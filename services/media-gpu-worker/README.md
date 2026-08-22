@@ -37,7 +37,9 @@ Production defaults:
 
 `scripts/northflank/provision-gpu-worker.ts` is the single canonical infrastructure controller. It selects/creates an L4-capable GPU project without moving the existing web services, provisions a persistent 150 GB model volume, configures the GPU worker, triggers an exact-SHA build, wires the restricted worker secret into Admin, waits for model readiness, and performs a real 5-second Wan 720p MP4 acceptance render.
 
-`.github/workflows/gpu-worker.yml` runs this contract from `main`. A deployment is not considered green merely because the container starts; the `GPU Media Acceptance` status passes only after the real generated MP4 is downloaded and validated.
+`.github/workflows/deploy-gpu-worker.yml` is the single production deployment authority and runs from scoped GPU changes on `main` or manual dispatch. It also enforces Northflank CI build rules and exactly one deployment instance. `.github/workflows/gpu-worker-ci.yml` is validation-only and never provisions paid GPU infrastructure.
+
+A deployment is not considered green merely because the container starts. The production workflow must verify the canonical `elevate-gpu-worker` service, enabled CI, scoped GPU build rules, exactly one deployment instance, and the real acceptance render performed by the provisioner.
 
 ## Failure behavior
 

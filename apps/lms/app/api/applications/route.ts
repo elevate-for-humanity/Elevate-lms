@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic';
  * The LMS route must never write application, funding, enrollment, document, or
  * account state independently. Keeping this proxy preserves older LMS callers
  * while enforcing one admissions authority and one lifecycle.
+ * Production acceptance trigger: 2026-08-22 closeout verification.
  */
 function canonicalApplicationUrl(): URL {
   const base =

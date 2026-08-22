@@ -1,9 +1,10 @@
 /**
  * process-intake Edge Function
  *
- * Reads received rows from application_intake and routes them into the
- * canonical workflow tables. Student/general applications MUST use
- * public.applications; student_applications is retired.
+ * Reads received rows from application_intake and routes them into canonical
+ * workflow authorities. Student/general application creation is delegated to
+ * the Marketing /api/applications boundary so deduplication, funding state,
+ * account provisioning, WorkOne continuity, and audit behavior cannot drift.
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -11,6 +12,9 @@ import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supa
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const CANONICAL_APPLICATION_URL =
+  Deno.env.get('CANONICAL_APPLICATION_URL') ||
+  'https://www.elevateforhumanity.org/api/applications';
 const BATCH_SIZE = 25;
 
 type Payload = Record<string, unknown>;
@@ -23,57 +27,34 @@ function stringValue(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function uuidOrNull(value: unknown): string | null {
-  const candidate = stringValue(value);
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidate)
-    ? candidate
-    : null;
-}
-
-function canonicalApplicationRecord(p: Payload): Record<string, unknown> {
+function canonicalApplicationPayload(p: Payload): Record<string, unknown> {
   const fullName = stringValue(p.full_name || p.name);
   const parts = fullName.split(/\s+/).filter(Boolean);
   const firstName = stringValue(p.first_name) || parts[0] || '';
   const lastName = stringValue(p.last_name) || parts.slice(1).join(' ');
-  const rawProgram = stringValue(p.program_slug || p.program_interest || p.program || p.program_id);
-  const programId = uuidOrNull(p.program_id);
-  const programSlug = stringValue(p.program_slug) || (!programId ? stringValue(p.program_id || p.program) : '');
+  const program = stringValue(p.program_slug || p.program_interest || p.program || p.program_id);
   const funding = stringValue(p.funding_type || p.funding_source || p.funding);
-
   return {
-    first_name: firstName,
-    last_name: lastName,
-    full_name: fullName || [firstName, lastName].filter(Boolean).join(' '),
+    firstName,
+    lastName,
     email: stringValue(p.email),
-    phone: stringValue(p.phone) || null,
-    program_id: programId,
-    program_slug: programSlug || null,
-    program_interest: rawProgram || 'General Inquiry',
-    funding_type: stringValue(p.funding_type) || funding || null,
-    funding_source: stringValue(p.funding_source) || funding || null,
-    notes: stringValue(p.notes) || null,
-    metadata: {
-      ...(typeof p.data === 'object' && p.data !== null ? (p.data as Record<string, unknown>) : {}),
-      intake_payload: p,
-    },
-    status: 'submitted',
-    state: 'submitted',
+    phone: stringValue(p.phone),
+    city: stringValue(p.city) || 'Not provided',
+    state: stringValue(p.state) || '',
+    zip: stringValue(p.zip || p.zip_code),
+    address: stringValue(p.address),
+    program: program || 'General Inquiry',
+    programSlug: stringValue(p.program_slug) || program || null,
+    fundingType: funding || null,
+    fundingSource: funding || null,
     source: 'application_intake',
-    submitted_at: new Date().toISOString(),
+    preferredContact: stringValue(p.preferred_contact) || 'phone',
+    dateOfBirth: stringValue(p.date_of_birth) || null,
+    goals: stringValue(p.goals || p.notes),
   };
 }
 
 const ROUTE_MAP: Record<string, RowMapper> = {
-  student: (p) => ({
-    table: 'applications',
-    record: canonicalApplicationRecord(p),
-  }),
-
-  application: (p) => ({
-    table: 'applications',
-    record: canonicalApplicationRecord(p),
-  }),
-
   employer: (p, t) => ({
     table: 'employer_applications',
     record: {
@@ -313,6 +294,9 @@ serve(async (req: Request) => {
 
 async function processRow(db: SupabaseClient, row: IntakeRow): Promise<ProcessResult> {
   if (row.application_type === 'career') return processCareer(db, row);
+  if (row.application_type === 'student' || row.application_type === 'application') {
+    return processCanonicalStudentApplication(db, row);
+  }
 
   const mapper = ROUTE_MAP[row.application_type];
   if (!mapper) {
@@ -333,23 +317,7 @@ async function processRow(db: SupabaseClient, row: IntakeRow): Promise<ProcessRe
       return { intake_id: row.id, ok: false, error: insertErr.message };
     }
 
-    await db
-      .from('application_intake')
-      .update({
-        status: 'processed',
-        processed_at: new Date().toISOString(),
-        destination_table: table,
-        destination_id: inserted.id,
-      })
-      .eq('id', row.id);
-
-    await db.from('application_state_events').insert({
-      application_type: row.application_type,
-      application_id: inserted.id,
-      to_state: 'submitted',
-    }).then(({ error }) => {
-      if (error) console.error('State event error:', error.message);
-    });
+    await markProcessed(db, row, table, inserted.id);
 
     return {
       intake_id: row.id,
@@ -362,6 +330,72 @@ async function processRow(db: SupabaseClient, row: IntakeRow): Promise<ProcessRe
     await markRejected(db, row.id, message);
     return { intake_id: row.id, ok: false, error: message };
   }
+}
+
+async function processCanonicalStudentApplication(
+  db: SupabaseClient,
+  row: IntakeRow,
+): Promise<ProcessResult> {
+  try {
+    const target = new URL(CANONICAL_APPLICATION_URL);
+    const response = await fetch(target, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Origin: target.origin,
+        'X-Idempotency-Key': `intake-${row.id}`,
+      },
+      body: JSON.stringify(canonicalApplicationPayload(row.payload)),
+    });
+    const result = (await response.json().catch(() => ({}))) as {
+      ok?: boolean;
+      id?: string;
+      error?: string;
+    };
+    if (!response.ok || !result.ok || !result.id) {
+      const message = result.error || `Canonical application endpoint failed with ${response.status}`;
+      await markRejected(db, row.id, message);
+      return { intake_id: row.id, ok: false, error: message };
+    }
+
+    await markProcessed(db, row, 'applications', result.id);
+    return {
+      intake_id: row.id,
+      ok: true,
+      destination_table: 'applications',
+      destination_id: result.id,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await markRejected(db, row.id, message);
+    return { intake_id: row.id, ok: false, error: message };
+  }
+}
+
+async function markProcessed(
+  db: SupabaseClient,
+  row: IntakeRow,
+  table: string,
+  destinationId: string,
+): Promise<void> {
+  await db
+    .from('application_intake')
+    .update({
+      status: 'processed',
+      processed_at: new Date().toISOString(),
+      destination_table: table,
+      destination_id: destinationId,
+    })
+    .eq('id', row.id);
+
+  await db.from('application_state_events').insert({
+    application_type: row.application_type,
+    application_id: destinationId,
+    to_state: 'submitted',
+  }).then(({ error }) => {
+    if (error) console.error('State event error:', error.message);
+  });
 }
 
 async function processCareer(db: SupabaseClient, row: IntakeRow): Promise<ProcessResult> {

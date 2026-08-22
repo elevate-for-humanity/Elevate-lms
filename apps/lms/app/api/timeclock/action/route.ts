@@ -12,6 +12,8 @@ import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-ent
 
 const MAX_ACCURACY_M = 50;
 const LUNCH_DURATION_MINUTES = 60;
+const MAX_OFFLINE_EVENT_AGE_MS = 72 * 60 * 60 * 1000;
+const MAX_CLIENT_CLOCK_SKEW_MS = 5 * 60 * 1000;
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
 type TimeclockAction = 'clock_in' | 'lunch_start' | 'lunch_end' | 'clock_out';
@@ -25,6 +27,9 @@ type ActionPayload = {
   lat: number;
   lng: number;
   accuracy_m?: number;
+  offline_replay?: boolean;
+  client_shift_id?: string;
+  client_recorded_at?: string;
 };
 
 function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number) {
@@ -80,6 +85,9 @@ async function emitGeofenceEvidence(params: {
   distanceM: number;
   radiusM: number;
   accepted: boolean;
+  offlineReplay?: boolean;
+  clientRecordedAt?: string | null;
+  clientShiftId?: string | null;
 }) {
   const eventType = params.accepted
     ? 'timeclock.geofence_verified'
@@ -103,6 +111,9 @@ async function emitGeofenceEvidence(params: {
       distance_m: params.distanceM,
       radius_m: params.radiusM,
       accepted: params.accepted,
+      offline_replay: Boolean(params.offlineReplay),
+      client_recorded_at: params.clientRecordedAt ?? null,
+      client_shift_id: params.clientShiftId ?? null,
       evaluated_at: new Date().toISOString(),
     },
     message: params.accepted
@@ -146,6 +157,22 @@ function validateCoordinates(lat: number, lng: number, accuracyM?: number) {
   return null;
 }
 
+function resolveActionTimestamp(body: ActionPayload, serverNowMs: number) {
+  if (!body.offline_replay) return { value: new Date(serverNowMs).toISOString(), error: null as string | null };
+  if (!body.client_shift_id || !body.client_recorded_at) {
+    return { value: '', error: 'Offline replay requires client_shift_id and client_recorded_at' };
+  }
+  const clientMs = Date.parse(body.client_recorded_at);
+  if (!Number.isFinite(clientMs)) return { value: '', error: 'Invalid client_recorded_at' };
+  if (clientMs > serverNowMs + MAX_CLIENT_CLOCK_SKEW_MS) {
+    return { value: '', error: 'Offline event timestamp is too far in the future' };
+  }
+  if (serverNowMs - clientMs > MAX_OFFLINE_EVENT_AGE_MS) {
+    return { value: '', error: 'Offline event is too old to replay automatically' };
+  }
+  return { value: new Date(clientMs).toISOString(), error: null as string | null };
+}
+
 async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -161,6 +188,9 @@ async function _POST(request: NextRequest) {
       lat,
       lng,
       accuracy_m,
+      offline_replay = false,
+      client_shift_id,
+      client_recorded_at,
     } = body;
 
     if (!['clock_in', 'lunch_start', 'lunch_end', 'clock_out'].includes(action) || !site_id) {
@@ -171,6 +201,13 @@ async function _POST(request: NextRequest) {
     if (coordinateError) {
       return NextResponse.json({ error: coordinateError }, { status: 400 });
     }
+
+    const serverNowMs = Date.now();
+    const actionTimestamp = resolveActionTimestamp(body, serverNowMs);
+    if (actionTimestamp.error) {
+      return NextResponse.json({ error: actionTimestamp.error }, { status: 400 });
+    }
+    const actionAt = actionTimestamp.value;
 
     const authClient = await createClient();
     const { data: { user }, error: authError } = await authClient.auth.getUser();
@@ -240,7 +277,10 @@ async function _POST(request: NextRequest) {
         lat,
         lng,
         accuracy_m: accuracy_m ?? null,
-        timestamp: new Date().toISOString(),
+        offline_replay,
+        client_recorded_at: client_recorded_at ?? null,
+        client_shift_id: client_shift_id ?? null,
+        timestamp: actionAt,
       };
       await writeComplianceAlert(db, 'geofence_violation', details);
       await emitGeofenceEvidence({
@@ -256,6 +296,9 @@ async function _POST(request: NextRequest) {
         distanceM,
         radiusM,
         accepted: false,
+        offlineReplay: offline_replay,
+        clientRecordedAt: client_recorded_at ?? null,
+        clientShiftId: client_shift_id ?? null,
       });
       sendEmail({
         to: ADMIN_EMAIL,
@@ -266,9 +309,8 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Outside geofence', distance_m: distanceM, radius_m: radiusM }, { status: 403 });
     }
 
-    const serverNow = new Date().toISOString();
-    const serverDate = serverNow.slice(0, 10);
-    const weekEndingDate = new Date(`${serverDate}T12:00:00Z`);
+    const actionDate = actionAt.slice(0, 10);
+    const weekEndingDate = new Date(`${actionDate}T12:00:00Z`);
     const daysToSaturday = (6 - weekEndingDate.getUTCDay() + 7) % 7;
     weekEndingDate.setUTCDate(weekEndingDate.getUTCDate() + daysToSaturday);
     const weekEnding = weekEndingDate.toISOString().slice(0, 10);
@@ -284,6 +326,16 @@ async function _POST(request: NextRequest) {
         .limit(1)
         .maybeSingle();
       if (openShift) {
+        if (offline_replay && openShift.site_id === site_id) {
+          return NextResponse.json({
+            success: true,
+            action,
+            progress_entry_id: openShift.id,
+            clock_in_at: openShift.clock_in_at,
+            geofence_verified: true,
+            replayed: true,
+          });
+        }
         return NextResponse.json(
           { error: 'An open shift already exists', progress_entry_id: openShift.id },
           { status: 409 },
@@ -297,15 +349,15 @@ async function _POST(request: NextRequest) {
           partner_id: apprentice.employer_id,
           program_id: resolvedProgramId,
           site_id,
-          work_date: serverDate,
+          work_date: actionDate,
           week_ending: weekEnding,
-          clock_in_at: serverNow,
+          clock_in_at: actionAt,
           clock_in_lat: lat,
           clock_in_lng: lng,
           clock_in_accuracy_m: normalizedAccuracy,
           last_known_lat: lat,
           last_known_lng: lng,
-          last_location_at: serverNow,
+          last_location_at: actionAt,
           status: 'submitted',
           auto_clocked_out: false,
         })
@@ -330,17 +382,21 @@ async function _POST(request: NextRequest) {
         distanceM,
         radiusM,
         accepted: true,
+        offlineReplay: offline_replay,
+        clientRecordedAt: client_recorded_at ?? null,
+        clientShiftId: client_shift_id ?? null,
       });
-      await notifyClockIn(db, { entryId: newEntry.id, userId: user.id, siteName: site.name ?? null, clockInAt: serverNow });
+      await notifyClockIn(db, { entryId: newEntry.id, userId: user.id, siteName: site.name ?? null, clockInAt: actionAt });
 
       return NextResponse.json({
         success: true,
         action,
         progress_entry_id: newEntry.id,
-        clock_in_at: serverNow,
+        clock_in_at: actionAt,
         geofence_verified: true,
         distance_m: distanceM,
         radius_m: radiusM,
+        offline_replay,
       });
     }
 
@@ -358,20 +414,62 @@ async function _POST(request: NextRequest) {
     if (entry.site_id !== site_id) {
       return NextResponse.json({ error: 'Selected site does not match the active shift' }, { status: 403 });
     }
-    if (entry.clock_out_at) return NextResponse.json({ error: 'Shift already closed' }, { status: 400 });
+    if (entry.clock_out_at) {
+      if (offline_replay && action === 'clock_out') {
+        return NextResponse.json({
+          success: true,
+          action: 'clock_out',
+          progress_entry_id: entry.id,
+          clock_out_at: entry.clock_out_at,
+          replayed: true,
+        });
+      }
+      return NextResponse.json({ error: 'Shift already closed' }, { status: 400 });
+    }
+
+    const clockInMs = Date.parse(entry.clock_in_at);
+    const actionMs = Date.parse(actionAt);
+    if (Number.isFinite(clockInMs) && actionMs < clockInMs) {
+      return NextResponse.json({ error: 'Offline event precedes clock-in time' }, { status: 400 });
+    }
 
     if (action === 'lunch_start') {
-      if (entry.lunch_start_at) return NextResponse.json({ error: 'Lunch already started' }, { status: 400 });
-      const { error } = await db.from('progress_entries').update({ lunch_start_at: serverNow }).eq('id', entry.id);
+      if (entry.lunch_start_at) {
+        if (offline_replay) {
+          return NextResponse.json({
+            success: true,
+            action,
+            progress_entry_id: entry.id,
+            lunch_start_at: entry.lunch_start_at,
+            replayed: true,
+          });
+        }
+        return NextResponse.json({ error: 'Lunch already started' }, { status: 400 });
+      }
+      const { error } = await db.from('progress_entries').update({ lunch_start_at: actionAt }).eq('id', entry.id);
       if (error) return NextResponse.json({ error: 'Failed to start lunch' }, { status: 500 });
-      return NextResponse.json({ success: true, action, progress_entry_id: entry.id, lunch_start_at: serverNow });
+      return NextResponse.json({ success: true, action, progress_entry_id: entry.id, lunch_start_at: actionAt, offline_replay });
     }
 
     if (action === 'lunch_end') {
       if (!entry.lunch_start_at) return NextResponse.json({ error: 'Lunch not started' }, { status: 400 });
-      if (entry.lunch_end_at) return NextResponse.json({ error: 'Lunch already ended' }, { status: 400 });
-      const lunchMinutes = (new Date(serverNow).getTime() - new Date(entry.lunch_start_at).getTime()) / 60000;
-      const { error } = await db.from('progress_entries').update({ lunch_end_at: serverNow }).eq('id', entry.id);
+      if (entry.lunch_end_at) {
+        if (offline_replay) {
+          return NextResponse.json({
+            success: true,
+            action,
+            progress_entry_id: entry.id,
+            lunch_end_at: entry.lunch_end_at,
+            replayed: true,
+          });
+        }
+        return NextResponse.json({ error: 'Lunch already ended' }, { status: 400 });
+      }
+      if (actionMs < Date.parse(entry.lunch_start_at)) {
+        return NextResponse.json({ error: 'Lunch end precedes lunch start' }, { status: 400 });
+      }
+      const lunchMinutes = (actionMs - new Date(entry.lunch_start_at).getTime()) / 60000;
+      const { error } = await db.from('progress_entries').update({ lunch_end_at: actionAt }).eq('id', entry.id);
       if (error) return NextResponse.json({ error: 'Failed to end lunch' }, { status: 500 });
       if (lunchMinutes > LUNCH_DURATION_MINUTES) {
         await writeComplianceAlert(db, 'excessive_lunch', {
@@ -380,40 +478,46 @@ async function _POST(request: NextRequest) {
           site_id,
           lunch_minutes: Math.round(lunchMinutes),
           standard_minutes: LUNCH_DURATION_MINUTES,
-          timestamp: serverNow,
+          offline_replay,
+          timestamp: actionAt,
         });
       }
       return NextResponse.json({
         success: true,
         action,
         progress_entry_id: entry.id,
-        lunch_end_at: serverNow,
+        lunch_end_at: actionAt,
         lunch_duration_minutes: Math.round(lunchMinutes),
         exceeded_standard: lunchMinutes > LUNCH_DURATION_MINUTES,
+        offline_replay,
       });
     }
 
-    const shiftHours = (new Date(serverNow).getTime() - new Date(entry.clock_in_at).getTime()) / 3600000;
+    const shiftHours = (actionMs - new Date(entry.clock_in_at).getTime()) / 3600000;
+    if (shiftHours < 0) {
+      return NextResponse.json({ error: 'Clock-out precedes clock-in' }, { status: 400 });
+    }
     if (shiftHours >= 6 && !entry.lunch_start_at) {
       await writeComplianceAlert(db, 'missing_lunch', {
         apprentice_id: apprentice.id,
         progress_entry_id: entry.id,
         site_id,
         shift_hours: Math.round(shiftHours * 10) / 10,
-        timestamp: serverNow,
+        offline_replay,
+        timestamp: actionAt,
       });
     }
 
     const { error: clockOutError } = await db
       .from('progress_entries')
       .update({
-        clock_out_at: serverNow,
+        clock_out_at: actionAt,
         clock_out_lat: lat,
         clock_out_lng: lng,
         clock_out_accuracy_m: normalizedAccuracy,
         last_known_lat: lat,
         last_known_lng: lng,
-        last_location_at: serverNow,
+        last_location_at: actionAt,
       })
       .eq('id', entry.id);
     if (clockOutError) return NextResponse.json({ error: 'Failed to clock out' }, { status: 500 });
@@ -431,6 +535,9 @@ async function _POST(request: NextRequest) {
       distanceM,
       radiusM,
       accepted: true,
+      offlineReplay: offline_replay,
+      clientRecordedAt: client_recorded_at ?? null,
+      clientShiftId: client_shift_id ?? null,
     });
 
     const syncResult = await syncProgressEntryToHourEntries(db, entry.id);
@@ -453,11 +560,12 @@ async function _POST(request: NextRequest) {
       success: true,
       action: 'clock_out',
       progress_entry_id: entry.id,
-      clock_out_at: serverNow,
+      clock_out_at: actionAt,
       hours_worked: syncResult?.hoursWorked ?? 0,
       geofence_verified: true,
       distance_m: distanceM,
       radius_m: radiusM,
+      offline_replay,
     });
   } catch (error) {
     logger.error(

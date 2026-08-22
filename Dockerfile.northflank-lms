@@ -1,52 +1,26 @@
 # Dockerfile.northflank-lms
 # Builds and serves the LMS application (apps/lms/)
 # Serves app.elevateforhumanity.org
-#
-# Northflank Configuration:
-#   - Build type: Dockerfile
-#   - Dockerfile path: /Dockerfile.northflank-lms
-#   - Build context: /
-#   - Public port: 3000
-#
-# Production contract:
-#   - dependency graph must match pnpm-lock.yaml exactly
-#   - the packaged standalone runtime must actually boot and serve /api/ping
-#   - build identity comes from Northflank's injected NF_GIT_SHA
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP=unknown
 ARG BUILD_ID
 
 FROM node:22-bookworm AS builder
-
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID
-
-# Force a clean recovery build after the August 20 production 503 incident.
-RUN echo "nf-cache-invalidate-lms-2026-08-20-packaged-runtime-smoke"
-
+RUN echo "nf-cache-invalidate-lms-2026-08-22-pwa-offline-e2e-v2"
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    build-essential \
-    ca-certificates \
-    ffmpeg \
-    libcairo2-dev \
-    libpango1.0-dev \
-    libjpeg-dev \
-    libgif-dev \
-    librsvg2-dev \
-    gnupg \
+    python3 build-essential ca-certificates ffmpeg libcairo2-dev libpango1.0-0 \
+    libjpeg-dev libgif-dev librsvg2-dev gnupg \
     && rm -rf /var/lib/apt/lists/*
-
 RUN corepack disable || true \
     && npm install -g pnpm@10.28.2 \
     && test "$(pnpm --version)" = "10.28.2"
-
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV FFMPEG_BIN=/usr/bin/ffmpeg
 WORKDIR /app
-
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json apps/admin/package.json
 COPY apps/lms/package.json apps/lms/package.json
@@ -55,7 +29,6 @@ COPY packages/config/package.json packages/config/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
-
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS=--max-old-space-size=12288
@@ -63,17 +36,11 @@ ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=LMS
 ENV CI=true
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
-
 RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
-# Production containers must be reproducible. Never mutate dependency resolution
-# during an image build.
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
-
-# Reassert the pinned pnpm executable after repository lifecycle hooks.
 RUN corepack disable || true \
     && npm install -g pnpm@10.28.2 \
     && test "$(pnpm --version)" = "10.28.2"
-
 COPY . .
 
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
@@ -84,13 +51,11 @@ ARG SUPABASE_SERVICE_ROLE_KEY
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID
-
 RUN echo "Validating NF_GIT_SHA=${NF_GIT_SHA}" && \
     test -n "${NF_GIT_SHA}" && \
     echo "${NF_GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && \
     echo "${NF_GIT_SHA}" | grep -qv '^0*$' && \
     echo "Northflank SHA validated: ${NF_GIT_SHA}"
-
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
@@ -105,13 +70,22 @@ ENV NEXT_PUBLIC_BUILD_VERSION=$NF_GIT_SHA
 ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
 ENV BUILD_ID=$BUILD_ID
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
-
 RUN echo "LMS Build SHA: ${NF_GIT_SHA}" && \
     echo "LMS Build Timestamp: ${BUILD_TIMESTAMP}" && \
     echo "NEXT_PUBLIC_BUILD_ID: elevate-${NF_GIT_SHA}"
 
-RUN pnpm run build:lms:compile --no-lint
+RUN node scripts/check-pwa-architecture.mjs
+RUN node scripts/stamp-sw.mjs
+RUN node scripts/sync-pwa-public.mjs lms
+RUN test -f /app/public/sw-lms.js \
+    && test -f /app/apps/lms/public/sw-lms.js \
+    && test -f /app/apps/lms/public/manifest-lms.json \
+    && test -f /app/apps/lms/public/offline.html \
+    && ! grep -q '__CACHE_VERSION__' /app/public/sw-lms.js \
+    && ! grep -q '__CACHE_VERSION__' /app/apps/lms/public/sw-lms.js \
+    && cmp /app/public/sw-lms.js /app/apps/lms/public/sw-lms.js
 
+RUN pnpm run build:lms:compile --no-lint
 RUN echo "=== STANDALONE STRUCTURE ===" && \
     if [ -d "/app/apps/lms/.next/standalone" ]; then \
         find /app/apps/lms/.next/standalone -maxdepth 4 -type f | sort; \
@@ -124,24 +98,13 @@ RUN echo "=== STANDALONE STRUCTURE ===" && \
     fi
 
 FROM node:22-bookworm-slim AS runner
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    ffmpeg \
-    fonts-liberation \
-    libcairo2 \
-    libpango-1.0-0 \
-    libjpeg62-turbo \
-    libgif7 \
-    librsvg2-2 \
-    librsvg2-common \
+    ca-certificates curl ffmpeg fonts-liberation libcairo2 libpango-1.0-0 \
+    libjpeg62-turbo libgif7 librsvg2-2 librsvg2-common \
     && rm -rf /var/lib/apt/lists/*
-
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID
-
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
@@ -157,67 +120,43 @@ ENV NEXT_PUBLIC_BUILD_VERSION=$NF_GIT_SHA
 ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
 ENV BUILD_ID=$BUILD_ID
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
-
 WORKDIR /app
-
 COPY --from=builder /app/apps/lms/.next/standalone ./
-
 RUN echo "=== RUNTIME VERIFICATION ===" && \
-    if [ -f "/app/server.js" ]; then \
-        echo "Standalone server.js found at /app/server.js"; \
-    elif [ -f "/app/apps/lms/server.js" ]; then \
-        echo "Standalone server.js found at /app/apps/lms/server.js"; \
-    else \
-        echo "ERROR: no runnable standalone server.js found"; \
-        find /app -maxdepth 5 -name server.js -print; \
-        exit 1; \
-    fi
-
+    if [ -f "/app/server.js" ]; then echo "Standalone server.js found at /app/server.js"; \
+    elif [ -f "/app/apps/lms/server.js" ]; then echo "Standalone server.js found at /app/apps/lms/server.js"; \
+    else echo "ERROR: no runnable standalone server.js found"; find /app -maxdepth 5 -name server.js -print; exit 1; fi
 COPY --from=builder /app/apps/lms/.next/static ./apps/lms/.next/static
-COPY --from=builder /app/public ./apps/lms/public
+# apps/lms/public is generated from the root canonical PWA assets before build.
 COPY --from=builder /app/apps/lms/public ./apps/lms/public
-
-RUN test -d /app/apps/lms/public/images
+RUN test -d /app/apps/lms/public/images \
+    && test -f /app/apps/lms/public/sw-lms.js \
+    && test -f /app/apps/lms/public/manifest-lms.json \
+    && test -f /app/apps/lms/public/offline.html \
+    && ! grep -q '__CACHE_VERSION__' /app/apps/lms/public/sw-lms.js \
+    && grep -q 'sync-timeclock' /app/apps/lms/public/sw-lms.js \
+    && grep -q 'TIMECLOCK_SYNC_REJECTED' /app/apps/lms/public/sw-lms.js \
+    && grep -q 'Waiting for a secure connection' /app/apps/lms/public/offline.html
 RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
-
-# Do not publish an image that merely contains a server file. Boot the exact
-# packaged runtime and require the same health endpoint Northflank will probe.
 RUN set -eux; \
     LOG=/tmp/lms-runtime-smoke.log; \
-    if [ -f /app/apps/lms/server.js ]; then \
-      node --max-http-header-size=32768 /app/apps/lms/server.js >"${LOG}" 2>&1 & \
-    else \
-      node --max-http-header-size=32768 /app/server.js >"${LOG}" 2>&1 & \
-    fi; \
+    if [ -f /app/apps/lms/server.js ]; then node --max-http-header-size=32768 /app/apps/lms/server.js >"${LOG}" 2>&1 & \
+    else node --max-http-header-size=32768 /app/server.js >"${LOG}" 2>&1 & fi; \
     PID=$!; \
     trap 'cat "${LOG}" || true; kill "${PID}" 2>/dev/null || true' EXIT; \
     READY=0; \
     for attempt in $(seq 1 45); do \
-      if curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/tmp/lms-ping.json 2>/tmp/lms-ping.err; then \
-        READY=1; \
-        break; \
-      fi; \
-      if ! kill -0 "${PID}" 2>/dev/null; then \
-        echo 'LMS standalone process exited during packaged-runtime smoke test.'; \
-        cat "${LOG}"; \
-        exit 1; \
-      fi; \
+      if curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/tmp/lms-ping.json 2>/tmp/lms-ping.err; then READY=1; break; fi; \
+      if ! kill -0 "${PID}" 2>/dev/null; then echo 'LMS standalone process exited during packaged-runtime smoke test.'; cat "${LOG}"; exit 1; fi; \
       sleep 2; \
     done; \
-    if [ "${READY}" -ne 1 ]; then \
-      echo 'LMS packaged standalone runtime did not become healthy.'; \
-      cat /tmp/lms-ping.err || true; \
-      cat "${LOG}"; \
-      exit 1; \
-    fi; \
+    if [ "${READY}" -ne 1 ]; then echo 'LMS packaged standalone runtime did not become healthy.'; cat /tmp/lms-ping.err || true; cat "${LOG}"; exit 1; fi; \
     cat /tmp/lms-ping.json; \
-    kill "${PID}"; \
-    wait "${PID}" || true; \
-    trap - EXIT
-
+    curl --fail --silent --show-error http://127.0.0.1:3000/sw-lms.js | grep -q 'sync-timeclock'; \
+    curl --fail --silent --show-error http://127.0.0.1:3000/manifest-lms.json | grep -q '"standalone"'; \
+    curl --fail --silent --show-error http://127.0.0.1:3000/offline.html | grep -q 'Waiting for a secure connection'; \
+    kill "${PID}"; wait "${PID}" || true; trap - EXIT
 EXPOSE 3000
-
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
   CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/ping" || exit 1
-
 CMD ["sh", "-c", "if [ -f /app/apps/lms/server.js ]; then exec node --max-http-header-size=32768 /app/apps/lms/server.js; else exec node --max-http-header-size=32768 /app/server.js; fi"]

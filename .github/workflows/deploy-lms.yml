@@ -17,6 +17,9 @@ on:
       - 'lib/ai/**'
       - 'lib/embeddings/**'
       - 'lib/lms/**'
+      - 'lib/timeclock/**'
+      - 'lib/offline/**'
+      - 'lib/pwa/**'
       - 'lib/course-factory/**'
       - 'lib/course-builder/**'
       - 'lib/curriculum/**'
@@ -25,11 +28,13 @@ on:
       - 'lib/programs/**'
       - 'lib/store/**'
       - 'lib/studio/**'
+      - 'hooks/useOfflineCourse.tsx'
       - 'components/platform/**'
       - 'components/lms/**'
       - 'components/portal/**'
       - 'components/auth/**'
       - 'components/pwa/**'
+      - 'components/timeclock/**'
       - 'components/SocialLearningCommunity.tsx'
       - 'components/careers/**'
       - 'packages/shared-utils/**'
@@ -37,8 +42,16 @@ on:
       - 'Dockerfile.northflank-lms'
       - 'scripts/northflank/**'
       - 'scripts/check-pwa-architecture.mjs'
+      - 'scripts/stamp-sw.mjs'
+      - 'scripts/sync-pwa-public.mjs'
       - 'public/sw-lms.js'
+      - 'public/offline.html'
       - 'public/manifest-lms.json'
+      - 'public/manifest-student.json'
+      - 'public/manifest-apprentice.json'
+      - 'public/manifest-employer.json'
+      - 'public/manifest-program-holder.json'
+      - 'public/manifest-shop-owner.json'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
@@ -52,10 +65,6 @@ on:
 permissions:
   contents: read
 
-# Production releases are serialized. Never cancel an in-flight Northflank build
-# because a newer commit landed on main; doing so can strand the public LMS on
-# an old or unhealthy deployment. Each queued run still verifies and deploys
-# its exact triggering SHA before the next run starts.
 concurrency:
   group: northflank-lms-deploy
   cancel-in-progress: false
@@ -137,6 +146,9 @@ jobs:
       - name: Install dependencies deterministically
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
+      - name: Verify PWA and offline architecture
+        run: node scripts/check-pwa-architecture.mjs
+
       - name: Enforce canonical Northflank LMS runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_LMS_SERVICE_ID" --execute
 
@@ -189,15 +201,17 @@ jobs:
               && echo "$ping_body" | grep -q '"ok":true' \
               && echo "$health_body" | grep -q '"ready":true'; then
               echo "LMS liveness and readiness passed."
-              exit 0
+              break
+            fi
+            if [ "$i" = "20" ]; then
+              echo "::error::LMS health contract failed after deploy."
+              cat /tmp/lms-ping.json 2>/dev/null || true
+              cat /tmp/lms-health.json 2>/dev/null || true
+              exit 1
             fi
             echo "LMS not ready: ping=${ping_status} health=${health_status}. Retry ${i}/20."
             sleep 15
           done
-          echo "::error::LMS health contract failed after deploy."
-          cat /tmp/lms-ping.json 2>/dev/null || true
-          cat /tmp/lms-health.json 2>/dev/null || true
-          exit 1
 
       - name: Smoke canonical learner route
         run: |
@@ -207,3 +221,18 @@ jobs:
             2*|3*) echo "Canonical learner route served HTTP ${status}." ;;
             *) echo "::error::Canonical learner route failed HTTP ${status}."; cat /tmp/lms-dashboard.html || true; exit 1 ;;
           esac
+
+      - name: Smoke deployed PWA assets and cache stamp
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          for asset in sw-lms.js manifest-lms.json offline.html; do
+            status=$(curl -sS --max-time 15 -o "/tmp/${asset}" -w "%{http_code}" "https://app.elevateforhumanity.org/${asset}?verify=${EXPECTED_SHA}" || true)
+            test "$status" = "200" || { echo "::error::/${asset} returned HTTP ${status}"; exit 1; }
+          done
+          grep -q 'sync-timeclock' /tmp/sw-lms.js || { echo '::error::deployed LMS worker lacks offline timeclock sync'; exit 1; }
+          grep -q 'TIMECLOCK_SYNC_REJECTED' /tmp/sw-lms.js || { echo '::error::deployed LMS worker lacks rejection handling'; exit 1; }
+          ! grep -q '__CACHE_VERSION__' /tmp/sw-lms.js || { echo '::error::deployed LMS worker contains unstamped cache placeholder'; exit 1; }
+          grep -q '"display"[[:space:]]*:[[:space:]]*"standalone"' /tmp/manifest-lms.json || { echo '::error::LMS manifest is not installable'; exit 1; }
+          grep -q 'Waiting for a secure connection' /tmp/offline.html || { echo '::error::dashboard-safe offline shell not deployed'; exit 1; }

@@ -2,9 +2,16 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { logger } from '@/lib/logger';
+import {
+  createClientShiftId,
+  getPendingTimeclockActions,
+  queueTimeclockAction,
+  requestTimeclockSync,
+  type QueuedTimeclockAction,
+} from '@/lib/timeclock/offline-queue';
 
 const MAX_ACCURACY_M = 50;
-const HEARTBEAT_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
+const HEARTBEAT_INTERVAL_MS = 2 * 60 * 1000;
 
 interface GPSPosition {
   lat: number;
@@ -12,8 +19,16 @@ interface GPSPosition {
   accuracy_m: number;
 }
 
+export interface InitialTimeclockShift {
+  entryId: string;
+  clockInAt: string;
+  lunchStartAt?: string | null;
+  lunchEndAt?: string | null;
+}
+
 interface TimeclockState {
   progressEntryId: string | null;
+  clientShiftId: string | null;
   clockInAt: string | null;
   clockOutAt: string | null;
   lunchStartAt: string | null;
@@ -22,6 +37,8 @@ interface TimeclockState {
   autoClockOut: boolean;
   autoClockOutReason: string | null;
   hoursWorked: number | null;
+  pendingSync: boolean;
+  syncError: string | null;
 }
 
 interface HeartbeatResponse {
@@ -30,7 +47,6 @@ interface HeartbeatResponse {
   auto_clocked_out: boolean;
   clock_out_at: string | null;
   auto_clock_out_reason: string | null;
-  closed?: boolean;
 }
 
 interface ActionResponse {
@@ -42,50 +58,57 @@ interface ActionResponse {
   lunch_start_at?: string;
   lunch_end_at?: string;
   hours_worked?: number;
+  queued?: boolean;
   error?: string;
 }
 
 interface UseTimeclockOptions {
   apprenticeId: string;
-  partnerId: string;
+  partnerId: string | null;
   programId: string;
   siteId: string;
+  initialShift?: InitialTimeclockShift | null;
   onError?: (error: string) => void;
   onAutoClockOut?: (reason: string) => void;
 }
 
-export function useTimeclock(options: UseTimeclockOptions) {
-  const { apprenticeId, partnerId, programId, siteId, onError, onAutoClockOut } = options;
+function isOfflineProgressId(value: string | null | undefined) {
+  return Boolean(value?.startsWith('offline:'));
+}
 
-  const [state, setState] = useState<TimeclockState>({
-    progressEntryId: null,
-    clockInAt: null,
+export function useTimeclock(options: UseTimeclockOptions) {
+  const { apprenticeId, partnerId, programId, siteId, initialShift, onError, onAutoClockOut } = options;
+  const initialClientShiftIdRef = useRef<string | null>(initialShift ? createClientShiftId() : null);
+
+  const [state, setState] = useState<TimeclockState>(() => ({
+    progressEntryId: initialShift?.entryId ?? null,
+    clientShiftId: initialClientShiftIdRef.current,
+    clockInAt: initialShift?.clockInAt ?? null,
     clockOutAt: null,
-    lunchStartAt: null,
-    lunchEndAt: null,
+    lunchStartAt: initialShift?.lunchStartAt ?? null,
+    lunchEndAt: initialShift?.lunchEndAt ?? null,
     withinGeofence: false,
     autoClockOut: false,
     autoClockOutReason: null,
     hoursWorked: null,
-  });
+    pendingSync: false,
+    syncError: null,
+  }));
 
   const [gpsPosition, setGpsPosition] = useState<GPSPosition | null>(null);
   const [gpsError, setGpsError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const watchIdRef = useRef<number | null>(null);
+  const gpsPositionRef = useRef<GPSPosition | null>(null);
 
-  /**
-   * Request high-accuracy GPS position
-   */
   const requestGPS = useCallback((): Promise<GPSPosition> => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error('Geolocation not supported'));
         return;
       }
-
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const pos: GPSPosition = {
@@ -93,45 +116,31 @@ export function useTimeclock(options: UseTimeclockOptions) {
             lng: position.coords.longitude,
             accuracy_m: position.coords.accuracy,
           };
-
           if (pos.accuracy_m > MAX_ACCURACY_M) {
-            reject(
-              new Error(
-                `GPS accuracy too low: ${Math.round(pos.accuracy_m)}m (max ${MAX_ACCURACY_M}m)`,
-              ),
-            );
+            reject(new Error(`GPS accuracy too low: ${Math.round(pos.accuracy_m)}m (max ${MAX_ACCURACY_M}m)`));
             return;
           }
-
+          gpsPositionRef.current = pos;
           setGpsPosition(pos);
           setGpsError(null);
           resolve(pos);
         },
         (error) => {
-          const errorMsg =
-            error.code === 1
-              ? 'Location permission denied'
-              : error.code === 2
-                ? 'Location unavailable'
-                : 'Location request timed out';
-          setGpsError(errorMsg);
-          reject(new Error(errorMsg));
+          const message = error.code === 1
+            ? 'Location permission denied'
+            : error.code === 2
+              ? 'Location unavailable'
+              : 'Location request timed out';
+          setGpsError(message);
+          reject(new Error(message));
         },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0,
-        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
       );
     });
   }, []);
 
-  /**
-   * Start continuous GPS watching
-   */
   const startGPSWatch = useCallback(() => {
     if (!navigator.geolocation || watchIdRef.current !== null) return;
-
     watchIdRef.current = navigator.geolocation.watchPosition(
       (position) => {
         const pos: GPSPosition = {
@@ -140,24 +149,16 @@ export function useTimeclock(options: UseTimeclockOptions) {
           accuracy_m: position.coords.accuracy,
         };
         if (pos.accuracy_m <= MAX_ACCURACY_M) {
+          gpsPositionRef.current = pos;
           setGpsPosition(pos);
           setGpsError(null);
         }
       },
-      (error) => {
-        logger.warn('[Timeclock] GPS watch error', { message: error.message });
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 30000,
-        maximumAge: 5000,
-      },
+      (error) => logger.warn('[Timeclock] GPS watch error', { message: error.message }),
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 5000 },
     );
   }, []);
 
-  /**
-   * Stop GPS watching
-   */
   const stopGPSWatch = useCallback(() => {
     if (watchIdRef.current !== null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
@@ -165,26 +166,22 @@ export function useTimeclock(options: UseTimeclockOptions) {
     }
   }, []);
 
-  /**
-   * Send heartbeat to server
-   */
-  const sendHeartbeat = useCallback(async () => {
-    if (!state.progressEntryId || !gpsPosition) return;
-
+  const sendHeartbeat = useCallback(async (progressEntryId: string) => {
+    const position = gpsPositionRef.current;
+    if (!progressEntryId || !position || isOfflineProgressId(progressEntryId) || !navigator.onLine) return;
     try {
       const response = await fetch('/api/timeclock/heartbeat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          progress_entry_id: state.progressEntryId,
-          lat: gpsPosition.lat,
-          lng: gpsPosition.lng,
-          accuracy_m: gpsPosition.accuracy_m,
+          progress_entry_id: progressEntryId,
+          lat: position.lat,
+          lng: position.lng,
+          accuracy_m: position.accuracy_m,
         }),
       });
-
+      if (!response.ok) return;
       const data: HeartbeatResponse = await response.json();
-
       setState((prev) => ({
         ...prev,
         withinGeofence: data.within_geofence,
@@ -192,36 +189,24 @@ export function useTimeclock(options: UseTimeclockOptions) {
         autoClockOutReason: data.auto_clock_out_reason,
         clockOutAt: data.clock_out_at,
       }));
-
-      if (data.auto_clocked_out && onAutoClockOut) {
-        onAutoClockOut(data.auto_clock_out_reason || 'Auto clock-out triggered');
-        stopHeartbeat();
+      if (data.auto_clocked_out) {
+        onAutoClockOut?.(data.auto_clock_out_reason || 'Auto clock-out triggered');
+        if (heartbeatIntervalRef.current) {
+          clearInterval(heartbeatIntervalRef.current);
+          heartbeatIntervalRef.current = null;
+        }
       }
     } catch (error) {
-      logger.error(
-        '[Timeclock] Heartbeat error',
-        error instanceof Error ? error : new Error(String(error)),
-      );
+      logger.error('[Timeclock] Heartbeat error', error instanceof Error ? error : new Error(String(error)));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.progressEntryId, gpsPosition, onAutoClockOut]);
+  }, [onAutoClockOut]);
 
-  /**
-   * Start heartbeat interval
-   */
-  const startHeartbeat = useCallback(() => {
-    if (heartbeatIntervalRef.current) return;
-
-    // Send initial heartbeat
-    sendHeartbeat();
-
-    // Set up interval
-    heartbeatIntervalRef.current = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);
+  const startHeartbeat = useCallback((progressEntryId: string) => {
+    if (!progressEntryId || isOfflineProgressId(progressEntryId) || heartbeatIntervalRef.current) return;
+    void sendHeartbeat(progressEntryId);
+    heartbeatIntervalRef.current = setInterval(() => void sendHeartbeat(progressEntryId), HEARTBEAT_INTERVAL_MS);
   }, [sendHeartbeat]);
 
-  /**
-   * Stop heartbeat interval
-   */
   const stopHeartbeat = useCallback(() => {
     if (heartbeatIntervalRef.current) {
       clearInterval(heartbeatIntervalRef.current);
@@ -229,237 +214,169 @@ export function useTimeclock(options: UseTimeclockOptions) {
     }
   }, []);
 
-  /**
-   * Clock in action
-   */
+  const postOrQueue = useCallback(async (
+    action: QueuedTimeclockAction,
+    pos: GPSPosition,
+    clientShiftId: string,
+    progressEntryId?: string | null,
+  ): Promise<ActionResponse> => {
+    const clientRecordedAt = new Date().toISOString();
+    const payload = {
+      action,
+      apprentice_id: apprenticeId,
+      partner_id: partnerId || undefined,
+      program_id: programId,
+      site_id: siteId,
+      progress_entry_id: progressEntryId || undefined,
+      lat: pos.lat,
+      lng: pos.lng,
+      accuracy_m: pos.accuracy_m,
+    };
+
+    const queue = async () => {
+      await queueTimeclockAction({
+        ...payload,
+        offline_replay: true,
+        client_shift_id: clientShiftId,
+        client_recorded_at: clientRecordedAt,
+      });
+      setState((prev) => ({ ...prev, pendingSync: true, syncError: null }));
+      return {
+        success: true,
+        action,
+        progress_entry_id: progressEntryId || `offline:${clientShiftId}`,
+        queued: true,
+        ...(action === 'clock_in' ? { clock_in_at: clientRecordedAt } : {}),
+        ...(action === 'lunch_start' ? { lunch_start_at: clientRecordedAt } : {}),
+        ...(action === 'lunch_end' ? { lunch_end_at: clientRecordedAt } : {}),
+        ...(action === 'clock_out' ? { clock_out_at: clientRecordedAt } : {}),
+      } satisfies ActionResponse;
+    };
+
+    if (!navigator.onLine || isOfflineProgressId(progressEntryId)) return queue();
+
+    try {
+      const response = await fetch('/api/timeclock/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data: ActionResponse = await response.json();
+      if (response.ok) return data;
+      if (response.status >= 500) return queue();
+      throw new Error(data.error || `${action.replaceAll('_', ' ')} failed`);
+    } catch (error) {
+      if (error instanceof TypeError || !navigator.onLine) return queue();
+      throw error;
+    }
+  }, [apprenticeId, partnerId, programId, siteId]);
+
   const clockIn = useCallback(async () => {
     setLoading(true);
     try {
       const pos = await requestGPS();
-
-      const response = await fetch('/api/timeclock/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'clock_in',
-          apprentice_id: apprenticeId,
-          partner_id: partnerId,
-          program_id: programId,
-          site_id: siteId,
-          lat: pos.lat,
-          lng: pos.lng,
-          accuracy_m: pos.accuracy_m,
-        }),
-      });
-
-      const data: ActionResponse = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Clock in failed');
-      }
-
+      const clientShiftId = createClientShiftId();
+      const data = await postOrQueue('clock_in', pos, clientShiftId);
+      const progressEntryId = data.progress_entry_id || null;
       setState((prev) => ({
         ...prev,
-        progressEntryId: data.progress_entry_id || null,
+        progressEntryId,
+        clientShiftId,
         clockInAt: data.clock_in_at || null,
         clockOutAt: null,
         lunchStartAt: null,
         lunchEndAt: null,
         autoClockOut: false,
         autoClockOutReason: null,
-        withinGeofence: true,
+        withinGeofence: !data.queued,
+        pendingSync: prev.pendingSync || Boolean(data.queued),
+        syncError: null,
       }));
-
       startGPSWatch();
-      startHeartbeat();
-
+      if (!data.queued && progressEntryId) startHeartbeat(progressEntryId);
       return data;
-    } catch (error: any) {
-      onError?.('Operation failed');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Clock in failed';
+      onError?.(message);
       throw error;
     } finally {
       setLoading(false);
     }
-  }, [
-    apprenticeId,
-    partnerId,
-    programId,
-    siteId,
-    requestGPS,
-    startGPSWatch,
-    startHeartbeat,
-    onError,
-  ]);
+  }, [requestGPS, postOrQueue, startGPSWatch, startHeartbeat, onError]);
 
-  /**
-   * Lunch start action
-   */
   const lunchStart = useCallback(async () => {
-    if (!state.progressEntryId) {
+    if (!state.progressEntryId || !state.clientShiftId) {
       onError?.('No active shift');
       return undefined;
     }
-
     setLoading(true);
     try {
       const pos = await requestGPS();
-
-      const response = await fetch('/api/timeclock/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'lunch_start',
-          apprentice_id: apprenticeId,
-          partner_id: partnerId,
-          program_id: programId,
-          site_id: siteId,
-          progress_entry_id: state.progressEntryId,
-          lat: pos.lat,
-          lng: pos.lng,
-          accuracy_m: pos.accuracy_m,
-        }),
-      });
-
-      const data: ActionResponse = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Lunch start failed');
-      }
-
-      setState((prev) => ({
-        ...prev,
-        lunchStartAt: data.lunch_start_at || null,
-      }));
-
+      const data = await postOrQueue('lunch_start', pos, state.clientShiftId, state.progressEntryId);
+      setState((prev) => ({ ...prev, lunchStartAt: data.lunch_start_at || prev.lunchStartAt, pendingSync: prev.pendingSync || Boolean(data.queued) }));
       return data;
-    } catch (error: any) {
-      onError?.('Operation failed');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Lunch start failed';
+      onError?.(message);
       throw error;
     } finally {
       setLoading(false);
     }
-  }, [state.progressEntryId, apprenticeId, partnerId, programId, siteId, requestGPS, onError]);
+  }, [state.progressEntryId, state.clientShiftId, requestGPS, postOrQueue, onError]);
 
-  /**
-   * Lunch end action
-   */
   const lunchEnd = useCallback(async () => {
-    if (!state.progressEntryId) {
+    if (!state.progressEntryId || !state.clientShiftId) {
       onError?.('No active shift');
       return undefined;
     }
-
     setLoading(true);
     try {
       const pos = await requestGPS();
-
-      const response = await fetch('/api/timeclock/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'lunch_end',
-          apprentice_id: apprenticeId,
-          partner_id: partnerId,
-          program_id: programId,
-          site_id: siteId,
-          progress_entry_id: state.progressEntryId,
-          lat: pos.lat,
-          lng: pos.lng,
-          accuracy_m: pos.accuracy_m,
-        }),
-      });
-
-      const data: ActionResponse = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Lunch end failed');
-      }
-
-      setState((prev) => ({
-        ...prev,
-        lunchEndAt: data.lunch_end_at || null,
-      }));
-
+      const data = await postOrQueue('lunch_end', pos, state.clientShiftId, state.progressEntryId);
+      setState((prev) => ({ ...prev, lunchEndAt: data.lunch_end_at || prev.lunchEndAt, pendingSync: prev.pendingSync || Boolean(data.queued) }));
       return data;
-    } catch (error: any) {
-      onError?.('Operation failed');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Lunch end failed';
+      onError?.(message);
       throw error;
     } finally {
       setLoading(false);
     }
-  }, [state.progressEntryId, apprenticeId, partnerId, programId, siteId, requestGPS, onError]);
+  }, [state.progressEntryId, state.clientShiftId, requestGPS, postOrQueue, onError]);
 
-  /**
-   * Clock out action
-   */
   const clockOut = useCallback(async () => {
-    if (!state.progressEntryId) {
+    if (!state.progressEntryId || !state.clientShiftId) {
       onError?.('No active shift');
       return undefined;
     }
-
     setLoading(true);
     try {
       const pos = await requestGPS();
-
-      const response = await fetch('/api/timeclock/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'clock_out',
-          apprentice_id: apprenticeId,
-          partner_id: partnerId,
-          program_id: programId,
-          site_id: siteId,
-          progress_entry_id: state.progressEntryId,
-          lat: pos.lat,
-          lng: pos.lng,
-          accuracy_m: pos.accuracy_m,
-        }),
-      });
-
-      const data: ActionResponse = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Clock out failed');
-      }
-
+      const data = await postOrQueue('clock_out', pos, state.clientShiftId, state.progressEntryId);
       setState((prev) => ({
         ...prev,
-        clockOutAt: data.clock_out_at || null,
-        hoursWorked: data.hours_worked || null,
+        clockOutAt: data.clock_out_at || prev.clockOutAt,
+        hoursWorked: data.hours_worked ?? prev.hoursWorked,
+        pendingSync: prev.pendingSync || Boolean(data.queued),
       }));
-
       stopHeartbeat();
       stopGPSWatch();
-
       return data;
-    } catch (error: any) {
-      onError?.('Operation failed');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Clock out failed';
+      onError?.(message);
       throw error;
     } finally {
       setLoading(false);
     }
-  }, [
-    state.progressEntryId,
-    apprenticeId,
-    partnerId,
-    programId,
-    siteId,
-    requestGPS,
-    stopHeartbeat,
-    stopGPSWatch,
-    onError,
-  ]);
+  }, [state.progressEntryId, state.clientShiftId, requestGPS, postOrQueue, stopHeartbeat, stopGPSWatch, onError]);
 
-  /**
-   * Reset state for new shift
-   */
   const reset = useCallback(() => {
     stopHeartbeat();
     stopGPSWatch();
     setState({
       progressEntryId: null,
+      clientShiftId: null,
       clockInAt: null,
       clockOutAt: null,
       lunchStartAt: null,
@@ -468,18 +385,64 @@ export function useTimeclock(options: UseTimeclockOptions) {
       autoClockOut: false,
       autoClockOutReason: null,
       hoursWorked: null,
+      pendingSync: false,
+      syncError: null,
     });
   }, [stopHeartbeat, stopGPSWatch]);
 
-  // Cleanup on unmount
   useEffect(() => {
-    return () => {
-      stopHeartbeat();
-      stopGPSWatch();
+    void getPendingTimeclockActions(apprenticeId).then((actions) => {
+      if (actions.length) setState((prev) => ({ ...prev, pendingSync: true }));
+    });
+    const handleOnline = () => void requestTimeclockSync();
+    window.addEventListener('online', handleOnline);
+    if (navigator.onLine) void requestTimeclockSync();
+    return () => window.removeEventListener('online', handleOnline);
+  }, [apprenticeId]);
+
+  useEffect(() => {
+    if (!initialShift?.entryId) return;
+    let cancelled = false;
+    void requestGPS()
+      .then(() => {
+        if (cancelled) return;
+        startGPSWatch();
+        startHeartbeat(initialShift.entryId);
+      })
+      .catch(() => {
+        // Location permission/status remains visible in the widget. The next
+        // attendance action will request location again before it can proceed.
+      });
+    return () => { cancelled = true; };
+  }, [initialShift?.entryId, requestGPS, startGPSWatch, startHeartbeat]);
+
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+    const handleWorkerMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'TIMECLOCK_SYNC_REJECTED') {
+        setState((prev) => ({
+          ...prev,
+          syncError: event.data?.data?.error || 'An offline attendance event was rejected during verification.',
+        }));
+        return;
+      }
+      if (event.data?.type === 'TIMECLOCK_SYNC_COMPLETE') {
+        void getPendingTimeclockActions(apprenticeId).then((actions) => {
+          const pending = actions.length > 0;
+          setState((prev) => ({ ...prev, pendingSync: pending }));
+          if (!pending && event.data?.data?.syncedCount > 0) window.location.reload();
+        });
+      }
     };
+    navigator.serviceWorker.addEventListener('message', handleWorkerMessage);
+    return () => navigator.serviceWorker.removeEventListener('message', handleWorkerMessage);
+  }, [apprenticeId]);
+
+  useEffect(() => () => {
+    stopHeartbeat();
+    stopGPSWatch();
   }, [stopHeartbeat, stopGPSWatch]);
 
-  // Derived state
   const isShiftOpen = state.clockInAt !== null && state.clockOutAt === null;
   const isOnLunch = state.lunchStartAt !== null && state.lunchEndAt === null;
   const canClockIn = !isShiftOpen;
@@ -488,21 +451,16 @@ export function useTimeclock(options: UseTimeclockOptions) {
   const canClockOut = isShiftOpen && !isOnLunch;
 
   return {
-    // State
     ...state,
     gpsPosition,
     gpsError,
     loading,
-
-    // Derived
     isShiftOpen,
     isOnLunch,
     canClockIn,
     canStartLunch,
     canEndLunch,
     canClockOut,
-
-    // Actions
     clockIn,
     lunchStart,
     lunchEnd,

@@ -1,52 +1,26 @@
 # syntax=docker/dockerfile:1.7
 # Dockerfile.northflank-admin - Northflank Admin Service
 # Serves admin.elevateforhumanity.org
-#
-# Production contract:
-# 1. Native module dependencies are installed and verified.
-# 2. Next.js standalone output is the authoritative production server.
-# 3. Build identity comes from Northflank's injected NF_GIT_SHA.
-# 4. The final packaged runtime must boot and serve /api/ping before the image is accepted.
-
 ARG BUILD_TIMESTAMP=unknown
 
 FROM node:22-bookworm-slim AS base
-
 ARG PNPM_VERSION=10.28.2
-
-ENV CI=true \
-    NEXT_TELEMETRY_DISABLED=1
-
+ENV CI=true NEXT_TELEMETRY_DISABLED=1
 RUN corepack disable || true \
     && npm install -g "pnpm@${PNPM_VERSION}" \
     && test "$(pnpm --version)" = "${PNPM_VERSION}"
-
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        fontconfig \
-        libfontconfig1 \
-        libfreetype6 \
-        libjpeg62-turbo \
-        libpng16-16 \
-        libwebp7 \
-        python3 \
-        make \
-        g++ \
-        curl \
+        ca-certificates fontconfig libfontconfig1 libfreetype6 libjpeg62-turbo libpng16-16 libwebp7 \
+        python3 make g++ curl \
     && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /workspace
-RUN echo "nf-cache-invalidate-admin-2026-08-22-remotion-runtime-source"
+RUN echo "nf-cache-invalidate-admin-2026-08-22-pwa-offline-e2e-v2"
 
 FROM base AS dependencies
-RUN echo "nf-deps-2026-08-13-block-ffmpeg-static-postinstall"
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json
 COPY packages ./packages
-# Runtime ships Debian FFmpeg. Prevent ffmpeg-static from downloading a second
-# binary during dependency installation, which has historically failed on
-# Northflank with ECONNRESET.
 RUN node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); if (p.pnpm?.onlyBuiltDependencies) p.pnpm.onlyBuiltDependencies=p.pnpm.onlyBuiltDependencies.filter((name)=>name!=='ffmpeg-static'); fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\n');"
 RUN set -eux; \
     PNPM_BIN="$(command -v pnpm)"; \
@@ -90,6 +64,18 @@ RUN set -eux; \
     test -n "$NF_GIT_SHA"; \
     test -f /workspace/remotion-src/index.ts; \
     echo "Admin build arguments verified"
+
+RUN node scripts/check-pwa-architecture.mjs
+RUN node scripts/stamp-sw.mjs
+RUN node scripts/sync-pwa-public.mjs admin
+RUN test -f /workspace/public/sw-admin.js \
+    && test -f /workspace/apps/admin/public/sw-admin.js \
+    && test -f /workspace/apps/admin/public/manifest-admin.json \
+    && test -f /workspace/apps/admin/public/offline.html \
+    && ! grep -q '__CACHE_VERSION__' /workspace/public/sw-admin.js \
+    && ! grep -q '__CACHE_VERSION__' /workspace/apps/admin/public/sw-admin.js \
+    && cmp /workspace/public/sw-admin.js /workspace/apps/admin/public/sw-admin.js
+
 RUN pnpm --filter @elevate/admin build
 RUN node scripts/verify-admin-critical-routes.mjs
 RUN set -eux; \
@@ -133,31 +119,30 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs --create-home nextjs
 
-# Keep Next.js's generated standalone launcher. Do not overwrite it with the
-# repository's custom development/server harness.
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/standalone/ /app/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/static/ /app/apps/admin/.next/static/
-COPY --from=builder --chown=nextjs:nodejs /workspace/public/ /app/apps/admin/public/
+# apps/admin/public was regenerated from root canonical PWA assets and preserves app-specific images.
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/public/ /app/apps/admin/public/
-# Remotion is bundled dynamically at render time. The standalone server changes
-# cwd to /app/apps/admin, so package the canonical repo-root composition there.
 COPY --from=builder --chown=nextjs:nodejs /workspace/remotion-src/ /app/apps/admin/remotion-src/
 COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules /app/node_modules
 RUN set -eux; \
     test -f /app/apps/admin/server.js; \
     test -d /app/apps/admin/.next/static; \
     test -f /app/apps/admin/.next/required-server-files.json; \
-    test -d /app/apps/admin/public; \
     test -d /app/apps/admin/public/images; \
+    test -f /app/apps/admin/public/sw-admin.js; \
+    test -f /app/apps/admin/public/manifest-admin.json; \
+    test -f /app/apps/admin/public/offline.html; \
+    ! grep -q '__CACHE_VERSION__' /app/apps/admin/public/sw-admin.js; \
+    grep -q "cache: 'no-store'" /app/apps/admin/public/sw-admin.js; \
+    grep -q 'Waiting for a secure connection' /app/apps/admin/public/offline.html; \
     test -f /app/apps/admin/remotion-src/index.ts; \
     test -f /app/apps/admin/remotion-src/Root.tsx; \
     test -d /app/node_modules/sharp; \
     test -d /app/node_modules/@napi-rs/canvas; \
     test -d /app/node_modules/fontkit; \
     test -d /app/node_modules/pdfkit; \
-    command -v ffmpeg; \
-    command -v ffprobe; \
-    fc-match 'DejaVu Sans'
+    command -v ffmpeg; command -v ffprobe; fc-match 'DejaVu Sans'
 
 RUN set -eux; \
     LOG=/tmp/admin-runtime-smoke.log; \
@@ -166,36 +151,19 @@ RUN set -eux; \
     trap 'cat "${LOG}" || true; kill "${PID}" 2>/dev/null || true' EXIT; \
     READY=0; \
     for attempt in $(seq 1 30); do \
-      if curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/tmp/admin-ping.json 2>/tmp/admin-ping.err; then \
-        READY=1; \
-        break; \
-      fi; \
-      if ! kill -0 "${PID}" 2>/dev/null; then \
-        echo 'Admin standalone process exited during packaged-runtime smoke test.'; \
-        cat "${LOG}"; \
-        exit 1; \
-      fi; \
+      if curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/tmp/admin-ping.json 2>/tmp/admin-ping.err; then READY=1; break; fi; \
+      if ! kill -0 "${PID}" 2>/dev/null; then echo 'Admin standalone process exited during packaged-runtime smoke test.'; cat "${LOG}"; exit 1; fi; \
       sleep 2; \
     done; \
-    if [ "${READY}" -ne 1 ]; then \
-      echo 'Admin packaged standalone runtime did not become healthy.'; \
-      cat /tmp/admin-ping.err || true; \
-      cat "${LOG}"; \
-      exit 1; \
-    fi; \
+    if [ "${READY}" -ne 1 ]; then echo 'Admin packaged standalone runtime did not become healthy.'; cat /tmp/admin-ping.err || true; cat "${LOG}"; exit 1; fi; \
     cat /tmp/admin-ping.json; \
-    kill "${PID}"; \
-    wait "${PID}" || true; \
-    trap - EXIT
+    curl --fail --silent --show-error http://127.0.0.1:3000/sw-admin.js | grep -q "cache: 'no-store'"; \
+    curl --fail --silent --show-error http://127.0.0.1:3000/manifest-admin.json | grep -q '"standalone"'; \
+    curl --fail --silent --show-error http://127.0.0.1:3000/offline.html | grep -q 'Waiting for a secure connection'; \
+    kill "${PID}"; wait "${PID}" || true; trap - EXIT
 
 USER nextjs
 EXPOSE 3000
-
-HEALTHCHECK \
-    --interval=30s \
-    --timeout=10s \
-    --start-period=90s \
-    --retries=5 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
     CMD curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/dev/null || exit 1
-
 CMD ["node", "--max-http-header-size=32768", "apps/admin/server.js"]

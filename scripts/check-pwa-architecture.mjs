@@ -37,6 +37,18 @@ for (const worker of ['public/sw-admin.js', 'public/sw-lms.js', 'public/sw-marke
     failures.push(`${worker} lacks offline navigation fallback`);
   }
   if (!content.includes("url.pathname.startsWith('/api/')")) failures.push(`${worker} may cache API data`);
+
+  if (worker === 'public/sw-lms.js') {
+    if (content.includes('CACHE_COURSE') || content.includes('COURSE_CACHE')) {
+      failures.push(`${worker} may persist authenticated course responses`);
+    }
+    if (!content.includes('lms\\/courses')) {
+      failures.push(`${worker} does not explicitly exclude LMS course routes from protected caching`);
+    }
+    if (!content.includes("name.endsWith('-courses')")) {
+      failures.push(`${worker} does not retire legacy course caches during activation`);
+    }
+  }
 }
 
 for (const manifest of required.filter((file) => file.includes('/manifest-'))) {
@@ -48,4 +60,4 @@ if (failures.length) {
   console.error(failures.map((failure) => `PWA ARCHITECTURE ERROR: ${failure}`).join('\n'));
   process.exit(1);
 }
-console.log('PWA architecture verified: one registration engine, three origin workers, role manifests, no Marketing navigation or API caching.');
+console.log('PWA architecture verified: one registration engine, three origin workers, role manifests, protected LMS content is not cached, and Marketing navigation/API caching remains disabled.');

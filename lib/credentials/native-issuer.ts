@@ -30,26 +30,38 @@ function firstProof(credential: OpenBadgeCredential): Record<string, unknown> | 
   return Array.isArray(credential.proof) ? credential.proof[0] : credential.proof;
 }
 
+function resolveSigningService(): { url: string; token: string } | null {
+  const explicitUrl = process.env.OPEN_BADGES_SIGNING_SERVICE_URL;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const url = explicitUrl || (supabaseUrl ? `${supabaseUrl.replace(/\/$/, '')}/functions/v1/open-badges-sign` : '');
+  const token =
+    process.env.OPEN_BADGES_SIGNING_SERVICE_TOKEN || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+  if (!url || !token) return null;
+  return { url, token };
+}
+
 async function signCredential(
   credential: OpenBadgeCredential,
 ): Promise<OpenBadgeCredential | null> {
-  const signingUrl = process.env.OPEN_BADGES_SIGNING_SERVICE_URL;
-  if (!signingUrl) return null;
+  const signer = resolveSigningService();
+  if (!signer) return null;
 
-  const response = await fetch(signingUrl, {
+  const response = await fetch(signer.url, {
     method: 'POST',
     headers: {
+      Authorization: `Bearer ${signer.token}`,
       'Content-Type': 'application/json',
-      ...(process.env.OPEN_BADGES_SIGNING_SERVICE_TOKEN
-        ? { Authorization: `Bearer ${process.env.OPEN_BADGES_SIGNING_SERVICE_TOKEN}` }
-        : {}),
     },
     body: JSON.stringify({ credential }),
     signal: AbortSignal.timeout(15_000),
   });
 
   if (!response.ok) {
-    throw new Error(`Open Badges signing service returned ${response.status}`);
+    const detail = await response.text().catch(() => '');
+    throw new Error(
+      `Open Badges signing service returned ${response.status}${detail ? `: ${detail.slice(0, 300)}` : ''}`,
+    );
   }
 
   const signed = (await response.json()) as OpenBadgeCredential;

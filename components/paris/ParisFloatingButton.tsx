@@ -67,13 +67,13 @@ export function ParisFloatingButton() {
         onMouseEnter={handleFloatingMouseEnter}
         onMouseLeave={handleFloatingMouseLeave}
         aria-label="Chat with Paris AI"
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-brand-red-600 hover:bg-brand-red-700 active:scale-95 transition-all shadow-xl flex items-center justify-center group"
+        className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-brand-red-600 hover:bg-brand-red-700 active:scale-95 transition-all shadow-xl flex items-center justify-center group md:bottom-6 md:right-6"
       >
         <MessageCircle className="w-6 h-6 text-white" />
       </button>
 
       {showTooltip && !isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 pointer-events-none">
+        <div className="fixed bottom-36 right-4 z-50 pointer-events-none md:bottom-24 md:right-6">
           <div className="bg-slate-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg max-w-[190px]">
             <p className="font-medium">Need help choosing a program?</p>
             <p className="text-slate-300 mt-0.5">Chat with Paris — our AI career assistant</p>

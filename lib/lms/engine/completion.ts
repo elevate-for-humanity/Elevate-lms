@@ -1,25 +1,19 @@
 import 'server-only';
 /**
- * recordStepCompletion / recordStepUncompletion / recordCheckpointAttempt
+ * Canonical LMS write engine.
  *
- * Write-side of the engine. These are the only functions that mutate
- * learner progress state. All other writes (enrollment progress %,
- * certificate issuance) are triggered from here.
- *
- * recordStepCompletion    — marks a lesson complete, recalculates progress %.
- * recordStepUncompletion  — marks a lesson incomplete, recalculates progress %.
- * recordCheckpointAttempt — writes a checkpoint_scores row.
+ * This module owns lesson_progress and checkpoint_scores mutations only.
+ * Program progress is recomputed by the database trigger across all required
+ * program courses. Course/program certificate issuance is deliberately outside
+ * this engine so a raw 100% lesson count cannot bypass seat-time, exam, external
+ * module, competency, or program-completion gates.
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { logger } from '@/lib/logger';
-import { setAuditContext } from '@/lib/audit-context';
+import type { SupabaseClient } from '@/lib/supabase';
 import type { StepCompletionResult, CheckpointAttemptResult } from './types';
-import { issueCertificateIfEligible } from './certificate';
 import { isCheckpointGateError, CheckpointGateError } from './gate';
 import { calcProgressPercent, isCourseComplete } from '@/lib/lms/progress-calc';
-
-// ─── recordStepCompletion ─────────────────────────────────────────────────────
 
 export async function recordStepCompletion(
   userId: string,
@@ -29,11 +23,8 @@ export async function recordStepCompletion(
   timeSpentSeconds: number = 0,
 ): Promise<StepCompletionResult> {
   const db = await requireAdminClient();
+  const now = new Date().toISOString();
 
-  // Upsert lesson_progress.
-  // The DB trigger trg_enforce_lesson_progress_checkpoint_gate fires here.
-  // If the gate blocks, Postgres raises ERRCODE 23514 — normalize it to a
-  // structured CheckpointGateError so callers get a consistent domain error.
   const { error: progressError } = await db.from('lesson_progress').upsert(
     {
       user_id: userId,
@@ -41,9 +32,9 @@ export async function recordStepCompletion(
       course_id: courseId,
       enrollment_id: enrollmentId,
       completed: true,
-      completed_at: new Date().toISOString(),
+      completed_at: now,
       time_spent_seconds: Math.max(0, timeSpentSeconds),
-      updated_at: new Date().toISOString(),
+      updated_at: now,
     },
     { onConflict: 'user_id,lesson_id' },
   );
@@ -63,84 +54,43 @@ export async function recordStepCompletion(
     throw new Error(`recordStepCompletion: ${progressError.message}`);
   }
 
-  // Recalculate progress % — canonical table: course_lessons
-  const [{ data: allLessons }, { data: completedLessons }] = await Promise.all([
-    db.from('course_lessons').select('id').eq('course_id', courseId),
-    db
-      .from('lesson_progress')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('course_id', courseId)
-      .eq('completed', true),
-  ]);
+  const [{ data: allLessons, error: lessonsError }, { data: completedLessons, error: completedError }] =
+    await Promise.all([
+      db
+        .from('course_lessons')
+        .select('id')
+        .eq('course_id', courseId)
+        .eq('is_required', true)
+        .eq('is_published', true),
+      db
+        .from('lesson_progress')
+        .select('lesson_id')
+        .eq('user_id', userId)
+        .eq('course_id', courseId)
+        .eq('completed', true),
+    ]);
+  if (lessonsError) throw lessonsError;
+  if (completedError) throw completedError;
 
-  const totalLessons = allLessons?.length ?? 0;
-  const completedCount = completedLessons?.length ?? 0;
+  const requiredLessonIds = new Set((allLessons ?? []).map((lesson) => lesson.id));
+  const completedCount = new Set(
+    (completedLessons ?? [])
+      .map((row) => row.lesson_id)
+      .filter((lessonId) => requiredLessonIds.has(lessonId)),
+  ).size;
+  const totalLessons = requiredLessonIds.size;
   const progressPercent = calcProgressPercent(completedCount, totalLessons);
   const courseCompleted = isCourseComplete(progressPercent, totalLessons);
-
-  // Persist progress % — canonical table: program_enrollments
-  // Try by course_id first (direct enrollment), then by program_id (program-level enrollment).
-  // NOTE: Supabase returns error=null when an UPDATE matches zero rows — check the returned
-  // data length instead of the error to detect a no-op update and trigger the fallback.
-  await setAuditContext(db, { actorUserId: userId, systemActor: 'lms_completion_engine' });
-  const { data: directUpdated, error: directUpdateError } = await db
-    .from('program_enrollments')
-    .update({ progress_percent: progressPercent, updated_at: new Date().toISOString() })
-    .eq('user_id', userId)
-    .eq('course_id', courseId)
-    .select('id');
-
-  if (directUpdateError || !directUpdated?.length) {
-    // Fallback: program-level enrollment — resolve program_id from courses
-    const { data: courseRow } = await db
-      .from('courses')
-      .select('program_id')
-      .eq('id', courseId)
-      .maybeSingle();
-
-    if (courseRow?.program_id) {
-      const { data: fallbackUpdated, error: fallbackError } = await db
-        .from('program_enrollments')
-        .update({ progress_percent: progressPercent, updated_at: new Date().toISOString() })
-        .eq('user_id', userId)
-        .eq('program_id', courseRow.program_id)
-        .select('id');
-
-      if (fallbackError) {
-        logger.error('[engine] progress_percent fallback update failed', { userId, courseId, fallbackError });
-      } else if (!fallbackUpdated?.length) {
-        // No enrollment row matched by course_id or program_id — the DB trigger will
-        // handle it if lesson_progress.course_id is set, but log for diagnostics.
-        logger.warn('[engine] progress_percent update matched no enrollment rows', { userId, courseId });
-      }
-    } else {
-      logger.warn('[engine] progress_percent update: no program_id found for course', { userId, courseId });
-    }
-  }
-
-  // Auto-issue certificate when course is complete
-  let certificateNumber: string | null = null;
-  if (courseCompleted) {
-    try {
-      certificateNumber = await issueCertificateIfEligible(userId, courseId, enrollmentId);
-    } catch (certErr) {
-      // Non-fatal — lesson completion is already recorded
-      logger.error('[engine] Certificate issuance failed (non-fatal):', certErr);
-    }
-  }
 
   return {
     lessonId,
     courseId,
     progressPercent,
     courseCompleted,
-    certificateIssued: certificateNumber !== null,
-    certificateNumber,
+    certificateIssued: false,
+    certificateNumber: null,
   };
 }
-
-// ─── recordStepUncompletion ───────────────────────────────────────────────────
 
 export async function recordStepUncompletion(
   userId: string,
@@ -157,54 +107,37 @@ export async function recordStepUncompletion(
       updated_at: new Date().toISOString(),
     })
     .eq('user_id', userId)
-    .eq('lesson_id', lessonId);
-
+    .eq('lesson_id', lessonId)
+    .eq('course_id', courseId);
   if (error) throw new Error(`recordStepUncompletion: ${error.message}`);
 
-  // Recalculate progress % — canonical table: course_lessons
-  const [{ data: allLessons }, { data: completedLessons }] = await Promise.all([
-    db.from('course_lessons').select('id').eq('course_id', courseId),
-    db
-      .from('lesson_progress')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('course_id', courseId)
-      .eq('completed', true),
-  ]);
-
-  const totalLessons = allLessons?.length ?? 0;
-  const completedCount = completedLessons?.length ?? 0;
-  const progressPercent = calcProgressPercent(completedCount, totalLessons);
-
-  // Persist progress % — canonical table: program_enrollments
-  // Same zero-row fallback pattern as recordStepCompletion.
-  const { data: directUpdated2, error: directUpdateError2 } = await db
-    .from('program_enrollments')
-    .update({ progress_percent: progressPercent, updated_at: new Date().toISOString() })
-    .eq('user_id', userId)
-    .eq('course_id', courseId)
-    .select('id');
-
-  if (directUpdateError2 || !directUpdated2?.length) {
-    const { data: courseRow } = await db
-      .from('courses')
-      .select('program_id')
-      .eq('id', courseId)
-      .maybeSingle();
-
-    if (courseRow?.program_id) {
-      await db
-        .from('program_enrollments')
-        .update({ progress_percent: progressPercent, updated_at: new Date().toISOString() })
+  const [{ data: allLessons, error: lessonsError }, { data: completedLessons, error: completedError }] =
+    await Promise.all([
+      db
+        .from('course_lessons')
+        .select('id')
+        .eq('course_id', courseId)
+        .eq('is_required', true)
+        .eq('is_published', true),
+      db
+        .from('lesson_progress')
+        .select('lesson_id')
         .eq('user_id', userId)
-        .eq('program_id', courseRow.program_id);
-    }
-  }
+        .eq('course_id', courseId)
+        .eq('completed', true),
+    ]);
+  if (lessonsError) throw lessonsError;
+  if (completedError) throw completedError;
 
-  return { progressPercent };
+  const requiredLessonIds = new Set((allLessons ?? []).map((lesson) => lesson.id));
+  const completedCount = new Set(
+    (completedLessons ?? [])
+      .map((row) => row.lesson_id)
+      .filter((completedLessonId) => requiredLessonIds.has(completedLessonId)),
+  ).size;
+
+  return { progressPercent: calcProgressPercent(completedCount, requiredLessonIds.size) };
 }
-
-// ─── recordCheckpointAttempt ──────────────────────────────────────────────────
 
 export async function recordCheckpointAttempt(
   userId: string,
@@ -228,7 +161,6 @@ export async function recordCheckpointAttempt(
     resolvedModuleOrder = (lessonRow as any)?.course_modules?.order_index ?? 1;
   }
 
-  // Learner path: SECURITY DEFINER RPC (auth.uid() must match session user).
   if (options?.supabase) {
     const { data, error } = await options.supabase.rpc('record_checkpoint_attempt', {
       p_lesson_id: lessonId,
@@ -238,10 +170,7 @@ export async function recordCheckpointAttempt(
       p_passing_score: passingScore,
       p_answers: answers,
     });
-
-    if (error) {
-      throw new Error(`recordCheckpointAttempt: ${error.message}`);
-    }
+    if (error) throw new Error(`recordCheckpointAttempt: ${error.message}`);
 
     const row = data as {
       lessonId?: string;
@@ -250,7 +179,6 @@ export async function recordCheckpointAttempt(
       passingScore?: number;
       attemptNumber?: number;
     } | null;
-
     return {
       lessonId: row?.lessonId ?? lessonId,
       score: row?.score ?? score,
@@ -261,8 +189,7 @@ export async function recordCheckpointAttempt(
   }
 
   const admin = await requireAdminClient();
-
-  const { data: prior } = await admin
+  const { data: prior, error: priorError } = await admin
     .from('checkpoint_scores')
     .select('attempt_number')
     .eq('user_id', userId)
@@ -270,10 +197,10 @@ export async function recordCheckpointAttempt(
     .order('attempt_number', { ascending: false })
     .limit(1)
     .maybeSingle();
+  if (priorError) throw priorError;
 
   const attemptNumber = (prior?.attempt_number ?? 0) + 1;
   const passed = score >= passingScore;
-
   const { error } = await admin.from('checkpoint_scores').insert({
     user_id: userId,
     lesson_id: lessonId,
@@ -284,23 +211,12 @@ export async function recordCheckpointAttempt(
     attempt_number: attemptNumber,
     answers,
   });
-
-  if (error) {
-    throw new Error(`recordCheckpointAttempt: ${error.message}`);
-  }
+  if (error) throw new Error(`recordCheckpointAttempt: ${error.message}`);
 
   return { lessonId, score, passed, passingScore, attemptNumber };
 }
 
-// ── Canonical re-exports ──────────────────────────────────────────────────────
-// Course-level completion check and credential pipeline are co-located here
-// so callers can import from a single canonical path.
-export {
-  checkCourseCompletion,
-  completeCourse,
-  getCourseProgress,
-  type CourseCompletionStatus,
-} from '@/lib/course-completion';
+export { checkCourseCompletion, getCourseProgress, type CourseCompletionStatus } from '@/lib/course-completion';
 
 export {
   startCredentialAttempt,

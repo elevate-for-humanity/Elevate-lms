@@ -77,7 +77,19 @@ export async function POST(request: NextRequest) {
   }
   if (addons.some((addon) => addon?.hiddenFromMarketplace)) {
     return NextResponse.json(
-      { error: 'One or more legacy add-ons are no longer available for new purchase' },
+      { error: 'One or more legacy or managed add-ons are not available for new self-service purchase' },
+      { status: 400 },
+    );
+  }
+
+  const redundantAddons = addons.filter(
+    (addon) => addon && addon.features.length > 0 && addon.features.every((feature) => plan.features.includes(feature)),
+  );
+  if (redundantAddons.length) {
+    return NextResponse.json(
+      {
+        error: `The selected ${redundantAddons.map((addon) => addon?.name).filter(Boolean).join(', ')} add-on is already included in the ${plan.name} plan.`,
+      },
       { status: 400 },
     );
   }

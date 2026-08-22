@@ -1,23 +1,51 @@
-// PUBLIC ROUTE: WIOA program application — public intake
+// PUBLIC ROUTE: specialized WIOA intake adapter.
+// Canonical application creation/reuse belongs exclusively to /api/applications.
+import crypto from 'node:crypto';
 import { NextResponse } from 'next/server';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { notifyApplicationSubmission } from '@/lib/applications/submission-notifications';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-function escapeHtml(value: unknown): string {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+function buildWioaNotes(body: Record<string, any>, fingerprint: string): string {
+  return [
+    `=== WIOA INTAKE ===`,
+    `WIOA Intake Fingerprint: ${fingerprint}`,
+    `Age 18+: ${body.isOver18 ? 'Yes' : 'No'}`,
+    `HS Diploma: ${body.hasHighSchoolDiploma ? 'Yes' : 'No'}`,
+    `Work Auth: ${body.hasWorkAuthorization ? 'Yes' : 'No'}`,
+    `IN Resident: ${body.isIndianaResident ? 'Yes' : 'No'}`,
+    `Can Commit: ${body.canCommitToSchedule ? 'Yes' : 'No'}`,
+    `DOB: ${body.dateOfBirth || 'Not provided'}`,
+    `Race: ${Array.isArray(body.race) ? body.race.join(', ') : 'Not specified'}`,
+    `Gender: ${body.gender || 'Not specified'}`,
+    `Education: ${body.educationLevel || 'Not specified'}`,
+    `Veteran: ${body.isVeteran ? 'Yes' : 'No'}`,
+    `Employment: ${body.employmentStatus || 'Not specified'}`,
+    `Income: ${body.annualIncome ?? 'Not specified'}`,
+    `Dependents: ${body.numberOfDependents ?? 'Not specified'}`,
+    `Public Assistance: ${Array.isArray(body.receivesPublicAssistance) ? body.receivesPublicAssistance.join(', ') : 'None'}`,
+    `Housing: ${body.housingStatus || 'Not specified'}`,
+    `Justice Involvement: ${body.hasJusticeInvolvement ? 'Yes' : 'No'}`,
+    `Work Auth Doc: ${body.workAuthDocument || 'Not specified'}`,
+    body.documentExpirationDate ? `Expires: ${body.documentExpirationDate}` : '',
+    `Barriers: ${Array.isArray(body.barriers) ? body.barriers.join(', ') : 'None'}`,
+    body.otherBarrier ? `Other Barrier: ${body.otherBarrier}` : '',
+    `Case Manager: ${body.hasCaseManager ? 'Yes' : 'No'}`,
+    body.caseManagerAgency ? `Agency: ${body.caseManagerAgency}` : '',
+    body.supportNeeds ? `Support Needs: ${body.supportNeeds}` : '',
+    `Background Check Consent: ${body.consentBackgroundCheck ? 'Yes' : 'No'}`,
+    `Photo/Video Consent: ${body.consentPhotoVideo ? 'Yes' : 'No'}`,
+    `Data Sharing Consent: ${body.consentDataSharing ? 'Yes' : 'No'}`,
+    `Text Messages Consent: ${body.consentTextMessages ? 'Yes' : 'No'}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
 }
 
 async function _POST(req: Request) {
@@ -25,105 +53,119 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
-    const body = await req.json();
-    const supabase = await requireAdminClient();
+    const body = (await req.json()) as Record<string, any>;
+    const firstName = String(body.firstName || '').trim();
+    const lastName = String(body.lastName || '').trim();
+    const email = String(body.email || '').trim().toLowerCase();
+    const phone = String(body.phone || '').trim();
+    const program = String(body.program || '').trim();
 
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
+    if (!firstName || !lastName || !email || !phone || !program) {
+      return NextResponse.json({ error: 'Missing required application fields.' }, { status: 400 });
     }
 
-    const referenceNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
-    const notes = [
-      `Reference: ${referenceNumber}`,
-      `\n=== ELIGIBILITY ===`,
-      `Age 18+: ${body.isOver18 ? 'Yes' : 'No'}`,
-      `HS Diploma: ${body.hasHighSchoolDiploma ? 'Yes' : 'No'}`,
-      `Work Auth: ${body.hasWorkAuthorization ? 'Yes' : 'No'}`,
-      `IN Resident: ${body.isIndianaResident ? 'Yes' : 'No'}`,
-      `Can Commit: ${body.canCommitToSchedule ? 'Yes' : 'No'}`,
-      `\n=== DEMOGRAPHICS ===`,
-      `DOB: ${body.dateOfBirth}`,
-      `Race: ${Array.isArray(body.race) ? body.race.join(', ') : 'Not specified'}`,
-      `Gender: ${body.gender}`,
-      `Education: ${body.educationLevel}`,
-      `Veteran: ${body.isVeteran ? 'Yes' : 'No'}`,
-      `\n=== WIOA ELIGIBILITY ===`,
-      `Employment: ${body.employmentStatus}`,
-      `Income: ${body.annualIncome}`,
-      `Dependents: ${body.numberOfDependents}`,
-      `Public Assistance: ${Array.isArray(body.receivesPublicAssistance) ? body.receivesPublicAssistance.join(', ') : 'None'}`,
-      `Housing: ${body.housingStatus}`,
-      `Justice Involvement: ${body.hasJusticeInvolvement ? 'Yes' : 'No'}`,
-      `\n=== AUTHORIZATION ===`,
-      `Work Auth Doc: ${body.workAuthDocument}`,
-      body.documentExpirationDate ? `Expires: ${body.documentExpirationDate}` : '',
-      `Barriers: ${Array.isArray(body.barriers) ? body.barriers.join(', ') : 'None'}`,
-      body.otherBarrier ? `Other Barrier: ${body.otherBarrier}` : '',
-      `Case Manager: ${body.hasCaseManager ? 'Yes' : 'No'}`,
-      body.caseManagerAgency ? `Agency: ${body.caseManagerAgency}` : '',
-      body.supportNeeds ? `Support Needs: ${body.supportNeeds}` : '',
-      `\n=== CONSENTS ===`,
-      `Background Check: ${body.consentBackgroundCheck ? 'Yes' : 'No'}`,
-      `Photo/Video: ${body.consentPhotoVideo ? 'Yes' : 'No'}`,
-      `Data Sharing: ${body.consentDataSharing ? 'Yes' : 'No'}`,
-      `Text Messages: ${body.consentTextMessages ? 'Yes' : 'No'}`,
-    ]
-      .filter(Boolean)
-      .join('\n');
-
-    const { data, error }: any = await supabase
-      .from('applications')
-      .insert({
-        first_name: body.firstName,
-        last_name: body.lastName,
-        email: body.email,
-        phone: body.phone || '',
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+    const canonicalUrl = new URL('/api/applications', siteUrl);
+    const canonicalResponse = await fetch(canonicalUrl, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Origin: canonicalUrl.origin,
+        'X-Idempotency-Key': `wioa-${crypto.randomUUID()}`,
+      },
+      cache: 'no-store',
+      body: JSON.stringify({
+        firstName,
+        lastName,
+        email,
+        phone,
         city: body.city || 'Indianapolis',
-        zip: body.zip || '00000',
-        program_interest: body.program || 'Not specified',
-        status: 'submitted',
-        support_notes: notes,
-      })
-      .select()
-      .maybeSingle();
+        zip: body.zip || '',
+        program,
+        programSlug: body.programSlug || program,
+        fundingType: 'wioa',
+        fundingSource: 'wioa',
+        fundingEligibilityStatus: body.hasWorkOneReferral ? null : 'needs_appointment',
+        hasWorkOneReferral: body.hasWorkOneReferral ? 'yes' : 'no',
+        workoneIntakeCompleted: body.hasWorkOneReferral ? 'yes' : 'no',
+        dateOfBirth: body.dateOfBirth || null,
+        employmentStatus: body.employmentStatus || null,
+        source: body.source || 'wioa-application',
+        preferredContact: body.preferredContact || 'phone',
+        hasCaseManager: body.hasCaseManager ? 'yes' : 'no',
+        caseManagerAgency: body.caseManagerAgency || null,
+        supportNeeds: body.supportNeeds || null,
+      }),
+    });
 
-    if (error || !data?.id) {
+    const canonical = (await canonicalResponse.json().catch(() => ({}))) as {
+      ok?: boolean;
+      id?: string;
+      referenceNumber?: string;
+      existing?: boolean;
+      error?: string;
+    };
+
+    if (!canonicalResponse.ok || !canonical.ok || !canonical.id) {
       return NextResponse.json(
         {
-          error: `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for assistance.`,
-          details: process.env.NODE_ENV === 'development' ? 'Internal server error' : undefined,
+          error:
+            canonical.error ||
+            `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for assistance.`,
         },
-        { status: 500 },
+        { status: canonicalResponse.status || 500 },
       );
     }
 
-    const applicantName = `${String(body.firstName || '').trim()} ${String(body.lastName || '').trim()}`.trim();
-    const applicantEmail = String(body.email || '').trim().toLowerCase();
-    const safeFirst = escapeHtml(body.firstName);
-    const safeName = escapeHtml(applicantName);
-    const safeEmail = escapeHtml(applicantEmail);
-    const safeProgram = escapeHtml(body.program || 'your selected program');
-    const safeReference = escapeHtml(referenceNumber);
+    // WIOA owns only its supplemental intake facts. It enriches the canonical
+    // application created/reused above; it never creates another application.
+    const supabase = await requireAdminClient();
+    const fingerprint = crypto
+      .createHash('sha256')
+      .update(JSON.stringify({
+        email,
+        program,
+        dateOfBirth: body.dateOfBirth || null,
+        employmentStatus: body.employmentStatus || null,
+        annualIncome: body.annualIncome ?? null,
+        numberOfDependents: body.numberOfDependents ?? null,
+        receivesPublicAssistance: body.receivesPublicAssistance || [],
+        barriers: body.barriers || [],
+      }))
+      .digest('hex')
+      .slice(0, 20);
+    const wioaNotes = buildWioaNotes(body, fingerprint);
 
-    const notifications = await notifyApplicationSubmission({
-      db: supabase,
-      applicationId: data.id,
-      applicationType: 'wioa',
-      applicantName,
-      applicantEmail,
-      applicantSubject: `WIOA Application Received [${referenceNumber}] | ${PLATFORM_DEFAULTS.orgName}`,
-      applicantHtml: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>WIOA Application Received</h2><p>Hi ${safeFirst},</p><p>We received your WIOA/funding application for <strong>${safeProgram}</strong>.</p><p><strong>Reference:</strong> ${safeReference}</p><h3>What happens next</h3><ol><li>Elevate reviews the application for completeness and funding-readiness.</li><li>A workforce advisor verifies WIOA eligibility and identifies any WorkOne documentation still needed.</li><li>You receive the exact next step for orientation, funding verification, or self-pay options as applicable.</li><li>Program portal/enrollment access is activated when the enrollment/funding requirements for your training path are satisfied.</li></ol><p>You do not need to submit another application. Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
-      staffSubject: `New WIOA Application [${referenceNumber}]: ${applicantName}`,
-      staffHtml: `<h2>New WIOA Application Received</h2><p><strong>Reference:</strong> ${safeReference}</p><p><strong>Name:</strong> ${safeName}</p><p><strong>Email:</strong> ${safeEmail}</p><p><strong>Phone:</strong> ${escapeHtml(body.phone)}</p><p><strong>Program:</strong> ${safeProgram}</p><p><strong>Location:</strong> ${escapeHtml(body.city)}, ${escapeHtml(body.zip)}</p><p><strong>Income:</strong> ${escapeHtml(body.annualIncome)}</p><p><strong>Employment:</strong> ${escapeHtml(body.employmentStatus)}</p><p><strong>Public Assistance:</strong> ${escapeHtml(Array.isArray(body.receivesPublicAssistance) ? body.receivesPublicAssistance.join(', ') : 'None')}</p><p><strong>Justice Involvement:</strong> ${body.hasJusticeInvolvement ? 'Yes' : 'No'}</p><p><strong>Barriers:</strong> ${escapeHtml(Array.isArray(body.barriers) ? body.barriers.join(', ') : 'None')}</p><p>Review in the Admin application queue and assign the appropriate funding/onboarding next action.</p>`,
-      metadata: { reference_number: referenceNumber, program: body.program || null },
-    });
+    const { data: current, error: readError } = await supabase
+      .from('applications')
+      .select('support_notes')
+      .eq('id', canonical.id)
+      .maybeSingle();
+
+    if (readError) {
+      return NextResponse.json({ error: 'Application saved, but WIOA intake details could not be verified.' }, { status: 500 });
+    }
+
+    const existingNotes = String(current?.support_notes || '');
+    if (!existingNotes.includes(`WIOA Intake Fingerprint: ${fingerprint}`)) {
+      const nextNotes = [existingNotes.trim(), wioaNotes].filter(Boolean).join('\n\n');
+      const { error: updateError } = await supabase
+        .from('applications')
+        .update({ support_notes: nextNotes })
+        .eq('id', canonical.id);
+      if (updateError) {
+        return NextResponse.json({ error: 'Application saved, but WIOA intake details could not be attached.' }, { status: 500 });
+      }
+    }
 
     return NextResponse.json(
       {
         ok: true,
-        id: data.id,
-        referenceNumber,
-        notificationStatus: notifications,
+        id: canonical.id,
+        referenceNumber: canonical.referenceNumber,
+        existing: Boolean(canonical.existing),
+        canonicalAuthority: 'applications',
       },
       { status: 200 },
     );

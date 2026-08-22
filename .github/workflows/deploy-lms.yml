@@ -12,6 +12,7 @@ on:
       - 'lib/portal/**'
       - 'lib/navigation/**'
       - 'lib/monitoring/**'
+      - 'lib/health/**'
       - 'lib/supabase/**'
       - 'lib/llm/**'
       - 'lib/ai/**'

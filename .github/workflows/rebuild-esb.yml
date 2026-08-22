@@ -23,6 +23,7 @@ permissions:
 
 env:
   CI: true
+  AI_CIRCUIT_RECOVERY_WAIT: '1'
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -35,11 +36,14 @@ jobs:
   rebuild-esb:
     name: Replace Entrepreneurship with ESB v2
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -144,3 +148,4 @@ jobs:
 # 2026-08-22 canonical Course Builder rerun after Remotion runtime packaging repair
 # 2026-08-22 report preflight/build/validate/verify results to issue 703
 # 2026-08-22 execute course-builder scripts with react-server export condition
+# 2026-08-22 rerun against current Gemini 2.5 provider with circuit recovery enabled

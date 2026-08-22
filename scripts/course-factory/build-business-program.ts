@@ -11,15 +11,8 @@ const EXPECTED_MICROCLIPS = 70;
 const MEDIA_POLL_MS = 20_000;
 const MEDIA_TIMEOUT_MS = 75 * 60_000;
 const AI_SECRET_KEYS = [
-  'GEMINI_API_KEY',
-  'GOOGLE_CLOUD_API_KEY',
-  'GROQ_API_KEY',
-  'CLOUDFLARE_ACCOUNT_ID',
-  'CLOUDFLARE_AI_API_TOKEN',
-  'CLOUDFLARE_API_TOKEN',
-  'OPENAI_API_KEY',
-  'ANTHROPIC_API_KEY',
-  'AZURE_OPENAI_API_KEY',
+  'GEMINI_API_KEY','GOOGLE_CLOUD_API_KEY','GROQ_API_KEY','CLOUDFLARE_ACCOUNT_ID',
+  'CLOUDFLARE_AI_API_TOKEN','CLOUDFLARE_API_TOKEN','OPENAI_API_KEY','ANTHROPIC_API_KEY','AZURE_OPENAI_API_KEY',
 ] as const;
 
 function fail(message: string): never { throw new Error(`[Business Course Builder] ${message}`); }
@@ -66,7 +59,10 @@ async function auditCourse(courseId: string) {
   if ((modules ?? []).length !== EXPECTED_MODULES) fail(`Expected ${EXPECTED_MODULES} modules; found ${(modules ?? []).length}`);
   if ((lessons ?? []).length !== EXPECTED_LESSONS) fail(`Expected ${EXPECTED_LESSONS} lessons; found ${(lessons ?? []).length}`);
   for (const lesson of lessons ?? []) {
-    const content = lesson.content as Record<string, unknown> | null;
+    const rawContent = lesson.content;
+    const content = typeof rawContent === 'string'
+      ? (() => { try { return JSON.parse(rawContent) as Record<string, unknown>; } catch { return null; } })()
+      : rawContent as Record<string, unknown> | null;
     const html = typeof content?.html === 'string' ? content.html : '';
     if (html.replace(/<[^>]*>/g, ' ').trim().length < 1000) fail(`${lesson.slug} has insufficient instructional content`);
     if (!Array.isArray(lesson.learning_objectives) || lesson.learning_objectives.length < 3) fail(`${lesson.slug} is missing learning objectives`);
@@ -84,9 +80,9 @@ async function main() {
   const { data: program, error: programError } = await db.from('programs').select('id,slug,title').eq('slug', PROGRAM_SLUG).maybeSingle();
   if (programError || !program?.id) fail(`Canonical program not found: ${programError?.message ?? PROGRAM_SLUG}`);
   const build = await courseFactory({ programId: program.id, programSlug: PROGRAM_SLUG, blueprint, mode: 'replace', contentSource: 'ai', videoMode: 'queue' });
-  if (!build.ok || !build.courseId) fail(`Course Factory failed: ${(build.errors ?? []).join('; ')}`);
+  if (!build.ok || !build.courseId) fail(`Course Factory failed: ${JSON.stringify(build.errors ?? [], null, 2)}`);
   if (build.moduleCount !== EXPECTED_MODULES || build.lessonCount !== EXPECTED_LESSONS) fail(`Course Factory returned ${build.moduleCount ?? 0} modules and ${build.lessonCount ?? 0} lessons`);
-  if ((build.generationFailures ?? []).length) fail(`Generation failures: ${JSON.stringify(build.generationFailures)}`);
+  if ((build.generationFailures ?? []).length) fail(`Generation failures: ${JSON.stringify(build.generationFailures, null, 2)}`);
   await auditCourse(build.courseId);
   const { data: jobs, error: jobsError } = await db.from('video_jobs').select('id,asset_kind').eq('course_id', build.courseId);
   if (jobsError) fail(`Video queue audit failed: ${jobsError.message}`);

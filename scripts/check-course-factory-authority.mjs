@@ -27,6 +27,7 @@ for (const required of [
   "from '@/lib/course-builder/orchestrator'",
   "from '@/lib/course-builder/edit-service'",
   "from '@/lib/course-builder/persisted-publish-service'",
+  "from '@/lib/course-builder/review-service'",
   "action === 'generate-from-blueprint'",
   "action === 'queue-media'",
   "action === 'save-program-config'",
@@ -34,6 +35,8 @@ for (const required of [
   "action === 'save-lesson'",
   "action === 'patch-lesson'",
   "action === 'link-scorm'",
+  "action === 'review-course'",
+  "action === 'review-lessons'",
   "action === 'publish'",
   "action === 'publish-persisted'",
   "action === 'repair'",
@@ -51,8 +54,12 @@ const editService = read('lib/course-builder/edit-service.ts');
 for (const capability of ['saveCourseModule','saveCourseLesson','patchCourseLesson','linkCourseScormPackage']) {
   if (!editService.includes(capability)) failures.push(`Course Builder edit service is missing ${capability}`);
 }
+const reviewService = read('lib/course-builder/review-service.ts');
+for (const capability of ['reviewCanonicalCourse','reviewCanonicalLessons','reviewed_by','approved']) {
+  if (!reviewService.includes(capability)) failures.push(`Course Builder review service is missing ${capability}`);
+}
 const persistedPublish = read('lib/course-builder/persisted-publish-service.ts');
-for (const capability of ['runPersistedCourseProcurementHealthCheck','publishPersistedCourse','publishCourse','review_status','module_completion_rules']) {
+for (const capability of ['runPersistedCourseProcurementHealthCheck','publishPersistedCourse','publishCourse','review_status','reviewed_by','module_completion_rules']) {
   if (!persistedPublish.includes(capability)) failures.push(`Persisted Course Builder publication service is missing ${capability}`);
 }
 
@@ -65,6 +72,8 @@ const retiredMutationRoutes = [
   'apps/admin/app/api/admin/course-builder/lesson/route.ts',
   'apps/admin/app/api/admin/course-builder/lesson-patch/route.ts',
   'apps/admin/app/api/admin/courses/[courseId]/generate-missing/route.ts',
+  'apps/admin/app/api/admin/courses/[courseId]/publish/route.ts',
+  'apps/admin/app/api/admin/courses/[courseId]/review/route.ts',
   'apps/admin/app/api/admin/courses/ai-builder/generate/route.ts',
   'apps/lms/app/api/ai/generate-and-publish-course/route.ts',
   'apps/admin/app/api/admin/courses/generate/publish/route.ts',
@@ -110,6 +119,15 @@ for (const rel of walk('apps')) {
     if (!studioFacadeAllowed) failures.push(`${rel}: independent HTTP complete-course caller detected; use ${rootRoute}`);
   }
   if (/\bpublishCourse\s*\(/.test(text) && rel.includes('/api/')) failures.push(`${rel}: independent HTTP publication caller detected; use ${rootRoute}`);
+  if (/\.from\(['\"]courses['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}status\s*:\s*['\"]published['\"]/.test(text)) {
+    failures.push(`${rel}: direct HTTP publication-state write detected; use ${rootRoute}`);
+  }
+  if (/\.from\(['\"]courses['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}review_status\s*:/.test(text)) {
+    failures.push(`${rel}: direct HTTP course-review mutation detected; use ${rootRoute}`);
+  }
+  if (/\.from\(['\"]course_lessons['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}approved\s*:/.test(text)) {
+    failures.push(`${rel}: direct HTTP lesson-review mutation detected; use ${rootRoute}`);
+  }
 }
 
 const forbiddenEndpointRefs = [
@@ -121,13 +139,13 @@ const forbiddenEndpointRefs = [
   '/api/admin/course-builder/lesson-patch',
   '/api/admin/course-builder/lesson',
   '/api/admin/course-builder/quick-add',
+  '/api/admin/courses/[courseId]/publish',
+  '/api/admin/courses/[courseId]/review',
   '/api/admin/courses/generate/publish',
   '/api/ai/generate-and-publish-course',
 ];
 const endpointReferenced = (text, endpoint) => {
-  if (endpoint === '/api/admin/course-builder/program') {
-    text = text.replaceAll('/api/admin/course-builder/program-map', '');
-  }
+  if (endpoint === '/api/admin/course-builder/program') text = text.replaceAll('/api/admin/course-builder/program-map', '');
   return text.includes(endpoint);
 };
 for (const rel of [...walk('apps'), ...walk('components'), ...walk('lib')]) {
@@ -141,4 +159,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder orchestration/editing/publication facade -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; no raw-engine, parallel complete-package, or parallel publication authority detected.');
+console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder generation/editing/review/publication -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; no raw-engine, parallel package, review, or publication authority detected.');

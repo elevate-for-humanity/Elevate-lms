@@ -8,8 +8,9 @@ const APPS = { marketing: 'apps/marketing/app', lms: 'apps/lms/app', admin: 'app
 const PORTALS = [
   ['lms','lms','/lms'], ['lms','apprentice','/apprentice'], ['lms','employer','/employer'],
   ['lms','host-shop','/host-shop'], ['lms','parent-portal','/parent-portal'], ['lms','workforce','/workforce'],
-  ['lms','program-holder','/program-holder'], ['marketing','provider','/provider'], ['marketing','case-manager','/case-manager'],
-  ['marketing','workforce-board','/workforce-board'], ['admin','instructor','/instructor'], ['admin','staff-portal','/staff-portal'],
+  ['lms','program-holder','/program-holder'], ['lms','creator','/creator'], ['marketing','provider','/provider'],
+  ['marketing','case-manager','/case-manager'], ['marketing','workforce-board','/workforce-board'],
+  ['admin','instructor','/instructor'], ['admin','staff-portal','/staff-portal'],
   ['admin','testing-center','/testing-center'], ['admin','studio','/studio'],
 ];
 let failures = 0;

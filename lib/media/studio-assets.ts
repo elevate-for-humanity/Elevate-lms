@@ -25,7 +25,7 @@ export function studioAssetPath(input: {
 
 export async function persistStudioAsset(input: {
   organizationId: string;
-  userId: string;
+  userId?: string | null;
   projectName: string;
   fileName: string;
   buffer: Buffer;
@@ -71,7 +71,7 @@ export async function persistStudioAsset(input: {
       transcript: input.transcript ?? null,
       title: input.title,
       status: 'active',
-      created_by: input.userId,
+      created_by: input.userId ?? null,
       metadata,
     })
     .select('id, org_id, storage_path, type, mime_type, duration_seconds, title, status, metadata, created_at')

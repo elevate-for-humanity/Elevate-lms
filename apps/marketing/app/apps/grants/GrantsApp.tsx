@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { CalendarDays, FileText, Search, Bookmark, Sparkles } from 'lucide-react';
+import { ContextAwareAdvisor } from '@/components/apps/ContextAwareAdvisor';
 
 type Row = Record<string, any>;
 
@@ -56,12 +57,14 @@ export function GrantsApp({ subscription, opportunities, savedGrants, applicatio
         {setupEntries.length > 0 && (
           <section className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
             <div className="flex items-center gap-2 text-emerald-900"><Sparkles className="h-5 w-5" /><h2 className="font-black">Guided discovery context</h2></div>
-            <p className="mt-2 text-sm leading-6 text-emerald-900">Your plain-English funding answers were carried into this workspace. They define the starting search context; opportunity availability still depends on the records and feeds available to Elevate.</p>
+            <p className="mt-2 text-sm leading-6 text-emerald-900">Your plain-English funding answers were carried into this workspace. They are also passed into the AI advisor as user-provided context; opportunity availability still depends on verified records and feeds available to Elevate.</p>
             <dl className="mt-4 grid gap-3 md:grid-cols-2">
               {setupEntries.map(([key, value]) => <div key={key} className="rounded-xl bg-white p-4"><dt className="text-xs font-black uppercase tracking-wide text-slate-500">{key}</dt><dd className="mt-1 text-sm text-slate-900">{value}</dd></div>)}
             </dl>
           </section>
         )}
+
+        <ContextAwareAdvisor appSlug="grants" context={setupContext} />
 
         <section className="mt-8 grid gap-4 sm:grid-cols-3">
           <Stat icon={Search} label="Open opportunities" value={opportunities.length} />

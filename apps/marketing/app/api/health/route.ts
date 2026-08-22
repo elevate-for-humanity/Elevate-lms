@@ -20,9 +20,10 @@ export async function GET() {
   return NextResponse.json(
     {
       service: 'marketing',
-      status: healthy ? 'healthy' : 'unhealthy',
-      ready: healthy,
-      healthContract: 'marketing-v3',
+      status: healthy ? 'healthy' : readiness.ready ? 'degraded' : 'unhealthy',
+      healthy,
+      ready: readiness.ready,
+      healthContract: 'marketing-v4',
       commit: readiness.commit,
       github: process.env.GITHUB_SHA ?? 'unknown',
       publicCommit: process.env.NEXT_PUBLIC_GIT_SHA ?? 'unknown',

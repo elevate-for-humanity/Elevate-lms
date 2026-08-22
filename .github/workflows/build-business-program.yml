@@ -2,6 +2,11 @@ name: Build Business Program Acceptance
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-business-program.yml'
+      - 'ops/triggers/business-course-builder.txt'
 
 permissions:
   contents: read
@@ -24,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     concurrency:
-      group: business-course-builder-manual-acceptance
+      group: business-course-builder-production-acceptance
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4

@@ -1,3 +1,4 @@
+// Production acceptance runner for Indiana INTraining Program #10005173.
 import { courseFactory } from '../../lib/course-factory';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { requireAdminClient } from '../../lib/supabase/admin';

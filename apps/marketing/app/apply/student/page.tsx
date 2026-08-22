@@ -19,6 +19,7 @@ export const metadata: Metadata = {
  * PARIS is the guided application surface. The conventional multi-step form is
  * retained at /apply/student/form as an accessibility/recovery fallback, but
  * both paths submit through the same /api/applications authority.
+ * Production acceptance trigger: 2026-08-22 closeout verification.
  */
 export default async function StudentApplicationPage({
   searchParams,

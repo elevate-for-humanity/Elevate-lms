@@ -50,6 +50,8 @@ requireText('lib/paris/admissions/interview-engine.ts', 'claimedTransferHours', 
 requireText('lib/paris/admissions/interview-engine.ts', 'supporting evidence and sponsor review', 'transfer-hours review disclaimer');
 requireText('apps/marketing/app/api/paris/applications/[applicationId]/decision/route.ts', 'approveApplication', 'canonical approval pipeline');
 requireText('apps/marketing/app/api/paris/applications/[applicationId]/decision/route.ts', "canonicalAuthority: 'applications'", 'canonical application authority response');
+forbidText('apps/marketing/app/api/paris/applications/[applicationId]/decision/route.ts', 'bypassPaymentGate: true', 'payment/funding gate bypass');
+requireText('apps/marketing/app/api/paris/applications/route.ts', 'Origin: canonicalUrl.origin', 'same-origin canonical submission');
 requireText('lib/zora/admissions/orchestration-service.ts', "from('applications')", 'ZORA canonical applications authority');
 requireText('lib/zora/admissions/orchestration-service.ts', "from('follow_up_reminders')", 'ZORA canonical follow-up authority');
 requireText('apps/marketing/app/api/paris/application-interview/documents/route.ts', "status: 'pending'", 'documents remain pending review');
@@ -62,8 +64,13 @@ requireText('lib/agentic/worker-registry.ts', "name: 'application-interview'", '
 requireText('lib/agentic/worker-registry.ts', "name: 'course-architect'", 'course worker');
 requireText('lib/agentic/worker-registry.ts', "name: 'website-builder'", 'website worker');
 requireText('lib/agentic/worker-registry.ts', "name: 'translation'", 'translation worker');
+requireText('lib/agentic/orchestrator.ts', 'createBaselineAgenticPlan', 'shared planner');
+requireText('lib/agentic/orchestrator.ts', 'startAgenticRun', 'shared BuildRun service');
+requireText('lib/agentic/orchestrator.ts', 'createAgenticCheckpoint', 'shared checkpoint service');
 requireText('supabase/migrations/20260822190000_retire_paris_application_authority.sql', 'drop table if exists public.paris_applications', 'forward retirement of duplicate authority');
 requireText('supabase/migrations/20260822191500_link_agentic_application_documents.sql', 'link_agentic_application_documents', 'server-side project/application document linking');
+requireText('supabase/migrations/20260822193000_documents_application_owner_types.sql', "'agentic_application'::text", 'pre-submission application document owner type');
+requireText('supabase/migrations/20260822194500_agentic_run_credit_accounting.sql', 'increment_agentic_run_credits', 'atomic agentic run credit accounting');
 
 if (!process.exitCode) {
   console.log('AGENTIC_ADMISSIONS_CONTRACT_PASS');

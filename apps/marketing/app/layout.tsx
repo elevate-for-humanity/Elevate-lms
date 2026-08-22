@@ -21,6 +21,7 @@ import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { FirstPartyTraffic } from '@/components/analytics/FirstPartyTraffic';
 import { SkipToContent } from '@/components/accessibility/SkipToContent';
 import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLabels';
+import CookieConsent from '@/components/CookieConsent';
 
 const siteUrl = 'https://www.elevateforhumanity.org';
 const logoUrl = `${siteUrl}/images/logo.png`;
@@ -143,6 +144,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
           <SiteFooter />
         </I18nProvider>
+        <CookieConsent />
       </body>
     </html>
   );

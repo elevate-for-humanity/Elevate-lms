@@ -14,12 +14,12 @@ concurrency:
 
 jobs:
   deploy:
-    if: startsWith(github.event.issue.title, '[FORCE ADMIN C43]')
+    if: startsWith(github.event.issue.title, '[FORCE ADMIN REMOTION]')
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 90
     env:
-      TARGET_SHA: c43c07a2614598ec86126bc6883022f72a3391c7
+      TARGET_SHA: c10fc34256c38a4e5448c0ced58da2eb99ded0e1
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}

@@ -79,6 +79,8 @@ jobs:
         id: rebuild
         if: steps.install.outputs.exit_code == '0' && steps.credentials.outputs.exit_code == '0'
         shell: bash
+        env:
+          NODE_OPTIONS: --conditions=react-server
         run: |
           set +e
           pnpm tsx scripts/course-builder/run.ts --course entrepreneurship --mode replace > /tmp/rebuild-esb.log 2>&1
@@ -91,6 +93,8 @@ jobs:
         id: validate
         if: steps.rebuild.outputs.exit_code == '0'
         shell: bash
+        env:
+          NODE_OPTIONS: --conditions=react-server
         run: |
           set +e
           pnpm tsx scripts/course-builder/run.ts --course entrepreneurship --validate > /tmp/rebuild-validate.log 2>&1
@@ -103,6 +107,8 @@ jobs:
         id: verify
         if: steps.rebuild.outputs.exit_code == '0' && steps.validate.outputs.exit_code == '0'
         shell: bash
+        env:
+          NODE_OPTIONS: --conditions=react-server
         run: |
           set +e
           pnpm tsx scripts/course-builder/verify-esb-runtime.ts > /tmp/rebuild-verify.log 2>&1
@@ -137,3 +143,4 @@ jobs:
 # 2026-08-19 runtime parity: use platform-standard Node 22
 # 2026-08-22 canonical Course Builder rerun after Remotion runtime packaging repair
 # 2026-08-22 report preflight/build/validate/verify results to issue 703
+# 2026-08-22 execute course-builder scripts with react-server export condition

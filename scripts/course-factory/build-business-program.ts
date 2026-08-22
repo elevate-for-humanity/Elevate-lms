@@ -8,8 +8,9 @@ const EXPECTED_MODULES = 5;
 const EXPECTED_LESSONS = 35;
 const EXPECTED_MAIN_VIDEOS = 35;
 const EXPECTED_MICROCLIPS = 70;
-const MEDIA_POLL_MS = 20_000;
+const MEDIA_POLL_MS = 15_000;
 const MEDIA_TIMEOUT_MS = 75 * 60_000;
+const ADMIN_URL = (process.env.ADMIN_URL || 'https://admin.elevateforhumanity.org').replace(/\/$/, '');
 const AI_SECRET_KEYS = [
   'GEMINI_API_KEY','GOOGLE_CLOUD_API_KEY','GROQ_API_KEY','CLOUDFLARE_ACCOUNT_ID',
   'CLOUDFLARE_AI_API_TOKEN','CLOUDFLARE_API_TOKEN','OPENAI_API_KEY','ANTHROPIC_API_KEY','AZURE_OPENAI_API_KEY',
@@ -30,10 +31,35 @@ async function hydrateAISecrets(db: Awaited<ReturnType<typeof requireAdminClient
   console.log(`[Business Course Builder] provider credentials ready: ${available.join(', ')}`);
 }
 
+async function kickMediaWorker() {
+  const secret = process.env.CRON_SECRET?.trim();
+  if (!secret) return;
+  try {
+    const response = await fetch(`${ADMIN_URL}/api/internal/videos/process-queue`, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${secret}`, 'content-type': 'application/json' },
+      signal: AbortSignal.timeout(45_000),
+    });
+    const text = await response.text();
+    if (!response.ok) {
+      console.warn(`[Business Course Builder] media worker kick returned HTTP ${response.status}: ${text.slice(0, 500)}`);
+      return;
+    }
+    console.log(`[Business Course Builder] media worker kick: ${text.slice(0, 500)}`);
+  } catch (error) {
+    console.warn(`[Business Course Builder] media worker kick failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 async function waitForMedia(courseId: string) {
   const db = await requireAdminClient();
   const deadline = Date.now() + MEDIA_TIMEOUT_MS;
   while (Date.now() < deadline) {
+    // Production schedulers run every five minutes, which is too coarse for a
+    // 105-asset acceptance package. Kick the same canonical Admin worker while
+    // polling so this test drains the real queue instead of inventing a bypass.
+    await kickMediaWorker();
+
     const { data, error } = await db.from('video_jobs').select('asset_kind,status,video_url,error_message').eq('course_id', courseId);
     if (error) fail(`Video job query failed: ${error.message}`);
     const rows = data ?? [];
@@ -41,7 +67,9 @@ async function waitForMedia(courseId: string) {
     if (failed.length) fail(`Media generation failed for ${failed.length} asset(s): ${failed.slice(0, 3).map((row) => row.error_message ?? 'unknown').join(' | ')}`);
     const main = rows.filter((row) => (row.asset_kind ?? 'lesson') === 'lesson' && row.status === 'complete' && row.video_url).length;
     const micro = rows.filter((row) => row.asset_kind === 'microclip' && row.status === 'complete' && row.video_url).length;
-    console.log(`[Business Course Builder] media main ${main}/${EXPECTED_MAIN_VIDEOS}, micro ${micro}/${EXPECTED_MICROCLIPS}`);
+    const rendering = rows.filter((row) => row.status === 'rendering').length;
+    const queued = rows.filter((row) => row.status === 'queued').length;
+    console.log(`[Business Course Builder] media main ${main}/${EXPECTED_MAIN_VIDEOS}, micro ${micro}/${EXPECTED_MICROCLIPS}, rendering ${rendering}, queued ${queued}`);
     if (main === EXPECTED_MAIN_VIDEOS && micro === EXPECTED_MICROCLIPS) return;
     await new Promise((resolve) => setTimeout(resolve, MEDIA_POLL_MS));
   }

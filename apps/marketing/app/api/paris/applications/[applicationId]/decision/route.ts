@@ -9,7 +9,8 @@ import { approveApplication } from '@/lib/enrollment/approve';
  *
  * Canonical admissions state lives on public.applications. Accepted decisions
  * must use the same approveApplication() pipeline as Admin so this route can
- * never create a parallel enrollment or bypass the canonical LMS-access path.
+ * never create a parallel enrollment or bypass the canonical payment/funding
+ * and LMS-access gates.
  */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -90,7 +91,6 @@ export async function POST(
         applicationId,
         programId: resolvedProgramId,
         fundingType: application.funding_type,
-        bypassPaymentGate: true,
       });
       if (!result.success) {
         return NextResponse.json({ success: false, error: result.error || 'Approval failed' }, { status: 409 });

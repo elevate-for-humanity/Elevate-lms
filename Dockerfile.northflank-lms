@@ -1,17 +1,6 @@
 # Dockerfile.northflank-lms
 # Builds and serves the LMS application (apps/lms/)
 # Serves app.elevateforhumanity.org
-#
-# Northflank Configuration:
-#   - Build type: Dockerfile
-#   - Dockerfile path: /Dockerfile.northflank-lms
-#   - Build context: /
-#   - Public port: 3000
-#
-# Production contract:
-#   - dependency graph must match pnpm-lock.yaml exactly
-#   - the packaged standalone runtime must actually boot and serve /api/ping
-#   - build identity comes from Northflank's injected NF_GIT_SHA
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP=unknown
 ARG BUILD_ID
@@ -22,20 +11,11 @@ ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID
 
-# Force a clean recovery build after the August 20 production 503 incident.
-RUN echo "nf-cache-invalidate-lms-2026-08-20-packaged-runtime-smoke"
+RUN echo "nf-cache-invalidate-lms-2026-08-22-pwa-offline-e2e"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    build-essential \
-    ca-certificates \
-    ffmpeg \
-    libcairo2-dev \
-    libpango1.0-dev \
-    libjpeg-dev \
-    libgif-dev \
-    librsvg2-dev \
-    gnupg \
+    python3 build-essential ca-certificates ffmpeg libcairo2-dev libpango1.0-0 \
+    libjpeg-dev libgif-dev librsvg2-dev gnupg \
     && rm -rf /var/lib/apt/lists/*
 
 RUN corepack disable || true \
@@ -65,11 +45,7 @@ ENV CI=true
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
 RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
-# Production containers must be reproducible. Never mutate dependency resolution
-# during an image build.
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
-
-# Reassert the pinned pnpm executable after repository lifecycle hooks.
 RUN corepack disable || true \
     && npm install -g pnpm@10.28.2 \
     && test "$(pnpm --version)" = "10.28.2"
@@ -110,6 +86,15 @@ RUN echo "LMS Build SHA: ${NF_GIT_SHA}" && \
     echo "LMS Build Timestamp: ${BUILD_TIMESTAMP}" && \
     echo "NEXT_PUBLIC_BUILD_ID: elevate-${NF_GIT_SHA}"
 
+# The Northflank image is the actual production build path. Enforce the same
+# PWA architecture gate here and stamp the canonical worker before compilation.
+RUN node scripts/check-pwa-architecture.mjs
+RUN node scripts/stamp-sw.mjs
+RUN test -f /app/public/sw-lms.js \
+    && test -f /app/public/manifest-lms.json \
+    && test -f /app/public/offline.html \
+    && ! grep -q '__CACHE_VERSION__' /app/public/sw-lms.js
+
 RUN pnpm run build:lms:compile --no-lint
 
 RUN echo "=== STANDALONE STRUCTURE ===" && \
@@ -126,16 +111,8 @@ RUN echo "=== STANDALONE STRUCTURE ===" && \
 FROM node:22-bookworm-slim AS runner
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    ffmpeg \
-    fonts-liberation \
-    libcairo2 \
-    libpango-1.0-0 \
-    libjpeg62-turbo \
-    libgif7 \
-    librsvg2-2 \
-    librsvg2-common \
+    ca-certificates curl ffmpeg fonts-liberation libcairo2 libpango-1.0-0 \
+    libjpeg62-turbo libgif7 librsvg2-2 librsvg2-common \
     && rm -rf /var/lib/apt/lists/*
 
 ARG NF_GIT_SHA
@@ -177,11 +154,16 @@ COPY --from=builder /app/apps/lms/.next/static ./apps/lms/.next/static
 COPY --from=builder /app/public ./apps/lms/public
 COPY --from=builder /app/apps/lms/public ./apps/lms/public
 
-RUN test -d /app/apps/lms/public/images
+RUN test -d /app/apps/lms/public/images \
+    && test -f /app/apps/lms/public/sw-lms.js \
+    && test -f /app/apps/lms/public/manifest-lms.json \
+    && test -f /app/apps/lms/public/offline.html \
+    && ! grep -q '__CACHE_VERSION__' /app/apps/lms/public/sw-lms.js \
+    && grep -q 'sync-timeclock' /app/apps/lms/public/sw-lms.js \
+    && grep -q 'TIMECLOCK_SYNC_REJECTED' /app/apps/lms/public/sw-lms.js \
+    && grep -q 'Waiting for a secure connection' /app/apps/lms/public/offline.html
 RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
 
-# Do not publish an image that merely contains a server file. Boot the exact
-# packaged runtime and require the same health endpoint Northflank will probe.
 RUN set -eux; \
     LOG=/tmp/lms-runtime-smoke.log; \
     if [ -f /app/apps/lms/server.js ]; then \
@@ -211,6 +193,9 @@ RUN set -eux; \
       exit 1; \
     fi; \
     cat /tmp/lms-ping.json; \
+    curl --fail --silent --show-error http://127.0.0.1:3000/sw-lms.js | grep -q 'sync-timeclock'; \
+    curl --fail --silent --show-error http://127.0.0.1:3000/manifest-lms.json | grep -q '"standalone"'; \
+    curl --fail --silent --show-error http://127.0.0.1:3000/offline.html | grep -q 'Waiting for a secure connection'; \
     kill "${PID}"; \
     wait "${PID}" || true; \
     trap - EXIT

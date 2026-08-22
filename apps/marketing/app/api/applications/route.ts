@@ -307,24 +307,35 @@ async function _POST(req: Request) {
       );
     }
 
-    // Active-application check: warn (don't block) if same email has an active
-    // application for the SAME program that isn't rejected/withdrawn.
-    // This helps students who forgot they already applied.
+    // Reuse an existing active application for the same applicant/program.
+    // A WorkOne or document update must advance the original application, not
+    // create a second admissions record.
     const { data: activeApp } = await supabase
       .from('applications')
-      .select('id, reference_number, status')
+      .select('id, reference_number, status, program_interest')
       .eq('email', body.email.toLowerCase().trim())
       .eq('program_interest', program)
       .not('status', 'in', '("rejected","withdrawn","duplicate")')
+      .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    let duplicateWarning: string | undefined;
     if (activeApp) {
-      duplicateWarning =
-        `You already have an active application for this program. ` +
-        `Reference: ${activeApp.reference_number ?? activeApp.id}. ` +
-        `Track your application: /apply/track?id=${activeApp.reference_number ?? activeApp.id}`;
+      return NextResponse.json(
+        {
+          ok: true,
+          existing: true,
+          id: activeApp.id,
+          program: activeApp.program_interest ?? program,
+          referenceNumber: activeApp.reference_number ?? activeApp.id,
+          applicationStatus: activeApp.status,
+          nextStepUrl:
+            activeApp.status === 'pending_workone' || activeApp.status === 'pending_funding'
+              ? `/apply/pending-workone?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
+              : `/apply/track?id=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`,
+        },
+        { status: 200, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
     }
 
     // Generate reference number
@@ -370,25 +381,27 @@ async function _POST(req: Request) {
       parseInt(body.transferHours ?? body.transfer_hours_claimed ?? '0') || 0,
     );
 
-    // Determine application status based on funding type and eligibility.
-    // WIOA / WRG applications require admin approval before enrollment.
-    // Students who have not yet been to Indiana Career Connect are saved as
-    // 'pending_funding' - they must complete the ICC process and reapply.
+    // Determine application status based on the actual funding/intake state.
+    // WIOA / WRG applications remain the same application while WorkOne work is
+    // completed; the applicant must never be told to submit a replacement one.
     const FUNDED_TYPES = ['wioa', 'wrg'];
     const fundingType = body.fundingType || body.fundingInterest || null;
     const eligibilityStatus = body.fundingEligibilityStatus || null;
     const isFunded = FUNDED_TYPES.includes(fundingType);
-    const needsICC = isFunded && eligibilityStatus === 'needs_appointment';
+    const workOneReferral = String(body.hasWorkOneReferral || '').trim().toLowerCase();
+    const workOneIntake = String(body.workoneIntakeCompleted || '').trim().toLowerCase();
+    const needsWorkOne =
+      isFunded &&
+      (eligibilityStatus === 'needs_appointment' ||
+        workOneReferral === 'no' ||
+        workOneIntake === 'not_started');
 
     let applicationStatus: string;
-    if (needsICC) {
-      // Has not been to ICC yet - hold application, send them to ICC first
-      applicationStatus = 'pending_funding';
+    if (needsWorkOne) {
+      applicationStatus = 'pending_workone';
     } else if (isFunded) {
-      // Has ICC approval or is in process - needs admin review before enrollment
       applicationStatus = 'pending_admin_review';
     } else {
-      // Self-pay, employer, unsure - standard submitted flow
       applicationStatus = 'submitted';
     }
 
@@ -580,7 +593,7 @@ async function _POST(req: Request) {
       }
     }
 
-    logger.info('[Applications] Saved - pending admin review', {
+    logger.info('[Applications] Saved', {
       applicationId: data.id,
       fundingType,
       eligibilityStatus,
@@ -619,25 +632,25 @@ async function _POST(req: Request) {
         wrg: 'Workforce Ready Grant / Next Level Jobs',
       };
       const fundingName = fundingType ? fundingLabel[fundingType] || fundingType : null;
+      const pendingWorkOneUrl = `${siteUrl}/apply/pending-workone?ref=${encodeURIComponent(referenceNumber)}&funding=${encodeURIComponent(fundingType || 'workone')}`;
 
-      const nextStepsHtml = needsICC
+      const nextStepsHtml = needsWorkOne
         ? `
         <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0;">
-          <h3 style="margin-top: 0; color: #92400e;">Action Required - Complete Indiana Career Connect First</h3>
-          <p style="color: #78350f;">You selected <strong>${fundingName}</strong> as your funding option. Before we can enroll you, you must complete the Indiana Career Connect process and receive your funding approval.</p>
+          <h3 style="margin-top: 0; color: #92400e;">Action Required - Complete Your WorkOne Intake</h3>
+          <p style="color: #78350f;">You selected <strong>${fundingName}</strong> as your funding option. Your Elevate application is saved under reference <strong>${referenceNumber}</strong> and will remain the same application while WorkOne completes its eligibility and funding review.</p>
           <h4 style="color: #92400e; margin-bottom: 8px;">Your next steps:</h4>
           <ol style="color: #78350f; padding-left: 20px; line-height: 1.8;">
-            <li>Go to <a href="https://www.indianacareerconnect.com" style="color: #ea580c; font-weight: bold;">IndianaCareerConnect.com</a> and create a free account</li>
-            <li>Complete your profile and upload your resume</li>
-            <li>Schedule an appointment at your nearest WorkOne center</li>
-            <li>Receive your funding approval letter (ITA or WRG approval)</li>
-            <li><strong>Come back and reapply</strong> - your application will be fast-tracked once you have your approval letter</li>
+            <li>Maintain or create your Indiana Career Connect profile</li>
+            <li>Complete your WorkOne intake appointment</li>
+            <li>Receive your eligibility/funding decision from WorkOne</li>
+            <li>Use your WorkOne progress link or contact Elevate so we can update this same application</li>
           </ol>
-          <p style="margin-bottom: 12px; color: #78350f;"><strong>Need help?</strong> Our enrollment team can walk you through the process.</p>
-          <a href="https://www.indianacareerconnect.com" style="display: inline-block; background: #1d4ed8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-right: 8px;">Go to Indiana Career Connect</a>
-          <a href="https://www.in.gov/dwd/find-a-workone-center/" style="display: inline-block; background: #374151; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Find a WorkOne Center</a>
+          <p style="margin-bottom: 12px; color: #78350f;"><strong>Do not submit a second application.</strong> Your current application and reference number remain active.</p>
+          <a href="${pendingWorkOneUrl}" style="display: inline-block; background: #1d4ed8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-right: 8px;">Continue WorkOne Steps</a>
+          <a href="https://www.in.gov/dwd/workone/workone-locations/" style="display: inline-block; background: #374151; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Find a WorkOne Center</a>
         </div>
-        <p style="color: #64748b; font-size: 14px;">Once you have your approval letter, reapply at <a href="${siteUrl}/programs/hvac-technician/apply" style="color: #ea580c;">${siteUrl}/programs</a> and select your funding type. Your application will be prioritized.</p>
+        ${passwordSection}
       `
         : isFunded
           ? `
@@ -666,10 +679,11 @@ async function _POST(req: Request) {
           </ol>
           <p style="color:#166534;margin-bottom:0;"><strong>Questions?</strong> Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color:#ea580c;">${PLATFORM_DEFAULTS.supportPhone}</a> or email <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color:#ea580c;">info@${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
         </div>
+        ${passwordSection}
       `;
 
-      const emailSubject = needsICC
-        ? `Action Required - Complete Indiana Career Connect to Enroll [Ref: ${referenceNumber}]`
+      const emailSubject = needsWorkOne
+        ? `Action Required - Complete WorkOne Intake [Ref: ${referenceNumber}]`
         : isFunded
           ? `Application Received - Pending Review [Ref: ${referenceNumber}]`
           : `Welcome to ${PLATFORM_DEFAULTS.orgName} - ${body.program} [Ref: ${referenceNumber}]`;
@@ -680,16 +694,16 @@ async function _POST(req: Request) {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="padding: 24px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 2px solid #e5e7eb;">
-              <h1 style="margin: 0; font-size: 24px;">${needsICC ? 'Next Step Required' : 'Welcome to ' + PLATFORM_DEFAULTS.orgName + '!'}</h1>
+              <h1 style="margin: 0; font-size: 24px;">${needsWorkOne ? 'Next Step Required' : 'Welcome to ' + PLATFORM_DEFAULTS.orgName + '!'}</h1>
             </div>
             <div style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
               <p style="font-size: 16px;">Hi ${body.firstName},</p>
-              <p>Your application for <strong>${body.program}</strong> has been received${needsICC ? ', but there is one more step before we can enroll you.' : isFunded ? ' and is pending admin review.' : ' and your enrollment is being processed.'}</p>
+              <p>Your application for <strong>${body.program}</strong> has been received${needsWorkOne ? ', and it is being held while you complete the WorkOne step.' : isFunded ? ' and is pending admin review.' : ' and is under review.'}</p>
 
               ${nextStepsHtml}
 
               ${
-                !needsICC
+                !needsWorkOne
                   ? `
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <h3 style="margin-top: 0; color: #ea580c;">Want to Talk Sooner?</h3>
@@ -717,8 +731,8 @@ async function _POST(req: Request) {
       });
 
       // Send staff email in parallel (don't wait for it to finish before responding)
-      const staffSubject = needsICC
-        ? `! Pending Funding [${referenceNumber}]: ${body.firstName} ${body.lastName} - Needs ICC First`
+      const staffSubject = needsWorkOne
+        ? `! Pending WorkOne [${referenceNumber}]: ${body.firstName} ${body.lastName}`
         : isFunded
           ? `🔵 Admin Review Required [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${fundingName}`
           : `New Application [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${body.program}`;
@@ -728,8 +742,8 @@ async function _POST(req: Request) {
         subject: staffSubject,
         html: `
           <h2>New Application Received</h2>
-          ${needsICC ? `<div style="background:#fffbeb;border:2px solid #f59e0b;border-radius:8px;padding:16px;margin-bottom:16px;"><strong>! ACTION: Student has NOT been to Indiana Career Connect.</strong> Do NOT enroll. Student has been emailed instructions to complete ICC and reapply.</div>` : ''}
-          ${isFunded && !needsICC ? `<div style="background:#eff6ff;border:2px solid #3b82f6;border-radius:8px;padding:16px;margin-bottom:16px;"><strong>🔵 ADMIN REVIEW REQUIRED before enrollment.</strong> Verify ${fundingName} approval with the agency before approving this application.</div>` : ''}
+          ${needsWorkOne ? `<div style="background:#fffbeb;border:2px solid #f59e0b;border-radius:8px;padding:16px;margin-bottom:16px;"><strong>! WORKONE STEP PENDING.</strong> Keep this application open. Do not enroll until funding is authorized, and update this same record when WorkOne evidence is received.</div>` : ''}
+          ${isFunded && !needsWorkOne ? `<div style="background:#eff6ff;border:2px solid #3b82f6;border-radius:8px;padding:16px;margin-bottom:16px;"><strong>🔵 ADMIN REVIEW REQUIRED before enrollment.</strong> Verify ${fundingName} approval with the agency before approving this application.</div>` : ''}
           <p><strong>Reference:</strong> ${referenceNumber}</p>
           <p><strong>Name:</strong> ${body.firstName} ${body.lastName}</p>
           <p><strong>Email:</strong> ${body.email}</p>
@@ -744,7 +758,7 @@ async function _POST(req: Request) {
           ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
           ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ''}
           <div style="text-align:center;margin:24px 0;">
-            <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review &amp; Enroll -></a>
+            <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review Application -></a>
           </div>
           <p style="font-size:12px;color:#6b7280;text-align:center;">Application ID: ${data.id}</p>
         `,
@@ -789,6 +803,10 @@ async function _POST(req: Request) {
       logger.warn('[Applications] Failed to queue automation job', queueError instanceof Error ? queueError.message : String(queueError));
     }
 
+    const nextStepUrl = needsWorkOne
+      ? `/apply/pending-workone?ref=${encodeURIComponent(referenceNumber)}&funding=${encodeURIComponent(fundingType || 'workone')}`
+      : `/apply/success?ref=${encodeURIComponent(referenceNumber)}&program=${encodeURIComponent(data.program_interest ?? program)}`;
+
     return NextResponse.json(
       {
         ok: true,
@@ -796,8 +814,9 @@ async function _POST(req: Request) {
         email: data.email,
         program: data.program_interest ?? program,
         referenceNumber: referenceNumber,
+        applicationStatus,
+        nextStepUrl,
         emailStatus,
-        ...(duplicateWarning ? { duplicateWarning } : {}),
       },
       { status: 200, headers: corsHeadersForOrigin(origin, allowedOrigins) },
     );

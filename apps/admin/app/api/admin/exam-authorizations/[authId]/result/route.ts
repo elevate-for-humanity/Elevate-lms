@@ -6,7 +6,6 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { logger } from '@/lib/logger';
-import { issueCertificateIfEligible } from '@/lib/lms/engine/certificate';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,7 +29,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ aut
   const db = await requireAdminClient();
   const { data: existing, error: fetchErr } = await db
     .from('exam_authorizations')
-    .select('id, status, user_id, program_id')
+    .select('id,status,user_id,program_id')
     .eq('id', authId)
     .maybeSingle();
   if (fetchErr || !existing) return safeError('Authorization not found', 404);
@@ -65,34 +64,24 @@ export async function POST(request: Request, { params }: { params: Promise<{ aut
     actorId: auth.id,
     entityType: 'exam_authorizations',
     entityId: authId,
-    metadata: { passed: passedBool, score: parsedScore, exam_date, user_id: existing.user_id, program_id: existing.program_id },
+    metadata: {
+      passed: passedBool,
+      score: parsedScore,
+      exam_date,
+      user_id: existing.user_id,
+      program_id: existing.program_id,
+    },
     req: request,
   }).catch((error) => logger.warn('[exam-result] Audit log failed', error));
 
-  let certificateNumber: string | null = null;
-  if (passedBool && existing.user_id) {
-    try {
-      const { data: enrollment } = await db
-        .from('program_enrollments')
-        .select('id, course_id')
-        .eq('user_id', existing.user_id)
-        .eq('program_id', existing.program_id)
-        .in('status', ['active', 'completed'])
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (enrollment?.id && enrollment?.course_id) {
-        certificateNumber = await issueCertificateIfEligible(existing.user_id, enrollment.course_id, enrollment.id);
-      }
-    } catch (error) {
-      logger.error('[exam-result] Certificate issuance failed (non-blocking)', error);
-    }
-  }
-
+  // Recording a passing exam result does not issue an Elevate completion
+  // certificate. Course/program issuance is allowed only after the canonical
+  // completion evaluators verify every lesson, assessment, seat-time, external
+  // module, competency, and program requirement.
   return NextResponse.json({
     success: true,
     passed: passedBool,
     status: passedBool ? 'passed' : 'failed',
-    certificate_number: certificateNumber ?? undefined,
+    external_certificate_number: certificate_number || undefined,
   });
 }

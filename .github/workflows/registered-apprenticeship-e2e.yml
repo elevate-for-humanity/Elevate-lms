@@ -15,6 +15,10 @@ on:
     types:
       - completed
 
+permissions:
+  contents: read
+  issues: write
+
 concurrency:
   group: registered-apprenticeship-e2e
   cancel-in-progress: false
@@ -89,3 +93,15 @@ jobs:
             test-results/
             playwright-report/
           retention-days: 14
+      - name: Publish production QA evidence
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          QA_STATUS: ${{ job.status }}
+          QA_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          QA_EVENT: ${{ github.event_name }}
+          QA_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment 791 --repo "$GITHUB_REPOSITORY" --body "### Host Shop + Apprentice production QA: ${QA_STATUS^^}\n\n- SHA: \`${QA_SHA}\`\n- Trigger: \`${QA_EVENT}\`\n- Run: ${QA_RUN_URL}\n- Scope: authenticated Apprentice dashboard/hours/RTI/competencies/documents/attendance/profile/handbook; authenticated Host Shop dashboard/apprentices/pending-hours/documents/competencies/attendance/wages/reports/profile; Host Shop competency write + restore; Apprentice-to-Host-Shop RBAC denial.\n- Result source: GitHub Actions production Playwright gate."

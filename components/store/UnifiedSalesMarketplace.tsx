@@ -8,8 +8,33 @@ import { BASE_PLANS, ADD_ON_MARKETPLACE } from '@/lib/store/platform-pricing';
 import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
 
 const categoryMeta: Record<CapabilityCategory, { label: string }> = {
-  business: { label: 'Business Growth' }, ai: { label: 'AI Team' }, education: { label: 'Education' },
-  workforce: { label: 'Workforce' }, compliance: { label: 'Compliance' }, apps: { label: 'Business Apps' }, enterprise: { label: 'Enterprise' },
+  business: { label: 'Business' },
+  ai: { label: 'AI Team' },
+  education: { label: 'Education' },
+  workforce: { label: 'Workforce' },
+  compliance: { label: 'Compliance' },
+  apps: { label: 'Business Apps' },
+  enterprise: { label: 'Enterprise' },
+};
+
+type StoreFamily = 'business' | 'learning' | 'enterprise';
+
+const familyMeta: Record<StoreFamily, { label: string; description: string; categories: CapabilityCategory[] }> = {
+  business: {
+    label: 'Business Platform',
+    description: 'Website, CRM, communications, AI assistants and focused business apps.',
+    categories: ['business', 'ai', 'apps'],
+  },
+  learning: {
+    label: 'Education & Workforce',
+    description: 'Course creation, learner operations, workforce, apprenticeship, employers and testing.',
+    categories: ['education', 'workforce'],
+  },
+  enterprise: {
+    label: 'Enterprise & Governance',
+    description: 'Managed compliance, orchestration and platform engineering capabilities.',
+    categories: ['compliance', 'enterprise'],
+  },
 };
 
 const CAPABILITY_IMAGES: Record<string, string> = {
@@ -61,28 +86,53 @@ function primaryAction(capability: PlatformCapability): { href: string; label: s
 
 export function UnifiedSalesMarketplace() {
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState<'all' | CapabilityCategory>('all');
+  const [family, setFamily] = useState<'all' | StoreFamily>('business');
+
   const items = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return CAPABILITY_CATALOG.filter((capability) => capability.status !== 'internal')
       .filter((capability) => capability.key !== 'course_factory' && capability.key !== 'lms')
-      .filter((capability) => category === 'all' || capability.category === category)
+      .filter((capability) => family === 'all' || familyMeta[family].categories.includes(capability.category))
       .filter((capability) => !needle || [capability.name, capability.description, ...capability.keywords].join(' ').toLowerCase().includes(needle));
-  }, [query, category]);
+  }, [query, family]);
 
   return (
     <section className="bg-slate-950 py-16 font-medium text-white" id="marketplace">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-300">Start basic. Add capabilities as your business grows.</p>
-          <h2 className="mt-5 text-3xl font-black tracking-tight text-white sm:text-5xl">Build your Elevate business stack</h2>
-          <p className="mt-4 text-base font-semibold leading-7 text-slate-100 sm:text-lg">Search the platform, see how each capability works, understand its commercial path, and add only what your organization needs.</p>
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-300">One platform. Three clear buying paths.</p>
+          <h2 className="mt-5 text-3xl font-black tracking-tight text-white sm:text-5xl">Choose the part of Elevate you need now</h2>
+          <p className="mt-4 text-base font-semibold leading-7 text-slate-100 sm:text-lg">Start with business operations, education and workforce, or a managed enterprise scope. Add capabilities without rebuilding your organization in another system.</p>
         </div>
-        <div className="mx-auto mt-8 max-w-3xl"><label className="block"><span className="sr-only">Search platform capabilities</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search website builder, CRM, PARIS, testing, apprenticeship..." className="w-full rounded-2xl border border-white/30 bg-white px-5 py-4 text-base font-bold text-slate-950 outline-none ring-brand-red-500 placeholder:text-slate-600 focus:ring-2" /></label></div>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button type="button" aria-pressed={category === 'all'} onClick={() => setCategory('all')} className={`rounded-full px-4 py-2 text-sm font-black ${category === 'all' ? 'bg-brand-red-600 text-white' : 'bg-white/15 text-white hover:bg-white/25'}`}>All</button>
-          {(Object.keys(categoryMeta) as CapabilityCategory[]).map((key) => <button key={key} type="button" aria-pressed={category === key} onClick={() => setCategory(key)} className={`rounded-full px-4 py-2 text-sm font-black ${category === key ? 'bg-brand-red-600 text-white' : 'bg-white/15 text-white hover:bg-white/25'}`}>{categoryMeta[key].label}</button>)}
+
+        <div className="mx-auto mt-8 grid max-w-5xl gap-3 md:grid-cols-3">
+          {(Object.keys(familyMeta) as StoreFamily[]).map((key) => {
+            const selected = family === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setFamily(key)}
+                className={`rounded-2xl border p-5 text-left transition ${selected ? 'border-brand-red-400 bg-white text-slate-950 shadow-lg' : 'border-white/20 bg-white/10 text-white hover:bg-white/15'}`}
+              >
+                <span className="block text-lg font-black">{familyMeta[key].label}</span>
+                <span className={`mt-2 block text-sm leading-6 ${selected ? 'text-slate-600' : 'text-slate-200'}`}>{familyMeta[key].description}</span>
+              </button>
+            );
+          })}
         </div>
+
+        <div className="mx-auto mt-7 grid max-w-5xl gap-3 sm:grid-cols-[1fr_auto]">
+          <label className="block"><span className="sr-only">Search platform capabilities</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search website builder, CRM, PARIS, testing, apprenticeship..." className="w-full rounded-xl border border-white/30 bg-white px-5 py-3.5 text-base font-bold text-slate-950 outline-none ring-brand-red-500 placeholder:text-slate-600 focus:ring-2" /></label>
+          <button type="button" aria-pressed={family === 'all'} onClick={() => setFamily('all')} className={`rounded-xl px-5 py-3 text-sm font-black ${family === 'all' ? 'bg-brand-red-600 text-white' : 'border border-white/30 bg-white/10 text-white hover:bg-white/20'}`}>View All</button>
+        </div>
+
+        {family !== 'all' ? (
+          <div className="mx-auto mt-6 max-w-5xl rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200">
+            Showing {familyMeta[family].label}. Use search or View All when you already know the capability you need.
+          </div>
+        ) : null}
 
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {items.map((capability) => {
@@ -109,7 +159,7 @@ export function UnifiedSalesMarketplace() {
             );
           })}
         </div>
-        {items.length === 0 ? <div className="mt-10 rounded-2xl border border-white/20 bg-white/10 p-8 text-center font-semibold text-slate-100">No matching capability. Try a broader search.</div> : null}
+        {items.length === 0 ? <div className="mt-10 rounded-2xl border border-white/20 bg-white/10 p-8 text-center font-semibold text-slate-100">No matching capability in this buying path. Try View All or a broader search.</div> : null}
         <div className="mt-12 grid gap-4 rounded-3xl border border-brand-red-500/40 bg-slate-900 p-7 md:grid-cols-[1fr_auto] md:items-center"><div><h3 className="text-2xl font-black text-white">Not sure what to choose?</h3><p className="mt-2 font-semibold text-slate-100">Use guided setup or start the 14-day trial. Your workspace can preserve the capabilities selected during onboarding.</p></div><div className="flex flex-wrap gap-3"><Link href="#guided-setup" className="rounded-xl border border-white/40 px-5 py-3 font-black text-white hover:bg-white/10">Use Guided Setup</Link><Link href="/store/trial" className="rounded-xl bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100">Start Free Trial</Link></div></div>
       </div>
     </section>

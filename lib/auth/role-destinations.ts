@@ -1,16 +1,12 @@
 /**
- * Canonical role → portal destination registry.
+ * Canonical role → portal assignment registry.
  *
- * portal-map.ts owns application hosts/base paths; this file owns which role
- * belongs to which portal and its canonical destination within that portal.
+ * Portal paths, hosts and ownership are never duplicated here. This file owns
+ * only role-to-portal assignment, role labels and precedence. Route facts are
+ * derived from PORTAL_MAP so role routing cannot drift from portal ownership.
  */
 
-import {
-  ADMIN_HOST,
-  LMS_HOST,
-  MARKETING_HOST,
-  type PortalKey,
-} from '@/lib/routing/portal-map';
+import { PORTAL_MAP, type PortalKey } from '@/lib/routing/portal-map';
 import type { UserRole } from '@/lib/rbac/role-matrix';
 
 export type { UserRole } from '@/lib/rbac/role-matrix';
@@ -23,69 +19,74 @@ export interface RoleRouteConfig {
   label: string;
 }
 
-export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = {
-  super_admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Super Admin' },
-  admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Admin' },
-  org_admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Org Admin' },
-  advisor: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Advisor' },
-  staff: { path: '/staff-portal/dashboard', host: 'admin', portalKey: 'staff', label: 'Staff' },
-  instructor: { path: '/instructor/dashboard', host: 'admin', portalKey: 'instructor', label: 'Instructor' },
-  test_admin: { path: '/testing-center', host: 'admin', portalKey: 'testing', label: 'Test Admin' },
-  proctor: { path: '/testing-center', host: 'admin', portalKey: 'testing', label: 'Proctor' },
+type RolePortalAssignment = { portalKey: PortalKey; label: string };
 
-  student: { path: '/lms/dashboard', host: 'lms', portalKey: 'lms', label: 'Student' },
-  learner: { path: '/lms/dashboard', host: 'lms', portalKey: 'lms', label: 'Learner' },
-  user: { path: '/lms/dashboard', host: 'lms', portalKey: 'lms', label: 'User' },
-  delegate: { path: '/lms/dashboard', host: 'lms', portalKey: 'lms', label: 'Delegate' },
-  grant_client: { path: '/lms/dashboard', host: 'lms', portalKey: 'lms', label: 'Grant Client' },
+export const ROLE_PORTAL_ASSIGNMENTS: Readonly<Record<string, RolePortalAssignment>> = {
+  super_admin: { portalKey: 'admin', label: 'Super Admin' },
+  admin: { portalKey: 'admin', label: 'Admin' },
+  org_admin: { portalKey: 'admin', label: 'Org Admin' },
+  advisor: { portalKey: 'admin', label: 'Advisor' },
+  staff: { portalKey: 'staff', label: 'Staff' },
+  instructor: { portalKey: 'instructor', label: 'Instructor' },
+  test_admin: { portalKey: 'testing', label: 'Test Admin' },
+  proctor: { portalKey: 'testing', label: 'Proctor' },
 
-  apprentice: { path: '/apprentice', host: 'lms', portalKey: 'apprentice', label: 'Apprentice' },
-  barber_apprentice: { path: '/apprentice', host: 'lms', portalKey: 'apprentice', label: 'Barber Apprentice' },
-  cosmetology_apprentice: { path: '/apprentice', host: 'lms', portalKey: 'apprentice', label: 'Cosmetology Apprentice' },
+  student: { portalKey: 'lms', label: 'Student' },
+  learner: { portalKey: 'lms', label: 'Learner' },
+  user: { portalKey: 'lms', label: 'User' },
+  delegate: { portalKey: 'lms', label: 'Delegate' },
+  grant_client: { portalKey: 'lms', label: 'Grant Client' },
 
-  sponsor: { path: '/employer/dashboard', host: 'lms', portalKey: 'employer', label: 'Sponsor' },
-  employer: { path: '/employer/dashboard', host: 'lms', portalKey: 'employer', label: 'Employer' },
-  recruiter: { path: '/employer/dashboard', host: 'lms', portalKey: 'employer', label: 'Recruiter' },
+  apprentice: { portalKey: 'apprentice', label: 'Apprentice' },
+  barber_apprentice: { portalKey: 'apprentice', label: 'Barber Apprentice' },
+  cosmetology_apprentice: { portalKey: 'apprentice', label: 'Cosmetology Apprentice' },
 
-  partner: { path: '/host-shop/dashboard', host: 'lms', portalKey: 'hostshop', label: 'Host Shop Partner' },
-  host_shop: { path: '/host-shop/dashboard', host: 'lms', portalKey: 'hostshop', label: 'Host Shop' },
-  host_shop_admin: { path: '/host-shop/dashboard', host: 'lms', portalKey: 'hostshop', label: 'Host Shop Admin' },
+  sponsor: { portalKey: 'employer', label: 'Sponsor' },
+  employer: { portalKey: 'employer', label: 'Employer' },
+  recruiter: { portalKey: 'employer', label: 'Recruiter' },
 
-  workforce_partner: { path: '/workforce/dashboard', host: 'lms', portalKey: 'workforce', label: 'Workforce Partner' },
-  parent: { path: '/parent-portal/dashboard', host: 'lms', portalKey: 'parent', label: 'Parent' },
-  creator: { path: '/creator/products', host: 'lms', portalKey: 'creator', label: 'Creator' },
-  program_holder: { path: '/program-holder/dashboard', host: 'lms', portalKey: 'programholder', label: 'Program Holder' },
+  partner: { portalKey: 'hostshop', label: 'Host Shop Partner' },
+  host_shop: { portalKey: 'hostshop', label: 'Host Shop' },
+  host_shop_admin: { portalKey: 'hostshop', label: 'Host Shop Admin' },
 
-  // These private portals still physically live in the Marketing app on the
-  // current canonical branch. Keep role destinations on the real owner until
-  // the route directories themselves are moved and verified in LMS.
-  case_manager: { path: '/case-manager/dashboard', host: 'marketing', portalKey: 'casemanager', label: 'Case Manager' },
-  workforce_board: { path: '/workforce-board/dashboard', host: 'marketing', portalKey: 'workforceboard', label: 'Workforce Board' },
-  workforce_board_admin: { path: '/workforce-board/dashboard', host: 'marketing', portalKey: 'workforceboard', label: 'Workforce Board Admin' },
-  provider: { path: '/provider/dashboard', host: 'marketing', portalKey: 'provider', label: 'Training Provider' },
-  provider_admin: { path: '/provider/dashboard', host: 'marketing', portalKey: 'provider', label: 'Training Provider Admin' },
+  workforce_partner: { portalKey: 'workforce', label: 'Workforce Partner' },
+  parent: { portalKey: 'parent', label: 'Parent' },
+  creator: { portalKey: 'creator', label: 'Creator' },
+  program_holder: { portalKey: 'programholder', label: 'Program Holder' },
+
+  case_manager: { portalKey: 'casemanager', label: 'Case Manager' },
+  workforce_board: { portalKey: 'workforceboard', label: 'Workforce Board' },
+  workforce_board_admin: { portalKey: 'workforceboard', label: 'Workforce Board Admin' },
+  provider: { portalKey: 'provider', label: 'Training Provider' },
+  provider_admin: { portalKey: 'provider', label: 'Training Provider Admin' },
 };
 
+function hostKind(portalKey: PortalKey): PortalHost {
+  const subdomain = PORTAL_MAP[portalKey].subdomain;
+  if (subdomain === 'admin') return 'admin';
+  if (subdomain === 'marketing') return 'marketing';
+  return 'lms';
+}
+
+export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = Object.fromEntries(
+  Object.entries(ROLE_PORTAL_ASSIGNMENTS).map(([role, assignment]) => {
+    const portal = PORTAL_MAP[assignment.portalKey];
+    return [role, {
+      path: portal.defaultPath,
+      host: hostKind(assignment.portalKey),
+      portalKey: assignment.portalKey,
+      label: assignment.label,
+    }];
+  }),
+);
+
 export const ROLE_ROUTE_PRIORITY: ReadonlyArray<UserRole | string> = [
-  'super_admin',
-  'admin',
-  'org_admin',
-  'advisor',
-  'staff',
-  'instructor',
-  'test_admin',
-  'proctor',
+  'super_admin', 'admin', 'org_admin', 'advisor', 'staff', 'instructor', 'test_admin', 'proctor',
 ];
 
 export const ROLE_DESTINATIONS: Readonly<Record<string, string>> = Object.fromEntries(
   Object.entries(ROLE_ROUTE_CONFIG).map(([role, config]) => [role, config.path]),
 );
-
-function hostFor(config: RoleRouteConfig): string {
-  if (config.host === 'admin') return ADMIN_HOST;
-  if (config.host === 'marketing') return MARKETING_HOST;
-  return LMS_HOST;
-}
 
 export function resolveRoleRoute(
   role: string | null | undefined,
@@ -96,12 +97,10 @@ export function resolveRoleRoute(
   for (const priorityRole of ROLE_ROUTE_PRIORITY) {
     if (roles.includes(priorityRole)) return ROLE_ROUTE_CONFIG[priorityRole];
   }
-
   for (const currentRole of roles) {
     const config = ROLE_ROUTE_CONFIG[currentRole];
     if (config) return config;
   }
-
   return ROLE_ROUTE_CONFIG.student;
 }
 
@@ -114,7 +113,8 @@ export function getRoleDestinationUrl(
   effectiveRoles?: string[],
 ): string {
   const config = resolveRoleRoute(role, effectiveRoles);
-  return `${hostFor(config)}${config.path}`;
+  const portal = PORTAL_MAP[config.portalKey];
+  return `${portal.host}${portal.defaultPath}`;
 }
 
 export function getRolePortalKey(
@@ -125,12 +125,12 @@ export function getRolePortalKey(
 }
 
 export function getRolesForPortal(portalKey: PortalKey): string[] {
-  return Object.entries(ROLE_ROUTE_CONFIG)
-    .filter(([, config]) => config.portalKey === portalKey)
+  return Object.entries(ROLE_PORTAL_ASSIGNMENTS)
+    .filter(([, assignment]) => assignment.portalKey === portalKey)
     .map(([role]) => role);
 }
 
 export function getRoleLabel(role: string | null | undefined): string {
   if (!role) return 'Unknown';
-  return ROLE_ROUTE_CONFIG[role]?.label ?? role;
+  return ROLE_PORTAL_ASSIGNMENTS[role]?.label ?? role;
 }

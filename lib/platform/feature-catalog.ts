@@ -147,7 +147,6 @@ export const ADDON_FEATURE_FALLBACK: Record<string, FeatureCode[]> = {
     PlatformFeature.AI_ELLIE,
     PlatformFeature.AI_LIZZY,
     PlatformFeature.AI_ZORA,
-    PlatformFeature.AI_ORCHESTRATOR,
   ],
   'ai-voice': [PlatformFeature.AI_VOICE],
   'course-creation-learning-platform': [

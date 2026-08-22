@@ -20,10 +20,11 @@ export async function GET() {
   return NextResponse.json(
     {
       service: 'admin',
-      status: healthy ? 'healthy' : 'unhealthy',
-      ready: healthy,
+      status: healthy ? 'healthy' : readiness.ready ? 'degraded' : 'unhealthy',
+      healthy,
+      ready: readiness.ready,
       canonicalDashboard: '/dashboard',
-      healthContract: 'admin-v3',
+      healthContract: 'admin-v4',
       commit: readiness.commit,
       buildId: readiness.buildId,
       builtAt: readiness.builtAt,

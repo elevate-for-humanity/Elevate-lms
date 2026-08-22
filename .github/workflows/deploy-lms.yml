@@ -178,31 +178,36 @@ jobs:
           EXPECTED_SHA: ${{ github.sha }}
         run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-lms --trust-deploy-status
 
-      - name: Smoke LMS liveness, readiness, and exact live SHA
+      - name: Smoke LMS liveness, readiness, dependency health, and exact live SHA
         run: |
           set -euo pipefail
           EXPECTED_SHA="${{ github.sha }}"
           for i in $(seq 1 20); do
             ping_status=$(curl -sS --max-time 10 -o /tmp/lms-ping.json -w "%{http_code}" "https://app.elevateforhumanity.org/api/ping?deploy=${EXPECTED_SHA}" || true)
+            ready_status=$(curl -sS --max-time 10 -o /tmp/lms-ready.json -w "%{http_code}" "https://app.elevateforhumanity.org/api/ready?deploy=${EXPECTED_SHA}" || true)
             health_status=$(curl -sS --max-time 10 -o /tmp/lms-health.json -w "%{http_code}" "https://app.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
             version_status=$(curl -sS --max-time 10 -o /tmp/lms-version.json -w "%{http_code}" "https://app.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
             ping_body=$(cat /tmp/lms-ping.json 2>/dev/null || true)
+            ready_body=$(cat /tmp/lms-ready.json 2>/dev/null || true)
             health_body=$(cat /tmp/lms-health.json 2>/dev/null || true)
             LIVE_SHA="$(node -e "try{const d=require('/tmp/lms-version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
-            echo "Attempt $i/20: ping=$ping_status health=$health_status version=$version_status live_sha=${LIVE_SHA:-missing}"
+            echo "Attempt $i/20: ping=$ping_status ready=$ready_status health=$health_status version=$version_status live_sha=${LIVE_SHA:-missing}"
             if [ "$ping_status" = "200" ] \
+              && [ "$ready_status" = "200" ] \
               && [ "$health_status" = "200" ] \
               && [ "$version_status" = "200" ] \
               && echo "$ping_body" | grep -q '"ok":true' \
-              && echo "$health_body" | grep -q '"ready":true' \
+              && echo "$ready_body" | grep -q '"ready":true' \
+              && echo "$health_body" | grep -q '"healthy":true' \
               && [ "$LIVE_SHA" = "$EXPECTED_SHA" ]; then
-              echo "LMS DEPLOYMENT VERIFIED: $EXPECTED_SHA is live"
+              echo "LMS DEPLOYMENT VERIFIED: $EXPECTED_SHA is live, ready, and dependency-healthy"
               exit 0
             fi
             sleep 15
           done
-          echo "::error::LMS production did not converge to exact SHA $EXPECTED_SHA"
+          echo "::error::LMS production did not converge to exact SHA $EXPECTED_SHA with healthy runtime contracts"
           cat /tmp/lms-ping.json 2>/dev/null || true
+          cat /tmp/lms-ready.json 2>/dev/null || true
           cat /tmp/lms-health.json 2>/dev/null || true
           cat /tmp/lms-version.json 2>/dev/null || true
           exit 1

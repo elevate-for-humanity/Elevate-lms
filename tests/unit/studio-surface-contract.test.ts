@@ -24,12 +24,18 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(nextConfig).toContain("destination: '/dashboard'");
   });
 
-  it('uses Admin-owned course generation and publishing from the Studio UI', () => {
+  it('uses the single canonical Course Builder route from the Studio UI', () => {
     const builder = source('components/course/AutomaticCourseBuilder.tsx');
+    const client = source('components/admin/course-builder/runCourseFactoryPipeline.ts');
+    const unified = source('components/admin/course-builder/UnifiedCourseBuilder.tsx');
 
-    expect(builder).toContain("fetch('/api/admin/courses/generate'");
-    expect(builder).toContain("fetch('/api/admin/courses/generate/publish'");
-    expect(builder).not.toContain("fetch('/api/ai/generate-and-publish-course'");
+    expect(builder).toContain('runCourseFactoryPipeline');
+    expect(client).toContain("fetch('/api/admin/course-builder'");
+    expect(client).not.toContain('/api/admin/course-builder/pipeline');
+    expect(unified).toContain("fetch('/api/admin/course-builder?action=blueprints'");
+    expect(unified).not.toContain('/api/admin/course-builder/generate-from-blueprint');
+    expect(builder).not.toContain('/api/admin/courses/generate');
+    expect(builder).not.toContain('/api/ai/generate-and-publish-course');
   });
 
   it('uses the canonical workflow API from dashboard and Studio panels', () => {

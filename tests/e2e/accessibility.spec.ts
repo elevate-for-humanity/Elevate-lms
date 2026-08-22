@@ -1,252 +1,188 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-test.describe('Accessibility Tests - WCAG AA Compliance', () => {
-  test('homepage should not have accessibility violations', async ({ page }) => {
+const PUBLIC_ROUTES = [
+  '/',
+  '/programs',
+  '/apprenticeships',
+  '/programs/business',
+  '/programs/hvac-technician',
+  '/programs/cdl-training',
+  '/programs/barber-apprenticeship',
+  '/partners/host-shops',
+  '/funding',
+  '/check-eligibility',
+  '/apply',
+  '/contact',
+] as const;
+
+async function scan(page: Page, route: string) {
+  await page.goto(route);
+  await page.waitForLoadState('domcontentloaded');
+  await page.waitForTimeout(300);
+
+  return new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+    .analyze();
+}
+
+test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
+  for (const route of PUBLIC_ROUTES) {
+    test(`${route} has no serious or critical axe violations`, async ({ page }) => {
+      const results = await scan(page, route);
+      const blocking = results.violations.filter(
+        (violation) => violation.impact === 'critical' || violation.impact === 'serious',
+      );
+      expect(blocking).toEqual([]);
+    });
+  }
+
+  test('homepage supports keyboard navigation and skip navigation', async ({ page }) => {
     await page.goto('/');
-    // Wait for all navigation and async rendering to settle before axe scan
-    // to prevent "Execution context was destroyed" from mid-scan redirects.
-    await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(500);
+    await page.keyboard.press('Tab');
 
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .analyze();
-
-    const blocking = accessibilityScanResults.violations.filter(
-      (violation) => violation.impact === 'critical' || violation.impact === 'serious',
-    );
-    expect(blocking).toEqual([]);
+    const skipLink = page.locator('.skip-to-main');
+    await expect(skipLink).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#main-content')).toBeFocused();
   });
 
-  test('header navigation should be keyboard accessible', async ({ page }) => {
-    await page.goto('/');
-
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-
-    const focusedElement = await page.evaluate(() => document.activeElement?.tagName);
-    expect(focusedElement).toBeTruthy();
-  });
-
-  test('dropdown menus should work with keyboard', async ({ page }) => {
-    await page.goto('/');
-
-    // Tab to navigation area
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-
-    // Check that we can navigate with keyboard
-    const focusedElement = await page.evaluate(() => document.activeElement?.tagName);
-    expect(['A', 'BUTTON']).toContain(focusedElement);
-  });
-
-  test('mobile menu should be accessible', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(500);
-
-    // Find the mobile menu toggle — prefer aria-label, fall back to header button with SVG
-    const menuButton = page
-      .locator('header button[aria-label], header button[aria-expanded], header button:has(svg)')
-      .first();
-
-    const isVisible = await menuButton.isVisible().catch(() => false);
-    if (isVisible) {
-      await menuButton.click();
-      await page.waitForTimeout(300);
-    }
-
-    // Nav links should be present regardless of menu state
-    const menuLinks = await page.locator('nav a').count();
-    expect(menuLinks).toBeGreaterThan(0);
-  });
-
-  test('escape key should close mobile menu', async ({ page }) => {
+  test('mobile menu can open and close with keyboard', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
 
-    await page.click('[aria-label="Open menu"]');
+    const menuButton = page.locator('header button[aria-label="Open menu"]').first();
+    await expect(menuButton).toBeVisible();
+    await menuButton.focus();
+    await page.keyboard.press('Enter');
     await page.keyboard.press('Escape');
 
-    const menuVisible = await page.locator('[role="dialog"]').isVisible();
-    expect(menuVisible).toBeFalsy();
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeHidden();
   });
 
-  test('skip to main content link should work', async ({ page }) => {
-    await page.goto('/');
-
-    // Tab to the skip link (first focusable element)
-    await page.keyboard.press('Tab');
-
-    // Check skip link exists and is focusable
-    const skipLink = page.locator('.skip-to-main');
-    const skipLinkExists = (await skipLink.count()) > 0;
-    expect(skipLinkExists).toBeTruthy();
-
-    // Verify main content has id
-    const mainContent = page.locator('#main-content');
-    await expect(mainContent).toBeVisible();
-  });
-
-  test('all images should have alt text', async ({ page }) => {
-    await page.goto('/');
-
-    const imagesWithoutAlt = await page.locator('img:not([alt])').count();
-    expect(imagesWithoutAlt).toBe(0);
-  });
-
-  test('all buttons should have accessible names', async ({ page }) => {
-    await page.goto('/');
-
-    const buttons = await page.locator('button').all();
-
-    for (const button of buttons) {
-      const ariaLabel = await button.getAttribute('aria-label');
-      const text = await button.textContent();
-      const hasAccessibleName = ariaLabel || (text && text.trim().length > 0);
-      expect(hasAccessibleName).toBeTruthy();
+  test('visible images expose alt attributes across key public routes', async ({ page }) => {
+    for (const route of PUBLIC_ROUTES.slice(0, 8)) {
+      await page.goto(route);
+      const imagesWithoutAlt = await page.locator('img:not([alt])').count();
+      expect(imagesWithoutAlt, `missing alt attributes on ${route}`).toBe(0);
     }
   });
 
-  test('color contrast should meet WCAG AA standards', async ({ page }) => {
+  test('visible buttons and links have accessible names', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(500);
 
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .withTags(['wcag2aa'])
-      .disableRules(['color-contrast']) // We'll check this separately
-      .analyze();
-
-    const contrastViolations = accessibilityScanResults.violations.filter(
-      (v) => v.id === 'color-contrast',
+    const unnamedButtons = await page.locator('button').evaluateAll((buttons) =>
+      buttons.filter((button) => {
+        const style = window.getComputedStyle(button);
+        const visible = button.getClientRects().length > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+        if (!visible) return false;
+        const text = button.textContent?.trim() ?? '';
+        const aria = button.getAttribute('aria-label')?.trim() ?? '';
+        const labelled = button.getAttribute('aria-labelledby')?.trim() ?? '';
+        return !text && !aria && !labelled;
+      }).length,
     );
-    expect(contrastViolations).toEqual([]);
+    expect(unnamedButtons).toBe(0);
+
+    const unnamedLinks = await page.locator('a').evaluateAll((links) =>
+      links.filter((anchor) => {
+        const style = window.getComputedStyle(anchor);
+        const visible = anchor.getClientRects().length > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+        if (!visible) return false;
+        const text = anchor.textContent?.trim() ?? '';
+        const aria = anchor.getAttribute('aria-label')?.trim() ?? '';
+        const imageAlt = anchor.querySelector('img[alt]')?.getAttribute('alt')?.trim() ?? '';
+        return !text && !aria && !imageAlt;
+      }).length,
+    );
+    expect(unnamedLinks).toBe(0);
   });
 
-  test('form inputs should have labels', async ({ page }) => {
+  test('apply form controls have programmatic labels', async ({ page }) => {
     await page.goto('/apply');
     await page.waitForLoadState('domcontentloaded');
 
-    // Verify inputs in main content have some form of accessible labeling:
-    // aria-label, aria-labelledby, or an associated <label for="id">
-    const unlabeledInputs = await page
-      .locator('main input:not([type="hidden"]):not([type="submit"]):not([type="button"])')
-      .evaluateAll((inputs) =>
-        inputs
-          .filter((input) => {
-            const style = window.getComputedStyle(input);
-            return (
-              input.getClientRects().length > 0 &&
-              style.display !== 'none' &&
-              style.visibility !== 'hidden'
-            );
+    const unlabeledControls = await page
+      .locator('main input:not([type="hidden"]), main select, main textarea')
+      .evaluateAll((controls) =>
+        controls
+          .filter((control) => {
+            const style = window.getComputedStyle(control);
+            return control.getClientRects().length > 0 && style.display !== 'none' && style.visibility !== 'hidden';
           })
-          .map((input) => {
-            const id = input.getAttribute('id') ?? '';
-            const ariaLabel = input.getAttribute('aria-label')?.trim() ?? '';
-            const ariaLabelledBy = input.getAttribute('aria-labelledby')?.trim() ?? '';
-            const placeholder = input.getAttribute('placeholder')?.trim() ?? '';
-            const title = input.getAttribute('title')?.trim() ?? '';
-            const labels = (input as HTMLInputElement).labels;
-            const labelFor = id ? document.querySelector(`label[for="${CSS.escape(id)}"]`) : null;
-
-            return {
-              id,
-              name: input.getAttribute('name') ?? '',
-              type: input.getAttribute('type') ?? '',
-              hasLabel: Boolean(
-                ariaLabel ||
-                  ariaLabelledBy ||
-                  placeholder ||
-                  title ||
-                  (labels && labels.length > 0) ||
-                  labelFor,
-              ),
-            };
+          .filter((control) => {
+            const element = control as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+            const ariaLabel = element.getAttribute('aria-label')?.trim();
+            const ariaLabelledBy = element.getAttribute('aria-labelledby')?.trim();
+            return !(ariaLabel || ariaLabelledBy || (element.labels && element.labels.length > 0));
           })
-          .filter((input) => !input.hasLabel),
+          .map((control) => ({ id: control.id, name: control.getAttribute('name'), tag: control.tagName })),
       );
 
-    expect(unlabeledInputs).toEqual([]);
+    expect(unlabeledControls).toEqual([]);
   });
 
-  test('headings should be in correct order', async ({ page }) => {
+  test('homepage heading hierarchy starts with one H1 and does not skip levels', async ({ page }) => {
     await page.goto('/');
 
-    const headings = await page.locator('h1, h2, h3, h4, h5, h6').all();
-    const levels = await Promise.all(
-      headings.map((h) => h.evaluate((el) => parseInt(el.tagName[1]))),
+    const levels = await page.locator('h1, h2, h3, h4, h5, h6').evaluateAll((headings) =>
+      headings.map((heading) => Number(heading.tagName.substring(1))),
     );
 
+    expect(levels.filter((level) => level === 1)).toHaveLength(1);
     expect(levels[0]).toBe(1);
-
-    for (let i = 1; i < levels.length; i++) {
-      const diff = levels[i] - levels[i - 1];
-      expect(diff).toBeLessThanOrEqual(1);
+    for (let index = 1; index < levels.length; index += 1) {
+      expect(levels[index] - levels[index - 1]).toBeLessThanOrEqual(1);
     }
   });
 
-  test('links should have descriptive text', async ({ page }) => {
-    await page.goto('/');
-
-    const linksWithoutNames = await page.locator('a').evaluateAll((anchors) =>
-      anchors
-        .filter((anchor) => {
-          const style = window.getComputedStyle(anchor);
-          const rect = anchor.getBoundingClientRect();
-          return (
-            rect.width > 0 &&
-            rect.height > 0 &&
-            style.display !== 'none' &&
-            style.visibility !== 'hidden'
-          );
-        })
-        .map((anchor) => ({
-          href: anchor.getAttribute('href') ?? '',
-          text: anchor.textContent?.trim() ?? '',
-          ariaLabel: anchor.getAttribute('aria-label')?.trim() ?? '',
-          imageAlt: anchor.querySelector('img[alt]')?.getAttribute('alt')?.trim() ?? '',
-        }))
-        .filter((anchor) => !anchor.text && !anchor.ariaLabel && !anchor.imageAlt),
-    );
-
-    expect(linksWithoutNames).toEqual([]);
+  test('color contrast rule is enabled and reports no serious violations on homepage', async ({ page }) => {
+    const results = await scan(page, '/');
+    const contrast = results.violations.filter((violation) => violation.id === 'color-contrast');
+    expect(contrast).toEqual([]);
   });
 
-  test('page should have proper language attribute', async ({ page }) => {
+  test('focus indicator is visually present', async ({ page }) => {
     await page.goto('/');
-
-    const lang = await page.locator('html').getAttribute('lang');
-    expect(lang).toBe('en');
-  });
-
-  test('interactive elements should have proper ARIA attributes', async ({ page }) => {
-    await page.goto('/');
-
-    // Check that buttons have accessible names
-    const buttons = await page.locator('button').all();
-    for (const button of buttons.slice(0, 5)) {
-      // Check first 5 buttons
-      const ariaLabel = await button.getAttribute('aria-label');
-      const text = await button.textContent();
-      const hasAccessibleName = ariaLabel || (text && text.trim().length > 0);
-      expect(hasAccessibleName).toBeTruthy();
-    }
-  });
-
-  test('focus indicators should be visible', async ({ page }) => {
-    await page.goto('/');
-
     await page.keyboard.press('Tab');
 
-    const focusedElement = page.locator(':focus');
-    const outline = await focusedElement.evaluate((el) => window.getComputedStyle(el).outline);
+    const focusAppearance = await page.locator(':focus').evaluate((element) => {
+      const style = window.getComputedStyle(element);
+      return {
+        outlineStyle: style.outlineStyle,
+        outlineWidth: style.outlineWidth,
+        boxShadow: style.boxShadow,
+      };
+    });
 
-    expect(outline).not.toBe('none');
-    expect(outline).not.toBe('');
+    const hasOutline = focusAppearance.outlineStyle !== 'none' && focusAppearance.outlineWidth !== '0px';
+    const hasShadow = focusAppearance.boxShadow !== 'none';
+    expect(hasOutline || hasShadow).toBeTruthy();
+  });
+
+  test('reduced motion preference suppresses long animations', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+
+    const violations = await page.locator('body *').evaluateAll((elements) =>
+      elements
+        .filter((element) => {
+          const style = window.getComputedStyle(element);
+          const duration = style.animationDuration
+            .split(',')
+            .map((value) => Number.parseFloat(value) || 0)
+            .some((value) => value > 0.1);
+          const transition = style.transitionDuration
+            .split(',')
+            .map((value) => Number.parseFloat(value) || 0)
+            .some((value) => value > 0.1);
+          return duration || transition;
+        })
+        .slice(0, 10)
+        .map((element) => element.tagName),
+    );
+
+    expect(violations).toEqual([]);
   });
 });

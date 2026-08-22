@@ -1,4 +1,5 @@
 import type { NextRequest } from 'next/server';
+import type { SupabaseClient } from '../supabase';
 import { createClient } from '../supabase/server';
 import { publishCourse } from '../lms/course-service';
 import { logAdminAudit, AdminAction } from '../admin/audit-log';
@@ -6,24 +7,27 @@ import { logAdminAudit, AdminAction } from '../admin/audit-log';
 const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam', 'final_exam']);
 const PRACTICAL_TYPES = new Set(['practical', 'lab', 'fieldwork', 'observation', 'practicum']);
 
-function asArray(value: unknown): any[] {
-  return Array.isArray(value) ? value : [];
-}
-
+function asArray(value: unknown): any[] { return Array.isArray(value) ? value : []; }
 function hasContent(value: unknown): boolean {
   if (typeof value === 'string') return value.trim().length > 0;
   return !!value && typeof value === 'object' && Object.keys(value as Record<string, unknown>).length > 0;
 }
 
-export async function runPersistedCourseProcurementHealthCheck(courseId: string) {
-  const supabase = await createClient();
+/**
+ * Canonical persisted-course procurement gate using an explicit database
+ * client. Runtime handlers and production acceptance therefore execute the same
+ * validation contract rather than maintaining parallel implementations.
+ */
+export async function runPersistedCourseProcurementHealthCheckWithClient(
+  supabase: SupabaseClient,
+  courseId: string,
+) {
   const blocking: string[] = [];
   const { data: course, error: courseError } = await supabase
     .from('courses')
-    .select('id,title,slug,description,status,generation_status,generation_progress,review_status,compliance_profile_key,governing_body,governing_standard_version,duration_hours,passing_score')
+    .select('id,title,slug,description,status,generation_status,generation_progress,review_status,reviewed_by,reviewed_at,compliance_profile_key,governing_body,governing_standard_version,duration_hours,passing_score')
     .eq('id', courseId)
     .maybeSingle();
-
   if (courseError) throw courseError;
   if (!course) return { pass: false, blocking_issues: ['course not found'], metrics: {} };
 
@@ -32,6 +36,8 @@ export async function runPersistedCourseProcurementHealthCheck(courseId: string)
   if (!course.description?.trim()) blocking.push('course description is missing');
   if (!course.duration_hours || Number(course.duration_hours) <= 0) blocking.push('course duration_hours is missing');
   if (course.review_status !== 'approved') blocking.push('course has not completed human review/approval');
+  if (course.review_status === 'approved' && !course.reviewed_by) blocking.push('course approval has no reviewer identity');
+  if (course.review_status === 'approved' && !course.reviewed_at) blocking.push('course approval has no review timestamp');
 
   const externalProfile = Boolean(course.compliance_profile_key && course.compliance_profile_key !== 'internal_basic');
   if (externalProfile && !course.governing_body?.trim()) blocking.push('governing body is missing');
@@ -86,11 +92,9 @@ export async function runPersistedCourseProcurementHealthCheck(courseId: string)
       const competencies = asArray(lesson.competency_checks);
       const questions = asArray(lesson.quiz_questions);
       const contentJson = lesson.content_json && typeof lesson.content_json === 'object'
-        ? (lesson.content_json as Record<string, any>)
-        : {};
+        ? lesson.content_json as Record<string, any> : {};
       const experience = contentJson.experience && typeof contentJson.experience === 'object'
-        ? contentJson.experience as Record<string, any>
-        : null;
+        ? contentJson.experience as Record<string, any> : null;
 
       if (lesson.approved === true) approvedLessons += 1;
       if (isAssessment) { assessments += 1; moduleHasAssessment = true; }
@@ -107,7 +111,7 @@ export async function runPersistedCourseProcurementHealthCheck(courseId: string)
       if (!lesson.hour_category) issues.push('hour category missing');
       if (!lesson.delivery_method) issues.push('delivery method missing');
       if (lesson.ai_generated === true && lesson.approved !== true) issues.push('AI lesson not human-approved');
-      if (lesson.ai_generated === true && lesson.generation_status && !['verification_ready', 'certificate_ready', 'published', 'completed'].includes(lesson.generation_status)) {
+      if (lesson.ai_generated === true && lesson.generation_status && !['verification_ready','certificate_ready','published','completed','generated'].includes(lesson.generation_status)) {
         issues.push(`generation not ready (${lesson.generation_status})`);
       }
 
@@ -121,9 +125,8 @@ export async function runPersistedCourseProcurementHealthCheck(courseId: string)
       } else {
         if (!hasContent(lesson.content) && !String(lesson.rendered_html ?? '').trim() && !String(lesson.video_url ?? '').trim()) issues.push('instructional content missing');
         if (lesson.ai_generated === true && !isPractical) {
-          if (!experience) {
-            issues.push('canonical interactive lesson experience missing');
-          } else {
+          if (!experience) issues.push('canonical interactive lesson experience missing');
+          else {
             if (!String(experience.narrationScript ?? '').trim()) issues.push('narration/transcript missing');
             if (!String(experience.visualPrompt ?? '').trim()) issues.push('visual specification missing');
             if (asArray(experience.flashcards).length < 4) issues.push('fewer than 4 flashcards');
@@ -143,7 +146,6 @@ export async function runPersistedCourseProcurementHealthCheck(courseId: string)
         if (!lesson.evidence_type) issues.push('practical evidence type missing');
         if (lesson.requires_instructor_signoff !== true) issues.push('authorized human sign-off missing');
       }
-
       if (issues.length > 0) blocking.push(`"${lesson.title}" (${module.title}): ${issues.join(', ')}`);
     }
     if (!moduleHasAssessment) blocking.push(`module "${module.title}" has no mastery assessment`);
@@ -156,10 +158,7 @@ export async function runPersistedCourseProcurementHealthCheck(courseId: string)
   if (interactiveLessons === 0) blocking.push('course has no interactive self-paced lesson experiences');
 
   if (mods.length > 1) {
-    const { count, error } = await supabase
-      .from('module_completion_rules')
-      .select('id', { count: 'exact', head: true })
-      .eq('course_id', courseId);
+    const { count, error } = await supabase.from('module_completion_rules').select('id', { count: 'exact', head: true }).eq('course_id', courseId);
     if (error) throw error;
     if ((count ?? 0) === 0) blocking.push('multiple modules but no mastery/progression rules');
   }
@@ -167,18 +166,31 @@ export async function runPersistedCourseProcurementHealthCheck(courseId: string)
   return {
     pass: blocking.length === 0,
     blocking_issues: [...new Set(blocking)],
-    metrics: { modules: mods.length, lessons: totalLessons, approvedLessons, assessments, practicals, competencyMappings, interactiveLessons, accessibleNarrationLessons },
+    metrics: {
+      modules: mods.length,
+      lessons: totalLessons,
+      approvedLessons,
+      assessments,
+      practicals,
+      competencyMappings,
+      interactiveLessons,
+      accessibleNarrationLessons,
+    },
   };
 }
 
-export async function publishPersistedCourse(input: {
+export async function runPersistedCourseProcurementHealthCheck(courseId: string) {
+  return runPersistedCourseProcurementHealthCheckWithClient(await createClient(), courseId);
+}
+
+export async function publishPersistedCourseWithClient(input: {
+  db: SupabaseClient;
   courseId: string;
   actorId: string;
   label?: string;
   request?: NextRequest;
 }) {
-  const supabase = await createClient();
-  const health = await runPersistedCourseProcurementHealthCheck(input.courseId);
+  const health = await runPersistedCourseProcurementHealthCheckWithClient(input.db, input.courseId);
   if (!health.pass) {
     await logAdminAudit({
       action: AdminAction.COURSE_PUBLISHED,
@@ -191,7 +203,7 @@ export async function publishPersistedCourse(input: {
     return { ok: false, error: 'PUBLISH_BLOCKED', blocking_issues: health.blocking_issues, metrics: health.metrics };
   }
 
-  const result = await publishCourse(supabase, input.courseId, input.actorId, input.label);
+  const result = await publishCourse(input.db, input.courseId, input.actorId, input.label);
   await logAdminAudit({
     action: AdminAction.COURSE_PUBLISHED,
     actorId: input.actorId,
@@ -201,4 +213,13 @@ export async function publishPersistedCourse(input: {
     req: input.request,
   });
   return { ok: true, procurement_gate: health.metrics, ...result };
+}
+
+export async function publishPersistedCourse(input: {
+  courseId: string;
+  actorId: string;
+  label?: string;
+  request?: NextRequest;
+}) {
+  return publishPersistedCourseWithClient({ ...input, db: await createClient() });
 }

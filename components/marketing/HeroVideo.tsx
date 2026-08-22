@@ -61,7 +61,6 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
   const [userActivated, setUserActivated] = useState(false);
   const [manualAudioOverride, setManualAudioOverride] = useState(false);
   const transcriptId = useId();
@@ -73,7 +72,6 @@ export default function HeroVideo({
 
   useEffect(() => {
     setVideoFailed(false);
-    setVideoReady(false);
     setMuted(true);
     setManualAudioOverride(false);
 
@@ -170,7 +168,7 @@ export default function HeroVideo({
       >
         {posterImage ? (
           <div
-            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+            className={`absolute inset-0 z-0 bg-cover bg-center bg-no-repeat ${showVideo ? 'invisible' : 'visible'}`}
             style={{ backgroundImage: `url(${posterImage})` }}
             aria-hidden="true"
           />
@@ -186,19 +184,15 @@ export default function HeroVideo({
             playsInline
             muted
             disablePictureInPicture
-            onLoadedData={() => setVideoReady(true)}
             onCanPlay={() => {
-              setVideoReady(true);
               const video = videoRef.current;
               if (video?.paused) void video.play().catch(() => {});
             }}
-            onPlaying={() => setVideoReady(true)}
             onError={() => {
-              setVideoReady(false);
               setVideoFailed(true);
               setMuted(true);
             }}
-            className={`absolute inset-0 z-10 h-full w-full bg-transparent transition-opacity duration-200 ${videoReady ? 'opacity-100' : 'opacity-0'} ${mediaClass} object-center`}
+            className={`absolute inset-0 z-10 h-full w-full bg-slate-900 ${mediaClass} object-center`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           >
             {mobileSource && mobileSource !== desktopSource ? (

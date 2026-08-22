@@ -1,0 +1,90 @@
+name: Build Business Program Acceptance
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [opened, reopened]
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/course-factory/build-business-program.ts'
+      - 'lib/curriculum/blueprints/business-entrepreneurship.ts'
+      - 'lib/curriculum/blueprints/index.ts'
+      - '.github/workflows/build-business-program.yml'
+      - 'lib/course-factory/**'
+      - 'lib/course-builder/video-queue.ts'
+      - 'lib/video/**'
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  CI: true
+  NODE_ENV: production
+  AI_CIRCUIT_RECOVERY_WAIT: '1'
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+jobs:
+  build-audit-publish:
+    if: github.event_name != 'issues' || github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    concurrency:
+      group: business-course-builder-production-acceptance
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Require production Supabase credentials
+        shell: bash
+        run: |
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+
+      - name: Build, audit, render, and publish business program
+        id: acceptance
+        shell: bash
+        env:
+          NODE_OPTIONS: --conditions=react-server
+        run: |
+          set -o pipefail
+          pnpm tsx scripts/course-factory/build-business-program.ts 2>&1 | tee /tmp/business-course-builder.log
+
+      - name: Post result to trigger issue
+        if: always() && github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const tail = fs.existsSync('/tmp/business-course-builder.log')
+              ? fs.readFileSync('/tmp/business-course-builder.log', 'utf8').slice(-24000)
+              : 'Course Builder did not produce a log.';
+            const ok = '${{ job.status }}' === 'success';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `${ok ? 'BUSINESS COURSE BUILDER PASS' : 'BUSINESS COURSE BUILDER FAIL'}\n\nCommit: ${context.sha}\n\n\`\`\`text\n${tail}\n\`\`\``
+            });

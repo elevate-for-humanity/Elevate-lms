@@ -221,7 +221,7 @@ export interface TaskFilterOptions {
 export interface WebhookConfig {
   id: string;
   url: string;
-  eventTypes: EventType[];
+  eventTypes: string[];
   secret: string;
   enabled: boolean;
   createdAt: number;
@@ -256,7 +256,7 @@ export interface ExecutionContext {
   intent?: AgentIntent;
 }
 
-export type AIProviderName = 'openai' | 'anthropic' | 'gemini' | 'azure' | 'groq' | 'none';
+export type AIProviderName = 'openai' | 'anthropic' | 'gemini' | 'google' | 'cloudflare' | 'azure' | 'groq' | 'none';
 export type AIImageProviderName = 'dalle' | 'stability' | 'azure' | 'none';
 
 export interface ChatMessage {

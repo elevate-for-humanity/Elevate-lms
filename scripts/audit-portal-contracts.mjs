@@ -22,6 +22,8 @@ const publicAccessRegistry = read('apps/marketing/lib/platform-access-registry.t
 const publicNavigation = read('lib/navigation.ts');
 const portalsPage = read('apps/marketing/app/portals/page.tsx');
 const adminDashboard = read('apps/admin/app/dashboard/page.tsx');
+const marketingMiddleware = read('apps/marketing/middleware.ts');
+const marketingChrome = read('components/site/MarketingChromeBoundary.tsx');
 
 const PORTALS = [
   { key: 'lms', surface: 'studentPortal', app: 'lms', path: '/lms/dashboard', roles: ['student', 'learner', 'user', 'delegate', 'grant_client'] },
@@ -61,9 +63,10 @@ console.log('\n── Single portal authority ──');
 if (!portalRouter.includes('label: portal.label') || !portalRouter.includes('description: portal.description')) fail('portal-router does not derive display metadata from PORTAL_MAP');
 else pass('portal-router derives display metadata from PORTAL_MAP');
 if (/export const PORTAL_META:\s*Record<PortalKey, PortalMeta>\s*=\s*\{/.test(portalRouter)) fail('portal-router reintroduced a hand-maintained PORTAL_META registry');
-else pass('no independent portal metadata registry');
 if (!roleDestinations.includes('ROLE_PORTAL_ASSIGNMENTS') || !roleDestinations.includes('PORTAL_MAP[assignment.portalKey]')) fail('role destinations do not derive route facts from PORTAL_MAP');
-else pass('role destinations derive route facts from PORTAL_MAP');
+if (!portalAccess.includes('PORTAL_MAP[portalKey].accessRoles')) fail('portal-access maintains or bypasses a second access-role registry');
+else pass('portal access roles derive from PORTAL_MAP');
+if (/PORTAL_ACCESS_ROLES\s*[:=]/.test(portalAccess)) fail('independent PORTAL_ACCESS_ROLES registry still exists');
 
 console.log('\n── Canonical portal ownership and role assignment ──');
 for (const portal of PORTALS) {
@@ -73,38 +76,39 @@ for (const portal of PORTALS) {
   if (portal.surface === 'employerPublic') canonical = (surface?.operational || []).find((x) => x.path === portal.path);
   if (!canonical) fail(`${portal.surface}: canonical contract missing`);
   else if (canonical.app !== portal.app || canonical.path !== portal.path) fail(`${portal.surface}: contract says ${canonical.app}:${canonical.path}, expected ${portal.app}:${portal.path}`);
-  else pass(`${portal.surface}: ${portal.app}:${portal.path}`);
   if (!routeExists(portal.app, portal.path)) fail(`${portal.key}: missing route for ${portal.app}:${portal.path}`);
-  else pass(`${portal.key}: route exists`);
 
   const portalBlock = blockFor(portalMap, portal.key);
   if (!portalBlock.includes(`defaultPath: '${portal.path}'`)) fail(`${portal.key}: PORTAL_MAP default path drift`);
-  for (const metadata of ['label:', 'description:', 'allowedRoles:', 'authSurface:', 'tenantScope:']) {
+  for (const metadata of ['label:', 'description:', 'destinationRoles:', 'accessRoles:', 'authSurface:', 'tenantScope:']) {
     if (!portalBlock.includes(metadata)) fail(`${portal.key}: missing canonical ${metadata.replace(':', '')} metadata`);
   }
   for (const role of portal.roles) {
     const assignment = new RegExp(`${role}:\\s*\\{[^}]*portalKey:\\s*['\"]${portal.key}['\"]`);
     if (!assignment.test(roleDestinations)) fail(`${role}: role assignment does not resolve to ${portal.key}`);
-    if (!portalBlock.includes(`'${role}'`)) fail(`${portal.key}: canonical allowedRoles omits ${role}`);
+    if (!portalBlock.includes(`'${role}'`)) fail(`${portal.key}: canonical destinationRoles omits ${role}`);
   }
 }
 
 console.log('\n── Role destination reachability ──');
 for (const role of ['admin', 'org_admin', 'advisor', 'staff']) {
   if (!adminDashboard.includes(`'${role}'`)) fail(`${role}: canonical Admin dashboard guard does not visibly include role`);
-  else pass(`${role}: Admin dashboard guard aligned`);
 }
+
+console.log('\n── Marketing operational boundary ──');
+for (const prefix of ['/case-manager', '/workforce-board', '/provider']) {
+  if (!marketingMiddleware.includes(`'${prefix}'`)) fail(`${prefix}: full operational family missing from Marketing middleware protection`);
+  if (!marketingChrome.includes(`'${prefix}'`)) fail(`${prefix}: public Header/Footer suppression missing`);
+}
+if (!marketingMiddleware.includes("new URL('/login', LMS_HOST)")) fail('Marketing operational auth does not use canonical LMS authentication host');
+if (!marketingMiddleware.includes("req.nextUrl.origin")) fail('Marketing operational login does not preserve absolute owning-host return URL');
 
 console.log('\n── Public discovery contract ──');
 if (!exists('apps/marketing/app/online-apps/page.tsx')) fail('/online-apps: public portal directory missing');
-else pass('/online-apps: public portal directory exists');
 if (!publicNavigation.includes("id: 'platform'") || !publicNavigation.includes("href: '/online-apps'")) fail('Platform/Online Apps are not exposed from canonical public navigation');
-else pass('Platform/Online Apps exposed from canonical public navigation');
 if (!portalsPage.includes('PORTAL_KEYS.map') || !portalsPage.includes('PORTAL_MAP[key]')) fail('/portals does not derive its directory from canonical portal registries');
-else pass('/portals derives its directory from canonical registries');
 if (/const\s+PORTAL_KEYS\s*:\s*PortalKey\[\]\s*=\s*\[/.test(portalsPage)) fail('/portals reintroduced a hand-maintained portal key list');
 if (!publicAccessRegistry.includes("import { PORTAL_MAP") || !publicAccessRegistry.includes('Object.keys(PORTAL_MAP)') || !publicAccessRegistry.includes('portal.host') || !publicAccessRegistry.includes('portal.defaultPath')) fail('/online-apps registry does not derive portal URLs from PORTAL_MAP');
-else pass('/online-apps registry derives portal URLs from PORTAL_MAP');
 if (!publicAccessRegistry.includes('CANONICAL_PORTAL_ACCESS')) fail('public access registry lacks full canonical portal projection');
 if (!publicNavigation.includes('ROUTES.creatorPortal')) fail('Creator Studio missing from global portal navigation');
 if (!publicNavigation.includes('ROUTES.testingPortal')) fail('Testing Center operations missing from global portal navigation');

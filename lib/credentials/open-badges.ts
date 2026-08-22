@@ -1,0 +1,187 @@
+import crypto from 'node:crypto';
+
+export const OPEN_BADGES_CONTEXT =
+  'https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json';
+
+export type OpenBadgeStatus = 'active' | 'expired' | 'revoked';
+
+export interface OpenBadgeIssuerProfile {
+  id: string;
+  type: ['Profile'];
+  name: string;
+  url: string;
+  email?: string;
+}
+
+export interface OpenBadgeAchievement {
+  id: string;
+  type: ['Achievement'];
+  name: string;
+  description: string;
+  achievementType?: string;
+  criteria: {
+    narrative?: string;
+    id?: string;
+  };
+  image?: {
+    id: string;
+    type: 'Image';
+  };
+  alignment?: Array<{
+    type: ['Alignment'];
+    targetCode?: string;
+    targetName: string;
+    targetFramework?: string;
+    targetType?: string;
+    targetUrl: string;
+  }>;
+}
+
+export interface OpenBadgeCredential {
+  '@context': string[];
+  id: string;
+  type: ['VerifiableCredential', 'OpenBadgeCredential'];
+  issuer: OpenBadgeIssuerProfile;
+  validFrom: string;
+  validUntil?: string;
+  name: string;
+  credentialSubject: {
+    id: string;
+    type: ['AchievementSubject'];
+    achievement: OpenBadgeAchievement;
+  };
+  proof?: Record<string, unknown>;
+}
+
+export interface BuildOpenBadgeInput {
+  credentialId: string;
+  verificationCode: string;
+  recipientIdentifier: string;
+  issuedAt: string;
+  expiresAt?: string | null;
+  achievement: {
+    id: string;
+    name: string;
+    description: string;
+    achievementType?: string | null;
+    criteriaNarrative?: string | null;
+    criteriaUrl?: string | null;
+    imageUrl?: string | null;
+    alignment?: OpenBadgeAchievement['alignment'];
+  };
+}
+
+function getBaseUrl(): string {
+  return (
+    process.env.OPEN_BADGES_PUBLIC_BASE_URL ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    'https://www.elevateforhumanity.org'
+  ).replace(/\/$/, '');
+}
+
+export function getOpenBadgeIssuerProfile(): OpenBadgeIssuerProfile {
+  const baseUrl = getBaseUrl();
+  return {
+    id: process.env.OPEN_BADGES_ISSUER_ID || `${baseUrl}/credentials/issuer`,
+    type: ['Profile'],
+    name: process.env.OPEN_BADGES_ISSUER_NAME || 'Elevate for Humanity Career & Technical Institute',
+    url: process.env.OPEN_BADGES_ISSUER_URL || baseUrl,
+    ...(process.env.OPEN_BADGES_ISSUER_EMAIL
+      ? { email: process.env.OPEN_BADGES_ISSUER_EMAIL }
+      : {}),
+  };
+}
+
+export function hashRecipientIdentifier(identifier: string): string {
+  return crypto.createHash('sha256').update(identifier.trim().toLowerCase()).digest('hex');
+}
+
+export function buildOpenBadgeCredential(input: BuildOpenBadgeInput): OpenBadgeCredential {
+  const baseUrl = getBaseUrl();
+  const credentialUrl = `${baseUrl}/api/credentials/${encodeURIComponent(input.verificationCode)}`;
+  const subjectHash = hashRecipientIdentifier(input.recipientIdentifier);
+
+  const achievement: OpenBadgeAchievement = {
+    id: input.achievement.id,
+    type: ['Achievement'],
+    name: input.achievement.name,
+    description: input.achievement.description,
+    ...(input.achievement.achievementType
+      ? { achievementType: input.achievement.achievementType }
+      : {}),
+    criteria: {
+      ...(input.achievement.criteriaNarrative
+        ? { narrative: input.achievement.criteriaNarrative }
+        : {}),
+      ...(input.achievement.criteriaUrl ? { id: input.achievement.criteriaUrl } : {}),
+    },
+    ...(input.achievement.imageUrl
+      ? { image: { id: input.achievement.imageUrl, type: 'Image' as const } }
+      : {}),
+    ...(input.achievement.alignment?.length
+      ? { alignment: input.achievement.alignment }
+      : {}),
+  };
+
+  return {
+    '@context': [
+      'https://www.w3.org/ns/credentials/v2',
+      OPEN_BADGES_CONTEXT,
+    ],
+    id: credentialUrl,
+    type: ['VerifiableCredential', 'OpenBadgeCredential'],
+    issuer: getOpenBadgeIssuerProfile(),
+    validFrom: new Date(input.issuedAt).toISOString(),
+    ...(input.expiresAt ? { validUntil: new Date(input.expiresAt).toISOString() } : {}),
+    name: input.achievement.name,
+    credentialSubject: {
+      id: `urn:sha256:${subjectHash}`,
+      type: ['AchievementSubject'],
+      achievement,
+    },
+  };
+}
+
+export function validateOpenBadgeStructure(credential: OpenBadgeCredential): string[] {
+  const errors: string[] = [];
+
+  if (!credential['@context']?.includes(OPEN_BADGES_CONTEXT)) {
+    errors.push('Missing Open Badges 3.0 JSON-LD context');
+  }
+  if (!credential.type?.includes('OpenBadgeCredential')) {
+    errors.push('type must include OpenBadgeCredential');
+  }
+  if (!credential.id?.startsWith('https://')) {
+    errors.push('Credential id must be a stable HTTPS URL');
+  }
+  if (!credential.issuer?.id || !credential.issuer?.name) {
+    errors.push('Issuer profile is incomplete');
+  }
+  if (!credential.validFrom) {
+    errors.push('validFrom is required');
+  }
+  if (!credential.credentialSubject?.achievement?.id) {
+    errors.push('Achievement id is required');
+  }
+  if (!credential.credentialSubject?.achievement?.name) {
+    errors.push('Achievement name is required');
+  }
+  if (!credential.credentialSubject?.achievement?.description) {
+    errors.push('Achievement description is required');
+  }
+  if (!credential.credentialSubject?.id) {
+    errors.push('Credential subject identifier is required');
+  }
+
+  return errors;
+}
+
+export function getOpenBadgeStatus(args: {
+  status?: string | null;
+  expiresAt?: string | null;
+  revokedAt?: string | null;
+}): OpenBadgeStatus {
+  if (args.status === 'revoked' || args.revokedAt) return 'revoked';
+  if (args.expiresAt && new Date(args.expiresAt).getTime() < Date.now()) return 'expired';
+  return 'active';
+}

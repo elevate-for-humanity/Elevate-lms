@@ -39,6 +39,8 @@ jobs:
         run: node scripts/verify-student-lifecycle-contract.mjs
       - name: Canonical payment lifecycle contract
         run: node scripts/verify-payment-lifecycle-contract.mjs
+      - name: Canonical Store commerce contract
+        run: node scripts/verify-store-commerce-contract.mjs
       - name: Canonical platform route and auth doctor
         run: node scripts/platform-doctor-static.mjs
       - name: Canonical portal contracts

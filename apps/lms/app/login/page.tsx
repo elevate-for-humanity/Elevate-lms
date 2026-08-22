@@ -62,6 +62,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   // An idle-timeout redirect must actually clear the Supabase browser session
   // before the user signs in again.
@@ -73,6 +78,7 @@ export default function LoginPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!hydrated) return;
     setLoading(true);
     setError('');
 
@@ -181,7 +187,7 @@ export default function LoginPage() {
           </div>
         ) : null}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5" aria-busy={!hydrated || loading}>
           <div>
             <label htmlFor="email" className="mb-2 block text-sm font-semibold text-slate-900">Email address</label>
             <input
@@ -189,9 +195,10 @@ export default function LoginPage() {
               type="email"
               autoComplete="email"
               required
+              disabled={!hydrated || loading}
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-950 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200"
+              className="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-950 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 disabled:cursor-wait disabled:bg-slate-100"
             />
           </div>
 
@@ -202,9 +209,10 @@ export default function LoginPage() {
               type="password"
               autoComplete="current-password"
               required
+              disabled={!hydrated || loading}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-950 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200"
+              className="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-950 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 disabled:cursor-wait disabled:bg-slate-100"
             />
           </div>
 
@@ -214,10 +222,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={!hydrated || loading}
             className="w-full rounded-lg bg-blue-700 px-5 py-3 font-bold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-400"
           >
-            {loading ? 'Signing in…' : 'Sign in'}
+            {!hydrated ? 'Loading sign in…' : loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
 

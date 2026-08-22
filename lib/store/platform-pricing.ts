@@ -179,15 +179,14 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     slug: 'ai-team',
     name: 'AI Business Team',
     priceMonthly: 79,
-    description: 'PARIS, ELLIE, LIZZY and ZORA with shared AI orchestration.',
+    description: 'One discounted bundle with access to PARIS, ELLIE, LIZZY and ZORA.',
     features: [
       PlatformFeature.AI_PARIS,
       PlatformFeature.AI_ELLIE,
       PlatformFeature.AI_LIZZY,
       PlatformFeature.AI_ZORA,
-      PlatformFeature.AI_ORCHESTRATOR,
     ],
-    bullets: ['PARIS', 'ELLIE', 'LIZZY', 'ZORA', 'Cross-agent task routing'],
+    bullets: ['PARIS Sales & Intake', 'ELLIE Learning & Support', 'LIZZY Operations', 'ZORA Compliance'],
   },
   {
     slug: 'ai-voice',

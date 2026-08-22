@@ -37,7 +37,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
-RUN echo "nf-cache-invalidate-admin-2026-08-19-generated-standalone-server"
+RUN echo "nf-cache-invalidate-admin-2026-08-22-remotion-runtime-source"
 
 FROM base AS dependencies
 RUN echo "nf-deps-2026-08-13-block-ffmpeg-static-postinstall"
@@ -88,6 +88,7 @@ RUN set -eux; \
     test -n "$NEXT_PUBLIC_SUPABASE_URL"; \
     test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"; \
     test -n "$NF_GIT_SHA"; \
+    test -f /workspace/remotion-src/index.ts; \
     echo "Admin build arguments verified"
 RUN pnpm --filter @elevate/admin build
 RUN node scripts/verify-admin-critical-routes.mjs
@@ -138,6 +139,9 @@ COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/standalone
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/static/ /app/apps/admin/.next/static/
 COPY --from=builder --chown=nextjs:nodejs /workspace/public/ /app/apps/admin/public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/public/ /app/apps/admin/public/
+# Remotion is bundled dynamically at render time. The standalone server changes
+# cwd to /app/apps/admin, so package the canonical repo-root composition there.
+COPY --from=builder --chown=nextjs:nodejs /workspace/remotion-src/ /app/apps/admin/remotion-src/
 COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules /app/node_modules
 RUN set -eux; \
     test -f /app/apps/admin/server.js; \
@@ -145,6 +149,8 @@ RUN set -eux; \
     test -f /app/apps/admin/.next/required-server-files.json; \
     test -d /app/apps/admin/public; \
     test -d /app/apps/admin/public/images; \
+    test -f /app/apps/admin/remotion-src/index.ts; \
+    test -f /app/apps/admin/remotion-src/Root.tsx; \
     test -d /app/node_modules/sharp; \
     test -d /app/node_modules/@napi-rs/canvas; \
     test -d /app/node_modules/fontkit; \

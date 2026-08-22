@@ -1,25 +1,24 @@
 import 'server-only';
+
 /**
- * Completion rule evaluator.
+ * Canonical completion evaluator.
  *
- * Reads completion_rules rows for a course or program and evaluates
- * whether the learner has satisfied them. Falls back to sensible
- * defaults when no rules are configured so existing courses keep
- * working without migration.
- *
- * Called by:
- *   - /api/courses/[courseId]/complete  (course completion check)
- *   - /api/lessons/[lessonId]/complete  (program completion check after course done)
+ * Course completion is evaluated from completion_rules plus canonical course data.
+ * Program completion is derived from program_courses + program_enrollments and the
+ * same course-completion engine. It does not depend on retired training_enrollments
+ * or database functions/views that are absent from the live schema.
  */
 
-import { createAdminClient, createAuditedAdminClient } from '@/lib/supabase/admin';
+import { createAuditedAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { checkCourseCompletion } from '@/lib/course-completion';
 
 export type EntityType = 'course' | 'program';
 
 interface CompletionRule {
   rule_type: string;
   config: Record<string, unknown>;
+  threshold_value?: number | null;
 }
 
 interface CourseCompletionContext {
@@ -36,58 +35,84 @@ interface ProgramCompletionContext {
   completedCourses: number;
 }
 
-/**
- * Evaluate whether a learner has completed a course.
- * Falls back to "all lessons complete" if no rules are configured.
- */
 export async function evaluateCourseCompletion(
   courseId: string,
   context: CourseCompletionContext,
 ): Promise<boolean> {
   const db = await createAuditedAdminClient({ systemActor: 'course_completion_eval' });
-  const { data: rules } = await db
+  const { data: rules, error } = await db
     .from('completion_rules')
-    .select('rule_type, config')
+    .select('rule_type,config,threshold_value')
     .eq('entity_type', 'course')
     .eq('entity_id', courseId)
     .eq('is_active', true);
 
-  // Default: all lessons must be completed
-  if (!rules || rules.length === 0) {
+  if (error) throw error;
+  if (!rules?.length) {
     return context.totalLessons > 0 && context.completedLessons >= context.totalLessons;
   }
 
-  return rules.every((rule: CompletionRule) => evaluateCourseRule(rule, context));
+  return rules.every((rule) => evaluateCourseRule(rule as CompletionRule, context));
 }
 
 function evaluateCourseRule(rule: CompletionRule, ctx: CourseCompletionContext): boolean {
   switch (rule.rule_type) {
     case 'all_lessons':
       return ctx.totalLessons > 0 && ctx.completedLessons >= ctx.totalLessons;
-
     case 'required_lessons':
       return ctx.requiredLessons > 0 && ctx.completedRequiredLessons >= ctx.requiredLessons;
-
     case 'min_score': {
-      const minScore = Number(rule.config.min_score ?? 70);
+      const minScore = Number(rule.config?.min_score ?? rule.threshold_value ?? 70);
       return ctx.achievedScore !== undefined && ctx.achievedScore >= minScore;
     }
-
     default:
-      // Unknown rule type — don't block completion
-      return true;
+      logger.error('[completion] Unknown active course completion rule', new Error(rule.rule_type));
+      return false;
   }
 }
 
-/**
- * Check whether completing a course triggers program completion.
- * Calls the check_program_completion DB function which reads
- * program_completion_candidates (all required courses done, program
- * not yet marked complete).
- *
- * Returns array of program enrollments that are now complete.
- * Empty array means no program was completed by this course.
- */
+async function evaluateProgramCompletion(
+  programId: string,
+  context: ProgramCompletionContext,
+): Promise<boolean> {
+  const db = await createAuditedAdminClient({ systemActor: 'program_completion_eval' });
+  const { data: rules, error } = await db
+    .from('completion_rules')
+    .select('rule_type,config,threshold_value')
+    .eq('entity_type', 'program')
+    .eq('entity_id', programId)
+    .eq('is_active', true);
+
+  if (error) throw error;
+  if (!rules?.length) {
+    return (
+      context.totalRequiredCourses > 0 &&
+      context.completedCourses >= context.totalRequiredCourses
+    );
+  }
+
+  return rules.every((rawRule) => {
+    const rule = rawRule as CompletionRule;
+    switch (rule.rule_type) {
+      case 'all_courses':
+      case 'required_courses':
+        return (
+          context.totalRequiredCourses > 0 &&
+          context.completedCourses >= context.totalRequiredCourses
+        );
+      case 'min_courses': {
+        const requiredCount = Number(rule.config?.count ?? rule.threshold_value ?? 1);
+        return context.completedCourses >= requiredCount;
+      }
+      default:
+        logger.error('[completion] Unknown active program completion rule', new Error(rule.rule_type), {
+          programId,
+        });
+        return false;
+    }
+  });
+}
+
 export async function checkProgramCompletion(
   userId: string,
   courseId: string,
@@ -96,24 +121,82 @@ export async function checkProgramCompletion(
     actorUserId: userId,
     systemActor: 'program_completion_check',
   });
-  const { data, error } = await db.rpc('check_program_completion', {
-    p_user_id: userId,
-    p_course_id: courseId,
-  });
 
-  if (error) {
-    // Function may not exist yet in this environment — non-fatal
-    return [];
+  const { data: directLinks, error: directLinkError } = await db
+    .from('program_courses')
+    .select('program_id')
+    .eq('course_id', courseId)
+    .eq('is_required', true);
+  if (directLinkError) throw directLinkError;
+
+  const linkedProgramIds = [
+    ...new Set((directLinks ?? []).map((link) => link.program_id).filter(Boolean)),
+  ] as string[];
+
+  let enrollmentQuery = db
+    .from('program_enrollments')
+    .select('id,program_id,course_id,status,user_id,student_id')
+    .or(`user_id.eq.${userId},student_id.eq.${userId}`);
+
+  if (linkedProgramIds.length) {
+    enrollmentQuery = enrollmentQuery.in('program_id', linkedProgramIds);
+  } else {
+    enrollmentQuery = enrollmentQuery.eq('course_id', courseId);
   }
 
-  return data ?? [];
+  const { data: enrollments, error: enrollmentError } = await enrollmentQuery;
+  if (enrollmentError) throw enrollmentError;
+
+  const completedPrograms: Array<{
+    program_enrollment_id: string;
+    program_id: string;
+    user_id: string;
+  }> = [];
+
+  for (const enrollment of enrollments ?? []) {
+    if (!enrollment.program_id || enrollment.status?.toLowerCase() === 'completed') continue;
+
+    const { data: requiredLinks, error: linksError } = await db
+      .from('program_courses')
+      .select('course_id')
+      .eq('program_id', enrollment.program_id)
+      .eq('is_required', true)
+      .order('order_index');
+    if (linksError) throw linksError;
+
+    const requiredCourseIds = [
+      ...new Set(
+        (requiredLinks?.length
+          ? requiredLinks.map((link) => link.course_id)
+          : [enrollment.course_id || courseId]
+        ).filter(Boolean),
+      ),
+    ] as string[];
+
+    if (!requiredCourseIds.includes(courseId) || requiredCourseIds.length === 0) continue;
+
+    const statuses = await Promise.all(
+      requiredCourseIds.map((requiredCourseId) => checkCourseCompletion(userId, requiredCourseId)),
+    );
+    const completedCourses = statuses.filter((status) => status.isComplete).length;
+
+    const programComplete = await evaluateProgramCompletion(enrollment.program_id, {
+      totalRequiredCourses: requiredCourseIds.length,
+      completedCourses,
+    });
+
+    if (programComplete) {
+      completedPrograms.push({
+        program_enrollment_id: enrollment.id,
+        program_id: enrollment.program_id,
+        user_id: userId,
+      });
+    }
+  }
+
+  return completedPrograms;
 }
 
-/**
- * Mark a program enrollment as completed, write a transcript entry,
- * generate the certificate PDF, store it, and issue the credential.
- * Idempotent — safe to call multiple times.
- */
 export async function completeProgramEnrollment(
   programEnrollmentId: string,
   userId: string,
@@ -124,31 +207,122 @@ export async function completeProgramEnrollment(
     systemActor: 'program_completion',
   });
 
-  // 1. Mark program completed in DB
-  await db.rpc('mark_program_completed', {
-    p_program_enrollment_id: programEnrollmentId,
+  const { data: enrollment, error: enrollmentError } = await db
+    .from('program_enrollments')
+    .select('id,program_id,user_id,student_id,status')
+    .eq('id', programEnrollmentId)
+    .eq('program_id', programId)
+    .maybeSingle();
+  if (enrollmentError) throw enrollmentError;
+  if (!enrollment) throw new Error('Program enrollment not found');
+  if (enrollment.user_id !== userId && enrollment.student_id !== userId) {
+    throw new Error('Program enrollment does not belong to learner');
+  }
+
+  const [{ data: profile, error: profileError }, { data: program, error: programError }] =
+    await Promise.all([
+      db.from('profiles').select('full_name,email').eq('id', userId).maybeSingle(),
+      db
+        .from('programs')
+        .select('title,name,required_hours,total_hours,training_hours')
+        .eq('id', programId)
+        .maybeSingle(),
+    ]);
+  if (profileError) throw profileError;
+  if (programError) throw programError;
+  if (!program) throw new Error('Program not found');
+
+  const studentName = profile?.full_name || profile?.email || 'Learner';
+  const studentEmail = profile?.email || undefined;
+  const programName = program.title || program.name || 'Program';
+  const programHours =
+    program.required_hours ?? program.total_hours ?? program.training_hours ?? null;
+
+  const { data: requiredCourses, error: requiredCoursesError } = await db
+    .from('program_courses')
+    .select('course_id')
+    .eq('program_id', programId)
+    .eq('is_required', true);
+  if (requiredCoursesError) throw requiredCoursesError;
+  const coursesCompleted = Math.max(1, requiredCourses?.length ?? 0);
+
+  const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
+  const issued = await issueCertificate({
+    supabase: db,
+    studentId: userId,
+    studentName,
+    studentEmail,
+    programId,
+    programName,
+    programHours,
+    enrollmentId: programEnrollmentId,
+    competencyEvidence: {
+      completionVerifiedAt: new Date().toISOString(),
+      completionMethod: 'program_requirements_verified',
+    },
   });
 
-  // 2. Fetch learner profile and program details
-  const [{ data: profile }, { data: program }] = await Promise.all([
-    db.from('profiles').select('full_name, email').eq('id', userId).maybeSingle(),
-    db.from('training_programs').select('name, required_hours').eq('id', programId).maybeSingle(),
-  ]);
+  if (!issued.success || !issued.certificate) {
+    throw new Error(issued.error || 'Program certificate issuance failed');
+  }
 
-  const studentName = profile?.full_name ?? 'Learner';
-  const studentEmail = profile?.email;
-  const programName = program?.name ?? 'Program';
-  const programHours = program?.required_hours ?? null;
-
-  // 3. Count completed courses for transcript
-  const { count: coursesCompleted } = await db
+  const completedAt = issued.certificate.completion_date || new Date().toISOString();
+  const { error: completionUpdateError } = await db
     .from('program_enrollments')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .not('completed_at', 'is', null);
+    .update({
+      status: 'completed',
+      progress_percent: 100,
+      completed_at: completedAt,
+      certificate_issued_at: completedAt,
+      updated_at: completedAt,
+    })
+    .eq('id', programEnrollmentId);
+  if (completionUpdateError) throw completionUpdateError;
 
-  // 4. Write transcript entry (idempotent via unique constraint)
-  const { data: transcriptRow } = await db
+  let pdfUrl: string | null = null;
+  try {
+    const { generateCertificatePDF } = await import('@/lib/certificates/generator');
+    const pdfBlob = await generateCertificatePDF({
+      studentName,
+      courseName: programName,
+      completionDate: new Date(completedAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }),
+      certificateNumber: issued.certificate.certificate_number,
+      programHours: programHours ?? undefined,
+    });
+
+    const storagePath = `programs/${programId}/${userId}/${issued.certificate.certificate_number}.pdf`;
+    const { error: uploadError } = await db.storage
+      .from('certificates')
+      .upload(storagePath, Buffer.from(await pdfBlob.arrayBuffer()), {
+        contentType: 'application/pdf',
+        upsert: true,
+      });
+    if (uploadError) throw uploadError;
+
+    const { data: signed, error: signedUrlError } = await db.storage
+      .from('certificates')
+      .createSignedUrl(storagePath, 60 * 60 * 24 * 365);
+    if (signedUrlError) throw signedUrlError;
+    pdfUrl = signed?.signedUrl ?? null;
+
+    if (pdfUrl) {
+      await db
+        .from('certificates')
+        .update({ pdf_url: pdfUrl, certificate_url: pdfUrl })
+        .eq('id', issued.certificate.id);
+    }
+  } catch (pdfError) {
+    logger.error('[completion] Program certificate PDF generation failed (non-fatal)', pdfError as Error, {
+      programEnrollmentId,
+      certificateId: issued.certificate.id,
+    });
+  }
+
+  const { data: transcript, error: transcriptError } = await db
     .from('transcripts')
     .upsert(
       {
@@ -156,81 +330,18 @@ export async function completeProgramEnrollment(
         program_enrollment_id: programEnrollmentId,
         program_id: programId,
         program_name: programName,
-        completed_at: new Date().toISOString(),
+        completed_at: completedAt,
         total_hours: programHours,
-        courses_completed: coursesCompleted ?? 0,
+        courses_completed: coursesCompleted,
+        certificate_id: issued.certificate.id,
+        pdf_url: pdfUrl,
       },
       { onConflict: 'user_id,program_enrollment_id', ignoreDuplicates: false },
     )
     .select('id')
-    .maybeSingle();
+    .single();
 
-  // 5. Generate certificate PDF and upload to storage
-  let pdfUrl: string | null = null;
-  try {
-    const { generateCertificatePDF, generateCertificateNumber } =
-      await import('@/lib/certificates/generator');
-
-    const certNumber = generateCertificateNumber();
-    const pdfBlob = await generateCertificatePDF({
-      studentName,
-      courseName: programName,
-      completionDate: new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
-      certificateNumber: certNumber,
-      programHours: programHours ?? undefined,
-    });
-
-    const pdfBuffer = Buffer.from(await pdfBlob.arrayBuffer());
-    const storagePath = `programs/${programId}/${userId}/${certNumber}.pdf`;
-
-    const { error: uploadErr } = await db.storage
-      .from('certificates')
-      .upload(storagePath, pdfBuffer, {
-        contentType: 'application/pdf',
-        upsert: true,
-      });
-
-    if (!uploadErr) {
-      const { data: signed } = await db.storage
-        .from('certificates')
-        .createSignedUrl(storagePath, 60 * 60 * 24 * 365); // 1-year signed URL
-      pdfUrl = signed?.signedUrl ?? null;
-
-      // Update transcript with PDF URL
-      if (transcriptRow?.id && pdfUrl) {
-        await db.from('transcripts').update({ pdf_url: pdfUrl }).eq('id', transcriptRow.id);
-      }
-    }
-  } catch (pdfErr) {
-    logger.error('[completion] PDF generation failed (non-fatal):', pdfErr);
-  }
-
-  // 6. Issue certificate record via canonical issuer
-  try {
-    const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
-    const result = await issueCertificate({
-      supabase: db,
-      studentId: userId,
-      studentName,
-      studentEmail,
-      programId,
-      programName,
-      programHours,
-      enrollmentId: programEnrollmentId,
-    });
-
-    // Link certificate to transcript
-    if (result.success && result.certificate?.id && transcriptRow?.id) {
-      await db
-        .from('transcripts')
-        .update({ certificate_id: result.certificate.id })
-        .eq('id', transcriptRow.id);
-    }
-  } catch {
-    // issueCertificate logs internally — non-fatal
+  if (transcriptError || !transcript) {
+    throw transcriptError || new Error('Transcript write failed');
   }
 }

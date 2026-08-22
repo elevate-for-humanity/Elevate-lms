@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   repair:
@@ -25,9 +26,11 @@ jobs:
         with:
           node-version: 22
       - name: Repair current contract drift
+        id: repair
         shell: bash
         run: |
-          node <<'NODE'
+          set +e
+          node <<'NODE' > /tmp/repair.log 2>&1
           const fs = require('fs');
           const file = 'lib/course-factory/factory.ts';
           let text = fs.readFileSync(file, 'utf8');
@@ -69,17 +72,54 @@ jobs:
           publisherText = publisherText.replace('  } catch {}', '  } catch {\n    // Plain HTML/text lesson content is normalized below.\n  }');
           fs.writeFileSync(publisher, publisherText);
           NODE
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          cat /tmp/repair.log
+          exit 0
       - name: Commit repaired contracts
+        id: commit
+        if: steps.repair.outputs.exit_code == '0'
         shell: bash
         run: |
+          set +e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add lib/course-factory/factory.ts lib/course-factory/publisher.ts
-          git diff --cached --check
-          if git diff --cached --quiet; then
-            echo "Contracts already aligned."
-            exit 0
+          git diff --cached --check > /tmp/commit.log 2>&1
+          code=$?
+          if [ "$code" = "0" ] && ! git diff --cached --quiet; then
+            git commit -m "fix(course-factory): align canonical contracts" >> /tmp/commit.log 2>&1 || code=$?
+            if [ "$code" = "0" ]; then
+              git pull --rebase origin main >> /tmp/commit.log 2>&1 || code=$?
+            fi
+            if [ "$code" = "0" ]; then
+              git push origin HEAD:main >> /tmp/commit.log 2>&1 || code=$?
+            fi
           fi
-          git commit -m "fix(course-factory): align canonical contracts"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          cat /tmp/commit.log
+          exit 0
+      - name: Report result to trigger issue
+        if: always() && github.event_name == 'issues'
+        uses: actions/github-script@v7
+        env:
+          REPAIR_EXIT: ${{ steps.repair.outputs.exit_code }}
+          COMMIT_EXIT: ${{ steps.commit.outputs.exit_code }}
+        with:
+          script: |
+            const fs = require('fs');
+            const repair = process.env.REPAIR_EXIT || 'not-run';
+            const commit = process.env.COMMIT_EXIT || 'not-run';
+            const repairLog = fs.existsSync('/tmp/repair.log') ? fs.readFileSync('/tmp/repair.log', 'utf8').slice(-12000) : '';
+            const commitLog = fs.existsSync('/tmp/commit.log') ? fs.readFileSync('/tmp/commit.log', 'utf8').slice(-12000) : '';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `COURSE FACTORY CONTRACT REPAIR ${repair === '0' && (commit === '0' || commit === 'not-run') ? 'PASS' : 'FAIL'}\n\nRepair: ${repair}\nCommit: ${commit}\n\n\`\`\`text\n${repairLog}\n${commitLog}\n\`\`\``
+            });
+      - name: Fail when repair failed
+        if: always()
+        run: |
+          test "${{ steps.repair.outputs.exit_code }}" = "0"
+          test "${{ steps.commit.outputs.exit_code }}" = "0" -o "${{ steps.commit.outputs.exit_code }}" = ""

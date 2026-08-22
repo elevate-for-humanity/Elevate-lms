@@ -34,6 +34,8 @@ for (const required of [
   "action === 'save-module'",
   "action === 'save-lesson'",
   "action === 'patch-lesson'",
+  "action === 'delete-lesson'",
+  "action === 'reorder-lessons'",
   "action === 'link-scorm'",
   "action === 'review-course'",
   "action === 'review-lessons'",
@@ -48,10 +50,11 @@ if (!index.includes("export { courseFactory } from '../course-builder/orchestrat
 const orchestrator = read('lib/course-builder/orchestrator.ts');
 if (!orchestrator.includes("from '../course-factory/factory'")) failures.push('Course Builder orchestrator does not own private Course Factory execution');
 if (!orchestrator.includes('saveCourseProgramConfiguration')) failures.push('Course Builder orchestrator does not own course program configuration persistence');
+if (!orchestrator.includes('queueCourseLessonVideos')) failures.push('Course Builder orchestrator does not own canonical media queue orchestration');
 const controller = read('lib/devstudio/course-builder-controller.ts');
 if (!controller.includes("from '../course-builder/orchestrator'")) failures.push('Studio Course Builder controller is not backed by canonical orchestrator');
 const editService = read('lib/course-builder/edit-service.ts');
-for (const capability of ['saveCourseModule','saveCourseLesson','patchCourseLesson','linkCourseScormPackage']) {
+for (const capability of ['saveCourseModule','saveCourseLesson','patchCourseLesson','deleteCourseLesson','reorderCourseLessons','linkCourseScormPackage']) {
   if (!editService.includes(capability)) failures.push(`Course Builder edit service is missing ${capability}`);
 }
 const reviewService = read('lib/course-builder/review-service.ts');
@@ -86,6 +89,23 @@ for (const rel of retiredMutationRoutes) {
   if (/\.from\(['\"](?:courses|course_modules|course_lessons)['\"]\)[\s\S]{0,220}\.(?:insert|upsert|update|delete)\(/.test(text)) failures.push(`${rel}: retired endpoint still writes canonical course tables`);
   if (/\bpublishCourse\s*\(/.test(text)) failures.push(`${rel}: retired endpoint still publishes outside Course Builder root`);
 }
+
+const mediaCompatRoute = 'apps/admin/app/api/admin/courses/[courseId]/generate-videos/route.ts';
+const mediaCompat = read(mediaCompatRoute);
+for (const required of ["/api/admin/course-builder", "action: 'queue-media'", "status: 'queued'"]) {
+  if (!mediaCompat.includes(required)) failures.push(`${mediaCompatRoute}: compatibility media route missing ${required}`);
+}
+for (const forbidden of ['processLesson', "from '@/lib/video/pipeline'", ".from('course_lessons').update", 'OPENAI_API_KEY', 'PEXELS_API_KEY']) {
+  if (mediaCompat.includes(forbidden)) failures.push(`${mediaCompatRoute}: duplicate media generation authority remains: ${forbidden}`);
+}
+
+const lessonCompatRoute = 'apps/admin/app/api/admin/courses/lessons/route.ts';
+const lessonCompat = read(lessonCompatRoute);
+if (!lessonCompat.includes('/api/admin/course-builder')) failures.push(`${lessonCompatRoute}: compatibility lesson mutations do not cross Course Builder root`);
+for (const forbidden of [".from('course_lessons').insert", ".from('course_lessons').delete", ".from('course_lessons').update"]) {
+  if (lessonCompat.includes(forbidden)) failures.push(`${lessonCompatRoute}: direct canonical lesson mutation remains: ${forbidden}`);
+}
+
 const scormText = read('apps/admin/app/api/admin/course-builder/scorm-link/route.ts');
 if (!scormText.includes('RETIRED mutation')) failures.push('SCORM mutation route is not explicitly retired');
 if (/export async function POST[\s\S]*?\.from\(['\"]scorm_packages['\"]\)[\s\S]{0,220}\.update\(/.test(scormText)) failures.push('SCORM POST still mutates outside Course Builder root');
@@ -97,7 +117,6 @@ const specializedPackageWriters = new Set([
   'lib/course-factory/post-generation-governance.ts',
   'lib/db/courses.ts',
   'lib/lms/course-service.ts',
-  'lib/studio/tools.ts',
   'scripts/e2e-test.ts',
   'scripts/run-pipeline-e2e.ts',
   'scripts/seed/apprenticeship-courses.mjs',
@@ -159,4 +178,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder generation/editing/review/publication -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; no raw-engine, parallel package, review, or publication authority detected.');
+console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder generation/editing/review/media/publication -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; legacy lesson/media routes are compatibility-only and no raw-engine, parallel package, review, media, or publication authority was detected.');

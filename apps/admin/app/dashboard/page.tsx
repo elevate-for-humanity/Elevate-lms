@@ -15,9 +15,19 @@ export const metadata: Metadata = {
  * Admin middleware is the first authorization boundary. requireRole is an
  * explicit second boundary so this page cannot render if middleware routing is
  * ever changed or bypassed by a future refactor.
+ *
+ * Advisor is intentionally included because the canonical role destination
+ * registry routes advisors to this operational dashboard. Keep this guard in
+ * lockstep with lib/auth/role-destinations.ts and the portal contract audit.
  */
 export default async function AdminDashboardPage() {
-  const { effectiveRoles } = await requireRole(['super_admin', 'admin', 'org_admin', 'staff']);
+  const { effectiveRoles } = await requireRole([
+    'super_admin',
+    'admin',
+    'org_admin',
+    'advisor',
+    'staff',
+  ]);
   const canAccessDevStudio = effectiveRoles.some((role) =>
     ['super_admin', 'admin'].includes(role),
   );

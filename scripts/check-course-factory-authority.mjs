@@ -53,6 +53,32 @@ for (const rel of [
   if (/\bcourseFactory\s*\(/.test(text)) failures.push(`${rel}: retired endpoint still invokes course generation`);
 }
 
+// Specialized mutations may touch multiple course tables for cloning/versioning,
+// but they are not allowed to become complete generation pipelines.
+const specializedPackageWriters = new Set([
+  'apps/admin/app/api/admin/courses/[courseId]/clone/route.ts',
+  'apps/admin/app/api/admin/programs/[programId]/clone/route.ts',
+  'lib/course-factory/versioning.ts',
+  'lib/course-factory/post-generation-governance.ts',
+  'lib/db/courses.ts',
+  'lib/lms/course-service.ts',
+  'lib/studio/tools.ts',
+  'scripts/e2e-test.ts',
+  'scripts/run-pipeline-e2e.ts',
+  'scripts/seed/apprenticeship-courses.mjs',
+  'scripts/smoke-test-pipeline.ts',
+]);
+
+for (const rel of [...walk('apps'), ...walk('lib'), ...walk('scripts'), ...walk('supabase/functions')]) {
+  if (rel === 'lib/course-factory/publisher.ts' || specializedPackageWriters.has(rel)) continue;
+  const text = read(rel);
+  const writes = (table) =>
+    new RegExp(`\\.from\\(['\"]${table}['\"]\\)[\\s\\S]{0,280}\\.(?:insert|upsert|update|delete)\\(`).test(text);
+  if (writes('courses') && writes('course_modules') && writes('course_lessons')) {
+    failures.push(`${rel}: parallel complete course-package writer detected; complete packages must persist through Course Factory publisher`);
+  }
+}
+
 for (const rel of walk('apps')) {
   if (rel === rootRoute) continue;
   const text = read(rel);
@@ -76,4 +102,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log('Course Builder authority gate passed: Studio control plane -> Course Builder orchestrator -> private Course Factory -> canonical persistence/media/publish -> LMS.');
+console.log('Course Builder authority gate passed: Studio control plane -> Course Builder orchestrator -> private Course Factory -> canonical persistence/media/publish -> LMS; no parallel complete-package writer detected.');

@@ -19,6 +19,7 @@ on:
       - 'supabase/migrations/20260822193000_documents_application_owner_types.sql'
       - 'supabase/migrations/20260822194500_agentic_run_credit_accounting.sql'
       - 'supabase/migrations/20260822195000_harden_agentic_application_document_link.sql'
+      - 'supabase/migrations/20260822195500_attach_agentic_application_to_user.sql'
       - 'scripts/check-agentic-admissions-contract.mjs'
       - '.github/workflows/agentic-admissions-acceptance.yml'
   workflow_dispatch:

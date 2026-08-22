@@ -24,13 +24,15 @@ function readQuickClips(contentJson: unknown): Array<Record<string, any>> {
   if (!contentJson || typeof contentJson !== 'object') return [];
   const experience = (contentJson as Record<string, any>).experience;
   return experience && typeof experience === 'object' && Array.isArray(experience.quickClips)
-    ? experience.quickClips
+    ? experience.quickClips.slice(0, 2)
     : [];
 }
 
 /**
  * Canonical course-media enqueue service.
  * Course Builder/Factory owns orchestration; lib/video owns rendering mechanics.
+ * Each persisted lesson owns one primary lesson video and at most two canonical
+ * quick-clip assets so media counts remain deterministic across generation and reruns.
  */
 export async function queueCourseLessonVideos(
   input: QueueCourseLessonVideosInput,

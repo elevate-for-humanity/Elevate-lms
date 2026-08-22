@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 async function loadApplicationPrograms() {
   try {
-    const db = getAdminClient();
+    const db = await getAdminClient();
     if (!db) throw new Error('Supabase admin client unavailable');
     const { data, error } = await db
       .from('programs')

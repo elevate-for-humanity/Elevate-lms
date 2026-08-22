@@ -24,37 +24,52 @@ const rootRoute = 'apps/admin/app/api/admin/course-builder/route.ts';
 const rootText = read(rootRoute);
 for (const required of [
   "from '@/lib/course-builder/orchestrator'",
+  "from '@/lib/course-builder/edit-service'",
   "action === 'generate-from-blueprint'",
   "action === 'queue-media'",
   "action === 'save-program-config'",
+  "action === 'save-module'",
+  "action === 'save-lesson'",
+  "action === 'patch-lesson'",
+  "action === 'link-scorm'",
   "action === 'publish'",
   "action === 'repair'",
   "action === 'audit'",
 ]) if (!rootText.includes(required)) failures.push(`${rootRoute}: missing canonical action/authority ${required}`);
 
 const index = read('lib/course-factory/index.ts');
-if (!index.includes("export { courseFactory } from '../course-builder/orchestrator'")) {
-  failures.push('lib/course-factory/index.ts must expose Course Builder facade instead of raw factory.ts');
-}
+if (!index.includes("export { courseFactory } from '../course-builder/orchestrator'")) failures.push('lib/course-factory/index.ts must expose Course Builder facade instead of raw factory.ts');
 const orchestrator = read('lib/course-builder/orchestrator.ts');
 if (!orchestrator.includes("from '../course-factory/factory'")) failures.push('Course Builder orchestrator does not own private Course Factory execution');
 if (!orchestrator.includes('saveCourseProgramConfiguration')) failures.push('Course Builder orchestrator does not own course program configuration persistence');
 const controller = read('lib/devstudio/course-builder-controller.ts');
 if (!controller.includes("from '../course-builder/orchestrator'")) failures.push('Studio Course Builder controller is not backed by canonical orchestrator');
+const editService = read('lib/course-builder/edit-service.ts');
+for (const capability of ['saveCourseModule','saveCourseLesson','patchCourseLesson','linkCourseScormPackage']) {
+  if (!editService.includes(capability)) failures.push(`Course Builder edit service is missing ${capability}`);
+}
 
-for (const rel of [
+const retiredMutationRoutes = [
   'apps/admin/app/api/admin/lms/courses/generate/route.ts',
   'apps/admin/app/api/admin/course-builder/publish/route.ts',
   'apps/admin/app/api/admin/course-builder/program/route.ts',
+  'apps/admin/app/api/admin/course-builder/module/route.ts',
+  'apps/admin/app/api/admin/course-builder/lesson/route.ts',
+  'apps/admin/app/api/admin/course-builder/lesson-patch/route.ts',
   'apps/admin/app/api/admin/courses/[courseId]/generate-missing/route.ts',
   'apps/lms/app/api/ai/generate-and-publish-course/route.ts',
   'apps/admin/app/api/admin/courses/generate/publish/route.ts',
   'supabase/functions/ai-course-create/index.ts',
-]) {
+];
+for (const rel of retiredMutationRoutes) {
   const text = read(rel);
   if (!/(RETIRED|COURSE_FACTORY_REQUIRED|COURSE_BUILDER_ROOT_REQUIRED)/.test(text)) failures.push(`${rel}: historical course mutation endpoint is not explicitly retired`);
   if (/\bcourseFactory\s*\(/.test(text)) failures.push(`${rel}: retired endpoint still invokes course generation`);
+  if (/\.from\(['\"](?:courses|course_modules|course_lessons)['\"]\)[\s\S]{0,220}\.(?:insert|upsert|update|delete)\(/.test(text)) failures.push(`${rel}: retired endpoint still writes canonical course tables`);
 }
+const scormText = read('apps/admin/app/api/admin/course-builder/scorm-link/route.ts');
+if (!scormText.includes('RETIRED mutation')) failures.push('SCORM mutation route is not explicitly retired');
+if (/export async function POST[\s\S]*?\.from\(['\"]scorm_packages['\"]\)[\s\S]{0,220}\.update\(/.test(scormText)) failures.push('SCORM POST still mutates outside Course Builder root');
 
 const specializedPackageWriters = new Set([
   'apps/admin/app/api/admin/courses/[courseId]/clone/route.ts',
@@ -69,15 +84,11 @@ const specializedPackageWriters = new Set([
   'scripts/seed/apprenticeship-courses.mjs',
   'scripts/smoke-test-pipeline.ts',
 ]);
-
 for (const rel of [...walk('apps'), ...walk('lib'), ...walk('scripts'), ...walk('supabase/functions')]) {
   if (rel === 'lib/course-factory/publisher.ts' || specializedPackageWriters.has(rel)) continue;
   const text = read(rel);
-  const writes = (table) =>
-    new RegExp(`\\.from\\(['\"]${table}['\"]\\)[\\s\\S]{0,280}\\.(?:insert|upsert|update|delete)\\(`).test(text);
-  if (writes('courses') && writes('course_modules') && writes('course_lessons')) {
-    failures.push(`${rel}: parallel complete course-package writer detected; complete packages must persist through Course Factory publisher`);
-  }
+  const writes = (table) => new RegExp(`\\.from\\(['\"]${table}['\"]\\)[\\s\\S]{0,280}\\.(?:insert|upsert|update|delete)\\(`).test(text);
+  if (writes('courses') && writes('course_modules') && writes('course_lessons')) failures.push(`${rel}: parallel complete course-package writer detected; complete packages must persist through Course Factory publisher`);
 }
 
 for (const rel of walk('apps')) {
@@ -91,6 +102,10 @@ const forbiddenEndpointRefs = [
   '/api/admin/lms/courses/generate',
   '/api/admin/course-builder/publish',
   '/api/admin/course-builder/program',
+  '/api/admin/course-builder/module',
+  '/api/admin/course-builder/lesson-patch',
+  '/api/admin/course-builder/lesson',
+  '/api/admin/course-builder/quick-add',
   '/api/admin/courses/generate/publish',
   '/api/ai/generate-and-publish-course',
 ];
@@ -104,4 +119,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log('Course Builder authority gate passed: Studio control plane -> Course Builder orchestrator -> private Course Factory -> canonical persistence/media/publish -> LMS; no parallel complete-package writer detected.');
+console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder orchestration/editing -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; no parallel complete-package writer detected.');

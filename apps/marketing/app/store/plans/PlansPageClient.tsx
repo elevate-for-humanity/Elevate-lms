@@ -12,7 +12,9 @@ export function PlansPageClient({
   vertical?: string;
   initialAddon?: string;
 }) {
-  const validInitialAddon = initialAddon && ADD_ON_MARKETPLACE.some((addon) => addon.slug === initialAddon)
+  const validInitialAddon = initialAddon && ADD_ON_MARKETPLACE.some(
+    (addon) => addon.slug === initialAddon && !addon.hiddenFromMarketplace,
+  )
     ? initialAddon
     : undefined;
   const [selectedAddons, setSelectedAddons] = useState<string[]>(validInitialAddon ? [validInitialAddon] : []);

@@ -2,10 +2,6 @@ name: Repair Course Factory Contracts
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/trigger-course-factory-contract-repair.txt'
   issues:
     types: [opened, reopened]
 
@@ -76,26 +72,27 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           cat /tmp/repair.log
           exit 0
-      - name: Commit repaired contracts
+      - name: Commit repaired contracts to fix branch
         id: commit
         if: steps.repair.outputs.exit_code == '0'
         shell: bash
+        env:
+          FIX_BRANCH: fix/course-factory-contracts
         run: |
           set +e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$FIX_BRANCH"
           git add lib/course-factory/factory.ts lib/course-factory/publisher.ts
           git diff --cached --check > /tmp/commit.log 2>&1
           code=$?
           if [ "$code" = "0" ] && ! git diff --cached --quiet; then
             git commit -m "fix(course-factory): align canonical contracts" >> /tmp/commit.log 2>&1 || code=$?
             if [ "$code" = "0" ]; then
-              git pull --rebase origin main >> /tmp/commit.log 2>&1 || code=$?
-            fi
-            if [ "$code" = "0" ]; then
-              git push origin HEAD:main >> /tmp/commit.log 2>&1 || code=$?
+              git push --force-with-lease origin "$FIX_BRANCH" >> /tmp/commit.log 2>&1 || code=$?
             fi
           fi
+          echo "branch=$FIX_BRANCH" >> "$GITHUB_OUTPUT"
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           cat /tmp/commit.log
           exit 0
@@ -105,21 +102,23 @@ jobs:
         env:
           REPAIR_EXIT: ${{ steps.repair.outputs.exit_code }}
           COMMIT_EXIT: ${{ steps.commit.outputs.exit_code }}
+          FIX_BRANCH: ${{ steps.commit.outputs.branch }}
         with:
           script: |
             const fs = require('fs');
             const repair = process.env.REPAIR_EXIT || 'not-run';
             const commit = process.env.COMMIT_EXIT || 'not-run';
+            const branch = process.env.FIX_BRANCH || 'fix/course-factory-contracts';
             const repairLog = fs.existsSync('/tmp/repair.log') ? fs.readFileSync('/tmp/repair.log', 'utf8').slice(-12000) : '';
             const commitLog = fs.existsSync('/tmp/commit.log') ? fs.readFileSync('/tmp/commit.log', 'utf8').slice(-12000) : '';
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `COURSE FACTORY CONTRACT REPAIR ${repair === '0' && (commit === '0' || commit === 'not-run') ? 'PASS' : 'FAIL'}\n\nRepair: ${repair}\nCommit: ${commit}\n\n\`\`\`text\n${repairLog}\n${commitLog}\n\`\`\``
+              body: `COURSE FACTORY CONTRACT REPAIR ${repair === '0' && commit === '0' ? 'PASS' : 'FAIL'}\n\nRepair: ${repair}\nCommit: ${commit}\nBranch: ${branch}\n\n\`\`\`text\n${repairLog}\n${commitLog}\n\`\`\``
             });
       - name: Fail when repair failed
         if: always()
         run: |
           test "${{ steps.repair.outputs.exit_code }}" = "0"
-          test "${{ steps.commit.outputs.exit_code }}" = "0" -o "${{ steps.commit.outputs.exit_code }}" = ""
+          test "${{ steps.commit.outputs.exit_code }}" = "0"

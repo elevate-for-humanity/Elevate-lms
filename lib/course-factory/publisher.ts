@@ -56,7 +56,9 @@ function normalizeLessonContent(content: string | undefined, objective: string |
   try {
     const parsed = JSON.parse(content);
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed as Record<string, unknown>;
-  } catch {}
+  } catch {
+    // Plain HTML/text lesson content is normalized below.
+  }
   return { html: content, learning_points: objective?.trim() ? [objective.trim()] : [], scenario: '' };
 }
 

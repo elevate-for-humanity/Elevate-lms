@@ -1,6 +1,10 @@
 import { courseFactory } from '../../lib/course-factory';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { requireAdminClient } from '../../lib/supabase/admin';
+import {
+  publishPersistedCourseWithClient,
+  runPersistedCourseProcurementHealthCheckWithClient,
+} from '../../lib/course-builder/persisted-publish-service';
 
 // Production acceptance runner for Indiana INTraining Program #10005173.
 const PROGRAM_SLUG = 'business-administration';
@@ -55,11 +59,7 @@ async function waitForMedia(courseId: string) {
   const db = await requireAdminClient();
   const deadline = Date.now() + MEDIA_TIMEOUT_MS;
   while (Date.now() < deadline) {
-    // Production schedulers run every five minutes, which is too coarse for a
-    // 105-asset acceptance package. Kick the same canonical Admin worker while
-    // polling so this test drains the real queue instead of inventing a bypass.
     await kickMediaWorker();
-
     const { data, error } = await db.from('video_jobs').select('asset_kind,status,video_url,error_message').eq('course_id', courseId);
     if (error) fail(`Video job query failed: ${error.message}`);
     const rows = data ?? [];
@@ -79,13 +79,17 @@ async function waitForMedia(courseId: string) {
 async function auditCourse(courseId: string) {
   const db = await requireAdminClient();
   const [{ data: modules, error: moduleError }, { data: lessons, error: lessonError }] = await Promise.all([
-    db.from('course_modules').select('id,title,domain_key').eq('course_id', courseId),
-    db.from('course_lessons').select('id,title,slug,content,content_json,learning_objectives,quiz_questions,script,video_url,generation_status').eq('course_id', courseId),
+    db.from('course_modules').select('id,title,domain_key,target_hours').eq('course_id', courseId),
+    db.from('course_lessons').select('id,title,slug,content,content_json,learning_objectives,quiz_questions,script,video_url,generation_status,approved').eq('course_id', courseId),
   ]);
   if (moduleError) fail(`Module audit failed: ${moduleError.message}`);
   if (lessonError) fail(`Lesson audit failed: ${lessonError.message}`);
   if ((modules ?? []).length !== EXPECTED_MODULES) fail(`Expected ${EXPECTED_MODULES} modules; found ${(modules ?? []).length}`);
   if ((lessons ?? []).length !== EXPECTED_LESSONS) fail(`Expected ${EXPECTED_LESSONS} lessons; found ${(lessons ?? []).length}`);
+  for (const module of modules ?? []) {
+    if (!module.domain_key?.trim()) fail(`${module.title} is missing domain/standards mapping`);
+    if (!module.target_hours || Number(module.target_hours) <= 0) fail(`${module.title} has invalid target hours`);
+  }
   for (const lesson of lessons ?? []) {
     const rawContent = lesson.content;
     const content = typeof rawContent === 'string'
@@ -96,7 +100,7 @@ async function auditCourse(courseId: string) {
     if (!Array.isArray(lesson.learning_objectives) || lesson.learning_objectives.length < 3) fail(`${lesson.slug} is missing learning objectives`);
     if (typeof lesson.script !== 'string' || lesson.script.trim().length < 200) fail(`${lesson.slug} is missing narration script`);
     if (!lesson.content_json || typeof lesson.content_json !== 'object') fail(`${lesson.slug} is missing interactive lesson experience`);
-    if (!['generated', 'published'].includes(lesson.generation_status ?? '')) fail(`${lesson.slug} generation status is ${lesson.generation_status}`);
+    if (!['generated','completed','verification_ready','certificate_ready','published'].includes(lesson.generation_status ?? '')) fail(`${lesson.slug} generation status is ${lesson.generation_status}`);
   }
 }
 
@@ -107,25 +111,78 @@ async function main() {
   if (!blueprint) fail('Business & Entrepreneurship blueprint was not found');
   const { data: program, error: programError } = await db.from('programs').select('id,slug,title').eq('slug', PROGRAM_SLUG).maybeSingle();
   if (programError || !program?.id) fail(`Canonical program not found: ${programError?.message ?? PROGRAM_SLUG}`);
-  const build = await courseFactory({ programId: program.id, programSlug: PROGRAM_SLUG, blueprint, mode: 'replace', contentSource: 'ai', videoMode: 'queue' });
+
+  const build = await courseFactory({
+    programId: program.id,
+    programSlug: PROGRAM_SLUG,
+    blueprint,
+    mode: 'replace',
+    contentSource: 'ai',
+    videoMode: 'queue',
+  });
   if (!build.ok || !build.courseId) fail(`Course Factory failed: ${JSON.stringify(build.errors ?? [], null, 2)}`);
   if (build.moduleCount !== EXPECTED_MODULES || build.lessonCount !== EXPECTED_LESSONS) fail(`Course Factory returned ${build.moduleCount ?? 0} modules and ${build.lessonCount ?? 0} lessons`);
   if ((build.generationFailures ?? []).length) fail(`Generation failures: ${JSON.stringify(build.generationFailures, null, 2)}`);
+
   await auditCourse(build.courseId);
   const { data: jobs, error: jobsError } = await db.from('video_jobs').select('id,asset_kind').eq('course_id', build.courseId);
   if (jobsError) fail(`Video queue audit failed: ${jobsError.message}`);
   const mainJobs = (jobs ?? []).filter((job) => (job.asset_kind ?? 'lesson') === 'lesson').length;
   const microJobs = (jobs ?? []).filter((job) => job.asset_kind === 'microclip').length;
   if (mainJobs !== EXPECTED_MAIN_VIDEOS || microJobs !== EXPECTED_MICROCLIPS) fail(`Expected ${EXPECTED_MAIN_VIDEOS} lesson video jobs and ${EXPECTED_MICROCLIPS} microclips; found ${mainJobs} and ${microJobs}`);
+
   await waitForMedia(build.courseId);
   await auditCourse(build.courseId);
-  const { error: publishError } = await db.rpc('publish_course_from_staging', { p_course_id: build.courseId, p_program_id: program.id });
-  if (publishError) fail(`Publish gate rejected course: ${publishError.message}`);
-  const { data: finalCourse, error: finalError } = await db.from('courses').select('id,slug,title,program_id,status,is_active,generation_status,generation_progress,total_lessons').eq('id', build.courseId).single();
+
+  const procurement = await runPersistedCourseProcurementHealthCheckWithClient(db, build.courseId);
+  if (!procurement.pass) {
+    fail(`Canonical procurement gate blocked publication: ${JSON.stringify({ blocking_issues: procurement.blocking_issues, metrics: procurement.metrics }, null, 2)}`);
+  }
+
+  const { data: review, error: reviewError } = await db
+    .from('courses')
+    .select('review_status,reviewed_by,reviewed_at')
+    .eq('id', build.courseId)
+    .single();
+  if (reviewError || !review) fail(`Human review verification failed: ${reviewError?.message ?? 'missing course'}`);
+  if (review.review_status !== 'approved' || !review.reviewed_by || !review.reviewed_at) {
+    fail(`Human review is incomplete: ${JSON.stringify(review)}`);
+  }
+
+  const publication = await publishPersistedCourseWithClient({
+    db,
+    courseId: build.courseId,
+    actorId: review.reviewed_by,
+    label: 'Business #10005173 verified acceptance',
+  });
+  if (!publication.ok) fail(`Canonical publication failed: ${JSON.stringify(publication, null, 2)}`);
+  if (!(publication as any).version?.id) fail('Canonical publication did not create an immutable course version');
+
+  const { data: finalCourse, error: finalError } = await db
+    .from('courses')
+    .select('id,slug,title,program_id,status,is_active,generation_status,generation_progress,total_lessons,review_status,reviewed_by')
+    .eq('id', build.courseId)
+    .single();
   if (finalError || !finalCourse) fail(`Final course verification failed: ${finalError?.message ?? 'missing course'}`);
-  if (finalCourse.status !== 'published' || !finalCourse.is_active || finalCourse.program_id !== program.id) fail(`Final course state invalid: ${JSON.stringify(finalCourse)}`);
+  if (finalCourse.status !== 'published' || !finalCourse.is_active || finalCourse.program_id !== program.id || finalCourse.review_status !== 'approved') {
+    fail(`Final course state invalid: ${JSON.stringify(finalCourse)}`);
+  }
+
   console.log('[Business Course Builder] PASS');
-  console.log(JSON.stringify({ programId: program.id, courseId: build.courseId, slug: finalCourse.slug, modules: build.moduleCount, lessons: build.lessonCount, videos: EXPECTED_MAIN_VIDEOS, microclips: EXPECTED_MICROCLIPS, status: finalCourse.status, active: finalCourse.is_active }, null, 2));
+  console.log(JSON.stringify({
+    programId: program.id,
+    courseId: build.courseId,
+    slug: finalCourse.slug,
+    modules: build.moduleCount,
+    lessons: build.lessonCount,
+    videos: EXPECTED_MAIN_VIDEOS,
+    microclips: EXPECTED_MICROCLIPS,
+    procurement: procurement.metrics,
+    versionId: (publication as any).version.id,
+    status: finalCourse.status,
+    active: finalCourse.is_active,
+    reviewedBy: finalCourse.reviewed_by,
+  }, null, 2));
 }
 
 main().catch((error) => { console.error(error); process.exit(1); });

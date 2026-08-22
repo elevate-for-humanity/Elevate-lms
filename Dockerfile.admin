@@ -63,6 +63,7 @@ ARG BUILD_TIMESTAMP=unknown
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV ELEVATE_SERVICE=admin
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 ENV GITHUB_SHA=$GITHUB_SHA
@@ -70,7 +71,8 @@ ENV GIT_SHA=$GIT_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$NEXT_PUBLIC_GIT_SHA
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
-RUN apk add --no-cache curl \
+# FFmpeg/ffprobe are required by the canonical Media Studio commercial renderer.
+RUN apk add --no-cache curl ffmpeg \
     && addgroup -g 1001 nodejs \
     && adduser -S -u 1001 -G nodejs nextjs
 

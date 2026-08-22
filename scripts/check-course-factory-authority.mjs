@@ -26,6 +26,7 @@ for (const required of [
   "from '@/lib/course-builder/orchestrator'",
   "action === 'generate-from-blueprint'",
   "action === 'queue-media'",
+  "action === 'save-program-config'",
   "action === 'publish'",
   "action === 'repair'",
   "action === 'audit'",
@@ -37,24 +38,24 @@ if (!index.includes("export { courseFactory } from '../course-builder/orchestrat
 }
 const orchestrator = read('lib/course-builder/orchestrator.ts');
 if (!orchestrator.includes("from '../course-factory/factory'")) failures.push('Course Builder orchestrator does not own private Course Factory execution');
+if (!orchestrator.includes('saveCourseProgramConfiguration')) failures.push('Course Builder orchestrator does not own course program configuration persistence');
 const controller = read('lib/devstudio/course-builder-controller.ts');
 if (!controller.includes("from '../course-builder/orchestrator'")) failures.push('Studio Course Builder controller is not backed by canonical orchestrator');
 
 for (const rel of [
   'apps/admin/app/api/admin/lms/courses/generate/route.ts',
   'apps/admin/app/api/admin/course-builder/publish/route.ts',
+  'apps/admin/app/api/admin/course-builder/program/route.ts',
   'apps/admin/app/api/admin/courses/[courseId]/generate-missing/route.ts',
   'apps/lms/app/api/ai/generate-and-publish-course/route.ts',
   'apps/admin/app/api/admin/courses/generate/publish/route.ts',
   'supabase/functions/ai-course-create/index.ts',
 ]) {
   const text = read(rel);
-  if (!/(RETIRED|COURSE_FACTORY_REQUIRED|COURSE_BUILDER_ROOT_REQUIRED)/.test(text)) failures.push(`${rel}: historical complete-course endpoint is not explicitly retired`);
+  if (!/(RETIRED|COURSE_FACTORY_REQUIRED|COURSE_BUILDER_ROOT_REQUIRED)/.test(text)) failures.push(`${rel}: historical course mutation endpoint is not explicitly retired`);
   if (/\bcourseFactory\s*\(/.test(text)) failures.push(`${rel}: retired endpoint still invokes course generation`);
 }
 
-// Specialized mutations may touch multiple course tables for cloning/versioning,
-// but they are not allowed to become complete generation pipelines.
 const specializedPackageWriters = new Set([
   'apps/admin/app/api/admin/courses/[courseId]/clone/route.ts',
   'apps/admin/app/api/admin/programs/[programId]/clone/route.ts',
@@ -89,6 +90,7 @@ for (const rel of walk('apps')) {
 const forbiddenEndpointRefs = [
   '/api/admin/lms/courses/generate',
   '/api/admin/course-builder/publish',
+  '/api/admin/course-builder/program',
   '/api/admin/courses/generate/publish',
   '/api/ai/generate-and-publish-course',
 ];

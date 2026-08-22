@@ -4,82 +4,28 @@
 
 import type React from 'react';
 import {
-  Activity,
-  Award,
-  BarChart3,
-  BookOpen,
-  Briefcase,
-  Building2,
-  Calendar,
-  ClipboardCheck,
-  ClipboardList,
-  Clock,
-  FileText,
-  GraduationCap,
-  LayoutDashboard,
-  Plus,
-  Settings,
-  Shield,
-  Target,
-  Users,
+  Activity, Award, BarChart3, BookOpen, Briefcase, Building2, Calendar,
+  ClipboardCheck, ClipboardList, Clock, FileText, GraduationCap,
+  LayoutDashboard, Palette, Plus, Settings, Shield, Target, Users,
 } from 'lucide-react';
 import { PortalRouter } from '@/lib/routing/portal-router';
 
 export type UserRole =
-  | 'student'
-  | 'learner'
-  | 'user'
-  | 'delegate'
-  | 'grant_client'
-  | 'apprentice'
-  | 'barber_apprentice'
-  | 'cosmetology_apprentice'
-  | 'instructor'
-  | 'employer'
-  | 'sponsor'
-  | 'recruiter'
-  | 'partner'
-  | 'partner_admin'
-  | 'host_shop'
-  | 'host_shop_admin'
-  | 'mentor'
-  | 'staff'
-  | 'case_manager'
-  | 'workforce'
-  | 'workforce_partner'
-  | 'workforce_board'
-  | 'workforce_board_admin'
-  | 'government'
-  | 'program_holder'
-  | 'provider'
-  | 'provider_admin'
-  | 'parent'
-  | 'admin'
-  | 'org_admin'
-  | 'super_admin'
-  | 'advisor'
-  | 'test_admin'
-  | 'proctor'
-  | 'testing_center'
-  | 'financial_aid'
-  | 'compliance'
-  | 'dev_studio';
+  | 'student' | 'learner' | 'user' | 'delegate' | 'grant_client'
+  | 'apprentice' | 'barber_apprentice' | 'cosmetology_apprentice'
+  | 'instructor' | 'employer' | 'sponsor' | 'recruiter'
+  | 'partner' | 'partner_admin' | 'host_shop' | 'host_shop_admin' | 'mentor'
+  | 'staff' | 'case_manager' | 'workforce' | 'workforce_partner'
+  | 'workforce_board' | 'workforce_board_admin' | 'government'
+  | 'program_holder' | 'provider' | 'provider_admin' | 'creator' | 'parent'
+  | 'admin' | 'org_admin' | 'super_admin' | 'advisor'
+  | 'test_admin' | 'proctor' | 'testing_center'
+  | 'financial_aid' | 'compliance' | 'dev_studio';
 
 export type NavigationRole =
-  | 'student'
-  | 'apprentice'
-  | 'instructor'
-  | 'employer'
-  | 'host_shop'
-  | 'staff'
-  | 'case_manager'
-  | 'workforce'
-  | 'workforce_board'
-  | 'program_holder'
-  | 'provider'
-  | 'parent'
-  | 'admin'
-  | 'testing';
+  | 'student' | 'apprentice' | 'instructor' | 'employer' | 'host_shop'
+  | 'staff' | 'case_manager' | 'workforce' | 'workforce_board'
+  | 'program_holder' | 'provider' | 'creator' | 'parent' | 'admin' | 'testing';
 
 export interface NavItem {
   id: string;
@@ -90,7 +36,6 @@ export interface NavItem {
   children?: NavItem[];
   dividerBefore?: boolean;
 }
-
 export interface ActionItem {
   id: string;
   label: string;
@@ -99,7 +44,6 @@ export interface ActionItem {
   icon?: React.ComponentType<{ className?: string }>;
   variant?: 'primary' | 'secondary' | 'ghost';
 }
-
 export interface BreadcrumbItem { label: string; href?: string }
 export interface NavSection { id: string; label?: string; items: NavItem[] }
 
@@ -152,7 +96,9 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
     { id: 'courses', label: 'Courses', href: p('staff', 'courses'), icon: BookOpen },
     { id: 'reports', label: 'Reports', href: p('admin', 'reports'), icon: BarChart3 },
   ] }],
-  testing: [{ id: 'testing', items: [{ id: 'dashboard', label: 'Testing Center', href: p('testing'), icon: ClipboardCheck }] }],
+  testing: [{ id: 'testing', items: [
+    { id: 'dashboard', label: 'Testing Center', href: p('testing'), icon: ClipboardCheck },
+  ] }],
   admin: [{ id: 'main', items: [
     { id: 'dashboard', label: 'Dashboard', href: p('admin'), icon: LayoutDashboard },
     { id: 'applications', label: 'Applications', href: p('admin', 'applications'), icon: FileText },
@@ -164,12 +110,36 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
     { id: 'testing', label: 'Testing Center', href: p('testing'), icon: ClipboardCheck },
     { id: 'health', label: 'System Health', href: p('admin', 'system-health'), icon: Activity },
   ] }],
-  workforce: [{ id: 'workforce', items: [{ id: 'dashboard', label: 'Dashboard', href: p('workforce'), icon: LayoutDashboard }] }],
-  parent: [{ id: 'parent', items: [{ id: 'dashboard', label: 'Dashboard', href: p('parent'), icon: LayoutDashboard }] }],
-  case_manager: [{ id: 'case-manager', items: [{ id: 'dashboard', label: 'Dashboard', href: p('casemanager'), icon: LayoutDashboard }] }],
-  workforce_board: [{ id: 'workforce-board', items: [{ id: 'dashboard', label: 'Dashboard', href: p('workforceboard'), icon: LayoutDashboard }] }],
-  program_holder: [{ id: 'program-holder', items: [{ id: 'dashboard', label: 'Dashboard', href: p('programholder'), icon: LayoutDashboard }] }],
-  provider: [{ id: 'provider', items: [{ id: 'dashboard', label: 'Dashboard', href: p('provider'), icon: LayoutDashboard }] }],
+  workforce: [{ id: 'workforce', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('workforce'), icon: LayoutDashboard },
+    { id: 'participants', label: 'Participants', href: p('workforce', 'participants'), icon: Users },
+  ] }],
+  parent: [{ id: 'parent', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('parent'), icon: LayoutDashboard },
+  ] }],
+  case_manager: [{ id: 'case-manager', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('casemanager'), icon: LayoutDashboard },
+    { id: 'participants', label: 'Participants', href: p('casemanager', 'participants'), icon: Users },
+    { id: 'placements', label: 'Placements', href: p('casemanager', 'placements'), icon: Briefcase },
+    { id: 'analytics', label: 'Analytics', href: p('casemanager', 'analytics'), icon: BarChart3 },
+    { id: 'wioa-report', label: 'WIOA Reporting', href: p('casemanager', 'reports/wioa'), icon: FileText },
+  ] }],
+  workforce_board: [{ id: 'workforce-board', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('workforceboard'), icon: LayoutDashboard },
+    { id: 'employment', label: 'Employment Outcomes', href: p('workforceboard', 'employment'), icon: Briefcase },
+  ] }],
+  program_holder: [{ id: 'program-holder', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('programholder'), icon: LayoutDashboard },
+  ] }],
+  provider: [{ id: 'provider', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('provider'), icon: LayoutDashboard },
+    { id: 'programs', label: 'Programs', href: p('provider', 'programs'), icon: BookOpen },
+    { id: 'compliance', label: 'Compliance', href: p('provider', 'compliance'), icon: Shield },
+    { id: 'settings', label: 'Settings', href: p('provider', 'settings'), icon: Settings },
+  ] }],
+  creator: [{ id: 'creator', items: [
+    { id: 'products', label: 'Creator Studio', href: p('creator'), icon: Palette },
+  ] }],
 };
 
 const ROLE_TO_NAVIGATION: Readonly<Record<UserRole, NavigationRole>> = {
@@ -179,7 +149,7 @@ const ROLE_TO_NAVIGATION: Readonly<Record<UserRole, NavigationRole>> = {
   partner: 'host_shop', partner_admin: 'host_shop', host_shop: 'host_shop', host_shop_admin: 'host_shop', mentor: 'host_shop',
   staff: 'staff', case_manager: 'case_manager', workforce: 'workforce', workforce_partner: 'workforce',
   workforce_board: 'workforce_board', workforce_board_admin: 'workforce_board', government: 'workforce_board',
-  program_holder: 'program_holder', provider: 'provider', provider_admin: 'provider', parent: 'parent',
+  program_holder: 'program_holder', provider: 'provider', provider_admin: 'provider', creator: 'creator', parent: 'parent',
   admin: 'admin', org_admin: 'admin', super_admin: 'admin', advisor: 'admin', financial_aid: 'admin', compliance: 'admin', dev_studio: 'admin',
   test_admin: 'testing', proctor: 'testing', testing_center: 'testing',
 };
@@ -211,7 +181,7 @@ export function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
 const NAVIGATION_DISPLAY_NAMES: Record<NavigationRole, string> = {
   student: 'Student Portal', apprentice: 'Apprentice Portal', instructor: 'Instructor Portal', employer: 'Employer Portal',
   host_shop: 'Host Shop Portal', staff: 'Staff Portal', case_manager: 'Case Manager', workforce: 'Workforce Portal',
-  workforce_board: 'Workforce Board', program_holder: 'Program Holder', provider: 'Provider Portal', parent: 'Parent Portal',
+  workforce_board: 'Workforce Board', program_holder: 'Program Holder', provider: 'Provider Portal', creator: 'Creator Studio', parent: 'Parent Portal',
   admin: 'Admin', testing: 'Testing Center',
 };
 

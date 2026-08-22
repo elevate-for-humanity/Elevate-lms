@@ -58,8 +58,8 @@ export default function HomePage() {
     <>
       <StructuredData />
       <HomeHeroVideo banner={heroBanners.home} />
-      <HomeApprenticeshipInfra />
       <HomeCareerPathways />
+      <HomeApprenticeshipInfra />
       <HomeFunding />
       <HomeFinalCTA />
       <HomeTrustBar />

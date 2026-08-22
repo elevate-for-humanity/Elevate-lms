@@ -7,10 +7,13 @@ import {
 } from '@/lib/tenant/middleware-tenant-routing';
 import { LMS_HOST } from '@/lib/routing/portal-map';
 
+// These route families are authenticated operational software, not public
+// marketing pages. Protect the complete family so child routes cannot inherit
+// a weaker boundary than their dashboard entry point.
 const PROTECTED_PORTAL_PREFIXES = [
-  '/case-manager/dashboard',
-  '/workforce-board/dashboard',
-  '/provider/dashboard',
+  '/case-manager',
+  '/workforce-board',
+  '/provider',
 ] as const;
 
 const ELEVATE_PUBLIC_HOSTS = new Set([
@@ -24,19 +27,8 @@ const ELEVATE_PUBLIC_HOSTS = new Set([
 ]);
 
 const STORE_RUNTIME_ALLOWED_PREFIXES = [
-  '/store',
-  '/login',
-  '/signup',
-  '/register',
-  '/forgot-password',
-  '/reset-password',
-  '/auth',
-  '/api/store',
-  '/api/webhooks/store',
-  '/api/webhooks/stripe',
-  '/api/auth',
-  '/api/ping',
-  '/api/health',
+  '/store', '/login', '/signup', '/register', '/forgot-password', '/reset-password', '/auth',
+  '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/ping', '/api/health',
 ] as const;
 
 function isProtectedPortal(pathname: string) {
@@ -45,10 +37,7 @@ function isProtectedPortal(pathname: string) {
   );
 }
 
-function cookieOptions(
-  name: string,
-  options: Record<string, unknown> | undefined,
-): Record<string, unknown> {
+function cookieOptions(name: string, options: Record<string, unknown> | undefined): Record<string, unknown> {
   const isAuthCookie = name.startsWith('sb-') && name.includes('-auth-token');
   return {
     ...(options || {}),
@@ -64,13 +53,7 @@ function requestHost(req: NextRequest) {
 }
 
 function isStaticRequest(pathname: string) {
-  return (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon') ||
-    pathname.startsWith('/robots.txt') ||
-    pathname.startsWith('/sitemap') ||
-    /\.[a-z0-9]+$/i.test(pathname)
-  );
+  return pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/robots.txt') || pathname.startsWith('/sitemap') || /\.[a-z0-9]+$/i.test(pathname);
 }
 
 function isCustomTenantHost(host: string) {
@@ -81,38 +64,22 @@ function isCustomTenantHost(host: string) {
 }
 
 function isStoreRuntimeAllowed(pathname: string): boolean {
-  return STORE_RUNTIME_ALLOWED_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-  );
+  return STORE_RUNTIME_ALLOWED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
 function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextResponse | null {
   if (process.env.STORE_ONLY_RUNTIME !== 'true') return null;
-
   if (pathname === '/') {
     const url = req.nextUrl.clone();
     url.pathname = '/store';
     return NextResponse.redirect(url, 307);
   }
-
-  if (isStoreRuntimeAllowed(pathname)) {
-    // This deployment can be reached through Northflank's generated code.run
-    // host before the branded CNAME is attached. Do not pass an allowed store
-    // route into generic custom-domain tenant resolution: code.run is the store
-    // service host, not a customer website domain.
-    return NextResponse.next();
-  }
-
-  // The isolated commerce deployment must not accidentally become a second
-  // public copy of the full marketing site. Keep one canonical marketing host
-  // while the store service owns only commerce/auth/checkout surfaces.
-  const canonical = new URL(`https://www.elevateforhumanity.org${pathname}${req.nextUrl.search}`);
-  return NextResponse.redirect(canonical, 307);
+  if (isStoreRuntimeAllowed(pathname)) return NextResponse.next();
+  return NextResponse.redirect(new URL(`https://www.elevateforhumanity.org${pathname}${req.nextUrl.search}`), 307);
 }
 
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
-
   if (isStaticRequest(pathname)) return NextResponse.next();
 
   const storeRuntimeResponse = handleStoreOnlyRuntime(req, pathname);
@@ -122,46 +89,31 @@ export async function middleware(req: NextRequest) {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', `${pathname}${search}`);
 
-  // Tenant forms/analytics APIs must execute as API routes on the tenant host;
-  // they resolve the published tenant from Host/x-forwarded-host themselves.
   if (pathname.startsWith('/api/tenant-sites/')) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
   const tenantSlug = tenantSlugFromAppHost(host);
-  if (tenantSlug) {
-    return rewriteTenantAppHostRequest(req, tenantSlug, pathname, requestHeaders);
-  }
+  if (tenantSlug) return rewriteTenantAppHostRequest(req, tenantSlug, pathname, requestHeaders);
+  if (isCustomTenantHost(host)) return rewriteCustomDomainRequest(req, host, pathname, requestHeaders);
 
-  if (isCustomTenantHost(host)) {
-    return rewriteCustomDomainRequest(req, host, pathname, requestHeaders);
+  // Preserve the pathname header for all requests so the root layout can
+  // reliably distinguish operational software from public marketing chrome.
+  if (!isProtectedPortal(pathname)) {
+    return NextResponse.next({ request: { headers: requestHeaders } });
   }
-
-  if (!isProtectedPortal(pathname)) return NextResponse.next();
 
   let response = NextResponse.next({ request: { headers: requestHeaders } });
   const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
     cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
     response = NextResponse.next({ request: { headers: requestHeaders } });
     cookiesToSet.forEach(({ name, value, options }) => {
-      response.cookies.set(
-        name,
-        value,
-        cookieOptions(name, options as Record<string, unknown>) as any,
-      );
+      response.cookies.set(name, value, cookieOptions(name, options as Record<string, unknown>) as any);
     });
   });
 
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
+  const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) {
-    // These workspaces are owned by the Marketing runtime, but authentication
-    // is owned by the LMS runtime. Preserve the absolute Marketing return URL
-    // so successful login comes back to the application that owns the route
-    // instead of resolving /provider, /case-manager, or /workforce-board on LMS.
     const loginUrl = new URL('/login', LMS_HOST);
     loginUrl.searchParams.set('redirect', `${req.nextUrl.origin}${pathname}${search}`);
     return NextResponse.redirect(loginUrl);
@@ -175,10 +127,7 @@ export async function middleware(req: NextRequest) {
     path: '/',
     maxAge: 60,
   });
-
   return response;
 }
 
-export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon\\.ico).*)'],
-};
+export const config = { matcher: ['/((?!_next/static|_next/image|favicon\\.ico).*)'] };

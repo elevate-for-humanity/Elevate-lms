@@ -1,0 +1,99 @@
+name: Apply Business Course Factory Metadata
+
+on:
+  push:
+    branches: [fix/business-course-factory-metadata-v2]
+    paths:
+      - 'ops/triggers/business-course-factory-metadata.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/business-course-factory-metadata-v2
+          clean: true
+      - name: Patch canonical Course Factory
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'lib/course-factory/factory.ts';
+          let text = fs.readFileSync(file, 'utf8');
+          const needle = `    const published = await publishCourse({
+      blueprint: enriched.blueprint,
+      courseTitle,
+      programId: input.programId,
+      contentSource: input.contentSource ?? 'ai',
+      mode: input.mode ?? 'refresh',
+      evidence,
+    });
+
+    let videosQueued = 0;`;
+          const replacement = `    const published = await publishCourse({
+      blueprint: enriched.blueprint,
+      courseTitle,
+      programId: input.programId,
+      contentSource: input.contentSource ?? 'ai',
+      mode: input.mode ?? 'refresh',
+      evidence,
+    });
+
+    if (!published.success || !published.courseId) {
+      throw new Error(
+        \`Canonical course persistence failed: \${published.errors.join('; ') || 'unknown persistence error'}\`,
+      );
+    }
+
+    const totalDurationMinutes = enriched.blueprint.modules.reduce(
+      (moduleTotal, courseModule) =>
+        moduleTotal +
+        (courseModule.lessons ?? []).reduce(
+          (lessonTotal, lesson) => lessonTotal + Number(lesson.durationMinutes ?? 0),
+          0,
+        ),
+      0,
+    );
+    const courseDurationHours = totalDurationMinutes / 60;
+    const courseDescription =
+      String(enriched.blueprint.description ?? '').trim() ||
+      \`Workforce training course for \${courseTitle}.\`;
+    const passingScore = Number(
+      enriched.blueprint.generationRules?.passingScore ??
+        enriched.blueprint.finalExam?.passingScore ??
+        80,
+    );
+    const metadataDb = await requireAdminClient();
+    const { error: metadataError } = await metadataDb
+      .from('courses')
+      .update({
+        description: courseDescription,
+        duration_hours: courseDurationHours,
+        passing_score: passingScore,
+        generation_status: 'completed',
+        generation_progress: 100,
+        total_lessons: published.lessonCount,
+        review_status: 'draft',
+        reviewed_by: null,
+        reviewed_at: null,
+      })
+      .eq('id', published.courseId);
+    if (metadataError) {
+      throw new Error(\`Unable to normalize canonical course metadata: \${metadataError.message}\`);
+    }
+
+    let videosQueued = 0;`;
+          if (!text.includes(needle)) throw new Error('Expected post-persistence Course Factory block not found');
+          fs.writeFileSync(file, text.replace(needle, replacement));
+          NODE
+      - name: Commit patched factory
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/course-factory/factory.ts
+          git diff --cached --check
+          git commit -m "fix(course-factory): normalize canonical course metadata"
+          git push origin HEAD:fix/business-course-factory-metadata-v2

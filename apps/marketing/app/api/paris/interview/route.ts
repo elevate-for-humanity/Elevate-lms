@@ -1,383 +1,193 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { requireAdminClient } from '@/lib/supabase/admin';
 import { createPublicClient } from '@/lib/supabase/server';
-import type { InterviewSession, ConversationMessage } from '@/lib/paris/interview/types';
-import { ConversationEngine } from '@/lib/paris/interview/conversation-engine';
-import { scoreResponse, calculateInterviewScore } from '@/lib/paris/interview/scoring-engine';
-import { determineEligibility } from '@/lib/paris/interview/eligibility-engine';
-import { provisionStudentFromInterview } from '@/lib/paris/interview/provisioning-service';
-import { getQuestionsForProgram } from '@/lib/paris/interview/question-bank';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
-// Initialize Supabase clients
-async function getSupabaseUser(request: NextRequest) {
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
-    return null;
-  }
-  
-  const token = authHeader.substring(7);
+const CRITICAL = new Set(['first_name','last_name','email','phone','address','date_of_birth','program_id','program_slug','funding_path','transfer_hours_claimed','signature']);
+const BASE_REQUIRED = ['first_name','last_name','email','phone','program_id'];
+
+async function getUser(request: NextRequest) {
+  const header = request.headers.get('authorization');
+  if (!header?.startsWith('Bearer ')) return null;
   const supabase = createPublicClient();
-  
-  const { data: { user }, error } = await supabase.auth.getUser(token);
-  if (error || !user) {
-    return null;
-  }
-  
-  return user;
+  const { data, error } = await supabase.auth.getUser(header.slice(7));
+  return error ? null : data.user;
 }
 
-// In-memory session storage (in production, use Redis or database)
-const sessionStore: Map<string, InterviewSession> = new Map();
-
-/**
- * POST /api/paris/interview
- * Submit interview response or complete interview
- */
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { 
-      applicationRef, 
-      questionId, 
-      response, 
-      isComplete,
-      sessionId 
-    } = body;
-
-    // Validate required fields
-    if (!applicationRef) {
-      return NextResponse.json(
-        { error: 'Missing required field: applicationRef' },
-        { status: 400 }
-      );
-    }
-
-    const supabase = await requireAdminClient();
-
-    // Fetch application from database
-    const { data: application, error: appError } = await supabase
-      .from('paris_applications')
-      .select('*')
-      .eq('application_ref', applicationRef)
-      .single();
-
-    if (appError || !application) {
-      return NextResponse.json(
-        { error: 'Application not found', code: 'APPLICATION_NOT_FOUND' },
-        { status: 404 }
-      );
-    }
-
-    // Check if program is eligible for PARS interview
-    const supportedPrograms = ['barber-apprenticeship', 'cdl-training', 'hvac', 'medical-assistant', 'cosmetology', 'phlebotomy'];
-    const programSlug = application.program_slug || application.program_id;
-    
-    if (!supportedPrograms.includes(programSlug)) {
-      return NextResponse.json(
-        { error: 'Program does not support PARS interview', code: 'PROGRAM_NOT_SUPPORTED' },
-        { status: 400 }
-      );
-    }
-
-    // Get or create session
-    let session: InterviewSession;
-    let engine: ConversationEngine;
-
-    if (sessionId && sessionStore.has(sessionId)) {
-      session = sessionStore.get(sessionId)!;
-      engine = ConversationEngine.fromJSON(session);
-    } else {
-      // Create new session
-      session = ConversationEngine.createSession(applicationRef, programSlug);
-      sessionStore.set(session.sessionId, session);
-      engine = new ConversationEngine(session);
-
-      // If this is a new session, start the interview
-      if (session.status === 'not_started') {
-        engine.startInterview();
-        session = engine.getSession();
-        sessionStore.set(session.sessionId, session);
-      }
-    }
-
-    // Save current state to database
-    await supabase
-      .from('paris_interview_sessions')
-      .upsert({
-        session_id: session.sessionId,
-        application_ref: applicationRef,
-        program_slug: programSlug,
-        current_question_index: session.currentQuestionIndex,
-        responses: session.responses,
-        status: session.status,
-        messages: session.messages.map(m => ({
-          ...m,
-          timestamp: m.timestamp instanceof Date ? m.timestamp.toISOString() : m.timestamp
-        })),
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: 'session_id'
-      });
-
-    // If completing interview
-    if (isComplete) {
-      const finalScore = engine.completeInterview();
-      session = engine.getSession();
-
-      // Calculate eligibility
-      const eligibility = determineEligibility(finalScore, programSlug);
-
-      // Update session status in database
-      await supabase
-        .from('paris_interview_sessions')
-        .update({
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-          total_score: finalScore.percentage,
-          risk_score: eligibility.riskLevel,
-          eligibility_status: eligibility.status
-        })
-        .eq('session_id', session.sessionId);
-
-      // Update application status
-      await supabase
-        .from('paris_applications')
-        .update({
-          status: eligibility.eligible ? 'interview_eligible' : 
-                  eligibility.status === 'review' ? 'interview_review' : 'interview_denied',
-          interview_completed_at: new Date().toISOString(),
-          interview_score: finalScore.percentage,
-          eligibility_status: eligibility.status,
-          risk_level: eligibility.riskLevel,
-          updated_at: new Date().toISOString()
-        })
-        .eq('application_ref', applicationRef);
-
-      // Provision student (create enrollment, binder, onboarding plan)
-      const provisioningResult = await provisionStudentFromInterview(session, finalScore, eligibility);
-
-      // Clean up session from memory
-      sessionStore.delete(session.sessionId);
-
-      return NextResponse.json({
-        sessionId: session.sessionId,
-        isComplete: true,
-        finalScore: {
-          totalScore: finalScore.totalScore,
-          maxScore: finalScore.maxScore,
-          percentage: finalScore.percentage,
-          riskLevel: finalScore.riskLevel,
-          eligibility: finalScore.eligibility
-        },
-        eligibility: {
-          eligible: eligibility.eligible,
-          status: eligibility.status,
-          reason: eligibility.reason,
-          riskLevel: eligibility.riskLevel,
-          fundingRecommendations: eligibility.fundingRecommendations,
-          nextSteps: eligibility.nextSteps
-        },
-        provisioning: provisioningResult
-      });
-    }
-
-    // Score the response
-    const questions = getQuestionsForProgram(programSlug);
-    const question = questions.find(q => q.id === questionId || q.id === questionId.split('-followup-')[0]);
-    
-    let score = 5; // Default score
-    if (question && response) {
-      const scoreResult = scoreResponse(questionId, response, question.domain);
-      score = scoreResult.score;
-    }
-
-    // Store message in database
-    const message: ConversationMessage = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
-      role: 'applicant',
-      content: response || '[SKIPPED]',
-      timestamp: new Date(),
-      questionId,
-      score
-    };
-
-    await supabase
-      .from('paris_interview_messages')
-      .insert({
-        session_id: session.sessionId,
-        role: message.role,
-        content: message.content,
-        question_id: questionId,
-        score: message.score,
-        created_at: new Date().toISOString()
-      });
-
-    // Get PARS response
-    const parisMessages = response ? engine.submitResponse(response) : [engine.skipQuestion()];
-    session = engine.getSession();
-    sessionStore.set(session.sessionId, session);
-
-    // Get current question for next iteration
-    const currentQuestion = engine.getCurrentQuestion();
-    const progress = engine.getProgress();
-
-    // Store PARS messages in database
-    for (const parisMsg of parisMessages) {
-      await supabase
-        .from('paris_interview_messages')
-        .insert({
-          session_id: session.sessionId,
-          role: parisMsg.role,
-          content: parisMsg.content,
-          question_id: parisMsg.questionId,
-          score: parisMsg.score,
-          created_at: new Date().toISOString()
-        });
-    }
-
-    return NextResponse.json({
-      sessionId: session.sessionId,
-      questionId: currentQuestion?.id || null,
-      score,
-      nextQuestion: currentQuestion ? {
-        id: currentQuestion.id,
-        question: currentQuestion.question,
-        domain: currentQuestion.domain,
-        followUps: currentQuestion.followUps
-      } : null,
-      isComplete: engine.isComplete(),
-      progress,
-      messages: parisMessages
-    });
-
-  } catch (error) {
-    console.error('PARS Interview API Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', message: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
-  }
+async function getApplication(admin: any, userId: string, applicationId: string) {
+  const { data, error } = await admin.from('applications').select('*').eq('id', applicationId).eq('user_id', userId).maybeSingle();
+  if (error) throw error;
+  return data;
 }
 
-/**
- * GET /api/paris/interview
- * Get interview status for an application
- */
+function interviewMeta(application: any) {
+  const meta = { ...(application.metadata || {}) };
+  const interview = { ...(meta.paris_application || {}) };
+  interview.answers = { ...(interview.answers || {}) };
+  interview.locale = interview.locale === 'es' ? 'es' : 'en';
+  interview.session_id = interview.session_id || crypto.randomUUID();
+  meta.paris_application = interview;
+  return { meta, interview };
+}
+
+function requiredFields(application: any, answers: Record<string,string>) {
+  const fields = new Set(BASE_REQUIRED);
+  const slug = String(application.program_slug || application.program_interest || '').toLowerCase();
+  if (/barber|cosmet|apprentice|manicur/.test(slug)) ['transfer_hours_claimed','host_shop_name','work_schedule'].forEach((f) => fields.add(f));
+  const funding = String(answers.funding_path || application.requested_funding_source || application.funding_type || '').toLowerCase();
+  if (/workone|wioa|workforce/.test(funding)) ['funding_path','workforce_referral_status'].forEach((f) => fields.add(f));
+  return [...fields];
+}
+
+function existingValue(application: any, answers: Record<string,string>, field: string) {
+  const answer = answers[field];
+  if (answer !== undefined && answer !== null && String(answer).trim()) return String(answer);
+  const value = application[field];
+  return value !== undefined && value !== null && String(value).trim() ? String(value) : '';
+}
+
+function progress(application: any, answers: Record<string,string>) {
+  const required = requiredFields(application, answers);
+  const missing = required.filter((field) => !existingValue(application, answers, field));
+  return { required, missing, percent: required.length ? Math.round(((required.length - missing.length) / required.length) * 100) : 0, complete: missing.length === 0 };
+}
+
+function question(field: string | undefined, locale: string) {
+  if (!field) return null;
+  const copy: Record<string,[string,string]> = {
+    first_name:['What is your legal first name?','¿Cuál es su nombre legal?'],
+    last_name:['What is your legal last name?','¿Cuál es su apellido legal?'],
+    email:['What is your email address?','¿Cuál es su correo electrónico?'],
+    phone:['What is your phone number?','¿Cuál es su número de teléfono?'],
+    program_id:['Which program are you applying for?','¿A qué programa está solicitando?'],
+    funding_path:['How do you plan to pay for or fund training?','¿Cómo planea pagar o financiar la capacitación?'],
+    workforce_referral_status:['Do you already have a WorkOne referral or authorization?','¿Ya tiene una referencia o autorización de WorkOne?'],
+    transfer_hours_claimed:['Are you claiming transfer hours? If yes, how many?','¿Está solicitando horas de transferencia? Si es así, ¿cuántas?'],
+    host_shop_name:['What is the name of your host shop or employer?','¿Cuál es el nombre de su tienda anfitriona o empleador?'],
+    work_schedule:['What is your usual work schedule?','¿Cuál es su horario de trabajo habitual?'],
+  };
+  const pair = copy[field] || [`Please provide ${field.replaceAll('_',' ')}.`,`Proporcione ${field.replaceAll('_',' ')}.`];
+  return { field, text: locale === 'es' ? pair[1] : pair[0] };
+}
+
+function decide(application: any, answers: Record<string,string>, state: ReturnType<typeof progress>) {
+  if (!state.complete) return { decision: 'continue_interview', authority: 'paris', reason: 'Required applicant information is still missing.' };
+  if (answers.transfer_hours_claimed && Number(answers.transfer_hours_claimed) > 0) return { decision: 'ready_for_sponsor_review', authority: 'sponsor', reason: 'Transfer hours require evidence and sponsor verification.' };
+  const funding = String(answers.funding_path || application.requested_funding_source || '').toLowerCase();
+  if (/workone|wioa|workforce/.test(funding) && !application.funding_verified) return { decision: 'ready_for_funding_review', authority: 'agency', reason: 'Application is complete; workforce funding eligibility requires authorized determination.' };
+  return { decision: 'ready_for_review', authority: 'paris', reason: 'All required applicant-provided items are complete.' };
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const applicationRef = searchParams.get('applicationRef');
-    const sessionId = searchParams.get('sessionId');
+    const user = await getUser(request);
+    if (!user) return NextResponse.json({ error:'Unauthorized' }, { status:401 });
+    const applicationId = new URL(request.url).searchParams.get('applicationId');
+    if (!applicationId) return NextResponse.json({ error:'applicationId is required' }, { status:400 });
+    const admin = await requireAdminClient();
+    const application = await getApplication(admin, user.id, applicationId);
+    if (!application) return NextResponse.json({ error:'Application not found' }, { status:404 });
+    const { interview } = interviewMeta(application);
+    const state = progress(application, interview.answers);
+    const decision = decide(application, interview.answers, state);
+    return NextResponse.json({
+      applicationId,
+      status: application.status,
+      locale: interview.locale,
+      answers: interview.answers,
+      progress: state.percent,
+      missing: state.missing,
+      nextQuestion: question(state.missing[0], interview.locale),
+      decision,
+      humanReviewRequired: decision.authority !== 'paris',
+      transferHours: { claimed: application.transfer_hours_claimed, verified: application.transfer_hours_verified, verifiedAt: application.transfer_hours_verified_at },
+      funding: { requested: application.requested_funding_source, status: application.funding_status, verified: application.funding_verified },
+    });
+  } catch (error) {
+    console.error('PARIS application interview GET failed', error);
+    return NextResponse.json({ error:'Unable to load application interview' }, { status:500 });
+  }
+}
 
-    if (!applicationRef && !sessionId) {
-      return NextResponse.json(
-        { error: 'Missing required parameter: applicationRef or sessionId' },
-        { status: 400 }
-      );
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getUser(request);
+    if (!user) return NextResponse.json({ error:'Unauthorized' }, { status:401 });
+    const body = await request.json();
+    const applicationId = String(body.applicationId || '');
+    if (!applicationId) return NextResponse.json({ error:'applicationId is required' }, { status:400 });
+    const admin = await requireAdminClient();
+    const application = await getApplication(admin, user.id, applicationId);
+    if (!application) return NextResponse.json({ error:'Application not found' }, { status:404 });
+    const { meta, interview } = interviewMeta(application);
+
+    if (body.action === 'set_locale') {
+      interview.locale = body.locale === 'es' ? 'es' : 'en';
+      await admin.from('applications').update({ metadata:meta, updated_at:new Date().toISOString() }).eq('id', applicationId).eq('user_id', user.id);
+      return NextResponse.json({ ok:true, locale:interview.locale });
     }
 
-    const supabase = await requireAdminClient();
-
-    // Try to find session
-    let session: InterviewSession | null = null;
-
-    if (sessionId) {
-      // Check memory first
-      if (sessionStore.has(sessionId)) {
-        session = sessionStore.get(sessionId)!;
-      } else {
-        // Check database
-        const { data: dbSession, error } = await supabase
-          .from('paris_interview_sessions')
-          .select('*')
-          .eq('session_id', sessionId)
-          .single();
-
-        if (!error && dbSession) {
-          session = {
-            sessionId: dbSession.session_id,
-            applicationRef: dbSession.application_ref,
-            programSlug: dbSession.program_slug,
-            currentQuestionIndex: dbSession.current_question_index,
-            messages: (dbSession.messages || []).map((m: any) => ({
-              ...m,
-              timestamp: new Date(m.timestamp)
-            })),
-            responses: dbSession.responses || {},
-            status: dbSession.status,
-            startedAt: new Date(dbSession.started_at || dbSession.created_at),
-            completedAt: dbSession.completed_at ? new Date(dbSession.completed_at) : undefined
-          };
-        }
-      }
-    } else if (applicationRef) {
-      // Find most recent session for application
-      const { data: dbSession, error } = await supabase
-        .from('paris_interview_sessions')
-        .select('*')
-        .eq('application_ref', applicationRef)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-
-      if (!error && dbSession) {
-        session = {
-          sessionId: dbSession.session_id,
-          applicationRef: dbSession.application_ref,
-          programSlug: dbSession.program_slug,
-          currentQuestionIndex: dbSession.current_question_index,
-          messages: (dbSession.messages || []).map((m: any) => ({
-            ...m,
-            timestamp: new Date(m.timestamp)
-          })),
-          responses: dbSession.responses || {},
-          status: dbSession.status,
-          startedAt: new Date(dbSession.started_at || dbSession.created_at),
-          completedAt: dbSession.completed_at ? new Date(dbSession.completed_at) : undefined
-        };
-      }
+    if (body.action === 'request_human_review') {
+      interview.human_review_required = true;
+      interview.human_review_reason = String(body.reason || 'Applicant requested staff assistance');
+      interview.human_review_requested_at = new Date().toISOString();
+      await admin.from('applications').update({ metadata:meta, updated_at:new Date().toISOString() }).eq('id', applicationId).eq('user_id', user.id);
+      return NextResponse.json({ ok:true, humanReviewRequired:true });
     }
 
-    // If no session found
-    if (!session) {
-      return NextResponse.json({
-        exists: false,
-        canStart: true,
-        message: 'No interview session found. Interview can be started.'
-      });
+    if (body.action !== 'answer') return NextResponse.json({ error:'Unsupported action' }, { status:400 });
+    const field = String(body.field || '');
+    const value = String(body.value ?? '').trim();
+    if (!field || !value) return NextResponse.json({ error:'field and value are required' }, { status:400 });
+
+    const source = body.source === 'voice' ? 'voice' : 'text';
+    const mustConfirm = source === 'voice' || CRITICAL.has(field);
+    if (mustConfirm && body.confirmed !== true) {
+      await admin.from('ai_conversations').insert({ session_id:interview.session_id, user_id:user.id, role:'user', content:value, metadata:{ target_type:'application', application_id:applicationId, field, source, confirmed:false } });
+      return NextResponse.json({ ok:true, requiresConfirmation:true, field, transcript:value, message:interview.locale === 'es' ? 'Revise y confirme esta respuesta antes de guardarla.' : 'Review and confirm this answer before it is saved.' });
     }
 
-    const engine = ConversationEngine.fromJSON(session);
-    const currentQuestion = engine.getCurrentQuestion();
-    const progress = engine.getProgress();
+    interview.answers[field] = value;
+    interview.last_completed_field = field;
+    interview.updated_at = new Date().toISOString();
+    const updates: Record<string,any> = { metadata:meta, updated_at:new Date().toISOString() };
+    if (['first_name','last_name','email','phone','address','program_slug'].includes(field)) updates[field] = value;
+    if (field === 'funding_path') updates.requested_funding_source = value;
+    if (field === 'transfer_hours_claimed') {
+      updates.transfer_hours_claimed = Number.parseInt(value,10) || 0;
+      interview.transfer_hours_pending_verification = true;
+    }
+
+    await admin.from('ai_conversations').insert({ session_id:interview.session_id, user_id:user.id, role:'user', content:value, metadata:{ target_type:'application', application_id:applicationId, field, source, confirmed:true } });
+    const { error:updateError } = await admin.from('applications').update(updates).eq('id', applicationId).eq('user_id', user.id);
+    if (updateError) throw updateError;
+
+    const refreshed = { ...application, ...updates };
+    const state = progress(refreshed, interview.answers);
+    const decision = decide(refreshed, interview.answers, state);
+    interview.decision = decision;
+
+    let nextStatus = String(application.status || 'submitted');
+    if (decision.decision === 'ready_for_review') nextStatus = 'ready_for_review';
+    if (decision.decision === 'ready_for_sponsor_review' || decision.decision === 'ready_for_funding_review') nextStatus = 'under_review';
+
+    if (nextStatus !== application.status && !['approved','enrolled','withdrawn','rejected','denied'].includes(String(application.status))) {
+      await admin.from('applications').update({ status:nextStatus, metadata:meta, updated_at:new Date().toISOString() }).eq('id', applicationId).eq('user_id', user.id);
+      await admin.from('application_state_events').insert({ application_type:application.application_type || 'student', application_id:applicationId, from_state:application.status, to_state:nextStatus, actor_id:user.id, actor_role:'applicant', reason:decision.reason, metadata:{ source:'paris_application_interview', decision } });
+    }
 
     return NextResponse.json({
-      exists: true,
-      sessionId: session.sessionId,
-      applicationRef: session.applicationRef,
-      programSlug: session.programSlug,
-      status: session.status,
-      currentQuestion: currentQuestion ? {
-        id: currentQuestion.id,
-        question: currentQuestion.question,
-        domain: currentQuestion.domain
-      } : null,
-      progress,
-      canResume: engine.canResume(),
-      canStart: session.status === 'not_started',
-      messages: session.messages.slice(-5), // Last 5 messages
-      responses: session.responses,
-      completedAt: session.completedAt
+      ok:true,
+      requiresConfirmation:false,
+      progress:state.percent,
+      missing:state.missing,
+      nextQuestion:question(state.missing[0], interview.locale),
+      decision,
+      humanReviewRequired:decision.authority !== 'paris',
     });
-
   } catch (error) {
-    console.error('PARS Interview GET Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', message: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    console.error('PARIS application interview POST failed', error);
+    return NextResponse.json({ error:'Unable to update application interview' }, { status:500 });
   }
 }

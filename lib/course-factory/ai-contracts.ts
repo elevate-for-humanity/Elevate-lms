@@ -42,10 +42,7 @@ export const generatedBlueprintSchema = z
                 z
                   .object({
                     title: z.string().trim().min(1),
-                    slug: z
-                      .string()
-                      .trim()
-                      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+                    slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
                     stepType: z.enum(['lesson', 'checkpoint', 'quiz', 'exam', 'lab', 'assignment']),
                   })
                   .strict(),
@@ -111,11 +108,6 @@ function extendTo(value: unknown, min: number, additions: string[]): string {
   return text;
 }
 
-/**
- * Repairs small structural gaps common in otherwise usable model responses.
- * This does not bypass validation: the repaired object is still parsed by the
- * same strict generatedLessonContentSchema before Course Factory persistence.
- */
 export function repairGeneratedLessonContent(value: unknown): unknown {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return value;
   const lesson = structuredClone(value) as Record<string, any>;
@@ -289,5 +281,9 @@ export function parseStrictAIJson<T>(
   schema: z.ZodType<T>,
   label: string,
 ): T {
-  return validateParsed(parseRawJson(raw, label), schema, label);
+  const parsed = parseRawJson(raw, label);
+  const candidate = label.toLowerCase().includes('lesson generation')
+    ? repairGeneratedLessonContent(parsed)
+    : parsed;
+  return validateParsed(candidate, schema, label);
 }

@@ -1,98 +1,70 @@
-import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { requireAdmin } from '@/lib/auth';
 import { ClipboardCheck, CheckCircle } from 'lucide-react';
+import { requireAdmin } from '@/lib/auth';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
-
 export const metadata: Metadata = { title: 'Completion Rules | Elevate Admin' };
 
-export default async function ProgramCompletionPage({
-  params,
-}: {
-  params: Promise<{ code: string }>;
-}) {
+const ruleLabels: Record<string, string> = {
+  all_courses: 'All program courses completed',
+  required_courses: 'All required program courses completed',
+  min_courses: 'Minimum number of courses completed',
+  all_lessons: 'All course lessons completed',
+  required_lessons: 'All required lessons completed',
+  min_score: 'Minimum assessment score met',
+};
+
+export default async function ProgramCompletionPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   await requireAdmin();
-  const supabase = await createClient();
+  const db = await requireAdminClient();
 
-  const { data: program } = await supabase
+  const { data: program } = await db
     .from('programs')
-    .select('id, title, completion_criteria')
+    .select('id,title')
     .or(`code.eq.${code},slug.eq.${code}`)
     .maybeSingle();
-  if (!program)
-    return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold">Program not found</h1>
-      </div>
-    );
+  if (!program) return <div className="p-8"><h1 className="text-2xl font-bold">Program not found</h1></div>;
 
-  const criteria = program.completion_criteria as any;
-  const rules = criteria?.rules || [];
-
-  const ruleLabels: Record<string, string> = {
-    lessons_complete: 'All required lessons completed',
-    quizzes_passed: 'All quizzes passed with minimum score',
-    min_hours: 'Minimum training hours met',
-    external_modules: 'External certifications completed',
-  };
+  const { data: rules, error } = await db
+    .from('completion_rules')
+    .select('id,rule_type,config,is_active')
+    .eq('entity_type', 'program')
+    .eq('entity_id', program.id)
+    .eq('is_active', true)
+    .order('created_at');
+  if (error) throw error;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <nav className="text-sm mb-4">
-        <ol className="flex items-center space-x-2 text-slate-700">
-          <li>
-            <Link href="/programs" className="hover:text-brand-blue-600">
-              Programs
-            </Link>
-          </li>
-          <li>/</li>
-          <li>
-            <Link href={`/programs/${code}/dashboard`} className="hover:text-brand-blue-600">
-              {program.title}
-            </Link>
-          </li>
-          <li>/</li>
-          <li className="text-slate-900 font-medium">Completion Rules</li>
-        </ol>
-      </nav>
-
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">Completion Rules — {program.title}</h1>
-
-      <div className="bg-white rounded-lg border p-6">
-        {rules.length === 0 ? (
-          <div className="text-center py-8">
-            <ClipboardCheck className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">Default completion rules</h3>
-            <p className="text-slate-700 mb-4">
-              This program uses the default rule: all required lessons must be completed.
-            </p>
-            <p className="text-sm text-slate-700">
-              To configure custom rules, update the{' '}
-              <code className="bg-slate-100 px-1 rounded">completion_criteria</code> field in the
-              programs table via the Supabase Dashboard.
-            </p>
+    <div className="mx-auto max-w-7xl px-4 py-8">
+      <nav className="mb-4 text-sm text-slate-600"><Link href="/programs" className="hover:underline">Programs</Link><span className="px-2">/</span><Link href={`/programs/${code}/dashboard`} className="hover:underline">{program.title}</Link><span className="px-2">/</span><span>Completion Rules</span></nav>
+      <h1 className="mb-6 text-2xl font-bold text-slate-950">Completion Rules — {program.title}</h1>
+      <div className="rounded-lg border bg-white p-6">
+        {!rules?.length ? (
+          <div className="py-8 text-center">
+            <ClipboardCheck className="mx-auto mb-4 h-12 w-12 text-slate-400" />
+            <h2 className="mb-2 text-lg font-medium text-slate-900">Default completion rule</h2>
+            <p className="text-slate-600">All required courses attached to the program must be completed.</p>
           </div>
         ) : (
           <div className="space-y-4">
-            <h3 className="font-medium text-slate-900">Active Rules</h3>
-            {rules.map((rule: any, i: number) => (
-              <div key={i} className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-slate-900">{ruleLabels[rule.type] || rule.type}</p>
-                  {rule.minScore && (
-                    <p className="text-sm text-slate-700">Minimum score: {rule.minScore}%</p>
-                  )}
-                  {rule.hours && (
-                    <p className="text-sm text-slate-700">Required hours: {rule.hours}</p>
-                  )}
+            <h2 className="font-medium text-slate-900">Active rules</h2>
+            {rules.map((rule) => {
+              const config = (rule.config ?? {}) as Record<string, unknown>;
+              return (
+                <div key={rule.id} className="flex items-start gap-3 rounded-lg bg-slate-50 p-4">
+                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+                  <div>
+                    <p className="font-medium text-slate-900">{ruleLabels[rule.rule_type] || rule.rule_type}</p>
+                    {config.min_score !== undefined ? <p className="text-sm text-slate-600">Minimum score: {String(config.min_score)}%</p> : null}
+                    {config.count !== undefined ? <p className="text-sm text-slate-600">Required courses: {String(config.count)}</p> : null}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

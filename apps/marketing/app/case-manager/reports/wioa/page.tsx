@@ -137,7 +137,7 @@ export default async function WIOAReportPage() {
               {total} participant{total !== 1 ? 's' : ''} · Performance period outcomes
             </p>
           </div>
-          <WIOAExportButton caseManagerId={user.id} />
+          <WIOAExportButton />
         </div>
 
         {/* Summary metrics */}

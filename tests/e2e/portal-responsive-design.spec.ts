@@ -5,17 +5,22 @@ const APPRENTICE_EMAIL = process.env.E2E_APPRENTICE_EMAIL || '';
 const APPRENTICE_PASSWORD = process.env.E2E_APPRENTICE_PASSWORD || '';
 const HOST_EMAIL = process.env.E2E_HOST_SHOP_EMAIL || '';
 const HOST_PASSWORD = process.env.E2E_HOST_SHOP_PASSWORD || '';
+const LEARNER_EMAIL = process.env.E2E_LEARNER_EMAIL || '';
+const LEARNER_PASSWORD = process.env.E2E_LEARNER_PASSWORD || '';
+const PROGRAM_HOLDER_EMAIL = process.env.E2E_PROGRAM_HOLDER_EMAIL || '';
+const PROGRAM_HOLDER_PASSWORD = process.env.E2E_PROGRAM_HOLDER_PASSWORD || '';
 
 async function login(page: Page, email: string, password: string) {
   await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
   const emailInput = page.locator('input[type="email"], input[name="email"]').first();
   const passwordInput = page.locator('input[type="password"]').first();
   const submit = page.locator('button[type="submit"]').first();
-
   await expect(emailInput).toBeVisible();
   await expect(passwordInput).toBeVisible();
   await expect(submit).toBeVisible();
-
+  await expect(emailInput).toBeEnabled();
+  await expect(passwordInput).toBeEnabled();
+  await expect(submit).toBeEnabled();
   await emailInput.fill(email);
   await passwordInput.fill(password);
   await page.waitForTimeout(250);
@@ -28,7 +33,6 @@ async function assertResponsivePage(page: Page, path: string) {
   expect(response?.status() ?? 200, `${path} returned server error`).toBeLessThan(500);
   expect(page.url(), `${path} unexpectedly returned to login`).not.toMatch(/\/login(?:\?|$)/);
   expect(page.url(), `${path} redirected to unauthorized`).not.toContain('/unauthorized');
-
   await page.waitForLoadState('networkidle').catch(() => {});
 
   const geometry = await page.evaluate(() => {
@@ -39,109 +43,66 @@ async function assertResponsivePage(page: Page, path: string) {
     const scrollWidth = Math.max(doc.scrollWidth, body?.scrollWidth || 0);
     const main = document.querySelector('main') || document.querySelector('[role="main"]') || body;
     const mainRect = main?.getBoundingClientRect();
-
-    const visibleCritical = Array.from(
-      document.querySelectorAll('button, input, select, textarea, a[href]'),
-    ).filter((element) => {
+    const visibleCritical = Array.from(document.querySelectorAll('button, input, select, textarea, a[href]')).filter((element) => {
       const el = element as HTMLElement;
       const style = window.getComputedStyle(el);
       const rect = el.getBoundingClientRect();
       return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
     });
-
-    const clippedCritical = visibleCritical
-      .filter((element) => {
-        const rect = (element as HTMLElement).getBoundingClientRect();
-        return rect.right > viewportWidth + 2 || rect.left < -2;
-      })
-      .slice(0, 10)
-      .map((element) => ({
-        tag: element.tagName,
-        text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '').trim().slice(0, 80),
-        href: element.getAttribute('href'),
-      }));
-
-    return {
-      viewportWidth,
-      viewportHeight,
-      scrollWidth,
-      mainWidth: mainRect?.width || 0,
-      mainHeight: mainRect?.height || 0,
-      clippedCritical,
-    };
+    const clippedCritical = visibleCritical.filter((element) => {
+      const rect = (element as HTMLElement).getBoundingClientRect();
+      return rect.right > viewportWidth + 2 || rect.left < -2;
+    }).slice(0, 10).map((element) => ({
+      tag: element.tagName,
+      text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '').trim().slice(0, 80),
+      href: element.getAttribute('href'),
+    }));
+    return { viewportWidth, viewportHeight, scrollWidth, mainWidth: mainRect?.width || 0, mainHeight: mainRect?.height || 0, clippedCritical };
   });
 
-  expect(
-    geometry.scrollWidth,
-    `${path} has page-level horizontal overflow: scrollWidth=${geometry.scrollWidth}, viewport=${geometry.viewportWidth}`,
-  ).toBeLessThanOrEqual(geometry.viewportWidth + 2);
-
+  expect(geometry.scrollWidth, `${path} has page-level horizontal overflow: scrollWidth=${geometry.scrollWidth}, viewport=${geometry.viewportWidth}`).toBeLessThanOrEqual(geometry.viewportWidth + 2);
   expect(geometry.mainWidth, `${path} primary content has zero width`).toBeGreaterThan(0);
   expect(geometry.mainHeight, `${path} primary content has zero height`).toBeGreaterThan(0);
   expect(geometry.clippedCritical, `${path} has clipped critical controls`).toEqual([]);
 
-  const mobile = geometry.viewportWidth < 768;
-  if (mobile) {
-    const tinyCritical = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('button, input, select, textarea'))
-        .filter((element) => {
-          const el = element as HTMLElement;
-          const rect = el.getBoundingClientRect();
-          const style = window.getComputedStyle(el);
-          if (style.display === 'none' || style.visibility === 'hidden' || rect.width === 0 || rect.height === 0) return false;
-          return rect.height < 32 || rect.width < 32;
-        })
-        .slice(0, 10)
-        .map((element) => ({
-          tag: element.tagName,
-          text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '').trim().slice(0, 80),
-        })),
-    );
+  if (geometry.viewportWidth < 768) {
+    const tinyCritical = await page.evaluate(() => Array.from(document.querySelectorAll('button, input, select, textarea')).filter((element) => {
+      const el = element as HTMLElement;
+      const rect = el.getBoundingClientRect();
+      const style = window.getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden' || rect.width === 0 || rect.height === 0) return false;
+      return rect.height < 32 || rect.width < 32;
+    }).slice(0, 10).map((element) => ({ tag: element.tagName, text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '').trim().slice(0, 80) })));
     expect(tinyCritical, `${path} has undersized mobile form/button controls`).toEqual([]);
   }
+}
+
+async function certify(page: Page, testInfo: any, role: string, email: string, password: string, paths: string[]) {
+  await login(page, email, password);
+  for (const path of paths) {
+    await test.step(`${testInfo.project.name}: ${path}`, async () => assertResponsivePage(page, path));
+  }
+  await page.screenshot({ path: testInfo.outputPath(`${role}-${testInfo.project.name}.png`), fullPage: true });
 }
 
 test.describe('Authenticated portal responsive design certification', () => {
   test.describe('Apprentice', () => {
     test.skip(!APPRENTICE_EMAIL || !APPRENTICE_PASSWORD, 'Disposable Apprentice identity is required');
-
-    test('critical Apprentice surfaces fit the active device viewport', async ({ page }, testInfo) => {
-      await login(page, APPRENTICE_EMAIL, APPRENTICE_PASSWORD);
-      for (const path of [
-        '/apprentice',
-        '/apprentice/hours',
-        '/apprentice/rti',
-        '/apprentice/competencies',
-        '/apprentice/documents',
-        '/apprentice/attendance',
-        '/apprentice/profile',
-        '/apprentice/handbook',
-      ]) {
-        await test.step(`${testInfo.project.name}: ${path}`, async () => assertResponsivePage(page, path));
-      }
-      await page.screenshot({ path: testInfo.outputPath(`apprentice-${testInfo.project.name}.png`), fullPage: true });
-    });
+    test('critical Apprentice surfaces fit the active device viewport', async ({ page }, testInfo) => certify(page, testInfo, 'apprentice', APPRENTICE_EMAIL, APPRENTICE_PASSWORD, ['/apprentice','/apprentice/hours','/apprentice/rti','/apprentice/competencies','/apprentice/documents','/apprentice/attendance','/apprentice/profile','/apprentice/handbook']));
   });
 
   test.describe('Host Shop', () => {
     test.skip(!HOST_EMAIL || !HOST_PASSWORD, 'Disposable Host Shop identity is required');
+    test('critical Host Shop surfaces fit the active device viewport', async ({ page }, testInfo) => certify(page, testInfo, 'host-shop', HOST_EMAIL, HOST_PASSWORD, ['/host-shop/dashboard','/host-shop/dashboard/apprentices','/host-shop/dashboard/hours/pending','/host-shop/dashboard/documents','/host-shop/dashboard/competencies','/host-shop/dashboard/attendance/record','/host-shop/dashboard/wages','/host-shop/dashboard/reports','/host-shop/dashboard/profile']));
+  });
 
-    test('critical Host Shop surfaces fit the active device viewport', async ({ page }, testInfo) => {
-      await login(page, HOST_EMAIL, HOST_PASSWORD);
-      for (const path of [
-        '/host-shop/dashboard',
-        '/host-shop/dashboard/apprentices',
-        '/host-shop/dashboard/hours/pending',
-        '/host-shop/dashboard/documents',
-        '/host-shop/dashboard/competencies',
-        '/host-shop/dashboard/attendance/record',
-        '/host-shop/dashboard/wages',
-        '/host-shop/dashboard/reports',
-        '/host-shop/dashboard/profile',
-      ]) {
-        await test.step(`${testInfo.project.name}: ${path}`, async () => assertResponsivePage(page, path));
-      }
-      await page.screenshot({ path: testInfo.outputPath(`host-shop-${testInfo.project.name}.png`), fullPage: true });
-    });
+  test.describe('Learner', () => {
+    test.skip(!LEARNER_EMAIL || !LEARNER_PASSWORD, 'Disposable Learner identity is required');
+    test('critical Learner surfaces fit the active device viewport', async ({ page }, testInfo) => certify(page, testInfo, 'learner', LEARNER_EMAIL, LEARNER_PASSWORD, ['/lms/dashboard','/lms/courses','/lms/certificates','/lms/calendar','/lms/messages','/lms/support','/lms/apply/status']));
+  });
+
+  test.describe('Program Holder', () => {
+    test.skip(!PROGRAM_HOLDER_EMAIL || !PROGRAM_HOLDER_PASSWORD, 'Disposable Program Holder identity is required');
+    test('critical Program Holder surfaces fit the active device viewport', async ({ page }, testInfo) => certify(page, testInfo, 'program-holder', PROGRAM_HOLDER_EMAIL, PROGRAM_HOLDER_PASSWORD, ['/program-holder/dashboard','/program-holder/students','/program-holder/portal/students','/program-holder/portal/reports','/program-holder/rights-responsibilities']));
   });
 });

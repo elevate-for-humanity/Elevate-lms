@@ -3,10 +3,12 @@
 /**
  * Canonical PWA install banner.
  *
- * Shows once until dismissed (localStorage).
- * Auto-hides when already installed.
- * Only shows on desktop/Android where beforeinstallprompt fires.
+ * - Android/Chromium: uses the native beforeinstallprompt flow.
+ * - iOS/iPadOS: shows the Safari Add to Home Screen instructions because
+ *   WebKit does not expose beforeinstallprompt.
+ * - Auto-hides when already installed.
  */
+import { useState } from 'react';
 import { usePwaInstall } from '@/hooks/usePwaInstall';
 
 interface PwaInstallBannerProps {
@@ -17,46 +19,64 @@ interface PwaInstallBannerProps {
 }
 
 export function PwaInstallBanner({
-  message = 'Install Elevate for faster access \u2014 add to your home screen.',
+  message = 'Install Elevate for faster access — add it to your home screen.',
   storageKey = 'pwa-install-banner-dismissed',
 }: PwaInstallBannerProps) {
-  const { canInstall, isInstalled, promptInstall, dismiss } = usePwaInstall();
+  const { canInstall, isInstalled, promptInstall, dismiss, platform } = usePwaInstall();
+  const [showIosHelp, setShowIosHelp] = useState(false);
 
-  if (!canInstall || isInstalled) return null;
+  if (isInstalled) return null;
   if (typeof window !== 'undefined' && localStorage.getItem(storageKey)) return null;
+
+  const isIos = platform === 'ios';
+  if (!canInstall && !isIos) return null;
+
+  const dismissBanner = () => {
+    dismiss();
+    setShowIosHelp(false);
+    if (typeof window !== 'undefined') localStorage.setItem(storageKey, '1');
+  };
 
   return (
     <div
       role="complementary"
-      aria-label="Install app"
-      className="fixed bottom-0 inset-x-0 z-50 flex items-center justify-between gap-4 bg-brand-orange-600 text-white px-4 py-3 shadow-lg"
+      aria-label="Install Elevate app"
+      className="fixed bottom-0 inset-x-0 z-50 bg-brand-orange-600 text-white px-4 py-3 shadow-lg"
       style={{ boxShadow: '0 -4px 16px rgba(0,0,0,0.15)' }}
     >
-      <p className="text-sm font-medium flex-1">{message}</p>
-      <div className="flex items-center gap-2 shrink-0">
-        <button
-          onClick={async () => {
-            await promptInstall();
-            dismiss();
-          }}
-          className="px-4 py-1.5 bg-white text-brand-orange-600 rounded-full text-sm font-semibold hover:bg-orange-50 transition-colors"
-        >
-          Install
-        </button>
-        <button
-          onClick={() => {
-            dismiss();
-            if (typeof window !== 'undefined') {
-              localStorage.setItem(storageKey, '1');
-            }
-          }}
-          aria-label="Dismiss install prompt"
-          className="p-1 text-white/70 hover:text-white transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium">{message}</p>
+          {isIos && showIosHelp ? (
+            <p className="mt-1 text-xs leading-5 text-white/90">
+              In Safari, tap Share, then choose <strong>Add to Home Screen</strong>, then tap Add.
+            </p>
+          ) : null}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={async () => {
+              if (isIos) {
+                setShowIosHelp(true);
+                return;
+              }
+              const accepted = await promptInstall();
+              if (accepted) dismiss();
+            }}
+            className="px-4 py-1.5 bg-white text-brand-orange-600 rounded-full text-sm font-semibold hover:bg-orange-50 transition-colors"
+          >
+            {isIos ? 'How to Install' : 'Install'}
+          </button>
+          <button
+            onClick={dismissBanner}
+            aria-label="Dismiss install prompt"
+            className="p-1 text-white/70 hover:text-white transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );

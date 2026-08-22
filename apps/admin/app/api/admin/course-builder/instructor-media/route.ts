@@ -3,7 +3,7 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
-import { queueCourseLessonVideos } from '@/lib/course-builder/video-queue';
+import { queueCourseLessonVideos } from '@/lib/course-factory/media-service';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 
 export const runtime = 'nodejs';

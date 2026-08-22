@@ -1,185 +1,118 @@
 /**
- * BNPL (Buy Now, Pay Later) Provider Configuration
+ * Flexible payment provider configuration.
  *
- * Single source of truth for all BNPL provider names, labels, and display settings.
- * Import from here instead of hardcoding provider names in UI components.
- *
- * To add/remove a provider, update this file only.
+ * BNPL/financing providers and direct payment methods are intentionally
+ * classified separately so marketing copy does not describe Cash App Pay or
+ * other direct-payment rails as financing.
  */
+
+export type PaymentProviderCategory = 'bnpl' | 'payment';
 
 export interface BnplProvider {
   id: string;
   name: string;
-  /**
-   * Stripe payment_method_types value for this provider.
-   * Stripe uses different identifiers than our internal IDs
-   * (e.g. "afterpay_clearpay" not "afterpay", "us_bank_account" not "bank").
-   * null = not a Stripe-native method (uses separate SDK flow).
-   */
+  category: PaymentProviderCategory;
   stripeMethodId: string | null;
-  /** Tailwind classes for the pill badge */
   badgeBg: string;
   badgeText: string;
-  /** Minimum order amount in dollars (0 = no minimum) */
   minAmount: number;
-  /** Maximum order amount in dollars (0 = no maximum) */
   maxAmount: number;
-  /** Short description shown in UI */
   description: string;
-  /** Whether this provider is currently active */
   enabled: boolean;
 }
 
 export const BNPL_PROVIDERS: BnplProvider[] = [
-  // --- Stripe-native (stripeMethodId = Stripe's payment_method_types value) ---
   {
-    id: 'klarna',
-    name: 'Klarna',
-    stripeMethodId: 'klarna',
-    badgeBg: 'bg-pink-100',
-    badgeText: 'text-pink-700',
-    minAmount: 35,
-    maxAmount: 10000,
-    description: 'Split into 4 interest-free payments or spread over 6–36 months. No hard credit check.',
-    enabled: true,
+    id: 'klarna', name: 'Klarna', category: 'bnpl', stripeMethodId: 'klarna',
+    badgeBg: 'bg-pink-100', badgeText: 'text-pink-700', minAmount: 35, maxAmount: 10000,
+    description: 'Installment financing offered by Klarna. Eligibility and terms are determined by Klarna.', enabled: true,
   },
   {
-    id: 'afterpay',
-    name: 'Afterpay',
-    stripeMethodId: 'afterpay_clearpay', // Stripe API name differs from display name
-    badgeBg: 'bg-teal-100',
-    badgeText: 'text-teal-700',
-    minAmount: 35,
-    maxAmount: 2000,
-    description: '4 interest-free payments every 2 weeks. Instant approval at checkout.',
-    enabled: true,
+    id: 'afterpay', name: 'Afterpay', category: 'bnpl', stripeMethodId: 'afterpay_clearpay',
+    badgeBg: 'bg-teal-100', badgeText: 'text-teal-700', minAmount: 35, maxAmount: 2000,
+    description: 'Installment payments offered by Afterpay. Eligibility and terms are determined by Afterpay.', enabled: true,
   },
   {
-    id: 'zip',
-    name: 'Zip',
-    stripeMethodId: 'zip',
-    badgeBg: 'bg-indigo-100',
-    badgeText: 'text-indigo-700',
-    minAmount: 35,
-    maxAmount: 1500,
-    description: 'Pay in 4 installments over 6 weeks. No interest on on-time payments.',
-    enabled: true,
+    id: 'zip', name: 'Zip', category: 'bnpl', stripeMethodId: 'zip',
+    badgeBg: 'bg-indigo-100', badgeText: 'text-indigo-700', minAmount: 35, maxAmount: 1500,
+    description: 'Installment payments offered by Zip. Eligibility and terms are determined by Zip.', enabled: true,
   },
   {
-    id: 'cashapp',
-    name: 'Cash App Pay',
-    stripeMethodId: 'cashapp',
-    badgeBg: 'bg-green-100',
-    badgeText: 'text-green-700',
-    minAmount: 35,
-    maxAmount: 0,
-    description: 'Pay directly from your Cash App balance or linked bank. Instant checkout.',
-    enabled: true,
+    id: 'cashapp', name: 'Cash App Pay', category: 'payment', stripeMethodId: 'cashapp',
+    badgeBg: 'bg-green-100', badgeText: 'text-green-700', minAmount: 35, maxAmount: 0,
+    description: 'Direct payment from Cash App or a linked funding source. This is not a BNPL product.', enabled: true,
   },
   {
-    id: 'amazon_pay',
-    name: 'Amazon Pay',
-    stripeMethodId: 'amazon_pay',
-    badgeBg: 'bg-orange-100',
-    badgeText: 'text-orange-700',
-    minAmount: 35,
-    maxAmount: 0,
-    description: 'Use your Amazon account and saved payment methods to check out in seconds.',
-    enabled: false, // not available on this Stripe account's Default config
+    id: 'amazon_pay', name: 'Amazon Pay', category: 'payment', stripeMethodId: 'amazon_pay',
+    badgeBg: 'bg-orange-100', badgeText: 'text-orange-700', minAmount: 35, maxAmount: 0,
+    description: 'Direct checkout using an Amazon account and saved payment method.', enabled: false,
   },
   {
-    id: 'us_bank_account',
-    name: 'Bank Transfer (ACH)',
-    stripeMethodId: 'us_bank_account',
-    badgeBg: 'bg-blue-100',
-    badgeText: 'text-blue-700',
-    minAmount: 35,
-    maxAmount: 0,
-    description: 'Direct bank transfer via ACH. No card required — link your bank account at checkout.',
-    enabled: false, // not available on this Stripe account's Default config
-  },
-  // --- Separate SDK flows (stripeMethodId = null — not routed through Stripe) ---
-  {
-    id: 'affirm',
-    name: 'Affirm',
-    stripeMethodId: null, // uses /api/affirm/checkout SDK flow
-    badgeBg: 'bg-brand-blue-100',
-    badgeText: 'text-brand-blue-700',
-    minAmount: 50,
-    maxAmount: 30000,
-    description: 'Monthly installment financing at 0–36% APR over 3–36 months. Subject to credit approval.',
-    enabled: true,
+    id: 'us_bank_account', name: 'Bank Transfer (ACH)', category: 'payment', stripeMethodId: 'us_bank_account',
+    badgeBg: 'bg-blue-100', badgeText: 'text-blue-700', minAmount: 35, maxAmount: 0,
+    description: 'Direct ACH bank payment. This is not a BNPL product.', enabled: false,
   },
   {
-    id: 'sezzle',
-    name: 'Sezzle',
-    stripeMethodId: null, // uses /api/sezzle/checkout SDK flow
-    badgeBg: 'bg-purple-100',
-    badgeText: 'text-purple-700',
-    minAmount: 35,
-    maxAmount: 2500,
-    description: '4 interest-free payments over 6 weeks. Quick approval, no hard credit check.',
-    enabled: true,
+    id: 'affirm', name: 'Affirm', category: 'bnpl', stripeMethodId: null,
+    badgeBg: 'bg-brand-blue-100', badgeText: 'text-brand-blue-700', minAmount: 50, maxAmount: 30000,
+    description: 'Installment financing through Affirm. APR, approval, and terms are determined by Affirm.', enabled: true,
+  },
+  {
+    id: 'sezzle', name: 'Sezzle', category: 'bnpl', stripeMethodId: null,
+    badgeBg: 'bg-purple-100', badgeText: 'text-purple-700', minAmount: 35, maxAmount: 2500,
+    description: 'Installment payments through Sezzle. Eligibility and terms are determined by Sezzle.', enabled: true,
   },
 ];
 
-/** Active providers only */
-export const ACTIVE_BNPL_PROVIDERS = BNPL_PROVIDERS.filter((p) => p.enabled);
+/** Every currently enabled flexible checkout provider. */
+export const ACTIVE_PAYMENT_PROVIDERS = BNPL_PROVIDERS.filter((provider) => provider.enabled);
 
-/** Comma-separated list of active provider names for display text */
-export const BNPL_PROVIDER_NAMES = ACTIVE_BNPL_PROVIDERS.map((p) => p.name).join(', ');
+/** Financing/installment providers only. Direct payment methods are excluded. */
+export const ACTIVE_BNPL_PROVIDERS = ACTIVE_PAYMENT_PROVIDERS.filter((provider) => provider.category === 'bnpl');
 
-/** Short label: "Affirm, Sezzle & 3 more" */
+export const DIRECT_PAYMENT_PROVIDERS = ACTIVE_PAYMENT_PROVIDERS.filter((provider) => provider.category === 'payment');
+
+export const BNPL_PROVIDER_NAMES = ACTIVE_BNPL_PROVIDERS.map((provider) => provider.name).join(', ');
 export const BNPL_PROVIDER_SUMMARY = (() => {
-  const names = ACTIVE_BNPL_PROVIDERS.map((p) => p.name);
+  const names = ACTIVE_BNPL_PROVIDERS.map((provider) => provider.name);
   if (names.length <= 2) return names.join(' & ');
   return `${names[0]}, ${names[1]} & ${names.length - 2} more`;
 })();
+export const BNPL_CHECKOUT_LABEL = `${ACTIVE_BNPL_PROVIDERS.slice(0, 2).map((provider) => provider.name).join(' & ')} financing available`;
+export const BNPL_DESCRIPTION = `Installment options may be available through ${BNPL_PROVIDER_NAMES}. Approval and terms are determined by each provider.`;
 
-/** Label for checkout pages: "Affirm & Sezzle BNPL accepted" */
-export const BNPL_CHECKOUT_LABEL = (() => {
-  const names = ACTIVE_BNPL_PROVIDERS.slice(0, 2).map((p) => p.name);
-  return `${names.join(' & ')} BNPL accepted`;
-})();
+/** Financing providers valid for a given dollar amount. */
+export function getBnplProvidersForAmount(amount: number): BnplProvider[] {
+  return ACTIVE_BNPL_PROVIDERS.filter((provider) => amount >= provider.minAmount && (provider.maxAmount === 0 || amount <= provider.maxAmount));
+}
 
-/** Full sentence for descriptions */
-export const BNPL_DESCRIPTION = `Split payments into installments with ${BNPL_PROVIDER_NAMES}. No hard credit check for most providers.`;
-
-/** Get providers valid for a given dollar amount */
+/** Backward-compatible checkout helper: returns all enabled flexible payment providers valid for the amount. */
 export function getProvidersForAmount(amount: number): BnplProvider[] {
-  return ACTIVE_BNPL_PROVIDERS.filter(
-    (p) => amount >= p.minAmount && (p.maxAmount === 0 || amount <= p.maxAmount),
-  );
+  return ACTIVE_PAYMENT_PROVIDERS.filter((provider) => amount >= provider.minAmount && (provider.maxAmount === 0 || amount <= provider.maxAmount));
 }
 
-/** Check if BNPL is available for a given amount */
 export function isBnplAvailable(amount: number): boolean {
-  return getProvidersForAmount(amount).length > 0;
+  return getBnplProvidersForAmount(amount).length > 0;
 }
 
-/**
- * Stripe payment_method_types array for all active Stripe-native BNPL providers.
- * Always includes 'card' as the base method.
- * Use this in stripe.checkout.sessions.create() instead of hardcoding provider names.
- *
- * Example: ['card', 'klarna', 'afterpay_clearpay', 'zip', 'cashapp', 'amazon_pay', 'us_bank_account']
- */
+/** Stripe-native financing methods only. */
 export const STRIPE_BNPL_PAYMENT_METHODS: string[] = [
   'card',
-  ...ACTIVE_BNPL_PROVIDERS.filter((p) => p.stripeMethodId !== null).map(
-    (p) => p.stripeMethodId as string,
-  ),
+  ...ACTIVE_BNPL_PROVIDERS.filter((provider) => provider.stripeMethodId !== null).map((provider) => provider.stripeMethodId as string),
 ];
 
-/**
- * Stripe payment_method_types for providers valid for a given dollar amount.
- * Always includes 'card'.
- */
+/** All enabled Stripe-native payment methods, including direct-payment rails such as Cash App Pay. */
+export const STRIPE_FLEXIBLE_PAYMENT_METHODS: string[] = [
+  'card',
+  ...ACTIVE_PAYMENT_PROVIDERS.filter((provider) => provider.stripeMethodId !== null).map((provider) => provider.stripeMethodId as string),
+];
+
+/** Backward-compatible checkout helper: all Stripe-native methods valid for the amount. */
 export function getStripeMethodsForAmount(amountDollars: number): string[] {
   return [
     'card',
     ...getProvidersForAmount(amountDollars)
-      .filter((p) => p.stripeMethodId !== null)
-      .map((p) => p.stripeMethodId as string),
+      .filter((provider) => provider.stripeMethodId !== null)
+      .map((provider) => provider.stripeMethodId as string),
   ];
 }

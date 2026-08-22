@@ -1,112 +1,77 @@
-import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { requireAdmin } from '@/lib/auth';
 import { Plus, BookOpen, ChevronRight } from 'lucide-react';
+import { requireAdmin } from '@/lib/auth';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
-
 export const metadata: Metadata = { title: 'Program Courses | Elevate Admin' };
 
-export default async function ProgramCoursesPage({
-  params,
-}: {
-  params: Promise<{ code: string }>;
-}) {
+export default async function ProgramCoursesPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   await requireAdmin();
-  const supabase = await createClient();
+  const db = await requireAdminClient();
 
-  const { data: program } = await supabase
+  const { data: program } = await db
     .from('programs')
-    .select('id, title, code, slug')
+    .select('id,title,code,slug')
     .or(`code.eq.${code},slug.eq.${code}`)
     .maybeSingle();
-  if (!program)
-    return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold">Program not found</h1>
-      </div>
-    );
+  if (!program) return <div className="p-8"><h1 className="text-2xl font-bold">Program not found</h1></div>;
 
-  const { data: courses } = await supabase
-    .from('lms_courses')
-    .select('id, course_name, title, slug, is_active, duration_hours, enrolled_count, status')
+  const { data: courses, error: courseError } = await db
+    .from('courses')
+    .select('id,title,slug,status,duration_hours,is_active,created_at')
     .eq('program_id', program.id)
     .order('created_at', { ascending: true });
+  if (courseError) throw courseError;
 
-  // Get lesson counts per course
-  const courseIds = (courses || []).map((c: any) => c.id);
+  const courseIds = (courses ?? []).map((course) => course.id);
   const lessonCounts: Record<string, number> = {};
-  if (courseIds.length > 0) {
-    const { data: lessons } = await supabase
-      .from('lms_lessons')
+  if (courseIds.length) {
+    const { data: lessons, error: lessonError } = await db
+      .from('course_lessons')
       .select('course_id')
       .in('course_id', courseIds);
-    for (const l of lessons || []) {
-      lessonCounts[l.course_id] = (lessonCounts[l.course_id] || 0) + 1;
-    }
+    if (lessonError) throw lessonError;
+    for (const lesson of lessons ?? []) lessonCounts[lesson.course_id] = (lessonCounts[lesson.course_id] ?? 0) + 1;
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <nav className="text-sm mb-4">
-        <ol className="flex items-center space-x-2 text-slate-700">
-          <li>
-            <Link href="/programs" className="hover:text-brand-blue-600">
-              Programs
-            </Link>
-          </li>
-          <li>/</li>
-          <li>
-            <Link href={`/admin/programs/${code}/dashboard`} className="hover:text-brand-blue-600">
-              {program.title}
-            </Link>
-          </li>
-          <li>/</li>
-          <li className="text-slate-900 font-medium">Courses</li>
-        </ol>
+    <div className="mx-auto max-w-7xl px-4 py-8">
+      <nav className="mb-4 text-sm text-slate-600">
+        <Link href="/programs" className="hover:underline">Programs</Link><span className="px-2">/</span>
+        <Link href={`/programs/${code}/dashboard`} className="hover:underline">{program.title}</Link><span className="px-2">/</span><span>Courses</span>
       </nav>
 
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Courses — {program.title}</h1>
-        <Link
-          href="/staff-portal/courses/create"
-          className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium"
-        >
-          <Plus className="w-4 h-4" /> Add Course
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold text-slate-950">Courses — {program.title}</h1>
+        <Link href="/course-builder" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-700">
+          <Plus className="h-4 w-4" /> Build Course
         </Link>
       </div>
 
-      {!courses || courses.length === 0 ? (
-        <div className="bg-white rounded-lg border p-12 text-center">
-          <BookOpen className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-slate-900 mb-2">No courses yet</h3>
-          <p className="text-slate-700 mb-4">Create the first course for this program.</p>
-          <Link href="/staff-portal/courses/create" className="text-brand-blue-600 hover:underline">
-            Create Course
-          </Link>
+      {!courses?.length ? (
+        <div className="rounded-lg border bg-white p-12 text-center">
+          <BookOpen className="mx-auto mb-4 h-12 w-12 text-slate-400" />
+          <h2 className="mb-2 text-lg font-medium text-slate-900">No courses yet</h2>
+          <p className="mb-4 text-slate-600">Create this program's first canonical course in Course Builder.</p>
+          <Link href="/course-builder" className="font-medium text-brand-blue-700 hover:underline">Open Course Builder</Link>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border divide-y">
-          {courses.map((course: any) => (
-            <Link
-              key={course.id}
-              href={`/admin/courses/${course.id}`}
-              className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors"
-            >
+        <div className="divide-y rounded-lg border bg-white">
+          {courses.map((course) => (
+            <Link key={course.id} href={`/course-builder?courseId=${encodeURIComponent(course.id)}`} className="flex items-center justify-between p-4 hover:bg-slate-50">
               <div className="flex-1">
-                <h3 className="font-medium text-slate-900">{course.title || course.course_name}</h3>
-                <div className="flex items-center gap-4 mt-1 text-sm text-slate-700">
-                  <span>{lessonCounts[course.id] || 0} lessons</span>
-                  {course.duration_hours && <span>{course.duration_hours}h</span>}
-                  <span className={course.is_active ? 'text-green-600' : 'text-slate-700'}>
-                    {course.is_active ? 'Active' : 'Inactive'}
-                  </span>
+                <h2 className="font-medium text-slate-900">{course.title}</h2>
+                <div className="mt-1 flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                  <span>{lessonCounts[course.id] ?? 0} lessons</span>
+                  {course.duration_hours ? <span>{course.duration_hours}h</span> : null}
+                  <span>{course.status || (course.is_active ? 'active' : 'inactive')}</span>
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-slate-700" />
+              <ChevronRight className="h-5 w-5 text-slate-400" />
             </Link>
           ))}
         </div>

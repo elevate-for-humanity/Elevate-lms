@@ -9,9 +9,11 @@ on:
       - 'apps/marketing/app/api/paris/application-interview/**'
       - 'apps/marketing/app/api/paris/applications/**'
       - 'apps/marketing/app/case-manager/reports/wioa/**'
+      - 'apps/lms/app/api/applications/**'
       - 'lib/agentic/**'
       - 'lib/paris/admissions/**'
       - 'lib/zora/admissions/**'
+      - 'supabase/functions/process-intake/**'
       - 'supabase/migrations/20260822183500_agentic_build_foundation.sql'
       - 'supabase/migrations/20260822190000_retire_paris_application_authority.sql'
       - 'supabase/migrations/20260822191500_link_agentic_application_documents.sql'
@@ -20,6 +22,7 @@ on:
       - 'supabase/migrations/20260822194500_agentic_run_credit_accounting.sql'
       - 'supabase/migrations/20260822195000_harden_agentic_application_document_link.sql'
       - 'supabase/migrations/20260822195500_attach_agentic_application_to_user.sql'
+      - 'supabase/migrations/20260822202000_agentic_application_human_review_handoff.sql'
       - 'scripts/check-agentic-admissions-contract.mjs'
       - '.github/workflows/agentic-admissions-acceptance.yml'
   workflow_dispatch:
@@ -36,7 +39,7 @@ jobs:
   acceptance:
     name: Agentic Admissions Acceptance
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,7 +52,7 @@ jobs:
             -H "Authorization: Bearer ${{ github.token }}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -d "{\"state\":\"pending\",\"context\":\"Agentic Admissions Acceptance\",\"description\":\"Validating PARIS admissions authority, types and marketing build\",\"target_url\":\"${RUN_URL}\"}" >/dev/null
+            -d "{\"state\":\"pending\",\"context\":\"Agentic Admissions Acceptance\",\"description\":\"Validating PARIS admissions authority, Marketing/LMS types and production builds\",\"target_url\":\"${RUN_URL}\"}" >/dev/null
 
       - uses: pnpm/action-setup@v4
         with:
@@ -70,8 +73,14 @@ jobs:
       - name: Typecheck marketing application
         run: pnpm run typecheck:marketing
 
+      - name: Typecheck LMS compatibility boundary
+        run: pnpm run typecheck:lms
+
       - name: Build marketing application
         run: pnpm run build:marketing
+
+      - name: Build LMS application
+        run: pnpm run build:lms
 
       - name: Report acceptance status
         if: always()
@@ -79,7 +88,7 @@ jobs:
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           if [ "${{ job.status }}" = "success" ]; then
             STATE=success
-            DESC="PARIS admissions contract, typecheck and marketing build passed"
+            DESC="PARIS admissions contract, Marketing/LMS typechecks and builds passed"
           else
             STATE=failure
             DESC="PARIS admissions acceptance failed; inspect workflow logs"

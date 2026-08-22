@@ -18,17 +18,21 @@ import {
   OpenAIProvider,
   AnthropicProvider,
   GeminiProvider,
+  GoogleProvider,
+  CloudflareProvider,
   AzureProvider,
   StabilityProvider,
   GroqProvider,
 } from './providers';
 
 const chatProviders: Record<string, () => AIProvider> = {
+  gemini: () => new GeminiProvider(),
+  google: () => new GoogleProvider(),
+  groq: () => new GroqProvider(),
+  cloudflare: () => new CloudflareProvider(),
   openai: () => new OpenAIProvider(),
   anthropic: () => new AnthropicProvider(),
-  gemini: () => new GeminiProvider(),
   azure: () => new AzureProvider(),
-  groq: () => new GroqProvider(),
 };
 
 const imageProviders: Record<string, () => AIImageProvider> = {
@@ -37,7 +41,10 @@ const imageProviders: Record<string, () => AIImageProvider> = {
   stability: () => new StabilityProvider(),
 };
 
-const chatProviderOrder = ['openai', 'anthropic', 'gemini', 'groq', 'azure'] as const;
+// Course Builder is free-first. Paid providers remain available, but are after
+// the configured Google/Groq/Cloudflare paths unless AI_PROVIDER explicitly
+// selects another provider.
+const chatProviderOrder = ['gemini', 'google', 'groq', 'cloudflare', 'openai', 'anthropic', 'azure'] as const;
 const CIRCUIT_RECOVERY_WAIT_MS = 31_000;
 const disabledChatProviders = new Set<string>();
 
@@ -64,8 +71,12 @@ function disableProviderForProcess(providerName: string, error: unknown): void {
   });
 }
 
+function configuredDefaultProvider(): string {
+  return String(process.env.AI_PROVIDER || 'gemini').trim().toLowerCase();
+}
+
 function resolveChatProvider(): AIProvider {
-  const preferred = (process.env.AI_PROVIDER || 'openai') as AIProviderName;
+  const preferred = configuredDefaultProvider() as AIProviderName;
 
   if (preferred !== 'none' && chatProviders[preferred] && !disabledChatProviders.has(preferred)) {
     const provider = chatProviders[preferred]();
@@ -83,7 +94,7 @@ function resolveChatProvider(): AIProvider {
   }
 
   throw new Error(
-    'No AI chat provider available. Set OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, GROQ_API_KEY, or AZURE_OPENAI_API_KEY.',
+    'No AI chat provider available. Configure GEMINI_API_KEY, GOOGLE_CLOUD_API_KEY, GROQ_API_KEY, Cloudflare Workers AI credentials, OPENAI_API_KEY, ANTHROPIC_API_KEY, or AZURE_OPENAI_API_KEY.',
   );
 }
 
@@ -91,7 +102,7 @@ function resolveChatCandidates(options: ChatCompletionOptions): AIProvider[] {
   const explicit = options.provider && options.provider !== 'none' && chatProviders[options.provider]
     ? String(options.provider)
     : null;
-  const preferred = explicit || String(process.env.AI_PROVIDER || 'openai');
+  const preferred = explicit || configuredDefaultProvider();
   const names = [preferred, ...chatProviderOrder].filter(
     (name, index, list) =>
       name !== 'none' &&
@@ -124,9 +135,7 @@ function resolveImageProvider(): AIImageProvider {
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
   let providers = resolveChatCandidates(options);
   if (!providers.length) {
-    throw new Error(
-      'No AI chat provider available. Set OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, GROQ_API_KEY, or AZURE_OPENAI_API_KEY.',
-    );
+    throw new Error('No AI chat provider available in the configured free-first or paid provider pools.');
   }
 
   let lastError: unknown;
@@ -154,9 +163,7 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
         return { ...result, provider: provider.name };
       } catch (error) {
         lastError = error;
-        if (isTerminalProviderError(error)) {
-          disableProviderForProcess(provider.name, error);
-        }
+        if (isTerminalProviderError(error)) disableProviderForProcess(provider.name, error);
         logger.warn(`[aiChat] provider "${provider.name}" failed; trying next configured provider`, {
           error: error instanceof Error ? error.message : String(error),
         });
@@ -171,7 +178,6 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
       providers = resolveChatCandidates(options);
       continue;
     }
-
     break;
   }
 
@@ -254,30 +260,16 @@ Passing threshold is 80%. Be specific in feedback. Return ONLY JSON.`,
     const cleaned = result.content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
     return JSON.parse(cleaned);
   } catch {
-    return {
-      score: 0,
-      maxScore,
-      feedback: 'Unable to grade automatically. Please contact your instructor.',
-      passed: false,
-    };
+    return { score: 0, maxScore, feedback: 'Unable to grade automatically. Please contact your instructor.', passed: false };
   }
 }
 
 export function getActiveProviderName(): string {
-  try {
-    return resolveChatProvider().name;
-  } catch {
-    return 'none';
-  }
+  try { return resolveChatProvider().name; } catch { return 'none'; }
 }
 
 export function isAIAvailable(): boolean {
-  try {
-    resolveChatProvider();
-    return true;
-  } catch {
-    return false;
-  }
+  try { resolveChatProvider(); return true; } catch { return false; }
 }
 
 export function resetProviders(): void {
@@ -295,7 +287,6 @@ function preferredReasoningProvider(): 'anthropic' | 'azure' | 'default' {
 
 export async function aiReason(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
   const preferred = preferredReasoningProvider();
-
   if (preferred === 'anthropic') {
     const provider = new AnthropicProvider();
     try {
@@ -311,9 +302,7 @@ export async function aiReason(options: ChatCompletionOptions): Promise<ChatComp
       });
       return { ...result, provider: provider.name };
     } catch (error) {
-      logger.warn('[aiReason] Claude reasoning failed; trying fallback', {
-        error: error instanceof Error ? error.message : String(error),
-      });
+      logger.warn('[aiReason] Claude reasoning failed; trying fallback', { error: error instanceof Error ? error.message : String(error) });
     }
   }
 
@@ -333,13 +322,10 @@ export async function aiReason(options: ChatCompletionOptions): Promise<ChatComp
         });
         return { ...result, provider: provider.name };
       } catch (error) {
-        logger.warn('[aiReason] Azure reasoning failed; falling back to standard AI', {
-          error: error instanceof Error ? error.message : String(error),
-        });
+        logger.warn('[aiReason] Azure reasoning failed; falling back to standard AI', { error: error instanceof Error ? error.message : String(error) });
       }
     }
   }
-
   return aiChat(options);
 }
 
@@ -349,11 +335,7 @@ export function isReasoningAvailable(): boolean {
 
 export type ToolDefinition = {
   type: 'function';
-  function: {
-    name: string;
-    description: string;
-    parameters: Record<string, unknown>;
-  };
+  function: { name: string; description: string; parameters: Record<string, unknown> };
 };
 
 export type ToolStreamEvent =
@@ -368,17 +350,14 @@ export async function* aiChatWithTools(options: {
   maxTokens?: number;
 }): AsyncIterable<ToolStreamEvent> {
   const provider = resolveChatProvider();
-
   if (provider.name === 'openai' && provider.isAvailable()) {
     yield* (provider as OpenAIProvider).chatStreamWithTools(options);
     return;
   }
-
   if (provider.name === 'anthropic' && provider.isAvailable()) {
     yield* (provider as AnthropicProvider).chatWithTools(options);
     return;
   }
-
   for await (const delta of aiChatStream({
     model: options.model,
     messages: options.messages,

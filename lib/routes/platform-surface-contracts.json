@@ -1,6 +1,6 @@
 {
-  "version": 6,
-  "updated": "2026-08-14",
+  "version": 7,
+  "updated": "2026-08-22",
   "surfaces": {
     "studentApplication": {
       "function": "Complete public student training application",
@@ -96,6 +96,10 @@
     "programHolderPortal": {
       "function": "Program holder training programs, students, hours, documents, and required actions",
       "canonical": { "app": "lms", "path": "/program-holder/dashboard" }
+    },
+    "creatorPortal": {
+      "function": "Authenticated creator workspace for learning products, content, and publishing",
+      "canonical": { "app": "lms", "path": "/creator/products" }
     },
     "adminPortal": {
       "function": "Platform administration and operational command center",

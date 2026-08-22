@@ -24,6 +24,7 @@ export interface HomeHeroVideoProps {
 }
 
 const HOME_MEDIA_REVISION = process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 12) || 'home-hero';
+const HOME_VOICEOVER = '/videos/voiceover.mp3';
 
 function withMediaRevision(src?: string) {
   if (!src) return undefined;
@@ -47,7 +48,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       videoSrcDesktop={withMediaRevision(banner.videoSrcDesktop)}
       videoSrcMobile={withMediaRevision(banner.videoSrcMobile)}
       posterImage={banner.posterImage}
-      voiceoverSrc={withMediaRevision(banner.voiceoverSrc)}
+      voiceoverSrc={withMediaRevision(banner.voiceoverSrc || HOME_VOICEOVER)}
       transcript={banner.transcript}
       analyticsName={banner.analyticsName}
       microLabel={banner.microLabel}

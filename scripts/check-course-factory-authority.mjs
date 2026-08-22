@@ -51,17 +51,11 @@ if (!orchestrator.includes('saveCourseProgramConfiguration')) failures.push('Cou
 const controller = read('lib/devstudio/course-builder-controller.ts');
 if (!controller.includes("from '../course-builder/orchestrator'")) failures.push('Studio Course Builder controller is not backed by canonical orchestrator');
 const editService = read('lib/course-builder/edit-service.ts');
-for (const capability of ['saveCourseModule','saveCourseLesson','patchCourseLesson','linkCourseScormPackage']) {
-  if (!editService.includes(capability)) failures.push(`Course Builder edit service is missing ${capability}`);
-}
+for (const capability of ['saveCourseModule','saveCourseLesson','patchCourseLesson','linkCourseScormPackage']) if (!editService.includes(capability)) failures.push(`Course Builder edit service is missing ${capability}`);
 const reviewService = read('lib/course-builder/review-service.ts');
-for (const capability of ['reviewCanonicalCourse','reviewCanonicalLessons','reviewed_by','approved']) {
-  if (!reviewService.includes(capability)) failures.push(`Course Builder review service is missing ${capability}`);
-}
+for (const capability of ['reviewCanonicalCourse','reviewCanonicalLessons','reviewed_by','approved']) if (!reviewService.includes(capability)) failures.push(`Course Builder review service is missing ${capability}`);
 const persistedPublish = read('lib/course-builder/persisted-publish-service.ts');
-for (const capability of ['runPersistedCourseProcurementHealthCheck','publishPersistedCourse','publishCourse','review_status','reviewed_by','module_completion_rules']) {
-  if (!persistedPublish.includes(capability)) failures.push(`Persisted Course Builder publication service is missing ${capability}`);
-}
+for (const capability of ['runPersistedCourseProcurementHealthCheck','publishPersistedCourse','publishCourse','review_status','reviewed_by','module_completion_rules']) if (!persistedPublish.includes(capability)) failures.push(`Persisted Course Builder publication service is missing ${capability}`);
 
 const retiredMutationRoutes = [
   'apps/admin/app/api/admin/lms/courses/generate/route.ts',
@@ -115,19 +109,13 @@ for (const rel of walk('apps')) {
   const text = read(rel);
   if (text.includes("@/lib/course-factory/factory")) failures.push(`${rel}: runtime route imports private Course Factory engine`);
   if (/\bcourseFactory\s*\(/.test(text) && rel.includes('/api/')) {
-    const studioFacadeAllowed = rel === studioChatRoute && text.includes("await import('@/lib/course-factory')") && !text.includes("@/lib/course-factory/factory");
-    if (!studioFacadeAllowed) failures.push(`${rel}: independent HTTP complete-course caller detected; use ${rootRoute}`);
+    const studioControllerAllowed = rel === studioChatRoute && text.includes("await import('@/lib/devstudio/course-builder-controller')") && !text.includes("@/lib/course-factory/factory") && !text.includes("await import('@/lib/course-factory')");
+    if (!studioControllerAllowed) failures.push(`${rel}: independent HTTP complete-course caller detected; Studio must enter Course Builder through lib/devstudio/course-builder-controller.ts and application clients must use ${rootRoute}`);
   }
   if (/\bpublishCourse\s*\(/.test(text) && rel.includes('/api/')) failures.push(`${rel}: independent HTTP publication caller detected; use ${rootRoute}`);
-  if (/\.from\(['\"]courses['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}status\s*:\s*['\"]published['\"]/.test(text)) {
-    failures.push(`${rel}: direct HTTP publication-state write detected; use ${rootRoute}`);
-  }
-  if (/\.from\(['\"]courses['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}review_status\s*:/.test(text)) {
-    failures.push(`${rel}: direct HTTP course-review mutation detected; use ${rootRoute}`);
-  }
-  if (/\.from\(['\"]course_lessons['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}approved\s*:/.test(text)) {
-    failures.push(`${rel}: direct HTTP lesson-review mutation detected; use ${rootRoute}`);
-  }
+  if (/\.from\(['\"]courses['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}status\s*:\s*['\"]published['\"]/.test(text)) failures.push(`${rel}: direct HTTP publication-state write detected; use ${rootRoute}`);
+  if (/\.from\(['\"]courses['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}review_status\s*:/.test(text)) failures.push(`${rel}: direct HTTP course-review mutation detected; use ${rootRoute}`);
+  if (/\.from\(['\"]course_lessons['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}approved\s*:/.test(text)) failures.push(`${rel}: direct HTTP lesson-review mutation detected; use ${rootRoute}`);
 }
 
 const forbiddenEndpointRefs = [
@@ -159,4 +147,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder generation/editing/review/publication -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; no raw-engine, parallel package, review, or publication authority detected.');
+console.log('Course Builder authority gate passed: Studio control plane -> Studio Course Builder controller/root Course Builder boundary -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; no raw-engine, parallel package, review, or publication authority detected.');

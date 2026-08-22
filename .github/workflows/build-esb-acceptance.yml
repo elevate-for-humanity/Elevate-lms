@@ -141,50 +141,41 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Verify relevant types, lint, Admin build, and LMS build
-        id: verification
+      - name: Run targeted Course Builder validation before generation
+        id: targeted
         shell: bash
         run: |
           set +e
-          : > /tmp/course-verification.log
-          if [ "${{ steps.install.outputs.exit_code }}" != "0" ]; then
-            echo "Dependency install failed; verification cannot run." >> /tmp/course-verification.log
+          : > /tmp/course-targeted.log
+          if [ "${{ steps.architecture.outputs.exit_code }}" != "0" ] || [ "${{ steps.install.outputs.exit_code }}" != "0" ] || [ "${{ steps.credentials.outputs.exit_code }}" != "0" ]; then
+            echo "Pre-generation gate failed." >> /tmp/course-targeted.log
             echo "exit_code=1" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-
           code=0
-          pnpm typecheck:studio >> /tmp/course-verification.log 2>&1 || code=1
+          pnpm typecheck:studio >> /tmp/course-targeted.log 2>&1 || code=1
           pnpm exec eslint \
             apps/admin/app/api/admin/course-builder \
-            apps/admin/app/api/devstudio/chat/route.ts \
-            apps/admin/app/api/internal/videos/process-queue/route.ts \
             lib/course-builder \
             lib/course-factory \
             lib/devstudio/course-builder-controller.ts \
-            lib/video \
-            apps/lms/app/lms/courses \
-            apps/lms/app/api/learner/interactions \
-            --quiet >> /tmp/course-verification.log 2>&1 || code=1
-          pnpm build:admin >> /tmp/course-verification.log 2>&1 || code=1
-          pnpm build:lms >> /tmp/course-verification.log 2>&1 || code=1
+            --quiet >> /tmp/course-targeted.log 2>&1 || code=1
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 360 /tmp/course-verification.log
+          tail -n 240 /tmp/course-targeted.log
           exit 0
 
-      - name: Build, audit, render full media package, and publish requested course
+      - name: Build and persist requested course draft through canonical Course Builder
         id: acceptance
         shell: bash
         env:
           NODE_OPTIONS: --conditions=react-server
         run: |
           set +e
-          if [ "${{ steps.architecture.outputs.exit_code }}" != "0" ] || [ "${{ steps.install.outputs.exit_code }}" != "0" ] || [ "${{ steps.credentials.outputs.exit_code }}" != "0" ] || [ "${{ steps.verification.outputs.exit_code }}" != "0" ]; then
-            echo "Preflight failed: architecture=${{ steps.architecture.outputs.exit_code }} install=${{ steps.install.outputs.exit_code }} credentials=${{ steps.credentials.outputs.exit_code }} verification=${{ steps.verification.outputs.exit_code }}" > /tmp/course-acceptance.log
+          if [ "${{ steps.targeted.outputs.exit_code }}" != "0" ]; then
+            echo "Pre-generation validation failed: architecture=${{ steps.architecture.outputs.exit_code }} install=${{ steps.install.outputs.exit_code }} credentials=${{ steps.credentials.outputs.exit_code }} targeted=${{ steps.targeted.outputs.exit_code }}" > /tmp/course-acceptance.log
             echo "exit_code=1" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-
           if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN ESB COURSE BUILDER ACCEPTANCE" ]; then
             pnpm tsx scripts/course-factory/build-esb-acceptance.ts > /tmp/course-acceptance.log 2>&1
           else
@@ -195,6 +186,31 @@ jobs:
           tail -n 360 /tmp/course-acceptance.log > /tmp/course-acceptance-tail.log || true
           exit 0
 
+      - name: Verify full Admin and LMS applications after course build
+        id: verification
+        shell: bash
+        run: |
+          set +e
+          : > /tmp/course-verification.log
+          if [ "${{ steps.acceptance.outputs.exit_code }}" != "0" ]; then
+            echo "Course Builder acceptance failed; full application verification deferred until the course defect is corrected." >> /tmp/course-verification.log
+            echo "exit_code=1" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          code=0
+          pnpm exec eslint \
+            apps/admin/app/api/devstudio/chat/route.ts \
+            apps/admin/app/api/internal/videos/process-queue/route.ts \
+            lib/video \
+            apps/lms/app/lms/courses \
+            apps/lms/app/api/learner/interactions \
+            --quiet >> /tmp/course-verification.log 2>&1 || code=1
+          pnpm build:admin >> /tmp/course-verification.log 2>&1 || code=1
+          pnpm build:lms >> /tmp/course-verification.log 2>&1 || code=1
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 360 /tmp/course-verification.log
+          exit 0
+
       - name: Post result to trigger issue
         if: always() && github.event_name == 'issues'
         uses: actions/github-script@v7
@@ -203,42 +219,33 @@ jobs:
           ARCHITECTURE_EXIT_CODE: ${{ steps.architecture.outputs.exit_code }}
           INSTALL_EXIT_CODE: ${{ steps.install.outputs.exit_code }}
           CREDENTIAL_EXIT_CODE: ${{ steps.credentials.outputs.exit_code }}
-          VERIFICATION_EXIT_CODE: ${{ steps.verification.outputs.exit_code }}
+          TARGETED_EXIT_CODE: ${{ steps.targeted.outputs.exit_code }}
           ACCEPTANCE_EXIT_CODE: ${{ steps.acceptance.outputs.exit_code }}
+          VERIFICATION_EXIT_CODE: ${{ steps.verification.outputs.exit_code }}
         with:
           script: |
             const fs = require('fs');
             const architectureCode = process.env.ARCHITECTURE_EXIT_CODE || 'not-run';
             const installCode = process.env.INSTALL_EXIT_CODE || 'not-run';
             const credentialCode = process.env.CREDENTIAL_EXIT_CODE || 'not-run';
-            const verificationCode = process.env.VERIFICATION_EXIT_CODE || 'not-run';
+            const targetedCode = process.env.TARGETED_EXIT_CODE || 'not-run';
             const acceptanceCode = process.env.ACCEPTANCE_EXIT_CODE || 'not-run';
-            const ok = architectureCode === '0' && installCode === '0' && credentialCode === '0' && verificationCode === '0' && acceptanceCode === '0';
-            const architectureTail = fs.existsSync('/tmp/course-architecture.log')
-              ? fs.readFileSync('/tmp/course-architecture.log', 'utf8').slice(-16000)
-              : 'Architecture checks did not produce a log.';
-            const verificationTail = fs.existsSync('/tmp/course-verification.log')
-              ? fs.readFileSync('/tmp/course-verification.log', 'utf8').slice(-22000)
-              : 'Verification checks did not produce a log.';
-            const tail = fs.existsSync('/tmp/course-acceptance-tail.log')
-              ? fs.readFileSync('/tmp/course-acceptance-tail.log', 'utf8').slice(-28000)
-              : fs.existsSync('/tmp/course-acceptance.log')
-                ? fs.readFileSync('/tmp/course-acceptance.log', 'utf8').slice(-28000)
-                : 'Course Builder did not produce a log.';
+            const verificationCode = process.env.VERIFICATION_EXIT_CODE || 'not-run';
+            const ok = architectureCode === '0' && installCode === '0' && credentialCode === '0' && targetedCode === '0' && acceptanceCode === '0' && verificationCode === '0';
+            const architectureTail = fs.existsSync('/tmp/course-architecture.log') ? fs.readFileSync('/tmp/course-architecture.log', 'utf8').slice(-16000) : 'Architecture checks did not produce a log.';
+            const targetedTail = fs.existsSync('/tmp/course-targeted.log') ? fs.readFileSync('/tmp/course-targeted.log', 'utf8').slice(-16000) : 'Targeted Course Builder validation did not produce a log.';
+            const verificationTail = fs.existsSync('/tmp/course-verification.log') ? fs.readFileSync('/tmp/course-verification.log', 'utf8').slice(-22000) : 'Full application verification did not produce a log.';
+            const tail = fs.existsSync('/tmp/course-acceptance-tail.log') ? fs.readFileSync('/tmp/course-acceptance-tail.log', 'utf8').slice(-28000) : fs.existsSync('/tmp/course-acceptance.log') ? fs.readFileSync('/tmp/course-acceptance.log', 'utf8').slice(-28000) : 'Course Builder did not produce a log.';
             const label = context.payload.issue.title.includes('BUSINESS') ? 'BUSINESS COURSE BUILDER' : 'ESB ACCEPTANCE';
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `${label} ${ok ? 'PASS' : 'FAIL'}\n\nTested checkout SHA: ${process.env.TESTED_SHA}\nArchitecture: ${architectureCode}\nInstall: ${installCode}\nCredentials: ${credentialCode}\nVerification: ${verificationCode}\nAcceptance: ${acceptanceCode}\n\nArchitecture:\n\`\`\`text\n${architectureTail}\n\`\`\`\n\nVerification:\n\`\`\`text\n${verificationTail}\n\`\`\`\n\nAcceptance:\n\`\`\`text\n${tail}\n\`\`\``
-            });
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: `${label} ${ok ? 'PASS' : 'FAIL'}\n\nTested checkout SHA: ${process.env.TESTED_SHA}\nArchitecture: ${architectureCode}\nInstall: ${installCode}\nCredentials: ${credentialCode}\nTargeted Course Builder validation: ${targetedCode}\nAcceptance: ${acceptanceCode}\nFull Admin/LMS verification: ${verificationCode}\n\nArchitecture:\n\`\`\`text\n${architectureTail}\n\`\`\`\n\nTargeted validation:\n\`\`\`text\n${targetedTail}\n\`\`\`\n\nAcceptance:\n\`\`\`text\n${tail}\n\`\`\`\n\nFull verification:\n\`\`\`text\n${verificationTail}\n\`\`\`` });
 
-      - name: Fail workflow when architecture, build verification, preflight, or acceptance failed
+      - name: Fail workflow when any required gate failed
         if: always()
         shell: bash
         run: |
           test "${{ steps.architecture.outputs.exit_code }}" = "0"
           test "${{ steps.install.outputs.exit_code }}" = "0"
           test "${{ steps.credentials.outputs.exit_code }}" = "0"
-          test "${{ steps.verification.outputs.exit_code }}" = "0"
+          test "${{ steps.targeted.outputs.exit_code }}" = "0"
           test "${{ steps.acceptance.outputs.exit_code }}" = "0"
+          test "${{ steps.verification.outputs.exit_code }}" = "0"

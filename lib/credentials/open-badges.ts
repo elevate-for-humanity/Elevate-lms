@@ -2,12 +2,15 @@ import crypto from 'node:crypto';
 
 export const OPEN_BADGES_CONTEXT =
   'https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json';
-export const VC_CREDENTIAL_SCHEMA_CONTEXT =
-  'https://purl.imsglobal.org/spec/vccs/v1p0/context.json';
+export const VC_CREDENTIAL_SCHEMA_CONTEXT = {
+  '1EdTechJsonSchemaValidator2019':
+    'https://purl.imsglobal.org/spec/vccs/v1p0/context.json#1EdTechJsonSchemaValidator2019',
+} as const;
 export const OPEN_BADGES_CREDENTIAL_SCHEMA =
   'https://purl.imsglobal.org/spec/ob/v3p0/schema/json/ob_v3p0_achievementcredential_schema.json';
 
 export type OpenBadgeStatus = 'active' | 'expired' | 'revoked';
+export type OpenBadgeContext = string | Record<string, string>;
 
 export interface OpenBadgeIssuerProfile {
   id: string;
@@ -50,7 +53,7 @@ export interface OpenBadgeAchievement {
 }
 
 export interface OpenBadgeCredential {
-  '@context': string[];
+  '@context': OpenBadgeContext[];
   id: string;
   type: ['VerifiableCredential', 'OpenBadgeCredential'];
   issuer: OpenBadgeIssuerProfile;
@@ -185,8 +188,15 @@ export function validateOpenBadgeStructure(credential: OpenBadgeCredential): str
   if (!credential['@context']?.includes(OPEN_BADGES_CONTEXT)) {
     errors.push('Missing Open Badges 3.0 JSON-LD context');
   }
-  if (!credential['@context']?.includes(VC_CREDENTIAL_SCHEMA_CONTEXT)) {
-    errors.push('Missing 1EdTech credential schema JSON-LD context');
+  const hasSchemaContext = credential['@context']?.some(
+    (context) =>
+      typeof context === 'object' &&
+      context !== null &&
+      context['1EdTechJsonSchemaValidator2019'] ===
+        VC_CREDENTIAL_SCHEMA_CONTEXT['1EdTechJsonSchemaValidator2019'],
+  );
+  if (!hasSchemaContext) {
+    errors.push('Missing 1EdTech credential schema validator JSON-LD mapping');
   }
   if (!credential.type?.includes('OpenBadgeCredential')) {
     errors.push('type must include OpenBadgeCredential');

@@ -2,6 +2,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import {
   buildOpenBadgeCredential,
+  createRecipientSalt,
   hashRecipientIdentifier,
   type OpenBadgeCredential,
   validateOpenBadgeStructure,
@@ -22,6 +23,11 @@ function credentialUrl(verificationCode: string): string {
     'https://www.elevateforhumanity.org'
   ).replace(/\/$/, '');
   return `${base}/api/credentials/${encodeURIComponent(verificationCode)}`;
+}
+
+function firstProof(credential: OpenBadgeCredential): Record<string, unknown> | undefined {
+  if (!credential.proof) return undefined;
+  return Array.isArray(credential.proof) ? credential.proof[0] : credential.proof;
 }
 
 async function signCredential(
@@ -47,12 +53,20 @@ async function signCredential(
   }
 
   const signed = (await response.json()) as OpenBadgeCredential;
-  const proof = signed.proof as Record<string, unknown> | undefined;
+  const proof = firstProof(signed);
   const proofType = String(proof?.type ?? '');
   const cryptosuite = String(proof?.cryptosuite ?? '');
+  const proofPurpose = String(proof?.proofPurpose ?? '');
+  const verificationMethod = String(proof?.verificationMethod ?? '');
+  const proofValue = String(proof?.proofValue ?? '');
 
   if (!ALLOWED_PROOF_TYPES.has(proofType) || !ALLOWED_CRYPTOSUITES.has(cryptosuite)) {
-    throw new Error('Signing service returned a proof outside the approved Open Badges 3.0 cryptosuites');
+    throw new Error(
+      'Signing service returned a proof outside the approved Open Badges 3.0 cryptosuites',
+    );
+  }
+  if (proofPurpose !== 'assertionMethod' || !verificationMethod || !proofValue) {
+    throw new Error('Signing service returned an incomplete Data Integrity proof');
   }
 
   return signed;
@@ -72,7 +86,7 @@ export async function issueNativeOpenBadge(
     .from('learner_credentials')
     .select(
       `id, learner_id, credential_id, verification_code, issued_at, expires_at, status,
-       open_badge_status, open_badge_credential,
+       open_badge_status, open_badge_credential, recipient_identity_salt,
        credentials!inner(id, name, description, issuer_type, issuing_authority,
          open_badges_enabled, achievement_type, achievement_criteria_narrative,
          achievement_criteria_url, badge_image_url, alignment, is_active, is_published)`
@@ -85,13 +99,19 @@ export async function issueNativeOpenBadge(
   const definition = Array.isArray(award.credentials) ? award.credentials[0] : award.credentials;
   if (!definition) return { success: false, error: 'Credential definition not found' };
   if (definition.issuer_type !== 'elevate_issued') {
-    return { success: false, error: 'Only Elevate-issued credentials may be issued as native Open Badges' };
+    return {
+      success: false,
+      error: 'Only Elevate-issued credentials may be issued as native Open Badges',
+    };
   }
   if (!definition.open_badges_enabled) {
     return { success: false, error: 'Open Badges is not enabled for this credential definition' };
   }
   if (!definition.is_active || !definition.is_published) {
-    return { success: false, error: 'Credential definition must be active and published before badge issuance' };
+    return {
+      success: false,
+      error: 'Credential definition must be active and published before badge issuance',
+    };
   }
   if (award.status !== 'active') {
     return { success: false, error: `Credential status ${award.status} cannot be issued` };
@@ -115,13 +135,18 @@ export async function issueNativeOpenBadge(
     .eq('id', award.learner_id)
     .maybeSingle();
 
-  if (!learner?.email) return { success: false, error: 'Learner email is required to bind the credential' };
+  if (!learner?.email) {
+    return { success: false, error: 'Learner email is required to bind the credential' };
+  }
 
+  const recipientSalt = award.recipient_identity_salt || createRecipientSalt();
+  const identityHash = hashRecipientIdentifier(learner.email, recipientSalt);
   const achievementId = `${credentialUrl(award.verification_code)}#achievement`;
   const draft = buildOpenBadgeCredential({
     credentialId: award.id,
     verificationCode: award.verification_code,
     recipientIdentifier: learner.email,
+    recipientSalt,
     issuedAt: award.issued_at,
     expiresAt: award.expires_at,
     achievement: {
@@ -146,7 +171,6 @@ export async function issueNativeOpenBadge(
   }
 
   const url = credentialUrl(award.verification_code);
-  const identityHash = hashRecipientIdentifier(learner.email);
 
   try {
     const signed = await signCredential(draft);
@@ -157,6 +181,8 @@ export async function issueNativeOpenBadge(
           open_badge_credential: draft,
           open_badge_credential_url: url,
           recipient_identity_hash: identityHash,
+          recipient_identity_salt: recipientSalt,
+          recipient_identity_type: 'email',
           open_badge_status: 'pending',
           open_badge_proof_type: null,
           updated_at: new Date().toISOString(),
@@ -166,13 +192,15 @@ export async function issueNativeOpenBadge(
       return { success: true, status: 'pending_signature', credential: draft, url };
     }
 
-    const proof = signed.proof as Record<string, unknown>;
+    const proof = firstProof(signed)!;
     await db
       .from('learner_credentials')
       .update({
         open_badge_credential: signed,
         open_badge_credential_url: url,
         recipient_identity_hash: identityHash,
+        recipient_identity_salt: recipientSalt,
+        recipient_identity_type: 'email',
         open_badge_status: 'issued',
         open_badge_issued_at: new Date().toISOString(),
         open_badge_proof_type: `${String(proof.type)}:${String(proof.cryptosuite)}`,
@@ -182,13 +210,24 @@ export async function issueNativeOpenBadge(
 
     return { success: true, status: 'issued', credential: signed, url };
   } catch (err) {
-    logger.error('Native Open Badge issuance failed', err instanceof Error ? err : new Error(String(err)), {
-      learnerCredentialId,
-    });
+    logger.error(
+      'Native Open Badge issuance failed',
+      err instanceof Error ? err : new Error(String(err)),
+      { learnerCredentialId },
+    );
     await db
       .from('learner_credentials')
-      .update({ open_badge_status: 'failed', updated_at: new Date().toISOString() })
+      .update({
+        open_badge_status: 'failed',
+        recipient_identity_salt: recipientSalt,
+        recipient_identity_hash: identityHash,
+        recipient_identity_type: 'email',
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', learnerCredentialId);
-    return { success: false, error: err instanceof Error ? err.message : 'Open Badge issuance failed' };
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Open Badge issuance failed',
+    };
   }
 }

@@ -1,8 +1,16 @@
 name: Configure Canonical GPU Worker
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'services/media-gpu-worker/**'
+      - 'scripts/northflank/provision-gpu-worker.ts'
+      - '.github/workflows/configure-canonical-gpu.yml'
   issues:
     types: [opened, edited]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,7 +22,7 @@ concurrency:
 
 jobs:
   configure:
-    if: startsWith(github.event.issue.title, '[GPU CONFIGURE]')
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && startsWith(github.event.issue.title, '[GPU CONFIGURE]'))
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 180
@@ -79,12 +87,12 @@ jobs:
           const rows=(p,k)=>{try{const j=JSON.parse(fs.readFileSync(p,'utf8'));return Array.isArray(j.data)?j.data:(Array.isArray(j.data?.[k])?j.data[k]:[])}catch{return[]}};
           const services=rows('/tmp/services.json','services').filter(x=>String(x.id||'').includes('gpu'));
           const volumes=rows('/tmp/volumes.json','volumes').filter(x=>String(x.id||'').includes('gpu'));
-          console.log('gpu_services='+JSON.stringify(services.map(x=>({id:x.id,name:x.name,status:x.status,plan:x.billing?.deploymentPlan}))));
+          console.log('gpu_services='+JSON.stringify(services.map(x=>({id:x.id,name:x.name,status:x.status,plan:x.billing?.deploymentPlan,instances:x.deployment?.instances}))));
           console.log('gpu_volumes='+JSON.stringify(volumes.map(x=>({id:x.id,name:x.name,storageMB:x.spec?.storageSize}))));
           NODE
           cat /tmp/inventory.txt
       - name: Post configuration result
-        if: always()
+        if: always() && github.event_name == 'issues'
         uses: actions/github-script@v7
         with:
           script: |

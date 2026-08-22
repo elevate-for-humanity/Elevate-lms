@@ -7,7 +7,7 @@ const HOST_EMAIL = process.env.E2E_HOST_SHOP_EMAIL || '';
 const HOST_PASSWORD = process.env.E2E_HOST_SHOP_PASSWORD || '';
 
 async function login(page: Page, email: string, password: string) {
-  await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
   const emailInput = page.locator('input[type="email"], input[name="email"]').first();
   const passwordInput = page.locator('input[type="password"]').first();
   const submit = page.locator('button[type="submit"]').first();
@@ -18,6 +18,7 @@ async function login(page: Page, email: string, password: string) {
 
   await emailInput.fill(email);
   await passwordInput.fill(password);
+  await page.waitForTimeout(250);
   await submit.click();
   await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 20_000 });
 }

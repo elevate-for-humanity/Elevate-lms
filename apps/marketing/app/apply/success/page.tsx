@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 
+import { getAdminClient } from '@/lib/supabase/admin';
 import { ensureWorkOneHandoffByReference } from '@/lib/workone/handoff';
 
 export const dynamic = 'force-dynamic';
@@ -37,6 +38,27 @@ export default async function ApplicationSuccessPage({
     } catch {
       // Do not block a valid application confirmation when email is temporarily
       // unavailable. The confirmation page performs one more idempotent attempt.
+    }
+
+    try {
+      const db = await getAdminClient();
+      if (db) {
+        const { data: application } = await db
+          .from('applications')
+          .select('status, funding_type')
+          .eq('reference_number', reference)
+          .maybeSingle();
+        if (application?.status === 'pending_workone' || application?.status === 'pending_funding') {
+          const funding = String(application.funding_type || query.get('funding') || 'workone');
+          redirect(
+            `/apply/pending-workone?ref=${encodeURIComponent(reference)}&funding=${encodeURIComponent(funding)}`,
+          );
+        }
+      }
+    } catch (error) {
+      // Next.js redirect() throws a framework redirect signal. Re-throw it; only
+      // swallow actual lookup failures so a valid confirmation is never blocked.
+      if (error && typeof error === 'object' && 'digest' in error) throw error;
     }
   }
 

@@ -1,152 +1,179 @@
 /**
- * lib/course-builder/program-resolver.ts
+ * Canonical program -> course resolver.
  *
- * DB-backed replacement for the hardcoded PROGRAM_COURSE_MAP in schema.ts.
- *
- * Resolves program_slug → course_id from the program_course_map table.
- * Falls back to the legacy static map during the migration window so existing
- * code paths continue to work before the migration is applied.
- *
- * Usage:
- *   import { resolveCourseIdFromDb } from '@/lib/course-builder/program-resolver';
- *   const courseId = await resolveCourseIdFromDb(db, 'hvac-technician');
- *
- * Admin registration (new programs, no code deploy required):
- *   import { registerProgramCourse } from '@/lib/course-builder/program-resolver';
- *   await registerProgramCourse(db, 'peer-recovery-specialist', courseId);
+ * `programs` owns program identity and `program_courses` owns the relationship
+ * between programs and courses. Legacy `program_course_map`,
+ * `program_course_links`, and hardcoded slug maps are not write authorities.
  */
 
 import type { SupabaseClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
-// ── Legacy fallback (removed once migration is confirmed live) ────────────────
-// These match the values that were hardcoded in schema.ts.
-const LEGACY_FALLBACK: Record<string, string> = {
-  'hvac-technician': 'f0593164-55be-5867-98e7-8a86770a8dd0',
-  'barber-apprenticeship': '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
+type ProgramRow = { id: string; slug: string | null };
+type ProgramCourseRow = {
+  id: string;
+  program_id: string;
+  course_id: string;
+  created_at: string | null;
+  order_index: number | null;
 };
 
-// ── DB resolver ───────────────────────────────────────────────────────────────
+async function resolveProgramId(
+  db: SupabaseClient,
+  programSlug: string,
+): Promise<{ id: string | null; error?: string }> {
+  const { data, error } = await db
+    .from('programs')
+    .select('id')
+    .eq('slug', programSlug)
+    .maybeSingle();
 
-/**
- * Resolves a program slug to its canonical course_id.
- * Queries program_course_map first; falls back to the legacy static map
- * if the table doesn't exist yet (pre-migration environments).
- *
- * Returns null if the slug is not registered anywhere.
- */
+  if (error) return { id: null, error: error.message };
+  return { id: data?.id ?? null };
+}
+
 export async function resolveCourseIdFromDb(
   db: SupabaseClient,
   programSlug: string,
 ): Promise<string | null> {
-  // Try program_course_links first (canonical, org-scoped).
-  const { data: linkData, error: linkError } = await db
-    .from('program_course_links')
-    .select('course_id')
-    .eq('program_slug', programSlug)
-    .eq('status', 'active')
-    .eq('is_primary', true)
-    .maybeSingle();
+  const program = await resolveProgramId(db, programSlug);
+  if (program.error) {
+    logger.error('[program-resolver] failed to resolve program', undefined, {
+      programSlug,
+      error: program.error,
+    });
+    return null;
+  }
+  if (!program.id) return null;
 
-  if (!linkError && linkData?.course_id) return linkData.course_id;
-
-  // Fall back to program_course_map (legacy, pre-migration).
   const { data, error } = await db
-    .from('program_course_map')
-    .select('course_id')
-    .eq('program_slug', programSlug)
+    .from('program_courses')
+    .select('course_id, order_index, is_required')
+    .eq('program_id', program.id)
+    .order('is_required', { ascending: false })
+    .order('order_index', { ascending: true })
+    .limit(1)
     .maybeSingle();
 
   if (error) {
-    if (error.code === '42P01') {
-      logger.warn('[program-resolver] program_course_map table not found — using legacy fallback', {
-        programSlug,
-      });
-      return LEGACY_FALLBACK[programSlug] ?? null;
-    }
-    logger.error('[program-resolver] DB error resolving program slug', undefined, {
+    logger.error('[program-resolver] failed to resolve canonical course mapping', undefined, {
       programSlug,
+      programId: program.id,
       error: error.message,
     });
-    return LEGACY_FALLBACK[programSlug] ?? null;
+    return null;
   }
 
-  if (data?.course_id) return data.course_id;
-
-  const legacy = LEGACY_FALLBACK[programSlug] ?? null;
-  if (legacy) {
-    logger.warn('[program-resolver] slug not in DB, using legacy fallback', { programSlug });
-  }
-  return legacy;
+  return data?.course_id ?? null;
 }
 
-/**
- * Lists all registered program → course mappings.
- * Used by the admin UI to show what programs are registered.
- */
 export async function listProgramCourseMappings(
   db: SupabaseClient,
 ): Promise<Array<{ program_slug: string; course_id: string; created_at: string }>> {
-  const { data, error } = await db
-    .from('program_course_map')
-    .select('program_slug, course_id, created_at')
-    .order('program_slug');
+  const [{ data: programs, error: programError }, { data: mappings, error: mappingError }] =
+    await Promise.all([
+      db.from('programs').select('id, slug').not('slug', 'is', null),
+      db
+        .from('program_courses')
+        .select('id, program_id, course_id, created_at, order_index')
+        .order('program_id')
+        .order('order_index'),
+    ]);
 
-  if (error) {
-    logger.error('[program-resolver] failed to list mappings', undefined, { error: error.message });
-    // Return legacy entries as fallback so the UI is never empty.
-    return Object.entries(LEGACY_FALLBACK).map(([program_slug, course_id]) => ({
-      program_slug,
-      course_id,
-      created_at: new Date(0).toISOString(),
-    }));
+  if (programError || mappingError) {
+    const message = programError?.message ?? mappingError?.message ?? 'unknown database error';
+    logger.error('[program-resolver] failed to list canonical mappings', undefined, {
+      error: message,
+    });
+    return [];
   }
 
-  return data ?? [];
+  const slugByProgramId = new Map(
+    ((programs ?? []) as ProgramRow[])
+      .filter((program) => Boolean(program.slug))
+      .map((program) => [program.id, program.slug as string]),
+  );
+
+  return ((mappings ?? []) as ProgramCourseRow[])
+    .map((mapping) => ({
+      program_slug: slugByProgramId.get(mapping.program_id) ?? '',
+      course_id: mapping.course_id,
+      created_at: mapping.created_at ?? new Date(0).toISOString(),
+    }))
+    .filter((mapping) => Boolean(mapping.program_slug))
+    .sort((a, b) => a.program_slug.localeCompare(b.program_slug));
 }
 
-/**
- * Registers a new program → course mapping.
- * Idempotent: updates course_id if the slug already exists.
- *
- * Call this from the admin UI when creating a new program,
- * instead of editing schema.ts.
- */
 export async function registerProgramCourse(
   db: SupabaseClient,
   programSlug: string,
   courseId: string,
 ): Promise<{ ok: boolean; error?: string }> {
-  const { error } = await db
-    .from('program_course_map')
-    .upsert({ program_slug: programSlug, course_id: courseId }, { onConflict: 'program_slug' });
+  const program = await resolveProgramId(db, programSlug);
+  if (program.error) return { ok: false, error: program.error };
+  if (!program.id) return { ok: false, error: `Program not found: ${programSlug}` };
+
+  const { error } = await db.from('program_courses').upsert(
+    {
+      program_id: program.id,
+      course_id: courseId,
+      is_required: true,
+      order_index: 0,
+    },
+    { onConflict: 'program_id,course_id', ignoreDuplicates: true },
+  );
 
   if (error) {
-    logger.error('[program-resolver] failed to register mapping', undefined, {
+    logger.error('[program-resolver] failed to register canonical mapping', undefined, {
       programSlug,
+      programId: program.id,
       courseId,
       error: error.message,
     });
     return { ok: false, error: error.message };
   }
 
-  logger.info('[program-resolver] registered program → course', { programSlug, courseId });
+  logger.info('[program-resolver] registered canonical program -> course mapping', {
+    programSlug,
+    programId: program.id,
+    courseId,
+  });
   return { ok: true };
 }
 
 /**
- * Removes a program → course mapping.
- * Does not delete the course or program — only the link.
+ * The historical endpoint identifies a relationship only by program slug.
+ * Deleting all courses from a multi-course program would be destructive, so
+ * deletion is permitted only when that program currently has exactly one link.
  */
 export async function unregisterProgramCourse(
   db: SupabaseClient,
   programSlug: string,
 ): Promise<{ ok: boolean; error?: string }> {
-  const { error } = await db.from('program_course_map').delete().eq('program_slug', programSlug);
+  const program = await resolveProgramId(db, programSlug);
+  if (program.error) return { ok: false, error: program.error };
+  if (!program.id) return { ok: false, error: `Program not found: ${programSlug}` };
 
+  const { data: mappings, error: readError } = await db
+    .from('program_courses')
+    .select('id')
+    .eq('program_id', program.id)
+    .limit(2);
+
+  if (readError) return { ok: false, error: readError.message };
+  if (!mappings?.length) return { ok: true };
+  if (mappings.length > 1) {
+    return {
+      ok: false,
+      error: 'Program has multiple course mappings; specify a course before removing a relationship.',
+    };
+  }
+
+  const { error } = await db.from('program_courses').delete().eq('id', mappings[0].id);
   if (error) {
-    logger.error('[program-resolver] failed to unregister mapping', undefined, {
+    logger.error('[program-resolver] failed to remove canonical mapping', undefined, {
       programSlug,
+      programId: program.id,
       error: error.message,
     });
     return { ok: false, error: error.message };

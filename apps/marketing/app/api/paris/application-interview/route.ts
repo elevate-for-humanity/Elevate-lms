@@ -67,6 +67,13 @@ function assistantIntro(locale: ApplicationInterviewLocale) {
     : 'I’m PARIS. I’ll guide you through the application one step at a time. You can type or speak, switch to Spanish at any time, and correct any answer before you submit.';
 }
 
+function requestsHumanReview(message: string | undefined): boolean {
+  const value = (message || '').trim().toLowerCase();
+  if (!value) return false;
+  return /(talk|speak|connect|transfer|escalate).*(person|human|staff|advisor|counselor|admissions)|\b(person|human|staff member|advisor|counselor|admissions representative)\b/.test(value)
+    || /(hablar|comunicar|conectar).*(persona|asesor|consejero|admisiones)|\b(una persona|un asesor|personal de admisiones)\b/.test(value);
+}
+
 function responsePayload(state: ApplicationInterviewState, projectId: string, messages: unknown[], events: unknown[]) {
   const progress = calculateApplicationInterviewProgress(state);
   const nextQuestion = getNextApplicationInterviewQuestion(state);
@@ -197,15 +204,47 @@ export async function POST(request: NextRequest) {
       ]);
       return NextResponse.json(responsePayload(state, updated.id, messages, events), { headers: { 'Cache-Control': 'no-store' } });
     } else {
-      const nextQuestion = getNextApplicationInterviewQuestion(state);
-      if (!nextQuestion) {
-        return NextResponse.json(responsePayload(state, session.project.id, await listAgenticMessages(session.project.id), await listAgenticEvents(session.project.id)), { headers: { 'Cache-Control': 'no-store' } });
+      if (requestsHumanReview(body.message)) {
+        const handoffAt = new Date().toISOString();
+        await appendAgenticMessage({ projectId: session.project.id, role: 'user', content: body.message || '', locale, inputMode: body.inputMode, confirmed: true, metadata: { intent: 'human_review_required' } });
+        await updateAgenticProjectMetadata({
+          project: session.project,
+          metadata: {
+            applicationInterviewState: state,
+            humanReviewRequired: true,
+            humanReviewReason: 'Applicant requested staff assistance',
+            humanReviewQueue: 'admissions',
+            humanReviewRequestedAt: handoffAt,
+          },
+          locale,
+        });
+        await recordAgenticEvent({
+          projectId: session.project.id,
+          eventType: 'application.human_review_required',
+          summary: locale === 'es' ? 'El solicitante pidió ayuda del personal de admisiones' : 'Applicant requested admissions staff assistance',
+          payload: { reason: 'applicant_request', queue: 'admissions', requestedAt: handoffAt },
+        });
+        await appendAgenticMessage({
+          projectId: session.project.id,
+          role: 'assistant',
+          content: locale === 'es'
+            ? 'He marcado su solicitud para seguimiento humano por parte del equipo de admisiones. No voy a adivinar una respuesta que requiera revisión del personal. Puede continuar con la solicitud mientras espera.'
+            : 'I marked your application for human follow-up by the admissions team. I will not guess at anything that requires staff review. You can continue the application while you wait.',
+          locale,
+          inputMode: 'system',
+          metadata: { humanReviewRequired: true, queue: 'admissions' },
+        });
+      } else {
+        const nextQuestion = getNextApplicationInterviewQuestion(state);
+        if (!nextQuestion) {
+          return NextResponse.json(responsePayload(state, session.project.id, await listAgenticMessages(session.project.id), await listAgenticEvents(session.project.id)), { headers: { 'Cache-Control': 'no-store' } });
+        }
+        if (!body.message) return NextResponse.json({ ok: false, error: 'An answer is required' }, { status: 400 });
+        await appendAgenticMessage({ projectId: session.project.id, role: 'user', content: body.message, locale, inputMode: body.inputMode, confirmed: !nextQuestion.critical, metadata: { field: nextQuestion.field } });
+        state = applyInterviewAnswer(state, nextQuestion.field, body.message, false);
+        await updateAgenticProjectMetadata({ project: session.project, metadata: { applicationInterviewState: state }, locale });
+        await recordAgenticEvent({ projectId: session.project.id, eventType: 'application.answer.received', summary: locale === 'es' ? 'Respuesta recibida' : 'Application answer received', payload: { field: nextQuestion.field, inputMode: body.inputMode, requiresConfirmation: nextQuestion.critical } });
       }
-      if (!body.message) return NextResponse.json({ ok: false, error: 'An answer is required' }, { status: 400 });
-      await appendAgenticMessage({ projectId: session.project.id, role: 'user', content: body.message, locale, inputMode: body.inputMode, confirmed: !nextQuestion.critical, metadata: { field: nextQuestion.field } });
-      state = applyInterviewAnswer(state, nextQuestion.field, body.message, false);
-      await updateAgenticProjectMetadata({ project: session.project, metadata: { applicationInterviewState: state }, locale });
-      await recordAgenticEvent({ projectId: session.project.id, eventType: 'application.answer.received', summary: locale === 'es' ? 'Respuesta recibida' : 'Application answer received', payload: { field: nextQuestion.field, inputMode: body.inputMode, requiresConfirmation: nextQuestion.critical } });
     }
 
     const next = getNextApplicationInterviewQuestion(state);

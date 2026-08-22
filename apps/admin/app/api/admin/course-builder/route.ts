@@ -23,6 +23,8 @@ import {
   saveCourseModule,
   saveCourseLesson,
   patchCourseLesson,
+  deleteCourseLesson,
+  reorderCourseLessons,
   linkCourseScormPackage,
 } from '@/lib/course-builder/edit-service';
 import { publishPersistedCourse } from '@/lib/course-builder/persisted-publish-service';
@@ -53,6 +55,8 @@ type CourseBuilderAction =
   | 'save-module'
   | 'save-lesson'
   | 'patch-lesson'
+  | 'delete-lesson'
+  | 'reorder-lessons'
   | 'link-scorm'
   | 'review-course'
   | 'review-lessons'
@@ -198,6 +202,14 @@ export async function POST(req: NextRequest) {
   if (action === 'patch-lesson') {
     try { return NextResponse.json({ ok: true, lesson: await patchCourseLesson(body.lesson ?? body) }); }
     catch (error) { logger.error('[course-builder] Lesson patch failed', error); return NextResponse.json({ ok: false, error: 'Failed to update lesson' }, { status: 400 }); }
+  }
+  if (action === 'delete-lesson') {
+    try { return NextResponse.json({ ok: true, result: await deleteCourseLesson(body.lesson ?? body) }); }
+    catch (error) { logger.error('[course-builder] Lesson delete failed', error); return NextResponse.json({ ok: false, error: 'Failed to delete lesson' }, { status: 400 }); }
+  }
+  if (action === 'reorder-lessons') {
+    try { return NextResponse.json({ ok: true, result: await reorderCourseLessons(body) }); }
+    catch (error) { logger.error('[course-builder] Lesson reorder failed', error); return NextResponse.json({ ok: false, error: 'Failed to reorder lessons' }, { status: 400 }); }
   }
   if (action === 'link-scorm') {
     try { return NextResponse.json({ ok: true, package: await linkCourseScormPackage(body, auth.id) }); }

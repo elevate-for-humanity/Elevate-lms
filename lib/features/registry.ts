@@ -1,14 +1,21 @@
 import type { FeatureDefinition } from './types';
 
+/**
+ * Registry of product capabilities that have an intentional runtime owner.
+ *
+ * Status rules:
+ * - enabled: mounted by a canonical production surface
+ * - beta: mounted by a canonical surface but intentionally limited
+ * - disabled: retained code/capability under evaluation; not a production claim
+ *
+ * Do not add placeholders or nonexistent component paths to this registry.
+ */
 export const FEATURE_REGISTRY: FeatureDefinition[] = [
-  // ── Global ──────────────────────────────────────────────────────────────
-  // Avatar experiments are retained for evaluation but are not mounted by
-  // any canonical app layout. Keep them explicitly disabled so audits do not
-  // mistake dormant code for a production capability.
+  // ── Global / guidance ────────────────────────────────────────────────────
   {
     id: 'global-avatar',
-    name: 'Global Avatar Guide',
-    description: 'Dormant floating video-avatar experiment; not mounted in production.',
+    name: 'Contextual Portal Guide',
+    description: 'Dormant contextual video-guide experiment; redesign as explicit user-triggered help before activation.',
     component: '@/components/GlobalAvatar',
     surface: 'global',
     category: 'avatar',
@@ -25,12 +32,12 @@ export const FEATURE_REGISTRY: FeatureDefinition[] = [
   },
   {
     id: 'facebook-pixel',
-    name: 'Facebook Pixel',
-    description: 'Meta Pixel for conversion tracking.',
+    name: 'Meta Pixel',
+    description: 'Optional marketing measurement integration; not mounted until consent-aware ownership is implemented.',
     component: '@/components/FacebookPixel',
     surface: 'global',
     category: 'analytics',
-    status: 'enabled',
+    status: 'disabled',
     requiresEnvVar: 'NEXT_PUBLIC_FACEBOOK_PIXEL_ID',
   },
   {
@@ -45,63 +52,36 @@ export const FEATURE_REGISTRY: FeatureDefinition[] = [
 
   // ── Marketing ────────────────────────────────────────────────────────────
   {
-    id: 'rotating-hero-banner',
-    name: 'Rotating Hero Banner',
-    description: 'Auto-advancing image carousel for marketing pages.',
-    component: '@/components/RotatingHeroBanner',
-    surface: 'marketing',
-    category: 'marketing',
-    status: 'enabled',
-  },
-  {
     id: 'newsletter-signup',
     name: 'Newsletter Signup',
-    description: 'Email capture form with honeypot spam protection.',
+    description: 'Retained email-capture component; currently not mounted by the canonical marketing page or footer.',
     component: '@/components/NewsletterSignup',
     surface: 'marketing',
     category: 'engagement',
-    status: 'enabled',
+    status: 'disabled',
   },
   {
     id: 'social-media-highlight',
     name: 'Social Media Highlight',
-    description: 'Social feed embed / highlight strip.',
+    description: 'Retained social-content experiment; currently not mounted by the canonical marketing surface.',
     component: '@/components/SocialMediaHighlight',
     surface: 'marketing',
     category: 'marketing',
-    status: 'enabled',
+    status: 'disabled',
   },
 
   // ── LMS ──────────────────────────────────────────────────────────────────
   {
-    id: 'ar-training-modules',
-    name: 'AR Training Modules',
-    description: 'Augmented-reality 3D model training for technical courses.',
-    component: '@/components/ARTrainingModules',
-    surface: 'lms-lesson',
-    category: 'video',
-    status: 'beta',
-  },
-  {
-    id: 'tiktok-video-player',
-    name: 'TikTok-Style Video Player',
-    description: 'Vertical short-form video player for lesson content.',
-    component: '@/components/video/TikTokStyleVideoPlayer',
-    surface: 'lms-lesson',
-    category: 'video',
-    status: 'beta',
-  },
-  {
     id: 'universal-course-player',
     name: 'Universal Course Player',
-    description: 'Iframe-based player for partner LMS / SCORM content.',
+    description: 'Canonical partner LMS / embedded course player used by LMS integrations.',
     component: '@/components/UniversalCoursePlayer',
     surface: 'lms',
     category: 'video',
     status: 'enabled',
   },
 
-  // ── Admin ────────────────────────────────────────────────────────────────
+  // ── Admin / compliance / analytics ──────────────────────────────────────
   {
     id: 'credential-integrity-verification',
     name: 'Cryptographic Credential Verification',
@@ -114,7 +94,7 @@ export const FEATURE_REGISTRY: FeatureDefinition[] = [
   {
     id: 'job-placement-tracking',
     name: 'Job Placement Tracking',
-    description: 'Dashboard for tracking graduate job placements and salaries.',
+    description: 'Admin analytics capability for tracking graduate job placements and salaries.',
     component: '@/components/JobPlacementTracking',
     surface: 'admin-analytics',
     category: 'tracking',
@@ -123,7 +103,7 @@ export const FEATURE_REGISTRY: FeatureDefinition[] = [
   {
     id: 'employer-talent-pipeline',
     name: 'Employer Talent Pipeline',
-    description: 'Kanban-style pipeline for employer candidate tracking.',
+    description: 'Admin analytics pipeline for employer candidate tracking.',
     component: '@/components/EmployerTalentPipeline',
     surface: 'admin-analytics',
     category: 'tracking',
@@ -132,7 +112,7 @@ export const FEATURE_REGISTRY: FeatureDefinition[] = [
   {
     id: 'excel-chart-generator',
     name: 'Excel Chart Generator',
-    description: 'Generate and export charts to Excel for reporting.',
+    description: 'Reporting export capability exposed through admin analytics.',
     component: '@/components/admin/ExcelChartGenerator',
     surface: 'admin-analytics',
     category: 'analytics',

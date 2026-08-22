@@ -169,6 +169,7 @@ export async function repairCanonicalCourse(courseId: string, progress?: Progres
 
 export async function queueCourseMedia(input: {
   courseId: string;
+  lessonId?: string | null;
   onlyMissing?: boolean;
   force?: boolean;
   limit?: number | null;

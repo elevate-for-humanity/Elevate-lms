@@ -2,23 +2,26 @@ import type { FeatureDefinition } from './types';
 
 export const FEATURE_REGISTRY: FeatureDefinition[] = [
   // ── Global ──────────────────────────────────────────────────────────────
+  // Avatar experiments are retained for evaluation but are not mounted by
+  // any canonical app layout. Keep them explicitly disabled so audits do not
+  // mistake dormant code for a production capability.
   {
     id: 'global-avatar',
     name: 'Global Avatar Guide',
-    description: 'Floating video avatar that adapts to the current page context.',
+    description: 'Dormant floating video-avatar experiment; not mounted in production.',
     component: '@/components/GlobalAvatar',
     surface: 'global',
     category: 'avatar',
-    status: 'enabled',
+    status: 'disabled',
   },
   {
     id: 'avatar-chat-bar',
     name: 'Avatar Chat Bar',
-    description: 'Persistent chat bar with avatar video and AI messaging.',
+    description: 'Dormant avatar/chat experiment; evaluate for merge into canonical learner guidance before activation.',
     component: '@/components/AvatarChatBar',
     surface: 'global',
     category: 'avatar',
-    status: 'enabled',
+    status: 'disabled',
   },
   {
     id: 'facebook-pixel',
@@ -31,11 +34,11 @@ export const FEATURE_REGISTRY: FeatureDefinition[] = [
     requiresEnvVar: 'NEXT_PUBLIC_FACEBOOK_PIXEL_ID',
   },
   {
-    id: 'ai-assistant-bubble',
-    name: 'AI Assistant Bubble',
-    description: 'Floating AI chat bubble available site-wide.',
-    component: '@/components/AIAssistantBubble',
-    surface: 'global',
+    id: 'paris-career-assistant',
+    name: 'PARIS Career Guidance Assistant',
+    description: 'Canonical public AI assistant for program discovery and career guidance.',
+    component: '@/components/paris/ParisFloatingButton',
+    surface: 'marketing',
     category: 'ai',
     status: 'enabled',
   },

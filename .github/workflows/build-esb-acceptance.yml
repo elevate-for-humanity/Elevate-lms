@@ -91,12 +91,17 @@ jobs:
 
       - name: Build, audit, render full media package, and publish Entrepreneurship course
         id: acceptance
-        if: steps.install.outputs.exit_code == '0' && steps.credentials.outputs.exit_code == '0'
         shell: bash
         env:
           NODE_OPTIONS: --conditions=react-server
         run: |
           set +e
+          if [ "${{ steps.install.outputs.exit_code }}" != "0" ] || [ "${{ steps.credentials.outputs.exit_code }}" != "0" ]; then
+            echo "Preflight failed: install=${{ steps.install.outputs.exit_code }} credentials=${{ steps.credentials.outputs.exit_code }}" > /tmp/esb-acceptance.log
+            echo "exit_code=1" >> "$GITHUB_OUTPUT"
+            tail -n 240 /tmp/esb-acceptance.log > /tmp/esb-acceptance-tail.log || true
+            exit 0
+          fi
           pnpm tsx scripts/course-factory/build-esb-acceptance.ts > /tmp/esb-acceptance.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
@@ -132,5 +137,9 @@ jobs:
             });
 
       - name: Fail workflow when preflight or acceptance failed
-        if: steps.install.outputs.exit_code != '0' || steps.credentials.outputs.exit_code != '0' || steps.acceptance.outputs.exit_code != '0'
-        run: exit 1
+        if: always()
+        shell: bash
+        run: |
+          test "${{ steps.install.outputs.exit_code }}" = "0"
+          test "${{ steps.credentials.outputs.exit_code }}" = "0"
+          test "${{ steps.acceptance.outputs.exit_code }}" = "0"

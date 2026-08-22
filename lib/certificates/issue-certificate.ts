@@ -7,7 +7,7 @@
  * complete; program completion is owned by lib/lms/completion-evaluator.ts.
  */
 
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import type { SupabaseClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -42,6 +42,9 @@ export interface IssueCertificateParams {
   signedBy?: string | null;
   issuedBy?: string | null;
   issueDate?: string | null;
+  metadata?: Record<string, unknown>;
+  credentialStack?: Record<string, unknown> | null;
+  issuanceSnapshot?: Record<string, unknown> | null;
 }
 
 export interface IssuedCertificateSummary {
@@ -112,6 +115,25 @@ function normalizeIssueDate(value?: string | null): string {
   return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
 }
 
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, nested]) => [key, canonicalize(nested)]),
+    );
+  }
+  return value;
+}
+
+function withSnapshotHash(snapshot?: Record<string, unknown> | null) {
+  if (!snapshot) return null;
+  const normalized = canonicalize(snapshot) as Record<string, unknown>;
+  const hash = createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
+  return { ...snapshot, snapshot_hash: hash };
+}
+
 export async function issueCertificate(
   params: IssueCertificateParams,
 ): Promise<IssueCertificateResult> {
@@ -131,6 +153,9 @@ export async function issueCertificate(
     signedBy,
     issuedBy,
     issueDate,
+    metadata,
+    credentialStack,
+    issuanceSnapshot,
   } = params;
 
   if (Boolean(courseId) === Boolean(programId)) {
@@ -183,6 +208,7 @@ export async function issueCertificate(
     const displayName = programName || courseTitle || 'Completion';
 
     const certMetadata: Record<string, unknown> = {
+      ...(metadata || {}),
       issued_via: 'canonical_issue_certificate',
       scope: programId ? 'program' : 'course',
       student_name: studentName,
@@ -234,6 +260,8 @@ export async function issueCertificate(
         verification_code: verificationCode,
         verification_url: verificationUrl,
         metadata: certMetadata,
+        credential_stack: credentialStack || null,
+        issuance_snapshot: withSnapshotHash(issuanceSnapshot),
         template_id: templateId || null,
         signed_by: signedBy || PLATFORM_DEFAULTS.orgName,
         issued_by: issuedBy || null,

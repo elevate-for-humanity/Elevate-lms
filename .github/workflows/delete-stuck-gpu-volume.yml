@@ -1,6 +1,10 @@
 name: Delete Stuck GPU Volume
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/delete-stuck-gpu-volume.yml'
   workflow_dispatch:
 
 permissions:

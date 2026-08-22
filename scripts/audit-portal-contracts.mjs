@@ -19,6 +19,8 @@ const roleMatrix = read('lib/rbac/role-matrix.ts');
 const portalAccess = read('lib/auth/portal-access.ts');
 const publicAccessRegistry = read('apps/marketing/lib/platform-access-registry.ts');
 const publicNavigation = read('lib/navigation.ts');
+const portalsPage = read('apps/marketing/app/portals/page.tsx');
+const adminDashboard = read('apps/admin/app/dashboard/page.tsx');
 
 const PORTALS = [
   { key: 'lms', surface: 'studentPortal', app: 'lms', path: '/lms/dashboard', roles: ['student', 'learner'], publicHref: 'https://app.elevateforhumanity.org/lms/dashboard' },
@@ -28,7 +30,8 @@ const PORTALS = [
   { key: 'parent', surface: 'parentPortal', app: 'lms', path: '/parent-portal/dashboard', roles: ['parent'], publicHref: 'https://app.elevateforhumanity.org/parent-portal/dashboard' },
   { key: 'workforce', surface: 'workforcePortal', app: 'lms', path: '/workforce/dashboard', roles: ['workforce_partner'], publicHref: 'https://app.elevateforhumanity.org/workforce/dashboard' },
   { key: 'programholder', surface: 'programHolderPortal', app: 'lms', path: '/program-holder/dashboard', roles: ['program_holder'], publicHref: 'https://app.elevateforhumanity.org/program-holder/dashboard' },
-  { key: 'admin', surface: 'adminPortal', app: 'admin', path: '/dashboard', roles: ['admin'], publicHref: 'https://admin.elevateforhumanity.org/dashboard' },
+  { key: 'creator', surface: 'creatorPortal', app: 'lms', path: '/creator/products', roles: ['creator'], publicHref: 'https://app.elevateforhumanity.org/creator/products' },
+  { key: 'admin', surface: 'adminPortal', app: 'admin', path: '/dashboard', roles: ['admin', 'org_admin', 'advisor'], publicHref: 'https://admin.elevateforhumanity.org/dashboard' },
   { key: 'instructor', surface: 'instructorPortal', app: 'admin', path: '/instructor/dashboard', roles: ['instructor'], publicHref: 'https://admin.elevateforhumanity.org/instructor/dashboard' },
   { key: 'staff', surface: 'staffPortal', app: 'admin', path: '/staff-portal/dashboard', roles: ['staff'], publicHref: 'https://admin.elevateforhumanity.org/staff-portal/dashboard' },
   { key: 'testing', surface: 'testingOperations', app: 'admin', path: '/testing-center', roles: ['test_admin', 'proctor'], publicHref: 'https://admin.elevateforhumanity.org/testing-center' },
@@ -75,15 +78,24 @@ for (const portal of PORTALS) {
   }
 }
 
+console.log('\n── Role destination reachability ──');
+for (const role of ['admin', 'org_admin', 'advisor', 'staff']) {
+  if (!adminDashboard.includes(`'${role}'`)) fail(`${role}: canonical Admin dashboard guard does not visibly include role`);
+  else pass(`${role}: Admin dashboard guard aligned`);
+}
+
 console.log('\n── Public discovery contract ──');
 if (!exists('apps/marketing/app/online-apps/page.tsx')) fail('/online-apps: public portal directory missing');
 else pass('/online-apps: public portal directory exists');
 if (!publicNavigation.includes("id: 'platform'") || !publicNavigation.includes("href: '/online-apps'")) fail('Platform/Online Apps are not exposed from canonical public navigation');
 else pass('Platform/Online Apps exposed from canonical public navigation');
 for (const portal of PORTALS) {
+  if (!portalsPage.includes(`'${portal.key}'`)) fail(`${portal.key}: missing from /portals directory`); else pass(`${portal.key}: /portals directory aligned`);
   if (!publicAccessRegistry.includes(portal.publicHref)) fail(`${portal.key}: canonical portal missing from public access registry`);
   else pass(`${portal.key}: public access registry aligned`);
 }
+if (!publicNavigation.includes('ROUTES.creatorPortal')) fail('Creator Studio missing from global portal navigation'); else pass('Creator Studio exposed from global portal navigation');
+if (!publicNavigation.includes('ROUTES.testingPortal')) fail('Testing Center operations missing from global portal navigation'); else pass('Testing Center operations exposed from global portal navigation');
 
 console.log('\n── Admin override invariant ──');
 if (!roleMatrix.includes("role === 'admin' || role === 'super_admin'")) fail('RBAC admin override invariant missing'); else pass('regular admin remains global portal override');

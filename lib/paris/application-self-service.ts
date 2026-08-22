@@ -12,6 +12,13 @@ export type ParisApplicationDecision = {
   completed: string[];
   nextAction: string;
   changed: boolean;
+  workOne: {
+    applicable: boolean;
+    visited: boolean | null;
+    processCompleted: boolean | null;
+    voucherApproved: boolean;
+    nextQuestion: string | null;
+  };
 };
 
 const FINAL_STATUSES = new Set(['denied', 'withdrawn', 'closed', 'enrolled']);
@@ -28,6 +35,37 @@ function normalizeFunding(app: Record<string, any>) {
 function isExternallyFunded(app: Record<string, any>) {
   const value = normalizeFunding(app);
   return ['wioa', 'workone', 'workforce', 'wrp', 'workforce_ready_grant', 'employer', 'sponsor'].some((key) => value.includes(key));
+}
+
+function isWorkOnePath(app: Record<string, any>) {
+  const value = normalizeFunding(app);
+  return ['wioa', 'workone', 'workforce', 'wrp', 'workforce_ready_grant'].some((key) => value.includes(key));
+}
+
+function getWorkOneState(app: Record<string, any>) {
+  const metadata = app.metadata || {};
+  const paris = metadata.paris || {};
+  const funding = paris.funding || {};
+  const visited = typeof funding.workone_visited === 'boolean'
+    ? funding.workone_visited
+    : typeof app.has_workone_appointment === 'boolean'
+      ? app.has_workone_appointment
+      : null;
+  const processCompleted = typeof funding.workone_process_completed === 'boolean'
+    ? funding.workone_process_completed
+    : null;
+  const voucherApproved = app.has_workone_approval === true || app.funding_verified === true || funding.voucher_approved === true;
+
+  let nextQuestion: string | null = null;
+  if (visited !== true) {
+    nextQuestion = 'Have you been to WorkOne yet?';
+  } else if (processCompleted !== true) {
+    nextQuestion = 'Have you completed the WorkOne eligibility and intake process?';
+  } else if (!voucherApproved) {
+    nextQuestion = 'Have you been approved for a training voucher or received written funding authorization?';
+  }
+
+  return { applicable: isWorkOnePath(app), visited, processCompleted, voucherApproved, nextQuestion };
 }
 
 export async function evaluateAndAdvanceApplication(
@@ -88,14 +126,25 @@ export async function evaluateAndAdvanceApplication(
   else missing.push('Required signature');
 
   const funding = normalizeFunding(application);
+  const workOne = getWorkOneState(application);
   if (!funding) {
     missing.push('Funding or payment pathway');
-  } else if (isExternallyFunded(application)) {
-    if (application.funding_verified === true || application.has_workone_approval === true) {
-      completed.push('Funding authorization');
+  } else if (workOne.applicable) {
+    if (workOne.visited !== true) {
+      missing.push('WorkOne visit');
     } else {
-      pendingReview.push('External funding authorization');
+      completed.push('WorkOne visit');
+      if (workOne.processCompleted !== true) {
+        missing.push('WorkOne eligibility/intake process');
+      } else {
+        completed.push('WorkOne eligibility/intake process');
+        if (workOne.voucherApproved) completed.push('WorkOne voucher/funding authorization');
+        else pendingReview.push('WorkOne voucher/funding authorization');
+      }
     }
+  } else if (isExternallyFunded(application)) {
+    if (application.funding_verified === true) completed.push('Funding authorization');
+    else pendingReview.push('External funding authorization');
   } else {
     completed.push('Funding or payment pathway');
   }
@@ -120,20 +169,20 @@ export async function evaluateAndAdvanceApplication(
   }
 
   const changed = decidedStatus !== application.status;
-  if (changed) {
-    const now = new Date().toISOString();
-    const metadata = {
-      ...(application.metadata || {}),
-      paris: {
-        ...((application.metadata || {}).paris || {}),
-        last_evaluated_at: now,
-        progress,
-        missing,
-        pending_review: pendingReview,
-        decision: decidedStatus,
-      },
-    };
+  const now = new Date().toISOString();
+  const metadata = {
+    ...(application.metadata || {}),
+    paris: {
+      ...((application.metadata || {}).paris || {}),
+      last_evaluated_at: now,
+      progress,
+      missing,
+      pending_review: pendingReview,
+      decision: decidedStatus,
+    },
+  };
 
+  if (changed) {
     await supabase
       .from('applications')
       .update({ status: decidedStatus, metadata, updated_at: now })
@@ -149,15 +198,19 @@ export async function evaluateAndAdvanceApplication(
       reason: 'PARIS self-service requirements evaluation',
       metadata: { progress, missing, pendingReview, source: 'paris_self_service' },
     });
+  } else {
+    await supabase.from('applications').update({ metadata, updated_at: now }).eq('id', application.id);
   }
 
-  const nextAction = missing[0]
-    ? `Complete: ${missing[0]}`
-    : pendingReview[0]
-      ? `Waiting for: ${pendingReview[0]}`
-      : decidedStatus === 'approved'
-        ? 'Application requirements are satisfied. Continue to enrollment.'
-        : 'Continue application.';
+  const nextAction = workOne.applicable && workOne.nextQuestion
+    ? workOne.nextQuestion
+    : missing[0]
+      ? `Complete: ${missing[0]}`
+      : pendingReview[0]
+        ? `Waiting for: ${pendingReview[0]}`
+        : decidedStatus === 'approved'
+          ? 'Application requirements are satisfied. Continue to enrollment.'
+          : 'Continue application.';
 
   return {
     applicationId: application.id,
@@ -171,6 +224,7 @@ export async function evaluateAndAdvanceApplication(
     completed,
     nextAction,
     changed,
+    workOne,
   };
 }
 
@@ -183,4 +237,46 @@ export async function getCurrentApplicantApplication(supabase: SupabaseClient, u
     .limit(1)
     .maybeSingle();
   return data || null;
+}
+
+export async function saveWorkOneAnswer(
+  supabase: SupabaseClient,
+  application: Record<string, any>,
+  field: 'workone_visited' | 'workone_process_completed' | 'voucher_approved',
+  value: boolean,
+  actorId?: string | null,
+) {
+  const now = new Date().toISOString();
+  const previousMetadata = application.metadata || {};
+  const previousParis = previousMetadata.paris || {};
+  const previousFunding = previousParis.funding || {};
+  const metadata = {
+    ...previousMetadata,
+    paris: {
+      ...previousParis,
+      funding: {
+        ...previousFunding,
+        [field]: value,
+        [`${field}_confirmed_at`]: now,
+      },
+    },
+  };
+
+  const update: Record<string, any> = { metadata, updated_at: now };
+  if (field === 'workone_visited') update.has_workone_appointment = value;
+  if (field === 'voucher_approved' && value) update.has_workone_approval = true;
+
+  await supabase.from('applications').update(update).eq('id', application.id);
+  await supabase.from('application_state_events').insert({
+    application_type: application.application_type || 'student',
+    application_id: application.id,
+    from_state: application.status || null,
+    to_state: application.status || 'in_progress',
+    actor_id: actorId || null,
+    actor_role: 'applicant',
+    reason: `Applicant confirmed ${field}`,
+    metadata: { field, value, source: 'paris_interview' },
+  });
+
+  return { ...application, ...update };
 }

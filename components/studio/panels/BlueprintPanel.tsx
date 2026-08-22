@@ -5,15 +5,15 @@
  * Reads course from CourseProvider, writes via updateCourse (autosaved).
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useCourse } from '../CourseProvider';
 import { Layers, ExternalLink } from 'lucide-react';
+import { AgenticCourseRunPanel } from '../AgenticCourseRunPanel';
 
 export function BlueprintPanel() {
   const { state, updateCourse, appendAIMemory, setPanel } = useCourse();
   const { course, modules } = state;
 
-  // Local form state — synced from provider on mount
   const [title, setTitle] = useState(course.title);
   const [description, setDescription] = useState(course.description ?? '');
   const [shortDescription, setShortDescription] = useState(course.short_description ?? '');
@@ -23,7 +23,6 @@ export function BlueprintPanel() {
   );
   const status = (course.status as 'draft' | 'published' | 'archived') ?? 'draft';
 
-  // Push changes into CourseProvider (triggers autosave)
   function commit(patch: Partial<typeof course>) {
     updateCourse(patch);
     appendAIMemory({
@@ -34,7 +33,7 @@ export function BlueprintPanel() {
   }
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-6 max-w-5xl">
       <PanelHeader
         icon={<Layers className="w-5 h-5" />}
         title="Blueprint"
@@ -51,8 +50,13 @@ export function BlueprintPanel() {
         }
       />
 
-      <div className="space-y-5">
-        {/* Title */}
+      <AgenticCourseRunPanel
+        courseId={course.id}
+        programId={course.program_id}
+        courseTitle={course.title}
+      />
+
+      <div className="max-w-2xl space-y-5">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
             Course Title <span className="text-red-500">*</span>
@@ -67,7 +71,6 @@ export function BlueprintPanel() {
           />
         </div>
 
-        {/* Short description */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
             Short Description
@@ -84,7 +87,6 @@ export function BlueprintPanel() {
           <p className="text-xs text-slate-400 mt-1">{shortDescription.length}/160</p>
         </div>
 
-        {/* Description */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
             Full Description
@@ -99,7 +101,6 @@ export function BlueprintPanel() {
           />
         </div>
 
-        {/* Thumbnail + Duration row */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">
@@ -134,7 +135,6 @@ export function BlueprintPanel() {
           </div>
         </div>
 
-        {/* Status — read-only; publishing goes through the Publish panel */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1.5">Status</label>
           <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-slate-200 bg-slate-50">
@@ -158,7 +158,6 @@ export function BlueprintPanel() {
           </p>
         </div>
 
-        {/* Read-only metadata */}
         {(course.governing_body || course.compliance_profile_key) && (
           <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3 space-y-1">
             {course.governing_body && (
@@ -178,8 +177,6 @@ export function BlueprintPanel() {
     </div>
   );
 }
-
-// ─── Shared helpers ───────────────────────────────────────────────────────────
 
 export function PanelHeader({
   icon,

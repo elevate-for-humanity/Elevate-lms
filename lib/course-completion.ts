@@ -1,12 +1,12 @@
-// lib/course-completion.ts
-// Course completion logic including external partner modules
+import 'server-only';
 
+/**
+ * Course-level completion checks that complement the canonical LMS engine.
+ * Course structure is read only from courses/course_lessons. Learner checkpoint
+ * results come from checkpoint_scores; legacy lms_* views are not authoritative.
+ */
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { setAuditContext } from '@/lib/audit-context';
-
-async function getSupabaseAdmin() {
-  return requireAdminClient();
-}
 
 export interface CourseCompletionStatus {
   isComplete: boolean;
@@ -23,321 +23,190 @@ export interface CourseCompletionStatus {
   missingRequirements: string[];
 }
 
-/**
- * Check if student has completed all requirements for a course
- * including internal lessons and external partner modules
- */
 export async function checkCourseCompletion(
   userId: string,
   courseId: string,
 ): Promise<CourseCompletionStatus> {
-  const status: CourseCompletionStatus = {
-    isComplete: false,
-    internalLessonsComplete: false,
-    externalModulesComplete: false,
-    quizzesPassed: false,
-    totalInternalLessons: 0,
-    completedInternalLessons: 0,
-    totalExternalModules: 0,
-    completedExternalModules: 0,
-    totalQuizzes: 0,
-    passedQuizzes: 0,
-    failedQuizTitles: [],
-    missingRequirements: [],
-  };
+  const [internal, external, assessments] = await Promise.all([
+    checkInternalLessons(userId, courseId),
+    checkExternalModules(userId, courseId),
+    checkRequiredAssessments(userId, courseId),
+  ]);
 
-  // Check internal lessons
-  const internalStatus = await checkInternalLessons(userId, courseId);
-  status.internalLessonsComplete = internalStatus.complete;
-  status.totalInternalLessons = internalStatus.total;
-  status.completedInternalLessons = internalStatus.completed;
-  if (!internalStatus.complete) {
-    status.missingRequirements.push(
-      `${internalStatus.total - internalStatus.completed} internal lesson(s) remaining`,
-    );
+  const missingRequirements: string[] = [];
+  if (!internal.complete) {
+    missingRequirements.push(`${Math.max(0, internal.total - internal.completed)} lesson(s) remaining`);
   }
-
-  // Check external modules
-  const externalStatus = await checkExternalModules(userId, courseId);
-  status.externalModulesComplete = externalStatus.complete;
-  status.totalExternalModules = externalStatus.total;
-  status.completedExternalModules = externalStatus.completed;
-  if (!externalStatus.complete) {
-    status.missingRequirements.push(
-      ...externalStatus.missingModules.map(
-        (m) => `External module: ${m.title} (${m.partner_name})`,
+  if (!external.complete) {
+    missingRequirements.push(
+      ...external.missingModules.map(
+        (module) => `External module: ${module.title} (${module.partner_name})`,
       ),
     );
   }
-
-  // Check quiz pass requirements (score >= 70% on all quiz-type lessons)
-  const quizStatus = await checkQuizzesPassed(userId, courseId);
-  status.quizzesPassed = quizStatus.allPassed;
-  status.totalQuizzes = quizStatus.total;
-  status.passedQuizzes = quizStatus.passed;
-  status.failedQuizTitles = quizStatus.failedTitles;
-  if (!quizStatus.allPassed && quizStatus.total > 0) {
-    status.missingRequirements.push(
-      `${quizStatus.failedTitles.length} quiz(zes) not yet passed: ${quizStatus.failedTitles.join(', ')}`,
+  if (!assessments.allPassed) {
+    missingRequirements.push(
+      `${assessments.failedTitles.length} required assessment(s) not yet passed: ${assessments.failedTitles.join(', ')}`,
     );
   }
 
-  // Course is complete only if ALL three gates pass
-  status.isComplete =
-    status.internalLessonsComplete && status.externalModulesComplete && status.quizzesPassed;
-
-  return status;
-}
-
-async function checkInternalLessons(
-  userId: string,
-  courseId: string,
-): Promise<{ complete: boolean; total: number; completed: number }> {
-  const supabase = await getSupabaseAdmin();
-  // Count total lessons in course
-  const { count: totalLessons } = await supabase
-    .from('lms_lessons')
-    .select('*', { count: 'exact', head: true })
-    .eq('course_id', courseId);
-
-  // Fetch lesson IDs for this course first (Supabase v2 .in() requires a plain array)
-  const { data: lessonRows } = await supabase
-    .from('lms_lessons')
-    .select('id')
-    .eq('course_id', courseId);
-  const lessonIds = (lessonRows ?? []).map((r: { id: string }) => r.id);
-
-  // Count completed lessons
-  const { count: completedLessons } = await supabase
-    .from('lesson_progress')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('completed', true)
-    .in('lesson_id', lessonIds.length ? lessonIds : ['__none__']);
-
   return {
-    complete: (completedLessons || 0) >= (totalLessons || 0),
-    total: totalLessons || 0,
-    completed: completedLessons || 0,
+    isComplete: internal.complete && external.complete && assessments.allPassed,
+    internalLessonsComplete: internal.complete,
+    externalModulesComplete: external.complete,
+    quizzesPassed: assessments.allPassed,
+    totalInternalLessons: internal.total,
+    completedInternalLessons: internal.completed,
+    totalExternalModules: external.total,
+    completedExternalModules: external.completed,
+    totalQuizzes: assessments.total,
+    passedQuizzes: assessments.passed,
+    failedQuizTitles: assessments.failedTitles,
+    missingRequirements,
   };
 }
 
-async function checkExternalModules(
-  userId: string,
-  courseId: string,
-): Promise<{
-  complete: boolean;
-  total: number;
-  completed: number;
-  missingModules: any[];
-}> {
-  const supabase = await getSupabaseAdmin();
-  // Get all required external modules for this course
-  const { data: requiredModules } = await supabase
+async function checkInternalLessons(userId: string, courseId: string) {
+  const db = await requireAdminClient();
+  const [{ data: lessons, error: lessonError }, { data: progress, error: progressError }] =
+    await Promise.all([
+      db.from('course_lessons').select('id').eq('course_id', courseId),
+      db
+        .from('lesson_progress')
+        .select('lesson_id')
+        .eq('user_id', userId)
+        .eq('course_id', courseId)
+        .eq('completed', true),
+    ]);
+
+  if (lessonError) throw lessonError;
+  if (progressError) throw progressError;
+
+  const lessonIds = new Set((lessons ?? []).map((lesson) => lesson.id));
+  const completed = new Set(
+    (progress ?? []).map((row) => row.lesson_id).filter((id) => lessonIds.has(id)),
+  ).size;
+  const total = lessonIds.size;
+
+  return { complete: total > 0 && completed >= total, total, completed };
+}
+
+async function checkExternalModules(userId: string, courseId: string) {
+  const db = await requireAdminClient();
+  const { data: requiredModules, error } = await db
     .from('external_partner_modules')
-    .select('*')
+    .select('id,title,partner_name')
     .eq('course_id', courseId)
     .eq('is_required', true);
+  if (error) throw error;
 
-  if (!requiredModules || requiredModules.length === 0) {
-    return {
-      complete: true,
-      total: 0,
-      completed: 0,
-      missingModules: [],
-    };
+  if (!requiredModules?.length) {
+    return { complete: true, total: 0, completed: 0, missingModules: [] as any[] };
   }
 
-  // Get student's progress for these modules
-  const { data: progress } = await supabase
+  const { data: progress, error: progressError } = await db
     .from('external_partner_progress')
-    .select('module_id, status')
+    .select('module_id,status')
     .eq('user_id', userId)
-    .in(
-      'module_id',
-      requiredModules.map((m) => m.id),
-    )
+    .in('module_id', requiredModules.map((module) => module.id))
     .eq('status', 'approved');
+  if (progressError) throw progressError;
 
-  const completedModuleIds = new Set((progress || []).map((p) => p.module_id));
-
-  const missingModules = requiredModules.filter((m) => !completedModuleIds.has(m.id));
-
+  const completedIds = new Set((progress ?? []).map((row) => row.module_id));
+  const missingModules = requiredModules.filter((module) => !completedIds.has(module.id));
   return {
     complete: missingModules.length === 0,
     total: requiredModules.length,
-    completed: completedModuleIds.size,
+    completed: completedIds.size,
     missingModules,
   };
 }
 
-async function checkQuizzesPassed(
-  userId: string,
-  courseId: string,
-): Promise<{
-  allPassed: boolean;
-  total: number;
-  passed: number;
-  failedTitles: string[];
-}> {
-  const supabase = await getSupabaseAdmin();
-
-  // Get all quiz-type lessons for this course
-  const { data: quizLessons } = await supabase
-    .from('lms_lessons')
-    .select('id, title')
+async function checkRequiredAssessments(userId: string, courseId: string) {
+  const db = await requireAdminClient();
+  const { data: lessons, error } = await db
+    .from('course_lessons')
+    .select('id,title,lesson_type,passing_score')
     .eq('course_id', courseId)
-    .eq('type', 'quiz');
+    .in('lesson_type', ['quiz', 'checkpoint', 'exam']);
+  if (error) throw error;
 
-  if (!quizLessons || quizLessons.length === 0) {
-    return { allPassed: true, total: 0, passed: 0, failedTitles: [] };
+  if (!lessons?.length) {
+    return { allPassed: true, total: 0, passed: 0, failedTitles: [] as string[] };
   }
 
-  const failedTitles: string[] = [];
-  let passed = 0;
+  const { data: scores, error: scoreError } = await db
+    .from('checkpoint_scores')
+    .select('lesson_id,passed,score,passing_score')
+    .eq('user_id', userId)
+    .eq('course_id', courseId)
+    .in('lesson_id', lessons.map((lesson) => lesson.id))
+    .eq('passed', true);
+  if (scoreError) throw scoreError;
 
-  for (const quiz of quizLessons) {
-    // Check for any passing attempt (score >= 70)
-    const { data: bestAttempt } = await supabase
-      .from('quiz_attempts')
-      .select('score, passed')
-      .eq('user_uuid', userId)
-      .eq('quiz_id', quiz.id)
-      .eq('passed', true)
-      .limit(1)
-      .maybeSingle();
-
-    if (bestAttempt) {
-      passed++;
-    } else {
-      failedTitles.push(quiz.title);
-    }
-  }
+  const passedIds = new Set((scores ?? []).map((score) => score.lesson_id));
+  const failedTitles = lessons
+    .filter((lesson) => !passedIds.has(lesson.id))
+    .map((lesson) => lesson.title);
 
   return {
     allPassed: failedTitles.length === 0,
-    total: quizLessons.length,
-    passed,
+    total: lessons.length,
+    passed: lessons.length - failedTitles.length,
     failedTitles,
   };
 }
 
-/**
- * Mark course as complete for student
- * Only succeeds if all requirements are met
- */
 export async function completeCourse(
   userId: string,
   courseId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const status = await checkCourseCompletion(userId, courseId);
-
   if (!status.isComplete) {
-    return {
-      success: false,
-      error: `Course requirements not met: ${status.missingRequirements.join(', ')}`,
-    };
+    return { success: false, error: `Course requirements not met: ${status.missingRequirements.join(', ')}` };
   }
 
-  const supabase = await getSupabaseAdmin();
-  await setAuditContext(supabase, { actorUserId: userId, systemActor: 'course_completion' });
-
-  // Update enrollment status
-  const { error } = await supabase
+  const db = await requireAdminClient();
+  await setAuditContext(db, { actorUserId: userId, systemActor: 'course_completion' });
+  const { error } = await db
     .from('program_enrollments')
-    .update({
-      status: 'completed',
-      completed_at: new Date().toISOString(),
-    })
+    .update({ status: 'completed', progress_percent: 100, completed_at: new Date().toISOString() })
     .eq('user_id', userId)
     .eq('course_id', courseId);
+  if (error) return { success: false, error: 'Unable to mark course complete' };
 
-  if (error) {
-    return {
-      success: false,
-      error: 'Operation failed',
-    };
-  }
-
-  // Generate certificate (if applicable)
   await generateCourseCertificate(userId, courseId);
-
   return { success: true };
 }
 
 async function generateCourseCertificate(userId: string, courseId: string): Promise<void> {
-  const supabase = await getSupabaseAdmin();
-  // Get course details
-  const { data: course } = await supabase
-    .from('lms_courses')
-    .select('title')
-    .eq('id', courseId)
-    .maybeSingle();
-
-  // Get student details
-  const { data: student } = await supabase
-    .from('profiles')
-    .select('full_name, email')
-    .eq('id', userId)
-    .maybeSingle();
-
+  const db = await requireAdminClient();
+  const [{ data: course }, { data: student }] = await Promise.all([
+    db.from('courses').select('title').eq('id', courseId).maybeSingle(),
+    db.from('profiles').select('full_name,email').eq('id', userId).maybeSingle(),
+  ]);
   if (!course || !student) return;
 
-  // Get all external modules for credential stack
-  const { data: externalModules } = await supabase
-    .from('external_partner_modules')
-    .select('title, partner_name')
-    .eq('course_id', courseId)
-    .eq('is_required', true);
-
-  // Issue certificate through the canonical gated service
   const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
   await issueCertificate({
-    supabase,
+    supabase: db,
     studentId: userId,
     courseId,
     studentName: student.full_name || student.email || 'Student',
     courseTitle: course.title,
-    // No competencyEvidence passed — this path is for non-exam courses.
-    // Courses requiring proctored exams must use /api/lms/progress/complete.
   });
 }
 
-function generateCertificateNumber(): string {
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-  return `EFH-${timestamp}-${random}`;
-}
-
-/**
- * Get course progress including external modules
- */
-export async function getCourseProgress(
-  userId: string,
-  courseId: string,
-): Promise<{
-  overallPercentage: number;
-  internalPercentage: number;
-  externalPercentage: number;
-  status: CourseCompletionStatus;
-}> {
+export async function getCourseProgress(userId: string, courseId: string) {
   const status = await checkCourseCompletion(userId, courseId);
-
-  const internalPercentage =
-    status.totalInternalLessons > 0
-      ? (status.completedInternalLessons / status.totalInternalLessons) * 100
-      : 100;
-
-  const externalPercentage =
-    status.totalExternalModules > 0
-      ? (status.completedExternalModules / status.totalExternalModules) * 100
-      : 100;
-
-  // Weight internal and external equally
-  const overallPercentage = (internalPercentage + externalPercentage) / 2;
-
+  const internalPercentage = status.totalInternalLessons
+    ? (status.completedInternalLessons / status.totalInternalLessons) * 100
+    : 0;
+  const externalPercentage = status.totalExternalModules
+    ? (status.completedExternalModules / status.totalExternalModules) * 100
+    : 100;
   return {
-    overallPercentage: Math.round(overallPercentage),
+    overallPercentage: Math.round((internalPercentage + externalPercentage) / 2),
     internalPercentage: Math.round(internalPercentage),
     externalPercentage: Math.round(externalPercentage),
     status,

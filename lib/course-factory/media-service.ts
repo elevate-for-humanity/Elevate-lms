@@ -5,6 +5,7 @@ import { generateInstructorIntro, getInstructorForCourse } from '@/lib/ai-instru
 
 export interface QueueCourseLessonVideosInput {
   courseId: string;
+  lessonId?: string | null;
   onlyMissing?: boolean;
   limit?: number | null;
   force?: boolean;
@@ -48,13 +49,14 @@ export async function queueCourseLessonVideos(
   }
 
   const instructor = getInstructorForCourse(course.title);
-  const { data: lessons, error } = await db
+  let lessonQuery = db
     .from('course_lessons')
     .select(
       'id, module_id, title, script, bullet_points, scene_data, content_json, video_url, video_status, order_index',
     )
-    .eq('course_id', input.courseId)
-    .order('order_index', { ascending: true });
+    .eq('course_id', input.courseId);
+  if (input.lessonId) lessonQuery = lessonQuery.eq('id', input.lessonId);
+  const { data: lessons, error } = await lessonQuery.order('order_index', { ascending: true });
   if (error) throw new Error(`Failed to load lessons for video queue: ${error.message}`);
 
   const { data: modules, error: moduleError } = await db

@@ -7,7 +7,9 @@ on:
       - main
     paths:
       - '.github/workflows/registered-apprenticeship-e2e.yml'
+      - 'playwright.config.ts'
       - 'tests/e2e/registered-apprenticeship-authenticated.spec.ts'
+      - 'tests/e2e/portal-responsive-design.spec.ts'
       - 'scripts/check-registered-apprenticeship-architecture.mjs'
       - 'scripts/qa/provision-apprenticeship-e2e.mjs'
   workflow_run:
@@ -27,10 +29,10 @@ concurrency:
 jobs:
   production-authenticated-e2e:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-    name: Apprentice + Host Shop authenticated persistence
+    name: Apprentice + Host Shop authenticated persistence and responsive design
     runs-on: ubuntu-latest
     environment: production
-    timeout-minutes: 25
+    timeout-minutes: 40
     env:
       PLAYWRIGHT_BASE_URL: https://app.elevateforhumanity.org
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -76,17 +78,19 @@ jobs:
           test -n "${SUPABASE_SERVICE_ROLE_KEY:-}" || { echo '::error::SUPABASE_SERVICE_ROLE_KEY is not configured'; exit 1; }
       - name: Provision disposable Host Shop + Apprentice identities
         run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
-      - name: Install Chromium
-        run: pnpm exec playwright install chromium --with-deps
+      - name: Install Chromium and WebKit
+        run: pnpm exec playwright install chromium webkit --with-deps
       - name: Run registered-apprenticeship architecture gate
         run: node scripts/check-registered-apprenticeship-architecture.mjs
-      - name: Run authenticated production E2E
-        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --project=chromium
+      - name: Run authenticated production functional E2E
+        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --project=desktop-chrome
+      - name: Run authenticated cross-device responsive design certification
+        run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
       - name: Clean disposable Host Shop + Apprentice identities
         if: always()
         run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
-      - name: Upload failure evidence
-        if: failure()
+      - name: Upload QA evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: registered-apprenticeship-e2e-results
@@ -94,6 +98,7 @@ jobs:
             test-results/
             playwright-report/
           retention-days: 14
+          if-no-files-found: ignore
       - name: Publish production QA evidence
         if: always()
         env:
@@ -105,4 +110,4 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh issue comment 791 --repo "$GITHUB_REPOSITORY" --body "### Host Shop + Apprentice production QA: ${QA_STATUS^^}\n\n- SHA: \`${QA_SHA}\`\n- Trigger: \`${QA_EVENT}\`\n- Run: ${QA_RUN_URL}\n- Fixture: disposable CI-created Host Shop and Apprentice; cleanup runs on success or failure.\n- Scope: authenticated Apprentice dashboard/hours/RTI/competencies/documents/attendance/profile/handbook; authenticated Host Shop dashboard/apprentices/pending-hours/documents/competencies/attendance/wages/reports/profile; Host Shop competency write + restore; Apprentice-to-Host-Shop RBAC denial.\n- Result source: GitHub Actions production Playwright gate."
+          gh issue comment 791 --repo "$GITHUB_REPOSITORY" --body "### Host Shop + Apprentice production QA: ${QA_STATUS^^}\n\n- SHA: \`${QA_SHA}\`\n- Trigger: \`${QA_EVENT}\`\n- Run: ${QA_RUN_URL}\n- Fixture: disposable CI-created Host Shop and Apprentice; cleanup runs on success or failure.\n- Functional scope: Apprentice dashboard/hours/RTI/competencies/documents/attendance/profile/handbook; Host Shop dashboard/apprentices/pending-hours/documents/competencies/attendance/wages/reports/profile; Host Shop competency write + restore; Apprentice-to-Host-Shop RBAC denial.\n- Responsive design scope: desktop 1440x900, laptop 1280x720, iPad-class tablet, iPhone WebKit, Pixel-class Android Chromium. Checks page overflow, clipped critical controls, zero-size primary content, and undersized mobile form/button controls.\n- Evidence: Playwright traces/screenshots/report artifact retained for 14 days."

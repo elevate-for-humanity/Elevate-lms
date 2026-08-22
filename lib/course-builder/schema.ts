@@ -39,8 +39,8 @@ export type ActivityType =
   | 'observation'
   | 'discussion'
   | 'lab'
-  | 'checkpoint'  // gated checkpoint quiz tab on lesson page
-  | 'practice';   // ungraded practice quiz tab
+  | 'checkpoint'
+  | 'practice';
 export type RequiredArtifact =
   | 'text'
   | 'video'
@@ -264,14 +264,11 @@ export interface ProgramBuilderTemplate {
 // content is overridden from Record<string,unknown> to string because the
 // pipeline stores rendered HTML in course_lessons.content (text column).
 export type CourseLesson = Omit<BuilderLesson, 'content' | 'quizQuestions' | 'orderIndex' | 'lessonType'> & {
-  // Pipeline-layer fields (camelCase, written to course_lessons)
   type: LessonType;
   order: number;
-  // BuilderLesson fields made optional at the pipeline layer — set by normalizer
   orderIndex?: number;
   lessonType?: LessonType;
   description?: string;
-  // content overridden from Record<string,unknown> to string (rendered HTML)
   content?: string;
   partnerExamCode?: string;
   quizQuestions?: Array<{
@@ -330,12 +327,12 @@ export const DEFAULT_ACTIVITIES: Record<string, ActivityType[]> = {
 };
 
 /**
- * Static fallback map — used ONLY when the DB is unavailable (e.g. build time,
- * scripts without a DB client). All runtime resolution goes through
- * lib/course-builder/program-resolver.ts → program_course_links table.
+ * Static fallback map — used ONLY when the DB is unavailable (for example build
+ * time or scripts without a DB client). Runtime resolution goes through
+ * lib/course-builder/program-resolver.ts and canonical program/course links.
  *
- * Do not add new entries here. Register new programs via
- * POST /api/admin/course-builder/program-map instead.
+ * Do not add new entries here. Register new program/course relationships through
+ * the canonical Course Builder root action instead of adding another HTTP route.
  *
  * @deprecated Use resolveCourseIdFromDb() from program-resolver.ts at runtime.
  */

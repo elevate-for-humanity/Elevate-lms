@@ -282,27 +282,12 @@ export async function createLaunchFoundation(input: LaunchFoundationInput) {
     });
   }
 
-  let courseId: string | null = null;
-  if (organizationId && foundation.course.title) {
-    const baseSlug = slugify(foundation.course.title);
-    const uniqueSlug = `${baseSlug}-${Date.now().toString().slice(-6)}`;
-    const { data: course } = await db.from('courses').insert({
-      org_id: organizationId,
-      title: foundation.course.title,
-      course_name: foundation.course.title,
-      slug: uniqueSlug,
-      course_slug: uniqueSlug,
-      short_description: foundation.course.description.slice(0, 300),
-      description: foundation.course.description,
-      status: 'draft',
-      generation_status: 'draft',
-      generator_prompt: `Created from Launch Foundation for ${input.businessName}`,
-      total_lessons: foundation.course.modules.reduce((sum, module) => sum + module.lessons.length, 0),
-      category: input.industry || 'Business',
-      submitted_by: input.userId,
-    }).select('id').maybeSingle();
-    courseId = course?.id ?? null;
-  }
+  // The Launch Architect may propose a course outline, but it must not author a
+  // canonical course. Studio -> Course Builder is the only application authoring
+  // authority, so the generated outline stays in the launch foundation until the
+  // authenticated owner chooses to build it there.
+  const courseId: string | null = null;
+  const courseBuilderDeferred = Boolean(foundation.course.title);
 
   const suggestedPriceCents = foundation.offer.suggestedMonthlyPrice * 100;
   let offerId: string | null = null;
@@ -321,7 +306,8 @@ export async function createLaunchFoundation(input: LaunchFoundationInput) {
       access_config: {
         launch_foundation: true,
         community: Boolean(foundation.community.name),
-        course_id: courseId,
+        course_id: null,
+        course_builder_deferred: courseBuilderDeferred,
       },
       created_by: input.userId,
     }).select('id').maybeSingle();
@@ -352,6 +338,8 @@ export async function createLaunchFoundation(input: LaunchFoundationInput) {
     launchFoundationId: launchRecord.id,
     websiteId,
     courseId,
+    courseBuilderDeferred,
+    courseBuilderUrl: courseBuilderDeferred ? '/studio/courses' : null,
     offerId,
     provider: result.provider,
   };

@@ -6,6 +6,7 @@ export type CourseEnrollmentResolution = {
   id: string;
   status: string;
   program_id: string | null;
+  funding_program_id: string | null;
   course_id: string | null;
   user_id: string | null;
   student_id: string | null;
@@ -27,7 +28,7 @@ export async function resolveCourseEnrollment(
 
   const { data: directRows, error: directError } = await db
     .from('program_enrollments')
-    .select('id,status,program_id,course_id,user_id,student_id,updated_at')
+    .select('id,status,program_id,funding_program_id,course_id,user_id,student_id,updated_at')
     .or(`user_id.eq.${userId},student_id.eq.${userId}`)
     .eq('course_id', courseId)
     .order('updated_at', { ascending: false })
@@ -52,7 +53,7 @@ export async function resolveCourseEnrollment(
 
   const { data: programRows, error: programEnrollmentError } = await db
     .from('program_enrollments')
-    .select('id,status,program_id,course_id,user_id,student_id,updated_at')
+    .select('id,status,program_id,funding_program_id,course_id,user_id,student_id,updated_at')
     .or(`user_id.eq.${userId},student_id.eq.${userId}`)
     .in('program_id', programIds)
     .order('updated_at', { ascending: false })

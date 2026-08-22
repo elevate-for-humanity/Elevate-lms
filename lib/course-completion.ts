@@ -1,12 +1,14 @@
 import 'server-only';
 
 /**
- * Course-level completion checks that complement the canonical LMS engine.
- * Course structure is read only from courses/course_lessons. Learner checkpoint
- * results come from checkpoint_scores; legacy lms_* views are not authoritative.
+ * Canonical course-completion evaluator.
+ *
+ * This module is deliberately read-only. Mutation/issuance authority lives in
+ * the authenticated LMS completion routes and the canonical certificate issuer.
+ * Keeping evaluation separate prevents a second course-completion writer from
+ * silently bypassing seat-time, exam, audit, or enrollment gates.
  */
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { setAuditContext } from '@/lib/audit-context';
 
 export interface CourseCompletionStatus {
   isComplete: boolean;
@@ -70,7 +72,7 @@ async function checkInternalLessons(userId: string, courseId: string) {
   const db = await requireAdminClient();
   const [{ data: lessons, error: lessonError }, { data: progress, error: progressError }] =
     await Promise.all([
-      db.from('course_lessons').select('id').eq('course_id', courseId),
+      db.from('course_lessons').select('id').eq('course_id', courseId).eq('is_required', true),
       db
         .from('lesson_progress')
         .select('lesson_id')
@@ -101,7 +103,12 @@ async function checkExternalModules(userId: string, courseId: string) {
   if (error) throw error;
 
   if (!requiredModules?.length) {
-    return { complete: true, total: 0, completed: 0, missingModules: [] as any[] };
+    return {
+      complete: true,
+      total: 0,
+      completed: 0,
+      missingModules: [] as Array<{ id: string; title: string; partner_name: string }>,
+    };
   }
 
   const { data: progress, error: progressError } = await db
@@ -128,6 +135,7 @@ async function checkRequiredAssessments(userId: string, courseId: string) {
     .from('course_lessons')
     .select('id,title,lesson_type,passing_score')
     .eq('course_id', courseId)
+    .eq('is_required', true)
     .in('lesson_type', ['quiz', 'checkpoint', 'exam']);
   if (error) throw error;
 
@@ -155,46 +163,6 @@ async function checkRequiredAssessments(userId: string, courseId: string) {
     passed: lessons.length - failedTitles.length,
     failedTitles,
   };
-}
-
-export async function completeCourse(
-  userId: string,
-  courseId: string,
-): Promise<{ success: boolean; error?: string }> {
-  const status = await checkCourseCompletion(userId, courseId);
-  if (!status.isComplete) {
-    return { success: false, error: `Course requirements not met: ${status.missingRequirements.join(', ')}` };
-  }
-
-  const db = await requireAdminClient();
-  await setAuditContext(db, { actorUserId: userId, systemActor: 'course_completion' });
-  const { error } = await db
-    .from('program_enrollments')
-    .update({ status: 'completed', progress_percent: 100, completed_at: new Date().toISOString() })
-    .eq('user_id', userId)
-    .eq('course_id', courseId);
-  if (error) return { success: false, error: 'Unable to mark course complete' };
-
-  await generateCourseCertificate(userId, courseId);
-  return { success: true };
-}
-
-async function generateCourseCertificate(userId: string, courseId: string): Promise<void> {
-  const db = await requireAdminClient();
-  const [{ data: course }, { data: student }] = await Promise.all([
-    db.from('courses').select('title').eq('id', courseId).maybeSingle(),
-    db.from('profiles').select('full_name,email').eq('id', userId).maybeSingle(),
-  ]);
-  if (!course || !student) return;
-
-  const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
-  await issueCertificate({
-    supabase: db,
-    studentId: userId,
-    courseId,
-    studentName: student.full_name || student.email || 'Student',
-    courseTitle: course.title,
-  });
 }
 
 export async function getCourseProgress(userId: string, courseId: string) {

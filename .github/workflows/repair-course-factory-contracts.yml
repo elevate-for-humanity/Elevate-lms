@@ -1,0 +1,75 @@
+name: Repair Course Factory Contracts
+
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.event.issue.title == 'RUN COURSE FACTORY CONTRACT REPAIR'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Repair current contract drift
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'lib/course-factory/factory.ts';
+          let text = fs.readFileSync(file, 'utf8');
+          const replace = (from, to) => {
+            if (!text.includes(from)) throw new Error(`Expected factory pattern missing: ${from.slice(0, 100)}`);
+            text = text.replace(from, to);
+          };
+          replace(
+            "lesson.quizQuestions = finalExam.questions.map((question) => ({\n          question: question.question,",
+            "lesson.quizQuestions = finalExam.questions.map((question, questionIndex) => ({\n          id: `${lesson.slug}-q-${questionIndex + 1}`,\n          question: question.question,"
+          );
+          replace(
+            "lesson.quizQuestions = assessment.questions.map((question) => ({\n          question: question.question,",
+            "lesson.quizQuestions = assessment.questions.map((question, questionIndex) => ({\n          id: `${lesson.slug}-q-${questionIndex + 1}`,\n          question: question.question,"
+          );
+          replace(
+            "lesson.quizQuestions = generated.quiz_questions.map((question) => ({\n        question: question.question,",
+            "lesson.quizQuestions = generated.quiz_questions.map((question, questionIndex) => ({\n        id: `${lesson.slug}-q-${questionIndex + 1}`,\n        question: question.question,"
+          );
+          replace(
+            "const loaded = await loadBlueprintWithProgram(programSlug, input.programId);\n      blueprint = loaded.blueprint ? cloneBlueprint(loaded.blueprint) : null;\n      program = loaded.program;",
+            "const db = await requireAdminClient();\n      const loaded = await loadBlueprintWithProgram(db, { programId: input.programId, programSlug });\n      blueprint = loaded?.blueprint ? cloneBlueprint(loaded.blueprint) : null;\n      program = loaded?.program ?? null;"
+          );
+          replace(
+            "      programSlug,\n      program,\n      blueprint,",
+            "      programSlug,\n      blueprint,"
+          );
+          replace(
+            "evidence.sources.map((source) => source.kind).join(', ')",
+            "evidence.sources.join(', ')"
+          );
+          text = text.replaceAll('errors: audit.errors,', 'errors: audit.errors.map((error) => error.message),');
+          text = text.replaceAll('errors: packageAudit.errors,', 'errors: packageAudit.errors.map((error) => error.message),');
+          fs.writeFileSync(file, text);
+
+          const publisher = 'lib/course-factory/publisher.ts';
+          let publisherText = fs.readFileSync(publisher, 'utf8');
+          if (!publisherText.includes('  } catch {}')) throw new Error('Expected publisher catch pattern missing');
+          publisherText = publisherText.replace('  } catch {}', '  } catch {\n    // Plain HTML/text lesson content is normalized below.\n  }');
+          fs.writeFileSync(publisher, publisherText);
+          NODE
+      - name: Commit repaired contracts
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/course-factory/factory.ts lib/course-factory/publisher.ts
+          git diff --cached --check
+          git commit -m "fix(course-factory): align canonical contracts"
+          git push origin HEAD:main

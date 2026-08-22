@@ -19,6 +19,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 env:
   CI: true
@@ -52,33 +53,87 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-
-      - name: Require runtime credentials
+        id: install
         shell: bash
         run: |
-          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-            echo "SUPABASE_SERVICE_ROLE_KEY is required to persist the rebuilt course."
-            exit 1
-          fi
-          if [ -z "$SUPABASE_URL" ] && [ -z "$NEXT_PUBLIC_SUPABASE_URL" ]; then
-            echo "A Supabase project URL is required."
-            exit 1
-          fi
-          if [ -z "$OPENAI_API_KEY" ] && [ -z "$GROQ_API_KEY" ] && [ -z "$GEMINI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo "At least one AI provider credential is required."
-            exit 1
-          fi
+          set +e
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/rebuild-install.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 120 /tmp/rebuild-install.log > /tmp/rebuild-install-tail.log || true
+          exit 0
+
+      - name: Check runtime credentials
+        id: credentials
+        shell: bash
+        run: |
+          set +e
+          code=0
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then code=1; fi
+          if [ -z "$SUPABASE_URL" ] && [ -z "$NEXT_PUBLIC_SUPABASE_URL" ]; then code=1; fi
+          if [ -z "$OPENAI_API_KEY" ] && [ -z "$GROQ_API_KEY" ] && [ -z "$GEMINI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ]; then code=1; fi
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Rebuild ESB v2 course through canonical Course Factory
-        run: pnpm tsx scripts/course-builder/run.ts --course entrepreneurship --mode replace
+        id: rebuild
+        if: steps.install.outputs.exit_code == '0' && steps.credentials.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set +e
+          pnpm tsx scripts/course-builder/run.ts --course entrepreneurship --mode replace > /tmp/rebuild-esb.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 220 /tmp/rebuild-esb.log > /tmp/rebuild-esb-tail.log || true
+          exit 0
 
       - name: Validate ESB blueprint after rebuild
-        run: pnpm tsx scripts/course-builder/run.ts --course entrepreneurship --validate
+        id: validate
+        if: steps.rebuild.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set +e
+          pnpm tsx scripts/course-builder/run.ts --course entrepreneurship --validate > /tmp/rebuild-validate.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 120 /tmp/rebuild-validate.log > /tmp/rebuild-validate-tail.log || true
+          exit 0
 
       - name: Verify persisted ESB runtime contract
-        run: pnpm tsx scripts/course-builder/verify-esb-runtime.ts
+        id: verify
+        if: steps.rebuild.outputs.exit_code == '0' && steps.validate.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set +e
+          pnpm tsx scripts/course-builder/verify-esb-runtime.ts > /tmp/rebuild-verify.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 160 /tmp/rebuild-verify.log > /tmp/rebuild-verify-tail.log || true
+          exit 0
+
+      - name: Report canonical ESB rebuild result
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          INSTALL_EXIT: ${{ steps.install.outputs.exit_code }}
+          CREDENTIAL_EXIT: ${{ steps.credentials.outputs.exit_code }}
+          REBUILD_EXIT: ${{ steps.rebuild.outputs.exit_code }}
+          VALIDATE_EXIT: ${{ steps.validate.outputs.exit_code }}
+          VERIFY_EXIT: ${{ steps.verify.outputs.exit_code }}
+        with:
+          script: |
+            const fs=require('fs');
+            const read=(p)=>fs.existsSync(p)?fs.readFileSync(p,'utf8').slice(-18000):'(not run)';
+            const e={install:process.env.INSTALL_EXIT||'not-run',credentials:process.env.CREDENTIAL_EXIT||'not-run',rebuild:process.env.REBUILD_EXIT||'not-run',validate:process.env.VALIDATE_EXIT||'not-run',verify:process.env.VERIFY_EXIT||'not-run'};
+            const ok=Object.values(e).every(v=>v==='0');
+            const body=`${ok?'ESB COURSE BUILDER REBUILD PASS':'ESB COURSE BUILDER REBUILD FAIL'}\n\nCommit: ${context.sha}\nSteps: ${JSON.stringify(e)}\n\nINSTALL\n\`\`\`text\n${read('/tmp/rebuild-install-tail.log')}\n\`\`\`\n\nREBUILD\n\`\`\`text\n${read('/tmp/rebuild-esb-tail.log')}\n\`\`\`\n\nVALIDATE\n\`\`\`text\n${read('/tmp/rebuild-validate-tail.log')}\n\`\`\`\n\nVERIFY\n\`\`\`text\n${read('/tmp/rebuild-verify-tail.log')}\n\`\`\``;
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:703,body});
+
+      - name: Fail when rebuild contract failed
+        if: steps.install.outputs.exit_code != '0' || steps.credentials.outputs.exit_code != '0' || steps.rebuild.outputs.exit_code != '0' || steps.validate.outputs.exit_code != '0' || steps.verify.outputs.exit_code != '0'
+        run: exit 1
 
 # 2026-08-19 20:33 EDT production acceptance rebuild trigger
 # 2026-08-19 runtime parity: use platform-standard Node 22
 # 2026-08-22 canonical Course Builder rerun after Remotion runtime packaging repair
+# 2026-08-22 report preflight/build/validate/verify results to issue 703

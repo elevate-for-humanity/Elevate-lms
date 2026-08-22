@@ -1,5 +1,4 @@
 import { logger } from '@/lib/logger';
-import { resolveHvacCourseId } from '@/lib/courses/resolvers';
 import { checkEligibilityAndAuthorize } from '@/lib/services/exam-eligibility';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -14,6 +13,7 @@ import {
 import type { CheckpointGateError } from '@/lib/lms/engine';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 import { checkCompetencyGate } from '@/lib/lms/competency-gate';
+import { resolveCourseEnrollment } from '@/lib/enrollment/resolve-course-enrollment';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
@@ -71,45 +71,25 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
       return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
     }
 
-    const { data: courseRow, error: courseError } = await db
-      .from('courses')
-      .select('id,program_id')
-      .eq('id', lesson.course_id)
-      .maybeSingle();
-    if (courseError || !courseRow) {
-      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    const enrollment = await resolveCourseEnrollment(user.id, lesson.course_id);
+    if (!enrollment) {
+      return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
     }
 
-    let enrollment: { id: string; status: string; program_id: string | null } | null = null;
-    const { data: directEnrollment } = await db
-      .from('program_enrollments')
-      .select('id,status,program_id')
-      .eq('user_id', user.id)
-      .eq('course_id', lesson.course_id)
-      .maybeSingle();
-    if (directEnrollment) {
-      enrollment = directEnrollment;
-    } else if (courseRow.program_id) {
-      const { data: programEnrollment } = await db
-        .from('program_enrollments')
-        .select('id,status,program_id')
-        .eq('user_id', user.id)
-        .eq('program_id', courseRow.program_id)
-        .maybeSingle();
-      if (programEnrollment) enrollment = programEnrollment;
-    }
-
-    if (!enrollment) return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
-    if (enrollment.status === 'pending_funding_verification') {
+    const enrollmentStatus = String(enrollment.status || '').toLowerCase();
+    if (enrollmentStatus === 'pending_funding_verification') {
       return NextResponse.json(
-        { error: 'Enrollment pending funding verification. Complete payment or funding approval to continue.' },
+        {
+          error:
+            'Enrollment pending funding verification. Complete payment or funding approval to continue.',
+        },
         { status: 403 },
       );
     }
-    if (enrollment.status === 'pending_approval') {
+    if (enrollmentStatus === 'pending_approval') {
       return NextResponse.json({ error: 'Enrollment pending approval' }, { status: 403 });
     }
-    if (!ACTIVE_ENROLLMENT_STATUSES.has(enrollment.status)) {
+    if (!ACTIVE_ENROLLMENT_STATUSES.has(enrollmentStatus)) {
       return NextResponse.json({ error: 'Enrollment is not active' }, { status: 403 });
     }
 
@@ -190,8 +170,6 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
       lessonTitle: lesson.title,
     });
 
-    // This is the only progress mutation. If it fails, no downstream competency
-    // or eligibility side effects are written.
     const completionResult = await recordStepCompletion(
       user.id,
       lessonId,
@@ -201,8 +179,6 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
     );
     const completedAt = new Date().toISOString();
 
-    // Competency touchpoints are a post-completion side effect and therefore run
-    // only after the canonical engine successfully records lesson progress.
     try {
       const { data: linkedCompetencies } = await db
         .from('lesson_competencies')
@@ -254,19 +230,6 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
         logger.error(
           '[program-completion] Check failed (non-fatal):',
           programError instanceof Error ? programError : new Error(String(programError)),
-        );
-      }
-    }
-
-    const hvacCourseId = await resolveHvacCourseId();
-    if (courseCompleted && lesson.course_id === hvacCourseId) {
-      try {
-        const { advanceHvacWorkflow } = await import('@/lib/courses/hvac-completion-workflow');
-        await advanceHvacWorkflow(user.id);
-      } catch (workflowError) {
-        logger.error(
-          '[hvac-workflow] Auto-advance failed (non-fatal):',
-          workflowError instanceof Error ? workflowError : new Error(String(workflowError)),
         );
       }
     }
@@ -374,6 +337,10 @@ async function _DELETE(
 
     try {
       await assertLessonAccess(user.id, lessonId);
+      const enrollment = await resolveCourseEnrollment(user.id, lesson.course_id);
+      if (!enrollment) {
+        return NextResponse.json({ error: 'Not enrolled in this course' }, { status: 403 });
+      }
       await recordStepUncompletion(user.id, lessonId, lesson.course_id);
     } catch (error) {
       logger.error(

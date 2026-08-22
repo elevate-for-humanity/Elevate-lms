@@ -23,7 +23,8 @@ function password() {
   return `Qa!${randomBytes(18).toString('base64url')}7z`;
 }
 
-async function must(result, label) {
+async function must(resultPromise, label) {
+  const result = await resultPromise;
   if (result.error) throw new Error(`${label}: ${result.error.message}`);
   return result.data;
 }

@@ -94,6 +94,17 @@ const lessonPatchSchema = z.object({
   status: z.enum(['draft','published']).optional(),
 });
 
+const deleteLessonSchema = z.object({
+  lessonId: z.string().uuid(),
+  courseId: z.string().uuid().optional(),
+});
+
+const reorderLessonsSchema = z.object({
+  courseId: z.string().uuid(),
+  lessonA: z.object({ id: z.string().uuid(), orderIndex: z.number().int().min(0) }),
+  lessonB: z.object({ id: z.string().uuid(), orderIndex: z.number().int().min(0) }),
+});
+
 const scormLinkSchema = z.object({
   courseId: z.string().uuid(),
   scormPackageId: z.string().uuid(),
@@ -184,11 +195,39 @@ export async function patchCourseLesson(input: unknown) {
     .from('course_lessons')
     .update(update)
     .eq('id', body.lessonId)
-    .select('id,title,lesson_type,status,updated_at')
+    .select('*')
     .maybeSingle();
   if (error) throw error;
   if (!data) throw new Error('Lesson not found');
   return data;
+}
+
+export async function deleteCourseLesson(input: unknown) {
+  const body = deleteLessonSchema.parse(input);
+  const db = await requireAdminClient();
+  let query = db.from('course_lessons').delete().eq('id', body.lessonId);
+  if (body.courseId) query = query.eq('course_id', body.courseId);
+  const { error } = await query;
+  if (error) throw error;
+  return { lessonId: body.lessonId };
+}
+
+export async function reorderCourseLessons(input: unknown) {
+  const body = reorderLessonsSchema.parse(input);
+  const db = await requireAdminClient();
+  const [first, second] = await Promise.all([
+    db.from('course_lessons')
+      .update({ order_index: body.lessonA.orderIndex, updated_at: new Date().toISOString() })
+      .eq('id', body.lessonA.id)
+      .eq('course_id', body.courseId),
+    db.from('course_lessons')
+      .update({ order_index: body.lessonB.orderIndex, updated_at: new Date().toISOString() })
+      .eq('id', body.lessonB.id)
+      .eq('course_id', body.courseId),
+  ]);
+  if (first.error) throw first.error;
+  if (second.error) throw second.error;
+  return { lessonA: body.lessonA, lessonB: body.lessonB };
 }
 
 export async function linkCourseScormPackage(input: unknown, actorId: string) {

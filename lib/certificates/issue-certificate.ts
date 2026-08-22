@@ -7,6 +7,7 @@
  * complete; program completion is owned by lib/lms/completion-evaluator.ts.
  */
 
+import { randomUUID } from 'node:crypto';
 import type { SupabaseClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -67,8 +68,6 @@ async function findExistingCertificate(
 ) {
   const { enrollmentId, studentId, courseId, programId } = params;
 
-  // Scope is authoritative. A program enrollment can cover multiple courses,
-  // so enrollment_id alone is never sufficient to identify a certificate.
   if (courseId) {
     const { data, error } = await supabase
       .from('certificates')
@@ -178,7 +177,7 @@ export async function issueCertificate(
       };
     }
 
-    const certificateNumber = `EFH-${Date.now().toString(36).toUpperCase()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+    const certificateNumber = `EFH-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;
     const completionDate = normalizeIssueDate(issueDate);
     const verificationCode = certificateNumber.split('-').pop() || certificateNumber;
     const displayName = programName || courseTitle || 'Completion';
@@ -243,8 +242,6 @@ export async function issueCertificate(
       .single();
 
     if (certError || !certificate) {
-      // Concurrent duplicate requests are expected to converge on the unique
-      // scope indexes. Re-read before returning failure.
       const raced = await findExistingCertificate(supabase, {
         enrollmentId,
         studentId,

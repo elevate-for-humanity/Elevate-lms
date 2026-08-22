@@ -1,5 +1,3 @@
-'use client';
-
 import Image from 'next/image';
 
 export interface HeroBanner {
@@ -80,12 +78,13 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           </div>
         </div>
 
-        <div className="relative min-h-[320px] sm:min-h-[440px] lg:min-h-[620px]">
+        <div className="relative min-h-[320px] bg-slate-100 sm:min-h-[440px] lg:min-h-[620px]">
           <Image
             src={image}
             alt="Students and professionals preparing for career training and apprenticeship pathways"
             fill
             priority
+            fetchPriority="high"
             sizes="(max-width: 1024px) 100vw, 55vw"
             className="object-cover object-center"
           />

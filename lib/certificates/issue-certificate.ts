@@ -46,6 +46,7 @@ export interface IssueCertificateParams {
   metadata?: Record<string, unknown>;
   credentialStack?: Record<string, unknown> | null;
   issuanceSnapshot?: Record<string, unknown> | null;
+  tenantId?: string | null;
 }
 
 export interface IssuedCertificateSummary {
@@ -113,6 +114,36 @@ async function findExistingCertificate(
   return data;
 }
 
+async function resolveTenantId(
+  supabase: SupabaseClient,
+  enrollmentId: string,
+  studentId: string,
+  programId?: string,
+): Promise<string | null> {
+  const { data: enrollment } = await supabase
+    .from('program_enrollments')
+    .select('tenant_id')
+    .eq('id', enrollmentId)
+    .maybeSingle();
+  if (enrollment?.tenant_id) return enrollment.tenant_id;
+
+  if (programId) {
+    const { data: program } = await supabase
+      .from('programs')
+      .select('tenant_id')
+      .eq('id', programId)
+      .maybeSingle();
+    if (program?.tenant_id) return program.tenant_id;
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('tenant_id')
+    .eq('id', studentId)
+    .maybeSingle();
+  return profile?.tenant_id || null;
+}
+
 function normalizeIssueDate(value?: string | null): string {
   if (!value) return new Date().toISOString();
   const parsed = new Date(value.length === 10 ? `${value}T12:00:00.000Z` : value);
@@ -167,6 +198,7 @@ export async function issueCertificate(
     metadata,
     credentialStack,
     issuanceSnapshot,
+    tenantId,
   } = params;
 
   if (Boolean(courseId) === Boolean(programId)) {
@@ -213,6 +245,15 @@ export async function issueCertificate(
       };
     }
 
+    const resolvedTenantId = tenantId || (await resolveTenantId(supabase, enrollmentId, studentId, programId));
+    if (!resolvedTenantId) {
+      return {
+        success: false,
+        alreadyIssued: false,
+        error: 'Certificate tenant context could not be resolved',
+      };
+    }
+
     const certificateNumber = `EFH-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;
     const completionDate = normalizeIssueDate(issueDate);
     const verificationCode = certificateNumber.split('-').pop() || certificateNumber;
@@ -250,6 +291,7 @@ export async function issueCertificate(
     const { data: certificate, error: certError } = await supabase
       .from('certificates')
       .insert({
+        tenant_id: resolvedTenantId,
         user_id: studentId,
         student_id: studentId,
         student_name: studentName,
@@ -263,7 +305,7 @@ export async function issueCertificate(
         program_name: programName || null,
         title: displayName,
         certificate_type: programId ? 'PROGRAM_COMPLETION' : 'COURSE_COMPLETION',
-        status: 'issued',
+        status: 'active',
         issued_date: completionDate.split('T')[0],
         completion_date: completionDate.split('T')[0],
         hours_completed: competencyEvidence?.seatTimeHours ?? programHours ?? null,

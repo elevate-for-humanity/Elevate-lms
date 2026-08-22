@@ -20,10 +20,11 @@ export async function GET() {
   return NextResponse.json(
     {
       service: 'lms',
-      status: healthy ? 'healthy' : 'unhealthy',
-      ready: healthy,
+      status: healthy ? 'healthy' : readiness.ready ? 'degraded' : 'unhealthy',
+      healthy,
+      ready: readiness.ready,
       canonicalDashboard: '/lms/dashboard',
-      healthContract: 'lms-v3',
+      healthContract: 'lms-v4',
       commit: readiness.commit,
       buildId: readiness.buildId,
       builtAt: readiness.builtAt,

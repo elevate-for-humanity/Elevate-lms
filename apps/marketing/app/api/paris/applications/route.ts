@@ -121,12 +121,14 @@ export async function POST(request: Request) {
       applicationCertification: true,
     };
 
+    const canonicalUrl = new URL('/api/applications', request.url);
     const headers = new Headers({
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      Origin: canonicalUrl.origin,
       'X-Idempotency-Key': `paris-${user.id}-${crypto.randomUUID()}`,
     });
-    const response = await fetch(new URL('/api/applications', request.url), {
+    const response = await fetch(canonicalUrl, {
       method: 'POST',
       headers,
       cache: 'no-store',

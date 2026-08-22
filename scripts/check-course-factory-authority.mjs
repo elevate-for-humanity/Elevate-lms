@@ -25,6 +25,7 @@ const rootText = read(rootRoute);
 for (const required of [
   "from '@/lib/course-builder/orchestrator'",
   "from '@/lib/course-builder/edit-service'",
+  "from '@/lib/course-builder/persisted-publish-service'",
   "action === 'generate-from-blueprint'",
   "action === 'queue-media'",
   "action === 'save-program-config'",
@@ -33,6 +34,7 @@ for (const required of [
   "action === 'patch-lesson'",
   "action === 'link-scorm'",
   "action === 'publish'",
+  "action === 'publish-persisted'",
   "action === 'repair'",
   "action === 'audit'",
 ]) if (!rootText.includes(required)) failures.push(`${rootRoute}: missing canonical action/authority ${required}`);
@@ -48,9 +50,14 @@ const editService = read('lib/course-builder/edit-service.ts');
 for (const capability of ['saveCourseModule','saveCourseLesson','patchCourseLesson','linkCourseScormPackage']) {
   if (!editService.includes(capability)) failures.push(`Course Builder edit service is missing ${capability}`);
 }
+const persistedPublish = read('lib/course-builder/persisted-publish-service.ts');
+for (const capability of ['runPersistedCourseProcurementHealthCheck','publishPersistedCourse','publishCourse','review_status','module_completion_rules']) {
+  if (!persistedPublish.includes(capability)) failures.push(`Persisted Course Builder publication service is missing ${capability}`);
+}
 
 const retiredMutationRoutes = [
   'apps/admin/app/api/admin/lms/courses/generate/route.ts',
+  'apps/admin/app/api/admin/lms/courses/[courseId]/publish/route.ts',
   'apps/admin/app/api/admin/course-builder/publish/route.ts',
   'apps/admin/app/api/admin/course-builder/program/route.ts',
   'apps/admin/app/api/admin/course-builder/module/route.ts',
@@ -66,6 +73,7 @@ for (const rel of retiredMutationRoutes) {
   if (!/(RETIRED|COURSE_FACTORY_REQUIRED|COURSE_BUILDER_ROOT_REQUIRED)/.test(text)) failures.push(`${rel}: historical course mutation endpoint is not explicitly retired`);
   if (/\bcourseFactory\s*\(/.test(text)) failures.push(`${rel}: retired endpoint still invokes course generation`);
   if (/\.from\(['\"](?:courses|course_modules|course_lessons)['\"]\)[\s\S]{0,220}\.(?:insert|upsert|update|delete)\(/.test(text)) failures.push(`${rel}: retired endpoint still writes canonical course tables`);
+  if (/\bpublishCourse\s*\(/.test(text)) failures.push(`${rel}: retired endpoint still publishes outside Course Builder root`);
 }
 const scormText = read('apps/admin/app/api/admin/course-builder/scorm-link/route.ts');
 if (!scormText.includes('RETIRED mutation')) failures.push('SCORM mutation route is not explicitly retired');
@@ -96,10 +104,12 @@ for (const rel of walk('apps')) {
   const text = read(rel);
   if (text.includes("@/lib/course-factory/factory")) failures.push(`${rel}: runtime route imports private Course Factory engine`);
   if (/\bcourseFactory\s*\(/.test(text) && rel.includes('/api/')) failures.push(`${rel}: independent HTTP complete-course caller detected; use ${rootRoute}`);
+  if (/\bpublishCourse\s*\(/.test(text) && rel.includes('/api/')) failures.push(`${rel}: independent HTTP publication caller detected; use ${rootRoute}`);
 }
 
 const forbiddenEndpointRefs = [
   '/api/admin/lms/courses/generate',
+  '/api/admin/lms/courses/[courseId]/publish',
   '/api/admin/course-builder/publish',
   '/api/admin/course-builder/program',
   '/api/admin/course-builder/module',
@@ -119,4 +129,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder orchestration/editing -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; no parallel complete-package writer detected.');
+console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder orchestration/editing/publication -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; no parallel complete-package or publication authority detected.');

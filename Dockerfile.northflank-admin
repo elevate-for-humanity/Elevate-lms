@@ -15,7 +15,7 @@ RUN apt-get update \
         python3 make g++ curl \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /workspace
-RUN echo "nf-cache-invalidate-admin-2026-08-22-pwa-offline-e2e"
+RUN echo "nf-cache-invalidate-admin-2026-08-22-pwa-offline-e2e-v2"
 
 FROM base AS dependencies
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -65,14 +65,16 @@ RUN set -eux; \
     test -f /workspace/remotion-src/index.ts; \
     echo "Admin build arguments verified"
 
-# Northflank is the production image path, so enforce the PWA boundary here:
-# protected Admin HTML remains network-only, while the static shell is installable.
 RUN node scripts/check-pwa-architecture.mjs
 RUN node scripts/stamp-sw.mjs
+RUN node scripts/sync-pwa-public.mjs admin
 RUN test -f /workspace/public/sw-admin.js \
-    && test -f /workspace/public/manifest-admin.json \
-    && test -f /workspace/public/offline.html \
-    && ! grep -q '__CACHE_VERSION__' /workspace/public/sw-admin.js
+    && test -f /workspace/apps/admin/public/sw-admin.js \
+    && test -f /workspace/apps/admin/public/manifest-admin.json \
+    && test -f /workspace/apps/admin/public/offline.html \
+    && ! grep -q '__CACHE_VERSION__' /workspace/public/sw-admin.js \
+    && ! grep -q '__CACHE_VERSION__' /workspace/apps/admin/public/sw-admin.js \
+    && cmp /workspace/public/sw-admin.js /workspace/apps/admin/public/sw-admin.js
 
 RUN pnpm --filter @elevate/admin build
 RUN node scripts/verify-admin-critical-routes.mjs
@@ -119,7 +121,7 @@ RUN groupadd --system --gid 1001 nodejs && \
 
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/standalone/ /app/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/static/ /app/apps/admin/.next/static/
-COPY --from=builder --chown=nextjs:nodejs /workspace/public/ /app/apps/admin/public/
+# apps/admin/public was regenerated from root canonical PWA assets and preserves app-specific images.
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/public/ /app/apps/admin/public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/remotion-src/ /app/apps/admin/remotion-src/
 COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules /app/node_modules
@@ -127,7 +129,6 @@ RUN set -eux; \
     test -f /app/apps/admin/server.js; \
     test -d /app/apps/admin/.next/static; \
     test -f /app/apps/admin/.next/required-server-files.json; \
-    test -d /app/apps/admin/public; \
     test -d /app/apps/admin/public/images; \
     test -f /app/apps/admin/public/sw-admin.js; \
     test -f /app/apps/admin/public/manifest-admin.json; \
@@ -141,9 +142,7 @@ RUN set -eux; \
     test -d /app/node_modules/@napi-rs/canvas; \
     test -d /app/node_modules/fontkit; \
     test -d /app/node_modules/pdfkit; \
-    command -v ffmpeg; \
-    command -v ffprobe; \
-    fc-match 'DejaVu Sans'
+    command -v ffmpeg; command -v ffprobe; fc-match 'DejaVu Sans'
 
 RUN set -eux; \
     LOG=/tmp/admin-runtime-smoke.log; \
@@ -153,15 +152,10 @@ RUN set -eux; \
     READY=0; \
     for attempt in $(seq 1 30); do \
       if curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/tmp/admin-ping.json 2>/tmp/admin-ping.err; then READY=1; break; fi; \
-      if ! kill -0 "${PID}" 2>/dev/null; then \
-        echo 'Admin standalone process exited during packaged-runtime smoke test.'; cat "${LOG}"; exit 1; \
-      fi; \
+      if ! kill -0 "${PID}" 2>/dev/null; then echo 'Admin standalone process exited during packaged-runtime smoke test.'; cat "${LOG}"; exit 1; fi; \
       sleep 2; \
     done; \
-    if [ "${READY}" -ne 1 ]; then \
-      echo 'Admin packaged standalone runtime did not become healthy.'; \
-      cat /tmp/admin-ping.err || true; cat "${LOG}"; exit 1; \
-    fi; \
+    if [ "${READY}" -ne 1 ]; then echo 'Admin packaged standalone runtime did not become healthy.'; cat /tmp/admin-ping.err || true; cat "${LOG}"; exit 1; fi; \
     cat /tmp/admin-ping.json; \
     curl --fail --silent --show-error http://127.0.0.1:3000/sw-admin.js | grep -q "cache: 'no-store'"; \
     curl --fail --silent --show-error http://127.0.0.1:3000/manifest-admin.json | grep -q '"standalone"'; \
@@ -170,8 +164,6 @@ RUN set -eux; \
 
 USER nextjs
 EXPOSE 3000
-
 HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
     CMD curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/dev/null || exit 1
-
 CMD ["node", "--max-http-header-size=32768", "apps/admin/server.js"]

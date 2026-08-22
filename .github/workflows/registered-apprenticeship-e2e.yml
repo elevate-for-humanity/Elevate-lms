@@ -12,6 +12,7 @@ on:
       - 'tests/e2e/portal-responsive-design.spec.ts'
       - 'scripts/check-registered-apprenticeship-architecture.mjs'
       - 'scripts/qa/provision-apprenticeship-e2e.mjs'
+      - 'scripts/qa/provision-learner-program-holder-e2e.mjs'
   workflow_run:
     workflows:
       - Deploy LMS
@@ -29,10 +30,10 @@ concurrency:
 jobs:
   production-authenticated-e2e:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-    name: Apprentice + Host Shop authenticated persistence and responsive design
+    name: Portal authenticated persistence and responsive design
     runs-on: ubuntu-latest
     environment: production
-    timeout-minutes: 40
+    timeout-minutes: 55
     env:
       PLAYWRIGHT_BASE_URL: https://app.elevateforhumanity.org
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -78,6 +79,8 @@ jobs:
           test -n "${SUPABASE_SERVICE_ROLE_KEY:-}" || { echo '::error::SUPABASE_SERVICE_ROLE_KEY is not configured'; exit 1; }
       - name: Provision disposable Host Shop + Apprentice identities
         run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
+      - name: Provision isolated Learner + Program Holder identities
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs provision
       - name: Install Chromium and WebKit
         run: pnpm exec playwright install chromium webkit --with-deps
       - name: Run registered-apprenticeship architecture gate
@@ -86,6 +89,9 @@ jobs:
         run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --project=desktop-chrome
       - name: Run authenticated cross-device responsive design certification
         run: pnpm exec playwright test tests/e2e/portal-responsive-design.spec.ts --config playwright.config.ts --project=desktop-chrome --project=laptop-chrome --project=tablet-chrome --project=iphone-webkit --project=android-chrome
+      - name: Clean isolated Learner + Program Holder identities
+        if: always()
+        run: node scripts/qa/provision-learner-program-holder-e2e.mjs cleanup
       - name: Clean disposable Host Shop + Apprentice identities
         if: always()
         run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
@@ -93,7 +99,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: registered-apprenticeship-e2e-results
+          name: portal-responsive-e2e-results
           path: |
             test-results/
             playwright-report/
@@ -110,4 +116,4 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh issue comment 791 --repo "$GITHUB_REPOSITORY" --body "### Host Shop + Apprentice production QA: ${QA_STATUS^^}\n\n- SHA: \`${QA_SHA}\`\n- Trigger: \`${QA_EVENT}\`\n- Run: ${QA_RUN_URL}\n- Fixture: disposable CI-created Host Shop and Apprentice; cleanup runs on success or failure.\n- Functional scope: Apprentice dashboard/hours/RTI/competencies/documents/attendance/profile/handbook; Host Shop dashboard/apprentices/pending-hours/documents/competencies/attendance/wages/reports/profile; Host Shop competency write + restore; Apprentice-to-Host-Shop RBAC denial.\n- Responsive design scope: desktop 1440x900, laptop 1280x720, iPad-class tablet, iPhone WebKit, Pixel-class Android Chromium. Checks page overflow, clipped critical controls, zero-size primary content, and undersized mobile form/button controls.\n- Evidence: Playwright traces/screenshots/report artifact retained for 14 days."
+          gh issue comment 791 --repo "$GITHUB_REPOSITORY" --body "### Portal production QA: ${QA_STATUS^^}\n\n- SHA: \`${QA_SHA}\`\n- Trigger: \`${QA_EVENT}\`\n- Run: ${QA_RUN_URL}\n- Fixtures: disposable Host Shop, Apprentice, Learner, and isolated Program Holder identities; mutable fixture rows are cleaned and Auth identities are soft-deleted to preserve immutable audit history.\n- Functional scope: Apprentice dashboard/hours/RTI/competencies/documents/attendance/profile/handbook; Host Shop dashboard/apprentices/pending-hours/documents/competencies/attendance/wages/reports/profile; competency persistence + restore; Apprentice-to-Host-Shop RBAC denial.\n- Responsive design scope: Host Shop, Apprentice, Learner, and Program Holder on desktop 1440x900, laptop 1280x720, iPad-class tablet, iPhone WebKit, and Pixel-class Android Chromium. Checks page overflow, clipped critical controls, zero-size primary content, mobile control sizing, login/authorization regressions, and HTTP 5xx responses.\n- Evidence: Playwright traces/screenshots/report artifact retained for 14 days."

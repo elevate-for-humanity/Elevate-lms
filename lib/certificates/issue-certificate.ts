@@ -39,17 +39,21 @@ export interface IssueCertificateParams {
   competencyEvidence?: CompetencyEvidence;
 }
 
+export interface IssuedCertificateSummary {
+  id: string;
+  certificate_number: string;
+  student_name: string;
+  program_name: string;
+  completion_date: string;
+  issued_at: string;
+  verification_url: string;
+  url: string;
+}
+
 export interface IssueCertificateResult {
   success: boolean;
   alreadyIssued: boolean;
-  certificate?: {
-    id: string;
-    certificate_number: string;
-    student_name: string;
-    program_name: string;
-    completion_date: string;
-    url: string;
-  };
+  certificate?: IssuedCertificateSummary;
   error?: string;
 }
 
@@ -115,6 +119,10 @@ export async function issueCertificate(
 
     if (existingCert) {
       const certificateUrl = `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/certificates/${existingCert.id}`;
+      const issuedAt = existingCert.issued_at || existingCert.metadata?.completion_date || '';
+      const verificationUrl =
+        existingCert.verification_url ||
+        `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/verify/${String(existingCert.verification_code || '').toLowerCase()}`;
       return {
         success: true,
         alreadyIssued: true,
@@ -129,8 +137,9 @@ export async function issueCertificate(
             programName ||
             courseTitle ||
             'Course',
-          completion_date:
-            existingCert.issued_at || existingCert.metadata?.completion_date || '',
+          completion_date: issuedAt,
+          issued_at: issuedAt,
+          verification_url: verificationUrl,
           url: certificateUrl,
         },
       };
@@ -264,6 +273,8 @@ export async function issueCertificate(
         student_name: studentName,
         program_name: displayName,
         completion_date: completionDate,
+        issued_at: completionDate,
+        verification_url: verificationUrl,
         url: certificateUrl,
       },
     };

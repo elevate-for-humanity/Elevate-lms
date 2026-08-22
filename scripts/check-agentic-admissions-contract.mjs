@@ -65,6 +65,16 @@ requireText('apps/marketing/app/api/applications/route.ts', 'existing: true', 'a
 forbidText('apps/marketing/app/api/applications/route.ts', 'Come back and reapply', 'duplicate-application WorkOne instruction');
 forbidText('apps/marketing/app/api/applications/route.ts', 'complete ICC and reapply', 'duplicate-application staff instruction');
 requireText('apps/marketing/app/apply/success/page.tsx', "application?.status === 'pending_workone'", 'pending WorkOne confirmation routing');
+
+// LMS preserves the legacy URL only as a compatibility proxy. It must never
+// become a second public admissions writer or own a conflicting funding state.
+requireText('apps/lms/app/api/applications/route.ts', "new URL('/api/applications', base)", 'canonical Marketing application proxy');
+requireText('apps/lms/app/api/applications/route.ts', 'Origin: target.origin', 'trusted server-to-server canonical origin');
+forbidText('apps/lms/app/api/applications/route.ts', "from('applications')", 'duplicate LMS application database access');
+forbidText('apps/lms/app/api/applications/route.ts', 'pending_funding', 'duplicate LMS funding lifecycle');
+forbidText('apps/lms/app/api/applications/route.ts', 'reapply', 'duplicate LMS reapplication instruction');
+forbidText('apps/lms/app/api/applications/route.ts', 'provisionAccount', 'duplicate LMS account provisioning');
+
 requireText('apps/marketing/app/api/paris/applications/[applicationId]/decision/route.ts', 'approveApplication', 'canonical approval pipeline');
 requireText('apps/marketing/app/api/paris/applications/[applicationId]/decision/route.ts', "canonicalAuthority: 'applications'", 'canonical application authority response');
 forbidText('apps/marketing/app/api/paris/applications/[applicationId]/decision/route.ts', 'bypassPaymentGate: true', 'payment/funding gate bypass');

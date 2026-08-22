@@ -41,96 +41,36 @@ export const SYSTEMS: SystemNode[] = [
     id: 'admin-core',
     name: 'Admin Operations',
     description: 'Privileged operational dashboard and manual record views. Admin AI is the primary control surface; these routes are governed manual views.',
-    routes: [
-      '/dashboard',
-      '/applications',
-      '/students',
-      '/programs',
-      '/operations',
-      '/reports',
-      '/system-health',
-    ],
+    routes: ['/dashboard','/applications','/students','/programs','/operations','/reports','/system-health'],
     apis: ['/api/admin/*'],
-    tables: [
-      'applications',
-      'program_enrollments',
-      'profiles',
-      'programs',
-      'audit_logs',
-      'admin_activity_log',
-    ],
+    tables: ['applications','program_enrollments','profiles','programs','audit_logs','admin_activity_log'],
     status: 'active',
   },
   {
     id: 'admin-ai',
     name: 'Admin AI / Studio',
     description: 'Conversation-first administrative control plane. Natural-language requests select internal capabilities; advanced Studio routes are manual inspection/editing surfaces.',
-    routes: [
-      '/studio',
-      '/studio/courses',
-      '/studio/repository',
-      '/studio/workflows',
-      '/studio/browser',
-      '/studio/deployments',
-      '/studio/health',
-      '/studio/settings',
-    ],
-    apis: [
-      '/api/devstudio/chat',
-      '/api/admin/ai-assistant',
-      '/api/admin/ai-assistant/approve',
-      '/api/devstudio/jobs',
-      '/api/devstudio/upload',
-      '/api/admin/dev-studio/*',
-    ],
-    tables: [
-      'devstudio_chat_log',
-      'studio_conversations',
-      'devstudio_jobs',
-      'devstudio_documents',
-      'ai_conversation_memory',
-      'ellie_pending_actions',
-      'audit_logs',
-    ],
+    routes: ['/studio','/studio/courses','/studio/repository','/studio/workflows','/studio/browser','/studio/deployments','/studio/health','/studio/settings'],
+    apis: ['/api/devstudio/chat','/api/admin/ai-assistant','/api/admin/ai-assistant/approve','/api/devstudio/jobs','/api/devstudio/upload','/api/admin/dev-studio/*'],
+    tables: ['devstudio_chat_log','studio_conversations','devstudio_jobs','devstudio_documents','ai_conversation_memory','ellie_pending_actions','audit_logs'],
     status: 'active',
   },
   {
     id: 'course-authoring',
-    name: 'Course Factory / Course Authoring',
-    description: 'Single course generation, validation, governance, and persistence authority. Canonical writes are atomic: courses → course_modules → course_lessons plus assessment_questions.',
+    name: 'Studio Course Builder / Course Factory',
+    description: 'Studio controls one Course Builder application boundary. Course Builder owns generation, editing, validation, governance, repair, media and publication; the private Course Factory performs complete-package execution and persistence.',
     routes: ['/studio/courses', '/studio/courses/[courseId]'],
-    apis: [
-      '/api/admin/course-builder/pipeline',
-      '/api/admin/course-builder/publish',
-      '/api/admin/lms/courses/[courseId]/publish',
-    ],
+    apis: ['/api/admin/course-builder'],
     tables: ['courses', 'course_modules', 'course_lessons', 'assessment_questions'],
     status: 'active',
   },
   {
     id: 'learner-lms',
     name: 'Learner LMS',
-    description: 'Learner delivery, progress, assessments, remediation, credentials, and course access.',
-    routes: [
-      '/lms/dashboard',
-      '/lms/courses',
-      '/lms/courses/[courseId]',
-      '/lms/courses/[courseId]/lessons/[lessonId]',
-      '/lms/certificates',
-    ],
-    apis: [
-      '/api/learner/*',
-      '/api/courses/[courseId]/*',
-      '/api/lms/*',
-    ],
-    tables: [
-      'program_enrollments',
-      'course_enrollments',
-      'course_lessons',
-      'lesson_progress',
-      'assessment_questions',
-      'program_completion_certificates',
-    ],
+    description: 'Learner delivery, progress, assessments, remediation, credentials, and course access. LMS consumes published canonical courses and does not own complete-course authoring.',
+    routes: ['/lms/dashboard','/lms/courses','/lms/courses/[courseId]','/lms/courses/[courseId]/lessons/[lessonId]','/lms/certificates'],
+    apis: ['/api/learner/*','/api/courses/[courseId]/*','/api/lms/*'],
+    tables: ['program_enrollments','course_enrollments','course_lessons','lesson_progress','assessment_questions','program_completion_certificates'],
     status: 'active',
   },
   {
@@ -166,14 +106,7 @@ export const SYSTEMS: SystemNode[] = [
     description: 'Payment lifecycle, checkout, subscriptions, revenue and funding state.',
     routes: ['/billing'],
     apis: ['/api/stripe/*', '/api/payments/*'],
-    tables: [
-      'program_enrollments',
-      'payments',
-      'stripe_sessions_staging',
-      'barber_subscriptions',
-      'cosmetology_subscriptions',
-      'barber_payments',
-    ],
+    tables: ['program_enrollments','payments','stripe_sessions_staging','barber_subscriptions','cosmetology_subscriptions','barber_payments'],
     status: 'active',
   },
   {
@@ -197,9 +130,7 @@ export const SYSTEMS: SystemNode[] = [
 ];
 
 export const ROUTE_SYSTEM_MAP: Record<string, string> = {};
-for (const system of SYSTEMS) {
-  for (const route of system.routes) ROUTE_SYSTEM_MAP[route] = system.id;
-}
+for (const system of SYSTEMS) for (const route of system.routes) ROUTE_SYSTEM_MAP[route] = system.id;
 
 export const TABLE_SYSTEM_MAP: Record<string, string[]> = {};
 for (const system of SYSTEMS) {
@@ -209,10 +140,7 @@ for (const system of SYSTEMS) {
   }
 }
 
-export const ROUTE_DEPENDENCIES: Record<
-  string,
-  { tables: string[]; apis: string[]; components: string[] }
-> = {
+export const ROUTE_DEPENDENCIES: Record<string,{ tables: string[]; apis: string[]; components: string[] }> = {
   '/dashboard': {
     tables: ['applications', 'program_enrollments', 'profiles', 'programs'],
     apis: ['/api/admin/*', '/api/devstudio/chat', '/api/admin/ai-assistant'],
@@ -225,12 +153,12 @@ export const ROUTE_DEPENDENCIES: Record<
   },
   '/studio/courses': {
     tables: ['courses', 'course_modules', 'course_lessons', 'assessment_questions'],
-    apis: ['/api/admin/course-builder/pipeline', '/api/admin/course-builder/publish'],
+    apis: ['/api/admin/course-builder'],
     components: ['UnifiedCourseBuilder'],
   },
   '/studio/courses/[courseId]': {
     tables: ['courses', 'course_modules', 'course_lessons', 'assessment_questions'],
-    apis: ['/api/admin/lms/courses/[courseId]/publish'],
+    apis: ['/api/admin/course-builder'],
     components: ['CourseProvider', 'CourseStudioApplication', 'StudioWorkspace'],
   },
   '/applications': {
@@ -266,7 +194,7 @@ export const PLATFORM_DEBT = [
   {
     id: 'legacy-course-projections',
     severity: 'high',
-    description: 'lms_courses, training_courses, modules, curriculum_lessons, lms_lessons, and training_lessons remain populated historical/projection stores. Course Factory is the only canonical authoring writer and persists to courses/course_modules/course_lessons.',
+    description: 'lms_courses, training_courses, modules, curriculum_lessons, lms_lessons, and training_lessons remain populated historical/projection stores. Course Builder is the application authority and Course Factory is the private complete-package persistence engine for courses/course_modules/course_lessons.',
     affectedRoutes: ['/studio/courses', '/lms/courses'],
     resolution: 'Inventory remaining consumers, classify required read projections, eliminate parallel writers, and retire or formally version compatibility projections.',
   },
@@ -309,8 +237,8 @@ export const CANONICAL_DECISIONS = [
   },
   {
     id: 'course-write-authority',
-    decision: 'Course Factory is the only course authoring persistence authority. Its atomic database function writes courses, course_modules, course_lessons, and assessment_questions.',
-    rationale: 'Eliminates partial course writes and parallel builder persistence.',
+    decision: 'Studio controls the Course Builder. /api/admin/course-builder is the single application mutation/orchestration boundary; Course Factory is the private complete-package execution/persistence engine.',
+    rationale: 'Eliminates partial course writes, competing HTTP builders, and parallel publication authorities while preserving specialized internal capability services.',
   },
   {
     id: 'studio-data-boundary',
@@ -341,21 +269,12 @@ export const CANONICAL_DECISIONS = [
 
 export function getKnowledgeGraphContext(): string {
   const lines: string[] = [
-    '=== ELEVATE PLATFORM CANONICAL KNOWLEDGE GRAPH ===',
-    '',
+    '=== ELEVATE PLATFORM CANONICAL KNOWLEDGE GRAPH ===','',
     '## SYSTEMS',
-    ...SYSTEMS.map(
-      (system) =>
-        `[${system.status.toUpperCase()}] ${system.name} (${system.id})\n` +
-        `  ${system.description}\n` +
-        `  Routes: ${system.routes.slice(0, 4).join(', ')}${system.routes.length > 4 ? ` +${system.routes.length - 4} more` : ''}\n` +
-        `  Tables: ${system.tables.slice(0, 5).join(', ')}${system.tables.length > 5 ? ` +${system.tables.length - 5} more` : ''}`,
-    ),
-    '',
-    '## OPEN CONSOLIDATION DEBT',
+    ...SYSTEMS.map((system) => `[${system.status.toUpperCase()}] ${system.name} (${system.id})\n  ${system.description}\n  Routes: ${system.routes.slice(0, 4).join(', ')}${system.routes.length > 4 ? ` +${system.routes.length - 4} more` : ''}\n  Tables: ${system.tables.slice(0, 5).join(', ')}${system.tables.length > 5 ? ` +${system.tables.length - 5} more` : ''}`),
+    '', '## OPEN CONSOLIDATION DEBT',
     ...PLATFORM_DEBT.map((debt) => `[${debt.severity.toUpperCase()}] ${debt.id}: ${debt.description}`),
-    '',
-    '## CANONICAL DECISIONS',
+    '', '## CANONICAL DECISIONS',
     ...CANONICAL_DECISIONS.map((decision) => `• ${decision.id}: ${decision.decision}`),
   ];
   return lines.join('\n');

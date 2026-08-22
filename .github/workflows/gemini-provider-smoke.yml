@@ -1,0 +1,68 @@
+name: Gemini Provider Smoke
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+jobs:
+  smoke:
+    if: startsWith(github.event.issue.title, '[GEMINI SMOKE]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe current Course Builder Gemini models
+        id: probe
+        shell: bash
+        run: |
+          set +e
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo 'GEMINI_API_KEY is not configured' > /tmp/gemini-smoke.txt
+            echo 'ok=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          ok=false
+          : > /tmp/gemini-smoke.txt
+          for model in gemini-3.1-flash-lite gemini-3.5-flash-lite gemini-3.5-flash gemini-3.6-flash gemini-3.7-flash gemini-3.1-pro-preview; do
+            status=$(curl -sS --max-time 30 -o /tmp/gemini-body.json -w '%{http_code}' \
+              -X POST "https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}" \
+              -H 'Content-Type: application/json' \
+              -d '{"contents":[{"parts":[{"text":"Return exactly: ELEVATE_GEMINI_OK"}]}],"generationConfig":{"temperature":0,"maxOutputTokens":32}}' || true)
+            if [ "$status" = '200' ]; then
+              echo "$model HTTP 200" >> /tmp/gemini-smoke.txt
+              ok=true
+              break
+            fi
+            detail=$(python - <<'PY'
+import json
+try:
+ d=json.load(open('/tmp/gemini-body.json'))
+ print(str(d.get('error',{}).get('message',''))[:180].replace('\n',' '))
+except Exception:
+ print('')
+PY
+)
+            echo "$model HTTP $status ${detail}" >> /tmp/gemini-smoke.txt
+          done
+          echo "ok=$ok" >> "$GITHUB_OUTPUT"
+
+      - name: Post smoke result
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          OK: ${{ steps.probe.outputs.ok }}
+        with:
+          script: |
+            const fs=require('fs');
+            const body=fs.existsSync('/tmp/gemini-smoke.txt')?fs.readFileSync('/tmp/gemini-smoke.txt','utf8'):'No probe output';
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:context.issue.number,body:`Gemini provider smoke: **${process.env.OK==='true'?'PASS':'FAIL'}**\n\n\`\`\`text\n${body}\n\`\`\``});
+
+      - name: Require usable Gemini model
+        if: steps.probe.outputs.ok != 'true'
+        run: exit 1

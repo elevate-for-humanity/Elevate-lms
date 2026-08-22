@@ -2,6 +2,11 @@ name: Registered Apprenticeship E2E
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Deploy LMS
+    types:
+      - completed
 
 concurrency:
   group: registered-apprenticeship-e2e
@@ -9,6 +14,7 @@ concurrency:
 
 jobs:
   production-authenticated-e2e:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     name: Apprentice + Host Shop authenticated persistence
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -20,6 +26,8 @@ jobs:
       E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
       - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
@@ -38,6 +46,25 @@ jobs:
               exit 1
             fi
           done
+      - name: Verify production LMS is ready
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 20); do
+            ping_status=$(curl -sS --max-time 10 -o /tmp/lms-ping.json -w "%{http_code}" https://app.elevateforhumanity.org/api/ping || true)
+            health_status=$(curl -sS --max-time 10 -o /tmp/lms-health.json -w "%{http_code}" https://app.elevateforhumanity.org/api/health || true)
+            if [[ "$ping_status" == "200" && "$health_status" == "200" ]] \
+              && grep -q '"ok":true' /tmp/lms-ping.json \
+              && grep -q '"ready":true' /tmp/lms-health.json; then
+              exit 0
+            fi
+            echo "LMS not ready yet (ping=$ping_status health=$health_status), retry $i/20"
+            sleep 15
+          done
+          echo "::error::Production LMS never reached ready state"
+          cat /tmp/lms-ping.json 2>/dev/null || true
+          cat /tmp/lms-health.json 2>/dev/null || true
+          exit 1
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Install Chromium

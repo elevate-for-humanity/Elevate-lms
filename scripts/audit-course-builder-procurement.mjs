@@ -7,9 +7,10 @@ const failures = [];
 const mustExist = [
   'components/admin/course-builder/UnifiedCourseBuilder.tsx',
   'apps/admin/app/studio/courses/page.tsx',
-  'apps/admin/app/api/admin/course-builder/pipeline/route.ts',
-  'apps/admin/app/api/admin/course-builder/publish/route.ts',
-  'apps/admin/app/api/admin/lms/courses/[courseId]/publish/route.ts',
+  'apps/admin/app/api/admin/course-builder/route.ts',
+  'lib/course-builder/orchestrator.ts',
+  'lib/course-builder/edit-service.ts',
+  'lib/course-builder/persisted-publish-service.ts',
   'lib/course-factory/index.ts',
   'lib/course-factory/factory.ts',
   'lib/course-factory/procurement-gate.ts',
@@ -36,35 +37,46 @@ if (failures.length === 0) {
   const studioCourses = read('apps/admin/app/studio/courses/page.tsx');
   if (!studioCourses.includes('UnifiedCourseBuilder')) fail('/studio/courses is not mounted to UnifiedCourseBuilder');
 
-  const pipeline = read('apps/admin/app/api/admin/course-builder/pipeline/route.ts');
-  for (const invariant of ['courseFactory(', 'normalizeGeneratedCourseForGovernance', 'moduleCount must be between 1 and 40']) {
-    if (!pipeline.includes(invariant)) fail(`canonical pipeline missing invariant: ${invariant}`);
+  const rootRoute = read('apps/admin/app/api/admin/course-builder/route.ts');
+  for (const invariant of [
+    "from '@/lib/course-builder/orchestrator'",
+    "from '@/lib/course-builder/persisted-publish-service'",
+    "action === 'publish'",
+    "action === 'publish-persisted'",
+    "action === 'repair'",
+    "action === 'audit'",
+    'moduleCount must be between 1 and 40',
+  ]) if (!rootRoute.includes(invariant)) fail(`canonical Course Builder root missing invariant: ${invariant}`);
+
+  const orchestrator = read('lib/course-builder/orchestrator.ts');
+  for (const invariant of ['auditCourseTemplate', 'runGovernmentProcurementGate', 'publishGovernedCourse', "from '../course-factory/factory'"]) {
+    if (!orchestrator.includes(invariant)) fail(`Course Builder orchestrator missing: ${invariant}`);
   }
 
-  const templatePublish = read('apps/admin/app/api/admin/course-builder/publish/route.ts');
-  for (const invariant of ['auditCourseTemplate', 'runGovernmentProcurementGate', 'courseFactory']) {
-    if (!templatePublish.includes(invariant)) fail(`template publish gate missing: ${invariant}`);
-  }
-
-  const persistedPublish = read('apps/admin/app/api/admin/lms/courses/[courseId]/publish/route.ts');
+  const persistedPublish = read('lib/course-builder/persisted-publish-service.ts');
   for (const invariant of [
     'review_status',
     'governing_standard_version',
     'AI lesson not human-approved',
     'rationale missing',
     'standards/competency mapping missing',
-    'interactive self-paced lesson experiences',
+    'canonical interactive lesson experience missing',
     'mastery remediation plan missing',
     'authorized human sign-off missing',
     'module_completion_rules',
-  ]) {
-    if (!persistedPublish.includes(invariant)) fail(`persisted publish gate missing: ${invariant}`);
-  }
+    'publishCourse',
+  ]) if (!persistedPublish.includes(invariant)) fail(`persisted Course Builder publish gate missing: ${invariant}`);
 
-  const legacy = read('apps/admin/app/api/admin/courses/generate/publish/route.ts');
-  if (!legacy.includes('LEGACY_COURSE_PUBLISHER_RETIRED')) fail('legacy independent publisher is still active');
-  for (const forbidden of [".from('courses').insert", ".from('course_modules').insert", ".from('course_lessons').insert"]) {
-    if (legacy.includes(forbidden)) fail(`legacy publisher still writes canonical course data: ${forbidden}`);
+  for (const retiredPath of [
+    'apps/admin/app/api/admin/course-builder/publish/route.ts',
+    'apps/admin/app/api/admin/lms/courses/[courseId]/publish/route.ts',
+    'apps/admin/app/api/admin/courses/generate/publish/route.ts',
+  ]) {
+    const retired = read(retiredPath);
+    if (!/(RETIRED|LEGACY_COURSE_PUBLISHER_RETIRED|COURSE_BUILDER_ROOT_REQUIRED)/.test(retired)) fail(`retired publisher still appears active: ${retiredPath}`);
+    for (const forbidden of [".from('courses').insert", ".from('course_modules').insert", ".from('course_lessons').insert", 'publishCourse(']) {
+      if (retired.includes(forbidden)) fail(`retired publisher still owns write/publish behavior (${retiredPath}): ${forbidden}`);
+    }
   }
 
   const interaction = read('apps/lms/app/api/learner/interactions/route.ts');
@@ -100,4 +112,4 @@ if (failures.length) {
 }
 
 console.log('Course Builder procurement architecture gate: PASS');
-console.log('Verified: one generation authority, one persisted publish authority, human AI review, standards traceability, mastery/remediation services, spaced review, readiness reporting, grounded AI tutoring, practical sign-off controls, and hardened RLS.');
+console.log('Verified: Studio-controlled root authority, governed template and persisted publication, human AI review, standards traceability, mastery/remediation services, spaced review, readiness reporting, grounded AI tutoring, practical sign-off controls, and hardened RLS.');

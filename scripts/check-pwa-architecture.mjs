@@ -8,6 +8,7 @@ const required = [
   'components/pwa/CanonicalPwaRegistration.tsx',
   'components/pwa/OfflineStatusBanner.tsx',
   'lib/timeclock/offline-queue.ts',
+  'hooks/useOfflineCourse.tsx',
   'public/sw-admin.js',
   'public/sw-lms.js',
   'public/sw-marketing.js',
@@ -48,14 +49,27 @@ if (!adminWorker.includes("fetch(request, { cache: 'no-store'")) failures.push('
 if (/cache\.put\([^\n]*(?:\/api\/|dashboard)/i.test(adminWorker)) failures.push('Admin worker appears to persist protected data');
 
 const lmsWorker = read('public/sw-lms.js');
-for (const marker of ['sync-timeclock', 'SYNC_TIMECLOCK', 'offline-actions', 'TIMECLOCK_SYNC_REJECTED']) {
-  if (!lmsWorker.includes(marker)) failures.push(`LMS worker missing offline attendance contract: ${marker}`);
+for (const marker of [
+  'sync-timeclock',
+  'SYNC_TIMECLOCK',
+  'offline-actions',
+  'TIMECLOCK_SYNC_REJECTED',
+  'updateQueuedShiftReferences',
+  'deleteShiftActions',
+  'CACHE_COURSE',
+  'MessagePort',
+]) {
+  // MessagePort is represented by event.ports in source; handle that marker below.
+  if (marker === 'MessagePort') continue;
+  if (!lmsWorker.includes(marker)) failures.push(`LMS worker missing offline contract: ${marker}`);
 }
-if (!lmsWorker.includes("credentials: 'same-origin'")) failures.push('LMS offline replay does not preserve authenticated session credentials');
+if (!lmsWorker.includes('event.ports') || !lmsWorker.includes('cachedCount')) failures.push('LMS course download lacks worker acknowledgement');
+if (!lmsWorker.includes("credentials: 'same-origin'")) failures.push('LMS offline replay/download does not preserve same-origin session behavior');
 if (!lmsWorker.includes("caches.match('/offline.html')")) failures.push('LMS worker lacks dashboard offline shell');
+if (!lmsWorker.includes("payload.action === 'clock_in'")) failures.push('LMS replay cannot persist server shift identity after offline clock-in');
 
 const queue = read('lib/timeclock/offline-queue.ts');
-for (const marker of ['offline_replay: true', 'client_shift_id', 'client_recorded_at', "sync.register('sync-timeclock')"]) {
+for (const marker of ['offline_replay: true', 'client_shift_id', 'client_recorded_at', "sync.register('sync-timeclock')", 'if (navigator.onLine) void askWorkerToSync()']) {
   if (!queue.includes(marker)) failures.push(`Offline timeclock queue missing ${marker}`);
 }
 
@@ -64,8 +78,16 @@ for (const marker of ['MAX_OFFLINE_EVENT_AGE_MS', 'MAX_CLIENT_CLOCK_SKEW_MS', 'o
   if (!actionRoute.includes(marker)) failures.push(`Timeclock replay validation missing ${marker}`);
 }
 
+const offlineCourse = read('hooks/useOfflineCourse.tsx');
+if (/caches\.open\(|cache\.put\(/.test(offlineCourse)) failures.push('Offline course hook directly writes Cache Storage instead of canonical worker');
+if (offlineCourse.includes("`/courses/${courseId}`") || offlineCourse.includes("'/courses/'")) failures.push('Offline course hook attempts to persist authenticated course HTML');
+for (const marker of ['SAFE_OFFLINE_ASSET', 'MessageChannel', 'CACHE_COURSE', 'CLEAR_COURSE_CACHE']) {
+  if (!offlineCourse.includes(marker)) failures.push(`Offline course hook missing secure download contract: ${marker}`);
+}
+
 for (const [dockerfile, worker] of [['Dockerfile.admin', 'sw-admin.js'], ['Dockerfile.lms', 'sw-lms.js']]) {
   const content = read(dockerfile);
+  if (!content.includes('scripts/check-pwa-architecture.mjs')) failures.push(`${dockerfile} does not run PWA architecture gate`);
   if (!content.includes('scripts/stamp-sw.mjs')) failures.push(`${dockerfile} does not stamp service workers`);
   if (!content.includes(worker) || !content.includes('__CACHE_VERSION__')) failures.push(`${dockerfile} does not verify ${worker} cache stamping`);
 }
@@ -79,4 +101,4 @@ if (failures.length) {
   console.error(failures.map((failure) => `PWA ARCHITECTURE ERROR: ${failure}`).join('\n'));
   process.exit(1);
 }
-console.log('PWA architecture verified: canonical workers, installable role manifests, protected-data cache boundaries, offline shell, deployment cache stamping, and server-validated offline timeclock replay.');
+console.log('PWA architecture verified: canonical workers, installable role manifests, protected-data cache boundaries, offline shell, static-resource-only course downloads, deployment cache stamping, and server-validated durable offline timeclock replay.');

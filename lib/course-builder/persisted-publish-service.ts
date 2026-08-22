@@ -13,13 +13,16 @@ function hasContent(value: unknown): boolean {
   return !!value && typeof value === 'object' && Object.keys(value as Record<string, unknown>).length > 0;
 }
 
-/** Canonical persisted-course procurement gate. Review is automated: passing
- * objective validation is the approval decision; no human checkpoint exists. */
+/**
+ * Canonical persisted-course procurement gate.
+ * Automated validation proves completeness, but AI-authored instructional
+ * material still requires an authorized human review before publication.
+ */
 export async function runPersistedCourseProcurementHealthCheckWithClient(supabase: SupabaseClient, courseId: string) {
   const blocking: string[] = [];
   const { data: course, error: courseError } = await supabase
     .from('courses')
-    .select('id,title,slug,description,status,generation_status,generation_progress,compliance_profile_key,governing_body,governing_standard_version,duration_hours,passing_score')
+    .select('id,title,slug,description,status,review_status,reviewed_by,reviewed_at,generation_status,generation_progress,compliance_profile_key,governing_body,governing_standard_version,duration_hours,passing_score')
     .eq('id', courseId).maybeSingle();
   if (courseError) throw courseError;
   if (!course) return { pass: false, blocking_issues: ['course not found'], metrics: {} };
@@ -28,6 +31,9 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
   if (!course.slug?.trim()) blocking.push('course slug is missing');
   if (!course.description?.trim()) blocking.push('course description is missing');
   if (!course.duration_hours || Number(course.duration_hours) <= 0) blocking.push('course duration_hours is missing');
+  if (course.review_status !== 'approved') blocking.push(`course review_status must be approved (found ${course.review_status ?? 'unset'})`);
+  if (!course.reviewed_by) blocking.push('authorized human course reviewer missing');
+  if (!course.reviewed_at) blocking.push('authorized human course review timestamp missing');
   const externalProfile = Boolean(course.compliance_profile_key && course.compliance_profile_key !== 'internal_basic');
   if (externalProfile && !course.governing_body?.trim()) blocking.push('governing body is missing');
   if (externalProfile && !course.governing_standard_version?.trim()) blocking.push('governing standard/test-plan version is missing');
@@ -35,13 +41,13 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
 
   const { data: modules, error: moduleError } = await supabase.from('course_modules').select(`
     id,title,slug,domain_key,target_hours,order_index,
-    course_lessons(id,title,slug,lesson_type,content,rendered_html,video_url,video_config,quiz_questions,passing_score,duration_minutes,generation_status,ai_generated,domain_key,hour_category,delivery_method,learning_objectives,competency_checks,practical_required,evidence_type,requires_instructor_signoff,content_json)
+    course_lessons(id,title,slug,lesson_type,content,rendered_html,video_url,video_config,quiz_questions,passing_score,duration_minutes,generation_status,ai_generated,approved,domain_key,hour_category,delivery_method,learning_objectives,competency_checks,practical_required,evidence_type,requires_instructor_signoff,content_json)
   `).eq('course_id', courseId).order('order_index', { ascending: true });
   if (moduleError) throw moduleError;
 
   const mods = modules ?? [];
   if (mods.length === 0) blocking.push('course has no modules');
-  let totalLessons = 0, assessments = 0, practicals = 0, competencyMappings = 0, interactiveLessons = 0, accessibleNarrationLessons = 0;
+  let totalLessons = 0, assessments = 0, practicals = 0, competencyMappings = 0, interactiveLessons = 0, accessibleNarrationLessons = 0, humanApprovedLessons = 0;
   for (const [mi, module] of (mods as any[]).entries()) {
     if (!module.title?.trim()) blocking.push(`module ${mi + 1}: title missing`);
     if (!module.slug?.trim()) blocking.push(`module ${mi + 1}: slug missing`);
@@ -64,6 +70,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
       competencyMappings += competencies.length;
       if (experience && Object.keys(experience).length > 0) interactiveLessons += 1;
       if (String(experience?.narrationScript ?? '').trim()) accessibleNarrationLessons += 1;
+      if (lesson.approved === true) humanApprovedLessons += 1;
       if (!type) issues.push('lesson_type missing');
       if (!lesson.slug?.trim()) issues.push('slug missing');
       if (!lesson.duration_minutes || Number(lesson.duration_minutes) <= 0) issues.push('duration missing');
@@ -71,6 +78,8 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
       if (!lesson.domain_key?.trim()) issues.push('standards/domain mapping missing');
       if (!lesson.hour_category) issues.push('hour category missing');
       if (!lesson.delivery_method) issues.push('delivery method missing');
+      if (lesson.ai_generated === true && lesson.approved !== true) issues.push('AI lesson not human-approved');
+      if (lesson.requires_instructor_signoff === true && lesson.approved !== true) issues.push('authorized human sign-off missing');
       if (lesson.ai_generated === true && lesson.generation_status && !['verification_ready','certificate_ready','published','completed','generated'].includes(lesson.generation_status)) issues.push(`generation not ready (${lesson.generation_status})`);
       if (isAssessment) {
         if (questions.length === 0) issues.push('assessment has no questions');
@@ -113,7 +122,23 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
     if (error) throw error;
     if ((count ?? 0) === 0) blocking.push('multiple modules but no mastery/progression rules');
   }
-  return { pass: blocking.length === 0, blocking_issues: [...new Set(blocking)], metrics: { modules: mods.length, lessons: totalLessons, assessments, practicals, competencyMappings, interactiveLessons, accessibleNarrationLessons, reviewMode: 'automated_validation' } };
+  return {
+    pass: blocking.length === 0,
+    blocking_issues: [...new Set(blocking)],
+    metrics: {
+      modules: mods.length,
+      lessons: totalLessons,
+      assessments,
+      practicals,
+      competencyMappings,
+      interactiveLessons,
+      accessibleNarrationLessons,
+      humanApprovedLessons,
+      review_status: course.review_status ?? null,
+      reviewed_by: course.reviewed_by ?? null,
+      reviewMode: 'authorized_human_review',
+    },
+  };
 }
 
 export async function runPersistedCourseProcurementHealthCheck(courseId: string) { return runPersistedCourseProcurementHealthCheckWithClient(await createClient(), courseId); }
@@ -125,7 +150,7 @@ export async function publishPersistedCourseWithClient(input: { db: SupabaseClie
     return { ok: false, error: 'PUBLISH_BLOCKED', blocking_issues: health.blocking_issues, metrics: health.metrics };
   }
   const result = await publishCourse(input.db, input.courseId, input.actorId, input.label);
-  await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { label: input.label, lesson_count: (result as any)?.lessonCount, procurement_gate: health.metrics, review_mode: 'automated_validation' }, req: input.request });
+  await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { label: input.label, lesson_count: (result as any)?.lessonCount, procurement_gate: health.metrics, review_mode: 'authorized_human_review', reviewed_by: (health.metrics as any).reviewed_by }, req: input.request });
   return { ok: true, procurement_gate: health.metrics, ...result };
 }
 

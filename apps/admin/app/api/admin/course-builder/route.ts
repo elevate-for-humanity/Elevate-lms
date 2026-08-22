@@ -1,16 +1,20 @@
 /**
- * POST /api/admin/course-builder
+ * /api/admin/course-builder
  *
- * Single HTTP orchestration boundary for complete course generation.
- * All authoring surfaces call this route; all generation work is delegated to
- * lib/course-factory. No alternate course-generation endpoint is authoritative.
+ * Single HTTP boundary for Course Builder orchestration. Authoring surfaces send
+ * an action to this route; complete-course generation always crosses
+ * lib/course-factory. Capability engines (media, blueprints, AI, validation) are
+ * internal services, not parallel course builders.
  */
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { courseFactory } from '@/lib/course-factory';
+import { courseFactory, loadAllBlueprints } from '@/lib/course-factory';
 import type { FactoryStage } from '@/lib/course-factory';
 import { normalizeGeneratedCourseForGovernance } from '@/lib/course-factory/post-generation-governance';
+import { queueCourseLessonVideos } from '@/lib/course-factory/media-service';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -27,6 +31,11 @@ type PipelineStage =
   | 'complete'
   | 'error';
 
+type CourseBuilderAction =
+  | 'generate'
+  | 'generate-from-blueprint'
+  | 'queue-media';
+
 function toPipelineStage(stage: FactoryStage): PipelineStage {
   if (stage === 'enrich') return 'lessons';
   if (stage === 'assess') return 'quizzes';
@@ -38,6 +47,71 @@ function toPipelineStage(stage: FactoryStage): PipelineStage {
   return 'blueprint';
 }
 
+async function loadCourse(courseId: string) {
+  const db = await requireAdminClient();
+  const { data, error } = await db
+    .from('courses')
+    .select('id,title,slug')
+    .eq('id', courseId)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function GET(req: NextRequest) {
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+
+  const action = req.nextUrl.searchParams.get('action') || 'blueprints';
+
+  try {
+    if (action === 'blueprints') {
+      const id = req.nextUrl.searchParams.get('id');
+      const registry = await loadAllBlueprints();
+      if (id) {
+        const blueprint = registry.find((item) => item.id === id);
+        if (!blueprint) return NextResponse.json({ error: 'Blueprint not found' }, { status: 404 });
+        return NextResponse.json({ blueprint });
+      }
+      return NextResponse.json({
+        blueprints: registry.map((blueprint) => ({
+          id: blueprint.id,
+          title: blueprint.credentialTitle,
+          credentialCode: blueprint.credentialCode,
+          state: blueprint.state,
+          slug: blueprint.programSlug,
+          modules: blueprint.modules.length,
+          lessons: blueprint.modules.reduce(
+            (sum, courseModule) => sum + (courseModule.lessons?.length ?? 0),
+            0,
+          ),
+          status: blueprint.status,
+          socCode: blueprint.socCode ?? null,
+        })),
+      });
+    }
+
+    if (action === 'instructor-media') {
+      const courseId = req.nextUrl.searchParams.get('courseId');
+      if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+      const course = await loadCourse(courseId);
+      if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+      return NextResponse.json({
+        ok: true,
+        course,
+        instructor: getInstructorForCourse(course.title),
+      });
+    }
+
+    return NextResponse.json({ error: `Unsupported Course Builder GET action: ${action}` }, { status: 400 });
+  } catch (error) {
+    logger.error('[course-builder] GET action failed', error);
+    return NextResponse.json({ error: 'Course Builder action failed' }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
@@ -45,52 +119,102 @@ export async function POST(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
 
-  let body: {
-    title: string;
-    topic: string;
-    difficulty?: 'beginner' | 'intermediate' | 'advanced';
-    programId: string;
-    programSlug?: string;
-    moduleCount?: number;
-    lessonsPerModule?: number;
-    includeVideos?: boolean;
-    dryRun?: boolean;
-    credential?: string;
-    state?: string;
-    audience?: string;
-    hours?: number;
-    deliveryFormat?: string;
-    additionalRequirements?: string;
-  };
-
+  let body: Record<string, any>;
   try {
     body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  if (!body.title || !body.topic || !body.programId) {
-    return new Response(JSON.stringify({ error: 'title, topic, and programId are required' }), { status: 400 });
+  const action = String(body.action || 'generate') as CourseBuilderAction;
+
+  if (action === 'generate-from-blueprint') {
+    if (!body.blueprintId || !body.programId) {
+      return NextResponse.json({ error: 'blueprintId and programId are required' }, { status: 400 });
+    }
+    try {
+      const blueprints = await loadAllBlueprints();
+      const blueprint = blueprints.find((item) => item.id === body.blueprintId);
+      if (!blueprint) return NextResponse.json({ error: 'Blueprint not found' }, { status: 404 });
+      const progress: Array<{ stage: string; message: string; progress?: number }> = [];
+      const result = await courseFactory(
+        {
+          programId: body.programId,
+          blueprint,
+          mode: ['replace', 'missing-only', 'refresh'].includes(body.mode) ? body.mode : 'refresh',
+          contentSource: ['ai', 'blueprint', 'curriculum_lessons'].includes(body.contentSource)
+            ? body.contentSource
+            : 'ai',
+          videoMode: body.videoMode === 'off' ? 'off' : 'queue',
+          videoQueueLimit:
+            typeof body.videoQueueLimit === 'number' && body.videoQueueLimit > 0
+              ? body.videoQueueLimit
+              : null,
+        },
+        (stage, message, percent) => progress.push({ stage, message, progress: percent }),
+      );
+      return NextResponse.json({ ...result, progress }, { status: result.ok ? 200 : 422 });
+    } catch (error) {
+      logger.error('[course-builder] Blueprint generation failed', error);
+      return NextResponse.json({ error: 'Course generation failed' }, { status: 500 });
+    }
+  }
+
+  if (action === 'queue-media') {
+    if (!body.courseId) {
+      return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+    }
+    try {
+      const course = await loadCourse(body.courseId);
+      if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+      const result = await queueCourseLessonVideos({
+        courseId: body.courseId,
+        onlyMissing: body.onlyMissing !== false,
+        force: body.force === true,
+        limit: typeof body.limit === 'number' ? body.limit : null,
+      });
+      return NextResponse.json({
+        ok: result.failed === 0,
+        course,
+        instructor: getInstructorForCourse(course.title),
+        result,
+      });
+    } catch (error) {
+      logger.error('[course-builder] Media queue failed', error);
+      return NextResponse.json({ error: 'Unable to queue course media' }, { status: 500 });
+    }
+  }
+
+  if (action !== 'generate') {
+    return NextResponse.json({ error: `Unsupported Course Builder action: ${action}` }, { status: 400 });
+  }
+
+  const title = typeof body.title === 'string' ? body.title.trim() : '';
+  const topic = typeof body.topic === 'string' ? body.topic.trim() : '';
+  const programId = typeof body.programId === 'string' ? body.programId.trim() : '';
+  if (!title || !topic || !programId) {
+    return NextResponse.json({ error: 'title, topic, and programId are required' }, { status: 400 });
   }
   if (body.moduleCount != null && (body.moduleCount < 1 || body.moduleCount > 40)) {
-    return new Response(JSON.stringify({ error: 'moduleCount must be between 1 and 40' }), { status: 400 });
+    return NextResponse.json({ error: 'moduleCount must be between 1 and 40' }, { status: 400 });
   }
   if (body.lessonsPerModule != null && (body.lessonsPerModule < 1 || body.lessonsPerModule > 20)) {
-    return new Response(JSON.stringify({ error: 'lessonsPerModule must be between 1 and 20' }), { status: 400 });
+    return NextResponse.json({ error: 'lessonsPerModule must be between 1 and 20' }, { status: 400 });
   }
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
-      const write = (data: object) => controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+      const write = (data: object) =>
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
 
       try {
         const result = await courseFactory(
           {
-            title: body.title,
-            topic: body.topic,
+            title,
+            topic,
             difficulty: body.difficulty ?? 'intermediate',
-            programId: body.programId,
+            programId,
             programSlug: body.programSlug,
             moduleCount: body.moduleCount,
             lessonsPerModule: body.lessonsPerModule,
@@ -123,7 +247,7 @@ export async function POST(req: NextRequest) {
           result: {
             success: result.ok,
             courseId: result.courseId ?? null,
-            title: result.title ?? body.title,
+            title: result.title ?? title,
             modulesGenerated: result.moduleCount ?? 0,
             lessonsGenerated: result.lessonCount ?? 0,
             lessonsWithQuizzes: result.assessmentsGenerated ?? 0,

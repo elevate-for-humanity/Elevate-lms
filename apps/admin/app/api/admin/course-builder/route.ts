@@ -25,6 +25,7 @@ import {
   patchCourseLesson,
   linkCourseScormPackage,
 } from '@/lib/course-builder/edit-service';
+import { publishPersistedCourse } from '@/lib/course-builder/persisted-publish-service';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
@@ -55,6 +56,7 @@ type CourseBuilderAction =
   | 'audit'
   | 'validate'
   | 'publish'
+  | 'publish-persisted'
   | 'repair'
   | 'generate-missing';
 
@@ -267,6 +269,23 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       logger.error('[course-builder] Governed publication failed', error);
       return NextResponse.json({ ok: false, error: 'Course publication failed' }, { status: 500 });
+    }
+  }
+
+  if (action === 'publish-persisted') {
+    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : '';
+    if (!courseId) return NextResponse.json({ ok: false, error: 'courseId is required' }, { status: 400 });
+    try {
+      const result = await publishPersistedCourse({
+        courseId,
+        actorId: auth.id,
+        label: typeof body.label === 'string' ? body.label : undefined,
+        request: req,
+      });
+      return NextResponse.json(result, { status: result.ok ? 200 : 422 });
+    } catch (error) {
+      logger.error('[course-builder] Persisted publication failed', error);
+      return NextResponse.json({ ok: false, error: 'Failed to publish persisted course' }, { status: 500 });
     }
   }
 

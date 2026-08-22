@@ -87,7 +87,8 @@ export async function POST(
 
   const warnings: string[] = [];
   const copySimpleRows = async (table: string, orderColumn?: string) => {
-    let query = db.from(table).select('*').eq('program_id', programId);
+    const dynamicDb = db as any;
+    let query = dynamicDb.from(table).select('*').eq('program_id', programId);
     if (orderColumn) query = query.order(orderColumn);
     const { data, error } = await query;
     if (error) {
@@ -106,7 +107,7 @@ export async function POST(
       if (row.created_at === undefined) delete row.created_at;
       if (row.updated_at === undefined) delete row.updated_at;
     }
-    const { error: insertError } = await db.from(table).insert(rows);
+    const { error: insertError } = await dynamicDb.from(table).insert(rows);
     if (insertError) {
       warnings.push(`${table}: insert failed`);
       logger.error('[program-clone] related row insert failed', undefined, { table, programId, error: insertError.message });

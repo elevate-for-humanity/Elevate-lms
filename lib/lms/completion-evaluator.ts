@@ -3,10 +3,11 @@ import 'server-only';
 /**
  * Canonical program-completion authority.
  *
- * Course completion is read from lib/course-completion.ts. Program completion is
- * derived from program_courses plus program-level compliance requirements. This
- * module is the only application service allowed to change a program enrollment
- * to completed.
+ * Course-based programs derive completion from program_courses plus canonical
+ * course gates. Apprenticeship programs may be competency/hour based and are
+ * therefore allowed to complete without a program_courses row only when their
+ * registered-program evidence gates pass. This module is the only application
+ * service allowed to change a program enrollment to completed.
  */
 
 import { createAuditedAdminClient } from '@/lib/supabase/admin';
@@ -24,6 +25,15 @@ interface CompletionRule {
 interface ProgramCompletionContext {
   totalRequiredCourses: number;
   completedCourses: number;
+}
+
+interface ApprenticeshipCriteria {
+  required_rti_hours?: number;
+  required_ojl_hours?: number;
+  required_competencies?: number;
+  requires_signed_agreement?: boolean;
+  requires_host_shop_verification?: boolean;
+  requires_wage_progression_evidence?: boolean;
 }
 
 export interface ProgramReadiness {
@@ -49,8 +59,8 @@ async function evaluateProgramCompletion(
     .eq('entity_type', 'program')
     .eq('entity_id', programId)
     .eq('is_active', true);
-
   if (error) throw error;
+
   if (!rules?.length) {
     return context.totalRequiredCourses > 0 && context.completedCourses >= context.totalRequiredCourses;
   }
@@ -94,6 +104,106 @@ async function getRequiredCourseIds(
   ] as string[];
 }
 
+async function evaluateApprenticeshipEvidence(
+  db: Awaited<ReturnType<typeof createAuditedAdminClient>>,
+  opts: {
+    enrollmentId: string;
+    userId: string;
+    programId: string;
+    programSlug: string;
+    minOjlHours: number | null;
+    minRtiHours: number | null;
+    criteria: ApprenticeshipCriteria;
+    agreementSigned: boolean | null;
+    hostShopId: string | null;
+  },
+): Promise<{ missing: string[]; evidence: Record<string, unknown> }> {
+  const missing: string[] = [];
+  const criteriaOjl = Number(opts.criteria.required_ojl_hours || 0);
+  const criteriaRti = Number(opts.criteria.required_rti_hours || 0);
+  const minOjl = Math.max(Number(opts.minOjlHours || 0), criteriaOjl);
+  const minRti = Math.max(Number(opts.minRtiHours || 0), criteriaRti);
+
+  const apprenticeship = await checkApprenticeshipEligibility(db, opts.userId, {
+    min_ojl_hours: minOjl,
+    min_rti_hours: minRti,
+    slug: opts.programSlug,
+  });
+  if (!apprenticeship.eligible) missing.push(...apprenticeship.blockingReasons);
+
+  if (opts.criteria.requires_signed_agreement && !opts.agreementSigned) {
+    missing.push('Signed apprenticeship agreement is required');
+  }
+
+  const { data: placement, error: placementError } = await db
+    .from('apprentice_placements')
+    .select('id,shop_id,status')
+    .eq('student_id', opts.userId)
+    .eq('program_slug', opts.programSlug)
+    .in('status', ['active', 'completed'])
+    .order('start_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (placementError) throw placementError;
+
+  if (opts.criteria.requires_host_shop_verification && !opts.hostShopId && !placement?.shop_id) {
+    missing.push('Verified apprenticeship host site placement is required');
+  }
+
+  const requiredCompetencies = Number(opts.criteria.required_competencies || 0);
+  let masteredCompetencies = 0;
+  if (requiredCompetencies > 0) {
+    const { data: competencies, error: competencyError } = await db
+      .from('competencies')
+      .select('id')
+      .eq('program_id', opts.programId);
+    if (competencyError) throw competencyError;
+    const competencyIds = (competencies ?? []).map((row) => row.id);
+    if (competencyIds.length) {
+      const { count, error: masteredError } = await db
+        .from('student_competency_progress')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', opts.userId)
+        .eq('is_mastered', true)
+        .in('competency_id', competencyIds);
+      if (masteredError) throw masteredError;
+      masteredCompetencies = count ?? 0;
+    }
+    if (masteredCompetencies < requiredCompetencies) {
+      missing.push(
+        `Apprenticeship competencies: ${masteredCompetencies} of ${requiredCompetencies} required competencies mastered`,
+      );
+    }
+  }
+
+  let verifiedWageEvidence = 0;
+  if (opts.criteria.requires_wage_progression_evidence) {
+    const { count, error: wageError } = await db
+      .from('apprenticeship_wage_obligations')
+      .select('id', { count: 'exact', head: true })
+      .eq('enrollment_id', opts.enrollmentId)
+      .not('verified_at', 'is', null);
+    if (wageError) throw wageError;
+    verifiedWageEvidence = count ?? 0;
+    if (verifiedWageEvidence === 0) {
+      missing.push('Verified wage progression evidence is required');
+    }
+  }
+
+  return {
+    missing,
+    evidence: {
+      approvedHours: apprenticeship.evidence,
+      agreementSigned: Boolean(opts.agreementSigned),
+      placementId: placement?.id ?? null,
+      hostShopId: opts.hostShopId ?? placement?.shop_id ?? null,
+      masteredCompetencies,
+      requiredCompetencies,
+      verifiedWageEvidence,
+    },
+  };
+}
+
 export async function checkProgramReadiness(
   programEnrollmentId: string,
   userId: string,
@@ -106,7 +216,7 @@ export async function checkProgramReadiness(
 
   const { data: enrollment, error: enrollmentError } = await db
     .from('program_enrollments')
-    .select('id,program_id,course_id,user_id,student_id,status')
+    .select('id,program_id,course_id,user_id,student_id,status,agreement_signed,host_shop_id')
     .eq('id', programEnrollmentId)
     .eq('program_id', programId)
     .maybeSingle();
@@ -119,18 +229,19 @@ export async function checkProgramReadiness(
   const { data: program, error: programError } = await db
     .from('programs')
     .select(
-      'id,slug,title,name,issuance_policy,min_rti_hours,min_ojl_hours,requires_instructor_attestation,min_engagement_hours,non_exam_program',
+      'id,slug,title,name,issuance_policy,min_rti_hours,min_ojl_hours,requires_instructor_attestation,min_engagement_hours,non_exam_program,completion_criteria',
     )
     .eq('id', programId)
     .maybeSingle();
   if (programError) throw programError;
   if (!program) throw new Error('Program not found');
 
+  const isApprenticeship = program.issuance_policy === 'apprenticeship_certificate';
   const requiredCourseIds = await getRequiredCourseIds(programId, enrollment.course_id);
   const missingRequirements: string[] = [];
   const evidence: Record<string, unknown> = {};
 
-  if (!requiredCourseIds.length) {
+  if (!requiredCourseIds.length && !isApprenticeship) {
     missingRequirements.push('Program has no required course configured');
   }
 
@@ -149,24 +260,30 @@ export async function checkProgramReadiness(
     }
   }
 
-  const programRulesPassed = await evaluateProgramCompletion(programId, {
-    totalRequiredCourses: requiredCourseIds.length,
-    completedCourses,
-  });
-  if (!programRulesPassed) {
-    missingRequirements.push('Program completion rule requirements are not satisfied');
+  if (requiredCourseIds.length) {
+    const programRulesPassed = await evaluateProgramCompletion(programId, {
+      totalRequiredCourses: requiredCourseIds.length,
+      completedCourses,
+    });
+    if (!programRulesPassed) {
+      missingRequirements.push('Program completion rule requirements are not satisfied');
+    }
   }
 
-  if (program.issuance_policy === 'apprenticeship_certificate') {
-    const apprenticeship = await checkApprenticeshipEligibility(db, userId, {
-      min_ojl_hours: program.min_ojl_hours,
-      min_rti_hours: program.min_rti_hours,
-      slug: program.slug,
+  if (isApprenticeship) {
+    const apprenticeship = await evaluateApprenticeshipEvidence(db, {
+      enrollmentId: programEnrollmentId,
+      userId,
+      programId,
+      programSlug: program.slug,
+      minOjlHours: program.min_ojl_hours,
+      minRtiHours: program.min_rti_hours,
+      criteria: (program.completion_criteria || {}) as ApprenticeshipCriteria,
+      agreementSigned: enrollment.agreement_signed,
+      hostShopId: enrollment.host_shop_id,
     });
     evidence.apprenticeship = apprenticeship.evidence;
-    if (!apprenticeship.eligible) {
-      missingRequirements.push(...apprenticeship.blockingReasons);
-    }
+    missingRequirements.push(...apprenticeship.missing);
   }
 
   const minEngagementHours = Number(program.min_engagement_hours || 0);
@@ -293,7 +410,6 @@ export async function completeProgramEnrollment(
   userId: string,
   programId: string,
 ): Promise<void> {
-  // Re-check every gate here. Never trust a caller's prior readiness result.
   const readiness = await checkProgramReadiness(programEnrollmentId, userId, programId);
   if (!readiness.ready) {
     throw new Error(`Program requirements not met: ${readiness.missingRequirements.join('; ')}`);

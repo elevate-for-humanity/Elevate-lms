@@ -13,10 +13,49 @@ export const metadata: Metadata = {
   description: 'Federal contractor registration and compliance management.',
 };
 
-export default async function SamGovPage() {
+type SamSetupContext = {
+  entity?: string;
+  status?: string;
+  goal?: string;
+  team?: string;
+};
+
+function cleanSetupValue(value: string | string[] | undefined, max = 500): string | undefined {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw) return undefined;
+  const cleaned = raw.trim().replace(/[\u0000-\u001F\u007F]/g, '').slice(0, max);
+  return cleaned || undefined;
+}
+
+export default async function SamGovPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const setupContext: SamSetupContext | null =
+    params.setup === 'guided'
+      ? {
+          entity: cleanSetupValue(params.entity),
+          status: cleanSetupValue(params.status, 100),
+          goal: cleanSetupValue(params.goal),
+          team: cleanSetupValue(params.team, 100),
+        }
+      : null;
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apps/sam-gov&message=login-required');
+  if (!user) {
+    const redirectTarget = new URLSearchParams();
+    redirectTarget.set('redirect', `/apps/sam-gov?${new URLSearchParams(
+      Object.entries(params).flatMap(([key, value]) => {
+        const first = Array.isArray(value) ? value[0] : value;
+        return first ? [[key, first] as [string, string]] : [];
+      }),
+    ).toString()}`);
+    redirectTarget.set('message', 'login-required');
+    redirect(`/login?${redirectTarget.toString()}`);
+  }
 
   const { data: storedSubscription } = await supabase
     .from('user_app_subscriptions')
@@ -25,7 +64,14 @@ export default async function SamGovPage() {
     .eq('app_slug', 'sam-gov')
     .maybeSingle();
 
-  if (!storedSubscription) redirect('/apps/sam-gov/start-trial');
+  if (!storedSubscription) {
+    const trial = new URL('/apps/sam-gov/start-trial', 'https://www.elevateforhumanity.org');
+    Object.entries(params).forEach(([key, value]) => {
+      const first = Array.isArray(value) ? value[0] : value;
+      if (first) trial.searchParams.set(key, first);
+    });
+    redirect(`${trial.pathname}${trial.search}`);
+  }
   const subscription = await syncPaidAppSubscription(storedSubscription);
 
   if (subscription.status !== 'trial' && subscription.status !== 'active') {
@@ -56,7 +102,7 @@ export default async function SamGovPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-white border-b"><div className="max-w-6xl mx-auto px-4 py-3"><Breadcrumbs items={[{ label: 'Apps', href: '/apps' }, { label: 'SAM.gov' }]} /></div></div>
-      <SamGovApp user={user} subscription={subscription} entities={entities || []} documents={documents} alerts={alerts} trialDaysRemaining={trialDaysRemaining} />
+      <SamGovApp user={user} subscription={subscription} entities={entities || []} documents={documents} alerts={alerts} trialDaysRemaining={trialDaysRemaining} setupContext={setupContext} />
     </div>
   );
 }

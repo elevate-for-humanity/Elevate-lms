@@ -49,8 +49,13 @@ requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspac
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "'X-Idempotency-Key'", 'application idempotency');
 requireText('apps/marketing/app/api/paris/application-interview/route.ts', 'paris_application_resume', 'persistent resume cookie');
 requireText('apps/marketing/app/api/paris/application-interview/route.ts', "inputMode: z.enum(['text', 'voice'])", 'shared voice/text state authority');
+requireText('apps/marketing/app/api/paris/application-interview/route.ts', 'application.human_review_required', 'human review event');
+requireText('apps/marketing/app/api/paris/application-interview/route.ts', "humanReviewQueue: 'admissions'", 'admissions handoff queue');
 requireText('lib/paris/admissions/interview-engine.ts', "export type ApplicationInterviewLocale = 'en' | 'es'", 'English/Spanish locale authority');
 requireText('lib/paris/admissions/interview-engine.ts', 'CRITICAL_FIELDS', 'critical answer confirmation');
+requireText('lib/paris/admissions/interview-engine.ts', "| 'applicationCertification'", 'explicit application certification field');
+requireText('lib/paris/admissions/interview-engine.ts', "normalized(state.answers.applicationCertification) === 'yes'", 'certification required before submission');
+requireText('lib/paris/admissions/interview-engine.ts', "fundingEligibilityStatus: needsWorkOneAppointment ? 'needs_appointment'", 'WorkOne pending-state propagation');
 requireText('lib/paris/admissions/interview-engine.ts', 'requiresWorkOne', 'WorkOne pathway branching');
 requireText('lib/paris/admissions/interview-engine.ts', 'claimedTransferHours', 'transfer-hours handling');
 requireText('lib/paris/admissions/interview-engine.ts', 'supporting evidence and sponsor review', 'transfer-hours review disclaimer');

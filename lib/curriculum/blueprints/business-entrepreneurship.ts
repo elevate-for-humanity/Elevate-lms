@@ -38,6 +38,20 @@ const governedPracticalSlugs = new Set([
   'esb-v2-capstone-go-to-market-financial',
 ]);
 
+function completeObjectives(title: string, objectives: string[]): string[] {
+  const completed = [...new Set(objectives.filter((objective) => objective.trim().length > 0))];
+  const fallbacks = [
+    `Apply ${title} concepts to a realistic small-business decision.`,
+    `Evaluate evidence related to ${title} and justify an appropriate business action.`,
+    `Demonstrate mastery of ${title} through an objective-aligned scenario or assessment.`,
+  ];
+  for (const fallback of fallbacks) {
+    if (completed.length >= 3) break;
+    if (!completed.includes(fallback)) completed.push(fallback);
+  }
+  return completed;
+}
+
 const modules = entrepreneurshipBlueprint.modules.map((courseModule) => {
   const moduleCompetencyChecks = (courseModule.competencies ?? []).map((competency) => ({
     key: competency.competencyKey,
@@ -49,12 +63,13 @@ const modules = entrepreneurshipBlueprint.modules.map((courseModule) => {
 
   const lessons = (courseModule.lessons ?? []).map((sourceLesson) => {
     const governedPractical = governedPracticalSlugs.has(sourceLesson.slug);
+    const learningObjectives = completeObjectives(sourceLesson.title, [
+      ...(sourceLesson.learningObjectives ?? []),
+      ...(retailObjectiveEnhancements[sourceLesson.slug] ?? []),
+    ]);
     return {
       ...sourceLesson,
-      learningObjectives: [
-        ...(sourceLesson.learningObjectives ?? []),
-        ...(retailObjectiveEnhancements[sourceLesson.slug] ?? []),
-      ],
+      learningObjectives,
       practicalRequired: governedPractical,
       ...(governedPractical
         ? {

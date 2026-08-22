@@ -25,7 +25,7 @@ async function _POST(
   const { id } = await params;
   const result = await issueNativeOpenBadge(id);
 
-  if (!result.success) {
+  if ('error' in result) {
     return NextResponse.json({ error: result.error }, { status: 409 });
   }
 

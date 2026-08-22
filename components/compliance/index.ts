@@ -1,8 +1,9 @@
 /**
  * Compliance Components Index
  *
- * Centralized exports for all compliance-related components.
- * Use these components to ensure consistent compliance language across the platform.
+ * Centralized exports for compliance-related components.
+ * Cookie consent is owned by components/CookieConsent.tsx and mounted by the
+ * marketing root layout; do not introduce a second consent implementation.
  */
 
 // Core compliance notices
@@ -29,9 +30,6 @@ export { default as BarberEnrollmentAcknowledgment } from './BarberEnrollmentAck
 export { default as BeautyEnrollmentAcknowledgment } from './BeautyEnrollmentAcknowledgment';
 export { default as HostShopRequirements } from './HostShopRequirements';
 export { default as BarberProgramFAQ } from './BarberProgramFAQ';
-
-// Privacy and consent
-export { default as CookieConsentBanner } from './CookieConsentBanner';
 
 // Training compliance
 export { default as FERPATrainingDashboard } from './FERPATrainingDashboard';

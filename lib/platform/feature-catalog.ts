@@ -184,6 +184,7 @@ export interface PlanLimits {
   users?: number;
   contacts?: number | null;
   locations?: number;
+  storageGb?: number;
   automation?: boolean;
   custom_branding?: boolean;
 }

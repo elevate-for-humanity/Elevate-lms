@@ -6,9 +6,12 @@ on:
     branches: [main]
     paths:
       - 'scripts/course-factory/build-esb-acceptance.ts'
+      - 'scripts/course-factory/build-business-program.ts'
       - '.github/workflows/build-esb-acceptance.yml'
       - 'lib/ai/ai-service.ts'
+      - 'lib/ai/providers/**'
       - 'lib/curriculum/blueprints/entrepreneurship.ts'
+      - 'lib/curriculum/blueprints/business-administration.ts'
       - 'lib/curriculum/lesson-content-schema.ts'
       - 'lib/curriculum/normalize-lesson-content.ts'
       - 'lib/course-factory/**'
@@ -21,11 +24,6 @@ on:
       - 'components/lms/LessonContentRenderer.tsx'
       - 'apps/lms/app/lms/courses/**'
       - 'apps/admin/app/api/internal/videos/process-queue/route.ts'
-      - 'supabase/migrations/20260820121500_harden_course_publish_completeness_gate.sql'
-      - 'supabase/migrations/20260820174500_course_factory_experience_assets.sql'
-      - 'supabase/migrations/20260820175500_course_factory_asset_trigger_idempotent.sql'
-      - 'supabase/migrations/20260820181000_course_microvideo_jobs.sql'
-      - 'supabase/migrations/20260820182500_course_domain_readiness.sql'
   issues:
     types: [opened, reopened]
 
@@ -37,21 +35,26 @@ env:
   CI: true
   NODE_ENV: production
   AI_CIRCUIT_RECOVERY_WAIT: '1'
+  AI_PROVIDER: gemini
   SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
   NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  GOOGLE_CLOUD_API_KEY: ${{ secrets.GOOGLE_CLOUD_API_KEY }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  CLOUDFLARE_AI_API_TOKEN: ${{ secrets.CLOUDFLARE_AI_API_TOKEN }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
 jobs:
   build-audit-publish:
-    if: github.event_name != 'issues' || github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE'
+    if: github.event_name != 'issues' || github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE' || github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     concurrency:
-      group: esb-course-builder-production-acceptance
+      group: course-builder-production-acceptance
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
@@ -73,10 +76,9 @@ jobs:
         shell: bash
         run: |
           set +e
-          pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/esb-install.log 2>&1
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/course-install.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 160 /tmp/esb-install.log > /tmp/esb-install-tail.log || true
           exit 0
 
       - name: Require production Supabase credentials
@@ -89,7 +91,7 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Build, audit, render full media package, and publish Entrepreneurship course
+      - name: Build, audit, render full media package, and publish requested course
         id: acceptance
         shell: bash
         env:
@@ -97,18 +99,21 @@ jobs:
         run: |
           set +e
           if [ "${{ steps.install.outputs.exit_code }}" != "0" ] || [ "${{ steps.credentials.outputs.exit_code }}" != "0" ]; then
-            echo "Preflight failed: install=${{ steps.install.outputs.exit_code }} credentials=${{ steps.credentials.outputs.exit_code }}" > /tmp/esb-acceptance.log
+            echo "Preflight failed" > /tmp/course-acceptance.log
             echo "exit_code=1" >> "$GITHUB_OUTPUT"
-            tail -n 240 /tmp/esb-acceptance.log > /tmp/esb-acceptance-tail.log || true
             exit 0
           fi
-          pnpm tsx scripts/course-factory/build-esb-acceptance.ts > /tmp/esb-acceptance.log 2>&1
+          if [ "${{ github.event.issue.title }}" = "RUN BUSINESS COURSE BUILDER ACCEPTANCE" ]; then
+            pnpm tsx scripts/course-factory/build-business-program.ts > /tmp/course-acceptance.log 2>&1
+          else
+            pnpm tsx scripts/course-factory/build-esb-acceptance.ts > /tmp/course-acceptance.log 2>&1
+          fi
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 240 /tmp/esb-acceptance.log > /tmp/esb-acceptance-tail.log || true
+          tail -n 320 /tmp/course-acceptance.log > /tmp/course-acceptance-tail.log || true
           exit 0
 
-      - name: Post result to issue 703
+      - name: Post result to trigger issue
         if: always() && github.event_name == 'issues'
         uses: actions/github-script@v7
         env:
@@ -118,23 +123,10 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const installCode = process.env.INSTALL_EXIT_CODE || '1';
-            const credentialCode = process.env.CREDENTIAL_EXIT_CODE || '1';
-            const acceptanceCode = process.env.ACCEPTANCE_EXIT_CODE || 'not-run';
-            const ok = installCode === '0' && credentialCode === '0' && acceptanceCode === '0';
-            const installTail = fs.existsSync('/tmp/esb-install-tail.log')
-              ? fs.readFileSync('/tmp/esb-install-tail.log', 'utf8').slice(-12000)
-              : 'Install step did not produce a log.';
-            const acceptanceTail = fs.existsSync('/tmp/esb-acceptance-tail.log')
-              ? fs.readFileSync('/tmp/esb-acceptance-tail.log', 'utf8').slice(-24000)
-              : 'Acceptance step did not run.';
-            const body = `${ok ? 'ESB ACCEPTANCE PASS' : 'ESB ACCEPTANCE FAIL'}\n\nCommit: ${context.sha}\nInstall exit: ${installCode}\nCredential gate: ${credentialCode}\nAcceptance exit: ${acceptanceCode}\n\nINSTALL\n\`\`\`text\n${installTail}\n\`\`\`\n\nACCEPTANCE\n\`\`\`text\n${acceptanceTail}\n\`\`\``;
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body,
-            });
+            const ok = process.env.INSTALL_EXIT_CODE === '0' && process.env.CREDENTIAL_EXIT_CODE === '0' && process.env.ACCEPTANCE_EXIT_CODE === '0';
+            const tail = fs.existsSync('/tmp/course-acceptance-tail.log') ? fs.readFileSync('/tmp/course-acceptance-tail.log', 'utf8').slice(-30000) : 'Course Builder did not produce a log.';
+            const label = context.payload.issue.title.includes('BUSINESS') ? 'BUSINESS COURSE BUILDER' : 'ESB ACCEPTANCE';
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: `${label} ${ok ? 'PASS' : 'FAIL'}\n\nCommit: ${context.sha}\n\n\`\`\`text\n${tail}\n\`\`\`` });
 
       - name: Fail workflow when preflight or acceptance failed
         if: always()

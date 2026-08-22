@@ -88,14 +88,7 @@ export async function queueCourseLessonVideos(
 
   const onlyMissing = input.onlyMissing !== false;
   const force = input.force === true;
-  let candidates = rows.filter((lesson) => {
-    if (force) return true;
-    if (lesson.video_status === 'queued' || lesson.video_status === 'rendering') return false;
-    if (!onlyMissing) return true;
-    const hasVideo = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
-    const isComplete = lesson.video_status === 'complete';
-    return !(hasVideo && isComplete);
-  });
+  let candidates = rows;
   if (typeof input.limit === 'number' && input.limit > 0) candidates = candidates.slice(0, input.limit);
 
   let queued = 0;
@@ -105,7 +98,13 @@ export async function queueCourseLessonVideos(
   for (const [candidateIndex, lesson] of candidates.entries()) {
     try {
       const lessonKey = `${lesson.id}:lesson:`;
-      if (force || !activeAssets.has(lessonKey)) {
+      const hasVideo = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
+      const mainComplete = hasVideo && lesson.video_status === 'complete';
+      const mainInFlight = lesson.video_status === 'queued' || lesson.video_status === 'rendering';
+      const shouldQueueMain =
+        force || (!mainInFlight && (!onlyMissing || !mainComplete));
+
+      if (shouldQueueMain && (force || !activeAssets.has(lessonKey))) {
         await createJob({
           lesson_id: lesson.id,
           course_id: input.courseId,

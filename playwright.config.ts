@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const launchOptions = { args: ['--no-sandbox', '--disable-setuid-sandbox'] };
+
 export default defineConfig({
   globalSetup: './tests/e2e/global-setup.ts',
   testDir: './tests/e2e',
@@ -21,10 +23,42 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      name: 'desktop-chrome',
       use: {
         ...devices['Desktop Chrome'],
-        launchOptions: { args: ['--no-sandbox', '--disable-setuid-sandbox'] },
+        viewport: { width: 1440, height: 900 },
+        launchOptions,
+      },
+    },
+    {
+      name: 'laptop-chrome',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+        launchOptions,
+      },
+    },
+    {
+      name: 'tablet-chrome',
+      use: {
+        ...devices['iPad Pro 11'],
+        browserName: 'chromium',
+        launchOptions,
+      },
+    },
+    {
+      name: 'iphone-webkit',
+      use: {
+        ...devices['iPhone 13'],
+        browserName: 'webkit',
+      },
+    },
+    {
+      name: 'android-chrome',
+      use: {
+        ...devices['Pixel 7'],
+        browserName: 'chromium',
+        launchOptions,
       },
     },
   ],

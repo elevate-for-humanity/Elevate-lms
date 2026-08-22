@@ -1,13 +1,10 @@
 /**
  * AUTHORITATIVE CERTIFICATE ISSUANCE SERVICE
  *
- * This is the single source of truth for issuing certificates.
- * All certificate issuance MUST go through this service.
- *
- * Features:
- * - Idempotent: will not create duplicate certificates
- * - Sends delivery email automatically
- * - Updates enrollment status
+ * Single source of truth for Elevate-issued completion certificates.
+ * The service is idempotent, writes the live certificates schema, updates the
+ * canonical program enrollment when an enrollment id is supplied, and delivers
+ * learner notifications best-effort after the credential record is durable.
  */
 
 import type { SupabaseClient } from '@/lib/supabase';
@@ -56,10 +53,41 @@ export interface IssueCertificateResult {
   error?: string;
 }
 
-/**
- * Issue a certificate for a completed program enrollment.
- * Idempotent - returns existing certificate if already issued.
- */
+async function findExistingCertificate(
+  supabase: SupabaseClient,
+  params: Pick<IssueCertificateParams, 'enrollmentId' | 'studentId' | 'courseId' | 'programId'>,
+) {
+  const { enrollmentId, studentId, courseId, programId } = params;
+
+  if (enrollmentId) {
+    const { data, error } = await supabase
+      .from('certificates')
+      .select('*')
+      .eq('enrollment_id', enrollmentId)
+      .order('issued_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    if (data) return data;
+  }
+
+  let query = supabase
+    .from('certificates')
+    .select('*')
+    .or(`student_id.eq.${studentId},user_id.eq.${studentId}`);
+
+  if (courseId) query = query.eq('course_id', courseId);
+  else if (programId) query = query.eq('program_id', programId);
+  else return null;
+
+  const { data, error } = await query
+    .order('issued_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function issueCertificate(
   params: IssueCertificateParams,
 ): Promise<IssueCertificateResult> {
@@ -78,35 +106,22 @@ export async function issueCertificate(
   } = params;
 
   try {
-    // IDEMPOTENCY CHECK: Check if certificate already exists
-    let existingQuery = supabase
-      .from('certificates')
-      .select('*')
-      .or(`student_id.eq.${studentId},user_id.eq.${studentId}`);
-
-    if (courseId) {
-      existingQuery = existingQuery.eq('course_id', courseId);
-    } else if (programId) {
-      existingQuery = existingQuery.eq('program_id', programId);
-    }
-
-    const { data: existingCert } = await existingQuery.maybeSingle();
+    const existingCert = await findExistingCertificate(supabase, {
+      enrollmentId,
+      studentId,
+      courseId,
+      programId,
+    });
 
     if (existingCert) {
-      logger.info('Certificate already exists, returning existing', {
-        enrollmentId,
-        certificateId: existingCert.id,
-      });
-
       const certificateUrl = `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/certificates/${existingCert.id}`;
-
       return {
         success: true,
         alreadyIssued: true,
         certificate: {
           id: existingCert.id,
           certificate_number: existingCert.certificate_number,
-          student_name: existingCert.metadata?.student_name || studentName,
+          student_name: existingCert.student_name || existingCert.metadata?.student_name || studentName,
           program_name:
             existingCert.program_name ||
             existingCert.course_title ||
@@ -114,73 +129,74 @@ export async function issueCertificate(
             programName ||
             courseTitle ||
             'Course',
-          completion_date: existingCert.issued_at || existingCert.metadata?.completion_date || '',
+          completion_date:
+            existingCert.issued_at || existingCert.metadata?.completion_date || '',
           url: certificateUrl,
         },
       };
     }
 
-    // Generate certificate number
     const certificateNumber = `EFH-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
     const completionDate = new Date().toISOString();
-
+    const verificationCode = certificateNumber.split('-').pop() || certificateNumber;
     const displayName = programName || courseTitle || 'Course Completion';
 
-    // Create certificate record
-    // Table columns: id, user_id, course_id, enrollment_id, certificate_number,
-    // issued_at, expires_at, pdf_url, verification_url, metadata, created_at,
-    // tenant_id, student_id, verification_code, course_title, program_name,
-    // Build metadata with competency evidence when available
-    const certMetadata: Record<string, any> = {
+    const certMetadata: Record<string, unknown> = {
       issued_via: 'canonical_issue_certificate',
       student_name: studentName,
       completion_date: completionDate,
-      completion_method: competencyEvidence?.completionMethod || 'legacy_completion',
+      completion_method: competencyEvidence?.completionMethod || 'verified_completion',
     };
 
-    if (competencyEvidence) {
-      if (competencyEvidence.quizScores && Object.keys(competencyEvidence.quizScores).length > 0) {
-        certMetadata.quiz_scores = competencyEvidence.quizScores;
-      }
-      if (competencyEvidence.seatTimeHours != null) {
-        certMetadata.seat_time_hours = competencyEvidence.seatTimeHours;
-        certMetadata.seat_time_seconds = competencyEvidence.seatTimeSeconds;
-      }
-      if (competencyEvidence.examSessionId) {
-        certMetadata.exam_session_id = competencyEvidence.examSessionId;
-        certMetadata.exam_provider = competencyEvidence.examProvider;
-        certMetadata.exam_result = competencyEvidence.examResult;
-        certMetadata.exam_score = competencyEvidence.examScore;
-        certMetadata.exam_proctor_id = competencyEvidence.examProctorId;
-        certMetadata.exam_date = competencyEvidence.examDate;
-      }
-      if (competencyEvidence.completionVerifiedAt) {
-        certMetadata.completion_verified_at = competencyEvidence.completionVerifiedAt;
-      }
+    if (competencyEvidence?.quizScores && Object.keys(competencyEvidence.quizScores).length > 0) {
+      certMetadata.quiz_scores = competencyEvidence.quizScores;
+    }
+    if (competencyEvidence?.seatTimeHours != null) {
+      certMetadata.seat_time_hours = competencyEvidence.seatTimeHours;
+      certMetadata.seat_time_seconds = competencyEvidence.seatTimeSeconds;
+    }
+    if (competencyEvidence?.examSessionId) {
+      certMetadata.exam_session_id = competencyEvidence.examSessionId;
+      certMetadata.exam_provider = competencyEvidence.examProvider;
+      certMetadata.exam_result = competencyEvidence.examResult;
+      certMetadata.exam_score = competencyEvidence.examScore;
+      certMetadata.exam_proctor_id = competencyEvidence.examProctorId;
+      certMetadata.exam_date = competencyEvidence.examDate;
+    }
+    if (competencyEvidence?.completionVerifiedAt) {
+      certMetadata.completion_verified_at = competencyEvidence.completionVerifiedAt;
     }
 
+    const verificationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/verify/${verificationCode.toLowerCase()}`;
     const { data: certificate, error: certError } = await supabase
       .from('certificates')
       .insert({
         user_id: studentId,
         student_id: studentId,
+        student_name: studentName,
+        student_email: studentEmail || null,
         course_id: courseId || null,
+        program_id: programId || null,
         enrollment_id: enrollmentId || null,
         certificate_number: certificateNumber,
         course_title: courseTitle || null,
         program_name: programName || null,
+        title: displayName,
+        certificate_type: programId ? 'PROGRAM_COMPLETION' : 'COURSE_COMPLETION',
+        status: 'issued',
         issued_date: completionDate.split('T')[0],
-        hours_completed: competencyEvidence?.seatTimeHours || programHours || null,
+        completion_date: completionDate.split('T')[0],
+        hours_completed: competencyEvidence?.seatTimeHours ?? programHours ?? null,
         issued_at: completionDate,
         exam_session_id: competencyEvidence?.examSessionId || null,
-        verification_code: certificateNumber.split('-').pop(),
-        verification_url: `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/verify/${certificateNumber.split('-').pop()?.toLowerCase()}`,
+        verification_code: verificationCode,
+        verification_url: verificationUrl,
         metadata: certMetadata,
       })
       .select()
-      .maybeSingle();
+      .single();
 
-    if (certError) {
+    if (certError || !certificate) {
       logger.error('Failed to create certificate', certError as Error);
       return {
         success: false,
@@ -189,30 +205,26 @@ export async function issueCertificate(
       };
     }
 
-    logger.info('Certificate created', {
-      certificateId: certificate.id,
-      certificateNumber,
-      enrollmentId,
-    });
+    if (enrollmentId) {
+      const { error: updateError } = await supabase
+        .from('program_enrollments')
+        .update({
+          status: 'completed',
+          progress_percent: 100,
+          completed_at: completionDate,
+          certificate_issued_at: completionDate,
+          updated_at: completionDate,
+        })
+        .eq('id', enrollmentId);
 
-    // Update enrollment with completion and certificate reference
-    const { error: updateError } = await supabase
-      .from('program_enrollments')
-      .update({
-        status: 'completed',
-        completed_at: completionDate,
-        certificate_id: certificate.id,
-        certificate_issued_at: completionDate,
-        updated_at: completionDate,
-      })
-      .eq('id', enrollmentId);
-
-    if (updateError) {
-      logger.error('Failed to update enrollment', updateError as Error);
-      // Certificate was created, continue to email
+      if (updateError) {
+        logger.error('Failed to update canonical enrollment after certificate issuance', updateError as Error, {
+          enrollmentId,
+          certificateId: certificate.id,
+        });
+      }
     }
 
-    // Send certificate delivery email
     const certificateUrl = `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/certificates/${certificate.id}`;
 
     if (studentEmail) {
@@ -224,24 +236,24 @@ export async function issueCertificate(
           displayName,
           certificateUrl,
         );
-        logger.info('Certificate delivery email sent', {
-          email: studentEmail,
-          certificateId: certificate.id,
-        });
       } catch (emailError) {
-        logger.error('Certificate email failed', emailError as Error);
-        // Don't fail - certificate is issued
+        logger.error('Certificate email failed', emailError as Error, { certificateId: certificate.id });
       }
-    } // end if (studentEmail)
+    }
 
-    // Create in-app notification
-    await supabase.from('notifications').insert({
-      user_id: studentId,
-      type: 'achievement',
-      title: 'Certificate Issued!',
-      message: `Congratulations! Your certificate for ${displayName} is ready.`,
-      action_url: certificateUrl,
-    });
+    try {
+      await supabase.from('notifications').insert({
+        user_id: studentId,
+        type: 'achievement',
+        title: 'Certificate Issued!',
+        message: `Congratulations! Your certificate for ${displayName} is ready.`,
+        action_url: certificateUrl,
+      });
+    } catch (notificationError) {
+      logger.error('Certificate notification failed', notificationError as Error, {
+        certificateId: certificate.id,
+      });
+    }
 
     return {
       success: true,
@@ -256,7 +268,7 @@ export async function issueCertificate(
       },
     };
   } catch (error) {
-    logger.error('Certificate issuance error', error as Error, { enrollmentId });
+    logger.error('Certificate issuance error', error as Error, { enrollmentId, courseId, programId });
     return {
       success: false,
       alreadyIssued: false,

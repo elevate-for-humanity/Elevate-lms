@@ -52,6 +52,23 @@ function applyAddonFallback(featureSet: Set<FeatureCode>, addonCode: string) {
   }
 }
 
+function applyCapacityAddons(base: PlanLimits, addonCodes: string[]): PlanLimits {
+  const limits: PlanLimits = { ...base };
+  const active = new Set(addonCodes.map(normalizeAddonCode));
+
+  if (active.has('additional-user')) {
+    limits.users = Math.max(0, limits.users ?? 0) + 1;
+  }
+  if (active.has('additional-location')) {
+    limits.locations = Math.max(0, limits.locations ?? 0) + 1;
+  }
+  if (active.has('additional-storage')) {
+    limits.storageGb = Math.max(0, limits.storageGb ?? 0) + 100;
+  }
+
+  return limits;
+}
+
 function subscriptionAccessState(status: string | null | undefined, currentPeriodEnd: string | null | undefined) {
   if (status === 'active') return { hasAccess: true, effectiveStatus: 'active' };
   if (status !== 'trialing') return { hasAccess: false, effectiveStatus: status ?? null };
@@ -233,12 +250,15 @@ export async function getOrganizationFeatures(
     for (const f of (license?.features as string[]) ?? []) addFeature(featureSet, f);
   }
 
-  const limits: PlanLimits = subscriptionHasAccess
+  const baseLimits: PlanLimits = subscriptionHasAccess
     ? ((planRow?.limits as PlanLimits) ??
       (planSlug && PLAN_LIMITS_FALLBACK[planSlug] ? PLAN_LIMITS_FALLBACK[planSlug] : { users: 1 }))
     : !orgSub && featureSet.size > 0
       ? { users: 1 }
       : { users: 0 };
+  const limits = allowStandaloneOrBaseAddons
+    ? applyCapacityAddons(baseLimits, activeAddonCodes)
+    : baseLimits;
 
   return {
     organizationId: tenantId,

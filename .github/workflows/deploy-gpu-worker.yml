@@ -1,106 +1,24 @@
 name: Deploy GPU Video Worker
 
 on:
-  issues:
-    types: [opened, edited]
+  push:
+    branches: [main]
+    paths:
+      - 'services/media-gpu-worker/**'
+      - 'scripts/northflank/provision-gpu-worker.ts'
+      - '.github/workflows/deploy-gpu-worker.yml'
   workflow_dispatch:
-    inputs:
-      confirm_gpu_cost:
-        description: 'Type DEPLOY_GPU to provision the paid GPU worker'
-        required: true
-        type: string
 
 permissions:
   contents: read
-  issues: write
 
 concurrency:
   group: northflank-gpu-video-deploy
   cancel-in-progress: false
 
 jobs:
-  cost-stop:
-    if: github.event_name == 'issues' && startsWith(github.event.issue.title, '[GPU COST STOP]')
-    name: Audit and stop unfinished GPU spend
-    runs-on: ubuntu-latest
-    environment: production
-    timeout-minutes: 10
-    env:
-      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
-      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
-      NORTHFLANK_GPU_PROJECT_ID: elevate-media-gpu
-    steps:
-      - name: Cleanup and capture evidence
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          test -n "$NORTHFLANK_API_TOKEN"
-          base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_GPU_PROJECT_ID}"
-          auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" -H 'Content-Type: application/json')
-          curl -fsS "${auth[@]}" "$base/services" > /tmp/services-before.json || echo '{"data":[]}' > /tmp/services-before.json
-          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-before.json || echo '{"data":[]}' > /tmp/volumes-before.json
-
-          deleted_services=0
-          for sid in elevate-gpu-worker elevate-media-gpu-worker; do
-            code=$(curl -sS -o "/tmp/${sid}.json" -w '%{http_code}' "${auth[@]}" "$base/services/$sid" || true)
-            if [ "$code" = "200" ]; then
-              echo "Deleting GPU service $sid and child resources"
-              curl -fsS -X DELETE "${auth[@]}" "$base/services/$sid?delete_child_objects=true"
-              deleted_services=$((deleted_services+1))
-            fi
-          done
-
-          sleep 5
-          deleted_volumes=0
-          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-mid.json || echo '{"data":[]}' > /tmp/volumes-mid.json
-          node - <<'NODE' > /tmp/gpu-volume-ids.txt
-          const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/volumes-mid.json','utf8'));
-          const d=Array.isArray(j.data)?j.data:(Array.isArray(j.data?.volumes)?j.data.volumes:[]);
-          for (const v of d) {
-            const id=String(v.id||''), name=String(v.name||'').toLowerCase();
-            if (id==='elevate-gpu-models' || name==='elevate gpu models') console.log(id);
-          }
-          NODE
-          while IFS= read -r vid; do
-            [ -z "$vid" ] && continue
-            code=$(curl -sS -o "/tmp/delete-volume-${vid}.json" -w '%{http_code}' -X DELETE "${auth[@]}" "$base/volumes/$vid" || true)
-            if [ "$code" = "200" ] || [ "$code" = "202" ] || [ "$code" = "204" ]; then
-              deleted_volumes=$((deleted_volumes+1))
-            else
-              echo "Volume delete returned HTTP $code for $vid"
-              cat "/tmp/delete-volume-${vid}.json" || true
-            fi
-          done < /tmp/gpu-volume-ids.txt
-
-          sleep 5
-          curl -fsS "${auth[@]}" "$base/services" > /tmp/services-after.json || echo '{"data":[]}' > /tmp/services-after.json
-          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-after.json || echo '{"data":[]}' > /tmp/volumes-after.json
-          node - "$deleted_services" "$deleted_volumes" <<'NODE' > /tmp/summary.txt
-          const fs=require('fs');
-          function rows(path,key){const j=JSON.parse(fs.readFileSync(path,'utf8')); if(Array.isArray(j.data)) return j.data; if(Array.isArray(j.data?.[key])) return j.data[key]; return [];}
-          const compact=x=>({id:x.id,name:x.name,status:x.status,plan:x.billing?.deploymentPlan,storageMB:x.spec?.storageSize});
-          console.log(`services_deleted=${process.argv[2]}`);
-          console.log(`volumes_deleted=${process.argv[3]}`);
-          console.log(`services_before=${JSON.stringify(rows('/tmp/services-before.json','services').map(compact))}`);
-          console.log(`volumes_before=${JSON.stringify(rows('/tmp/volumes-before.json','volumes').map(compact))}`);
-          console.log(`services_after=${JSON.stringify(rows('/tmp/services-after.json','services').map(compact))}`);
-          console.log(`volumes_after=${JSON.stringify(rows('/tmp/volumes-after.json','volumes').map(compact))}`);
-          NODE
-          cat /tmp/summary.txt
-
-      - name: Post cleanup result
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs=require('fs');
-            let summary='Cleanup step produced no summary.';
-            try { summary=fs.readFileSync('/tmp/summary.txt','utf8'); } catch {}
-            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:context.issue.number,body:`GPU cost-stop result: **${{ job.status }}**\n\n\`\`\`text\n${summary}\n\`\`\``});
-
   deploy-gpu-worker:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_gpu_cost == 'DEPLOY_GPU'
-    name: Provision, deploy, and accept GPU video worker
+    name: Provision and verify canonical GPU worker
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 180
@@ -116,6 +34,7 @@ jobs:
       NORTHFLANK_GPU_COUNT: '1'
       NORTHFLANK_GPU_DEPLOYMENT_PLAN: nf-gpu-l4-24-1g
       NORTHFLANK_GPU_BUILD_PLAN: nf-compute-800-16
+      NORTHFLANK_GPU_MODEL_VOLUME_ID: elevate-gpu-models
       NORTHFLANK_GPU_MODEL_VOLUME_MB: '153600'
       NORTHFLANK_GPU_EPHEMERAL_MB: '256000'
       NORTHFLANK_GPU_BUILD_EPHEMERAL_MB: '32768'
@@ -124,63 +43,104 @@ jobs:
       WAN_MIN_VRAM_GB: '22'
       GITHUB_SHA: ${{ github.sha }}
       BUILD_SHA: ${{ github.sha }}
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           clean: true
-      - name: Prove exact main SHA
+
+      - name: Verify production credentials
         shell: bash
         run: |
           set -Eeuo pipefail
-          git fetch origin main --depth=200
-          test "$(git rev-parse HEAD)" = "${{ github.sha }}"
-          git merge-base --is-ancestor "${{ github.sha }}" origin/main
-          test -z "$(git status --porcelain)"
+          test -n "$NORTHFLANK_API_TOKEN"
+          test -n "$NORTHFLANK_TEAM_ID"
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-      - name: Validate GPU source and provisioning contracts
+
+      - name: Validate GPU worker source
         run: |
           python -m py_compile services/media-gpu-worker/worker.py
           python -m py_compile services/media-gpu-worker/bootstrap_models.py
           pnpm tsx scripts/northflank/provision-gpu-worker.ts
-      - name: Provision, exact-SHA deploy, bootstrap Wan, and generate real MP4
+
+      - name: Provision, build, deploy, bootstrap and acceptance-test GPU worker
         run: pnpm tsx scripts/northflank/provision-gpu-worker.ts --execute
-      - name: Build exact Admin SHA
-        id: admin_build
-        run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
-      - name: Wait, verify, and deploy Admin
-        run: |
-          set -Eeuo pipefail
-          test -n "${{ steps.admin_build.outputs.build_id }}"
-          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --timeout-ms 3600000
-          pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
-          pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
-          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 3600000
-      - name: Prove Admin and Admin-to-GPU readiness
+
+      - name: Enforce canonical Northflank build rules and one instance
         shell: bash
         run: |
           set -Eeuo pipefail
-          for i in $(seq 1 40); do
-            ping=$(curl -sS --max-time 10 -o /tmp/admin-ping.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/ping || true)
-            health=$(curl -sS --max-time 10 -o /tmp/admin-health.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/health || true)
-            gpu=$(curl -sS --max-time 15 -o /tmp/admin-gpu.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/health/gpu-video || true)
-            if [ "$ping" = 200 ] && [ "$health" = 200 ] && [ "$gpu" = 200 ] && grep -q '"ready":true' /tmp/admin-health.json && grep -q '"ready":true' /tmp/admin-gpu.json; then
-              cat /tmp/admin-gpu.json
-              exit 0
-            fi
-            sleep 15
-          done
-          cat /tmp/admin-ping.json 2>/dev/null || true
-          cat /tmp/admin-health.json 2>/dev/null || true
-          cat /tmp/admin-gpu.json 2>/dev/null || true
-          exit 1
+          base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_GPU_PROJECT_ID}"
+          auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" -H 'Content-Type: application/json')
+          cat >/tmp/gpu-rules.json <<'JSON'
+          {
+            "disabledCI": false,
+            "vcsData": {
+              "projectUrl": "https://github.com/elevate-for-humanity/Elevate-lms",
+              "projectType": "github",
+              "projectBranch": "main"
+            },
+            "buildConfiguration": {
+              "pathIgnoreRules": [
+                "services/media-gpu-worker/**",
+                "scripts/northflank/provision-gpu-worker.ts"
+              ],
+              "isAllowList": true,
+              "ciIgnoreFlagsEnabled": true,
+              "ciIgnoreFlags": ["[skip ci]", "[ci skip]", "[northflank skip]", "[skip northflank]"]
+            },
+            "deployment": {
+              "type": "deployment",
+              "instances": 1,
+              "strategy": {"type": "recreate"},
+              "gracePeriodSeconds": 180
+            }
+          }
+          JSON
+          curl -fsS -X PATCH "${auth[@]}" --data-binary @/tmp/gpu-rules.json "$base/services/combined/${NORTHFLANK_GPU_SERVICE_ID}" >/tmp/gpu-patch.json
+
+      - name: Verify canonical GPU service state
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_GPU_PROJECT_ID}"
+          auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" -H 'Content-Type: application/json')
+          curl -fsS "${auth[@]}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}" >/tmp/gpu-final.json
+          node <<'NODE'
+          const fs=require('fs');
+          const raw=JSON.parse(fs.readFileSync('/tmp/gpu-final.json','utf8'));
+          const s=raw.data||raw;
+          const rules=s.buildConfiguration?.pathIgnoreRules||[];
+          const instances=Number(s.deployment?.instances ?? s.deployment?.spec?.instances ?? 0);
+          const expected=['services/media-gpu-worker/**','scripts/northflank/provision-gpu-worker.ts'];
+          const out={
+            id:s.id||s.name,
+            disabledCI:s.disabledCI,
+            instances,
+            isAllowList:s.buildConfiguration?.isAllowList,
+            pathIgnoreRules:rules,
+            buildStatus:s.status?.build?.status||null,
+            deploymentStatus:s.status?.deployment?.status||null
+          };
+          console.log(JSON.stringify(out,null,2));
+          if ((s.id||s.name)!=='elevate-gpu-worker') throw new Error('Canonical GPU service missing');
+          if (s.disabledCI!==false) throw new Error('GPU CI is disabled');
+          if (s.buildConfiguration?.isAllowList!==true) throw new Error('GPU build rules are not allow-list mode');
+          if (!expected.every(r=>rules.includes(r))) throw new Error('GPU path rules did not persist');
+          if (instances!==1) throw new Error(`Expected exactly 1 GPU instance, got ${instances}`);
+          NODE

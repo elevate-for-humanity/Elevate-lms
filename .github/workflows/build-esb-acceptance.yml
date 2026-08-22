@@ -71,6 +71,26 @@ jobs:
           ref: main
           clean: true
 
+      - name: Record exact tested commit
+        id: tested
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Post acceptance start evidence
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        env:
+          TESTED_SHA: ${{ steps.tested.outputs.sha }}
+        with:
+          script: |
+            const label = context.payload.issue.title.includes('BUSINESS') ? 'BUSINESS COURSE BUILDER' : 'ESB ACCEPTANCE';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `${label} STARTED\n\nExact checked-out main SHA: ${process.env.TESTED_SHA}`,
+            });
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
@@ -179,6 +199,7 @@ jobs:
         if: always() && github.event_name == 'issues'
         uses: actions/github-script@v7
         env:
+          TESTED_SHA: ${{ steps.tested.outputs.sha }}
           ARCHITECTURE_EXIT_CODE: ${{ steps.architecture.outputs.exit_code }}
           INSTALL_EXIT_CODE: ${{ steps.install.outputs.exit_code }}
           CREDENTIAL_EXIT_CODE: ${{ steps.credentials.outputs.exit_code }}
@@ -209,7 +230,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `${label} ${ok ? 'PASS' : 'FAIL'}\n\nCommit: ${context.sha}\nArchitecture: ${architectureCode}\nInstall: ${installCode}\nCredentials: ${credentialCode}\nVerification: ${verificationCode}\nAcceptance: ${acceptanceCode}\n\nArchitecture:\n\`\`\`text\n${architectureTail}\n\`\`\`\n\nVerification:\n\`\`\`text\n${verificationTail}\n\`\`\`\n\nAcceptance:\n\`\`\`text\n${tail}\n\`\`\``
+              body: `${label} ${ok ? 'PASS' : 'FAIL'}\n\nTested checkout SHA: ${process.env.TESTED_SHA}\nArchitecture: ${architectureCode}\nInstall: ${installCode}\nCredentials: ${credentialCode}\nVerification: ${verificationCode}\nAcceptance: ${acceptanceCode}\n\nArchitecture:\n\`\`\`text\n${architectureTail}\n\`\`\`\n\nVerification:\n\`\`\`text\n${verificationTail}\n\`\`\`\n\nAcceptance:\n\`\`\`text\n${tail}\n\`\`\``
             });
 
       - name: Fail workflow when architecture, build verification, preflight, or acceptance failed

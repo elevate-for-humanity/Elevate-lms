@@ -6,6 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { createCommercialPlan, type CommercialBrief } from '@/lib/media/commercial-plan';
 import { cleanupCommercialRender, renderCommercialVideo } from '@/lib/media/commercial-renderer';
 import { persistStudioAsset } from '@/lib/media/studio-assets';
+import { processCourseAgenticTask } from './course-executor';
 
 const POLL_MS = 15_000;
 const HOME_HERO_KIND = 'homepage-hero-commercial';
@@ -267,7 +268,7 @@ async function pollOnce() {
     const db = await requireAdminClient();
     const { data: tasks, error } = await db
       .from('agentic_build_tasks')
-      .select('id, run_id, worker, action, dependencies, status, requires_approval, created_at')
+      .select('id, run_id, worker, action, dependencies, input, status, requires_approval, created_at')
       .eq('status', 'queued')
       .order('created_at', { ascending: true })
       .limit(10);
@@ -284,11 +285,11 @@ async function pollOnce() {
       if (!run) continue;
       const { data: project } = await db
         .from('agentic_build_projects')
-        .select('id, tenant_id, user_id, target_type, metadata, status')
+        .select('id, tenant_id, user_id, target_id, target_type, metadata, status')
         .eq('id', run.project_id)
         .eq('status', 'active')
         .maybeSingle();
-      if (!project || project.target_type !== 'marketing_campaign') continue;
+      if (!project || !['marketing_campaign', 'course'].includes(project.target_type)) continue;
       if (task.requires_approval && project.metadata?.execution_approved !== true) continue;
       if (!(await claimTask(task.id))) continue;
 
@@ -302,7 +303,11 @@ async function pollOnce() {
       });
 
       try {
-        await processMarketingTask({ ...task, status: 'running' }, run, project);
+        if (project.target_type === 'course') {
+          await processCourseAgenticTask({ task: { ...task, status: 'running' }, run, project });
+        } else {
+          await processMarketingTask({ ...task, status: 'running' }, run, project);
+        }
       } catch (err) {
         await failTask(task.id, run.id, project.id, err);
       }

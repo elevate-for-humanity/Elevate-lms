@@ -8,6 +8,7 @@ on:
       - 'apps/marketing/app/api/applications/**'
       - 'apps/marketing/app/api/paris/application-interview/**'
       - 'apps/marketing/app/api/paris/applications/**'
+      - 'apps/marketing/app/case-manager/reports/wioa/**'
       - 'lib/agentic/**'
       - 'lib/paris/admissions/**'
       - 'lib/zora/admissions/**'

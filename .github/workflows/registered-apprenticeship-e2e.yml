@@ -14,19 +14,6 @@ on:
       - 'scripts/qa/provision-apprenticeship-e2e.mjs'
       - 'scripts/qa/provision-learner-program-holder-e2e.mjs'
       - 'scripts/qa/provision-remaining-portal-e2e.mjs'
-      - 'apps/lms/app/host-shop/**'
-      - 'apps/lms/app/apprentice/**'
-      - 'apps/lms/app/lms/**'
-      - 'apps/lms/app/program-holder/**'
-      - 'apps/lms/app/employer/**'
-      - 'apps/admin/app/instructor/**'
-      - 'apps/admin/app/staff-portal/**'
-      - 'apps/admin/app/dashboard/**'
-      - 'apps/marketing/app/case-manager/**'
-      - 'lib/auth/**'
-      - 'lib/rbac/**'
-      - 'lib/partner/**'
-      - 'lib/routing/portal-map.ts'
   workflow_run:
     workflows:
       - Deploy LMS

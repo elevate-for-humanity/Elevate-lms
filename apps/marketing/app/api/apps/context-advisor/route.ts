@@ -25,7 +25,7 @@ function cleanContext(value: unknown): Record<string, string> {
 }
 
 export async function POST(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'ai');
+  const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
@@ -65,9 +65,7 @@ export async function POST(request: NextRequest) {
     ? 'Help the user reason about grant discovery, fit, application planning, and reporting. Never invent an award, eligibility decision, deadline, or funding source. Distinguish user-provided context from verified opportunity records.'
     : 'Help the user organize SAM.gov registration and federal contractor compliance work. Never claim to replace SAM.gov, issue federal approval, or invent a UEI, CAGE code, registration status, or deadline.';
 
-  const contextBlock = Object.keys(context).length
-    ? JSON.stringify(context, null, 2)
-    : '{}';
+  const contextBlock = Object.keys(context).length ? JSON.stringify(context, null, 2) : '{}';
 
   try {
     const result = await provider.chat({

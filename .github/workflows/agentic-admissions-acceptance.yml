@@ -27,9 +27,12 @@ on:
       - '.github/workflows/agentic-admissions-acceptance.yml'
   workflow_dispatch:
 
+# Do not kill a valid production acceptance run simply because another engineering
+# environment lands an admissions/agentic commit on main. Serialize the gate and
+# let the in-flight run finish; the newest pending run will validate the newer head.
 concurrency:
   group: agentic-admissions-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read

@@ -6,9 +6,11 @@ import {
   listAgenticEvents,
   listAgenticMessages,
   loadAgenticProject,
+  loadLatestAgenticProjectForUser,
   recordAgenticEvent,
   updateAgenticProjectMetadata,
 } from '@/lib/agentic/project-service';
+import { createClient } from '@/lib/supabase/server';
 import {
   applyInterviewAnswer,
   applicationInterviewReadyForSubmission,
@@ -92,13 +94,39 @@ function responsePayload(state: ApplicationInterviewState, projectId: string, me
   };
 }
 
+async function authenticatedUserId(): Promise<string | null> {
+  const auth = await createClient();
+  const { data, error } = await auth.auth.getUser();
+  if (error || !data.user) return null;
+  return data.user.id;
+}
+
 async function loadSession(request: NextRequest, body?: z.infer<typeof requestSchema>) {
+  const userId = await authenticatedUserId();
   const cookie = readSessionCookie(request);
   const projectId = body?.projectId ?? cookie?.projectId;
   const resumeToken = body?.resumeToken ?? cookie?.resumeToken;
-  if (!projectId || !resumeToken) return null;
-  const project = await loadAgenticProject({ projectId, resumeToken });
-  return project ? { project, resumeToken } : null;
+
+  // Explicit project requests from an authenticated user must belong to that
+  // user. Anonymous resume stays token-bound to the browser session.
+  if (projectId && userId) {
+    const owned = await loadAgenticProject({ projectId, userId });
+    if (owned) return { project: owned, resumeToken: null as string | null };
+  }
+  if (projectId && resumeToken) {
+    const project = await loadAgenticProject({ projectId, resumeToken });
+    if (project) return { project, resumeToken };
+  }
+
+  // After submission the database attaches the PARIS project to the provisioned
+  // applicant user. This allows logout/login or a new browser to resume the same
+  // application conversation without relying on the original anonymous cookie.
+  if (userId) {
+    const project = await loadLatestAgenticProjectForUser({ userId, targetType: 'application' });
+    if (project) return { project, resumeToken: null as string | null };
+  }
+
+  return null;
 }
 
 export async function GET(request: NextRequest) {

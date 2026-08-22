@@ -1,10 +1,10 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { checkCertificateIssuanceEligibility } from '@/lib/services/credential-pipeline';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,18 +14,17 @@ async function _POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   try {
-    const supabase = await createClient();
+    const session = await createClient();
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await session.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { data: profile } = await supabase
+    const { data: profile } = await session
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-
     if (!profile?.role || !['admin', 'super_admin', 'staff', 'instructor'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -35,75 +34,56 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'enrollment_id required' }, { status: 400 });
     }
 
-    const { data: enrollment, error: enrollError } = await supabase
+    const db = await requireAdminClient();
+    const { data: enrollment, error: enrollError } = await db
       .from('program_enrollments')
-      .select('id, user_id, course_id, program_id, status')
-      .eq('id', enrollment_id)
+      .select('id,user_id,student_id,program_id,status')
+      .eq('id', String(enrollment_id))
       .maybeSingle();
-
-    if (enrollError || !enrollment) {
-      return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 });
+    if (enrollError || !enrollment?.program_id) {
+      return NextResponse.json({ error: 'Program enrollment not found' }, { status: 404 });
     }
 
-    if (enrollment.status !== 'completed') {
+    const learnerId = enrollment.user_id || enrollment.student_id;
+    if (!learnerId) {
+      return NextResponse.json({ error: 'Enrollment has no learner' }, { status: 400 });
+    }
+
+    const { checkProgramReadiness, completeProgramEnrollment } =
+      await import('@/lib/lms/completion-evaluator');
+    const readiness = await checkProgramReadiness(enrollment.id, learnerId, enrollment.program_id);
+    if (!readiness.ready) {
       return NextResponse.json(
-        { error: 'Enrollment must be completed before issuing certificate' },
+        {
+          error: 'Program completion requirements not met',
+          blocking_reasons: readiness.missingRequirements,
+        },
         { status: 400 },
       );
     }
 
-    // Credential pipeline gate — payment + exam passage
-    // Admins cannot bypass this: if the learner hasn't paid or passed the exam,
-    // the certificate must not be issued regardless of who is requesting.
-    if (enrollment.program_id) {
-      const gate = await checkCertificateIssuanceEligibility(
-        enrollment.user_id,
-        enrollment.program_id,
-      );
-      if (!gate.eligible) {
-        return NextResponse.json({ error: gate.reason }, { status: 400 });
-      }
-    }
-
-    // Check for existing certificate
-    const { data: existing } = await supabase
+    await completeProgramEnrollment(enrollment.id, learnerId, enrollment.program_id);
+    const { data: certificate, error: certificateError } = await db
       .from('certificates')
-      .select('id')
-      .eq('enrollment_id', enrollment_id)
+      .select('id,certificate_number,verification_url,issued_at')
+      .or(`student_id.eq.${learnerId},user_id.eq.${learnerId}`)
+      .eq('program_id', enrollment.program_id)
+      .is('course_id', null)
       .maybeSingle();
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'Certificate already issued', certificate_id: existing.id },
-        { status: 409 },
-      );
+    if (certificateError) throw certificateError;
+    if (!certificate) {
+      return NextResponse.json({ error: 'Program certificate not found after issuance' }, { status: 500 });
     }
 
-    const certNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
-
-    const { data: cert, error: certError } = await supabase
-      .from('certificates')
-      .insert({
-        user_id: enrollment.user_id,
-        student_id: enrollment.user_id,
-        course_id: enrollment.course_id,
-        enrollment_id: enrollment.id,
-        certificate_number: certNumber,
-        issued_at: new Date().toISOString(),
-        tenant_id: '6ba71334-58f4-4104-9b2a-5114f2a7614c',
-      })
-      .select('id, certificate_number')
-      .maybeSingle();
-
-    if (certError) {
-      logger.error('Certificate issuance failed', certError);
-      return NextResponse.json({ error: 'Failed to issue certificate' }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true, certificate: cert });
+    return NextResponse.json({ success: true, certificate });
   } catch (error) {
-    logger.error('Certificate issuance error', normalizeError(error, 'Certificate issuance failed'), getErrorContext(error));
+    logger.error(
+      'Certificate issuance error',
+      normalizeError(error, 'Certificate issuance failed'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
 export const POST = withApiAudit('/api/certificates/issue-program', _POST);

@@ -115,12 +115,12 @@ export async function startAgenticRun(input: {
         worker: task.worker,
         action: task.action,
         dependencies: dependencyIds,
-        status: task.dependencies.length ? 'queued' : 'running',
+        status: 'queued',
         input: task.input,
         output: {},
         cost_class: task.costClass,
         requires_approval: task.approvalRequired,
-        started_at: task.dependencies.length ? null : new Date().toISOString(),
+        started_at: null,
       })
       .select('id')
       .single();

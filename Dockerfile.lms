@@ -44,9 +44,18 @@ RUN pnpm exec vitest run tests/unit/platform-shell-mobile-contract.test.ts tests
 # Capture a real build timestamp even when the platform does not inject one.
 RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); console.log('LMS build timestamp:', ts)"
 
+# Every LMS deployment must ship a worker with a unique cache namespace. Without
+# this, installed PWAs can remain controlled by stale dashboard/course caches.
+RUN node scripts/stamp-sw.mjs
+RUN ! grep -q '__CACHE_VERSION__' /app/public/sw-lms.js || \
+    (echo "ERROR: __CACHE_VERSION__ still present in sw-lms.js" && exit 1)
+
 RUN pnpm --filter @elevate/lms build
 RUN test -d /app/apps/lms/.next
 RUN test -f /app/apps/lms/.next/BUILD_ID
+RUN test -f /app/public/sw-lms.js
+RUN test -f /app/public/manifest-lms.json
+RUN test -f /app/public/offline.html
 
 FROM node:22-alpine AS runner
 
@@ -76,6 +85,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/static ./apps/lms/
 # sw-lms.js, offline.html, icons). Copy it first, then overlay app-specific assets.
 COPY --from=builder --chown=nextjs:nodejs /app/public ./apps/lms/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/public ./apps/lms/public
+
+RUN test -f /app/apps/lms/public/sw-lms.js \
+    && test -f /app/apps/lms/public/manifest-lms.json \
+    && test -f /app/apps/lms/public/offline.html \
+    && ! grep -q '__CACHE_VERSION__' /app/apps/lms/public/sw-lms.js
 
 RUN if [ -f "./apps/lms/server.js" ]; then \
       true; \

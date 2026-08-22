@@ -122,15 +122,31 @@ jobs:
         env: { EXPECTED_SHA: '${{ github.sha }}' }
         run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status
 
-      - name: Smoke Admin liveness and readiness
+      - name: Smoke Admin liveness, readiness, and exact live SHA
         run: |
           set -euo pipefail
+          EXPECTED_SHA="${{ github.sha }}"
           for i in $(seq 1 20); do
-            ping_status=$(curl -sS --max-time 10 -o /tmp/admin-ping.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/ping || true)
-            health_status=$(curl -sS --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/health || true)
-            if [ "$ping_status" = 200 ] && [ "$health_status" = 200 ] && grep -q '"ok":true' /tmp/admin-ping.json && grep -q '"ready":true' /tmp/admin-health.json; then exit 0; fi
+            ping_status=$(curl -sS --max-time 10 -o /tmp/admin-ping.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/ping?deploy=${EXPECTED_SHA}" || true)
+            health_status=$(curl -sS --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
+            version_status=$(curl -sS --max-time 10 -o /tmp/admin-version.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
+            LIVE_SHA="$(node -e "try{const d=require('/tmp/admin-version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
+            echo "Attempt $i/20: ping=$ping_status health=$health_status version=$version_status live_sha=${LIVE_SHA:-missing}"
+            if [ "$ping_status" = 200 ] \
+              && [ "$health_status" = 200 ] \
+              && [ "$version_status" = 200 ] \
+              && grep -q '"ok":true' /tmp/admin-ping.json \
+              && grep -q '"ready":true' /tmp/admin-health.json \
+              && [ "$LIVE_SHA" = "$EXPECTED_SHA" ]; then
+              echo "ADMIN DEPLOYMENT VERIFIED: $EXPECTED_SHA is live"
+              exit 0
+            fi
             sleep 15
           done
+          echo "::error::Admin production did not converge to exact SHA $EXPECTED_SHA"
+          cat /tmp/admin-ping.json 2>/dev/null || true
+          cat /tmp/admin-health.json 2>/dev/null || true
+          cat /tmp/admin-version.json 2>/dev/null || true
           exit 1
 
       - name: Smoke canonical Admin and installed-PWA contracts

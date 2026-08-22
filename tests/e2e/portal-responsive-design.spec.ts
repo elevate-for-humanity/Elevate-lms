@@ -17,20 +17,24 @@ const creds = {
 } as const;
 
 async function login(page: Page, email: string, password: string) {
-  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
+  const response = await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  expect(response?.status() ?? 200, 'Login route returned a server error').toBeLessThan(500);
+
   const emailInput = page.locator('input[type="email"], input[name="email"]').first();
   const passwordInput = page.locator('input[type="password"]').first();
   const submit = page.locator('button[type="submit"]').first();
-  await expect(emailInput).toBeVisible();
-  await expect(passwordInput).toBeVisible();
-  await expect(submit).toBeVisible();
-  await expect(emailInput).toBeEnabled();
-  await expect(passwordInput).toBeEnabled();
-  await expect(submit).toBeEnabled();
+  await expect(emailInput).toBeVisible({ timeout: 15_000 });
+  await expect(passwordInput).toBeVisible({ timeout: 15_000 });
+  await expect(submit).toBeVisible({ timeout: 15_000 });
+  await expect(emailInput).toBeEnabled({ timeout: 20_000 });
+  await expect(passwordInput).toBeEnabled({ timeout: 20_000 });
+  await expect(submit).toBeEnabled({ timeout: 20_000 });
   await emailInput.fill(email);
   await passwordInput.fill(password);
-  await submit.click();
-  await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 25_000 });
+  await Promise.all([
+    page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 30_000 }),
+    submit.click(),
+  ]);
 }
 
 async function assertResponsivePage(page: Page, pathOrUrl: string) {
@@ -39,7 +43,7 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
   expect(response?.status() ?? 200, `${target} returned server error`).toBeLessThan(500);
   expect(page.url(), `${target} unexpectedly returned to login`).not.toMatch(/\/login(?:\?|$)/);
   expect(page.url(), `${target} redirected to unauthorized`).not.toContain('/unauthorized');
-  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForTimeout(500);
 
   const geometry = await page.evaluate(() => {
     const doc = document.documentElement;

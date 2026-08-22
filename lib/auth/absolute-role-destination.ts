@@ -1,7 +1,7 @@
 import { siteUrls } from '@/lib/utils/site-urls';
 
 const ADMIN_PATH_PREFIXES = [
-  '/lms/dashboard',
+  '/dashboard',
   '/staff-portal',
   '/instructor',
   '/testing-center',
@@ -18,12 +18,13 @@ const ADMIN_PATH_PREFIXES = [
   '/system-health',
 ] as const;
 
+// Only operational portals physically owned by the Marketing application belong
+// here. Program Holder and Creator are LMS-owned and must not be reclassified
+// by this compatibility helper.
 const MARKETING_PATH_PREFIXES = [
   '/case-manager',
   '/workforce-board',
-  '/program-holder',
   '/provider',
-  '/creator',
 ] as const;
 
 function matches(path: string, prefix: string): boolean {

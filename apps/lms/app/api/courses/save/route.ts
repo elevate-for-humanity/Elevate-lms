@@ -1,75 +1,37 @@
-import { logger } from '@/lib/logger';
-import { safeInternalError } from '@/lib/api/safe-error';
+/** RETIRED: LMS does not own course authoring persistence. */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
-import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-export const runtime = 'nodejs';
-export const maxDuration = 60;
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-async function _POST(req: NextRequest) {
-  try {
-    const rateLimited = await applyRateLimit(req, 'api');
-    if (rateLimited) return rateLimited;
+async function _POST(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
 
-    // Auth: require admin or instructor
-    const supabase = await createClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .maybeSingle();
-    if (!profile || !['admin', 'super_admin', 'instructor'].includes(profile.role)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const body = await req.json();
-    const { id, metadata, slug, title } = body;
-
-    if (!id) {
-      return NextResponse.json({ error: 'Missing course id' }, { status: 400 });
-    }
-
-    // LEGACY_SYSTEM_DISABLED — course updates must go through /api/admin/lms/courses/[courseId]
-    return NextResponse.json(
-      { error: 'LEGACY_SYSTEM_DISABLED: use PATCH /api/admin/lms/courses/[courseId]' },
-      { status: 410 },
-    );
-
-    const updateData: any = {};
-    if (metadata) updateData.metadata = metadata;
-    if (slug) updateData.slug = slug;
-    if (title) updateData.title = title;
-
-    const { data, error }: any = await supabase
-      .from('lms_courses')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      logger.error('Supabase error', normalizeError(error, 'Supabase error'), getErrorContext(error));
-      return safeInternalError(error as Error, 'Bad request');
-    }
-
-    return NextResponse.json({ ok: true, course: data });
-  } catch (error) {
-    logger.error('Save course error:', error instanceof Error ? error : new Error(String(error)));
-    return NextResponse.json(
-      { error: 'Failed to save course', message: toErrorMessage(error) },
-      { status: 500 },
-    );
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', session.user.id)
+    .maybeSingle();
+  if (!profile || !['admin', 'super_admin', 'instructor'].includes(profile.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
+
+  return NextResponse.json(
+    {
+      error: 'COURSE_BUILDER_ROOT_REQUIRED',
+      message: 'LMS course authoring persistence is retired. Edit courses through the canonical Admin/Studio course authoring surface.',
+      canonicalSurface: '/studio/courses',
+    },
+    { status: 410 },
+  );
 }
+
 export const POST = withApiAudit('/api/courses/save', _POST);

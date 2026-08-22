@@ -1,4 +1,6 @@
-// PUBLIC ROUTE: barber apprenticeship application form
+// PUBLIC ROUTE: Barber Apprenticeship application adapter.
+// Canonical application creation/reuse belongs exclusively to /api/applications.
+import crypto from 'node:crypto';
 import { logger } from '@/lib/logger';
 
 import { NextResponse } from 'next/server';
@@ -8,11 +10,9 @@ import { DOT_CODES } from '@/lib/compliance/rapids-integration';
 import { RAPIDS_CONFIG, getRAPIDSEnrollmentData } from '@/lib/compliance/rapids-config';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { sendOnboardingEmail } from '@/lib/email/send-onboarding';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
-
 export const dynamic = 'force-dynamic';
 
 const barberApplicationSchema = z.object({
@@ -42,122 +42,212 @@ export async function POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 
-    const data = await req.json();
-    const validated = barberApplicationSchema.parse(data);
+    const validated = barberApplicationSchema.parse(await req.json());
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+    const canonicalUrl = new URL('/api/applications', siteUrl);
+
+    const canonicalResponse = await fetch(canonicalUrl, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Origin: canonicalUrl.origin,
+        'X-Idempotency-Key': `barber-${crypto.randomUUID()}`,
+      },
+      cache: 'no-store',
+      body: JSON.stringify({
+        firstName: validated.firstName,
+        lastName: validated.lastName,
+        email: validated.email,
+        phone: validated.phone,
+        dateOfBirth: validated.dateOfBirth,
+        address: validated.address,
+        city: validated.city,
+        state: validated.state,
+        zip: validated.zipCode,
+        program: 'barber-apprenticeship',
+        programSlug: 'barber-apprenticeship',
+        fundingType: validated.fundingSource || 'self-pay',
+        fundingSource: validated.fundingSource || 'self-pay',
+        hasHostShop: validated.hasHostShop,
+        hostShopName: validated.hostShopName || null,
+        source: 'barber-apply-form',
+        preferredContact: 'phone',
+      }),
+    });
+
+    const canonical = (await canonicalResponse.json().catch(() => ({}))) as {
+      ok?: boolean;
+      id?: string;
+      referenceNumber?: string;
+      existing?: boolean;
+      error?: string;
+    };
+
+    if (!canonicalResponse.ok || !canonical.ok || !canonical.id) {
+      return NextResponse.json(
+        {
+          error:
+            canonical.error ||
+            `Failed to submit application. Please call ${PLATFORM_DEFAULTS.supportPhone}.`,
+        },
+        { status: canonicalResponse.status || 500 },
+      );
+    }
 
     const supabase = await requireAdminClient();
 
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
-    }
+    // Barber-specific intake facts enrich the same canonical application.
+    // They never create a second application or alter authorized approval state.
+    const detailFingerprint = crypto
+      .createHash('sha256')
+      .update(
+        JSON.stringify({
+          applicationId: canonical.id,
+          hasHostShop: validated.hasHostShop,
+          hostShopName: validated.hostShopName || null,
+          hostShopAddress: validated.hostShopAddress || null,
+          hostShopContact: validated.hostShopContact || null,
+          enrolledInBarberSchool: validated.enrolledInBarberSchool,
+          barberSchoolName: validated.barberSchoolName || null,
+          priorExperience: validated.priorExperience || null,
+        }),
+      )
+      .digest('hex')
+      .slice(0, 20);
 
-    const barberRef = `EFH-${Date.now().toString(36).toUpperCase()}`;
-    const normalizedBarberEmail = validated.email.toLowerCase().trim();
-
-    // Insert into applications table
-    const { data: application, error } = await supabase
+    const { data: application, error: readError } = await supabase
       .from('applications')
-      .insert({
-        first_name: validated.firstName,
-        last_name: validated.lastName,
-        email: validated.email,
-        normalized_email: normalizedBarberEmail,
-        normalized_phone: validated.phone.replace(/\D/g, ''),
-        phone: validated.phone,
-        city: validated.city,
-        zip: validated.zipCode,
-        program_interest: 'barber-apprenticeship',
-        program_slug: 'barber-apprenticeship',
-        program_id: '5ff21fcb-1968-41fd-99d3-37d69a31bd5c',
-        reference_number: barberRef,
-        status: 'submitted',
-        type: 'student',
-        source: 'barber-apply-form',
-        funding_type: validated.fundingSource || 'self-pay',
-        eligibility_data: {
-          date_of_birth: validated.dateOfBirth,
-          address: validated.address,
-          state: validated.state,
-        },
-        support_notes: [
-          `Ref: ${barberRef}`,
-          `Program type: apprenticeship`,
-          `Funding: ${validated.fundingSource || 'self-pay'}`,
-          `Host shop: ${validated.hasHostShop}`,
-          validated.hostShopName ? `Shop name: ${validated.hostShopName}` : '',
-          validated.hostShopAddress ? `Shop address: ${validated.hostShopAddress}` : '',
-          validated.hostShopContact ? `Shop contact: ${validated.hostShopContact}` : '',
-          `Enrolled in barber school: ${validated.enrolledInBarberSchool}`,
-          validated.barberSchoolName ? `School: ${validated.barberSchoolName}` : '',
-          validated.priorExperience ? `Prior experience: ${validated.priorExperience}` : '',
-        ].filter(Boolean).join(' | '),
-      })
-      .select('id')
+      .select('id, support_notes, eligibility_data')
+      .eq('id', canonical.id)
       .maybeSingle();
 
-    if (error) {
-      logger.error('[barber/apply] DB insert failed', {
-        code: (error as any)?.code,
-        message: (error as any)?.message,
-        hint: (error as any)?.hint,
-        email: validated.email,
-      });
+    if (readError || !application) {
       return NextResponse.json(
-        { error: `Failed to submit application. Please call ${PLATFORM_DEFAULTS.supportPhone}.` },
+        { error: 'Application saved, but Barber Apprenticeship details could not be verified.' },
         { status: 500 },
       );
     }
 
-    // Create RAPIDS pre-registration record (will be finalized after payment)
-    // Uses centralized RAPIDS config for consistency
+    const marker = `Barber Intake Fingerprint: ${detailFingerprint}`;
+    const supportNotes = String(application.support_notes || '');
+    if (!supportNotes.includes(marker)) {
+      const barberNotes = [
+        marker,
+        'Program type: apprenticeship',
+        `Host shop: ${validated.hasHostShop}`,
+        validated.hostShopName ? `Shop name: ${validated.hostShopName}` : '',
+        validated.hostShopAddress ? `Shop address: ${validated.hostShopAddress}` : '',
+        validated.hostShopContact ? `Shop contact: ${validated.hostShopContact}` : '',
+        `Enrolled in barber school: ${validated.enrolledInBarberSchool}`,
+        validated.barberSchoolName ? `School: ${validated.barberSchoolName}` : '',
+        validated.priorExperience ? `Prior experience: ${validated.priorExperience}` : '',
+      ]
+        .filter(Boolean)
+        .join(' | ');
+
+      const eligibilityData = {
+        ...(application.eligibility_data && typeof application.eligibility_data === 'object'
+          ? application.eligibility_data
+          : {}),
+        date_of_birth: validated.dateOfBirth,
+        address: validated.address,
+        state: validated.state,
+        host_shop: {
+          has_host_shop: validated.hasHostShop,
+          name: validated.hostShopName || null,
+          address: validated.hostShopAddress || null,
+          contact: validated.hostShopContact || null,
+        },
+        prior_training: {
+          enrolled_in_barber_school: validated.enrolledInBarberSchool,
+          school_name: validated.barberSchoolName || null,
+          prior_experience: validated.priorExperience || null,
+        },
+      };
+
+      const { error: updateError } = await supabase
+        .from('applications')
+        .update({
+          support_notes: [supportNotes.trim(), barberNotes].filter(Boolean).join('\n\n'),
+          eligibility_data: eligibilityData,
+        })
+        .eq('id', canonical.id);
+
+      if (updateError) {
+        return NextResponse.json(
+          { error: 'Application saved, but Barber Apprenticeship details could not be attached.' },
+          { status: 500 },
+        );
+      }
+    }
+
+    // RAPIDS preregistration is Barber-specific and remains a specialized
+    // post-application action. Reuse an existing preregistration if one exists.
     const rapidsEnrollmentData = getRAPIDSEnrollmentData('barber-apprenticeship');
-    const rapidsPreRegistration = {
-      application_id: application.id,
-      program_number: RAPIDS_CONFIG.programNumber,
-      sponsor_name: RAPIDS_CONFIG.sponsorOfRecord,
-      occupation_code: DOT_CODES.BARBER,
-      occupation_title: 'Barber',
-      status: 'submitted',
-      created_at: new Date().toISOString(),
-      // Additional RAPIDS enrollment data
-      ...(rapidsEnrollmentData || {}),
-    };
+    const { data: existingRapids } = await supabase
+      .from('rapids_registrations')
+      .select('id, program_number')
+      .eq('application_id', canonical.id)
+      .eq('program_number', RAPIDS_CONFIG.programNumber)
+      .limit(1)
+      .maybeSingle();
 
-    // Store RAPIDS pre-registration
-    await supabase.from('rapids_registrations').insert(rapidsPreRegistration);
+    if (!existingRapids) {
+      const { error: rapidsError } = await supabase.from('rapids_registrations').insert({
+        application_id: canonical.id,
+        program_number: RAPIDS_CONFIG.programNumber,
+        sponsor_name: RAPIDS_CONFIG.sponsorOfRecord,
+        occupation_code: DOT_CODES.BARBER,
+        occupation_title: 'Barber',
+        status: 'submitted',
+        created_at: new Date().toISOString(),
+        ...(rapidsEnrollmentData || {}),
+      });
+      if (rapidsError) {
+        logger.error('[barber/apply] RAPIDS preregistration failed', {
+          applicationId: canonical.id,
+          message: rapidsError.message,
+        });
+      }
+    }
 
-    // Audit log: Application created
-    await auditLog({
-      actorId: application.id,
-      actorRole: 'student',
-      action: AuditAction.CASE_CREATED,
-      entity: AuditEntity.APPLICATION,
-      entityId: application.id,
-      metadata: {
-        program: 'barber-apprenticeship',
-        email: validated.email,
-        fundingSource: 'self-pay',
-        rapidsProgram: rapidsPreRegistration.program_number,
-      },
-    });
+    if (!canonical.existing) {
+      await auditLog({
+        actorId: canonical.id,
+        actorRole: 'student',
+        action: AuditAction.CASE_CREATED,
+        entity: AuditEntity.APPLICATION,
+        entityId: canonical.id,
+        metadata: {
+          program: 'barber-apprenticeship',
+          email: validated.email,
+          fundingSource: validated.fundingSource || 'self-pay',
+          rapidsProgram: RAPIDS_CONFIG.programNumber,
+          canonicalAuthority: 'applications',
+        },
+      });
+    }
 
-    // Send barber onboarding email with Calendly link (BCC admin)
-    sendOnboardingEmail({
-      email: validated.email,
-      name: `${validated.firstName} ${validated.lastName}`.trim(),
-      program: 'Barber Apprenticeship',
-    }).catch((err) => {
-      logger.error('[barber-apply] Onboarding email failed (non-blocking):', err);
-    });
-
+    // Do not send a separate Barber "onboarding" email here. The canonical
+    // application authority already sends the correct application/account next
+    // steps, while enrollment onboarding is gated by authorized approval.
     return NextResponse.json({
       success: true,
-      applicationId: application.id,
-      rapidsPreRegistration: rapidsPreRegistration.program_number,
-      message: 'Application submitted. Proceed to payment.',
+      applicationId: canonical.id,
+      referenceNumber: canonical.referenceNumber,
+      existing: Boolean(canonical.existing),
+      canonicalAuthority: 'applications',
+      rapidsPreRegistration: existingRapids?.program_number || RAPIDS_CONFIG.programNumber,
+      message: canonical.existing
+        ? 'Your existing Barber Apprenticeship application is still active.'
+        : 'Application submitted. Continue with the next required step shown in your application status.',
     });
   } catch (err: any) {
     logger.error('Barber application error:', err);
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: 'Invalid Barber Apprenticeship application.' }, { status: 400 });
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -71,6 +71,23 @@ export async function loadAgenticProject(input: {
   return data ? (data as AgenticProjectRecord) : null;
 }
 
+export async function loadLatestAgenticProjectForUser(input: {
+  userId: string;
+  targetType: AgenticTargetType;
+}): Promise<AgenticProjectRecord | null> {
+  const db = await requireAdminClient();
+  const { data, error } = await db
+    .from('agentic_build_projects')
+    .select('*')
+    .eq('user_id', input.userId)
+    .eq('target_type', input.targetType)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(`Unable to load owned agentic project: ${error.message}`);
+  return data ? (data as AgenticProjectRecord) : null;
+}
+
 export async function updateAgenticProjectMetadata(input: {
   project: AgenticProjectRecord;
   metadata: Record<string, unknown>;

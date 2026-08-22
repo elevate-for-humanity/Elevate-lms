@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { resolveSlug } from '@/lib/program-registry';
 import { ALL_PROGRAMS } from '@/lib/programs/static-registry';
+import { getAdminClient } from '@/lib/supabase/admin';
 import ParisApplicationWorkspace from './ParisApplicationWorkspace';
 import ApplicationDocumentsPanel from './ApplicationDocumentsPanel';
 
@@ -17,6 +18,36 @@ export const metadata: Metadata = {
   },
 };
 
+async function loadApplicationPrograms() {
+  try {
+    const db = getAdminClient();
+    if (!db) throw new Error('Supabase admin client unavailable');
+    const { data, error } = await db
+      .from('programs')
+      .select('slug,title')
+      .eq('is_active', true)
+      .eq('published', true)
+      .in('enrollment_state', ['open', 'waitlist'])
+      .order('display_order', { ascending: true, nullsFirst: false })
+      .order('title', { ascending: true });
+    if (error) throw error;
+    if (data?.length) {
+      return data
+        .filter((program) => Boolean(program.slug && program.title))
+        .map((program) => ({ slug: program.slug as string, title: program.title as string }));
+    }
+  } catch (error) {
+    console.error(
+      'paris.application.programs.load.failed',
+      error instanceof Error ? error.message : String(error),
+    );
+  }
+
+  // Recovery fallback only. Canonical application submission still resolves the
+  // selected slug against public.programs before accepting the application.
+  return ALL_PROGRAMS.map((program) => ({ slug: program.slug, title: program.title }));
+}
+
 export default async function ParisStudentApplicationPage({
   searchParams,
 }: {
@@ -24,10 +55,7 @@ export default async function ParisStudentApplicationPage({
 }) {
   const params = await searchParams;
   const initialProgram = resolveSlug(params?.program || '') || '';
-  const programs = ALL_PROGRAMS.map((program) => ({
-    slug: program.slug,
-    title: program.title,
-  }));
+  const programs = await loadApplicationPrograms();
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">

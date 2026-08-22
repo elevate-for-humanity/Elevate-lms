@@ -160,7 +160,7 @@ const healthChecks = [
   {
     protocol: 'HTTP',
     type: 'readinessProbe',
-    path: '/api/health',
+    path: '/api/ready',
     port: RUNTIME_PORT,
     initialDelaySeconds: 5,
     periodSeconds: 10,
@@ -282,7 +282,7 @@ async function configureService(
   console.info(
     `[patch-ok] ${service.role}:${service.id} dockerfile=${service.dockerfile} ` +
       `port=${RUNTIME_PORT} instances=${DESIRED_INSTANCES} rollout=${appliedRolloutMode} ` +
-      `${availabilitySummary} health=startup:/api/ping,readiness:/api/health,liveness:/api/ping ` +
+      `${availabilitySummary} health=startup:/api/ping,readiness:/api/ready,liveness:/api/ping ` +
       `ci=github-actions buildPlan=${billing.buildPlan} deploymentPlan=${billing.deploymentPlan} ` +
       `ephemeralMB=${appliedEphemeralMb} buildkitCacheMB=${BUILDKIT_CACHE_MB}`,
   );
@@ -313,7 +313,7 @@ async function main() {
       console.info(
         `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, instances=${DESIRED_INSTANCES}, ` +
           `rollout=${rolloutMode}, maxUnavailable=0, maxSurge=1, ` +
-          `health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ` +
+          `health=startup:/api/ping,readiness:/api/ready,liveness:/api/ping, ` +
           `ci=github-actions, buildkitCacheMB=${BUILDKIT_CACHE_MB}`,
       );
     }

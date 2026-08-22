@@ -39,8 +39,8 @@ serve(async (req) => {
     JSON.stringify({
       error: 'Legacy AI course creation is disabled. Use the canonical Admin Course Factory.',
       code: 'COURSE_FACTORY_REQUIRED',
-      canonicalSurface: '/studio/courses',
-      canonicalApi: '/api/admin/course-builder/pipeline',
+      canonicalSurface: '/admin/course-builder',
+      canonicalApi: '/api/admin/course-builder',
     }),
     { status: 410, headers: corsHeaders },
   );

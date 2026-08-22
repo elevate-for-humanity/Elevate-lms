@@ -29,14 +29,45 @@ const retailObjectiveEnhancements: Record<string, string[]> = {
   ],
 };
 
+const governedPracticalSlugs = new Set([
+  'esb-v2-venture-concept-lab',
+  'esb-v2-sales-channels-process-support',
+  'esb-v2-distribution-fulfillment-lab',
+  'esb-v2-startup-budget-funding',
+  'esb-v2-capstone-business-model',
+  'esb-v2-capstone-go-to-market-financial',
+]);
+
 const modules = entrepreneurshipBlueprint.modules.map((courseModule) => {
-  const lessons = (courseModule.lessons ?? []).map((sourceLesson) => ({
-    ...sourceLesson,
-    learningObjectives: [
-      ...(sourceLesson.learningObjectives ?? []),
-      ...(retailObjectiveEnhancements[sourceLesson.slug] ?? []),
-    ],
+  const moduleCompetencyChecks = (courseModule.competencies ?? []).map((competency) => ({
+    key: competency.competencyKey,
+    label: competency.competencyKey.replace(/_/g, ' '),
+    isCritical: competency.isCritical,
+    requiresInstructorSignoff: true,
+    domainKey: competency.domainKey ?? courseModule.domainKey,
   }));
+
+  const lessons = (courseModule.lessons ?? []).map((sourceLesson) => {
+    const governedPractical = governedPracticalSlugs.has(sourceLesson.slug);
+    return {
+      ...sourceLesson,
+      learningObjectives: [
+        ...(sourceLesson.learningObjectives ?? []),
+        ...(retailObjectiveEnhancements[sourceLesson.slug] ?? []),
+      ],
+      practicalRequired: governedPractical,
+      ...(governedPractical
+        ? {
+            stepType: 'practical',
+            hourCategory: 'practical',
+            evidenceType: 'observation',
+            requiresInstructorSignoff: true,
+            competencyChecks: moduleCompetencyChecks,
+          }
+        : {}),
+    };
+  });
+
   const targetHours =
     lessons.reduce((minutes, lesson) => minutes + Number(lesson.durationMinutes ?? 0), 0) / 60;
   const baseModule = { ...courseModule, targetHours, lessons };

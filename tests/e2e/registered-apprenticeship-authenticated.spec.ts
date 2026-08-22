@@ -47,7 +47,10 @@ test.describe('Registered apprenticeship authorization', () => {
     });
     expect([401, 403]).toContain(forbidden.status());
 
-    const hostDashboard = await page.request.get(`${BASE}/host-shop/dashboard`, { failOnStatusCode: false });
+    const hostDashboard = await page.request.get(`${BASE}/host-shop/dashboard`, {
+      failOnStatusCode: false,
+      maxRedirects: 0,
+    });
     expect([302, 303, 307, 308, 401, 403]).toContain(hostDashboard.status());
   });
 });

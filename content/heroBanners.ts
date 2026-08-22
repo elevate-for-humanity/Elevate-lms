@@ -181,21 +181,21 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
     normalized = {
       ...normalized,
       posterImage: posterFor(key, banner),
-      voiceoverSrc: '/audio/heroes/home.mp3',
-      microLabel: 'Workforce Training & Technology',
+      voiceoverSrc: undefined,
+      microLabel: 'Career Training • Apprenticeships • Funding Guidance',
       eyebrow: 'Career Training & Workforce Development',
-      belowHeroHeadline: 'Career Training, Registered Apprenticeships & Workforce Technology in Indiana',
+      belowHeroHeadline: 'Train for a career. Earn while you learn. Build your next chapter.',
       belowHeroSubheadline:
-        'Explore program-specific training, registered-apprenticeship activity, employer services, and workforce-funding pathways. Funding and participant eligibility require the responsible agency\'s authorization.',
-      primaryCta: { label: 'Check Eligibility', href: '/check-eligibility' },
-      secondaryCta: { label: 'Employers & Agencies', href: '/partners', variant: 'secondary' },
+        'Explore hands-on career programs, registered apprenticeships, and employer-connected training in Indiana. Start with the path that fits you, then we will help you understand enrollment and possible funding options.',
+      primaryCta: { label: 'Explore Programs', href: '/programs' },
+      secondaryCta: { label: 'Explore Apprenticeships', href: '/apprenticeships', variant: 'secondary' },
       trustIndicators: [
-        'Program-Specific Funding Records',
-        'Documented Apprenticeship Standards',
-        'Credential Verification Workflows',
+        'Hands-on career training',
+        'Earn-while-you-learn apprenticeships',
+        'Funding guidance when available',
       ],
       transcript:
-        'Elevate for Humanity connects career training, documented apprenticeship activity, credential workflows, employer services, and workforce operations through one platform. Program, funding, credential, and outcome claims remain subject to their controlling records and responsible authorities.',
+        'Elevate for Humanity offers career training, registered apprenticeships, funding guidance, and employer-connected learning. Explore the pathway that fits your goals and review program-specific requirements before enrollment.',
       analyticsName: 'home',
     };
   }

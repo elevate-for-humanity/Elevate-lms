@@ -76,15 +76,16 @@ for (const marker of ['SAFE_OFFLINE_ASSET', 'MessageChannel', 'CACHE_COURSE', 'C
   if (!offlineCourse.includes(marker)) failures.push(`Offline course hook missing secure download contract: ${marker}`);
 }
 
-for (const [dockerfile, worker] of [
-  ['Dockerfile.admin', 'sw-admin.js'],
-  ['Dockerfile.lms', 'sw-lms.js'],
-  ['Dockerfile.northflank-admin', 'sw-admin.js'],
-  ['Dockerfile.northflank-lms', 'sw-lms.js'],
+for (const [dockerfile, worker, service] of [
+  ['Dockerfile.admin', 'sw-admin.js', 'admin'],
+  ['Dockerfile.lms', 'sw-lms.js', 'lms'],
+  ['Dockerfile.northflank-admin', 'sw-admin.js', 'admin'],
+  ['Dockerfile.northflank-lms', 'sw-lms.js', 'lms'],
 ]) {
   const content = read(dockerfile);
   if (!content.includes('scripts/check-pwa-architecture.mjs')) failures.push(`${dockerfile} does not run PWA architecture gate`);
   if (!content.includes('scripts/stamp-sw.mjs')) failures.push(`${dockerfile} does not stamp service workers`);
+  if (!content.includes(`scripts/sync-pwa-public.mjs ${service}`)) failures.push(`${dockerfile} does not regenerate app-local ${service} PWA assets from canonical sources`);
   if (!content.includes(worker) || !content.includes('__CACHE_VERSION__')) failures.push(`${dockerfile} does not verify ${worker} cache stamping`);
 }
 
@@ -97,4 +98,4 @@ if (failures.length) {
   console.error(failures.map((failure) => `PWA ARCHITECTURE ERROR: ${failure}`).join('\n'));
   process.exit(1);
 }
-console.log('PWA architecture verified: canonical workers, installable role manifests, protected-data cache boundaries, offline shell, static-resource-only course downloads, production-image cache stamping, and server-validated durable offline timeclock replay.');
+console.log('PWA architecture verified: canonical workers, generated app-local assets, installable role manifests, protected-data cache boundaries, offline shell, static-resource-only course downloads, production-image cache stamping, and server-validated durable offline timeclock replay.');

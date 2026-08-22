@@ -25,7 +25,7 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
     setMessage('');
     try {
       const response = await fetch(
-        `/api/admin/course-builder/instructor-media?courseId=${encodeURIComponent(courseId)}`,
+        `/api/admin/course-builder?action=instructor-media&courseId=${encodeURIComponent(courseId)}`,
         { cache: 'no-store' },
       );
       const data = await response.json();
@@ -47,15 +47,15 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
     setLoading(true);
     setMessage('');
     try {
-      const response = await fetch('/api/admin/course-builder/instructor-media', {
+      const response = await fetch('/api/admin/course-builder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId, onlyMissing: true }),
+        body: JSON.stringify({ action: 'queue-media', courseId, onlyMissing: true }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Unable to queue videos');
       setMessage(
-        `Queued ${data.result.queued} instructor-led lesson videos. ${data.result.skipped} already complete or in progress.`,
+        `Queued ${data.result.queued} instructor-led lesson videos and ${data.result.microclipsQueued ?? 0} microclips. ${data.result.skipped} already complete or in progress.`,
       );
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Unable to queue videos');

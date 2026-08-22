@@ -78,6 +78,7 @@ async function findExistingCertificate(
       .select('*')
       .or(`student_id.eq.${studentId},user_id.eq.${studentId}`)
       .eq('course_id', courseId)
+      .is('revoked_at', null)
       .order('issued_at', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -92,6 +93,7 @@ async function findExistingCertificate(
       .or(`student_id.eq.${studentId},user_id.eq.${studentId}`)
       .eq('program_id', programId)
       .is('course_id', null)
+      .is('revoked_at', null)
       .order('issued_at', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -103,6 +105,7 @@ async function findExistingCertificate(
     .from('certificates')
     .select('*')
     .eq('enrollment_id', enrollmentId)
+    .is('revoked_at', null)
     .order('issued_at', { ascending: false })
     .limit(1)
     .maybeSingle();

@@ -1,292 +1,153 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { readFileSync } from 'fs';
-import path from 'path';
-
-function loadCourseDefinitions(): any[] {
-  return JSON.parse(
-    readFileSync(path.join(process.cwd(), 'public/data/course-definitions.json'), 'utf8'),
-  );
-}
-import { HVAC_LESSON_UUID, HVAC_MODULE_UUID } from '@/lib/courses/hvac-legacy-maps';
-
-import { buildLessonContent, isPlaceholderContent } from '@/lib/courses/hvac-content-builder';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Known course UUID → definition slug mapping for pre-migration fallback
-const COURSE_ID_TO_SLUG: Record<string, string> = {
-  [HVAC_COURSE_ID]: 'hvac-technician',
-};
-
-// Lesson definition ID → UUID lookup (currently only HVAC)
-const LESSON_ID_TO_UUID: Record<string, Record<string, string>> = {
-  'hvac-technician': HVAC_LESSON_UUID,
-};
-const MODULE_ID_TO_UUID: Record<string, Record<string, string>> = {
-  'hvac-technician': HVAC_MODULE_UUID,
-};
-// Quiz questions are now served from course_lessons.quiz_questions in the DB.
-// The local fallback returns null for quiz fields — enrolled users get the DB path.
-const QUIZ_MAPS: Record<
-  string,
-  Record<string, { questions: any[]; passingScore: number; timeLimit?: number }>
-> = {};
-
-/**
- * Build lesson/module response from local CourseDefinition when Supabase
- * hasn't been seeded yet. Uses deterministic UUIDs so lesson URLs match.
- */
-function buildLocalFallback(courseId: string, slug: string, COURSE_DEFINITIONS: any[]) {
-  const def = COURSE_DEFINITIONS.find((c: any) => c.slug === slug);
-  if (!def) return null;
-
-  const lessonUuids = LESSON_ID_TO_UUID[slug] || {};
-  const moduleUuids = MODULE_ID_TO_UUID[slug] || {};
-
-  const course = {
-    title: def.title,
-    description: def.subtitle,
-    is_active: true,
-  };
-
-  let lessonNumber = 0;
-  const modules = def.modules.map((mod, mi) => ({
-    id: moduleUuids[mod.id] || mod.id,
-    title: mod.title,
-    description: mod.description,
-    order_index: mi + 1,
-  }));
-
-  const quizMap = QUIZ_MAPS[slug] || {};
-
-  const lessons = def.modules.flatMap((mod, mi) =>
-    mod.lessons.map((lesson, li) => {
-      lessonNumber++;
-      const quiz = quizMap[lesson.id];
-      const lessonUuid = lessonUuids[lesson.id] || lesson.id;
-      // Auto-resolve audio URL for video/lab lessons when no explicit contentUrl
-      const resolvedVideoUrl =
-        lesson.contentUrl ||
-        (lesson.type === 'video' || lesson.type === 'lab'
-          ? `/hvac/audio/lesson-${lessonUuid}.mp3`
-          : null);
-      // Use rich generated content instead of one-line description
-      const richContent =
-        slug === 'hvac-technician' ? buildLessonContent(lesson.id) : lesson.description || '';
-      return {
-        id: lessonUuid,
-        course_id: courseId,
-        title: lesson.title,
-        content: richContent,
-        video_url: resolvedVideoUrl,
-        lesson_number: lessonNumber,
-        order_index: li + 1,
-        duration_minutes:
-          lesson.durationMinutes ||
-          (lesson.type === 'reading' ? 15 : lesson.type === 'assignment' ? 30 : 20),
-        is_required: true,
-        is_published: true,
-        content_type: lesson.type,
-        quiz_id: quiz ? lesson.id : null,
-        quiz_questions: quiz ? quiz.questions : null,
-        passing_score: quiz ? quiz.passingScore : null,
-        description: lesson.description || '',
-        topics: null,
-      };
-    }),
-  );
-
-  return { course: { ...course, title: course.title }, lessons, modules };
-}
-
 /**
  * GET /api/courses/[courseId]/lessons/public
  *
- * Combined public metadata + conditional enrichment endpoint.
- * Returns the same lesson list for all callers, but content fields
- * (video_url, quiz_questions, full HTML) are stripped unless the
- * caller is authenticated AND enrolled in the course.
+ * Canonical course syllabus endpoint.
+ *
+ * Source of truth:
+ *   courses -> course_modules -> course_lessons
  *
  * Access tiers:
- *   Unauthenticated / not enrolled → syllabus only (titles, types, durations)
- *   Authenticated + enrolled       → full content (video URLs, quiz data, HTML)
+ *   anonymous / not enrolled -> syllabus metadata only
+ *   authenticated + enrolled -> learner content fields
  *
- * Auth is read from Supabase session cookies via createClient().
- * Enrollment is checked via the admin client (bypasses RLS) against
- * training_enrollments, with program_enrollments as a fallback.
- *
- * Falls back to local course definitions (lib/courses/definitions.ts)
- * when the course hasn't been seeded into Supabase.
+ * There is intentionally no file-system or hardcoded UUID fallback here. A
+ * missing database course is an integrity error, not permission to expose a
+ * bundled legacy copy of course content.
  */
-async function _GET(_request: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {
-  const limited = await applyRateLimit(_request, 'pageLoad');
+async function _GET(request: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {
+  const limited = await applyRateLimit(request, 'pageLoad');
   if (limited) return limited;
 
   const { courseId } = await params;
-  // Load per-request — GC-eligible after handler returns
-  const COURSE_DEFINITIONS = loadCourseDefinitions();
-
-  // Use the server client (respects RLS) — never the admin client for public routes.
-  // The admin client bypasses RLS and would serve protected content to unauthenticated callers.
   const supabase = await createClient();
-  if (!supabase) {
-    const slug = COURSE_ID_TO_SLUG[courseId];
-    if (slug) {
-      const fallback = buildLocalFallback(courseId, slug, COURSE_DEFINITIONS);
-      if (fallback) return NextResponse.json(stripSensitiveFields(fallback));
-    }
-    return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });
-  }
 
-  // Check auth + enrollment status
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const isAuthenticated = Boolean(user);
   let isEnrolled = false;
-  const isAuthenticated = !!user;
+
   if (user) {
     const { data: enrollment } = await supabase
-      .from('program_enrollments')
-      .select('id')
-      .eq('user_id', user.id)
+      .from('course_enrollments')
+      .select('id, status')
+      .eq('student_id', user.id)
       .eq('course_id', courseId)
+      .in('status', ['active', 'enrolled', 'in_progress', 'completed'])
       .limit(1)
       .maybeSingle();
-    isEnrolled = !!enrollment;
 
-    // Also check program_enrollments as a fallback
-    if (!isEnrolled) {
-      const { data: progEnrollment } = await supabase
-        .from('program_enrollments')
-        .select('id')
-        .eq('user_id', user.id)
-        .limit(1)
-        .maybeSingle();
-      isEnrolled = !!progEnrollment;
-    }
+    isEnrolled = Boolean(enrollment);
   }
 
-  // Fetch course
-  const { data: course, error: courseErr } = await supabase
+  const { data: course, error: courseError } = await supabase
     .from('courses')
     .select('id, title, description, is_active')
     .eq('id', courseId)
     .maybeSingle();
 
-  if (courseErr || !course) {
-    const slug = COURSE_ID_TO_SLUG[courseId];
-    if (slug) {
-      const fallback = buildLocalFallback(courseId, slug, COURSE_DEFINITIONS);
-      if (fallback) {
-        // Known courses serve full content publicly
-        return NextResponse.json({
-          ...fallback,
-          enrolled: isEnrolled,
-          authenticated: isAuthenticated,
-        });
-      }
-    }
+  if (courseError) {
+    return NextResponse.json({ error: 'Failed to load course' }, { status: 500 });
+  }
+  if (!course) {
     return NextResponse.json({ error: 'Course not found' }, { status: 404 });
   }
 
-  // Fetch published lessons via admin client (bypasses RLS)
-  const { data: lessons, error: lessonsErr } = await supabase
-    .from('course_lessons')
-    // Select syllabus fields only — sensitive fields (quiz_questions, passing_score,
-    // video_url, content) are added below only when the user is enrolled.
-    .select(
-      'id, course_id, title, description, topics, lesson_number, order_index, duration_minutes, is_required, is_published, content_type, quiz_id',
-    )
-    .eq('course_id', courseId)
-    .eq('is_published', true)
-    .order('lesson_number');
+  const [lessonsResult, modulesResult] = await Promise.all([
+    supabase
+      .from('course_lessons')
+      .select(
+        'id, course_id, module_id, title, description, lesson_number, order_index, duration_minutes, is_required, is_published, content_type, quiz_id',
+      )
+      .eq('course_id', courseId)
+      .eq('is_published', true)
+      .order('lesson_number', { ascending: true }),
+    supabase
+      .from('course_modules')
+      .select('id, title, description, order_index')
+      .eq('course_id', courseId)
+      .order('order_index', { ascending: true }),
+  ]);
 
-  if (lessonsErr) {
+  if (lessonsResult.error) {
     return NextResponse.json({ error: 'Failed to load lessons' }, { status: 500 });
   }
+  if (modulesResult.error) {
+    return NextResponse.json({ error: 'Failed to load modules' }, { status: 500 });
+  }
 
-  // Fetch course modules for week grouping
-  const { data: modules } = await supabase
-    .from('course_modules')
-    .select('id, title, description, order_index')
-    .eq('course_id', courseId)
-    .order('order_index');
-
-  // Enrich DB lessons that have placeholder content with generated rich HTML
-  const slug = COURSE_ID_TO_SLUG[courseId];
-  const enrichedLessons = (lessons || []).map((lesson: any) => {
-    if (slug === 'hvac-technician' && isPlaceholderContent(lesson.content)) {
-      // Reverse-lookup: UUID → definition ID
-      const lessonUuids = LESSON_ID_TO_UUID[slug] || {};
-      const defId = Object.entries(lessonUuids).find(([, uuid]) => uuid === lesson.id)?.[0];
-      if (defId) {
-        const richContent = buildLessonContent(defId);
-        return { ...lesson, content: richContent };
-      }
-    }
-    return lesson;
-  });
-
-  const normalizedCourse = { ...course, title: course.title };
   const payload = {
-    course: normalizedCourse,
-    lessons: enrichedLessons,
-    modules: modules || [],
+    course,
+    modules: modulesResult.data ?? [],
+    lessons: lessonsResult.data ?? [],
     enrolled: isEnrolled,
     authenticated: isAuthenticated,
   };
 
-  // Full content (video_url, quiz_questions, HTML) requires enrollment.
-  // Unauthenticated and non-enrolled callers receive syllabus only.
-  // Enrolled users get a second targeted fetch for sensitive fields —
-  // these are never fetched from the DB for unenrolled callers.
-  if (isEnrolled) {
-    const lessonIds = payload.lessons.map((l: any) => l.id);
-    const { data: enriched } = await supabase
-      .from('course_lessons')
-      .select('id, content, video_url, quiz_questions, passing_score')
-      .in('id', lessonIds);
-
-    const enrichMap = new Map<string, Record<string, unknown>>(
-      (enriched ?? []).map((r: any) => [String(r.id), r as Record<string, unknown>]),
-    );
-    const fullLessons = payload.lessons.map((l: any) => ({
-      ...l,
-      ...(enrichMap.get(String(l.id)) ?? {}),
-    }));
-    return NextResponse.json({ ...payload, lessons: fullLessons });
+  if (!isEnrolled) {
+    return NextResponse.json(stripSensitiveFields(payload));
   }
-  return NextResponse.json(stripSensitiveFields(payload));
+
+  const lessonIds = payload.lessons.map((lesson) => lesson.id);
+  if (lessonIds.length === 0) return NextResponse.json(payload);
+
+  const { data: protectedFields, error: protectedError } = await supabase
+    .from('course_lessons')
+    .select('id, content, video_url, quiz_questions, passing_score, topics, resources')
+    .in('id', lessonIds);
+
+  if (protectedError) {
+    return NextResponse.json({ error: 'Failed to load learner content' }, { status: 500 });
+  }
+
+  const protectedMap = new Map(
+    (protectedFields ?? []).map((row) => [String(row.id), row]),
+  );
+
+  return NextResponse.json({
+    ...payload,
+    lessons: payload.lessons.map((lesson) => ({
+      ...lesson,
+      ...(protectedMap.get(String(lesson.id)) ?? {}),
+    })),
+  });
 }
 
-/**
- * Strip video URLs, full content, and quiz answers from lesson data.
- * Returns only what's needed for the course syllabus/overview page.
- */
-function stripSensitiveFields(data: any) {
+function stripSensitiveFields(data: {
+  course: unknown;
+  modules: unknown[];
+  lessons: Array<Record<string, any>>;
+  enrolled: boolean;
+  authenticated: boolean;
+}) {
   return {
-    ...data,
+    course: data.course,
+    modules: data.modules,
     enrolled: false,
-    authenticated: data.authenticated ?? false,
-    lessons: (data.lessons || []).map((l: any) => ({
-      id: l.id,
-      course_id: l.course_id,
-      title: l.title,
-      lesson_number: l.lesson_number,
-      order_index: l.order_index,
-      duration_minutes: l.duration_minutes,
-      is_required: l.is_required,
-      is_published: l.is_published,
-      content_type: l.content_type,
-      description: l.description,
-      // Stripped: video_url, content, quiz_questions, quiz_id, passing_score, topics
+    authenticated: data.authenticated,
+    lessons: data.lessons.map((lesson) => ({
+      id: lesson.id,
+      course_id: lesson.course_id,
+      module_id: lesson.module_id,
+      title: lesson.title,
+      description: lesson.description,
+      lesson_number: lesson.lesson_number,
+      order_index: lesson.order_index,
+      duration_minutes: lesson.duration_minutes,
+      is_required: lesson.is_required,
+      is_published: lesson.is_published,
+      content_type: lesson.content_type,
     })),
   };
 }
+
 export const GET = withApiAudit('/api/courses/[courseId]/lessons/public', _GET);

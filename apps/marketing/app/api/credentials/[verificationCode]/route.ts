@@ -24,7 +24,7 @@ export async function GET(
     .select(
       `id, verification_code, status, expires_at, revoked_at, open_badge_credential,
        open_badge_credential_url, open_badge_status, badge_url,
-       credentials!inner(id, name, description, is_active, is_published)`,
+       credentials!inner(id, name, description)`,
     )
     .eq('verification_code', verificationCode)
     .maybeSingle();
@@ -34,9 +34,8 @@ export async function GET(
   }
 
   const definition = Array.isArray(data.credentials) ? data.credentials[0] : data.credentials;
-
-  if (!definition?.is_active || !definition?.is_published) {
-    return NextResponse.json({ error: 'Credential not available' }, { status: 404 });
+  if (!definition) {
+    return NextResponse.json({ error: 'Credential definition not found' }, { status: 404 });
   }
 
   const status = getOpenBadgeStatus({
@@ -67,9 +66,8 @@ export async function GET(
     );
   }
 
-  // Return the signed credential byte-for-byte as stored. Do not append custom
-  // properties here: issuer certification uses JSON-LD safe-mode validation,
-  // which rejects terms that are not defined by an associated context.
+  // Return only the signed credential. Issuer certification uses JSON-LD safe
+  // mode and rejects undefined custom terms added to the credential document.
   return NextResponse.json(data.open_badge_credential, {
     headers: {
       'Content-Type': 'application/ld+json; charset=utf-8',

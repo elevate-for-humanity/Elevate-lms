@@ -7,18 +7,29 @@ const HOST_EMAIL = process.env.E2E_HOST_SHOP_EMAIL || '';
 const HOST_PASSWORD = process.env.E2E_HOST_SHOP_PASSWORD || '';
 
 async function login(page: Page, email: string, password: string) {
-  await page.goto(`${BASE}/login`, { waitUntil: 'networkidle' });
+  const response = await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  expect(response?.status() ?? 200, 'Login route returned a server error').toBeLessThan(500);
+
   const emailInput = page.locator('input[type="email"], input[name="email"]').first();
   const passwordInput = page.locator('input[type="password"]').first();
   const submit = page.locator('button[type="submit"]').first();
-  await expect(emailInput).toBeVisible();
-  await expect(passwordInput).toBeVisible();
-  await expect(submit).toBeVisible();
+
+  await expect(emailInput).toBeVisible({ timeout: 15_000 });
+  await expect(passwordInput).toBeVisible({ timeout: 15_000 });
+  await expect(submit).toBeVisible({ timeout: 15_000 });
+  // The production login intentionally keeps controls disabled until React is
+  // hydrated. Enabled controls are the authoritative user-ready signal; a
+  // persistent connection on the page means networkidle is not reliable.
+  await expect(emailInput).toBeEnabled({ timeout: 20_000 });
+  await expect(passwordInput).toBeEnabled({ timeout: 20_000 });
+  await expect(submit).toBeEnabled({ timeout: 20_000 });
+
   await emailInput.fill(email);
   await passwordInput.fill(password);
-  await page.waitForTimeout(250);
-  await submit.click();
-  await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 20_000 });
+  await Promise.all([
+    page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 30_000 }),
+    submit.click(),
+  ]);
 }
 
 async function expectPortalRoute(page: Page, path: string, expectedText?: RegExp) {

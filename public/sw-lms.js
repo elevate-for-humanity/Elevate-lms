@@ -86,9 +86,6 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // Authenticated dashboard HTML and API payloads are never persisted. When
-  // offline, navigation falls back to the static offline shell. Individual
-  // supported mutations (for example timeclock events) use the durable queue.
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() => caches.match('/offline.html')),
@@ -133,6 +130,7 @@ self.addEventListener('message', (event) => {
               payload.urls.map(async (rawUrl) => {
                 const url = new URL(rawUrl, self.location.origin);
                 if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+                if (!/\.(?:pdf|png|jpe?g|webp|avif|gif|svg|mp3|m4a|ogg|wav|mp4|webm|vtt)$/i.test(url.pathname)) return;
                 const request = new Request(url.toString(), { cache: 'reload', redirect: 'follow' });
                 const response = await fetch(request);
                 await safeCachePut(cache, request, response);
@@ -220,14 +218,67 @@ function deleteOfflineAction(db, id) {
   });
 }
 
+async function updateQueuedShiftReferences(db, clientShiftId, serverProgressEntryId) {
+  if (!clientShiftId || !serverProgressEntryId) return;
+  const tx = db.transaction('offline-actions', 'readwrite');
+  const store = tx.objectStore('offline-actions');
+  const request = store.getAll();
+  await new Promise((resolve, reject) => {
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve();
+  });
+  for (const queued of request.result || []) {
+    if (queued?.type !== 'timeclock') continue;
+    try {
+      const payload = JSON.parse(queued.body || '{}');
+      if (payload.client_shift_id !== clientShiftId || payload.action === 'clock_in') continue;
+      if (!payload.progress_entry_id || String(payload.progress_entry_id).startsWith('offline:')) {
+        payload.progress_entry_id = serverProgressEntryId;
+        queued.body = JSON.stringify(payload);
+        store.put(queued);
+      }
+    } catch {
+      // Malformed records are handled by the main replay loop.
+    }
+  }
+  await new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
+async function deleteShiftActions(db, clientShiftId) {
+  if (!clientShiftId) return;
+  const tx = db.transaction('offline-actions', 'readwrite');
+  const store = tx.objectStore('offline-actions');
+  const request = store.getAll();
+  await new Promise((resolve, reject) => {
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve();
+  });
+  for (const queued of request.result || []) {
+    if (queued?.type !== 'timeclock') continue;
+    try {
+      const payload = JSON.parse(queued.body || '{}');
+      if (payload.client_shift_id === clientShiftId) store.delete(queued.id);
+    } catch {
+      // Leave unrelated malformed records to the main replay loop.
+    }
+  }
+  await new Promise((resolve, reject) => {
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error);
+  });
+}
+
 async function notifyClients(message) {
   const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
   for (const client of clientList) client.postMessage(message);
 }
 
 async function syncTimeclockActions() {
-  if (!self.navigator.onLine) return;
-
   let db;
   try {
     db = await openOfflineActionDB();
@@ -260,11 +311,7 @@ async function syncTimeclockActions() {
     if (payload.action !== 'clock_in') {
       const resolved = serverShiftIds.get(clientShiftId);
       if (resolved) payload.progress_entry_id = resolved;
-      if (!payload.progress_entry_id || String(payload.progress_entry_id).startsWith('offline:')) {
-        // Wait for the clock-in event for this client shift to establish the
-        // authoritative progress_entry_id before replaying later actions.
-        continue;
-      }
+      if (!payload.progress_entry_id || String(payload.progress_entry_id).startsWith('offline:')) continue;
     }
 
     try {
@@ -279,21 +326,22 @@ async function syncTimeclockActions() {
       if (response.ok) {
         if (data.progress_entry_id && clientShiftId) {
           serverShiftIds.set(clientShiftId, data.progress_entry_id);
+          if (payload.action === 'clock_in') {
+            await updateQueuedShiftReferences(db, clientShiftId, data.progress_entry_id);
+          }
         }
         await deleteOfflineAction(db, queued.id);
         syncedCount += 1;
         continue;
       }
 
-      if (response.status === 401 || response.status >= 500) {
-        // Preserve the queue until authentication/network/server health returns.
-        break;
-      }
+      if (response.status === 401 || response.status >= 500) break;
 
-      // A deterministic 4xx rejection means server-side authorization,
-      // assignment, chronology, or geofence validation failed. Do not loop it
-      // forever; surface it to the dashboard and retain server audit evidence.
-      await deleteOfflineAction(db, queued.id);
+      if (payload.action === 'clock_in' && clientShiftId) {
+        await deleteShiftActions(db, clientShiftId);
+      } else {
+        await deleteOfflineAction(db, queued.id);
+      }
       rejectedCount += 1;
       await notifyClients({
         type: 'TIMECLOCK_SYNC_REJECTED',
@@ -309,10 +357,7 @@ async function syncTimeclockActions() {
   }
 
   if (syncedCount || rejectedCount) {
-    await notifyClients({
-      type: 'TIMECLOCK_SYNC_COMPLETE',
-      data: { syncedCount, rejectedCount },
-    });
+    await notifyClients({ type: 'TIMECLOCK_SYNC_COMPLETE', data: { syncedCount, rejectedCount } });
   }
 }
 

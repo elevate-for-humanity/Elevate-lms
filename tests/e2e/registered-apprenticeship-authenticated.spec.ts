@@ -50,6 +50,7 @@ async function expectBrowserDeniedFromPortal(page: Page, path: string) {
     })
     .not.toMatch(/^\/host-shop\/dashboard(?:\/|$)/);
   expect(page.url(), `${path} did not resolve to an authorization/login boundary`).toMatch(/\/(?:unauthorized|host-shop\/login|login)(?:\?|$)/);
+  await expect(page.getByRole('heading', { name: /host shop dashboard/i })).toHaveCount(0);
 }
 
 test.describe('Registered apprenticeship authorization', () => {

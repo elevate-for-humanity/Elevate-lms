@@ -81,3 +81,4 @@ jobs:
 
 # 2026-08-19 20:33 EDT production acceptance rebuild trigger
 # 2026-08-19 runtime parity: use platform-standard Node 22
+# 2026-08-22 canonical Course Builder rerun after Remotion runtime packaging repair

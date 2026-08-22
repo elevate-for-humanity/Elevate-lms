@@ -2,67 +2,45 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Offline - Elevate for Humanity</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#1e3a5f" />
+    <title>Offline | Elevate for Humanity</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        color: white;
-      }
-      .container {
-        text-align: center;
-        max-width: 400px;
-      }
-      .icon {
-        font-size: 64px;
-        margin-bottom: 24px;
-      }
-      h1 {
-        font-size: 28px;
-        margin-bottom: 16px;
-      }
-      p {
-        font-size: 16px;
-        opacity: 0.9;
-        margin-bottom: 24px;
-        line-height: 1.5;
-      }
-      button {
-        background: #f97316;
-        color: white;
-        border: none;
-        padding: 14px 28px;
-        font-size: 16px;
-        font-weight: 600;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.2s;
-      }
-      button:hover {
-        background: #ea580c;
-      }
+      *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f8fafc;color:#0f172a}body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}.shell{width:min(680px,100%);background:#fff;border:1px solid #e2e8f0;border-radius:24px;box-shadow:0 20px 50px rgba(15,23,42,.12);overflow:hidden}.top{background:#1e3a5f;color:#fff;padding:28px}.brand{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.9}.top h1{margin:10px 0 8px;font-size:30px;line-height:1.1}.top p{margin:0;color:#dbeafe;line-height:1.6}.body{padding:28px}.status{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid #fcd34d;background:#fffbeb;border-radius:14px;margin-bottom:18px}.dot{width:11px;height:11px;margin-top:5px;border-radius:999px;background:#f59e0b;flex:0 0 auto}.body h2{font-size:18px;margin:22px 0 8px}.body p,.body li{font-size:15px;line-height:1.6;color:#475569}.body ul{margin:8px 0 0;padding-left:20px}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}button{appearance:none;border:0;border-radius:12px;background:#b91c1c;color:#fff;padding:12px 18px;font-weight:800;font-size:15px;cursor:pointer}button.secondary{background:#e2e8f0;color:#0f172a}.small{margin-top:16px;font-size:12px;color:#64748b}#online{display:none;color:#166534;font-weight:800;margin-top:14px}@media(max-width:520px){body{padding:12px}.top,.body{padding:22px}.top h1{font-size:26px}.actions button{width:100%}}
     </style>
   </head>
   <body>
-    <div class="container">
-      <div class="icon">📡</div>
-      <h1>You're Offline</h1>
-      <p>
-        It looks like you've lost your internet connection. Please check your connection and try
-        again.
-      </p>
-      <button onclick="window.location.reload()">Try Again</button>
-    </div>
+    <main class="shell">
+      <section class="top">
+        <div class="brand">Elevate for Humanity</div>
+        <h1>Your connection is offline</h1>
+        <p>The installed dashboard shell is still available, but protected participant and administrative records are never copied into the browser cache.</p>
+      </section>
+      <section class="body">
+        <div class="status"><span class="dot"></span><div><strong>Waiting for a secure connection</strong><div style="margin-top:4px;color:#92400e;font-size:14px;line-height:1.5">Reconnect before loading sensitive records or completing actions that require live authorization.</div></div></div>
+        <h2>What still works</h2>
+        <ul>
+          <li>Previously downloaded course resources that were explicitly saved for offline use.</li>
+          <li>Attendance actions started from an already-open LMS dashboard can be queued with GPS evidence and verified by the server after reconnection.</li>
+          <li>The app automatically checks for a connection and can return to the page you were using.</li>
+        </ul>
+        <h2>What is intentionally not cached</h2>
+        <p>Admin records, participant identity data, wage information, applications, API responses, and authenticated dashboard HTML require a live secure connection.</p>
+        <div class="actions">
+          <button onclick="retry()">Try Again</button>
+          <button class="secondary" onclick="history.back()">Go Back</button>
+        </div>
+        <div id="online">Connection restored. Reloading…</div>
+        <div class="small">Offline attendance remains pending until server-side account, host-site, geofence, timestamp, and chronology checks pass.</div>
+      </section>
+    </main>
+    <script>
+      function retry(){ window.location.reload(); }
+      window.addEventListener('online', function(){
+        var el=document.getElementById('online');
+        if(el) el.style.display='block';
+        setTimeout(function(){ window.location.reload(); }, 500);
+      });
+    </script>
   </body>
 </html>

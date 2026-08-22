@@ -6,10 +6,7 @@ import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { auditedMutation } from '@/lib/audit/transactional';
 
-async function _POST(request: NextRequest) {
-  const rateLimited = await applyRateLimit(request, 'api');
-  if (rateLimited) return rateLimited;
-
+async function requireCertificationReviewer(request: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -17,7 +14,7 @@ async function _POST(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return { supabase, error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
   }
 
   const { data: profile } = await supabase
@@ -26,76 +23,69 @@ async function _POST(request: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile || !['admin', 'staff'].includes(profile.role)) {
-    return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+  if (!profile || !['admin', 'staff', 'super_admin'].includes(profile.role)) {
+    return {
+      supabase,
+      error: NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 }),
+    };
   }
 
-  const body = await request.json();
-  const { submissionId, action, notes } = body;
+  return { supabase, user, error: null };
+}
 
-  if (!submissionId || !action) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+async function _POST(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await requireCertificationReviewer(request);
+  if (auth.error || !auth.user) return auth.error!;
+
+  const body = await request.json().catch(() => null);
+  const submissionId = body?.submissionId;
+  const action = body?.action;
+
+  if (!submissionId || !['approve', 'reject'].includes(action)) {
+    return NextResponse.json({ error: 'A certification id and valid action are required' }, { status: 400 });
   }
-  if (!['approve', 'reject'].includes(action)) {
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  }
 
-  const newStatus = action === 'approve' ? 'approved' : 'rejected';
-
+  // The Manage Certifications UI is backed by user_certifications. The old
+  // certification_submissions route targeted a different, incomplete table and
+  // attempted to write columns that do not exist in the live schema.
+  const newStatus = action === 'approve' ? 'active' : 'revoked';
   const { data, error } = await auditedMutation({
-    table: 'certification_submissions',
+    table: 'user_certifications',
     operation: 'update',
     rowData: {
       status: newStatus,
-      reviewed_by: user.id,
-      reviewed_at: new Date().toISOString(),
-      reviewer_notes: notes || null,
+      updated_at: new Date().toISOString(),
     },
     filter: { id: submissionId },
     audit: {
       action: 'api:post:/api/admin/certifications/review',
-      actorId: user.id,
-      targetType: 'certification_submissions',
+      actorId: auth.user.id,
+      targetType: 'user_certifications',
       targetId: submissionId,
-      metadata: { decision: action, notes: notes || null },
+      metadata: { decision: action },
     },
   });
 
-  if (error) {
-    logger.error('Failed to update submission:', error);
-    return NextResponse.json({ error: 'Failed to update submission' }, { status: 500 });
+  if (error || !data) {
+    logger.error('Failed to review certification:', error as Error);
+    return NextResponse.json({ error: 'Failed to update certification' }, { status: 500 });
   }
 
   await logAdminAudit({
     action: AdminAction.CERTIFICATION_REVIEWED,
-    actorId: user.id,
-    entityType: 'certification_submissions',
+    actorId: auth.user.id,
+    entityType: 'user_certifications',
     entityId: submissionId,
-    metadata: { decision: action, notes: notes || null },
+    metadata: { decision: action },
     req: request,
   });
 
-  const submission = data as { program_id?: unknown; user_id?: unknown } | null;
-  if (
-    action === 'approve' &&
-    submission?.program_id === 'hvac-technician' &&
-    typeof submission.user_id === 'string'
-  ) {
-    try {
-      const { advanceHvacWorkflow } = await import('@/lib/courses/hvac-completion-workflow');
-      const wfResult = await advanceHvacWorkflow(submission.user_id);
-      logger.info('[hvac-workflow] Advanced on admin approval', {
-        userId: submission.user_id,
-        ...wfResult,
-      });
-    } catch (wfErr) {
-      logger.error('[hvac-workflow] Advance failed (non-fatal):', wfErr);
-    }
-  }
-
   return NextResponse.json({
     success: true,
-    submission: data,
+    certification: data,
     message: `Certification ${newStatus}`,
   });
 }
@@ -103,38 +93,15 @@ async function _POST(request: NextRequest) {
 async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-  const supabase = await createClient();
 
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
+  const auth = await requireCertificationReviewer(request);
+  if (auth.error) return auth.error;
 
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (!profile || !['admin', 'staff'].includes(profile.role)) {
-    return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
-  }
-
-  const { searchParams } = new URL(request.url);
-  const status = searchParams.get('status');
-
-  let query = supabase
-    .from('certification_submissions')
+  const status = new URL(request.url).searchParams.get('status');
+  let query = auth.supabase
+    .from('user_certifications')
     .select(
-      `
-      *,
-      profiles:user_id (id, full_name, email),
-      programs:program_id (id, name, title)
-    `,
+      'id,user_id,certification_type_id,certification_name,certification_type,status,earned_date,created_at,updated_at',
     )
     .order('created_at', { ascending: false });
 
@@ -142,11 +109,27 @@ async function _GET(request: NextRequest) {
 
   const { data, error } = await query;
   if (error) {
-    logger.error('Failed to fetch submissions:', error);
-    return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 });
+    logger.error('Failed to fetch certifications:', error);
+    return NextResponse.json({ error: 'Failed to fetch certifications' }, { status: 500 });
   }
 
-  return NextResponse.json({ submissions: data });
+  const userIds = [...new Set((data ?? []).map((row) => row.user_id).filter(Boolean))];
+  const { data: profiles, error: profileError } = userIds.length
+    ? await auth.supabase.from('profiles').select('id,full_name,email').in('id', userIds)
+    : { data: [], error: null };
+  if (profileError) {
+    logger.error('Failed to fetch certification profiles:', profileError);
+    return NextResponse.json({ error: 'Failed to fetch certifications' }, { status: 500 });
+  }
+
+  const profileMap = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+  return NextResponse.json({
+    certifications: (data ?? []).map((row) => ({
+      ...row,
+      profiles: profileMap.get(row.user_id) ?? null,
+    })),
+  });
 }
+
 export const GET = withApiAudit('/api/admin/certifications/review', _GET, { critical: true });
 export const POST = withApiAudit('/api/admin/certifications/review', _POST, { critical: true });

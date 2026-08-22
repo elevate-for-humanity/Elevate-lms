@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Building2, Bell, FileText, ShieldCheck, Sparkles } from 'lucide-react';
+import { ContextAwareAdvisor } from '@/components/apps/ContextAwareAdvisor';
 
 type Row = Record<string, any>;
 
@@ -52,12 +53,14 @@ export function SamGovApp({ subscription, entities, documents, alerts, trialDays
         {setupEntries.length > 0 && (
           <section className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
             <div className="flex items-center gap-2 text-emerald-900"><Sparkles className="h-5 w-5" /><h2 className="font-black">Guided setup context</h2></div>
-            <p className="mt-2 text-sm leading-6 text-emerald-900">Your plain-English setup answers were carried into this workspace. Use them as the starting context for entity setup and compliance planning; review all data before relying on it.</p>
+            <p className="mt-2 text-sm leading-6 text-emerald-900">Your plain-English setup answers were carried into this workspace and are passed into the AI advisor as user-provided context. Official SAM.gov records remain the source of truth.</p>
             <dl className="mt-4 grid gap-3 md:grid-cols-2">
               {setupEntries.map(([key, value]) => <div key={key} className="rounded-xl bg-white p-4"><dt className="text-xs font-black uppercase tracking-wide text-slate-500">{key}</dt><dd className="mt-1 text-sm text-slate-900">{value}</dd></div>)}
             </dl>
           </section>
         )}
+
+        <ContextAwareAdvisor appSlug="sam-gov" context={setupContext} />
 
         <section className="mt-8 grid gap-4 sm:grid-cols-3">
           <Stat icon={Building2} label="Entities" value={entities.length} />

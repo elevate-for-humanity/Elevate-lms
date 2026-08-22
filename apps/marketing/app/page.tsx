@@ -2,11 +2,9 @@ import type { Metadata } from 'next';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
-import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
+import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
 import { HomeFunding } from '@/components/home/HomeFunding';
-import { FundingQuickCheck } from '@/components/home/FundingQuickCheck';
-import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeMobileActions } from '@/components/home/HomeMobileActions';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -61,11 +59,9 @@ export default function HomePage() {
       <StructuredData />
       <HomeHeroVideo banner={heroBanners.home} />
       <HomeTrustBar />
-      <FundingQuickCheck />
+      <HomeApprenticeshipInfra />
       <HomeCareerPathways />
-      <HomeHowItWorks />
       <HomeFunding />
-      <HomeEmployerStrip />
       <HomeFinalCTA />
       <ParisFloatingButton />
       <HomeMobileActions />

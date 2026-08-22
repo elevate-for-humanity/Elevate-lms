@@ -24,10 +24,11 @@ permissions:
   contents: read
   issues: write
 
-# Production certification should represent the newest main/deployed runtime,
-# not wait behind obsolete QA runs created by earlier SHAs.
+# Keep source-regression QA and exact deployed-SHA certification independent.
+# Newer runs may supersede older runs of the same authority class, but a
+# test-only push must never cancel the workflow_run that certifies production.
 concurrency:
-  group: registered-apprenticeship-e2e
+  group: registered-apprenticeship-e2e-${{ github.event_name == 'workflow_run' && 'deployment' || 'source' }}
   cancel-in-progress: true
 
 jobs:

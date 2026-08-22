@@ -202,10 +202,10 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     slug: 'text-messaging',
     name: 'Text Messaging',
     priceMonthly: 15,
-    description: 'SMS outreach with included bundle.',
+    description: 'SMS messaging for organizations that do not already have SMS included in their base plan.',
     features: [PlatformFeature.SMS],
-    bullets: ['500 SMS included', 'Additional usage billed separately'],
-    usageNote: '500 SMS/mo included',
+    bullets: ['SMS outreach', 'Alerts and reminders tied to platform workflows'],
+    usageNote: 'Carrier/provider usage and messaging-policy limits may apply',
   },
   {
     slug: 'course-creation-learning-platform',

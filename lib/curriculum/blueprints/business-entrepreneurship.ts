@@ -37,58 +37,56 @@ const modules = entrepreneurshipBlueprint.modules.map((courseModule) => {
       ...(retailObjectiveEnhancements[sourceLesson.slug] ?? []),
     ],
   }));
+  const targetHours =
+    lessons.reduce((minutes, lesson) => minutes + Number(lesson.durationMinutes ?? 0), 0) / 60;
+  const baseModule = { ...courseModule, targetHours, lessons };
 
   if (courseModule.domainKey === 'marketing_sales') {
     return {
-      ...courseModule,
+      ...baseModule,
       title: 'Week 2 — Marketing, Sales & Customer Experience',
       description:
         'Market research, target customers, customer value, pricing, marketing, selling, service recovery, sales channels, customer retention, and retail customer experience.',
-      lessons,
     };
   }
 
   if (courseModule.domainKey === 'production_distribution') {
     return {
-      ...courseModule,
+      ...baseModule,
       title: 'Week 3 — Retail Operations, Inventory & Distribution',
       description:
         'Products and services, quality, suppliers, inventory lifecycle and controls, merchandising-related operations, regulation, safety, distribution, fulfillment, stock risk, and loss-prevention concepts.',
-      lessons,
     };
   }
 
   if (courseModule.domainKey === 'business_financials') {
     return {
-      ...courseModule,
+      ...baseModule,
       title: 'Week 4 — Business Finance, Pricing & Retail Math',
       description:
         'Startup costs, revenue, expenses, pricing, markdowns, gross profit, profit margin, cost of goods sold, inventory economics, break-even, cash flow, financial statements, ROI, budgets, and funding readiness.',
-      lessons,
     };
   }
 
   if (courseModule.domainKey === 'entrepreneurial_small_business_concepts') {
     return {
-      ...courseModule,
+      ...baseModule,
       title: 'Week 1 — Entrepreneurship, Opportunity & Business Planning',
       description:
         'Entrepreneurial mindset, opportunity recognition, customers, value propositions, ownership, business planning, design thinking, risk, and intellectual property.',
-      lessons,
     };
   }
 
   if (courseModule.domainKey === 'capstone_exam_readiness') {
     return {
-      ...courseModule,
+      ...baseModule,
       title: 'Week 5 — Business Simulation, Credential Readiness & Final Assessment',
       description:
         'Integrates entrepreneurship, customer service, retail operations, inventory, merchandising, marketing, sales, and practical business finance through capstone work, practice assessment, remediation, and final evaluation.',
-      lessons,
     };
   }
 
-  return { ...courseModule, lessons };
+  return baseModule;
 });
 
 export const businessEntrepreneurshipBlueprint: CredentialBlueprint = {

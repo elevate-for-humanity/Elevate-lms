@@ -2,6 +2,10 @@ name: Repair Course Factory Contracts
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/trigger-course-factory-contract-repair.txt'
   issues:
     types: [opened, reopened]
 

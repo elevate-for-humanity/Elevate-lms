@@ -8,6 +8,7 @@ on:
       - '.github/workflows/rebuild-esb.yml'
       - 'lib/curriculum/blueprints/entrepreneurship.ts'
       - 'lib/course-builder/assessment-generator.ts'
+      - 'lib/ai/**'
       - 'lib/video/edge-tts.ts'
       - 'scripts/course-builder/run.ts'
       - 'scripts/course-builder/verify-esb-runtime.ts'
@@ -21,8 +22,13 @@ permissions:
   contents: read
   issues: write
 
+concurrency:
+  group: esb-canonical-course-builder-rebuild
+  cancel-in-progress: true
+
 env:
   CI: true
+  AI_PROVIDER: gemini
   AI_CIRCUIT_RECOVERY_WAIT: '1'
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -148,4 +154,4 @@ jobs:
 # 2026-08-22 canonical Course Builder rerun after Remotion runtime packaging repair
 # 2026-08-22 report preflight/build/validate/verify results to issue 703
 # 2026-08-22 execute course-builder scripts with react-server export condition
-# 2026-08-22 rerun against current Gemini 2.5 provider with circuit recovery enabled
+# 2026-08-22 prefer current Gemini pool; watch lib/ai and cancel stale duplicate rebuilds

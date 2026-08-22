@@ -44,7 +44,6 @@ env:
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-  NODE_OPTIONS: --conditions=react-server
 
 jobs:
   build-audit-publish:
@@ -69,39 +68,62 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-
-      - name: Require production Supabase credentials
+      - name: Install dependencies deterministically
+        id: install
         shell: bash
         run: |
-          test -n "$SUPABASE_URL"
-          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          set +e
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/esb-install.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 160 /tmp/esb-install.log > /tmp/esb-install-tail.log || true
+          exit 0
+
+      - name: Require production Supabase credentials
+        id: credentials
+        shell: bash
+        run: |
+          set +e
+          test -n "$SUPABASE_URL" && test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Build, audit, render full media package, and publish Entrepreneurship course
         id: acceptance
+        if: steps.install.outputs.exit_code == '0' && steps.credentials.outputs.exit_code == '0'
         shell: bash
+        env:
+          NODE_OPTIONS: --conditions=react-server
         run: |
           set +e
           pnpm tsx scripts/course-factory/build-esb-acceptance.ts > /tmp/esb-acceptance.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 240 /tmp/esb-acceptance.log > /tmp/esb-acceptance-tail.log
+          tail -n 240 /tmp/esb-acceptance.log > /tmp/esb-acceptance-tail.log || true
           exit 0
 
       - name: Post result to issue 703
         if: always()
         uses: actions/github-script@v7
         env:
-          EXIT_CODE: ${{ steps.acceptance.outputs.exit_code }}
+          INSTALL_EXIT_CODE: ${{ steps.install.outputs.exit_code }}
+          CREDENTIAL_EXIT_CODE: ${{ steps.credentials.outputs.exit_code }}
+          ACCEPTANCE_EXIT_CODE: ${{ steps.acceptance.outputs.exit_code }}
         with:
           script: |
             const fs = require('fs');
-            const code = process.env.EXIT_CODE || '1';
-            const ok = code === '0';
-            const tail = fs.existsSync('/tmp/esb-acceptance-tail.log')
+            const installCode = process.env.INSTALL_EXIT_CODE || '1';
+            const credentialCode = process.env.CREDENTIAL_EXIT_CODE || '1';
+            const acceptanceCode = process.env.ACCEPTANCE_EXIT_CODE || 'not-run';
+            const ok = installCode === '0' && credentialCode === '0' && acceptanceCode === '0';
+            const installTail = fs.existsSync('/tmp/esb-install-tail.log')
+              ? fs.readFileSync('/tmp/esb-install-tail.log', 'utf8').slice(-12000)
+              : 'Install step did not produce a log.';
+            const acceptanceTail = fs.existsSync('/tmp/esb-acceptance-tail.log')
               ? fs.readFileSync('/tmp/esb-acceptance-tail.log', 'utf8').slice(-24000)
-              : 'Acceptance command did not produce a log.';
-            const body = `${ok ? 'ESB ACCEPTANCE PASS' : 'ESB ACCEPTANCE FAIL'}\n\nCommit: ${context.sha}\nExit code: ${code}\n\n\`\`\`text\n${tail}\n\`\`\``;
+              : 'Acceptance step did not run.';
+            const body = `${ok ? 'ESB ACCEPTANCE PASS' : 'ESB ACCEPTANCE FAIL'}\n\nCommit: ${context.sha}\nInstall exit: ${installCode}\nCredential gate: ${credentialCode}\nAcceptance exit: ${acceptanceCode}\n\nINSTALL\n\`\`\`text\n${installTail}\n\`\`\`\n\nACCEPTANCE\n\`\`\`text\n${acceptanceTail}\n\`\`\``;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -109,6 +131,6 @@ jobs:
               body,
             });
 
-      - name: Fail workflow when acceptance failed
-        if: steps.acceptance.outputs.exit_code != '0'
+      - name: Fail workflow when preflight or acceptance failed
+        if: steps.install.outputs.exit_code != '0' || steps.credentials.outputs.exit_code != '0' || steps.acceptance.outputs.exit_code != '0'
         run: exit 1

@@ -5,6 +5,7 @@ import {
   rewriteTenantAppHostRequest,
   tenantSlugFromAppHost,
 } from '@/lib/tenant/middleware-tenant-routing';
+import { LMS_HOST } from '@/lib/routing/portal-map';
 
 const PROTECTED_PORTAL_PREFIXES = [
   '/case-manager/dashboard',
@@ -157,8 +158,12 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (error || !user) {
-    const loginUrl = new URL('/login', req.url);
-    loginUrl.searchParams.set('redirect', `${pathname}${search}`);
+    // These workspaces are owned by the Marketing runtime, but authentication
+    // is owned by the LMS runtime. Preserve the absolute Marketing return URL
+    // so successful login comes back to the application that owns the route
+    // instead of resolving /provider, /case-manager, or /workforce-board on LMS.
+    const loginUrl = new URL('/login', LMS_HOST);
+    loginUrl.searchParams.set('redirect', `${req.nextUrl.origin}${pathname}${search}`);
     return NextResponse.redirect(loginUrl);
   }
 

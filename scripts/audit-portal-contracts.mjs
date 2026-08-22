@@ -24,21 +24,21 @@ const portalsPage = read('apps/marketing/app/portals/page.tsx');
 const adminDashboard = read('apps/admin/app/dashboard/page.tsx');
 
 const PORTALS = [
-  { key: 'lms', surface: 'studentPortal', app: 'lms', path: '/lms/dashboard', roles: ['student', 'learner', 'user', 'delegate', 'grant_client'], publicHref: 'https://app.elevateforhumanity.org/lms/dashboard' },
-  { key: 'apprentice', surface: 'apprenticePortal', app: 'lms', path: '/apprentice', roles: ['apprentice', 'barber_apprentice', 'cosmetology_apprentice'], publicHref: 'https://app.elevateforhumanity.org/apprentice' },
-  { key: 'employer', surface: 'employerPublic', app: 'lms', path: '/employer/dashboard', roles: ['employer', 'sponsor', 'recruiter'], publicHref: 'https://app.elevateforhumanity.org/employer/dashboard' },
-  { key: 'hostshop', surface: 'hostSites', app: 'lms', path: '/host-shop/dashboard', roles: ['partner', 'host_shop', 'host_shop_admin'], publicHref: 'https://app.elevateforhumanity.org/host-shop/dashboard' },
-  { key: 'parent', surface: 'parentPortal', app: 'lms', path: '/parent-portal/dashboard', roles: ['parent'], publicHref: 'https://app.elevateforhumanity.org/parent-portal/dashboard' },
-  { key: 'workforce', surface: 'workforcePortal', app: 'lms', path: '/workforce/dashboard', roles: ['workforce_partner'], publicHref: 'https://app.elevateforhumanity.org/workforce/dashboard' },
-  { key: 'programholder', surface: 'programHolderPortal', app: 'lms', path: '/program-holder/dashboard', roles: ['program_holder'], publicHref: 'https://app.elevateforhumanity.org/program-holder/dashboard' },
-  { key: 'creator', surface: 'creatorPortal', app: 'lms', path: '/creator/products', roles: ['creator'], publicHref: 'https://app.elevateforhumanity.org/creator/products' },
-  { key: 'admin', surface: 'adminPortal', app: 'admin', path: '/dashboard', roles: ['super_admin', 'admin', 'org_admin', 'advisor'], publicHref: 'https://admin.elevateforhumanity.org/dashboard' },
-  { key: 'instructor', surface: 'instructorPortal', app: 'admin', path: '/instructor/dashboard', roles: ['instructor'], publicHref: 'https://admin.elevateforhumanity.org/instructor/dashboard' },
-  { key: 'staff', surface: 'staffPortal', app: 'admin', path: '/staff-portal/dashboard', roles: ['staff'], publicHref: 'https://admin.elevateforhumanity.org/staff-portal/dashboard' },
-  { key: 'testing', surface: 'testingOperations', app: 'admin', path: '/testing-center', roles: ['test_admin', 'proctor'], publicHref: 'https://admin.elevateforhumanity.org/testing-center' },
-  { key: 'casemanager', surface: 'caseManagerPortal', app: 'marketing', path: '/case-manager/dashboard', roles: ['case_manager'], publicHref: 'https://www.elevateforhumanity.org/case-manager/dashboard' },
-  { key: 'workforceboard', surface: 'workforceBoardPortal', app: 'marketing', path: '/workforce-board/dashboard', roles: ['workforce_board', 'workforce_board_admin'], publicHref: 'https://www.elevateforhumanity.org/workforce-board/dashboard' },
-  { key: 'provider', surface: 'providerPortal', app: 'marketing', path: '/provider/dashboard', roles: ['provider', 'provider_admin'], publicHref: 'https://www.elevateforhumanity.org/provider/dashboard' },
+  { key: 'lms', surface: 'studentPortal', app: 'lms', path: '/lms/dashboard', roles: ['student', 'learner', 'user', 'delegate', 'grant_client'] },
+  { key: 'apprentice', surface: 'apprenticePortal', app: 'lms', path: '/apprentice', roles: ['apprentice', 'barber_apprentice', 'cosmetology_apprentice'] },
+  { key: 'employer', surface: 'employerPublic', app: 'lms', path: '/employer/dashboard', roles: ['employer', 'sponsor', 'recruiter'] },
+  { key: 'hostshop', surface: 'hostSites', app: 'lms', path: '/host-shop/dashboard', roles: ['partner', 'host_shop', 'host_shop_admin'] },
+  { key: 'parent', surface: 'parentPortal', app: 'lms', path: '/parent-portal/dashboard', roles: ['parent'] },
+  { key: 'workforce', surface: 'workforcePortal', app: 'lms', path: '/workforce/dashboard', roles: ['workforce_partner'] },
+  { key: 'programholder', surface: 'programHolderPortal', app: 'lms', path: '/program-holder/dashboard', roles: ['program_holder'] },
+  { key: 'creator', surface: 'creatorPortal', app: 'lms', path: '/creator/products', roles: ['creator'] },
+  { key: 'admin', surface: 'adminPortal', app: 'admin', path: '/dashboard', roles: ['super_admin', 'admin', 'org_admin', 'advisor'] },
+  { key: 'instructor', surface: 'instructorPortal', app: 'admin', path: '/instructor/dashboard', roles: ['instructor'] },
+  { key: 'staff', surface: 'staffPortal', app: 'admin', path: '/staff-portal/dashboard', roles: ['staff'] },
+  { key: 'testing', surface: 'testingOperations', app: 'admin', path: '/testing-center', roles: ['test_admin', 'proctor'] },
+  { key: 'casemanager', surface: 'caseManagerPortal', app: 'marketing', path: '/case-manager/dashboard', roles: ['case_manager'] },
+  { key: 'workforceboard', surface: 'workforceBoardPortal', app: 'marketing', path: '/workforce-board/dashboard', roles: ['workforce_board', 'workforce_board_admin'] },
+  { key: 'provider', surface: 'providerPortal', app: 'marketing', path: '/provider/dashboard', roles: ['provider', 'provider_admin'] },
 ];
 
 function routeFileCandidates(app, route) {
@@ -47,29 +47,23 @@ function routeFileCandidates(app, route) {
   const suffix = `${clean}${clean ? '/' : ''}page.tsx`;
   const candidates = [`${base}/${suffix}`];
   if (app === 'lms' && clean.startsWith('lms/')) {
-    candidates.push(`${base}/lms/(app)/${clean.slice('lms/'.length)}${clean.slice('lms/'.length) ? '/' : ''}page.tsx`);
+    const tail = clean.slice('lms/'.length);
+    candidates.push(`${base}/lms/(app)/${tail}${tail ? '/' : ''}page.tsx`);
   }
   return candidates;
 }
-
-function routeExists(app, route) {
-  return routeFileCandidates(app, route).some(exists);
-}
-
+const routeExists = (app, route) => routeFileCandidates(app, route).some(exists);
 function blockFor(source, key) {
   return source.match(new RegExp(`${key}:\\s*\\{([\\s\\S]*?)\\n\\s*\\},`, 'm'))?.[1] || '';
 }
 
 console.log('\n── Single portal authority ──');
-if (!portalRouter.includes('label: portal.label') || !portalRouter.includes('description: portal.description')) {
-  fail('portal-router maintains or bypasses canonical portal metadata instead of deriving from PORTAL_MAP');
-} else pass('portal-router derives display metadata from PORTAL_MAP');
-if (/export const PORTAL_META:\s*Record<PortalKey, PortalMeta>\s*=\s*\{/.test(portalRouter)) {
-  fail('portal-router reintroduced a second hand-maintained PORTAL_META registry');
-} else pass('no independent portal metadata registry');
-if (!roleDestinations.includes('ROLE_PORTAL_ASSIGNMENTS') || !roleDestinations.includes('PORTAL_MAP[assignment.portalKey]')) {
-  fail('role destinations do not derive route facts from PORTAL_MAP');
-} else pass('role destinations derive route facts from PORTAL_MAP');
+if (!portalRouter.includes('label: portal.label') || !portalRouter.includes('description: portal.description')) fail('portal-router does not derive display metadata from PORTAL_MAP');
+else pass('portal-router derives display metadata from PORTAL_MAP');
+if (/export const PORTAL_META:\s*Record<PortalKey, PortalMeta>\s*=\s*\{/.test(portalRouter)) fail('portal-router reintroduced a hand-maintained PORTAL_META registry');
+else pass('no independent portal metadata registry');
+if (!roleDestinations.includes('ROLE_PORTAL_ASSIGNMENTS') || !roleDestinations.includes('PORTAL_MAP[assignment.portalKey]')) fail('role destinations do not derive route facts from PORTAL_MAP');
+else pass('role destinations derive route facts from PORTAL_MAP');
 
 console.log('\n── Canonical portal ownership and role assignment ──');
 for (const portal of PORTALS) {
@@ -77,25 +71,20 @@ for (const portal of PORTALS) {
   let canonical = surface?.canonical;
   if (portal.surface === 'hostSites') canonical = surface?.portal;
   if (portal.surface === 'employerPublic') canonical = (surface?.operational || []).find((x) => x.path === portal.path);
-
   if (!canonical) fail(`${portal.surface}: canonical contract missing`);
   else if (canonical.app !== portal.app || canonical.path !== portal.path) fail(`${portal.surface}: contract says ${canonical.app}:${canonical.path}, expected ${portal.app}:${portal.path}`);
   else pass(`${portal.surface}: ${portal.app}:${portal.path}`);
-
-  if (!routeExists(portal.app, portal.path)) fail(`${portal.key}: missing route for ${portal.app}:${portal.path}`); else pass(`${portal.key}: route exists`);
+  if (!routeExists(portal.app, portal.path)) fail(`${portal.key}: missing route for ${portal.app}:${portal.path}`);
+  else pass(`${portal.key}: route exists`);
 
   const portalBlock = blockFor(portalMap, portal.key);
   if (!portalBlock.includes(`defaultPath: '${portal.path}'`)) fail(`${portal.key}: PORTAL_MAP default path drift`);
-  else pass(`${portal.key}: PORTAL_MAP path aligned`);
-
   for (const metadata of ['label:', 'description:', 'allowedRoles:', 'authSurface:', 'tenantScope:']) {
     if (!portalBlock.includes(metadata)) fail(`${portal.key}: missing canonical ${metadata.replace(':', '')} metadata`);
   }
-
   for (const role of portal.roles) {
     const assignment = new RegExp(`${role}:\\s*\\{[^}]*portalKey:\\s*['\"]${portal.key}['\"]`);
     if (!assignment.test(roleDestinations)) fail(`${role}: role assignment does not resolve to ${portal.key}`);
-    else pass(`${role}: role assignment aligned`);
     if (!portalBlock.includes(`'${role}'`)) fail(`${portal.key}: canonical allowedRoles omits ${role}`);
   }
 }
@@ -111,17 +100,18 @@ if (!exists('apps/marketing/app/online-apps/page.tsx')) fail('/online-apps: publ
 else pass('/online-apps: public portal directory exists');
 if (!publicNavigation.includes("id: 'platform'") || !publicNavigation.includes("href: '/online-apps'")) fail('Platform/Online Apps are not exposed from canonical public navigation');
 else pass('Platform/Online Apps exposed from canonical public navigation');
-for (const portal of PORTALS) {
-  if (!portalsPage.includes(`'${portal.key}'`)) fail(`${portal.key}: missing from /portals directory`); else pass(`${portal.key}: /portals directory aligned`);
-  if (!publicAccessRegistry.includes(portal.publicHref)) fail(`${portal.key}: canonical portal missing from public access registry`);
-  else pass(`${portal.key}: public access registry aligned`);
-}
-if (!publicNavigation.includes('ROUTES.creatorPortal')) fail('Creator Studio missing from global portal navigation'); else pass('Creator Studio exposed from global portal navigation');
-if (!publicNavigation.includes('ROUTES.testingPortal')) fail('Testing Center operations missing from global portal navigation'); else pass('Testing Center operations exposed from global portal navigation');
+if (!portalsPage.includes('PORTAL_KEYS.map') || !portalsPage.includes('PORTAL_MAP[key]')) fail('/portals does not derive its directory from canonical portal registries');
+else pass('/portals derives its directory from canonical registries');
+if (/const\s+PORTAL_KEYS\s*:\s*PortalKey\[\]\s*=\s*\[/.test(portalsPage)) fail('/portals reintroduced a hand-maintained portal key list');
+if (!publicAccessRegistry.includes("import { PORTAL_MAP") || !publicAccessRegistry.includes('Object.keys(PORTAL_MAP)') || !publicAccessRegistry.includes('portal.host') || !publicAccessRegistry.includes('portal.defaultPath')) fail('/online-apps registry does not derive portal URLs from PORTAL_MAP');
+else pass('/online-apps registry derives portal URLs from PORTAL_MAP');
+if (!publicAccessRegistry.includes('CANONICAL_PORTAL_ACCESS')) fail('public access registry lacks full canonical portal projection');
+if (!publicNavigation.includes('ROUTES.creatorPortal')) fail('Creator Studio missing from global portal navigation');
+if (!publicNavigation.includes('ROUTES.testingPortal')) fail('Testing Center operations missing from global portal navigation');
 
 console.log('\n── Admin override invariant ──');
-if (!roleMatrix.includes("role === 'admin' || role === 'super_admin'")) fail('RBAC admin override invariant missing'); else pass('regular admin remains global portal override');
-if (!portalAccess.includes("auth.effectiveRoles.includes('admin')")) fail('portal-access does not recognize regular admin as platform admin'); else pass('portal-access recognizes regular admin');
+if (!roleMatrix.includes("role === 'admin' || role === 'super_admin'")) fail('RBAC admin override invariant missing');
+if (!portalAccess.includes("auth.effectiveRoles.includes('admin')")) fail('portal-access does not recognize regular admin as platform admin');
 
 console.log('\n── PWA persona contracts ──');
 const PWA = [
@@ -133,32 +123,26 @@ const PWA = [
 for (const [key, name, manifestPath, startUrl, scope, layoutPath] of PWA) {
   if (!exists(manifestPath)) { fail(`${name}: missing ${manifestPath}`); continue; }
   const manifest = JSON.parse(read(manifestPath));
-  if (manifest.start_url !== startUrl) fail(`${name}: start_url ${manifest.start_url} != ${startUrl}`); else pass(`${name}: start_url aligned`);
-  if (manifest.scope !== scope) fail(`${name}: scope ${manifest.scope} != ${scope}`); else pass(`${name}: scope aligned`);
+  if (manifest.start_url !== startUrl) fail(`${name}: start_url ${manifest.start_url} != ${startUrl}`);
+  if (manifest.scope !== scope) fail(`${name}: scope ${manifest.scope} != ${scope}`);
   const canonicalBlock = blockFor(portalMap, key);
   if (!canonicalBlock.includes(`pwaManifest: '/${manifestPath.replace('public/', '')}'`)) fail(`${name}: PWA manifest not governed by PORTAL_MAP`);
   if (!canonicalBlock.includes(`pwaScope: '${scope}'`)) fail(`${name}: PWA scope not governed by PORTAL_MAP`);
   if (!exists(layoutPath)) fail(`${name}: missing portal layout ${layoutPath}`);
-  else {
-    const layout = read(layoutPath);
-    const href = `/${manifestPath.replace('public/', '')}`;
-    if (!layout.includes(href)) fail(`${name}: layout does not link ${href}`); else pass(`${name}: manifest linked by layout`);
-  }
+  else if (!read(layoutPath).includes(`/${manifestPath.replace('public/', '')}`)) fail(`${name}: layout does not link manifest`);
 }
 
 console.log('\n── Retired portal ownership ──');
 for (const retired of ['/portal/barber', '/portal/cosmetology', '/portal/esthetician', '/portal/nail-technician']) {
-  if (portalMap.includes(retired)) fail(`PORTAL_MAP still advertises retired route ${retired}`); else pass(`${retired}: not canonical`);
+  if (portalMap.includes(retired)) fail(`PORTAL_MAP still advertises retired route ${retired}`);
 }
-const programHolderBlock = blockFor(portalMap, 'programholder');
-if (/subdomain:\s*['\"]marketing['\"]/.test(programHolderBlock)) fail('Program Holder still owned by Marketing'); else pass('Program Holder is not owned by Marketing');
+if (/subdomain:\s*['\"]marketing['\"]/.test(blockFor(portalMap, 'programholder'))) fail('Program Holder still owned by Marketing');
 
 if (!failures) {
   console.log('\n── Portal function integrity ──');
   const child = spawnSync(process.execPath, [join(ROOT, 'scripts/audit-portal-functions.mjs')], { cwd: ROOT, stdio: 'inherit' });
   if (child.status !== 0) failures += 1;
 }
-
 if (failures) {
   console.error(`\n❌ Portal contract audit FAILED — ${failures} issue(s).`);
   process.exit(1);

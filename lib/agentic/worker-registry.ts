@@ -56,7 +56,7 @@ const WORKERS: AgenticWorkerDefinition[] = [
   {
     name: 'visual-designer',
     capabilities: ['layout', 'design_tokens', 'component_selection'],
-    targetTypes: ['website', 'course', 'store_workspace', 'dev_studio'],
+    targetTypes: ['website', 'course', 'store_workspace', 'dev_studio', 'marketing_campaign'],
     costClass: 'low',
   },
   {
@@ -86,14 +86,14 @@ const WORKERS: AgenticWorkerDefinition[] = [
   {
     name: 'compliance-qa',
     capabilities: ['accessibility', 'claims_review', 'completion_validation', 'security_checks'],
-    targetTypes: ['website', 'course', 'program', 'workflow', 'store_workspace', 'dev_studio'],
+    targetTypes: ['website', 'course', 'program', 'workflow', 'store_workspace', 'dev_studio', 'marketing_campaign'],
     costClass: 'low',
     approvalRequired: true,
   },
   {
     name: 'publisher',
     capabilities: ['canonical_persist', 'publish'],
-    targetTypes: ['website', 'course', 'program', 'workflow', 'store_workspace', 'dev_studio'],
+    targetTypes: ['website', 'course', 'program', 'workflow', 'store_workspace', 'dev_studio', 'marketing_campaign'],
     costClass: 'low',
     approvalRequired: true,
   },

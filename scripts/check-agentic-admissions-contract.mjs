@@ -69,8 +69,11 @@ requireText('lib/agentic/orchestrator.ts', 'startAgenticRun', 'shared BuildRun s
 requireText('lib/agentic/orchestrator.ts', 'createAgenticCheckpoint', 'shared checkpoint service');
 requireText('supabase/migrations/20260822190000_retire_paris_application_authority.sql', 'drop table if exists public.paris_applications', 'forward retirement of duplicate authority');
 requireText('supabase/migrations/20260822191500_link_agentic_application_documents.sql', 'link_agentic_application_documents', 'server-side project/application document linking');
+requireText('supabase/migrations/20260822191800_preserve_document_delete_audit.sql', 'drop constraint if exists document_audit_log_document_id_fkey', 'document deletion audit persistence');
 requireText('supabase/migrations/20260822193000_documents_application_owner_types.sql', "'agentic_application'::text", 'pre-submission application document owner type');
 requireText('supabase/migrations/20260822194500_agentic_run_credit_accounting.sql', 'increment_agentic_run_credits', 'atomic agentic run credit accounting');
+requireText('supabase/migrations/20260822195000_harden_agentic_application_document_link.sql', 'Agentic application link identity mismatch', 'identity-bound agentic document handoff');
+requireText('supabase/migrations/20260822195000_harden_agentic_application_document_link.sql', 'Agentic application link program mismatch', 'program-bound agentic document handoff');
 
 if (!process.exitCode) {
   console.log('AGENTIC_ADMISSIONS_CONTRACT_PASS');

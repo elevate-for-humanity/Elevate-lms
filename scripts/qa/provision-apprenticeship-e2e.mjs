@@ -266,8 +266,10 @@ async function cleanup() {
 
   for (const userId of [apprenticeId, hostId].filter(Boolean)) {
     await db.from('profiles').delete().eq('id', userId);
-    const { error } = await db.auth.admin.deleteUser(userId);
-    if (error && !/not found/i.test(error.message)) console.error(`delete auth user ${userId}: ${error.message}`);
+    // Preserve immutable audit-log foreign keys while disabling the disposable QA identity.
+    // Supabase soft delete prevents future sign-in without erasing compliance history.
+    const { error } = await db.auth.admin.deleteUser(userId, true);
+    if (error && !/not found/i.test(error.message)) console.error(`soft-delete auth user ${userId}: ${error.message}`);
   }
 
   console.log(JSON.stringify({ ok: true, cleanedRunId: state.runId }));

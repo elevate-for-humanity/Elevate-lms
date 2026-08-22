@@ -8,9 +8,18 @@ export const dynamic = 'force-dynamic';
 
 const ALLOWED_APPS = new Set(['grants', 'sam-gov']);
 
+function stripControlCharacters(value: string): string {
+  return Array.from(value)
+    .filter((character) => {
+      const code = character.charCodeAt(0);
+      return code > 31 && code !== 127;
+    })
+    .join('');
+}
+
 function cleanText(value: unknown, max = 1200): string {
   return typeof value === 'string'
-    ? value.trim().replace(/[\u0000-\u001F\u007F]/g, '').slice(0, max)
+    ? stripControlCharacters(value.trim()).slice(0, max)
     : '';
 }
 

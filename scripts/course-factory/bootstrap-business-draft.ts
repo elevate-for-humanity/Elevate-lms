@@ -6,6 +6,19 @@ import { requireAdminClient } from '../../lib/supabase/admin';
 const PROGRAM_SLUG = 'business-administration';
 const EXPECTED_MODULES = 5;
 const EXPECTED_LESSONS = 35;
+const AI_SECRET_KEYS = [
+  'GEMINI_API_KEY',
+  'GOOGLE_CLOUD_API_KEY',
+  'GROQ_API_KEY',
+  'CLOUDFLARE_ACCOUNT_ID',
+  'CLOUDFLARE_AI_API_TOKEN',
+  'CLOUDFLARE_API_TOKEN',
+  'OPENAI_API_KEY',
+  'ANTHROPIC_API_KEY',
+  'AZURE_OPENAI_API_KEY',
+] as const;
+
+type AdminDb = Awaited<ReturnType<typeof requireAdminClient>>;
 
 function fail(message: string): never {
   throw new Error(`[Business Draft Bootstrap] ${message}`);
@@ -20,8 +33,41 @@ function instructionalText(value: unknown): string {
   return '';
 }
 
+async function hydrateAISecrets(db: AdminDb) {
+  const available: string[] = [];
+  for (const key of AI_SECRET_KEYS) {
+    if (process.env[key]?.trim()) {
+      available.push(key);
+      continue;
+    }
+    const { data, error } = await db.rpc('get_platform_secret', { p_key: key });
+    if (!error && typeof data === 'string' && data.trim()) {
+      process.env[key] = data.trim();
+      available.push(key);
+    }
+  }
+
+  const usable =
+    available.some((key) =>
+      [
+        'GEMINI_API_KEY',
+        'GOOGLE_CLOUD_API_KEY',
+        'GROQ_API_KEY',
+        'OPENAI_API_KEY',
+        'ANTHROPIC_API_KEY',
+        'AZURE_OPENAI_API_KEY',
+      ].includes(key),
+    ) ||
+    (available.includes('CLOUDFLARE_ACCOUNT_ID') &&
+      (available.includes('CLOUDFLARE_AI_API_TOKEN') || available.includes('CLOUDFLARE_API_TOKEN')));
+
+  if (!usable) fail('No usable AI provider credential is available from workflow or platform secrets');
+}
+
 async function main() {
   const db = await requireAdminClient();
+  await hydrateAISecrets(db);
+
   const blueprint = await getBlueprintBySlug(PROGRAM_SLUG);
   if (!blueprint) fail('Canonical Business blueprint not found');
 

@@ -12,6 +12,7 @@ import { loadAllBlueprints } from '@/lib/course-factory';
 import type { FactoryStage } from '@/lib/course-factory';
 import {
   courseFactory,
+  saveCourseProgramConfiguration,
   auditCourseGovernance,
   publishGovernedCourse,
   repairCanonicalCourse,
@@ -40,6 +41,7 @@ type CourseBuilderAction =
   | 'generate'
   | 'generate-from-blueprint'
   | 'queue-media'
+  | 'save-program-config'
   | 'audit'
   | 'validate'
   | 'publish'
@@ -185,6 +187,16 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       logger.error('[course-builder] Media queue failed', error);
       return NextResponse.json({ error: 'Unable to queue course media' }, { status: 500 });
+    }
+  }
+
+  if (action === 'save-program-config') {
+    try {
+      const course = await saveCourseProgramConfiguration(body.program ?? body);
+      return NextResponse.json({ ok: true, course });
+    } catch (error) {
+      logger.error('[course-builder] Program configuration failed', error);
+      return NextResponse.json({ ok: false, error: 'Failed to save course configuration' }, { status: 400 });
     }
   }
 

@@ -179,14 +179,14 @@ export function CurriculumPanel() {
 
   const generateVideos = async (lessonId?: string, force = false) => {
     const prompt = lessonId
-      ? 'Regenerate the video for this lesson?'
+      ? 'Queue regeneration for the video on this lesson?'
       : force
-        ? `Regenerate all ${editableLessons.length} lesson videos?`
-        : `Generate videos for ${missingVideos} lessons missing video?`;
+        ? `Queue regeneration for all ${editableLessons.length} lesson videos?`
+        : `Queue videos for ${missingVideos} lessons missing video?`;
     if (!window.confirm(prompt)) return;
     setBusy(true);
     setError(null);
-    setVideoStatus('Generating video content…');
+    setVideoStatus('Queueing media through Course Builder…');
     try {
       const response = await fetch(`/api/admin/courses/${course.id}/generate-videos`, {
         method: 'POST',
@@ -194,10 +194,13 @@ export function CurriculumPanel() {
         body: JSON.stringify({ lessonId, force }),
       });
       const body = await response.json();
-      if (!response.ok) throw new Error(body?.error || 'Video generation failed');
-      setVideoStatus(`Generated ${body.generated ?? 0} video${body.generated === 1 ? '' : 's'}${body.failed ? ` · ${body.failed} failed` : ''}`);
+      if (!response.ok) throw new Error(body?.error || 'Video queue request failed');
+      setVideoStatus(
+        body?.message ||
+          `Queued ${body.queued ?? 0} lesson video${body.queued === 1 ? '' : 's'} and ${body.microclipsQueued ?? 0} microclip${body.microclipsQueued === 1 ? '' : 's'}. Generation is complete only after persisted jobs finish with playable URLs.`,
+      );
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Video generation failed');
+      setError(cause instanceof Error ? cause.message : 'Video queue request failed');
       setVideoStatus(null);
     } finally {
       setBusy(false);
@@ -218,12 +221,12 @@ export function CurriculumPanel() {
         </button>
         {hasVideoProfile && missingVideos > 0 ? (
           <button type="button" onClick={() => generateVideos()} disabled={busy} className="inline-flex items-center gap-2 rounded-lg border border-purple-300 px-4 py-2 text-sm font-bold text-purple-700 hover:bg-purple-50 disabled:opacity-50">
-            <Film className="h-4 w-4" /> Generate {missingVideos} Missing Video{missingVideos === 1 ? '' : 's'}
+            <Film className="h-4 w-4" /> Queue {missingVideos} Missing Video{missingVideos === 1 ? '' : 's'}
           </button>
         ) : null}
         {hasVideoProfile && editableLessons.length > 0 ? (
           <button type="button" onClick={() => generateVideos(undefined, true)} disabled={busy} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50">
-            Regenerate All Videos
+            Queue Regeneration for All Videos
           </button>
         ) : null}
       </div>
@@ -245,7 +248,7 @@ export function CurriculumPanel() {
                   <p className="truncate font-semibold text-slate-900">{lesson.title}</p>
                   <p className="text-xs text-slate-500">{lesson.duration_minutes ?? 0} min · {lesson.video_url ? 'video attached' : 'no video'}</p>
                 </div>
-                {hasVideoProfile ? <button type="button" onClick={() => generateVideos(lesson.id, true)} disabled={busy} className="rounded-lg border border-purple-200 px-3 py-2 text-xs font-bold text-purple-700 hover:bg-purple-50 disabled:opacity-50"><Film className="mr-1 inline h-3.5 w-3.5" />Video</button> : null}
+                {hasVideoProfile ? <button type="button" onClick={() => generateVideos(lesson.id, true)} disabled={busy} className="rounded-lg border border-purple-200 px-3 py-2 text-xs font-bold text-purple-700 hover:bg-purple-50 disabled:opacity-50"><Film className="mr-1 inline h-3.5 w-3.5" />Queue Video</button> : null}
                 <button type="button" onClick={() => beginEdit(lesson)} className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50" aria-label={`Edit ${lesson.title}`}><Pencil className="h-4 w-4" /></button>
                 <button type="button" onClick={() => removeLesson(lesson)} disabled={busy} className="rounded-lg border border-red-200 p-2 text-red-600 hover:bg-red-50 disabled:opacity-50" aria-label={`Delete ${lesson.title}`}><Trash2 className="h-4 w-4" /></button>
               </div>

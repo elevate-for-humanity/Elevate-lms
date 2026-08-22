@@ -10,9 +10,12 @@ permissions:
   actions: write
   contents: read
 
+# A newer trigger supersedes an older trigger. The service-specific deployment
+# workflows also cancel superseded runs and always resolve their own exact
+# github.sha from the current main ref.
 concurrency:
   group: northflank-trigger-dispatch
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   dispatch:
@@ -37,14 +40,16 @@ jobs:
             echo "::error::Invalid or missing merge_sha in .northflank-trigger"
             exit 1
           fi
+
           git fetch origin main --depth=100
           RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
+          CURRENT_MAIN="$(git rev-parse origin/main)"
           if [[ -z "$RESOLVED_SHA" ]]; then
             echo "::error::Requested SHA cannot be resolved in repository history: $REQUESTED_SHA"
             exit 1
           fi
-          if ! git merge-base --is-ancestor "$RESOLVED_SHA" origin/main; then
-            echo "::error::Requested production SHA is not contained in main: $RESOLVED_SHA"
+          if ! git merge-base --is-ancestor "$RESOLVED_SHA" "$CURRENT_MAIN"; then
+            echo "::error::Requested production SHA is not contained in current main: $RESOLVED_SHA"
             exit 1
           fi
 
@@ -52,19 +57,21 @@ jobs:
             echo "::error::No services requested in .northflank-trigger"
             exit 1
           fi
-          case ",$SERVICES," in
-            *,all,*|*,marketing,*|*,admin,*|*,lms,*) ;;
-            *) echo "::error::Unsupported service list: $SERVICES"; exit 1 ;;
-          esac
+          IFS=',' read -ra SERVICE_LIST <<< "$SERVICES"
+          for service in "${SERVICE_LIST[@]}"; do
+            case "$service" in
+              marketing|admin|lms|all) ;;
+              *) echo "::error::Unsupported service: $service"; exit 1 ;;
+            esac
+          done
 
-          echo "sha=$RESOLVED_SHA" >> "$GITHUB_OUTPUT"
           echo "services=$SERVICES" >> "$GITHUB_OUTPUT"
-          echo "Verified deploy request: $SERVICES @ $RESOLVED_SHA"
+          echo "current_main=$CURRENT_MAIN" >> "$GITHUB_OUTPUT"
+          echo "Validated trigger request $SERVICES from $RESOLVED_SHA; production will converge on current main $CURRENT_MAIN"
 
-      - name: Dispatch canonical production workflow
+      - name: Dispatch canonical service production workflows
         env:
           GH_TOKEN: ${{ github.token }}
-          REQUESTED_SHA: ${{ steps.request.outputs.sha }}
           SERVICES: ${{ steps.request.outputs.services }}
         shell: bash
         run: |
@@ -72,24 +79,24 @@ jobs:
 
           dispatch_service() {
             local service="$1"
+            local workflow
             case "$service" in
-              marketing|admin|lms|all)
-                gh workflow run elevate-production-deploy.yml \
-                  --repo "${{ github.repository }}" \
-                  --ref main \
-                  -f service="$service" \
-                  -f environment=production \
-                  -f git_sha="$REQUESTED_SHA"
-                ;;
-              *)
-                echo "::error::Unsupported service: $service"
-                exit 1
-                ;;
+              marketing) workflow='deploy-marketing.yml' ;;
+              admin) workflow='deploy-admin.yml' ;;
+              lms) workflow='deploy-lms.yml' ;;
+              *) echo "::error::Unsupported service: $service"; exit 1 ;;
             esac
+
+            gh workflow run "$workflow" \
+              --repo "${{ github.repository }}" \
+              --ref main
+            echo "Dispatched $workflow from current main"
           }
 
           if [[ "$SERVICES" == "all" ]]; then
-            dispatch_service all
+            dispatch_service marketing
+            dispatch_service admin
+            dispatch_service lms
           else
             IFS=',' read -ra SERVICE_LIST <<< "$SERVICES"
             for service in "${SERVICE_LIST[@]}"; do

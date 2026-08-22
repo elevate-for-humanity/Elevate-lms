@@ -30,7 +30,7 @@ export interface AddOnDefinition {
   features: PlatformFeatureKey[];
   bullets: string[];
   usageNote?: string;
-  /** Keep legacy billing slugs resolvable without advertising duplicate products. */
+  /** Keep legacy or managed billing slugs resolvable without advertising duplicate/unproven products. */
   hiddenFromMarketplace?: boolean;
 }
 
@@ -321,9 +321,10 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     slug: 'white-label-mobile',
     name: 'White Label Mobile App',
     priceMonthly: 199,
-    description: 'Branded mobile experience for learners and clients.',
+    description: 'Managed branded mobile/PWA capability retained for existing catalog compatibility.',
     features: [PlatformFeature.WHITE_LABEL_MOBILE],
-    bullets: ['Branded iOS/Android PWA', 'Push-ready architecture', 'Your logo and colors'],
+    bullets: ['Managed implementation', 'Branding and mobile/PWA scope confirmed before sale'],
+    hiddenFromMarketplace: true,
   },
   {
     slug: 'additional-user',

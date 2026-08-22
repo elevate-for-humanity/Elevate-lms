@@ -28,6 +28,20 @@ export function createClientShiftId(): string {
   return randomId();
 }
 
+async function askWorkerToSync(): Promise<void> {
+  if (!navigator.onLine || !('serviceWorker' in navigator)) return;
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const sync = (registration as ServiceWorkerRegistration & {
+      sync?: { register(tag: string): Promise<void> };
+    }).sync;
+    if (sync) await sync.register('sync-timeclock');
+    registration.active?.postMessage({ type: 'SYNC_TIMECLOCK' });
+  } catch {
+    // The durable queue remains intact; the online listener retries later.
+  }
+}
+
 export async function queueTimeclockAction(payload: QueuedTimeclockPayload): Promise<number> {
   const id = await offlineDB.addOfflineAction({
     type: 'timeclock',
@@ -39,19 +53,10 @@ export async function queueTimeclockAction(payload: QueuedTimeclockPayload): Pro
     retryCount: 0,
   });
 
-  if ('serviceWorker' in navigator) {
-    try {
-      const registration = await navigator.serviceWorker.ready;
-      const sync = (registration as ServiceWorkerRegistration & {
-        sync?: { register(tag: string): Promise<void> };
-      }).sync;
-      if (sync) await sync.register('sync-timeclock');
-      else registration.active?.postMessage({ type: 'SYNC_TIMECLOCK' });
-    } catch {
-      // The online listener below is the fallback when Background Sync is unavailable.
-    }
-  }
-
+  // Never wait for serviceWorker.ready while actually offline. On first-install
+  // devices that promise may remain unresolved until a network returns, which
+  // would make an otherwise durable local save look frozen to the apprentice.
+  if (navigator.onLine) void askWorkerToSync();
   return id;
 }
 
@@ -61,15 +66,5 @@ export async function getPendingTimeclockActions() {
 }
 
 export async function requestTimeclockSync(): Promise<void> {
-  if (!navigator.onLine || !('serviceWorker' in navigator)) return;
-  try {
-    const registration = await navigator.serviceWorker.ready;
-    const sync = (registration as ServiceWorkerRegistration & {
-      sync?: { register(tag: string): Promise<void> };
-    }).sync;
-    if (sync) await sync.register('sync-timeclock');
-    registration.active?.postMessage({ type: 'SYNC_TIMECLOCK' });
-  } catch {
-    // Queue remains durable until the next online event/worker activation.
-  }
+  await askWorkerToSync();
 }

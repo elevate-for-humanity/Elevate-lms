@@ -30,8 +30,14 @@ for (const file of runtimeFiles) {
   forbidText(file, '@/lib/paris/admissions/application-service', 'retired application-service import');
 }
 
-if (exists('lib/paris/admissions/application-service.ts')) {
-  fail('retired lib/paris/admissions/application-service.ts still exists');
+for (const retiredFile of [
+  'lib/paris/admissions/application-service.ts',
+  'lib/paris/admissions/enrollment-service.ts',
+  'lib/paris/admissions/provisioning-service.ts',
+  'apps/marketing/app/api/paris/applications/[applicationId]/enroll/route.ts',
+  'apps/marketing/types/paris-provisioning.d.ts',
+]) {
+  if (exists(retiredFile)) fail(`retired ${retiredFile} still exists`);
 }
 
 requireText('apps/marketing/app/apply/student/page.tsx', '/apply/student/interview', 'PARIS-first canonical redirect');

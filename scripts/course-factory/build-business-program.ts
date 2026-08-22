@@ -2,6 +2,7 @@ import { courseFactory } from '../../lib/course-factory';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { requireAdminClient } from '../../lib/supabase/admin';
 
+// Production acceptance runner for Indiana INTraining Program #10005173.
 const PROGRAM_SLUG = 'business-administration';
 const EXPECTED_MODULES = 5;
 const EXPECTED_LESSONS = 35;

@@ -8,10 +8,11 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 interface Participant {
   id: string;
   user_id: string;
-  course_id: string;
+  course_id: string | null;
+  program_id: string | null;
   completed_at: string | null;
-  profiles: { full_name: string; email: string } | null;
-  courses: { title: string } | null;
+  profiles: { full_name: string | null; email: string | null } | null;
+  learning_title: string;
 }
 
 export default function BulkIssueForm({
@@ -33,17 +34,19 @@ export default function BulkIssueForm({
   const [error, setError] = useState('');
 
   const toggleAll = () => {
-    if (selected.size === eligibleParticipants.length) {
-      setSelected(new Set());
-    } else {
-      setSelected(new Set(eligibleParticipants.map((p) => p.id)));
-    }
+    setSelected((current) =>
+      current.size === eligibleParticipants.length
+        ? new Set()
+        : new Set(eligibleParticipants.map((participant) => participant.id)),
+    );
   };
 
   const toggle = (id: string) => {
-    const next = new Set(selected);
-    next.has(id) ? next.delete(id) : next.add(id);
-    setSelected(next);
+    setSelected((current) => {
+      const next = new Set(current);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   };
 
   const handleIssue = async () => {
@@ -74,8 +77,8 @@ export default function BulkIssueForm({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Bulk issuance failed');
       setResult({ success: data.issued || 0, failed: data.failed || 0 });
-    } catch (err: any) {
-      setError('Failed to issue certificates. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to issue certificates. Please try again.');
     } finally {
       setIssuing(false);
     }
@@ -85,9 +88,9 @@ export default function BulkIssueForm({
     return (
       <div className="bg-white rounded-xl border p-8 text-center">
         <CheckCircle className="w-16 h-16 text-brand-green-600 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold mb-2">Certificates Issued</h2>
+        <h2 className="text-2xl font-bold mb-2">Certificate Run Complete</h2>
         <p className="text-slate-700 mb-4">
-          {result.success} issued, {result.failed} failed
+          {result.success} issued or already present, {result.failed} failed
         </p>
         <button
           onClick={() => router.push('/certificates')}
@@ -115,9 +118,9 @@ export default function BulkIssueForm({
                 className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select a template</option>
-                {templates.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
+                {templates.map((template) => (
+                  <option key={template.id} value={template.id}>
+                    {template.name}
                   </option>
                 ))}
               </select>
@@ -138,7 +141,7 @@ export default function BulkIssueForm({
                 value={signedBy}
                 onChange={(e) => setSignedBy(e.target.value)}
                 className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                placeholder="Director Name"
+                placeholder="Authorized signer"
               />
             </div>
 
@@ -168,7 +171,7 @@ export default function BulkIssueForm({
         <div className="bg-brand-blue-50 rounded-lg p-4 mt-4">
           <h3 className="font-medium text-brand-blue-900">Eligible Participants</h3>
           <p className="text-3xl font-bold text-brand-blue-600 mt-1">{eligibleCount}</p>
-          <p className="text-sm text-brand-blue-700">Ready for certificate issuance</p>
+          <p className="text-sm text-brand-blue-700">Verified complete and awaiting issuance</p>
         </div>
       </div>
 
@@ -190,29 +193,32 @@ export default function BulkIssueForm({
           </div>
           <div className="divide-y max-h-[600px] overflow-y-auto">
             {eligibleParticipants.length > 0 ? (
-              eligibleParticipants.map((e) => (
+              eligibleParticipants.map((participant) => (
                 <div
-                  key={e.id}
+                  key={participant.id}
                   className="p-4 flex items-center gap-4 hover:bg-slate-50 cursor-pointer"
-                  onClick={() => toggle(e.id)}
+                  onClick={() => toggle(participant.id)}
                 >
                   <input
                     type="checkbox"
-                    checked={selected.has(e.id)}
+                    checked={selected.has(participant.id)}
                     readOnly
+                    aria-label={`Select ${participant.profiles?.full_name || participant.learning_title}`}
                     className="w-4 h-4 text-brand-blue-600 rounded"
                   />
                   <div className="flex-1">
                     <p className="font-medium text-slate-900">
-                      {e.profiles?.full_name || 'Unknown'}
+                      {participant.profiles?.full_name || 'Unknown learner'}
                     </p>
-                    <p className="text-sm text-slate-700">{e.profiles?.email}</p>
-                    <p className="text-sm text-brand-blue-600">{e.courses?.title}</p>
+                    <p className="text-sm text-slate-700">{participant.profiles?.email}</p>
+                    <p className="text-sm text-brand-blue-600">{participant.learning_title}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-slate-700">Completed</p>
                     <p className="text-sm font-medium">
-                      {e.completed_at ? new Date(e.completed_at).toLocaleDateString() : 'N/A'}
+                      {participant.completed_at
+                        ? new Date(participant.completed_at).toLocaleDateString()
+                        : 'N/A'}
                     </p>
                   </div>
                 </div>

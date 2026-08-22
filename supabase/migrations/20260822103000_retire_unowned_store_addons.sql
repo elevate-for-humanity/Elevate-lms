@@ -4,8 +4,7 @@
 -- and fulfillment eligibility is disabled.
 
 update public.saas_addon_catalog
-set active = false,
-    updated_at = now()
+set active = false
 where code in (
   'ADD-PRIORITY-SUPPORT',
   'ADD-DEDICATED-CSM',

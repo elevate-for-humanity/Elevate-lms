@@ -529,6 +529,22 @@ export async function courseFactory(
       evidence,
     });
 
+    if (!published.success || !published.courseId) {
+      const errors = published.errors?.length
+        ? published.errors
+        : ['Canonical course persistence did not report success or a course ID.'];
+      tracker.emit('error', errors.join('; '), 100);
+      return {
+        ok: false,
+        courseId: published.courseId || undefined,
+        moduleCount: published.moduleCount,
+        lessonCount: published.lessonCount,
+        assessmentsGenerated: enriched.assessmentsGenerated,
+        videosQueued: 0,
+        errors,
+      };
+    }
+
     let videosQueued = 0;
     if (input.videoMode !== 'off' && published.courseId) {
       tracker.emit('media', 'Queueing missing lesson videos and microclips.', 93);

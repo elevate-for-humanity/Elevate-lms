@@ -132,6 +132,25 @@ async function tickCanonicalProductionWorker() {
 
 async function waitForCanonicalMedia() {
   const db = await requireAdminClient();
+
+  // This acceptance run is the explicit operator authorization to retry jobs
+  // that exhausted their bounded attempts on the previously stale Admin image.
+  // Recovery remains course-scoped and uses canonical identities, so completed
+  // media stays untouched and duplicate jobs are not created.
+  const authorizedRetry = await recoverCourseMediaJobs({
+    courseId: COURSE_ID,
+    force: true,
+  });
+  console.log('[ESB acceptance] authorized course-scoped media retry', authorizedRetry);
+  await logAcceptance(db, 'authorized_media_retry', {
+    recovered_jobs: authorizedRetry.recovered.length,
+    blocked_jobs: authorizedRetry.blocked,
+    reason: 'Admin production health and repaired media runtime verified before retry',
+  });
+  if (authorizedRetry.blocked.length) {
+    fail(`authorized media retry left blocked jobs: ${authorizedRetry.blocked.join(' | ')}`);
+  }
+
   const deadline = Date.now() + MEDIA_TIMEOUT_MS;
   let lastSignature = '';
 

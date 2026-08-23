@@ -36,28 +36,25 @@ export async function GET(request: NextRequest) {
   }
 
   const { start, end } = monthBounds(year, month);
+  const startDate = start.slice(0, 10);
+  const endDate = end.slice(0, 10);
   const { data, error } = await supabase
     .from('calendar_events')
-    .select('id, title, start_time, end_time, event_type, description, course_id, is_public')
-    .or(`user_id.eq.${user.id},is_public.eq.true`)
-    .gte('start_time', start)
-    .lt('start_time', end)
-    .order('start_time', { ascending: true });
+    .select('id, title, date, time, event_type, description')
+    .eq('user_id', user.id)
+    .gte('date', startDate)
+    .lt('date', endDate)
+    .order('date', { ascending: true })
+    .order('time', { ascending: true });
 
   if (error) {
     return NextResponse.json({ error: 'Unable to load calendar events' }, { status: 500 });
   }
 
-  const courseIds = [...new Set((data ?? []).map((event) => event.course_id).filter(Boolean))] as string[];
-  const courseTitles = new Map<string, string>();
-
-  if (courseIds.length > 0) {
-    const { data: courses } = await supabase.from('courses').select('id, title').in('id', courseIds);
-    for (const course of courses ?? []) courseTitles.set(String(course.id), String(course.title));
-  }
-
   const events = (data ?? []).map((event) => {
-    const startTime = new Date(String(event.start_time));
+    const date = String(event.date);
+    const time = event.time ? String(event.time).slice(0, 5) : '00:00';
+    const startTime = new Date(`${date}T${time}:00Z`);
     const rawType = String(event.event_type ?? 'event').toLowerCase();
     const type = ['assignment', 'quiz', 'deadline', 'class', 'event'].includes(rawType) ? rawType : 'event';
 
@@ -67,7 +64,7 @@ export async function GET(request: NextRequest) {
       date: startTime.toISOString().slice(0, 10),
       time: startTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' }),
       type,
-      course: event.course_id ? courseTitles.get(String(event.course_id)) : undefined,
+      course: undefined,
     };
   });
 

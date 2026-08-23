@@ -18,6 +18,7 @@ const defaultSite = requireFile('lib/tenant/default-site-config.ts');
 const startWorkspaceTrial = requireFile('lib/workspace/start-workspace-trial.ts');
 const trialLifecycle = requireFile('apps/admin/app/api/cron/trial-lifecycle/route.ts');
 const licensingMiddleware = requireFile('lib/licensing/middleware.ts');
+const marketingMiddleware = requireFile('apps/marketing/middleware.ts');
 
 for (const forbidden of ['AdminFooter', 'LiveChatWidget']) {
   if (adminLayout.includes(forbidden)) {
@@ -101,6 +102,13 @@ if (legacyLicenseIndex >= 0 && managedLicenseIndex >= 0 && legacyLicenseIndex < 
 }
 if (!licensingMiddleware.includes("code = license.tier === 'trial' ? 'TRIAL_EXPIRED'")) {
   failures.push('API licensing must return an explicit TRIAL_EXPIRED code');
+}
+
+if (!marketingMiddleware.includes("`${MARKETING_HOST}${pathname}${search}`")) {
+  failures.push('Marketing-hosted portal login returns must use the canonical public marketing host');
+}
+if (marketingMiddleware.includes("`${req.nextUrl.origin}${pathname}${search}`")) {
+  failures.push('Marketing-hosted portal login returns must not derive from an internal request origin');
 }
 
 if (failures.length) {

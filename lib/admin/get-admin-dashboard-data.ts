@@ -81,7 +81,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     db.from('program_holder_documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     db.from('program_enrollments').select('id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at').order('created_at', { ascending: false }).limit(25),
     db.from('admin_alerts').select('id,alert_type,severity,message,created_at,resolved').eq('resolved', false).order('created_at', { ascending: false }).limit(50),
-    db.from('crm_leads').select('id,first_name,last_name,email,status,updated_at').order('updated_at', { ascending: true }).limit(100),
+    db.from('crm_leads').select('id,full_name,email,status,updated_at').order('updated_at', { ascending: true }).limit(100),
     db.from('documents').select('id', { count: 'exact', head: true }).eq('status', 'pending').ilike('document_type', '%wioa%'),
     db.from('lesson_submissions').select('id,user_id,course_lesson_id,step_type,status,created_at').eq('status', 'pending').limit(100),
     db.from('programs').select('id,title,slug,status,is_active,updated_at').order('title').limit(300),
@@ -227,10 +227,10 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   }));
 
   const staleLeads = leadRows
-    .filter((row: any) => !isTestRecord(row.first_name, row.last_name, row.email))
+    .filter((row: any) => !isTestRecord(row.full_name, row.email))
     .map((row: any) => ({
       id: row.id,
-      name: [row.first_name, row.last_name].filter(Boolean).join(' ') || row.email || null,
+      name: row.full_name || row.email || null,
       status: row.status ?? null,
       updated_at: row.updated_at ?? null,
       days_stale: row.updated_at ? Math.max(0, Math.floor((now - new Date(row.updated_at).getTime()) / 86_400_000)) : 0,

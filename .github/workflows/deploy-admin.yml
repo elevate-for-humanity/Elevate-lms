@@ -12,6 +12,7 @@ on:
       - 'components/pwa/**'
       - 'public/**'
       - 'scripts/northflank/**'
+      - 'scripts/course-factory/**'
       - 'scripts/verify-admin-instrumentation-boundary.mjs'
       - 'instrumentation.ts'
       - 'scripts/verify-no-retired-admin-ui-routes.mjs'

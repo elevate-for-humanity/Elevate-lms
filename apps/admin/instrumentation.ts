@@ -1,12 +1,10 @@
 /**
- * Admin app entry — validates environment variables at startup.
- * Required because `next build` runs from apps/admin; Next only loads instrumentation.ts
- * from the app project root.
+ * Admin app entry — validates environment variables and starts the canonical
+ * server-side agentic executor when this app is running as the Admin service.
  *
- * IMPORTANT: instrumentation must stay web-runtime safe. Do not import the video
- * rendering worker here. That worker depends on Node filesystem/OS/native Remotion
- * modules and must run from an explicit server-only worker entry, not the Next
- * instrumentation graph.
+ * IMPORTANT: instrumentation must stay web-runtime safe. Do not import video
+ * rendering workers or native media dependencies directly here. The agentic
+ * executor owns lazy domain dispatch behind the nodejs/Admin runtime boundary.
  */
 export async function register(): Promise<void> {
   if (process.env.NEXT_RUNTIME !== 'nodejs') {
@@ -32,6 +30,18 @@ export async function register(): Promise<void> {
     }
   } catch (error) {
     console.warn('[admin] Environment validation error:', error);
+  }
+
+  if (process.env.ELEVATE_SERVICE === 'admin') {
+    try {
+      const { startAgenticExecutor } = await import('../../lib/agentic/executor');
+      startAgenticExecutor();
+    } catch (error) {
+      console.error(
+        '[admin] Canonical agentic executor failed to start:',
+        error instanceof Error ? error.message : error,
+      );
+    }
   }
 }
 

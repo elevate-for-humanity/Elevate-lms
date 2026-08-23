@@ -83,7 +83,6 @@ jobs:
             SUPABASE_SERVICE_ROLE_KEY
             NEXTAUTH_SECRET
             STRIPE_SECRET_KEY
-            SENDGRID_API_KEY
           )
           for name in "${required[@]}"; do
             test -n "${!name:-}" || { echo "$name GitHub secret is missing"; exit 1; }

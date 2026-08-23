@@ -22,23 +22,30 @@ function extractBalancedJson(input: string): string {
 
   const stack: string[] = [];
   let inString = false;
+  let inBacktick = false;
   let escaped = false;
 
   for (let index = start; index < source.length; index += 1) {
     const char = source[index];
-    if (inString) {
+    if (inString || inBacktick) {
       if (escaped) {
         escaped = false;
       } else if (char === '\\') {
         escaped = true;
-      } else if (char === '"') {
+      } else if (inString && char === '"') {
         inString = false;
+      } else if (inBacktick && char === '`') {
+        inBacktick = false;
       }
       continue;
     }
 
     if (char === '"') {
       inString = true;
+      continue;
+    }
+    if (char === '`') {
+      inBacktick = true;
       continue;
     }
     if (char === '{') stack.push('}');
@@ -52,6 +59,57 @@ function extractBalancedJson(input: string): string {
   }
 
   return source.slice(start).trim();
+}
+
+/** Convert JavaScript-style template-literal values emitted by some instruct
+ * models into ordinary JSON strings. Only runs for responses explicitly
+ * requested as JSON; it does not evaluate interpolation or JavaScript. */
+function quoteBacktickStrings(input: string): string {
+  let result = '';
+  let inDouble = false;
+  let escaped = false;
+
+  for (let index = 0; index < input.length; index += 1) {
+    const char = input[index];
+    if (inDouble) {
+      result += char;
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === '"') inDouble = false;
+      continue;
+    }
+    if (char === '"') {
+      inDouble = true;
+      result += char;
+      continue;
+    }
+    if (char !== '`') {
+      result += char;
+      continue;
+    }
+
+    let value = '';
+    let innerEscaped = false;
+    let closed = false;
+    for (index += 1; index < input.length; index += 1) {
+      const inner = input[index];
+      if (innerEscaped) {
+        value += inner;
+        innerEscaped = false;
+      } else if (inner === '\\') {
+        value += inner;
+        innerEscaped = true;
+      } else if (inner === '`') {
+        closed = true;
+        break;
+      } else {
+        value += inner;
+      }
+    }
+    result += closed ? JSON.stringify(value) : `\`${value}`;
+  }
+
+  return result;
 }
 
 function escapeLiteralControlsInStrings(input: string): string {
@@ -100,15 +158,18 @@ function escapeLiteralControlsInStrings(input: string): string {
 }
 
 /**
- * Open-weight/low-cost models sometimes prepend prose to a JSON response or
- * emit literal newlines/control characters inside JSON strings. When the
- * request explicitly requires JSON, normalize only those transport-level
- * defects. Schema/business validation remains the caller's responsibility.
+ * Open-weight/low-cost models sometimes prepend prose, use JS-style backticks
+ * for long HTML values, or emit literal control characters inside JSON
+ * strings. When the request explicitly requires JSON, normalize only those
+ * transport-level defects. Schema/business validation remains the caller's
+ * responsibility.
  */
 export function normalizeStructuredOutput(
   content: string,
   options: ChatCompletionOptions,
 ): string {
   if (!requestsJson(options)) return content;
-  return escapeLiteralControlsInStrings(extractBalancedJson(content));
+  const extracted = extractBalancedJson(content);
+  const quoted = quoteBacktickStrings(extracted);
+  return escapeLiteralControlsInStrings(quoted);
 }

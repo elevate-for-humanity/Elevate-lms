@@ -1,0 +1,124 @@
+name: Synthetic Intelligence Acceptance
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [opened, reopened]
+  push:
+    branches: [main]
+    paths:
+      - 'lib/platform/planner.ts'
+      - 'lib/platform/orchestration/**'
+      - 'lib/workflows/**'
+      - 'lib/devstudio/os/**'
+      - 'apps/admin/app/api/devstudio/plan/**'
+      - 'scripts/check-synthetic-intelligence-architecture.mjs'
+      - '.github/workflows/synthetic-intelligence-acceptance.yml'
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  CI: true
+  NODE_ENV: production
+
+jobs:
+  acceptance:
+    if: github.event_name != 'issues' || github.event.issue.title == 'RUN SYNTHETIC INTELLIGENCE ACCEPTANCE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+
+      - name: Record exact tested main
+        id: tested
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        id: install
+        shell: bash
+        run: |
+          set +e
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/synthetic-install.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 100 /tmp/synthetic-install.log
+          exit 0
+
+      - name: Architecture gate
+        id: architecture
+        shell: bash
+        run: |
+          set +e
+          node scripts/check-synthetic-intelligence-architecture.mjs > /tmp/synthetic-architecture.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          cat /tmp/synthetic-architecture.log
+          exit 0
+
+      - name: Studio typecheck and targeted lint
+        id: validation
+        shell: bash
+        run: |
+          set +e
+          : > /tmp/synthetic-validation.log
+          code=0
+          if [ "${{ steps.install.outputs.exit_code }}" != "0" ] || [ "${{ steps.architecture.outputs.exit_code }}" != "0" ]; then
+            echo 'Pre-validation gate failed.' >> /tmp/synthetic-validation.log
+            code=1
+          else
+            pnpm typecheck:studio >> /tmp/synthetic-validation.log 2>&1 || code=1
+            pnpm exec eslint \
+              lib/platform/planner.ts \
+              lib/platform/orchestration/context-service.ts \
+              lib/platform/orchestration/evaluator.ts \
+              lib/workflows/action-policy.ts \
+              lib/workflows/tool-registry.ts \
+              lib/workflows/engine.ts \
+              apps/admin/app/api/devstudio/plan/route.ts \
+              --quiet >> /tmp/synthetic-validation.log 2>&1 || code=1
+          fi
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 300 /tmp/synthetic-validation.log
+          exit 0
+
+      - name: Post result
+        if: always() && github.event_name == 'issues'
+        uses: actions/github-script@v7
+        env:
+          TESTED_SHA: ${{ steps.tested.outputs.sha }}
+          INSTALL_CODE: ${{ steps.install.outputs.exit_code }}
+          ARCH_CODE: ${{ steps.architecture.outputs.exit_code }}
+          VALIDATION_CODE: ${{ steps.validation.outputs.exit_code }}
+        with:
+          script: |
+            const fs = require('fs');
+            const ok = process.env.INSTALL_CODE === '0' && process.env.ARCH_CODE === '0' && process.env.VALIDATION_CODE === '0';
+            const arch = fs.existsSync('/tmp/synthetic-architecture.log') ? fs.readFileSync('/tmp/synthetic-architecture.log','utf8').slice(-12000) : '';
+            const validation = fs.existsSync('/tmp/synthetic-validation.log') ? fs.readFileSync('/tmp/synthetic-validation.log','utf8').slice(-22000) : '';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `SYNTHETIC INTELLIGENCE ${ok ? 'PASS' : 'FAIL'}\n\nTested main SHA: ${process.env.TESTED_SHA}\nInstall: ${process.env.INSTALL_CODE}\nArchitecture: ${process.env.ARCH_CODE}\nTypecheck/Lint: ${process.env.VALIDATION_CODE}\n\nArchitecture:\n\`\`\`text\n${arch}\n\`\`\`\n\nValidation:\n\`\`\`text\n${validation}\n\`\`\``
+            });
+
+      - name: Enforce acceptance
+        if: always()
+        run: |
+          test "${{ steps.install.outputs.exit_code }}" = "0"
+          test "${{ steps.architecture.outputs.exit_code }}" = "0"
+          test "${{ steps.validation.outputs.exit_code }}" = "0"

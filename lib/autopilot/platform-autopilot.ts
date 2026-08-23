@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { getPlatformHealth } from '@/lib/platform/platform-health';
 import { emitEvent } from '@/lib/platform/events';
+import { reconcileApplicationRemediations } from '@/lib/automation/reconcile-application-remediations';
 
 export type AutopilotTickResult = {
   ok: boolean;
@@ -83,6 +84,21 @@ export async function runPlatformAutopilotTick(): Promise<AutopilotTickResult> {
       } catch {
         errors.push(`requeue_failed:${ws.id}`);
       }
+    }
+
+    try {
+      const remediation = await reconcileApplicationRemediations(db, 50);
+      checks.push(`application_remediation_checked:${remediation.checked}`);
+      for (const [outcome, count] of Object.entries(remediation.outcomes)) {
+        if (count > 0) actions.push(`application_remediation_${outcome}:${count}`);
+      }
+      if (remediation.outcomes.failed) {
+        errors.push(`application_remediation_failed:${remediation.outcomes.failed}`);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'application_remediation_failed';
+      errors.push(`application_remediation_failed:${message}`);
+      logger.warn('[autopilot] application remediation reconciliation failed', { error: message });
     }
 
     await emitEvent('autopilot.tick_complete', 'system', {

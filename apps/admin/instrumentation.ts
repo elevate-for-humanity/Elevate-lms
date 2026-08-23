@@ -36,7 +36,9 @@ export async function register(): Promise<void> {
     try {
       const { startAgenticExecutor } = await import('../../lib/agentic/executor');
       startAgenticExecutor();
+      process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED = 'true';
     } catch (error) {
+      delete process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED;
       console.error(
         '[admin] Canonical agentic executor failed to start:',
         error instanceof Error ? error.message : error,

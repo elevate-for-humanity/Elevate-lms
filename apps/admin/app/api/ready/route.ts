@@ -7,20 +7,27 @@ export const revalidate = 0;
 
 export async function GET() {
   const readiness = getRuntimeReadiness();
+  const agenticExecutorReady = process.env.ELEVATE_SERVICE !== 'admin'
+    || process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED === 'true';
+  const ready = readiness.ready && agenticExecutorReady;
+  const missing = agenticExecutorReady
+    ? readiness.missing
+    : [...readiness.missing, 'AGENTIC_EXECUTOR'];
 
   return NextResponse.json(
     {
       service: 'admin',
-      ready: readiness.ready,
-      status: readiness.ready ? 'ready' : 'not_ready',
+      ready,
+      status: ready ? 'ready' : 'not_ready',
       commit: readiness.commit,
       buildId: readiness.buildId,
       builtAt: readiness.builtAt,
-      missing: readiness.missing,
+      missing,
+      agenticExecutorReady,
       timestamp: new Date().toISOString(),
     },
     {
-      status: readiness.ready ? 200 : 503,
+      status: ready ? 200 : 503,
       headers: { 'Cache-Control': 'no-store' },
     },
   );

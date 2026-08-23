@@ -3,8 +3,10 @@ import { readFile } from 'node:fs/promises';
 
 const instrumentationFile = 'apps/admin/instrumentation.ts';
 const executorFile = 'lib/agentic/executor.ts';
+const readinessFile = 'apps/admin/app/api/ready/route.ts';
 const instrumentation = await readFile(instrumentationFile, 'utf8');
 const executor = await readFile(executorFile, 'utf8');
+const readiness = await readFile(readinessFile, 'utf8');
 
 const forbidden = [
   'lib/video/background-worker',
@@ -44,6 +46,11 @@ if (!instrumentation.includes("import('../../lib/agentic/executor')") || !instru
   process.exit(1);
 }
 
+if (!instrumentation.includes("process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED = 'true'")) {
+  console.error('[verify-admin-instrumentation-boundary] Admin runtime does not expose canonical executor startup readiness.');
+  process.exit(1);
+}
+
 const executorContracts = [
   "import { processCourseAgenticTask } from './course-executor'",
   "['marketing_campaign', 'course'].includes(project.target_type)",
@@ -61,4 +68,17 @@ if (missingExecutorContracts.length) {
   process.exit(1);
 }
 
-console.info('[verify-admin-instrumentation-boundary] Admin instrumentation is web-build safe and starts canonical course/marketing agentic execution.');
+const readinessContracts = [
+  'ELEVATE_AGENTIC_EXECUTOR_STARTED',
+  "'AGENTIC_EXECUTOR'",
+  'agenticExecutorReady',
+];
+const missingReadinessContracts = readinessContracts.filter((token) => !readiness.includes(token));
+if (missingReadinessContracts.length) {
+  console.error(
+    `[verify-admin-instrumentation-boundary] Admin readiness can go green without the agentic executor: ${missingReadinessContracts.join(', ')}`,
+  );
+  process.exit(1);
+}
+
+console.info('[verify-admin-instrumentation-boundary] Admin instrumentation is web-build safe, starts canonical course/marketing agentic execution, and gates readiness on executor startup.');

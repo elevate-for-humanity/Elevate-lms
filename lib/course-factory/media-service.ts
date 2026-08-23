@@ -1,5 +1,6 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { createJob } from '@/lib/video/job-queue';
+import { createJob, type VideoJob } from '@/lib/video/job-queue';
+import { resetCanonicalMediaJob } from '@/lib/course-factory/media-manager';
 import { logger } from '@/lib/logger';
 import { generateInstructorIntro, getInstructorForCourse } from '@/lib/ai-instructors';
 
@@ -26,6 +27,10 @@ function readQuickClips(contentJson: unknown): Array<Record<string, any>> {
   return experience && typeof experience === 'object' && Array.isArray(experience.quickClips)
     ? experience.quickClips.slice(0, 2)
     : [];
+}
+
+function assetIdentity(lessonId: string, assetKind: string, assetKey?: string | null) {
+  return `${lessonId}:${assetKind}:${assetKey ?? ''}`;
 }
 
 /**
@@ -69,14 +74,14 @@ export async function queueCourseLessonVideos(
 
   const { data: existingJobs, error: jobsError } = await db
     .from('video_jobs')
-    .select('lesson_id, asset_kind, asset_key, status')
-    .eq('course_id', input.courseId)
-    .in('status', ['queued', 'rendering', 'complete']);
+    .select('*')
+    .eq('course_id', input.courseId);
   if (jobsError) throw new Error(`Failed to load existing video jobs: ${jobsError.message}`);
 
-  const activeAssets = new Set(
-    (existingJobs ?? []).map((job) => `${job.lesson_id}:${job.asset_kind ?? 'lesson'}:${job.asset_key ?? ''}`),
-  );
+  const existingByAsset = new Map<string, VideoJob>();
+  for (const job of (existingJobs ?? []) as VideoJob[]) {
+    existingByAsset.set(assetIdentity(job.lesson_id, job.asset_kind ?? 'lesson', job.asset_key), job);
+  }
 
   const moduleOrder = new Map((modules ?? []).map((row) => [row.id, Number(row.order_index)]));
   const rows = [...(lessons ?? [])].sort((left, right) => {
@@ -95,17 +100,36 @@ export async function queueCourseLessonVideos(
   let microclipsQueued = 0;
   let failed = 0;
 
+  async function ensureQueued(
+    existing: VideoJob | undefined,
+    create: () => Promise<VideoJob>,
+  ): Promise<VideoJob> {
+    if (!existing) return create();
+    if (existing.status === 'failed' || (force && existing.status !== 'rendering')) {
+      return resetCanonicalMediaJob(
+        {
+          courseId: existing.course_id,
+          lessonId: existing.lesson_id,
+          assetKind: existing.asset_kind ?? 'lesson',
+          assetKey: existing.asset_key,
+        },
+        { force, reason: force ? 'Authorized Course Factory media repair' : existing.error_message ?? 'Retrying failed media asset' },
+      );
+    }
+    return existing;
+  }
+
   for (const [candidateIndex, lesson] of candidates.entries()) {
     try {
-      const lessonKey = `${lesson.id}:lesson:`;
+      const lessonKey = assetIdentity(lesson.id, 'lesson', null);
+      const existingLessonJob = existingByAsset.get(lessonKey);
       const hasVideo = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
       const mainComplete = hasVideo && lesson.video_status === 'complete';
       const mainInFlight = lesson.video_status === 'queued' || lesson.video_status === 'rendering';
-      const shouldQueueMain =
-        force || (!mainInFlight && (!onlyMissing || !mainComplete));
+      const shouldQueueMain = force || (!mainInFlight && (!onlyMissing || !mainComplete));
 
-      if (shouldQueueMain && (force || !activeAssets.has(lessonKey))) {
-        await createJob({
+      if (shouldQueueMain) {
+        const job = await ensureQueued(existingLessonJob, () => createJob({
           lesson_id: lesson.id,
           course_id: input.courseId,
           lesson_title: lesson.title,
@@ -116,18 +140,20 @@ export async function queueCourseLessonVideos(
           bullet_points: Array.isArray(lesson.bullet_points) ? (lesson.bullet_points as string[]) : [],
           scene_data: lesson.scene_data ?? null,
           asset_kind: 'lesson',
-        });
-        queued += 1;
+        }));
+        existingByAsset.set(lessonKey, job);
+        if (job.status === 'queued') queued += 1;
       }
 
       for (const clip of readQuickClips(lesson.content_json)) {
         const clipId = typeof clip.id === 'string' ? clip.id : '';
         if (!clipId) continue;
         const hasRenderedClip = typeof clip.videoUrl === 'string' && clip.videoUrl.trim().length > 0;
-        const clipKey = `${lesson.id}:microclip:${clipId}`;
-        if (!force && (hasRenderedClip || activeAssets.has(clipKey))) continue;
+        const clipKey = assetIdentity(lesson.id, 'microclip', clipId);
+        const existingClipJob = existingByAsset.get(clipKey);
+        if (!force && hasRenderedClip && existingClipJob?.status === 'complete') continue;
 
-        await createJob({
+        const job = await ensureQueued(existingClipJob, () => createJob({
           lesson_id: lesson.id,
           course_id: input.courseId,
           lesson_title: `${lesson.title} — ${String(clip.title ?? clipId)}`,
@@ -141,12 +167,13 @@ export async function queueCourseLessonVideos(
           },
           asset_kind: 'microclip',
           asset_key: clipId,
-        });
-        microclipsQueued += 1;
+        }));
+        existingByAsset.set(clipKey, job);
+        if (job.status === 'queued') microclipsQueued += 1;
       }
     } catch (err) {
       failed += 1;
-      logger.warn('[course-factory/media] Failed to enqueue media assets', {
+      logger.warn('[course-factory/media] Failed to enqueue/retry media assets', {
         courseId: input.courseId,
         lessonId: lesson.id,
         error: err instanceof Error ? err.message : String(err),

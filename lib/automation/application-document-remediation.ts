@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { runTabularIntelligence } from '@/lib/ai/tabular-intelligence';
+import { logAuditEvent } from '@/lib/audit';
 import { executeGovernedEllieAction } from '@/lib/ellie/governed-executor';
 import { evaluateAndAdvanceApplication } from '@/lib/paris/application-self-service';
 
@@ -24,11 +25,11 @@ export interface RemediationResult {
   message?: string;
 }
 
-function documentOnly(items: string[]): string[] {
+export function documentOnly(items: string[]): string[] {
   return items.filter((item) => item.toLowerCase().includes('document'));
 }
 
-function deterministicMessage(missingDocuments: string[]): string {
+export function deterministicMissingDocumentMessage(missingDocuments: string[]): string {
   const list = missingDocuments.map((item) => `- ${item}`).join('\n');
   return [
     'Your application is still missing the following required item(s):',
@@ -39,7 +40,7 @@ function deterministicMessage(missingDocuments: string[]): string {
 }
 
 async function buildMessage(application: Record<string, any>, missingDocuments: string[]) {
-  const fallback = deterministicMessage(missingDocuments);
+  const fallback = deterministicMissingDocumentMessage(missingDocuments);
   try {
     const result = await runTabularIntelligence({
       mode: 'generate',
@@ -55,19 +56,43 @@ async function buildMessage(application: Record<string, any>, missingDocuments: 
   }
 }
 
-async function audit(
+async function audit(applicationId: string, metadata: Record<string, unknown>) {
+  await logAuditEvent({
+    userId: null,
+    action: 'autopilot.application_missing_documents',
+    resourceType: 'application',
+    resourceId: applicationId,
+    metadata: { ...metadata, source: 'closed_loop_autopilot' },
+  });
+}
+
+async function markEscalated(
   db: SupabaseClient,
   applicationId: string,
-  metadata: Record<string, unknown>,
+  triggerType: string,
+  missingDocuments: string[],
+  attemptCount: number,
+  maxAttempts: number,
+  reason: string,
 ) {
-  await db.from('audit_logs').insert({
-    actor_id: null,
-    actor_type: 'system',
-    action: 'autopilot.application_missing_documents',
-    resource_type: 'application',
-    resource_id: applicationId,
-    metadata: { ...metadata, source: 'closed_loop_autopilot' },
-  }).then(() => {}, () => {});
+  const idempotencyKey = `${WORKFLOW_KEY}:application:${applicationId}`;
+  await db.from('automation_followups').upsert({
+    workflow_key: WORKFLOW_KEY,
+    subject_type: 'application',
+    subject_id: applicationId,
+    trigger_type: triggerType,
+    state: 'escalated',
+    detected_condition: { missingDocuments },
+    proposed_action: 'send_reminder',
+    action_policy: 'AUTO',
+    execution_status: 'suppressed',
+    attempt_count: attemptCount,
+    max_attempts: maxAttempts,
+    escalation_status: 'needed',
+    failure_reason: reason,
+    idempotency_key: idempotencyKey,
+    audit_metadata: { rule: 'required_document_presence' },
+  }, { onConflict: 'workflow_key,subject_type,subject_id' });
 }
 
 export async function remediateMissingApplicationDocuments(
@@ -114,7 +139,7 @@ export async function remediateMissingApplicationDocuments(
         audit_metadata: { ...(existing.audit_metadata || {}), resolution: 'requirements_satisfied' },
       }).eq('id', existing.id);
     }
-    await audit(db, applicationId, {
+    await audit(applicationId, {
       triggerType,
       outcome: 'resolved',
       missingDocuments: [],
@@ -124,25 +149,22 @@ export async function remediateMissingApplicationDocuments(
   }
 
   if (!application.user_id) {
-    const idempotencyKey = `${WORKFLOW_KEY}:application:${applicationId}`;
-    await db.from('automation_followups').upsert({
-      workflow_key: WORKFLOW_KEY,
-      subject_type: 'application',
-      subject_id: applicationId,
-      trigger_type: triggerType,
-      state: 'escalated',
-      detected_condition: { missingDocuments },
-      proposed_action: 'send_reminder',
-      action_policy: 'AUTO',
-      execution_status: 'failed',
-      attempt_count: attemptCount,
-      max_attempts: maxAttempts,
-      escalation_status: 'needed',
-      failure_reason: 'Application has no linked user_id for canonical reminder delivery.',
-      idempotency_key: idempotencyKey,
-      audit_metadata: { rule: 'required_document_presence' },
-    }, { onConflict: 'workflow_key,subject_type,subject_id' });
-    await audit(db, applicationId, { triggerType, outcome: 'escalated', missingDocuments, reason: 'missing_user_id' });
+    const reason = 'Application has no linked user_id for canonical reminder delivery.';
+    await markEscalated(db, applicationId, triggerType, missingDocuments, attemptCount, maxAttempts, reason);
+    await audit(applicationId, { triggerType, outcome: 'escalated', missingDocuments, reason: 'missing_user_id' });
+    return { outcome: 'escalated', applicationId, missingDocuments, attemptCount };
+  }
+
+  const { data: profile } = await db
+    .from('profiles')
+    .select('id, email, full_name')
+    .eq('id', application.user_id)
+    .maybeSingle();
+
+  if (!profile?.email) {
+    const reason = 'Linked applicant profile has no deliverable email address.';
+    await markEscalated(db, applicationId, triggerType, missingDocuments, attemptCount, maxAttempts, reason);
+    await audit(applicationId, { triggerType, outcome: 'escalated', missingDocuments, reason: 'missing_contact_destination' });
     return { outcome: 'escalated', applicationId, missingDocuments, attemptCount };
   }
 
@@ -158,15 +180,9 @@ export async function remediateMissingApplicationDocuments(
   }
 
   if (attemptCount >= maxAttempts) {
-    await db.from('automation_followups').update({
-      state: 'escalated',
-      execution_status: 'suppressed',
-      detected_condition: { missingDocuments },
-      escalation_status: 'needed',
-      next_check_at: null,
-      failure_reason: `No resolution after ${attemptCount} reminder attempts.`,
-    }).eq('id', existing.id);
-    await audit(db, applicationId, { triggerType, outcome: 'escalated', missingDocuments, attemptCount });
+    const reason = `No resolution after ${attemptCount} reminder attempts.`;
+    await markEscalated(db, applicationId, triggerType, missingDocuments, attemptCount, maxAttempts, reason);
+    await audit(applicationId, { triggerType, outcome: 'escalated', missingDocuments, attemptCount });
     return { outcome: 'escalated', applicationId, missingDocuments, attemptCount };
   }
 
@@ -236,7 +252,7 @@ export async function remediateMissingApplicationDocuments(
       failure_reason: failureReason,
       next_check_at: new Date(now.getTime() + RECHECK_MS).toISOString(),
     }).eq('workflow_key', WORKFLOW_KEY).eq('subject_type', 'application').eq('subject_id', applicationId);
-    await audit(db, applicationId, { triggerType, outcome: 'failed', missingDocuments, failureReason });
+    await audit(applicationId, { triggerType, outcome: 'failed', missingDocuments, failureReason });
     return { outcome: 'failed', applicationId, missingDocuments, attemptCount, message: failureReason };
   }
 
@@ -245,7 +261,7 @@ export async function remediateMissingApplicationDocuments(
     .select('id, status, recipient, created_at')
     .eq('channel', 'email')
     .eq('template_name', 'ellie_reminder')
-    .eq('recipient', application.email)
+    .eq('recipient', profile.email)
     .gte('created_at', new Date(now.getTime() - 60_000).toISOString())
     .order('created_at', { ascending: false })
     .limit(1)
@@ -271,14 +287,13 @@ export async function remediateMissingApplicationDocuments(
     },
   }).eq('workflow_key', WORKFLOW_KEY).eq('subject_type', 'application').eq('subject_id', applicationId);
 
-  await audit(db, applicationId, {
+  await audit(applicationId, {
     triggerType,
     outcome: verified ? 'sent' : 'failed',
     missingDocuments,
     attemptCount: nextAttempt,
     actionPolicy: 'AUTO',
     action: 'send_reminder',
-    execution,
     verification: { deliveryId: delivery?.id || null, status: delivery?.status || null },
   });
 

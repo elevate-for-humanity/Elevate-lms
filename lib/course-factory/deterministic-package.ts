@@ -104,7 +104,7 @@ export function buildDeterministicCoursePackage(
           lesson,
         });
         const stepType = inferStepType(lesson.slug);
-        const questionCount = stepType === 'exam' ? 25 : ['checkpoint', 'quiz'].includes(stepType) ? 10 : 3;
+        const questionCount = stepType === 'exam' ? 50 : ['checkpoint', 'quiz'].includes(stepType) ? 10 : 3;
         const quizQuestions = deterministicAssessmentQuestions({
           lessonSlug: lesson.slug,
           lessonTitle: lesson.title,

@@ -235,6 +235,11 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     const audioBuffer = await generateEdgeTTS(script, { voice: instructor.voice });
     await writeFile(paths.audioPath, audioBuffer);
 
+    // Remotion compositions execute in Chromium, so they cannot read an
+    // arbitrary host filesystem path. Persist narration before rendering and
+    // pass its public URL to the browser-side <Audio> component.
+    const audioUrl = await uploadLessonFileFromDisk(paths.audioPath, lessonId, 'mp3');
+
     const duration = estimateDuration(script);
     logger.info(`[RemotionRender] Audio written: ${paths.audioPath} (~${duration}s)`);
 
@@ -257,7 +262,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
       example: input.example,
       summary: input.summary,
       quizTeaser: input.quizTeaser,
-      audioSrc: paths.audioPath, // absolute path — Remotion reads from disk
+      audioSrc: audioUrl, // browser-readable durable narration asset
       backgroundImageSrc,
       instructorName: instructor.name,
       instructorTitle: instructor.title,
@@ -321,7 +326,6 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     logger.info(`[RemotionRender] MP4 written: ${paths.videoPath}`);
 
     const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, lessonId, 'mp4');
-    const audioUrl = await uploadLessonFileFromDisk(paths.audioPath, lessonId, 'mp3');
     await rm(paths.outputDir, { recursive: true, force: true }).catch(() => {});
 
     return {

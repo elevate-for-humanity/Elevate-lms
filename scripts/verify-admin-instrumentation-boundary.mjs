@@ -36,8 +36,16 @@ if (!instrumentation.includes("process.env.NEXT_RUNTIME !== 'nodejs'")) {
   process.exit(1);
 }
 
-if (!instrumentation.includes("process.env.ELEVATE_SERVICE === 'admin'")) {
-  console.error('[verify-admin-instrumentation-boundary] Missing explicit Admin-service boundary for agentic execution.');
+const roleContracts = [
+  'process.env.ELEVATE_SERVICE || process.env.SERVICE_ROLE',
+  "serviceRole === 'admin'",
+  "process.env.ELEVATE_SERVICE = 'admin'",
+];
+const missingRoleContracts = roleContracts.filter((token) => !instrumentation.includes(token));
+if (missingRoleContracts.length) {
+  console.error(
+    `[verify-admin-instrumentation-boundary] Admin service-role normalization regressed: ${missingRoleContracts.join(', ')}`,
+  );
   process.exit(1);
 }
 
@@ -69,9 +77,9 @@ if (missingExecutorContracts.length) {
 }
 
 const readinessContracts = [
-  'ELEVATE_AGENTIC_EXECUTOR_STARTED',
+  "process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED === 'true'",
   "'AGENTIC_EXECUTOR'",
-  'agenticExecutorReady',
+  'const ready = readiness.ready && agenticExecutorReady',
 ];
 const missingReadinessContracts = readinessContracts.filter((token) => !readiness.includes(token));
 if (missingReadinessContracts.length) {
@@ -81,4 +89,4 @@ if (missingReadinessContracts.length) {
   process.exit(1);
 }
 
-console.info('[verify-admin-instrumentation-boundary] Admin instrumentation is web-build safe, starts canonical course/marketing agentic execution, and gates readiness on executor startup.');
+console.info('[verify-admin-instrumentation-boundary] Admin runtime normalizes service role, starts canonical course/marketing agentic execution, and cannot report ready without executor startup.');

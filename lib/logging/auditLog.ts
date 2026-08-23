@@ -4,61 +4,48 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 export interface AuditLogEntry {
   actorId?: string;
   actorRole?: string;
+  tenantId?: string;
   action: string;
   entity: string;
   entityId?: string;
   metadata?: Record<string, any>;
   ipAddress?: string;
   userAgent?: string;
+  success?: boolean;
 }
 
 /**
- * Log an audit event to the audit_logs table.
+ * Canonical general-purpose writer for the immutable audit_logs table.
  *
- * Used for SOC-2 compliance and security monitoring.
- * Only service role can insert audit logs.
+ * audit_logs canonical columns are:
+ * user_id, tenant_id, role, action, resource_type, resource_id, details,
+ * ip_address, user_agent, success.
  *
- * @example
- * await auditLog({
- *   actorId: userId,
- *   actorRole: 'admin',
- *   action: 'APPROVED_HOURS',
- *   entity: 'apprenticeship_hours',
- *   entityId: hoursId,
- *   metadata: { hours: 40, week: '2025-W01' },
- *   ipAddress: req.headers['x-forwarded-for'],
- *   userAgent: req.headers['user-agent']
- * });
+ * Older actor_id/target_type/target_id/metadata columns remain database
+ * compatibility fields and should not receive new application writes.
  */
 export async function auditLog(entry: AuditLogEntry): Promise<void> {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !serviceRoleKey) {
-      logger.error('[auditLog] Missing Supabase credentials');
-      return;
-    }
-
     const supabase = await requireAdminClient();
 
     const { error } = await supabase.from('audit_logs').insert({
-      actor_id: entry.actorId,
-      actor_role: entry.actorRole,
+      user_id: entry.actorId ?? null,
+      tenant_id: entry.tenantId ?? null,
+      role: entry.actorRole ?? null,
       action: entry.action,
-      entity: entry.entity,
-      entity_id: entry.entityId,
-      metadata: entry.metadata || {},
-      ip_address: entry.ipAddress,
-      user_agent: entry.userAgent,
+      resource_type: entry.entity,
+      resource_id: entry.entityId ?? null,
+      details: entry.metadata || {},
+      ip_address: entry.ipAddress ?? null,
+      user_agent: entry.userAgent ?? null,
+      success: entry.success ?? true,
     });
 
     if (error) {
       logger.error('[auditLog] Failed to insert audit log:', error);
     }
   } catch (error) {
-    /* Error handled silently */
-    // Don't throw - audit logging should never break the app
+    // Audit logging must not break the primary transaction path.
     logger.error('[auditLog] Exception:', error);
   }
 }
@@ -90,6 +77,9 @@ export const AuditAction = {
   ENROLLMENT_CREATED: 'ENROLLMENT_CREATED',
   ENROLLMENT_STATUS_CHANGED: 'ENROLLMENT_STATUS_CHANGED',
   ENROLLMENT_COMPLETED: 'ENROLLMENT_COMPLETED',
+  PLACEMENT_CREATED: 'placement_created',
+  PLACEMENT_STATUS_UPDATED: 'placement_status_updated',
+  WIOA_OUTCOMES_EXPORTED: 'wioa_outcomes_exported',
 
   // Signature actions
   SIGNATURE_ADDED: 'SIGNATURE_ADDED',
@@ -167,4 +157,6 @@ export const AuditEntity = {
   SETTINGS: 'settings',
   INVITE: 'org_invite',
   APPLICATION: 'applications',
+  PLACEMENT_RECORD: 'placement_record',
+  CASE_MANAGER_REPORT: 'case_manager_report',
 } as const;

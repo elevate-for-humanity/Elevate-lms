@@ -2,6 +2,7 @@ import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { loadBlueprintWithProgram } from '@/lib/course-factory/blueprint-loader';
+import { getCourseMediaState } from '@/lib/course-factory/media-manager';
 import { courseBuilderController } from '@/lib/devstudio/course-builder-controller';
 import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
 import {
@@ -123,51 +124,6 @@ async function updateTask(
   });
 }
 
-async function courseMediaState(courseId: string) {
-  const db = await requireAdminClient();
-  const { data: lessons, error: lessonError } = await db
-    .from('course_lessons')
-    .select('id,content_json')
-    .eq('course_id', courseId);
-  if (lessonError) throw lessonError;
-
-  let requiredMicroclips = 0;
-  for (const lesson of lessons ?? []) {
-    const content = lesson.content_json && typeof lesson.content_json === 'object'
-      ? lesson.content_json as Record<string, any>
-      : {};
-    const experience = content.experience && typeof content.experience === 'object'
-      ? content.experience as Record<string, any>
-      : {};
-    requiredMicroclips += Array.isArray(experience.quickClips) ? Math.min(experience.quickClips.length, 2) : 0;
-  }
-
-  const { data: jobs, error: jobError } = await db
-    .from('video_jobs')
-    .select('asset_kind,status,video_url,error_message')
-    .eq('course_id', courseId);
-  if (jobError) throw jobError;
-
-  const completedLessonVideos = (jobs ?? []).filter(
-    (job) => (job.asset_kind ?? 'lesson') === 'lesson' && job.status === 'complete' && stringValue(job.video_url),
-  ).length;
-  const completedMicroclips = (jobs ?? []).filter(
-    (job) => job.asset_kind === 'microclip' && job.status === 'complete' && stringValue(job.video_url),
-  ).length;
-  const failed = (jobs ?? []).filter((job) => job.status === 'failed').length;
-
-  return {
-    requiredLessonVideos: lessons?.length ?? 0,
-    requiredMicroclips,
-    completedLessonVideos,
-    completedMicroclips,
-    failed,
-    complete:
-      completedLessonVideos >= (lessons?.length ?? 0) &&
-      completedMicroclips >= requiredMicroclips,
-  };
-}
-
 function reviewOnlyBlockingIssues(issues: string[]) {
   const reviewPatterns = [
     'review_status must be approved',
@@ -228,7 +184,7 @@ export async function processCourseAgenticTask(input: {
     const result = await courseBuilderController({
       programId: target.programId ?? undefined,
       programSlug: target.programSlug ?? undefined,
-      mode: 'replace',
+      mode: target.courseId ? 'missing-only' : 'replace',
       contentSource: 'ai',
       videoMode: 'off',
     });
@@ -280,24 +236,24 @@ export async function processCourseAgenticTask(input: {
 
   if (task.worker === 'media-director') {
     const queued = await queueCourseMedia({ courseId: target.courseId, onlyMissing: true });
-    const media = await courseMediaState(target.courseId);
-    if (!media.complete) {
+    const media = await getCourseMediaState(target.courseId, { verifyUrls: true });
+    if (!media.completePackage) {
       await updateTask(task, project, 'queued', {
         course_id: target.courseId,
         ...queued,
         ...media,
-        note: 'Queued is not complete. This task remains queued until every required persisted media asset has a playable URL.',
-      }, `Media pending: ${media.completedLessonVideos}/${media.requiredLessonVideos} lesson videos and ${media.completedMicroclips}/${media.requiredMicroclips} microclips complete.`);
+        note: 'Queued is not complete. This task remains queued until every required canonical media asset is complete and playable.',
+      }, `Media pending: ${media.complete}/${media.expectedTotal} canonical assets complete; ${media.failed} failed; ${media.queued} queued; ${media.rendering} rendering.`);
       return;
     }
-    await updateTask(task, project, 'completed', { course_id: target.courseId, ...queued, ...media }, 'All required course media is persisted with playable URLs.');
+    await updateTask(task, project, 'completed', { course_id: target.courseId, ...queued, ...media }, 'All required canonical course media is persisted and playable.');
     return;
   }
 
   if (task.worker === 'compliance-qa') {
-    const media = await courseMediaState(target.courseId);
-    if (!media.complete) {
-      await updateTask(task, project, 'queued', { course_id: target.courseId, ...media }, 'QA is waiting for persisted course media to complete.');
+    const media = await getCourseMediaState(target.courseId, { verifyUrls: true });
+    if (!media.completePackage) {
+      await updateTask(task, project, 'queued', { course_id: target.courseId, ...media }, 'QA is waiting for canonical Course Factory media readiness.');
       return;
     }
     const health = await runPersistedCourseProcurementHealthCheckWithClient(db, target.courseId);
@@ -325,6 +281,10 @@ export async function processCourseAgenticTask(input: {
 
   if (task.worker === 'publisher') {
     if (!project.user_id) throw new Error('Canonical publication requires an authenticated reviewer/publisher identity.');
+    const media = await getCourseMediaState(target.courseId, { verifyUrls: true });
+    if (!media.completePackage) {
+      throw new Error(`Publication blocked: canonical media package incomplete (${media.complete}/${media.expectedTotal} complete, ${media.failed} failed, ${media.queued} queued, ${media.rendering} rendering).`);
+    }
     const result = await publishPersistedCourseWithClient({
       db,
       courseId: target.courseId,
@@ -337,8 +297,9 @@ export async function processCourseAgenticTask(input: {
     await updateTask(task, project, 'completed', {
       course_id: target.courseId,
       procurement_gate: result.procurement_gate,
+      media,
       published: true,
-    }, 'Canonical course publication completed after governance and authorized human review.');
+    }, 'Canonical course publication completed after media readiness, governance, and authorized human review.');
     await db
       .from('agentic_build_runs')
       .update({ status: 'completed', completed_at: new Date().toISOString(), error: null })

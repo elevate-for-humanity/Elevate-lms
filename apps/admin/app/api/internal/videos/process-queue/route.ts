@@ -34,12 +34,13 @@ export async function POST(request: NextRequest) {
   const db = await requireAdminClient();
   const maxConcurrent = renderConcurrency();
 
-  let activeQuery = db
+  // Capacity is global even when candidate selection is course-scoped. This
+  // prevents an acceptance/repair run from overbooking Chromium while another
+  // course already owns render slots.
+  const { count: activeCount, error: activeError } = await db
     .from('video_jobs')
     .select('id', { count: 'exact', head: true })
     .eq('status', 'rendering');
-  if (courseId) activeQuery = activeQuery.eq('course_id', courseId);
-  const { count: activeCount, error: activeError } = await activeQuery;
   if (activeError) {
     return NextResponse.json({ error: 'Unable to inspect the video queue' }, { status: 500 });
   }
@@ -63,9 +64,7 @@ export async function POST(request: NextRequest) {
     .eq('status', 'queued');
   if (courseId) candidateQuery = candidateQuery.eq('course_id', courseId);
   const { data: candidates, error: queueError } = await candidateQuery
-    // Full lesson media is learner-critical and drains before microclips.
     .order('asset_kind', { ascending: true })
-    // Stable FIFO order within the same asset class prevents starvation.
     .order('queued_at', { ascending: true })
     .order('id', { ascending: true })
     .limit(availableSlots);

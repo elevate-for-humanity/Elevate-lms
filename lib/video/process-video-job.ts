@@ -16,6 +16,9 @@ import { recordMediaProvenance } from './media-provenance';
 import { inferDomainKey, renderLessonVideo } from './remotion-render';
 import { uploadLessonMediaBuffer } from './upload-lesson-media';
 
+const REMOTION_PROVIDER = 'remotion';
+const REMOTION_MODEL = 'ElevateLesson';
+
 async function hydrateMediaRuntimeSecrets(): Promise<void> {
   const missing = ['ELEVENLABS_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY', 'PEXELS_API_KEY'].filter(
     (key) => !process.env[key]?.trim(),
@@ -53,7 +56,9 @@ function mediaCharacters(sceneData: Record<string, unknown>): MediaCharacterRefe
     }));
 }
 
-/** Render one already-claimed video job using local generative scenes when available, with Remotion as the zero-failure fallback. */
+/** Render one already-claimed canonical video job. GPU generation is an optional
+ * rendering mechanic for microclips; Remotion is the common fallback. Both
+ * report terminal state through the same video_jobs identity. */
 export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   await hydrateMediaRuntimeSecrets();
   const db = createAdminClient();
@@ -89,9 +94,6 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   });
 
   try {
-    // Cinematic inserts are now directed through a canonical storyboard. This
-    // makes camera, continuity, reference media, operation type, and provenance
-    // explicit instead of hiding them inside a single free-form prompt.
     if (isMicroclip && (await gpuVideoAvailable())) {
       const scene = storyboard.scenes[0];
       const requestedDuration = Math.min(15, Math.max(1, scene.durationSeconds));
@@ -114,6 +116,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
           const videoUrl = await uploadLessonMediaBuffer(buffer, renderId, 'mp4');
           const renderSeconds = Math.max(0, (Date.now() - gpuStartedAt) / 1000);
           const outputSeconds = generated.durationSeconds ?? requestedDuration;
+          const model = generated.provider === 'wan' ? 'Wan2.2-TI2V-5B' : 'LTX-Video';
 
           try {
             await Promise.all([
@@ -172,7 +175,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
                 storyboard,
                 scene,
                 provider: generated.provider,
-                model: generated.provider === 'wan' ? 'Wan2.2-TI2V-5B' : 'LTX-Video',
+                model,
                 operation: scene.operation,
                 referenceUrls: [scene.referenceImageUrl, scene.sourceVideoUrl].filter((value): value is string => Boolean(value)),
                 likenessConsentRecordIds: storyboard.characters.map((character) => character.consentRecordId).filter((value): value is string => Boolean(value)),
@@ -191,10 +194,19 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
           await markComplete(job.id, {
             video_url: videoUrl,
             duration_seconds: outputSeconds,
+            provider: generated.provider,
+            provider_model: model,
           });
           return;
         }
       } catch (gpuError) {
+        const gpuMessage = gpuError instanceof Error ? gpuError.message : String(gpuError);
+        await db.from('video_jobs').update({
+          last_provider: 'gpu',
+          last_provider_model: null,
+          last_failure_at: new Date().toISOString(),
+          error_message: `GPU fallback: ${gpuMessage}`.slice(0, 2000),
+        }).eq('id', job.id);
         try {
           await recordPlatformUsage(db, {
             tenantId,
@@ -211,7 +223,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
               course_id: job.course_id,
               lesson_id: job.lesson_id,
               elapsed_seconds: Math.max(0, (Date.now() - gpuStartedAt) / 1000),
-              error: gpuError instanceof Error ? gpuError.message.slice(0, 500) : String(gpuError).slice(0, 500),
+              error: gpuMessage.slice(0, 500),
             },
           });
         } catch (meterError) {
@@ -223,7 +235,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         logger.warn('[video-worker] GPU scene failed; falling back to Remotion', {
           jobId: job.id,
           operation: scene.operation,
-          error: gpuError instanceof Error ? gpuError.message : String(gpuError),
+          error: gpuMessage,
         });
       } finally {
         if (generated) await deleteGpuVideoAsset(generated);
@@ -250,17 +262,22 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       visualPrompt: scenePrompt(primaryScene, storyboard.characters),
     });
     if (!result.success || !result.videoUrl) {
-      await markFailed(job.id, result.error ?? 'Render returned no playable video URL');
+      await markFailed(job.id, result.error ?? 'Render returned no playable video URL', {
+        provider: REMOTION_PROVIDER,
+        provider_model: REMOTION_MODEL,
+      });
       return;
     }
     await markComplete(job.id, {
       video_url: result.videoUrl,
       audio_url: result.audioUrl ?? undefined,
       duration_seconds: result.duration,
+      provider: REMOTION_PROVIDER,
+      provider_model: REMOTION_MODEL,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     logger.error('[video-worker] Render failed', error, { jobId: job.id });
-    await markFailed(job.id, message);
+    await markFailed(job.id, message, { provider: 'video-worker' });
   }
 }

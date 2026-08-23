@@ -1,5 +1,35 @@
 # OpenHands Agent Memory - Elevate LMS
 
+## ACTIVE HANDOFF — WEBSITE DESIGN PAGES (Priority Task, 2026-08-23)
+
+The AI inference architecture is DONE (see below). The next agent's job is the
+**public website design layer** — this was explicitly deferred and is now the
+top priority.
+
+### What is already finished (do NOT rebuild)
+- Cloudflare Workers AI verified live (token has Workers AI permission; account ff0d5ca582b5911a626ba012935cf3ec)
+- Cloudflare + Groq credentials stored in BOTH Supabase `platform_secrets` (scope=runtime) and GitHub Actions secrets
+- Self-hosted vLLM worker + `ElevateProvider` + Northflank provisioner on main (commit 456d9e620a)
+- Provider order configurable via `AI_PROVIDER_ORDER`; default: elevate → cloudflare → groq → gemini → google → anthropic → azure → openai
+- Deterministic Course Builder checkpointing; `generation_status` uses canonical `queued` value
+- OpenAI is optional everywhere
+
+### THE TASK: Restore the premium website experience
+Per the MASTER PROJECT PROMPT below, audit and enhance EVERY public page:
+1. **Homepage** — hero → proof → career pathways → how it works → funding → success stories → employers → apply
+2. **Program pages** — each must be a complete sales/enrollment page: hero image, outcomes, pay, duration, credential, funding, price, BNPL calculator, apply CTA
+3. **Header/footer pages** — no stubs, no dead links
+4. **Testing/funding/about/landing pages** — no "coming soon", no placeholders
+
+### Rules for this task
+- Do NOT replace the site with a template — enhance existing structure
+- Every page: premium hero, real photography (see `config/efhImageMap.ts` + Supabase image bucket), clear CTA, SEO metadata, mobile-optimized
+- No fake data, no lorem ipsum, no generic icon-only sections
+- Follow the ROUTING ARCHITECTURE rules below (canonical routes, portal subdomains)
+- Verify with `pnpm typecheck`, `pnpm lint`, `pnpm build` before committing
+
+---
+
 ## MASTER PROJECT PROMPT: ELEVATE FOR HUMANITY OPERATING SYSTEM — FINAL PRODUCTION COMPLETION
 
 ### ROLE

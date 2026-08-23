@@ -36,7 +36,7 @@ on:
     types: [opened, reopened]
 
 permissions:
-  contents: write
+  contents: read
   issues: write
 
 env:
@@ -67,7 +67,7 @@ jobs:
     timeout-minutes: 180
     concurrency:
       group: unified-course-builder-production-acceptance
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
@@ -134,7 +134,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/course-install.log 2>&1
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false --prod=false > /tmp/course-install.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           tail -n 120 /tmp/course-install.log > /tmp/course-install-tail.log || true
@@ -242,12 +242,34 @@ jobs:
             const acceptanceCode = process.env.ACCEPTANCE_EXIT_CODE || 'not-run';
             const verificationCode = process.env.VERIFICATION_EXIT_CODE || 'not-run';
             const ok = architectureCode === '0' && installCode === '0' && credentialCode === '0' && targetedCode === '0' && acceptanceCode === '0' && verificationCode === '0';
-            const architectureTail = fs.existsSync('/tmp/course-architecture.log') ? fs.readFileSync('/tmp/course-architecture.log', 'utf8').slice(-18000) : 'Architecture checks did not produce a log.';
-            const targetedTail = fs.existsSync('/tmp/course-targeted.log') ? fs.readFileSync('/tmp/course-targeted.log', 'utf8').slice(-18000) : 'Targeted Course Builder validation did not produce a log.';
-            const verificationTail = fs.existsSync('/tmp/course-verification.log') ? fs.readFileSync('/tmp/course-verification.log', 'utf8').slice(-22000) : 'Full application verification did not produce a log.';
-            const tail = fs.existsSync('/tmp/course-acceptance-tail.log') ? fs.readFileSync('/tmp/course-acceptance-tail.log', 'utf8').slice(-30000) : fs.existsSync('/tmp/course-acceptance.log') ? fs.readFileSync('/tmp/course-acceptance.log', 'utf8').slice(-30000) : 'Course Builder did not produce a log.';
+            const sensitiveNames = [
+              'SUPABASE_SERVICE_ROLE_KEY',
+              'OPENAI_API_KEY',
+              'GROQ_API_KEY',
+              'GEMINI_API_KEY',
+              'GOOGLE_CLOUD_API_KEY',
+              'CLOUDFLARE_AI_API_TOKEN',
+              'CLOUDFLARE_API_TOKEN',
+              'ANTHROPIC_API_KEY',
+              'AZURE_OPENAI_API_KEY',
+              'CRON_SECRET',
+            ];
+            const redact = (value) => sensitiveNames.reduce((text, name) => {
+              const secret = process.env[name];
+              return secret && secret.length >= 8 ? text.replaceAll(secret, '***') : text;
+            }, value);
+            const readTail = (path, fallback, limit = 6000) => redact(
+              fs.existsSync(path) ? fs.readFileSync(path, 'utf8').slice(-limit) : fallback,
+            );
+            const architectureTail = readTail('/tmp/course-architecture.log', 'Architecture checks did not produce a log.');
+            const installTail = readTail('/tmp/course-install-tail.log', 'Dependency installation did not produce a log.');
+            const targetedTail = readTail('/tmp/course-targeted.log', 'Targeted Course Builder validation did not produce a log.');
+            const verificationTail = readTail('/tmp/course-verification.log', 'Full application verification did not produce a log.');
+            const tail = fs.existsSync('/tmp/course-acceptance-tail.log')
+              ? readTail('/tmp/course-acceptance-tail.log', '', 8000)
+              : readTail('/tmp/course-acceptance.log', 'Course Builder did not produce a log.', 8000);
             const label = context.payload.issue.title.includes('BUSINESS') ? 'BUSINESS COURSE BUILDER' : 'ESB ACCEPTANCE';
-            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: `${label} ${ok ? 'PASS' : 'FAIL'}\n\nTested checkout SHA: ${process.env.TESTED_SHA}\nArchitecture: ${architectureCode}\nInstall: ${installCode}\nCredentials: ${credentialCode}\nTargeted Course Builder validation: ${targetedCode}\nAcceptance: ${acceptanceCode}\nFull Admin/LMS verification: ${verificationCode}\n\nArchitecture:\n\`\`\`text\n${architectureTail}\n\`\`\`\n\nTargeted validation:\n\`\`\`text\n${targetedTail}\n\`\`\`\n\nAcceptance:\n\`\`\`text\n${tail}\n\`\`\`\n\nFull verification:\n\`\`\`text\n${verificationTail}\n\`\`\`` });
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: `${label} ${ok ? 'PASS' : 'FAIL'}\n\nTested checkout SHA: ${process.env.TESTED_SHA}\nArchitecture: ${architectureCode}\nInstall: ${installCode}\nCredentials: ${credentialCode}\nTargeted Course Builder validation: ${targetedCode}\nAcceptance: ${acceptanceCode}\nFull Admin/LMS verification: ${verificationCode}\n\nArchitecture:\n\`\`\`text\n${architectureTail}\n\`\`\`\n\nInstall:\n\`\`\`text\n${installTail}\n\`\`\`\n\nTargeted validation:\n\`\`\`text\n${targetedTail}\n\`\`\`\n\nAcceptance:\n\`\`\`text\n${tail}\n\`\`\`\n\nFull verification:\n\`\`\`text\n${verificationTail}\n\`\`\`` });
 
       - name: Fail workflow when any required gate failed
         if: always()

@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { getEllieReminderTemplate } from './ellie-reminder-template';
 import { getTemplate } from './templates';
 import type { TemplateKey } from './templates';
 
@@ -17,7 +18,7 @@ const MAX_RETRIES = 5;
 interface QueuedNotification {
   id: string;
   to_email: string;
-  template_key: TemplateKey;
+  template_key: string;
   template_data: Record<string, any>;
   attempts: number;
   max_attempts: number;
@@ -28,6 +29,13 @@ interface ProcessResult {
   sent: number;
   failed: number;
   errors: Array<{ id: string; error: string }>;
+}
+
+function resolveTemplate(notification: QueuedNotification) {
+  if (notification.template_key === 'ellie_reminder') {
+    return getEllieReminderTemplate(notification.template_data);
+  }
+  return getTemplate(notification.template_key as TemplateKey, notification.template_data);
 }
 
 /**
@@ -77,10 +85,8 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
   // Process each claimed notification
   for (const notification of claimed as QueuedNotification[]) {
     try {
-      // Get email template
-      const template = getTemplate(notification.template_key, notification.template_data);
+      const template = resolveTemplate(notification);
 
-      // Send email
       const sendResult = await sendEmailViaProvider({
         to: notification.to_email,
         subject: template.subject,
@@ -113,7 +119,6 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
           attempts: newAttempts,
           last_error: 'Operation failed',
           dead_letter: exhausted ? true : undefined,
-          // Exponential backoff: 2^n minutes (2m, 4m, 8m, 16m, 32m)
           scheduled_for: !exhausted
             ? new Date(Date.now() + Math.pow(2, newAttempts) * 60000).toISOString()
             : undefined,
@@ -138,7 +143,6 @@ async function sendEmailViaProvider(params: {
   html: string;
   text: string;
 }): Promise<{ success: boolean; error?: string }> {
-  // Dynamic import to avoid circular dependency
   const { sendEmail: sgSend } = await import('@/lib/email/sendgrid');
 
   const result = await sgSend({

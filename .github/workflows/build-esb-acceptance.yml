@@ -67,7 +67,9 @@ jobs:
     timeout-minutes: 180
     concurrency:
       group: unified-course-builder-production-acceptance
-      cancel-in-progress: false
+      # Only the newest exact-main acceptance may mutate production course state.
+      # Cancel stale runs so an older renderer cannot keep processing after a fix.
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
         with:

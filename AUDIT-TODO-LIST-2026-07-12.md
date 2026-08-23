@@ -516,3 +516,32 @@ app/(marketing)/platform-architecture/       [CREATE]
 **Document Version:** 1.0  
 **Last Updated:** July 12, 2026, 12:10 UTC  
 **Next Review:** After marketing pages created
+
+
+---
+
+## PORTALS, TESTING & PRIVACY — VERIFIED AUGUST 23, 2026
+
+### Confirmed working in production and present on current main
+
+- [x] `/portals` renders 15 role-specific portal cards with descriptions, tenant scope, authorized-role counts, and canonical destinations.
+- [x] `/online-apps` provides the broader public-versus-authenticated portal directory.
+- [x] `/testing` renders the canonical catalog with seven configured provider checkout paths.
+- [x] `/testing/checkout` and `/testing/book` render successfully; checkout copy states that the server re-resolves the selected exam and price.
+- [x] `/testing/policies` and `/testing/for-employers` exist and render public testing guidance.
+- [x] The working credential-verification destination is `https://app.elevateforhumanity.org/verify-credentials`; the Compliance Center now links to that host.
+- [x] `/privacy` is the canonical full Privacy Policy. `/legal/privacy` is a compatibility redirect to `/privacy`.
+
+### Gaps repaired on current main
+
+- [x] Restore `/testing/schedule` as a permanent compatibility redirect to `/testing/book` (commit `d584329`).
+- [x] Restore `/testing/proctor-information` as a permanent compatibility redirect to `/testing/policies` (commit `bcb4940`).
+- [x] Point the Compliance Center directly to canonical `/privacy`, avoiding the legacy redirect (commit `35aafb5`).
+
+### Deployment verification still required
+
+- [ ] Wait for the Marketing deployment containing commit `35aafb5` or a descendant.
+- [ ] Verify the exact live Marketing SHA from the production version/health endpoint.
+- [ ] Recheck both repaired testing URLs and confirm their final destinations after deployment.
+- [ ] Exercise Stripe checkout creation with an approved non-production/test payment path; page rendering alone does not prove a completed payment.
+- [ ] Complete authenticated role-by-role portal workflow testing. Public cards and auth redirects do not prove each authorized dashboard workflow.

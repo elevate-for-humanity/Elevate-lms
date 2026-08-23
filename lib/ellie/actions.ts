@@ -1,13 +1,8 @@
 /**
  * Ellie action registry.
  *
- * Every action Ellie can propose is defined here:
- *   - type: machine identifier used in DB and API
- *   - label: human-readable name shown in approval cards
- *   - description: what the action does (shown to the user before approval)
- *   - requiresApproval: always true — Ellie never executes without a human confirm
- *   - bulk: whether this action can target multiple records at once
- *   - dangerLevel: 'low' | 'medium' | 'high' — controls UI warning color
+ * Every action Ellie can propose is defined here. The registry is also the
+ * canonical machine-enforced policy map for autonomous execution.
  */
 
 export type EllieActionType =
@@ -26,12 +21,19 @@ export type EllieActionType =
   | 'run_workflow'
   | 'navigate';
 
+export type ActionExecutionPolicy =
+  | 'AUTO'
+  | 'RULE_VERIFIED'
+  | 'APPROVAL'
+  | 'PROHIBITED_AUTONOMOUS';
+
 export interface EllieActionDef {
   type: EllieActionType;
   label: string;
   description: string;
   bulk: boolean;
   dangerLevel: 'low' | 'medium' | 'high';
+  executionPolicy: ActionExecutionPolicy;
 }
 
 export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
@@ -41,6 +43,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Send an email reminder to the selected student(s).',
     bulk: true,
     dangerLevel: 'low',
+    executionPolicy: 'AUTO',
   },
   flag_at_risk: {
     type: 'flag_at_risk',
@@ -48,6 +51,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Mark enrollment(s) as at-risk and notify the assigned case manager.',
     bulk: true,
     dangerLevel: 'medium',
+    executionPolicy: 'RULE_VERIFIED',
   },
   unflag_at_risk: {
     type: 'unflag_at_risk',
@@ -55,6 +59,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Clear the at-risk flag on the selected enrollment(s).',
     bulk: true,
     dangerLevel: 'low',
+    executionPolicy: 'RULE_VERIFIED',
   },
   approve_application: {
     type: 'approve_application',
@@ -62,6 +67,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Approve the application and move the student to enrollment.',
     bulk: false,
     dangerLevel: 'medium',
+    executionPolicy: 'APPROVAL',
   },
   reject_application: {
     type: 'reject_application',
@@ -69,6 +75,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Reject the application and notify the applicant.',
     bulk: false,
     dangerLevel: 'high',
+    executionPolicy: 'APPROVAL',
   },
   approve_program_holder: {
     type: 'approve_program_holder',
@@ -76,6 +83,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Approve the program holder application and activate their account.',
     bulk: false,
     dangerLevel: 'medium',
+    executionPolicy: 'APPROVAL',
   },
   reject_program_holder: {
     type: 'reject_program_holder',
@@ -83,13 +91,15 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Reject the program holder application and notify the applicant.',
     bulk: false,
     dangerLevel: 'high',
+    executionPolicy: 'APPROVAL',
   },
   issue_certificate: {
     type: 'issue_certificate',
     label: 'Issue Certificate',
-    description: 'Manually issue a completion certificate to the student.',
+    description: 'Request certificate issuance through the canonical completion gate.',
     bulk: false,
-    dangerLevel: 'medium',
+    dangerLevel: 'high',
+    executionPolicy: 'PROHIBITED_AUTONOMOUS',
   },
   send_magic_link: {
     type: 'send_magic_link',
@@ -97,6 +107,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Send a passwordless login link to the user\'s email.',
     bulk: false,
     dangerLevel: 'low',
+    executionPolicy: 'APPROVAL',
   },
   assign_case_manager: {
     type: 'assign_case_manager',
@@ -104,6 +115,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Assign a case manager to the student enrollment. Updates assigned_staff_id and creates a case_manager_assignments row.',
     bulk: false,
     dangerLevel: 'low',
+    executionPolicy: 'APPROVAL',
   },
   schedule_exam: {
     type: 'schedule_exam',
@@ -111,6 +123,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Create an exam booking at the testing center. Requires firstName, lastName, email, examType, and preferredDate.',
     bulk: false,
     dangerLevel: 'low',
+    executionPolicy: 'APPROVAL',
   },
   cancel_exam: {
     type: 'cancel_exam',
@@ -118,6 +131,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Cancel an exam booking by ID and queue a cancellation email to the student.',
     bulk: false,
     dangerLevel: 'medium',
+    executionPolicy: 'APPROVAL',
   },
   run_workflow: {
     type: 'run_workflow',
@@ -125,6 +139,7 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Trigger the selected automation workflow.',
     bulk: false,
     dangerLevel: 'medium',
+    executionPolicy: 'APPROVAL',
   },
   navigate: {
     type: 'navigate',
@@ -132,5 +147,10 @@ export const ELLIE_ACTION_REGISTRY: Record<EllieActionType, EllieActionDef> = {
     description: 'Open a page in the admin portal.',
     bulk: false,
     dangerLevel: 'low',
+    executionPolicy: 'AUTO',
   },
 };
+
+export function getActionExecutionPolicy(actionType: EllieActionType): ActionExecutionPolicy {
+  return ELLIE_ACTION_REGISTRY[actionType].executionPolicy;
+}

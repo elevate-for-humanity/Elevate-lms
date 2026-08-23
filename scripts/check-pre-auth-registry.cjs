@@ -27,18 +27,16 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-// Scan all app directories for API routes (monorepo split + app-legacy)
 const API_DIRS = [
   path.join(ROOT, 'app-legacy', 'api'),
   path.join(ROOT, 'apps', 'marketing', 'app', 'api'),
   path.join(ROOT, 'apps', 'lms', 'app', 'api'),
   path.join(ROOT, 'apps', 'admin', 'app', 'api'),
 ];
-const API_DIR = API_DIRS[0]; // legacy fallback
+const API_DIR = API_DIRS[0];
 const REGISTRY_FILE = path.join(ROOT, 'lib', 'pre-auth-tables.ts');
 const REPORT_DIR = path.join(ROOT, 'reports');
 
-// 1. Parse registered tables from lib/pre-auth-tables.ts
 const registrySource = fs.readFileSync(REGISTRY_FILE, 'utf8');
 const registeredTables = new Set();
 for (const match of registrySource.matchAll(/table:\s*['"]([^'"]+)['"]/g)) {
@@ -49,7 +47,6 @@ if (registeredTables.size === 0) {
   process.exit(1);
 }
 
-// 2. Auth guard patterns - presence of ANY = route has auth
 const AUTH_PATTERNS = [
   /\.getUser\s*\(/,
   /\.getSession\s*\(/,
@@ -59,6 +56,7 @@ const AUTH_PATTERNS = [
   /requireRoleAPI\s*\(/,
   /apiAuthGuard\s*\(/,
   /apiRequireAdmin\s*\(/,
+  /apiRequireDevStudio\s*\(/,
   /requireAdmin\s*\(/,
   /requireRole\s*\(/,
   /requireApiAuth\s*\(/,
@@ -85,7 +83,6 @@ const EXEMPT_RE = /\/\/\s*pre-auth-registry:\s*exempt/i;
 const INSERT_RE = /\.from\s*\(\s*['"]([^'"]+)['"]\s*\)[\s\S]{0,300}?\.(insert|upsert)\s*\(/g;
 const IDENTITY_COLS = /user_id|student_id|customer_email|recipient_id/;
 
-// 3. Walk all app/api directories
 function walkDir(dir, results = []) {
   if (!fs.existsSync(dir)) return results;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -97,7 +94,6 @@ function walkDir(dir, results = []) {
 }
 const routeFiles = API_DIRS.flatMap(d => walkDir(d));
 
-// 4. Scan
 const issues = [];
 const coverage = [];
 
@@ -113,9 +109,7 @@ for (const file of routeFiles) {
     coverage.push({ file: rel, status: 'authenticated', tables: [] });
     continue;
   }
-  if (!source.includes('.insert(') && !source.includes('.upsert(')) {
-    continue;
-  }
+  if (!source.includes('.insert(') && !source.includes('.upsert(')) continue;
 
   const tableMatches = [...source.matchAll(INSERT_RE)];
   if (tableMatches.length === 0) continue;
@@ -139,7 +133,6 @@ for (const file of routeFiles) {
   }
 }
 
-// 5. Write coverage report
 if (!fs.existsSync(REPORT_DIR)) fs.mkdirSync(REPORT_DIR, { recursive: true });
 fs.writeFileSync(
   path.join(REPORT_DIR, 'pre_auth_registry_report.json'),
@@ -157,7 +150,6 @@ fs.writeFileSync(
   ),
 );
 
-// 6. Output
 console.log(`[pre-auth-check] Registry: ${registeredTables.size} tables registered`);
 console.log(`[pre-auth-check] Scanned:  ${routeFiles.length} route files`);
 console.log('');

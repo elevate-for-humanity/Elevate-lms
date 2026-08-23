@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import {
   getOpenHandsConfig,
@@ -8,6 +9,9 @@ import {
 } from '@/lib/devstudio/openhands/client';
 
 export async function POST(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
@@ -66,6 +70,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 

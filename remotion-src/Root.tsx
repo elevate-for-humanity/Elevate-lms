@@ -6,6 +6,24 @@ import {
   type SlideLessonProps,
 } from './compositions/SlideLesson';
 
+const CANONICAL_INSTRUCTOR_IMAGE_URL =
+  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg';
+
+/**
+ * Runtime render props historically supplied root-relative instructor images.
+ * Remotion renders on an ephemeral localhost origin, so those URLs resolve to
+ * localhost rather than the bundled/public asset and Chromium rejects them.
+ * Normalize only local instructor references at the composition boundary to
+ * Elevate's canonical public instructor asset. Remote/custom references remain
+ * untouched.
+ */
+function CanonicalElevateLesson(props: ElevateLessonProps) {
+  const instructorImageSrc = props.instructorImageSrc?.startsWith('/')
+    ? CANONICAL_INSTRUCTOR_IMAGE_URL
+    : props.instructorImageSrc;
+  return <ElevateLesson {...props} instructorImageSrc={instructorImageSrc} />;
+}
+
 // Default props for Remotion Studio preview
 const defaultProps: ElevateLessonProps = {
   title: 'What Is Peer Recovery Support?',
@@ -23,15 +41,15 @@ const defaultProps: ElevateLessonProps = {
   summary:
     'Peer recovery support is a powerful, evidence-based practice built on lived experience, mutual respect, and the belief that recovery is possible for everyone.',
   quizTeaser: 'Ready to test your knowledge? Complete the checkpoint quiz to continue.',
-  audioSrc: 'https://example.com/audio.mp3', // replaced at render time
+  audioSrc: 'https://example.com/audio.mp3',
   backgroundImageSrc: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
   instructorName: 'Marcus Johnson',
   instructorTitle: 'Workforce Development Specialist',
-  instructorImageSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/instructors/marcus-johnson.jpg',
+  instructorImageSrc: CANONICAL_INSTRUCTOR_IMAGE_URL,
   topBarColor: '#f97316',
   accentColor: '#3b82f6',
   backgroundColor: '#0f172a',
-  segmentFrames: [150, 180, 180, 150, 150], // 5s, 6s, 6s, 5s, 5s at 30fps
+  segmentFrames: [150, 180, 180, 150, 150],
 };
 
 // Default props for SlideLesson Studio preview
@@ -87,7 +105,7 @@ export function RemotionRoot() {
     <>
       <Composition
         id="ElevateLesson"
-        component={ElevateLesson}
+        component={CanonicalElevateLesson}
         durationInFrames={totalFrames}
         fps={30}
         width={1920}

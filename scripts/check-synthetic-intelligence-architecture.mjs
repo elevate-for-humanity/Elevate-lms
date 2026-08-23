@@ -29,6 +29,11 @@ for (const path of [
   'lib/workflows/engine.ts',
   'lib/workflows/action-policy.ts',
   'lib/devstudio/os/task-runner.ts',
+  'lib/devstudio/openhands/client.ts',
+  'lib/devstudio/openhands/runtime.ts',
+  'lib/devstudio/openhands/github-verifier.ts',
+  'apps/admin/app/api/devstudio/openhands/chat/route.ts',
+  'apps/admin/app/api/devstudio/openhands/agent/route.ts',
   'apps/admin/app/api/devstudio/plan/route.ts',
   'services/llm-gpu-worker/Dockerfile',
   'services/llm-gpu-worker/entrypoint.sh',
@@ -59,6 +64,28 @@ requireText('lib/ai/tools/registry.ts', 'approvalRequired', 'tool approval polic
 requireText('lib/ai/tools/registry.ts', 'idempotent', 'tool idempotency policy');
 requireText('lib/ai/tools/registry.ts', 'retryAttempts', 'tool retry policy');
 requireText('lib/ai/tools/registry.ts', 'audit', 'tool audit policy');
+requireText('lib/ai/tools/registry.ts', "name: 'openhands.execute'", 'governed OpenHands execution tool');
+requireText('lib/ai/tools/registry.ts', "name: 'openhands.status'", 'governed OpenHands status tool');
+requireText('lib/ai/tools/registry.ts', 'CONFIRM OPENHANDS EXECUTION', 'OpenHands human approval boundary');
+requireText('lib/ai/tools/planner.ts', "name: 'openhands.execute'", 'engineering delegation to OpenHands');
+requireText('lib/ai/tools/planner.ts', "name: 'courses.generate'", 'Course Builder remains outside OpenHands');
+requireText('lib/ai/tools/executor.ts', "status: 'accepted'", 'asynchronous governed tool status');
+requireText('lib/ai/runtime/command-executor.ts', "status: 'running'", 'async command lifecycle');
+
+requireText('lib/devstudio/openhands/client.ts', '/api/v1/app-conversations', 'current OpenHands Cloud V1 API');
+requireText('lib/devstudio/openhands/client.ts', 'start-tasks?ids=', 'OpenHands startup polling');
+requireText('lib/devstudio/openhands/client.ts', 'execution_status', 'OpenHands execution polling');
+requireText('lib/devstudio/openhands/client.ts', 'OPENHANDS_API_KEY', 'server-side OpenHands API key');
+requireText('lib/devstudio/openhands/client.ts', 'configured allowlist', 'OpenHands repository allowlist');
+requireText('lib/devstudio/openhands/runtime.ts', "from('ai_tasks')", 'OpenHands canonical ai_tasks persistence');
+requireText('lib/devstudio/openhands/runtime.ts', "from('ai_task_steps')", 'OpenHands canonical task steps');
+requireText('lib/devstudio/openhands/runtime.ts', "from('ai_memory')", 'OpenHands validated memory persistence');
+requireText('lib/devstudio/openhands/runtime.ts', 'verifyOpenHandsGitHubOutcome', 'independent GitHub verification');
+requireText('lib/devstudio/openhands/runtime.ts', 'REQUIRES_HUMAN_REVIEW', 'OpenHands verification approval fallback');
+requireText('lib/devstudio/openhands/github-verifier.ts', '/pulls/', 'OpenHands PR verification');
+requireText('lib/devstudio/openhands/github-verifier.ts', '/check-runs', 'OpenHands CI verification');
+requireText('apps/admin/app/api/devstudio/openhands/agent/route.ts', 'dispatchOpenHandsTask', 'thin governed OpenHands execution route');
+requireText('apps/admin/app/api/devstudio/openhands/agent/route.ts', 'refreshOpenHandsTask', 'OpenHands status lifecycle route');
 
 requireText('lib/platform/planner.ts', "'awaiting_approval'", 'approval-aware plan state');
 requireText('lib/platform/planner.ts', 'verification_rule', 'plan verification contract');
@@ -88,6 +115,7 @@ requireText('lib/devstudio/os/task-runner.ts', "from('ai_task_steps')", 'persist
 requireText('lib/devstudio/os/task-runner.ts', "from('ai_approvals')", 'human approval persistence');
 requireText('lib/devstudio/os/task-runner.ts', "from('ai_memory')", 'task-result memory persistence');
 requireText('lib/devstudio/os/task-runner.ts', 'writeDevAuditLog', 'agent audit logging');
+requireText('lib/devstudio/os/task-runner.ts', "result.status === 'running'", 'async task preservation');
 
 requireText('lib/course-factory/publisher.ts', 'courseModule.orderIndex * 1000 + lesson.order', 'globally unique canonical lesson order');
 
@@ -105,4 +133,7 @@ console.log('- canonical agent/tool runtime retained');
 console.log('- planner checkpoints and uses persisted ai_tasks');
 console.log('- shared context composes existing memory/workflow/RAG authorities');
 console.log('- evaluator and approval-aware plan state present');
+console.log('- OpenHands uses current Cloud V1 API through one canonical server client');
+console.log('- OpenHands engineering runs are governed, persisted, asynchronous, and independently verified through GitHub');
+console.log('- Course Builder remains on the normal inference path, not the OpenHands engineering path');
 console.log('- workflow primitives are governed separately from domain AI tools');

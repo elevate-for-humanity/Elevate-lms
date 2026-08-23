@@ -109,10 +109,11 @@ export async function executeAICommand(
     }
 
     if (!toolResult.ok) {
+      const failedStatus: 'failed' | 'blocked' = toolResult.status === 'blocked' ? 'blocked' : 'failed';
       return {
         ok: false,
         executed: false,
-        status: toolResult.status,
+        status: failedStatus,
         message: toolResult.error ?? 'Tool execution failed.',
         tool: toolResult.tool,
         risk: toolResult.risk,

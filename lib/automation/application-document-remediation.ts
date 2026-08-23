@@ -1,0 +1,293 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
+
+import { runTabularIntelligence } from '@/lib/ai/tabular-intelligence';
+import { executeGovernedEllieAction } from '@/lib/ellie/governed-executor';
+import { evaluateAndAdvanceApplication } from '@/lib/paris/application-self-service';
+
+const WORKFLOW_KEY = 'application_missing_documents';
+const RECHECK_MS = 24 * 60 * 60 * 1000;
+const DEFAULT_MAX_ATTEMPTS = 3;
+
+export type RemediationOutcome =
+  | 'resolved'
+  | 'sent'
+  | 'suppressed'
+  | 'escalated'
+  | 'failed';
+
+export interface RemediationResult {
+  outcome: RemediationOutcome;
+  applicationId: string;
+  missingDocuments: string[];
+  attemptCount: number;
+  nextCheckAt?: string | null;
+  message?: string;
+}
+
+function documentOnly(items: string[]): string[] {
+  return items.filter((item) => item.toLowerCase().includes('document'));
+}
+
+function deterministicMessage(missingDocuments: string[]): string {
+  const list = missingDocuments.map((item) => `- ${item}`).join('\n');
+  return [
+    'Your application is still missing the following required item(s):',
+    list,
+    '',
+    'Please upload the listed item(s) through your applicant portal. If you already submitted them, no additional action is needed while staff review is pending.',
+  ].join('\n');
+}
+
+async function buildMessage(application: Record<string, any>, missingDocuments: string[]) {
+  const fallback = deterministicMessage(missingDocuments);
+  try {
+    const result = await runTabularIntelligence({
+      mode: 'generate',
+      instruction: 'Write a concise, respectful applicant reminder. State every missing document exactly as supplied. Explain that the applicant should upload the listed items through the applicant portal. Do not add eligibility, funding, approval, denial, or compliance claims.',
+      row: {
+        applicant_name: [application.first_name, application.last_name].filter(Boolean).join(' '),
+        missing_documents: missingDocuments,
+      },
+    });
+    return result.value.trim() || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+async function audit(
+  db: SupabaseClient,
+  applicationId: string,
+  metadata: Record<string, unknown>,
+) {
+  await db.from('audit_logs').insert({
+    actor_id: null,
+    actor_type: 'system',
+    action: 'autopilot.application_missing_documents',
+    resource_type: 'application',
+    resource_id: applicationId,
+    metadata: { ...metadata, source: 'closed_loop_autopilot' },
+  }).then(() => {}, () => {});
+}
+
+export async function remediateMissingApplicationDocuments(
+  db: SupabaseClient,
+  applicationId: string,
+  triggerType = 'scheduled_reconciliation',
+): Promise<RemediationResult> {
+  const now = new Date();
+  const nowIso = now.toISOString();
+
+  const { data: application, error: applicationError } = await db
+    .from('applications')
+    .select('*')
+    .eq('id', applicationId)
+    .maybeSingle();
+
+  if (applicationError) throw new Error(`Failed to load application: ${applicationError.message}`);
+  if (!application) throw new Error(`Application ${applicationId} not found`);
+
+  const decision = await evaluateAndAdvanceApplication(db, application, null);
+  const missingDocuments = documentOnly(decision.missing);
+
+  const { data: existing } = await db
+    .from('automation_followups')
+    .select('*')
+    .eq('workflow_key', WORKFLOW_KEY)
+    .eq('subject_type', 'application')
+    .eq('subject_id', applicationId)
+    .maybeSingle();
+
+  const attemptCount = Number(existing?.attempt_count || 0);
+  const maxAttempts = Number(existing?.max_attempts || DEFAULT_MAX_ATTEMPTS);
+
+  if (missingDocuments.length === 0) {
+    if (existing) {
+      await db.from('automation_followups').update({
+        state: 'resolved',
+        execution_status: 'verified',
+        detected_condition: { missingDocuments: [] },
+        resolved_at: nowIso,
+        next_check_at: null,
+        escalation_status: existing.escalation_status === 'created' ? 'closed' : 'none',
+        failure_reason: null,
+        audit_metadata: { ...(existing.audit_metadata || {}), resolution: 'requirements_satisfied' },
+      }).eq('id', existing.id);
+    }
+    await audit(db, applicationId, {
+      triggerType,
+      outcome: 'resolved',
+      missingDocuments: [],
+      rule: 'required_document_presence',
+    });
+    return { outcome: 'resolved', applicationId, missingDocuments: [], attemptCount };
+  }
+
+  if (!application.user_id) {
+    const idempotencyKey = `${WORKFLOW_KEY}:application:${applicationId}`;
+    await db.from('automation_followups').upsert({
+      workflow_key: WORKFLOW_KEY,
+      subject_type: 'application',
+      subject_id: applicationId,
+      trigger_type: triggerType,
+      state: 'escalated',
+      detected_condition: { missingDocuments },
+      proposed_action: 'send_reminder',
+      action_policy: 'AUTO',
+      execution_status: 'failed',
+      attempt_count: attemptCount,
+      max_attempts: maxAttempts,
+      escalation_status: 'needed',
+      failure_reason: 'Application has no linked user_id for canonical reminder delivery.',
+      idempotency_key: idempotencyKey,
+      audit_metadata: { rule: 'required_document_presence' },
+    }, { onConflict: 'workflow_key,subject_type,subject_id' });
+    await audit(db, applicationId, { triggerType, outcome: 'escalated', missingDocuments, reason: 'missing_user_id' });
+    return { outcome: 'escalated', applicationId, missingDocuments, attemptCount };
+  }
+
+  const nextCheckAt = existing?.next_check_at ? new Date(existing.next_check_at) : null;
+  if (existing && existing.state !== 'resolved' && nextCheckAt && nextCheckAt.getTime() > now.getTime()) {
+    return {
+      outcome: 'suppressed',
+      applicationId,
+      missingDocuments,
+      attemptCount,
+      nextCheckAt: existing.next_check_at,
+    };
+  }
+
+  if (attemptCount >= maxAttempts) {
+    await db.from('automation_followups').update({
+      state: 'escalated',
+      execution_status: 'suppressed',
+      detected_condition: { missingDocuments },
+      escalation_status: 'needed',
+      next_check_at: null,
+      failure_reason: `No resolution after ${attemptCount} reminder attempts.`,
+    }).eq('id', existing.id);
+    await audit(db, applicationId, { triggerType, outcome: 'escalated', missingDocuments, attemptCount });
+    return { outcome: 'escalated', applicationId, missingDocuments, attemptCount };
+  }
+
+  const message = await buildMessage(application, missingDocuments);
+  const nextAttempt = attemptCount + 1;
+  const actionKey = `${WORKFLOW_KEY}:${applicationId}:attempt:${nextAttempt}:${missingDocuments.slice().sort().join('|')}`;
+
+  if (existing?.last_action_key === actionKey) {
+    return {
+      outcome: 'suppressed',
+      applicationId,
+      missingDocuments,
+      attemptCount,
+      nextCheckAt: existing.next_check_at,
+    };
+  }
+
+  const idempotencyKey = `${WORKFLOW_KEY}:application:${applicationId}`;
+  if (!existing) {
+    await db.from('automation_followups').insert({
+      workflow_key: WORKFLOW_KEY,
+      subject_type: 'application',
+      subject_id: applicationId,
+      trigger_type: triggerType,
+      state: 'open',
+      detected_condition: { missingDocuments },
+      proposed_action: 'send_reminder',
+      action_policy: 'AUTO',
+      execution_status: 'executing',
+      attempt_count: attemptCount,
+      max_attempts: maxAttempts,
+      escalation_status: 'none',
+      idempotency_key: idempotencyKey,
+      last_action_key: actionKey,
+      audit_metadata: { rule: 'required_document_presence' },
+    });
+  } else {
+    await db.from('automation_followups').update({
+      state: 'open',
+      detected_condition: { missingDocuments },
+      proposed_action: 'send_reminder',
+      action_policy: 'AUTO',
+      execution_status: 'executing',
+      last_action_key: actionKey,
+      failure_reason: null,
+    }).eq('id', existing.id);
+  }
+
+  let execution;
+  try {
+    execution = await executeGovernedEllieAction(
+      'send_reminder',
+      { userId: application.user_id, message },
+      db,
+      {
+        mode: 'autonomous',
+        preconditionsVerified: true,
+        actorId: null,
+        reason: 'Deterministic required-document check found missing required documents.',
+      },
+    );
+  } catch (error) {
+    const failureReason = error instanceof Error ? error.message : 'Reminder execution failed';
+    await db.from('automation_followups').update({
+      state: 'failed',
+      execution_status: 'failed',
+      failure_reason: failureReason,
+      next_check_at: new Date(now.getTime() + RECHECK_MS).toISOString(),
+    }).eq('workflow_key', WORKFLOW_KEY).eq('subject_type', 'application').eq('subject_id', applicationId);
+    await audit(db, applicationId, { triggerType, outcome: 'failed', missingDocuments, failureReason });
+    return { outcome: 'failed', applicationId, missingDocuments, attemptCount, message: failureReason };
+  }
+
+  const { data: delivery } = await db
+    .from('delivery_logs')
+    .select('id, status, recipient, created_at')
+    .eq('channel', 'email')
+    .eq('template_name', 'ellie_reminder')
+    .eq('recipient', application.email)
+    .gte('created_at', new Date(now.getTime() - 60_000).toISOString())
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const verified = execution.success && Boolean(delivery);
+  const nextCheck = new Date(now.getTime() + RECHECK_MS).toISOString();
+
+  await db.from('automation_followups').update({
+    state: verified ? 'waiting' : 'failed',
+    execution_status: verified ? 'verified' : 'failed',
+    attempt_count: nextAttempt,
+    last_attempt_at: nowIso,
+    next_check_at: nextCheck,
+    failure_reason: verified ? null : 'Reminder action returned without a verifiable delivery record.',
+    audit_metadata: {
+      rule: 'required_document_presence',
+      missingDocuments,
+      actionKey,
+      deliveryId: delivery?.id || null,
+      deliveryStatus: delivery?.status || null,
+      execution,
+    },
+  }).eq('workflow_key', WORKFLOW_KEY).eq('subject_type', 'application').eq('subject_id', applicationId);
+
+  await audit(db, applicationId, {
+    triggerType,
+    outcome: verified ? 'sent' : 'failed',
+    missingDocuments,
+    attemptCount: nextAttempt,
+    actionPolicy: 'AUTO',
+    action: 'send_reminder',
+    execution,
+    verification: { deliveryId: delivery?.id || null, status: delivery?.status || null },
+  });
+
+  return {
+    outcome: verified ? 'sent' : 'failed',
+    applicationId,
+    missingDocuments,
+    attemptCount: nextAttempt,
+    nextCheckAt: nextCheck,
+    message,
+  };
+}

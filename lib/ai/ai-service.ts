@@ -15,6 +15,7 @@ import type {
   GradingResult,
 } from './types';
 import {
+  ElevateProvider,
   OpenAIProvider,
   AnthropicProvider,
   GeminiProvider,
@@ -26,6 +27,7 @@ import {
 } from './providers';
 
 const chatProviders: Record<string, () => AIProvider> = {
+  elevate: () => new ElevateProvider(),
   gemini: () => new GeminiProvider(),
   google: () => new GoogleProvider(),
   groq: () => new GroqProvider(),
@@ -41,10 +43,27 @@ const imageProviders: Record<string, () => AIImageProvider> = {
   stability: () => new StabilityProvider(),
 };
 
-// Course Builder is free-first. Paid providers remain available, but are after
-// the configured Google/Groq/Cloudflare paths unless AI_PROVIDER explicitly
-// selects another provider.
-const chatProviderOrder = ['gemini', 'google', 'groq', 'cloudflare', 'openai', 'anthropic', 'azure'] as const;
+// Provider precedence is fully configurable via AI_PROVIDER_ORDER
+// (comma-separated). The default is self-hosted/free-first: the platform-owned
+// GPU worker leads when configured, then Cloudflare Workers AI and the other
+// low-cost paths, with OpenAI last and optional.
+const DEFAULT_CHAT_PROVIDER_ORDER = ['elevate', 'cloudflare', 'groq', 'gemini', 'google', 'anthropic', 'azure', 'openai'];
+
+function chatProviderOrder(): string[] {
+  const configured = process.env.AI_PROVIDER_ORDER?.trim();
+  if (!configured) return DEFAULT_CHAT_PROVIDER_ORDER;
+  const names = configured
+    .split(',')
+    .map((name) => name.trim().toLowerCase())
+    .filter((name) => name && name !== 'none' && Boolean(chatProviders[name]));
+  const deduped = names.filter((name, index) => names.indexOf(name) === index);
+  // Append any providers not explicitly listed so an override can never
+  // silently remove a working fallback path.
+  for (const name of DEFAULT_CHAT_PROVIDER_ORDER) {
+    if (!deduped.includes(name)) deduped.push(name);
+  }
+  return deduped;
+}
 const CIRCUIT_RECOVERY_WAIT_MS = 31_000;
 const disabledChatProviders = new Set<string>();
 
@@ -72,7 +91,11 @@ function disableProviderForProcess(providerName: string, error: unknown): void {
 }
 
 function configuredDefaultProvider(): string {
-  return String(process.env.AI_PROVIDER || 'gemini').trim().toLowerCase();
+  const configured = process.env.AI_PROVIDER?.trim().toLowerCase();
+  if (configured) return configured;
+  // No explicit preference: lead with the first provider in the configured
+  // order (self-hosted first by default).
+  return chatProviderOrder()[0];
 }
 
 function resolveChatProvider(): AIProvider {
@@ -84,7 +107,7 @@ function resolveChatProvider(): AIProvider {
     logger.warn(`AI provider "${preferred}" not available, trying fallbacks`);
   }
 
-  for (const name of chatProviderOrder) {
+  for (const name of chatProviderOrder()) {
     if (name === preferred || disabledChatProviders.has(name)) continue;
     const provider = chatProviders[name]();
     if (provider.isAvailable()) {
@@ -94,7 +117,7 @@ function resolveChatProvider(): AIProvider {
   }
 
   throw new Error(
-    'No AI chat provider available. Configure GEMINI_API_KEY, GOOGLE_CLOUD_API_KEY, GROQ_API_KEY, Cloudflare Workers AI credentials, OPENAI_API_KEY, ANTHROPIC_API_KEY, or AZURE_OPENAI_API_KEY.',
+    'No AI chat provider available. Configure the Elevate LLM worker (ELEVATE_LLM_URL/ELEVATE_LLM_SECRET), Cloudflare Workers AI credentials, GROQ_API_KEY, GEMINI_API_KEY, GOOGLE_CLOUD_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY, or AZURE_OPENAI_API_KEY.',
   );
 }
 
@@ -103,7 +126,7 @@ function resolveChatCandidates(options: ChatCompletionOptions): AIProvider[] {
     ? String(options.provider)
     : null;
   const preferred = explicit || configuredDefaultProvider();
-  const names = [preferred, ...chatProviderOrder].filter(
+  const names = [preferred, ...chatProviderOrder()].filter(
     (name, index, list) =>
       name !== 'none' &&
       Boolean(chatProviders[name]) &&

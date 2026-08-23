@@ -256,7 +256,7 @@ export interface ExecutionContext {
   intent?: AgentIntent;
 }
 
-export type AIProviderName = 'openai' | 'anthropic' | 'gemini' | 'google' | 'cloudflare' | 'azure' | 'groq' | 'none';
+export type AIProviderName = 'openai' | 'anthropic' | 'gemini' | 'google' | 'cloudflare' | 'azure' | 'groq' | 'elevate' | 'none';
 export type AIImageProviderName = 'dalle' | 'stability' | 'azure' | 'none';
 
 export interface ChatMessage {

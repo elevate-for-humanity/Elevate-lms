@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     env:
-      APP_URL: https://app.elevateforhumanity.org
+      RUNTIME_URL: https://site--elevate-lms--pknyktykz4wg.code.run
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
     steps:
       - name: Require cron secret
@@ -27,12 +27,12 @@ jobs:
           set -euo pipefail
           test -n "$CRON_SECRET" || { echo '::error::CRON_SECRET is not configured'; exit 1; }
 
-      - name: Process canonical notification queue through resilient runtime
+      - name: Process canonical notification queue through direct LMS runtime
         shell: bash
         run: |
           set -euo pipefail
           response_file="$(mktemp)"
-          status="$(curl -sS -X POST "$APP_URL/api/cron/process-notifications" \
+          status="$(curl -sS -X POST "$RUNTIME_URL/api/cron/process-notifications" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             --max-time 60 \

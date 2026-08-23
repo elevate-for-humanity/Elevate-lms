@@ -5,6 +5,7 @@ const instrumentationFile = 'apps/admin/instrumentation.ts';
 const executorFile = 'lib/agentic/executor.ts';
 const readinessFile = 'apps/admin/app/api/ready/route.ts';
 const instrumentation = await readFile(instrumentationFile, 'utf8');
+const rootInstrumentation = await readFile('instrumentation.ts', 'utf8');
 const executor = await readFile(executorFile, 'utf8');
 const readiness = await readFile(readinessFile, 'utf8');
 
@@ -23,6 +24,9 @@ const forbidden = [
 ];
 
 const violations = forbidden.filter((token) => instrumentation.includes(token));
+if (rootInstrumentation.includes("./lib/agentic/executor")) {
+  violations.push('root instrumentation imports the Admin agentic executor');
+}
 if (violations.length) {
   console.error(
     `[verify-admin-instrumentation-boundary] Admin instrumentation imports Node-only rendering dependencies: ${violations.join(', ')}`,

@@ -27,15 +27,6 @@ export async function register() {
       console.warn('[instrumentation] hydrateProcessEnv failed (server will still start):', err instanceof Error ? err.message : err);
     }
 
-    if (process.env.ELEVATE_SERVICE === 'admin') {
-      try {
-        const { startAgenticExecutor } = await import('./lib/agentic/executor');
-        startAgenticExecutor();
-      } catch (err) {
-        console.error('[instrumentation] agentic executor failed to start:', err);
-      }
-    }
-
     if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
       await import('./sentry.server.config');
     }

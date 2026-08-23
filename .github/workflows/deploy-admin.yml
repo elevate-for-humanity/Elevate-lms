@@ -13,6 +13,7 @@ on:
       - 'public/**'
       - 'scripts/northflank/**'
       - 'scripts/verify-admin-instrumentation-boundary.mjs'
+      - 'instrumentation.ts'
       - 'scripts/verify-no-retired-admin-ui-routes.mjs'
       - 'scripts/verify-portal-production-contracts.mjs'
       - 'next.config.mjs'

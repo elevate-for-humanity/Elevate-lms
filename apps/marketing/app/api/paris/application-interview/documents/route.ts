@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - applicant document uploads are authorized by the opaque PARIS application resume session before insert; user_id may remain null until account reconciliation.
 import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { loadAgenticProject } from '@/lib/agentic/project-service';

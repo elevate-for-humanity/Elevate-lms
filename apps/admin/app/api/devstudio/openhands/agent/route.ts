@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { hasPermission } from '@/lib/rbac/role-matrix';
+import { requiresApproval } from '@/lib/devstudio/os/risk';
+import { getOpenHandsConfig, getOpenHandsLifecycle } from '@/lib/devstudio/openhands/client';
+import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
 
-function getOpenHandsConfig() {
-  const apiKey = process.env.OPENHANDS_API_KEY;
-  const baseUrl = (process.env.OPENHANDS_API_URL || 'https://app.all-hands.dev/api/v1').replace(/\/$/, '');
-  const model = process.env.OPENHANDS_MODEL || process.env.OPENAI_MODEL || 'gpt-4.1';
-  return { apiKey, baseUrl, model };
-}
+const CONFIRMATION = 'CONFIRM OPENHANDS EXECUTION';
 
 export async function POST(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
   // Autonomous repository execution is a dev-tool capability. Keep it
-  // super-admin-only even though read/chat Studio access is available to admin.
+  // privileged even though read/chat Studio access is available to admins.
   if (!hasPermission(auth.role, 'access_dev_tools')) {
     return NextResponse.json({ error: 'Super admin required for autonomous agent execution' }, { status: 403 });
   }
@@ -22,59 +20,60 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const task = typeof body?.task === 'string' ? body.task.trim() : '';
-    const workspace = typeof body?.workspace === 'string' && body.workspace.trim()
-      ? body.workspace.trim()
-      : '/workspace';
+    const repository = typeof body?.repository === 'string' ? body.repository.trim() : undefined;
+    const confirmationText = typeof body?.confirmationText === 'string' ? body.confirmationText : '';
 
     if (!task) {
       return NextResponse.json({ error: 'task is required' }, { status: 400 });
     }
 
-    const { apiKey, baseUrl, model: configuredModel } = getOpenHandsConfig();
-    if (!apiKey) {
+    const config = getOpenHandsConfig();
+    if (!config.configured) {
       return NextResponse.json({ error: 'OpenHands API key not configured' }, { status: 503 });
     }
 
-    const headers = {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    };
-
-    const startRes = await fetch(`${baseUrl}/conversations`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ model: configuredModel, workspace }),
-      signal: AbortSignal.timeout(60_000),
-    });
-
-    if (!startRes.ok) {
-      return NextResponse.json({ error: 'Failed to start OpenHands conversation' }, { status: startRes.status });
+    // High-impact repository work must still pass Elevate's approval boundary.
+    if (requiresApproval(task) && confirmationText !== CONFIRMATION) {
+      return NextResponse.json(
+        {
+          error: 'Human approval is required for this OpenHands engineering task.',
+          status: 'approval_required',
+          requiredConfirmation: CONFIRMATION,
+        },
+        { status: 409 },
+      );
     }
 
-    const conversation = await startRes.json();
-    if (!conversation?.id) {
-      return NextResponse.json({ error: 'OpenHands returned no conversation id' }, { status: 502 });
-    }
+    const correlationId =
+      request.headers.get('x-correlation-id') ||
+      request.headers.get('idempotency-key') ||
+      crypto.randomUUID();
 
-    const msgRes = await fetch(`${baseUrl}/conversations/${encodeURIComponent(conversation.id)}/messages`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ message: task }),
-      signal: AbortSignal.timeout(60_000),
+    const dispatched = await dispatchOpenHandsTask({
+      actorId: auth.userId,
+      task,
+      repository,
+      correlationId,
+      tenantId: null,
     });
 
-    if (!msgRes.ok) {
-      return NextResponse.json({ error: 'Failed to submit OpenHands task' }, { status: msgRes.status });
-    }
-
-    return NextResponse.json({
-      success: true,
-      conversationId: conversation.id,
-      status: 'running',
-      provider: 'openhands',
-    });
-  } catch {
-    return NextResponse.json({ error: 'OpenHands connection failed' }, { status: 502 });
+    return NextResponse.json(
+      {
+        success: true,
+        taskId: dispatched.taskId,
+        startTaskId: dispatched.startTaskId,
+        conversationId: dispatched.conversationId ?? null,
+        status: dispatched.status,
+        provider: 'openhands',
+        apiVersion: 'v1',
+      },
+      { status: 202 },
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'OpenHands connection failed' },
+      { status: 502 },
+    );
   }
 }
 
@@ -82,13 +81,48 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
-  const { apiKey, baseUrl, model } = getOpenHandsConfig();
+  const config = getOpenHandsConfig();
+  const url = new URL(request.url);
+  const taskId = url.searchParams.get('taskId');
+  const startTaskId = url.searchParams.get('startTaskId');
+  const conversationId = url.searchParams.get('conversationId');
+
+  if (taskId) {
+    if (!hasPermission(auth.role, 'access_dev_tools')) {
+      return NextResponse.json({ error: 'Super admin required for autonomous agent status' }, { status: 403 });
+    }
+    try {
+      const lifecycle = await refreshOpenHandsTask({ taskId, actorId: auth.userId });
+      return NextResponse.json({ success: true, taskId, provider: 'openhands', lifecycle });
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : 'OpenHands status refresh failed' },
+        { status: 502 },
+      );
+    }
+  }
+
+  if (startTaskId || conversationId) {
+    try {
+      const lifecycle = await getOpenHandsLifecycle({ startTaskId, conversationId });
+      return NextResponse.json({ success: true, provider: 'openhands', lifecycle });
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : 'OpenHands status lookup failed' },
+        { status: 502 },
+      );
+    }
+  }
+
   return NextResponse.json({
-    configured: !!apiKey,
+    configured: config.configured,
     executable: hasPermission(auth.role, 'access_dev_tools'),
     provider: 'openhands',
-    baseUrl,
-    model,
-    capabilities: ['code_generation', 'code_review', 'bug_fixing', 'refactoring', 'testing'],
+    apiVersion: 'v1',
+    baseUrl: config.origin,
+    repository: config.configuredRepository,
+    model: config.model,
+    capabilities: ['code_generation', 'code_review', 'bug_fixing', 'refactoring', 'testing', 'status_polling'],
+    endpoint: '/api/devstudio/openhands/agent',
   });
 }

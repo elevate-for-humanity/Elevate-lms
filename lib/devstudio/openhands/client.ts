@@ -178,6 +178,7 @@ export async function startOpenHandsTask(
 ): Promise<OpenHandsStartTask> {
   const message = normalizeMessage(input.message);
   const repository = validateRepository(input.repository);
+  const { model } = getOpenHandsConfig();
   const metadata: Record<string, string | number | boolean | string[]> = {};
   if (input.traceId) metadata.trace_id = input.traceId;
   if (input.taskId) metadata.elevate_task_id = input.taskId;
@@ -191,6 +192,7 @@ export async function startOpenHandsTask(
         run: true,
       },
       selected_repository: repository,
+      ...(model ? { llm_model: model } : {}),
       observability_span_name: 'elevate_openhands_engineering',
       observability_tags: ['elevate', 'dev-studio', ...(input.tags ?? [])].slice(0, 12),
       observability_metadata: metadata,
@@ -250,7 +252,7 @@ export async function getOpenHandsConversation(
 
 function normalizePrNumbers(value: OpenHandsConversation['pr_number']): number[] {
   if (Array.isArray(value)) return value.filter((item): item is number => Number.isInteger(item));
-  return Number.isInteger(value) ? [value as number] : [];
+  return typeof value === 'number' && Number.isInteger(value) ? [value] : [];
 }
 
 function lifecycleFromConversation(

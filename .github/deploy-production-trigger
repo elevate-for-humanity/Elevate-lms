@@ -1,2 +1,2 @@
 Deploy current protected main to production.
-Retriggered 2026-08-23 after Course Factory media authority, canonical video_jobs uniqueness, course-aware worker, and Remotion instructor URL fixes.
+Retriggered 2026-08-23 after final Course Factory retry/backoff, canonical media readiness, ESB acceptance, provider evidence, and course-aware worker consolidation.

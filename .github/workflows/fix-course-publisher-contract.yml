@@ -1,0 +1,82 @@
+name: Fix Course Publisher Contract
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: fix-course-publisher-contract
+  cancel-in-progress: false
+
+jobs:
+  fix:
+    if: github.event.issue.title == 'FIX COURSE PUBLISHER CONTRACT'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Re-read main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+      - name: Mark started
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue comment ${{ github.event.issue.number }} --body "COURSE PUBLISHER CONTRACT FIX STARTED\n\nMain SHA: $(git rev-parse HEAD)"
+      - name: Patch exact publisher handoff
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          p=Path('lib/course-factory/factory.ts')
+          s=p.read_text()
+          anchor='''    const published = await publishCourse({\n      blueprint: enriched.blueprint,\n      courseTitle,\n      programId: input.programId,\n      contentSource: input.contentSource ?? 'ai',\n      mode: input.mode ?? 'refresh',\n      evidence,\n    });\n\n    let videosQueued = 0;\n'''
+          replacement='''    const published = await publishCourse({\n      blueprint: enriched.blueprint,\n      courseTitle,\n      programId: input.programId,\n      contentSource: input.contentSource ?? 'ai',\n      mode: input.mode ?? 'refresh',\n      evidence,\n    });\n\n    if (!published.success || !published.courseId) {\n      const errors = published.errors?.length\n        ? published.errors\n        : ['Canonical course persistence did not report success or a course ID.'];\n      tracker.emit('error', errors.join('; '), 100);\n      return {\n        ok: false,\n        courseId: published.courseId || undefined,\n        moduleCount: published.moduleCount,\n        lessonCount: published.lessonCount,\n        assessmentsGenerated: enriched.assessmentsGenerated,\n        videosQueued: 0,\n        errors,\n      };\n    }\n\n    let videosQueued = 0;\n'''
+          if anchor not in s:
+              if "if (!published.success || !published.courseId)" in s:
+                  print('Contract already repaired')
+              else:
+                  raise SystemExit('factory publisher anchor changed; refusing unsafe patch')
+          else:
+              p.write_text(s.replace(anchor,replacement,1))
+          PY
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Validate
+        run: |
+          node scripts/check-course-factory-authority.mjs
+          node scripts/check-studio-architecture.mjs
+          pnpm typecheck:studio
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/course-factory/factory.ts
+          if ! git diff --cached --quiet; then
+            git commit -m "fix(course-factory): propagate publisher failure"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Report pass
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue comment ${{ github.event.issue.number }} --body "COURSE PUBLISHER CONTRACT FIX PASS\n\nMain SHA: $(git rev-parse HEAD)"
+      - name: Report fail
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue comment ${{ github.event.issue.number }} --body "COURSE PUBLISHER CONTRACT FIX FAIL\n\nNo completion claim is valid."

@@ -61,6 +61,7 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const [userActivated, setUserActivated] = useState(false);
   const [manualAudioOverride, setManualAudioOverride] = useState(false);
   const transcriptId = useId();
@@ -72,6 +73,7 @@ export default function HeroVideo({
 
   useEffect(() => {
     setVideoFailed(false);
+    setVideoReady(false);
     setMuted(true);
     setManualAudioOverride(false);
 
@@ -166,7 +168,7 @@ export default function HeroVideo({
         className={`relative isolate w-full overflow-hidden flex items-end bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
-        {posterImage && !showVideo ? (
+        {posterImage ? (
           <div
             className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${posterImage})` }}
@@ -187,13 +189,15 @@ export default function HeroVideo({
             disablePictureInPicture
             onCanPlay={() => {
               const video = videoRef.current;
+              setVideoReady(true);
               if (video?.paused) void video.play().catch(() => {});
             }}
             onError={() => {
+              setVideoReady(false);
               setVideoFailed(true);
               setMuted(true);
             }}
-            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center`}
+            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-500 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           >
             {mobileSource && mobileSource !== desktopSource ? (

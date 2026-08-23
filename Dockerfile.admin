@@ -70,6 +70,7 @@ ENV GITHUB_SHA=$GITHUB_SHA
 ENV GIT_SHA=$GIT_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$NEXT_PUBLIC_GIT_SHA
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+ENV REMOTION_BROWSER_EXECUTABLE=/usr/bin/chromium-browser
 
 # FFmpeg/ffprobe are required by the canonical Media Studio commercial renderer.
 RUN apk add --no-cache curl ffmpeg \

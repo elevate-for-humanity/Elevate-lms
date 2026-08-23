@@ -21,7 +21,7 @@ export type ParisApplicationDecision = {
   };
 };
 
-const FINAL_STATUSES = new Set(['denied', 'withdrawn', 'closed', 'enrolled']);
+const FINAL_STATUSES = new Set(['approved', 'denied', 'withdrawn', 'closed', 'enrolled']);
 const APPROVED_DOCUMENT_STATES = new Set(['approved', 'accepted', 'verified']);
 
 function present(value: unknown) {
@@ -179,7 +179,7 @@ export async function evaluateAndAdvanceApplication(
       pending_review: pendingReview,
       decision: decidedStatus,
       requirements_satisfied: complete,
-      requires_authorized_review: complete,
+      requires_authorized_review: complete && decidedStatus !== 'approved',
     },
   };
 
@@ -197,7 +197,7 @@ export async function evaluateAndAdvanceApplication(
       actor_id: actorId || null,
       actor_role: 'paris',
       reason: 'PARIS self-service requirements evaluation',
-      metadata: { progress, missing, pendingReview, complete, requiresAuthorizedReview: complete, source: 'paris_self_service' },
+      metadata: { progress, missing, pendingReview, complete, requiresAuthorizedReview: complete && decidedStatus !== 'approved', source: 'paris_self_service' },
     });
   } else {
     await supabase.from('applications').update({ metadata, updated_at: now }).eq('id', application.id);
@@ -209,9 +209,11 @@ export async function evaluateAndAdvanceApplication(
       ? `Complete: ${missing[0]}`
       : pendingReview[0]
         ? `Waiting for: ${pendingReview[0]}`
-        : complete
-          ? 'Application requirements are satisfied and ready for authorized review.'
-          : 'Continue application.';
+        : decidedStatus === 'approved'
+          ? 'Application has been approved.'
+          : complete
+            ? 'Application requirements are satisfied and ready for authorized review.'
+            : 'Continue application.';
 
   return {
     applicationId: application.id,
@@ -219,7 +221,7 @@ export async function evaluateAndAdvanceApplication(
     decidedStatus,
     progress,
     complete,
-    approved: String(application.status || '').toLowerCase() === 'approved',
+    approved: decidedStatus === 'approved',
     missing,
     pendingReview,
     completed,

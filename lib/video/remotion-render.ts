@@ -270,8 +270,10 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     const { renderMedia, selectComposition } = await import('@remotion/renderer');
     const { registerUsageEvent } = await import('@remotion/licensing');
 
+    const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
     const composition = await selectComposition({
       serveUrl: bundleUrl,
+      browserExecutable,
       id: 'ElevateLesson',
       inputProps: compositionProps,
     });
@@ -292,6 +294,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     await renderMedia({
       composition,
       serveUrl: bundleUrl,
+      browserExecutable,
       codec: 'h264',
       outputLocation: paths.videoPath,
       inputProps: compositionProps,

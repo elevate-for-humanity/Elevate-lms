@@ -158,7 +158,10 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               slug: lesson.slug,
               title: lesson.title,
               lesson_type: stepType,
-              order_index: lesson.order,
+              // order is module-local in canonical blueprints. The live schema also
+              // enforces UNIQUE(course_id, order_index), so persist a stable global
+              // index using the long-established 1000-per-module convention.
+              order_index: courseModule.orderIndex * 1000 + lesson.order,
               objective: lesson.objective ?? null,
               content,
               content_json: experience ? { experience } : {},

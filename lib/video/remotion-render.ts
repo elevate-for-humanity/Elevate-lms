@@ -114,7 +114,11 @@ const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
   },
 };
 
-// One real portrait is packaged with every Admin image and served by the Remotion bundle.\n// Keep rendering deterministic even when optional instructor-specific portraits are absent.\nconst CANONICAL_PACKAGED_INSTRUCTOR_IMAGE = '/images/instructors/marcus-johnson.jpg';\n\nconst DEFAULT_INSTRUCTOR: InstructorConfig = INSTRUCTOR_CONFIGS['marcus-johnson'];
+// One real portrait is packaged with every Admin image and served by the Remotion bundle.
+// Keep rendering deterministic even when optional instructor-specific portraits are absent.
+const CANONICAL_PACKAGED_INSTRUCTOR_IMAGE = '/images/instructors/marcus-johnson.jpg';
+
+const DEFAULT_INSTRUCTOR: InstructorConfig = INSTRUCTOR_CONFIGS['marcus-johnson'];
 
 function getInstructor(instructorId?: string): InstructorConfig {
   if (instructorId && INSTRUCTOR_CONFIGS[instructorId]) {
@@ -184,6 +188,9 @@ async function getBundleUrl(): Promise<string> {
   const { bundle } = await import('@remotion/bundler');
   _bundleUrl = await bundle({
     entryPoint,
+    // Explicitly package static assets. The Admin server runs from apps/admin,
+    // while canonical instructor media lives in that runtime public directory.
+    publicDir: path.join(process.cwd(), 'public'),
     // Webpack override: mark Node-only modules as external so they don't
     // get bundled into the browser-side Remotion bundle.
     webpackOverride: (config) => ({

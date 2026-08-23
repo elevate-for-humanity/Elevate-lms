@@ -1,5 +1,4 @@
-import { logger } from '@/lib/logger';
-import { createClient } from '@/lib/supabase/server';
+import { auditLog } from '@/lib/logging/auditLog';
 
 export type AuditAction = {
   action: string;
@@ -9,27 +8,18 @@ export type AuditAction = {
 };
 
 /**
- * Simple audit log wrapper for admin safeguard actions.
- * For admin-specific mutations, use logAdminAudit from @/lib/admin/audit-log.
- * For API-layer audit wrapping, use withApiAudit from @/lib/audit/withApiAudit.
+ * Compatibility adapter for the remaining case-manager safeguard callers.
+ *
+ * Canonical replacement: @/lib/logging/auditLog.
+ * Removal condition: migrate the remaining logAction callers to auditLog directly.
  */
 export async function logAction(actor_id: string, actor_role: string, payload: AuditAction) {
-  const supabase = await createClient();
-
-  const { error } = await supabase.from('audit_logs').insert({
-    user_id: actor_id,
+  return auditLog({
+    actorId: actor_id,
+    actorRole: actor_role,
     action: payload.action,
-    resource_type: payload.entity_type ?? null,
-    resource_id: payload.entity_id ?? null,
-    details: {
-      ...payload.metadata,
-      actor_role,
-    },
-    success: true,
-    created_at: new Date().toISOString(),
+    entity: payload.entity_type ?? 'unknown',
+    entityId: payload.entity_id,
+    metadata: payload.metadata,
   });
-
-  if (error) {
-    logger.error('audit log insert failed', error);
-  }
 }

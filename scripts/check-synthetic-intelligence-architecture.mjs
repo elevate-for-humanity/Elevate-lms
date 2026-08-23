@@ -21,6 +21,8 @@ for (const path of [
   'lib/ai/tools/planner.ts',
   'lib/ai/tools/executor.ts',
   'lib/ai/providers/elevate.ts',
+  'lib/ai/providers/cloudflare.ts',
+  'lib/ai/providers/structured-output.ts',
   'lib/platform/planner.ts',
   'lib/platform/orchestration/context-service.ts',
   'lib/platform/orchestration/evaluator.ts',
@@ -43,6 +45,10 @@ requireText('lib/ai/ai-service.ts', 'AI_PROVIDER_ORDER', 'configurable provider 
 requireText('lib/ai/providers/elevate.ts', 'ELEVATE_LLM_URL', 'self-hosted inference endpoint configuration');
 requireText('lib/ai/providers/elevate.ts', 'ELEVATE_LLM_SECRET', 'self-hosted inference bearer secret');
 requireText('lib/ai/providers/elevate.ts', '/v1/chat/completions', 'OpenAI-compatible self-hosted inference API');
+requireText('lib/ai/providers/elevate.ts', 'normalizeStructuredOutput', 'self-hosted structured output normalization');
+requireText('lib/ai/providers/cloudflare.ts', 'normalizeStructuredOutput', 'Cloudflare structured output normalization');
+requireText('lib/ai/providers/structured-output.ts', 'extractBalancedJson', 'structured JSON extraction');
+requireText('lib/ai/providers/structured-output.ts', 'escapeLiteralControlsInStrings', 'structured JSON control-character repair');
 requireText('services/llm-gpu-worker/entrypoint.sh', 'vllm', 'vLLM runtime');
 requireText('scripts/northflank/provision-llm-worker.ts', 'ELEVATE_LLM_URL', 'Northflank LLM URL wiring');
 requireText('scripts/northflank/provision-llm-worker.ts', 'ELEVATE_LLM_SECRET', 'Northflank LLM secret wiring');
@@ -94,6 +100,7 @@ if (errors.length) {
 console.log('Synthetic intelligence architecture gate: PASS');
 console.log('- self-hosted Elevate/vLLM inference is present and registered first');
 console.log('- external providers remain fallback paths behind the canonical AI service');
+console.log('- structured JSON output is normalized for Cloudflare and Elevate open-model paths');
 console.log('- canonical agent/tool runtime retained');
 console.log('- planner checkpoints and uses persisted ai_tasks');
 console.log('- shared context composes existing memory/workflow/RAG authorities');

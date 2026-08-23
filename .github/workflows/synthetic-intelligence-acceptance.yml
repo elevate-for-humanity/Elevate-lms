@@ -9,15 +9,20 @@ on:
     paths:
       - 'lib/ai/ai-service.ts'
       - 'lib/ai/providers/**'
+      - 'lib/ai/runtime/**'
+      - 'lib/ai/tools/**'
       - 'lib/platform/planner.ts'
       - 'lib/platform/orchestration/**'
       - 'lib/workflows/**'
       - 'lib/devstudio/os/**'
+      - 'lib/devstudio/openhands/**'
       - 'apps/admin/app/api/devstudio/plan/**'
+      - 'apps/admin/app/api/devstudio/openhands/**'
       - 'services/llm-gpu-worker/**'
       - 'scripts/northflank/provision-llm-worker.ts'
       - 'scripts/check-synthetic-intelligence-architecture.mjs'
       - 'tests/unit/course-factory/structured-output.test.ts'
+      - 'tests/unit/ai/openhands-planner.test.ts'
       - '.github/workflows/synthetic-intelligence-acceptance.yml'
 
 permissions:
@@ -86,11 +91,24 @@ jobs:
             code=1
           else
             pnpm typecheck:studio >> /tmp/synthetic-validation.log 2>&1 || code=1
-            pnpm exec vitest run tests/unit/course-factory/structured-output.test.ts >> /tmp/synthetic-validation.log 2>&1 || code=1
+            pnpm exec vitest run \
+              tests/unit/course-factory/structured-output.test.ts \
+              tests/unit/ai/openhands-planner.test.ts \
+              >> /tmp/synthetic-validation.log 2>&1 || code=1
             pnpm exec eslint \
               lib/ai/providers/structured-output.ts \
               lib/ai/providers/cloudflare.ts \
               lib/ai/providers/elevate.ts \
+              lib/ai/runtime/command-executor.ts \
+              lib/ai/tools/registry.ts \
+              lib/ai/tools/planner.ts \
+              lib/ai/tools/executor.ts \
+              lib/devstudio/os/task-runner.ts \
+              lib/devstudio/openhands/client.ts \
+              lib/devstudio/openhands/runtime.ts \
+              lib/devstudio/openhands/github-verifier.ts \
+              apps/admin/app/api/devstudio/openhands/chat/route.ts \
+              apps/admin/app/api/devstudio/openhands/agent/route.ts \
               lib/platform/planner.ts \
               lib/platform/orchestration/context-service.ts \
               lib/platform/orchestration/evaluator.ts \
@@ -101,7 +119,7 @@ jobs:
               --quiet >> /tmp/synthetic-validation.log 2>&1 || code=1
           fi
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 300 /tmp/synthetic-validation.log
+          tail -n 400 /tmp/synthetic-validation.log
           exit 0
 
       - name: Post result
@@ -116,8 +134,8 @@ jobs:
           script: |
             const fs = require('fs');
             const ok = process.env.INSTALL_CODE === '0' && process.env.ARCH_CODE === '0' && process.env.VALIDATION_CODE === '0';
-            const arch = fs.existsSync('/tmp/synthetic-architecture.log') ? fs.readFileSync('/tmp/synthetic-architecture.log','utf8').slice(-12000) : '';
-            const validation = fs.existsSync('/tmp/synthetic-validation.log') ? fs.readFileSync('/tmp/synthetic-validation.log','utf8').slice(-22000) : '';
+            const arch = fs.existsSync('/tmp/synthetic-architecture.log') ? fs.readFileSync('/tmp/synthetic-architecture.log','utf8').slice(-14000) : '';
+            const validation = fs.existsSync('/tmp/synthetic-validation.log') ? fs.readFileSync('/tmp/synthetic-validation.log','utf8').slice(-26000) : '';
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,

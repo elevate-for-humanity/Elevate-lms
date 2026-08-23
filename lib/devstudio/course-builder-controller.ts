@@ -7,6 +7,7 @@
  */
 export {
   courseFactory,
+  courseFactory as courseBuilderController,
   auditCourseGovernance,
   publishGovernedCourse,
   repairCanonicalCourse,

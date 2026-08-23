@@ -1,4 +1,5 @@
 import { courseFactory } from '../../lib/course-factory';
+import { publishCourse } from '../../lib/course-factory/publisher';
 import { queueCourseLessonVideos } from '../../lib/course-factory/media-service';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { requireAdminClient } from '../../lib/supabase/admin';
@@ -273,6 +274,59 @@ async function auditCourse(courseId: string) {
   }
 }
 
+async function checkpointStructure(db: AdminDb, programId: string, blueprint: Awaited<ReturnType<typeof getBlueprintBySlug>>) {
+  if (!blueprint) fail('Business blueprint not found');
+  const { data: existing, error: existingError } = await db
+    .from('courses')
+    .select('id,program_id')
+    .eq('slug', PROGRAM_SLUG)
+    .maybeSingle();
+  if (existingError) fail(`Existing course lookup failed: ${existingError.message}`);
+
+  const [{ count: moduleCount }, { count: lessonCount }] = existing?.id
+    ? await Promise.all([
+        db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', existing.id),
+        db.from('course_lessons').select('id', { count: 'exact', head: true }).eq('course_id', existing.id),
+      ])
+    : [{ count: 0 }, { count: 0 }];
+
+  if (existing?.id && existing.program_id === programId && moduleCount === EXPECTED_MODULES && lessonCount === EXPECTED_LESSONS) {
+    return existing.id as string;
+  }
+
+  const checkpoint = await publishCourse({
+    programId,
+    courseSlug: PROGRAM_SLUG,
+    courseTitle: blueprint.title || blueprint.credentialTitle || 'Business Administration',
+    blueprint,
+    contentSource: 'blueprint',
+    mode: 'replace',
+  });
+  if (!checkpoint.success || !checkpoint.courseId) {
+    fail(`Deterministic structure checkpoint failed: ${checkpoint.errors.join(' | ')}`);
+  }
+  if (checkpoint.moduleCount !== EXPECTED_MODULES || checkpoint.lessonCount !== EXPECTED_LESSONS) {
+    fail(`Deterministic checkpoint returned ${checkpoint.moduleCount} modules/${checkpoint.lessonCount} lessons`);
+  }
+
+  const { error: stateError } = await db
+    .from('courses')
+    .update({
+      status: 'draft',
+      is_active: false,
+      generation_status: 'content_pending',
+      generation_progress: 15,
+      total_lessons: EXPECTED_LESSONS,
+      review_status: 'draft',
+      published_at: null,
+    })
+    .eq('id', checkpoint.courseId);
+  if (stateError) fail(`Deterministic checkpoint state update failed: ${stateError.message}`);
+
+  console.log(`[Business Course Builder] deterministic checkpoint ready ${checkpoint.courseId}: ${EXPECTED_MODULES} modules/${EXPECTED_LESSONS} lessons`);
+  return checkpoint.courseId;
+}
+
 async function getReusableCourse(db: AdminDb, programId: string): Promise<string | null> {
   const { data: course, error } = await db
     .from('courses')
@@ -282,7 +336,7 @@ async function getReusableCourse(db: AdminDb, programId: string): Promise<string
   if (error) fail(`Existing course lookup failed: ${error.message}`);
   if (!course?.id || course.program_id !== programId) return null;
 
-  const [{ count: moduleCount, error: moduleError }, { count: lessonCount, error: lessonError }] =
+  const [{ count: moduleCount, error: moduleError }, { data: lessons, error: lessonError }] =
     await Promise.all([
       db
         .from('course_modules')
@@ -290,13 +344,26 @@ async function getReusableCourse(db: AdminDb, programId: string): Promise<string
         .eq('course_id', course.id),
       db
         .from('course_lessons')
-        .select('id', { count: 'exact', head: true })
+        .select('content,learning_objectives,script,content_json,generation_status')
         .eq('course_id', course.id),
     ]);
 
   if (moduleError) fail(`Existing module count failed: ${moduleError.message}`);
-  if (lessonError) fail(`Existing lesson count failed: ${lessonError.message}`);
-  return moduleCount === EXPECTED_MODULES && lessonCount === EXPECTED_LESSONS ? course.id : null;
+  if (lessonError) fail(`Existing lesson inspection failed: ${lessonError.message}`);
+  if (moduleCount !== EXPECTED_MODULES || (lessons ?? []).length !== EXPECTED_LESSONS) return null;
+
+  const complete = (lessons ?? []).every((lesson) => {
+    const payloadLength = instructionalText(lesson.content).replace(/\s+/g, ' ').trim().length;
+    return (
+      payloadLength >= 1000 &&
+      Array.isArray(lesson.learning_objectives) && lesson.learning_objectives.length >= 3 &&
+      typeof lesson.script === 'string' && lesson.script.trim().length >= 200 &&
+      Boolean(lesson.content_json && typeof lesson.content_json === 'object') &&
+      ['generated', 'completed', 'verification_ready', 'certificate_ready', 'published'].includes(lesson.generation_status ?? '')
+    );
+  });
+
+  return complete ? course.id : null;
 }
 
 async function main() {
@@ -314,6 +381,8 @@ async function main() {
   if (programError || !program?.id) {
     fail(`Canonical program not found: ${programError?.message ?? PROGRAM_SLUG}`);
   }
+
+  await checkpointStructure(db, program.id, blueprint);
 
   let courseId = await getReusableCourse(db, program.id);
   let moduleCount = EXPECTED_MODULES;
@@ -333,7 +402,18 @@ async function main() {
       videoMode: 'queue',
     });
     if (!build.ok || !build.courseId) {
-      fail(`Course Factory failed: ${JSON.stringify(build.errors ?? [])}`);
+      const { data: checkpoint } = await db
+        .from('courses')
+        .select('id')
+        .eq('slug', PROGRAM_SLUG)
+        .maybeSingle();
+      if (checkpoint?.id) {
+        await db
+          .from('courses')
+          .update({ generation_status: 'failed_retryable', generation_progress: 15, status: 'draft', is_active: false })
+          .eq('id', checkpoint.id);
+      }
+      fail(`Course Factory failed after deterministic checkpoint: ${JSON.stringify(build.errors ?? [])}`);
     }
     if (build.moduleCount !== EXPECTED_MODULES || build.lessonCount !== EXPECTED_LESSONS) {
       fail(`Factory returned ${build.moduleCount} modules/${build.lessonCount} lessons`);

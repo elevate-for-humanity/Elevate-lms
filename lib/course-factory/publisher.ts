@@ -237,7 +237,9 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
                       readiness: experience.readiness ?? null,
                     }
                   : null),
-              generation_status: experience ? 'generated' : 'pending',
+              // course_lessons_generation_status_check accepts queued/generating/generated/approved.
+              // Blueprint-only shells are durable work waiting for enrichment, so queued is canonical.
+              generation_status: experience ? 'generated' : 'queued',
               last_generated_at: experience ? new Date().toISOString() : null,
             };
           }),

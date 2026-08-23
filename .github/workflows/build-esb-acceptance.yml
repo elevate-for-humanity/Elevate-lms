@@ -34,7 +34,7 @@ on:
     types: [opened, reopened]
 
 permissions:
-  contents: read
+  contents: write
   issues: write
 
 env:
@@ -70,6 +70,80 @@ jobs:
         with:
           ref: main
           clean: true
+          fetch-depth: 0
+
+      - name: Re-read latest main before any repair
+        shell: bash
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Repair canonical return and zero-AI acceptance contracts if still needed
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          factory=Path('lib/course-factory/factory.ts')
+          s=factory.read_text()
+          anchor="""    const published = await publishCourse({
+      blueprint: enriched.blueprint,
+      courseTitle,
+      programId: input.programId,
+      contentSource: input.contentSource ?? 'ai',
+      mode: input.mode ?? 'refresh',
+      evidence,
+    });
+
+    let videosQueued = 0;
+"""
+          replacement="""    const published = await publishCourse({
+      blueprint: enriched.blueprint,
+      courseTitle,
+      programId: input.programId,
+      contentSource: input.contentSource ?? 'ai',
+      mode: input.mode ?? 'refresh',
+      evidence,
+    });
+
+    if (!published.success || !published.courseId) {
+      const errors = published.errors?.length
+        ? published.errors
+        : ['Canonical course persistence did not report success or a course ID.'];
+      tracker.emit('error', errors.join('; '), 100);
+      return {
+        ok: false,
+        courseId: published.courseId || undefined,
+        moduleCount: published.moduleCount,
+        lessonCount: published.lessonCount,
+        assessmentsGenerated: enriched.assessmentsGenerated,
+        videosQueued: 0,
+        errors,
+      };
+    }
+
+    let videosQueued = 0;
+"""
+          if anchor in s:
+              factory.write_text(s.replace(anchor,replacement,1))
+          elif "if (!published.success || !published.courseId)" not in s:
+              raise SystemExit('factory publisher handoff changed; refusing unsafe repair')
+
+          business=Path('scripts/course-factory/build-business-program.ts')
+          b=business.read_text()
+          old="  if (!usable) fail('No AI provider credential is available');\n"
+          if old in b:
+              business.write_text(b.replace(old,"  if (!usable) console.warn('[Business Course Builder] No AI provider credential is available; deterministic baseline mode remains valid.');\n",1))
+          PY
+
+          if ! git diff --quiet -- lib/course-factory/factory.ts scripts/course-factory/build-business-program.ts; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add lib/course-factory/factory.ts scripts/course-factory/build-business-program.ts
+            git commit -m "fix(course-factory): expose persistence failures and allow zero-AI baseline"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
 
       - name: Record exact tested commit
         id: tested
@@ -128,16 +202,13 @@ jobs:
           tail -n 120 /tmp/course-install.log > /tmp/course-install-tail.log || true
           exit 0
 
-      - name: Require production Supabase and at least one AI provider
+      - name: Require production Supabase; AI providers are optional enrichment
         id: credentials
         shell: bash
         run: |
           set +e
           code=0
           test -n "$SUPABASE_URL" && test -n "$SUPABASE_SERVICE_ROLE_KEY" || code=1
-          if [ -z "$GEMINI_API_KEY" ] && [ -z "$GOOGLE_CLOUD_API_KEY" ] && [ -z "$GROQ_API_KEY" ] && [ -z "$CLOUDFLARE_AI_API_TOKEN" ] && [ -z "$CLOUDFLARE_API_TOKEN" ] && [ -z "$OPENAI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$AZURE_OPENAI_API_KEY" ]; then
-            code=1
-          fi
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 

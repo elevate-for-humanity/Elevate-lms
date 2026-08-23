@@ -279,7 +279,6 @@ async function waitForMedia(courseId: string, lessons: Array<Record<string, any>
 
 async function main() {
   const db = await requireAdminClient();
-  const providerKeys = await hydrateProductionAISecrets(db);
   const blueprint = await getBlueprintBySlug(COURSE_SLUG);
   if (!blueprint) fail('unbranded Entrepreneurship blueprint could not be resolved');
   assertNoProviderBranding('resolved blueprint', blueprint);
@@ -297,7 +296,8 @@ async function main() {
     expected_lessons: EXPECTED_LESSONS,
     expected_main_videos: EXPECTED_MAIN_VIDEOS,
     expected_microclips: EXPECTED_MICROCLIPS,
-    provider_count: providerKeys.length,
+    provider_count: 0,
+    build_mode: 'deterministic',
     blueprint: blueprint.credentialCode,
   });
 
@@ -305,7 +305,7 @@ async function main() {
   const build = await courseFactory({
     blueprint,
     mode: 'replace',
-    contentSource: 'ai',
+    contentSource: 'curriculum_lessons',
     videoMode: 'queue',
   });
 

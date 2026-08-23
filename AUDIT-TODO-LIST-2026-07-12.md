@@ -557,3 +557,14 @@ app/(marketing)/platform-architecture/       [CREATE]
 - [ ] Deploy Marketing at commit `86e70c6` or a descendant and verify exact live SHA.
 - [ ] Re-run the public-route crawl after deployment and attach HTTP status/final-destination evidence.
 - [ ] If real-time chat is required, implement an authenticated chat provider, availability state, queue/fallback behavior, transcript retention policy, and accessibility testing before restoring “Live Chat” language.
+
+
+### Testing checkout production blocker — verified August 23, 2026
+
+- [x] Confirm the public Testing checkout UI renders and offers priced exams.
+- [x] Send a real production checkout-session request for one ESCO Core exam; production returned HTTP 503 `Payment system not configured.`
+- [x] Repair the missing runtime-secret hydration before `getStripe()` in `/api/testing/checkout` (commit `c5d5927`).
+- [ ] Deploy Marketing at `c5d5927` or a descendant and repeat session-creation verification.
+- [ ] Confirm the production runtime contains a valid least-privilege `STRIPE_RESTRICTED_KEY` or `STRIPE_SECRET_KEY`; never commit or expose the value.
+- [ ] Complete a Stripe test-mode payment and verify signed webhook processing, payment record, booking record, success return, confirmation notification, and idempotency.
+- [ ] Do not claim student checkout is production-ready until all downstream persistence checks pass.

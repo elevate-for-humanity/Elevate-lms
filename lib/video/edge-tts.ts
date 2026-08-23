@@ -66,6 +66,38 @@ async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
   });
 }
 
+async function generateLocalNarration(text: string): Promise<Buffer> {
+  const wav = await new Promise<Buffer>((resolve, reject) => {
+    const speech = spawn('espeak-ng', ['--stdin', '--stdout', '-v', 'en-us', '-s', '155']);
+    const output: Buffer[] = [];
+    const errors: Buffer[] = [];
+    speech.stdout.on('data', (chunk: Buffer) => output.push(chunk));
+    speech.stderr.on('data', (chunk: Buffer) => errors.push(chunk));
+    speech.on('error', reject);
+    speech.on('close', (code) => {
+      const result = Buffer.concat(output);
+      if (code !== 0 || !result.length) reject(new Error(`local narration failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 300)}`));
+      else resolve(result);
+    });
+    speech.stdin.end(text, 'utf8');
+  });
+
+  return new Promise((resolve, reject) => {
+    const ffmpeg = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-f', 'wav', '-i', 'pipe:0', '-codec:a', 'libmp3lame', '-b:a', '128k', '-f', 'mp3', 'pipe:1']);
+    const output: Buffer[] = [];
+    const errors: Buffer[] = [];
+    ffmpeg.stdout.on('data', (chunk: Buffer) => output.push(chunk));
+    ffmpeg.stderr.on('data', (chunk: Buffer) => errors.push(chunk));
+    ffmpeg.on('error', reject);
+    ffmpeg.on('close', (code) => {
+      const result = Buffer.concat(output);
+      if (code !== 0 || !result.length) reject(new Error(`local narration transcode failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 300)}`));
+      else resolve(result);
+    });
+    ffmpeg.stdin.end(wav);
+  });
+}
+
 async function generateGeminiNarration(text: string): Promise<Buffer> {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
@@ -142,6 +174,13 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
     return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
   } catch (edgeError) {
     logger.warn('[Narration] Edge TTS unavailable; trying authenticated providers', { error: edgeError instanceof Error ? edgeError.message : String(edgeError) });
+  }
+
+  try {
+    logger.info('[Narration] Using zero-credit local espeak-ng fallback');
+    return await generateLocalNarration(normalizedText);
+  } catch (localError) {
+    logger.warn('[Narration] Local narration unavailable; trying authenticated providers', { error: localError instanceof Error ? localError.message : String(localError) });
   }
 
   if (process.env.ELEVENLABS_API_KEY?.trim()) {

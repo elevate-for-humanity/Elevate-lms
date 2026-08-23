@@ -16,14 +16,13 @@ permissions:
   contents: read
   issues: write
 
-concurrency:
-  group: northflank-production-full
-  cancel-in-progress: true
-
 jobs:
   deploy-all:
     if: github.event_name != 'issues' || github.event.issue.title == 'DEPLOY PRODUCTION ALL SERVICES'
     name: Sync, configure, build, and verify Marketing + LMS + Admin
+    concurrency:
+      group: northflank-production-full
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}

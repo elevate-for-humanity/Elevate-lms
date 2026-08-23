@@ -40,12 +40,23 @@ const adminConfig = {
 
   transpilePackages: ['edge-tts'],
 
-  webpack(config, { isServer }) {
+  webpack(config, { isServer, nextRuntime }) {
     config.resolve.alias['@'] = ROOT;
 
     config.resolve.alias[
       'next/dist/server/route-modules/app-page/vendored/contexts/loadable'
     ] = 'next/dist/shared/lib/loadable-context.shared-runtime.js';
+
+    if (nextRuntime === 'edge') {
+      config.resolve.fallback = {
+        ...(config.resolve.fallback ?? {}),
+        fs: false,
+        'fs/promises': false,
+        path: false,
+        os: false,
+        child_process: false,
+      };
+    }
 
     if (isServer) {
       config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.ts');

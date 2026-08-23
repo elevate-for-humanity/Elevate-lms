@@ -46,7 +46,7 @@ const roleContracts = [
   "serviceRole === 'admin'",
   "process.env.ELEVATE_SERVICE = 'admin'",
 ];
-const missingRoleContracts = roleContracts.filter((token) => !instrumentation.includes(token));
+const missingRoleContracts = roleContracts.filter((token) => !(instrumentation + nodeInstrumentation).includes(token));
 if (missingRoleContracts.length) {
   console.error(
     `[verify-admin-instrumentation-boundary] Admin service-role normalization regressed: ${missingRoleContracts.join(', ')}`,

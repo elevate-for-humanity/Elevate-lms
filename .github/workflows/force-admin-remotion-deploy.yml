@@ -19,7 +19,7 @@ jobs:
     environment: production
     timeout-minutes: 90
     env:
-      TARGET_SHA: c10fc34256c38a4e5448c0ced58da2eb99ded0e1
+      TARGET_SHA: ${{ github.sha }}
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}

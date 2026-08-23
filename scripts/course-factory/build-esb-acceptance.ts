@@ -336,8 +336,8 @@ async function verifyPlayableMediaAndApprove(
   const { error: auditError } = await db.from('course_audit_log').insert({
     course_id: courseId,
     actor_id: null,
-    action: 'approved',
-    metadata: evidence,
+    action: 'updated',
+    metadata: { ...evidence, stage: 'automated_policy_approved' },
   });
   if (auditError) fail(`automatic review evidence could not be persisted: ${auditError.message}`);
   const { error: reviewError } = await db.from('courses').update({

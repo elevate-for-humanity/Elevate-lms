@@ -142,11 +142,18 @@ async function importCourses(
         },
       });
       const body = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(String(body?.error || 'Course Builder import failed'));
+      if (!response.ok) {
+        logger.error(
+          'Course Builder import failed',
+          new Error(typeof body?.error === 'string' ? body.error : `HTTP ${response.status}`),
+        );
+        throw new Error('Course Builder import failed');
+      }
       result.imported++;
     } catch (error) {
       result.failed++;
-      result.errors.push(`${record.name || record.course_name || 'Unknown'}: ${error instanceof Error ? error.message : 'Import failed'}`);
+      if (error instanceof Error) logger.error('Course import row failed', error);
+      result.errors.push(`${record.name || record.course_name || 'Unknown'}: Import failed: see logs`);
     }
   }
   result.success = result.failed === 0;

@@ -53,7 +53,7 @@ function metadataValue(metadata: Record<string, unknown> | null, ...keys: string
 
 async function resolveCourseTarget(project: AgenticProjectRow, run: AgenticRunRow): Promise<CourseTarget> {
   const db = await requireAdminClient();
-  let courseId = project.target_id ?? metadataValue(project.metadata, 'courseId', 'course_id');
+  const courseId = project.target_id ?? metadataValue(project.metadata, 'courseId', 'course_id');
   let programId = metadataValue(project.metadata, 'programId', 'program_id');
   let programSlug = metadataValue(project.metadata, 'programSlug', 'program_slug');
 

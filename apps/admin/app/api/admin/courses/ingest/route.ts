@@ -9,7 +9,7 @@ import { isOpenAIConfigured, getOpenAIClient } from '@/lib/ai/openai-client';
 import { loadIndustryStandards } from '@/lib/industry/standards-loader';
 import { buildBlueprintSystemPrompt } from '@/lib/ai/prompts/course-blueprint';
 import { logger } from '@/lib/logger';
-import { queueCourseLessonVideos } from '@/lib/course-builder/video-queue';
+import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
 import {
   SAFE_CHARS,
   MAX_CHARS,
@@ -127,10 +127,10 @@ async function _POST(request: Request) {
         created_by: auth.id,
       });
 
-      let videoQueueResult: Awaited<ReturnType<typeof queueCourseLessonVideos>> | null = null;
+      let videoQueueResult: Awaited<ReturnType<typeof queueCourseMedia>> | null = null;
       if (queue_videos !== false && result.courseId) {
         try {
-          videoQueueResult = await queueCourseLessonVideos({
+          videoQueueResult = await queueCourseMedia({
             courseId: result.courseId,
             limit: typeof video_queue_limit === 'number' ? video_queue_limit : null,
             onlyMissing: true,
@@ -277,10 +277,10 @@ async function _POST(request: Request) {
       created_by: auth.id,
     });
 
-    let videoQueueResult: Awaited<ReturnType<typeof queueCourseLessonVideos>> | null = null;
+    let videoQueueResult: Awaited<ReturnType<typeof queueCourseMedia>> | null = null;
     if (queue_videos !== false && result.courseId) {
       try {
-        videoQueueResult = await queueCourseLessonVideos({
+        videoQueueResult = await queueCourseMedia({
           courseId: result.courseId,
           limit: typeof video_queue_limit === 'number' ? video_queue_limit : null,
           onlyMissing: true,

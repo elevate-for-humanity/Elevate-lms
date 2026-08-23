@@ -2,6 +2,11 @@ name: Notification Queue Worker
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/lms/app/api/cron/process-notifications/**'
+      - '.github/workflows/notification-queue-worker.yml'
   schedule:
     - cron: '*/5 * * * *'
 

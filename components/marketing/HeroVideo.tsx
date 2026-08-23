@@ -166,7 +166,7 @@ export default function HeroVideo({
         className={`relative isolate w-full overflow-hidden flex items-end bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
-        {posterImage && !desktopSource ? (
+        {posterImage ? (
           <div
             className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${posterImage})` }}
@@ -183,6 +183,7 @@ export default function HeroVideo({
             loop
             playsInline
             muted
+            poster={posterImage}
             disablePictureInPicture
             onCanPlay={() => {
               const video = videoRef.current;
@@ -192,7 +193,7 @@ export default function HeroVideo({
               setVideoFailed(true);
               setMuted(true);
             }}
-            className={`absolute inset-0 z-10 h-full w-full bg-slate-900 ${mediaClass} object-center`}
+            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           >
             {mobileSource && mobileSource !== desktopSource ? (

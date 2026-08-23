@@ -1,12 +1,16 @@
 name: Deploy production (all services)
 
-# Manual full-platform recovery/deploy. Synchronizes the shared production
-# environment, configures all Northflank services, then builds and verifies
-# Marketing, LMS, and Admin from the same commit.
+# Full-platform recovery/deploy. Synchronizes the shared production environment,
+# configures all Northflank services, then builds and verifies Marketing, LMS,
+# and Admin from the same commit.
 on:
   workflow_dispatch:
   issues:
     types: [opened, reopened]
+  push:
+    branches: [main]
+    paths:
+      - '.github/deploy-production-trigger'
 
 permissions:
   contents: read

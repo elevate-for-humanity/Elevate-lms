@@ -155,7 +155,7 @@ async function waitForCanonicalMedia() {
     if (signature !== lastSignature) {
       lastSignature = signature;
       console.log('[ESB acceptance] media progress', state);
-      await logAcceptance('media_progress', state as unknown as Record<string, unknown>);
+      await logAcceptance(db, 'media_progress', state as unknown as Record<string, unknown>);
       await reportMediaEvidence();
     }
 
@@ -196,7 +196,7 @@ function reviewOnlyIssues(issues: string[]) {
 
 async function runGovernanceAndPublish(media: Awaited<ReturnType<typeof getCourseMediaState>>) {
   const db = await requireAdminClient();
-  await logAcceptance('automated_policy_passed', {
+  await logAcceptance(db, 'automated_policy_passed', {
     ruleset: AUTOMATED_REVIEW_RULESET,
     media_expected: media.expectedTotal,
     media_playable: media.playable,
@@ -209,7 +209,7 @@ async function runGovernanceAndPublish(media: Awaited<ReturnType<typeof getCours
 
   if (!health.pass && reviewOnlyIssues(health.blocking_issues)) {
     if (!reviewerId) {
-      await logAcceptance('waiting_authorized_review', { blocking_issues: health.blocking_issues });
+      await logAcceptance(db, 'waiting_authorized_review', { blocking_issues: health.blocking_issues });
       fail(`authorized human review required before canonical publication: ${health.blocking_issues.join(' | ')}`);
     }
 
@@ -235,7 +235,7 @@ async function runGovernanceAndPublish(media: Awaited<ReturnType<typeof getCours
     label: 'ESB canonical production acceptance',
   });
   if (!published.ok) fail(`canonical publisher blocked ESB: ${(published.blocking_issues ?? []).join(' | ') || published.error}`);
-  await logAcceptance('canonical_publish_passed', { procurement_gate: published.procurement_gate });
+  await logAcceptance(db, 'canonical_publish_passed', { procurement_gate: published.procurement_gate });
 }
 
 async function main() {
@@ -244,7 +244,7 @@ async function main() {
   const blueprint = await getBlueprintBySlug(COURSE_SLUG);
   if (!blueprint) fail('Entrepreneurship blueprint could not be resolved');
 
-  await logAcceptance('started', {
+  await logAcceptance(structure.db, 'started', {
     course_id: COURSE_ID,
     modules: structure.modules,
     lessons: structure.lessons,
@@ -279,7 +279,7 @@ async function main() {
     fail(`publication verification failed: status=${finalState.course.status}, active=${finalState.course.is_active}, published_at=${finalState.course.published_at ?? 'null'}`);
   }
 
-  await logAcceptance('passed', {
+  await logAcceptance(finalState.db, 'passed', {
     modules: finalState.modules,
     lessons: finalState.lessons,
     assessment_questions: finalState.assessments,

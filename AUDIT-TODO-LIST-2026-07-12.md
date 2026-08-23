@@ -1,4 +1,104 @@
 # Elevate LMS - Comprehensive Audit TODO List
+
+## LIVE WEBSITE NAVIGATION, LEGAL, ACCESSIBILITY & DESIGN BACKLOG — AUGUST 23, 2026
+
+Evidence baseline: live Marketing crawl plus repository comparison at 08af7b649f36e788cde35c05099738961a3c3c37.
+Rule: do not mark an item complete until the corrected Marketing SHA is live and the affected route or interaction passes production verification.
+
+### Completed in main — awaiting production verification
+
+| Priority | Item | Evidence / implementation |
+|---|---|---|
+| P0 | Legacy legal terms recovery | Added /legal/terms compatibility route to canonical /terms-of-service. |
+| P0 | Obsolete membership recovery | Added /membership compatibility route to the current Store rather than leaving an inbound 404. It is not restored as a primary navigation item. |
+| P0 | Credential-verification dead link | Compliance Center now targets the working LMS verifier at https://app.elevateforhumanity.org/verify-credentials. |
+
+### Corrected audit record
+
+- The supplied “12+ legal 404s” report was stale. Live checks returned HTTP 200 for data sharing, FERPA consent, EULA, acceptable use, license agreement, program license agreement, marketplace terms, enrollment agreement, participation agreement, employer agreement, partner MOU, disclosures, governance, policies, grievance, student handbook, privacy, security, accessibility, and federal compliance.
+- Confirmed dead routes before remediation: /legal/terms, /membership, and the Marketing-hosted /verify-credentials target.
+- The live footer already uses canonical /terms-of-service; /membership is not part of current homepage navigation.
+- /legal/privacy correctly resolves to canonical /privacy; retain one canonical privacy document.
+- Legal and funding repetition must not be removed blindly. Shared language should use governed reusable components with versioned legal copy so required disclosures remain visible at decision points.
+
+### P0 — production verification and functional integrity
+
+- [ ] Deploy current Marketing main and verify its exact live SHA.
+- [ ] Verify /legal/terms permanently resolves to /terms-of-service without a 404 or redirect loop.
+- [ ] Verify /membership permanently resolves to /store and is not reintroduced into primary navigation.
+- [ ] Verify Compliance Center credential verification opens the LMS verifier.
+- [ ] Crawl every header, footer, Compliance Center, Legal index, application, funding, program, host-shop, testing, and portal link; record status, final host, redirect chain, and visible destination.
+- [ ] Test application deep-link recovery for missing, expired, malformed, and valid session IDs.
+- [ ] Test PARIS on narrow mobile viewports for overflow, hidden actions, keyboard obstruction, and recoverable session state.
+- [ ] Verify dynamic PARIS status and validation messages use appropriate aria-live, focus management, and nonvisual error summaries.
+
+### P1 — accessibility and communication consistency
+
+- [ ] Run automated and manual WCAG 2.2 AA checks for Homepage, Programs, Funding, Apply, Host Shops, Legal, Compliance, Contact, and shared header/footer.
+- [ ] Measure text/background contrast for hero overlays, saturated cards, footer copy, disclaimers, disabled controls, links, focus rings, and small text. Do not rely on visual estimates.
+- [ ] Verify keyboard order, skip link, mobile-menu focus trap, visible focus, reduced motion, zoom/reflow at 200–400%, form labels, error associations, and screen-reader announcements.
+- [ ] Inventory info@, support@, named compliance contacts, and Gmail references. Approve one public support address and document specialized compliance/admissions aliases.
+- [ ] Remove consumer Gmail addresses from canonical public and legal pages unless a documented fallback is required.
+- [ ] Keep support@elevateforhumanity.org as the current canonical footer address unless leadership approves a different routing policy.
+
+### P1 — design and conversion roadmap
+
+#### Homepage
+
+- [ ] Evaluate a compact trust bar below the hero using only current authorized marks and accurately scoped claims. Do not imply DOL, DWD, WIOA, ETPL, or other agency endorsement.
+- [ ] Add a visible audio state/volume indicator tied to actual playback; respect reduced motion and provide a nonanimated alternative.
+- [ ] Preserve the video hero, poster fallback, responsive crop, controls, and no-flash hydration behavior.
+
+#### Programs catalog
+
+- [ ] Make filters sticky or persistently reopenable on mobile without covering results or breaking keyboard navigation.
+- [ ] Add wage badges only when backed by current authoritative BLS/O*NET/state data, with occupation mapping, geography, source date, and a not-guaranteed disclosure. Never invent average starting salaries.
+
+#### Funding and eligibility
+
+- [ ] Add an accessible process map: application → agency orientation/eligibility → authorization → enrollment.
+- [ ] Keep /funding as the explanatory hub and /check-eligibility as the interactive tool unless analytics and user testing prove consolidation improves completion.
+- [ ] Convert repeated funding language into one governed disclosure component while retaining required context at each decision.
+
+#### Application workspace
+
+- [ ] Implement resilient cookie/account-backed session recovery with expiry, consent, and cross-device behavior documented.
+- [ ] Evaluate secure mobile document capture with camera input, crop/quality checks, encrypted upload, malware scanning, least-privilege access, audit logging, retention/deletion rules, and explicit consent.
+- [ ] Do not casually capture or retain Social Security cards. Confirm legal necessity and provide a safer alternative before adding SS-card scanning.
+
+#### Host-site network
+
+- [ ] Evaluate an accessible map/list toggle with address privacy, consent, loading performance, keyboard controls, and a non-map fallback.
+- [ ] Add shop preference/favorite functionality only after defining the data model, consent, placement disclaimer, staff workflow, and rule that preference does not guarantee placement.
+
+#### Legal and compliance
+
+- [ ] Keep /legal as the canonical Policy Center and consider sidebar navigation inside the existing legal family; do not collapse distinct documents into one unversioned page.
+- [ ] Add route-integrity tests for every link declared by the Legal index and Compliance Center.
+- [ ] Verify hash targets such as /legal/disclosures#attendance exist, receive focus when appropriate, and remain readable beneath the sticky header.
+
+#### Contact
+
+- [ ] Show live support or response-time estimates only when sourced from actual telemetry with freshness, business-hours logic, fallback copy, and no unsupported under-five-minute promise.
+
+### P2 — duplication and content governance
+
+- [ ] Compare funding disclaimers across Programs, Funding, Eligibility, and FAQ; centralize identical policy text while preserving page-specific explanations.
+- [ ] Reuse canonical CDL/HVAC program data across Programs, Funding, and Approvals while retaining context-specific calls to action.
+- [ ] Review overlap among Equal Opportunity, Federal Compliance, and Grievance; preserve legally distinct purposes and cross-link shared authority.
+- [ ] Add one canonical public-contact configuration consumed by header, footer, Contact, Legal, Compliance, structured data, and transactional templates.
+- [ ] Add CI route tests that fail when public navigation points to a missing Marketing route or the wrong platform host.
+
+### Exit criteria
+
+- Zero confirmed header/footer/Legal/Compliance 404s.
+- No portal link hosted on the wrong Elevate service.
+- Canonical Privacy and Terms routes have one destination each with compatibility redirects.
+- WCAG findings have measured evidence and no critical or serious unresolved violations on primary flows.
+- Public emails follow an approved routing policy.
+- No unsourced wage, endorsement, response-time, or placement claims.
+- Marketing exact live SHA and post-deployment crawl are attached to completion evidence.
+
 **Date:** July 12, 2026  
 **Status:** PHASE 1 IN PROGRESS  
 **Auditor:** OpenHands Agent

@@ -13,8 +13,9 @@ export const metadata: Metadata = {
 };
 
 const POLICIES = [
-  { title: 'Terms of Service', href: '/legal', desc: 'Platform and program terms of use.' },
-  { title: 'Privacy Policy', href: '/legal/privacy', desc: 'Data collection, use, and protection.' },
+  { title: 'Terms of Service', href: '/terms-of-service', desc: 'Platform and program terms of use.' },
+  { title: 'Privacy Policy', href: '/privacy', desc: 'Data collection, use, and protection.' },
+  { title: 'Student Handbook', href: '/legal/student-handbook', desc: 'Student rights, responsibilities, conduct, and program expectations.' },
   { title: 'Refund Policy', href: '/tuition-fees#refund', desc: 'Tuition refund schedule and procedures.' },
   { title: 'Satisfactory Academic Progress', href: '/satisfactory-academic-progress', desc: 'SAP standards for funded students.' },
   { title: 'Attendance Policy', href: '/legal/disclosures#attendance', desc: 'Attendance requirements by program type.' },

@@ -19,7 +19,7 @@ const SECTIONS = [
     icon: Scale,
     links: [
       { href: '/legal', label: 'Terms of Service' },
-      { href: '/legal/privacy', label: 'Privacy Policy' },
+      { href: '/privacy', label: 'Privacy Policy' },
       { href: '/security-and-data-protection', label: 'Data Protection Statement' },
       { href: '/policies', label: 'All Policies Index' },
     ],

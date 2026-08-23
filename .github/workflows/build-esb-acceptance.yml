@@ -11,7 +11,7 @@ on:
       - 'scripts/check-studio-architecture.mjs'
       - 'scripts/check-course-media-authority.mjs'
       - 'scripts/audit-course-builder-procurement.mjs'
-      - 'tests/course-factory-media-authority.test.ts'
+      - 'tests/unit/course-factory/media-authority.test.ts'
       - '.github/workflows/build-esb-acceptance.yml'
       - 'lib/ai/ai-service.ts'
       - 'lib/ai/providers/**'
@@ -169,7 +169,7 @@ jobs:
             lib/course-factory \
             lib/devstudio/course-builder-controller.ts \
             --quiet >> /tmp/course-targeted.log 2>&1 || code=1
-          pnpm exec vitest run tests/course-factory-media-authority.test.ts >> /tmp/course-targeted.log 2>&1 || code=1
+          pnpm exec vitest run tests/unit/course-factory/media-authority.test.ts >> /tmp/course-targeted.log 2>&1 || code=1
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           tail -n 300 /tmp/course-targeted.log
           exit 0

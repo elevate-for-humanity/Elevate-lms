@@ -18,7 +18,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 async function kickCanonicalWorker(): Promise<void> {
-  const secret = await getSecret('CRON_SECRET');
+  const secret = process.env.CRON_SECRET?.trim() || await getSecret('CRON_SECRET');
   if (!secret?.trim()) {
     logger.warn('[video-background-worker] CRON_SECRET is unavailable; queue tick skipped');
     return;

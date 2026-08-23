@@ -1,4 +1,5 @@
 import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '../types';
+import { normalizeStructuredOutput } from './structured-output';
 
 const MODELS = [
   '@cf/meta/llama-3.1-8b-instruct',
@@ -53,7 +54,7 @@ export class CloudflareProvider implements AIProvider {
           lastError = new Error(`Cloudflare ${model} returned no text content`);
           continue;
         }
-        return { content: String(content), model };
+        return { content: normalizeStructuredOutput(String(content), options), model };
       } catch (error) {
         lastError = error as Error;
       }

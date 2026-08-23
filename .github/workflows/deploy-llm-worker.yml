@@ -1,0 +1,81 @@
+name: Deploy Elevate LLM Worker
+
+on:
+  issues:
+    types: [opened, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: elevate-llm-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-llm-worker:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == 'DEPLOY ELEVATE LLM WORKER'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 180
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+      NORTHFLANK_LLM_PROJECT_ID: elevate-media-gpu
+      NORTHFLANK_GPU_REGION: us-central
+      NORTHFLANK_LLM_SERVICE_ID: elevate-llm-worker
+      NORTHFLANK_GPU_TYPE: l4-24
+      NORTHFLANK_GPU_COUNT: '1'
+      NORTHFLANK_LLM_DEPLOYMENT_PLAN: nf-gpu-l4-24-1g
+      NORTHFLANK_GPU_BUILD_PLAN: nf-compute-800-16
+      NORTHFLANK_LLM_MODEL_VOLUME_ID: elevate-llm-models
+      NORTHFLANK_LLM_MODEL_VOLUME_MB: '81920'
+      LLM_MODEL: Qwen/Qwen2.5-7B-Instruct
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Verify provisioner and credentials
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -n "$NORTHFLANK_API_TOKEN"
+          test -f scripts/northflank/provision-llm-worker.ts
+          test -f services/llm-gpu-worker/Dockerfile
+          pnpm tsx scripts/northflank/provision-llm-worker.ts
+
+      - name: Post start evidence
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: `ELEVATE LLM DEPLOYMENT STARTED\n\nMain SHA: ${context.sha}` })
+
+      - name: Provision and accept Elevate LLM
+        run: pnpm tsx scripts/northflank/provision-llm-worker.ts --execute
+
+      - name: Post completion evidence
+        if: always() && github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: `ELEVATE LLM DEPLOYMENT ${process.env.JOB_STATUS === 'success' ? 'PASS' : 'FAIL'}\n\nMain SHA: ${context.sha}` })
+        env:
+          JOB_STATUS: ${{ job.status }}

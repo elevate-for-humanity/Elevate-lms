@@ -20,6 +20,7 @@ for (const path of [
   'lib/ai/tools/registry.ts',
   'lib/ai/tools/planner.ts',
   'lib/ai/tools/executor.ts',
+  'lib/ai/providers/elevate.ts',
   'lib/platform/planner.ts',
   'lib/platform/orchestration/context-service.ts',
   'lib/platform/orchestration/evaluator.ts',
@@ -27,11 +28,24 @@ for (const path of [
   'lib/workflows/action-policy.ts',
   'lib/devstudio/os/task-runner.ts',
   'apps/admin/app/api/devstudio/plan/route.ts',
+  'services/llm-gpu-worker/Dockerfile',
+  'services/llm-gpu-worker/entrypoint.sh',
+  'scripts/northflank/provision-llm-worker.ts',
 ]) requireFile(path);
 
 if (exists('lib/platform/orchestration/agent-planner.ts')) {
   errors.push('duplicate high-level planner authority still exists: lib/platform/orchestration/agent-planner.ts');
 }
+
+requireText('lib/ai/ai-service.ts', "elevate: () => new ElevateProvider()", 'self-hosted Elevate provider registration');
+requireText('lib/ai/ai-service.ts', "['elevate', 'cloudflare', 'groq', 'gemini', 'google', 'anthropic', 'azure', 'openai']", 'self-hosted/free-first provider order');
+requireText('lib/ai/ai-service.ts', 'AI_PROVIDER_ORDER', 'configurable provider ordering');
+requireText('lib/ai/providers/elevate.ts', 'ELEVATE_LLM_URL', 'self-hosted inference endpoint configuration');
+requireText('lib/ai/providers/elevate.ts', 'ELEVATE_LLM_SECRET', 'self-hosted inference bearer secret');
+requireText('lib/ai/providers/elevate.ts', '/v1/chat/completions', 'OpenAI-compatible self-hosted inference API');
+requireText('services/llm-gpu-worker/entrypoint.sh', 'vllm', 'vLLM runtime');
+requireText('scripts/northflank/provision-llm-worker.ts', 'ELEVATE_LLM_URL', 'Northflank LLM URL wiring');
+requireText('scripts/northflank/provision-llm-worker.ts', 'ELEVATE_LLM_SECRET', 'Northflank LLM secret wiring');
 
 requireText('lib/ai/tools/registry.ts', 'allowedAgents', 'agent tool permissions');
 requireText('lib/ai/tools/registry.ts', 'allowedRoles', 'role tool permissions');
@@ -69,19 +83,7 @@ requireText('lib/devstudio/os/task-runner.ts', "from('ai_approvals')", 'human ap
 requireText('lib/devstudio/os/task-runner.ts', "from('ai_memory')", 'task-result memory persistence');
 requireText('lib/devstudio/os/task-runner.ts', 'writeDevAuditLog', 'agent audit logging');
 
-requireText('.github/workflows/dev-studio-course-builder.yml', 'AI_PROVIDER: cloudflare', 'Cloudflare-first Course Builder preference');
 requireText('lib/course-factory/publisher.ts', 'courseModule.orderIndex * 1000 + lesson.order', 'globally unique canonical lesson order');
-
-const inferenceSignals = [
-  'services/inference-gpu-worker',
-  'lib/ai/providers/elevate.ts',
-  'lib/ai/providers/elevate-provider.ts',
-].filter(exists);
-if (inferenceSignals.length) {
-  notes.push(`self-hosted inference signal(s) detected: ${inferenceSignals.join(', ')}`);
-} else {
-  notes.push('self-hosted inference not yet on main; external inference remains behind canonical AI service while OpenHands work is in progress');
-}
 
 if (errors.length) {
   console.error('Synthetic intelligence architecture gate: FAIL');
@@ -90,9 +92,10 @@ if (errors.length) {
 }
 
 console.log('Synthetic intelligence architecture gate: PASS');
-for (const note of notes) console.log(`- ${note}`);
+console.log('- self-hosted Elevate/vLLM inference is present and registered first');
+console.log('- external providers remain fallback paths behind the canonical AI service');
 console.log('- canonical agent/tool runtime retained');
-console.log('- planner now checkpoints and uses persisted ai_tasks');
+console.log('- planner checkpoints and uses persisted ai_tasks');
 console.log('- shared context composes existing memory/workflow/RAG authorities');
 console.log('- evaluator and approval-aware plan state present');
 console.log('- workflow primitives are governed separately from domain AI tools');

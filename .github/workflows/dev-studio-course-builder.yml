@@ -1,0 +1,166 @@
+name: Dev Studio Course Builder Control Plane
+
+on:
+  workflow_dispatch:
+    inputs:
+      program:
+        description: Course package to build through Dev Studio -> Course Builder
+        required: true
+        type: choice
+        default: business-administration
+        options:
+          - business-administration
+          - esb
+  issues:
+    types: [opened, reopened]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/dev-studio-course-builder.yml'
+      - 'lib/devstudio/course-builder-controller.ts'
+      - 'lib/course-builder/**'
+      - 'lib/course-factory/**'
+      - 'lib/curriculum/blueprints/**'
+      - 'scripts/course-factory/build-business-program.ts'
+      - 'scripts/course-factory/build-esb-acceptance.ts'
+      - 'scripts/check-course-factory-authority.mjs'
+      - 'scripts/check-studio-architecture.mjs'
+      - 'scripts/audit-course-builder-procurement.mjs'
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  CI: true
+  NODE_ENV: production
+  AI_CIRCUIT_RECOVERY_WAIT: '1'
+  AI_PROVIDER: gemini
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  GOOGLE_CLOUD_API_KEY: ${{ secrets.GOOGLE_CLOUD_API_KEY }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  CLOUDFLARE_AI_API_TOKEN: ${{ secrets.CLOUDFLARE_AI_API_TOKEN }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+  ADMIN_URL: ${{ secrets.ADMIN_URL }}
+  CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+jobs:
+  dev-studio-course-builder:
+    if: >-
+      github.event_name != 'issues' ||
+      github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE' ||
+      github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    concurrency:
+      group: dev-studio-course-builder-${{ github.event_name == 'workflow_dispatch' && inputs.program || github.event.issue.title || 'push' }}
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+
+      - name: Record canonical control-plane revision
+        id: tested
+        shell: bash
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          test -f lib/devstudio/course-builder-controller.ts
+
+      - name: Post Dev Studio start evidence
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        env:
+          TESTED_SHA: ${{ steps.tested.outputs.sha }}
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `DEV STUDIO -> COURSE BUILDER STARTED\n\nExact checked-out main SHA: ${process.env.TESTED_SHA}`,
+            });
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies deterministically
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Enforce Studio as control plane and Course Builder as orchestration authority
+        run: |
+          node scripts/check-course-factory-authority.mjs
+          node scripts/check-studio-architecture.mjs
+          node scripts/audit-course-builder-procurement.mjs
+          pnpm typecheck:studio
+          pnpm exec eslint lib/devstudio/course-builder-controller.ts lib/course-builder lib/course-factory --quiet
+
+      - name: Require production persistence and AI provider
+        shell: bash
+        run: |
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          if [ -z "$GEMINI_API_KEY" ] && [ -z "$GOOGLE_CLOUD_API_KEY" ] && [ -z "$GROQ_API_KEY" ] && [ -z "$CLOUDFLARE_AI_API_TOKEN" ] && [ -z "$CLOUDFLARE_API_TOKEN" ] && [ -z "$OPENAI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$AZURE_OPENAI_API_KEY" ]; then
+            echo 'No AI provider credential is configured.' >&2
+            exit 1
+          fi
+
+      - name: Resolve requested package
+        id: target
+        shell: bash
+        run: |
+          target="business-administration"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            target="${{ inputs.program }}"
+          elif [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN ESB COURSE BUILDER ACCEPTANCE" ]; then
+            target="esb"
+          fi
+          echo "program=$target" >> "$GITHUB_OUTPUT"
+
+      - name: Build through canonical Dev Studio controlled Course Builder
+        env:
+          NODE_OPTIONS: --conditions=react-server
+        shell: bash
+        run: |
+          if [ "${{ steps.target.outputs.program }}" = "esb" ]; then
+            pnpm tsx scripts/course-factory/build-esb-acceptance.ts
+          else
+            pnpm tsx scripts/course-factory/build-business-program.ts
+          fi
+
+      - name: Verify Admin and LMS consumers after governed publication
+        run: |
+          pnpm exec eslint apps/admin/app/api/admin/course-builder apps/lms/app/lms/courses apps/lms/app/api/learner/interactions --quiet
+          pnpm build:admin
+          pnpm build:lms
+
+      - name: Post Dev Studio completion evidence
+        if: always() && github.event_name == 'issues'
+        uses: actions/github-script@v7
+        env:
+          JOB_STATUS: ${{ job.status }}
+          TESTED_SHA: ${{ steps.tested.outputs.sha }}
+          PROGRAM: ${{ steps.target.outputs.program }}
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `DEV STUDIO -> COURSE BUILDER ${process.env.JOB_STATUS === 'success' ? 'PASS' : 'FAIL'}\n\nProgram: ${process.env.PROGRAM || 'unresolved'}\nTested main SHA: ${process.env.TESTED_SHA || 'unknown'}`,
+            });

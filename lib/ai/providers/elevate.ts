@@ -1,4 +1,5 @@
 import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '../types';
+import { normalizeStructuredOutput } from './structured-output';
 
 const DEFAULT_TIMEOUT_MS = 120_000;
 const SERVED_MODEL = 'elevate-local';
@@ -82,7 +83,7 @@ export class ElevateProvider implements AIProvider {
     const completionTokens = payload.usage?.completion_tokens ?? 0;
 
     return {
-      content: String(content),
+      content: normalizeStructuredOutput(String(content), options),
       model: payload.model || SERVED_MODEL,
       usage: {
         promptTokens,

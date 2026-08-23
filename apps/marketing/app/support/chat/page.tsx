@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { MessageCircle, Clock, Phone, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Live Chat | Elevate Support',
-  description: 'Chat with our support team in real-time. Get instant help with your questions.',
+  title: 'Support Options | Elevate Support',
+  description: 'Contact Elevate support by web form, phone, or email.',
 };
 
 export default function SupportChatPage() {
@@ -17,9 +17,9 @@ export default function SupportChatPage() {
           <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <MessageCircle className="w-8 h-8 text-brand-blue-600" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">Live Chat</h1>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">Support Options</h1>
           <p className="text-slate-600 mb-8">
-            Our live chat is available during business hours. Connect with a support specialist for instant help.
+            Choose the support channel that works best for you. Web requests are routed to the support team during business hours.
           </p>
           <div className="space-y-3">
             <Link
@@ -27,7 +27,7 @@ export default function SupportChatPage() {
               className="w-full inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
-              Start Chat
+              Contact Support
             </Link>
             <div className="flex items-center justify-center gap-4 text-sm text-slate-500 mt-6">
               <div className="flex items-center gap-1">

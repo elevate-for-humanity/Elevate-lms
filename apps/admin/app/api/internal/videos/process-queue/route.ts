@@ -14,19 +14,14 @@ function renderConcurrency(): number {
   return Math.max(1, Math.min(Math.trunc(parsed), 4));
 }
 
-async function syncLessonQueueState(
-  db: Awaited<ReturnType<typeof requireAdminClient>>,
-  rows: Array<{ lesson_id?: string | null; asset_kind?: string | null }>,
-) {
-  const lessonIds = rows
-    .filter((row) => (row.asset_kind ?? 'lesson') === 'lesson' && row.lesson_id)
-    .map((row) => row.lesson_id as string);
-  if (!lessonIds.length) return;
-
-  await db
-    .from('course_lessons')
-    .update({ video_status: 'queued', video_error: null })
-    .in('id', lessonIds);
+async function requestedCourseId(request: NextRequest): Promise<string | null> {
+  try {
+    const body = await request.json();
+    const value = body && typeof body.courseId === 'string' ? body.courseId.trim() : '';
+    return value || null;
+  } catch {
+    return null;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -35,51 +30,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  const courseId = await requestedCourseId(request);
   const db = await requireAdminClient();
-  const now = new Date().toISOString();
-
-  // Recover workers that died after claiming a job.
-  const staleBefore = new Date(Date.now() - 45 * 60 * 1000).toISOString();
-  const { data: recovered } = await db
-    .from('video_jobs')
-    .update({
-      status: 'queued',
-      started_at: null,
-      completed_at: null,
-      error_message: 'Recovered after render worker timeout',
-      queued_at: now,
-      updated_at: now,
-    })
-    .eq('status', 'rendering')
-    .lt('started_at', staleBefore)
-    .select('lesson_id,asset_kind,asset_key');
-  await syncLessonQueueState(db, recovered ?? []);
-
-  // One-time recovery path for the historical Edge TTS datacenter 403 failures.
-  // Current narration code falls back to authenticated speech, so these jobs are
-  // safe to retry instead of remaining permanently dead.
-  const retryCutoff = new Date(Date.now() - 30 * 60 * 1000).toISOString();
-  const { data: retried403 } = await db
-    .from('video_jobs')
-    .update({
-      status: 'queued',
-      started_at: null,
-      completed_at: null,
-      error_message: 'Retrying after authenticated narration fallback upgrade',
-      queued_at: now,
-      updated_at: now,
-    })
-    .eq('status', 'failed')
-    .eq('error_message', 'Unexpected server response: 403')
-    .lt('updated_at', retryCutoff)
-    .select('lesson_id,asset_kind,asset_key');
-  await syncLessonQueueState(db, retried403 ?? []);
-
   const maxConcurrent = renderConcurrency();
-  const { count: activeCount, error: activeError } = await db
+
+  let activeQuery = db
     .from('video_jobs')
     .select('id', { count: 'exact', head: true })
     .eq('status', 'rendering');
+  if (courseId) activeQuery = activeQuery.eq('course_id', courseId);
+  const { count: activeCount, error: activeError } = await activeQuery;
   if (activeError) {
     return NextResponse.json({ error: 'Unable to inspect the video queue' }, { status: 500 });
   }
@@ -91,32 +51,30 @@ export async function POST(request: NextRequest) {
       ok: true,
       started: 0,
       reason: 'render-capacity-full',
+      courseId,
       active,
       maxConcurrent,
-      recovered: recovered?.length ?? 0,
-      retried403: retried403?.length ?? 0,
     });
   }
 
-  const { data: candidates, error: queueError } = await db
+  let candidateQuery = db
     .from('video_jobs')
     .select('*')
-    .eq('status', 'queued')
+    .eq('status', 'queued');
+  if (courseId) candidateQuery = candidateQuery.eq('course_id', courseId);
+  const { data: candidates, error: queueError } = await candidateQuery
     // Full lesson media is learner-critical and drains before microclips.
     .order('asset_kind', { ascending: true })
+    // Stable FIFO order within the same asset class prevents starvation.
     .order('queued_at', { ascending: true })
+    .order('id', { ascending: true })
     .limit(availableSlots);
+
   if (queueError) {
     return NextResponse.json({ error: 'Unable to read the video queue' }, { status: 500 });
   }
   if (!candidates?.length) {
-    return NextResponse.json({
-      ok: true,
-      started: 0,
-      reason: 'queue-empty',
-      recovered: recovered?.length ?? 0,
-      retried403: retried403?.length ?? 0,
-    });
+    return NextResponse.json({ ok: true, started: 0, reason: 'queue-empty', courseId });
   }
 
   const claimedJobs: VideoJob[] = [];
@@ -136,7 +94,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (!claimedJobs.length) {
-    return NextResponse.json({ ok: true, started: 0, reason: 'already-claimed' });
+    return NextResponse.json({ ok: true, started: 0, reason: 'already-claimed', courseId });
   }
 
   after(async () => {
@@ -145,6 +103,7 @@ export async function POST(request: NextRequest) {
       if (result.status === 'rejected') {
         logger.error('[video-worker] Background processor failed', result.reason, {
           jobId: claimedJobs[index]?.id,
+          courseId: claimedJobs[index]?.course_id,
         });
       }
     });
@@ -153,17 +112,18 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(
     {
       ok: true,
+      courseId,
       started: claimedJobs.length,
       jobs: claimedJobs.map((job) => ({
         jobId: job.id,
+        courseId: job.course_id,
         lessonId: job.lesson_id,
         assetKind: job.asset_kind ?? 'lesson',
         assetKey: job.asset_key ?? null,
+        retryCount: job.retry_count ?? 0,
       })),
       activeBeforeClaim: active,
       maxConcurrent,
-      recovered: recovered?.length ?? 0,
-      retried403: retried403?.length ?? 0,
     },
     { status: 202 },
   );

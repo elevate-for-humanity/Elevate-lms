@@ -261,14 +261,32 @@ export async function remediateMissingApplicationDocuments(
     );
   } catch (error) {
     const failureReason = error instanceof Error ? error.message : 'Reminder execution failed';
+    const retryAt = new Date(now.getTime() + RECHECK_MS).toISOString();
     await db.from('automation_followups').update({
       state: 'failed',
       execution_status: 'failed',
+      attempt_count: nextAttempt,
+      last_attempt_at: nowIso,
+      last_action_key: null,
       failure_reason: failureReason,
-      next_check_at: new Date(now.getTime() + RECHECK_MS).toISOString(),
+      next_check_at: retryAt,
     }).eq('workflow_key', WORKFLOW_KEY).eq('subject_type', 'application').eq('subject_id', applicationId);
-    await audit(applicationId, { triggerType, outcome: 'failed', missingDocuments, failureReason });
-    return { outcome: 'failed', applicationId, missingDocuments, attemptCount, message: failureReason };
+    await audit(applicationId, {
+      triggerType,
+      outcome: 'failed',
+      missingDocuments,
+      attemptCount: nextAttempt,
+      failureReason,
+      retryAt,
+    });
+    return {
+      outcome: 'failed',
+      applicationId,
+      missingDocuments,
+      attemptCount: nextAttempt,
+      nextCheckAt: retryAt,
+      message: failureReason,
+    };
   }
 
   const { data: delivery } = await db

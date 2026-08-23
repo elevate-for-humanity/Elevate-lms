@@ -9,7 +9,9 @@ on:
       - 'scripts/course-factory/build-business-program.ts'
       - 'scripts/check-course-factory-authority.mjs'
       - 'scripts/check-studio-architecture.mjs'
+      - 'scripts/check-course-media-authority.mjs'
       - 'scripts/audit-course-builder-procurement.mjs'
+      - 'tests/course-factory-media-authority.test.ts'
       - '.github/workflows/build-esb-acceptance.yml'
       - 'lib/ai/ai-service.ts'
       - 'lib/ai/providers/**'
@@ -56,6 +58,7 @@ env:
   AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
   ADMIN_URL: ${{ secrets.ADMIN_URL }}
   CRON_SECRET: ${{ secrets.CRON_SECRET }}
+  COURSE_REVIEWER_ID: ${{ secrets.COURSE_REVIEWER_ID }}
 
 jobs:
   build-audit-publish:
@@ -174,7 +177,7 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - name: Enforce Studio, Course Builder, and procurement architecture
+      - name: Enforce Studio, Course Builder, media, and procurement architecture
         id: architecture
         shell: bash
         run: |
@@ -183,12 +186,14 @@ jobs:
           code1=$?
           node scripts/check-studio-architecture.mjs >> /tmp/course-architecture.log 2>&1
           code2=$?
-          node scripts/audit-course-builder-procurement.mjs >> /tmp/course-architecture.log 2>&1
+          node scripts/check-course-media-authority.mjs >> /tmp/course-architecture.log 2>&1
           code3=$?
+          node scripts/audit-course-builder-procurement.mjs >> /tmp/course-architecture.log 2>&1
+          code4=$?
           code=0
-          if [ "$code1" != "0" ] || [ "$code2" != "0" ] || [ "$code3" != "0" ]; then code=1; fi
+          if [ "$code1" != "0" ] || [ "$code2" != "0" ] || [ "$code3" != "0" ] || [ "$code4" != "0" ]; then code=1; fi
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 300 /tmp/course-architecture.log
+          tail -n 360 /tmp/course-architecture.log
           exit 0
 
       - name: Install dependencies deterministically
@@ -231,8 +236,9 @@ jobs:
             lib/course-factory \
             lib/devstudio/course-builder-controller.ts \
             --quiet >> /tmp/course-targeted.log 2>&1 || code=1
+          pnpm exec vitest run tests/course-factory-media-authority.test.ts >> /tmp/course-targeted.log 2>&1 || code=1
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 240 /tmp/course-targeted.log
+          tail -n 300 /tmp/course-targeted.log
           exit 0
 
       - name: Build and persist requested course draft through canonical Course Builder
@@ -254,7 +260,7 @@ jobs:
           fi
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 360 /tmp/course-acceptance.log > /tmp/course-acceptance-tail.log || true
+          tail -n 420 /tmp/course-acceptance.log > /tmp/course-acceptance-tail.log || true
           exit 0
 
       - name: Verify full Admin and LMS applications after course build
@@ -303,10 +309,10 @@ jobs:
             const acceptanceCode = process.env.ACCEPTANCE_EXIT_CODE || 'not-run';
             const verificationCode = process.env.VERIFICATION_EXIT_CODE || 'not-run';
             const ok = architectureCode === '0' && installCode === '0' && credentialCode === '0' && targetedCode === '0' && acceptanceCode === '0' && verificationCode === '0';
-            const architectureTail = fs.existsSync('/tmp/course-architecture.log') ? fs.readFileSync('/tmp/course-architecture.log', 'utf8').slice(-16000) : 'Architecture checks did not produce a log.';
-            const targetedTail = fs.existsSync('/tmp/course-targeted.log') ? fs.readFileSync('/tmp/course-targeted.log', 'utf8').slice(-16000) : 'Targeted Course Builder validation did not produce a log.';
+            const architectureTail = fs.existsSync('/tmp/course-architecture.log') ? fs.readFileSync('/tmp/course-architecture.log', 'utf8').slice(-18000) : 'Architecture checks did not produce a log.';
+            const targetedTail = fs.existsSync('/tmp/course-targeted.log') ? fs.readFileSync('/tmp/course-targeted.log', 'utf8').slice(-18000) : 'Targeted Course Builder validation did not produce a log.';
             const verificationTail = fs.existsSync('/tmp/course-verification.log') ? fs.readFileSync('/tmp/course-verification.log', 'utf8').slice(-22000) : 'Full application verification did not produce a log.';
-            const tail = fs.existsSync('/tmp/course-acceptance-tail.log') ? fs.readFileSync('/tmp/course-acceptance-tail.log', 'utf8').slice(-28000) : fs.existsSync('/tmp/course-acceptance.log') ? fs.readFileSync('/tmp/course-acceptance.log', 'utf8').slice(-28000) : 'Course Builder did not produce a log.';
+            const tail = fs.existsSync('/tmp/course-acceptance-tail.log') ? fs.readFileSync('/tmp/course-acceptance-tail.log', 'utf8').slice(-30000) : fs.existsSync('/tmp/course-acceptance.log') ? fs.readFileSync('/tmp/course-acceptance.log', 'utf8').slice(-30000) : 'Course Builder did not produce a log.';
             const label = context.payload.issue.title.includes('BUSINESS') ? 'BUSINESS COURSE BUILDER' : 'ESB ACCEPTANCE';
             await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body: `${label} ${ok ? 'PASS' : 'FAIL'}\n\nTested checkout SHA: ${process.env.TESTED_SHA}\nArchitecture: ${architectureCode}\nInstall: ${installCode}\nCredentials: ${credentialCode}\nTargeted Course Builder validation: ${targetedCode}\nAcceptance: ${acceptanceCode}\nFull Admin/LMS verification: ${verificationCode}\n\nArchitecture:\n\`\`\`text\n${architectureTail}\n\`\`\`\n\nTargeted validation:\n\`\`\`text\n${targetedTail}\n\`\`\`\n\nAcceptance:\n\`\`\`text\n${tail}\n\`\`\`\n\nFull verification:\n\`\`\`text\n${verificationTail}\n\`\`\`` });
 

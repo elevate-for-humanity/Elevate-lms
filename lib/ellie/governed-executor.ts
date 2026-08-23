@@ -9,6 +9,65 @@ function text(value: unknown): string | undefined {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
+async function executeCanonicalReminder(
+  params: Record<string, unknown>,
+  db: SupabaseClient,
+) {
+  const userIds = Array.isArray(params.userIds)
+    ? params.userIds.filter((value): value is string => typeof value === 'string' && value.length > 0)
+    : text(params.userId)
+      ? [text(params.userId)!]
+      : [];
+
+  if (!userIds.length) return { success: false, message: 'No user IDs provided.' };
+
+  const { data: profiles, error: profileError } = await db
+    .from('profiles')
+    .select('id, full_name, email')
+    .in('id', userIds);
+
+  if (profileError) throw new Error(`Failed to load reminder recipients: ${profileError.message}`);
+  if (!profiles?.length) return { success: false, message: 'No matching profiles found.' };
+
+  const message = text(params.message) || 'You have an action waiting in your Elevate account.';
+  const rows = profiles
+    .filter((profile: { email?: string | null }) => Boolean(profile.email))
+    .map((profile: { id: string; full_name?: string | null; email: string }) => ({
+      to_email: profile.email,
+      channel: 'email',
+      template_key: 'ellie_reminder',
+      template_data: {
+        recipient_name: profile.full_name || 'there',
+        message,
+      },
+      status: 'queued',
+      attempts: 0,
+      max_attempts: 5,
+      scheduled_for: new Date().toISOString(),
+      entity_type: 'profile',
+      entity_id: profile.id,
+    }));
+
+  if (!rows.length) return { success: false, message: 'No reminder recipients have an email address.' };
+
+  const { data: queued, error } = await db
+    .from('notification_outbox')
+    .insert(rows)
+    .select('id, to_email, status');
+
+  if (error) throw new Error(`Failed to queue reminders: ${error.message}`);
+
+  return {
+    success: true,
+    message: `${queued?.length || rows.length} reminder(s) queued through the canonical notification outbox.`,
+    data: {
+      count: queued?.length || rows.length,
+      notificationIds: (queued || []).map((item: { id: string }) => item.id),
+      recipients: (queued || []).map((item: { to_email: string }) => item.to_email),
+    },
+  };
+}
+
 async function executeCanonicalCertificate(
   params: Record<string, unknown>,
   db: SupabaseClient,
@@ -77,6 +136,8 @@ export async function executeGovernedEllieAction(
   const policy = assertActionPolicy(actionType, context);
   const result = actionType === 'issue_certificate'
     ? await executeCanonicalCertificate(params, db)
-    : await executeEllieAction(actionType, params, db);
+    : actionType === 'send_reminder'
+      ? await executeCanonicalReminder(params, db)
+      : await executeEllieAction(actionType, params, db);
   return { ...result, policy: policy.policy, policyReason: policy.reason };
 }

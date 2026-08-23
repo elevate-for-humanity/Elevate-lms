@@ -1,0 +1,59 @@
+name: Marketing Staging Gate
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: marketing-staging-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: '10.28.2'
+
+jobs:
+  marketing-staging:
+    name: Deploy Marketing → staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies deterministically
+        env:
+          NODE_OPTIONS: --max-old-space-size=16384
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Verify public claim integrity
+        run: node scripts/check-public-claims.mjs
+
+      - name: Verify canonical hero media registry
+        run: pnpm tsx scripts/verify-hero-video-registry.ts
+
+      - name: Build Marketing container
+        run: docker build --file Dockerfile.marketing --tag elevate-marketing:staging-gate --build-arg GITHUB_SHA=${{ github.sha }} --build-arg GIT_SHA=${{ github.sha }} --build-arg NEXT_PUBLIC_GIT_SHA=${{ github.sha }} .
+
+      - name: Smoke Marketing container
+        run: |
+          chmod +x scripts/smoke-test-container.sh
+          scripts/smoke-test-container.sh elevate-marketing:staging-gate marketing-staging-smoke 3100

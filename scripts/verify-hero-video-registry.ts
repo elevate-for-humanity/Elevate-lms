@@ -11,6 +11,7 @@ const errors: string[] = [];
 const expectedPageKeys = [
   'home',
   'programs',
+  'barber-apprenticeship',
   'cna',
   'cdl-training',
   'hvac-technician',
@@ -68,7 +69,7 @@ for (const pageKey of expectedPageKeys) {
 
   const expectedSlug = pageKey === 'home'
     ? '/'
-    : pageKey === 'cna' || pageKey === 'cdl-training' || pageKey === 'hvac-technician'
+    : pageKey === 'barber-apprenticeship' || pageKey === 'cna' || pageKey === 'cdl-training' || pageKey === 'hvac-technician'
       ? `/programs/${pageKey}`
       : pageKey === 'for-providers'
         ? '/for-providers'

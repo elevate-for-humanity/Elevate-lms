@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { runTabularIntelligence } from '@/lib/ai/tabular-intelligence';
@@ -37,6 +38,12 @@ export function deterministicMissingDocumentMessage(missingDocuments: string[]):
     '',
     'Please upload the listed item(s) through your applicant portal. If you already submitted them, no additional action is needed while staff review is pending.',
   ].join('\n');
+}
+
+function makeActionKey(applicationId: string, attempt: number, missingDocuments: string[]): string {
+  return createHash('sha256')
+    .update(`${WORKFLOW_KEY}:${applicationId}:${attempt}:${missingDocuments.slice().sort().join('|')}`)
+    .digest('hex');
 }
 
 async function buildMessage(application: Record<string, any>, missingDocuments: string[]) {
@@ -188,21 +195,11 @@ export async function remediateMissingApplicationDocuments(
 
   const message = await buildMessage(application, missingDocuments);
   const nextAttempt = attemptCount + 1;
-  const actionKey = `${WORKFLOW_KEY}:${applicationId}:attempt:${nextAttempt}:${missingDocuments.slice().sort().join('|')}`;
-
-  if (existing?.last_action_key === actionKey) {
-    return {
-      outcome: 'suppressed',
-      applicationId,
-      missingDocuments,
-      attemptCount,
-      nextCheckAt: existing.next_check_at,
-    };
-  }
-
+  const actionKey = makeActionKey(applicationId, nextAttempt, missingDocuments);
   const idempotencyKey = `${WORKFLOW_KEY}:application:${applicationId}`;
+
   if (!existing) {
-    await db.from('automation_followups').insert({
+    await db.from('automation_followups').upsert({
       workflow_key: WORKFLOW_KEY,
       subject_type: 'application',
       subject_id: applicationId,
@@ -211,16 +208,18 @@ export async function remediateMissingApplicationDocuments(
       detected_condition: { missingDocuments },
       proposed_action: 'send_reminder',
       action_policy: 'AUTO',
-      execution_status: 'executing',
+      execution_status: 'pending',
       attempt_count: attemptCount,
       max_attempts: maxAttempts,
       escalation_status: 'none',
       idempotency_key: idempotencyKey,
-      last_action_key: actionKey,
       audit_metadata: { rule: 'required_document_presence' },
-    });
-  } else {
-    await db.from('automation_followups').update({
+    }, { onConflict: 'workflow_key,subject_type,subject_id', ignoreDuplicates: true });
+  }
+
+  const { data: claimed, error: claimError } = await db
+    .from('automation_followups')
+    .update({
       state: 'open',
       detected_condition: { missingDocuments },
       proposed_action: 'send_reminder',
@@ -228,7 +227,23 @@ export async function remediateMissingApplicationDocuments(
       execution_status: 'executing',
       last_action_key: actionKey,
       failure_reason: null,
-    }).eq('id', existing.id);
+    })
+    .eq('workflow_key', WORKFLOW_KEY)
+    .eq('subject_type', 'application')
+    .eq('subject_id', applicationId)
+    .or(`last_action_key.is.null,last_action_key.neq.${actionKey}`)
+    .select('id')
+    .maybeSingle();
+
+  if (claimError) throw new Error(`Failed to claim remediation action: ${claimError.message}`);
+  if (!claimed) {
+    return {
+      outcome: 'suppressed',
+      applicationId,
+      missingDocuments,
+      attemptCount,
+      nextCheckAt: existing?.next_check_at || null,
+    };
   }
 
   let execution;

@@ -1,2 +1,2 @@
 Deploy current protected main to production.
-Triggered 2026-08-23 after issue-event deployment trigger failed to emit a run result.
+Retriggered 2026-08-23 after exact-build-SHA and exact-live-SHA production gate hardening.

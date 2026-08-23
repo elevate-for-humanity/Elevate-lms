@@ -41,7 +41,7 @@ const SECTIONS = [
       { href: '/compliance', label: 'Credential Disclosure Hub' },
       { href: '/credentials', label: 'Credential Authority Separation' },
       { href: '/apprenticeships', label: `Apprenticeship Programs (${RAPIDS_SPONSOR_LABEL})` },
-      { href: '/verify-credentials', label: 'Verify Credentials' },
+      { href: 'https://app.elevateforhumanity.org/verify-credentials', label: 'Verify Credentials' },
     ],
   },
   {

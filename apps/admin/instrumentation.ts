@@ -4,7 +4,7 @@
  *
  * IMPORTANT: instrumentation must stay web-runtime safe. Do not import video
  * rendering workers or native media dependencies directly here. The agentic
- * executor owns lazy domain dispatch behind the nodejs/Admin runtime boundary.
+ * executor owns domain dispatch behind the nodejs/Admin runtime boundary.
  */
 export async function register(): Promise<void> {
   if (process.env.NEXT_RUNTIME !== 'nodejs') {
@@ -32,8 +32,13 @@ export async function register(): Promise<void> {
     console.warn('[admin] Environment validation error:', error);
   }
 
-  if (process.env.ELEVATE_SERVICE === 'admin') {
+  const serviceRole = process.env.ELEVATE_SERVICE || process.env.SERVICE_ROLE;
+  if (serviceRole === 'admin') {
     try {
+      // Northflank's canonical service configurator historically exposed
+      // SERVICE_ROLE. Normalize it before entering the shared executor so there
+      // is one runtime authority while older deployments roll forward safely.
+      process.env.ELEVATE_SERVICE = 'admin';
       const { startAgenticExecutor } = await import('../../lib/agentic/executor');
       startAgenticExecutor();
       process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED = 'true';

@@ -4,6 +4,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'payment');
   if (rateLimited) return rateLimited;
 
+  await hydrateProcessEnv();
   const stripe = getStripe();
   if (!stripe) {
     return NextResponse.json({ error: 'Payment system not configured.' }, { status: 503 });

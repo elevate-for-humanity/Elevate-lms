@@ -61,8 +61,8 @@ export default async function CompliancePage() {
 
         <section>
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Program-to-Credential Mapping</h2>
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="max-w-full overflow-x-auto overscroll-x-contain rounded-xl bg-white shadow-sm" role="region" aria-label="Program-to-credential mapping" tabIndex={0}>
+            <table className="w-full min-w-[720px] text-sm">
               <thead className="bg-white">
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold text-slate-900">Program</th>

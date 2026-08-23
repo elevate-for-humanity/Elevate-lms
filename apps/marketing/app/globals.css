@@ -1295,15 +1295,6 @@ html {
   }
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
-  /* Scoped to content areas - not header */
-  main .grid,
-  section .grid,
-  article .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @supports (-webkit-touch-callout: none) {
   .h-screen {
     height: -webkit-fill-available;

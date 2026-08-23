@@ -5,6 +5,107 @@
 Evidence baseline: live Marketing crawl plus repository comparison at 08af7b649f36e788cde35c05099738961a3c3c37.
 Rule: do not mark an item complete until the corrected Marketing SHA is live and the affected route or interaction passes production verification.
 
+## CREATOR STUDIO & RESPONSIVE CONTAINER BACKLOG — AUGUST 23, 2026
+
+Evidence baseline: live `/apply`, `/programs`, and apprenticeship-structure review plus repository comparison at 33e574c08872445cc2184a3a9cd1cf4dfe468679.
+
+### Corrected audit record and gaps filled
+
+- `/creator` is the authenticated LMS creator-product portal backed by `marketplace_products`; it is not the Admin Creator Studio Course Builder. Keep marketplace products, Admin `/studio`, and canonical Course Builder authority distinct in navigation, help text, permissions, and telemetry.
+- The canonical Course Builder already has a blueprint/template gallery, blueprint search, Course Factory generation, course cloning, validation, review, media, and publication gates. Do not log “add templates” as wholly missing. The remaining product gap is a guided reuse experience: make existing blueprints discoverable, explain safe clone/customize behavior, and determine whether module-level reuse needs a governed library with provenance and versioning.
+- The inspected code does not prove that marketplace “Products” are mapped directly to “Authorized Learning Paths.” Document that relationship only after the owning tables, API, permission checks, and learner-delivery path are traced end to end.
+- The current intended `/apply` entry redirects into the PARIS-guided application, but the inspected live crawl still exposed the conventional application surface. Treat exact deployed SHA and route behavior as an acceptance prerequisite before evaluating the intended PARIS workspace.
+- PARIS is not implemented as a fixed sidebar in the current workspace. Its chat/summary layout switches at `lg`, but a global tablet CSS rule forces every content `.grid` to two columns from 768–1024 px. That broad override can prematurely split PARIS and unrelated layouts and is the most credible source of the reported tablet shift.
+- Program descriptions are already line-clamped, but program titles and the card action area do not have an explicit equal-height contract. `clamp()` typography alone will not align cards. Preserve the full accessible program name while using a bounded title region, flex-column card layout, consistent action placement, and tested wrapping for long credentials.
+- There is no global Marketing `not-found.tsx` in the inspected app. Program and Store 404 containers provide recovery links, but not direct search. The existing `/search` route is only a placeholder, so a canonical Marketing 404 should first provide verified Home/Programs/Funding/Apply/Testing/Contact recovery links. Add a search form only after `/search?q=...` returns real, relevant results.
+- The current `/compliance/apprenticeship-structure` page does not contain a table, so that route-specific table claim is stale. Other Marketing compliance/governance pages do render raw tables without a local overflow wrapper; audit those actual routes instead of attaching the defect to the wrong page.
+- Do not use a global `body { overflow-x: hidden }` as the primary repair. It can hide the overflowing component and clip focus rings, menus, or positioned content. Fix the source width first; use `min-w-0`, `max-w-full`, and component-level scrolling, with `overflow-x: clip` only at an intentional application-shell boundary.
+
+### P0 — responsive integrity
+
+- [ ] Remove the broad `main .grid`, `section .grid`, and `article .grid` tablet column override from Marketing global CSS. Replace it with explicit component-owned breakpoints so unrelated grids retain their intended layout.
+- [ ] Test the PARIS application at 320, 375, 768, 820, 1024, and 1280 CSS pixels, portrait and landscape. No panel may overlap another panel; the active input, voice control, send control, confirmation choices, progress summary, and standard-form fallback must remain visible and tappable.
+- [ ] Test PARIS with the software keyboard open, 200% and 400% zoom, long English/Spanish answers, long program names, pending confirmations, API errors, and resumed sessions. Require no document-level horizontal scroll and no clipped focus target.
+- [ ] Inventory every raw `<table>` in Marketing compliance, legal-governance, program, and application routes. Wrap wide tables in a labeled `max-w-full overflow-x-auto overscroll-x-contain` region, give genuinely wide tables an intentional `min-w-*`, and keep the page viewport fixed while the table itself scrolls.
+- [ ] Add an automated viewport assertion that fails when `document.documentElement.scrollWidth > document.documentElement.clientWidth` on `/apply/student/interview`, `/programs`, `/compliance`, representative legal-governance table pages, and the global 404.
+
+### P1 — Course Builder ease of use and reuse
+
+- [ ] Rename or explain the `/creator` product portal and Admin Creator Studio surfaces so users cannot mistake marketplace product management for course-authoring authority.
+- [ ] Verify and test the actual authorization matrix for `/creator`, Admin `/studio`, blueprint selection, course clone, editing, review, media retry, and publication. Do not rely on the claim that there are exactly two authorized roles until route guards and server-side checks agree.
+- [ ] Add first-run guidance to Course Builder: choose a canonical blueprint, preview its credential/state/module scope, create a governed draft, customize safely, validate, request authorized review, generate/repair media, and publish only after readiness gates pass.
+- [ ] Add plain-language help, a progress/checklist surface, safe defaults, undo/version recovery, actionable empty/error states, and links from each failed gate to the exact field or asset that needs attention.
+- [ ] Audit module-level reuse separately from whole-course cloning. If shared modules are introduced, require immutable source identity, version pinning, dependency impact preview, tenant/organization scope, accessibility/compliance metadata, authorized update propagation, and audit history. Never silently mutate every course that consumes a shared module.
+- [ ] Add usability acceptance with at least one first-time authorized instructor and one administrator. Measure time to create a draft from a blueprint, validation errors recovered without support, and whether participants can distinguish draft, reviewed, media-ready, and published states.
+
+### P1 — container polish and recovery
+
+- [ ] Refactor program cards to `h-full`/flex-column structure with a consistent title/content/action layout. Long titles and credentials must wrap without overlapping badges or buttons; full names must remain available to assistive technology and not depend on hover-only tooltips.
+- [ ] Use fluid `clamp()` sizing only for appropriate display headings, with minimum/maximum sizes verified at zoom. Do not shrink essential program names until they are unreadable merely to equalize cards.
+- [ ] Add a root Marketing `not-found.tsx` with a useful heading/status message and verified links to Home, Programs, Funding, Apply, Testing, and Contact. Preserve the specialized Program and Store 404 recovery paths; do not advertise the placeholder `/search` page as functional search.
+- [ ] Implement a real `/search?q=...` experience with a governed index, keyboard-accessible results, no-result recovery, analytics, and route-integrity tests before adding search to the 404 container.
+- [ ] Standardize responsive containers on `w-full min-w-0 max-w-full`; audit `w-screen`, fixed widths, negative margins, transforms, absolute/fixed panels, long unbroken text, and third-party embeds before applying any shell-level clipping.
+
+### Exit criteria for this backlog
+
+- Creator marketplace products, Admin Studio, Course Builder, and learner delivery are documented as separate authorities with verified route and role tests.
+- Existing blueprint/template and clone capabilities are discoverable; any new module reuse is governed, versioned, scoped, and auditable.
+- PARIS completes the full application flow at every target viewport without overlap, keyboard obstruction, document-level horizontal scroll, or loss of state.
+- Program cards remain aligned with the longest production titles while full names remain perceivable.
+- Every wide table scrolls inside its own labeled region; the page itself does not wobble horizontally.
+- The global Marketing 404 offers working search and recovery links.
+- Completion evidence includes the exact deployed SHA, automated viewport results, keyboard/zoom checks, and production screenshots for each target breakpoint.
+
+## DEPLOYMENT, COURSE MAPPING & MEDIA DELIVERY AUDIT — AUGUST 23, 2026
+
+Evidence baseline: live HTTP/HTML/media probes plus repository comparison at 33e574c08872445cc2184a3a9cd1cf4dfe468679.
+
+### Corrected audit record
+
+- Live Marketing currently returns 404 for `/legal/terms` and `/testing/schedule`, while current `main` already contains permanent redirects to `/terms-of-service` and `/testing/book`. This is verified deployment drift, not missing source routes. Production is not corrected until a Marketing build containing those route files is live.
+- `www` currently returns 404 for `/verify-credentials`, while `app.elevateforhumanity.org/verify-credentials` returns 200 and the Compliance Center already targets the LMS host. Preserve the LMS verifier as canonical and add only a cross-host compatibility redirect for old Marketing inbound links.
+- `/privacy` is canonical and `/legal/privacy` permanently redirects to it. That is a valid canonical/compatibility pair, not a duplicate-content collision. Keep one indexed policy and test the redirect chain.
+- The duplicated `Indianapolis, IN 46220, Indianapolis, IN 46220` address is confirmed in the Student Handbook and multiple related legal/governance templates. Repair the content and move public legal identity/address output toward one governed configuration so the defect cannot recur independently.
+- This production stack deploys through GitHub Actions to Northflank. Vercel/Netlify “Static Route Generation” logs are not the authority for these failures, and a blind clean rebuild is not proof of recovery. Use the Northflank build/deploy IDs, exact commit SHA, service health, and route smoke evidence.
+- There is no root redirects file governing these Next.js App Router pages. Compatibility is implemented with route files and `permanentRedirect`; audit and test those authorities directly.
+- Marketplace Products under LMS `/creator` are not the canonical Admin Course Builder. No inspected contract requires a marketplace Product ID to equal an Enrollment ID. Course visibility must instead be traced through the actual canonical program/course mapping, publication/readiness gates, enrollment records, and LMS queries.
+- `/creator` admits the creator role with platform-admin override, while Admin `/studio` is admin-governed and its server/API checks add organization-scoped builder rules where applicable. A lower role being denied publication is not automatically a permissions leak; inconsistent UI promises, route guards, or server authorization would be.
+- The live CDL page HTML contains its R2 MP4 source, voiceover MP3, poster, transcript control, and audio control. The MP4, MP3, and inspected WebP assets all return HTTP 200 with non-empty payloads. Do not classify the current evidence as an expired Vimeo/Wistia key or missing payload; reproduce any remaining blank-player report in a real browser and capture the media/network error.
+- Next image optimization is intentionally disabled for standalone Docker deployment (`images.unoptimized: true`). Local WebP files are served directly; a broken image would point to an absent artifact, bad URL, stale build, cache/CDN response, or client policy—not an on-demand Vercel/Cloudinary transformation failure.
+- The CDL MP4 is hosted on public Cloudflare R2 and currently returns 200 with range support. CORS should be verified from the browser response when reproducing a client failure, but changing bucket CORS without an observed CORS error is not justified.
+
+### P0 — deployment truth and route recovery
+
+- [ ] Deploy a current Marketing SHA and require `/legal/terms` → `/terms-of-service`, `/testing/schedule` → `/testing/book`, `/legal/privacy` → `/privacy`, and old Marketing `/verify-credentials` → the LMS verifier to resolve without a loop or 404.
+- [ ] Add those route chains to the Marketing post-deploy smoke test. Record initial status, every redirect location, final host/status, and the exact live Marketing/LMS SHA.
+- [ ] Keep compatibility routes `noindex` where appropriate and keep canonical destinations indexed; add automated assertions for canonical metadata so recovery paths do not create duplicate search results.
+- [ ] Repair every confirmed duplicated legal address, then add a repository check that rejects repeated city/state/ZIP fragments in public legal, handbook, agreement, governance, transcript, and program-layout content.
+- [ ] Require the deployment workflow to prove the exact GitHub SHA was built, deployed, and served by Northflank. A successful build alone, an old healthy container, or a route present only in source is not a pass.
+
+### P0 — canonical course visibility and permissions
+
+- [ ] Trace one published course end to end: canonical blueprint/template → persisted program/course mapping → authorized review → complete/playable media → publication state → learner enrollment → LMS query. Record real table keys and API ownership; do not substitute marketplace Product IDs.
+- [ ] Add a readiness diagnostic that explains why a course is absent from the Student Portal: unmapped program, inactive/unpublished course, missing authorized review, incomplete media, no qualifying enrollment, tenant mismatch, or denied role.
+- [ ] Test `/creator` and `/studio` independently for anonymous, student, staff, instructor, creator, organization builder/owner, and platform admin identities. UI visibility, route middleware, server components, API mutations, review, retry, and publication must agree.
+- [ ] Never broaden publication rights merely to eliminate a 403. If instructors or staff need a contribution workflow, define draft/edit/review permissions separately from final publish authority and log every decision.
+
+### P1 — video and image delivery evidence
+
+- [ ] Add a CDL browser acceptance test that proves the `<video>` receives a source, reaches `loadedmetadata`/`canplay`, displays either video or poster, and keeps transcript/audio controls usable with autoplay blocked, reduced motion, data saver, and keyboard navigation.
+- [ ] Add live byte-range probes for the canonical CDL MP4 plus content-type/size probes for its voiceover and poster. Record response status, `Content-Type`, `Content-Length`, `Accept-Ranges`, and the resolved asset URL.
+- [ ] Preserve the current poster fallback when video playback fails and surface a nonvisual status plus retry/open-media recovery instead of leaving an empty black container.
+- [ ] Inventory every local image path referenced by Marketing and verify the file is included in the split Docker build. Separately probe all remote image hosts allowed by `next.config.mjs`; fail on 403, HTML masquerading as an image, zero-byte content, or disallowed host drift.
+- [ ] Capture browser console, network status, response headers, CSP/CORS message, service worker/cache state, and exact live SHA before changing CDN, R2, or image configuration.
+
+### Exit criteria for this audit
+
+- All four legacy/canonical route chains resolve to the intended host with no 404, loop, or duplicate indexed page.
+- No repeated address fragment remains in the public legal/handbook/governance surfaces, and CI prevents recurrence.
+- Course absence diagnostics identify the real failed gate without conflating marketplace Products with Course Builder persistence.
+- Role tests prove contribution and publication boundaries across UI, server, and API enforcement.
+- CDL video, voiceover, poster, transcript, and audio controls pass both direct payload probes and real-browser playback/fallback checks.
+- Production evidence names GitHub SHA, Northflank build/deployment IDs, live service SHA, and post-deploy route/media results.
+
 ### Completed in main — awaiting production verification
 
 | Priority | Item | Evidence / implementation |

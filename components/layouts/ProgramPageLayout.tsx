@@ -216,8 +216,6 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
                 </h3>
                 <p className="text-sm text-black">
                   6331 N Keystone Ave, Suite D, Indianapolis, IN 46220
-                  <br />
-                  Indianapolis, IN 46220
                 </p>
                 <p className="mt-2 text-xs font-medium text-amber-700">
                   Hybrid institute — by appointment only. Not a walk-in location.

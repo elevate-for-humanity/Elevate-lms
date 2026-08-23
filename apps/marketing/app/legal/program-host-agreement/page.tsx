@@ -393,7 +393,7 @@ export default function ProgramHostAgreementPage() {
               2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
             </strong>
             <br />
-            6331 N Keystone Ave, Suite D, Indianapolis, IN 46220, Indianapolis, IN 46220
+            6331 N Keystone Ave, Suite D, Indianapolis, IN 46220
             <br />
             Email: info@elevateforhumanity.org · Phone: {PLATFORM_DEFAULTS.supportPhone}
           </p>

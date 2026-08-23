@@ -115,6 +115,9 @@ jobs:
       - name: Enforce public government-claim integrity
         run: node scripts/check-public-claims.mjs
 
+      - name: Enforce public address integrity
+        run: node scripts/check-public-address-integrity.mjs
+
       - name: Verify production deployment credentials
         run: |
           set -euo pipefail
@@ -254,3 +257,50 @@ jobs:
           cat /tmp/www-version.json 2>/dev/null || true
           grep -Eo '<title>[^<]+' /tmp/www-esthetics.html 2>/dev/null || true
           exit 1
+
+      - name: Smoke compatibility routes, recovery UI, legal copy, and CDL media
+        run: |
+          set -euo pipefail
+
+          assert_redirect() {
+            label="$1"
+            source_url="$2"
+            expected_url="$3"
+            result=$(curl -sS -L --max-redirs 5 --max-time 30 -o "/tmp/${label}.body" -w '%{http_code}|%{url_effective}' "$source_url")
+            status="${result%%|*}"
+            effective_url="${result#*|}"
+            echo "$label: status=$status effective_url=$effective_url"
+            test "$status" = "200"
+            test "$effective_url" = "$expected_url"
+          }
+
+          assert_redirect legal-terms https://www.elevateforhumanity.org/legal/terms https://www.elevateforhumanity.org/terms-of-service
+          assert_redirect testing-schedule https://www.elevateforhumanity.org/testing/schedule https://www.elevateforhumanity.org/testing/book
+          assert_redirect legal-privacy https://www.elevateforhumanity.org/legal/privacy https://www.elevateforhumanity.org/privacy
+          assert_redirect verify-credentials https://www.elevateforhumanity.org/verify-credentials https://app.elevateforhumanity.org/verify-credentials
+
+          missing_status=$(curl -sS --max-time 20 -o /tmp/www-not-found.html -w '%{http_code}' https://www.elevateforhumanity.org/deployment-route-audit-not-found)
+          test "$missing_status" = "404"
+          grep -q 'right path' /tmp/www-not-found.html
+
+          curl -fsS --max-time 20 https://www.elevateforhumanity.org/legal/student-handbook -o /tmp/student-handbook.html
+          ! grep -q 'Indianapolis, IN 46220, Indianapolis, IN 46220' /tmp/student-handbook.html
+
+          curl -fsS --max-time 30 https://www.elevateforhumanity.org/programs/cdl-training -o /tmp/cdl-page.html
+          grep -q 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4' /tmp/cdl-page.html
+          grep -q '/audio/heroes/cdl.mp3' /tmp/cdl-page.html
+          grep -q 'Video transcript' /tmp/cdl-page.html
+          grep -q 'Play audio' /tmp/cdl-page.html
+
+          curl -fsS --range 0-1023 --max-time 30 -D /tmp/cdl-video.headers -o /tmp/cdl-video.bin https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4
+          grep -qi '^content-type: video/mp4' /tmp/cdl-video.headers
+          grep -qi '^accept-ranges: bytes' /tmp/cdl-video.headers
+          test "$(wc -c < /tmp/cdl-video.bin)" -gt 0
+
+          curl -fsS --max-time 30 -D /tmp/cdl-audio.headers -o /tmp/cdl-audio.mp3 https://www.elevateforhumanity.org/audio/heroes/cdl.mp3
+          grep -qi '^content-type: audio/' /tmp/cdl-audio.headers
+          test "$(wc -c < /tmp/cdl-audio.mp3)" -gt 1000
+
+          curl -fsS --max-time 30 -D /tmp/cdl-poster.headers -o /tmp/cdl-poster.webp https://www.elevateforhumanity.org/images/pages/cdl-hero.webp
+          grep -qi '^content-type: image/webp' /tmp/cdl-poster.headers
+          test "$(wc -c < /tmp/cdl-poster.webp)" -gt 1000

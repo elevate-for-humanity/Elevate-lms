@@ -354,7 +354,7 @@ export default function BeautyProgramPage({ program, campuses = DEFAULT_CAMPUSES
               <p>Elevate for Humanity Career & Technical Institute</p>
             </div>
             <div className="footer-contact">
-              <p>6331 N Keystone Ave, Suite D, Indianapolis, IN 46220<br />Indianapolis, IN 46220<br />(317) 314-3757</p>
+              <p>6331 N Keystone Ave, Suite D, Indianapolis, IN 46220<br />(317) 314-3757</p>
             </div>
             <div className="footer-links">
               <Link href="/about">About</Link>

@@ -20,7 +20,7 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
   const funded = program.funding_tier === 'workforce-funded';
   const image = getProgramCardImage(program.slug);
   return (
-    <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+    <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/programs/${program.slug}`} className="block">
         <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
           <ProgramCardImage src={image} alt={`${program.title} training program`} category={program.category} />
@@ -34,15 +34,15 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
           </div>
         </div>
       </Link>
-      <div className="p-5 sm:p-6">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
         <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-slate-500">{program.category}</p>
-        <h3 className="text-xl font-extrabold leading-tight text-slate-950"><Link href={`/programs/${program.slug}`} className="hover:text-brand-red-700">{program.title}</Link></h3>
+        <h3 className="line-clamp-2 min-h-[3.5rem] text-xl font-extrabold leading-tight text-slate-950"><Link href={`/programs/${program.slug}`} className="break-words hover:text-brand-red-700">{program.title}</Link></h3>
         {program.description ? <p className="mt-3 line-clamp-3 text-base leading-relaxed text-slate-600">{program.description}</p> : null}
         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-slate-600">
           {program.duration ? <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" />{program.duration}</span> : null}
           {program.credential ? <span className="inline-flex items-center gap-1.5"><Award className="h-4 w-4" />{program.credential}</span> : null}
         </div>
-        <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+        <div className="mt-auto flex flex-col gap-2 pt-5 sm:flex-row">
           <Link href={`/programs/${program.slug}`} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-base font-bold text-white hover:bg-slate-800">View Program <ArrowRight className="h-4 w-4" /></Link>
           <Link href={`/apply?program=${program.slug}`} className={`inline-flex flex-1 items-center justify-center rounded-xl px-4 py-3 text-base font-bold ${funded ? 'bg-brand-red-600 text-white hover:bg-brand-red-700' : 'border border-slate-300 text-slate-900 hover:bg-slate-50'}`}>{funded ? 'Start Application' : 'Self-Pay Enrollment'}</Link>
         </div>

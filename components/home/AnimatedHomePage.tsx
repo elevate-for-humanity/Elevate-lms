@@ -543,7 +543,6 @@ export default function AnimatedHomePage() {
               <h4 className="font-bold mb-4">Contact</h4>
               <div className="space-y-2 text-slate-400">
                 <p>6331 N Keystone Ave, Suite D, Indianapolis, IN 46220</p>
-                <p>Indianapolis, IN 46220</p>
                 <p className="text-brand-red-400">(317) 314-3757</p>
               </div>
             </div>

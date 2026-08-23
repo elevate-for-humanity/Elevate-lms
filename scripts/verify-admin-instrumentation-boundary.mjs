@@ -7,6 +7,7 @@ const readinessFile = 'apps/admin/app/api/ready/route.ts';
 const instrumentation = await readFile(instrumentationFile, 'utf8');
 const rootInstrumentation = await readFile('instrumentation.ts', 'utf8');
 const executor = await readFile(executorFile, 'utf8');
+const nodeInstrumentation = await readFile('apps/admin/instrumentation-node.ts', 'utf8');
 const readiness = await readFile(readinessFile, 'utf8');
 
 const forbidden = [
@@ -53,12 +54,17 @@ if (missingRoleContracts.length) {
   process.exit(1);
 }
 
-if (!instrumentation.includes("import('../../lib/agentic/executor')") || !instrumentation.includes('startAgenticExecutor()')) {
+if (!instrumentation.includes("import('./instrumentation-node')") || !instrumentation.includes('startAdminAgenticExecutor()')) {
   console.error('[verify-admin-instrumentation-boundary] Admin runtime does not start the canonical agentic executor.');
   process.exit(1);
 }
 
-if (!instrumentation.includes("process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED = 'true'")) {
+if (!nodeInstrumentation.includes("import { startAgenticExecutor } from '../../lib/agentic/executor'") || !nodeInstrumentation.includes('startAgenticExecutor()')) {
+  console.error('[verify-admin-instrumentation-boundary] Node instrumentation does not start the canonical agentic executor.');
+  process.exit(1);
+}
+
+if (!nodeInstrumentation.includes("process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED = 'true'")) {
   console.error('[verify-admin-instrumentation-boundary] Admin runtime does not expose canonical executor startup readiness.');
   process.exit(1);
 }

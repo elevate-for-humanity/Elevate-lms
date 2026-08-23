@@ -34,6 +34,17 @@ function wioaFollowupInput(command: string, context: Record<string, unknown>): R
   return input;
 }
 
+function isOpenHandsStatusCommand(lower: string): boolean {
+  return /\bopenhands\b/.test(lower) && /\b(status|progress|state|check|result|finished|running)\b/.test(lower);
+}
+
+function isEngineeringCommand(lower: string): boolean {
+  if (/\bopenhands\b/.test(lower)) return true;
+  const engineeringNoun = /\b(code|codebase|repo|repository|github|pull request|pr\b|branch|commit|typescript|javascript|route|component|api endpoint|test file|regression test|ci\b|workflow file|source file)\b/.test(lower);
+  const engineeringVerb = /\b(fix|debug|refactor|implement|modify|change|update|edit|review|write|add|remove|clean up|cleanup|test)\b/.test(lower);
+  return engineeringNoun && engineeringVerb;
+}
+
 /**
  * Deterministic planner for operational commands.
  *
@@ -99,14 +110,27 @@ export function planAIToolFromCommand(
   if (/\b(send|email)\b.*\breminder/.test(lower)) {
     return { name: 'communications.remind', input: asAIRecord(context.toolInput) };
   }
+  // Domain generation stays inside Elevate's canonical Course Builder, never OpenHands.
   if (/\b(generate|build|create)\b.*\bcourse\b/.test(lower)) {
     return { name: 'courses.generate', input: { ...asAIRecord(context.toolInput), prompt: command } };
   }
-  if (/\brun\b.*\btests?\b/.test(lower)) {
-    return { name: 'workflows.runTests', input: asAIRecord(context.toolInput) };
-  }
   if (/\b(build|generate)\b.*\b(all )?courses?\b/.test(lower)) {
     return { name: 'workflows.buildCourses', input: asAIRecord(context.toolInput) };
+  }
+
+  // OpenHands is an engineering worker, not a general platform action router.
+  if (isOpenHandsStatusCommand(lower)) {
+    return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
+  }
+  if (isEngineeringCommand(lower)) {
+    return {
+      name: 'openhands.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
+
+  if (/\brun\b.*\btests?\b/.test(lower)) {
+    return { name: 'workflows.runTests', input: asAIRecord(context.toolInput) };
   }
   if (/\bdeploy\b/.test(lower)) {
     return { name: 'deployments.autopilot', input: asAIRecord(context.toolInput) };

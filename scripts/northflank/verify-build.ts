@@ -26,6 +26,10 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  if (!/^[a-f0-9]{40}$/i.test(expectedSha)) {
+    throw new Error(`Expected SHA must be a full 40-character Git SHA. Received: ${expectedSha}`);
+  }
+
   const projectId = resolveProjectId();
 
   if (!projectId) {
@@ -50,30 +54,35 @@ async function main(): Promise<void> {
     sha: build?.sha,
   });
 
-  // Check for failure states
   if (
     build?.status === 'FAILURE' ||
+    build?.status === 'FAILED' ||
     build?.status === 'CRASHED' ||
     build?.status === 'ABORTED' ||
     build?.status === 'SUBMISSION_FAILURE' ||
-    build?.status === 'TIMEOUT'
+    build?.status === 'TIMEOUT' ||
+    build?.status === 'ERROR'
   ) {
     throw new Error(
       `Build ${buildId} FAILED with status: ${build?.status}. Refusing to deploy.`,
     );
   }
 
-  // Check for success
   if (build?.status !== 'SUCCESS') {
     throw new Error(
       `Build ${buildId} did not succeed. Status: ${build?.status ?? 'unknown'}. Expected SUCCESS.`,
     );
   }
 
-  // Verify SHA matches
-  if (build?.sha && build.sha !== expectedSha) {
+  if (!build?.sha || !/^[a-f0-9]{40}$/i.test(build.sha)) {
     throw new Error(
-      `Build SHA mismatch. Expected ${expectedSha}, received ${build?.sha}`,
+      `Build ${buildId} does not expose a valid full Git SHA. Received: ${build?.sha ?? 'missing'}. Refusing to deploy an unidentifiable artifact.`,
+    );
+  }
+
+  if (build.sha.toLowerCase() !== expectedSha.toLowerCase()) {
+    throw new Error(
+      `Build SHA mismatch. Expected ${expectedSha}, received ${build.sha}`,
     );
   }
 
@@ -81,6 +90,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  console.error('❌ VERIFY BUILD FAILED:', error.message);
+  console.error('❌ VERIFY BUILD FAILED:', error instanceof Error ? error.message : String(error));
   process.exit(1);
 });

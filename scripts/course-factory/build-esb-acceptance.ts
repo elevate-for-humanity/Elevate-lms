@@ -3,7 +3,7 @@ import {
   getCourseMediaState,
   recoverCourseMediaJobs,
 } from '../../lib/course-factory/media-manager';
-import { courseFactory } from '../../lib/devstudio/course-builder-controller';
+import { courseBuilderController } from '../../lib/devstudio/course-builder-controller';
 import {
   publishPersistedCourseWithClient,
   runPersistedCourseProcurementHealthCheckWithClient,
@@ -256,7 +256,7 @@ async function main() {
 
   // Studio's controller is the application-facing authority. Existing ESB
   // content is repaired missing-only; it is never replaced by acceptance.
-  const build = await courseFactory({
+  const build = await courseBuilderController({
     programId: structure.course.program_id ?? undefined,
     blueprint,
     mode: 'missing-only',

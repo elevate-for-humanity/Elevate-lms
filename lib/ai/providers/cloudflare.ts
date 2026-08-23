@@ -6,6 +6,14 @@ const MODELS = [
   '@cf/meta/llama-3.2-3b-instruct',
 ];
 
+function contentText(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object') {
+    try { return JSON.stringify(value); } catch { return ''; }
+  }
+  return value == null ? '' : String(value);
+}
+
 /** Cloudflare Workers AI provider used as a free/low-cost failover path. */
 export class CloudflareProvider implements AIProvider {
   readonly name = 'cloudflare' as const;
@@ -49,12 +57,13 @@ export class CloudflareProvider implements AIProvider {
         }
 
         const payload = await response.json();
-        const content = payload?.result?.response || payload?.result?.text || '';
-        if (!String(content).trim()) {
+        const rawContent = payload?.result?.response ?? payload?.result?.text ?? '';
+        const content = contentText(rawContent);
+        if (!content.trim()) {
           lastError = new Error(`Cloudflare ${model} returned no text content`);
           continue;
         }
-        return { content: normalizeStructuredOutput(String(content), options), model };
+        return { content: normalizeStructuredOutput(content, options), model };
       } catch (error) {
         lastError = error as Error;
       }

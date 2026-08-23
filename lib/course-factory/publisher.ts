@@ -304,7 +304,6 @@ export async function publishCourse(input: PublishInput): Promise<PublishResult>
     const metadata: Record<string, unknown> = {
       duration_hours: totalDurationMinutes / 60,
       passing_score: passingScore,
-      generation_status: 'review',
       generation_progress: 100,
       total_lessons: sourceModules.reduce(
         (count, courseModule) => count + (courseModule.lessons?.length ?? 0),

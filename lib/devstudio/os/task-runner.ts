@@ -390,6 +390,40 @@ export async function runTaskExecution(
       return;
     }
 
+    if (result.status === 'running') {
+      if (executeStep) {
+        await db.from('ai_task_steps').update({
+          status: 'running',
+          output: result.message,
+          output_json: {
+            ok: true,
+            executed: result.executed,
+            status: result.status,
+            tool: result.tool ?? null,
+            payload: result.payload ?? null,
+            trace_id: result.traceId ?? null,
+          },
+        }).eq('id', executeStep.id);
+      }
+      await db.from('ai_tasks').update({
+        status: 'running',
+        result_json: {
+          ok: true,
+          executed: result.executed,
+          status: 'running',
+          message: result.message,
+          tool: result.tool ?? null,
+          payload: result.payload ?? null,
+          trace_id: result.traceId ?? null,
+        },
+        tool_output: result.payload ?? null,
+        updated_at: new Date().toISOString(),
+      }).eq('id', taskId);
+      await setAgentStatus(db, task.agent_id, 'idle');
+      await appendTaskLog(db, taskId, 'External tool accepted the task; canonical task remains running until status verification completes.', 'info', executeStep?.id, runtime.tenantId ?? task.tenant_id, actorId);
+      return;
+    }
+
     if (executeStep) {
       await db.from('ai_task_steps').update({
         status: 'completed',

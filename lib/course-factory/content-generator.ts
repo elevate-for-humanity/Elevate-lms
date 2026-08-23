@@ -14,6 +14,12 @@ import {
   generatedLessonContentSchema,
   parseStrictAIJson,
 } from './ai-contracts';
+import {
+  loadAssessmentCheckpoint,
+  loadLessonGenerationCheckpoint,
+  persistAssessmentCheckpoint,
+  persistLessonGenerationCheckpoint,
+} from './generation-checkpoints';
 import type { BlueprintLessonRef, QuizQuestion } from './types';
 
 export interface GeneratedLessonContent {
@@ -35,6 +41,15 @@ interface LessonGenerationInput {
 export async function generateLessonContent(
   input: LessonGenerationInput,
 ): Promise<GeneratedLessonContent> {
+  const cached = await loadLessonGenerationCheckpoint(input.courseTitle, input.lesson.slug);
+  if (cached) {
+    logger.info('[course-factory/content-generator] Reusing generated lesson checkpoint', {
+      lesson: input.lesson.slug,
+      courseTitle: input.courseTitle,
+    });
+    return cached;
+  }
+
   if (!isAIAvailable()) throw new Error('AI service not available');
 
   const domainKey = input.lesson.domainKey || input.moduleTitle.toLowerCase().replace(/[^a-z0-9]+/g, '_');
@@ -169,7 +184,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
         'Lesson generation',
       );
 
-      return {
+      const generated: GeneratedLessonContent = {
         objective: parsed.objective,
         content: JSON.stringify({
           html: parsed.content,
@@ -181,6 +196,19 @@ The content must be original, job-ready, factually grounded, and aligned to the 
         scenario: parsed.scenario,
         quiz_questions: parsed.quiz_questions,
       };
+
+      await persistLessonGenerationCheckpoint({
+        courseTitle: input.courseTitle,
+        lessonSlug: input.lesson.slug,
+        objective: parsed.objective,
+        html: parsed.content,
+        learningPoints: parsed.learning_points,
+        scenario: parsed.scenario,
+        quizQuestions: parsed.quiz_questions,
+        experience: parsed.experience as Record<string, any>,
+      });
+
+      return generated;
     } catch (error) {
       lastError = error;
       logger.warn('[course-factory/content-generator] Lesson contract retry', {
@@ -211,9 +239,19 @@ interface GeneratedAssessment {
 export async function generateAssessment(
   input: AssessmentGenerationInput,
 ): Promise<GeneratedAssessment> {
+  const count = input.questionCount ?? 10;
+  const cached = await loadAssessmentCheckpoint(input.courseTitle, input.lessonSlug, count);
+  if (cached) {
+    logger.info('[course-factory/content-generator] Reusing assessment checkpoint', {
+      lesson: input.lessonSlug,
+      courseTitle: input.courseTitle,
+      questions: cached.length,
+    });
+    return { questions: cached };
+  }
+
   if (!isAIAvailable()) throw new Error('AI service not available');
 
-  const count = input.questionCount ?? 10;
   const types = input.questionTypes ?? ['multiple_choice'];
   const prompt = `
 Generate ${count} assessment questions for:
@@ -263,7 +301,13 @@ Return ONLY valid JSON.
         `Assessment generation returned ${parsed.questions.length}/${count} required questions`,
       );
     }
-    return { questions: parsed.questions.slice(0, count) };
+    const questions = parsed.questions.slice(0, count);
+    await persistAssessmentCheckpoint({
+      courseTitle: input.courseTitle,
+      lessonSlug: input.lessonSlug,
+      questions,
+    });
+    return { questions };
   } catch (error) {
     logger.error('[course-factory/content-generator] Assessment generation failed', error);
     throw error;

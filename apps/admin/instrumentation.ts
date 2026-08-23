@@ -35,13 +35,10 @@ export async function register(): Promise<void> {
   const serviceRole = process.env.ELEVATE_SERVICE || process.env.SERVICE_ROLE;
   if (serviceRole === 'admin') {
     try {
-      // Northflank's canonical service configurator historically exposed
-      // SERVICE_ROLE. Normalize it before entering the shared executor so there
-      // is one runtime authority while older deployments roll forward safely.
-      process.env.ELEVATE_SERVICE = 'admin';
-      const { startAgenticExecutor } = await import('../../lib/agentic/executor');
-      startAgenticExecutor();
-      process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED = 'true';
+      // Keep Node-only executor imports in the dedicated Node instrumentation
+      // module so the Edge instrumentation bundle never traces Node built-ins.
+      const { startAdminAgenticExecutor } = await import('./instrumentation-node');
+      startAdminAgenticExecutor();
     } catch (error) {
       delete process.env.ELEVATE_AGENTIC_EXECUTOR_STARTED;
       console.error(

@@ -146,15 +146,45 @@ jobs:
       - name: Wait for Admin deployment
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 3600000
 
-      - name: Smoke all public service endpoints
+      - name: Verify exact live SHA and smoke all production services
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          curl -fsS --max-time 20 https://www.elevateforhumanity.org/api/ping >/tmp/marketing-ping.json
-          curl -fsS --max-time 20 https://app.elevateforhumanity.org/api/ping >/tmp/lms-ping.json
-          curl -fsS --max-time 20 https://admin.elevateforhumanity.org/api/ping >/tmp/admin-ping.json
-          cat /tmp/marketing-ping.json
-          cat /tmp/lms-ping.json
-          cat /tmp/admin-ping.json
+
+          verify_live_sha() {
+            service="$1"
+            url="$2"
+            output="$3"
+
+            curl -fsS --max-time 20 "$url" > "$output"
+            cat "$output"
+
+            live_sha=$(node -e '
+              const fs = require("fs");
+              const body = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+              const sha = body.commit || body.buildId || body.sha || body.gitSha || "";
+              process.stdout.write(String(sha).trim());
+            ' "$output")
+
+            if [ -z "$live_sha" ] || [ "$live_sha" = "unknown" ] || [ "$live_sha" = "MISSING" ]; then
+              echo "$service does not expose a live Git SHA; refusing to mark production green."
+              exit 1
+            fi
+
+            if [ "$live_sha" != "$EXPECTED_SHA" ]; then
+              echo "$service live SHA mismatch: expected $EXPECTED_SHA, received $live_sha"
+              exit 1
+            fi
+
+            echo "$service live SHA verified: $live_sha"
+          }
+
+          verify_live_sha "Marketing" "https://www.elevateforhumanity.org/api/health" "/tmp/marketing-health.json"
+          verify_live_sha "LMS" "https://app.elevateforhumanity.org/api/ping" "/tmp/lms-ping.json"
+          verify_live_sha "Admin" "https://admin.elevateforhumanity.org/api/ping" "/tmp/admin-ping.json"
+
+          echo "All production services are healthy and serving exact SHA $EXPECTED_SHA"
 
       - name: Verify trial infrastructure dependency
         run: |
@@ -172,7 +202,7 @@ jobs:
         with:
           script: |
             const ok = '${{ job.status }}' === 'success';
-            const body = `${ok ? 'PRODUCTION DEPLOYMENT PASS' : 'PRODUCTION DEPLOYMENT FAIL'}\n\nCommit: ${context.sha}\nJob status: ${{ job.status }}\n\nThe canonical Northflank workflow synchronized production environment/configuration, built and verified Marketing/LMS/Admin from the same commit, deployed the services, waited for health, and ran public smoke checks. A PASS means every preceding deployment gate completed successfully; a FAIL means the workflow stopped at a blocking deployment gate and the Actions job is the authoritative failure evidence.`;
+            const body = `${ok ? 'PRODUCTION DEPLOYMENT PASS' : 'PRODUCTION DEPLOYMENT FAIL'}\n\nCommit: ${context.sha}\nJob status: ${{ job.status }}\n\nThe canonical Northflank workflow synchronized production environment/configuration, built and verified Marketing/LMS/Admin from the same commit, deployed the exact verified builds, waited for health, and required every live service endpoint to report the exact workflow SHA. A PASS means all three services are both healthy and on the identical release SHA; a FAIL means production remains blocked.`;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,

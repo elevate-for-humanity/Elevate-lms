@@ -261,6 +261,21 @@ const nextConfig = {
         permanent: true,
       },
 
+      // ── Public legacy compatibility routes ────────────────────────────────
+      ...[
+        { source: '/home', destination: '/' },
+        { source: '/index.html', destination: '/' },
+        { source: '/training', destination: '/programs' },
+        { source: '/terms-and-conditions', destination: '/terms-of-service' },
+        { source: '/legal/terms-of-service', destination: '/terms-of-service' },
+        { source: '/student-handbook', destination: '/legal/student-handbook' },
+        { source: '/dashboard', destination: 'https://app.elevateforhumanity.org/lms/dashboard' },
+      ].map((route) => ({
+        ...route,
+        has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
+        permanent: true,
+      })),
+
       // ── Video asset ──────────────────────────────────────────────────────
       {
         source: '/videos/barber-hero-final.mp4',

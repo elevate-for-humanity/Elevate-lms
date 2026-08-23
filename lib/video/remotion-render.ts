@@ -114,7 +114,7 @@ const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
   },
 };
 
-const DEFAULT_INSTRUCTOR: InstructorConfig = INSTRUCTOR_CONFIGS['marcus-johnson'];
+// One real portrait is packaged with every Admin image and served by the Remotion bundle.\n// Keep rendering deterministic even when optional instructor-specific portraits are absent.\nconst CANONICAL_PACKAGED_INSTRUCTOR_IMAGE = '/images/instructors/marcus-johnson.jpg';\n\nconst DEFAULT_INSTRUCTOR: InstructorConfig = INSTRUCTOR_CONFIGS['marcus-johnson'];
 
 function getInstructor(instructorId?: string): InstructorConfig {
   if (instructorId && INSTRUCTOR_CONFIGS[instructorId]) {
@@ -254,7 +254,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
       backgroundImageSrc,
       instructorName: instructor.name,
       instructorTitle: instructor.title,
-      instructorImageSrc: instructor.imageSrc,
+      instructorImageSrc: CANONICAL_PACKAGED_INSTRUCTOR_IMAGE,
       topBarColor: instructor.topBarColor,
       accentColor: instructor.accentColor,
       backgroundColor: '#fff7ed',

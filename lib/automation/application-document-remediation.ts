@@ -9,6 +9,7 @@ import { evaluateAndAdvanceApplication } from '@/lib/paris/application-self-serv
 const WORKFLOW_KEY = 'application_missing_documents';
 const RECHECK_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_MAX_ATTEMPTS = 3;
+const EMAIL_PREFERENCES = new Set(['email', 'e-mail']);
 
 export type RemediationOutcome =
   | 'resolved'
@@ -175,6 +176,20 @@ export async function remediateMissingApplicationDocuments(
     return { outcome: 'escalated', applicationId, missingDocuments, attemptCount };
   }
 
+  const contactPreference = String(application.contact_preference || '').trim().toLowerCase();
+  if (contactPreference && !EMAIL_PREFERENCES.has(contactPreference)) {
+    const reason = `Applicant contact preference is ${contactPreference}; this remediation loop currently supports automatic email only.`;
+    await markEscalated(db, applicationId, triggerType, missingDocuments, attemptCount, maxAttempts, reason);
+    await audit(applicationId, {
+      triggerType,
+      outcome: 'escalated',
+      missingDocuments,
+      reason: 'unsupported_contact_preference',
+      contactPreference,
+    });
+    return { outcome: 'escalated', applicationId, missingDocuments, attemptCount };
+  }
+
   const nextCheckAt = existing?.next_check_at ? new Date(existing.next_check_at) : null;
   if (existing && existing.state !== 'resolved' && nextCheckAt && nextCheckAt.getTime() > now.getTime()) {
     return {
@@ -289,18 +304,21 @@ export async function remediateMissingApplicationDocuments(
     };
   }
 
-  const { data: delivery } = await db
-    .from('delivery_logs')
-    .select('id, status, recipient, created_at')
-    .eq('channel', 'email')
-    .eq('template_name', 'ellie_reminder')
-    .eq('recipient', profile.email)
-    .gte('created_at', new Date(now.getTime() - 60_000).toISOString())
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const notificationIds = Array.isArray(execution.data?.notificationIds)
+    ? execution.data.notificationIds.filter((value): value is string => typeof value === 'string')
+    : [];
 
-  const verified = execution.success && Boolean(delivery);
+  const { data: queuedNotifications } = notificationIds.length
+    ? await db
+        .from('notification_outbox')
+        .select('id, status, to_email')
+        .in('id', notificationIds)
+        .in('status', ['queued', 'processing', 'sent'])
+    : { data: [] as Array<{ id: string; status: string; to_email: string }> };
+
+  const verified = execution.success
+    && notificationIds.length > 0
+    && (queuedNotifications?.length || 0) === notificationIds.length;
   const nextCheck = new Date(now.getTime() + RECHECK_MS).toISOString();
 
   await db.from('automation_followups').update({
@@ -309,13 +327,13 @@ export async function remediateMissingApplicationDocuments(
     attempt_count: nextAttempt,
     last_attempt_at: nowIso,
     next_check_at: nextCheck,
-    failure_reason: verified ? null : 'Reminder action returned without a verifiable delivery record.',
+    failure_reason: verified ? null : 'Reminder action returned without verifiable canonical notification-outbox records.',
     audit_metadata: {
       rule: 'required_document_presence',
       missingDocuments,
       actionKey,
-      deliveryId: delivery?.id || null,
-      deliveryStatus: delivery?.status || null,
+      notificationIds,
+      notificationStatuses: (queuedNotifications || []).map((item: { id: string; status: string }) => ({ id: item.id, status: item.status })),
       execution,
     },
   }).eq('workflow_key', WORKFLOW_KEY).eq('subject_type', 'application').eq('subject_id', applicationId);
@@ -327,7 +345,10 @@ export async function remediateMissingApplicationDocuments(
     attemptCount: nextAttempt,
     actionPolicy: 'AUTO',
     action: 'send_reminder',
-    verification: { deliveryId: delivery?.id || null, status: delivery?.status || null },
+    verification: {
+      notificationIds,
+      statuses: (queuedNotifications || []).map((item: { status: string }) => item.status),
+    },
   });
 
   return {

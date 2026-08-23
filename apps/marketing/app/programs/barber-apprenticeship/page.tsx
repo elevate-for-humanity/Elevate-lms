@@ -35,7 +35,7 @@ const VISUAL_STORY = [
     body: 'Theory, sanitation, client safety, professional practice, and technical knowledge support what happens in the shop.',
   },
   {
-    image: '/images/pages/barber-hero-main.webp',
+    image: '/images/pages/barber-apprenticeship-hero.jpg',
     alt: 'Barber apprentice practicing supervised haircutting and grooming skills',
     label: 'Hands-on Barbering',
     title: 'Build skill through supervised practice.',
@@ -69,7 +69,9 @@ export default async function BarberApprenticeshipPage() {
 
       <HeroVideo
         videoSrcDesktop={BARBER_HERO_VIDEO?.video_url}
-        posterImage={BARBER_HERO_IMAGE}
+        videoSrcMobile={BARBER_HERO_VIDEO?.video_url}
+        posterImage={BARBER_HERO_VIDEO?.thumbnail_url || BARBER_HERO_IMAGE}
+        voiceoverSrc="/videos/barber-voiceover.mp3"
         analyticsName="barber-apprenticeship"
         heightClassName="h-[46vh] min-h-[320px] max-h-[620px] sm:h-[54vh]"
         overlayMode="none"

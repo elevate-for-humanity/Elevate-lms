@@ -1,2 +1,2 @@
 Deploy current protected main to production.
-Retriggered 2026-08-23 after idempotent Course Factory enqueue/retry integration and final unified media authority fixes.
+Retriggered 2026-08-23 after unified Course Factory media authority regression tests and live schema verification.

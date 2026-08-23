@@ -26,6 +26,13 @@ describe('normalizeStructuredOutput', () => {
     expect(JSON.parse(normalized).content).toBe('Line one\nLine two\tTabbed');
   });
 
+  it('converts model-emitted backtick HTML values into JSON strings', () => {
+    const raw = '{"objective":"Apply the concept","content":`\n<h1>Lesson</h1>\n<p>Apply evidence.</p>\n`,"ok":true}';
+    const normalized = normalizeStructuredOutput(raw, options('Return ONLY valid JSON.'));
+    expect(() => JSON.parse(normalized)).not.toThrow();
+    expect(JSON.parse(normalized).content).toContain('<h1>Lesson</h1>');
+  });
+
   it('does not rewrite ordinary non-JSON responses', () => {
     const raw = 'Use {braces} as an example in normal explanatory text.';
     const plainOptions: ChatCompletionOptions = {

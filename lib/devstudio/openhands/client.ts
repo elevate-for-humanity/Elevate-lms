@@ -50,6 +50,12 @@ export type StartOpenHandsTaskInput = {
   tags?: string[];
 };
 
+export type OpenHandsSendMessageResult = {
+  success: boolean;
+  sandbox_status?: string | null;
+  message?: string | null;
+};
+
 const DEFAULT_ORIGIN = 'https://app.all-hands.dev';
 const DEFAULT_REPOSITORY = 'elevate-for-humanity/Elevate-lms';
 const REQUEST_TIMEOUT_MS = 60_000;
@@ -82,7 +88,11 @@ export function getOpenHandsConfig() {
 
 function headers(apiKey: string): HeadersInit {
   return {
+    // The Cloud guide documents Bearer auth while the generated V1 reference
+    // documents X-Access-Token. Supplying both keeps the client compatible
+    // with the documented Cloud gateway without exposing either to browsers.
     Authorization: `Bearer ${apiKey}`,
+    'X-Access-Token': apiKey,
     'Content-Type': 'application/json',
     Accept: 'application/json',
   };
@@ -155,6 +165,14 @@ function normalizeMessage(message: string): string {
   return trimmed;
 }
 
+function validateConversationId(conversationId: string): string {
+  const id = conversationId.trim();
+  if (!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id)) {
+    throw new Error('OpenHands conversation id is invalid');
+  }
+  return id;
+}
+
 export async function startOpenHandsTask(
   input: StartOpenHandsTaskInput,
 ): Promise<OpenHandsStartTask> {
@@ -168,7 +186,9 @@ export async function startOpenHandsTask(
     method: 'POST',
     body: JSON.stringify({
       initial_message: {
+        role: 'user',
         content: [{ type: 'text', text: message }],
+        run: true,
       },
       selected_repository: repository,
       observability_span_name: 'elevate_openhands_engineering',
@@ -180,6 +200,31 @@ export async function startOpenHandsTask(
   const task = firstItem<OpenHandsStartTask>(payload);
   if (!task?.id) throw new Error('OpenHands returned no start-task id');
   return task;
+}
+
+export async function sendOpenHandsMessage(
+  conversationId: string,
+  message: string,
+): Promise<OpenHandsSendMessageResult> {
+  const id = validateConversationId(conversationId);
+  const text = normalizeMessage(message);
+  const payload = await requestJson(
+    `/api/v1/app-conversations/${encodeURIComponent(id)}/send-message`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        content: [{ type: 'text', text }],
+        role: 'user',
+        run: true,
+      }),
+    },
+  );
+  if (!payload || typeof payload !== 'object') {
+    throw new Error('OpenHands returned an invalid follow-up response');
+  }
+  const result = payload as OpenHandsSendMessageResult;
+  if (result.success !== true) throw new Error(result.message || 'OpenHands follow-up message failed');
+  return result;
 }
 
 export async function getOpenHandsStartTask(startTaskId: string): Promise<OpenHandsStartTask | null> {
@@ -195,8 +240,7 @@ export async function getOpenHandsStartTask(startTaskId: string): Promise<OpenHa
 export async function getOpenHandsConversation(
   conversationId: string,
 ): Promise<OpenHandsConversation | null> {
-  const id = conversationId.trim();
-  if (!id) return null;
+  const id = validateConversationId(conversationId);
   const payload = await requestJson(
     `/api/v1/app-conversations?ids=${encodeURIComponent(id)}`,
     { method: 'GET' },

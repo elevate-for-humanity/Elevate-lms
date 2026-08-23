@@ -138,7 +138,7 @@ async function hydrateAISecrets(db: AdminDb) {
     (available.includes('CLOUDFLARE_ACCOUNT_ID') &&
       (available.includes('CLOUDFLARE_AI_API_TOKEN') || available.includes('CLOUDFLARE_API_TOKEN')));
 
-  if (!usable) fail('No AI provider credential is available');
+  if (!usable) console.warn('[Business Course Builder] No AI provider credential is available; deterministic baseline mode remains valid.');
 }
 
 async function kickMediaWorker() {

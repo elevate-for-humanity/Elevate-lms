@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:
-      group: unified-course-builder-production-acceptance-${{ github.event_name == 'issues' && 'issue' || 'push' }}
+      group: "unified-course-builder-production-acceptance-${{ github.event_name == 'issues' && 'issue' || 'push' }}"
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4

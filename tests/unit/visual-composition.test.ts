@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const aiChatMock = vi.fn();
+const { aiChatMock } = vi.hoisted(() => ({
+  aiChatMock: vi.fn(),
+}));
 
 vi.mock('../../lib/ai/ai-service', () => ({
   aiChat: aiChatMock,

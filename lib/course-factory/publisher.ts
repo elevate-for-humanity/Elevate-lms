@@ -95,7 +95,7 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
   const instructor = getInstructorForCourse(courseTitle);
   return [...modules]
     .sort((a, b) => a.orderIndex - b.orderIndex)
-    .map((courseModule) => {
+    .map((courseModule, modulePosition) => {
       const moduleExtra = courseModule as typeof courseModule & Record<string, any>;
       return {
         slug: courseModule.slug,
@@ -107,7 +107,7 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
         is_required: moduleExtra.isRequired ?? true,
         lessons: [...(courseModule.lessons ?? [])]
           .sort((a, b) => a.order - b.order)
-          .map((lesson) => {
+          .map((lesson, lessonPosition) => {
             const extra = lesson as typeof lesson & Record<string, any>;
             const stepType = normalizeLessonType(extra, lesson.slug);
             const content = normalizeLessonContent(lesson.content, lesson.objective);
@@ -158,10 +158,10 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               slug: lesson.slug,
               title: lesson.title,
               lesson_type: stepType,
-              // order is module-local in canonical blueprints. The live schema also
-              // enforces UNIQUE(course_id, order_index), so persist a stable global
-              // index using the long-established 1000-per-module convention.
-              order_index: courseModule.orderIndex * 1000 + lesson.order,
+              // The live schema enforces UNIQUE(course_id, order_index). Blueprint
+              // order fields are descriptive and may be duplicated or zero-based, so
+              // derive the persisted global index from normalized array positions.
+              order_index: (modulePosition + 1) * 1000 + (lessonPosition + 1),
               objective: lesson.objective ?? null,
               content,
               content_json: experience ? { experience } : {},

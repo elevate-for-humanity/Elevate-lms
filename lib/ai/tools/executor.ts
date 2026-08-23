@@ -20,7 +20,7 @@ export type AIToolExecutionContext = {
 
 export type AIToolExecutionResult = {
   ok: boolean;
-  status: 'completed' | 'failed' | 'blocked' | 'approval_required';
+  status: 'completed' | 'accepted' | 'failed' | 'blocked' | 'approval_required';
   httpStatus: number;
   tool: string;
   risk: AIToolDefinition['risk'];
@@ -56,7 +56,8 @@ function headerValue(headers: AIToolExecutionContext['requestHeaders'], name: st
 
 function toolUrl(tool: AIToolDefinition, input: Record<string, unknown>, context: AIToolExecutionContext): string {
   const path = typeof tool.path === 'function' ? tool.path(input) : tool.path;
-  const origin = path.startsWith('/api/admin/')
+  const isAdminControlPlane = path.startsWith('/api/admin/') || path.startsWith('/api/devstudio/');
+  const origin = isAdminControlPlane
     ? context.adminOrigin
     : context.appOrigin ?? context.adminOrigin;
   return `${origin.replace(/\/$/, '')}${path}`;
@@ -283,6 +284,31 @@ export async function executeRegisteredAITool(
           approvalRequired: tool.approvalRequired,
           payload,
           error: lastError,
+          traceId: eventId,
+        };
+      }
+
+      const payloadStatus =
+        payload && typeof payload === 'object' && 'status' in payload
+          ? String((payload as { status?: unknown }).status ?? '').toLowerCase()
+          : '';
+      const accepted = response.status === 202 || payloadStatus === 'queued' || payloadStatus === 'running';
+      if (accepted) {
+        await writeToolRun(tool, context, input, {
+          status: 'accepted',
+          output: payload,
+          startedAt,
+        });
+        await emitAuditEvent(tool, context, input, 'accepted', { http_status: response.status, source_event_id: eventId });
+        return {
+          ok: true,
+          status: 'accepted',
+          httpStatus: response.status,
+          tool: tool.name,
+          risk: tool.risk,
+          classification: tool.classification,
+          approvalRequired: tool.approvalRequired,
+          payload,
           traceId: eventId,
         };
       }

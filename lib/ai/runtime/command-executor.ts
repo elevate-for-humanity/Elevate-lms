@@ -18,7 +18,7 @@ export type AICommandExecutionContext = Omit<AIToolExecutionContext, 'agent'> & 
 export type AICommandExecutionResult = {
   ok: boolean;
   executed: boolean;
-  status: 'completed' | 'failed' | 'blocked' | 'approval_required' | 'advisory';
+  status: 'completed' | 'running' | 'failed' | 'blocked' | 'approval_required' | 'advisory';
   message: string;
   tool?: string;
   risk?: 'low' | 'medium' | 'high' | 'critical';
@@ -114,6 +114,19 @@ export async function executeAICommand(
         executed: false,
         status: toolResult.status,
         message: toolResult.error ?? 'Tool execution failed.',
+        tool: toolResult.tool,
+        risk: toolResult.risk,
+        payload: toolResult.payload,
+        traceId: toolResult.traceId,
+      };
+    }
+
+    if (toolResult.status === 'accepted') {
+      return {
+        ok: true,
+        executed: true,
+        status: 'running',
+        message: `${context.agentLabel ?? context.agent} dispatched ${toolResult.tool}; external execution is still running.`,
         tool: toolResult.tool,
         risk: toolResult.risk,
         payload: toolResult.payload,

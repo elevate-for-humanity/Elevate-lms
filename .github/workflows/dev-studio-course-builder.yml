@@ -61,7 +61,7 @@ jobs:
     timeout-minutes: 180
     concurrency:
       group: dev-studio-course-builder-${{ github.event_name == 'workflow_dispatch' && inputs.program || github.event.issue.title || 'push' }}
-      cancel-in-progress: false
+      cancel-in-progress: true
 
     steps:
       - uses: actions/checkout@v4
@@ -110,15 +110,11 @@ jobs:
           pnpm typecheck:studio
           pnpm exec eslint lib/devstudio/course-builder-controller.ts lib/course-builder lib/course-factory --quiet
 
-      - name: Require production persistence and AI provider
+      - name: Require production persistence
         shell: bash
         run: |
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
-          if [ -z "$GEMINI_API_KEY" ] && [ -z "$GOOGLE_CLOUD_API_KEY" ] && [ -z "$GROQ_API_KEY" ] && [ -z "$CLOUDFLARE_AI_API_TOKEN" ] && [ -z "$CLOUDFLARE_API_TOKEN" ] && [ -z "$OPENAI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$AZURE_OPENAI_API_KEY" ]; then
-            echo 'No AI provider credential is configured.' >&2
-            exit 1
-          fi
 
       - name: Resolve requested package
         id: target

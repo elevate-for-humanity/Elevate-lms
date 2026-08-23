@@ -3,10 +3,14 @@ import path from 'node:path';
 
 const root = process.cwd();
 const failures = [];
-const read = (rel) => {
+const readRequired = (rel) => {
   const abs = path.join(root, rel);
   if (!fs.existsSync(abs)) { failures.push(`Missing required file: ${rel}`); return ''; }
   return fs.readFileSync(abs, 'utf8');
+};
+const readOptional = (rel) => {
+  const abs = path.join(root, rel);
+  return fs.existsSync(abs) ? fs.readFileSync(abs, 'utf8') : '';
 };
 const walk = (dir, out = []) => {
   const abs = path.join(root, dir);
@@ -22,7 +26,7 @@ const walk = (dir, out = []) => {
 
 const rootRoute = 'apps/admin/app/api/admin/course-builder/route.ts';
 const studioChatRoute = 'apps/admin/app/api/devstudio/chat/route.ts';
-const rootText = read(rootRoute);
+const rootText = readRequired(rootRoute);
 for (const required of [
   "from '@/lib/course-builder/orchestrator'",
   "from '@/lib/course-builder/edit-service'",
@@ -45,28 +49,28 @@ for (const required of [
   "action === 'audit'",
 ]) if (!rootText.includes(required)) failures.push(`${rootRoute}: missing canonical action/authority ${required}`);
 
-const index = read('lib/course-factory/index.ts');
+const index = readRequired('lib/course-factory/index.ts');
 if (!index.includes("export { courseFactory } from '../course-builder/orchestrator'")) failures.push('lib/course-factory/index.ts must expose Course Builder facade instead of raw factory.ts');
-const orchestrator = read('lib/course-builder/orchestrator.ts');
+const orchestrator = readRequired('lib/course-builder/orchestrator.ts');
 if (!orchestrator.includes("from '../course-factory/factory'")) failures.push('Course Builder orchestrator does not own private Course Factory execution');
 if (!orchestrator.includes('saveCourseProgramConfiguration')) failures.push('Course Builder orchestrator does not own course program configuration persistence');
 if (!orchestrator.includes('queueCourseLessonVideos')) failures.push('Course Builder orchestrator does not own canonical media queue orchestration');
-const controller = read('lib/devstudio/course-builder-controller.ts');
+const controller = readRequired('lib/devstudio/course-builder-controller.ts');
 if (!controller.includes("from '../course-builder/orchestrator'")) failures.push('Studio Course Builder controller is not backed by canonical orchestrator');
-const editService = read('lib/course-builder/edit-service.ts');
+const editService = readRequired('lib/course-builder/edit-service.ts');
 for (const capability of ['saveCourseModule','saveCourseLesson','patchCourseLesson','deleteCourseLesson','reorderCourseLessons','linkCourseScormPackage']) {
   if (!editService.includes(capability)) failures.push(`Course Builder edit service is missing ${capability}`);
 }
-const reviewService = read('lib/course-builder/review-service.ts');
+const reviewService = readRequired('lib/course-builder/review-service.ts');
 for (const capability of ['reviewCanonicalCourse','reviewCanonicalLessons','reviewed_by','approved']) {
   if (!reviewService.includes(capability)) failures.push(`Course Builder review service is missing ${capability}`);
 }
-const persistedPublish = read('lib/course-builder/persisted-publish-service.ts');
+const persistedPublish = readRequired('lib/course-builder/persisted-publish-service.ts');
 for (const capability of ['runPersistedCourseProcurementHealthCheck','publishPersistedCourse','publishCourse','review_status','reviewed_by','module_completion_rules']) {
   if (!persistedPublish.includes(capability)) failures.push(`Persisted Course Builder publication service is missing ${capability}`);
 }
 
-const cloneService = read('lib/course-builder/clone-service.ts');
+const cloneService = readRequired('lib/course-builder/clone-service.ts');
 for (const capability of ['cloneCanonicalCourse', ".from('courses')", ".from('course_modules')", ".from('course_lessons')", "review_status: 'draft'", 'approved = false']) {
   if (!cloneService.includes(capability)) failures.push(`Course Builder clone service is missing ${capability}`);
 }
@@ -74,7 +78,7 @@ for (const rel of [
   'apps/admin/app/api/admin/courses/[courseId]/clone/route.ts',
   'apps/admin/app/api/admin/programs/[programId]/clone/route.ts',
 ]) {
-  const text = read(rel);
+  const text = readRequired(rel);
   if (!text.includes('cloneCanonicalCourse')) failures.push(`${rel}: clone route is not delegated to Course Builder clone service`);
   for (const forbidden of [".from('courses').insert", ".from('course_modules').insert", ".from('course_lessons').insert"]) {
     if (text.includes(forbidden)) failures.push(`${rel}: direct canonical clone write remains: ${forbidden}`);
@@ -98,7 +102,8 @@ const retiredMutationRoutes = [
   'supabase/functions/ai-course-create/index.ts',
 ];
 for (const rel of retiredMutationRoutes) {
-  const text = read(rel);
+  const text = readOptional(rel);
+  if (!text) continue;
   if (!/(RETIRED|COURSE_FACTORY_REQUIRED|COURSE_BUILDER_ROOT_REQUIRED)/.test(text)) failures.push(`${rel}: historical course mutation endpoint is not explicitly retired`);
   if (/\bcourseFactory\s*\(/.test(text)) failures.push(`${rel}: retired endpoint still invokes course generation`);
   if (/\.from\(['\"](?:courses|course_modules|course_lessons)['\"]\)[\s\S]{0,220}\.(?:insert|upsert|update|delete)\(/.test(text)) failures.push(`${rel}: retired endpoint still writes canonical course tables`);
@@ -106,7 +111,7 @@ for (const rel of retiredMutationRoutes) {
 }
 
 const mediaCompatRoute = 'apps/admin/app/api/admin/courses/[courseId]/generate-videos/route.ts';
-const mediaCompat = read(mediaCompatRoute);
+const mediaCompat = readRequired(mediaCompatRoute);
 for (const required of ["/api/admin/course-builder", "action: 'queue-media'", "status: 'queued'"]) {
   if (!mediaCompat.includes(required)) failures.push(`${mediaCompatRoute}: compatibility media route missing ${required}`);
 }
@@ -115,13 +120,13 @@ for (const forbidden of ['processLesson', "from '@/lib/video/pipeline'", ".from(
 }
 
 const lessonCompatRoute = 'apps/admin/app/api/admin/courses/lessons/route.ts';
-const lessonCompat = read(lessonCompatRoute);
+const lessonCompat = readRequired(lessonCompatRoute);
 if (!lessonCompat.includes('/api/admin/course-builder')) failures.push(`${lessonCompatRoute}: compatibility lesson mutations do not cross Course Builder root`);
 for (const forbidden of [".from('course_lessons').insert", ".from('course_lessons').delete", ".from('course_lessons').update"]) {
   if (lessonCompat.includes(forbidden)) failures.push(`${lessonCompatRoute}: direct canonical lesson mutation remains: ${forbidden}`);
 }
 
-const scormText = read('apps/admin/app/api/admin/course-builder/scorm-link/route.ts');
+const scormText = readRequired('apps/admin/app/api/admin/course-builder/scorm-link/route.ts');
 if (!scormText.includes('RETIRED mutation')) failures.push('SCORM mutation route is not explicitly retired');
 if (/export async function POST[\s\S]*?\.from\(['\"]scorm_packages['\"]\)[\s\S]{0,220}\.update\(/.test(scormText)) failures.push('SCORM POST still mutates outside Course Builder root');
 
@@ -138,29 +143,23 @@ const specializedPackageWriters = new Set([
 ]);
 for (const rel of [...walk('apps'), ...walk('lib'), ...walk('scripts'), ...walk('supabase/functions')]) {
   if (rel === 'lib/course-factory/publisher.ts' || specializedPackageWriters.has(rel)) continue;
-  const text = read(rel);
+  const text = readOptional(rel);
   const writes = (table) => new RegExp(`\\.from\\(['\"]${table}['\"]\\)[\\s\\S]{0,280}\\.(?:insert|upsert|update|delete)\\(`).test(text);
   if (writes('courses') && writes('course_modules') && writes('course_lessons')) failures.push(`${rel}: parallel complete course-package writer detected; complete packages must persist through Course Factory publisher or Course Builder clone service`);
 }
 
 for (const rel of walk('apps')) {
   if (rel === rootRoute || retiredMutationRoutes.includes(rel)) continue;
-  const text = read(rel);
+  const text = readOptional(rel);
   if (text.includes("@/lib/course-factory/factory")) failures.push(`${rel}: runtime route imports private Course Factory engine`);
   if (/\bcourseFactory\s*\(/.test(text) && rel.includes('/api/')) {
     const studioFacadeAllowed = rel === studioChatRoute && text.includes("await import('@/lib/course-factory')") && !text.includes("@/lib/course-factory/factory");
     if (!studioFacadeAllowed) failures.push(`${rel}: independent HTTP complete-course caller detected; use ${rootRoute}`);
   }
   if (/\bpublishCourse\s*\(/.test(text) && rel.includes('/api/')) failures.push(`${rel}: independent HTTP publication caller detected; use ${rootRoute}`);
-  if (/\.from\(['\"]courses['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}status\s*:\s*['\"]published['\"]/.test(text)) {
-    failures.push(`${rel}: direct HTTP publication-state write detected; use ${rootRoute}`);
-  }
-  if (/\.from\(['\"]courses['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}review_status\s*:/.test(text)) {
-    failures.push(`${rel}: direct HTTP course-review mutation detected; use ${rootRoute}`);
-  }
-  if (/\.from\(['\"]course_lessons['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}approved\s*:/.test(text)) {
-    failures.push(`${rel}: direct HTTP lesson-review mutation detected; use ${rootRoute}`);
-  }
+  if (/\.from\(['\"]courses['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}status\s*:\s*['\"]published['\"]/.test(text)) failures.push(`${rel}: direct HTTP publication-state write detected; use ${rootRoute}`);
+  if (/\.from\(['\"]courses['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}review_status\s*:/.test(text)) failures.push(`${rel}: direct HTTP course-review mutation detected; use ${rootRoute}`);
+  if (/\.from\(['\"]course_lessons['\"]\)[\s\S]{0,350}\.update\(\{[\s\S]{0,220}approved\s*:/.test(text)) failures.push(`${rel}: direct HTTP lesson-review mutation detected; use ${rootRoute}`);
 }
 
 const forbiddenEndpointRefs = [
@@ -183,7 +182,7 @@ const endpointReferenced = (text, endpoint) => {
 };
 for (const rel of [...walk('apps'), ...walk('components'), ...walk('lib')]) {
   if (retiredMutationRoutes.includes(rel)) continue;
-  const text = read(rel);
+  const text = readOptional(rel);
   for (const endpoint of forbiddenEndpointRefs) if (endpointReferenced(text, endpoint)) failures.push(`${rel}: retired endpoint referenced: ${endpoint}`);
 }
 

@@ -545,3 +545,15 @@ app/(marketing)/platform-architecture/       [CREATE]
 - [ ] Recheck both repaired testing URLs and confirm their final destinations after deployment.
 - [ ] Exercise Stripe checkout creation with an approved non-production/test payment path; page rendering alone does not prove a completed payment.
 - [ ] Complete authenticated role-by-role portal workflow testing. Public cards and auth redirects do not prove each authorized dashboard workflow.
+
+
+### Legacy route and support corrections — verified August 23, 2026
+
+- [x] Add Marketing-host compatibility redirects: `/home` → `/`, `/index.html` → `/`, `/training` → `/programs`, `/terms-and-conditions` → `/terms-of-service`, `/legal/terms-of-service` → `/terms-of-service`, `/student-handbook` → `/legal/student-handbook`, and `/dashboard` → the LMS student dashboard (commit `8ebc918`).
+- [x] Preserve `/programs/all`; live verification returned a working page, so redirecting it would remove valid behavior.
+- [x] Keep `/privacy` canonical; `/privacy-policy` and `/legal/privacy` already redirect to it.
+- [x] Remove the false live-chat promise from `/support/chat`; label the current contact workflow honestly until a real chat backend exists (commit `08cfc87`).
+- [x] Point the Policies index directly to canonical Terms, Privacy, and Student Handbook routes (commit `86e70c6`).
+- [ ] Deploy Marketing at commit `86e70c6` or a descendant and verify exact live SHA.
+- [ ] Re-run the public-route crawl after deployment and attach HTTP status/final-destination evidence.
+- [ ] If real-time chat is required, implement an authenticated chat provider, availability state, queue/fallback behavior, transcript retention policy, and accessibility testing before restoring “Live Chat” language.

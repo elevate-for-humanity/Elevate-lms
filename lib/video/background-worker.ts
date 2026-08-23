@@ -2,6 +2,7 @@ import 'server-only';
 
 import { logger } from '@/lib/logger';
 import { getSecret } from '@/lib/secrets';
+import { recoverCourseMediaJobs } from '@/lib/course-factory/media-manager';
 
 const START_DELAY_MS = 15_000;
 const TICK_DELAY_MS = 30_000;
@@ -24,6 +25,13 @@ async function kickCanonicalWorker(): Promise<void> {
     return;
   }
 
+  // Retry/recovery policy belongs to Course Factory. The renderer endpoint only
+  // claims queued canonical jobs and executes them.
+  const maintenance = await recoverCourseMediaJobs();
+  if (maintenance.recovered.length || maintenance.blocked.length) {
+    logger.info('[video-background-worker] Course Factory media maintenance', maintenance);
+  }
+
   // Keep Remotion and all Node-only rendering dependencies isolated in the
   // Node API route. Instrumentation only makes a localhost HTTP request.
   const port = process.env.PORT?.trim() || '3000';
@@ -33,6 +41,7 @@ async function kickCanonicalWorker(): Promise<void> {
       authorization: `Bearer ${secret}`,
       'content-type': 'application/json',
     },
+    body: JSON.stringify({}),
     cache: 'no-store',
   });
 

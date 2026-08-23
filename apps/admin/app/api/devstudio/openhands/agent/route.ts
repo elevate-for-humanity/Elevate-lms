@@ -3,6 +3,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { hasPermission } from '@/lib/rbac/role-matrix';
 import { requiresApproval } from '@/lib/devstudio/os/risk';
+import { buildOpenHandsContextPrompt } from '@/lib/devstudio/openhands/context';
 import { getOpenHandsConfig, getOpenHandsLifecycle } from '@/lib/devstudio/openhands/client';
 import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
 
@@ -52,10 +53,16 @@ export async function POST(request: NextRequest) {
       request.headers.get('x-correlation-id') ||
       request.headers.get('idempotency-key') ||
       crypto.randomUUID();
+    const contextPrompt = await buildOpenHandsContextPrompt({
+      goal: task,
+      actorId: auth.userId,
+      tenantId: null,
+    });
+    const governedTask = `${task}\n\n${contextPrompt}`;
 
     const dispatched = await dispatchOpenHandsTask({
       actorId: auth.userId,
-      task,
+      task: governedTask,
       repository,
       correlationId,
       tenantId: null,

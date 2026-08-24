@@ -711,7 +711,7 @@ export default function ProgramDetailPage({
                 {enrollmentTracks.selfPay.description}
               </p>
 
-              {/* Pay & Enroll button — shown when self-pay is available and a checkout href is configured */}
+              {/* Legacy direct checkout link, when one is configured. */}
               {enrollmentTracks.selfPay.available && p.cta.stripeCheckoutHref && (
                 <div className="mt-2 mb-4">
                   <PayNowButton
@@ -719,23 +719,25 @@ export default function ProgramDetailPage({
                     cost={enrollmentTracks.selfPay.cost}
                     stripeCheckoutHref={p.cta.stripeCheckoutHref}
                   />
-                  {/* Payment Plan Calculator */}
-                  <div className="mt-4">
-                    <PaymentPlanCalculator
-                      programSlug={p.slug}
-                      stripeDepositUrl={p.cta.stripeCheckoutHref}
-                    />
-                  </div>
                 </div>
               )}
 
-              {/* Apply Now fallback — shown when self-pay is available but no Stripe checkout configured */}
+              {/* Every published self-pay program uses the canonical server-created checkout.
+                  This provides the payment calculator, BNPL eligibility, and coupon entry
+                  without depending on a legacy hard-coded Stripe URL. */}
+              {enrollmentTracks.selfPay.available && selfPayNumeric > 0 && (
+                <div className="mt-4 mb-4">
+                  <PaymentPlanCalculator programSlug={p.slug} />
+                </div>
+              )}
+
+              {/* Application fallback remains available when no legacy direct link exists. */}
               {enrollmentTracks.selfPay.available && !p.cta.stripeCheckoutHref && (
                 <Link
                   href={enrollmentTracks.selfPay.applyHref}
-                  className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm mt-2 mb-4"
+                  className="block w-full text-center border-2 border-brand-blue-200 hover:border-brand-blue-400 text-brand-blue-700 font-bold py-3.5 rounded-xl transition-colors text-sm mt-2 mb-4"
                 >
-                  Apply Now — Self-Pay
+                  Apply Before Payment
                 </Link>
               )}
 

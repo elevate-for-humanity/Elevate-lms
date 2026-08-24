@@ -2,10 +2,10 @@
  * Universal narration adapter used by the Remotion lesson renderer.
  *
  * Narration priority:
- *   1. Edge TTS (zero-cost public endpoint)
- *   2. ElevenLabs authenticated MP3
- *   3. Gemini authenticated TTS, transcoded to MP3
- *   4. OpenAI authenticated MP3
+ *   1. ElevenLabs authenticated MP3
+ *   2. Gemini authenticated TTS, transcoded to MP3
+ *   3. OpenAI authenticated MP3
+ *   4. Edge TTS (zero-cost public endpoint)
  *
  * Edge TTS can reject datacenter traffic with HTTP 403. Production therefore
  * never depends on that public endpoint as the sole narration provider.
@@ -40,6 +40,17 @@ const OPENAI_VOICE_MAP: Record<EdgeTTSVoice, 'alloy' | 'echo' | 'fable' | 'onyx'
   'en-GB-RyanNeural': 'fable',
   'en-US-DavisNeural': 'echo',
 };
+
+export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
+
+function narrationFailureDetail(error: unknown): string {
+  const raw = error instanceof Error ? error.message : String(error);
+  return raw
+    .replace(/(api[-_ ]?key|authorization|xi-api-key)(["'\s:=]+)[^\s,"'}]+/gi, '$1$2[redacted]')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 320) || 'unknown error';
+}
 
 async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
   return new Promise((resolve, reject) => {
@@ -101,7 +112,7 @@ async function generateLocalNarration(text: string): Promise<Buffer> {
 async function generateGeminiNarration(text: string): Promise<Buffer> {
   const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
-  const model = process.env.GEMINI_TTS_MODEL?.trim() || 'gemini-3.1-flash-tts-preview';
+  const model = process.env.GEMINI_TTS_MODEL?.trim() || DEFAULT_GEMINI_TTS_MODEL;
   const voiceName = process.env.GEMINI_TTS_VOICE?.trim() || 'Kore';
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
@@ -168,32 +179,39 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
   const normalizedText = text.trim();
   if (!normalizedText) throw new Error('Narration requires non-empty text');
   const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%', pitch = '0Hz', volume = '+0%' } = options;
+  const failures: string[] = [];
+
+  const recordFailure = (provider: string, error: unknown) => {
+    const detail = narrationFailureDetail(error);
+    failures.push(`${provider}: ${detail}`);
+    return detail;
+  };
 
   if (process.env.ELEVENLABS_API_KEY?.trim()) {
     try { return await generateElevenLabsNarration(normalizedText); }
-    catch (error) { logger.warn('[Narration] ElevenLabs unavailable; trying Gemini', { error: error instanceof Error ? error.message : String(error) }); }
+    catch (error) { logger.warn('[Narration] ElevenLabs unavailable; trying Gemini', { error: recordFailure('ElevenLabs', error) }); }
   }
   if (process.env.GEMINI_API_KEY?.trim()) {
     try { return await generateGeminiNarration(normalizedText); }
-    catch (error) { logger.warn('[Narration] Gemini TTS unavailable; trying OpenAI', { error: error instanceof Error ? error.message : String(error) }); }
+    catch (error) { logger.warn('[Narration] Gemini TTS unavailable; trying OpenAI', { error: recordFailure('Gemini', error) }); }
   }
   if (isOpenAIConfigured()) {
     try { return await generateOpenAINarration(normalizedText, voice); }
-    catch (error) { logger.warn('[Narration] OpenAI TTS unavailable; trying Edge TTS', { error: error instanceof Error ? error.message : String(error) }); }
+    catch (error) { logger.warn('[Narration] OpenAI TTS unavailable; trying Edge TTS', { error: recordFailure('OpenAI', error) }); }
   }
 
   try {
     const audio = await tts(normalizedText, { voice, rate, pitch, volume });
     return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
   } catch (edgeError) {
-    logger.warn('[Narration] Edge TTS unavailable', { error: edgeError instanceof Error ? edgeError.message : String(edgeError) });
+    logger.warn('[Narration] Edge TTS unavailable', { error: recordFailure('Edge TTS', edgeError) });
   }
 
   if (process.env.NODE_ENV !== 'production') {
     logger.info('[Narration] Using diagnostic-only local espeak-ng fallback');
     return generateLocalNarration(normalizedText);
   }
-  throw new Error('No publication-quality narration provider is available');
+  throw new Error(`No publication-quality narration provider is available. Attempts: ${failures.join(' | ') || 'none configured'}`);
 }
 
 export function buildLessonScript(lesson: { title: string; moduleTitle: string; objective: string; keyPoints: string[]; example: string; summary: string }): string {

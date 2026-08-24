@@ -2,15 +2,19 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
+  AlertTriangle,
   ArrowRight,
   Award,
+  BriefcaseBusiness,
   BadgeCheck,
   BarChart2,
   BookOpen,
   CheckCircle,
   Clock,
   CreditCard,
+  ClipboardCheck,
   ExternalLink,
+  FileText,
   GraduationCap,
   Play,
   Upload,
@@ -78,6 +82,8 @@ export default async function StudentDashboard() {
     paymentLogsRes,
     externalCoursesRes,
     externalCompletionsRes,
+    onboardingRes,
+    partnerEnrollmentsRes,
   ] = await Promise.all([
     supabase
       .from('program_enrollments')
@@ -118,7 +124,7 @@ export default async function StudentDashboard() {
     supabase
       .from('program_external_courses')
       .select(
-        'id, title, partner_name, external_url, credential_type, duration_display, is_required, elevate_fee_cents, fee_label, support_included, program_id, programs(slug, title)',
+        'id, title, partner_name, external_url, description, duration_display, credential_type, credential_name, enrollment_instructions, is_required, elevate_fee_cents, fee_label, support_included, program_id, programs(slug, title)',
       )
       .eq('is_active', true)
       .order('sort_order', { ascending: true })
@@ -127,6 +133,17 @@ export default async function StudentDashboard() {
       .from('external_course_completions')
       .select('id, external_course_id, completed_at, certificate_url, approved_at, elevate_sponsored, stripe_session_id')
       .eq('user_id', user.id),
+    supabase
+      .from('student_onboarding')
+      .select('handbook_reviewed, milady_orientation_completed, ai_instructor_met, shop_placed')
+      .eq('student_id', user.id)
+      .maybeSingle(),
+    supabase
+      .from('partner_lms_enrollments')
+      .select('id, status, progress_percentage, external_account_id, external_enrollment_id, metadata, provider_id')
+      .eq('student_id', user.id)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false }),
   ]);
 
   const isAdminPreview = String(profile?.role ?? '').toLowerCase() === 'admin';
@@ -145,6 +162,15 @@ export default async function StudentDashboard() {
   const recentPayments = paymentLogsRes.data ?? [];
   const workoneApp = workoneAppRes.data;
   const isPendingWorkone = Boolean(workoneApp);
+  const onboarding = onboardingRes.data;
+  const partnerEnrollments = partnerEnrollmentsRes.data ?? [];
+  const onboardingItems = [
+    { label: 'Review the Student Handbook', done: Boolean(onboarding?.handbook_reviewed) },
+    { label: 'Complete learner orientation', done: Boolean(onboarding?.milady_orientation_completed) },
+    { label: 'Meet your learner support assistant', done: Boolean(onboarding?.ai_instructor_met) },
+    { label: 'Confirm training placement or external provider access', done: Boolean(onboarding?.shop_placed) },
+  ];
+  const onboardingComplete = onboardingItems.every((item) => item.done);
 
   const courseIds = Array.from(
     new Set(courseEnrollments.map((row) => row.course_id).filter((value): value is string => Boolean(value))),
@@ -239,6 +265,7 @@ export default async function StudentDashboard() {
     { href: '/lms/calendar', label: 'Schedule', text: 'Review classes, deadlines, and upcoming activity.', image: '/images/pages/career-counseling.jpg' },
     { href: '/lms/messages', label: 'Messages', text: 'Open learner communications and program messages.', image: '/images/pages/contact-hero.jpg' },
     { href: '/lms/support', label: 'Get Help', text: 'Reach learner support when you need assistance.', image: '/images/pages/about-hero.webp' },
+    { href: '/lms/jobs', label: 'Career Opportunities', text: 'Browse current jobs and placement resources.', image: '/images/pages/career-counseling.jpg' },
   ];
 
   return (
@@ -310,14 +337,46 @@ export default async function StudentDashboard() {
           </section>
         ) : (
           <section className="rounded-3xl border border-blue-300 bg-blue-50 p-7 sm:p-9">
-            <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-900">Welcome, {firstName}</p>
-            <h1 className="mt-2 text-3xl font-black text-slate-950">Choose your next training step</h1>
+            <p className="text-xs font-black uppercase tracking-[0.15em] text-blue-900">External training · Welcome, {firstName}</p>
+            <h1 className="mt-2 text-3xl font-black text-slate-950">
+              {externalCourses.length > 0 ? 'Your Certiport training is active' : 'Choose your next training step'}
+            </h1>
             <p className="mt-3 max-w-2xl font-medium text-slate-700">
-              You do not currently have an active course enrollment. Review your programs, application status, and funding options before starting training.
+              {externalCourses.length > 0
+                ? 'Complete training on the approved provider platform. Elevate will track your account, progress evidence, and final credential without creating a duplicate LMS course.'
+                : 'Review your program, application status, and funding options before starting training.'}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/lms/courses" className="rounded-xl bg-brand-blue-700 px-5 py-3 font-black text-white hover:bg-brand-blue-800">Browse Courses</Link>
-              <Link href="/lms/apply/status" className="rounded-xl border border-blue-400 bg-white px-5 py-3 font-bold text-blue-950 hover:bg-blue-100">Application Status</Link>
+              {externalCourses[0]?.external_url ? (
+                <a href={externalCourses[0].external_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl bg-brand-blue-700 px-5 py-3 font-black text-white hover:bg-brand-blue-800">
+                  Open {externalCourses[0].partner_name || 'Training Provider'} <ExternalLink className="h-4 w-4" />
+                </a>
+              ) : null}
+              <Link href="/lms/onboarding" className="rounded-xl border border-blue-400 bg-white px-5 py-3 font-bold text-blue-950 hover:bg-blue-100">Complete Onboarding</Link>
+            </div>
+          </section>
+        )}
+
+        {!onboardingComplete && (
+          <section className="rounded-2xl border-2 border-amber-400 bg-amber-50 p-5 sm:p-6" aria-labelledby="onboarding-warning-title">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0 text-amber-800" aria-hidden="true" />
+              <div className="min-w-0 flex-1">
+                <h2 id="onboarding-warning-title" className="text-xl font-black text-amber-950">Onboarding is incomplete</h2>
+                <p className="mt-1 text-sm font-medium text-amber-900">Finish every required item before credential completion can be verified.</p>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  {onboardingItems.map((item) => (
+                    <div key={item.label} className="flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-bold text-slate-900">
+                      {item.done ? <CheckCircle className="h-4 w-4 text-green-700" /> : <Clock className="h-4 w-4 text-amber-700" />}
+                      {item.label}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link href="/lms/onboarding" className="inline-flex items-center gap-2 rounded-lg bg-amber-900 px-4 py-2 text-sm font-black text-white hover:bg-amber-950"><ClipboardCheck className="h-4 w-4" /> Continue onboarding</Link>
+                  <Link href="/lms/documents" className="inline-flex items-center gap-2 rounded-lg border border-amber-500 bg-white px-4 py-2 text-sm font-black text-amber-950 hover:bg-amber-100"><FileText className="h-4 w-4" /> Required documents</Link>
+                </div>
+              </div>
             </div>
           </section>
         )}
@@ -381,6 +440,10 @@ export default async function StudentDashboard() {
                           <div>
                             <p className="font-bold text-slate-950">{course.title}</p>
                             <p className="mt-1 text-xs font-medium text-slate-700">{course.partner_name}{course.credential_type ? ` · ${course.credential_type}` : ''}</p>
+                            {course.description ? <p className="mt-2 text-sm font-medium leading-5 text-slate-700">{course.description}</p> : null}
+                            {course.duration_display ? <p className="mt-2 text-xs font-bold text-slate-900">Expected duration: {course.duration_display}</p> : null}
+                            {course.credential_name ? <p className="mt-1 text-xs font-bold text-slate-900">Credential: {course.credential_name}</p> : null}
+                            {course.enrollment_instructions ? <p className="mt-2 text-xs font-medium leading-5 text-slate-700">{course.enrollment_instructions}</p> : null}
                           </div>
                           {approved ? <BadgeCheck className="h-5 w-5 shrink-0 text-green-700" /> : null}
                         </div>
@@ -487,6 +550,27 @@ export default async function StudentDashboard() {
                 <Link href="/lms/payments" className="mt-4 inline-flex text-sm font-bold text-brand-blue-800 hover:underline">View payment history</Link>
               </div>
             </section>
+
+            <section className="rounded-2xl border border-cyan-300 bg-cyan-50 p-5">
+              <h2 className="flex items-center gap-2 font-black text-cyan-950"><BriefcaseBusiness className="h-4 w-4" /> Career Center</h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-cyan-950">Browse live opportunities and use placement resources while completing your credential.</p>
+              <Link href="/lms/jobs" className="mt-4 inline-flex items-center gap-2 text-sm font-black text-cyan-950 hover:underline">View career opportunities <ArrowRight className="h-4 w-4" /></Link>
+            </section>
+
+            {partnerEnrollments.length > 0 && (
+              <section className="rounded-2xl border border-blue-300 bg-blue-50 p-5">
+                <h2 className="font-black text-blue-950">External Training Progress</h2>
+                <div className="mt-3 space-y-2 text-sm">
+                  {partnerEnrollments.map((enrollment: any) => (
+                    <div key={enrollment.id} className="rounded-xl bg-white p-3">
+                      <p className="font-bold text-slate-950">{enrollment.metadata?.credential ?? 'Partner training'}</p>
+                      <p className="mt-1 font-medium text-slate-700">Provider progress: {Number(enrollment.progress_percentage ?? 0)}%</p>
+                      <p className="mt-1 text-xs font-medium text-slate-600">Account: {enrollment.external_account_id ?? 'Linked'}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <section className="rounded-2xl bg-slate-950 p-5 text-white">
               <h2 className="font-black text-white">Credential Pathway</h2>

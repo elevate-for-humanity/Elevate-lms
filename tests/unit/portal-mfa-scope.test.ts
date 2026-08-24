@@ -20,4 +20,15 @@ describe('portal MFA scope', () => {
     expect(login).toContain('resolveDashboardUrl(profile.role, effectiveRoles)');
     expect(login).not.toContain('/mfa');
   });
+
+  it('does not weaken privileged enrollment writes when restoring learner reads', () => {
+    const migration = source(
+      'supabase/migrations/20260824173000_allow_learners_read_own_program_enrollments.sql',
+    );
+
+    expect(migration).toContain('program_enrollments_owner_read');
+    expect(migration).toContain('(SELECT auth.uid()) = COALESCE(user_id, student_id)');
+    expect(migration).not.toContain('DROP POLICY IF EXISTS require_privileged_aal2');
+    expect(migration).not.toContain("auth.jwt() ->> 'aal'");
+  });
 });

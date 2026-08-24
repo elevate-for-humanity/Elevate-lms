@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import {
   getCourseMediaState,
@@ -258,6 +260,9 @@ async function runGovernanceAndPublish(media: Awaited<ReturnType<typeof getCours
 }
 
 async function main() {
+  if (existsSync('.github/COURSE_MEDIA_PAUSED')) {
+    fail('course media generation is paused by the repository cost-control kill switch');
+  }
   const structure = await auditPersistedStructure();
   if (structure.course.slug !== COURSE_SLUG) fail(`course slug mismatch: ${structure.course.slug}`);
   const blueprint = await getBlueprintBySlug(COURSE_SLUG);

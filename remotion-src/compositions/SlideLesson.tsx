@@ -455,7 +455,7 @@ function SceneSlide({
               </div>
             ))}
           </div>
-        )
+        )}
       </div>
 
       {/* Per-scene audio */}

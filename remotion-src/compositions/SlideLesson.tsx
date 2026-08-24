@@ -29,6 +29,7 @@ import {
   Sequence,
   staticFile,
 } from 'remotion';
+import { instructionalLayoutForTitle, type InstructionalLayout } from '../instructional-layout';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -250,6 +251,79 @@ function CaptionBar({
   );
 }
 
+function InstructionalGraphic({
+  layout,
+  frame,
+  props,
+}: {
+  layout: InstructionalLayout;
+  frame: number;
+  props: SlideLessonProps;
+}) {
+  const card = {
+    background: 'rgba(255,255,255,0.96)',
+    border: '1px solid rgba(148,163,184,0.45)',
+    borderRadius: 14,
+    color: '#0f172a',
+    fontFamily: 'sans-serif',
+    fontWeight: 800,
+    boxShadow: '0 14px 35px rgba(15,23,42,0.16)',
+  } as const;
+
+  if (layout.kind === 'comparison') {
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+        {layout.columns.map((column, index) => (
+          <div key={column.title} style={{ ...card, padding: 28, opacity: fadeIn(frame, 16 + index * 10, 16) }}>
+            <div style={{ color: props.primaryColor, fontSize: 28, marginBottom: 12 }}>{column.title}</div>
+            <div style={{ fontSize: 22, lineHeight: 1.35, fontWeight: 650 }}>{column.purpose}</div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const columns = layout.kind === 'lean-canvas' ? 3 : layout.kind === 'pitch-deck' ? 4 : 3;
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 12 }}>
+      {layout.items.map((item, index) => (
+        <div
+          key={item}
+          style={{
+            ...card,
+            padding: layout.kind === 'activity' ? '16px 20px' : '18px 14px',
+            minHeight: layout.kind === 'lean-canvas' ? 76 : 62,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            opacity: fadeIn(frame, 14 + index * 6, 14),
+            transform: `translateY(${Math.max(0, 14 - Math.max(0, frame - index * 6))}px)`,
+          }}
+        >
+          <div
+            style={{
+              width: 28,
+              height: 28,
+              flexShrink: 0,
+              borderRadius: layout.kind === 'activity' ? 7 : 14,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: props.primaryColor,
+              color: '#fff',
+              fontSize: 14,
+              fontWeight: 900,
+            }}
+          >
+            {layout.kind === 'activity' ? '✓' : index + 1}
+          </div>
+          <div style={{ fontSize: layout.kind === 'lean-canvas' ? 17 : 18, lineHeight: 1.2 }}>{item}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── Scene slide ───────────────────────────────────────────────────────────────
 
 function SceneSlide({
@@ -262,11 +336,12 @@ function SceneSlide({
   props: SlideLessonProps;
 }) {
   const { fps } = useVideoConfig();
+  const instructionalLayout = instructionalLayoutForTitle(scene.title);
 
   return (
-    <AbsoluteFill style={{ background: props.backgroundColor }}>
-      {/* Background: video clip (looped) or image */}
-      {scene.clipUrl ? (
+    <AbsoluteFill style={{ background: instructionalLayout ? '#eef2f7' : props.backgroundColor }}>
+      {/* Background: video clip (looped) or image. Exact teaching graphics own the full frame. */}
+      {!instructionalLayout && scene.clipUrl ? (
         <Video
           src={scene.clipUrl}
           style={{
@@ -293,14 +368,16 @@ function SceneSlide({
         />
       ) : null}
 
-      {/* Directional scrim keeps the text readable without crushing the footage. */}
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.28) 58%, rgba(15,23,42,0.08) 100%)',
-        }}
-      />
+      {/* Directional scrim keeps cinematic footage readable. Instructional graphics use a clean canvas. */}
+      {!instructionalLayout && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.28) 58%, rgba(15,23,42,0.08) 100%)',
+          }}
+        />
+      )}
 
       <BrandBar color={props.primaryColor} logoText={props.logoText ?? 'Elevate LMS'} />
 
@@ -343,12 +420,12 @@ function SceneSlide({
           style={{
             opacity: fadeIn(frame, 8, 22),
             transform: `translateY(${slideUp(frame, fps, 8)}px)`,
-            fontSize: 52,
+            fontSize: instructionalLayout ? 42 : 52,
             fontWeight: 900,
-            color: '#fff',
+            color: instructionalLayout ? '#0f172a' : '#fff',
             fontFamily: 'sans-serif',
             lineHeight: 1.2,
-            textShadow: '0 2px 12px rgba(0,0,0,0.6)',
+            textShadow: instructionalLayout ? 'none' : '0 2px 12px rgba(0,0,0,0.6)',
             borderLeft: `5px solid ${props.primaryColor}`,
             paddingLeft: 24,
           }}
@@ -356,43 +433,29 @@ function SceneSlide({
           {scene.title}
         </div>
 
-        {/* Bullet points */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingLeft: 8 }}>
-          {scene.bullets.map((bullet, i) => (
-            <div
-              key={i}
-              style={{
-                opacity: fadeIn(frame, 22 + i * 14, 18),
-                transform: `translateY(${slideUp(frame, fps, 22 + i * 14)}px)`,
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 16,
-              }}
-            >
+        {instructionalLayout ? (
+          <InstructionalGraphic layout={instructionalLayout} frame={frame} props={props} />
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingLeft: 8 }}>
+            {scene.bullets.map((bullet, i) => (
               <div
+                key={i}
                 style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: '50%',
-                  background: props.accentColor,
-                  flexShrink: 0,
-                  marginTop: 10,
-                }}
-              />
-              <div
-                style={{
-                  color: '#e2e8f0',
-                  fontSize: 28,
-                  fontFamily: 'sans-serif',
-                  lineHeight: 1.5,
-                  textShadow: '0 1px 6px rgba(0,0,0,0.5)',
+                  opacity: fadeIn(frame, 22 + i * 14, 18),
+                  transform: `translateY(${slideUp(frame, fps, 22 + i * 14)}px)`,
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 16,
                 }}
               >
-                {bullet}
+                <div style={{ width: 10, height: 10, borderRadius: '50%', background: props.accentColor, flexShrink: 0, marginTop: 10 }} />
+                <div style={{ color: '#e2e8f0', fontSize: 28, fontFamily: 'sans-serif', lineHeight: 1.5, textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
+                  {bullet}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )
       </div>
 
       {/* Per-scene audio */}

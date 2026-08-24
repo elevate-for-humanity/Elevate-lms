@@ -337,9 +337,19 @@ function SceneSlide({
 }) {
   const { fps } = useVideoConfig();
   const instructionalLayout = instructionalLayoutForTitle(scene.title);
+  const instructionalBackgroundPosition =
+    `${50 + Math.sin(frame / (fps * 2)) * 30}% ${50 + Math.cos(frame / (fps * 2.5)) * 20}%`;
 
   return (
-    <AbsoluteFill style={{ background: instructionalLayout ? '#eef2f7' : props.backgroundColor }}>
+    <AbsoluteFill
+      style={{
+        background: instructionalLayout
+          ? 'linear-gradient(120deg, #eef2f7 0%, #dbeafe 45%, #f8fafc 100%)'
+          : props.backgroundColor,
+        backgroundSize: instructionalLayout ? '200% 200%' : undefined,
+        backgroundPosition: instructionalLayout ? instructionalBackgroundPosition : undefined,
+      }}
+    >
       {/* Background: video clip (looped) or image. Exact teaching graphics own the full frame. */}
       {!instructionalLayout && scene.clipUrl ? (
         <Video

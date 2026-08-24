@@ -124,7 +124,7 @@ function servicePayload(volumeId: string): R {
     billing: { deploymentPlan: GPU_DEPLOYMENT_PLAN, buildPlan: BUILD_PLAN, gpu },
     infrastructure: { architecture: 'x86' },
     buildSource: 'git',
-    disabledCI: true,
+    disabledCI: false,
     vcsData: { projectUrl: REPO, projectType: 'github', projectBranch: 'main' },
     buildSettings: {
       storage: { ephemeralStorage: { storageSize: BUILD_EPHEMERAL_MB } },

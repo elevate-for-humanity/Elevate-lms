@@ -9,7 +9,7 @@ export function HomeFinalCTA() {
   return (
     <section className="bg-white px-4 py-14 sm:py-18" aria-labelledby="final-cta-heading">
       <div className="mx-auto grid max-w-6xl overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-xl lg:grid-cols-[1fr_1fr]">
-        <div className="relative min-h-[300px] sm:min-h-[420px]">
+        <div className="relative min-h-[300px] sm:min-h-[400px]">
           <Image
             src={FINAL_CTA_IMAGE}
             alt="Student beginning an Elevate for Humanity career training application"

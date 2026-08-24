@@ -57,7 +57,7 @@ export function AgenticCourseRunPanel({
 
   async function refresh(id = projectId) {
     if (!id) return;
-    const response = await fetch(`/api/devstudio/course-agent?projectId=${encodeURIComponent(id)}`, { cache: 'no-store' });
+    const response = await fetch(`/api/admin/dev-studio/course-agent?projectId=${encodeURIComponent(id)}`, { cache: 'no-store' });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(body.error || 'Unable to load Course Builder run');
     setSnapshot(body);
@@ -83,7 +83,7 @@ export function AgenticCourseRunPanel({
     setStarting(true);
     setError('');
     try {
-      const response = await fetch('/api/devstudio/course-agent', {
+      const response = await fetch('/api/admin/dev-studio/course-agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'start', goal, programId, courseId, title: courseTitle }),

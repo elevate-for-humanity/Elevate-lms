@@ -42,7 +42,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       transcript={banner.transcript}
       analyticsName={banner.analyticsName}
       overlayMode="none"
-      heightClassName="h-[52vh] min-h-[360px] max-h-[680px] md:h-[58vh] md:min-h-[480px] lg:h-[62vh]"
+      heightClassName="h-[38vh] min-h-[320px] max-h-[520px]"
     />
   );
 }

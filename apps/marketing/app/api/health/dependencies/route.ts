@@ -6,20 +6,14 @@
  */
 
 import { NextResponse } from 'next/server';
+import { checkDependencies } from '@/lib/health/dependency-checks';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
-  const checks = {
-    supabase: false,
-    redis: false,
-    sendgrid: false,
-  };
-
-  // TODO: Add actual dependency checks here
-  // For now, just report structure without checking
+  const checks = await checkDependencies();
 
   return NextResponse.json(
     {

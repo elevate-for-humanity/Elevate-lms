@@ -98,7 +98,7 @@ export function HomeTrustBar() {
                   width={56}
                   height={56}
                   className="object-contain w-full h-full"
-                  sizes="64px"
+                  sizes="(max-width: 640px) 40vw, 16vw"
                   loading="lazy"
                 />
               </div>
@@ -131,7 +131,7 @@ export function HomeTrustBar() {
                   alt={logo.alt}
                   fill
                   className="object-contain"
-                  sizes="128px"
+                  sizes="(max-width: 768px) 40vw, 10vw"
                   loading="lazy"
                   placeholder="empty"
                 />

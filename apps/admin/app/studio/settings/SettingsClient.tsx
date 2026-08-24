@@ -92,7 +92,7 @@ export default function SettingsClient() {
     // namespace is independently consolidated; do not couple that migration
     // to the already-proven health route migration.
     try {
-      const res = await fetch('/api/devstudio/builds');
+      const res = await fetch('/api/admin/dev-studio/builds');
       if (res.ok) {
         const data = await res.json();
         const hasToken = data.builds !== undefined;

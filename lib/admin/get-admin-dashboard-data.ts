@@ -120,7 +120,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
         submitted_at: row.submitted_at ?? null,
         age_days: ageDays,
         urgent: ageDays >= 3,
-        href: `/admin/applications/review/${row.id}`,
+        href: `/applications/review/${row.id}`,
       };
     })
     .sort((a, b) => b.age_days - a.age_days);
@@ -140,7 +140,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       submitted_at: row.submitted_at ?? null,
       age_days: ageDays,
       urgent: ageDays >= 3,
-      href: `/admin/applications/review/${row.id}`,
+      href: `/applications/review/${row.id}`,
     };
   });
 
@@ -156,7 +156,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     enrollment_status: row.enrollment_state ?? row.status ?? null,
     created_at: row.enrolled_at ?? row.created_at ?? null,
     program_name: programTitleById.get(row.program_id) ?? row.program_slug ?? null,
-    href: `/admin/students/${row.user_id || row.id}`,
+    href: `/students/${row.user_id || row.id}`,
   }));
 
   const statusCounts = activeEnrollments.reduce<Record<string, number>>((acc, row: any) => {
@@ -234,7 +234,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       status: row.status ?? null,
       updated_at: row.updated_at ?? null,
       days_stale: row.updated_at ? Math.max(0, Math.floor((now - new Date(row.updated_at).getTime()) / 86_400_000)) : 0,
-      href: `/admin/crm/leads/${row.id}`,
+      href: `/crm/leads/${row.id}`,
     }))
     .filter((row) => row.days_stale >= 7);
 
@@ -248,7 +248,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       email: row.email ?? null,
       daysInactive: Math.floor((now - new Date(row.updated_at).getTime()) / 86_400_000),
       programTitle: programTitleById.get(row.program_id) ?? row.program_slug ?? null,
-      href: `/admin/students/${row.user_id}`,
+      href: `/students/${row.user_id}`,
     }));
 
   const blockedPrograms = programRows.filter((row: any) => row.status !== 'published' || row.is_active === false).map((row: any) => ({
@@ -257,7 +257,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     slug: row.slug ?? '',
     status: row.status ?? 'draft',
     updatedAt: row.updated_at ?? '',
-    href: `/admin/programs/${row.id}`,
+    href: `/programs/${row.id}`,
   }));
 
   const pendingSubmissions = submissionRows.map((row: any) => ({
@@ -273,19 +273,19 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const priorities: PriorityItem[] = [];
   if (pendingApplications.length) {
     const score = calculatePriorityScore({ type: 'enrollment', days: Math.max(0, pendingApplications[0].age_days - 3), money: 2, blocked: true });
-    priorities.push({ id: 'pending-applications', type: 'enrollment', label: `${pendingApplications.length} applications awaiting review`, href: '/admin/applications', score, severity: scoreSeverity(score), context: `${pendingApplications.filter((row) => row.urgent).length} are 3+ days old` });
+    priorities.push({ id: 'pending-applications', type: 'enrollment', label: `${pendingApplications.length} applications awaiting review`, href: '/applications', score, severity: scoreSeverity(score), context: `${pendingApplications.filter((row) => row.urgent).length} are 3+ days old` });
   }
   if (complianceAlerts.length) {
     const score = calculatePriorityScore({ type: 'compliance', risk: 4, blocked: true });
-    priorities.push({ id: 'compliance-alerts', type: 'compliance', label: `${complianceAlerts.length} unresolved compliance alerts`, href: '/admin/compliance', score, severity: scoreSeverity(score), context: 'Review current compliance alerts' });
+    priorities.push({ id: 'compliance-alerts', type: 'compliance', label: `${complianceAlerts.length} unresolved compliance alerts`, href: '/compliance', score, severity: scoreSeverity(score), context: 'Review current compliance alerts' });
   }
   if (staleLeads.length) {
     const score = calculatePriorityScore({ type: 'lead', days: staleLeads[0]?.days_stale ?? 0, money: 2 });
-    priorities.push({ id: 'stale-leads', type: 'lead', label: `${staleLeads.length} stale CRM leads`, href: '/admin/crm/leads', score, severity: scoreSeverity(score), context: 'No activity for 7+ days' });
+    priorities.push({ id: 'stale-leads', type: 'lead', label: `${staleLeads.length} stale CRM leads`, href: '/crm/leads', score, severity: scoreSeverity(score), context: 'No activity for 7+ days' });
   }
   if (pendingWioaDocs) {
     const score = calculatePriorityScore({ type: 'wioa', risk: 3, blocked: true });
-    priorities.push({ id: 'wioa-docs', type: 'wioa', label: `${pendingWioaDocs} WIOA documents awaiting review`, href: '/admin/wioa/documents', score, severity: scoreSeverity(score), context: 'Funding eligibility may be blocked' });
+    priorities.push({ id: 'wioa-docs', type: 'wioa', label: `${pendingWioaDocs} WIOA documents awaiting review`, href: '/wioa/documents', score, severity: scoreSeverity(score), context: 'Funding eligibility may be blocked' });
   }
 
   const recentActivity = [
@@ -306,12 +306,12 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   };
 
   const kpis = [
-    { label: 'Pending Applications', value: counts.pendingApplications, delta: 0, deltaLabel: 'Live pending count', href: '/admin/applications', urgent: counts.pendingApplications > 0, sub: `${pendingApplications.filter((row) => row.urgent).length} aged 3+ days` },
-    { label: 'Active Enrollments', value: counts.activeEnrollments, delta: 0, deltaLabel: 'Live active count', href: '/admin/students?status=active', urgent: inactiveLearners.length > 0, sub: `${inactiveLearners.length} inactive 7+ days` },
-    { label: 'Revenue This Month', value: revenueThisMonthCents, delta: 0, deltaLabel: 'Database aggregate', href: '/admin/integrations/stripe', urgent: false, sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} tracked all time` },
-    { label: 'Certificates Issued', value: counts.certificatesIssued, delta: 0, deltaLabel: 'Live certificate count', href: '/admin/certificates', urgent: false },
-    { label: 'Pending Program Holders', value: counts.pendingProgramHolders, delta: 0, deltaLabel: 'Awaiting approval', href: '/admin/program-holders', urgent: counts.pendingProgramHolders > 0 },
-    { label: 'Pending Documents', value: counts.pendingDocuments, delta: 0, deltaLabel: 'Awaiting review', href: '/admin/program-holder-documents', urgent: counts.pendingDocuments > 0 },
+    { label: 'Pending Applications', value: counts.pendingApplications, delta: 0, deltaLabel: 'Live pending count', href: '/applications', urgent: counts.pendingApplications > 0, sub: `${pendingApplications.filter((row) => row.urgent).length} aged 3+ days` },
+    { label: 'Active Enrollments', value: counts.activeEnrollments, delta: 0, deltaLabel: 'Live active count', href: '/students?status=active', urgent: inactiveLearners.length > 0, sub: `${inactiveLearners.length} inactive 7+ days` },
+    { label: 'Revenue This Month', value: revenueThisMonthCents, delta: 0, deltaLabel: 'Database aggregate', href: '/integrations/stripe', urgent: false, sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} tracked all time` },
+    { label: 'Certificates Issued', value: counts.certificatesIssued, delta: 0, deltaLabel: 'Live certificate count', href: '/certificates', urgent: false },
+    { label: 'Pending Program Holders', value: counts.pendingProgramHolders, delta: 0, deltaLabel: 'Awaiting approval', href: '/program-holders', urgent: counts.pendingProgramHolders > 0 },
+    { label: 'Pending Documents', value: counts.pendingDocuments, delta: 0, deltaLabel: 'Awaiting review', href: '/program-holder-documents', urgent: counts.pendingDocuments > 0 },
   ];
 
   const profile = profileRes.data ? { full_name: profileRes.data.full_name ?? null, role: profileRes.data.role ?? undefined } : null;

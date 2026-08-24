@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
+import Image from 'next/image';
 import { Volume2, VolumeX } from 'lucide-react';
 
 export interface HeroVideoCta {
@@ -56,7 +57,7 @@ export default function HeroVideo({
   className = '',
   children,
   mediaFit = 'cover',
-  heightClassName = 'min-h-[520px] sm:min-h-[560px] lg:min-h-[620px]',
+  heightClassName = 'h-[38vh] min-h-[320px] max-h-[520px]',
   overlayMode = 'default',
 }: HeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -64,6 +65,8 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [audioFailed, setAudioFailed] = useState(false);
   const [userActivated, setUserActivated] = useState(false);
   const [manualAudioOverride, setManualAudioOverride] = useState(false);
   const transcriptId = useId();
@@ -75,6 +78,8 @@ export default function HeroVideo({
 
   useEffect(() => {
     setVideoFailed(false);
+    setVideoReady(false);
+    setAudioFailed(false);
     setMuted(true);
     setManualAudioOverride(false);
 
@@ -101,7 +106,7 @@ export default function HeroVideo({
   }, []);
 
   useEffect(() => {
-    if (!voiceoverSrc || !userActivated || manualAudioOverride) return;
+    if (!voiceoverSrc || audioFailed || !userActivated || manualAudioOverride) return;
 
     const audio = audioRef.current;
     const video = videoRef.current;
@@ -113,7 +118,7 @@ export default function HeroVideo({
     }
 
     void audio.play().then(() => setMuted(false)).catch(() => setMuted(true));
-  }, [manualAudioOverride, userActivated, voiceoverSrc]);
+  }, [audioFailed, manualAudioOverride, userActivated, voiceoverSrc]);
 
   useEffect(
     () => () => {
@@ -137,7 +142,7 @@ export default function HeroVideo({
     }
 
     try {
-      if (voiceoverSrc && audio) {
+      if (voiceoverSrc && audio && !audioFailed) {
         if (video) {
           video.muted = true;
           if (video.paused) await video.play();
@@ -170,9 +175,14 @@ export default function HeroVideo({
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
         {mountedFrameImage || posterImage ? (
-          <div
-            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${mountedFrameImage || posterImage})` }}
+          <Image
+            src={mountedFrameImage || posterImage || ''}
+            alt=""
+            fill
+            priority
+            unoptimized
+            sizes="100vw"
+            className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center`}
             aria-hidden="true"
           />
         ) : null}
@@ -186,17 +196,21 @@ export default function HeroVideo({
             loop
             playsInline
             muted
-            poster={mountedFrameImage ? undefined : posterImage}
             disablePictureInPicture
+            data-video-ready={videoReady ? 'true' : 'false'}
+            onLoadedData={() => setVideoReady(true)}
             onCanPlay={() => {
+              setVideoReady(true);
               const video = videoRef.current;
               if (video?.paused) void video.play().catch(() => {});
             }}
+            onPlaying={() => setVideoReady(true)}
             onError={() => {
               setVideoFailed(true);
+              setVideoReady(false);
               setMuted(true);
             }}
-            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center`}
+            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-500 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           >
             {mobileSource && mobileSource !== desktopSource ? (
@@ -221,6 +235,10 @@ export default function HeroVideo({
             aria-hidden="true"
             className="hidden"
             onEnded={() => setMuted(true)}
+            onError={() => {
+              setAudioFailed(true);
+              setMuted(true);
+            }}
           />
         ) : null}
 
@@ -281,7 +299,7 @@ export default function HeroVideo({
           </div>
         ) : null}
 
-        {voiceoverSrc || showVideo ? (
+        {(voiceoverSrc && !audioFailed) || showVideo ? (
           <button
             type="button"
             onClick={() => void toggleSound()}

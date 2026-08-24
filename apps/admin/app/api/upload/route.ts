@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const path = `${category}/${Date.now()}-${safeName}`;
 
-  const db = await createAdminClient();
+  const db = await requireAdminClient();
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const { error: uploadError } = await db.storage
@@ -140,7 +140,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'path is required' }, { status: 400 });
   }
 
-  const db = await createAdminClient();
+  const db = await requireAdminClient();
 
   const { error: storageError } = await db.storage.from(BUCKET).remove([filePath]);
   if (storageError) {

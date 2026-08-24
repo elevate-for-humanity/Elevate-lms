@@ -24,7 +24,7 @@ describe('marketing hero transcript runtime behavior', () => {
     expect(screen.getByRole('button', { name: /image transcript/i })).toBeInTheDocument();
   });
 
-  it('keeps one native poster owner while video is available', () => {
+  it('keeps the poster mounted until video data is ready', () => {
     const poster = '/images/heroes/hero-homepage.webp';
     const { container } = render(
       <HeroVideo
@@ -35,9 +35,14 @@ describe('marketing hero transcript runtime behavior', () => {
 
     const video = container.querySelector('video');
     expect(video).not.toBeNull();
-    expect(video).toHaveAttribute('poster', poster);
+    expect(video).not.toHaveAttribute('poster');
+    expect(video).toHaveAttribute('data-video-ready', 'false');
+    expect(video).toHaveClass('opacity-0');
+    expect(container.querySelector(`img[src="${poster}"]`)).not.toBeNull();
 
-    expect(container.querySelector(`[style*="${poster}"]`)).toBeNull();
+    fireEvent.loadedData(video!);
+    expect(video).toHaveAttribute('data-video-ready', 'true');
+    expect(video).toHaveClass('opacity-100');
   });
 
   it('mounts an exact first frame beneath video without a native poster', () => {
@@ -53,7 +58,7 @@ describe('marketing hero transcript runtime behavior', () => {
     const video = container.querySelector('video');
     expect(video).not.toBeNull();
     expect(video).not.toHaveAttribute('poster');
-    expect(container.querySelector(`[style*="${firstFrame}"]`)).not.toBeNull();
+    expect(container.querySelector(`img[src="${firstFrame}"]`)).not.toBeNull();
   });
 
   it('toggles the HeroVideo transcript without throwing at runtime', () => {

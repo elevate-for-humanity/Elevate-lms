@@ -129,6 +129,26 @@ for (const block of liveVideoBlocks) {
 if (parsedLiveVideos) pass(`${parsedLiveVideos} live video registry entries have valid local/remote media contracts`);
 else fail('No live entries could be parsed from the canonical video registry');
 
+console.log('\n── Hero narration coverage ──');
+const heroBannerPath = path.join(publicDir, 'data/hero-banners.json');
+const heroBanners = JSON.parse(fs.readFileSync(heroBannerPath, 'utf8'));
+const localHeroVoiceovers = [];
+for (const [pageKey, banner] of Object.entries(heroBanners)) {
+  const voiceover = typeof banner?.voiceoverSrc === 'string' ? banner.voiceoverSrc.trim() : '';
+  if (!voiceover || !voiceover.startsWith('/')) continue;
+  const voicePath = path.join(publicDir, voiceover.replace(/^\//, ''));
+  localHeroVoiceovers.push(voiceover);
+  if (!fs.existsSync(voicePath) || fs.statSync(voicePath).size === 0) {
+    fail(`${pageKey}: configured hero narration is missing or empty: ${voiceover}`);
+  }
+}
+if (localHeroVoiceovers.length && localHeroVoiceovers.every((voiceover) => {
+  const voicePath = path.join(publicDir, voiceover.replace(/^\//, ''));
+  return fs.existsSync(voicePath) && fs.statSync(voicePath).size > 0;
+})) {
+  pass(`${new Set(localHeroVoiceovers).size} configured local hero narration files resolve in public/`);
+}
+
 console.log('\n── Static program image coverage ──');
 const indexSource = fs.readFileSync(path.join(rootDir, 'data/programs/index.ts'), 'utf8');
 const importedProgramFiles = [...indexSource.matchAll(/from ['"]\.\/([^'"]+)['"]/g)].map((match) => match[1]);

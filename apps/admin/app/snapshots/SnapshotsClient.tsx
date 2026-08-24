@@ -41,7 +41,7 @@ export default function SnapshotsClient() {
     setError('');
     try {
       const params = filter !== 'all' ? `?type=${filter}` : '?limit=50';
-      const res = await fetch(`/api/devstudio/snapshot${params}`);
+      const res = await fetch(`/api/admin/dev-studio/snapshot${params}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to load snapshots');
       setSnapshots(data.snapshots ?? []);
@@ -65,7 +65,7 @@ export default function SnapshotsClient() {
     setSuccess('');
 
     try {
-      const res = await fetch(`/api/devstudio/snapshot/${snapshot.id}/rollback`, {
+      const res = await fetch(`/api/admin/dev-studio/snapshot/${snapshot.id}/rollback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });

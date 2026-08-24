@@ -2,9 +2,9 @@
  * Canonical marketing hero configuration.
  *
  * Dedicated production media from the video registry wins when available.
- * Otherwise the page's configured JSON video remains valid. Reusing a verified
- * category video across multiple pages is allowed; it must never silently turn
- * a video hero into a poster-only hero.
+ * Otherwise a unique page video remains valid. Broad legacy category films are
+ * suppressed when a page-specific picture is available so unrelated pages do
+ * not repeat the same generic footage.
  *
  * Public marketing copy is still sanitized before render so media restoration
  * cannot reintroduce unsupported funding, wage, placement, credential, or
@@ -76,6 +76,14 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   store: '/images/pages/store-licensing-hero.webp',
 };
 
+const SHARED_GENERIC_VIDEO_FILES = new Set([
+  'hero-home-fast.mp4',
+  'programs-overview-video-with-narration.mp4',
+  'cna-hero.mp4',
+  'hvac-hero-final.mp4',
+  'it-technology.mp4',
+]);
+
 const UNSUPPORTED_HERO_SENTENCE =
   /(?:\b(?:every|all)\s+(?:program|student|graduate)|\bmost\s+(?:programs?|students?)|\bjob offers?\b|\bjob placement rate\b|\bstarting (?:pay|wages?|salary)\b|\bcommonly earn\b|\bguaranteed employment\b|\bcredential(?:s)? (?:is|are) issued automatically\b|\bcertification is issued automatically\b|\bchecks? eligibility automatically\b|\bWIOA\s*&\s*DOL compliant\b|\b100% compliant\b|\bstate-approved curricula\b|\bclinical rotations included\b|\blaunch in (?:two|2) weeks\b|\bno paper\b|\breports? generate themselves\b|\bWOTC documentation is generated automatically\b)/i;
 
@@ -100,6 +108,25 @@ function sanitizeHeroTrustIndicators(values: string[] | undefined, key: string):
   return sanitizePublicFundingList(values, key)
     .map((value) => sanitizeHeroText(value, key))
     .filter(Boolean);
+}
+
+function isSharedGenericVideo(src?: string): boolean {
+  if (!src) return false;
+  const pathname = src.split('?')[0]?.split('#')[0] ?? '';
+  const filename = pathname.split('/').pop()?.toLowerCase() ?? '';
+  return SHARED_GENERIC_VIDEO_FILES.has(filename);
+}
+
+function mediaKey(value?: string): string | undefined {
+  if (!value) return undefined;
+  const clean = value.split('#')[0]?.split('?')[0]?.trim();
+  if (!clean) return undefined;
+  try {
+    const url = new URL(clean, 'https://elevate.local');
+    return `${url.hostname.toLowerCase()}${url.pathname.replace(/\/{2,}/g, '/').toLowerCase()}`;
+  } catch {
+    return clean.replace(/\/{2,}/g, '/').toLowerCase();
+  }
 }
 
 function escapeSvgText(value: string): string {
@@ -140,10 +167,16 @@ function posterFor(key: string, banner: RawHeroBannerConfig): string {
   return semanticInlinePoster(key, banner);
 }
 
-function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerConfig {
+function normalizeBanner(
+  key: string,
+  banner: RawHeroBannerConfig,
+  allowJsonVideo = true,
+): HeroBannerConfig {
   const dedicated = getHeroVideoForPageKey(key);
   const jsonDesktop = banner.videoSrcDesktop || banner.videoSrcMobile;
   const jsonMobile = banner.videoSrcMobile || banner.videoSrcDesktop;
+  const desktop = dedicated?.video_url || (allowJsonVideo ? jsonDesktop : undefined);
+  const mobile = dedicated?.video_url || (allowJsonVideo ? jsonMobile : undefined);
 
   const rawHeadline = banner.belowHeroHeadline ?? banner.headline ?? '';
   const rawSubheadline = banner.belowHeroSubheadline ?? banner.subheadline ?? '';
@@ -151,8 +184,8 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
   let normalized: HeroBannerConfig = {
     ...banner,
     pageKey: banner.pageKey ?? key,
-    videoSrcDesktop: dedicated?.video_url || jsonDesktop,
-    videoSrcMobile: dedicated?.video_url || jsonMobile,
+    videoSrcDesktop: desktop,
+    videoSrcMobile: mobile,
     posterImage: posterFor(key, banner),
     microLabel: sanitizeHeroText(banner.microLabel, key),
     eyebrow: sanitizeHeroText(banner.eyebrow, key),
@@ -175,6 +208,16 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
 
   if ('salaryRangeLabel' in normalized) {
     delete (normalized as HeroBannerConfig & { salaryRangeLabel?: string }).salaryRangeLabel;
+  }
+
+  const picture = normalized.posterImage;
+  const desktopShared = !dedicated && isSharedGenericVideo(normalized.videoSrcDesktop);
+  if (desktopShared && picture) {
+    normalized = {
+      ...normalized,
+      videoSrcDesktop: undefined,
+      videoSrcMobile: undefined,
+    };
   }
 
   if (key === 'home') {
@@ -224,8 +267,25 @@ let normalizedData: Record<string, HeroBannerConfig> | null = null;
 function getData(): Record<string, HeroBannerConfig> {
   if (normalizedData) return normalizedData;
   const raw = loadJsonOnce<Record<string, RawHeroBannerConfig>>('hero-banners.json');
+
+  const effectiveVideoCounts = new Map<string, number>();
+  for (const [key, banner] of Object.entries(raw)) {
+    const dedicated = getHeroVideoForPageKey(key);
+    const candidate = dedicated?.video_url || banner.videoSrcDesktop || banner.videoSrcMobile;
+    const candidateKey = mediaKey(candidate);
+    if (candidateKey) {
+      effectiveVideoCounts.set(candidateKey, (effectiveVideoCounts.get(candidateKey) ?? 0) + 1);
+    }
+  }
+
   normalizedData = Object.fromEntries(
-    Object.entries(raw).map(([key, banner]) => [key, normalizeBanner(key, banner)]),
+    Object.entries(raw).map(([key, banner]) => {
+      const dedicated = getHeroVideoForPageKey(key);
+      const candidate = dedicated?.video_url || banner.videoSrcDesktop || banner.videoSrcMobile;
+      const candidateKey = mediaKey(candidate);
+      const allowJsonVideo = Boolean(dedicated) || !candidateKey || (effectiveVideoCounts.get(candidateKey) ?? 0) <= 1;
+      return [key, normalizeBanner(key, banner, allowJsonVideo)];
+    }),
   );
   return normalizedData;
 }

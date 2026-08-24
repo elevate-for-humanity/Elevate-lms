@@ -83,9 +83,9 @@ const TOOL_SECTIONS = [
       { label: 'Licenses', href: '/admin/licenses', desc: 'License assignments and expirations' },
       { label: 'License Requests', href: '/admin/license-requests', desc: 'Pending license upgrade requests' },
       { label: 'Promo Codes', href: '/admin/promo-codes', desc: 'Discount and promo code management' },
-      { label: 'Commercialization Checklist', href: '/admin/docs', desc: 'MVP gate, hardening gate, pricing tiers, and 10-minute buyer demo plan' },
-      { label: 'Admin Remediation TODO', href: '/admin/docs', desc: 'Priority-ordered execution list for reliability, prefill completion, and commercialization hardening' },
-      { label: 'DevStudio Dispatch Checklist', href: '/admin/docs', desc: 'Verify GitHub Actions dispatch for build/deploy/test commands' },
+      { label: 'Commercialization Checklist', href: '/docs', desc: 'MVP gate, hardening gate, pricing tiers, and 10-minute buyer demo plan' },
+      { label: 'Admin Remediation TODO', href: '/docs', desc: 'Priority-ordered execution list for reliability, prefill completion, and commercialization hardening' },
+      { label: 'DevStudio Dispatch Checklist', href: '/docs', desc: 'Verify GitHub Actions dispatch for build/deploy/test commands' },
     ],
   },
   {

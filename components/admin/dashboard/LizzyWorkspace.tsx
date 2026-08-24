@@ -55,7 +55,7 @@ export function LizzyWorkspace({
     fetch('/api/admin/dev-studio/config').then((response) => response.ok ? response.json() : null).then((data: StudioConfig | null) => setConfig(data)).catch(() => setConfig(null));
   }, []);
   useEffect(() => {
-    fetch('/api/devstudio/health').then((response) => response.ok ? response.json() : null).then((data) => setHealth(data)).catch(() => setHealth(null));
+    fetch('/api/admin/dev-studio/health').then((response) => response.ok ? response.json() : null).then((data) => setHealth(data)).catch(() => setHealth(null));
   }, []);
 
   const visibleTools = TOOLS.filter((tool) => tool.id !== 'secrets' || isSuperAdmin);

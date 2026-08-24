@@ -48,7 +48,7 @@ export default function DocumentsPanel() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/devstudio/upload');
+      const res = await fetch('/api/admin/dev-studio/upload');
       // 404 means this panel is running outside the admin app — fail silently
       if (res.status === 404) { setLoading(false); return; }
       if (res.status === 401 || res.status === 403) { setLoading(false); return; }
@@ -79,7 +79,7 @@ export default function DocumentsPanel() {
       form.append('file', file);
       if (label.trim()) form.append('label', label.trim());
 
-      const res = await fetch('/api/devstudio/upload', { method: 'POST', body: form });
+      const res = await fetch('/api/admin/dev-studio/upload', { method: 'POST', body: form });
       const data = await res.json().catch(() => ({}));
       if (res.status === 404) {
         setUploadErr('Upload unavailable outside the admin app');

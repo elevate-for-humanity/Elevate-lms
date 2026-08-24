@@ -62,7 +62,7 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Platform Overview', href: '/platform', isSectionLink: true },
       { name: 'Online Apps & Portals', href: '/online-apps', isSectionLink: true },
       { name: 'Workforce Board Platform', href: '/platform/workforce-boards', isSectionLink: true },
-      { name: 'Dev Studio', href: '/dev-studio', isSectionLink: true },
+      { name: 'Dev Studio', href: '/store/dev-studio', isSectionLink: true },
       { name: 'Website Builder', href: '/store', isSectionLink: true },
       { name: 'Plans & Products', href: '/store#marketplace', isSectionLink: true },
     ],

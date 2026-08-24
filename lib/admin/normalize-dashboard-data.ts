@@ -86,7 +86,7 @@ function normalizePriorities(items: PriorityItem[] | null | undefined): Priority
     id: String(item.id ?? 'priority'),
     type: item.type ?? 'system',
     label: typeof item.label === 'string' ? item.label : 'Operational item',
-    href: typeof item.href === 'string' ? item.href : '/admin/operations',
+    href: typeof item.href === 'string' ? item.href : '/operations',
     score: asCount(item.score),
     severity: PRIORITY_SEVERITIES.has(item.severity) ? item.severity : 'low',
     context: typeof item.context === 'string' ? item.context : '',
@@ -184,7 +184,7 @@ function normalizeRecentStudents(students: RecentStudent[] | null | undefined): 
         href:
           typeof student.href === 'string' && student.href.startsWith('/')
             ? student.href
-            : `/admin/students/${id}`,
+            : `/students/${id}`,
       };
     })
     .filter((row): row is RecentStudent => row != null);
@@ -210,7 +210,7 @@ function normalizeInactiveLearners(
         href:
           typeof learner.href === 'string' && learner.href.startsWith('/')
             ? learner.href
-            : `/admin/students/${userId || enrollmentId}`,
+            : `/students/${userId || enrollmentId}`,
       };
     })
     .filter((row): row is InactiveLearner => row != null);
@@ -251,7 +251,7 @@ function normalizeRecentApplications(
     href:
       typeof app.href === 'string' && app.href.startsWith('/')
         ? app.href
-        : '/admin/applications',
+        : '/applications',
   }));
 }
 

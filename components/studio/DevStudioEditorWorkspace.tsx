@@ -43,7 +43,7 @@ export default function DevStudioEditorWorkspace({
 
   const refreshFiles = useCallback(async () => {
     try {
-      const res = await fetch('/api/devstudio/files', { cache: 'no-store' });
+      const res = await fetch('/api/admin/dev-studio/files', { cache: 'no-store' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setFiles(walkFiles(data.tree ?? []));
@@ -65,7 +65,7 @@ export default function DevStudioEditorWorkspace({
     setLoading(true);
     setStatus('');
     try {
-      const res = await fetch(`/api/devstudio/files?path=${encodeURIComponent(path)}`, {
+      const res = await fetch(`/api/admin/dev-studio/files?path=${encodeURIComponent(path)}`, {
         cache: 'no-store',
       });
       const data = await res.json();
@@ -86,7 +86,7 @@ export default function DevStudioEditorWorkspace({
     setLoading(true);
     setStatus(updating ? 'Committing update…' : 'Creating file…');
     try {
-      const res = await fetch('/api/devstudio/files', {
+      const res = await fetch('/api/admin/dev-studio/files', {
         method: updating ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

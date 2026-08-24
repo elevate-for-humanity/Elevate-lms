@@ -10,11 +10,12 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const revalidate = 3600;
 
 interface Props {
-  params: { program: string };
+  params: Promise<{ program: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const program = await getProgramBySlug(params.program);
+  const { program: programSlug } = await params;
+  const program = await getProgramBySlug(programSlug);
   if (!program) return { title: 'Request Information' };
   return {
     title: `Request Information — ${program.title} | ${PLATFORM_DEFAULTS.orgName}`,
@@ -23,10 +24,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function RequestInfoPage({ params }: Props) {
-  const program = await getProgramBySlug(params.program);
+  const { program: programSlug } = await params;
+  const program = await getProgramBySlug(programSlug);
   if (!program) notFound();
 
-  const programPageHref = `/programs/${params.program}`;
+  const programPageHref = `/programs/${programSlug}`;
 
   return (
     <div className="min-h-screen bg-white">
@@ -67,7 +69,7 @@ export default async function RequestInfoPage({ params }: Props) {
           {/* Form */}
           <div className="lg:col-span-2">
             <RequestInfoForm
-              slug={params.program}
+              slug={programSlug}
               programTitle={program.title}
               applyHref={program.cta.applyHref}
             />

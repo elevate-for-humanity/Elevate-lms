@@ -199,7 +199,7 @@ export function PublicTenantSite({
                 </div>
 
                 {config.homepage.heroImage ? (
-                  <div className="relative min-h-[420px] overflow-hidden rounded-[2rem] bg-slate-100 shadow-2xl">
+                  <div className="relative min-h-[360px] max-h-[520px] overflow-hidden rounded-[2rem] bg-slate-100 shadow-2xl">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={config.homepage.heroImage}

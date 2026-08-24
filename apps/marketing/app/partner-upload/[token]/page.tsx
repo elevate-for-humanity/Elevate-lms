@@ -19,7 +19,7 @@ export default async function PartnerUploadPage({ params }: { params: Promise<{ 
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-[#1E293B] py-4 px-6">
+      <div className="bg-slate-800 px-6 py-4">
         <p className="text-white font-bold text-lg">{PLATFORM_DEFAULTS.orgName}</p>
         <p className="text-slate-300 text-sm">Partner Document Upload</p>
       </div>

@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
       notifs.push({
         id: 'apps',
         unread: true,
-        href: '/admin/applications?status=submitted',
+        href: '/applications?status=submitted',
         title: `${appsRes.count} application${appsRes.count !== 1 ? 's' : ''} pending review`,
         time: 'Pending action',
       });
@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
       notifs.push({
         id: 'docs',
         unread: true,
-        href: '/admin/documents/review',
+        href: '/documents/review',
         title: `${docsRes.count} document${docsRes.count !== 1 ? 's' : ''} need review`,
         time: 'Compliance required',
       });
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
       notifs.push({
         id: 'compliance',
         unread: true,
-        href: '/admin/compliance',
+        href: '/compliance',
         title: `${alertsRes.count} unresolved compliance alert${alertsRes.count !== 1 ? 's' : ''}`,
         time: 'Needs attention',
       });
@@ -98,7 +98,7 @@ export async function GET(req: NextRequest) {
       notifs.push({
         id: 'wioa',
         unread: true,
-        href: '/admin/wioa/documents',
+        href: '/wioa/documents',
         title: `${wioaDocsRes.count} WIOA document${wioaDocsRes.count !== 1 ? 's' : ''} awaiting review`,
         time: 'WIOA queue',
       });
@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
       notifs.push({
         id: 'leads',
         unread: true,
-        href: '/admin/crm/leads',
+        href: '/crm/leads',
         title: `${staleLeadsRes.count} CRM lead${staleLeadsRes.count !== 1 ? 's' : ''} with no activity in 5+ days`,
         time: 'Follow-up needed',
       });

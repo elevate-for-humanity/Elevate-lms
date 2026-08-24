@@ -42,7 +42,7 @@ export default function RunWorkspace({ studioRuntime }: { studioRuntime?: Studio
     try {
       const isSmoke = /smoke.?test|health.?check|check.*platform|verify.*platform/i.test(trimmed);
       const res = await fetch(
-        isSmoke ? '/api/devstudio/smoke-test' : '/api/devstudio/execute',
+        isSmoke ? '/api/admin/dev-studio/smoke-test' : '/api/admin/dev-studio/execute',
         isSmoke
           ? undefined
           : {

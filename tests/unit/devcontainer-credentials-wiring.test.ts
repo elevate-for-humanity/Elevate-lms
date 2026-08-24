@@ -67,7 +67,7 @@ describe('dev container credential wiring (no fake secrets in UI)', () => {
 
   it('devcontainer API hydrates platform_secrets before GitHub calls', () => {
     const route = readFileSync(
-      join(REPO_ROOT, 'apps/admin/app/api/devstudio/devcontainer/route.ts'),
+      join(REPO_ROOT, 'apps/admin/app/api/admin/dev-studio/devcontainer/route.ts'),
       'utf8',
     );
     expect(route).toContain('ensureDevStudioSecrets');

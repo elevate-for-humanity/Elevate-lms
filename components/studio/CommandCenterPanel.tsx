@@ -59,9 +59,9 @@ export default function CommandCenterPanel() {
     setError(null);
     try {
       const [wfRes, agentsRes, tasksRes] = await Promise.all([
-        fetch('/api/devstudio/workflows'),
-        fetch('/api/devstudio/agents'),
-        fetch('/api/devstudio/tasks?limit=15'),
+        fetch('/api/admin/dev-studio/workflows'),
+        fetch('/api/admin/dev-studio/agents'),
+        fetch('/api/admin/dev-studio/tasks?limit=15'),
       ]);
 
       const wfData = await wfRes.json().catch(() => ({}));
@@ -95,7 +95,7 @@ export default function CommandCenterPanel() {
     if (!title) return;
     setActionId('create');
     try {
-      const res = await fetch('/api/devstudio/tasks', {
+      const res = await fetch('/api/admin/dev-studio/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, agentSlug: selectedAgent, command: title }),
@@ -114,7 +114,7 @@ export default function CommandCenterPanel() {
   async function approveTask(id: string) {
     setActionId(id);
     try {
-      const res = await fetch(`/api/devstudio/tasks/${id}/approve`, { method: 'POST' });
+      const res = await fetch(`/api/admin/dev-studio/tasks/${id}/approve`, { method: 'POST' });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error((data as { error?: string }).error ?? `HTTP ${res.status}`);
       await load();
@@ -128,7 +128,7 @@ export default function CommandCenterPanel() {
   async function triggerBuild(kind: (typeof BUILD_KINDS)[number]) {
     setActionId(`build-${kind}`);
     try {
-      const res = await fetch('/api/devstudio/builds', {
+      const res = await fetch('/api/admin/dev-studio/builds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ kind }),
@@ -147,7 +147,7 @@ export default function CommandCenterPanel() {
     setIndexing(true);
     setError(null);
     try {
-      const res = await fetch('/api/devstudio/workflows', {
+      const res = await fetch('/api/admin/dev-studio/workflows', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'index-repo', maxFiles: 300 }),
@@ -166,7 +166,7 @@ export default function CommandCenterPanel() {
     setRepoQuery(q);
     try {
       const res = await fetch(
-        `/api/devstudio/workflows?view=repo-search&q=${encodeURIComponent(q)}`,
+        `/api/admin/dev-studio/workflows?view=repo-search&q=${encodeURIComponent(q)}`,
       );
       const data = await res.json().catch(() => ({}));
       if (res.ok) {

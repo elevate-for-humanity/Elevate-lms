@@ -31,6 +31,7 @@ export default function StoreProductVideo({
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
+  const [ready, setReady] = useState(false);
 
   const start = () => {
     setStarted(true);
@@ -64,16 +65,16 @@ export default function StoreProductVideo({
       onClick={togglePlay}
     >
       {/* Poster — shown before play */}
+      <Image
+        src={poster}
+        alt={alt}
+        fill
+        className="object-cover"
+        sizes="(max-width: 768px) 100vw, 50vw"
+        quality={85}
+      />
       {!started && (
         <>
-          <Image
-            src={poster}
-            alt={alt}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 50vw"
-            quality={85}
-          />
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 hover:bg-black/50 transition-colors">
             <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform mb-3">
               <Play className="w-9 h-9 text-brand-red-600 ml-1" />
@@ -92,12 +93,14 @@ export default function StoreProductVideo({
         <>
           <video
             ref={videoRef}
-            className="absolute inset-0 w-full h-full object-contain bg-black"
+            className={`absolute inset-0 w-full h-full object-contain bg-black transition-opacity duration-300 ${ready ? 'opacity-100' : 'opacity-0'}`}
             playsInline
             muted
             onCanPlay={() => {
+              setReady(true);
               videoRef.current?.play().then(() => setPlaying(true)).catch(() => {});
             }}
+            onError={() => { setReady(false); setPlaying(false); }}
             onEnded={() => setPlaying(false)}
             onPause={() => setPlaying(false)}
             onPlay={() => setPlaying(true)}

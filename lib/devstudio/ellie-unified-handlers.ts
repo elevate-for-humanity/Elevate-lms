@@ -17,7 +17,7 @@ export async function fetchAiHealth(): Promise<{
   providers: Record<string, boolean>;
 }> {
   try {
-    const res = await fetch('/api/devstudio/health');
+    const res = await fetch('/api/admin/dev-studio/health');
     const data = await res.json().catch(() => ({}));
     const providers = {
       groq: Boolean(data.hasGroq),
@@ -77,7 +77,7 @@ export async function streamPlatformChat(
     }) => void;
   },
 ): Promise<void> {
-  const res = await fetch('/api/devstudio/chat', {
+  const res = await fetch('/api/admin/dev-studio/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -132,7 +132,7 @@ export async function streamExecuteCommand(
 ): Promise<void> {
   const isSmoke = /smoke.?test|health.?check|check.*platform/i.test(command);
   const res = await fetch(
-    isSmoke ? '/api/devstudio/smoke-test' : '/api/devstudio/execute',
+    isSmoke ? '/api/admin/dev-studio/smoke-test' : '/api/admin/dev-studio/execute',
     isSmoke
       ? undefined
       : {

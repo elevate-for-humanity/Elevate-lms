@@ -147,11 +147,11 @@ export async function publishPersistedCourseWithClient(input: { db: SupabaseClie
   const health = await runPersistedCourseProcurementHealthCheckWithClient(input.db, input.courseId);
   if (!health.pass) {
     await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { blocked: true, label: input.label, blocking_issues: health.blocking_issues, metrics: health.metrics }, req: input.request });
-    return { ok: false, error: 'PUBLISH_BLOCKED', blocking_issues: health.blocking_issues, metrics: health.metrics };
+    return { ok: false as const, error: 'PUBLISH_BLOCKED', blocking_issues: health.blocking_issues, metrics: health.metrics };
   }
   const result = await publishCourse(input.db, input.courseId, input.actorId, input.label);
   await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { label: input.label, lesson_count: (result as any)?.lessonCount, procurement_gate: health.metrics, review_mode: 'authorized_human_review', reviewed_by: (health.metrics as any).reviewed_by }, req: input.request });
-  return { ok: true, procurement_gate: health.metrics, ...result };
+  return { ok: true as const, procurement_gate: health.metrics, ...result };
 }
 
 export async function publishPersistedCourse(input: { courseId: string; actorId: string; label?: string; request?: NextRequest; }) { return publishPersistedCourseWithClient({ ...input, db: await createClient() }); }

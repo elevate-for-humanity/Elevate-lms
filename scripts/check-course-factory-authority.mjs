@@ -25,7 +25,7 @@ const walk = (dir, out = []) => {
 };
 
 const rootRoute = 'apps/admin/app/api/admin/course-builder/route.ts';
-const studioChatRoute = 'apps/admin/app/api/devstudio/chat/route.ts';
+const studioChatRoute = 'apps/admin/app/api/admin/dev-studio/chat/route.ts';
 const rootText = readRequired(rootRoute);
 for (const required of [
   "from '@/lib/course-builder/orchestrator'",

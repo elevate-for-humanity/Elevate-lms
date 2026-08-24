@@ -5,7 +5,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FileText, CheckCircle2, Clock, DollarSign, ArrowRight, Phone, Search, AlertCircle, Circle } from 'lucide-react';
-import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; icon: any }> = {
   pending: { color: 'text-slate-600', bg: 'bg-slate-100', icon: Circle },
@@ -226,8 +225,6 @@ export default function EnrollmentPage() {
         </div>
       </section>
 
-      {/* PARIS AI Assistant */}
-      <ParisFloatingWrapper />
     </div>
   );
 }

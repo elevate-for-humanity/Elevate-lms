@@ -23,7 +23,7 @@ export default function CloudBrowserWorkspace() {
 
   async function start() {
     setError(''); setStatus('Starting isolated Chromium…');
-    const response = await fetch('/api/devstudio/browser/session', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ url: target, width: 1440, height: 900 }) });
+    const response = await fetch('/api/admin/dev-studio/browser/session', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ url: target, width: 1440, height: 900 }) });
     const payload = await response.json();
     if (!response.ok) { setError(payload.error || 'Could not start browser'); setStatus('Unavailable'); return; }
     setSession(payload); setStatus('Connected');
@@ -46,7 +46,7 @@ export default function CloudBrowserWorkspace() {
     if (!session || !agentTask.trim()) return;
     setAgentRunning(true); setAgentResult(''); setError('');
     try {
-      const response = await fetch('/api/devstudio/browser/agent', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ task: agentTask, sessionId: session.id, sessionToken: session.token }) });
+      const response = await fetch('/api/admin/dev-studio/browser/agent', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ task: agentTask, sessionId: session.id, sessionToken: session.token }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || 'AI browser task failed');
       setAgentResult(payload.output || `Completed ${payload.steps?.length || 0} browser steps.`);

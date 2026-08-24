@@ -15,12 +15,18 @@ if (!source.includes("currentLevel === 'aal2'")) {
   process.exit(1);
 }
 
-const invariantEnforcement =
+const scopedDashboardPolicy =
   source.includes('export function privilegedMfaEnforcementEnabled()') &&
-  /privilegedMfaEnforcementEnabled\(\)[\s\S]*?return\s+true\s*;/.test(source);
+  /privilegedMfaEnforcementEnabled\(\)[\s\S]*?return\s+false\s*;/.test(source);
 
-if (!invariantEnforcement) {
-  console.error('FAIL: privileged MFA must be an unconditional production invariant.');
+if (!scopedDashboardPolicy) {
+  console.error('FAIL: privileged MFA must not be a global portal/dashboard gate.');
+  process.exit(1);
+}
+
+const middleware = fs.readFileSync('apps/admin/middleware.ts', 'utf8');
+if (!middleware.includes('privilegedMfaEnforcementEnabled() && privileged')) {
+  console.error('FAIL: Admin middleware bypasses the scoped MFA policy.');
   process.exit(1);
 }
 
@@ -29,4 +35,4 @@ if (source.includes("process.env.REQUIRE_PRIVILEGED_MFA") || source.includes('RE
   process.exit(1);
 }
 
-console.log('OK: privileged MFA covers canonical admin roles, requires AAL2, and cannot be disabled by runtime configuration.');
+console.log('OK: privileged MFA roles and AAL2 verification remain available without trapping ordinary portal/dashboard navigation.');

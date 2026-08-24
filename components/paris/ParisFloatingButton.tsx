@@ -1,24 +1,21 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { X, MessageCircle } from 'lucide-react';
 import ParisChat from './ParisChat';
+import type { ParisLearnerContext } from './ParisFloatingWrapper';
 
-export function ParisFloatingButton() {
+export function ParisFloatingButton({
+  surface = 'public',
+  courseTitle,
+  nextLessonTitle,
+  courseProgress,
+}: ParisLearnerContext) {
   const [isOpen, setIsOpen] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const tooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
-
-  const handleFloatingMouseEnter = () => {
-    tooltipTimer.current = setTimeout(() => setShowTooltip(true), 400);
-  };
-  const handleFloatingMouseLeave = () => {
-    if (tooltipTimer.current) clearTimeout(tooltipTimer.current);
-    setShowTooltip(false);
-  };
+  const learnerSurface = surface === 'learner';
 
   return (
     <>
@@ -26,24 +23,28 @@ export function ParisFloatingButton() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Paris AI Assistant"
-          className="fixed inset-0 z-[9999] flex items-stretch"
+          aria-label={learnerSurface ? 'PARIS Learning Assistant' : 'PARIS Career Assistant'}
+          className="fixed inset-0 z-[9999] flex items-stretch sm:pointer-events-none sm:items-end sm:justify-end sm:p-6 sm:pb-24"
         >
           <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm sm:hidden"
             onClick={close}
             aria-hidden="true"
           />
 
-          <div className="relative z-10 ml-auto w-full sm:w-[min(100vw,640px)] lg:w-[min(100vw,720px)] h-full bg-white flex flex-col shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200">
+          <div className="pointer-events-auto relative z-10 ml-auto flex h-full w-full flex-col bg-white shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200 sm:h-[min(680px,calc(100vh-8rem))] sm:w-[min(480px,calc(100vw-3rem))] sm:rounded-2xl sm:border sm:border-slate-200">
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 shrink-0 bg-white">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-red-600 flex items-center justify-center text-white text-sm sm:text-base font-bold shrink-0">
                   P
                 </div>
                 <div>
-                  <span className="font-bold text-slate-800 text-base sm:text-lg">Paris AI</span>
-                  <span className="hidden sm:block text-xs text-slate-500 ml-2">Career Guidance Assistant</span>
+                  <span className="block font-bold text-slate-800 text-base sm:text-lg">
+                    {learnerSurface ? 'PARIS Learning Assistant' : 'PARIS Career Assistant'}
+                  </span>
+                  <span className="block max-w-[300px] truncate text-xs text-slate-600">
+                    {learnerSurface ? courseTitle || 'Your Elevate coursework' : 'Admissions and career navigation'}
+                  </span>
                 </div>
               </div>
               <button
@@ -56,7 +57,13 @@ export function ParisFloatingButton() {
             </div>
 
             <div className="flex-1 overflow-hidden min-h-0">
-              <ParisChat showHeader={false} />
+              <ParisChat
+                showHeader={false}
+                surface={surface}
+                courseTitle={courseTitle}
+                nextLessonTitle={nextLessonTitle}
+                courseProgress={courseProgress}
+              />
             </div>
           </div>
         </div>
@@ -64,22 +71,12 @@ export function ParisFloatingButton() {
 
       <button
         onClick={open}
-        onMouseEnter={handleFloatingMouseEnter}
-        onMouseLeave={handleFloatingMouseLeave}
-        aria-label="Chat with Paris AI"
-        className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-brand-red-600 hover:bg-brand-red-700 active:scale-95 transition-all shadow-xl flex items-center justify-center group md:bottom-6 md:right-6"
+        aria-label={learnerSurface ? 'Open PARIS Learning Assistant for course help' : 'Open PARIS Career Assistant'}
+        className="fixed bottom-20 right-4 z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-4 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 md:bottom-6 md:right-6"
       >
-        <MessageCircle className="w-6 h-6 text-white" />
+        <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+        <span>{learnerSurface ? 'Ask PARIS · Course help' : 'Ask PARIS'}</span>
       </button>
-
-      {showTooltip && !isOpen && (
-        <div className="fixed bottom-36 right-4 z-50 pointer-events-none md:bottom-24 md:right-6">
-          <div className="bg-slate-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg max-w-[190px]">
-            <p className="font-medium">Need help choosing a program?</p>
-            <p className="text-slate-300 mt-0.5">Chat with Paris — our AI career assistant</p>
-          </div>
-        </div>
-      )}
     </>
   );
 }

@@ -1,4 +1,5 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { setAuditContext } from '@/lib/audit-context';
 import { logger } from '@/lib/logger';
 import {
   buildOpenBadgeCredential,
@@ -92,6 +93,7 @@ export async function issueNativeOpenBadge(
   learnerCredentialId: string,
 ): Promise<NativeIssueResult> {
   const db = await requireAdminClient();
+  await setAuditContext(db, { systemActor: 'native_open_badge_issuer' });
 
   const { data: award, error } = await db
     .from('learner_credentials')

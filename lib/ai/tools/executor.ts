@@ -56,7 +56,7 @@ function headerValue(headers: AIToolExecutionContext['requestHeaders'], name: st
 
 function toolUrl(tool: AIToolDefinition, input: Record<string, unknown>, context: AIToolExecutionContext): string {
   const path = typeof tool.path === 'function' ? tool.path(input) : tool.path;
-  const isAdminControlPlane = path.startsWith('/api/admin/') || path.startsWith('/api/devstudio/');
+  const isAdminControlPlane = path.startsWith('/api/admin/') || path.startsWith('/api/admin/dev-studio/');
   const origin = isAdminControlPlane
     ? context.adminOrigin
     : context.appOrigin ?? context.adminOrigin;

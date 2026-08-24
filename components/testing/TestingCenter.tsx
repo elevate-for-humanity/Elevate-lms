@@ -688,26 +688,39 @@ function SchoolPartnerships() {
 
 // Main Component
 export function PremiumTestingCenter() {
+  const [heroVideoReady, setHeroVideoReady] = useState(false);
+
   return (
     <main className="bg-white">
       
       {/* ===== CINEMATIC HERO ===== */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-slate-900">
+      <section className="relative h-[38vh] min-h-[360px] max-h-[520px] flex items-center overflow-hidden bg-slate-900">
         <div className="absolute inset-0">
+          <Image
+            src="/images/pages/testing-page-1.webp"
+            alt="Indiana workforce credential testing center"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
           <video
             autoPlay
             muted
             loop
             playsInline
-            className="w-full h-full object-cover"
-            poster="/images/pages/testing-page-1.webp"
+            preload="metadata"
+            onLoadedData={() => setHeroVideoReady(true)}
+            onCanPlay={() => setHeroVideoReady(true)}
+            onError={() => setHeroVideoReady(false)}
+            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${heroVideoReady ? 'opacity-100' : 'opacity-0'}`}
           >
             <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/testing-hero.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-900/50" />
         </div>
         
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-32">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 py-12 sm:py-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

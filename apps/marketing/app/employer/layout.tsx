@@ -1,4 +1,5 @@
 import { headers, cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { requireRole } from '@/lib/auth/require-role';
 import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
@@ -12,14 +13,16 @@ export const metadata = {
 };
 
 export default async function EmployerLayout({ children }: { children: React.ReactNode }) {
-  const { user, profile } = await requireRole(['employer', 'sponsor', 'admin', 'staff']);
-
   const headersList = await headers();
   const cookieStore = await cookies();
   const pathname =
     headersList.get('x-pathname') ||
     cookieStore.get('__efh_pathname')?.value ||
     '/employer';
+
+  if (pathname === '/employer') redirect('/employers');
+
+  const { user, profile } = await requireRole(['employer', 'sponsor', 'admin', 'staff']);
   const breadcrumbs = generateBreadcrumbs(pathname);
 
   return (

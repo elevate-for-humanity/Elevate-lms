@@ -124,7 +124,7 @@ export default function NorthflankStatusPanel() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/devstudio/northflank-status');
+      const res = await fetch('/api/admin/dev-studio/northflank-status');
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         throw new Error((d as { error?: string }).error ?? `HTTP ${res.status}`);

@@ -39,7 +39,7 @@ export default function BarberCompetencyRubricPage() {
         </div>
       </div>
 
-      <section className="relative isolate min-h-[420px] overflow-hidden bg-slate-950">
+      <section className="relative isolate h-[38vh] min-h-[320px] max-h-[520px] overflow-hidden bg-slate-950">
         <Image
           src="/images/barber-hero-new.webp"
           alt="Barber apprentice demonstrating a supervised technical skill"
@@ -49,7 +49,7 @@ export default function BarberCompetencyRubricPage() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-slate-950/75" aria-hidden="true" />
-        <div className="relative mx-auto flex min-h-[420px] max-w-6xl items-center px-4 py-14 sm:px-6">
+        <div className="relative mx-auto flex h-full max-w-6xl items-center px-4 py-12 sm:px-6">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-black/25 px-4 py-2 text-sm font-bold text-white">
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />

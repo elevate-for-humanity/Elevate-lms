@@ -17,7 +17,7 @@ const CANONICAL_INSTRUCTOR_IMAGE_URL =
  * Elevate's canonical public instructor asset. Remote/custom references remain
  * untouched.
  */
-function CanonicalElevateLesson(props: ElevateLessonProps) {
+function CanonicalElevateLesson(props: ElevateLessonProps & Record<string, unknown>) {
   const instructorImageSrc = props.instructorImageSrc?.startsWith('/')
     ? CANONICAL_INSTRUCTOR_IMAGE_URL
     : props.instructorImageSrc;

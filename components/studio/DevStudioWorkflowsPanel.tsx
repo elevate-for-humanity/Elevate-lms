@@ -40,7 +40,7 @@ export default function DevStudioWorkflowsPanel() {
     try {
       const [wfRes, runsRes] = await Promise.all([
         fetch('/api/admin/workflows'),
-        fetch('/api/devstudio/workflows'),
+        fetch('/api/admin/dev-studio/workflows'),
       ]);
       const wfData = await wfRes.json().catch(() => ({}));
       const runsData = await runsRes.json().catch(() => ({}));

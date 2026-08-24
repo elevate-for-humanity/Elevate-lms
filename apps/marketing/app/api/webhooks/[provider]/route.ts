@@ -31,8 +31,9 @@ function buildForwardHeaders(request: NextRequest, provider: string): Headers {
 }
 
 // PUBLIC ROUTE: third-party webhook providers cannot use app session auth; provider-specific target routes verify signatures/secrets.
-export async function POST(request: NextRequest, { params }: { params: { provider: string } }) {
-  const provider = params.provider?.toLowerCase();
+export async function POST(request: NextRequest, { params }: { params: Promise<{ provider: string }> }) {
+  const { provider: providerParam } = await params;
+  const provider = providerParam?.toLowerCase();
   const targetPath = PROVIDER_TARGETS[provider];
   if (!targetPath) return safeError('Unsupported webhook provider', 404);
 
@@ -52,8 +53,9 @@ export async function POST(request: NextRequest, { params }: { params: { provide
 }
 
 // PUBLIC ROUTE: operational metadata only; no user/provider payload is returned.
-export async function GET(_request: NextRequest, { params }: { params: { provider: string } }) {
-  const provider = params.provider?.toLowerCase();
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ provider: string }> }) {
+  const { provider: providerParam } = await params;
+  const provider = providerParam?.toLowerCase();
   return NextResponse.json({
     ok: Boolean(PROVIDER_TARGETS[provider]),
     provider,

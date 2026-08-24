@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'lucide-react';
 import Link from 'next/link';
-import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const metadata: Metadata = {
   title: 'Contact Elevate for Humanity | Workforce Development & Apprenticeship Programs',
@@ -301,7 +300,6 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
-      <ParisFloatingWrapper />
     </div>
   );
 }

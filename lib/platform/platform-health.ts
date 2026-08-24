@@ -84,18 +84,35 @@ async function checkDatabase(): Promise<ServiceCheck> {
 
 async function checkRedis(): Promise<ServiceCheck> {
   const url = process.env.REDIS_URL?.trim();
-  if (!url) {
+  const restUrl = process.env.UPSTASH_REDIS_REST_URL?.trim();
+  const restToken = process.env.UPSTASH_REDIS_REST_TOKEN?.trim();
+  if (!url && !(restUrl && restToken)) {
     return {
       name: 'Redis',
       status: 'unknown',
       configured: false,
-      message: 'REDIS_URL not configured',
+      message: 'Redis connection is not configured',
     };
   }
 
   const start = Date.now();
   let redis: import('ioredis').Redis | null = null;
   try {
+    if (restUrl && restToken) {
+      const response = await fetch(`${restUrl.replace(/\/$/, '')}/ping`, {
+        headers: { Authorization: `Bearer ${restToken}` },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(5_000),
+      });
+      if (!response.ok) throw new Error(`Redis REST ping returned HTTP ${response.status}`);
+      return {
+        name: 'Redis',
+        status: 'healthy',
+        latencyMs: Date.now() - start,
+        configured: true,
+      };
+    }
+
     // ioredis is CommonJS-compatible and Next/Node may expose the constructor as
     // default or named depending on bundling. Resolve both forms explicitly.
     const module = await import('ioredis');
@@ -104,7 +121,7 @@ async function checkRedis(): Promise<ServiceCheck> {
       throw new Error('ioredis constructor unavailable');
     }
 
-    redis = new RedisCtor(url, {
+    redis = new RedisCtor(url!, {
       maxRetriesPerRequest: 1,
       connectTimeout: 5_000,
       enableReadyCheck: true,
@@ -282,7 +299,7 @@ function generateAlerts(
   if (services.redis.status === 'down') {
     alerts.push({ severity: 'warning', service: 'Redis', message: services.redis.message ?? 'Rate limiting unavailable — Redis is down' });
   } else if (!services.redis.configured) {
-    alerts.push({ severity: 'warning', service: 'Redis', message: 'Rate limiting unavailable — REDIS_URL is not configured' });
+    alerts.push({ severity: 'warning', service: 'Redis', message: 'Rate limiting unavailable — Redis is not configured' });
   }
 
   for (const service of [services.stripe, services.email, services.storage]) {
@@ -375,6 +392,10 @@ export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'se
     process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
   );
   const ai = checkAIProviders();
+  const redisConfigured = Boolean(
+    process.env.REDIS_URL ||
+      (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN),
+  );
 
   return {
     services: {
@@ -382,8 +403,8 @@ export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'se
       redis: {
         name: 'Redis',
         status: 'unknown',
-        configured: Boolean(process.env.REDIS_URL),
-        message: process.env.REDIS_URL ? 'Not probed' : 'REDIS_URL not configured',
+        configured: redisConfigured,
+        message: redisConfigured ? 'Not probed' : 'Redis connection is not configured',
       },
       stripe: {
         name: 'Stripe',

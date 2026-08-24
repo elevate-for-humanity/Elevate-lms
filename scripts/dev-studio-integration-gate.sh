@@ -24,7 +24,7 @@ else
 fi
 
 echo "\n== Canonical API ownership =="
-if [[ -d "$CANONICAL" ]] && find "$CANONICAL" -name route.ts -type f | grep -q .; then
+if [[ -d "$CANONICAL" ]] && [[ -n "$(find "$CANONICAL" -name route.ts -type f -print -quit)" ]]; then
   pass "Admin owns canonical /api/admin/dev-studio"
 else
   fail "Missing canonical Admin Dev Studio API tree"
@@ -44,7 +44,7 @@ for route in env devcontainer container-env; do
   fi
 
   if [[ -f "$LEGACY_APP/$route/route.ts" ]]; then
-    fail "Historical apps/app /api/devstudio/$route implementation reintroduced"
+    fail "Historical apps/app /api/admin/dev-studio/$route implementation reintroduced"
   else
     pass "Historical apps/app $route implementation absent"
   fi

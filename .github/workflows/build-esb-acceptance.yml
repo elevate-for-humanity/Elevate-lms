@@ -30,7 +30,7 @@ on:
       - 'apps/admin/app/api/admin/course-builder/**'
       - 'apps/admin/app/api/admin/lms/courses/generate/route.ts'
       - 'apps/admin/app/api/admin/courses/**'
-      - 'apps/admin/app/api/devstudio/chat/route.ts'
+      - 'apps/admin/app/api/admin/dev-studio/chat/route.ts'
       - 'apps/admin/app/api/internal/videos/process-queue/route.ts'
   issues:
     types: [opened, reopened]
@@ -211,7 +211,7 @@ jobs:
           fi
           code=0
           pnpm exec eslint \
-            apps/admin/app/api/devstudio/chat/route.ts \
+            apps/admin/app/api/admin/dev-studio/chat/route.ts \
             apps/admin/app/api/internal/videos/process-queue/route.ts \
             lib/video \
             apps/lms/app/lms/courses \

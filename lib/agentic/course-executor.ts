@@ -17,6 +17,7 @@ interface AgenticTaskRow {
   action: string;
   dependencies?: string[] | null;
   input?: Record<string, unknown> | null;
+  status?: string;
 }
 
 interface AgenticRunRow {

@@ -69,7 +69,7 @@ export default async function CalendarPage() {
       {/* Hero with image */}
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
+        <div className="relative h-[38vh] min-h-[320px] max-h-[520px] w-full overflow-hidden">
           <Image
             src="/images/hero/hero-tech-careers.webp"
             alt="Calendar and Schedule"

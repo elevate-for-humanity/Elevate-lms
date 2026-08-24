@@ -416,7 +416,7 @@ export default function BeautyCheckoutPage() {
                       </svg>
                       Klarna
                     </button>
-                    <button className="flex items-center justify-center gap-2 py-3 px-4 bg-[#00B4E6] text-white rounded-xl font-bold hover:bg-[#009FCC] transition-all">
+                    <button className="flex items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-3 font-bold text-white transition-all hover:bg-brand-blue-800">
                       <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
                         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                       </svg>

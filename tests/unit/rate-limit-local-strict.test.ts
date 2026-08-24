@@ -23,7 +23,7 @@ describe('applyRateLimit resilient fallback behavior', () => {
     delete process.env.UPSTASH_REDIS_REST_TOKEN;
 
     const result = await applyRateLimit(
-      new Request('http://localhost/api/devstudio/chat', {
+      new Request('http://localhost/api/admin/dev-studio/chat', {
         headers: { 'x-forwarded-for': '198.51.100.11' },
       }),
       'strict',
@@ -38,7 +38,7 @@ describe('applyRateLimit resilient fallback behavior', () => {
     delete process.env.UPSTASH_REDIS_REST_TOKEN;
 
     const request = () =>
-      new Request('https://www.elevateforhumanity.org/api/devstudio/chat', {
+      new Request('https://www.elevateforhumanity.org/api/admin/dev-studio/chat', {
         headers: { 'x-forwarded-for': '198.51.100.22' },
       });
 

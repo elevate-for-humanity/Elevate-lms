@@ -18,11 +18,13 @@ concurrency:
 
 jobs:
   sync-redis:
-    name: Sync REDIS_URL to Northflank
+    name: Sync Redis configuration to Northflank
     runs-on: ubuntu-latest
     environment: production
     env:
       REDIS_URL: ${{ secrets.REDIS_URL }}
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
@@ -39,7 +41,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -n "${REDIS_URL:-}" || { echo '::error::REDIS_URL GitHub secret is missing'; exit 1; }
+          if [[ -z "${REDIS_URL:-}" && ( -z "${UPSTASH_REDIS_REST_URL:-}" || -z "${UPSTASH_REDIS_REST_TOKEN:-}" ) ]]; then
+            echo '::error::Configure REDIS_URL or both UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN'
+            exit 1
+          fi
           test -n "${NORTHFLANK_API_TOKEN:-}" || { echo '::error::NORTHFLANK_API_TOKEN GitHub secret is missing'; exit 1; }
           echo 'Redis and Northflank credentials are configured.'
 
@@ -58,5 +63,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Merge REDIS_URL into shared production secret group and restart services
+      - name: Merge Redis configuration into shared production secret group and restart services
         run: pnpm tsx scripts/northflank/sync-redis-secret.ts
+
+      - name: Verify Redis secret linkage
+        run: pnpm tsx scripts/northflank/verify-linkage.ts

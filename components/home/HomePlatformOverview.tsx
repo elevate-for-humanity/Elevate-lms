@@ -24,7 +24,7 @@ const FEATURES = [
   {
     title: 'Manage Workforce Operations',
     body: 'Applications, participants, employers, funding workflows, compliance records, and administrative tools across one platform.',
-    image: '/images/pages/for-employers-page-1.webp',
+    image: '/images/pages/workforce-training.webp',
     href: '/platform',
   },
 ] as const;
@@ -49,7 +49,7 @@ export function HomePlatformOverview() {
           {FEATURES.map((feature) => (
             <Link key={feature.title} href={feature.href} className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
               <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                <Image src={feature.image} alt="" fill className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw" />
+                <Image src={feature.image} alt={feature.title} fill className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.04]" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" aria-hidden="true" />
               </div>
               <div className="p-6">

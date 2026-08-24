@@ -219,7 +219,7 @@ class SkillsLoader {
   private async loadCustomSkills(): Promise<Skill[]> {
     // In browser context, we'd fetch from API
     try {
-      const response = await fetch('/api/devstudio/skills');
+      const response = await fetch('/api/admin/dev-studio/skills');
       if (response.ok) {
         const data = await response.json();
         return data.skills || [];

@@ -26,8 +26,8 @@ for (const file of [
   'lib/devstudio/course-builder-controller.ts',
   'lib/course-builder/orchestrator.ts',
   'services/studio-browser/server.mjs',
-  'apps/admin/app/api/devstudio/browser/session/route.ts',
-  'apps/admin/app/api/devstudio/browser/agent/route.ts',
+  'apps/admin/app/api/admin/dev-studio/browser/session/route.ts',
+  'apps/admin/app/api/admin/dev-studio/browser/agent/route.ts',
   'components/studio/CloudBrowserWorkspace.tsx',
   'components/studio/CourseStudioApplication.tsx',
   'components/studio/CourseProvider.tsx',
@@ -94,7 +94,8 @@ function routeFiles(base, current = base) {
   return fs.readdirSync(current, { withFileTypes: true }).flatMap((entry) => entry.isDirectory() ? routeFiles(base, path.join(current, entry.name)) : entry.name === 'route.ts' ? [path.relative(base, path.join(current, entry.name))] : []);
 }
 const capabilityRoutes = new Set(routeFiles(canonicalRoot));
-for (const route of routeFiles(runtimeRoot)) if (capabilityRoutes.has(route)) fail(`duplicate API route exists in both Studio namespaces: ${route}`);
+if (capabilityRoutes.size === 0) fail('canonical /api/admin/dev-studio API tree is empty');
+if (fs.existsSync(runtimeRoot)) fail('legacy /api/devstudio route tree exists; Studio APIs must be Admin-owned');
 if (fs.existsSync(forbiddenLegacyRoot)) fail('legacy /api/admin/devstudio namespace exists; use /api/admin/dev-studio for Admin capability APIs');
 
 function sourceFiles(current) {
@@ -106,10 +107,13 @@ function sourceFiles(current) {
   });
 }
 const checkerPath = path.join(root, 'scripts/check-studio-architecture.mjs');
+const legacyReferenceGatePath = path.join(root, 'scripts/dev-studio-integration-gate.sh');
 for (const sourceRoot of ['apps/admin', 'components', 'lib', 'scripts', 'tests']) {
   for (const file of sourceFiles(path.join(root, sourceRoot))) {
-    if (file === checkerPath) continue;
-    if (read(path.relative(root, file)).includes('/api/admin/devstudio')) fail(`legacy /api/admin/devstudio reference exists: ${path.relative(root, file)}`);
+    if (file === checkerPath || file === legacyReferenceGatePath) continue;
+    const source = read(path.relative(root, file));
+    if (source.includes('/api/admin/devstudio')) fail(`legacy /api/admin/devstudio reference exists: ${path.relative(root, file)}`);
+    if (source.includes('/api/devstudio')) fail(`legacy /api/devstudio reference exists: ${path.relative(root, file)}`);
   }
 }
 
@@ -136,7 +140,7 @@ if (!studioController.includes("from '../course-builder/orchestrator'")) fail('S
 const courseOrchestrator = read('lib/course-builder/orchestrator.ts');
 if (!courseOrchestrator.includes("from '../course-factory/factory'")) fail('Course Builder orchestrator is not the owner of private Course Factory execution');
 
-const adminAiChat = read('apps/admin/app/api/devstudio/chat/route.ts');
+const adminAiChat = read('apps/admin/app/api/admin/dev-studio/chat/route.ts');
 if (!adminAiChat.includes("await import('@/lib/course-factory')") && !adminAiChat.includes("await import('@/lib/devstudio/course-builder-controller')")) {
   fail('Admin AI does not delegate course creation through the canonical Course Builder facade/controller');
 }
@@ -186,4 +190,4 @@ if (failures.length) {
   console.error(failures.map((message) => `STUDIO ARCHITECTURE ERROR: ${message}`).join('\n'));
   process.exit(1);
 }
-console.log(`Studio architecture verified: Studio control plane plus ${routes.length} advanced capability surfaces; Course Builder facade/orchestrator owns course execution, canonical application data is preserved, and no parallel Studio API/schema authority exists.`);
+console.log(`Studio architecture verified: one Admin shell, ${routes.length} advanced capability surfaces, and ${capabilityRoutes.size} Admin-owned Studio APIs; Course Builder facade/orchestrator owns course execution and no parallel Studio API/schema authority exists.`);

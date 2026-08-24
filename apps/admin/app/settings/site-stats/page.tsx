@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import SiteStatsClient from './SiteStatsClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -23,7 +23,7 @@ const STAT_KEYS = [
 
 async function getCurrentStats(): Promise<Record<string, string>> {
   try {
-    const db = createAdminClient();
+    const db = await requireAdminClient();
     const { data } = await db
       .from('platform_settings')
       .select('key, value')

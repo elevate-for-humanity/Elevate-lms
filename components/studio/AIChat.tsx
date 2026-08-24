@@ -368,7 +368,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
   useEffect(() => {
     async function checkAi() {
       try {
-        const res = await fetch('/api/devstudio/health');
+        const res = await fetch('/api/admin/dev-studio/health');
         if (!res.ok) {
           setAiStatus('unconfigured');
           return;
@@ -415,7 +415,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
     let cancelled = false;
     async function loadDocs() {
       try {
-        const res = await fetch('/api/devstudio/upload');
+        const res = await fetch('/api/admin/dev-studio/upload');
         if (!res.ok) return;
         const data = await res.json();
         const docs = (data.documents ?? []) as Array<{ name?: string; original_name?: string; content_type?: string; size_bytes?: number; created_at?: string }>;
@@ -473,7 +473,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
   const executeAction = async (action: NonNullable<Message['action']>) => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/devstudio/execute', {
+      const res = await fetch('/api/admin/dev-studio/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: action.type, params: action.params }),
@@ -531,7 +531,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
 
     // ── Code AI mode — uses devstudio/chat SSE endpoint ──
     try {
-      const res = await fetch('/api/devstudio/chat', {
+      const res = await fetch('/api/admin/dev-studio/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -881,7 +881,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
                   ]);
 
                   try {
-                    const res = await fetch('/api/devstudio/upload', { method: 'POST', body: formData });
+                    const res = await fetch('/api/admin/dev-studio/upload', { method: 'POST', body: formData });
                     const data = await res.json();
                     if (!res.ok) throw new Error(data.error ?? 'Upload failed');
 
@@ -900,7 +900,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
                     if (docId) {
                       setIsLoading(true);
                       try {
-                        const chatRes = await fetch('/api/devstudio/chat', {
+                        const chatRes = await fetch('/api/admin/dev-studio/chat', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({

@@ -111,7 +111,7 @@ export default function ServicesPanel() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/devstudio/services');
+      const res = await fetch('/api/admin/dev-studio/services');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setData(await res.json());
     } catch (e) {
@@ -127,7 +127,7 @@ export default function ServicesPanel() {
     setActions((prev) => ({ ...prev, [serviceKey + action]: 'loading' }));
     setActionMsg((prev) => ({ ...prev, [serviceKey]: '' }));
     try {
-      const res = await fetch('/api/devstudio/services', {
+      const res = await fetch('/api/admin/dev-studio/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, service: serviceKey }),

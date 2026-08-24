@@ -7,6 +7,7 @@ import InteractiveLessonExperience from '@/components/lms/InteractiveLessonExper
 import AITeachingPlayer, { type TeachingSlide } from '@/components/lms/AITeachingPlayer';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import LessonProgressClient from './LessonProgressClient';
+import LessonFocusShell from '@/components/lms/LessonFocusShell';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -112,8 +113,7 @@ export default async function LessonPage({ params }: { params: Promise<{ courseI
   const passingScore = Number(lesson.passing_score ?? 70);
   const moduleOrder = Number(moduleRow?.order_index ?? 1);
 
-  return (
-    <main className="min-h-screen bg-slate-50 text-slate-950">
+  const lessonHeader = (
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
           <Link href={`/lms/courses/${course.id}`} className="inline-flex items-center gap-2 text-sm font-bold text-cyan-800 hover:underline"><ArrowLeft className="h-4 w-4" /> Back to {course.title}</Link>
@@ -126,6 +126,10 @@ export default async function LessonPage({ params }: { params: Promise<{ courseI
           </div>
         </div>
       </header>
+  );
+
+  return (
+    <LessonFocusShell header={lessonHeader}>
 
       <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
         {lessonVisual?.media_type === 'image' ? (
@@ -168,6 +172,6 @@ export default async function LessonPage({ params }: { params: Promise<{ courseI
           {next ? <Link href={`/lms/courses/${course.id}/lessons/${next.id}`} className="rounded-lg bg-cyan-700 px-5 py-3 text-right font-bold text-white hover:bg-cyan-800">{next.title} →</Link> : <Link href={`/lms/courses/${course.id}`} className="rounded-lg bg-cyan-700 px-5 py-3 font-bold text-white hover:bg-cyan-800">Return to course</Link>}
         </nav>
       </div>
-    </main>
+    </LessonFocusShell>
   );
 }

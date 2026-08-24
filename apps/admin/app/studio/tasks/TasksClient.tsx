@@ -24,7 +24,7 @@ export default function TasksClient() {
   async function fetchTasks() {
     setLoading(true);
     try {
-      const res = await fetch('/api/devstudio/tasks');
+      const res = await fetch('/api/admin/dev-studio/tasks');
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setTasks(json.tasks ?? []);
@@ -37,12 +37,12 @@ export default function TasksClient() {
   }
 
   async function approveTask(id: string) {
-    await fetch(`/api/devstudio/tasks/${id}/approve`, { method: 'POST' });
+    await fetch(`/api/admin/dev-studio/tasks/${id}/approve`, { method: 'POST' });
     fetchTasks();
   }
 
   async function rollbackTask(id: string) {
-    await fetch(`/api/devstudio/tasks/${id}/rollback`, { method: 'POST' });
+    await fetch(`/api/admin/dev-studio/tasks/${id}/rollback`, { method: 'POST' });
     fetchTasks();
   }
 

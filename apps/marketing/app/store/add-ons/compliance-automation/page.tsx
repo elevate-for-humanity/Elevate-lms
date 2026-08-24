@@ -95,7 +95,7 @@ export default function ComplianceAutomationPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-48 md:h-64 flex items-center overflow-hidden">
+      <section className="relative h-[38vh] min-h-48 max-h-[520px] md:h-64 flex items-center overflow-hidden">
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="

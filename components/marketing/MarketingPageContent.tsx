@@ -16,7 +16,7 @@ export function MarketingPageContent({ page }: MarketingPageContentProps) {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative min-h-[320px] sm:min-h-[380px] lg:min-h-[440px] flex items-center">
+      <section className="relative h-[38vh] min-h-[320px] max-h-[520px] flex items-center">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
           src={page.hero_image}

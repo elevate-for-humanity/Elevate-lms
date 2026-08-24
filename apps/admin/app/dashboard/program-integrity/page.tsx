@@ -197,7 +197,7 @@ export default function ProgramIntegrityPage() {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Link
-                        href={`/admin/programs/${p.id}`}
+                        href={`/programs/${p.id}`}
                         className="text-blue-600 hover:underline text-sm flex items-center gap-1 justify-end"
                       >
                         Fix <ArrowRight className="w-3 h-3" />

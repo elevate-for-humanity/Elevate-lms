@@ -22,7 +22,7 @@ export default function DevStudioFilesWorkspace() {
 
   const refreshFiles = useCallback(async () => {
     try {
-      const res = await fetch('/api/devstudio/files');
+      const res = await fetch('/api/admin/dev-studio/files');
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       const flat: string[] = [];
@@ -48,7 +48,7 @@ export default function DevStudioFilesWorkspace() {
     setLoading(true);
     setStatus('');
     try {
-      const res = await fetch(`/api/devstudio/files?path=${encodeURIComponent(path)}`);
+      const res = await fetch(`/api/admin/dev-studio/files?path=${encodeURIComponent(path)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setContent(data.content ?? '');
@@ -67,7 +67,7 @@ export default function DevStudioFilesWorkspace() {
     setStatus('');
     try {
       const method = sha ? 'PUT' : 'POST';
-      const res = await fetch('/api/devstudio/files', {
+      const res = await fetch('/api/admin/dev-studio/files', {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: selected, content, sha: sha || undefined, message }),

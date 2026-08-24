@@ -1,6 +1,6 @@
 /**
  * apps/admin/server.js — Next.js standalone entry (admin ECS task).
- * Studio Shell WebSocket proxy removed — Lizzy uses GitHub API + /api/devstudio/shell (workflows) only.
+ * Studio Shell WebSocket proxy removed — Lizzy uses GitHub API + /api/admin/dev-studio/shell (workflows) only.
  */
 'use strict';
 

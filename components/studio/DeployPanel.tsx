@@ -66,7 +66,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
     setError(null);
     setRun(null);
     try {
-      const res = await fetch('/api/devstudio/shell', {
+      const res = await fetch('/api/admin/dev-studio/shell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ workflow: workflow.key }),
@@ -84,7 +84,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
   async function refreshRun() {
     if (!lastResult?.runId) return;
     try {
-      const res = await fetch(`/api/devstudio/shell?run_id=${lastResult.runId}`);
+      const res = await fetch(`/api/admin/dev-studio/shell?run_id=${lastResult.runId}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `Status failed with HTTP ${res.status}`);
       setRun(data);
@@ -101,7 +101,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
     setGitPushState('loading');
     setError(null);
     try {
-      const res = await fetch('/api/devstudio/git', {
+      const res = await fetch('/api/admin/dev-studio/git', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'configure-and-push', targetBranch: 'main', confirmation: 'CONFIRM PUSH' }),
@@ -131,7 +131,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
     setDeployAllState('loading');
     setError(null);
     try {
-      const res = await fetch('/api/devstudio/shell', {
+      const res = await fetch('/api/admin/dev-studio/shell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ workflow: 'deploy-production-dispatch' }),

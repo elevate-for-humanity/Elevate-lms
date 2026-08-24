@@ -105,7 +105,7 @@ async function execWebhookCall(config: Record<string, unknown>, ctx: RunContext)
   if (!rawUrl) return { ok: false, output: { error: 'webhook_call requires url' } };
 
   const validated = validateWorkflowWebhookUrl(rawUrl);
-  if (!validated.ok) return { ok: false, output: { error: validated.error } };
+  if (validated.ok === false) return { ok: false, output: { error: validated.error } };
 
   const method = String(r.method ?? 'POST').toUpperCase();
   if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {

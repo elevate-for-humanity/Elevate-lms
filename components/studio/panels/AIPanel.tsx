@@ -113,7 +113,7 @@ export function AIPanel() {
     }]);
 
     try {
-      const res = await fetch('/api/devstudio/chat', {
+      const res = await fetch('/api/admin/dev-studio/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

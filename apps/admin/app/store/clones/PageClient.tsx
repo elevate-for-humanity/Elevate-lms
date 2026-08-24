@@ -436,7 +436,7 @@ export default function StoreBuilderPage() {
                     </li>
                   </ul>
                 </div>
-                <div className="relative h-[60vh] min-h-[400px] max-h-[720px] rounded-2xl overflow-hidden shadow-2xl">
+                <div className="relative h-[38vh] min-h-[320px] max-h-[520px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
                     src="/images/pages/admin-store-hero.webp"
                     alt="Students learning"

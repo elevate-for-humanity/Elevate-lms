@@ -35,7 +35,7 @@ export default function StorePage() {
       <section className="border-b border-cyan-100 bg-gradient-to-b from-cyan-50 via-white to-rose-50 py-6 sm:py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="overflow-hidden rounded-3xl border border-white bg-white shadow-2xl shadow-cyan-900/10 ring-1 ring-slate-200">
-            <HeroVideo videoSrcDesktop={hero.videoSrcDesktop} videoSrcMobile={hero.videoSrcMobile} posterImage={hero.posterImage || '/images/pages/store-licensing-hero.jpg'} voiceoverSrc={hero.voiceoverSrc} analyticsName="store-commercial" mediaFit="cover" heightClassName="aspect-video h-auto min-h-[260px] max-h-none" />
+            <HeroVideo videoSrcDesktop={hero.videoSrcDesktop} videoSrcMobile={hero.videoSrcMobile} posterImage={hero.posterImage || '/images/pages/store-licensing-hero.webp'} voiceoverSrc={hero.voiceoverSrc} analyticsName="store-commercial" mediaFit="cover" heightClassName="aspect-[16/9] h-auto min-h-[260px] max-h-[520px] sm:aspect-[21/9]" />
           </div>
         </div>
       </section>

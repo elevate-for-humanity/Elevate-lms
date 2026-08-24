@@ -16,7 +16,7 @@ export const MEDIA_STORAGE_POLICY = {
   devStudioDocs: {
     primary: 'supabase:documents',
     optional: 'cloudflare-r2 (R2_ENDPOINT + R2_BUCKET)',
-    route: 'apps/admin/app/api/devstudio/upload/route.ts',
+    route: 'apps/admin/app/api/admin/dev-studio/upload/route.ts',
   },
   /** Digital store downloads — Cloudflare R2 via lib/storage/file-storage.ts */
   digitalProducts: {

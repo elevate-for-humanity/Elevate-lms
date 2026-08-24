@@ -32,9 +32,9 @@ for (const path of [
   'lib/devstudio/openhands/client.ts',
   'lib/devstudio/openhands/runtime.ts',
   'lib/devstudio/openhands/github-verifier.ts',
-  'apps/admin/app/api/devstudio/openhands/chat/route.ts',
-  'apps/admin/app/api/devstudio/openhands/agent/route.ts',
-  'apps/admin/app/api/devstudio/plan/route.ts',
+  'apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts',
+  'apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts',
+  'apps/admin/app/api/admin/dev-studio/plan/route.ts',
   'services/llm-gpu-worker/Dockerfile',
   'services/llm-gpu-worker/entrypoint.sh',
   'scripts/northflank/provision-llm-worker.ts',
@@ -87,18 +87,18 @@ requireText('lib/devstudio/openhands/runtime.ts', 'verifyOpenHandsGitHubOutcome'
 requireText('lib/devstudio/openhands/runtime.ts', 'REQUIRES_HUMAN_REVIEW', 'OpenHands verification approval fallback');
 requireText('lib/devstudio/openhands/github-verifier.ts', '/pulls/', 'OpenHands PR verification');
 requireText('lib/devstudio/openhands/github-verifier.ts', '/check-runs', 'OpenHands CI verification');
-requireText('apps/admin/app/api/devstudio/openhands/chat/route.ts', 'sendOpenHandsMessage', 'thin V1 chat continuation route');
-requireText('apps/admin/app/api/devstudio/openhands/chat/route.ts', 'continuationSupported: true', 'OpenHands V1 continuation capability');
-requireText('apps/admin/app/api/devstudio/openhands/agent/route.ts', 'dispatchOpenHandsTask', 'thin governed OpenHands execution route');
-requireText('apps/admin/app/api/devstudio/openhands/agent/route.ts', 'refreshOpenHandsTask', 'OpenHands status lifecycle route');
+requireText('apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts', 'sendOpenHandsMessage', 'thin V1 chat continuation route');
+requireText('apps/admin/app/api/admin/dev-studio/openhands/chat/route.ts', 'continuationSupported: true', 'OpenHands V1 continuation capability');
+requireText('apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts', 'dispatchOpenHandsTask', 'thin governed OpenHands execution route');
+requireText('apps/admin/app/api/admin/dev-studio/openhands/agent/route.ts', 'refreshOpenHandsTask', 'OpenHands status lifecycle route');
 
 requireText('lib/platform/planner.ts', "'awaiting_approval'", 'approval-aware plan state');
 requireText('lib/platform/planner.ts', 'verification_rule', 'plan verification contract');
-requireText('apps/admin/app/api/devstudio/plan/route.ts', 'createAiTask', 'canonical persisted task execution');
-requireText('apps/admin/app/api/devstudio/plan/route.ts', 'evaluateExecution', 'independent evaluation');
-requireText('apps/admin/app/api/devstudio/plan/route.ts', 'persistPlan', 'plan checkpointing');
-requireText('apps/admin/app/api/devstudio/plan/route.ts', 'loadSharedContext', 'shared context loading');
-requireText('apps/admin/app/api/devstudio/plan/route.ts', 'runTaskExecution', 'safe retry/resume runtime');
+requireText('apps/admin/app/api/admin/dev-studio/plan/route.ts', 'createAiTask', 'canonical persisted task execution');
+requireText('apps/admin/app/api/admin/dev-studio/plan/route.ts', 'evaluateExecution', 'independent evaluation');
+requireText('apps/admin/app/api/admin/dev-studio/plan/route.ts', 'persistPlan', 'plan checkpointing');
+requireText('apps/admin/app/api/admin/dev-studio/plan/route.ts', 'loadSharedContext', 'shared context loading');
+requireText('apps/admin/app/api/admin/dev-studio/plan/route.ts', 'runTaskExecution', 'safe retry/resume runtime');
 
 for (const status of ['PASS', 'FAIL_RETRYABLE', 'FAIL_BLOCKING', 'REQUIRES_HUMAN_REVIEW']) {
   requireText('lib/platform/orchestration/evaluator.ts', status, `evaluator status ${status}`);

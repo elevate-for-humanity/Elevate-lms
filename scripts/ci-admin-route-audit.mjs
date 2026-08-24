@@ -1,5 +1,5 @@
 // scripts/ci-admin-route-audit.mjs
-// Targeted audit for app/admin, app/api/admin, components/admin, lib/admin.
+// Targeted audit for the deployed Admin app plus shared Admin components/data.
 // Errors block CI. Warnings are reported only.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,7 +22,7 @@ import path from 'node:path';
 // ─────────────────────────────────────────────────────────────────────────────
 {
   const _ROOT = process.cwd();
-  const APP_DIR = path.join(_ROOT, 'app');
+  const APP_DIR = path.join(_ROOT, 'apps/admin/app');
   const REQUEST_TIME_LIB_DIRS = ['lib/auth', 'lib/api', 'lib/middleware']
     .map((d) => path.join(_ROOT, d))
     .filter((d) => fs.existsSync(d));
@@ -65,7 +65,7 @@ import path from 'node:path';
 
   let coldStartViolations = 0;
 
-  // Rule 1: app/ — banned entirely
+  // Rule 1: deployed Admin app — banned entirely
   for (const file of walkGuard(APP_DIR)) {
     for (const v of findViolations(file, false)) {
       const rel = path.relative(_ROOT, file);
@@ -118,7 +118,7 @@ import path from 'node:path';
 }
 
 const ROOT = process.cwd();
-const TARGET_DIRS = ['app/admin', 'app/api/admin', 'components/admin', 'lib/admin'].filter((d) =>
+const TARGET_DIRS = ['apps/admin/app', 'components/admin', 'lib/admin'].filter((d) =>
   fs.existsSync(path.join(ROOT, d)),
 );
 

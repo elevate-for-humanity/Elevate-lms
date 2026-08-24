@@ -8,7 +8,6 @@ import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeMobileActions } from '@/components/home/HomeMobileActions';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
 import StructuredData from '@/components/StructuredData';
 import { getApprovedHomeHeroAsset } from '@/lib/media/home-hero-asset';
 
@@ -74,7 +73,6 @@ export default async function HomePage() {
       <HomeFunding />
       <HomeFinalCTA />
       <HomeTrustBar />
-      <ParisFloatingButton />
       <HomeMobileActions />
     </>
   );

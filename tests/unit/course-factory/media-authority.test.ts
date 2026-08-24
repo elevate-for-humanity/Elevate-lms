@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+// Static contracts prevent Studio, Course Factory, and the renderer from
+// regaining overlapping media authority as their implementations evolve.
 const root = process.cwd();
 const read = (rel: string) => fs.readFileSync(path.join(root, rel), 'utf8');
 const exists = (rel: string) => fs.existsSync(path.join(root, rel));

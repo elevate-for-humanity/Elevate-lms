@@ -1,7 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
 import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
-import { PRIVILEGED_MFA_ROLES } from '@/lib/auth/privileged-mfa';
+import {
+  PRIVILEGED_MFA_ROLES,
+  privilegedMfaEnforcementEnabled,
+} from '@/lib/auth/privileged-mfa';
 import {
   ADMIN_ROLES,
   INSTRUCTOR_ROLES,
@@ -51,7 +54,6 @@ function requiredRoles(pathname: string): readonly UserRole[] {
     pathname.startsWith('/admin/studio') ||
     pathname.startsWith('/admin/dev-studio') ||
     pathname.startsWith('/dev-studio') ||
-    pathname.startsWith('/api/devstudio') ||
     pathname.startsWith('/api/admin/dev-studio');
   if (isStudio) return ['super_admin', 'admin'];
 
@@ -105,6 +107,11 @@ export async function middleware(req: NextRequest) {
   if (pathname === '/admin/dashboard') {
     const canonicalUrl = req.nextUrl.clone();
     canonicalUrl.pathname = '/dashboard';
+    return NextResponse.redirect(canonicalUrl, 308);
+  }
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    const canonicalUrl = req.nextUrl.clone();
+    canonicalUrl.pathname = pathname === '/admin' ? '/dashboard' : pathname.slice('/admin'.length);
     return NextResponse.redirect(canonicalUrl, 308);
   }
 
@@ -168,7 +175,7 @@ export async function middleware(req: NextRequest) {
   }
 
   const privileged = effectiveRoles.some((role) => PRIVILEGED_MFA_ROLES.includes(role));
-  if (privileged && pathname !== '/mfa') {
+  if (privilegedMfaEnforcementEnabled() && privileged && pathname !== '/mfa') {
     const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     const aal2 = !aalError && aal.currentLevel === 'aal2';
 

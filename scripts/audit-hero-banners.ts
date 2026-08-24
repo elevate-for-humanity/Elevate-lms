@@ -135,7 +135,7 @@ if (heroRenderer === null) {
   console.error('FAIL canonical HeroVideo renderer is missing');
   failures += 1;
 } else {
-  if (!heroRenderer.includes('absolute inset-0 z-0 bg-cover')) {
+  if (!heroRenderer.includes('absolute inset-0 z-0 h-full w-full')) {
     console.error('FAIL HeroVideo poster is not locked to the base z-0 media layer');
     failures += 1;
   }
@@ -158,13 +158,13 @@ if (homeWrapper === null) {
   console.error('FAIL HomeHeroVideo wrapper is missing');
   failures += 1;
 } else {
-  const expectedDesktopHeight = 'h-[52vh] min-h-[360px] max-h-[680px] md:h-[58vh] md:min-h-[480px] lg:h-[62vh]';
+  const expectedDesktopHeight = 'h-[38vh] min-h-[320px] max-h-[520px]';
   if (!homeWrapper.includes(expectedDesktopHeight)) {
     console.error('FAIL homepage hero desktop proportions drifted from the production contract');
     failures += 1;
   }
-  if (homeWrapper.includes('h-[46vh] min-h-[340px]')) {
-    console.error('FAIL homepage hero reintroduced the compressed legacy desktop height');
+  if (/max-h-\[(?:5[3-9]\d|[6-9]\d\d)px\]/.test(homeWrapper)) {
+    console.error('FAIL homepage hero exceeds the canonical 520px maximum');
     failures += 1;
   }
 }

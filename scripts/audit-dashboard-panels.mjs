@@ -38,7 +38,7 @@ const panels = [
   {
     panel: 'LizzyWorkspace health',
     method: 'GET',
-    path: '/api/devstudio/health',
+    path: '/api/admin/dev-studio/health',
     expectUnauth: [200, 307, 401, 403],
   },
 ];

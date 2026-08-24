@@ -97,7 +97,7 @@ export default function PlatformStatusPanels() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/devstudio/platform-status');
+      const res = await fetch('/api/admin/dev-studio/platform-status');
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Failed to load status');
       setData(json);

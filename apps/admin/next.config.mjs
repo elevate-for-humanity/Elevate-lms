@@ -95,7 +95,6 @@ const adminConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        { source: '/api/devstudio/health', destination: '/api/admin/dev-studio/health' },
         { source: '/admin/applications/:path*', destination: '/applications/:path*' },
         ...legacyImageRewrites(),
       ],
@@ -111,6 +110,8 @@ const adminConfig = {
       { source: '/admin/dev-studio/:path*', destination: '/studio/:path*', permanent: true },
       { source: '/dev-studio/:path*', destination: '/studio/:path*', permanent: true },
       { source: '/admin/dashboard', destination: '/dashboard', permanent: true },
+      { source: '/admin', destination: '/dashboard', permanent: true },
+      { source: '/admin/:path*', destination: '/:path*', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },
       { source: '/about', destination: 'https://www.elevateforhumanity.org/about', permanent: false },

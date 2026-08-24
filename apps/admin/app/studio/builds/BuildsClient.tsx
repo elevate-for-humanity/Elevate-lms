@@ -23,7 +23,7 @@ export default function BuildsClient() {
   async function fetchBuilds() {
     setLoading(true);
     try {
-      const res = await fetch('/api/devstudio/builds');
+      const res = await fetch('/api/admin/dev-studio/builds');
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setBuilds(json.builds ?? []);
@@ -38,7 +38,7 @@ export default function BuildsClient() {
   async function triggerBuild(service: string) {
     setTriggering(true);
     try {
-      await fetch('/api/devstudio/builds', {
+      await fetch('/api/admin/dev-studio/builds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ service }),

@@ -152,7 +152,7 @@ export function ProgramIntegrityPanel() {
             {visible.map((p) => (
               <Link
                 key={p.id}
-                href={`/admin/programs/${p.id}`}
+                href={`/programs/${p.id}`}
                 className="flex items-start justify-between px-4 sm:px-6 py-3 hover:bg-slate-50 transition-colors group"
               >
                 <div className="min-w-0 flex-1">

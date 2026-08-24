@@ -23,7 +23,7 @@ export default function MemoryClient() {
   async function fetchMemories() {
     setLoading(true);
     try {
-      const res = await fetch('/api/devstudio/memory');
+      const res = await fetch('/api/admin/dev-studio/memory');
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setMemories(json.memories ?? []);
@@ -37,7 +37,7 @@ export default function MemoryClient() {
 
   async function addMemory() {
     if (!newKey || !newValue) return;
-    await fetch('/api/devstudio/memory', {
+    await fetch('/api/admin/dev-studio/memory', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ key: newKey, value: newValue, category: 'manual' }),

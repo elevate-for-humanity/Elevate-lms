@@ -22,6 +22,8 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(nextConfig).toContain("destination: '/studio/:path*'");
     expect(nextConfig).toContain("source: '/admin/dashboard'");
     expect(nextConfig).toContain("destination: '/dashboard'");
+    expect(nextConfig).toContain("source: '/admin/:path*'");
+    expect(nextConfig).toContain("destination: '/:path*'");
   });
 
   it('uses the single canonical Course Builder route from the Studio UI', () => {
@@ -53,7 +55,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
   it('uses the canonical Dev Studio chat controller', () => {
     const panel = source('components/studio/panels/AIPanel.tsx');
 
-    expect(panel).toContain("fetch('/api/devstudio/chat'");
+    expect(panel).toContain("fetch('/api/admin/dev-studio/chat'");
     expect(panel).not.toContain('/api/admin/studio/');
   });
 });

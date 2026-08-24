@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --port 3001",
     "prebuild": "node ../../scripts/sync-pwa-public.mjs admin",
-    "build": "next build",
+    "build": "node --require ../../scripts/next-fs-rm-retry.cjs ../../node_modules/next/dist/bin/next build",
     "prestart": "node ../../scripts/sync-pwa-public.mjs admin",
     "start": "node server.js",
     "lint": "next lint"

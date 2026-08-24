@@ -19,7 +19,7 @@ export function LizzyUploadPanel() {
       const form = new FormData();
       form.append('file', file);
       form.append('label', file.name);
-      const res = await fetch('/api/devstudio/upload', { method: 'POST', body: form });
+      const res = await fetch('/api/admin/dev-studio/upload', { method: 'POST', body: form });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setStatus(`Uploaded ${file.name}`);

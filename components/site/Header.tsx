@@ -39,14 +39,14 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* One responsive contract: below xl uses the drawer; xl and above
+        {/* One responsive contract: compact widths use the drawer; wider screens
             use the horizontal desktop navigation. Do not split these breakpoints. */}
-        <div className="hidden min-w-0 justify-center overflow-visible xl:flex">
+        <div className="hidden min-w-0 justify-center overflow-visible min-[1360px]:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
         <div className="flex min-w-0 flex-shrink-0 flex-nowrap items-center justify-end gap-1.5">
-          <div className="hidden flex-nowrap items-center gap-1 xl:flex">
+          <div className="hidden flex-nowrap items-center gap-1 min-[1360px]:flex">
             <Link
               href={ROUTES.login}
               className="inline-flex whitespace-nowrap px-1.5 py-2 text-[13px] font-semibold text-slate-800 hover:text-slate-950 xl:px-2 xl:text-sm"
@@ -62,7 +62,7 @@ export default function Header() {
           </div>
 
           {/* Phones, tablets, and compact laptops use the dedicated drawer. */}
-          <div className="flex flex-nowrap items-center gap-1 xl:hidden">
+          <div className="flex flex-nowrap items-center gap-1 min-[1360px]:hidden">
             <span className="hidden whitespace-nowrap text-sm font-bold text-slate-700 sm:inline" aria-hidden="true">
               Menu
             </span>

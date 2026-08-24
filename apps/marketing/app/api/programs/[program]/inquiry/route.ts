@@ -6,7 +6,8 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: NextRequest, { params }: { params: { program: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ program: string }> }) {
+  const { program } = await params;
   let body: {
     firstName?: string;
     lastName?: string;
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest, { params }: { params: { program
       name: `${firstName} ${lastName}`.trim(),
       email,
       phone: body.phone || null,
-      program: params.program,
+      program,
       message: body.message || '',
       fundingQuestion: body.fundingQuestion || '',
       fundingSource: body.fundingSource || null,

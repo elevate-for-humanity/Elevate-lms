@@ -30,9 +30,9 @@ describe('SiteHeader', () => {
     expect(src).toContain('NAV_ITEMS');
   });
 
-  it('keeps compact laptop widths on desktop navigation', () => {
-    expect(src).toContain('min-[900px]:flex');
-    expect(src).toContain('min-[900px]:hidden');
-    expect(src).toContain('below 900px use the dedicated drawer');
+  it('keeps widths that cannot fit the full navigation on the drawer', () => {
+    expect(src).toContain('min-[1360px]:flex');
+    expect(src).toContain('min-[1360px]:hidden');
+    expect(src).toContain('compact widths use the drawer');
   });
 });

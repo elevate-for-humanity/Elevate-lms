@@ -44,6 +44,8 @@ type CourseRow = {
   id: string;
   title: string | null;
   description: string | null;
+  status: string | null;
+  is_active: boolean | null;
 };
 
 type LessonRow = {
@@ -148,7 +150,7 @@ export default async function StudentDashboard() {
     new Set(courseEnrollments.map((row) => row.course_id).filter((value): value is string => Boolean(value))),
   );
   const { data: courseRows, error: courseRowsError } = courseIds.length
-    ? await supabase.from('courses').select('id, title, description').in('id', courseIds)
+    ? await supabase.from('courses').select('id, title, description, status, is_active').in('id', courseIds)
     : { data: [], error: null };
   if (courseRowsError) throw new Error(`STUDENT_COURSES_FAILED:${courseRowsError.message}`);
 
@@ -162,11 +164,12 @@ export default async function StudentDashboard() {
     null;
   const activeCourseId = activeCourseEnrollment?.course_id ?? null;
   const activeCourse = activeCourseId ? courseMap.get(activeCourseId) ?? null : null;
+  const activeCourseIsAvailable = activeCourse?.status === 'published' && activeCourse.is_active === true;
 
   let lessons: LessonRow[] = [];
   let completedLessonIds = new Set<string>();
 
-  if (activeCourseId) {
+  if (activeCourseId && activeCourseIsAvailable) {
     const [lessonsRes, progressRes] = await Promise.all([
       supabase
         .from('course_lessons')
@@ -204,7 +207,7 @@ export default async function StudentDashboard() {
     ? Math.min(5, Math.max(1, Math.ceil((courseProgress || 1) / 20)))
     : 1;
 
-  const resumeHref = activeCourseId
+  const resumeHref = activeCourseId && activeCourseIsAvailable
     ? nextLesson
       ? `/lms/courses/${activeCourseId}/lessons/${nextLesson.id}`
       : `/lms/courses/${activeCourseId}`
@@ -261,10 +264,18 @@ export default async function StudentDashboard() {
                 {activeCourse?.title ?? 'Active Course'}
               </p>
               <h1 className="mt-3 text-3xl font-black text-white sm:text-4xl">
-                {isComplete ? `Training complete, ${firstName}` : isFirstVisit ? `Ready to start, ${firstName}?` : `Keep going, ${firstName}`}
+                {!activeCourseIsAvailable
+                  ? `Your course is being prepared, ${firstName}`
+                  : isComplete
+                    ? `Training complete, ${firstName}`
+                    : isFirstVisit
+                      ? `Ready to start, ${firstName}?`
+                      : `Keep going, ${firstName}`}
               </h1>
               <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-100">
-                {isComplete
+                {!activeCourseIsAvailable
+                  ? 'Your enrollment is recorded. Training will open here after the curriculum and media pass final review.'
+                  : isComplete
                   ? 'Every lesson in this course is recorded complete.'
                   : nextLesson
                     ? `${lessonsLeft} lesson${lessonsLeft === 1 ? '' : 's'} remaining. Next: ${nextLesson.title ?? 'lesson'}.`
@@ -289,9 +300,11 @@ export default async function StudentDashboard() {
                     <Play className="h-4 w-4" /> {isComplete ? 'Review Course' : isFirstVisit ? 'Start Training' : 'Continue Training'}
                   </Link>
                 ) : null}
-                <Link href={`/lms/courses/${activeCourseId}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white hover:bg-white/10">
-                  View Curriculum <ArrowRight className="h-4 w-4" />
-                </Link>
+                {activeCourseIsAvailable ? (
+                  <Link href={`/lms/courses/${activeCourseId}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white hover:bg-white/10">
+                    View Curriculum <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : null}
               </div>
             </div>
           </section>
@@ -487,7 +500,14 @@ export default async function StudentDashboard() {
         </div>
       </div>
 
-      <ParisFloatingWrapper />
+      {activeCourseIsAvailable ? (
+        <ParisFloatingWrapper
+          surface="learner"
+          courseTitle={activeCourse?.title}
+          nextLessonTitle={nextLesson?.title}
+          courseProgress={courseProgress}
+        />
+      ) : null}
     </div>
   );
 }

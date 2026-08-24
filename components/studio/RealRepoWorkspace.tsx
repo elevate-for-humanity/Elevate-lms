@@ -68,7 +68,7 @@ export default function RealRepoWorkspace({
 
   const refreshTree = useCallback(async () => {
     try {
-      const response = await fetch('/api/devstudio/files', { cache: 'no-store' });
+      const response = await fetch('/api/admin/dev-studio/files', { cache: 'no-store' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
       const nextTree = Array.isArray(data.tree) ? data.tree : [];
@@ -121,7 +121,7 @@ export default function RealRepoWorkspace({
   async function openFile(path: string) {
     setStatus(`Opening ${path}…`);
     try {
-      const response = await fetch(`/api/devstudio/files?path=${encodeURIComponent(path)}`, {
+      const response = await fetch(`/api/admin/dev-studio/files?path=${encodeURIComponent(path)}`, {
         cache: 'no-store',
       });
       const data = await response.json();
@@ -145,7 +145,7 @@ export default function RealRepoWorkspace({
     setStatus(`Committing ${activePath}…`);
     try {
       const updating = Boolean(sha);
-      const response = await fetch('/api/devstudio/files', {
+      const response = await fetch('/api/admin/dev-studio/files', {
         method: updating ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

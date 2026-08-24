@@ -62,7 +62,7 @@ const EXPERIENCE = [
 export default function ApprenticeshipsPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950">
-      <section className="relative isolate min-h-[620px] overflow-hidden bg-slate-950 sm:min-h-[680px]">
+      <section className="relative isolate h-[38vh] min-h-[360px] max-h-[520px] overflow-hidden bg-slate-950">
         <Image
           src="/images/pages/admin-apprenticeships-hero.webp"
           alt="Apprentice receiving supervised hands-on training"
@@ -73,7 +73,7 @@ export default function ApprenticeshipsPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/94 via-slate-950/72 to-slate-950/20" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-slate-950/15" aria-hidden="true" />
-        <div className="relative z-10 mx-auto flex min-h-[620px] max-w-7xl items-end px-5 pb-12 pt-28 sm:min-h-[680px] sm:px-8 sm:pb-16 lg:px-10">
+        <div className="relative z-10 mx-auto flex h-full max-w-7xl items-end px-5 pb-10 pt-24 sm:px-8 sm:pb-12 lg:px-10">
           <div className="max-w-3xl">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-red-300">Learn by doing</p>
             <h1 className="mt-4 text-4xl font-black leading-[1.02] tracking-tight text-white sm:text-5xl lg:text-6xl">

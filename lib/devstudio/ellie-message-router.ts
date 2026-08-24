@@ -1,8 +1,8 @@
 /**
  * Routes a single Admin AI message to the correct existing backend:
- * - command  → /api/devstudio/execute (explicit deploy/smoke/test execution)
+ * - command  → /api/admin/dev-studio/execute (explicit deploy/smoke/test execution)
  * - ops      → /api/admin/ai-assistant (live admin data + staged approvals)
- * - platform → /api/devstudio/chat (tool orchestration: courses, websites, code, schema, documents)
+ * - platform → /api/admin/dev-studio/chat (tool orchestration: courses, websites, code, schema, documents)
  *
  * Product rule: business outcomes such as "build a course" must route to the
  * platform tool orchestrator, never to the raw command executor.

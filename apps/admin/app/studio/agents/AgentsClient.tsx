@@ -21,7 +21,7 @@ export default function AgentsClient() {
   async function fetchAgents() {
     setLoading(true);
     try {
-      const res = await fetch('/api/devstudio/agents');
+      const res = await fetch('/api/admin/dev-studio/agents');
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setAgents(json.agents ?? []);

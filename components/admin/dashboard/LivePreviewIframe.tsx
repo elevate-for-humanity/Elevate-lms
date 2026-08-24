@@ -12,7 +12,7 @@ function useEmbedCheck(url: string) {
     if (!url) return;
     setState({ embeddable: null });
     const controller = new AbortController();
-    fetch(`/api/devstudio/embed-check?url=${encodeURIComponent(url)}`, { signal: controller.signal })
+    fetch(`/api/admin/dev-studio/embed-check?url=${encodeURIComponent(url)}`, { signal: controller.signal })
       .then((r) => r.json())
       .then((d: { embeddable: boolean; reason?: string }) => setState(d))
       .catch(() => setState({ embeddable: true }));

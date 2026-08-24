@@ -108,7 +108,7 @@ export class OpenStudioAgent {
 
     try {
       // Call the chat API
-      const response = await fetch('/api/devstudio/chat', {
+      const response = await fetch('/api/admin/dev-studio/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

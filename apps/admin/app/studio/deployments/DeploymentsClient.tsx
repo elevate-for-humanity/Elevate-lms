@@ -23,7 +23,7 @@ export default function DeploymentsClient() {
   async function fetchDeployments() {
     setLoading(true);
     try {
-      const res = await fetch('/api/devstudio/builds');
+      const res = await fetch('/api/admin/dev-studio/builds');
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setDeployments(json.builds ?? []);

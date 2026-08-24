@@ -69,7 +69,7 @@ export default function PracticeTestsPage() {
       </div>
 
       {/* Hero - Bright & Clean */}
-      <section className="relative min-h-[70vh] flex items-end overflow-hidden bg-slate-100">
+      <section className="relative h-[38vh] min-h-[320px] max-h-[520px] flex items-end overflow-hidden bg-slate-100">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image 

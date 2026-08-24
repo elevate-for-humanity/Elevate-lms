@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireAdmin } from '@/lib/auth';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { DocumentCenterClient } from './DocumentCenterClient';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function DocumentCenterPage() {
   await requireAdmin();
-  const db = await createAdminClient();
+  const db = await requireAdminClient();
 
   const { data, error } = await db
     .from('documents')

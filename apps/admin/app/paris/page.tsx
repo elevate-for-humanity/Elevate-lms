@@ -120,7 +120,7 @@ export default function ParisOSPage() {
   useEffect(() => {
     async function loadStats() {
       try {
-        const res = await fetch('/api/devstudio/workflows');
+        const res = await fetch('/api/admin/dev-studio/workflows');
         if (!res.ok) return;
         const data = await res.json();
         const tasks = Array.isArray(data) ? data : (data.tasks ?? []);
@@ -176,7 +176,7 @@ export default function ParisOSPage() {
       }
 
       // Refresh stats
-      const statsRes = await fetch('/api/devstudio/workflows');
+      const statsRes = await fetch('/api/admin/dev-studio/workflows');
       if (statsRes.ok) {
         const statsData = await statsRes.json();
         const tasks = Array.isArray(statsData) ? statsData : (statsData.tasks ?? []);

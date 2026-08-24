@@ -36,7 +36,7 @@ export async function GET(request: Request) {
 
   let health: Record<string, unknown> = {};
   try {
-    const healthRes = await fetch(new URL('/api/devstudio/health', request.url), {
+    const healthRes = await fetch(new URL('/api/admin/dev-studio/health', request.url), {
       headers: { cookie: request.headers.get('cookie') ?? '' },
     });
     if (healthRes.ok) {

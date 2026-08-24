@@ -13,7 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { invalidateSecuritySettingsCache } from '@/lib/admin/security-settings';
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   const keys = req.nextUrl.searchParams.get('keys')?.split(',').filter(Boolean);
 
   try {
-    const db = createAdminClient();
+    const db = await requireAdminClient();
     let q = db.from('platform_settings').select('key, value');
     if (keys?.length) q = q.in('key', keys) as typeof q;
 
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const db = createAdminClient();
+    const db = await requireAdminClient();
 
     const rows = entries.map(([key, value]) => ({
       key: key.trim(),

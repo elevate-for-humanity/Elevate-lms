@@ -32,7 +32,7 @@ export default async function InstructorPortalLanding() {
       </div>
 
       <section className="relative w-full">
-        <div className="relative h-[50vh] min-h-[320px] w-full overflow-hidden sm:h-[55vh] md:h-[60vh] lg:h-[65vh]">
+        <div className="relative h-[38vh] min-h-[320px] max-h-[520px] w-full overflow-hidden">
           <Image
             src="/images/pages/instructor-hero.webp"
             alt="Instructor Portal"

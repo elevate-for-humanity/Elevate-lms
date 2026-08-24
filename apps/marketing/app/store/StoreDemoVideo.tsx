@@ -14,6 +14,7 @@ export default function StoreDemoVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [ready, setReady] = useState(false);
 
   const start = () => {
     setStarted(true);
@@ -38,17 +39,17 @@ export default function StoreDemoVideo() {
       onClick={toggle}
     >
       {/* Poster — shown before play */}
+      <Image
+        src="/images/pages/admin-activity-hero.webp"
+        alt="HVAC Technician course — Module 1 preview"
+        fill
+        className="object-cover"
+        sizes="100vw"
+        quality={90}
+        priority
+      />
       {!started && (
         <>
-          <Image
-            src="/images/pages/admin-activity-hero.webp"
-            alt="HVAC Technician course — Module 1 preview"
-            fill
-            className="object-cover"
-            sizes="100vw"
-            quality={90}
-            priority
-          />
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform mb-4">
               <Play className="w-11 h-11 text-brand-red-600 ml-1" />
@@ -64,11 +65,12 @@ export default function StoreDemoVideo() {
         <>
           <video
             ref={videoRef}
-            className="absolute inset-0 w-full h-full object-contain bg-black"
+            className={`absolute inset-0 w-full h-full object-contain bg-black transition-opacity duration-300 ${ready ? 'opacity-100' : 'opacity-0'}`}
             playsInline
             muted
             controls={false}
-            onCanPlay={() => { videoRef.current?.play().then(() => setPlaying(true)).catch(() => {}); }}
+            onCanPlay={() => { setReady(true); videoRef.current?.play().then(() => setPlaying(true)).catch(() => {}); }}
+            onError={() => { setReady(false); setPlaying(false); }}
             onEnded={() => setPlaying(false)}
           >
             <source src={getBrowserPublicStorageUrl('course-videos', 'hvac/hvac-module1-lesson1.mp4')} type="video/mp4" />

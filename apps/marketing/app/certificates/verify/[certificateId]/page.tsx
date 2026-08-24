@@ -18,8 +18,9 @@ export const metadata: Metadata = {
 export default async function VerifyCertificatePage({
   params,
 }: {
-  params: { certificateId: string };
+  params: Promise<{ certificateId: string }>;
 }) {
+  const { certificateId } = await params;
   const supabase = await createClient();
 
   if (!supabase) {
@@ -49,7 +50,7 @@ export default async function VerifyCertificatePage({
       )
     `,
     )
-    .eq('certificate_number', params.certificateId)
+    .eq('certificate_number', certificateId)
     .single();
 
   const { data: moduleCert } = await supabase
@@ -63,7 +64,7 @@ export default async function VerifyCertificatePage({
       )
     `,
     )
-    .eq('certificate_number', params.certificateId)
+    .eq('certificate_number', certificateId)
     .single();
 
   const certificate = programCert || moduleCert;
@@ -114,7 +115,7 @@ export default async function VerifyCertificatePage({
           <h1 className="text-3xl font-bold text-black mb-4">Certificate Not Found</h1>
           <p className="text-lg text-black mb-8">
             Certificate number{' '}
-            <span className="font-mono font-semibold">{params.certificateId}</span> will not be
+            <span className="font-mono font-semibold">{certificateId}</span> will not be
             found in our repository.
           </p>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">

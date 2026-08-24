@@ -132,7 +132,7 @@ export const headerNavigation: NavGroup[] = [
     items: [
       {
         label: 'Hire Talent',
-        href: '/employer',
+        href: '/employers',
         description: 'Find job-ready candidates',
       },
       {
@@ -147,12 +147,12 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'Partner Benefits',
-        href: '/employer',
+        href: '/employers',
         description: 'Why partner with us',
       },
       {
         label: 'Employer Login',
-        href: '/employer',
+        href: 'https://app.elevateforhumanity.org/employer/dashboard',
         description: 'Access your portal',
       },
     ],

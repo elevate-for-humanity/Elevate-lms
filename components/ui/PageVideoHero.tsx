@@ -23,8 +23,8 @@ export interface PageVideoHeroProps {
 const HEIGHT_BY_SIZE: Record<HeroSize, string> = {
   compact: 'h-[30vh] min-h-[220px] max-h-[360px]',
   marketing: 'h-[38vh] min-h-[260px] max-h-[520px]',
-  primary: 'h-[42vh] min-h-[280px] max-h-[560px]',
-  full: 'h-[46vh] min-h-[300px] max-h-[600px]',
+  primary: 'h-[42vh] min-h-[280px] max-h-[520px]',
+  full: 'h-[46vh] min-h-[300px] max-h-[520px]',
 };
 
 export default function PageVideoHero({

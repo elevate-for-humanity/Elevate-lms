@@ -9,7 +9,7 @@ export function HomeFunding() {
   return (
     <section className="border-t border-slate-100 bg-slate-50 px-4 py-16 sm:py-20" aria-labelledby="funding-heading">
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-        <div className="relative min-h-[360px] overflow-hidden rounded-3xl sm:min-h-[480px]">
+        <div className="relative min-h-[340px] overflow-hidden rounded-3xl sm:min-h-[400px]">
           <Image
             src="/images/pages/funding-hero.webp"
             alt="Advisor helping a student understand career training and funding options"

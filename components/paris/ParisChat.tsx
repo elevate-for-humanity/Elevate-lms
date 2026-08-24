@@ -23,6 +23,10 @@ interface ParisChatProps {
   onComplete?: (recommendations: string[]) => void;
   showHeader?: boolean;
   className?: string;
+  surface?: 'public' | 'learner';
+  courseTitle?: string | null;
+  nextLessonTitle?: string | null;
+  courseProgress?: number | null;
 }
 
 const PATHWAYS = [
@@ -32,7 +36,7 @@ const PATHWAYS = [
   { id: 'testing', label: 'Testing & Credentials', icon: FileCheck },
 ] as const;
 
-const GREETING: Message = {
+const PUBLIC_GREETING: Message = {
   role: 'assistant',
   content: `Hi — I'm PARIS, Elevate's public admissions and career-navigation assistant.
 
@@ -41,8 +45,28 @@ I can help you find the current program, funding, apprenticeship, testing, or ap
 Choose a pathway below or type your question.`,
 };
 
-export default function ParisChat({ onComplete, showHeader = true, className = '' }: ParisChatProps) {
-  const [messages, setMessages] = useState<Message[]>([GREETING]);
+function learnerGreeting(courseTitle?: string | null, nextLessonTitle?: string | null): Message {
+  return {
+    role: 'assistant',
+    content: `Hi — I'm PARIS, your Elevate learning assistant${courseTitle ? ` for ${courseTitle}` : ''}.
+
+I can explain course concepts, help you study, and guide you to your next step${nextLessonTitle ? `: ${nextLessonTitle}` : ''}. I will support your learning, but I will not complete graded assignments or assessments for you.`,
+  };
+}
+
+export default function ParisChat({
+  onComplete,
+  showHeader = true,
+  className = '',
+  surface = 'public',
+  courseTitle,
+  nextLessonTitle,
+  courseProgress,
+}: ParisChatProps) {
+  const learnerSurface = surface === 'learner';
+  const [messages, setMessages] = useState<Message[]>([
+    learnerSurface ? learnerGreeting(courseTitle, nextLessonTitle) : PUBLIC_GREETING,
+  ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -68,7 +92,15 @@ export default function ParisChat({ onComplete, showHeader = true, className = '
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
         cache: 'no-store',
-        body: JSON.stringify({ messages: requestMessages }),
+        body: JSON.stringify({
+          messages: requestMessages,
+          context: {
+            surface,
+            courseTitle: courseTitle || null,
+            nextLessonTitle: nextLessonTitle || null,
+            courseProgress: typeof courseProgress === 'number' ? courseProgress : null,
+          },
+        }),
       });
 
       const data = await response.json().catch(() => ({}));
@@ -83,14 +115,16 @@ export default function ParisChat({ onComplete, showHeader = true, className = '
         ...previous,
         {
           role: 'assistant',
-          content: 'I cannot retrieve a verified answer right now. Please use the Program Directory at https://www.elevateforhumanity.org/programs or contact Admissions at https://www.elevateforhumanity.org/contact.',
+          content: learnerSurface
+            ? 'I cannot retrieve your course guidance right now. Please continue from your learner dashboard or contact your instructor. I will not guess about your progress or graded work.'
+            : 'I cannot retrieve a verified answer right now. Please use the Program Directory at https://www.elevateforhumanity.org/programs or contact Admissions at https://www.elevateforhumanity.org/contact.',
         },
       ]);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  }, [isLoading, messages, onComplete]);
+  }, [courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, surface]);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -113,8 +147,8 @@ export default function ParisChat({ onComplete, showHeader = true, className = '
               <GraduationCap className="h-6 w-6" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-lg font-bold">PARIS</h2>
-              <p className="text-sm text-slate-200">Admissions & career navigation</p>
+              <h2 className="text-lg font-bold">{learnerSurface ? 'PARIS Learning Assistant' : 'PARIS'}</h2>
+              <p className="text-sm text-slate-200">{learnerSurface ? courseTitle || 'Course guidance and study support' : 'Admissions & career navigation'}</p>
             </div>
           </div>
         </div>
@@ -156,7 +190,28 @@ export default function ParisChat({ onComplete, showHeader = true, className = '
           </div>
         )}
 
-        {!isLoading && messages.length === 1 && (
+        {!isLoading && messages.length === 1 && learnerSurface && (
+          <div className="grid gap-2">
+            {[
+              nextLessonTitle ? `What should I know before I start ${nextLessonTitle}?` : 'What should I do next in my course?',
+              'Help me make a study plan from my current progress.',
+              'Explain a course concept without giving me graded answers.',
+            ].map((prompt) => (
+              <button
+                type="button"
+                key={prompt}
+                onClick={() => void sendToApi(prompt)}
+                className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 text-left font-semibold text-slate-950 shadow-sm transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-700"
+              >
+                <GraduationCap className="h-5 w-5 shrink-0" aria-hidden="true" />
+                <span>{prompt}</span>
+                <ArrowRight className="ml-auto h-4 w-4 shrink-0" aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {!isLoading && messages.length === 1 && !learnerSurface && (
           <div className="grid gap-2 sm:grid-cols-2">
             {PATHWAYS.map(({ id, label, icon: Icon }) => (
               <button
@@ -184,7 +239,7 @@ export default function ParisChat({ onComplete, showHeader = true, className = '
             value={input}
             onChange={(event) => setInput(event.target.value.slice(0, 2000))}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about a program, funding, testing, or apprenticeship…"
+            placeholder={learnerSurface ? 'Ask about your course or next lesson…' : 'Ask about a program, funding, testing, or apprenticeship…'}
             className="min-h-[52px] max-h-40 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-4 py-3 text-sm text-slate-950 focus:border-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-200"
             rows={2}
             disabled={isLoading}

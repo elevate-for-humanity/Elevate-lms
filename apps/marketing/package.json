@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "prebuild": "node ../../scripts/sync-pwa-public.mjs marketing",
-    "build": "next build --no-lint",
+    "build": "node --require ../../scripts/next-fs-rm-retry.cjs ../../node_modules/next/dist/bin/next build --no-lint",
     "prestart": "node ../../scripts/sync-pwa-public.mjs marketing",
     "start": "next start",
     "lint": "next lint"

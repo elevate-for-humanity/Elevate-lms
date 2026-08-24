@@ -45,7 +45,7 @@ is_production_file() {
 is_sensitive_route() {
   local f="$1"
   is_production_file "$f" || return 1
-  echo "$f" | grep -qE '/api/admin/|/api/devstudio/|/api/platform/workspaces/provision/|/api/program-holder/applications/.+/(approve|deny)/|/api/admin/sendgrid/'
+  echo "$f" | grep -qE '/api/admin/|/api/admin/dev-studio/|/api/platform/workspaces/provision/|/api/program-holder/applications/.+/(approve|deny)/|/api/admin/sendgrid/'
 }
 
 echo "=== Elevate LMS — Auth Gap Audit ==="

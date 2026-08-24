@@ -64,7 +64,7 @@ export default async function CredentialVerificationPage({
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={badgeImage}
-                alt=""
+                alt={`${definition.name} credential badge`}
                 className="mx-auto mb-5 h-28 w-28 rounded-xl object-contain"
               />
             ) : (

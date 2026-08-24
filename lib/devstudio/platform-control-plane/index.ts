@@ -3,7 +3,7 @@
  *
  * Canonical AI Studio charter: `lib/devstudio/devint-container.ts`
  * Dev runtime: `.devcontainer/devcontainer.json`
- * Ops UI: DevContainerPanel + `/api/devstudio/devcontainer` + container-env
+ * Ops UI: DevContainerPanel + `/api/admin/dev-studio/devcontainer` + container-env
  *
  * Secret precedence: platform_secrets → app_secrets → process.env
  */

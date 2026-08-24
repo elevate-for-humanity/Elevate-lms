@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 
 export const dynamic = 'force-dynamic';
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
 
-  const db = createAdminClient();
+  const db = await requireAdminClient();
   const { data, error } = await db
     .from('team_members')
     .select('*')
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
   if (!body.name || !body.title) return safeError('name and title are required', 400);
 
-  const db = createAdminClient();
+  const db = await requireAdminClient();
   const { data, error } = await db
     .from('team_members')
     .upsert({
@@ -73,7 +73,7 @@ export async function DELETE(req: NextRequest) {
   const id = req.nextUrl.searchParams.get('id');
   if (!id) return safeError('id is required', 400);
 
-  const db = createAdminClient();
+  const db = await requireAdminClient();
   const { error } = await db
     .from('team_members')
     .update({ is_active: false, updated_at: new Date().toISOString() })

@@ -12,7 +12,7 @@
  * - Pull (rebase)
  * - Recent commit log
  *
- * Backed by /api/devstudio/git — runs git commands in /workspaces/Elevate-lms.
+ * Backed by /api/admin/dev-studio/git — runs git commands in /workspaces/Elevate-lms.
  * No Gitpod dependency.
  */
 
@@ -67,7 +67,7 @@ export default function GitPanel() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/devstudio/git?action=status');
+      const res = await fetch('/api/admin/dev-studio/git?action=status');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setStatus(await res.json());
     } catch (e) {
@@ -86,8 +86,8 @@ export default function GitPanel() {
     setPanel('diff');
     try {
       const url = file
-        ? `/api/devstudio/git?action=diff&file=${encodeURIComponent(file)}`
-        : '/api/devstudio/git?action=diff';
+        ? `/api/admin/dev-studio/git?action=diff&file=${encodeURIComponent(file)}`
+        : '/api/admin/dev-studio/git?action=diff';
       const res = await fetch(url);
       const json = await res.json();
       setDiff(json.diff ?? '(no diff)');
@@ -102,7 +102,7 @@ export default function GitPanel() {
     setActionLoading(action);
     setActionMsg('');
     try {
-      const res = await fetch('/api/devstudio/git', {
+      const res = await fetch('/api/admin/dev-studio/git', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, ...extra }),

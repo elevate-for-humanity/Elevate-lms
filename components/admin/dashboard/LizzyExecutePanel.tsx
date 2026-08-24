@@ -36,10 +36,10 @@ export function LizzyExecutePanel() {
       const isSmoke = /smoke.?test|health.?check|check.*platform|verify.*platform/i.test(trimmed);
       const isQa = /qa.?scan|platform.?qa|diagnose|audit.?platform/i.test(trimmed);
       const endpoint = isSmoke
-        ? '/api/devstudio/smoke-test'
+        ? '/api/admin/dev-studio/smoke-test'
         : isQa
-          ? '/api/devstudio/qa-scan?scope=all'
-          : '/api/devstudio/execute';
+          ? '/api/admin/dev-studio/qa-scan?scope=all'
+          : '/api/admin/dev-studio/execute';
 
       const res = await fetch(
         endpoint,
@@ -110,7 +110,7 @@ export function LizzyExecutePanel() {
         {lines.length === 0 && (
           <p className="text-[#555]">
             Lizzy runs real admin APIs across the full platform: LMS, enrollments, workflows, deploy, QA,
-            and schema — wired through /api/devstudio/execute (no legacy shell).
+            and schema — wired through /api/admin/dev-studio/execute (no legacy shell).
           </p>
         )}
         {lines.map((line, index) => (

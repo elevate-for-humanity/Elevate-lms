@@ -51,7 +51,7 @@ export const SYSTEMS: SystemNode[] = [
     name: 'Admin AI / Studio',
     description: 'Conversation-first administrative control plane. Natural-language requests select internal capabilities; advanced Studio routes are manual inspection/editing surfaces.',
     routes: ['/studio','/studio/courses','/studio/repository','/studio/workflows','/studio/browser','/studio/deployments','/studio/health','/studio/settings'],
-    apis: ['/api/devstudio/chat','/api/admin/ai-assistant','/api/admin/ai-assistant/approve','/api/devstudio/jobs','/api/devstudio/upload','/api/admin/dev-studio/*'],
+    apis: ['/api/admin/dev-studio/chat','/api/admin/ai-assistant','/api/admin/ai-assistant/approve','/api/admin/dev-studio/jobs','/api/admin/dev-studio/upload','/api/admin/dev-studio/*'],
     tables: ['devstudio_chat_log','studio_conversations','devstudio_jobs','devstudio_documents','ai_conversation_memory','ellie_pending_actions','audit_logs'],
     status: 'active',
   },
@@ -143,12 +143,12 @@ for (const system of SYSTEMS) {
 export const ROUTE_DEPENDENCIES: Record<string,{ tables: string[]; apis: string[]; components: string[] }> = {
   '/dashboard': {
     tables: ['applications', 'program_enrollments', 'profiles', 'programs'],
-    apis: ['/api/admin/*', '/api/devstudio/chat', '/api/admin/ai-assistant'],
+    apis: ['/api/admin/*', '/api/admin/dev-studio/chat', '/api/admin/ai-assistant'],
     components: ['AdminDashboardContent', 'StatsOverviewBar', 'SystemHealthPanel'],
   },
   '/studio': {
     tables: ['devstudio_chat_log', 'studio_conversations', 'ellie_pending_actions'],
-    apis: ['/api/devstudio/chat', '/api/admin/ai-assistant', '/api/admin/ai-assistant/approve'],
+    apis: ['/api/admin/dev-studio/chat', '/api/admin/ai-assistant', '/api/admin/ai-assistant/approve'],
     components: ['UnifiedEllieChat', 'StudioWorkspaceGrid'],
   },
   '/studio/courses': {
@@ -247,7 +247,7 @@ export const CANONICAL_DECISIONS = [
   },
   {
     id: 'studio-api-boundaries',
-    decision: '/api/devstudio/* owns operational runtime APIs; /api/admin/dev-studio/* owns Admin capability health/configuration APIs. Duplicate relative implementations are forbidden.',
+    decision: '/api/admin/dev-studio/* owns operational runtime APIs; /api/admin/dev-studio/* owns Admin capability health/configuration APIs. Duplicate relative implementations are forbidden.',
     rationale: 'Keeps runtime operations separate from privileged capability configuration without duplicate behavior.',
   },
   {

@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 export const metadata: Metadata = {
   title: 'Dev Studio | Elevate for Humanity',
   description: 'AI-powered development environment for the Elevate platform.',
-  alternates: { canonical: '/dev-studio' },
+  alternates: { canonical: '/store/dev-studio' },
 };
 
 /**
@@ -14,5 +14,5 @@ export const metadata: Metadata = {
  * a second copy of the same marketing content.
  */
 export default function DevStudioAiCompatibilityRoute() {
-  redirect('/dev-studio');
+  redirect('/store/dev-studio');
 }

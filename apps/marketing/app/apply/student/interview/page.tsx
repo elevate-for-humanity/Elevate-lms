@@ -6,6 +6,7 @@ import { ALL_PROGRAMS } from '@/lib/programs/static-registry';
 import { getAdminClient } from '@/lib/supabase/admin';
 import ParisApplicationWorkspace from './ParisApplicationWorkspace';
 import ApplicationDocumentsPanel from './ApplicationDocumentsPanel';
+import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,6 +97,24 @@ export default async function ParisStudentApplicationPage({
           </div>
 
           <ParisApplicationWorkspace programs={programs} initialProgram={initialProgram} />
+
+          {initialProgram && (
+            <section className="mt-8" aria-labelledby="application-payment-options">
+              <div className="mb-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-blue-700">
+                  Self-pay options
+                </p>
+                <h2 id="application-payment-options" className="mt-2 text-2xl font-black text-slate-950">
+                  Payment calculator, BNPL, and coupon code
+                </h2>
+                <p className="mt-2 text-sm text-slate-600">
+                  Applying is free. Use this calculator only if you plan to self-pay; workforce-funding eligibility is reviewed separately.
+                </p>
+              </div>
+              <PaymentPlanCalculator programSlug={initialProgram} />
+            </section>
+          )}
+
           <ApplicationDocumentsPanel />
 
           <div className="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-xs leading-5 text-slate-600">

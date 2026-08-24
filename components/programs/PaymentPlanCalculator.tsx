@@ -47,6 +47,7 @@ export default function PaymentPlanCalculator({ programSlug }: Props) {
   const [depositCents, setDepositCents] = useState(0);
   const [showSchedule, setShowSchedule] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<'deposit' | 'full' | null>(null);
+  const [couponCode, setCouponCode] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -85,6 +86,7 @@ export default function PaymentPlanCalculator({ programSlug }: Props) {
           amountCents: mode === 'deposit' ? depositCents : pricing.tuition_cents,
           successUrl: `${window.location.origin}/programs/${programSlug}/enrollment-success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/programs/${programSlug}`,
+          couponCode: couponCode.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -178,7 +180,33 @@ export default function PaymentPlanCalculator({ programSlug }: Props) {
         )}
 
         <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-          <div className="flex items-start gap-2"><Tag className="w-5 h-5 text-blue-700 mt-0.5" /><div><p className="font-bold text-blue-950">Have a coupon or promotion code?</p><p className="text-sm leading-relaxed text-blue-800 mt-1">Stripe Checkout will display the promotion-code box before payment. Only active codes configured in Elevate&apos;s Stripe account will be accepted.</p></div></div>
+          <label htmlFor={`coupon-${programSlug}`} className="flex items-center gap-2 font-bold text-blue-950">
+            <Tag className="w-5 h-5 text-blue-700" />
+            Coupon or promotion code
+          </label>
+          <div className="mt-3 flex flex-col sm:flex-row gap-2">
+            <input
+              id={`coupon-${programSlug}`}
+              type="text"
+              value={couponCode}
+              onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
+              placeholder="Enter coupon code"
+              autoComplete="off"
+              className="min-w-0 flex-1 rounded-lg border border-blue-300 bg-white px-3 py-2.5 text-base font-semibold uppercase tracking-wide text-slate-950 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
+            {couponCode && (
+              <button
+                type="button"
+                onClick={() => setCouponCode('')}
+                className="rounded-lg border border-blue-300 bg-white px-4 py-2.5 text-sm font-bold text-blue-800 hover:bg-blue-100"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <p className="text-sm leading-relaxed text-blue-800 mt-2">
+            The code is securely validated when checkout starts. Only active promotion codes configured in Elevate&apos;s Stripe account are accepted.
+          </p>
         </div>
 
         <div className="space-y-3 pt-2 border-t border-slate-100">

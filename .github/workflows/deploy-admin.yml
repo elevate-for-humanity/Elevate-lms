@@ -6,6 +6,7 @@ on:
     paths:
       - 'apps/admin/**'
       - 'lib/**'
+      - 'remotion-src/**'
       - 'packages/**'
       - 'components/admin/**'
       - 'components/studio/**'

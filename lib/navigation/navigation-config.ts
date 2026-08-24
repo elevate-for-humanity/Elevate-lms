@@ -53,11 +53,17 @@ const p = (key: Parameters<typeof PortalRouter.get>[0], path?: string) =>
 export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
   student: [{ id: 'learning', items: [
     { id: 'dashboard', label: 'Dashboard', href: p('lms'), icon: LayoutDashboard },
+    { id: 'onboarding', label: 'Onboarding', href: p('lms', 'onboarding'), icon: ClipboardList },
+    { id: 'documents', label: 'Required Documents', href: p('lms', 'documents'), icon: FileText },
+    { id: 'binder', label: 'Digital Binder', href: p('lms', 'binder'), icon: ClipboardCheck },
+    { id: 'agreements', label: 'Agreements', href: p('lms', 'agreements'), icon: Shield },
+    { id: 'handbook', label: 'Student Handbook', href: p('lms', 'handbook'), icon: BookOpen },
     { id: 'courses', label: 'My Courses', href: p('lms', 'courses'), icon: BookOpen },
     { id: 'progress', label: 'Progress', href: p('lms', 'progress'), icon: BarChart3 },
     { id: 'assignments', label: 'Assignments', href: p('lms', 'assignments'), icon: ClipboardCheck },
     { id: 'calendar', label: 'Schedule', href: p('lms', 'calendar'), icon: Calendar },
     { id: 'certificates', label: 'Certificates', href: p('lms', 'certificates'), icon: Award },
+    { id: 'career', label: 'Career Services', href: p('lms', 'career'), icon: Briefcase },
   ] }],
   apprentice: [{ id: 'apprenticeship', items: [
     { id: 'dashboard', label: 'Dashboard', href: p('apprentice'), icon: LayoutDashboard },
@@ -65,6 +71,9 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
     { id: 'timeclock', label: 'Timeclock', href: p('apprentice', 'timeclock'), icon: Clock },
     { id: 'competencies', label: 'Competencies', href: p('apprentice', 'competencies'), icon: Target },
     { id: 'documents', label: 'Documents', href: p('apprentice', 'documents'), icon: FileText },
+    { id: 'rti', label: 'RTI', href: p('apprentice', 'rti'), icon: BookOpen },
+    { id: 'handbook', label: 'Handbook', href: p('apprentice', 'handbook'), icon: ClipboardList },
+    { id: 'state-board', label: 'State Board', href: p('apprentice', 'state-board'), icon: Shield },
     { id: 'rti', label: 'RTI Courses', href: p('lms', 'courses'), icon: BookOpen },
   ] }],
   employer: [{ id: 'operations', items: [
@@ -77,11 +86,14 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
   ] }],
   host_shop: [{ id: 'host-shop', items: [
     { id: 'dashboard', label: 'Dashboard', href: p('hostshop'), icon: LayoutDashboard },
-    { id: 'apprentices', label: 'Apprentices', href: p('hostshop', 'apprentices'), icon: GraduationCap },
-    { id: 'hours', label: 'Work Hours', href: p('hostshop', 'hours'), icon: Clock },
-    { id: 'competencies', label: 'Competencies', href: p('hostshop', 'competencies'), icon: ClipboardCheck },
-    { id: 'wages', label: 'Wage Compliance', href: p('hostshop', 'wages'), icon: BarChart3 },
-    { id: 'documents', label: 'Documents', href: p('hostshop', 'documents'), icon: FileText },
+    { id: 'apprentices', label: 'Apprentices', href: `${p('hostshop')}/apprentices`, icon: GraduationCap },
+    { id: 'hours', label: 'Work Hours', href: `${p('hostshop')}/hours`, icon: Clock },
+    { id: 'competencies', label: 'Competencies', href: `${p('hostshop')}/competencies`, icon: ClipboardCheck },
+    { id: 'wages', label: 'Wage Compliance', href: `${p('hostshop')}/wages`, icon: BarChart3 },
+    { id: 'documents', label: 'Documents', href: `${p('hostshop')}/documents`, icon: FileText },
+    { id: 'messages', label: 'Messages', href: `${p('hostshop')}/messages`, icon: Users },
+    { id: 'reports', label: 'Reports', href: `${p('hostshop')}/reports`, icon: BarChart3 },
+    { id: 'settings', label: 'Settings', href: `${p('hostshop')}/settings`, icon: Settings },
     { id: 'mou', label: 'MOU', href: '/host-shop/onboarding/mou', icon: ClipboardList },
   ] }],
   instructor: [{ id: 'instruction', items: [

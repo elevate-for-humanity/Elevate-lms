@@ -1,8 +1,9 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getRequiredAgreements } from '@/lib/legal/requiredAgreements';
+import { recordAgreementAcceptance } from '@/lib/legal/recordAgreementAcceptance';
 
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
@@ -23,34 +24,32 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
-    const admin = await requireAdminClient();
-    if (!admin) {
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-    }
-
     // Get user profile for role
-    const { data: profile } = await admin
+    const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role,full_name')
       .eq('id', user.id)
       .maybeSingle();
 
-    // Insert acceptance record
-    const { error: insertError } = await admin.from('license_agreement_acceptances').insert({
-      user_id: user.id,
-      agreement_type,
-      document_version,
-      role_at_signing: profile?.role || 'student',
-      signer_email: user.email,
-      signer_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Student',
-      signature_method: 'click',
-      legal_acknowledgment: true,
+    const allowed = getRequiredAgreements(profile?.role || 'student').find(
+      (item) => item.type === agreement_type && item.version === document_version,
+    );
+    if (!allowed || !user.email) return NextResponse.json({ error: 'Agreement is not required for this account' }, { status: 400 });
+    const result = await recordAgreementAcceptance({
+      supabase,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: profile?.role || 'student',
+      agreementType: allowed.type,
+      documentVersion: allowed.version,
+      signerName: profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0],
+      signerEmail: user.email,
+      signatureMethod: 'checkbox',
+      ipAddress: req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown',
+      userAgent: req.headers.get('user-agent') || 'unknown',
+      context: 'learner_portal',
     });
-
-    if (insertError) {
-      logger.error('Agreement insert failed', undefined, { detail: insertError.message });
-      return NextResponse.json({ error: 'Failed to save agreement' }, { status: 500 });
-    }
+    if (!result.success) return NextResponse.json({ error: result.error || 'Failed to save agreement' }, { status: 500 });
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

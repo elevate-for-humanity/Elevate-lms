@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import CertificateDownload from '@/components/CertificateDownload';
-import CertificateGenerator from '@/components/CertificateGenerator';
 import { CertificateTemplate } from '@/components/lms/CertificateTemplate';
 import { GenerateCertificateButton } from '@/components/lms/GenerateCertificateButton';
 
@@ -167,14 +166,6 @@ export default async function CertificatesPage() {
           </div>
         )}
 
-        {/* Certificate Generator */}
-        <div className="mt-8">
-          <CertificateGenerator
-            courseName="Course"
-            studentName={user?.email || 'Student'}
-            completionDate={new Date().toISOString()}
-          />
-        </div>
       </div>
     </div>
   );

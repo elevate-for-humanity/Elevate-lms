@@ -24,6 +24,8 @@ export type NormalizedEnrollment = {
   program_title: string | null;
   course_id: string | null;
   course_title: string | null;
+  course_description: string | null;
+  duration_hours: number | null;
   provider_id: string | null;
   provider_name: string | null;
   status: string;
@@ -52,6 +54,9 @@ type CourseRow = {
   id: string;
   title: string | null;
   course_name: string | null;
+  description: string | null;
+  short_description: string | null;
+  duration_hours: number | null;
 };
 
 export async function getUserEnrollments(userId: string): Promise<EnrollmentQueryResult> {
@@ -86,7 +91,10 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
           .in('id', programIds)
       : Promise.resolve({ data: [] as ProgramRow[], error: null }),
     courseIds.length
-      ? supabase.from('courses').select('id,title,course_name').in('id', courseIds)
+      ? supabase
+          .from('courses')
+          .select('id,title,course_name,description,short_description,duration_hours')
+          .in('id', courseIds)
       : Promise.resolve({ data: [] as CourseRow[], error: null }),
   ]);
 
@@ -121,6 +129,8 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
         program?.title ?? program?.name ?? (row.program_slug ? formatProgramSlug(row.program_slug) : null),
       course_id: row.course_id ?? null,
       course_title: course?.title ?? course?.course_name ?? null,
+      course_description: course?.description ?? course?.short_description ?? null,
+      duration_hours: course?.duration_hours ?? null,
       provider_id: null,
       provider_name: null,
       status: row.status || 'active',
@@ -139,9 +149,9 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     .from('partner_lms_enrollments')
     .select(
       `
-      id, student_id, course_name, status, progress, created_at, updated_at,
-      partner_lms_courses (id, title, slug),
-      partner_lms_providers (id, name, portal_url)
+      id, student_id, course_id, provider_id, status, progress_percentage, enrolled_at, created_at, updated_at, metadata,
+      partner_lms_courses (id, course_name, course_description, description, duration_hours),
+      partner_lms_providers (id, provider_name, website_url)
     `,
     )
     .eq('student_id', userId);
@@ -150,27 +160,40 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     return { enrollments: results, error: partnerError.message };
   }
 
+  const partnerCourseIds = [...new Set((partnerEnrollments ?? []).map((row) => row.course_id).filter((id): id is string => Boolean(id) && !coursesById.has(id)))];
+  if (partnerCourseIds.length) {
+    const { data: partnerCourseFallbacks, error: fallbackError } = await supabase
+      .from('courses')
+      .select('id,title,course_name,description,short_description,duration_hours')
+      .in('id', partnerCourseIds);
+    if (fallbackError) return { enrollments: results, error: fallbackError.message };
+    for (const course of (partnerCourseFallbacks ?? []) as CourseRow[]) coursesById.set(course.id, course);
+  }
+
   for (const row of partnerEnrollments ?? []) {
     const course = row.partner_lms_courses as any;
     const provider = row.partner_lms_providers as any;
+    const internalCourse = row.course_id ? coursesById.get(row.course_id) ?? null : null;
     const { mode, inferred } = resolveDeliveryMode('partner_lms_enrollments', null);
     const enrollment: NormalizedEnrollment = {
       source_table: 'partner_lms_enrollments',
       enrollment_id: row.id,
       user_key: row.student_id,
       program_id: null,
-      program_slug: course?.slug || null,
-      program_title: course?.title || row.course_name || null,
-      course_id: course?.id || null,
-      course_title: course?.title || row.course_name || null,
-      provider_id: provider?.id || null,
-      provider_name: provider?.name || null,
+      program_slug: null,
+      program_title: course?.course_name || internalCourse?.title || internalCourse?.course_name || (row.metadata as any)?.credential || null,
+      course_id: row.course_id || course?.id || null,
+      course_title: course?.course_name || internalCourse?.title || internalCourse?.course_name || (row.metadata as any)?.credential || null,
+      course_description: course?.course_description || course?.description || internalCourse?.description || internalCourse?.short_description || null,
+      duration_hours: course?.duration_hours ?? internalCourse?.duration_hours ?? null,
+      provider_id: row.provider_id || provider?.id || null,
+      provider_name: provider?.provider_name || null,
       status: row.status || 'active',
-      progress: Number(row.progress ?? 0),
+      progress: Number(row.progress_percentage ?? 0),
       delivery_mode: mode,
       inferred_delivery_mode: inferred,
       continue_url: '',
-      created_at: row.created_at,
+      created_at: row.enrolled_at || row.created_at,
       updated_at: row.updated_at,
     };
     enrollment.continue_url = getContinueLearningUrl(mode, enrollment);

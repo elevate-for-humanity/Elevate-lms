@@ -6,8 +6,8 @@
  */
 
 import { Clock, Users, CreditCard } from 'lucide-react';
+import Link from 'next/link';
 import type { ExamDefinition } from '@/lib/testing/proctoring-capabilities';
-import { AddExamToCartButton } from './TestingCart';
 import { getProvidersForAmount } from '@/lib/bnpl-config';
 
 interface ProviderExamListProps {
@@ -43,20 +43,17 @@ export function ProviderExamList({ providerKey, exams, isActive }: ProviderExamL
                 )}
               </div>
               {isActive && amountCents ? (
-                <AddExamToCartButton
-                  examType={providerKey}
-                  examName={name}
-                  amountCents={amountCents}
-                  active={isActive}
-                />
-              ) : isActive ? (
-                // Fallback for exams without a per-exam price (shouldn't happen after migration)
-                <a
-                  href={`/testing/book?exam=${providerKey}&exam_name=${encodeURIComponent(name)}`}
-                  className="inline-flex items-center gap-1 border border-brand-red-300 text-brand-red-700 hover:border-brand-red-400 text-xs font-semibold px-2.5 py-1 rounded-md whitespace-nowrap"
+                <Link
+                  href={`/testing/checkout?provider=${encodeURIComponent(providerKey)}&exam=${encodeURIComponent(name)}`}
+                  className="inline-flex items-center gap-1 rounded-md bg-brand-red-600 px-3 py-2 text-xs font-bold text-white hover:bg-brand-red-700 whitespace-nowrap"
                 >
-                  Pay for Test
-                </a>
+                  <CreditCard className="w-3 h-3" />
+                  Pay {`${(amountCents / 100).toFixed(0)}`}
+                </Link>
+              ) : isActive ? (
+                <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 whitespace-nowrap">
+                  Price unavailable
+                </span>
               ) : null}
             </div>
             {desc && <p className="text-slate-700 text-sm leading-relaxed">{desc}</p>}

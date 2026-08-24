@@ -27,10 +27,7 @@ const DEMO_TYPES = [
       'API integrations',
       'User permissions',
     ],
-    demoCredentials: {
-      email: 'demo-admin@elevateforhumanity.org',
-      password: 'DemoPassword123!',
-    },
+    demoMode: 'Role-scoped Admin sandbox',
   },
   {
     id: 'student',
@@ -46,10 +43,7 @@ const DEMO_TYPES = [
       'Payment status',
       'Career resources',
     ],
-    demoCredentials: {
-      email: 'demo-student@elevateforhumanity.org',
-      password: 'DemoPassword123!',
-    },
+    demoMode: 'Role-scoped learner sandbox',
   },
   {
     id: 'employer',
@@ -65,10 +59,7 @@ const DEMO_TYPES = [
       'Compliance documents',
       'Job placement tools',
     ],
-    demoCredentials: {
-      email: 'demo-employer@elevateforhumanity.org',
-      password: 'DemoPassword123!',
-    },
+    demoMode: 'Role-scoped employer sandbox',
   },
   {
     id: 'host-shop',
@@ -84,10 +75,7 @@ const DEMO_TYPES = [
       'Competency sign-offs',
       'Communication hub',
     ],
-    demoCredentials: {
-      email: 'demo-hostshop@elevateforhumanity.org',
-      password: 'DemoPassword123!',
-    },
+    demoMode: 'Role-scoped Host Shop sandbox',
   },
   {
     id: 'lms',
@@ -103,10 +91,7 @@ const DEMO_TYPES = [
       'Completion certificates',
       'SCORM support',
     ],
-    demoCredentials: {
-      email: 'demo-lms@elevateforhumanity.org',
-      password: 'DemoPassword123!',
-    },
+    demoMode: 'Role-scoped Course Builder sandbox',
   },
 ];
 
@@ -151,13 +136,13 @@ export default function DemosPage() {
             See Elevate in Action
           </h1>
           <p className="text-xl text-purple-100 max-w-3xl mx-auto mb-8">
-            Explore every dashboard, portal, and feature with sandbox demo accounts. 
-            No commitment required.
+            Explore role-scoped dashboards and workflows with protected sandbox data.
+            No shared credentials and no commitment required.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a href="#sandbox" className="bg-white text-purple-900 font-bold py-3 px-6 rounded-lg hover:bg-purple-50 flex items-center gap-2">
               <Monitor className="w-5 h-5" />
-              Try Sandbox Demo
+              Explore Demo Options
             </a>
             <Link href="#live-demo" className="bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-500 flex items-center gap-2">
               <Clock className="w-5 h-5" />
@@ -181,7 +166,7 @@ export default function DemosPage() {
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-600" />
-              <span>Available 24/7</span>
+              <span>Time-limited role access</span>
             </div>
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-green-600" />
@@ -197,8 +182,8 @@ export default function DemosPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Interactive Sandbox Demos</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Click any demo below to explore that specific dashboard. 
-              All demos use fake sandbox data so you can experiment freely.
+              Choose the dashboard you want to see. We issue protected,
+              time-limited access so one public password never unlocks multiple roles.
             </p>
           </div>
 
@@ -226,16 +211,16 @@ export default function DemosPage() {
                     </div>
 
                     <div className="bg-slate-50 rounded-lg p-3 mb-4 text-xs">
-                      <p className="font-medium text-slate-700 mb-1">Demo Credentials:</p>
-                      <p className="text-slate-600">{demo.demoCredentials.email}</p>
-                      <p className="text-slate-600">{demo.demoCredentials.password}</p>
+                      <p className="font-medium text-slate-700 mb-1">Protected demo access</p>
+                      <p className="text-slate-600">{demo.demoMode}</p>
+                      <p className="text-slate-600">No shared or public passwords.</p>
                     </div>
 
                     <Link 
-                      href={`/login?demo=${demo.id}`}
+                      href={`/contact?type=demo&portal=${demo.id}`}
                       className="block w-full bg-slate-900 text-white text-center py-2 px-4 rounded-lg font-semibold hover:bg-slate-800 transition-colors"
                     >
-                      Launch Demo
+                      Request Demo Access
                     </Link>
                   </div>
                 </div>
@@ -245,7 +230,7 @@ export default function DemosPage() {
 
           <div className="mt-12 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 text-center">
             <p className="text-slate-700 font-medium">
-              💡 <strong>Tip:</strong> Open multiple demo accounts in different browser tabs to see how the platform works across different user roles.
+              <strong>Need multiple roles?</strong> Tell us which workflows you want to compare and we will provision separate, least-privilege demo access.
             </p>
           </div>
         </div>

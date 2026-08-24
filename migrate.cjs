@@ -1,11 +1,13 @@
 const { Client } = require('pg');
 
+const connectionString = process.env.SUPABASE_DB_URL || process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('SUPABASE_DB_URL or DATABASE_URL must be configured.');
+  process.exit(1);
+}
+
 const client = new Client({
-  host: 'db.cuxzzpsyufcewtmicszk.supabase.co',
-  port: 5432,
-  database: 'postgres',
-  user: 'postgres',
-  password: 'kingGreene08$$$',
+  connectionString,
   ssl: { rejectUnauthorized: false },
   connectionTimeoutMillis: 30000,
 });

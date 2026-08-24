@@ -19,6 +19,7 @@ import { evaluateExecution } from '@/lib/platform/orchestration/evaluator';
 import { loadSharedContext } from '@/lib/platform/orchestration/context-service';
 import { getAITool } from '@/lib/ai/tools/registry';
 import { getAdminUrl } from '@/lib/utils/siteUrl';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -283,9 +284,13 @@ export async function POST(req: NextRequest) {
 
               await persistPlan(db, plan, auth.id, tenantId);
             } catch (error) {
+              logger.error('[dev-studio/plan] step execution failed', error, {
+                planId: plan.id,
+                stepId: step.id,
+              });
               step.status = 'failed';
               step.evaluation = 'FAIL_BLOCKING';
-              step.error = error instanceof Error ? error.message : String(error);
+              step.error = 'Plan step execution failed';
               failedSteps += 1;
               write(`${FAIL} Step ${step.order} failed: ${step.title}`);
               for (const dependent of plan.steps) {
@@ -332,7 +337,8 @@ export async function POST(req: NextRequest) {
           message: `AI planner checkpoint: ${plan.goal} (${plan.status})`,
         });
       } catch (error) {
-        write(`${FAIL} Planner error: ${error instanceof Error ? error.message : 'unknown error'}`);
+        logger.error('[dev-studio/plan] planner execution failed', error);
+        write(`${FAIL} Planner execution failed`);
       } finally {
         try { controller.enqueue(done()); } catch { /* stream closed */ }
         controller.close();

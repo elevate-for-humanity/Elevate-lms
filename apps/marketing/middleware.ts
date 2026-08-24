@@ -5,7 +5,7 @@ import {
   rewriteTenantAppHostRequest,
   tenantSlugFromAppHost,
 } from '@/lib/tenant/middleware-tenant-routing';
-import { LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
+import { LMS_HOST } from '@/lib/routing/portal-map';
 
 // These route families are authenticated operational software, not public
 // marketing pages. Protect the complete family so child routes cannot inherit
@@ -115,7 +115,7 @@ export async function middleware(req: NextRequest) {
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error || !user) {
     const loginUrl = new URL('/login', LMS_HOST);
-    loginUrl.searchParams.set('redirect', `${MARKETING_HOST}${pathname}${search}`);
+    loginUrl.searchParams.set('redirect', `${req.nextUrl.origin}${pathname}${search}`);
     return NextResponse.redirect(loginUrl);
   }
 

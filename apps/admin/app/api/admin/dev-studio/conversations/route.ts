@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { AgentMessage, ConversationSession, AgentConfig } from '@/lib/studio/agent';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,18 +17,19 @@ interface StoredConversation {
 }
 
 export async function GET(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const { data, error } = await supabase
       .from('studio_conversations')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', auth.id)
       .order('updated_at', { ascending: false })
       .limit(50);
 
@@ -43,13 +46,14 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const body = await request.json();
     const { title, messages, config } = body;
@@ -57,7 +61,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from('studio_conversations')
       .insert({
-        user_id: user.id,
+        user_id: auth.id,
         title: title || 'New Conversation',
         messages: messages || [],
         config: config || {},
@@ -78,13 +82,14 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const body = await request.json();
     const { id, title, messages } = body;
@@ -97,7 +102,7 @@ export async function PUT(request: NextRequest) {
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)
-      .eq('user_id', user.id)
+      .eq('user_id', auth.id)
       .select()
       .single();
 
@@ -114,13 +119,14 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -133,7 +139,7 @@ export async function DELETE(request: NextRequest) {
       .from('studio_conversations')
       .delete()
       .eq('id', id)
-      .eq('user_id', user.id);
+      .eq('user_id', auth.id);
 
     if (error) throw error;
 

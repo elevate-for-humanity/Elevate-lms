@@ -26,7 +26,8 @@ jobs:
           status=$(curl -sS --max-time 45 -o /tmp/result.json -w '%{http_code}' \
             -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
             -H "Authorization: Bearer $CRON_SECRET" \
-            -H 'Content-Type: application/json' || true)
+            -H 'Content-Type: application/json' \
+            --data '{"courseId":"398acfef-5d20-4c1d-b23a-6982dc05a250","maxJobs":1}' || true)
           echo "$status" >/tmp/status.txt
           cat /tmp/result.json || true
           case "$status" in 200|202) ;; *) exit 1;; esac

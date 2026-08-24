@@ -68,7 +68,8 @@ describe('canonical Course Factory media architecture', () => {
 
   it('uses one global renderer with optional course-scoped candidate selection', () => {
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
-    expect(worker).toContain('requestedCourseId');
+    expect(worker).toContain('requestedOptions');
+    expect(worker).toContain('maxJobs ?? maxConcurrent');
     expect(worker).toContain("candidateQuery.eq('course_id', courseId)");
     expect(worker).toContain('processClaimedVideoJob(job)');
     expect(worker).toContain('activeBeforeClaim');

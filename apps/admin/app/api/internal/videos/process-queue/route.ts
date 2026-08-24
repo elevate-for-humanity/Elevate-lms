@@ -14,13 +14,24 @@ function renderConcurrency(): number {
   return Math.max(1, Math.min(Math.trunc(parsed), 4));
 }
 
-async function requestedCourseId(request: NextRequest): Promise<string | null> {
+interface QueueRequestOptions {
+  courseId: string | null;
+  maxJobs: number | null;
+}
+
+async function requestedOptions(request: NextRequest): Promise<QueueRequestOptions> {
   try {
     const body = await request.json();
     const value = body && typeof body.courseId === 'string' ? body.courseId.trim() : '';
-    return value || null;
+    const requestedMax = Number(body?.maxJobs);
+    return {
+      courseId: value || null,
+      maxJobs: Number.isFinite(requestedMax)
+        ? Math.max(1, Math.min(Math.trunc(requestedMax), 4))
+        : null,
+    };
   } catch {
-    return null;
+    return { courseId: null, maxJobs: null };
   }
 }
 
@@ -30,7 +41,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const courseId = await requestedCourseId(request);
+  const { courseId, maxJobs } = await requestedOptions(request);
   const db = await requireAdminClient();
   const maxConcurrent = renderConcurrency();
 
@@ -46,7 +57,10 @@ export async function POST(request: NextRequest) {
   }
 
   const active = activeCount ?? 0;
-  const availableSlots = Math.max(0, maxConcurrent - active);
+  const availableSlots = Math.min(
+    Math.max(0, maxConcurrent - active),
+    maxJobs ?? maxConcurrent,
+  );
   if (availableSlots === 0) {
     return NextResponse.json({
       ok: true,

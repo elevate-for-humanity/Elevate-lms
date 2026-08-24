@@ -113,6 +113,21 @@ describe('canonical Course Factory media architecture', () => {
     expect(acceptance).toContain('EXPECTED_MEDIA = 105');
   });
 
+  it('authorizes course-scoped recovery for Business acceptance without replacing completed assets', () => {
+    const acceptance = read('scripts/course-factory/build-business-program.ts');
+    expect(acceptance).toContain("recoverCourseMediaJobs({ courseId, force: true })");
+    expect(acceptance).toContain('Authorized media recovery left blocked jobs');
+    expect(acceptance).toContain('EXPECTED_MAIN_VIDEOS = 35');
+    expect(acceptance).toContain('EXPECTED_MICROCLIPS = 70');
+  });
+
+  it('normalizes packaged instructor paths to a durable URL before Remotion rendering', () => {
+    const root = read('remotion-src/Root.tsx');
+    expect(root).toContain("props.instructorImageSrc?.startsWith('/')");
+    expect(root).toContain('CANONICAL_INSTRUCTOR_IMAGE_URL');
+    expect(root).toContain('cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images');
+  });
+
   it('repairs the existing ESB course missing-only and never replaces it', () => {
     const acceptance = read('scripts/course-factory/build-esb-acceptance.ts');
     expect(acceptance).toContain("mode: 'missing-only'");

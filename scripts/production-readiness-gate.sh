@@ -23,6 +23,7 @@ run() {
 section(){ echo ""; echo "=============================================="; echo "$1"; echo "=============================================="; }
 
 section "SECTION 1: CORE SECURITY CHECKS"
+run "Hardcoded credential audit" node scripts/check-no-hardcoded-credentials.mjs
 run "API admin guards" bash scripts/audit-api-auth-guards.sh
 run "Auth gaps (strict production-sensitive enforcement)" bash scripts/audit-auth-gaps.sh --strict
 run "Env vars" bash scripts/audit-env-vars.sh

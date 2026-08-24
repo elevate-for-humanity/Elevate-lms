@@ -302,7 +302,7 @@ async function checkEnrollmentWrite() {
   // Create test user via admin API
   const { data: authData, error: authErr } = await db.auth.admin.createUser({
     email: TEST_EMAIL,
-    password: 'TestPass123!',
+    password: `Test-${crypto.randomUUID()}-Aa1!`,
     email_confirm: true,
   });
 

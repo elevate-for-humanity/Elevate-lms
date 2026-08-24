@@ -717,7 +717,7 @@ export function PremiumTestingCenter() {
           >
             <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/testing-hero.mp4" type="video/mp4" />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-900/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/90 via-brand-blue-900/70 to-brand-blue-900/50" />
         </div>
         
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-12 sm:py-16">
@@ -991,7 +991,7 @@ export function PremiumTestingCenter() {
                 Explore Training Programs
               </Link>
               <Link
-                href="/contact"
+                href="https://www.elevateforhumanity.org/contact"
                 className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg text-lg border border-white/30 transition-colors"
               >
                 Contact the Testing Center

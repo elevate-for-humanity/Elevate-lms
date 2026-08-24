@@ -5,7 +5,7 @@ import { loadSharedContext } from '@/lib/platform/orchestration/context-service'
 const MAX_CONTEXT_CHARS = 8_000;
 const SECRET_PATTERNS = [
   /\b(?:sk|ghp|github_pat|sbp|xox[baprs])-[-A-Za-z0-9_]{12,}\b/g,
-  /\bBearer\s+[A-Za-z0-9._~+\/-]{12,}\b/gi,
+  /\bBearer\s+[A-Za-z0-9._~+/-]{12,}\b/gi,
   /\b(?:api[_ -]?key|secret|token|password)\s*[:=]\s*[^\s,;]+/gi,
 ];
 

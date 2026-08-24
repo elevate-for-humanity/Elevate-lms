@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
+import { logger } from '@/lib/logger';
 import {
   runTabularIntelligenceBatch,
   type TabularIntelligenceMode,
@@ -64,9 +65,7 @@ export async function POST(request: NextRequest) {
       results,
     });
   } catch (error) {
-    return safeError(
-      error instanceof Error ? error.message : 'Tabular intelligence failed',
-      503,
-    );
+    logger.error('[admin/intelligence/tabular] batch failed', error);
+    return safeError('Tabular intelligence failed', 503);
   }
 }

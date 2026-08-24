@@ -51,7 +51,19 @@ jobs:
         run: pnpm tsx scripts/verify-hero-video-registry.ts
 
       - name: Build Marketing container
-        run: docker build --file Dockerfile.marketing --tag elevate-marketing:staging-gate --build-arg GITHUB_SHA=${{ github.sha }} --build-arg GIT_SHA=${{ github.sha }} --build-arg NEXT_PUBLIC_GIT_SHA=${{ github.sha }} .
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+        run: |
+          docker build \
+            --file Dockerfile.marketing \
+            --tag elevate-marketing:staging-gate \
+            --build-arg GITHUB_SHA=${{ github.sha }} \
+            --build-arg GIT_SHA=${{ github.sha }} \
+            --build-arg NEXT_PUBLIC_GIT_SHA=${{ github.sha }} \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}" \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}" \
+            .
 
       - name: Smoke Marketing container
         run: |

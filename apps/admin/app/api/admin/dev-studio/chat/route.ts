@@ -20,8 +20,7 @@ import { isGroqConfigured, getGroqClient } from '@/lib/groq-client';
 import { isGeminiConfigured } from '@/lib/gemini-client';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import type Groq from 'groq-sdk';
+import { aiChat } from '@/lib/ai/ai-service';
 import { getRAGContext } from '@/lib/platform/rag';
 import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
 import {
@@ -1403,22 +1402,18 @@ async function _POST(req: NextRequest) {
       if (nextProvider === 'gemini' && isGeminiConfigured()) {
         try {
           const selectedModel = modelFor('gemini', rawModel);
-          const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-          const geminiModel = genAI.getGenerativeModel({
+          const result = await aiChat({
+            provider: 'gemini',
             model: selectedModel,
-            systemInstruction: systemPrompt,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              ...toChatMessages(messages),
+            ],
+            temperature: 0.4,
+            maxTokens: 4096,
           });
-          const history = messages
-            .slice(0, -1)
-            .map((m: { role: string; content: string }) => ({
-              role: m.role === 'assistant' ? 'model' : 'user',
-              parts: [{ text: m.content }],
-            }));
-          const chat = geminiModel.startChat({ history });
-          const last = messages[messages.length - 1];
-          const result = await chat.sendMessage(last.content);
-          assistantMessage = result.response.text();
-          provider = 'gemini';
+          assistantMessage = result.content ?? null;
+          provider = result.provider ?? 'gemini';
           model = selectedModel;
         } catch (err) {
           logger.warn('[devstudio/chat] Gemini failed', err);
@@ -1428,7 +1423,6 @@ async function _POST(req: NextRequest) {
 
     if (!assistantMessage) {
       try {
-        const { aiChat } = await import('@/lib/ai/ai-service');
         const fallbackResult = await aiChat({
           model: 'gpt-4.1-mini',
           messages: [{ role: 'system', content: systemPrompt }, ...messages],

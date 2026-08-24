@@ -88,7 +88,13 @@ jobs:
           done
 
       - name: Sync shared production env to all services
-        run: pnpm tsx scripts/northflank/sync-env.ts --execute
+        run: |
+          if [ -z "${SENDGRID_API_KEY:-}" ]; then
+            echo "SENDGRID_API_KEY is not available in GitHub Secrets; preserving the existing Northflank secret group."
+            echo "Skipping full secret-group replacement so an existing runtime email key is not erased."
+          else
+            pnpm tsx scripts/northflank/sync-env.ts --execute
+          fi
 
       - name: Configure all Northflank production services
         run: pnpm tsx scripts/northflank/configure-services.ts --all --execute

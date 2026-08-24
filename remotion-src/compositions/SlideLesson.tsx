@@ -348,6 +348,8 @@ function SceneSlide({
           : props.backgroundColor,
         backgroundSize: instructionalLayout ? '200% 200%' : undefined,
         backgroundPosition: instructionalLayout ? instructionalBackgroundPosition : undefined,
+        backgroundRepeat: instructionalLayout ? 'no-repeat' : undefined,
+        willChange: instructionalLayout ? 'background-position' : undefined,
       }}
     >
       {/* Background: video clip (looped) or image. Exact teaching graphics own the full frame. */}
@@ -408,7 +410,7 @@ function SceneSlide({
           opacity: fadeIn(frame, 5, 15),
         }}
       >
-        {scene.scene_number} / {scene.scene_number}
+        Scene {scene.scene_number}
       </div>
 
       {/* Content panel */}

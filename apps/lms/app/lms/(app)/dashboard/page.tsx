@@ -265,7 +265,7 @@ export default async function StudentDashboard() {
     { href: '/lms/calendar', label: 'Schedule', text: 'Review classes, deadlines, and upcoming activity.', image: '/images/pages/career-counseling.jpg' },
     { href: '/lms/messages', label: 'Messages', text: 'Open learner communications and program messages.', image: '/images/pages/contact-hero.jpg' },
     { href: '/lms/support', label: 'Get Help', text: 'Reach learner support when you need assistance.', image: '/images/pages/about-hero.webp' },
-    { href: '/lms/jobs', label: 'Career Opportunities', text: 'Browse current jobs and placement resources.', image: '/images/pages/career-counseling.jpg' },
+    { href: '/lms/jobs', label: 'Career Opportunities', text: 'Browse current jobs and placement resources.', image: '/images/pages/career-services-page-7.webp' },
   ];
 
   return (

@@ -11,6 +11,7 @@ import {
   gpuVideoAvailable,
 } from './gpu-video-client';
 import { markComplete, markFailed, type VideoJob } from './job-queue';
+import { enforceMediaQuality } from './media-quality-gate';
 import { directMedia, scenePrompt, type MediaCharacterReference } from './media-director';
 import { recordMediaProvenance } from './media-provenance';
 import { inferDomainKey, renderLessonVideo, renderStoryboardVideo } from './remotion-render';
@@ -194,6 +195,14 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
             });
           }
 
+          await enforceMediaQuality({
+            videoUrl,
+            expectedDurationSeconds: outputSeconds,
+            expectedSceneCount: 1,
+            sceneData: storyboard,
+            provider: generated.provider,
+            providerModel: model,
+          });
           await markComplete(job.id, {
             video_url: videoUrl,
             duration_seconds: outputSeconds,
@@ -282,6 +291,15 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       });
       return;
     }
+    const completedStoryboard = result.sceneData ?? storyboard;
+    await enforceMediaQuality({
+      videoUrl: result.videoUrl,
+      expectedDurationSeconds: result.duration ?? 0,
+      expectedSceneCount: storyboard.scenes.length,
+      sceneData: completedStoryboard,
+      provider: REMOTION_PROVIDER,
+      providerModel: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
+    });
     await markComplete(job.id, {
       video_url: result.videoUrl,
       audio_url: result.audioUrl ?? undefined,
@@ -289,7 +307,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       provider: REMOTION_PROVIDER,
       provider_model: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
       scene_count: storyboard.scenes.length,
-      scene_data: result.sceneData ?? storyboard,
+      scene_data: completedStoryboard,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

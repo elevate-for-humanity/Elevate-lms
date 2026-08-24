@@ -235,6 +235,7 @@ export async function markComplete(
     error_message: null,
     last_provider: result.provider ?? null,
     last_provider_model: result.provider_model ?? null,
+    provider: result.provider ?? null,
   };
   // A renderer that returns no replacement storyboard must not erase the
   // canonical plan that was attached when the job was queued.

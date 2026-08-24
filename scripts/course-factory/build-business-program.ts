@@ -1,6 +1,7 @@
 import { courseFactory } from '../../lib/course-factory';
 import { publishCourse } from '../../lib/course-factory/publisher';
 import { queueCourseLessonVideos } from '../../lib/course-factory/media-service';
+import { recoverCourseMediaJobs } from '../../lib/course-factory/media-manager';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { requireAdminClient } from '../../lib/supabase/admin';
 import {
@@ -427,6 +428,17 @@ async function main() {
   }
 
   await auditCourse(courseId);
+
+  // This production acceptance is an explicit operator-authorized repair.
+  // Reset only failed/stale media belonging to the canonical Business course
+  // after the renderer/runtime defect has been corrected. Completed assets
+  // remain untouched, and canonical job identities prevent duplicates.
+  const recovery = await recoverCourseMediaJobs({ courseId, force: true });
+  console.log('[Business Course Builder] authorized course-scoped media recovery', recovery);
+  if (recovery.blocked.length) {
+    fail(`Authorized media recovery left blocked jobs: ${recovery.blocked.map((item) => `${item.jobId}: ${item.reason}`).join(' | ')}`);
+  }
+
   await repairMissingMedia(courseId);
 
   const initialMedia = summarizeMedia(await loadCurrentMediaRows(db, courseId));

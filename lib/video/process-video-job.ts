@@ -21,7 +21,7 @@ const REMOTION_PROVIDER = 'remotion';
 const REMOTION_MODEL = 'ElevateLesson';
 
 async function hydrateMediaRuntimeSecrets(): Promise<void> {
-  const missing = ['ELEVENLABS_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY', 'PEXELS_API_KEY'].filter(
+  const missing = ['ELEVENLABS_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY', 'PEXELS_API_KEY', 'DID_API_KEY'].filter(
     (key) => !process.env[key]?.trim(),
   );
   if (!missing.length) return;

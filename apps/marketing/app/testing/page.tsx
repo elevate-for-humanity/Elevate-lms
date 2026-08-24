@@ -209,7 +209,13 @@ export default function TestingPage() {
                           >
                             <span className="font-medium text-slate-700">{name}</span>
                             {cents ? (
-                              <span className="font-black text-slate-950">${(cents / 100).toFixed(0)}</span>
+                              <Link
+                                href={`/testing/checkout?provider=${encodeURIComponent(provider.key)}&exam=${encodeURIComponent(name)}`}
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-red-600 px-3 py-2 text-xs font-bold text-white hover:bg-brand-red-700"
+                              >
+                                Pay {`${(cents / 100).toFixed(0)}`}
+                                <ArrowRight className="h-3.5 w-3.5" />
+                              </Link>
                             ) : (
                               <span className="text-xs font-semibold text-slate-500">Not configured</span>
                             )}

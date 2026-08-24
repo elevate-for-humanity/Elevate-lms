@@ -42,8 +42,10 @@ export const competencyMappingSchema = z.object({
 function parseRawJson(raw: string | null | undefined, label: string): unknown {
   const content = raw?.trim() ?? '';
   if (!content) throw new Error(`${label} returned an empty response`);
-  const clean = content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
-  try { return JSON.parse(clean); }
+  if (/^```/i.test(content) || /```$/.test(content)) {
+    throw new Error(`${label} returned markdown-wrapped JSON; plain JSON is required`);
+  }
+  try { return JSON.parse(content); }
   catch (error) {
     throw new Error(`${label} returned malformed JSON: ${error instanceof Error ? error.message : String(error)}`, { cause: error });
   }

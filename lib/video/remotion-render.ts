@@ -34,6 +34,7 @@ import {
   gpuVideoAvailable,
 } from './gpu-video-client';
 import type { SceneData, SlideLessonProps } from '@/remotion-src/compositions/SlideLesson';
+import { instructionalLayoutForTitle } from '@/remotion-src/instructional-layout';
 
 // Remotion's inputProps requires Record<string, unknown> — this cast is safe
 // because ElevateLessonProps is a plain serialisable object.
@@ -413,7 +414,8 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
       const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
       const audioSrc = await uploadLessonMediaBuffer(audio, `${input.lessonId}-scene-${index + 1}`, 'mp3');
       const query = [scene.subject, scene.environment, scene.action].join(' ').slice(0, 180);
-      let clipUrl = scene.sourceVideoUrl || null;
+      const instructionalLayout = instructionalLayoutForTitle(scene.subject);
+      let clipUrl = instructionalLayout ? null : scene.sourceVideoUrl || null;
       let lipSyncedInstructor = false;
 
       // A visible instructor may appear only when the delivered narration is
@@ -450,7 +452,9 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
 
       const imageUrl = lipSyncedInstructor
         ? CANONICAL_TALKING_INSTRUCTOR_IMAGE
-        : scene.referenceImageUrl || await getPexelsImage('default', { query });
+        : instructionalLayout
+          ? null
+          : scene.referenceImageUrl || await getPexelsImage('default', { query });
       let generated: Awaited<ReturnType<typeof generateGpuVideo>> = null;
       if (!clipUrl && canGenerateMotion) {
         try {
@@ -502,17 +506,21 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
         referenceImageUrl: imageUrl || undefined,
         sourceVideoUrl: clipUrl || undefined,
         resolvedProvider:
-          resolvedStoryboard.scenes[index].resolvedProvider ||
-          (clipUrl
-            ? 'pexels'
-            : imageUrl?.includes('pollinations')
-              ? 'pollinations'
-              : imageUrl
+          instructionalLayout
+            ? 'remotion'
+            : resolvedStoryboard.scenes[index].resolvedProvider ||
+              (clipUrl
                 ? 'pexels'
-                : undefined),
+                : imageUrl?.includes('pollinations')
+                  ? 'pollinations'
+                  : imageUrl
+                    ? 'pexels'
+                    : undefined),
         resolvedModel:
-          resolvedStoryboard.scenes[index].resolvedModel ||
-          (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined),
+          instructionalLayout
+            ? `deterministic-${instructionalLayout.kind}`
+            : resolvedStoryboard.scenes[index].resolvedModel ||
+              (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined),
       };
       const narrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60) + 1;
       const durationSeconds = Math.max(scene.durationSeconds, narrationSeconds, 4);

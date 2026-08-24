@@ -159,6 +159,8 @@ const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
 // One real portrait is packaged with every Admin image and served by the Remotion bundle.
 // Keep rendering deterministic even when optional instructor-specific portraits are absent.
 const CANONICAL_PACKAGED_INSTRUCTOR_IMAGE = '/images/instructors/marcus-johnson.jpg';
+const CANONICAL_TALKING_INSTRUCTOR_IMAGE =
+  'https://www.elevateforhumanity.org/images/brandon-instructor.png';
 
 const DEFAULT_INSTRUCTOR: InstructorConfig = INSTRUCTOR_CONFIGS['marcus-johnson'];
 
@@ -411,8 +413,44 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
       const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
       const audioSrc = await uploadLessonMediaBuffer(audio, `${input.lessonId}-scene-${index + 1}`, 'mp3');
       const query = [scene.subject, scene.environment, scene.action].join(' ').slice(0, 180);
-      const imageUrl = scene.referenceImageUrl || await getPexelsImage('default', { query });
       let clipUrl = scene.sourceVideoUrl || null;
+      let lipSyncedInstructor = false;
+
+      // A visible instructor may appear only when the delivered narration is
+      // actually driving the mouth movement. Keep this to the opening scene so
+      // the rest of the lesson can teach with cinematic and exact graphics.
+      if (index === 0 && process.env.DID_API_KEY?.trim()) {
+        try {
+          const { createTalk, pollTalkResult } = await import('@/lib/d-id/generate-talk');
+          const talk = await createTalk({
+            photoUrl: CANONICAL_TALKING_INSTRUCTOR_IMAGE,
+            audioUrl: audioSrc,
+            expression: 'subtle',
+          });
+          const completed = await pollTalkResult(talk.id);
+          if (completed.result_url) {
+            clipUrl = completed.result_url;
+            lipSyncedInstructor = true;
+            resolvedStoryboard.scenes[index] = {
+              ...resolvedStoryboard.scenes[index],
+              sourceVideoUrl: clipUrl,
+              referenceImageUrl: CANONICAL_TALKING_INSTRUCTOR_IMAGE,
+              resolvedProvider: 'd-id',
+              resolvedModel: 'talks-lip-sync',
+            };
+          }
+        } catch (error) {
+          logger.warn('[RemotionRender] Lip-synced instructor unavailable; using non-speaking cinematic footage', {
+            lessonId: input.lessonId,
+            scene: index + 1,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+      }
+
+      const imageUrl = lipSyncedInstructor
+        ? CANONICAL_TALKING_INSTRUCTOR_IMAGE
+        : scene.referenceImageUrl || await getPexelsImage('default', { query });
       let generated: Awaited<ReturnType<typeof generateGpuVideo>> = null;
       if (!clipUrl && canGenerateMotion) {
         try {

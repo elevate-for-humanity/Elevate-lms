@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
   }
   if (addons.some((addon) => addon?.hiddenFromMarketplace)) {
     return NextResponse.json(
-      { error: 'One or more legacy or managed add-ons are not available for new self-service purchase' },
+      { error: 'One or more legacy add-ons are no longer available for new purchase or self-service activation' },
       { status: 400 },
     );
   }

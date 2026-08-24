@@ -58,6 +58,7 @@ jobs:
           docker build \
             --file Dockerfile.marketing \
             --tag elevate-marketing:staging-gate \
+            --build-arg NF_GIT_SHA=${{ github.sha }} \
             --build-arg GITHUB_SHA=${{ github.sha }} \
             --build-arg GIT_SHA=${{ github.sha }} \
             --build-arg NEXT_PUBLIC_GIT_SHA=${{ github.sha }} \

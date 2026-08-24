@@ -293,12 +293,12 @@ function SceneSlide({
         />
       ) : null}
 
-      {/* Dark overlay so text is always readable */}
+      {/* Directional scrim keeps the text readable without crushing the footage. */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: `linear-gradient(160deg, rgba(15,23,42,0.82) 0%, rgba(15,23,42,0.65) 100%)`,
+          background: 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.28) 58%, rgba(15,23,42,0.08) 100%)',
         }}
       />
 
@@ -396,7 +396,7 @@ function SceneSlide({
       </div>
 
       {/* Per-scene audio */}
-      {scene.audioSrc && <Audio src={scene.audioSrc} />}
+      {scene.audioSrc && <Audio src={scene.audioSrc} volume={1.35} />}
 
       {/* Caption bar */}
       <CaptionBar text={scene.narration} frame={frame} primaryColor={props.primaryColor} />
@@ -496,7 +496,7 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
   return (
     <AbsoluteFill>
       {/* Optional full-lesson audio track (when per-scene audio is absent) */}
-      {props.fullAudioSrc && <Audio src={props.fullAudioSrc} />}
+      {props.fullAudioSrc && <Audio src={props.fullAudioSrc} volume={1.35} />}
 
       {/* Branded intro */}
       <Sequence from={0} durationInFrames={INTRO_FRAMES}>

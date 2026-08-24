@@ -204,16 +204,53 @@ async function ensureService(volumeId: string) {
   }
 }
 
-async function triggerExactBuild() {
+type ExactBuild = { buildId: string; sha: string };
+
+async function triggerExactBuild(): Promise<ExactBuild> {
   const sha = process.env.GITHUB_SHA?.trim();
-  const body = sha && /^[0-9a-f]{40}$/i.test(sha) ? { sha } : {};
+  if (!sha || !/^[0-9a-f]{40}$/i.test(sha)) {
+    throw new Error(`GITHUB_SHA must be a full 40-character Git SHA; received ${sha || 'missing'}`);
+  }
   const result = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/build`), {
-    method: 'POST', body: JSON.stringify(body),
+    method: 'POST', body: JSON.stringify({ sha }),
   });
-  log('Exact-SHA build triggered', { buildId: result.id, sha: result.sha || sha || 'latest' });
+  if (!result.id) throw new Error('Northflank accepted the build request but returned no build ID');
+  log('Exact-SHA build triggered', { buildId: result.id, sha: result.sha || sha });
+  return { buildId: String(result.id), sha };
 }
 
-function buildStatus(service: R) { return service.status?.build?.status || service.build?.status || service.buildStatus; }
+async function waitForExactBuild({ buildId, sha }: ExactBuild): Promise<void> {
+  const deadline = Date.now() + BUILD_TIMEOUT_MS;
+  const failed = new Set(['FAILURE', 'FAILED', 'ERROR', 'CRASHED', 'ABORTED', 'SUBMISSION_FAILURE', 'TIMEOUT']);
+  let previous = '';
+  while (Date.now() < deadline) {
+    const response = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/build/${buildId}`));
+    const build = response.data || response;
+    const status = String(build.status || 'unknown').toUpperCase();
+    if (status !== previous) { log(`Exact build ${buildId} status ${status}`); previous = status; }
+    if (failed.has(status)) throw new Error(`GPU build ${buildId} failed: ${status}`);
+    if (status === 'SUCCESS') {
+      if (!build.sha || String(build.sha).toLowerCase() !== sha.toLowerCase()) {
+        throw new Error(`GPU build SHA mismatch: expected ${sha}, received ${build.sha || 'missing'}`);
+      }
+      return;
+    }
+    await sleep(15_000);
+  }
+  throw new Error(`Timed out waiting for exact GPU build ${buildId}`);
+}
+
+async function deployExactBuild({ buildId, sha }: ExactBuild): Promise<void> {
+  await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/deployment`), {
+    method: 'POST',
+    body: JSON.stringify({
+      internal: { id: SERVICE_ID, branch: 'main', buildId },
+      docker: { configType: 'default' },
+    }),
+  });
+  log('Exact build deployment accepted', { buildId, sha });
+}
+
 function deploymentStatus(service: R) { return service.status?.deployment?.status || service.deployment?.status || service.deploymentStatus; }
 
 async function waitForDeployment(): Promise<R> {
@@ -222,15 +259,14 @@ async function waitForDeployment(): Promise<R> {
   let previous = '';
   while (Date.now() < deadline) {
     const service = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`));
-    const build = buildStatus(service);
     const deployment = deploymentStatus(service);
-    const status = `${build || 'unknown'}/${deployment || 'unknown'}`;
-    if (status !== previous) { log(`Service status ${status}`); previous = status; }
-    if (failed.has(build || '') || failed.has(deployment || '')) throw new Error(`GPU service failed: ${status}`);
-    if (build === 'SUCCESS' && deployment === 'COMPLETED') return service;
+    const status = deployment || 'unknown';
+    if (status !== previous) { log(`Deployment status ${status}`); previous = status; }
+    if (failed.has(deployment || '')) throw new Error(`GPU deployment failed: ${status}`);
+    if (deployment === 'COMPLETED') return service;
     await sleep(15_000);
   }
-  throw new Error('Timed out waiting for GPU build/deployment');
+  throw new Error('Timed out waiting for GPU deployment');
 }
 
 function collectStrings(value: unknown, output: string[] = []): string[] {
@@ -357,7 +393,9 @@ async function main() {
 
   const volumeId = await ensureVolume();
   await ensureService(volumeId);
-  await triggerExactBuild();
+  const exactBuild = await triggerExactBuild();
+  await waitForExactBuild(exactBuild);
+  await deployExactBuild(exactBuild);
   const deployed = await waitForDeployment();
   const publicUrl = discoverPublicUrl(deployed) || await waitForPublicUrl();
   const workerSecret = crypto.randomBytes(32).toString('hex');

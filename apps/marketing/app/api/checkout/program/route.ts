@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
     amountCents?: number;
     successUrl?: string;
     cancelUrl?: string;
+    couponCode?: string;
   };
   try {
     body = await request.json();
@@ -148,6 +149,36 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unable to prepare enrollment checkout.' }, { status: 500 });
   }
 
+  const couponCode = body.couponCode?.trim();
+  let promotionCodeId: string | null = null;
+  if (couponCode) {
+    try {
+      const promotionCodes = await stripe.promotionCodes.list({
+        code: couponCode,
+        active: true,
+        limit: 1,
+      });
+      promotionCodeId = promotionCodes.data[0]?.id ?? null;
+    } catch (error) {
+      logger.warn('[program-checkout] Promotion-code lookup failed', {
+        slug,
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    if (!promotionCodeId) {
+      await admin
+        .from('program_enrollments')
+        .delete()
+        .eq('id', pendingEnrollment.id)
+        .eq('status', 'checkout_pending');
+      return NextResponse.json(
+        { error: 'That coupon code is invalid or inactive.' },
+        { status: 400 },
+      );
+    }
+  }
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -169,7 +200,9 @@ export async function POST(request: NextRequest) {
       ],
       success_url: successUrl,
       cancel_url: cancelUrl,
-      allow_promotion_codes: true,
+      ...(promotionCodeId
+        ? { discounts: [{ promotion_code: promotionCodeId }] }
+        : { allow_promotion_codes: true }),
       billing_address_collection: 'auto',
       client_reference_id: pendingEnrollment.id,
       metadata: {
@@ -181,6 +214,7 @@ export async function POST(request: NextRequest) {
         checkout_mode: checkoutMode,
         tuition_cents: String(pricing.tuitionCents),
         amount_charged_cents: String(chargeCents),
+        coupon_code: couponCode || '',
         source: 'marketing_program_page',
       },
     });

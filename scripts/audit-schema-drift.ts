@@ -33,6 +33,15 @@ const baselinePathArg = args.find((a, i) => args[i - 1] === '--baseline') ?? nul
 const writeBaselinePathArg = args.find((a, i) => args[i - 1] === '--write-baseline') ?? null;
 const forceMigrations = args.includes('--source') && args[args.indexOf('--source') + 1] === 'migrations';
 
+type DriftBaseline = { schemaSource?: string; entries?: string[] };
+
+function readBaseline(root: string): DriftBaseline | null {
+  if (!baselinePathArg) return null;
+  const baselinePath = path.resolve(root, baselinePathArg);
+  if (!fs.existsSync(baselinePath)) return null;
+  return JSON.parse(fs.readFileSync(baselinePath, 'utf8')) as DriftBaseline;
+}
+
 type TableSchema = Map<string, Set<string>>;
 
 async function fetchLiveSchema(supabaseUrl: string, serviceKey: string): Promise<TableSchema | null> {
@@ -212,6 +221,8 @@ function auditDrift(calls: SelectCall[], schema: TableSchema): DriftResult[] {
 async function main() {
   const root = path.resolve(__dirname, '..');
   const migrationsDir = path.join(root, 'supabase', 'migrations');
+  const baseline = readBaseline(root);
+  const baselineUsesMigrations = baseline?.schemaSource?.startsWith('migrations') === true;
   const srcDirs = ['app', 'apps', 'lib', 'components', 'packages']
     .map((d) => path.join(root, d));
 
@@ -233,7 +244,7 @@ async function main() {
   let schema: TableSchema;
   let schemaSource: string;
 
-  if (!forceMigrations && supabaseUrl && serviceKey) {
+  if (!forceMigrations && !baselineUsesMigrations && supabaseUrl && serviceKey) {
     process.stdout.write('Fetching live schema from Supabase...');
     const live = await fetchLiveSchema(supabaseUrl, serviceKey);
     if (live) {
@@ -282,8 +293,7 @@ async function main() {
       console.error(`Schema drift baseline not found: ${path.relative(root, baselinePath)}`);
       process.exit(1);
     }
-    const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8')) as { entries?: string[] };
-    const baselineEntries = Array.isArray(baseline.entries) ? baseline.entries : [];
+    const baselineEntries = Array.isArray(baseline?.entries) ? baseline.entries : [];
     const baselineSet = new Set(baselineEntries);
     newDriftSignatures = driftSignatures.filter((signature) => !baselineSet.has(signature));
     const resolvedCount = baselineEntries.filter((signature) => !currentSignatureSet.has(signature)).length;

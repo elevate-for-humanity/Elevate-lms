@@ -101,7 +101,8 @@ for (const prefix of ['/case-manager', '/workforce-board', '/provider']) {
   if (!marketingChrome.includes(`'${prefix}'`)) fail(`${prefix}: public Header/Footer suppression missing`);
 }
 if (!marketingMiddleware.includes("new URL('/login', LMS_HOST)")) fail('Marketing operational auth does not use canonical LMS authentication host');
-if (!marketingMiddleware.includes("req.nextUrl.origin")) fail('Marketing operational login does not preserve absolute owning-host return URL');
+if (!marketingMiddleware.includes("`${MARKETING_HOST}${pathname}${search}`")) fail('Marketing operational login does not preserve the canonical public return URL');
+if (marketingMiddleware.includes("`${req.nextUrl.origin}${pathname}${search}`")) fail('Marketing operational login derives its return URL from an internal request origin');
 
 console.log('\n── Public discovery contract ──');
 if (!exists('apps/marketing/app/online-apps/page.tsx')) fail('/online-apps: public portal directory missing');

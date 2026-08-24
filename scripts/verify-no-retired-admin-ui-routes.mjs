@@ -31,7 +31,7 @@ for (const configPath of [
   'apps/marketing/next.config.js',
 ]) {
   const config = read(configPath);
-  for (const forbidden of ["source: '/admin'", "source: '/admin/:path*'"]) {
+  for (const forbidden of ["source: '/admin'", "source: '/admin/", "source: '/dev-studio/:path*'"]) {
     if (config.includes(forbidden)) {
       violations.push(`${configPath} contains retired private alias ${forbidden}`);
     }

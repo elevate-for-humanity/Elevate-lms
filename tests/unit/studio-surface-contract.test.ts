@@ -13,17 +13,16 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(contracts.surfaces.devStudio.canonical).toEqual({ app: 'admin', path: '/studio' });
   });
 
-  it('redirects legacy Admin surfaces before authentication middleware runs', () => {
+  it('canonicalizes legacy Admin paths once in middleware without duplicate Next routes', () => {
     const nextConfig = source('apps/admin/next.config.mjs');
+    const middleware = source('apps/admin/middleware.ts');
 
-    expect(nextConfig).toContain("source: '/admin/studio/:path*'");
-    expect(nextConfig).toContain("source: '/admin/dev-studio/:path*'");
-    expect(nextConfig).toContain("source: '/dev-studio/:path*'");
-    expect(nextConfig).toContain("destination: '/studio/:path*'");
-    expect(nextConfig).toContain("source: '/admin/dashboard'");
-    expect(nextConfig).toContain("destination: '/dashboard'");
-    expect(nextConfig).toContain("source: '/admin/:path*'");
-    expect(nextConfig).toContain("destination: '/:path*'");
+    expect(nextConfig).not.toContain("source: '/admin'");
+    expect(nextConfig).not.toContain("source: '/admin/");
+    expect(nextConfig).not.toContain("source: '/dev-studio/:path*'");
+    expect(middleware).toContain("const legacyStudioPrefixes = ['/admin/studio', '/admin/dev-studio', '/dev-studio']");
+    expect(middleware).toContain("pathname === '/admin/dashboard'");
+    expect(middleware).toContain("pathname === '/admin' || pathname.startsWith('/admin/')");
   });
 
   it('uses the single canonical Course Builder route from the Studio UI', () => {

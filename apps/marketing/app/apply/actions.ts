@@ -1,6 +1,5 @@
 'use server';
 
-import crypto from 'node:crypto';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export async function submitStudentApplication(data: {

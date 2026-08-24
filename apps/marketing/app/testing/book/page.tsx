@@ -12,6 +12,7 @@ import {
   CreditCard,
   CheckCircle,
   CalendarDays,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   ALL_PROVIDERS,
@@ -73,6 +74,7 @@ function BookingForm() {
   const [calendlyLoading, setCalendlyLoading] = useState(false);
   const [paidExamName, setPaidExamName] = useState('');
   const [paidConfirmationCode, setPaidConfirmationCode] = useState('');
+  const [paymentVerificationError, setPaymentVerificationError] = useState('');
   const [enforcementHold, setEnforcementHold] = useState<{
     id: string;
     enforcement_type: string;
@@ -203,8 +205,7 @@ function BookingForm() {
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
     if (!sessionId) return;
-    setPaid(true);
-    setPaidSessionId(sessionId);
+    setPaymentVerificationError('');
 
     // Restore form state from sessionStorage so the slot picker works
     try {
@@ -237,6 +238,8 @@ function BookingForm() {
         const res = await fetch(`/api/testing/booking-status?session_id=${encodeURIComponent(sessionId)}`);
         const data = await res.json();
         if (data.found) {
+          setPaid(true);
+          setPaidSessionId(sessionId);
           setCalendlyUrl(data.calendlySchedulingUrl ?? null);
           if (data.examName) setPaidExamName(data.examName);
           if (data.confirmationCode) setPaidConfirmationCode(data.confirmationCode);
@@ -250,16 +253,71 @@ function BookingForm() {
       if (attempts < maxAttempts) {
         setTimeout(poll, 2000);
       } else {
-        // Webhook hasn't fired after 10s — fall back to public Calendly URL
-        setCalendlyUrl(CALENDLY_CONFIG.testingUrl);
         setCalendlyLoading(false);
+        setPaymentVerificationError(
+          'Payment could not be verified. Scheduling remains locked. If you completed payment, use the confirmation email link or contact the Testing Center.',
+        );
       }
     };
 
     poll();
   }, [searchParams]);
 
-  const proctoringOptions = selectedProvider ? getProctoringOptions(selectedProvider.key) : null;
+  const checkoutSessionId = searchParams.get('session_id');
+
+  if (!checkoutSessionId) {
+    return (
+      <main className="min-h-screen bg-slate-50 px-4 py-16">
+        <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <CreditCard className="mx-auto h-12 w-12 text-brand-red-600" />
+          <h1 className="mt-4 text-3xl font-extrabold text-slate-950">Payment required before scheduling</h1>
+          <p className="mt-3 text-base leading-relaxed text-slate-600">
+            Choose your exact exam and complete secure checkout first. Your scheduling link unlocks only after Stripe confirms payment.
+          </p>
+          <Link
+            href="/testing/checkout"
+            className="mt-6 inline-flex items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3.5 font-bold text-white hover:bg-brand-red-700"
+          >
+            Choose Exam & Pay
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  if (!paid) {
+    return (
+      <main className="min-h-screen bg-slate-50 px-4 py-16">
+        <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <ShieldCheck className="mx-auto h-12 w-12 text-brand-blue-700" />
+          <h1 className="mt-4 text-3xl font-extrabold text-slate-950">
+            {paymentVerificationError ? 'Scheduling locked' : 'Verifying payment'}
+          </h1>
+          <p className="mt-3 text-base leading-relaxed text-slate-600">
+            {paymentVerificationError || 'Please wait while we confirm your completed Stripe Checkout session.'}
+          </p>
+          {paymentVerificationError && (
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Link
+                href="/testing/checkout"
+                className="inline-flex items-center justify-center rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700"
+              >
+                Return to Checkout
+              </Link>
+              <a
+                href={`tel:${TESTING_CENTER.phone}`}
+                className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-bold text-slate-800 hover:bg-slate-50"
+              >
+                Call Testing Center
+              </a>
+            </div>
+          )}
+        </div>
+      </main>
+    );
+  }
+
+    const proctoringOptions = selectedProvider ? getProctoringOptions(selectedProvider.key) : null;
 
   const availableModes = proctoringOptions
     ? (Object.entries(proctoringOptions) as [string, boolean][])

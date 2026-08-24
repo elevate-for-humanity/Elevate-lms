@@ -27,10 +27,18 @@ jobs:
             -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H 'Content-Type: application/json' \
-            --data '{"courseId":"398acfef-5d20-4c1d-b23a-6982dc05a250","maxJobs":1}' || true)
+            --data '{"courseId":"398acfef-5d20-4c1d-b23a-6982dc05a250","maxJobs":1,"queueOneDraft":true}' || true)
           echo "$status" >/tmp/status.txt
           cat /tmp/result.json || true
-          case "$status" in 200|202) ;; *) exit 1;; esac
+          test "$status" = '202'
+          node - <<'NODE'
+          const fs = require('fs');
+          const result = JSON.parse(fs.readFileSync('/tmp/result.json', 'utf8'));
+          const courseId = '398acfef-5d20-4c1d-b23a-6982dc05a250';
+          if (result.started !== 1 || result.courseId !== courseId || result.jobs?.length !== 1) {
+            throw new Error(`Bounded ESB pilot did not start exactly one asset: ${JSON.stringify(result)}`);
+          }
+          NODE
       - name: Post result
         if: always()
         uses: actions/github-script@v7

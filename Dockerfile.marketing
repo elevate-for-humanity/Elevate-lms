@@ -64,6 +64,10 @@ ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 COPY --from=dependencies /workspace/node_modules ./node_modules
+# pnpm keeps direct workspace dependencies (including browser polyfills) in the
+# workspace package's node_modules. Copy that directory as well so the
+# container build resolves the same dependency graph as local/CI builds.
+COPY --from=dependencies /workspace/apps/marketing/node_modules ./apps/marketing/node_modules
 COPY . .
 
 RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \

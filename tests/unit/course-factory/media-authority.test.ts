@@ -75,6 +75,16 @@ describe('canonical Course Factory media architecture', () => {
     expect(worker).toContain('activeBeforeClaim');
   });
 
+  it('allows an authenticated ESB acceptance run to promote only one draft asset', () => {
+    const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
+    const workflow = read('.github/workflows/esb-video-recovery-test.yml');
+    expect(worker).toContain('queueOneDraft requires an exact courseId and maxJobs=1');
+    expect(worker).toContain(".eq('status', 'draft')");
+    expect(worker).toContain(".eq('status', 'queued')");
+    expect(workflow).toContain('"queueOneDraft":true');
+    expect(workflow).toContain('result.started !== 1');
+  });
+
   it('keeps render capacity global during course-scoped runs', () => {
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
     const activeBlock = worker.slice(worker.indexOf('activeCount'), worker.indexOf('availableSlots'));

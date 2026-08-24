@@ -17,6 +17,7 @@ function renderConcurrency(): number {
 interface QueueRequestOptions {
   courseId: string | null;
   maxJobs: number | null;
+  queueOneDraft: boolean;
 }
 
 async function requestedOptions(request: NextRequest): Promise<QueueRequestOptions> {
@@ -29,9 +30,10 @@ async function requestedOptions(request: NextRequest): Promise<QueueRequestOptio
       maxJobs: Number.isFinite(requestedMax)
         ? Math.max(1, Math.min(Math.trunc(requestedMax), 4))
         : null,
+      queueOneDraft: body?.queueOneDraft === true,
     };
   } catch {
-    return { courseId: null, maxJobs: null };
+    return { courseId: null, maxJobs: null, queueOneDraft: false };
   }
 }
 
@@ -41,7 +43,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { courseId, maxJobs } = await requestedOptions(request);
+  const { courseId, maxJobs, queueOneDraft } = await requestedOptions(request);
+  if (queueOneDraft && (!courseId || maxJobs !== 1)) {
+    return NextResponse.json(
+      { error: 'queueOneDraft requires an exact courseId and maxJobs=1' },
+      { status: 400 },
+    );
+  }
   const db = await requireAdminClient();
   const maxConcurrent = renderConcurrency();
 
@@ -70,6 +78,54 @@ export async function POST(request: NextRequest) {
       active,
       maxConcurrent,
     });
+  }
+
+  // A bounded acceptance run may promote exactly one existing draft asset only
+  // after global render capacity is available. Bulk course recovery remains a
+  // separate, intentionally paused operation.
+  let queuedDraftJobId: string | null = null;
+  if (queueOneDraft && courseId) {
+    const { count: queuedCount, error: queuedCountError } = await db
+      .from('video_jobs')
+      .select('id', { count: 'exact', head: true })
+      .eq('course_id', courseId)
+      .eq('status', 'queued');
+    if (queuedCountError) {
+      return NextResponse.json({ error: 'Unable to inspect the course video queue' }, { status: 500 });
+    }
+
+    if ((queuedCount ?? 0) === 0) {
+      const { data: draft, error: draftError } = await db
+        .from('video_jobs')
+        .select('id')
+        .eq('course_id', courseId)
+        .eq('status', 'draft')
+        .order('asset_kind', { ascending: true })
+        .order('created_at', { ascending: true })
+        .order('id', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (draftError) {
+        return NextResponse.json({ error: 'Unable to read a draft course video job' }, { status: 500 });
+      }
+      if (!draft) {
+        return NextResponse.json({ ok: true, started: 0, reason: 'no-draft-or-queued-job', courseId });
+      }
+
+      const now = new Date().toISOString();
+      const { data: queuedDraft, error: queueDraftError } = await db
+        .from('video_jobs')
+        .update({ status: 'queued', queued_at: now, updated_at: now })
+        .eq('id', draft.id)
+        .eq('course_id', courseId)
+        .eq('status', 'draft')
+        .select('id')
+        .maybeSingle();
+      if (queueDraftError) {
+        return NextResponse.json({ error: 'Unable to queue the bounded draft video job' }, { status: 500 });
+      }
+      queuedDraftJobId = queuedDraft?.id ?? null;
+    }
   }
 
   let candidateQuery = db
@@ -137,6 +193,7 @@ export async function POST(request: NextRequest) {
       })),
       activeBeforeClaim: active,
       maxConcurrent,
+      queuedDraftJobId,
     },
     { status: 202 },
   );

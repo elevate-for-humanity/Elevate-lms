@@ -57,6 +57,9 @@ export interface MediaScene {
   characterIds: string[];
   negativePrompt?: string;
   seed?: number;
+  /** Persisted evidence of the source selected for this rendered scene. */
+  resolvedProvider?: string;
+  resolvedModel?: string;
 }
 
 export interface MediaStoryboard {
@@ -70,6 +73,8 @@ export interface MediaStoryboard {
   characters: MediaCharacterReference[];
   scenes: MediaScene[];
   promptHash: string;
+  captionUrl?: string;
+  transcriptUrl?: string;
 }
 
 export interface MediaDirectorInput {
@@ -136,11 +141,20 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
   const raw = input.sceneData ?? {};
   const rawScenes = Array.isArray(raw.scenes) ? raw.scenes : [];
   const characters = Array.isArray(input.characters) ? input.characters : [];
-  const defaultDuration = numberValue(raw.duration_seconds, input.defaultDurationSeconds ?? 5, 1, 15);
+  const defaultDuration = numberValue(
+    raw.duration_seconds ?? raw.target_duration_seconds,
+    input.defaultDurationSeconds ?? 5,
+    1,
+    15,
+  );
 
   const sourceScenes: Record<string, unknown>[] = rawScenes.length
     ? rawScenes.filter((scene): scene is Record<string, unknown> => Boolean(scene && typeof scene === 'object'))
-    : sentenceScenes(input.script).map((sentence) => ({ action: sentence, subject: input.title }));
+    : sentenceScenes(input.script).map((sentence) => ({
+        action: sentence,
+        subject: input.title,
+        visual_prompt: stringValue(raw.visual_prompt),
+      }));
 
   const fallbackScene: Record<string, unknown> = {
     action: input.script,
@@ -150,9 +164,18 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
   const scenes = (sourceScenes.length ? sourceScenes : [fallbackScene]).map((scene, index): MediaScene => {
     const referenceImageUrl = stringValue(scene.reference_image_url, stringValue(raw.reference_image_url)) || undefined;
     const sourceVideoUrl = stringValue(scene.source_video_url, stringValue(raw.source_video_url)) || undefined;
-    const action = stringValue(scene.action, stringValue(scene.visual_prompt, input.script));
+    const action = stringValue(
+      scene.action,
+      stringValue(scene.visual_prompt, stringValue(raw.visual_prompt, input.script)),
+    );
     const subject = stringValue(scene.subject, input.title);
-    const environment = stringValue(scene.environment, stringValue(raw.environment, 'professional real-world environment'));
+    const environment = stringValue(
+      scene.environment,
+      stringValue(
+        scene.visual_prompt,
+        stringValue(raw.visual_prompt, stringValue(raw.environment, 'professional real-world environment')),
+      ),
+    );
     const visualStyle = stringValue(scene.visual_style, stringValue(raw.visual_style, 'cinematic photorealistic educational film'));
     const lighting = stringValue(scene.lighting, stringValue(raw.lighting, 'natural motivated lighting'));
     const characterIds = Array.isArray(scene.character_ids)

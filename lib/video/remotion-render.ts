@@ -15,12 +15,25 @@ import path from 'path';
 import os from 'os';
 import { mkdir, writeFile, unlink, rm } from 'fs/promises';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
-import { getPexelsImage } from './pexels';
+import { getPexelsImage, getPexelsVideoClip } from './pexels';
 import { logger } from '@/lib/logger';
 // Type-only import — never bundled, only used for type checking
 import type { ElevateLessonProps } from '@/remotion-src/compositions/ElevateLesson';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { lessonRenderTempPaths, uploadLessonFileFromDisk } from '@/lib/video/upload-lesson-media';
+import {
+  lessonRenderTempPaths,
+  uploadCourseVideosObject,
+  uploadLessonFileFromDisk,
+  uploadLessonMediaBuffer,
+} from '@/lib/video/upload-lesson-media';
+import { scenePrompt, type MediaStoryboard } from './media-director';
+import {
+  deleteGpuVideoAsset,
+  downloadGpuVideoAsset,
+  generateGpuVideo,
+  gpuVideoAvailable,
+} from './gpu-video-client';
+import type { SceneData, SlideLessonProps } from '@/remotion-src/compositions/SlideLesson';
 
 // Remotion's inputProps requires Record<string, unknown> — this cast is safe
 // because ElevateLessonProps is a plain serialisable object.
@@ -50,6 +63,35 @@ export interface RemotionRenderResult {
   duration?: number; // seconds
   method: 'remotion-free';
   error?: string;
+  sceneData?: MediaStoryboard;
+}
+
+export interface StoryboardRenderInput {
+  lessonId: string;
+  courseTitle: string;
+  storyboard: MediaStoryboard;
+  instructorId?: string;
+}
+
+function vttTimestamp(seconds: number): string {
+  const milliseconds = Math.max(0, Math.round(seconds * 1000));
+  const hours = Math.floor(milliseconds / 3_600_000);
+  const minutes = Math.floor((milliseconds % 3_600_000) / 60_000);
+  const secs = Math.floor((milliseconds % 60_000) / 1000);
+  const millis = milliseconds % 1000;
+  return [hours, minutes, secs]
+    .map((value) => String(value).padStart(2, '0'))
+    .join(':') + `.${String(millis).padStart(3, '0')}`;
+}
+
+export function buildStoryboardWebVtt(scenes: SceneData[]): string {
+  let cursor = 3;
+  const cues = scenes.map((scene, index) => {
+    const start = cursor;
+    cursor += scene.durationFrames / 30;
+    return `${index + 1}\n${vttTimestamp(start)} --> ${vttTimestamp(cursor)}\n${scene.narration}`;
+  });
+  return `WEBVTT\n\n${cues.join('\n\n')}\n`;
 }
 
 // ── Instructor config ─────────────────────────────────────────────────────────
@@ -349,6 +391,168 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
       error: msg,
       method: 'remotion-free',
     };
+  }
+}
+
+/** Render the canonical Media Director storyboard through the existing rich
+ * SlideLesson composition. Each scene gets its own narration and relevant
+ * full-frame motion or image fallback instead of collapsing to one backdrop. */
+export async function renderStoryboardVideo(input: StoryboardRenderInput): Promise<RemotionRenderResult> {
+  const paths = getOutputPaths(input.lessonId);
+  const instructor = getInstructor(input.instructorId);
+  try {
+    await mkdir(paths.outputDir, { recursive: true });
+    const scenes: SceneData[] = [];
+    const canGenerateMotion = await gpuVideoAvailable();
+    const resolvedStoryboard: MediaStoryboard = structuredClone(input.storyboard);
+
+    for (const [index, scene] of input.storyboard.scenes.entries()) {
+      const narration = scene.dialogue?.trim() || scene.action.trim();
+      const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
+      const audioSrc = await uploadLessonMediaBuffer(audio, `${input.lessonId}-scene-${index + 1}`, 'mp3');
+      const query = [scene.subject, scene.environment, scene.action].join(' ').slice(0, 180);
+      const imageUrl = scene.referenceImageUrl || await getPexelsImage('default', { query });
+      let clipUrl = scene.sourceVideoUrl || null;
+      let generated: Awaited<ReturnType<typeof generateGpuVideo>> = null;
+      if (!clipUrl && canGenerateMotion) {
+        try {
+          generated = await generateGpuVideo({
+            prompt: scenePrompt(scene, input.storyboard.characters),
+            operation: imageUrl ? 'imageToVideo' : 'textToVideo',
+            imageUrl: imageUrl || undefined,
+            width: input.storyboard.width,
+            height: input.storyboard.height,
+            durationSeconds: Math.min(15, Math.max(4, scene.durationSeconds)),
+            seed: scene.seed,
+            negativePrompt: scene.negativePrompt,
+          });
+          if (generated) {
+            const buffer = await downloadGpuVideoAsset(generated);
+            clipUrl = await uploadLessonMediaBuffer(
+              buffer,
+              `${input.lessonId}-scene-${index + 1}`,
+              'mp4',
+            );
+            resolvedStoryboard.scenes[index] = {
+              ...resolvedStoryboard.scenes[index],
+              operation: imageUrl ? 'imageToVideo' : 'textToVideo',
+              referenceImageUrl: imageUrl || undefined,
+              sourceVideoUrl: clipUrl,
+              resolvedProvider: generated.provider,
+              resolvedModel: generated.provider === 'wan' ? 'Wan' : 'LTX-Video',
+            };
+          }
+        } catch (error) {
+          logger.warn('[RemotionRender] Generated scene unavailable; using licensed fallback', {
+            lessonId: input.lessonId,
+            scene: index + 1,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        } finally {
+          if (generated) await deleteGpuVideoAsset(generated);
+        }
+      }
+      if (!clipUrl) {
+        clipUrl = await getPexelsVideoClip(query, {
+          minDuration: 3,
+          maxDuration: 30,
+          perPage: 8,
+        });
+      }
+      resolvedStoryboard.scenes[index] = {
+        ...resolvedStoryboard.scenes[index],
+        referenceImageUrl: imageUrl || undefined,
+        sourceVideoUrl: clipUrl || undefined,
+        resolvedProvider:
+          resolvedStoryboard.scenes[index].resolvedProvider ||
+          (clipUrl
+            ? 'pexels'
+            : imageUrl?.includes('pollinations')
+              ? 'pollinations'
+              : imageUrl
+                ? 'pexels'
+                : undefined),
+        resolvedModel:
+          resolvedStoryboard.scenes[index].resolvedModel ||
+          (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined),
+      };
+      const narrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60) + 1;
+      const durationSeconds = Math.max(scene.durationSeconds, narrationSeconds, 4);
+      const bullets = narration
+        .split(/(?<=[.!?])\s+/)
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .slice(0, 4);
+
+      scenes.push({
+        scene_number: index + 1,
+        title: scene.subject,
+        bullets: bullets.length ? bullets : [scene.action],
+        narration,
+        clip_keyword: query,
+        clipUrl,
+        imageUrl,
+        audioSrc,
+        durationFrames: Math.ceil(durationSeconds * 30),
+      });
+    }
+
+    const props: SlideLessonProps & Record<string, unknown> = {
+      courseTitle: input.courseTitle,
+      lessonTitle: input.storyboard.title,
+      scenes,
+      primaryColor: instructor.topBarColor,
+      accentColor: instructor.accentColor,
+      backgroundColor: '#0f172a',
+      logoText: 'Elevate LMS',
+    };
+    const totalFrames = 180 + scenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
+    const bundleUrl = await getBundleUrl();
+    const { renderMedia, selectComposition } = await import('@remotion/renderer');
+    const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
+    const selected = await selectComposition({
+      serveUrl: bundleUrl,
+      browserExecutable,
+      id: 'SlideLesson',
+      inputProps: props,
+    });
+    const composition = { ...selected, durationInFrames: totalFrames };
+    await renderMedia({
+      composition,
+      serveUrl: bundleUrl,
+      browserExecutable,
+      codec: 'h264',
+      outputLocation: paths.videoPath,
+      inputProps: props,
+      concurrency: Math.max(1, (os.cpus().length ?? 2) - 1),
+      crf: 20,
+    });
+    const captionUrl = await uploadCourseVideosObject(
+      Buffer.from(buildStoryboardWebVtt(scenes), 'utf8'),
+      `generated-lessons/lesson-${input.lessonId}.vtt`,
+      'text/vtt',
+    );
+    const transcriptUrl = await uploadCourseVideosObject(
+      Buffer.from(scenes.map((scene) => scene.narration).join('\n\n'), 'utf8'),
+      `generated-lessons/lesson-${input.lessonId}.txt`,
+      'text/plain',
+    );
+    resolvedStoryboard.captionUrl = captionUrl;
+    resolvedStoryboard.transcriptUrl = transcriptUrl;
+    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, input.lessonId, 'mp4');
+    await rm(paths.outputDir, { recursive: true, force: true }).catch(() => {});
+    return {
+      success: true,
+      videoUrl,
+      duration: totalFrames / 30,
+      method: 'remotion-free',
+      sceneData: resolvedStoryboard,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.error('[RemotionRender] Storyboard render failed: ' + message);
+    await rm(paths.outputDir, { recursive: true, force: true }).catch(() => {});
+    return { success: false, error: message, method: 'remotion-free' };
   }
 }
 

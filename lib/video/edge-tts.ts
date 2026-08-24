@@ -169,20 +169,6 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
   if (!normalizedText) throw new Error('Narration requires non-empty text');
   const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%', pitch = '0Hz', volume = '+0%' } = options;
 
-  try {
-    const audio = await tts(normalizedText, { voice, rate, pitch, volume });
-    return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
-  } catch (edgeError) {
-    logger.warn('[Narration] Edge TTS unavailable; trying authenticated providers', { error: edgeError instanceof Error ? edgeError.message : String(edgeError) });
-  }
-
-  try {
-    logger.info('[Narration] Using zero-credit local espeak-ng fallback');
-    return await generateLocalNarration(normalizedText);
-  } catch (localError) {
-    logger.warn('[Narration] Local narration unavailable; trying authenticated providers', { error: localError instanceof Error ? localError.message : String(localError) });
-  }
-
   if (process.env.ELEVENLABS_API_KEY?.trim()) {
     try { return await generateElevenLabsNarration(normalizedText); }
     catch (error) { logger.warn('[Narration] ElevenLabs unavailable; trying Gemini', { error: error instanceof Error ? error.message : String(error) }); }
@@ -191,7 +177,23 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
     try { return await generateGeminiNarration(normalizedText); }
     catch (error) { logger.warn('[Narration] Gemini TTS unavailable; trying OpenAI', { error: error instanceof Error ? error.message : String(error) }); }
   }
-  return generateOpenAINarration(normalizedText, voice);
+  if (isOpenAIConfigured()) {
+    try { return await generateOpenAINarration(normalizedText, voice); }
+    catch (error) { logger.warn('[Narration] OpenAI TTS unavailable; trying Edge TTS', { error: error instanceof Error ? error.message : String(error) }); }
+  }
+
+  try {
+    const audio = await tts(normalizedText, { voice, rate, pitch, volume });
+    return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
+  } catch (edgeError) {
+    logger.warn('[Narration] Edge TTS unavailable', { error: edgeError instanceof Error ? edgeError.message : String(edgeError) });
+  }
+
+  if (process.env.NODE_ENV !== 'production') {
+    logger.info('[Narration] Using diagnostic-only local espeak-ng fallback');
+    return generateLocalNarration(normalizedText);
+  }
+  throw new Error('No publication-quality narration provider is available');
 }
 
 export function buildLessonScript(lesson: { title: string; moduleTitle: string; objective: string; keyPoints: string[]; example: string; summary: string }): string {

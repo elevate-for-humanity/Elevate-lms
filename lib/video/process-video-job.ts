@@ -13,7 +13,7 @@ import {
 import { markComplete, markFailed, type VideoJob } from './job-queue';
 import { directMedia, scenePrompt, type MediaCharacterReference } from './media-director';
 import { recordMediaProvenance } from './media-provenance';
-import { inferDomainKey, renderLessonVideo } from './remotion-render';
+import { inferDomainKey, renderLessonVideo, renderStoryboardVideo } from './remotion-render';
 import { uploadLessonMediaBuffer } from './upload-lesson-media';
 
 const REMOTION_PROVIDER = 'remotion';
@@ -94,7 +94,10 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   });
 
   try {
-    if (isMicroclip && (await gpuVideoAvailable())) {
+    // A single GPU clip is a valid terminal asset only for a single-scene plan.
+    // Multi-scene instructional clips must continue to the compositor so the
+    // remaining objective-aligned scenes are not discarded.
+    if (isMicroclip && storyboard.scenes.length === 1 && (await gpuVideoAvailable())) {
       const scene = storyboard.scenes[0];
       const requestedDuration = Math.min(15, Math.max(1, scene.durationSeconds));
       const gpuStartedAt = Date.now();
@@ -196,6 +199,8 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
             duration_seconds: outputSeconds,
             provider: generated.provider,
             provider_model: model,
+            scene_count: 1,
+            scene_data: storyboard,
           });
           return;
         }
@@ -243,24 +248,33 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     }
 
     const primaryScene = storyboard.scenes[0];
-    const result = await renderLessonVideo({
-      lessonId: renderId,
-      title: job.lesson_title,
-      moduleTitle: courseTitle,
-      objective: bulletPoints[0] ?? job.lesson_title,
-      keyPoints: bulletPoints.length
-        ? bulletPoints.slice(0, 5)
-        : script.split(/\.\s+/).filter(Boolean).slice(0, 5),
-      example: isMicroclip ? script : script.slice(0, 700),
-      summary: isMicroclip ? 'Review the key idea, then apply it in the lesson activity.' : script.slice(-500),
-      quizTeaser: isMicroclip
-        ? 'Return to the lesson and apply this concept.'
-        : 'Complete the knowledge check and review any missed objectives to continue.',
-      domainKey: inferDomainKey(courseTitle, job.lesson_title),
-      instructorId: instructor.id,
-      courseName: courseTitle,
-      visualPrompt: scenePrompt(primaryScene, storyboard.characters),
-    });
+    const result = storyboard.scenes.length > 1
+      ? await renderStoryboardVideo({
+          lessonId: renderId,
+          courseTitle,
+          storyboard,
+          instructorId: instructor.id,
+        })
+      : await renderLessonVideo({
+          lessonId: renderId,
+          title: job.lesson_title,
+          moduleTitle: courseTitle,
+          objective: bulletPoints[0] ?? job.lesson_title,
+          keyPoints: bulletPoints.length
+            ? bulletPoints.slice(0, 5)
+            : script.split(/\.\s+/).filter(Boolean).slice(0, 5),
+          example: isMicroclip ? script : script.slice(0, 700),
+          summary: isMicroclip
+            ? 'Review the key idea, then apply it in the lesson activity.'
+            : script.slice(-500),
+          quizTeaser: isMicroclip
+            ? 'Return to the lesson and apply this concept.'
+            : 'Complete the knowledge check and review any missed objectives to continue.',
+          domainKey: inferDomainKey(courseTitle, job.lesson_title),
+          instructorId: instructor.id,
+          courseName: courseTitle,
+          visualPrompt: scenePrompt(primaryScene, storyboard.characters),
+        });
     if (!result.success || !result.videoUrl) {
       await markFailed(job.id, result.error ?? 'Render returned no playable video URL', {
         provider: REMOTION_PROVIDER,
@@ -273,7 +287,9 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       audio_url: result.audioUrl ?? undefined,
       duration_seconds: result.duration,
       provider: REMOTION_PROVIDER,
-      provider_model: REMOTION_MODEL,
+      provider_model: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
+      scene_count: storyboard.scenes.length,
+      scene_data: result.sceneData ?? storyboard,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

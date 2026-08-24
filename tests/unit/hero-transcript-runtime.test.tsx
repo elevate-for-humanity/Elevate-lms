@@ -40,6 +40,22 @@ describe('marketing hero transcript runtime behavior', () => {
     expect(container.querySelector(`[style*="${poster}"]`)).toBeNull();
   });
 
+  it('mounts an exact first frame beneath video without a native poster', () => {
+    const firstFrame = '/images/heroes/hero-home-first-frame.webp';
+    const { container } = render(
+      <HeroVideo
+        videoSrcDesktop="/videos/hero.mp4"
+        posterImage="/images/heroes/unrelated-poster.webp"
+        mountedFrameImage={firstFrame}
+      />,
+    );
+
+    const video = container.querySelector('video');
+    expect(video).not.toBeNull();
+    expect(video).not.toHaveAttribute('poster');
+    expect(container.querySelector(`[style*="${firstFrame}"]`)).not.toBeNull();
+  });
+
   it('toggles the HeroVideo transcript without throwing at runtime', () => {
     render(
       <HeroVideo

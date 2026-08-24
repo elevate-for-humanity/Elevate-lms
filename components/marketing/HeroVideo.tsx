@@ -19,6 +19,8 @@ export interface HeroVideoProps {
   videoSrcDesktop?: string;
   videoSrcMobile?: string;
   posterImage?: string;
+  /** Exact first frame mounted beneath the video to prevent a poster/hydration flash. */
+  mountedFrameImage?: string;
   voiceoverSrc?: string;
   microLabel?: string;
   showBrandBug?: boolean;
@@ -42,6 +44,7 @@ export default function HeroVideo({
   videoSrcDesktop,
   videoSrcMobile,
   posterImage,
+  mountedFrameImage,
   voiceoverSrc,
   microLabel,
   belowHeroHeadline,
@@ -168,10 +171,10 @@ export default function HeroVideo({
         className={`relative isolate w-full overflow-hidden flex items-end bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
-        {posterImage ? (
+        {mountedFrameImage || posterImage ? (
           <div
             className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${posterImage})` }}
+            style={{ backgroundImage: `url(${mountedFrameImage || posterImage})` }}
             aria-hidden="true"
           />
         ) : null}
@@ -185,7 +188,7 @@ export default function HeroVideo({
             loop
             playsInline
             muted
-            poster={posterImage}
+            poster={mountedFrameImage ? undefined : posterImage}
             disablePictureInPicture
             onCanPlay={() => {
               const video = videoRef.current;

@@ -224,21 +224,24 @@ export async function markComplete(
 ): Promise<void> {
   const supabase = db();
   const now = new Date().toISOString();
+  const completionPatch: Record<string, unknown> = {
+    status: 'complete',
+    completed_at: now,
+    updated_at: now,
+    video_url: result.video_url,
+    audio_url: result.audio_url ?? null,
+    duration_seconds: result.duration_seconds ?? null,
+    scene_count: result.scene_count ?? null,
+    error_message: null,
+    last_provider: result.provider ?? null,
+    last_provider_model: result.provider_model ?? null,
+  };
+  // A renderer that returns no replacement storyboard must not erase the
+  // canonical plan that was attached when the job was queued.
+  if (result.scene_data != null) completionPatch.scene_data = result.scene_data;
   const { data: job } = await supabase
     .from('video_jobs')
-    .update({
-      status: 'complete',
-      completed_at: now,
-      updated_at: now,
-      video_url: result.video_url,
-      audio_url: result.audio_url ?? null,
-      duration_seconds: result.duration_seconds ?? null,
-      scene_count: result.scene_count ?? null,
-      scene_data: result.scene_data ?? null,
-      error_message: null,
-      last_provider: result.provider ?? null,
-      last_provider_model: result.provider_model ?? null,
-    })
+    .update(completionPatch)
     .eq('id', jobId)
     .select('lesson_id, asset_kind, asset_key')
     .single();
@@ -252,7 +255,7 @@ export async function markComplete(
         video_error: null,
         video_generated_at: now,
         duration_seconds: result.duration_seconds ?? null,
-        scene_data: result.scene_data ?? null,
+        ...(result.scene_data != null ? { scene_data: result.scene_data } : {}),
       })
       .eq('id', job.lesson_id);
   } else if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {

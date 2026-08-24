@@ -16,4 +16,9 @@ describe('production health endpoint', () => {
     expect(src).toContain('ready');
     expect(src).not.toContain('getPublicUrl');
   });
+
+  it('keeps readiness public so deployment probes are not redirected to login', () => {
+    const middleware = readFileSync(join(process.cwd(), 'middleware.ts'), 'utf8');
+    expect(middleware).toContain("'/api/ready'");
+  });
 });

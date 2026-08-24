@@ -81,6 +81,7 @@ export const ROUTE_POLICY: Record<string, AccessPolicy> = {
   '/api/apply': 'public',
   '/api/contact': 'public',
   '/api/health': 'public',
+  '/api/ready': 'public',
   '/api/verify': 'public',
   '/api/credentials/verify': 'public',
   '/api/programs/featured': 'public',

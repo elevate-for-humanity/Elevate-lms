@@ -22,6 +22,9 @@ const PUBLIC_PATHS = [
   '/api/auth/admin-login',
   '/api/health',
   '/api/ping',
+  // Northflank and release automation must evaluate readiness before login.
+  // The endpoint exposes configuration state only; it does not expose data.
+  '/api/ready',
   '/api/version',
   // This internal worker authenticates with CRON_SECRET in its route handler.
   // It must bypass session middleware or cron/local worker calls are redirected

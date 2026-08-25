@@ -16,7 +16,7 @@ const IMPORT_SOURCES = [
     label: 'SCORM Package',
     description: 'Upload a SCORM 1.2 or 2004 .zip package.',
     icon: Package,
-    href: '/admin/videos/upload',
+    href: '/videos/upload',
   },
   {
     id: 'csv',
@@ -30,7 +30,7 @@ const IMPORT_SOURCES = [
     label: 'External LMS',
     description: 'Pull courses from a connected LMS integration.',
     icon: Globe,
-    href: '/admin/partners/lms-integrations',
+    href: '/partners/lms-integrations',
   },
 ];
 

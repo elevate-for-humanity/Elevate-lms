@@ -79,7 +79,7 @@ export default async function IepListPage({
         <Breadcrumbs
           items={[
             { label: 'Admin', href: '/dashboard' },
-            { label: 'WIOA', href: '/admin/wioa' },
+            { label: 'WIOA', href: '/wioa' },
             { label: 'Employment Plans' },
           ]}
         />
@@ -117,7 +117,7 @@ export default async function IepListPage({
           {['all', 'draft', 'active', 'completed', 'cancelled'].map((s) => (
             <Link
               key={s}
-              href={`/admin/wioa/iep?status=${s}`}
+              href={`/wioa/iep?status=${s}`}
               className={`text-xs px-3 py-1 rounded-full font-medium transition ${
                 (params.status ?? 'all') === s
                   ? 'bg-slate-900 text-white'
@@ -225,7 +225,7 @@ export default async function IepListPage({
                     {/* Actions */}
                     <div className="flex flex-col gap-2 shrink-0">
                       <Link
-                        href={`/admin/wioa/iep/${iep.id}`}
+                        href={`/wioa/iep/${iep.id}`}
                         className="inline-flex items-center gap-1.5 text-xs font-semibold border border-slate-200 text-slate-600 hover:border-slate-300 px-3 py-1.5 rounded-lg transition"
                       >
                         View / edit <ArrowRight className="w-3 h-3" />

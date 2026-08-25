@@ -6,7 +6,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/hr/leave' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/hr/leave' },
   title: 'Leave Management | Elevate For Humanity',
   description: 'Manage employee leave requests and balances.',
 };
@@ -42,7 +42,7 @@ export default async function LeavePage() {
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-700">
               <li>
-                <Link href="/admin" className="hover:text-primary">
+                <Link href="/" className="hover:text-primary">
                   Admin
                 </Link>
               </li>

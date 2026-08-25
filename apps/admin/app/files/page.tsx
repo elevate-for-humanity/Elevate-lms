@@ -7,7 +7,7 @@ import AdvancedVideoUploader from '@/components/admin/AdvancedVideoUploader';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/files' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/files' },
   title: 'File Manager | Elevate For Humanity',
   description: 'Manage uploaded files and media.',
 };
@@ -24,7 +24,7 @@ export default async function FilesPage() {
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-700">
               <li>
-                <Link href="/admin" className="hover:text-primary">
+                <Link href="/" className="hover:text-primary">
                   Admin
                 </Link>
               </li>

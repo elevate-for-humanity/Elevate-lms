@@ -134,7 +134,7 @@ export default function DocumentDetailClient({
         <div className="flex gap-2 flex-wrap">
           {extractionStatus === 'extracted' && (
             <Link
-              href={`/admin/documents/${doc.id}/map`}
+              href={`/documents/${doc.id}/map`}
               className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 transition-colors"
             >
               <Map className="w-4 h-4" /> Map Fields
@@ -274,7 +274,7 @@ export default function DocumentDetailClient({
                   Extracted Fields ({extractedFields.length})
                 </span>
                 <Link
-                  href={`/admin/documents/${doc.id}/map`}
+                  href={`/documents/${doc.id}/map`}
                   className="text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1"
                 >
                   Map to forms <ChevronRight className="w-3 h-3" />

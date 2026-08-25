@@ -9,7 +9,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string; triggerId: string }> },
 ) {
   const auth = await apiRequireAdmin(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   const { triggerId } = await params;
   const db = await requireAdminClient();

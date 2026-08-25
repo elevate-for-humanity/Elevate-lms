@@ -66,7 +66,7 @@ export default async function JRIPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Job Ready Indy' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Job Ready Indy' }]} />
           <div className="flex justify-between items-center mt-4">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">Job Ready Indy</h1>
@@ -185,9 +185,9 @@ export default async function JRIPage() {
         {/* Quick Links */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { href: '/admin/jri/participants', icon: Users,     label: 'All Participants',   desc: 'View and manage all Job Ready Indy participants' },
-            { href: '/admin/jri/reports',      icon: FileText,  label: 'Compliance Reports', desc: 'Generate Job Ready Indy compliance reports' },
-            { href: '/admin/funding',          icon: Briefcase, label: 'Funding Tracking',   desc: 'Job Ready Indy funding allocations and disbursements' },
+            { href: '/jri/participants', icon: Users,     label: 'All Participants',   desc: 'View and manage all Job Ready Indy participants' },
+            { href: '/jri/reports',      icon: FileText,  label: 'Compliance Reports', desc: 'Generate Job Ready Indy compliance reports' },
+            { href: '/funding',          icon: Briefcase, label: 'Funding Tracking',   desc: 'Job Ready Indy funding allocations and disbursements' },
           ].map((item) => (
             <Link key={item.href} href={item.href} className="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition-shadow flex items-start gap-4">
               <div className="w-10 h-10 bg-brand-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">

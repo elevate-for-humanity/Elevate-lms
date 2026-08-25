@@ -8,7 +8,7 @@ import BulkCertificationsClient from './BulkCertificationsClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/certificates/bulk' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/certificates/bulk' },
   title: 'Bulk Certificates & Certifications | Admin | Elevate For Humanity',
 };
 
@@ -114,7 +114,7 @@ export default async function BulkCertificatesPage({
         <div className="mb-6">
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-500">
-              <li><Link href="/admin" className="hover:text-slate-900">Admin</Link></li>
+              <li><Link href="/" className="hover:text-slate-900">Admin</Link></li>
               <li>/</li>
               <li><Link href="/certificates" className="hover:text-slate-900">Certificates</Link></li>
               <li>/</li>

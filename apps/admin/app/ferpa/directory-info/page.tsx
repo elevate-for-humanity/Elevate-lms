@@ -70,8 +70,8 @@ export default async function FerpaDirectoryInfoPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'FERPA', href: '/admin/ferpa' },
+            { label: 'Admin', href: '/' },
+            { label: 'FERPA', href: '/ferpa' },
             { label: 'Directory Information' },
           ]}
         />

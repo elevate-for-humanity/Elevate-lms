@@ -233,7 +233,7 @@ export default function FieldMapClient({
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link
-              href={`/admin/documents/${doc.id}`}
+              href={`/documents/${doc.id}`}
               className="text-slate-500 hover:text-slate-700 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -356,7 +356,7 @@ export default function FieldMapClient({
               <FileText className="w-8 h-8 text-slate-300 mx-auto mb-2" />
               <p className="text-sm text-slate-500">No fields extracted yet.</p>
               <Link
-                href={`/admin/documents/${doc.id}`}
+                href={`/documents/${doc.id}`}
                 className="mt-2 inline-block text-sm text-violet-600 hover:underline"
               >
                 Run extraction first →

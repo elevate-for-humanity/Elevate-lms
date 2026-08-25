@@ -60,7 +60,7 @@ async function _POST(request: NextRequest) {
       req: request,
     });
 
-    return NextResponse.redirect(new URL('/admin/wioa/verify', request.url));
+    return NextResponse.redirect(new URL('/wioa/verify', request.url));
   } catch (error) {
     logger.error('WIOA verification failed', error as Error);
     return NextResponse.json({ error: 'Verification failed' }, { status: 500 });

@@ -32,8 +32,8 @@ export default async function NewCredentialPage() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'Credential Registry', href: '/admin/credentials' },
+            { label: 'Admin', href: '/' },
+            { label: 'Credential Registry', href: '/credentials' },
             { label: 'New Credential' },
           ]}
         />

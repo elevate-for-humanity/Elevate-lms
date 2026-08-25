@@ -94,7 +94,7 @@ export default async function GrantApplicationsPage() {
                       </span>
                     </td>
                     <td className="py-3.5 px-5 text-right">
-                      <Link href={`/admin/grants/applications/${a.id}`}
+                      <Link href={`/grants/applications/${a.id}`}
                         className="inline-flex items-center gap-1 text-xs font-semibold text-violet-600 hover:text-violet-700">
                         Edit <ArrowRight className="w-3 h-3" />
                       </Link>

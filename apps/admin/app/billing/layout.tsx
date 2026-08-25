@@ -11,7 +11,7 @@ export default async function AdminBillingLayout({ children }: { children: React
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Billing' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Billing' }]} />
         </div>
       </div>
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -19,7 +19,7 @@ export default async function AdminBillingLayout({ children }: { children: React
         <p className="text-slate-600 text-sm mb-6">
           Plans, add-ons, and organization subscriptions (Phase 1 licensing layer).
         </p>
-        <BillingSubnav items={ADMIN_BILLING_NAV} basePath="/admin/billing" />
+        <BillingSubnav items={ADMIN_BILLING_NAV} basePath="/billing" />
         {children}
       </div>
     </div>

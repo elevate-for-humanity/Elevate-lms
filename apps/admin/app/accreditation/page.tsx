@@ -209,7 +209,7 @@ export default async function AccreditationPage() {
                         {status ?? 'No evidence'}
                       </span>
                       <Link
-                        href={`/admin/accreditation/standards/${s.id}`}
+                        href={`/accreditation/standards/${s.id}`}
                         className="text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700 flex-shrink-0"
                       >
                         <ArrowRight className="w-3.5 h-3.5" />

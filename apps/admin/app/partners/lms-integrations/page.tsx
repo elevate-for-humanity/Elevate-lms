@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/partners/lms-integrations',
+    canonical: 'https://admin.elevateforhumanity.org/partners/lms-integrations',
   },
   title: 'Lms Integrations | Elevate For Humanity',
   description: 'Manage partner LMS integrations.',

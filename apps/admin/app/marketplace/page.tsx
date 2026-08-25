@@ -41,7 +41,7 @@ export default async function AdminMarketplacePage() {
   const sections = [
     {
       name: 'Products',
-      href: '/admin/marketplace/products',
+      href: '/marketplace/products',
       icon: ShoppingBag,
       description: 'Review and approve creator marketplace product listings.',
       count: productCount ?? 0,
@@ -49,7 +49,7 @@ export default async function AdminMarketplacePage() {
     },
     {
       name: 'Creators',
-      href: '/admin/marketplace/creators',
+      href: '/marketplace/creators',
       icon: Users,
       description: 'Manage creator accounts and approval status.',
       count: creatorCount ?? 0,
@@ -57,7 +57,7 @@ export default async function AdminMarketplacePage() {
     },
     {
       name: 'Payouts',
-      href: '/admin/marketplace/payouts',
+      href: '/marketplace/payouts',
       icon: DollarSign,
       description: 'Track and process creator payout requests.',
       count: pendingPayouts ?? 0,

@@ -47,7 +47,7 @@ export default function NewWioaPage() {
       <Breadcrumbs
         items={[
           { label: 'Admin', href: '/dashboard' },
-          { label: 'WIOA', href: '/admin/wioa' },
+          { label: 'WIOA', href: '/wioa' },
           { label: 'New Participant' },
         ]}
       />

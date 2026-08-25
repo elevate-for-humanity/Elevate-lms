@@ -55,7 +55,7 @@ export default async function CredentialRegistryPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs
-          items={[{ label: 'Admin', href: '/admin' }, { label: 'Credential Registry' }]}
+          items={[{ label: 'Admin', href: '/' }, { label: 'Credential Registry' }]}
         />
 
         <div className="mt-6 flex items-start justify-between gap-4">
@@ -194,7 +194,7 @@ export default async function CredentialRegistryPage() {
                           </span>
                         )}
                         <Link
-                          href={`/admin/credentials/${c.id}`}
+                          href={`/credentials/${c.id}`}
                           className="text-xs text-brand-blue-600 hover:underline px-2 py-1 rounded hover:bg-brand-blue-50"
                         >
                           Edit

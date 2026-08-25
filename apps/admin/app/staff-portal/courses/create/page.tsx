@@ -97,7 +97,7 @@ export default function CreateCoursePage() {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push('/login?redirect=/admin/staff-portal/courses/create');
+        router.push('/login?redirect=/staff-portal/courses/create');
         return;
       }
 
@@ -134,8 +134,8 @@ export default function CreateCoursePage() {
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: 'Staff Portal', href: '/admin/staff-portal' },
-              { label: 'Courses', href: '/admin/staff-portal/courses' },
+              { label: 'Staff Portal', href: '/staff-portal' },
+              { label: 'Courses', href: '/staff-portal/courses' },
               { label: 'Create Course' },
             ]}
           />

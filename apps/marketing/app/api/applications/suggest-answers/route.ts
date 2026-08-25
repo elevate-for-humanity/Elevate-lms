@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const auth = await apiAuthGuard(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   let body: { fields?: Array<{ fieldName: string; fieldLabel: string }> };
   try {

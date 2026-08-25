@@ -156,14 +156,14 @@ export default function CreateCourseContentPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Create' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Create' }]} />
       </div>
       {/* Header */}
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/admin" className="text-slate-700 hover:text-slate-900">
+              <Link href="/" className="text-slate-700 hover:text-slate-900">
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div>

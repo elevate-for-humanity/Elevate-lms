@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await apiRequireAdmin(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   const { id } = await params;
   const body = await request.json();
@@ -17,13 +17,28 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const db = await requireAdminClient();
   const { data, error } = await db
     .from('workflow_triggers')
-    .insert({ workflow_id: id, trigger_type, event_filter: event_filter ?? {}, cron_expr: cron_expr ?? null })
+    .insert({
+      workflow_id: id,
+      trigger_type,
+      event_filter: event_filter ?? {},
+      cron_expr: cron_expr ?? null,
+    })
     .select()
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  logAdminAudit({ action: AdminAction.WORKFLOW_TRIGGER_ADDED, actorId: auth.id, entityType: 'workflow_triggers', entityId: data.id, metadata: { workflow_id: id, trigger_type, cron_expr }, req: request }).then(() => {}, () => {});
+  logAdminAudit({
+    action: AdminAction.WORKFLOW_TRIGGER_ADDED,
+    actorId: auth.id,
+    entityType: 'workflow_triggers',
+    entityId: data.id,
+    metadata: { workflow_id: id, trigger_type, cron_expr },
+    req: request,
+  }).then(
+    () => {},
+    () => {},
+  );
 
   return NextResponse.json({ trigger: data }, { status: 201 });
 }

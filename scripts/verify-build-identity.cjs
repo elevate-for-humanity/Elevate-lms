@@ -21,7 +21,7 @@ const targets = [
   'apps/next.config.mjs',
   'apps/admin/next.config.mjs',
   'apps/lms/next.config.mjs',
-  'apps/marketing/next.config.js',
+  'apps/marketing/next.config.mjs',
   'Dockerfile.northflank-admin',
   'Dockerfile.northflank-lms',
   'Dockerfile.marketing',

@@ -495,7 +495,7 @@ export default function OpportunitiesPage() {
                         </a>
                       )}
                       <Link
-                        href={`/admin/submissions/opportunities/${opp.id}`}
+                        href={`/submissions/opportunities/${opp.id}`}
                         className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-brand-blue-50 hover:border-brand-blue-300 hover:text-brand-blue-700 transition"
                       >
                         Profile <ChevronRight className="w-3.5 h-3.5" />
@@ -515,7 +515,7 @@ export default function OpportunitiesPage() {
           onClose={() => setShowIngest(false)}
           onSuccess={(id) => {
             setShowIngest(false);
-            window.location.href = `/admin/submissions/opportunities/${id}`;
+            window.location.href = `/submissions/opportunities/${id}`;
           }}
         />
       )}

@@ -43,7 +43,7 @@ export default async function SignPage({
 
   const { data: runs } = await runQuery;
   const run = runs?.[0];
-  if (!run) redirect(`/admin/contracts/${id}`);
+  if (!run) redirect(`/contracts/${id}`);
 
   // Load existing signature if any
   const { data: existingSig } = await db

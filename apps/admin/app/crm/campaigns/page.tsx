@@ -110,7 +110,7 @@ export default async function CampaignsPage() {
               {campaigns.map((campaign) => (
                 <Link
                   key={campaign.id}
-                  href={`/admin/crm/campaigns/${campaign.id}`}
+                  href={`/crm/campaigns/${campaign.id}`}
                   className="block px-6 py-4 hover:bg-slate-50 transition-colors"
                 >
                   <div className="flex items-start justify-between">

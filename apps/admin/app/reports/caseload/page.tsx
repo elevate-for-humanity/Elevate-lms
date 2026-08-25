@@ -6,7 +6,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/reports/caseload' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/reports/caseload' },
   title: 'Caseload Reports | Elevate For Humanity',
   description: 'View caseload distribution and staff assignments.',
 };
@@ -60,7 +60,7 @@ export default async function CaseloadReportsPage() {
         <div className="mb-8">
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-700">
-              <li><Link href="/admin" className="hover:text-primary">Admin</Link></li>
+              <li><Link href="/" className="hover:text-primary">Admin</Link></li>
               <li>/</li>
               <li><Link href="/reports" className="hover:text-primary">Reports</Link></li>
               <li>/</li>

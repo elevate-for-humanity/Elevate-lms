@@ -21,7 +21,7 @@ export default function SOPsPage() {
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'SOPs' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'SOPs' }]} />
         </div>
       </div>
 
@@ -67,10 +67,10 @@ export default function SOPsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <Link href={`/admin/sops/${sop.id}`} className="p-2 hover:bg-slate-100 rounded-lg" title="View">
+                      <Link href={`/sops/${sop.id}`} className="p-2 hover:bg-slate-100 rounded-lg" title="View">
                         <Eye className="w-4 h-4 text-slate-600" />
                       </Link>
-                      <Link href={`/admin/sops/${sop.id}/edit`} className="p-2 hover:bg-slate-100 rounded-lg" title="Edit">
+                      <Link href={`/sops/${sop.id}/edit`} className="p-2 hover:bg-slate-100 rounded-lg" title="Edit">
                         <Edit className="w-4 h-4 text-slate-600" />
                       </Link>
                     </div>

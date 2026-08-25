@@ -23,7 +23,7 @@ export default async function AdminNewJobPage() {
           <Breadcrumbs
             items={[
               { label: 'Admin', href: '/dashboard' },
-              { label: 'Jobs', href: '/admin/jobs' },
+              { label: 'Jobs', href: '/jobs' },
               { label: 'New Job' },
             ]}
           />

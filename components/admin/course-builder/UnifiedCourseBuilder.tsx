@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { BookOpen, Bot, Boxes, Loader2, RefreshCw, Sparkles, Video } from 'lucide-react';
 import CourseInstructorMediaPanel from '@/components/admin/course-builder/CourseInstructorMediaPanel';
 import { runCourseFactoryPipeline } from '@/components/admin/course-builder/runCourseFactoryPipeline';
+import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
 
 const AutomaticCourseBuilder = dynamic(() => import('@/components/course/AutomaticCourseBuilder'), {
   ssr: false,
@@ -29,6 +30,11 @@ type BlueprintRow = {
   lessons: number;
   status?: string;
 };
+type CreditState = {
+  operator?: boolean;
+  metered?: boolean;
+  credits?: { balance?: number };
+};
 
 const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'courses', label: 'Courses', icon: BookOpen },
@@ -42,6 +48,7 @@ export default function UnifiedCourseBuilder() {
   const [courses, setCourses] = useState<CourseRow[]>([]);
   const [courseId, setCourseId] = useState('');
   const [blueprints, setBlueprints] = useState<BlueprintRow[]>([]);
+  const [creditState, setCreditState] = useState<CreditState | null>(null);
 
   const selectedCourse = useMemo(
     () => courses.find((course) => course.id === courseId) ?? null,
@@ -58,6 +65,10 @@ export default function UnifiedCourseBuilder() {
 
   useEffect(() => {
     void loadCourses();
+    fetch('/api/admin/course-builder?action=credits', { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((data) => setCreditState(data))
+      .catch(() => setCreditState(null));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (tab !== 'blueprints' || blueprints.length) return;
@@ -79,6 +90,13 @@ export default function UnifiedCourseBuilder() {
             <p className="mt-1 max-w-3xl text-sm text-slate-400">
               Build, review, govern, publish, and maintain complete courses from one authority.
             </p>
+            {creditState ? (
+              <p className="mt-2 text-sm font-bold text-amber-300">
+                {creditState.operator
+                  ? 'Platform operator workspace • usage metering exempt'
+                  : `${Number(creditState.credits?.balance ?? 0).toLocaleString()} Course Builder credits available`}
+              </p>
+            ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -142,9 +160,7 @@ export default function UnifiedCourseBuilder() {
             }}
           />
         )}
-        {tab === 'media' && (
-          <CourseInstructorMediaPanel courseId={courseId} />
-        )}
+        {tab === 'media' && <CourseInstructorMediaPanel courseId={courseId} />}
       </main>
     </div>
   );
@@ -266,7 +282,11 @@ function CreateCoursePanel({ onCreated }: { onCreated: (id: string) => void | Pr
           className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
         />
       </div>
-      {error && <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">{error}</p>}
+      {error && (
+        <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
+          {error}
+        </p>
+      )}
       <button
         type="submit"
         disabled={saving}
@@ -300,7 +320,7 @@ function BlueprintPanel({
     try {
       const res = await fetch('/api/admin/course-builder', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: courseBuilderJsonHeaders('generate-from-blueprint'),
         body: JSON.stringify({
           action: 'generate-from-blueprint',
           blueprintId: blueprint.id,
@@ -311,7 +331,8 @@ function BlueprintPanel({
         }),
       });
       const result = await res.json();
-      if (!res.ok || !result.courseId) throw new Error(result.error || 'Blueprint generation failed');
+      if (!res.ok || !result.courseId)
+        throw new Error(result.error || 'Blueprint generation failed');
       await onGenerated(result.courseId);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Blueprint generation failed');
@@ -324,14 +345,21 @@ function BlueprintPanel({
       <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
         <h2 className="text-lg font-bold">Credential blueprints</h2>
         <p className="mt-1 text-sm text-slate-400">
-          Generate through the same Course Builder authority. Blueprints provide regulated structure; Course Factory fills governed course content and media.
+          Generate through the same Course Builder authority. Blueprints provide regulated
+          structure; Course Factory fills governed course content and media.
         </p>
       </div>
-      {error && <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">{error}</p>}
+      {error && (
+        <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">
+          {error}
+        </p>
+      )}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {blueprints.map((blueprint) => (
           <div key={blueprint.id} className="rounded-xl border border-slate-800 bg-slate-900 p-5">
-            <div className="text-xs font-bold uppercase tracking-wide text-cyan-400">{blueprint.state ?? 'General'}</div>
+            <div className="text-xs font-bold uppercase tracking-wide text-cyan-400">
+              {blueprint.state ?? 'General'}
+            </div>
             <h3 className="mt-1 font-bold text-white">{blueprint.title}</h3>
             <p className="mt-2 text-sm text-slate-400">
               {blueprint.modules} modules · {blueprint.lessons} lessons
@@ -342,7 +370,11 @@ function BlueprintPanel({
               disabled={busy === blueprint.id || !selectedCourse?.program_id}
               className="mt-4 inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-slate-950 disabled:opacity-40"
             >
-              {busy === blueprint.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {busy === blueprint.id ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
               Generate governed course
             </button>
           </div>

@@ -38,7 +38,7 @@ export default async function JRIReportsPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Job Ready Indy', href: '/admin/jri' }, { label: 'Reports' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Job Ready Indy', href: '/jri' }, { label: 'Reports' }]} />
           <div className="flex justify-between items-center mt-4">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">Job Ready Indy Reports</h1>

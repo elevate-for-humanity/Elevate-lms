@@ -409,8 +409,8 @@ export default function WebhookHealthDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'System', href: '/admin/system-health' },
+            { label: 'Admin', href: '/' },
+            { label: 'System', href: '/system-health' },
             { label: 'Webhooks' },
           ]}
         />

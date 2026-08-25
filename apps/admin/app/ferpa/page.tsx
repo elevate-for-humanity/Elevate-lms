@@ -83,10 +83,10 @@ export default async function AdminFerpaPage() {
   ];
 
   const quickActions = [
-    { label: 'Manage Consent Forms', href: '/admin/documents?type=consent', icon: FileText },
-    { label: 'Review Access Requests', href: '/admin/documents?status=pending', icon: Eye },
-    { label: 'Directory Information', href: '/admin/students', icon: Users },
-    { label: 'Generate FERPA Report', href: '/admin/ferpa/audit-log', icon: Download },
+    { label: 'Manage Consent Forms', href: '/documents?type=consent', icon: FileText },
+    { label: 'Review Access Requests', href: '/documents?status=pending', icon: Eye },
+    { label: 'Directory Information', href: '/students', icon: Users },
+    { label: 'Generate FERPA Report', href: '/ferpa/audit-log', icon: Download },
   ];
 
   return (

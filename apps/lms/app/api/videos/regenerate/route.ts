@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   let lessonId: string;
   try {
@@ -30,10 +30,15 @@ export async function POST(request: NextRequest) {
     return safeError('Invalid JSON body', 400);
   }
 
-  const adminBase = (process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org').replace(/\/$/, '');
-  logger.warn('[VideoRegenerate] Legacy LMS regeneration endpoint redirected to Admin-owned renderer', {
-    lessonId,
-  });
+  const adminBase = (
+    process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org'
+  ).replace(/\/$/, '');
+  logger.warn(
+    '[VideoRegenerate] Legacy LMS regeneration endpoint redirected to Admin-owned renderer',
+    {
+      lessonId,
+    },
+  );
 
   return NextResponse.json(
     {

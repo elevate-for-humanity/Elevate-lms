@@ -62,11 +62,11 @@ export default async function CountersignMouPage({ params, searchParams }: Props
 
     if (error) {
       redirect(
-        `/admin/program-holders/${id}/countersign-mou?error=${encodeURIComponent('Failed to countersign MOU — check server logs')}`,
+        `/program-holders/${id}/countersign-mou?error=${encodeURIComponent('Failed to countersign MOU — check server logs')}`,
       );
     }
     redirect(
-      `/admin/program-holders/${id}?success=${encodeURIComponent('MOU countersigned successfully')}`,
+      `/program-holders/${id}?success=${encodeURIComponent('MOU countersigned successfully')}`,
     );
   }
 
@@ -75,9 +75,9 @@ export default async function CountersignMouPage({ params, searchParams }: Props
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'Program Holders', href: '/admin/program-holders' },
-            { label: holder.organization_name ?? 'Holder', href: `/admin/program-holders/${id}` },
+            { label: 'Admin', href: '/' },
+            { label: 'Program Holders', href: '/program-holders' },
+            { label: holder.organization_name ?? 'Holder', href: `/program-holders/${id}` },
             { label: 'Countersign MOU' },
           ]}
         />
@@ -86,7 +86,7 @@ export default async function CountersignMouPage({ params, searchParams }: Props
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
         <div className="flex items-center gap-3">
           <Link
-            href={`/admin/program-holders/${id}`}
+            href={`/program-holders/${id}`}
             className="text-slate-500 hover:text-slate-700"
           >
             <ArrowLeft className="w-5 h-5" />

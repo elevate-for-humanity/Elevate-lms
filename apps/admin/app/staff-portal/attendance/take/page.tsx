@@ -138,8 +138,8 @@ export default function TakeAttendancePage() {
         <div className="max-w-5xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: 'Staff Portal', href: '/admin/staff-portal' },
-              { label: 'Attendance', href: '/admin/staff-portal/attendance' },
+              { label: 'Staff Portal', href: '/staff-portal' },
+              { label: 'Attendance', href: '/staff-portal/attendance' },
               { label: 'Take Attendance' },
             ]}
           />

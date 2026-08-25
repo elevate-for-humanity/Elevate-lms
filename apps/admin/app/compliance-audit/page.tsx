@@ -80,9 +80,9 @@ export default async function ComplianceAuditPage() {
       {/* Quick links to related compliance sections */}
       <div className="grid sm:grid-cols-3 gap-4">
         {[
-          { label: 'FERPA Audit Log', href: '/admin/ferpa/audit-log', desc: 'Student record access log' },
-          { label: 'WIOA Compliance', href: '/admin/wioa', desc: 'WIOA Title I reporting' },
-          { label: 'Governance', href: '/admin/governance', desc: 'Legal and security governance' },
+          { label: 'FERPA Audit Log', href: '/ferpa/audit-log', desc: 'Student record access log' },
+          { label: 'WIOA Compliance', href: '/wioa', desc: 'WIOA Title I reporting' },
+          { label: 'Governance', href: '/governance', desc: 'Legal and security governance' },
         ].map(l => (
           <Link key={l.href} href={l.href}
             className="bg-white border border-slate-200 rounded-2xl p-4 hover:shadow-md transition-all group">

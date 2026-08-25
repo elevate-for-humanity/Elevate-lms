@@ -55,7 +55,7 @@ export default async function EmployerProposalPage({
         <nav className="text-sm mb-6">
           <ol className="flex items-center space-x-2 text-slate-600">
             <li>
-              <Link href="/admin" className="hover:text-slate-900">
+              <Link href="/" className="hover:text-slate-900">
                 Admin
               </Link>
             </li>
@@ -67,7 +67,7 @@ export default async function EmployerProposalPage({
             </li>
             <li>/</li>
             <li>
-              <Link href={`/admin/employers/${id}`} className="hover:text-slate-900">
+              <Link href={`/employers/${id}`} className="hover:text-slate-900">
                 {employer.name}
               </Link>
             </li>

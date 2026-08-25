@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: `Admin | Store | Clones | ${PLATFORM_DEFAULTS.orgName}`,
   description: `${PLATFORM_DEFAULTS.orgName} - Career training and workforce development programs.`,
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/store/clones',
+    canonical: 'https://admin.elevateforhumanity.org/store/clones',
   },
   robots: {
     index: false,

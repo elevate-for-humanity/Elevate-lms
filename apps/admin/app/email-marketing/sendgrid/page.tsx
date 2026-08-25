@@ -93,8 +93,8 @@ export default async function SendGridSettingsPage() {
       <div className="max-w-5xl mx-auto px-4 py-8">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'Email Marketing', href: '/admin/email-marketing' },
+            { label: 'Admin', href: '/' },
+            { label: 'Email Marketing', href: '/email-marketing' },
             { label: 'SendGrid Settings' },
           ]}
         />

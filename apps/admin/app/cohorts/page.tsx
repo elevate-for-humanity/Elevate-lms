@@ -157,7 +157,7 @@ export default async function CohortTrackerPage() {
                       <tr key={cohort.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-6 py-4">
                           <Link
-                            href={`/admin/cohorts/${cohort.id}`}
+                            href={`/cohorts/${cohort.id}`}
                             className="font-semibold text-slate-900 hover:text-brand-red-600"
                           >
                             {cohort.name}

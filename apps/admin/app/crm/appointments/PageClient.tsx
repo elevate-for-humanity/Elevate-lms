@@ -51,7 +51,7 @@ export default function AppointmentsPage() {
           <Breadcrumbs
             items={[
               { label: 'Admin', href: '/dashboard' },
-              { label: 'CRM', href: '/admin/crm' },
+              { label: 'CRM', href: '/crm' },
               { label: 'Appointments' },
             ]}
           />

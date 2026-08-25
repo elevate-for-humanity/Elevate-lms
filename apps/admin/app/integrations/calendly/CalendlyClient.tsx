@@ -121,8 +121,8 @@ export default function CalendlyClient() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <Breadcrumbs items={[
-        { label: 'Admin', href: '/admin' },
-        { label: 'Integrations', href: '/admin/integrations' },
+        { label: 'Admin', href: '/' },
+        { label: 'Integrations', href: '/integrations' },
         { label: 'Calendly' },
       ]} />
 

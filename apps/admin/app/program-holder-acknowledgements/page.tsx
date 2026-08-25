@@ -81,7 +81,7 @@ export default async function ProgramHolderAcknowledgementsPage() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
+            { label: 'Admin', href: '/' },
             { label: 'Program Holders', href: '/program-holders' },
             { label: 'Acknowledgements' },
           ]}

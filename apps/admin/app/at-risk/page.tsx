@@ -114,7 +114,7 @@ export default async function AtRiskPage() {
               return (
                 <Link
                   key={action.id}
-                  href={`/admin/email-marketing/campaigns/new?tool=${action.id}`}
+                  href={`/email-marketing/campaigns/new?tool=${action.id}`}
                   className={`flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 hover:border-${action.color}-300 hover:bg-${action.color}-50 transition-all text-center`}
                 >
                   <Icon className={`w-6 h-6 text-${action.color}-600`} />

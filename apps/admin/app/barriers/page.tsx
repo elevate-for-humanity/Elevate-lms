@@ -46,7 +46,7 @@ export default async function BarriersPage() {
         <div className="mb-8">
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-700">
-              <li><Link href="/admin" className="hover:text-primary">Admin</Link></li>
+              <li><Link href="/" className="hover:text-primary">Admin</Link></li>
               <li>/</li>
               <li className="text-slate-900 font-medium">Barriers</li>
             </ol>

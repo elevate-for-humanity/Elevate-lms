@@ -30,7 +30,7 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ skillId: 
     { onConflict: 'user_id,skill_name' },
   );
 
-  return NextResponse.redirect(new URL('/admin/staff-portal/skills', req.url));
+  return NextResponse.redirect(new URL('/staff-portal/skills', req.url));
 }
 
 export const POST = withApiAudit('/api/staff/skills/[skillId]/complete', _POST);

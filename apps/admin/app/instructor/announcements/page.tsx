@@ -29,7 +29,7 @@ export default async function InstructorAnnouncementsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Breadcrumbs items={[{ label: 'Instructor', href: '/admin/instructor' }, { label: 'Announcements' }]} />
+        <Breadcrumbs items={[{ label: 'Instructor', href: '/instructor' }, { label: 'Announcements' }]} />
         <div className="flex items-center justify-between mb-6 mt-4">
           <div className="flex items-center gap-3">
             <MessageSquare className="w-7 h-7 text-brand-blue-600" />

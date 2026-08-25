@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
                 src.includes('getCurrentUser') || src.includes('getUser') ||
                 src.includes('requireAdmin') || src.includes('requireRole') || isPublic;
               if (!hasAuth) noAuth++;
-              const isAdminRoute = full.includes('/admin/');
+              const isAdminRoute = full.includes('/');
               if (isAdminRoute && !src.includes('apiRequireAdmin') && !src.includes('requireAdmin') && !src.includes('requireRole') && !isPublic) {
                 adminNoRole++;
               }

@@ -59,7 +59,7 @@ export default async function ChartsPage() {
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-slate-700"><li><Link href="/admin" className="hover:text-primary">Admin</Link></li><li>/</li><li><Link href="/reports" className="hover:text-primary">Reports</Link></li><li>/</li><li className="text-slate-900 font-medium">Charts</li></ol></nav>
+          <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-slate-700"><li><Link href="/" className="hover:text-primary">Admin</Link></li><li>/</li><li><Link href="/reports" className="hover:text-primary">Reports</Link></li><li>/</li><li className="text-slate-900 font-medium">Charts</li></ol></nav>
           <h1 className="text-3xl font-bold text-slate-900">Charts & Visualizations</h1>
           <p className="text-slate-700 mt-2">Real-time analytics from platform data</p>
         </div>

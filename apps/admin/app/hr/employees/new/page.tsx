@@ -7,7 +7,7 @@ import { createEmployeeAction } from './actions';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/hr/employees/new' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/hr/employees/new' },
   title: 'Add Employee | Elevate For Humanity',
   description: 'Add a new employee to the system.',
 };
@@ -24,7 +24,7 @@ export default async function NewEmployeePage() {
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-700">
               <li>
-                <Link href="/admin" className="hover:text-primary">
+                <Link href="/" className="hover:text-primary">
                   Admin
                 </Link>
               </li>

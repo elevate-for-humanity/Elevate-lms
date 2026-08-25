@@ -43,19 +43,19 @@ export default async function PlatformConsolePage() {
   ]);
 
   const links = [
-    { label: 'Tenants', href: '/admin/tenants', desc: 'Organization + tenant records' },
-    { label: 'System health', href: '/admin/system-health', desc: 'Service connectivity' },
-    { label: 'Store catalog', href: '/admin/store', desc: 'Plans and add-ons' },
-    { label: 'Billing', href: '/admin/billing', desc: 'Subscriptions and invoices' },
-    { label: 'Referrals', href: '/admin/referrals', desc: 'Partner referral program' },
-    { label: 'Provisioning jobs', href: '/admin/system/jobs', desc: 'Async workspace jobs' },
+    { label: 'Tenants', href: '/tenants', desc: 'Organization + tenant records' },
+    { label: 'System health', href: '/system-health', desc: 'Service connectivity' },
+    { label: 'Store catalog', href: '/store', desc: 'Plans and add-ons' },
+    { label: 'Billing', href: '/billing', desc: 'Subscriptions and invoices' },
+    { label: 'Referrals', href: '/referrals', desc: 'Partner referral program' },
+    { label: 'Provisioning jobs', href: '/system/jobs', desc: 'Async workspace jobs' },
   ];
 
   return (
     <div className="min-h-screen bg-slate-950 p-6">
       <div className="mx-auto max-w-5xl space-y-8">
         <Breadcrumbs
-          items={[{ label: 'Admin', href: '/admin' }, { label: 'Platform Console' }]}
+          items={[{ label: 'Admin', href: '/' }, { label: 'Platform Console' }]}
         />
 
         <div>

@@ -54,13 +54,23 @@ async function logAcceptance(
 async function auditPersistedStructure() {
   const db = await requireAdminClient();
   const [courseResult, moduleResult, lessonResult, questionResult] = await Promise.all([
-    db.from('courses').select('id,slug,status,is_active,review_status,reviewed_by,reviewed_at,published_at,generation_status,generation_progress,total_lessons,program_id').eq('id', COURSE_ID).single(),
+    db
+      .from('courses')
+      .select(
+        'id,slug,status,is_active,review_status,reviewed_by,reviewed_at,published_at,generation_status,generation_progress,total_lessons,program_id',
+      )
+      .eq('id', COURSE_ID)
+      .single(),
     db.from('course_modules').select('id', { count: 'exact' }).eq('course_id', COURSE_ID),
     db.from('course_lessons').select('id', { count: 'exact' }).eq('course_id', COURSE_ID),
-    db.from('assessment_questions').select('id,course_lessons!inner(course_id)', { count: 'exact' }).eq('course_lessons.course_id', COURSE_ID),
+    db
+      .from('assessment_questions')
+      .select('id,course_lessons!inner(course_id)', { count: 'exact' })
+      .eq('course_lessons.course_id', COURSE_ID),
   ]);
 
-  if (courseResult.error || !courseResult.data) fail(`course query failed: ${courseResult.error?.message ?? 'not found'}`);
+  if (courseResult.error || !courseResult.data)
+    fail(`course query failed: ${courseResult.error?.message ?? 'not found'}`);
   if (moduleResult.error) fail(`module query failed: ${moduleResult.error.message}`);
   if (lessonResult.error) fail(`lesson query failed: ${lessonResult.error.message}`);
   if (questionResult.error) fail(`assessment query failed: ${questionResult.error.message}`);
@@ -70,7 +80,8 @@ async function auditPersistedStructure() {
   const assessments = questionResult.count ?? questionResult.data?.length ?? 0;
   if (modules !== EXPECTED_MODULES) fail(`expected ${EXPECTED_MODULES} modules; found ${modules}`);
   if (lessons !== EXPECTED_LESSONS) fail(`expected ${EXPECTED_LESSONS} lessons; found ${lessons}`);
-  if (assessments !== EXPECTED_ASSESSMENT_QUESTIONS) fail(`expected ${EXPECTED_ASSESSMENT_QUESTIONS} assessment questions; found ${assessments}`);
+  if (assessments !== EXPECTED_ASSESSMENT_QUESTIONS)
+    fail(`expected ${EXPECTED_ASSESSMENT_QUESTIONS} assessment questions; found ${assessments}`);
 
   return { db, course: courseResult.data, modules, lessons, assessments };
 }
@@ -79,7 +90,9 @@ async function reportMediaEvidence() {
   const db = await requireAdminClient();
   const { data, error } = await db
     .from('video_jobs')
-    .select('id,course_id,lesson_id,asset_kind,asset_key,status,retry_count,last_provider,last_provider_model,error_message,video_url,queued_at,started_at,completed_at,updated_at')
+    .select(
+      'id,course_id,lesson_id,asset_kind,asset_key,status,retry_count,last_provider,last_provider_model,error_message,video_url,queued_at,started_at,completed_at,updated_at',
+    )
     .eq('course_id', COURSE_ID)
     .order('asset_kind', { ascending: true })
     .order('lesson_id', { ascending: true })
@@ -115,9 +128,15 @@ async function reportMediaEvidence() {
 }
 
 async function tickCanonicalProductionWorker() {
-  const adminUrl = (process.env.ADMIN_URL || 'https://admin.elevateforhumanity.org').replace(/\/$/, '');
+  const adminUrl = (process.env.ADMIN_URL || 'https://admin.elevateforhumanity.org').replace(
+    /\/$/,
+    '',
+  );
   const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) fail('CRON_SECRET is required to request course-scoped processing from the canonical production worker');
+  if (!secret)
+    fail(
+      'CRON_SECRET is required to request course-scoped processing from the canonical production worker',
+    );
   const response = await fetch(`${adminUrl}/api/internal/videos/process-queue`, {
     method: 'POST',
     headers: {
@@ -128,7 +147,10 @@ async function tickCanonicalProductionWorker() {
     signal: AbortSignal.timeout(20_000),
   });
   const text = await response.text();
-  if (!response.ok) fail(`canonical production worker rejected course-scoped tick: HTTP ${response.status} ${text.slice(0, 500)}`);
+  if (!response.ok)
+    fail(
+      `canonical production worker rejected course-scoped tick: HTTP ${response.status} ${text.slice(0, 500)}`,
+    );
   console.log('[ESB acceptance] worker tick', text.slice(0, 1000));
 }
 
@@ -201,7 +223,9 @@ async function waitForCanonicalMedia() {
 
   await reportMediaEvidence();
   const state = await getCourseMediaState(COURSE_ID, { verifyUrls: false });
-  fail(`media timeout: complete=${state.complete}/${state.expectedTotal}, queued=${state.queued}, rendering=${state.rendering}, failed=${state.failed}, stale=${state.staleRendering}, duplicates=${state.duplicateIdentities}`);
+  fail(
+    `media timeout: complete=${state.complete}/${state.expectedTotal}, queued=${state.queued}, rendering=${state.rendering}, failed=${state.failed}, stale=${state.staleRendering}, duplicates=${state.duplicateIdentities}`,
+  );
 }
 
 function reviewOnlyIssues(issues: string[]) {
@@ -212,7 +236,10 @@ function reviewOnlyIssues(issues: string[]) {
     'AI lesson not human-approved',
     'authorized human sign-off missing',
   ];
-  return issues.length > 0 && issues.every((issue) => patterns.some((pattern) => issue.includes(pattern)));
+  return (
+    issues.length > 0 &&
+    issues.every((issue) => patterns.some((pattern) => issue.includes(pattern)))
+  );
 }
 
 async function runGovernanceAndPublish(media: Awaited<ReturnType<typeof getCourseMediaState>>) {
@@ -230,24 +257,52 @@ async function runGovernanceAndPublish(media: Awaited<ReturnType<typeof getCours
 
   if (!health.pass && reviewOnlyIssues(health.blocking_issues)) {
     if (!reviewerId) {
-      await logAcceptance(db, 'waiting_authorized_review', { blocking_issues: health.blocking_issues });
-      fail(`authorized human review required before canonical publication: ${health.blocking_issues.join(' | ')}`);
+      await logAcceptance(db, 'waiting_authorized_review', {
+        blocking_issues: health.blocking_issues,
+      });
+      fail(
+        `authorized human review required before canonical publication: ${health.blocking_issues.join(' | ')}`,
+      );
     }
 
-    await reviewCanonicalLessons({ courseId: COURSE_ID, action: 'approve', allRequired: true, notes: 'ESB production acceptance review' }, reviewerId);
-    const { data: course } = await db.from('courses').select('review_status').eq('id', COURSE_ID).single();
+    await reviewCanonicalLessons(
+      {
+        courseId: COURSE_ID,
+        action: 'approve',
+        allRequired: true,
+        notes: 'ESB production acceptance review',
+      },
+      reviewerId,
+    );
+    const { data: course } = await db
+      .from('courses')
+      .select('review_status')
+      .eq('id', COURSE_ID)
+      .single();
     if ((course?.review_status ?? 'draft') === 'draft' || course?.review_status === 'rejected') {
-      await reviewCanonicalCourse({ courseId: COURSE_ID, action: 'submit', notes: 'ESB production acceptance review' }, reviewerId);
+      await reviewCanonicalCourse(
+        { courseId: COURSE_ID, action: 'submit', notes: 'ESB production acceptance review' },
+        reviewerId,
+      );
     }
-    const { data: submitted } = await db.from('courses').select('review_status').eq('id', COURSE_ID).single();
+    const { data: submitted } = await db
+      .from('courses')
+      .select('review_status')
+      .eq('id', COURSE_ID)
+      .single();
     if (submitted?.review_status === 'in_review') {
-      await reviewCanonicalCourse({ courseId: COURSE_ID, action: 'approve', notes: 'ESB production acceptance review' }, reviewerId);
+      await reviewCanonicalCourse(
+        { courseId: COURSE_ID, action: 'approve', notes: 'ESB production acceptance review' },
+        reviewerId,
+      );
     }
     health = await runPersistedCourseProcurementHealthCheckWithClient(db, COURSE_ID);
   }
 
-  if (!health.pass) fail(`governance/procurement gate failed: ${health.blocking_issues.join(' | ')}`);
-  if (!reviewerId) fail('COURSE_REVIEWER_ID is required for canonical publication audit attribution');
+  if (!health.pass)
+    fail(`governance/procurement gate failed: ${health.blocking_issues.join(' | ')}`);
+  if (!reviewerId)
+    fail('COURSE_REVIEWER_ID is required for canonical publication audit attribution');
 
   const published = await publishPersistedCourseWithClient({
     db,
@@ -255,8 +310,13 @@ async function runGovernanceAndPublish(media: Awaited<ReturnType<typeof getCours
     actorId: reviewerId,
     label: 'ESB canonical production acceptance',
   });
-  if (!published.ok) fail(`canonical publisher blocked ESB: ${(published.blocking_issues ?? []).join(' | ') || published.error}`);
-  await logAcceptance(db, 'canonical_publish_passed', { procurement_gate: published.procurement_gate });
+  if (!published.ok)
+    fail(
+      `canonical publisher blocked ESB: ${(published.blocking_issues ?? []).join(' | ') || published.error}`,
+    );
+  await logAcceptance(db, 'canonical_publish_passed', {
+    procurement_gate: published.procurement_gate,
+  });
 }
 
 async function main() {
@@ -281,26 +341,38 @@ async function main() {
   // Studio's controller is the application-facing authority. Existing ESB
   // content is repaired missing-only; it is never replaced by acceptance.
   const build = await courseBuilderController({
+    courseId: COURSE_ID,
     programId: structure.course.program_id ?? undefined,
     blueprint,
     mode: 'missing-only',
     contentSource: 'curriculum_lessons',
     videoMode: 'queue',
   });
-  if (!build.ok || !build.courseId) fail(`Course Builder failed: ${(build.errors ?? []).join('; ') || 'unknown error'}`);
-  if (build.courseId !== COURSE_ID) fail(`Course Builder attempted to change canonical ESB identity: ${build.courseId}`);
+  if (!build.ok || !build.courseId)
+    fail(`Course Builder failed: ${(build.errors ?? []).join('; ') || 'unknown error'}`);
+  if (build.courseId !== COURSE_ID)
+    fail(`Course Builder attempted to change canonical ESB identity: ${build.courseId}`);
 
   const afterRepair = await auditPersistedStructure();
   await reportMediaEvidence();
   const media = await waitForCanonicalMedia();
-  if (media.requiredLessonVideos !== EXPECTED_MAIN_VIDEOS) fail(`required lesson videos ${media.requiredLessonVideos}/${EXPECTED_MAIN_VIDEOS}`);
-  if (media.requiredMicroclips !== EXPECTED_MICROCLIPS) fail(`required microclips ${media.requiredMicroclips}/${EXPECTED_MICROCLIPS}`);
-  if (media.expectedTotal !== EXPECTED_MEDIA || media.playable !== EXPECTED_MEDIA) fail(`playable media ${media.playable}/${EXPECTED_MEDIA}`);
+  if (media.requiredLessonVideos !== EXPECTED_MAIN_VIDEOS)
+    fail(`required lesson videos ${media.requiredLessonVideos}/${EXPECTED_MAIN_VIDEOS}`);
+  if (media.requiredMicroclips !== EXPECTED_MICROCLIPS)
+    fail(`required microclips ${media.requiredMicroclips}/${EXPECTED_MICROCLIPS}`);
+  if (media.expectedTotal !== EXPECTED_MEDIA || media.playable !== EXPECTED_MEDIA)
+    fail(`playable media ${media.playable}/${EXPECTED_MEDIA}`);
 
   await runGovernanceAndPublish(media);
   const finalState = await auditPersistedStructure();
-  if (finalState.course.status !== 'published' || !finalState.course.is_active || !finalState.course.published_at) {
-    fail(`publication verification failed: status=${finalState.course.status}, active=${finalState.course.is_active}, published_at=${finalState.course.published_at ?? 'null'}`);
+  if (
+    finalState.course.status !== 'published' ||
+    !finalState.course.is_active ||
+    !finalState.course.published_at
+  ) {
+    fail(
+      `publication verification failed: status=${finalState.course.status}, active=${finalState.course.is_active}, published_at=${finalState.course.published_at ?? 'null'}`,
+    );
   }
 
   await logAcceptance(finalState.db, 'passed', {

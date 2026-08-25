@@ -15,7 +15,7 @@ async function _POST(req: Request) {
     if (rateLimited) return rateLimited;
 
     const auth = await apiRequireAdmin(req);
-    if (auth instanceof NextResponse) return auth;
+    if (auth.error) return auth.error;
 
     const body = await req.json();
     const { apprentice_id, rapids_id, status, registration_date, completion_date } = body;

@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: `Admin | Crm | Campaigns | New | ${PLATFORM_DEFAULTS.orgName}`,
   description: `${PLATFORM_DEFAULTS.orgName} - Career training and workforce development programs.`,
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/crm/campaigns/new',
+    canonical: 'https://admin.elevateforhumanity.org/crm/campaigns/new',
   },
   robots: {
     index: false,

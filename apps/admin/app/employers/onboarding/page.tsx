@@ -51,7 +51,7 @@ export default async function EmployerOnboardingReview() {
     <div className="min-h-screen bg-white py-8 px-4">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Onboarding' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Onboarding' }]} />
       </div>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
@@ -101,7 +101,7 @@ export default async function EmployerOnboardingReview() {
                       </td>
                       <td className="px-6 py-4">
                         <Link
-                          href={`/admin/employers/onboarding/${onboarding.id}`}
+                          href={`/employers/onboarding/${onboarding.id}`}
                           className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
                         >
                           Review →

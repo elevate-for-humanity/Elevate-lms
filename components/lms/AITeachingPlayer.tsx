@@ -12,6 +12,7 @@ interface Props {
   lessonTitle: string;
   instructorName: string;
   instructorImage: string;
+  visualImage?: string;
   slides: TeachingSlide[];
 }
 
@@ -20,6 +21,7 @@ export default function AITeachingPlayer({
   lessonTitle,
   instructorName,
   instructorImage,
+  visualImage,
   slides,
 }: Props) {
   const [index, setIndex] = useState(0);
@@ -82,6 +84,18 @@ export default function AITeachingPlayer({
 
         <div className="flex flex-col justify-between p-7 sm:p-10">
           <div>
+            {visualImage ? (
+              <div className="relative mb-6 aspect-[16/7] overflow-hidden rounded-2xl border border-white bg-white shadow-md">
+                <Image
+                  src={visualImage}
+                  alt={`Visual for ${lessonTitle}`}
+                  fill
+                  sizes="(min-width: 1024px) 56vw, 100vw"
+                  unoptimized
+                  className="object-cover"
+                />
+              </div>
+            ) : null}
             <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-700">
               {courseTitle}
             </p>
@@ -149,7 +163,8 @@ export default function AITeachingPlayer({
           </div>
           {naturalVoice.error ? (
             <p className="mt-3 text-sm font-semibold text-red-800" role="alert">
-              Natural instructor voice is temporarily unavailable. The complete lesson remains available in captions.
+              Natural instructor voice is temporarily unavailable. The complete lesson remains
+              available in captions.
             </p>
           ) : null}
         </div>

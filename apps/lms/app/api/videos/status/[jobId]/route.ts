@@ -27,7 +27,7 @@ export async function GET(
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   const { jobId } = await params;
   if (!jobId) return safeError('job_id is required', 400);

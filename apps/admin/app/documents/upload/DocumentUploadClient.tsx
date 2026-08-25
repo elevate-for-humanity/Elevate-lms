@@ -152,7 +152,7 @@ export function DocumentUploadClient() {
       <nav className="text-sm mb-6">
         <ol className="flex items-center gap-2 text-slate-700">
           <li>
-            <Link href="/admin" className="hover:text-slate-900">
+            <Link href="/" className="hover:text-slate-900">
               Admin
             </Link>
           </li>

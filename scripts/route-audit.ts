@@ -46,7 +46,6 @@ const BANNED_PAGE_PREFIXES = [
   'learners',
   'dashboards',
   'hvac/lesson',
-  'cosmetology-host-shop',
 ];
 
 const BANNED_EXACT_PAGES = new Set([

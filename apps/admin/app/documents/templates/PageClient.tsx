@@ -702,7 +702,7 @@ export default function DocumentTemplatesPage() {
         <nav className="text-sm mb-4">
           <ol className="flex items-center space-x-2 text-slate-700">
             <li>
-              <Link href="/admin" className="hover:text-brand-blue-600">
+              <Link href="/" className="hover:text-brand-blue-600">
                 Admin
               </Link>
             </li>

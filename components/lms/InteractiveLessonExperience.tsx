@@ -17,6 +17,7 @@ import {
   Video,
 } from 'lucide-react';
 import TextToSpeech from '@/components/TextToSpeech';
+import CommercialLessonExperience from '@/components/lms/CommercialLessonExperience';
 
 type Interaction = {
   id: string;
@@ -38,6 +39,7 @@ type Payload = {
   visualPrompt?: string | null;
   practicalTask?: any;
   interactiveVideo?: any;
+  experience?: Record<string, unknown> | null;
 };
 
 export default function InteractiveLessonExperience({
@@ -130,7 +132,8 @@ export default function InteractiveLessonExperience({
       ) : null}
 
       {payload?.visualPrompt ? <VisualBrief text={payload.visualPrompt} /> : null}
-      {flashcards.length ? <Flashcards cards={flashcards} /> : null}
+      {payload?.experience ? <CommercialLessonExperience experience={payload.experience} /> : null}
+      {flashcards.length && !payload?.experience ? <Flashcards cards={flashcards} /> : null}
 
       {interactions.map((interaction) => {
         if (interaction.type === 'knowledge-check')

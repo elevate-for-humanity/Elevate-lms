@@ -84,9 +84,9 @@ export default async function SystemJobsPage() {
   const recent = (recentCompleted ?? []) as JobRow[];
 
   const breadcrumbs = [
-    { label: 'Admin', href: '/admin' },
-    { label: 'System', href: '/admin/system' },
-    { label: 'Background Jobs', href: '/admin/system/jobs' },
+    { label: 'Admin', href: '/' },
+    { label: 'System', href: '/system' },
+    { label: 'Background Jobs', href: '/system/jobs' },
   ];
 
   return (

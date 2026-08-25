@@ -71,7 +71,7 @@ export default async function CRMHubPage() {
     <div className="min-h-screen bg-white py-8">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Crm' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Crm' }]} />
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}

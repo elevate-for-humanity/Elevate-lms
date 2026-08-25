@@ -206,7 +206,7 @@ export default async function ContactsPage() {
                     Last contact: {contact.lastContact}
                   </span>
                   <Link
-                    href={`/admin/crm/contacts/${contact.id}`}
+                    href={`/crm/contacts/${contact.id}`}
                     className="text-brand-blue-600 text-sm font-medium hover:text-brand-blue-700"
                   >
                     View Details

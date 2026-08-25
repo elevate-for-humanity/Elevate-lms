@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/staff-portal/qa-checklist',
+    canonical: 'https://admin.elevateforhumanity.org/staff-portal/qa-checklist',
   },
   title: 'QA Checklist',
   description: 'Daily and weekly quality assurance checklists for staff.',
@@ -45,7 +45,7 @@ export default async function QAChecklistPage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Staff Portal', href: '/admin/staff-portal' }, { label: 'QA Checklist' }]}
+            items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'QA Checklist' }]}
           />
         </div>
       </div>

@@ -45,8 +45,8 @@ export default async function InstructorAddStudentPage() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[
-            { label: 'Instructor', href: '/admin/instructor' },
-            { label: 'Students', href: '/admin/instructor/students' },
+            { label: 'Instructor', href: '/instructor' },
+            { label: 'Students', href: '/instructor/students' },
             { label: 'Add Student' },
           ]}
         />

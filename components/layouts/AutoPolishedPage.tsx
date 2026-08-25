@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Flame } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export type AutoPolishedPageProps = {
   route: string; // e.g. "/lms/dashboard"
@@ -363,8 +364,14 @@ function getAutoConfig(section: string, label: string, route: string): AutoConfi
         audience: 'Instructors, facilitators, and coaches',
         shortTagline: 'Give educators the tools they deserve, not just a login.',
         description: `The "${baseLabel}" page supports instructors and facilitators managing classes, communication, and grading on the platform.`,
-        primaryCta: { href: '/admin/instructor/dashboard', label: 'Open instructor dashboard' },
-        secondaryCta: { href: '/admin/instructor/analytics', label: 'View teaching analytics' },
+        primaryCta: {
+          href: getAdminUrl('/instructor/dashboard'),
+          label: 'Open instructor dashboard',
+        },
+        secondaryCta: {
+          href: getAdminUrl('/instructor/analytics'),
+          label: 'View teaching analytics',
+        },
         bullets: [
           'Keep track of sections, assignments, and attendance in one place',
           'See which students may need additional support early',
@@ -443,7 +450,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center rounded-full bg-white/20 px-3 py-2 text-xs font-bold text-slate-900 animate-pulse">
-                <Flame className="w-4 h-4 mr-1"/> NOW ENROLLING
+                <Flame className="w-4 h-4 mr-1" /> NOW ENROLLING
               </span>
               <p className="text-white font-semibold text-sm sm:text-base">
                 Free Career Training - 100% Government Funded • Start in 2 Weeks
@@ -469,7 +476,8 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
           sizes="100vw"
           className="object-cover object-top"
           priority
-          quality={85} placeholder="empty"
+          quality={85}
+          placeholder="empty"
         />
 
         <div className="relative h-full flex items-center">

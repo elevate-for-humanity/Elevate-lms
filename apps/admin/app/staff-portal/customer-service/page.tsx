@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/staff-portal/customer-service',
+    canonical: 'https://admin.elevateforhumanity.org/staff-portal/customer-service',
   },
   title: 'Customer Service',
   description: 'Manage customer service tickets and protocols.',
@@ -42,7 +42,7 @@ export default async function CustomerServicePage() {
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: 'Staff Portal', href: '/admin/staff-portal' },
+              { label: 'Staff Portal', href: '/staff-portal' },
               { label: 'Customer Service' },
             ]}
           />

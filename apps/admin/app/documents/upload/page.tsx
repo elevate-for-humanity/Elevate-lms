@@ -5,7 +5,7 @@ import { DocumentUploadClient } from './DocumentUploadClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/documents/upload' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/documents/upload' },
   title: 'Upload Documents | Elevate For Humanity',
   description: 'Upload documents and files to the document center.',
 };

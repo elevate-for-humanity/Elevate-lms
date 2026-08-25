@@ -39,7 +39,7 @@ export default function NavEditorClient() {
       if (!Array.isArray(section.items)) throw new Error(`Section "${section.label}" needs an items array.`);
       for (const item of section.items) {
         if (!item.label || !item.href) throw new Error(`Item in "${section.label}" is missing label or href.`);
-        if (!item.href.startsWith('/admin')) throw new Error(`href "${item.href}" must start with /admin.`);
+        if (!item.href.startsWith('/')) throw new Error(`href "${item.href}" must start with /admin.`);
       }
     }
     return parsed as NavSection[];

@@ -71,7 +71,7 @@ export default async function SeoIndexingPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <Breadcrumbs
-        items={[{ label: 'Governance', href: '/admin/governance' }, { label: 'SEO & Indexing' }]}
+        items={[{ label: 'Governance', href: '/governance' }, { label: 'SEO & Indexing' }]}
       />
       {/* Header */}
       <div className="bg-slate-900 text-white py-12">

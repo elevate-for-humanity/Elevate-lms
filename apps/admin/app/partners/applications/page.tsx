@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/partners/applications',
+    canonical: 'https://admin.elevateforhumanity.org/partners/applications',
   },
   title: 'Partner Applications | Elevate For Humanity',
   description: 'Review and process partner applications.',
@@ -87,7 +87,7 @@ export default async function PartnerApplicationsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <Link href={`/admin/partners/applications/${app.id}`}
+                      <Link href={`/partners/applications/${app.id}`}
                         className="text-xs px-3 py-1.5 border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-700">
                         View / Edit
                       </Link>

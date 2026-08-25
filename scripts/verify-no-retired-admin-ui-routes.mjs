@@ -28,7 +28,7 @@ if (fs.existsSync(retiredTree)) {
 for (const configPath of [
   'apps/admin/next.config.mjs',
   'apps/lms/next.config.mjs',
-  'apps/marketing/next.config.js',
+  'apps/marketing/next.config.mjs',
 ]) {
   const config = read(configPath);
   for (const forbidden of ["source: '/admin'", "source: '/admin/", "source: '/dev-studio/:path*'"]) {

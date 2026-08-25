@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: `Admin | Live chat | ${PLATFORM_DEFAULTS.orgName}`,
   description: `${PLATFORM_DEFAULTS.orgName} - Career training and workforce development programs.`,
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/live-chat',
+    canonical: 'https://admin.elevateforhumanity.org/live-chat',
   },
   robots: {
     index: false,

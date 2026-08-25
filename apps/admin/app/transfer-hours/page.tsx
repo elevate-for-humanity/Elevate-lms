@@ -70,7 +70,7 @@ export default async function TransferHoursPage() {
     <div className="min-h-screen bg-white p-8">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Transfer Hours' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Transfer Hours' }]} />
       </div>
       <div className="max-w-7xl mx-auto">
         {/* Header */}

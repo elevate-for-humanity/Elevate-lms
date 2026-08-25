@@ -42,7 +42,7 @@ export default async function ExportPage({
 
   const { data: runs } = await runQuery;
   const run = runs?.[0];
-  if (!run) redirect(`/admin/contracts/${id}`);
+  if (!run) redirect(`/contracts/${id}`);
 
   // Load previous exports
   const { data: exports } = await db

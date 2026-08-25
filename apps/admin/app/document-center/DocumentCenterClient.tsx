@@ -166,7 +166,7 @@ export function DocumentCenterClient({
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Document Center' }]} />
+      <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Document Center' }]} />
 
       <div className="flex items-center justify-between mt-6 mb-8">
         <div>

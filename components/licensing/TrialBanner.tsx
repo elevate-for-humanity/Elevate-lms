@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Clock, ArrowRight, X, Circle } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 interface TrialBannerProps {
   expiresAt: Date;
@@ -115,7 +116,9 @@ export function TrialBanner({
           {/* Right: Actions */}
           <div className="flex items-center gap-3">
             <Link
-              href={`/admin/licenses?reason=${isExpired ? 'expired' : 'upgrade'}&license_id=${licenseId}&tenant_id=${tenantId}`}
+              href={getAdminUrl(
+                `/licenses?reason=${isExpired ? 'expired' : 'upgrade'}&license_id=${licenseId}&tenant_id=${tenantId}`,
+              )}
               className={`inline-flex items-center gap-2 ${buttonColor} text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors`}
             >
               {isExpired ? 'Subscribe Now' : 'Upgrade'}
@@ -210,7 +213,7 @@ export function TrialBadge({ expiresAt, licenseId }: { expiresAt: Date; licenseI
 
   return (
     <Link
-      href={`/admin/licenses?license_id=${licenseId}`}
+      href={getAdminUrl(`/licenses?license_id=${licenseId}`)}
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeColor} hover:opacity-80 transition-opacity`}
     >
       <Clock className="w-3.5 h-3.5" />

@@ -236,7 +236,7 @@ export default async function PayoutQueuePage({
           {FILTERS.map((f) => (
             <Link
               key={f.key}
-              href={'/admin/payout-queue?status=' + encodeURIComponent(f.key)}
+              href={'/payout-queue?status=' + encodeURIComponent(f.key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 filterStatus === f.key
                   ? 'bg-slate-900 text-white'

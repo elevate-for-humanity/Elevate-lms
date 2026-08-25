@@ -325,7 +325,7 @@ export default function AutomaticCourseBuilder() {
               </dl>
               <div className="mt-4 flex gap-4">
                 <button
-                  onClick={() => router.push(`/admin/curriculum/${result.course_id}`)}
+                  onClick={() => router.push(`/curriculum/${result.course_id}`)}
                   className="text-sm font-semibold text-brand-green-700 hover:text-brand-green-800"
                 >
                   Review in Curriculum Builder →

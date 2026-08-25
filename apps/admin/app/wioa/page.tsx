@@ -210,7 +210,7 @@ export default async function WioaPage() {
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <Link
-                          href={`/admin/wioa/${p.id}`}
+                          href={`/wioa/${p.id}`}
                           className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
                         >
                           View <ArrowRight className="w-3 h-3" />

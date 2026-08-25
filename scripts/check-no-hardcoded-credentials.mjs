@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const trackedFiles = execFileSync('git', ['ls-files', '-z'], { encoding: 'utf8' })
   .split('\0')
@@ -19,6 +19,9 @@ const secretPatterns = [
 
 const violations = [];
 for (const file of trackedFiles) {
+  // A tracked file can be intentionally removed in the release diff. Deleted
+  // files cannot ship credentials and must not make the audit itself crash.
+  if (!existsSync(file)) continue;
   const source = readFileSync(file, 'utf8');
   for (const [label, pattern] of secretPatterns) {
     pattern.lastIndex = 0;

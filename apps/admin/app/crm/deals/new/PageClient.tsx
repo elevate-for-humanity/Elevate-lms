@@ -60,8 +60,8 @@ export default function NewDealPage() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'CRM', href: '/admin/crm' },
+            { label: 'Admin', href: '/' },
+            { label: 'CRM', href: '/crm' },
             { label: 'New Deal' },
           ]}
         />

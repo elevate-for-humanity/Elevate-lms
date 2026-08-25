@@ -56,14 +56,14 @@ export default async function ProgramCatalogPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Catalog' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Catalog' }]} />
       </div>
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-2 text-sm text-slate-700 mb-2">
-              <Link href="/admin" className="hover:text-slate-900">
+              <Link href="/" className="hover:text-slate-900">
                 Admin
               </Link>
               <span>/</span>

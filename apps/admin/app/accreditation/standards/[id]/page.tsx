@@ -39,8 +39,8 @@ export default async function AccreditationStandardPage({ params }: { params: Pr
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Accreditation', href: '/admin/accreditation' },
+          { label: 'Admin', href: '/' },
+          { label: 'Accreditation', href: '/accreditation' },
           { label: standard.name },
         ]} />
       </div>

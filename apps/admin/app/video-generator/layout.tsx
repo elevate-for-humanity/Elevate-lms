@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: `Admin | Video generator | ${PLATFORM_DEFAULTS.orgName}`,
   description: `${PLATFORM_DEFAULTS.orgName} - Career training and workforce development programs.`,
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/video-generator',
+    canonical: 'https://admin.elevateforhumanity.org/video-generator',
   },
   robots: {
     index: false,

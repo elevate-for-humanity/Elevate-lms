@@ -65,7 +65,7 @@ export default async function WOTCAdminPage() {
     <div className="min-h-screen bg-white p-8">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Wotc' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Wotc' }]} />
       </div>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
@@ -214,7 +214,7 @@ export default async function WOTCAdminPage() {
                     </td>
                     <td className="px-6 py-4">
                       <Link
-                        href={`/admin/wotc/${app.id}`}
+                        href={`/wotc/${app.id}`}
                         className="px-4 py-2 bg-brand-blue-600 text-white text-sm rounded-lg hover:bg-brand-blue-700 transition"
                       >
                         View

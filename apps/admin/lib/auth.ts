@@ -19,7 +19,7 @@ export async function requireAuth(requiredRoles?: string[]): Promise<AuthUser> {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?redirect=/admin');
+    redirect('/login?redirect=/');
   }
 
   const { data: profile } = await supabase

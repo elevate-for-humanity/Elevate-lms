@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/payroll-cards',
+    canonical: 'https://admin.elevateforhumanity.org/payroll-cards',
   },
   title: 'Payroll Cards | Elevate For Humanity',
   description: 'Manage participant payroll cards.',
@@ -35,7 +35,7 @@ export default async function PayrollCardsPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Payroll Cards' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Payroll Cards' }]} />
       </div>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">

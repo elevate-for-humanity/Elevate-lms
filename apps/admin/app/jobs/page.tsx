@@ -90,7 +90,7 @@ export default async function JobsPage() {
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Jobs' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Jobs' }]} />
         </div>
       </div>
 
@@ -205,21 +205,21 @@ export default async function JobsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <Link
-                        href={`/admin/jobs/${job.id}`}
+                        href={`/jobs/${job.id}`}
                         className="p-2 hover:bg-slate-100 rounded-lg"
                         title="View"
                       >
                         <Eye className="w-4 h-4 text-slate-700" />
                       </Link>
                       <Link
-                        href={`/admin/jobs/${job.id}/edit`}
+                        href={`/jobs/${job.id}/edit`}
                         className="p-2 hover:bg-slate-100 rounded-lg"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4 text-slate-700" />
                       </Link>
                       <Link
-                        href={`/admin/jobs/${job.id}/delete`}
+                        href={`/jobs/${job.id}/delete`}
                         className="p-2 hover:bg-brand-red-50 rounded-lg"
                         title="Delete"
                       >

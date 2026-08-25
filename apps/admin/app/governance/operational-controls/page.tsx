@@ -62,7 +62,7 @@ export default async function OperationalControlsPage() {
       {/* Hero Image */}
       <Breadcrumbs
         items={[
-          { label: 'Governance', href: '/admin/governance' },
+          { label: 'Governance', href: '/governance' },
           { label: 'Operational Controls' },
         ]}
       />

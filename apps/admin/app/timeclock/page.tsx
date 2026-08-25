@@ -196,7 +196,7 @@ export default async function TimeclockPage({
         {tabs.map((t) => (
           <Link
             key={t.key}
-            href={`/admin/timeclock?tab=${t.key}${t.key === 'day' ? `&date=${dateFilter}` : ''}`}
+            href={`/timeclock?tab=${t.key}${t.key === 'day' ? `&date=${dateFilter}` : ''}`}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
               tab === t.key
                 ? 'border-slate-900 text-slate-900'
@@ -280,7 +280,7 @@ export default async function TimeclockPage({
           {/* Date picker */}
           <div className="flex items-center gap-3">
             <Calendar className="w-4 h-4 text-slate-400" />
-            <form method="get" action="/admin/timeclock" className="flex items-center gap-2">
+            <form method="get" action="/timeclock" className="flex items-center gap-2">
               <input type="hidden" name="tab" value="day" />
               <input
                 type="date"
@@ -418,7 +418,7 @@ export default async function TimeclockPage({
                       </td>
                       <td className="px-4 py-3">
                         <Link
-                          href={`/admin/apprenticeships?entry=${r.id}`}
+                          href={`/apprenticeships?entry=${r.id}`}
                           className="text-xs text-blue-600 hover:underline whitespace-nowrap"
                         >
                           Review →

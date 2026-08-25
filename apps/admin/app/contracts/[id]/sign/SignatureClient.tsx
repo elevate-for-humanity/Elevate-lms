@@ -141,13 +141,13 @@ export default function SignatureClient({
         </p>
         <div className="flex justify-center gap-3">
           <Link
-            href={`/admin/contracts/${contractId}/export?run=${runId}`}
+            href={`/contracts/${contractId}/export?run=${runId}`}
             className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700 transition-colors"
           >
             Export document <ChevronRight className="w-4 h-4" />
           </Link>
           <Link
-            href={`/admin/contracts/${contractId}`}
+            href={`/contracts/${contractId}`}
             className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
           >
             Back to contract
@@ -161,7 +161,7 @@ export default function SignatureClient({
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div>
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
-          <Link href={`/admin/contracts/${contractId}`} className="hover:text-slate-700 flex items-center gap-1">
+          <Link href={`/contracts/${contractId}`} className="hover:text-slate-700 flex items-center gap-1">
             <ArrowLeft className="w-3 h-3" /> {contractTitle}
           </Link>
           <ChevronRight className="w-3 h-3" />
@@ -180,7 +180,7 @@ export default function SignatureClient({
             </p>
             <p className="text-xs text-amber-700 mt-0.5">
               You can sign now, but the exported document will have blank fields.{' '}
-              <Link href={`/admin/contracts/${contractId}/prefill?run=${runId}`} className="underline">
+              <Link href={`/contracts/${contractId}/prefill?run=${runId}`} className="underline">
                 Review fields first
               </Link>
             </p>
@@ -278,7 +278,7 @@ export default function SignatureClient({
           >
             {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : <><PenLine className="w-4 h-4" /> Apply signature</>}
           </button>
-          <Link href={`/admin/contracts/${contractId}/prefill?run=${runId}`}
+          <Link href={`/contracts/${contractId}/prefill?run=${runId}`}
             className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
             Back to review
           </Link>

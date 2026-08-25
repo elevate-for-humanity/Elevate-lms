@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { logger } from '@/lib/logger';
+import { getAdminUrl } from '@/lib/config/admin-url';
 import {
   Video,
   FileText,
@@ -203,7 +204,7 @@ export function ModuleListForProgram({
           <p className="text-slate-500 mb-4">No modules defined for this program yet.</p>
           {editable && (
             <Link
-              href={`/admin/programs/${programId}/modules/new`}
+              href={getAdminUrl(`/programs/${programId}/modules/new`)}
               className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Plus className="w-4 h-4" />
@@ -331,7 +332,7 @@ export function ModuleListForProgram({
 
                     {editable && (
                       <Link
-                        href={`/admin/programs/${programId}/modules/${module.id}/edit`}
+                        href={getAdminUrl(`/programs/${programId}/modules/${module.id}/edit`)}
                         className="text-xs text-slate-500 hover:text-slate-700"
                       >
                         Edit Module
@@ -367,7 +368,7 @@ export function ModuleListForProgram({
 
       {editable && modules.length > 0 && (
         <Link
-          href={`/admin/programs/${programId}/modules/new`}
+          href={getAdminUrl(`/programs/${programId}/modules/new`)}
           className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-brand-blue-500 hover:text-brand-blue-600 transition-colors"
         >
           <Plus className="w-4 h-4" />

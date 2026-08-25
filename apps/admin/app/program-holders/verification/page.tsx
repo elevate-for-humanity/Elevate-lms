@@ -87,7 +87,7 @@ export default async function ProgramHolderVerificationPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Verification' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Verification' }]} />
       </div>
       {/* Header */}
       <div className="bg-white border-b">

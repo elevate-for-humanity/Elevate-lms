@@ -141,7 +141,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ code: 
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-semibold text-slate-800">Courses ({courseRows.length})</h2>
             <Link
-              href={`/admin/courses/create?program=${program.id}`}
+              href={`/courses/create?program=${program.id}`}
               className="text-sm text-blue-600 hover:underline"
             >
               + Add Course
@@ -173,7 +173,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ code: 
                       {c.status}
                     </span>
                     <Link
-                      href={`/admin/courses/${c.id}`}
+                      href={`/courses/${c.id}`}
                       className="inline-flex items-center gap-1 text-blue-600 hover:underline text-sm"
                     >
                       <Edit3 className="w-3.5 h-3.5" /> Edit

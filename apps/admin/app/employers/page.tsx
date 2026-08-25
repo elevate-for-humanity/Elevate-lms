@@ -72,7 +72,7 @@ export default async function AdminEmployersPage() {
             {employers.map((e: any) => (
               <Link
                 key={e.id}
-                href={`/admin/employers/${e.id}`}
+                href={`/employers/${e.id}`}
                 className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:border-brand-blue-300 hover:shadow-md transition-all group"
               >
                 <div className="flex items-start justify-between mb-3">

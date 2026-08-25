@@ -24,7 +24,7 @@ export default async function NewAffiliatePage() {
           <Breadcrumbs
             items={[
               { label: 'Admin', href: '/dashboard' },
-              { label: 'Affiliates', href: '/admin/affiliates' },
+              { label: 'Affiliates', href: '/affiliates' },
               { label: 'New Affiliate' },
             ]}
           />

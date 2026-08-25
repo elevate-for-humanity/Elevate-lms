@@ -200,7 +200,7 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ i
           {tenant.contact_email && <p><span className="font-medium text-slate-700">Contact:</span> {tenant.contact_email}</p>}
           {tenant.cloned_from && (
             <p><span className="font-medium text-slate-700">Cloned from:</span>{' '}
-              <Link href={`/admin/tenants/${tenant.cloned_from}`} className="text-brand-blue-600 hover:underline font-mono">
+              <Link href={`/tenants/${tenant.cloned_from}`} className="text-brand-blue-600 hover:underline font-mono">
                 {tenant.cloned_from}
               </Link>
             </p>

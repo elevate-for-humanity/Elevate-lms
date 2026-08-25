@@ -108,7 +108,7 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
       <div className="flex items-center justify-between mb-6">
         <div>
           <nav className="text-xs text-slate-400 mb-1">
-            <Link href="/admin" className="hover:text-slate-700">Admin</Link>
+            <Link href="/" className="hover:text-slate-700">Admin</Link>
             {' / '}
             <span className="text-slate-700 font-medium">MOUs</span>
           </nav>
@@ -200,11 +200,11 @@ export default function MouAdminClient({ partnerMous, mouCount, templates, signa
                   </div>
                   {expandedId === mou.id && (
                     <div className="px-5 pb-4 pt-2 bg-slate-50 border-t border-slate-100 flex gap-2">
-                      <Link href={`/admin/mou/${mou.id}`}
+                      <Link href={`/mou/${mou.id}`}
                         className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 bg-white text-slate-700 text-xs font-medium rounded-lg hover:bg-slate-50">
                         <Eye className="w-3 h-3" /> View
                       </Link>
-                      <Link href={`/admin/mou/${mou.id}/edit`}
+                      <Link href={`/mou/${mou.id}/edit`}
                         className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 bg-white text-slate-700 text-xs font-medium rounded-lg hover:bg-slate-50">
                         <Edit3 className="w-3 h-3" /> Edit
                       </Link>

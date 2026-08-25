@@ -43,21 +43,21 @@ const MAIN_NAV_CARDS: NavCard[] = [
   {
     title: 'Courses',
     description: 'Build and manage course curriculum, lessons, quizzes, and labs.',
-    href: '/admin/courses',
+    href: '/courses',
     icon: <BookOpen className="w-6 h-6" />,
     color: 'bg-brand-purple-600',
   },
   {
     title: 'Credentials',
     description: 'Issue and verify certifications, badges, and credentials.',
-    href: '/admin/certificates',
+    href: '/certificates',
     icon: <Award className="w-6 h-6" />,
     color: 'bg-brand-orange-600',
   },
   {
     title: 'Reports',
     description: 'Analytics on enrollment, revenue, compliance, and program performance.',
-    href: '/admin/reports',
+    href: '/reports',
     icon: <BarChart3 className="w-6 h-6" />,
     color: 'bg-brand-red-600',
   },
@@ -73,9 +73,9 @@ const MAIN_NAV_CARDS: NavCard[] = [
 const QUICK_ACTIONS = [
   { label: 'Add New Student', href: '/students/new', icon: <Users className="w-4 h-4" /> },
   { label: 'Create Program', href: '/programs/new', icon: <GraduationCap className="w-4 h-4" /> },
-  { label: 'Schedule Orientation', href: '/admin/operations', icon: <Activity className="w-4 h-4" /> },
-  { label: 'View Analytics', href: '/admin/analytics', icon: <BarChart3 className="w-4 h-4" /> },
-  { label: 'System Settings', href: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
+  { label: 'Schedule Orientation', href: '/operations', icon: <Activity className="w-4 h-4" /> },
+  { label: 'View Analytics', href: '/analytics', icon: <BarChart3 className="w-4 h-4" /> },
+  { label: 'System Settings', href: '/settings', icon: <Settings className="w-4 h-4" /> },
   { label: 'Compliance Reports', href: '/compliance', icon: <Shield className="w-4 h-4" /> },
 ];
 
@@ -190,11 +190,11 @@ export default async function AdminHomePage() {
         <h2 className="text-xl font-semibold text-slate-900 mb-6">Additional Tools</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[
-            { label: 'Settings', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
+            { label: 'Settings', href: '/settings', icon: <Settings className="w-5 h-5" /> },
             { label: 'Compliance', href: '/compliance', icon: <Shield className="w-5 h-5" /> },
-            { label: 'Notifications', href: '/admin/notifications', icon: <Bell className="w-5 h-5" /> },
-            { label: 'Documents', href: '/admin/documents', icon: <FileText className="w-5 h-5" /> },
-            { label: 'Billing', href: '/admin/billing', icon: <CreditCard className="w-5 h-5" /> },
+            { label: 'Notifications', href: '/notifications', icon: <Bell className="w-5 h-5" /> },
+            { label: 'Documents', href: '/documents', icon: <FileText className="w-5 h-5" /> },
+            { label: 'Billing', href: '/billing', icon: <CreditCard className="w-5 h-5" /> },
             { label: 'Dev Studio', href: '/studio', icon: <Activity className="w-5 h-5" /> },
           ].map((item) => (
             <Link

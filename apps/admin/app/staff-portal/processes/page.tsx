@@ -7,7 +7,7 @@ import { BookOpen, Search, FileText, Clock, TrendingUp } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/staff-portal/processes',
+    canonical: 'https://admin.elevateforhumanity.org/staff-portal/processes',
   },
   title: 'Process Documentation',
   description: 'Access step-by-step guides for all internal processes.',
@@ -95,7 +95,7 @@ export default async function ProcessesPage() {
                 </div>
 
                 <Link
-                  href={`/admin/staff-portal/processes/${process.id}`}
+                  href={`/staff-portal/processes/${process.id}`}
                   className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   View Process

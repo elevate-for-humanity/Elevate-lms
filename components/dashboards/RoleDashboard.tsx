@@ -4,6 +4,7 @@
  */
 
 import Link from 'next/link';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 interface RoleDashboardProps {
   role: 'board' | 'delegate' | 'instructor' | 'partner' | 'staff' | 'admin';
@@ -38,8 +39,8 @@ const roleConfig = {
   instructor: {
     title: 'Instructor Dashboard',
     description: 'Manage your classes, assignments, and student progress',
-    primaryAction: { label: 'My Classes', href: '/admin/instructor/classes' },
-    secondaryAction: { label: 'Assignments', href: '/admin/instructor/assignments' },
+    primaryAction: { label: 'My Classes', href: getAdminUrl('/instructor/classes') },
+    secondaryAction: { label: 'Assignments', href: getAdminUrl('/instructor/assignments') },
     stats: [
       { label: 'Active Students', value: '120' },
       { label: 'Classes', value: '5' },
@@ -74,8 +75,8 @@ const roleConfig = {
   admin: {
     title: 'Admin Dashboard',
     description: 'Full system administration and management',
-    primaryAction: { label: 'System Settings', href: '/admin/settings' },
-    secondaryAction: { label: 'User Management', href: '/admin/staff' },
+    primaryAction: { label: 'System Settings', href: getAdminUrl('/settings') },
+    secondaryAction: { label: 'User Management', href: getAdminUrl('/staff') },
     stats: [
       { label: 'Total Users', value: '3,200+' },
       { label: 'Active Programs', value: '28' },

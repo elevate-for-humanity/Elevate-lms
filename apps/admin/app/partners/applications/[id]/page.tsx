@@ -47,8 +47,8 @@ export default async function PartnerApplicationDetailPage({
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Breadcrumbs items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Partner Applications', href: '/admin/partners/applications' },
+          { label: 'Admin', href: '/' },
+          { label: 'Partner Applications', href: '/partners/applications' },
           { label: (app.organization_name as string) ?? id },
         ]} />
 

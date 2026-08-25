@@ -142,7 +142,7 @@ export default async function ReferralsPage({
             {['all', 'referred', 'intake_started', 'enrolled', 'active', 'completed', 'withdrawn', 'cancelled'].map((s) => (
               <Link
                 key={s}
-                href={`/admin/referrals?status=${s}${params.agency ? `&agency=${params.agency}` : ''}`}
+                href={`/referrals?status=${s}${params.agency ? `&agency=${params.agency}` : ''}`}
                 className={`text-xs px-3 py-1 rounded-full font-medium transition ${
                   (params.status ?? 'all') === s
                     ? 'bg-slate-900 text-white'
@@ -157,7 +157,7 @@ export default async function ReferralsPage({
             {['all', 'american_job_center', 'workforce_board', 'wioa', 'snap_et', 'fssa', 'jri', 'vocational_rehabilitation', 'other'].map((a) => (
               <Link
                 key={a}
-                href={`/admin/referrals?${params.status ? `status=${params.status}&` : ''}agency=${a}`}
+                href={`/referrals?${params.status ? `status=${params.status}&` : ''}agency=${a}`}
                 className={`text-xs px-3 py-1 rounded-full font-medium transition ${
                   (params.agency ?? 'all') === a
                     ? 'bg-slate-900 text-white'

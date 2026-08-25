@@ -24,7 +24,7 @@ export default async function PartnerEntitiesPage() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/admin');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/');
 
   const { data: org } = await db
     .from('sos_organizations')
@@ -151,7 +151,7 @@ export default async function PartnerEntitiesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <Link
-                        href={`/admin/submissions/partners/${p.id}`}
+                        href={`/submissions/partners/${p.id}`}
                         className="text-xs text-brand-blue-600 hover:underline"
                       >
                         Edit

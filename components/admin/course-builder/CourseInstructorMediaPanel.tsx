@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
 import { Bot, Loader2, Mic2, PlayCircle, RefreshCw, Sparkles } from 'lucide-react';
 
 type Instructor = {
@@ -49,7 +50,7 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
     try {
       const response = await fetch('/api/admin/course-builder', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: courseBuilderJsonHeaders('queue-media'),
         body: JSON.stringify({ action: 'queue-media', courseId, onlyMissing: true }),
       });
       const data = await response.json();
@@ -77,9 +78,15 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
       <div className="grid gap-0 lg:grid-cols-[280px_1fr]">
         <div className="relative min-h-72 bg-cyan-950">
           {instructor?.avatar ? (
-            <img src={instructor.avatar} alt={instructor.name} className="h-full w-full object-cover" />
+            <img
+              src={instructor.avatar}
+              alt={instructor.name}
+              className="h-full w-full object-cover"
+            />
           ) : (
-            <div className="flex h-full items-center justify-center"><Bot className="h-20 w-20 text-cyan-300" /></div>
+            <div className="flex h-full items-center justify-center">
+              <Bot className="h-20 w-20 text-cyan-300" />
+            </div>
           )}
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 p-5 pt-16">
             <p className="font-black">{instructor?.name || 'Loading instructor…'}</p>
@@ -116,14 +123,25 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
               disabled={loading}
               className="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-5 py-3 font-black text-slate-950 hover:bg-amber-300 disabled:opacity-60"
             >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <PlayCircle className="h-5 w-5" />}
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <PlayCircle className="h-5 w-5" />
+              )}
               Generate missing instructor lessons
             </button>
-            <button type="button" onClick={() => void load()} disabled={loading} className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-4 py-3 font-bold hover:bg-white/10">
+            <button
+              type="button"
+              onClick={() => void load()}
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-4 py-3 font-bold hover:bg-white/10"
+            >
               <RefreshCw className="h-4 w-4" /> Refresh
             </button>
           </div>
-          {message ? <p className="mt-4 rounded-lg bg-white/10 p-3 text-sm text-cyan-100">{message}</p> : null}
+          {message ? (
+            <p className="mt-4 rounded-lg bg-white/10 p-3 text-sm text-cyan-100">{message}</p>
+          ) : null}
         </div>
       </div>
     </section>

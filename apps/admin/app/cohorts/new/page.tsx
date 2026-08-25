@@ -41,8 +41,8 @@ export default async function NewCohortPage() {
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <Breadcrumbs items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Cohorts', href: '/admin/cohorts' },
+          { label: 'Admin', href: '/' },
+          { label: 'Cohorts', href: '/cohorts' },
           { label: 'New Cohort' },
         ]} />
 

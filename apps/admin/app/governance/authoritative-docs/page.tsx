@@ -46,7 +46,7 @@ export default async function AuthoritativeDocsPage() {
       {/* Hero Image */}
       <Breadcrumbs
         items={[
-          { label: 'Governance', href: '/admin/governance' },
+          { label: 'Governance', href: '/governance' },
           { label: 'Authoritative Documents' },
         ]}
       />

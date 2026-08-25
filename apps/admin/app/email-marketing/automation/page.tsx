@@ -35,8 +35,8 @@ export default async function EmailAutomationPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'Email Marketing', href: '/admin/email-marketing' },
+            { label: 'Admin', href: '/' },
+            { label: 'Email Marketing', href: '/email-marketing' },
             { label: 'Automations' },
           ]}
         />

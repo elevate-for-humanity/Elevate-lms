@@ -31,7 +31,7 @@ export default async function ContentLibraryPage() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/admin');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/');
 
   const { data: org } = await db
     .from('sos_organizations')
@@ -125,7 +125,7 @@ export default async function ContentLibraryPage() {
                     <p className="text-xs text-slate-400 mt-1">{block.word_count ?? '—'} words</p>
                   </div>
                   <Link
-                    href={`/admin/submissions/content/${block.id}`}
+                    href={`/submissions/content/${block.id}`}
                     className="text-xs px-3 py-1.5 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition flex-shrink-0"
                   >
                     Edit

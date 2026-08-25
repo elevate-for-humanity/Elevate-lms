@@ -31,25 +31,25 @@ const quickLinks = [
   {
     title: 'Legal & Entity Information',
     description: 'Corporate structure, partner relationships, and entity details',
-    href: '/admin/governance/legal',
+    href: '/governance/legal',
     icon: Building2,
   },
   {
     title: 'Authoritative Documents',
     description: 'The seven governing documents that define platform operations',
-    href: '/admin/governance/authoritative-docs',
+    href: '/governance/authoritative-docs',
     icon: FileText,
   },
   {
     title: 'Security & Data Protection',
     description: 'How data is collected, protected, and managed',
-    href: '/admin/governance/security',
+    href: '/governance/security',
     icon: Shield,
   },
   {
     title: 'Compliance & Disclosures',
     description: 'Legal, financial, and eligibility standards',
-    href: '/admin/governance/compliance',
+    href: '/governance/compliance',
     icon: Scale,
   },
   {
@@ -61,13 +61,13 @@ const quickLinks = [
   {
     title: 'SEO & Indexing Governance',
     description: 'How search visibility is controlled and enforced',
-    href: '/admin/governance/seo-indexing',
+    href: '/governance/seo-indexing',
     icon: Settings,
   },
   {
     title: 'Governance Contact',
     description: 'Who to contact for diligence questions',
-    href: '/admin/governance/contact',
+    href: '/governance/contact',
     icon: Mail,
   },
 ];

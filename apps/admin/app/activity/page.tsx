@@ -100,7 +100,7 @@ export default async function ActivityPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-6 py-5">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Activity Feed' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Activity Feed' }]} />
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center">

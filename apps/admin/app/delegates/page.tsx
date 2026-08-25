@@ -6,7 +6,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/delegates' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/delegates' },
   title: 'Delegates Management | Elevate For Humanity',
   description: 'Manage delegate access and permissions.',
 };
@@ -43,7 +43,7 @@ export default async function DelegatesPage() {
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-700">
               <li>
-                <Link href="/admin" className="hover:text-primary">
+                <Link href="/" className="hover:text-primary">
                   Admin
                 </Link>
               </li>

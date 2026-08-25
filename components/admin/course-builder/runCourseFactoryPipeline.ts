@@ -1,5 +1,7 @@
 'use client';
 
+import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
+
 export type CourseFactoryPipelineStage =
   | 'blueprint'
   | 'lessons'
@@ -57,7 +59,7 @@ export async function runCourseFactoryPipeline(
 ): Promise<CourseFactoryPipelineResult> {
   const response = await fetch('/api/admin/course-builder', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
+    headers: { ...courseBuilderJsonHeaders('generate'), Accept: 'text/event-stream' },
     cache: 'no-store',
     body: JSON.stringify(input),
   });

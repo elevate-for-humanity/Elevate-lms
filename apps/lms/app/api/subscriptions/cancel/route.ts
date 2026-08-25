@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { safeError, safeInternalError, safeOk } from '@/lib/api/safe-error';
@@ -11,7 +10,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
  */
 async function _POST(request: NextRequest) {
   const auth = await apiAuthGuard(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   try {
     const db = await requireAdminClient();
@@ -46,4 +45,3 @@ async function _POST(request: NextRequest) {
 }
 
 export const POST = withRuntime(_POST);
-

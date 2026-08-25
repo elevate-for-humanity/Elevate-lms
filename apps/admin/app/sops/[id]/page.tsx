@@ -22,7 +22,7 @@ export default async function SOPDetailPage({ params }: Props) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-4 mb-4">
             <Link
-              href="/admin"
+              href="/"
               className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-700 text-sm"
             >
               <ArrowLeft className="w-4 h-4" />

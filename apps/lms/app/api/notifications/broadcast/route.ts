@@ -29,7 +29,7 @@ async function _POST(req: Request) {
     const { apiRequireAdmin } = await import('@/lib/admin/guards');
     try {
       const auth = await apiRequireAdmin(req);
-      if (auth instanceof NextResponse) return auth;
+      if (auth.error) return auth.error;
     } catch (e) {
       return e instanceof Response
         ? e
@@ -95,7 +95,11 @@ async function _POST(req: Request) {
               sent_at: new Date().toISOString(),
             });
           } catch (error) {
-            logger.error(`Error sending to subscription ${subscription.id}`, normalizeError(error, `Failed to send to subscription ${subscription.id}`), getErrorContext(error));
+            logger.error(
+              `Error sending to subscription ${subscription.id}`,
+              normalizeError(error, `Failed to send to subscription ${subscription.id}`),
+              getErrorContext(error),
+            );
             failed++;
 
             // If subscription is invalid (410 Gone), mark as inactive
@@ -118,7 +122,11 @@ async function _POST(req: Request) {
           }
         }
       } catch (error) {
-        logger.error(`Error processing user ${user.id}`, normalizeError(error, 'Failed to process user'), getErrorContext(error));
+        logger.error(
+          `Error processing user ${user.id}`,
+          normalizeError(error, 'Failed to process user'),
+          getErrorContext(error),
+        );
         failed++;
       }
     }
@@ -132,7 +140,11 @@ async function _POST(req: Request) {
       },
     });
   } catch (error) {
-    logger.error('Broadcast notification error', normalizeError(error, 'Broadcast notification error'), getErrorContext(error));
+    logger.error(
+      'Broadcast notification error',
+      normalizeError(error, 'Broadcast notification error'),
+      getErrorContext(error),
+    );
     return safeInternalError(error as Error, 'Internal server error');
   }
 }
@@ -197,7 +209,11 @@ async function getTargetUsers(supabase: any, targetAudience: string) {
   const { data, error } = await query;
 
   if (error) {
-    logger.error('Error fetching users', normalizeError(error, 'Failed to fetch users'), getErrorContext(error));
+    logger.error(
+      'Error fetching users',
+      normalizeError(error, 'Failed to fetch users'),
+      getErrorContext(error),
+    );
     return [];
   }
 

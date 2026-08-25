@@ -18,7 +18,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   robots: { index: false },
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/grants/submissions',
+    canonical: 'https://admin.elevateforhumanity.org/grants/submissions',
   },
   title: 'Submissions | Elevate For Humanity',
   description: 'Review and process grant application submissions.',
@@ -229,7 +229,7 @@ export default async function GrantSubmissionsPage() {
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
                         <Link
-                          href={`/admin/grants/submission/${submission.id}`}
+                          href={`/grants/submission/${submission.id}`}
                           className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                         >
                           View Details

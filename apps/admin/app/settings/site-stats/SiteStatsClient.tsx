@@ -59,8 +59,8 @@ export default function SiteStatsClient({
     <div className="min-h-screen bg-slate-950 p-6">
       <div className="max-w-2xl mx-auto space-y-6">
         <Breadcrumbs items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Settings', href: '/admin/settings' },
+          { label: 'Admin', href: '/' },
+          { label: 'Settings', href: '/settings' },
           { label: 'Site Stats' },
         ]} />
 

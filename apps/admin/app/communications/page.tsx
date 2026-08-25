@@ -166,7 +166,7 @@ export default async function CommunicationsPage() {
                 templates.slice(0, 5).map((tmpl: any) => (
                   <Link
                     key={tmpl.id}
-                    href={`/admin/communications/templates/${tmpl.id}`}
+                    href={`/communications/templates/${tmpl.id}`}
                     className="block p-4 hover:bg-gray-50"
                   >
                     <p className="font-medium">{tmpl.name}</p>

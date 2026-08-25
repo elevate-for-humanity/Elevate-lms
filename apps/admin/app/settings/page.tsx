@@ -25,7 +25,7 @@ export default async function AdminSettingsPage() {
     {
       title: 'General',
       icon: Globe,
-      href: '/admin/settings/general',
+      href: '/settings/general',
       fields: [
         { label: 'Site Name', value: settings['site_name'] ?? '—' },
         { label: 'Support Email', value: settings['support_email'] ?? '—' },
@@ -36,7 +36,7 @@ export default async function AdminSettingsPage() {
     {
       title: 'Notifications',
       icon: Bell,
-      href: '/admin/settings/notifications',
+      href: '/settings/notifications',
       fields: [
         { label: 'Email Notifications', value: settings['email_notifications'] ?? '—' },
         { label: 'SMS Notifications', value: settings['sms_notifications'] ?? '—' },
@@ -46,7 +46,7 @@ export default async function AdminSettingsPage() {
     {
       title: 'Security',
       icon: Shield,
-      href: '/admin/settings/security',
+      href: '/settings/security',
       fields: [
         { label: 'MFA Required', value: settings['mfa_required'] ?? '—' },
         { label: 'Session Timeout', value: settings['session_timeout'] ?? '—' },
@@ -56,7 +56,7 @@ export default async function AdminSettingsPage() {
     {
       title: 'Payments',
       icon: CreditCard,
-      href: '/admin/settings/payments',
+      href: '/settings/payments',
       fields: [
         { label: 'Stripe Mode', value: settings['stripe_mode'] ?? '—' },
         { label: 'Currency', value: settings['currency'] ?? 'USD' },
@@ -66,7 +66,7 @@ export default async function AdminSettingsPage() {
     {
       title: 'Email',
       icon: Mail,
-      href: '/admin/settings/email',
+      href: '/settings/email',
       fields: [
         { label: 'From Name', value: settings['email_from_name'] ?? '—' },
         { label: 'From Address', value: settings['email_from_address'] ?? '—' },
@@ -76,7 +76,7 @@ export default async function AdminSettingsPage() {
     {
       title: 'Social Media Accounts',
       icon: Share2,
-      href: '/admin/settings/social-media',
+      href: '/settings/social-media',
       fields: [
         {
           label: 'Facebook',
@@ -99,7 +99,7 @@ export default async function AdminSettingsPage() {
     {
       title: 'Integrations & Webhooks',
       icon: Webhook,
-      href: '/admin/settings/integrations',
+      href: '/settings/integrations',
       fields: [
         { label: 'Active Integrations', value: settings['active_integrations'] ?? '—' },
         { label: 'Webhook Secret', value: settings['webhook_secret'] ? 'Configured' : 'Not set' },

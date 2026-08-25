@@ -31,7 +31,7 @@ export default function LiveChatPage() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Live Chat' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Live Chat' }]} />
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <MessageCircle className="w-8 h-8 text-brand-blue-600" />

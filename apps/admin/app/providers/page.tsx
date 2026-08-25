@@ -119,7 +119,7 @@ export default async function AdminProvidersPage() {
             {(tenants ?? []).map((tenant) => (
               <Link
                 key={tenant.id}
-                href={'/admin/providers/' + tenant.id}
+                href={'/providers/' + tenant.id}
                 className="flex items-center justify-between bg-white rounded-xl border border-slate-200 px-5 py-4 hover:border-brand-blue-300 hover:shadow-sm transition group"
               >
                 <div className="flex items-center gap-4">

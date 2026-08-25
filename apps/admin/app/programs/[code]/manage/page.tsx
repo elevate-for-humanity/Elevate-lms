@@ -39,7 +39,7 @@ export default async function ManageProgramPage({ params }: { params: Promise<{ 
   return (
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-4xl px-4 py-8">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Programs', href: '/admin/programs' }, { label: program.title, href: `/admin/programs/${programCode}/dashboard` }, { label: 'Manage Training' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Programs', href: '/programs' }, { label: program.title, href: `/programs/${programCode}/dashboard` }, { label: 'Manage Training' }]} />
         <div className="mb-8 mt-6"><h1 className="text-2xl font-bold text-slate-900">{program.title}</h1><p className="mt-1 text-slate-500">Manage internal LMS courses and external partner training for this program.</p></div>
         <ProgramManagerClient
           programId={program.id}

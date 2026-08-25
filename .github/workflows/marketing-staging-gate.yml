@@ -67,6 +67,8 @@ jobs:
             .
 
       - name: Smoke Marketing container
+        env:
+          HEALTH_PATH: /api/ping
         run: |
           chmod +x scripts/smoke-test-container.sh
           scripts/smoke-test-container.sh elevate-marketing:staging-gate marketing-staging-smoke 3100

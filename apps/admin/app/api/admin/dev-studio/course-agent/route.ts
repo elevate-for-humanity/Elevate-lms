@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     if (!projectId) return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
 
     // Status polling also wakes queued work, preventing a cold background timer from stranding runs.
-  void runAgenticExecutorOnce();
+  await runAgenticExecutorOnce();
 
   const project = await loadAgenticProject({ projectId, userId: auth.id });
     if (!project || project.target_type !== 'course') {
@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Wake the durable executor immediately; its claim is atomic and safe alongside the background poller.
-  void runAgenticExecutorOnce();
+  await runAgenticExecutorOnce();
 
   return NextResponse.json({
     ok: true,
@@ -203,6 +203,9 @@ export async function GET(req: NextRequest) {
 
   const projectId = text(req.nextUrl.searchParams.get('projectId'));
   if (!projectId) return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
+
+  // Await one atomic executor pass so status polling durably advances queued work.
+  await runAgenticExecutorOnce();
 
   const project = await loadAgenticProject({ projectId, userId: auth.id });
   if (!project || project.target_type !== 'course') {

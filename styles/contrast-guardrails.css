@@ -234,6 +234,26 @@
   background-color: #c2410c !important;
 }
 
+.efh-contrast :is(.text-orange-600, .text-brand-orange-500, .text-brand-orange-600) {
+  color: #9a3412 !important;
+}
+
+/* Interface and compliance text must remain readable on phones. */
+.efh-contrast
+  :is(
+    .text-\[8px\],
+    .text-\[9px\],
+    .text-\[10px\],
+    .text-\[11px\],
+    .text-\[0\.5rem\],
+    .text-\[0\.6rem\],
+    .text-\[0\.625rem\],
+    .text-\[0\.6875rem\]
+  ) {
+  font-size: 0.75rem !important;
+  line-height: 1rem !important;
+}
+
 .efh-contrast
   :is(
     .bg-black,

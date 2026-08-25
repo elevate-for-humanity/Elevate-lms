@@ -24,7 +24,11 @@ const R2_PUBLIC_URL = process.env.CLOUDFLARE_R2_PUBLIC_URL; // e.g., https://med
 
 // Check if R2 is configured
 export const isR2Configured = () => {
-  return !!(R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY);
+  return !!(
+    process.env.CLOUDFLARE_ACCOUNT_ID &&
+    process.env.CLOUDFLARE_R2_ACCESS_KEY_ID &&
+    process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY
+  );
 };
 
 // Create S3-compatible client for R2

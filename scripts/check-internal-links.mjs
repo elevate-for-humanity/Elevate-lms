@@ -16,7 +16,8 @@ const EXTERNAL_ALLOWLIST = new Set(canonicalConfig.externalOrAppHostedAllowlist 
 const IGNORE_PREFIXES = ['http://','https://','mailto:','tel:','#','/#','/_next/','/api/','/images/','/img/','/icons/','/fonts/','/videos/','/audio/','/documents/','/files/','/public/','/static/','/assets/','/.well-known/','/sitemap','/robots','/feed','/rss'];
 const IGNORE_EXTENSIONS = ['.jpg','.jpeg','.png','.gif','.svg','.webp','.avif','.mp4','.webm','.mp3','.wav','.pdf','.zip','.xml','.json','.csv','.ico','.woff','.woff2','.ttf'];
 const FILE_EXTENSIONS = new Set(['.tsx','.ts','.jsx','.js','.mdx','.md']);
-const SCAN_ROOTS = ['app','components/marketing','components/layout','components/programs','components/home','content','data','lib/routes'];
+const MARKETING_APP_ROOT = 'apps/marketing/app';
+const SCAN_ROOTS = [MARKETING_APP_ROOT,'components/marketing','components/layout','components/programs','components/home','content','data','lib/routes'];
 
 function normalizePath(input) {
   if (!input || typeof input !== 'string') return null;
@@ -37,7 +38,7 @@ function shouldIgnoreHref(h) {
 }
 
 function loadCompiledRoutes() {
-  const manifest = path.join(ROOT, '.next/server/app-paths-manifest.json');
+  const manifest = path.join(ROOT, 'apps/marketing/.next/server/app-paths-manifest.json');
   if (fs.existsSync(manifest)) {
     const m = JSON.parse(fs.readFileSync(manifest, 'utf8'));
     return new Set(Object.keys(m).map((k) => normalizePath(k.replace(/\/page$/, '').replace(/\/\([^)]+\)/g, '')) || '/').filter(Boolean));
@@ -51,7 +52,7 @@ function loadCompiledRoutes() {
       else if (/^page\.(tsx|ts|jsx|js)$/.test(e.name)) routes.add(prefix || '/');
     }
   }
-  walk(path.join(ROOT, 'app'), '');
+  walk(path.join(ROOT, MARKETING_APP_ROOT), '');
   return routes;
 }
 
@@ -73,7 +74,7 @@ function matchDynamic(pattern, candidate) {
 
 function readRedirectSources() {
   const s = new Set([...CANONICAL_ALIASES.keys()]);
-  const nc = path.join(ROOT, 'next.config.mjs');
+  const nc = path.join(ROOT, 'apps/marketing/next.config.mjs');
   if (fs.existsSync(nc)) {
     const content = fs.readFileSync(nc, 'utf8');
     let m; const re = /source:\s*['"`]([^'"`]+)['"`]/g;

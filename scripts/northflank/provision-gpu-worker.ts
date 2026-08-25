@@ -240,6 +240,42 @@ async function triggerExactBuild(): Promise<ExactBuild> {
   return { buildId: String(result.id), sha };
 }
 
+async function logBuildFailure(buildId: string, build: R): Promise<void> {
+  log('Build failure detail', {
+    id: build.id || buildId,
+    status: build.status,
+    message: build.message || null,
+    concluded: build.concluded,
+  });
+  try {
+    const query = new URLSearchParams({
+      buildId,
+      queryType: 'range',
+      duration: '3600',
+      lineLimit: '500',
+      direction: 'forward',
+    });
+    const entries = arrayFrom(
+      await nfFetch<R[]>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/build-logs?${query}`)),
+    );
+    const diagnosticPattern = /error|failed|failure|denied|not found|no space|unauthorized|manifest|timeout|timed out|tls|certificate|rate limit|\b429\b|\b5\d\d\b/i;
+    const safeLines = entries
+      .map((entry) => String(entry.log || '').replace(/^(stdout|stderr)\s+[A-Z]\s+/, ''))
+      .filter((line) => diagnosticPattern.test(line))
+      .slice(-80)
+      .map((line) => line
+        .replace(/https?:\/\/\S+/gi, '[url-redacted]')
+        .replace(/bearer\s+\S+/gi, 'Bearer [redacted]')
+        .replace(/\b(token|secret|password|api[_-]?key)\s*[=:]\s*\S+/gi, '$1=[redacted]')
+        .replace(/\b[0-9a-f]{32,}\b/gi, '[identifier-redacted]')
+        .replace(/[\r\n\t]+/g, ' ')
+        .slice(0, 1200));
+    safeLines.forEach((line) => console.error(`[gpu-build-diagnostic] ${line}`));
+  } catch (error) {
+    log('Unable to retrieve Northflank build logs', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function waitForExactBuild({ buildId, sha }: ExactBuild): Promise<void> {
   const deadline = Date.now() + BUILD_TIMEOUT_MS;
   const failed = new Set(['FAILURE', 'FAILED', 'ERROR', 'CRASHED', 'ABORTED', 'SUBMISSION_FAILURE', 'TIMEOUT']);
@@ -249,7 +285,10 @@ async function waitForExactBuild({ buildId, sha }: ExactBuild): Promise<void> {
     const build = response.data || response;
     const status = String(build.status || 'unknown').toUpperCase();
     if (status !== previous) { log(`Exact build ${buildId} status ${status}`); previous = status; }
-    if (failed.has(status)) throw new Error(`GPU build ${buildId} failed: ${status}`);
+    if (failed.has(status)) {
+      await logBuildFailure(buildId, build);
+      throw new Error(`GPU build ${buildId} failed: ${status}${build.message ? `: ${build.message}` : ''}`);
+    }
     if (status === 'SUCCESS') {
       if (!build.sha || String(build.sha).toLowerCase() !== sha.toLowerCase()) {
         throw new Error(`GPU build SHA mismatch: expected ${sha}, received ${build.sha || 'missing'}`);

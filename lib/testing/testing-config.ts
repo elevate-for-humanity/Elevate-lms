@@ -7,7 +7,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const TESTING_CENTER = {
   name: 'Elevate for Humanity Testing Center',
-  address: '120 Market St, Suite 930, Indianapolis, IN 46204',
+  address: '120 E. Market St., Suite 930, Indianapolis, IN 46204',
   phone: '' + PLATFORM_DEFAULTS.supportPhone + '',
   phoneTel: '+13173143757',
   email: 'testing@elevateforhumanity.org',

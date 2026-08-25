@@ -8,6 +8,7 @@ import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
 import { TESTING_CENTER, TESTING_EMAIL, CALENDLY_CONFIG } from '@/lib/testing/testing-config';
+import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 import { createSchedulingLink, getEventTypes } from '@/lib/testing/calendly';
 import {
   TestingEnforcementMeta,
@@ -24,6 +25,111 @@ export async function handleTestingCheckoutSession(
   db: SupabaseClient,
 ): Promise<void> {
   const paymentType = session.metadata?.payment_type;
+
+  if (paymentType === 'testing_cart') {
+    const paymentIntentId =
+      typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
+    const cartIds = (session.metadata?.testing_cart_ids ?? '')
+      .split(',')
+      .map((id) => id.trim())
+      .filter(Boolean);
+
+    if (!paymentIntentId || cartIds.length === 0 || cartIds.length > 10) {
+      logger.error('[testing/cart] Invalid paid cart metadata', undefined, { sessionId: session.id });
+      return;
+    }
+
+    const { data: existingRows } = await db
+      .from('exam_bookings')
+      .select('id')
+      .eq('payment_intent_id', paymentIntentId)
+      .limit(1);
+    if (existingRows?.length) {
+      logger.info('[testing/cart] Already processed', { paymentIntentId });
+      return;
+    }
+
+    const canonicalExams = new Map<
+      string,
+      { providerKey: string; name: string; amountCents: number }
+    >();
+    for (const provider of Object.values(CERT_PROVIDERS)) {
+      if (provider.status !== 'active' || provider.publicVisible === false) continue;
+      for (const exam of provider.exams) {
+        if (typeof exam !== 'object' || !exam.amountCents || exam.amountCents <= 0) continue;
+        const id = `testing-${provider.key}-${exam.name}`.replace(/\s+/g, '-').toLowerCase();
+        canonicalExams.set(id, {
+          providerKey: provider.key,
+          name: exam.name,
+          amountCents: exam.amountCents,
+        });
+      }
+    }
+
+    const resolved = cartIds.map((id) => canonicalExams.get(id));
+    if (resolved.some((exam) => !exam)) {
+      logger.error('[testing/cart] Paid cart contains an unknown exam', undefined, {
+        sessionId: session.id,
+      });
+      return;
+    }
+
+    const stripe = await getStripeServer();
+    const fullSession = await stripe!.checkout.sessions.retrieve(session.id, {
+      expand: ['customer_details'],
+    });
+    const customerEmail = fullSession.customer_details?.email ?? '';
+    const customerName = fullSession.customer_details?.name ?? '';
+    const [firstName, ...rest] = customerName.trim().split(' ');
+    const lastName = rest.join(' ') || '';
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+    const rows = resolved.map((exam) => ({
+      exam_type: exam!.providerKey,
+      exam_name: exam!.name,
+      booking_type: 'individual',
+      first_name: firstName || 'Customer',
+      last_name: lastName,
+      email: customerEmail,
+      participant_count: 1,
+      status: 'pending',
+      payment_status: 'paid',
+      payment_intent_id: paymentIntentId,
+      fee_cents: exam!.amountCents,
+      confirmation_code: Array.from(
+        { length: 8 },
+        () => chars[Math.floor(Math.random() * chars.length)],
+      ).join(''),
+      add_on: false,
+      add_on_paid: false,
+      calendly_scheduling_url: null,
+      slot_id: null,
+    }));
+
+    const { error: insertErr } = await db.from('exam_bookings').insert(rows);
+    if (insertErr) {
+      logger.error('[testing/cart] Booking inserts failed', new Error(insertErr.message), {
+        sessionId: session.id,
+      });
+      return;
+    }
+
+    if (customerEmail) {
+      const examList = rows
+        .map((row) => `<li>${row.exam_name} — confirmation <strong>${row.confirmation_code}</strong></li>`)
+        .join('');
+      await sendEmail({
+        to: customerEmail,
+        from: FROM,
+        subject: 'Testing payment confirmed — schedule your exams',
+        html: `<p>Hi ${firstName || 'there'}, payment was confirmed for:</p><ul>${examList}</ul>
+<p><a href="${SITE_URL}/testing/book?session_id=${session.id}">Schedule each paid exam →</a></p>
+<p>Appointments require at least 24 hours advance notice. After booking, call ${TESTING_CENTER.phone} to confirm.</p>
+<p>Location: ${TESTING_CENTER.address}</p>`,
+      }).catch((err) => logger.warn('[testing/cart] Email failed', { err }));
+    }
+    return;
+  }
 
   if (paymentType === 'testing_fee') {
     const meta = parseWebhookMeta(TestingSessionMeta, session.metadata, session.id, logger);

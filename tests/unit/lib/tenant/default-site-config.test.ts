@@ -6,7 +6,7 @@ describe('buildDefaultSiteConfig', () => {
     const cfg = buildDefaultSiteConfig({ organizationName: 'Acme Training' });
     expect(cfg.branding.logoText).toBe('Acme Training');
     expect(cfg.homepage.heroTitle).toContain('Acme Training');
-    expect(cfg.programs.length).toBeGreaterThan(0);
+    expect(cfg.programs).toEqual([]);
     expect(cfg.navigation.some((n) => n.href === '/programs')).toBe(true);
   });
 });

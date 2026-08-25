@@ -10,13 +10,25 @@ export type PublicTestingPricingState = 'verified' | 'quote';
 const VERIFIED_PUBLIC_PRICING: Record<
   string,
   { state: 'verified'; verifiedOn: string; note: string }
-> = {
-  nha: {
-    state: 'verified',
-    verifiedOn: '2026-05-01',
-    note: 'Owner-approved retail price: $149 NHA exam + $100 testing/administration.',
-  },
-};
+> = Object.fromEntries(
+  [
+    'esco',
+    'nrf',
+    'certiport',
+    'nha',
+    'workkeys',
+    'careersafe',
+    'midland',
+  ].map((providerKey) => [
+    providerKey,
+    {
+      state: 'verified' as const,
+      verifiedOn: '2026-08-25',
+      note:
+        'Owner-approved retail pricing, including Elevate markup, is resolved from the canonical provider pricing module.',
+    },
+  ]),
+);
 
 export function getPublicTestingPricingState(providerKey: string): PublicTestingPricingState {
   return VERIFIED_PUBLIC_PRICING[providerKey]?.state ?? 'quote';

@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04
+FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 
 ENV DEBIAN_FRONTEND=noninteractive PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -7,7 +7,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /srv/worker
 COPY services/media-gpu-worker/requirements.txt ./requirements.txt
-RUN python3 -m pip install --no-cache-dir -r requirements.txt
+# The base image already carries the CUDA-compatible torch runtime. Installing
+# the broad torch requirements again downloads a second CUDA stack and exhausts
+# Northflank's build disk. Add only the matching small companion wheels, then
+# install the non-PyTorch service dependencies.
+RUN python3 -m pip install --no-cache-dir --no-deps \
+      torchvision==0.21.0 torchaudio==2.6.0 && \
+    grep -Ev '^(torch|torchvision|torchaudio)([<>=]|$)' requirements.txt > runtime-requirements.txt && \
+    python3 -m pip install --no-cache-dir -r runtime-requirements.txt && \
+    python3 -c "import torch; assert torch.__version__.startswith('2.6.0'); print(torch.__version__)"
 COPY services/media-gpu-worker/worker.py ./worker.py
 COPY services/media-gpu-worker/bootstrap_models.py ./bootstrap_models.py
 

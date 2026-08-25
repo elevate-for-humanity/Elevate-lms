@@ -39,6 +39,10 @@ COPY . .
 # stale proof/demo IDs, or Website Builder starts seeding invented business data.
 RUN node scripts/verify-portal-production-contracts.mjs
 
+# Admin document navigations must remain browser-owned. Intercepting them in
+# the service worker can resolve without a Response and surface as ERR_FAILED.
+RUN ! grep -Fq "event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' })" /app/public/sw-admin.js
+
 # Capture a real build timestamp even when the platform does not inject one.
 RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); console.log('Admin build timestamp:', ts)"
 

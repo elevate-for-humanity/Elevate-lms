@@ -13,6 +13,8 @@ import {
 } from '@/lib/testing/public-pricing';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { AddExamToCartButton } from '@/components/testing/TestingCart';
+import TestingCart from '@/components/testing/TestingCart';
 
 export const dynamic = 'force-dynamic';
 
@@ -159,12 +161,21 @@ export default async function ProviderPage({ params }: Props) {
 
                     <div className="mt-4 flex flex-wrap gap-3">
                       {verified && cents ? (
-                        <Link
-                          href={`/testing/checkout?provider=${key}&exam_name=${encodeURIComponent(name)}`}
-                          className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-red-700"
-                        >
-                          Pay & schedule <ArrowRight className="h-4 w-4" />
-                        </Link>
+                        <>
+                          <Link
+                            href={`/testing/checkout?provider=${key}&exam_name=${encodeURIComponent(name)}`}
+                            className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-red-700"
+                          >
+                            Pay ${(cents / 100).toFixed(0)} now <ArrowRight className="h-4 w-4" />
+                          </Link>
+                          <AddExamToCartButton
+                            examType={key}
+                            examName={name}
+                            amountCents={cents}
+                            active
+                            className="inline-flex items-center gap-2 rounded-lg border-2 border-brand-blue-600 bg-white px-5 py-2.5 text-sm font-bold text-brand-blue-700 hover:bg-brand-blue-50"
+                          />
+                        </>
                       ) : (
                         <Link
                           href={`/contact?topic=testing-pricing&provider=${key}&exam=${encodeURIComponent(name)}`}
@@ -179,6 +190,14 @@ export default async function ProviderPage({ params }: Props) {
               })}
             </div>
           </div>
+
+          <section className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
+            <h2 className="text-2xl font-black text-slate-950">Testing cart</h2>
+            <p className="mt-2 mb-5 text-sm text-slate-600">
+              Add one or more exams, then pay the server-verified retail total. Scheduling stays locked until Stripe confirms payment.
+            </p>
+            <TestingCart />
+          </section>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-slate-200 bg-white p-5">

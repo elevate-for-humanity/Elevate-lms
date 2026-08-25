@@ -39,6 +39,8 @@ export interface HeroVideoProps {
   demoSlideSeconds?: number;
   heightClassName?: string;
   overlayMode?: 'default' | 'none';
+  /** Delay mounting remote video sources so the first visual frame can paint without competing network work. */
+  deferVideoMs?: number;
 }
 
 export default function HeroVideo({
@@ -59,12 +61,14 @@ export default function HeroVideo({
   mediaFit = 'cover',
   heightClassName = 'h-[38vh] min-h-[320px] max-h-[520px]',
   overlayMode = 'default',
+  deferVideoMs = 0,
 }: HeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [videoEnabled, setVideoEnabled] = useState(deferVideoMs <= 0);
   const [videoReady, setVideoReady] = useState(false);
   const [audioFailed, setAudioFailed] = useState(false);
   const [userActivated, setUserActivated] = useState(false);
@@ -74,7 +78,16 @@ export default function HeroVideo({
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
   const desktopSource = videoSrcDesktop || videoSrcMobile || '';
   const mobileSource = videoSrcMobile || videoSrcDesktop || '';
-  const showVideo = Boolean(desktopSource) && !videoFailed;
+  const showVideo = Boolean(desktopSource) && !videoFailed && videoEnabled;
+
+  useEffect(() => {
+    if (deferVideoMs <= 0) {
+      setVideoEnabled(true);
+      return;
+    }
+    const timer = window.setTimeout(() => setVideoEnabled(true), deferVideoMs);
+    return () => window.clearTimeout(timer);
+  }, [deferVideoMs]);
 
   useEffect(() => {
     setVideoFailed(false);
@@ -84,11 +97,11 @@ export default function HeroVideo({
     setManualAudioOverride(false);
 
     const video = videoRef.current;
-    if (!video || !desktopSource) return;
+    if (!videoEnabled || !video || !desktopSource) return;
 
     video.muted = true;
     void video.play().catch(() => {});
-  }, [desktopSource, mobileSource]);
+  }, [desktopSource, mobileSource, videoEnabled]);
 
   useEffect(() => {
     const unlock = () => setUserActivated(true);
@@ -191,7 +204,7 @@ export default function HeroVideo({
           <video
             key={`${mobileSource}|${desktopSource}`}
             ref={videoRef}
-            preload="auto"
+            preload="metadata"
             autoPlay
             loop
             playsInline

@@ -28,10 +28,11 @@ export async function GET(request: NextRequest) {
 
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const paymentType = session.metadata?.payment_type;
     const isPaidTestingSession =
       session.payment_status === 'paid' &&
       session.status === 'complete' &&
-      session.metadata?.payment_type === 'testing_fee';
+      (paymentType === 'testing_fee' || paymentType === 'testing_cart');
 
     if (!isPaidTestingSession) {
       return NextResponse.json({ found: false }, { status: 402 });
@@ -44,12 +45,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ found: false }, { status: 409 });
     }
 
-    const { data: booking, error } = await admin
+    const { data: bookings, error } = await admin
       .from('exam_bookings')
-      .select('exam_name, confirmation_code, calendly_scheduling_url, payment_status')
+      .select('exam_type, exam_name, confirmation_code, calendly_scheduling_url, payment_status')
       .eq('payment_intent_id', paymentIntentId)
-      .eq('payment_status', 'paid')
-      .maybeSingle();
+      .eq('payment_status', 'paid');
 
     if (error) {
       logger.error('[testing/booking-status] Booking lookup failed', new Error(error.message), {
@@ -59,17 +59,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ found: false }, { status: 500 });
     }
 
-    if (!booking) {
-      // Stripe is paid but the webhook is still creating the booking. The client
-      // retries briefly and never exposes scheduling until this row exists.
+    if (!bookings?.length) {
+      // Stripe is paid but the webhook is still creating the booking records. The
+      // client retries briefly and never exposes scheduling until they exist.
       return NextResponse.json({ found: false }, { status: 202 });
     }
 
     return NextResponse.json({
       found: true,
-      examName: booking.exam_name,
-      confirmationCode: booking.confirmation_code,
-      calendlySchedulingUrl: booking.calendly_scheduling_url,
+      examName: bookings[0].exam_name,
+      confirmationCode: bookings[0].confirmation_code,
+      calendlySchedulingUrl: bookings[0].calendly_scheduling_url,
+      bookings: bookings.map((booking) => ({
+        examType: booking.exam_type,
+        examName: booking.exam_name,
+        confirmationCode: booking.confirmation_code,
+        schedulingUrl: booking.calendly_scheduling_url,
+      })),
     });
   } catch (error) {
     logger.warn('[testing/booking-status] Checkout verification failed', {

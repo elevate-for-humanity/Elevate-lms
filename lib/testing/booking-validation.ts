@@ -45,6 +45,7 @@ export interface ValidationResult {
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const MINIMUM_BOOKING_NOTICE_HOURS = 24;
 
 function normalizeDate(raw: unknown): string | null {
   if (!raw || typeof raw !== 'string' || raw.trim() === '') return null;
@@ -112,6 +113,15 @@ export function validateBookingInput(body: Record<string, unknown>): ValidationR
     alternateDate === null
   ) {
     errors.push({ field: 'alternateDate', message: 'Invalid date format — use YYYY-MM-DD' });
+  }
+
+  if (preferredDate) {
+    const requestedTime = normalizeString(body.preferredTime) || '00:00';
+    const requestedAt = new Date(`${preferredDate}T${requestedTime}:00`);
+    const earliestAllowed = new Date(Date.now() + MINIMUM_BOOKING_NOTICE_HOURS * 60 * 60 * 1000);
+    if (Number.isNaN(requestedAt.getTime()) || requestedAt < earliestAllowed) {
+      errors.push({ field: 'preferredDate', message: 'Testing appointments require at least 24 hours advance notice' });
+    }
   }
 
   // participantCount must be a positive integer

@@ -53,7 +53,15 @@ export function AgenticCourseRunPanel({
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState('');
 
-  const active = Boolean(projectId && snapshot?.run && !['completed', 'failed', 'canceled'].includes(snapshot.run.status));
+  const terminal = Boolean(projectId && snapshot?.run && ['completed', 'failed', 'canceled'].includes(snapshot.run.status));
+  const active = Boolean(projectId && snapshot?.run && !terminal);
+
+  function resetRun() {
+    window.localStorage.removeItem(storageKey);
+    setProjectId('');
+    setSnapshot(null);
+    setError('');
+  }
 
   async function refresh(id = projectId) {
     if (!id) return;
@@ -119,9 +127,16 @@ export function AgenticCourseRunPanel({
           </p>
         </div>
         {projectId ? (
-          <button type="button" onClick={() => void refresh()} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
-            <RefreshCw className="h-3.5 w-3.5" /> Refresh
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => void refresh()} className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+              <RefreshCw className="h-3.5 w-3.5" /> Refresh
+            </button>
+            {terminal ? (
+              <button type="button" onClick={resetRun} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white hover:bg-violet-700">
+                <Play className="h-3.5 w-3.5" /> Start new run
+              </button>
+            ) : null}
+          </div>
         ) : null}
       </div>
 

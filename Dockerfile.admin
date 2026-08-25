@@ -1,3 +1,4 @@
+# Course Builder executor wake contract: queued runs must be claimed on API activity (2026-08-25).
 FROM node:22-alpine AS base
 
 ENV PNPM_HOME="/pnpm"

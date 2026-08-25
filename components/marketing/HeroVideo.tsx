@@ -73,6 +73,7 @@ export default function HeroVideo({
   const [audioFailed, setAudioFailed] = useState(false);
   const [userActivated, setUserActivated] = useState(false);
   const [manualAudioOverride, setManualAudioOverride] = useState(false);
+  const soundRequestedRef = useRef(false);
   const transcriptId = useId();
 
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
@@ -148,6 +149,7 @@ export default function HeroVideo({
     setManualAudioOverride(true);
 
     if (!muted) {
+      soundRequestedRef.current = false;
       audio?.pause();
       if (video) video.muted = true;
       setMuted(true);
@@ -155,6 +157,7 @@ export default function HeroVideo({
     }
 
     try {
+      soundRequestedRef.current = true;
       if (voiceoverSrc && audio && !audioFailed) {
         if (video) {
           video.muted = true;
@@ -172,6 +175,7 @@ export default function HeroVideo({
       }
       setMuted(false);
     } catch {
+      soundRequestedRef.current = false;
       if (video) video.muted = true;
       setMuted(true);
     }
@@ -247,9 +251,34 @@ export default function HeroVideo({
             preload="metadata"
             aria-hidden="true"
             className="hidden"
-            onEnded={() => setMuted(true)}
+            onEnded={() => {
+              const video = videoRef.current;
+              if (soundRequestedRef.current && video) {
+                video.muted = false;
+                video.volume = 1;
+                void video.play().then(() => setMuted(false)).catch(() => {
+                  soundRequestedRef.current = false;
+                  video.muted = true;
+                  setMuted(true);
+                });
+                return;
+              }
+              soundRequestedRef.current = false;
+              setMuted(true);
+            }}
             onError={() => {
               setAudioFailed(true);
+              const video = videoRef.current;
+              if (soundRequestedRef.current && video) {
+                video.muted = false;
+                video.volume = 1;
+                void video.play().then(() => setMuted(false)).catch(() => {
+                  soundRequestedRef.current = false;
+                  video.muted = true;
+                  setMuted(true);
+                });
+                return;
+              }
               setMuted(true);
             }}
           />

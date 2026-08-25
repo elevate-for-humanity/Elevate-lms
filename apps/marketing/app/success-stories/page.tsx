@@ -218,7 +218,7 @@ export default async function SuccessStoriesPage() {
         accentText="Stories"
         subheadline="Lives transformed through training and opportunity"
         description="Real people who transformed their lives through education, determination, and the right support at the right time."
-        imageSrc="/images/pages/healthcare-grad.jpg"
+        imageSrc="/images/pages/success-stories-hero.jpg"
         imageAlt="Success Stories"
         primaryCTA={{ text: 'Read Stories', href: '#stories' }}
         secondaryCTA={{ text: 'Start Your Journey', href: '/apply' }}
@@ -363,25 +363,25 @@ export default async function SuccessStoriesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-white text-white">
+      <section className="py-16 bg-slate-50 text-slate-950">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-6">
               Ready to Write Your Success Story?
             </h2>
-            <p className="text-base md:text-lg text-blue-100 mb-8">
+            <p className="text-base md:text-lg text-slate-700 mb-8">
               Every success story starts with a single step. Take yours today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/apply"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-brand-blue-600 bg-white rounded-lg hover:bg-slate-50 transition shadow-lg"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-brand-red-600 rounded-lg hover:bg-brand-red-700 transition shadow-lg"
               >
                 Apply Now - It&apos;s Free
               </Link>
               <Link
                 href="/programs"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-white/10 backdrop-blur-sm border-2 border-white rounded-lg hover:bg-white/20 transition"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-slate-900 bg-white border-2 border-slate-300 rounded-lg hover:bg-slate-100 transition"
               >
                 View Programs
               </Link>

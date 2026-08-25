@@ -214,6 +214,26 @@ async function ensureService(volumeId: string) {
     throw error;
   }
   if (exists) {
+    // A previous deployment may still have the legacy RWO model volume
+    // attached at /models. Northflank rejects a deployment when two attached
+    // volumes resolve to the same container mount path, so detach only those
+    // conflicting legacy mounts before attaching the canonical RWX volume.
+    const volumes = arrayFrom(await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, '/volumes')), 'volumes');
+    for (const volume of volumes) {
+      if (String(volume.id || '') === volumeId) continue;
+      const detailResponse = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/volumes/${volume.id}`));
+      const detail = detailResponse.data || detailResponse;
+      const attached = arrayFrom(detail.attachedObjects).some(
+        (item) => item.id === SERVICE_ID && item.type === 'service',
+      );
+      const mounts = arrayFrom(detail.mounts).concat(arrayFrom(detail.spec?.mounts));
+      const conflicts = mounts.some((mount) => mount.containerMountPath === '/models');
+      if (!attached || !conflicts) continue;
+      await nfFetch(projectApiPath(GPU_PROJECT_ID, `/volumes/${volume.id}/detach`), {
+        method: 'POST', body: JSON.stringify({ nfObject: { id: SERVICE_ID, type: 'service' } }),
+      });
+      log('Detached conflicting legacy model volume', { id: volume.id });
+    }
     try {
       await nfFetch(projectApiPath(GPU_PROJECT_ID, `/volumes/${volumeId}/attach`), {
         method: 'POST', body: JSON.stringify({ nfObject: { id: SERVICE_ID, type: 'service' } }),

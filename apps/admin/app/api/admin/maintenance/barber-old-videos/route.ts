@@ -21,7 +21,16 @@ function barberStoragePath(value: string): string | null {
   }
 }
 
-export async function DELETE(request: NextRequest) {
+export async function GET(request: NextRequest) {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+  return new NextResponse(
+    '<!doctype html><html><body><h1>Barber old-video cleanup</h1><p>This removes only current barber/ lesson video objects. Replacement jobs are not changed.</p><form method="post"><button type="submit">Delete 50 old barber videos</button></form></body></html>',
+    { headers: { 'content-type': 'text/html; charset=utf-8' } },
+  );
+}
+
+export async function POST(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 

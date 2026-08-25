@@ -14,9 +14,13 @@ const GPU_PROJECT_ID = process.env.NORTHFLANK_GPU_PROJECT_ID || 'elevate-media-g
 const GPU_REGION = process.env.NORTHFLANK_GPU_REGION || 'us-central';
 const SERVICE_ID = process.env.NORTHFLANK_GPU_SERVICE_ID || 'elevate-gpu-worker';
 const ADMIN_SERVICE_ID = process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin';
-const MODEL_VOLUME_ID = process.env.NORTHFLANK_GPU_MODEL_VOLUME_ID || 'elevate-gpu-models';
+const MODEL_VOLUME_ID = process.env.NORTHFLANK_GPU_MODEL_VOLUME_ID || 'elevate-gpu-models-rwx';
 const MODEL_VOLUME_MB = Number(process.env.NORTHFLANK_GPU_MODEL_VOLUME_MB || '153600');
-const MODEL_STORAGE_CLASS = process.env.NORTHFLANK_GPU_MODEL_STORAGE_CLASS || 'nvme';
+// Northflank GPU workloads only accept ReadWriteMany volumes. The platform's
+// managed RWX storage class is nf-multi-rw; access mode is immutable after
+// volume creation, so this intentionally uses a new volume ID.
+const MODEL_STORAGE_CLASS = process.env.NORTHFLANK_GPU_MODEL_STORAGE_CLASS || 'nf-multi-rw';
+const MODEL_ACCESS_MODE = 'ReadWriteMany';
 const GPU_TYPE = process.env.NORTHFLANK_GPU_TYPE || 'l4-24';
 const GPU_COUNT = Number(process.env.NORTHFLANK_GPU_COUNT || '1');
 // Confirmed by the Northflank API: nf-compute-* plans are rejected for managed GPU workloads.
@@ -90,10 +94,24 @@ async function ensureVolume(): Promise<string> {
       body: JSON.stringify({
         name: 'Elevate GPU Models',
         mounts: [{ volumeMountPath: '', containerMountPath: '/models' }],
-        spec: { storageClassName: MODEL_STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
+        spec: {
+          accessMode: MODEL_ACCESS_MODE,
+          storageClassName: MODEL_STORAGE_CLASS,
+          storageSize: MODEL_VOLUME_MB,
+        },
       }),
     });
-    log('Created model volume', { id: volume.id, storageSize: MODEL_VOLUME_MB, storageClassName: MODEL_STORAGE_CLASS });
+    log('Created model volume', {
+      id: volume.id,
+      accessMode: MODEL_ACCESS_MODE,
+      storageSize: MODEL_VOLUME_MB,
+      storageClassName: MODEL_STORAGE_CLASS,
+    });
+  } else if (volume.spec?.accessMode && volume.spec.accessMode !== MODEL_ACCESS_MODE) {
+    throw new Error(
+      `GPU model volume ${volume.id || MODEL_VOLUME_ID} uses ${volume.spec.accessMode}; ` +
+      `${MODEL_ACCESS_MODE} is required and volume access mode cannot be changed in place.`,
+    );
   } else if (Number(volume.spec?.storageSize || 0) < MODEL_VOLUME_MB) {
     await nfFetch(projectApiPath(GPU_PROJECT_ID, `/volumes/${volume.id}`), {
       method: 'POST',
@@ -387,6 +405,7 @@ async function main() {
     gpuPlan: GPU_DEPLOYMENT_PLAN,
     modelVolumeMb: MODEL_VOLUME_MB,
     modelStorageClass: MODEL_STORAGE_CLASS,
+    modelAccessMode: MODEL_ACCESS_MODE,
     deploymentEphemeralMb: GPU_DEPLOYMENT_EPHEMERAL_MB,
   });
   if (!execute) return;

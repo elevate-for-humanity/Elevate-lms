@@ -87,12 +87,15 @@ async function preflight() {
 
 async function ensureVolume(): Promise<string> {
   const volumes = arrayFrom(await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, '/volumes')), 'volumes');
-  let volume = volumes.find((item) => item.id === MODEL_VOLUME_ID || item.name === 'Elevate GPU Models');
+  // Access mode is immutable, so never fall back to a display-name match: the
+  // legacy volume has the same old name but is ReadWriteOnce and cannot be
+  // attached to a GPU workload.
+  let volume = volumes.find((item) => item.id === MODEL_VOLUME_ID);
   if (!volume) {
     volume = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, '/volumes'), {
       method: 'POST',
       body: JSON.stringify({
-        name: 'Elevate GPU Models',
+        name: 'Elevate GPU Models RWX',
         mounts: [{ volumeMountPath: '', containerMountPath: '/models' }],
         spec: {
           accessMode: MODEL_ACCESS_MODE,

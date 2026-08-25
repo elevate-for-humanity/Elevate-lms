@@ -15,6 +15,8 @@ RUN python3 -m pip install --no-cache-dir --no-deps \
       torch==2.4.1+cu121 torchvision==0.19.1+cu121 torchaudio==2.4.1+cu121 && \
     grep -Ev '^(torch|torchvision|torchaudio)([<>=]|$)' requirements.txt > runtime-requirements.txt && \
     python3 -m pip install --no-cache-dir \
+      nvidia-cublas-cu12==12.1.3.1 \
+      nvidia-cuda-cupti-cu12==12.1.105 \
       nvidia-cudnn-cu12==9.1.0.70 \
       filelock typing-extensions sympy networkx jinja2 fsspec \
       -r runtime-requirements.txt && \

@@ -175,7 +175,8 @@ export async function middleware(req: NextRequest) {
   }
 
   const privileged = effectiveRoles.some((role) => PRIVILEGED_MFA_ROLES.includes(role));
-  // Honor the canonical policy switch so MFA enrollment never becomes an unintended global lockout.\n  if (privilegedMfaEnforcementEnabled() && privileged && pathname !== '/mfa') {
+  // Honor the canonical policy switch so MFA enrollment never becomes an unintended global lockout.
+  if (privilegedMfaEnforcementEnabled() && privileged && pathname !== '/mfa') {
     const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     const aal2 = !aalError && aal.currentLevel === 'aal2';
 

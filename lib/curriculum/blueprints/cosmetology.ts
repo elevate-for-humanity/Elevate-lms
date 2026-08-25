@@ -227,9 +227,15 @@ export const cosmetologyBlueprint: CredentialBlueprint = {
           domainKey: 'hair',
         },
         {
+          slug: 'cosmo-thermal-styling',
+          title: 'Thermal Styling and Hair Pressing',
+          order: 8,
+          domainKey: 'hair',
+        },
+        {
           slug: 'cosmo-hair-checkpoint',
           title: 'Hair Care Services — Checkpoint',
-          order: 8,
+          order: 9,
           domainKey: 'hair',
         },
       ],
@@ -337,9 +343,15 @@ export const cosmetologyBlueprint: CredentialBlueprint = {
           domainKey: 'skincare',
         },
         {
+          slug: 'cosmo-makeup-application',
+          title: 'Makeup Application and Color Selection',
+          order: 5,
+          domainKey: 'skincare',
+        },
+        {
           slug: 'cosmo-skincare-checkpoint',
           title: 'Skin Care — Checkpoint',
-          order: 5,
+          order: 6,
           domainKey: 'skincare',
         },
       ],
@@ -450,9 +462,15 @@ export const cosmetologyBlueprint: CredentialBlueprint = {
       competencies: [],
       lessons: [
         {
+          slug: 'cosmo-state-board-practical-prep',
+          title: 'Indiana State Board Practical Examination Preparation',
+          order: 1,
+          domainKey: 'exam',
+        },
+        {
           slug: 'cosmo-final-exam',
           title: 'Cosmetology Final Examination',
-          order: 1,
+          order: 2,
           domainKey: 'exam',
         },
       ],

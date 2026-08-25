@@ -67,7 +67,7 @@ describe('transformLessonContent', () => {
     expect(result.html).toContain('<div class="lesson-content">');
     expect(result.html).toContain('<h2>Key Concepts</h2>');
     expect(result.html).toContain('<li>Refrigerant handling requires EPA 608 certification</li>');
-    expect(result.html).toContain('<h2>Workplace Scenario</h2>');
+    expect(result.html).toContain('<h2>Application Scenario</h2>');
     expect(result.html).toContain('rooftop unit');
   });
 

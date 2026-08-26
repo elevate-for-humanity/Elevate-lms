@@ -377,8 +377,8 @@ export default function ParisApplicationWorkspace({
           </div>
           <div className="flex items-center rounded-lg border border-slate-700 bg-slate-900 p-1" aria-label={t.language}>
             <Languages className="mx-2 h-4 w-4 text-slate-300" />
-            <button type="button" onClick={() => void switchLanguage('en')} className={`rounded-md px-2 py-1 text-xs font-bold ${locale === 'en' ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}>English</button>
-            <button type="button" onClick={() => void switchLanguage('es')} className={`rounded-md px-2 py-1 text-xs font-bold ${locale === 'es' ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}>Español</button>
+            <button type="button" onClick={() => void switchLanguage('en')} className={`rounded-md px-2 py-1 text-xs font-bold ${locale === 'en' ? 'bg-white !text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}>English</button>
+            <button type="button" onClick={() => void switchLanguage('es')} className={`rounded-md px-2 py-1 text-xs font-bold ${locale === 'es' ? 'bg-white !text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}>Español</button>
           </div>
         </div>
       </div>

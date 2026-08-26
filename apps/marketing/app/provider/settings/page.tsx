@@ -13,7 +13,7 @@ export default async function ProviderSettingsPage({ searchParams }: { searchPar
 
   const [{ data: tenant }, { data: org }] = await Promise.all([
     access.db.from('tenants').select('id, name, slug').eq('id', tenantId).maybeSingle(),
-    access.db.from('organizations').select('id, name, slug, logo_url, tagline, support_email, website, phone, address_line1, city, state, zip').eq('tenant_id', tenantId).maybeSingle(),
+    access.db.from('organizations').select('id, name, slug, logo_url, tagline, support_email, website, phone, address, city, state, zip').eq('tenant_id', tenantId).maybeSingle(),
   ]);
 
   return (
@@ -32,7 +32,7 @@ export default async function ProviderSettingsPage({ searchParams }: { searchPar
           supportEmail: org?.support_email ?? access.profile.email ?? '',
           website: org?.website ?? '',
           phone: org?.phone ?? '',
-          addressLine1: org?.address_line1 ?? '',
+          addressLine1: org?.address ?? '',
           city: org?.city ?? '',
           state: org?.state ?? 'IN',
           zip: org?.zip ?? '',

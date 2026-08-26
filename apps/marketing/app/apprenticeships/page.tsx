@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BriefcaseBusiness, GraduationCap, MapPin, ShieldCheck } from 'lucide-react';
 import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
+import HeroVideo from '@/components/marketing/HeroVideo';
+import heroBanners from '@/content/heroBanners';
 
 export const metadata: Metadata = {
   title: 'Apprenticeship Programs | Elevate for Humanity',
@@ -60,38 +62,27 @@ const EXPERIENCE = [
 ] as const;
 
 export default function ApprenticeshipsPage() {
+  const hero = heroBanners.apprenticeships;
   return (
     <main className="min-h-screen bg-white text-slate-950">
-      <section className="relative isolate min-h-[520px] overflow-hidden bg-sky-50">
-        <Image
-          src="/images/pages/admin-apprenticeships-hero.webp"
-          alt="Apprentice receiving supervised hands-on training"
-          fill
-          priority
-          className="object-cover object-center"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent" aria-hidden="true" />
-        <div className="relative z-10 mx-auto flex min-h-[520px] max-w-7xl items-center px-5 py-24 sm:px-8 lg:px-10">
-          <div className="max-w-3xl rounded-3xl border border-white/80 bg-white/90 p-6 shadow-xl backdrop-blur-sm sm:p-9">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">Learn by doing</p>
-            <h1 className="mt-4 text-4xl font-black leading-[1.02] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
-              Apprenticeship puts training where the work happens.
-            </h1>
-            <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-slate-800 sm:text-xl sm:leading-8">
-              Build real skills through supervised work-based learning, structured instruction, progress tracking, and a clear path toward occupation-specific requirements.
-            </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <a href="#programs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white hover:bg-brand-red-700">
-                Explore Apprenticeships <ArrowRight className="h-4 w-4" />
-              </a>
-              <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-700 bg-white px-7 py-3.5 font-black text-brand-blue-800 hover:bg-sky-50">
-                Find Host-Site Information
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroVideo
+        videoSrcDesktop={hero.videoSrcDesktop}
+        videoSrcMobile={hero.videoSrcMobile}
+        posterImage={hero.posterImage || '/images/pages/admin-apprenticeships-hero.webp'}
+        voiceoverSrc={hero.voiceoverSrc}
+        microLabel="Earn while you learn"
+        belowHeroHeadline="Apprenticeship puts training where the work happens."
+        belowHeroSubheadline="Build real skills through supervised work-based learning, structured instruction, progress tracking, and a clear path toward occupation-specific requirements."
+        ctas={[
+          { label: 'Explore Apprenticeships', href: '#programs' },
+          { label: 'Find Host Shops', href: '/partners/host-shops', variant: 'secondary' },
+        ]}
+        trustIndicators={hero.trustIndicators}
+        transcript={hero.transcript}
+        analyticsName="apprenticeships"
+        heightClassName="aspect-[16/9] h-auto min-h-[280px] max-h-[600px] sm:aspect-[21/9]"
+        mediaFit="cover"
+      />
 
       <section className="border-b border-slate-200 bg-white px-4 py-10 sm:py-12">
         <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-4">

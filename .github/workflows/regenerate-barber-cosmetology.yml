@@ -33,7 +33,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
           clean: true
 
       - uses: pnpm/action-setup@v4
@@ -53,14 +52,23 @@ jobs:
         run: |
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          test -n "$OPENAI_API_KEY$GROQ_API_KEY$GEMINI_API_KEY$ANTHROPIC_API_KEY"
 
-      - name: Regenerate Barber and Cosmetology in preservation mode
+      - name: Regenerate Barber in preservation mode
         shell: bash
         run: |
           set -o pipefail
-          pnpm tsx scripts/course-factory.ts --barber --cosmo --mode refresh 2>&1 | tee /tmp/barber-cosmetology-regeneration.log
-          test "$(grep -c 'Course ID:' /tmp/barber-cosmetology-regeneration.log)" -eq 2
-          test "$(grep -c 'FAILED\|ERROR' /tmp/barber-cosmetology-regeneration.log || true)" -eq 0
+          pnpm tsx scripts/course-factory.ts --barber 2>&1 | tee /tmp/barber-regeneration.log
+          test "$(grep -c 'Course ID:' /tmp/barber-regeneration.log)" -eq 1
+          test "$(grep -c 'FAILED\|ERROR' /tmp/barber-regeneration.log || true)" -eq 0
+
+      - name: Regenerate Cosmetology in preservation mode
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm tsx scripts/course-factory.ts --cosmo 2>&1 | tee /tmp/cosmetology-regeneration.log
+          test "$(grep -c 'Course ID:' /tmp/cosmetology-regeneration.log)" -eq 1
+          test "$(grep -c 'FAILED\|ERROR' /tmp/cosmetology-regeneration.log || true)" -eq 0
 
       - name: Verify apprenticeship architecture
         run: pnpm tsx scripts/audit-apprenticeship-architecture.ts

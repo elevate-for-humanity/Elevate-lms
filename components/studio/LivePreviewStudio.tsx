@@ -4,13 +4,12 @@ import { useState, useCallback, useEffect } from 'react';
 import { 
   Bot, Code, Eye, Play, Save, Send, Settings, 
   SplitSquareHorizontal, ChevronLeft, ChevronRight,
-  Image, Video, FileText, Layout, Monitor, Smartphone,
+  Image as ImageIcon, Video, FileText, Layout, Monitor, Smartphone,
   Loader2, CheckCircle, AlertCircle, RefreshCw, Globe
 } from 'lucide-react';
 import { AIChat } from './AIChat';
 import { IframePreview } from './IframePreview';
 import { CodeEditor } from './CodeEditor';
-import Image from 'next/image';
 
 type PreviewMode = 'desktop' | 'tablet' | 'mobile';
 type ViewMode = 'split' | 'chat' | 'editor' | 'preview';
@@ -37,7 +36,9 @@ export default function LivePreviewStudio({
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [generatedImages, setGeneratedImages] = useState<Array<{ id: string; url: string; type: string }>>([]);
-  const [generatedVideos, setGeneratedVideos] = useState<Array<{ id: string; url: string; status: string }>>([]);
+  const [generatedVideos] = useState<Array<{ id: string; url: string; status: string }>>([]);
+  const [mediaError, setMediaError] = useState('');
+  const [generatingImage, setGeneratingImage] = useState(false);
   const [qaChecks, setQaChecks] = useState<Record<string, boolean>>({
     links: false,
     images: false,
@@ -105,18 +106,55 @@ export default function LivePreviewStudio({
     };
   };
 
-  // Generate image
+  // Generate through the canonical governed Media Studio service.
   const handleGenerateImage = async (type: 'cover' | 'thumbnail' | 'hero') => {
-    const id = `img-${Date.now()}`;
-    setGeneratedImages(prev => [...prev, { id, url: '', type }]);
-    // Would call AI image generation API
+    setGeneratingImage(true);
+    setMediaError('');
+    const title = `${contentType} ${type} image`;
+    const context = code.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 900);
+    const prompt = [
+      `Create a bright, professional ${type} image for an Elevate for Humanity ${contentType}.`,
+      context ? `Content context: ${context}` : 'Use an authentic workforce-training setting.',
+      'Show authentic people, a clear action, visible evidence of the work, natural light, and room for readable page copy. Do not place text or logos in the image.',
+    ].join(' ');
+
+    try {
+      const response = await fetch('/api/admin/media-studio/image', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectName: 'Dev Studio',
+          title,
+          prompt,
+          size: type === 'thumbnail' ? '1024x1024' : '1792x1024',
+          style: 'natural',
+          usage: type === 'hero' ? 'hero' : contentType === 'course' ? 'course' : 'general',
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.ok || !payload.publicUrl) {
+        const detail =
+          typeof payload?.error === 'string'
+            ? payload.error
+            : payload?.error?.message || 'Image generation failed.';
+        throw new Error(detail);
+      }
+      setGeneratedImages((previous) => [
+        ...previous,
+        { id: String(payload.id), url: String(payload.publicUrl), type },
+      ]);
+      setCode((current) => `${current}\n\n![${title}](${payload.publicUrl})\n`);
+    } catch (error) {
+      setMediaError(error instanceof Error ? error.message : 'Image generation failed.');
+    } finally {
+      setGeneratingImage(false);
+    }
   };
 
-  // Generate video prompt
-  const handleGenerateVideo = async (lessonTitle: string) => {
-    const id = `vid-${Date.now()}`;
-    setGeneratedVideos(prev => [...prev, { id, url: '', status: 'generating' }]);
-    // Would call AI video generation API
+  // Video creation has its own governed storyboard, review, and render workflow.
+  const handleGenerateVideo = () => {
+    window.location.assign('/studio/media');
   };
 
   const previewWidth = previewMode === 'desktop' ? '100%' : previewMode === 'tablet' ? '768px' : '375px';
@@ -228,13 +266,14 @@ export default function LivePreviewStudio({
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => handleGenerateImage('cover')}
+                      disabled={generatingImage}
                       className="p-1.5 hover:bg-slate-700 rounded text-slate-400 hover:text-white"
                       title="Generate Image"
                     >
-                      <Image className="h-4 w-4" alt="" />
+                      <ImageIcon className="h-4 w-4" />
                     </button>
                     <button
-                      onClick={() => handleGenerateVideo('Lesson')}
+                      onClick={handleGenerateVideo}
                       className="p-1.5 hover:bg-slate-700 rounded text-slate-400 hover:text-white"
                       title="Generate Video"
                     >
@@ -242,6 +281,7 @@ export default function LivePreviewStudio({
                     </button>
                     <button
                       onClick={() => handleGenerateImage('hero')}
+                      disabled={generatingImage}
                       className="p-1.5 hover:bg-slate-700 rounded text-slate-400 hover:text-white"
                       title="Insert Template"
                     >
@@ -298,6 +338,12 @@ export default function LivePreviewStudio({
           </div>
         )}
       </div>
+
+      {mediaError ? (
+        <div role="alert" className="border-t border-red-700 bg-red-950 px-4 py-2 text-sm font-semibold text-red-100">
+          {mediaError}
+        </div>
+      ) : null}
 
       {/* Bottom Status Bar */}
       <div className="h-8 bg-slate-800 border-t border-slate-700 flex items-center justify-between px-4 text-xs text-slate-400">

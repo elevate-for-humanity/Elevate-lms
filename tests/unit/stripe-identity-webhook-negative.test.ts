@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-const routePath = path.resolve('app/api/webhooks/stripe-identity/route.ts');
+const routePath = path.resolve('apps/marketing/app/api/webhooks/stripe-identity/route.ts');
 const src = fs.readFileSync(routePath, 'utf-8');
 
 describe('Stripe Identity webhook negative paths', () => {

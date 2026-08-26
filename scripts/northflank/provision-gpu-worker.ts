@@ -153,7 +153,7 @@ function servicePayload(volumeId: string): R {
         buildEngine: 'buildkit',
         dockerFilePath: DOCKERFILE,
         dockerWorkDir: '/',
-        buildkit: { useCache: true, cacheStorageSize: 16384 },
+        buildkit: { useCache: false, cacheStorageSize: 0 },
       },
     },
     buildConfiguration: {
@@ -273,7 +273,7 @@ async function logBuildFailure(buildId: string, build: R): Promise<void> {
       queryType: 'range',
       duration: '3600',
       lineLimit: '500',
-      direction: 'forward',
+      direction: 'backward',
     });
     const entries = arrayFrom(
       await nfFetch<R[]>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/build-logs?${query}`)),

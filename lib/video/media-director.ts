@@ -60,6 +60,9 @@ export interface MediaScene {
   /** Persisted evidence of the source selected for this rendered scene. */
   resolvedProvider?: string;
   resolvedModel?: string;
+  /** Instructional phase and the exact action the picture must prove. */
+  procedurePhase?: string;
+  requiredVisualEvidence?: string;
 }
 
 export interface MediaStoryboard {
@@ -123,12 +126,37 @@ function promptHash(input: unknown): string {
   return crypto.createHash('sha256').update(JSON.stringify(input)).digest('hex');
 }
 
-function sentenceScenes(script: string): string[] {
-  return script
+function procedurePhase(text: string, index: number, total: number): string {
+  const normalized = text.toLowerCase();
+  if (/saniti|disinfect|ppe|wash|safety|infection control/.test(normalized)) return 'safety';
+  if (/tool|supply|equipment|material/.test(normalized)) return 'tools';
+  if (/consult|assess|analy|inspect|prepare|section|drape/.test(normalized)) return 'preparation';
+  if (/check|verify|inspect|quality|symmetr|finish/.test(normalized)) return 'quality-check';
+  if (/clean|aftercare|record|dispose|recover/.test(normalized)) return 'recovery';
+  if (index === 0) return 'orientation';
+  if (index === total - 1) return 'quality-check';
+  return 'procedure';
+}
+
+function scriptScenes(script: string, title: string): Record<string, unknown>[] {
+  const sentences = script
     .split(/(?<=[.!?])\s+/)
     .map((value) => value.trim())
-    .filter(Boolean)
-    .slice(0, 12);
+    .filter(Boolean);
+  return sentences.map((action, index) => {
+    const phase = procedurePhase(action, index, sentences.length);
+    const detail = /angle|position|blade|guard|hand|finger|line|section|tool/i.test(action);
+    return {
+      action,
+      subject: title,
+      dialogue: action,
+      procedure_phase: phase,
+      required_visual_evidence: action,
+      shot_size: detail ? 'close-up' : index === 0 ? 'wide' : 'medium-close',
+      camera_move: detail ? 'locked' : 'dolly-in',
+      transition: 'cut',
+    };
+  });
 }
 
 /**
@@ -150,11 +178,7 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
 
   const sourceScenes: Record<string, unknown>[] = rawScenes.length
     ? rawScenes.filter((scene): scene is Record<string, unknown> => Boolean(scene && typeof scene === 'object'))
-    : sentenceScenes(input.script).map((sentence) => ({
-        action: sentence,
-        subject: input.title,
-        visual_prompt: stringValue(raw.visual_prompt),
-      }));
+    : scriptScenes(input.script, input.title);
 
   const fallbackScene: Record<string, unknown> = {
     action: input.script,
@@ -202,6 +226,8 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
       characterIds,
       negativePrompt: stringValue(scene.negative_prompt, stringValue(raw.negative_prompt)) || undefined,
       seed: Number.isFinite(Number(scene.seed)) ? Number(scene.seed) : undefined,
+      procedurePhase: stringValue(scene.procedure_phase) || undefined,
+      requiredVisualEvidence: stringValue(scene.required_visual_evidence, action) || undefined,
     };
   });
 
@@ -237,6 +263,8 @@ export function scenePrompt(scene: MediaScene, characters: MediaCharacterReferen
     refs ? `Character continuity: ${refs}` : '',
     scene.dialogue ? `Dialogue: ${scene.dialogue}` : '',
     scene.sound ? `Sound: ${scene.sound}` : '',
+    scene.procedurePhase ? `Instructional phase: ${scene.procedurePhase}` : '',
+    scene.requiredVisualEvidence ? `The picture must visibly demonstrate: ${scene.requiredVisualEvidence}` : '',
     scene.negativePrompt ? `Avoid: ${scene.negativePrompt}` : '',
   ].filter(Boolean).join('. ');
 }

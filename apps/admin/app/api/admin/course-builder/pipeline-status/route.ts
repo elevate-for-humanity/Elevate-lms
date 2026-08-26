@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', courseId),
       db
         .from('course_lessons')
-        .select('id, content, objective, video_status, video_url')
+        .select('id, content, objective:learning_objectives, video_status, video_url')
         .eq('course_id', courseId),
       db.from('video_jobs').select('id, status').eq('course_id', courseId),
     ]);
@@ -76,14 +76,20 @@ export async function GET(request: NextRequest) {
     let videosMissing = 0;
 
     for (const lesson of lessons) {
-      const hasContent = typeof lesson.content === 'string' && lesson.content.trim().length > 0;
+      const hasContent = typeof lesson.content === 'string'
+        ? lesson.content.trim().length > 0
+        : Boolean(lesson.content && typeof lesson.content === 'object' && Object.keys(lesson.content).length > 0);
       if (hasContent) {
         lessonsWithContent += 1;
       } else {
         lessonsMissingContent += 1;
       }
 
-      const hasObjective = typeof lesson.objective === 'string' && lesson.objective.trim().length > 0;
+      const hasObjective = typeof lesson.objective === 'string'
+        ? lesson.objective.trim().length > 0
+        : Array.isArray(lesson.objective)
+          ? lesson.objective.length > 0
+          : Boolean(lesson.objective && typeof lesson.objective === 'object' && Object.keys(lesson.objective).length > 0);
       if (hasObjective) lessonsWithObjective += 1;
 
       const state = String(lesson.video_status ?? '').toLowerCase();

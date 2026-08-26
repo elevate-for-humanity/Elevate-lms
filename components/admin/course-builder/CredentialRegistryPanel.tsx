@@ -78,6 +78,22 @@ export default function CredentialRegistryPanel({ course }: { course?: CourseSee
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <Select label="Registry environment" required value={record.registryEnvironment}
+            options={['production', 'sandbox']}
+            onChange={(value) => patch({ registryEnvironment: value as 'production' | 'sandbox' })} />
+          <Field label="Elevate Organization CTID" value={record.organizationCtid}
+            onChange={(value) => patch({ organizationCtid: value.trim() })}
+          />
+          <Field label="Credential CTID" value={record.ctid}
+            onChange={(value) => patch({ ctid: value.trim() })}
+          />
+          <Field label="Last published or updated" type="date" value={record.lastPublishedAt}
+            onChange={(value) => patch({ lastPublishedAt: value })} />
+          <div className="md:col-span-2 rounded-lg border border-cyan-900 bg-cyan-950/40 px-4 py-3 text-xs leading-relaxed text-cyan-100">
+            The Organization CTID belongs to Elevate’s separately published organization record.
+            Keep each credential CTID unchanged when updating that credential. Use a new CTID only
+            for a genuinely new credential that cannot replace the old one.
+          </div>
           <Field label="Credential name" required value={record.credentialName}
             onChange={(value) => patch({ credentialName: value })} />
           <Select label="Credential type" required value={record.credentialType}

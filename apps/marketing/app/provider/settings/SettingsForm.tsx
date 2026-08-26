@@ -41,7 +41,7 @@ export default function SettingsForm({ tenantId, orgId, initial }: Props) {
       support_email: String(form.get('supportEmail') || '').trim() || null,
       website: String(form.get('website') || '').trim() || null,
       phone: String(form.get('phone') || '').trim() || null,
-      address_line1: String(form.get('addressLine1') || '').trim() || null,
+      address: String(form.get('addressLine1') || '').trim() || null,
       city: String(form.get('city') || '').trim() || null,
       state: String(form.get('state') || '').trim().toUpperCase() || null,
       zip: String(form.get('zip') || '').trim() || null,

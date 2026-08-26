@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const { execFileSync } = vi.hoisted(() => ({ execFileSync: vi.fn() }));
-vi.mock('child_process', () => ({ execFileSync }));
+vi.mock('child_process', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('child_process')>()),
+  execFileSync,
+}));
 
 import {
   resetVideoEncoderSelectionForTests,

@@ -65,8 +65,9 @@ interface UpsertRecord {
 
 function buildUpsertRecord(
   userId: string,
-  body: Required<Pick<QuizAnswerPayload, 'question' | 'selectedAnswer' | 'isCorrect'>> &
-    Partial<QuizAnswerPayload>,
+  body: Required<
+    Pick<QuizAnswerPayload, 'lessonId' | 'question' | 'selectedAnswer' | 'correctAnswer' | 'isCorrect'>
+  > & Partial<QuizAnswerPayload>,
 ): UpsertRecord {
   return {
     user_id: userId,
@@ -142,28 +143,9 @@ describe('Video quiz upsert record builder', () => {
     expect(record.timestamp_sec).toBe(30);
   });
 
-  it('sets lesson_id to null when not provided', () => {
-    const record = buildUpsertRecord('user-1', {
-      question: 'Q?',
-      selectedAnswer: 0,
-      correctAnswer: 1,
-      isCorrect: false,
-    });
-    expect(record.lesson_id).toBeNull();
-  });
-
-  it('sets correct_answer to null when not provided', () => {
-    const record = buildUpsertRecord('user-1', {
-      question: 'Q?',
-      selectedAnswer: 0,
-      correctAnswer: 1,
-      isCorrect: false,
-    });
-    expect(record.correct_answer).toBeNull();
-  });
-
   it('sets timestamp_sec to null when not provided', () => {
     const record = buildUpsertRecord('user-1', {
+      lessonId: 'l1',
       question: 'Q?',
       selectedAnswer: 0,
       correctAnswer: 1,

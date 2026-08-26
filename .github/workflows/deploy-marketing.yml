@@ -30,7 +30,9 @@ permissions:
 
 concurrency:
   group: northflank-marketing-deploy
-  cancel-in-progress: true
+  # Never terminate an active production deployment when another commit lands.
+  # GitHub still keeps only the newest pending run for this concurrency group.
+  cancel-in-progress: false
 
 env:
   EXPECTED_SHA: ${{ github.sha }}
@@ -304,3 +306,17 @@ jobs:
           curl -fsS --max-time 30 -D /tmp/cdl-poster.headers -o /tmp/cdl-poster.webp https://www.elevateforhumanity.org/images/pages/cdl-hero.webp
           grep -qi '^content-type: image/webp' /tmp/cdl-poster.headers
           test "$(wc -c < /tmp/cdl-poster.webp)" -gt 1000
+
+          # CNA must remain explicitly self-pay and must use claim-free, playable hero media.
+          curl -fsS --max-time 30 https://www.elevateforhumanity.org/programs/cna -o /tmp/cna-page.html
+          grep -q 'Self-Pay Program' /tmp/cna-page.html
+          grep -q 'Self-Pay Available' /tmp/cna-page.html
+          grep -q 'cna-hero.mp4' /tmp/cna-page.html
+
+          curl -fsS --range 0-1023 --max-time 30 -D /tmp/cna-video.headers -o /tmp/cna-video.bin https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cna-hero.mp4
+          grep -qi '^content-type: video/mp4' /tmp/cna-video.headers
+          test "$(wc -c < /tmp/cna-video.bin)" -gt 0
+
+          # Trial owners must be directed through password creation before PARIS.
+          curl -fsS --max-time 20 https://www.elevateforhumanity.org/auth/set-password -o /tmp/set-password.html
+          grep -qi 'create.*password\|set.*password' /tmp/set-password.html

@@ -23,7 +23,7 @@ export const VIDEO_HEROES = {
   // Program Categories
   barber: `${R2}/barber-hero-final.mp4`,
   barberApprenticeship: `${R2}/barber-hero-final.mp4`,
-  healthcare: `${R2}/6290542-hd_1280_720_30fps.mp4`,
+  healthcare: `${R2}/cna-hero.mp4`,
   skilledTrades: `${R2}/hvac-hero-final.mp4`,
   technology: `${R2}/hero-home-fast.mp4`,
 

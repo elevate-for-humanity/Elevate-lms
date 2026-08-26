@@ -147,7 +147,7 @@ export default function EmployerPartners({
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 flex-none items-center justify-center overflow-hidden rounded-lg bg-slate-100">
                   {partner.logo_url ? (
-                    <Image src={partner.logo_url} alt={`${partner.name} logo`} width={48} height={48} className="h-10 w-10 object-contain" />
+                    <Image src={partner.logo_url} alt={`${partner.name} logo`} width={48} height={48} className="h-10 w-10 object-contain" sizes="(max-width: 768px) 100vw, 50vw" />
                   ) : (
                     <Building2 className="h-6 w-6 text-slate-600" />
                   )}

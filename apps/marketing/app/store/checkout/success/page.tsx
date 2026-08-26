@@ -149,7 +149,7 @@ function CheckoutSuccessContent() {
 
           <div className="mt-8 pt-6 border-t">
             <Link
-              href="/dashboards"
+              href="/portals"
               className="block w-full text-center bg-white text-slate-900 py-4 rounded-lg font-bold text-lg hover:bg-white transition-colors"
             >
               Go to Dashboards

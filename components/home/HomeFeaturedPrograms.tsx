@@ -90,7 +90,7 @@ const FEATURED_PROGRAMS: FeaturedProgram[] = [
     duration: '12-18 Months',
     credential: 'Indiana Barber License',
     salary: '$28K - $52K/year',
-    cta: { label: 'Start Apprenticeship', href: '/apprenticeships/barber' },
+    cta: { label: 'Start Apprenticeship', href: '/programs/barber-apprenticeship' },
     secondaryCta: { label: 'View Details', href: '/apprenticeships' },
     features: [
       'Get paid while training',

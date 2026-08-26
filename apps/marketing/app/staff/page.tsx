@@ -54,19 +54,19 @@ export default async function StaffPortalLanding() {
   const quickLinks = [
     { label: 'Students', href: '/staff/students', icon: Users, desc: 'Manage enrollments' },
     { label: 'Attendance', href: '/staff/attendance', icon: ClipboardList, desc: 'Record & export' },
-    { label: 'Reports', href: '/staff/reports', icon: BarChart2, desc: 'Progress & outcomes' },
-    { label: 'Scheduling', href: '/staff/scheduling', icon: Calendar, desc: 'Classes & sessions' },
-    { label: 'Documents', href: '/employee/documents', icon: FileText, desc: 'Forms & uploads' },
-    { label: 'My Payroll', href: '/employee/payroll', icon: DollarSign, desc: 'Pay stubs & W-2' },
-    { label: 'Handbook', href: '/employee/handbook', icon: BookOpen, desc: 'Policies & procedures' },
+    { label: 'Reports', href: 'https://admin.elevateforhumanity.org/staff-portal/reports', icon: BarChart2, desc: 'Progress & outcomes' },
+    { label: 'Scheduling', href: 'https://admin.elevateforhumanity.org/staff-portal/scheduling', icon: Calendar, desc: 'Classes & sessions' },
+    { label: 'Documents', href: 'https://admin.elevateforhumanity.org/staff-portal/documents', icon: FileText, desc: 'Forms & uploads' },
+    { label: 'My Payroll', href: 'https://admin.elevateforhumanity.org/staff-portal/payroll', icon: DollarSign, desc: 'Pay stubs & W-2' },
+    { label: 'Handbook', href: 'https://admin.elevateforhumanity.org/staff-portal/handbook', icon: BookOpen, desc: 'Policies & procedures' },
     { label: 'My Skills', href: '/staff/skills', icon: Star, desc: 'Track competencies' },
     { label: 'Interviews', href: '/careers', icon: Video, desc: 'Hiring pipeline' },
-    { label: 'Settings', href: '/staff/settings', icon: Settings, desc: 'Preferences' },
+    { label: 'Settings', href: 'https://admin.elevateforhumanity.org/staff-portal/settings', icon: Settings, desc: 'Preferences' },
   ];
 
   const onboardingItems = [
-    { label: 'Orientation Video', href: '/onboarding/staff/orientation', done: !!user },
-    { label: 'Employee Handbook', href: '/employee/handbook', done: handbookDone },
+    { label: 'Orientation Video', href: 'https://admin.elevateforhumanity.org/staff-portal/onboarding', done: !!user },
+    { label: 'Employee Handbook', href: 'https://admin.elevateforhumanity.org/staff-portal/handbook', done: handbookDone },
     { label: 'Payroll & W-9 Setup', href: '/onboarding/payroll-setup', done: payrollDone },
     { label: 'Skills Assessment', href: '/staff/skills', done: skillsCount >= 5 },
   ];

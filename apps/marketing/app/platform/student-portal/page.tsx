@@ -59,12 +59,12 @@ const PORTAL_FEATURES = [
 ];
 
 const DASHBOARD_SECTIONS = [
-  { name: 'My Courses', description: 'View and continue your enrolled courses', href: '/lms/courses' },
-  { name: 'Assignments', description: 'Track and submit your assignments', href: '/lms/assignments' },
-  { name: 'Grades', description: 'View your grades and academic progress', href: '/lms/grades' },
-  { name: 'Certificates', description: 'Download your earned certificates', href: '/lms/certificates' },
-  { name: 'Calendar', description: 'See upcoming deadlines and events', href: '/lms/calendar' },
-  { name: 'AI Tutor', description: 'Get help with your coursework', href: '/lms/ai-tutor' },
+  { name: 'My Courses', description: 'View and continue your enrolled courses', href: 'https://app.elevateforhumanity.org/lms/courses' },
+  { name: 'Assignments', description: 'Track and submit your assignments', href: 'https://app.elevateforhumanity.org/lms/assignments' },
+  { name: 'Grades', description: 'View your grades and academic progress', href: 'https://app.elevateforhumanity.org/lms/grades' },
+  { name: 'Certificates', description: 'Download your earned certificates', href: 'https://app.elevateforhumanity.org/lms/certificates' },
+  { name: 'Calendar', description: 'See upcoming deadlines and events', href: 'https://app.elevateforhumanity.org/lms/calendar' },
+  { name: 'AI Tutor', description: 'Get help with your coursework', href: 'https://app.elevateforhumanity.org/lms/ai-tutor' },
 ];
 
 export default function StudentPortalPage() {
@@ -90,7 +90,7 @@ export default function StudentPortalPage() {
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Link
-                    href="/lms/login"
+                    href="https://app.elevateforhumanity.org/lms/login"
                     className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition shadow-lg"
                   >
                     <Play className="w-5 h-5" />

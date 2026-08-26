@@ -288,7 +288,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       credentialIssued: `RTI completion (${RTI_HOURS} verified hours)`,
       duration: `${RTI_HOURS} hours RTI`,
       required: true,
-      enrollmentUrl: '/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
+      enrollmentUrl: 'https://app.elevateforhumanity.org/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
     },
   ],
   microCourses: [

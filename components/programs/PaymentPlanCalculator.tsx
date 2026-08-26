@@ -140,7 +140,7 @@ export default function PaymentPlanCalculator({ programSlug }: Props) {
             <label className="text-base font-bold text-slate-800">Choose a deposit</label>
             <span className="text-xl font-extrabold text-slate-950">{fmt(depositCents)}</span>
           </div>
-          <input type="range" min={minDeposit} max={maxDeposit} step={100} value={depositCents} onChange={(e) => setDepositCents(Number(e.target.value))} className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-slate-900" />
+          <input aria-label="Deposit amount" type="range" min={minDeposit} max={maxDeposit} step={100} value={depositCents} onChange={(e) => setDepositCents(Number(e.target.value))} className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-slate-900" />
           <div className="flex justify-between text-sm text-slate-500 mt-2"><span>Minimum {fmt(minDeposit)}</span><span>Full tuition {fmt(pricing.tuition_cents)}</span></div>
         </div>
 

@@ -53,7 +53,7 @@ export default async function StaffPortalAttendancePage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Staff Portal', href: '/admin/staff-portal' }, { label: 'Attendance' }]}
+            items={[{ label: 'Staff Portal', href: 'https://admin.elevateforhumanity.org/staff-portal' }, { label: 'Attendance' }]}
           />
         </div>
       </div>

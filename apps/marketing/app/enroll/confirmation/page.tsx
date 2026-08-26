@@ -218,7 +218,7 @@ function EnrollConfirmationContent() {
           <h2 className="font-semibold text-slate-900 mb-4">What You Can Do Now</h2>
           <div className="space-y-3">
             <Link
-              href="/messages"
+              href="/contact"
               className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition"
             >
               <MessageCircle className="w-5 h-5 text-brand-blue-600" />

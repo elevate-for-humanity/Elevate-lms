@@ -51,7 +51,7 @@ export default async function InstructorPerformancePage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       <div>
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-          <a href={getAdminUrl("/dashboard")} className="hover:text-slate-700">Admin</a>
+          <a href={getAdminUrl("/portals")} className="hover:text-slate-700">Admin</a>
           <ChevronRight className="w-3 h-3" />
           <a href={getAdminUrl("/staff")} className="hover:text-slate-700">Staff</a>
           <ChevronRight className="w-3 h-3" />

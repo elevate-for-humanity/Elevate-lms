@@ -265,7 +265,7 @@ export default function FounderPage() {
                 name: 'Selfish Inc.',
                 role: '501(c)(3) Nonprofit',
                 desc: 'IRS-recognized 501(c)(3) nonprofit supporting mental wellness services, community programming, and free VITA tax preparation for Indianapolis families.',
-                href: '/tax',
+                href: '/services',
               },
               {
                 name: 'Elevate Tax Operations',

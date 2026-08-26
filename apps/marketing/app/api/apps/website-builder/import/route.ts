@@ -33,7 +33,7 @@ function canonicalTenantHref(labelValue: unknown, hrefValue: unknown, sourceOrig
   if (/\b(home|welcome)\b/.test(semantic)) return { label, href: '/' };
   if (/\b(about|our story|who we are)\b/.test(semantic)) return { label, href: '/about' };
   if (/\b(contact|connect|reach us)\b/.test(semantic)) return { label, href: '/contact' };
-  if (/\b(shop|store|product|merch)\b/.test(semantic)) return { label, href: '/shop' };
+  if (/\b(shop|store|product|merch)\b/.test(semantic)) return { label, href: '/store' };
   if (/\b(program|service|course|training|offering)\b/.test(semantic)) return { label, href: '/programs' };
 
   try {
@@ -65,7 +65,7 @@ function normalizeImportedConfig(imported: any, sourceUrl: string) {
 
   const required = [
     { label: 'Home', href: '/' },
-    { label: imported?.config?.meta?.siteKind === 'store' ? 'Shop' : 'Programs', href: imported?.config?.meta?.siteKind === 'store' ? '/shop' : '/programs' },
+    { label: imported?.config?.meta?.siteKind === 'store' ? 'Shop' : 'Programs', href: imported?.config?.meta?.siteKind === 'store' ? '/store' : '/programs' },
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
   ];

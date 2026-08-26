@@ -85,7 +85,7 @@ export default async function SchoolOnboardingPage() {
       id: 'documents',
       label: 'Upload Organization Documents',
       description: 'Submit your W-9, business license, and any required organizational documents.',
-      href: '/program-holder/documents/upload',
+      href: 'https://app.elevateforhumanity.org/program-holder/documents/upload',
       icon: FileText,
       done: orgDocUploaded,
     },
@@ -103,7 +103,7 @@ export default async function SchoolOnboardingPage() {
       label: 'Access Your Partner Portal',
       description:
         'Set up your program-holder portal to manage students, reports, and compliance.',
-      href: '/program-holder/dashboard',
+      href: 'https://app.elevateforhumanity.org/program-holder/dashboard',
       icon: Users,
       done: false,
     },
@@ -200,7 +200,7 @@ export default async function SchoolOnboardingPage() {
               programs.
             </p>
             <Link
-              href="/program-holder/dashboard"
+              href="https://app.elevateforhumanity.org/program-holder/dashboard"
               className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-brand-green-700"
             >
               Go to Partner Portal <ArrowRight className="w-4 h-4" />

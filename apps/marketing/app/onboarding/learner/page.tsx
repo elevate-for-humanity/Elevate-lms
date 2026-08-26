@@ -48,7 +48,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     id: 'profile',
     title: 'Complete Your Profile',
     description: 'Add your contact information so we can support you throughout the program.',
-    href: '/profile/edit',
+    href: 'https://app.elevateforhumanity.org/lms/profile',
     icon: User,
     image: '/images/pages/career-services-page-2.jpg',
     imageAlt: `Student completing profile at ${PLATFORM_DEFAULTS.orgName}`,
@@ -161,7 +161,7 @@ export default async function LearnerOnboardingPage({
     .maybeSingle();
 
   if (roleCheck?.role === 'program_holder') {
-    redirect('/program-holder/onboarding');
+    redirect('https://app.elevateforhumanity.org/program-holder/onboarding');
   }
   if (roleCheck?.role === 'employer') {
     redirect('/onboarding/employer');
@@ -236,7 +236,7 @@ export default async function LearnerOnboardingPage({
     if (!profile?.orientation_completed) {
       redirect(`/programs/${enrollment.program_slug}/orientation`);
     } else {
-      redirect('/apprentice');
+      redirect('https://app.elevateforhumanity.org/apprentice');
     }
   }
 
@@ -487,7 +487,7 @@ export default async function LearnerOnboardingPage({
             </Link>
             <p className="text-sm text-slate-400 mt-6">
               Already applied?{' '}
-              <Link href="/learner/dashboard" className="underline text-slate-500 hover:text-slate-700">
+              <Link href="https://app.elevateforhumanity.org/lms/dashboard" className="underline text-slate-500 hover:text-slate-700">
                 Check your application status
               </Link>
             </p>
@@ -511,7 +511,7 @@ export default async function LearnerOnboardingPage({
               when that happens — usually within 1 business day.
             </p>
             <Link
-              href="/learner/dashboard"
+              href="https://app.elevateforhumanity.org/lms/dashboard"
               className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-700 transition"
             >
               Check Application Status <ArrowRight className="w-4 h-4" />
@@ -548,7 +548,7 @@ export default async function LearnerOnboardingPage({
                     </p>
                   </div>
                   <Link
-                    href="/learner/dashboard"
+                    href="https://app.elevateforhumanity.org/lms/dashboard"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-bold hover:bg-brand-blue-700 transition flex-shrink-0"
                   >
                     Go to Student Portal <ArrowRight className="w-4 h-4" />
@@ -572,7 +572,7 @@ export default async function LearnerOnboardingPage({
                     </p>
                   </div>
                   <Link
-                    href="/learner/dashboard"
+                    href="https://app.elevateforhumanity.org/lms/dashboard"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-700 transition flex-shrink-0"
                   >
                     View Dashboard <ArrowRight className="w-4 h-4" />
@@ -594,7 +594,7 @@ export default async function LearnerOnboardingPage({
                     </p>
                   </div>
                   <Link
-                    href="/learner/dashboard"
+                    href="https://app.elevateforhumanity.org/lms/dashboard"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-700 transition flex-shrink-0"
                   >
                     View Dashboard <ArrowRight className="w-4 h-4" />

@@ -217,7 +217,7 @@ export default function AgreementsPage() {
                 Continue Onboarding <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/lms/courses"
+                href="https://app.elevateforhumanity.org/lms/courses"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-semibold hover:bg-brand-blue-700 transition"
               >
                 Go to My Courses <ArrowRight className="w-4 h-4" />

@@ -11,14 +11,14 @@ export const metadata: Metadata = {
 const policies = [
   {
     title: 'Federal Compliance Policy',
-    href: '/policies/federal-compliance',
+    href: '/legal/disclosures',
     description: 'Our compliance with FERPA, Title IX, ADA, WIOA, and other federal regulations.',
     icon: Shield,
     color: 'blue',
   },
   {
     title: 'FERPA Policy',
-    href: '/policies/ferpa',
+    href: '/legal/disclosures',
     description:
       'Family Educational Rights and Privacy Act - protecting student education records.',
     icon: FileText,
@@ -26,7 +26,7 @@ const policies = [
   },
   {
     title: 'WIOA Policy',
-    href: '/policies/wioa',
+    href: '/legal/disclosures',
     description:
       'Workforce Innovation and Opportunity Act compliance and equal access requirements.',
     icon: Users,
@@ -34,7 +34,7 @@ const policies = [
   },
   {
     title: 'Grievance Procedure',
-    href: '/policies/grievance',
+    href: '/legal/disclosures',
     description:
       'How to file a complaint or grievance regarding discrimination or policy violations.',
     icon: Scale,
@@ -42,7 +42,7 @@ const policies = [
   },
   {
     title: 'Admissions Policy',
-    href: '/policies/admissions',
+    href: '/legal/disclosures',
     description: 'Non-discriminatory admissions practices and eligibility requirements.',
     icon: Users,
     color: 'teal',
@@ -179,4 +179,3 @@ export default function EqualOpportunityPage() {
     </div>
   );
 }
-

@@ -169,7 +169,7 @@ export default async function LicensePage() {
               Pricing
             </Link>
             <Link
-              href="/license/onboarding"
+              href="/license"
               className="px-4 py-1.5 bg-brand-orange-600 text-white rounded-full text-sm font-medium hover:bg-brand-orange-700 transition-colors"
             >
               Start Onboarding

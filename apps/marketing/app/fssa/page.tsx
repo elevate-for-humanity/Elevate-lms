@@ -65,7 +65,7 @@ export default function FSSAPage() {
           <p className="text-slate-600 max-w-2xl mx-auto mb-8">
             Elevate partners with Indiana FSSA to provide workforce training services across the state. Contact us to discuss partnership opportunities.
           </p>
-          <Link href="/partners/fssa" className="inline-block bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">
+          <Link href="/fssa" className="inline-block bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700">
             Partnership Information
           </Link>
         </div>

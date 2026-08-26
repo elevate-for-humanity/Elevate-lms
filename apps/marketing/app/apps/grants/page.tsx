@@ -93,7 +93,7 @@ export default async function GrantsPage({
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-white border-b"><div className="max-w-6xl mx-auto px-4 py-3"><Breadcrumbs items={[{ label: 'Apps', href: '/apps' }, { label: 'Grants' }]} /></div></div>
+      <div className="bg-white border-b"><div className="max-w-6xl mx-auto px-4 py-3"><Breadcrumbs items={[{ label: 'Apps', href: '/platform' }, { label: 'Grants' }]} /></div></div>
       <GrantsApp user={user} subscription={subscription} opportunities={opportunities || []} savedGrants={savedGrants || []} applications={applications || []} trialDaysRemaining={trialDaysRemaining} setupContext={setupContext} />
     </div>
   );

@@ -229,6 +229,36 @@
   color: #0f172a;
 }
 
+/* A light card can be nested inside a dark CTA or hero. The card owns its
+ * foreground; an outer dark-surface rule must never turn it white-on-white. */
+.efh-contrast
+  :is(.bg-white, .bg-slate-50, .bg-gray-50)
+  :is(
+    .text-slate-500,
+    .text-slate-600,
+    .text-slate-700,
+    .text-slate-800,
+    .text-slate-900,
+    .text-slate-950,
+    .text-gray-500,
+    .text-gray-600,
+    .text-gray-700,
+    .text-gray-800,
+    .text-gray-900
+  ) {
+  color: #0f172a !important;
+}
+
+/* White text on the framework's 500/600 green and blue shades misses AA for
+ * normal-size labels. Keep the hue but use the accessible brand depth. */
+.efh-contrast :is(.bg-green-500, .bg-green-600) {
+  background-color: #166534 !important;
+}
+
+.efh-contrast :is(.bg-blue-500, .bg-blue-600, .bg-brand-blue-500, .bg-brand-blue-600) {
+  background-color: #1e40af !important;
+}
+
 /* Orange remains a brand accent, but white text requires the darker AA-safe shade. */
 .efh-contrast :is(.bg-orange-600, .bg-brand-orange-500, .bg-brand-orange-600) {
   background-color: #c2410c !important;

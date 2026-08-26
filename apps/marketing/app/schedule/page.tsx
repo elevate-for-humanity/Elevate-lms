@@ -38,7 +38,7 @@ export default function SchedulePage() {
               <p className="text-gray-600 mb-4">
                 Browse our weekly class schedules for all programs.
               </p>
-              <Link href="/lms/schedule" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
+              <Link href="https://app.elevateforhumanity.org/lms/schedule" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
                 View Schedule →
               </Link>
             </div>

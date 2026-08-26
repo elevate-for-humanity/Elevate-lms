@@ -207,7 +207,7 @@ export function HomeAIDemo() {
             {/* CTA */}
             <div className="mt-6 text-center">
               <a
-                href="/ai-chat"
+                  href="/paris/interview"
                 className="inline-flex items-center gap-2 text-brand-red-400 hover:text-brand-red-300 font-semibold transition-colors"
               >
                 Try the full AI assistant

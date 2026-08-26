@@ -65,6 +65,46 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
     }
   }
 
+  async function rebuildCourseMedia() {
+    if (!courseId) return;
+    setLoading(true);
+    setMessage('Preparing course-specific scripts and visual scenes…');
+    try {
+      const repairResponse = await fetch('/api/admin/course-builder', {
+        method: 'POST',
+        headers: courseBuilderJsonHeaders('repair'),
+        body: JSON.stringify({ action: 'repair', courseId }),
+      });
+      const repairData = await repairResponse.json();
+      if (!repairResponse.ok || !repairData.ok) {
+        throw new Error(repairData.error || 'Unable to prepare course media');
+      }
+
+      setMessage('Course scripts are ready. Queueing replacement visual lessons…');
+      const queueResponse = await fetch('/api/admin/course-builder', {
+        method: 'POST',
+        headers: courseBuilderJsonHeaders('queue-media'),
+        body: JSON.stringify({
+          action: 'queue-media',
+          courseId,
+          onlyMissing: false,
+          force: true,
+        }),
+      });
+      const queueData = await queueResponse.json();
+      if (!queueResponse.ok || !queueData.ok) {
+        throw new Error(queueData.error || 'Unable to queue replacement videos');
+      }
+      setMessage(
+        `Queued ${queueData.result.queued} replacement lesson videos and ${queueData.result.microclipsQueued ?? 0} visual microclips. Existing published files remain available until replacements pass processing.`,
+      );
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to rebuild course media');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (!courseId) {
     return (
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
@@ -129,6 +169,19 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
                 <PlayCircle className="h-5 w-5" />
               )}
               Generate missing instructor lessons
+            </button>
+            <button
+              type="button"
+              onClick={rebuildCourseMedia}
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-xl bg-cyan-400 px-5 py-3 font-black text-slate-950 hover:bg-cyan-300 disabled:opacity-60"
+            >
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Sparkles className="h-5 w-5" />
+              )}
+              Rebuild scripts + visual lessons
             </button>
             <button
               type="button"

@@ -69,11 +69,11 @@ const LICENSE_DATA = {
 const DEMO_PAGES = [
   { name: 'Homepage', path: '/', description: 'Main landing page' },
   { name: 'Programs', path: '/programs', description: 'Training programs catalog' },
-  { name: 'Courses', path: '/courses', description: 'Course listings' },
+  { name: 'Courses', path: '/store', description: 'Course listings' },
   { name: 'Apply', path: '/apply', description: 'Student application' },
-  { name: 'LMS Dashboard', path: '/lms/dashboard', description: 'Student portal' },
+  { name: 'LMS Dashboard', path: 'https://app.elevateforhumanity.org/lms/dashboard', description: 'Student portal' },
   { name: 'Admin', path: '/admin', description: 'Admin dashboard' },
-  { name: 'Partner Portal', path: '/program-holder/dashboard', description: 'Partner management' },
+  { name: 'Partner Portal', path: 'https://app.elevateforhumanity.org/program-holder/dashboard', description: 'Partner management' },
   { name: 'Employer Portal', path: '/employer', description: 'Employer dashboard' },
   { name: 'AI Studio', path: '/ai-studio', description: 'AI content generation' },
 ];

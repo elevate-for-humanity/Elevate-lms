@@ -134,7 +134,7 @@ export default function LegalEntityStructurePage() {
             Elevate does not issue professional licenses (barber, cosmetology, nail, etc.). State
             boards issue licenses; Elevate coordinates registered apprenticeship and training
             pathways. Credential verification:{' '}
-            <Link href="/about/approvals" className="text-brand-blue-600 underline">
+            <Link href="/approvals" className="text-brand-blue-600 underline">
               /about/approvals
             </Link>
             .

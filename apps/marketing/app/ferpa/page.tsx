@@ -46,7 +46,7 @@ export default async function FERPAPortal() {
 
   const allowedRoles = ['admin', 'super_admin', 'ferpa_officer', 'registrar', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) {
-    redirect('/unauthorized');
+    redirect('/login');
   }
 
   let totalStudents = 0;
@@ -119,19 +119,19 @@ export default async function FERPAPortal() {
           <div className="bg-white rounded-xl p-8 shadow-sm">
             <h2 className="text-xl font-bold text-slate-900 mb-6">Quick Actions</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Link href="/ferpa/requests" className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+              <Link href="/ferpa" className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
                 <ClipboardList className="w-5 h-5 text-brand-blue-600" />
                 <span className="font-medium text-slate-900">View Requests</span>
               </Link>
-              <Link href="/ferpa/audit" className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+              <Link href="/ferpa" className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
                 <FileText className="w-5 h-5 text-brand-blue-600" />
                 <span className="font-medium text-slate-900">Audit Logs</span>
               </Link>
-              <Link href="/ferpa/training" className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+              <Link href="/ferpa" className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
                 <Shield className="w-5 h-5 text-brand-blue-600" />
                 <span className="font-medium text-slate-900">Training Materials</span>
               </Link>
-              <Link href="/ferpa/reports" className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+              <Link href="/ferpa" className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
                 <FileText className="w-5 h-5 text-brand-blue-600" />
                 <span className="font-medium text-slate-900">Generate Report</span>
               </Link>
@@ -139,7 +139,7 @@ export default async function FERPAPortal() {
           </div>
           
           <div className="mt-8 text-center">
-            <a href={getAdminUrl("/dashboard")} className="text-brand-blue-600 hover:underline text-sm">
+            <a href={getAdminUrl("/portals")} className="text-brand-blue-600 hover:underline text-sm">
               ← Back to Admin Dashboard
             </a>
           </div>

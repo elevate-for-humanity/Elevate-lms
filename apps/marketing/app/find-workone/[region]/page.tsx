@@ -61,7 +61,7 @@ export default async function WorkOneRegionPage({
             Counties: {region.counties.join(', ')}
           </p>
           <Link
-            href="/workforce-training-indianapolis"
+            href="/programs"
             className="inline-block mt-4 text-sm font-semibold text-brand-blue-700 hover:underline"
           >
             {PLATFORM_DEFAULTS.orgName} training programs in this region →

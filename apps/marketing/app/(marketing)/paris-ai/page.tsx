@@ -657,7 +657,7 @@ export default function ParisAIPage() {
               <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
               <Link href="/security" className="hover:text-white transition-colors">Security</Link>
-              <Link href="/documentation" className="hover:text-white transition-colors">Documentation</Link>
+              <Link href="/help" className="hover:text-white transition-colors">Documentation</Link>
             </div>
           </div>
         </div>

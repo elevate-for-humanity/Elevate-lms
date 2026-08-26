@@ -7,7 +7,7 @@ const PLATFORM_CAPABILITIES = [
     label: 'Learner Portal',
     desc: 'Progress, assignments, attendance, credentials, and learner records in one authenticated workspace.',
     img: '/images/pages/platform-page-1.webp',
-    href: '/lms',
+    href: 'https://app.elevateforhumanity.org/lms',
   },
   {
     label: 'Employer & Apprenticeship Workflows',

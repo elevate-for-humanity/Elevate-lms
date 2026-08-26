@@ -37,7 +37,7 @@ const aiProducts = [
     icon: '🌐',
     features: ['AI content generation', 'SEO optimization', 'Mobile responsive', 'Custom branding'],
     color: 'from-green-600 to-teal-600',
-    href: '/ai/website-builder',
+    href: '/apps/website-builder',
   },
   {
     slug: 'course-factory',
@@ -77,7 +77,7 @@ const aiProducts = [
     icon: '📁',
     features: ['Document storage', 'E-signatures', 'Checklist tracking', 'Compliance archives'],
     color: 'from-slate-600 to-gray-600',
-    href: '/ai/digital-binder',
+    href: '/ai',
   },
   {
     slug: 'media-studio',
@@ -87,7 +87,7 @@ const aiProducts = [
     icon: '🎬',
     features: ['Video generation', 'Graphic design', 'Social templates', 'Brand consistency'],
     color: 'from-pink-600 to-rose-600',
-    href: '/ai/media-studio',
+    href: '/ai',
   },
   {
     slug: 'workforce-os',
@@ -117,7 +117,7 @@ const aiProducts = [
     icon: '🔗',
     features: ['Stripe payments', 'SendGrid email', 'Google Classroom', 'API webhooks'],
     color: 'from-cyan-600 to-blue-600',
-    href: '/integrations',
+    href: '/platform',
   },
   {
     slug: 'api',
@@ -127,7 +127,7 @@ const aiProducts = [
     icon: '🔌',
     features: ['REST API', 'Webhooks', 'SDK libraries', 'Documentation'],
     color: 'from-violet-600 to-purple-600',
-    href: '/api-docs',
+    href: '/help',
   },
 ];
 

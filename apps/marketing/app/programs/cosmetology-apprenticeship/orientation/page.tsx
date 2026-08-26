@@ -37,7 +37,7 @@ const ORIENTATION_STEPS = [
     title: 'Complete Your Enrollment Documents',
     description:
       'Your enrollment packet has been sent to your email. Sign and return all documents within 48 hours to secure your placement.',
-    action: { label: 'View Documents', href: '/portal/documents' },
+    action: { label: 'View Documents', href: 'https://app.elevateforhumanity.org/lms/documents' },
     icon: BookOpen,
   },
   {
@@ -53,7 +53,7 @@ const ORIENTATION_STEPS = [
     title: 'Set Up Your Student Portal',
     description:
       'Access your learning materials, track your hours, and submit weekly progress reports through your student dashboard.',
-    action: { label: 'Go to Dashboard', href: '/learner/dashboard' },
+    action: { label: 'Go to Dashboard', href: 'https://app.elevateforhumanity.org/lms/dashboard' },
     icon: Star,
   },
   {
@@ -387,7 +387,7 @@ export default async function CosmetologyOrientationPage() {
               <ChevronRight className="w-4 h-4" />
             </Link>
             <Link
-              href={`/lms/courses/${COSMETOLOGY_COURSE_ID}`}
+              href={`https://app.elevateforhumanity.org/lms/courses/${COSMETOLOGY_COURSE_ID}`}
               className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-slate-900 font-semibold px-8 py-3.5 rounded-lg border border-white/30 transition-colors"
             >
               View My Course

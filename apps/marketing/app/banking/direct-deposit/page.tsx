@@ -311,7 +311,7 @@ export default function DirectDepositPage() {
             Set up direct deposit and get your refund faster.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={getAdminUrl("/dashboard")}
+            <a href={getAdminUrl("/portals")}
               className="bg-white hover:bg-white text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               File Your Taxes <ArrowRight className="ml-2 w-5 h-5" />

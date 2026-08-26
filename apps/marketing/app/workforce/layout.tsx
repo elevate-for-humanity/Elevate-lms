@@ -32,7 +32,7 @@ export default async function WorkforceLayout({ children }: { children: React.Re
     .maybeSingle();
 
   if (!profile?.role || !ALLOWED_ROLES.includes(profile.role)) {
-    redirect('/unauthorized');
+    redirect('/login');
   }
 
   // Get pathname for breadcrumbs
@@ -42,7 +42,7 @@ export default async function WorkforceLayout({ children }: { children: React.Re
   ]);
   const headers = await headersList();
   const cookieStore = await cookies();
-  const pathname = headers.get('x-pathname') || cookieStore.get('__efh_pathname')?.value || '/workforce';
+  const pathname = headers.get('x-pathname') || cookieStore.get('__efh_pathname')?.value || '/workforce-partners';
   const breadcrumbs = generateBreadcrumbs(pathname);
 
   return (

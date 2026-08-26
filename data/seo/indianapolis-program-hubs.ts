@@ -141,7 +141,7 @@ export const CNA_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
       'OJT reimbursement coordination for eligible partners',
       'No recruiting fee for partner employers',
     ],
-    cta: { label: 'Employer Partnership Inquiry', href: '/employer-workforce-partnerships-indiana' },
+    cta: { label: 'Employer Partnership Inquiry', href: '/employer' },
   },
   faqs: [
     {
@@ -161,7 +161,7 @@ export const CNA_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
     },
   ],
   relatedLinks: [
-    { label: 'Workforce Training Indianapolis', href: '/workforce-training-indianapolis' },
+    { label: 'Workforce Training Indianapolis', href: '/programs' },
     { label: 'Healthcare Training Hub', href: '/healthcare-training-indianapolis' },
     { label: 'CNA Program Page', href: '/programs/cna' },
     { label: 'Funding Options', href: '/funding' },
@@ -248,7 +248,7 @@ export const HVAC_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
       'Indianapolis HVAC contractors and facilities employers can hire apprentices or funded trainees through Elevate’s workforce pipeline.',
     ],
     bullets: ['EPA 608-ready candidates', 'Apprenticeship sponsorship support', 'OJT reimbursement coordination'],
-    cta: { label: 'Employer Partnerships', href: '/employer-workforce-partnerships-indiana' },
+    cta: { label: 'Employer Partnerships', href: '/employer' },
   },
   faqs: [
     {
@@ -347,7 +347,7 @@ export const CDL_TRAINING_INDIANAPOLIS: IndianapolisProgramHubConfig = {
   ],
   relatedLinks: [
     { label: 'CDL Program', href: '/programs/cdl-training' },
-    { label: 'Workforce Hub', href: '/workforce-training-indianapolis' },
+    { label: 'Workforce Hub', href: '/programs' },
     { label: 'Funding', href: '/funding' },
     { label: 'Apply', href: '/apply?program=cdl-training' },
   ],
@@ -432,7 +432,7 @@ export const BARBER_APPRENTICESHIP_INDIANAPOLIS: IndianapolisProgramHubConfig = 
   relatedLinks: [
     { label: 'Barber Program', href: '/programs/barber-apprenticeship' },
     { label: 'Apprenticeships', href: '/programs/apprenticeships' },
-    { label: 'Workforce Hub', href: '/workforce-training-indianapolis' },
+    { label: 'Workforce Hub', href: '/programs' },
     { label: 'Apply', href: '/programs/barber-apprenticeship/apply' },
   ],
   complianceNotes: [

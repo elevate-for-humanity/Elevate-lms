@@ -37,7 +37,7 @@ export default function OperationalControlsPage() {
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Governance', href: '/governance' },
+            { label: 'Governance', href: '/governance/operational-controls' },
             { label: 'Operational Controls' },
           ]}
         />

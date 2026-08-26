@@ -14,7 +14,7 @@ export default function UpdatePasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [portal, setPortal] = useState('/learner/dashboard');
+  const [portal, setPortal] = useState('https://app.elevateforhumanity.org/lms/dashboard');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {

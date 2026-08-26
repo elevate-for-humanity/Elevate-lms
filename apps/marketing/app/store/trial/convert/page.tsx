@@ -152,7 +152,7 @@ export default function TrialConvertPage() {
           <p className="text-slate-600 mb-6">
             Your trial has been successfully converted to a paid subscription. Welcome to {trial.organization_name}!
           </p>
-          <Link href="/dashboard" className="inline-flex items-center gap-2 bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700">
+          <Link href="/portals" className="inline-flex items-center gap-2 bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700">
             Go to Dashboard <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

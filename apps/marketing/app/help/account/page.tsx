@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 };
 
 const topics = [
-  { icon: User, title: 'Managing Your Profile', articles: 8, href: '/help/account/profile' },
-  { icon: Mail, title: 'Email & Notifications', articles: 5, href: '/help/account/email' },
-  { icon: Lock, title: 'Password & Security', articles: 6, href: '/help/account/security' },
-  { icon: CreditCard, title: 'Billing & Payments', articles: 10, href: '/help/account/billing' },
-  { icon: Bell, title: 'Notification Settings', articles: 4, href: '/help/account/notifications' },
-  { icon: Shield, title: 'Privacy Settings', articles: 7, href: '/help/account/privacy' },
+  { icon: User, title: 'Managing Your Profile', articles: 8, href: '/help/account' },
+  { icon: Mail, title: 'Email & Notifications', articles: 5, href: '/help/account' },
+  { icon: Lock, title: 'Password & Security', articles: 6, href: '/help/account' },
+  { icon: CreditCard, title: 'Billing & Payments', articles: 10, href: '/help/account' },
+  { icon: Bell, title: 'Notification Settings', articles: 4, href: '/help/account' },
+  { icon: Shield, title: 'Privacy Settings', articles: 7, href: '/help/account' },
 ];
 
 export default function AccountHelpPage() {

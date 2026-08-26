@@ -255,7 +255,7 @@ export default function MOUOnboardingPage() {
         throw new Error(d.error || 'Failed to sign');
       }
       setSigned(true);
-      setTimeout(() => router.push('/program-holder/onboarding'), 2000);
+      setTimeout(() => router.push('https://app.elevateforhumanity.org/program-holder/onboarding'), 2000);
     } catch (e: any) {
       setError(e.message || 'Failed to record signature. Please try again.');
     } finally {
@@ -311,7 +311,7 @@ export default function MOUOnboardingPage() {
             </h2>
             <p className="text-brand-green-700">Your signature (v{MOU_VERSION}) is on file.</p>
             <Link
-              href="/program-holder/onboarding"
+              href="https://app.elevateforhumanity.org/program-holder/onboarding"
               className="inline-block mt-4 text-brand-blue-600 hover:underline"
             >
               ← Back to Onboarding
@@ -602,7 +602,7 @@ export default function MOUOnboardingPage() {
 
         <div className="pb-8">
           <Link
-            href="/program-holder/onboarding"
+            href="https://app.elevateforhumanity.org/program-holder/onboarding"
             className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Onboarding

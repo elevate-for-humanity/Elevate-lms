@@ -15,7 +15,7 @@ const services = [
   {
     title: 'Tax Services',
     description: 'Professional tax preparation and maximum refund guarantee',
-    href: '/tax-self-prep',
+    href: '/services',
     image: '/images/pages/career-services.jpg',
   },
   {
@@ -39,7 +39,7 @@ const services = [
   {
     title: 'Career Fairs',
     description: 'Meet employers hiring our graduates',
-    href: '/career-fair',
+    href: '/career-services',
     image: '/images/pages/career-services-page-7.webp',
   },
   {

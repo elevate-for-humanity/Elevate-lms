@@ -51,9 +51,9 @@ const LICENSE_DATA = {
 const DEMO_PAGES = [
   { name: 'Homepage', path: '/', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Main landing page' },
   { name: 'Programs', path: '/programs', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Training programs catalog' },
-  { name: 'Courses', path: '/courses', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Course listings' },
+  { name: 'Courses', path: '/store', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Course listings' },
   { name: 'Apply', path: '/apply', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Student application' },
-  { name: 'LMS Dashboard', path: '/lms/dashboard', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Student portal' },
+  { name: 'LMS Dashboard', path: 'https://app.elevateforhumanity.org/lms/dashboard', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Student portal' },
   { name: 'Admin', path: '/admin', keywords: ["get started", "apply", "enroll", "workforce training"], description: 'Admin dashboard' },
 ];
 

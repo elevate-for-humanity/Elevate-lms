@@ -41,7 +41,7 @@ const AI_PRODUCTS = [
   },
   { 
     name: 'Media Studio', 
-    href: '/ai/media-studio',
+    href: '/ai',
     icon: Video,
     desc: 'AI video & content generation',
     color: 'from-pink-500 to-rose-500'

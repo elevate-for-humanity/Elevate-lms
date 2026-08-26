@@ -109,7 +109,7 @@ export default function AcceptInvitePage() {
       }
 
       // Success - redirect to organization dashboard
-      router.push('/dashboard');
+      router.push('/portals');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to accept invitation');
       setAccepting(false);

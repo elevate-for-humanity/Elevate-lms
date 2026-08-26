@@ -18,25 +18,25 @@ const resources = [
     icon: FileText,
     title: 'Course Templates',
     description: 'Ready-to-use templates for building courses',
-    href: '/educatorhub/templates',
+    href: '/educatorhub',
   },
   {
     icon: Video,
     title: 'Video Tutorials',
     description: 'Learn how to use the LMS effectively',
-    href: '/educatorhub/tutorials',
+    href: '/educatorhub',
   },
   {
     icon: BarChart,
     title: 'Analytics Guide',
     description: 'Track and improve student outcomes',
-    href: '/educatorhub/analytics',
+    href: '/educatorhub',
   },
   {
     icon: Award,
     title: 'Best Practices',
     description: 'Tips from successful instructors',
-    href: '/educatorhub/best-practices',
+    href: '/educatorhub',
   },
 ];
 

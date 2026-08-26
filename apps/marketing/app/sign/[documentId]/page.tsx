@@ -139,7 +139,7 @@ export default function SignDocumentPage() {
           <h1 className="text-xl font-bold text-slate-900 mb-2">Document Not Found</h1>
           <p className="text-slate-500 mb-6">{error}</p>
           <Link
-            href="/learner/dashboard"
+            href="https://app.elevateforhumanity.org/lms/dashboard"
             className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-semibold hover:bg-brand-blue-700"
           >
             Return to Dashboard
@@ -173,7 +173,7 @@ export default function SignDocumentPage() {
             Your signature has been recorded. A copy has been saved to your account.
           </p>
           <Link
-            href="/learner/dashboard"
+            href="https://app.elevateforhumanity.org/lms/dashboard"
             className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-semibold hover:bg-brand-blue-700"
           >
             Return to Dashboard
@@ -264,7 +264,7 @@ export default function SignDocumentPage() {
               {signing ? 'Signing...' : 'Sign Document'}
             </button>
             <Link
-              href="/learner/dashboard"
+              href="https://app.elevateforhumanity.org/lms/dashboard"
               className="px-6 py-3 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
             >
               Cancel

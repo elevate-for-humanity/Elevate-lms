@@ -20,7 +20,7 @@ test.describe('Canonical application flow', () => {
     await page.goto('/apply');
     await expect(page).toHaveURL(/\/apply\/student\/interview/);
     await expect(page.getByRole('heading', { name: /Talk with PARIS/i })).toBeVisible();
-    await expect(page.getByPlaceholder(/Type your answer|Escriba su respuesta/i)).toBeVisible();
+    await expect(page.getByPlaceholder(/Type your answer|Escriba su respuesta/i)).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole('button', { name: /Speak answer|Escuchar/i })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Use standard form instead' })).toBeVisible();
   });

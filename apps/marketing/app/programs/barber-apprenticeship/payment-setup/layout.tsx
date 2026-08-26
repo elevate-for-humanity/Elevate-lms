@@ -28,7 +28,7 @@ export default async function PaymentSetupLayout({ children }: { children: React
 
   if (enrollment.payment_status === 'paid' || enrollment.enrollment_state === 'active') {
     // Already paid — send to apprentice dashboard
-    redirect('/apprentice');
+    redirect('https://app.elevateforhumanity.org/apprentice');
   }
 
   return <>{children}</>;

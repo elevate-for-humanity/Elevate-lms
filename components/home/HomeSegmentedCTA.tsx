@@ -47,7 +47,7 @@ const SEGMENTS = [
     cta: 'Agency Tools',
     href: '/for-agencies',
     secondaryCta: 'Submit Referral',
-    secondaryHref: '/agency-referral-workforce-training-indiana',
+    secondaryHref: '/for-agencies',
     img: '/images/pages/workforce-board-page-1.webp',
     alt: 'Workforce agency case manager with participant',
     badge: 'WIOA aligned',

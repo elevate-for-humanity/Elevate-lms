@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 };
 
 const MODULES = [
-  { icon: Search,      label: 'SAM.gov Search',         desc: 'Search federal opportunities by keyword, agency, CFDA number, or deadline', href: '/admin/grants/opportunities' },
-  { icon: Briefcase,   label: 'Application Pipeline',   desc: 'Draft → review → approved → submitted → awarded with full status tracking', href: '/admin/grants/applications' },
-  { icon: ShieldCheck, label: 'Org Profile',            desc: 'Legal name, EIN, UEI, CAGE, SAM status, signatory — single source of truth', href: '/admin/settings/organization-profile' },
-  { icon: FileText,    label: 'Facts Vault',            desc: 'Approved atomic facts for all prefill — never re-enter the same data twice', href: '/admin/submissions/facts' },
-  { icon: Users,       label: 'Content Library',        desc: 'Approved prose blocks, past performance, capability statements for reuse', href: '/admin/submissions/content' },
-  { icon: BarChart3,   label: 'Grant Revenue',          desc: 'Track awarded amounts, expenditures, and reporting deadlines', href: '/admin/grants/revenue' },
+  { icon: Search,      label: 'SAM.gov Search',         desc: 'Search federal opportunities by keyword, agency, CFDA number, or deadline', href: 'https://admin.elevateforhumanity.org/grants/opportunities' },
+  { icon: Briefcase,   label: 'Application Pipeline',   desc: 'Draft → review → approved → submitted → awarded with full status tracking', href: 'https://admin.elevateforhumanity.org/grants/applications' },
+  { icon: ShieldCheck, label: 'Org Profile',            desc: 'Legal name, EIN, UEI, CAGE, SAM status, signatory — single source of truth', href: 'https://admin.elevateforhumanity.org/settings/organization-profile' },
+  { icon: FileText,    label: 'Facts Vault',            desc: 'Approved atomic facts for all prefill — never re-enter the same data twice', href: 'https://admin.elevateforhumanity.org/submissions/facts' },
+  { icon: Users,       label: 'Content Library',        desc: 'Approved prose blocks, past performance, capability statements for reuse', href: 'https://admin.elevateforhumanity.org/submissions/content' },
+  { icon: BarChart3,   label: 'Grant Revenue',          desc: 'Track awarded amounts, expenditures, and reporting deadlines', href: 'https://admin.elevateforhumanity.org/grants/revenue' },
 ];
 
 const FEATURES = [

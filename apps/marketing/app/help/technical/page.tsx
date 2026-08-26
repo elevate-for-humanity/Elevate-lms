@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 };
 
 const topics = [
-  { icon: Monitor, title: 'Browser Requirements', description: 'Supported browsers and settings.', articles: 5, href: '/help/technical/browser' },
-  { icon: Wifi, title: 'Internet Connection', description: 'Troubleshooting connection issues.', articles: 4, href: '/help/technical/connection' },
-  { icon: Download, title: 'App Installation', description: 'Installing the mobile or desktop app.', articles: 6, href: '/help/technical/install' },
-  { icon: Lock, title: 'Security Settings', description: 'Firewall, pop-ups, and permissions.', articles: 3, href: '/help/technical/security' },
-  { icon: RefreshCw, title: 'Clear Cache', description: 'How to clear your browser cache.', articles: 2, href: '/help/technical/cache' },
-  { icon: HelpCircle, title: 'General Troubleshooting', description: 'Common issues and solutions.', articles: 8, href: '/help/technical/troubleshooting' },
+  { icon: Monitor, title: 'Browser Requirements', description: 'Supported browsers and settings.', articles: 5, href: '/help/technical' },
+  { icon: Wifi, title: 'Internet Connection', description: 'Troubleshooting connection issues.', articles: 4, href: '/help/technical' },
+  { icon: Download, title: 'App Installation', description: 'Installing the mobile or desktop app.', articles: 6, href: '/help/technical' },
+  { icon: Lock, title: 'Security Settings', description: 'Firewall, pop-ups, and permissions.', articles: 3, href: '/help/technical' },
+  { icon: RefreshCw, title: 'Clear Cache', description: 'How to clear your browser cache.', articles: 2, href: '/help/technical' },
+  { icon: HelpCircle, title: 'General Troubleshooting', description: 'Common issues and solutions.', articles: 8, href: '/help/technical' },
 ];
 
 export default function TechnicalHelpPage() {

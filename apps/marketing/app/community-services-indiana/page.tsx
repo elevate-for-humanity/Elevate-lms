@@ -78,25 +78,25 @@ export default function CommunityServicesIndianaPage() {
             <h3 className="font-semibold mb-3">Other States</h3>
             <div className="space-y-1">
               <Link
-                href="/community-services-ohio"
+                href="/community-services-indiana"
                 className="text-green-600 hover:underline block"
               >
                 Ohio
               </Link>
               <Link
-                href="/community-services-illinois"
+                href="/community-services-indiana"
                 className="text-green-600 hover:underline block"
               >
                 Illinois
               </Link>
               <Link
-                href="/community-services-tennessee"
+                href="/community-services-indiana"
                 className="text-green-600 hover:underline block"
               >
                 Tennessee
               </Link>
               <Link
-                href="/community-services-texas"
+                href="/community-services-indiana"
                 className="text-green-600 hover:underline block"
               >
                 Texas

@@ -26,7 +26,7 @@ export default async function DocumentsLayout({
 
   if (!enrollment) redirect(`/programs/${program}`);
   if (!enrollment.orientation_completed_at) redirect(`/programs/${program}/orientation`);
-  if (enrollment.documents_submitted_at) redirect('/apprentice');
+  if (enrollment.documents_submitted_at) redirect('https://app.elevateforhumanity.org/apprentice');
 
   return <>{children}</>;
 }

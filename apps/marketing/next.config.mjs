@@ -84,6 +84,7 @@ const nextConfig = {
       { source: '/apprenticeships/ipla-exam', destination: '/testing', permanent: true },
       { source: '/partners/barber-host-shop', destination: '/partners/host-shops', permanent: true },
       { source: '/partners/barber-host-shop/apply', destination: '/partners/host-shop/apply', permanent: true },
+      { source: '/student-portal', destination: '/platform/student-portal', permanent: true },
     ];
   },
 

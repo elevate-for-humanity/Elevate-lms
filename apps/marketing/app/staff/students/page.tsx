@@ -75,7 +75,7 @@ export default async function StudentsPage() {
                     </div>
                   </div>
                   <Link
-                    href={`/admin/staff-portal/students/${student.id}`}
+                    href={`https://admin.elevateforhumanity.org/staff-portal/students/${student.id}`}
                     className="text-brand-blue-600 hover:text-brand-blue-800 text-sm"
                   >
                     View Profile

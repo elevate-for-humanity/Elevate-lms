@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 
 import React from 'react';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Play,
   Pause,
@@ -81,6 +81,9 @@ interface TranscriptSegment {
   text: string;
 }
 
+const getCheckpointKey = (checkpoint: Checkpoint) =>
+  `${checkpoint.type}:${checkpoint.timestamp}`;
+
 interface InteractiveVideoPlayerProps {
   videoUrl: string;
   title: string;
@@ -130,22 +133,25 @@ export default function InteractiveVideoPlayer({
   const [checkpointFeedback, setCheckpointFeedback] = useState('');
   const [completedCheckpointKeys, setCompletedCheckpointKeys] = useState<Set<string>>(new Set());
 
-  const checkpointKey = (checkpoint: Checkpoint) =>
-    `${checkpoint.type}:${checkpoint.timestamp}`;
-  const checkpointQuizzes: VideoQuiz[] = checkpoints
-    .filter((checkpoint): checkpoint is CheckpointQuiz => checkpoint.type === 'quiz')
-    .map((checkpoint) => ({
-      id: checkpointKey(checkpoint),
-      timestamp: checkpoint.timestamp,
-      question: checkpoint.question,
-      options: checkpoint.options,
-      correctAnswer: checkpoint.answer,
-      explanation: checkpoint.explanation,
-    }));
-  const effectiveQuizzes = [...quizzes, ...checkpointQuizzes.filter(
-    (checkpoint) => !quizzes.some((quiz) => quiz.id === checkpoint.id),
-  )];
-  const nonQuizCheckpoints = checkpoints.filter((checkpoint) => checkpoint.type !== 'quiz');
+  const effectiveQuizzes = useMemo(() => {
+    const checkpointQuizzes: VideoQuiz[] = checkpoints
+      .filter((checkpoint): checkpoint is CheckpointQuiz => checkpoint.type === 'quiz')
+      .map((checkpoint) => ({
+        id: getCheckpointKey(checkpoint),
+        timestamp: checkpoint.timestamp,
+        question: checkpoint.question,
+        options: checkpoint.options,
+        correctAnswer: checkpoint.answer,
+        explanation: checkpoint.explanation,
+      }));
+    return [...quizzes, ...checkpointQuizzes.filter(
+      (checkpoint) => !quizzes.some((quiz) => quiz.id === checkpoint.id),
+    )];
+  }, [checkpoints, quizzes]);
+  const nonQuizCheckpoints = useMemo(
+    () => checkpoints.filter((checkpoint) => checkpoint.type !== 'quiz'),
+    [checkpoints],
+  );
 
   // Detect media type from URL
   const isAudioOnly = /\.(mp3|wav|ogg|aac|m4a)(\?|$)/i.test(videoUrl);
@@ -257,7 +263,7 @@ export default function InteractiveVideoPlayer({
     const checkpoint = nonQuizCheckpoints.find(
       (item) =>
         Math.abs(item.timestamp - currentTime) < 0.75 &&
-        !completedCheckpointKeys.has(checkpointKey(item)),
+        !completedCheckpointKeys.has(getCheckpointKey(item)),
     );
     if (checkpoint) {
       setActiveCheckpoint(checkpoint);
@@ -424,6 +430,7 @@ export default function InteractiveVideoPlayer({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           lessonId: lessonRecordId,
+          courseId,
           question: currentQuiz.question,
           selectedAnswer: quizAnswer,
           correctAnswer: currentQuiz.correctAnswer,
@@ -475,7 +482,7 @@ export default function InteractiveVideoPlayer({
     if (!valid) return;
 
     const completed = activeCheckpoint;
-    setCompletedCheckpointKeys((current) => new Set(current).add(checkpointKey(completed)));
+    setCompletedCheckpointKeys((current) => new Set(current).add(getCheckpointKey(completed)));
     setTimeout(() => {
       setActiveCheckpoint(null);
       setCheckpointChoice(null);
@@ -488,7 +495,7 @@ export default function InteractiveVideoPlayer({
 
   const allCheckpointsComplete =
     checkpoints.length === 0 ||
-    checkpoints.every((checkpoint) => completedCheckpointKeys.has(checkpointKey(checkpoint)));
+    checkpoints.every((checkpoint) => completedCheckpointKeys.has(getCheckpointKey(checkpoint)));
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -742,7 +749,7 @@ export default function InteractiveVideoPlayer({
               ))}
               {nonQuizCheckpoints.map((checkpoint) => (
                 <div
-                  key={checkpointKey(checkpoint)}
+                  key={getCheckpointKey(checkpoint)}
                   className="absolute h-2 w-2 rounded-full bg-cyan-400 -mt-3"
                   style={{ left: `${(checkpoint.timestamp / duration) * 100}%` }}
                   title={`${checkpoint.type} at ${formatTime(checkpoint.timestamp)}`}

@@ -57,6 +57,7 @@ export default async function SubscriptionPage() {
             <div className="rounded-2xl border border-slate-200 p-5"><dt className="flex items-center gap-2 text-sm font-bold text-slate-600"><Calendar className="h-4 w-4" /> Started</dt><dd className="mt-2 font-black text-slate-950">{current.started_at ? new Date(current.started_at).toLocaleString() : 'Not recorded'}</dd></div>
             <div className="rounded-2xl border border-slate-200 p-5"><dt className="flex items-center gap-2 text-sm font-bold text-slate-600"><Calendar className="h-4 w-4" /> Expires / renews</dt><dd className="mt-2 font-black text-slate-950">{current.expires_at ? new Date(current.expires_at).toLocaleString() : 'Not recorded'}</dd></div>
           </dl>
+          <a href="https://www.elevateforhumanity.org/store/plans" className="mt-6 inline-flex rounded-xl bg-brand-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-800">Change plan or manage billing</a>
         </section>
       ) : (
         <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-7 sm:p-9">
@@ -64,7 +65,7 @@ export default async function SubscriptionPage() {
           <h2 className="mt-5 text-2xl font-black text-slate-950">No host-shop subscription record found</h2>
           <p className="mt-3 max-w-2xl leading-7 text-slate-700">This account does not currently have a record in the host-shop subscription ledger. The portal will not invent a plan, price, payment, or renewal date.</p>
           <div className="mt-6 rounded-2xl border border-brand-green-200 bg-brand-green-50 p-5"><div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 text-brand-green-700" /><p className="text-sm font-semibold text-brand-green-950">Billing details appear only after a verified subscription or payment workflow creates the corresponding database record.</p></div></div>
-          <Link href="/contact" className="mt-6 inline-flex rounded-xl bg-brand-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-800">Contact support about host-shop billing</Link>
+          <div className="mt-6 flex flex-wrap gap-3"><a href="https://www.elevateforhumanity.org/store/plans" className="inline-flex rounded-xl bg-brand-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-800">Choose a verified plan</a><Link href="/contact" className="inline-flex rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800 hover:bg-slate-50">Contact billing support</Link></div>
         </section>
       )}
     </main>

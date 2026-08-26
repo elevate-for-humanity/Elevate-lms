@@ -60,6 +60,17 @@ async function main() {
 
     failureStage = `${programSlug}-validation-${result.status ?? 'unknown'}`;
     if (!result.ok) {
+      const diagnosticDb = await requireAdminClient();
+      await diagnosticDb.from('ai_course_generation_log').insert({
+        action: 'course_regeneration_failure',
+        details: {
+          programSlug,
+          errors: result.errors ?? [],
+          generationFailures: result.generationFailures ?? [],
+          moduleCount: result.moduleCount ?? 0,
+          lessonCount: result.lessonCount ?? 0,
+        },
+      });
       throw new Error(
         `${programSlug} regeneration failed: ${JSON.stringify(result.errors ?? result.generationFailures ?? result)}`,
       );

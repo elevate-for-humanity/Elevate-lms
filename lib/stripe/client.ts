@@ -34,7 +34,7 @@ export function getStripe(): StripeInstance | null {
     _StripeClass = require('stripe').default ?? require('stripe');
   }
   return new _StripeClass!(key, {
-    apiVersion: '2025-10-29.clover' as any,
+    apiVersion: '2026-07-29.dahlia' as any,
     typescript: true,
   });
 }

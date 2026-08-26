@@ -3,7 +3,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = process.cwd();
-const PROGRAMS_DIR = join(ROOT, 'app/programs');
+const PROGRAMS_DIR = join(ROOT, 'apps/marketing/app/programs');
 
 describe('program marketing pages', () => {
   it('ProgramDetailPage resolves delivery via formatDeliveryDisclosure helper', () => {
@@ -20,7 +20,7 @@ describe('program marketing pages', () => {
     // This test documents the current state - [program] dynamic route exists
     const detail = readFileSync(join(ROOT, 'components/programs/ProgramDetailPage.tsx'), 'utf8');
     // The dynamic route exists
-    expect(existsSync(join(ROOT, 'app/programs/[program]/page.tsx'))).toBe(true);
+    expect(existsSync(join(PROGRAMS_DIR, '[program]/page.tsx'))).toBe(true);
     // ProgramDetailPage is the main component
     expect(detail).toContain('ProgramDetailPage');
   });

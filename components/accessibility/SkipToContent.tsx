@@ -4,10 +4,12 @@ import { useEffect, useRef } from 'react';
 
 export function SkipToContent() {
   const linkRef = useRef<HTMLAnchorElement>(null);
+  const handledFirstTab = useRef(false);
 
   useEffect(() => {
     const focusSkipLinkOnFirstTab = (event: KeyboardEvent) => {
-      if (event.key !== 'Tab' || event.shiftKey || document.activeElement !== document.body) return;
+      if (event.key !== 'Tab' || event.shiftKey || handledFirstTab.current) return;
+      handledFirstTab.current = true;
       event.preventDefault();
       linkRef.current?.focus();
     };

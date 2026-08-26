@@ -36,7 +36,7 @@ describe('build-program-schema', () => {
 
 describe('single program page renderer', () => {
   it('[program]/page.tsx has no legacy ProgramPage or cf-programs fallback', () => {
-    const page = readFileSync(join(process.cwd(), 'app/programs/[program]/page.tsx'), 'utf8');
+    const page = readFileSync(join(process.cwd(), 'apps/marketing/app/programs/[program]/page.tsx'), 'utf8');
     expect(page).not.toContain('cf-programs');
     expect(page).not.toContain('function ProgramPage');
     expect(page).not.toContain('ProgramPage');

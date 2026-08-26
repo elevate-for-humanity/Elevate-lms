@@ -154,7 +154,7 @@ describe('hasLmsAccess — state consistency with proxy.ts', () => {
 // ---------------------------------------------------------------------------
 
 describe('onboarding/learner page — null profile handling', () => {
-  const src = read('app/onboarding/learner/page.tsx');
+  const src = read('apps/marketing/app/onboarding/learner/page.tsx');
 
   it('uses requireAdminClient for profile fetch (bypasses RLS for new accounts)', () => {
     expect(src).toContain('requireAdminClient');
@@ -229,7 +229,7 @@ describe('full student LMS access path contract', () => {
   });
 
   it('LMS layout uses hasLmsAccess for access determination', () => {
-    const layoutSrc = read('app/lms/(app)/layout.tsx');
+    const layoutSrc = read('apps/lms/app/lms/(app)/layout.tsx');
     expect(layoutSrc).toContain('hasLmsAccess');
   });
 
@@ -237,11 +237,9 @@ describe('full student LMS access path contract', () => {
     expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'enrolled' }))).toBe(true);
   });
 
-  it('submit-documents sets access_granted_at so hasLmsAccess passes via primary gate', () => {
-    const submitSrc = read('app/api/enrollment/submit-documents/route.ts');
-    expect(submitSrc).toContain('access_granted_at: now');
-    // After this fix, new enrollments will have access_granted_at set,
-    // so the fallback state check is only needed for pre-fix rows.
-    expect(hasLmsAccess(makeEnrollment({ accessGrantedAt: new Date().toISOString() }))).toBe(true);
+  it('enforced enrollment validates eligibility before creating access records', () => {
+    const routeSrc = read('apps/lms/app/api/enrollments/create-enforced/route.ts');
+    expect(routeSrc).toContain('validateEnrollmentEligibility');
+    expect(routeSrc).toContain(".eq('status', 'completed')");
   });
 });

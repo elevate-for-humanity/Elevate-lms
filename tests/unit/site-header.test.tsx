@@ -31,8 +31,8 @@ describe('SiteHeader', () => {
   });
 
   it('keeps widths that cannot fit the full navigation on the drawer', () => {
-    expect(src).toContain('min-[1360px]:flex');
-    expect(src).toContain('min-[1360px]:hidden');
+    expect(src).toContain('min-[1180px]:flex');
+    expect(src).toContain('min-[1180px]:hidden');
     expect(src).toContain('compact widths use the drawer');
   });
 });

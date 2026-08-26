@@ -1,0 +1,66 @@
+name: Regenerate Barber and Cosmetology Courses
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/regenerate-barber-cosmetology.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+  NODE_ENV: production
+  AI_CIRCUIT_RECOVERY_WAIT: '1'
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  NODE_OPTIONS: --conditions=react-server
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    concurrency:
+      group: barber-cosmetology-course-regeneration
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Require production credentials
+        shell: bash
+        run: |
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+
+      - name: Regenerate Barber and Cosmetology in preservation mode
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm tsx scripts/course-factory.ts --barber --cosmo --mode refresh 2>&1 | tee /tmp/barber-cosmetology-regeneration.log
+          test "$(grep -c 'Course ID:' /tmp/barber-cosmetology-regeneration.log)" -eq 2
+          test "$(grep -c 'FAILED\|ERROR' /tmp/barber-cosmetology-regeneration.log || true)" -eq 0
+
+      - name: Verify apprenticeship architecture
+        run: pnpm tsx scripts/audit-apprenticeship-architecture.ts

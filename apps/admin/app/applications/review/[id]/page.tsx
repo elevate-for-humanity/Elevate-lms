@@ -132,7 +132,7 @@ export default async function ReviewApplicationPage({
               alt="Admissions team reviewing applications"
               fill
               priority
-              className="object-cover opacity-35"
+              className="object-cover opacity-35" sizes="100vw"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/75 to-brand-blue-900/45" />
             <div className="relative z-10 max-w-3xl">

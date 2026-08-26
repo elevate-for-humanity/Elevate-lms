@@ -17,7 +17,7 @@ export default async function AdminApiKeysPage() {
 
   const { data: apiKeys } = await supabase
     .from('api_keys')
-    .select('id, name, is_active, created_at, last_used_at')
+    .select('id, name, key_prefix, status, created_at, last_used_at')
     .order('created_at', { ascending: false });
 
   const { count: totalKeys } = await supabase
@@ -27,7 +27,7 @@ export default async function AdminApiKeysPage() {
   const { count: activeKeys } = await supabase
     .from('api_keys')
     .select('*', { count: 'exact', head: true })
-    .eq('is_active', true);
+    .eq('status', 'active');
 
   return (
     <div className="min-h-screen bg-white">

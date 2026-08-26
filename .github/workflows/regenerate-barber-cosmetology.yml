@@ -31,7 +31,6 @@ jobs:
       github.event_name != 'issues' ||
       (github.event.issue.number == 928 &&
        github.event.issue.title == 'RUN BARBER COSMETOLOGY COURSE REGENERATION' &&
-       github.actor == 'elevateforhumanity' &&
        github.event.issue.author_association == 'OWNER')
     runs-on: ubuntu-latest
     timeout-minutes: 180

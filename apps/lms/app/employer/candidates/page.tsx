@@ -11,9 +11,16 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default async function CandidatesPage() {
-  const { user } = await requireRole(['employer', 'admin']);
+export default async function CandidatesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; program?: string }>;
+}) {
+  const { user } = await requireRole(['employer', 'recruiter', 'admin']);
   const supabase = await createClient();
+  const filters = await searchParams;
+  const query = filters.q?.trim() ?? '';
+  const program = filters.program?.trim() ?? '';
 
   const { data: employerProfile } = await supabase
     .from('profiles')
@@ -22,52 +29,18 @@ export default async function CandidatesPage() {
     .maybeSingle();
   const canContact = Boolean(employerProfile?.verified);
 
-  // Get completed/graduated candidates only — not all students
-  const { data: enrollments } = await supabase
-    .from('program_enrollments')
-    .select(
-      `
-      id,
-      user_id,
-      progress_percent,
-      completed_at,
-      training_courses:course_id (
-        id,
-        title
-      )
-    `,
-    )
-    .eq('progress_percent', 100)
-    .order('completed_at', { ascending: false })
+  let candidateQuery = supabase
+    .from('candidate_employment_profiles')
+    .select('id,display_name,headline,city,state,program_name,skills,credential_names,contact_email,contact_phone,resume_url,updated_at')
+    .eq('available_for_employment', true)
+    .eq('consent_status', 'granted')
+    .order('updated_at', { ascending: false })
     .limit(50);
-
-  // Hydrate profiles separately (user_id → auth.users, no FK to profiles)
-  const userIds = [...new Set((enrollments ?? []).map((e: any) => e.user_id).filter(Boolean))];
-  const { data: profileRows } = userIds.length
-    ? await supabase
-        .from('profiles')
-        .select('id, full_name, email, phone, city, state')
-        .in('id', userIds)
-    : { data: [] };
-  const profileMap = Object.fromEntries((profileRows ?? []).map((p: any) => [p.id, p]));
-
-  const candidates = (enrollments ?? []).map((e: any) => ({
-    ...profileMap[e.user_id],
-    course_title: e.training_courses?.title ?? null,
-    completed_at: e.completed_at,
-  }));
-
-  // Get certified candidates count
-  const { count: certifiedCount } = userIds.length
-    ? await supabase
-        .from('profiles')
-        .select('id', { count: 'exact', head: true })
-        .in('id', userIds)
-        .eq('is_certified', true)
-    : { count: 0 };
-
-  // Get program graduates count (already have from enrollments)
-  const graduatesCount = candidates.length;
+  if (query) candidateQuery = candidateQuery.or(`display_name.ilike.%${query.replace(/[%_,]/g, '')}%,headline.ilike.%${query.replace(/[%_,]/g, '')}%`);
+  if (program) candidateQuery = candidateQuery.ilike('program_name', `%${program.replace(/[%_,]/g, '')}%`);
+  const { data: candidates } = await candidateQuery;
+  const certifiedCount = (candidates ?? []).filter((candidate: any) => candidate.credential_names?.length).length;
+  const graduatesCount = candidates?.length ?? 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -91,26 +64,29 @@ export default async function CandidatesPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Search */}
-        <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
+        <form method="get" className="bg-white rounded-lg shadow-sm border p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700" />
                 <input
+                  name="q"
+                  defaultValue={query}
                   type="text"
                   placeholder="Search by name, skill, or certification..."
                   className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
+            <select name="program" defaultValue={program} className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option value="">All Programs</option>
               <option value="healthcare">Healthcare</option>
               <option value="skilled-trades">Skilled Trades</option>
               <option value="technology">Technology</option>
             </select>
+            <button className="rounded-lg bg-brand-blue-700 px-5 py-2 font-semibold text-white" type="submit">Search</button>
           </div>
-        </div>
+        </form>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-6">
@@ -155,7 +131,7 @@ export default async function CandidatesPage() {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-slate-900">
-                        {candidate.full_name || 'Candidate'}
+                        {candidate.display_name || 'Candidate'}
                       </h3>
                       {(candidate.city || candidate.state) && (
                         <div className="flex items-center gap-1 text-sm text-slate-700 mt-1">
@@ -163,6 +139,11 @@ export default async function CandidatesPage() {
                           {[candidate.city, candidate.state].filter(Boolean).join(', ')}
                         </div>
                       )}
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {[...(candidate.skills ?? []), ...(candidate.credential_names ?? [])].map((item: string) => (
+                        <span key={item} className="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">{item}</span>
+                      ))}
                     </div>
                   </div>
 

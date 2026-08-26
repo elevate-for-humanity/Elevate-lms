@@ -5,6 +5,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export interface SMSNotification {
   to: string;
   message: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface SMSResult {
@@ -17,6 +18,7 @@ async function auditSMSDelivery(
   recipient: string,
   messageLength: number,
   result: SMSResult,
+  metadata: Record<string, unknown> = {},
 ): Promise<void> {
   try {
     const { getAdminClient } = await import('@/lib/supabase/admin');
@@ -32,6 +34,7 @@ async function auditSMSDelivery(
       metadata: {
         provider: 'twilio',
         message_length: messageLength,
+        ...metadata,
       },
     });
     if (error) logger.warn('[SMS] delivery audit insert failed', { error: error.message });
@@ -71,7 +74,7 @@ export class SMSService {
     const cleanPhone = notification.to.replace(/\D/g, '');
     if (cleanPhone.length < 10) {
       const result = { success: false, error: 'Invalid phone number' };
-      await auditSMSDelivery(notification.to, notification.message.length, result);
+      await auditSMSDelivery(notification.to, notification.message.length, result, notification.metadata);
       return result;
     }
 
@@ -83,7 +86,7 @@ export class SMSService {
         messageLength: notification.message.length,
       });
       const result = { success: false, error: 'SMS service unavailable — Twilio not configured' };
-      await auditSMSDelivery(formattedPhone, notification.message.length, result);
+      await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     }
 
@@ -112,18 +115,18 @@ export class SMSService {
           status: response.status,
         });
         const result = { success: false, error: data.message || 'SMS send failed' };
-        await auditSMSDelivery(formattedPhone, notification.message.length, result);
+        await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
         return result;
       }
 
       logger.info('SMS sent successfully', { to: formattedPhone, messageId: data.sid });
       const result = { success: true, messageId: data.sid };
-      await auditSMSDelivery(formattedPhone, notification.message.length, result);
+      await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     } catch (error) {
       logger.error('SMS send exception', error as Error, { to: formattedPhone });
       const result = { success: false, error: (error as Error).message };
-      await auditSMSDelivery(formattedPhone, notification.message.length, result);
+      await auditSMSDelivery(formattedPhone, notification.message.length, result, notification.metadata);
       return result;
     }
   }

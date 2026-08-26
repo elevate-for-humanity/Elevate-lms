@@ -40,12 +40,10 @@ function statusClass(status: string | null) {
 export default async function SmsDeliveryPage() {
   await requireRole(['admin', 'staff']);
   const admin = await requireAdminClient();
-  const { data, error } = await admin
-    .from('delivery_logs')
-    .select('id, recipient, status, provider_message_id, error_message, sent_at, created_at')
-    .eq('channel', 'sms')
-    .order('created_at', { ascending: false })
-    .limit(250);
+  const [{ data, error }, { data: recipientRows }] = await Promise.all([
+    admin.from('delivery_logs').select('id, recipient, status, provider_message_id, error_message, sent_at, created_at').eq('channel', 'sms').order('created_at', { ascending: false }).limit(250),
+    admin.from('profiles').select('id, full_name, email, phone').not('phone', 'is', null).order('full_name', { ascending: true }).limit(1000),
+  ]);
 
   if (error) {
     throw new Error(`Unable to load SMS delivery logs: ${error.message}`);
@@ -68,7 +66,7 @@ export default async function SmsDeliveryPage() {
         </p>
       </div>
 
-      <SmsComposer enabled={smsService.isEnabled()} />
+      <SmsComposer enabled={smsService.isEnabled()} recipients={(recipientRows ?? []).filter((row: any) => String(row.phone || '').replace(/\D/g, '').length >= 10)} />
 
       <section className="grid gap-4 sm:grid-cols-3" aria-label="SMS delivery summary">
         {[

@@ -27,24 +27,24 @@ interface ValidationResult {
 // ── Validation logic (mirrors route handler) ──────────────────────────────────
 
 function validateQuizPayload(body: QuizAnswerPayload): ValidationResult {
-  if (!body.question) {
+  if (!body.lessonId || !body.question || body.correctAnswer === undefined) {
     return {
       valid: false,
-      error: 'Missing required fields: question, selectedAnswer, isCorrect',
+      error: 'Missing required fields: lessonId, question, selectedAnswer, correctAnswer, isCorrect',
       status: 400,
     };
   }
   if (body.selectedAnswer === undefined) {
     return {
       valid: false,
-      error: 'Missing required fields: question, selectedAnswer, isCorrect',
+      error: 'Missing required fields: lessonId, question, selectedAnswer, correctAnswer, isCorrect',
       status: 400,
     };
   }
   if (body.isCorrect === undefined) {
     return {
       valid: false,
-      error: 'Missing required fields: question, selectedAnswer, isCorrect',
+      error: 'Missing required fields: lessonId, question, selectedAnswer, correctAnswer, isCorrect',
       status: 400,
     };
   }
@@ -55,10 +55,10 @@ function validateQuizPayload(body: QuizAnswerPayload): ValidationResult {
 
 interface UpsertRecord {
   user_id: string;
-  lesson_id: string | null;
+  lesson_id: string;
   question: string;
   selected_answer: number;
-  correct_answer: number | null;
+  correct_answer: number;
   is_correct: boolean;
   timestamp_sec: number | null;
 }
@@ -70,10 +70,10 @@ function buildUpsertRecord(
 ): UpsertRecord {
   return {
     user_id: userId,
-    lesson_id: body.lessonId ?? null,
+    lesson_id: body.lessonId!,
     question: body.question,
     selected_answer: body.selectedAnswer,
-    correct_answer: body.correctAnswer ?? null,
+    correct_answer: body.correctAnswer!,
     is_correct: body.isCorrect,
     timestamp_sec: body.timestamp ?? null,
   };
@@ -83,30 +83,30 @@ function buildUpsertRecord(
 
 describe('Video quiz payload validation', () => {
   it('rejects missing question', () => {
-    const result = validateQuizPayload({ selectedAnswer: 0, isCorrect: true });
+    const result = validateQuizPayload({ lessonId: 'lesson-uuid', selectedAnswer: 0, correctAnswer: 0, isCorrect: true });
     expect(result.valid).toBe(false);
     expect(result.status).toBe(400);
   });
 
   it('rejects missing selectedAnswer', () => {
-    const result = validateQuizPayload({ question: 'What is refrigerant?', isCorrect: true });
+    const result = validateQuizPayload({ lessonId: 'lesson-uuid', question: 'What is refrigerant?', correctAnswer: 0, isCorrect: true });
     expect(result.valid).toBe(false);
     expect(result.status).toBe(400);
   });
 
   it('rejects missing isCorrect', () => {
-    const result = validateQuizPayload({ question: 'What is refrigerant?', selectedAnswer: 2 });
+    const result = validateQuizPayload({ lessonId: 'lesson-uuid', question: 'What is refrigerant?', selectedAnswer: 2, correctAnswer: 2 });
     expect(result.valid).toBe(false);
     expect(result.status).toBe(400);
   });
 
   it('accepts selectedAnswer of 0 (falsy but valid)', () => {
-    const result = validateQuizPayload({ question: 'Q?', selectedAnswer: 0, isCorrect: false });
+    const result = validateQuizPayload({ lessonId: 'lesson-uuid', question: 'Q?', selectedAnswer: 0, correctAnswer: 1, isCorrect: false });
     expect(result.valid).toBe(true);
   });
 
   it('accepts isCorrect of false (falsy but valid)', () => {
-    const result = validateQuizPayload({ question: 'Q?', selectedAnswer: 1, isCorrect: false });
+    const result = validateQuizPayload({ lessonId: 'lesson-uuid', question: 'Q?', selectedAnswer: 1, correctAnswer: 0, isCorrect: false });
     expect(result.valid).toBe(true);
   });
 
@@ -146,6 +146,7 @@ describe('Video quiz upsert record builder', () => {
     const record = buildUpsertRecord('user-1', {
       question: 'Q?',
       selectedAnswer: 0,
+      correctAnswer: 1,
       isCorrect: false,
     });
     expect(record.lesson_id).toBeNull();
@@ -155,6 +156,7 @@ describe('Video quiz upsert record builder', () => {
     const record = buildUpsertRecord('user-1', {
       question: 'Q?',
       selectedAnswer: 0,
+      correctAnswer: 1,
       isCorrect: false,
     });
     expect(record.correct_answer).toBeNull();
@@ -164,6 +166,7 @@ describe('Video quiz upsert record builder', () => {
     const record = buildUpsertRecord('user-1', {
       question: 'Q?',
       selectedAnswer: 0,
+      correctAnswer: 1,
       isCorrect: false,
     });
     expect(record.timestamp_sec).toBeNull();
@@ -174,12 +177,14 @@ describe('Video quiz upsert record builder', () => {
     const r1 = buildUpsertRecord('user-1', {
       question: 'Q?',
       selectedAnswer: 0,
+      correctAnswer: 1,
       isCorrect: false,
       lessonId: 'l1',
     });
     const r2 = buildUpsertRecord('user-1', {
       question: 'Q?',
       selectedAnswer: 1,
+      correctAnswer: 1,
       isCorrect: true,
       lessonId: 'l1',
     });

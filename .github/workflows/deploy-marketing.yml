@@ -1,6 +1,9 @@
 name: Deploy Marketing (www)
 
 on:
+  # Temporary recovery trigger; remove after the latest main deployment is verified.
+  schedule:
+    - cron: '*/5 * * * *'
   push:
     branches:
       - main

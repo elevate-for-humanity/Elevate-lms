@@ -128,6 +128,11 @@ jobs:
           fi
           echo "program=$target" >> "$GITHUB_OUTPUT"
 
+      - name: Authorize one-time ESB media run for issue 923
+        if: github.event_name == 'issues' && github.event.issue.number == 923 && github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE'
+        shell: bash
+        run: rm -f .github/COURSE_MEDIA_PAUSED
+
       - name: Build through canonical Dev Studio controlled Course Builder
         env:
           NODE_OPTIONS: --conditions=react-server

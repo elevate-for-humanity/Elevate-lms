@@ -35,28 +35,28 @@ const SCREENS = [
     title: 'Opportunities',
     description:
       'Pipeline of grants, RFPs, contracts, and bids — ingest from URL, profile, and track status.',
-    href: '/admin/submissions/opportunities',
+    href: '/submissions/opportunities',
     icon: Target,
     color: 'bg-brand-blue-50 text-brand-blue-600',
   },
   {
     title: 'Org Profile',
     description: 'Legal name, EIN, UEI, SAM status, authorized signatory, address.',
-    href: '/admin/submissions/org',
+    href: '/submissions/org',
     icon: Building2,
     color: 'bg-brand-blue-50 text-brand-blue-600',
   },
   {
     title: 'Facts Vault',
     description: 'Approved atomic facts used as merge-field sources in every generated document.',
-    href: '/admin/submissions/facts',
+    href: '/submissions/facts',
     icon: Database,
     color: 'bg-purple-50 text-purple-600',
   },
   {
     title: 'Attachment Library',
     description: 'W-9, insurance certs, audit, board list, SAM proof, capability statement.',
-    href: '/admin/submissions/attachments',
+    href: '/submissions/attachments',
     icon: Paperclip,
     color: 'bg-amber-50 text-amber-600',
   },
@@ -64,28 +64,28 @@ const SCREENS = [
     title: 'Content Library',
     description:
       'Approved prose blocks — mission, org overview, program summaries, equity statement.',
-    href: '/admin/submissions/content',
+    href: '/submissions/content',
     icon: BookOpen,
     color: 'bg-green-50 text-green-600',
   },
   {
     title: 'Document Templates',
     description: 'Branded letterhead layouts with merge fields for every document type.',
-    href: '/admin/submissions/templates',
+    href: '/submissions/templates',
     icon: FileText,
     color: 'bg-sky-50 text-sky-600',
   },
   {
     title: 'Past Performance',
     description: 'Approved project history for capability statements and RFP responses.',
-    href: '/admin/submissions/past-performance',
+    href: '/submissions/past-performance',
     icon: Award,
     color: 'bg-emerald-50 text-emerald-600',
   },
   {
     title: 'Compliance Records',
     description: 'Licenses, certifications, SAM registration, ETPL listing, insurance.',
-    href: '/admin/submissions/compliance',
+    href: '/submissions/compliance',
     icon: ShieldCheck,
     color: 'bg-rose-50 text-rose-600',
   },
@@ -93,21 +93,21 @@ const SCREENS = [
     title: 'Partner Entities',
     description:
       'Approved subcontractors, MOU partners, co-applicants, letter-of-support providers.',
-    href: '/admin/submissions/partners',
+    href: '/submissions/partners',
     icon: Users,
     color: 'bg-indigo-50 text-indigo-600',
   },
   {
     title: 'Exception Queue',
     description: 'Unresolved blockers — missing data, required reviews, signature requests.',
-    href: '/admin/submissions/exceptions',
+    href: '/submissions/exceptions',
     icon: AlertTriangle,
     color: 'bg-orange-50 text-orange-600',
   },
   {
     title: 'Audit Log',
     description: 'Permanent record of every submission run, inserted value, and approval.',
-    href: '/admin/audit-logs',
+    href: '/audit-logs',
     icon: ScrollText,
     color: 'bg-slate-100 text-slate-600',
   },
@@ -131,7 +131,7 @@ export default async function SubmissionsOSPage() {
     .maybeSingle();
 
   if (!profile || !['admin', 'staff'].includes(profile.role)) {
-    redirect('/admin');
+    redirect('/');
   }
 
   // Load summary counts from SOS tables (graceful — tables may not exist yet)
@@ -256,12 +256,12 @@ export default async function SubmissionsOSPage() {
           <h2 className="font-semibold text-slate-900 text-sm mb-3">Grant Management (Legacy)</h2>
           <div className="flex flex-wrap gap-3">
             {[
-              { label: 'Overview', href: '/admin/grants' },
-              { label: 'Opportunity Inbox', href: '/admin/grants/intake' },
-              { label: 'New Opportunity', href: '/admin/grants' },
-              { label: 'Workflow', href: '/admin/grants/workflow' },
-              { label: 'Submissions Log', href: '/admin/grants/submissions' },
-              { label: 'Revenue Tracking', href: '/admin/grants/revenue' },
+              { label: 'Overview', href: '/grants' },
+              { label: 'Opportunity Inbox', href: '/grants/intake' },
+              { label: 'New Opportunity', href: '/grants' },
+              { label: 'Workflow', href: '/grants/workflow' },
+              { label: 'Submissions Log', href: '/grants/submissions' },
+              { label: 'Revenue Tracking', href: '/grants/revenue' },
             ].map((l) => (
               <Link
                 key={l.href}

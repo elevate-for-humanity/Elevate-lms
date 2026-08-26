@@ -25,16 +25,12 @@ export async function PATCH(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
   const userId = auth.id;
 
   // Require instructor or admin role
   const db = await requireAdminClient();
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', userId)
-    .maybeSingle();
+  const { data: profile } = await db.from('profiles').select('role').eq('id', userId).maybeSingle();
 
   if (!profile || !ALLOWED_ROLES.includes(profile.role)) {
     return safeError('Forbidden', 403);

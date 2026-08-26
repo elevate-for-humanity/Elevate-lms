@@ -261,7 +261,7 @@ async function processMarketingTask(task: any, run: any, project: any) {
   throw new Error(`Unsupported marketing campaign worker: ${task.worker}`);
 }
 
-async function pollOnce() {
+export async function runAgenticExecutorOnce() {
   if (polling) return;
   polling = true;
   try {
@@ -323,8 +323,8 @@ async function pollOnce() {
 export function startAgenticExecutor() {
   if (started || process.env.ELEVATE_SERVICE !== 'admin') return;
   started = true;
-  void pollOnce();
-  timer = setInterval(() => void pollOnce(), POLL_MS);
+  void runAgenticExecutorOnce();
+  timer = setInterval(() => void runAgenticExecutorOnce(), POLL_MS);
   timer.unref?.();
   console.info('[agentic-executor] Admin agentic executor started');
 }

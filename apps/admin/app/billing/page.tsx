@@ -27,10 +27,10 @@ export default async function AdminBillingOverviewPage() {
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {[
-        { label: 'Active plans', value: planCount ?? 0, href: '/admin/billing/plans' },
-        { label: 'Org subscriptions', value: subCount ?? 0, href: '/admin/billing/subscriptions' },
-        { label: 'Active add-ons', value: addonCount ?? 0, href: '/admin/billing/addons' },
-        { label: 'Licenses (legacy sync)', value: licenseCount ?? 0, href: '/admin/billing/licenses' },
+        { label: 'Active plans', value: planCount ?? 0, href: '/billing/plans' },
+        { label: 'Org subscriptions', value: subCount ?? 0, href: '/billing/subscriptions' },
+        { label: 'Active add-ons', value: addonCount ?? 0, href: '/billing/addons' },
+        { label: 'Licenses (legacy sync)', value: licenseCount ?? 0, href: '/billing/licenses' },
       ].map((card) => (
         <Link
           key={card.href}

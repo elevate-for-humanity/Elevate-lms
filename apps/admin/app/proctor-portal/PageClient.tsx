@@ -60,7 +60,7 @@ export default function ProctorPortalPage({ programs = [] }: { programs?: Progra
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
-        router.replace('/login?redirect=/admin/proctor-portal');
+        router.replace('/login?redirect=/proctor-portal');
         return;
       }
       fetchSessions();
@@ -149,7 +149,7 @@ export default function ProctorPortalPage({ programs = [] }: { programs?: Progra
 
   return (
     <div className="min-h-screen bg-white">
-      <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Proctor Portal' }]} />
+      <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Proctor Portal' }]} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}

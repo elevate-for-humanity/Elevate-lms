@@ -36,7 +36,7 @@ export default function OrganizationPage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-purple-700 to-blue-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Organization' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Organization' }]} />
           <h1 className="text-4xl font-bold mt-6 mb-4">Elevate for Humanity</h1>
           <p className="text-xl text-blue-100 max-w-2xl">
             Transforming careers through workforce development, apprenticeship programs, and career training services.

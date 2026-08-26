@@ -47,7 +47,7 @@ export default async function EnrollmentJobsPage() {
     <div className="min-h-screen bg-white py-8">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Enrollment Jobs' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Enrollment Jobs' }]} />
       </div>
       <div className="container mx-auto px-4">
         <div className="mb-8">

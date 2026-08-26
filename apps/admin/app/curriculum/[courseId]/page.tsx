@@ -139,7 +139,7 @@ export default async function CurriculumCourseEditorPage({
           </div>
 
           <Link
-            href={`/admin/courses/${courseId}/edit`}
+            href={`/courses/${courseId}/edit`}
             className="text-sm px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium"
           >
             Course settings

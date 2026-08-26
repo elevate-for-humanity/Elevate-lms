@@ -60,8 +60,8 @@ export default async function FerpaAuditLogPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'FERPA', href: '/admin/ferpa' },
+            { label: 'Admin', href: '/' },
+            { label: 'FERPA', href: '/ferpa' },
             { label: 'Audit Log' },
           ]}
         />

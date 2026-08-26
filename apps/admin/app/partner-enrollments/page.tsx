@@ -24,7 +24,7 @@ export default async function PartnerEnrollmentsPage() {
     <div className="min-h-screen bg-white p-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Admin', href: '/admin' }, { label: 'Partner Enrollments' }]}
+          items={[{ label: 'Admin', href: '/' }, { label: 'Partner Enrollments' }]}
         />
       </div>
       <div className="max-w-7xl mx-auto">

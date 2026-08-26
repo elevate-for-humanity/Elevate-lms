@@ -6,8 +6,8 @@ import { DEFAULT_NAV, isNavSections, type NavSection } from '@/lib/admin/nav-con
 import { safeError } from '@/lib/api/safe-error';
 
 function normalizeAdminHref(href: string): string {
-  if (href === '/admin') return '/';
-  if (href.startsWith('/admin/')) return href.slice('/admin'.length) || '/';
+  if (href === '/') return '/';
+  if (href.startsWith('/')) return href.slice('/'.length) || '/';
   return href;
 }
 

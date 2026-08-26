@@ -40,7 +40,7 @@ export default async function OrgProfilePage() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/admin');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/');
 
   const { data: org } = await db
     .from('sos_organizations')

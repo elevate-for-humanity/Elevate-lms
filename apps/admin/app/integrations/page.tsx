@@ -22,7 +22,7 @@ import {
 
 export const metadata: Metadata = {
   title: 'Integrations | Admin | Elevate For Humanity',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/integrations' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/integrations' },
 };
 
 type IntegrationStatus = 'active' | 'configured' | 'not_configured';
@@ -69,7 +69,7 @@ const INTEGRATIONS: Integration[] = [
     envVars: ['CALENDLY_API_TOKEN', 'CALENDLY_WEBHOOK_SECRET'],
     status: 'not_configured',
     docsUrl: 'https://calendly.com/integrations',
-    configUrl: '/admin/integrations/calendly',
+    configUrl: '/integrations/calendly',
   },
   {
     name: 'Google Calendar',
@@ -91,7 +91,7 @@ const INTEGRATIONS: Integration[] = [
     category: 'communication',
     envVars: ['TEAMS_WEBHOOK_URL'],
     status: 'not_configured',
-    configUrl: '/admin/integrations/teams',
+    configUrl: '/integrations/teams',
   },
   {
     name: 'SendGrid (Email)',
@@ -142,7 +142,7 @@ const INTEGRATIONS: Integration[] = [
     category: 'payments',
     envVars: ['QB_CLIENT_ID', 'QB_CLIENT_SECRET'],
     status: 'not_configured',
-    configUrl: '/admin/integrations/quickbooks',
+    configUrl: '/integrations/quickbooks',
     docsUrl: 'https://developer.intuit.com/',
   },
   {
@@ -165,7 +165,7 @@ const INTEGRATIONS: Integration[] = [
     category: 'learning',
     envVars: ['GEMINI_API_KEY'],
     status: 'not_configured',
-    configUrl: '/admin/integrations/gemini',
+    configUrl: '/integrations/gemini',
   },
   {
     name: 'LTI 1.3',
@@ -187,7 +187,7 @@ const INTEGRATIONS: Integration[] = [
     category: 'learning',
     envVars: ['SCORM_STORAGE_BUCKET'],
     status: 'not_configured',
-    configUrl: '/admin/course-import',
+    configUrl: '/course-import',
   },
   {
     name: 'xAPI / TinCan',
@@ -240,7 +240,7 @@ export default async function AdminIntegrationsPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Integrations' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Integrations' }]} />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">

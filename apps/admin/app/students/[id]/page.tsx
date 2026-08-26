@@ -119,7 +119,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
 
           <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="border-b border-slate-100 px-5 py-4"><h2 className="flex items-center gap-2 font-black text-slate-950"><FileText className="h-4 w-4" />Applications</h2></div>{applications.length ? <div className="divide-y divide-slate-100">{applications.map((application) => {
             const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(application.id);
-            const reviewHref = isUuid ? `/admin/applications/review/${application.id}` : `/admin/applications?search=${encodeURIComponent(application.email || application.id)}`;
+            const reviewHref = isUuid ? `/applications/review/${application.id}` : `/applications?search=${encodeURIComponent(application.email || application.id)}`;
             return <Link key={application.id} href={reviewHref} className="flex items-center gap-3 px-5 py-4 hover:bg-slate-50"><div className="min-w-0 flex-1"><p className="font-bold text-slate-900">{application.program_interest || application.program_slug || 'Program not recorded'}</p><p className="text-xs text-slate-500">Submitted {fmtDate(application.submitted_at || application.created_at)}{application.funding_type ? ` · ${application.funding_type}` : ''}</p></div><Badge status={application.status} /><ExternalLink className="h-4 w-4 text-slate-400" /></Link>;
           })}</div> : <p className="p-6 text-sm text-slate-500">No applications.</p>}</section>
         </div>

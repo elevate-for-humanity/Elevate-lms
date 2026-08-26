@@ -26,9 +26,9 @@ export default async function NewJRIParticipantPage() {
         <div className="mb-8">
           <Breadcrumbs
             items={[
-              { label: 'Admin', href: '/admin' },
-              { label: 'Job Ready Indy', href: '/admin/jri' },
-              { label: 'Participants', href: '/admin/jri/participants' },
+              { label: 'Admin', href: '/' },
+              { label: 'Job Ready Indy', href: '/jri' },
+              { label: 'Participants', href: '/jri/participants' },
               { label: 'New' },
             ]}
           />

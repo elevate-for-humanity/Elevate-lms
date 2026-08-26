@@ -29,7 +29,7 @@ export default async function InstructorAttendancePage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <Breadcrumbs items={[{ label: 'Instructor', href: '/admin/instructor' }, { label: 'Attendance' }]} />
+        <Breadcrumbs items={[{ label: 'Instructor', href: '/instructor' }, { label: 'Attendance' }]} />
         <div className="flex items-center justify-between mb-6 mt-4">
           <div className="flex items-center gap-3">
             <ClipboardList className="w-7 h-7 text-brand-blue-600" />

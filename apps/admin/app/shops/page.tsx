@@ -76,7 +76,7 @@ export default async function AdminShopsPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Shops' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Shops' }]} />
       </div>
       {/* Header */}
       <div className="bg-white border-b border-slate-200">
@@ -171,7 +171,7 @@ export default async function AdminShopsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/admin/shops/applications/${app.id}`}
+                      href={`/shops/applications/${app.id}`}
                       className="px-4 py-2 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition text-sm"
                     >
                       Review
@@ -241,13 +241,13 @@ export default async function AdminShopsPage() {
 
                     <div className="flex flex-col gap-2">
                       <Link
-                        href={`/admin/shops/${shop.id}`}
+                        href={`/shops/${shop.id}`}
                         className="px-4 py-2 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition text-sm text-center"
                       >
                         Manage
                       </Link>
                       <Link
-                        href={`/admin/shops/${shop.id}/documents`}
+                        href={`/shops/${shop.id}/documents`}
                         className="px-4 py-2 border border-slate-300 text-black font-semibold rounded-lg hover:bg-slate-50 transition text-sm text-center"
                       >
                         Documents

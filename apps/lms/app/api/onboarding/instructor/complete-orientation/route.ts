@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   const db = await requireAdminClient();
   if (!db) return safeError('Database unavailable', 503);

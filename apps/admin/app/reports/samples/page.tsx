@@ -76,7 +76,7 @@ export default async function SampleReportsPage() {
         <div className="mb-4">
           <Breadcrumbs items={[
             { label: 'Admin', href: '/dashboard' },
-            { label: 'Reports', href: '/admin/reports' },
+            { label: 'Reports', href: '/reports' },
             { label: 'Sample Reports' },
           ]} />
         </div>

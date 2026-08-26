@@ -12,7 +12,7 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/signatures',
+    canonical: 'https://admin.elevateforhumanity.org/signatures',
   },
   title: 'Signatures Management | Elevate For Humanity',
   description: 'Manage digital signatures, document approvals, and electronic consent forms.',
@@ -51,7 +51,7 @@ export default async function SignaturesPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Signatures' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Signatures' }]} />
       </div>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">

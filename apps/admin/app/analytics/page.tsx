@@ -65,22 +65,22 @@ export default async function AnalyticsPage() {
 
   const METRICS = [
     { label: 'Website Views (30d)', value: pageViews30d ?? 0, icon: Globe2, href: '/analytics/traffic', color: 'text-cyan-700', bg: 'bg-cyan-50' },
-    { label: 'Total Users', value: totalUsers ?? 0, icon: Users, href: '/admin/students', color: 'text-brand-blue-600', bg: 'bg-brand-blue-50' },
-    { label: 'Students', value: totalStudents ?? 0, icon: GraduationCap, href: '/admin/students', color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Active Enrollments', value: activeEnrollments ?? 0, icon: TrendingUp, href: '/admin/enrollments', color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Completion Rate', value: `${completionRate}%`, icon: Target, href: '/admin/reports', color: 'text-purple-600', bg: 'bg-purple-50' },
-    { label: 'Certificates', value: totalCerts ?? 0, icon: Award, href: '/admin/certificates', color: 'text-rose-600', bg: 'bg-rose-50' },
-    { label: 'Live Programs', value: livePrograms ?? 0, icon: BarChart3, href: '/admin/programs', color: 'text-slate-600', bg: 'bg-slate-100' },
+    { label: 'Total Users', value: totalUsers ?? 0, icon: Users, href: '/students', color: 'text-brand-blue-600', bg: 'bg-brand-blue-50' },
+    { label: 'Students', value: totalStudents ?? 0, icon: GraduationCap, href: '/students', color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'Active Enrollments', value: activeEnrollments ?? 0, icon: TrendingUp, href: '/enrollments', color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Completion Rate', value: `${completionRate}%`, icon: Target, href: '/reports', color: 'text-purple-600', bg: 'bg-purple-50' },
+    { label: 'Certificates', value: totalCerts ?? 0, icon: Award, href: '/certificates', color: 'text-rose-600', bg: 'bg-rose-50' },
+    { label: 'Live Programs', value: livePrograms ?? 0, icon: BarChart3, href: '/programs', color: 'text-slate-600', bg: 'bg-slate-100' },
   ];
 
   const DEEP_LINKS = [
     { label: 'Website Traffic', desc: 'Page views, sessions, top pages, referrers, and campaign sources', href: '/analytics/traffic', icon: Globe2 },
-    { label: 'Learning Analytics', desc: 'Completion rates, lesson engagement, quiz scores', href: '/admin/analytics/learning', icon: Activity },
-    { label: 'Engagement Analytics', desc: 'Login patterns, session length, active users', href: '/admin/analytics/engagement', icon: TrendingUp },
-    { label: 'Program Analytics', desc: 'Program performance, outcomes, pass rates', href: '/admin/analytics/programs', icon: Target },
-    { label: 'Revenue Analytics', desc: 'Payments, refunds, funding sources breakdown', href: '/admin/analytics/revenue', icon: DollarSign },
-    { label: 'Employer Pipeline', desc: 'Job placements, OJT hours, employer activity', href: '/admin/analytics/employers', icon: Users },
-    { label: 'Reports & Exports', desc: 'WIOA reports, DOL submissions, CSV exports', href: '/admin/reports', icon: BarChart3 },
+    { label: 'Learning Analytics', desc: 'Completion rates, lesson engagement, quiz scores', href: '/analytics/learning', icon: Activity },
+    { label: 'Engagement Analytics', desc: 'Login patterns, session length, active users', href: '/analytics/engagement', icon: TrendingUp },
+    { label: 'Program Analytics', desc: 'Program performance, outcomes, pass rates', href: '/analytics/programs', icon: Target },
+    { label: 'Revenue Analytics', desc: 'Payments, refunds, funding sources breakdown', href: '/analytics/revenue', icon: DollarSign },
+    { label: 'Employer Pipeline', desc: 'Job placements, OJT hours, employer activity', href: '/analytics/employers', icon: Users },
+    { label: 'Reports & Exports', desc: 'WIOA reports, DOL submissions, CSV exports', href: '/reports', icon: BarChart3 },
   ];
 
   return (

@@ -6,14 +6,13 @@
  * courses and learner state.
  */
 import { z } from 'zod';
-import { isAIAvailable } from '../ai/ai-service';
-import { logger } from '../logger';
 import { courseFactory as executeCourseFactory } from '../course-factory/factory';
 import type { FactoryInput, FactoryOutput, ProgressCallback } from '../course-factory/types';
 import { normalizeGeneratedCourseForGovernance } from '../course-factory/post-generation-governance';
 import { queueCourseLessonVideos } from '../course-factory/media-service';
 import { loadBlueprintWithProgram } from '../course-factory/blueprint-loader';
-import { buildDeterministicCoursePackage } from '../course-factory/deterministic-package';
+import { buildAuthoredCoursePackage } from '../course-factory/authored-content-compiler';
+import { upgradePersistedAuthoredCourse } from '../course-factory/persisted-authored-upgrade';
 import { runGovernmentProcurementGate } from '../course-factory/procurement-gate';
 import { auditCourseTemplate } from './audit';
 import type { ProgramBuilderTemplate } from './schema';
@@ -26,7 +25,14 @@ const courseProgramConfigSchema = z.object({
   slug: z.string().min(1),
   description: z.string().optional(),
   isActive: z.boolean().optional(),
-  credentialTarget: z.enum(['INTERNAL','STATE_BOARD','IC&RC','NAADAC','CUSTOM','DOL_APPRENTICESHIP']),
+  credentialTarget: z.enum([
+    'INTERNAL',
+    'STATE_BOARD',
+    'IC&RC',
+    'NAADAC',
+    'CUSTOM',
+    'DOL_APPRENTICESHIP',
+  ]),
   minimumHours: z.number().positive(),
   requiresFinalExam: z.boolean(),
   finalExam: z.object({
@@ -47,14 +53,21 @@ const courseProgramConfigSchema = z.object({
   }),
   regulatory: z.object({
     complianceProfileKey: z.string().min(1),
-    credentialTarget: z.enum(['INTERNAL','STATE_BOARD','IC&RC','NAADAC','CUSTOM','DOL_APPRENTICESHIP']),
+    credentialTarget: z.enum([
+      'INTERNAL',
+      'STATE_BOARD',
+      'IC&RC',
+      'NAADAC',
+      'CUSTOM',
+      'DOL_APPRENTICESHIP',
+    ]),
     governingBody: z.string().nullable().optional(),
     governingRegion: z.string().nullable().optional(),
     governingStandardVersion: z.string().nullable().optional(),
     retentionPolicyDays: z.number().nullable().optional(),
     auditNotes: z.string().nullable().optional(),
   }),
-  status: z.enum(['draft','published']).default('draft'),
+  status: z.enum(['draft', 'published']).default('draft'),
 });
 
 async function resolveRegisteredBlueprint(input: FactoryInput) {
@@ -68,24 +81,26 @@ async function resolveRegisteredBlueprint(input: FactoryInput) {
   return loaded?.blueprint ?? null;
 }
 
-async function queueBaselineMediaIfRequested(
+async function queueUpgradedMediaIfRequested(
   input: FactoryInput,
-  baseline: FactoryOutput,
+  result: FactoryOutput,
 ): Promise<FactoryOutput> {
-  if (input.videoMode !== 'queue' || !baseline.courseId || input.dryRun) return baseline;
+  if (input.videoMode !== 'queue' || !result.courseId || input.dryRun) return result;
   const media = await queueCourseLessonVideos({
-    courseId: baseline.courseId,
+    courseId: result.courseId,
     onlyMissing: true,
     limit: input.videoQueueLimit ?? null,
   });
   return {
-    ...baseline,
+    ...result,
     videosQueued: media.queued + media.microclipsQueued,
     lessonVideosQueued: media.queued,
     microclipsQueued: media.microclipsQueued,
     warnings: [
-      ...(baseline.warnings ?? []),
-      ...(media.failed > 0 ? [`${media.failed} deterministic media enqueue attempt(s) failed and remain retryable.`] : []),
+      ...(result.warnings ?? []),
+      ...(media.failed > 0
+        ? [`${media.failed} media enqueue attempt(s) failed and remain retryable.`]
+        : []),
     ],
   };
 }
@@ -93,86 +108,60 @@ async function queueBaselineMediaIfRequested(
 /**
  * Public compatibility facade. Raw application callers no longer reach factory.ts directly.
  *
- * Registered-blueprint complete-content builds are baseline-first:
- * 1. Assemble and persist a substantive deterministic package through the existing private factory.
- * 2. Attempt AI enrichment only after that durable package exists.
- * 3. If inference is unavailable/exhausted, retain the baseline and queue its media instead of failing.
- *
- * Free-form course creation still needs inference to invent a blueprint; registered courses do not.
+ * There are exactly three explicit content paths:
+ * 1. `blueprint` compiles complete authored source already embedded in a blueprint.
+ * 2. `curriculum_lessons` upgrades an identified persisted course from its
+ *    authored curriculum records without replacing identity or learner state.
+ * 3. `ai` generates a complete strict package and fails when inference or the
+ *    content contract fails. Generic fallback lessons are never published.
  */
 export async function courseFactory(
   input: FactoryInput,
   progress?: ProgressCallback,
 ): Promise<FactoryOutput> {
-  if (input.contentSource === 'blueprint') {
-    return executeCourseFactory(input, progress);
+  if (input.contentSource === 'curriculum_lessons') {
+    if (!input.courseId) {
+      return {
+        ok: false,
+        errors: ['courseId is required for an authored persisted-curriculum upgrade'],
+        videosQueued: 0,
+      };
+    }
+    progress?.('resolve', 'Loading the identified persisted authored curriculum.', 10);
+    const upgraded = await upgradePersistedAuthoredCourse(input.courseId);
+    progress?.('validate', 'All lessons passed the universal interactive contract.', 85);
+    const result: FactoryOutput = {
+      ok: true,
+      courseId: upgraded.courseId,
+      courseSlug: upgraded.courseSlug,
+      moduleCount: upgraded.moduleCount,
+      lessonCount: upgraded.lessonCount,
+      assessmentsGenerated: 0,
+      videosQueued: 0,
+    };
+    const withMedia = await queueUpgradedMediaIfRequested(input, result);
+    progress?.('complete', 'Authored course upgrade completed.', 100);
+    return withMedia;
   }
 
   const registeredBlueprint = await resolveRegisteredBlueprint(input);
-  if (!registeredBlueprint) {
-    return executeCourseFactory(input, progress);
+  if (input.contentSource === 'blueprint') {
+    if (!registeredBlueprint) {
+      return { ok: false, errors: ['A complete authored blueprint is required'], videosQueued: 0 };
+    }
+    const courseTitle =
+      input.title || registeredBlueprint.title || registeredBlueprint.credentialTitle;
+    const authoredBlueprint = buildAuthoredCoursePackage(registeredBlueprint, courseTitle);
+    return executeCourseFactory(
+      { ...input, blueprint: authoredBlueprint, contentSource: 'blueprint' },
+      progress,
+    );
   }
 
-  const courseTitle = input.title || registeredBlueprint.title || registeredBlueprint.credentialTitle;
-  const deterministicBlueprint = buildDeterministicCoursePackage(registeredBlueprint, courseTitle);
-  const baseline = await executeCourseFactory(
-    {
-      ...input,
-      blueprint: deterministicBlueprint,
-      contentSource: 'blueprint',
-      videoMode: 'off',
-    },
+  return executeCourseFactory(
+    registeredBlueprint ? { ...input, blueprint: registeredBlueprint, contentSource: 'ai' } : input,
     progress,
   );
-  if (!baseline.ok) return baseline;
-
-  const requestedSource = input.contentSource ?? 'ai';
-  if (requestedSource === 'ai' && isAIAvailable()) {
-    try {
-      const enriched = await executeCourseFactory(
-        {
-          ...input,
-          blueprint: deterministicBlueprint,
-          contentSource: 'ai',
-        },
-        progress,
-      );
-      if (enriched.ok) return enriched;
-      logger.warn('[course-builder] AI enrichment returned an incomplete result; preserving deterministic baseline', {
-        courseId: baseline.courseId,
-        errors: enriched.errors,
-      });
-      return queueBaselineMediaIfRequested(input, {
-        ...baseline,
-        warnings: [
-          ...(baseline.warnings ?? []),
-          'AI enrichment did not complete. The deterministic baseline was preserved and remains the authoritative course package.',
-        ],
-      });
-    } catch (error) {
-      logger.warn('[course-builder] AI enrichment failed; preserving deterministic baseline', {
-        courseId: baseline.courseId,
-        error: error instanceof Error ? error.message : String(error),
-      });
-      return queueBaselineMediaIfRequested(input, {
-        ...baseline,
-        warnings: [
-          ...(baseline.warnings ?? []),
-          'AI enrichment was unavailable. The deterministic baseline was preserved and media generation continues from that package.',
-        ],
-      });
-    }
-  }
-
-  return queueBaselineMediaIfRequested(input, {
-    ...baseline,
-    warnings: [
-      ...(baseline.warnings ?? []),
-      ...(requestedSource === 'ai'
-        ? ['No healthy AI provider was available. The deterministic baseline completed without external inference.']
-        : []),
-    ],
-  });
 }
 
 export async function saveCourseProgramConfiguration(input: unknown) {
@@ -241,9 +230,10 @@ export async function publishGovernedCourse(
     progress,
   );
 
-  const governance = result.ok && result.courseId
-    ? await normalizeGeneratedCourseForGovernance(result.courseId)
-    : null;
+  const governance =
+    result.ok && result.courseId
+      ? await normalizeGeneratedCourseForGovernance(result.courseId)
+      : null;
 
   return { ...gate, ok: gate.ok && result.ok, result, governance };
 }
@@ -252,37 +242,31 @@ export async function repairCanonicalCourse(courseId: string, progress?: Progres
   const db = await requireAdminClient();
   const { data: course, error } = await db
     .from('courses')
-    .select('id,slug,title,program_id,programs(slug)')
+    .select('id,slug,title,program_id')
     .eq('id', courseId)
     .maybeSingle();
 
   if (error) throw error;
   if (!course) throw new Error('Course not found');
 
-  const relatedPrograms = course.programs as unknown as Array<{ slug: string }> | { slug: string } | null;
-  const programSlug = Array.isArray(relatedPrograms)
-    ? relatedPrograms[0]?.slug ?? null
-    : relatedPrograms?.slug ?? null;
-  const programId = course.program_id as string | null;
-
-  if (!programId || !programSlug) throw new Error('Course is not linked to a canonical program');
-
   const result = await courseFactory(
     {
-      programId,
-      programSlug,
+      courseId,
+      programId: course.program_id ?? undefined,
+      programSlug: course.slug,
       mode: 'missing-only',
-      contentSource: 'ai',
+      contentSource: 'curriculum_lessons',
       videoMode: 'queue',
     },
     progress,
   );
 
-  const governance = result.ok && result.courseId
-    ? await normalizeGeneratedCourseForGovernance(result.courseId)
-    : null;
+  const governance =
+    result.ok && result.courseId
+      ? await normalizeGeneratedCourseForGovernance(result.courseId)
+      : null;
 
-  return { ...result, governance, repairedCourseId: courseId, programSlug };
+  return { ...result, governance, repairedCourseId: courseId, programSlug: course.slug };
 }
 
 export async function queueCourseMedia(input: {

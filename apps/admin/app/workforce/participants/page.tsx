@@ -145,7 +145,7 @@ export default async function ParticipantsPage() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <Link
-                      href={`/admin/workforce/participants/${participant.id}`}
+                      href={`/workforce/participants/${participant.id}`}
                       className="text-blue-600 hover:text-blue-800 flex items-center justify-end gap-1"
                     >
                       View

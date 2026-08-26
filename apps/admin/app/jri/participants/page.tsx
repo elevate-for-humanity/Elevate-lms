@@ -36,8 +36,8 @@ export default async function JRIParticipantsPage() {
         <div className="mb-8">
           <Breadcrumbs
             items={[
-              { label: 'Admin', href: '/admin' },
-              { label: 'Job Ready Indy', href: '/admin/jri' },
+              { label: 'Admin', href: '/' },
+              { label: 'Job Ready Indy', href: '/jri' },
               { label: 'Participants' },
             ]}
           />

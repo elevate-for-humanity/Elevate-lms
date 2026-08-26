@@ -71,7 +71,7 @@ export default function NewCampaignPage() {
     <div className="min-h-screen bg-white py-8">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'New' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'New' }]} />
       </div>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">

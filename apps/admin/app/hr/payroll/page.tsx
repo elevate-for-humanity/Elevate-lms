@@ -6,7 +6,7 @@ import PayrollClient from './PayrollClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/hr/payroll' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/hr/payroll' },
   title: 'Payroll Management | Elevate For Humanity',
   description: 'Process and manage employee payroll.',
 };

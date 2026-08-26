@@ -37,8 +37,8 @@ export default async function FinancialAssurancePage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'Compliance', href: '/admin/compliance' },
+            { label: 'Admin', href: '/' },
+            { label: 'Compliance', href: '/compliance' },
             { label: 'Financial Assurance' },
           ]}
         />

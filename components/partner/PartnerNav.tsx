@@ -14,6 +14,7 @@ import {
   HelpCircle,
   BadgeCheck,
 } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 const items = [
   { href: '/partner/board', label: 'My Board', icon: LayoutDashboard },
@@ -27,9 +28,9 @@ const items = [
 ];
 
 const adminItems = [
-  { href: '/admin/partner-enrollments', label: 'Enrollments', icon: Users },
-  { href: '/admin/partner-inquiries', label: 'Inquiries', icon: HelpCircle },
-  { href: '/admin/partners', label: 'All Partners', icon: Shield },
+  { href: getAdminUrl('/partner-enrollments'), label: 'Enrollments', icon: Users },
+  { href: getAdminUrl('/partner-inquiries'), label: 'Inquiries', icon: HelpCircle },
+  { href: getAdminUrl('/partners'), label: 'All Partners', icon: Shield },
 ];
 
 export default function PartnerNav({ isAdmin }: { isAdmin: boolean }) {

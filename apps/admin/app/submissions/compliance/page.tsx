@@ -24,7 +24,7 @@ export default async function CompliancePage() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/admin');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/');
 
   const { data: org } = await db
     .from('sos_organizations')
@@ -165,7 +165,7 @@ export default async function CompliancePage() {
                       </td>
                       <td className="px-4 py-3">
                         <Link
-                          href={`/admin/submissions/compliance/${r.id}`}
+                          href={`/submissions/compliance/${r.id}`}
                           className="text-xs text-brand-blue-600 hover:underline"
                         >
                           Edit

@@ -28,8 +28,8 @@ export default async function FerpaConsentFormsPage() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'FERPA', href: '/admin/ferpa' },
+            { label: 'Admin', href: '/' },
+            { label: 'FERPA', href: '/ferpa' },
             { label: 'Consent Forms' },
           ]}
         />
@@ -124,7 +124,7 @@ export default async function FerpaConsentFormsPage() {
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <Link
-                          href={`/admin/documents/${form.id}`}
+                          href={`/documents/${form.id}`}
                           className="text-xs font-semibold text-brand-blue-600 hover:underline"
                         >
                           View

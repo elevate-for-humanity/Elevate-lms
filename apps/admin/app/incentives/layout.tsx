@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: `Admin | Incentives | ${PLATFORM_DEFAULTS.orgName}`,
   description: `${PLATFORM_DEFAULTS.orgName} - Career training and workforce development programs.`,
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/incentives',
+    canonical: 'https://admin.elevateforhumanity.org/incentives',
   },
   robots: {
     index: false,

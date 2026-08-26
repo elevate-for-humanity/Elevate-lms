@@ -7,7 +7,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /srv/worker
 COPY services/media-gpu-worker/requirements.txt ./requirements.txt
-RUN python3 -m pip install --no-cache-dir -r requirements.txt
+# Install CUDA 12.1 wheels without their bundled NVIDIA dependency packages;
+# the CUDA/cuDNN runtime is already supplied by the base image. This prevents a
+# duplicate CUDA stack from exhausting Northflank's 32 GB project allowance.
+RUN python3 -m pip install --no-cache-dir --no-deps \
+      --index-url https://download.pytorch.org/whl/cu121 \
+      torch==2.4.1+cu121 torchvision==0.19.1+cu121 torchaudio==2.4.1+cu121 && \
+    grep -Ev '^(torch|torchvision|torchaudio)([<>=]|$)' requirements.txt > runtime-requirements.txt && \
+    python3 -m pip install --no-cache-dir \
+      nvidia-cublas-cu12==12.1.3.1 \
+      nvidia-cuda-cupti-cu12==12.1.105 \
+      nvidia-cudnn-cu12==9.1.0.70 \
+      filelock typing-extensions sympy networkx jinja2 fsspec \
+      -r runtime-requirements.txt && \
+    python3 -c "import torch; assert torch.__version__.startswith('2.4.1'); print(torch.__version__)"
 COPY services/media-gpu-worker/worker.py ./worker.py
 COPY services/media-gpu-worker/bootstrap_models.py ./bootstrap_models.py
 

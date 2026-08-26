@@ -34,19 +34,19 @@ export default async function ComplianceAutomationPage() {
   ]);
 
   const PIPELINE_STEPS = [
-    { step: '1', label: 'Upload Template', desc: 'Upload state/agency contract, grant form, or MOU', icon: Upload, href: '/admin/contracts', color: 'bg-violet-50 text-violet-600' },
-    { step: '2', label: 'Extract Fields', desc: 'AI detects all blank fields, checkboxes, and signature lines', icon: Search, href: '/admin/contracts', color: 'bg-blue-50 text-blue-600' },
-    { step: '3', label: 'Prefill from Org Profile', desc: 'EIN, UEI, CAGE, address, signatory auto-populated from verified facts', icon: ShieldCheck, href: '/admin/settings/organization-profile', color: 'bg-emerald-50 text-emerald-600' },
-    { step: '4', label: 'Review & Approve', desc: 'Admin reviews every field — AI narrative flagged for approval', icon: CheckCircle2, href: '/admin/contracts', color: 'bg-amber-50 text-amber-600' },
-    { step: '5', label: 'Sign', desc: 'Draw or typed signature with legal audit trail', icon: PenTool, href: '/admin/signatures', color: 'bg-rose-50 text-rose-600' },
-    { step: '6', label: 'Export', desc: 'Generate signed PDF or DOCX for submission', icon: Download, href: '/admin/contracts', color: 'bg-slate-50 text-slate-600' },
+    { step: '1', label: 'Upload Template', desc: 'Upload state/agency contract, grant form, or MOU', icon: Upload, href: '/contracts', color: 'bg-violet-50 text-violet-600' },
+    { step: '2', label: 'Extract Fields', desc: 'AI detects all blank fields, checkboxes, and signature lines', icon: Search, href: '/contracts', color: 'bg-blue-50 text-blue-600' },
+    { step: '3', label: 'Prefill from Org Profile', desc: 'EIN, UEI, CAGE, address, signatory auto-populated from verified facts', icon: ShieldCheck, href: '/settings/organization-profile', color: 'bg-emerald-50 text-emerald-600' },
+    { step: '4', label: 'Review & Approve', desc: 'Admin reviews every field — AI narrative flagged for approval', icon: CheckCircle2, href: '/contracts', color: 'bg-amber-50 text-amber-600' },
+    { step: '5', label: 'Sign', desc: 'Draw or typed signature with legal audit trail', icon: PenTool, href: '/signatures', color: 'bg-rose-50 text-rose-600' },
+    { step: '6', label: 'Export', desc: 'Generate signed PDF or DOCX for submission', icon: Download, href: '/contracts', color: 'bg-slate-50 text-slate-600' },
   ];
 
   const MODULES = [
     {
       title: 'Contracts & Templates',
       desc: 'State agency contracts, MOUs, vendor registrations, RFP responses',
-      href: '/admin/contracts',
+      href: '/contracts',
       icon: FileText,
       stats: [
         { label: 'Total', value: contractCount ?? 0 },
@@ -56,7 +56,7 @@ export default async function ComplianceAutomationPage() {
     {
       title: 'Grant Applications',
       desc: 'Federal, state, and private grant applications with org prefill',
-      href: '/admin/grants/applications',
+      href: '/grants/applications',
       icon: Briefcase,
       stats: [
         { label: 'Total', value: grantAppCount ?? 0 },
@@ -66,14 +66,14 @@ export default async function ComplianceAutomationPage() {
     {
       title: 'Grant Opportunities',
       desc: 'SAM.gov search, opportunity tracking, deadline alerts',
-      href: '/admin/grants/opportunities',
+      href: '/grants/opportunities',
       icon: Search,
       stats: [],
     },
     {
       title: 'Document Intelligence',
       desc: 'Upload, extract, and map fields from any document',
-      href: '/admin/documents',
+      href: '/documents',
       icon: Upload,
       stats: [
         { label: 'Total', value: docCount ?? 0 },
@@ -83,28 +83,28 @@ export default async function ComplianceAutomationPage() {
     {
       title: 'Signatures',
       desc: 'Digital signature management and audit trail',
-      href: '/admin/signatures',
+      href: '/signatures',
       icon: PenTool,
       stats: [],
     },
     {
       title: 'Organization Profile',
       desc: 'Legal name, EIN, UEI, CAGE, SAM status, authorized signatory',
-      href: '/admin/settings/organization-profile',
+      href: '/settings/organization-profile',
       icon: ShieldCheck,
       stats: [],
     },
     {
       title: 'Submissions OS',
       desc: 'Org profile, facts vault, content library, past performance, templates',
-      href: '/admin/submissions',
+      href: '/submissions',
       icon: CheckCircle2,
       stats: [],
     },
     {
       title: 'MOU Management',
       desc: 'Partner MOUs, countersignatures, and distribution',
-      href: '/admin/mou',
+      href: '/mou',
       icon: FileText,
       stats: [],
     },

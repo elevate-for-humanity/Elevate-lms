@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 // GET /api/admin/workflows/[id] — workflow detail with triggers, steps, recent runs
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await apiRequireAdmin(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   const { id } = await params;
   const db = await requireAdminClient();
@@ -28,13 +28,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   if (!workflow) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  return NextResponse.json({ workflow, triggers: triggers ?? [], steps: steps ?? [], runs: runs ?? [] });
+  return NextResponse.json({
+    workflow,
+    triggers: triggers ?? [],
+    steps: steps ?? [],
+    runs: runs ?? [],
+  });
 }
 
 // PATCH /api/admin/workflows/[id] — update status / name / metadata
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await apiRequireAdmin(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   const { id } = await params;
   const body = await request.json();
@@ -49,22 +54,45 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const { data, error } = await db.from('workflows').update(update).eq('id', id).select().single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  logAdminAudit({ action: AdminAction.WORKFLOW_UPDATED, actorId: auth.id, entityType: 'workflows', entityId: id, metadata: update, req: request }).then(() => {}, () => {});
+  logAdminAudit({
+    action: AdminAction.WORKFLOW_UPDATED,
+    actorId: auth.id,
+    entityType: 'workflows',
+    entityId: id,
+    metadata: update,
+    req: request,
+  }).then(
+    () => {},
+    () => {},
+  );
 
   return NextResponse.json({ workflow: data });
 }
 
 // DELETE /api/admin/workflows/[id]
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const auth = await apiRequireAdmin(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   const { id } = await params;
   const db = await requireAdminClient();
   const { error } = await db.from('workflows').delete().eq('id', id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  logAdminAudit({ action: AdminAction.WORKFLOW_DELETED, actorId: auth.id, entityType: 'workflows', entityId: id, metadata: {}, req: request }).then(() => {}, () => {});
+  logAdminAudit({
+    action: AdminAction.WORKFLOW_DELETED,
+    actorId: auth.id,
+    entityType: 'workflows',
+    entityId: id,
+    metadata: {},
+    req: request,
+  }).then(
+    () => {},
+    () => {},
+  );
 
   return NextResponse.json({ deleted: true });
 }

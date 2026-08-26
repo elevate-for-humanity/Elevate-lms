@@ -32,7 +32,7 @@ run "Route and SEO governance" node scripts/check-route-seo-governance.mjs
 run "Public route guards" node scripts/guard-public-routes.mjs
 run "Pre-auth registry" node scripts/check-pre-auth-registry.cjs
 run "Canonical portal contracts" node scripts/audit-portal-contracts.mjs
-run "Repository schema drift regression" npx tsx scripts/audit-schema-drift.ts --baseline scripts/schema-drift-baseline.json --fail-on-new-drift
+run "Repository schema drift regression" node --import tsx scripts/audit-schema-drift.ts --baseline scripts/schema-drift-baseline.json --fail-on-new-drift
 run "Live portal data integrity" node scripts/audit-portal-data-integrity.mjs
 run "Privileged MFA architecture" node scripts/check-privileged-mfa-config.mjs
 
@@ -79,7 +79,7 @@ section "SECTION 4: VERIFIED CLAIMS & PUBLIC VISUALS"
 [[ -f lib/automation/evidence-processor.ts ]] && echo "OK: Evidence processor exists" || { echo "WARN: Evidence processor missing"; WARN=$((WARN+1)); }
 run "Public claim integrity" node scripts/check-public-claims.mjs
 run "Homepage visual integrity" node scripts/check-home-visual-integrity.mjs
-run "Hero banner integrity" npx tsx scripts/audit-hero-banners.ts
+run "Hero banner integrity" node --import tsx scripts/audit-hero-banners.ts
 
 section "SECTION 5: WORKFLOW ENGINE"
 [[ -f lib/workflows/engine.ts ]] && echo "OK: Workflow Engine exists" || { echo "FAIL: Workflow Engine missing"; FAIL=$((FAIL+1)); }

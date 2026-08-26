@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/integrations/google-classroom',
+    canonical: 'https://admin.elevateforhumanity.org/integrations/google-classroom',
   },
   title: 'Google Classroom | Elevate For Humanity',
   description: 'Google Classroom integration settings.',

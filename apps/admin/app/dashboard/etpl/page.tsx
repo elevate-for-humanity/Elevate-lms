@@ -37,7 +37,7 @@ export default async function EtplDashboard() {
     <div className="min-h-screen bg-white py-8 px-4">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Etpl' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Etpl' }]} />
       </div>
       <div className="max-w-7xl mx-auto">
         {/* Header */}

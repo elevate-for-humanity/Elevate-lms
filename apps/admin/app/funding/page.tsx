@@ -80,10 +80,10 @@ export default async function FundingPage() {
   const totalSelfPay = selfPayStudents.reduce((s: number, e: any) => s + (e.amount_paid_cents ?? 0), 0);
 
   const QUICK_LINKS = [
-    { label: 'WIOA Participants', href: '/admin/wioa' },
-    { label: 'Grants', href: '/admin/grants' },
-    { label: 'Funding Verification', href: '/admin/funding-verification' },
-    { label: 'Payroll', href: '/admin/hr/payroll' },
+    { label: 'WIOA Participants', href: '/wioa' },
+    { label: 'Grants', href: '/grants' },
+    { label: 'Funding Verification', href: '/funding-verification' },
+    { label: 'Payroll', href: '/hr/payroll' },
   ];
 
   return (
@@ -137,7 +137,7 @@ export default async function FundingPage() {
                   <td className="py-3.5 px-4 whitespace-nowrap"><p className="font-semibold text-slate-900 tabular-nums">${Number(v.total_voucher_amount ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>{outstanding > 0 && <p className="text-[10px] text-amber-600 font-medium">${outstanding.toLocaleString('en-US', { minimumFractionDigits: 2 })} outstanding</p>}</td>
                   <td className="py-3.5 px-4 tabular-nums text-slate-600 whitespace-nowrap">${Number(v.payments_to_date ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                   <td className="py-3.5 px-4"><span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${STATUS_STYLES[v.status || ''] ?? 'bg-slate-100 text-slate-600'}`}>{v.status ?? 'unknown'}</span></td>
-                  <td className="py-3.5 px-4 text-right"><Link href={`/admin/funding/${v.id}`} className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700 whitespace-nowrap">View <ArrowRight className="w-3 h-3" /></Link></td>
+                  <td className="py-3.5 px-4 text-right"><Link href={`/funding/${v.id}`} className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700 whitespace-nowrap">View <ArrowRight className="w-3 h-3" /></Link></td>
                 </tr>;
               })}
             </tbody></table></div>

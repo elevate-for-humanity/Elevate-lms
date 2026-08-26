@@ -1,10 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
 import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
-import {
-  PRIVILEGED_MFA_ROLES,
-  privilegedMfaEnforcementEnabled,
-} from '@/lib/auth/privileged-mfa';
+import { PRIVILEGED_MFA_ROLES, privilegedMfaEnforcementEnabled } from '@/lib/auth/privileged-mfa';
 import {
   ADMIN_ROLES,
   INSTRUCTOR_ROLES,
@@ -40,7 +37,9 @@ const PUBLIC_PATHS = [
 
 function isPublicPath(pathname: string): boolean {
   return (
-    PUBLIC_PATHS.some((path) => pathname === path || (path !== '/' && pathname.startsWith(`${path}/`))) ||
+    PUBLIC_PATHS.some(
+      (path) => pathname === path || (path !== '/' && pathname.startsWith(`${path}/`)),
+    ) ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
     /[a-z0-9]+\.[a-z]+$/i.test(pathname)
@@ -133,11 +132,7 @@ export async function middleware(req: NextRequest) {
 
   const withCookies = (response: NextResponse) => {
     for (const cookie of pendingCookies) {
-      response.cookies.set(
-        cookie.name,
-        cookie.value,
-        platformCookieOptions(cookie.options) as any,
-      );
+      response.cookies.set(cookie.name, cookie.value, platformCookieOptions(cookie.options) as any);
     }
     response.cookies.set('__efh_pathname', `${pathname}${search}`, {
       httpOnly: false,

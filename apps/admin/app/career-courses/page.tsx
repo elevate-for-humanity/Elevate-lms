@@ -105,7 +105,7 @@ export default async function CareerCoursesPage() {
                 </div>
                 <div className="col-span-1 text-right">
                   <Link
-                    href={`/admin/career-courses/create?id=${course.id}`}
+                    href={`/career-courses/create?id=${course.id}`}
                     className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
                   >
                     Edit <ArrowRight className="w-3 h-3" />

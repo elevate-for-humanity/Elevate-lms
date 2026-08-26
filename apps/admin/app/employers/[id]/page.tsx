@@ -50,9 +50,9 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
   const jobRows = jobs ?? [];
 
   const QUICK_LINKS = [
-    { label: 'Proposal', href: `/admin/employers/${id}/proposal` },
-    { label: 'Onboarding', href: `/admin/employers/${id}/onboarding` },
-    { label: 'Job Postings', href: `/admin/jobs?employer=${id}` },
+    { label: 'Proposal', href: `/employers/${id}/proposal` },
+    { label: 'Onboarding', href: `/employers/${id}/onboarding` },
+    { label: 'Job Postings', href: `/jobs?employer=${id}` },
   ];
 
   return (
@@ -167,7 +167,7 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
               <Briefcase className="w-4 h-4 text-slate-400" /> Job Postings ({jobCount ?? 0})
             </h2>
             <Link
-              href={`/admin/jobs/new?employer=${id}`}
+              href={`/jobs/new?employer=${id}`}
               className="text-sm text-blue-600 hover:underline"
             >
               + Post Job
@@ -199,7 +199,7 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
                       {j.status}
                     </span>
                     <Link
-                      href={`/admin/jobs/${j.id}`}
+                      href={`/jobs/${j.id}`}
                       className="text-sm text-blue-600 hover:underline"
                     >
                       View

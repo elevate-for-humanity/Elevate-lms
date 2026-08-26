@@ -54,7 +54,7 @@ export default async function GeminiIntegrationPage() {
     },
     {
       surface: 'Quiz Generator',
-      route: '/admin/quiz-builder',
+      route: '/quiz-builder',
       description: 'Generates quiz questions from lesson content',
     },
   ];
@@ -65,7 +65,7 @@ export default async function GeminiIntegrationPage() {
         <Breadcrumbs
           items={[
             { label: 'Admin', href: '/dashboard' },
-            { label: 'Integrations', href: '/admin/integrations' },
+            { label: 'Integrations', href: '/integrations' },
             { label: 'Gemini AI' },
           ]}
         />

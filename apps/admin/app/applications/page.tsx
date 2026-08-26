@@ -147,7 +147,7 @@ export default async function ApplicationsPage({
   const totalPages = Math.ceil((totalCount || 0) / pageSize);
   const pending = (statusCounts['pending'] || 0) + (statusCounts['submitted'] || 0);
 
-  const baseHref = `/admin/applications${rawStatus && rawStatus !== 'all' ? `?status=${rawStatus}` : ''}${search ? `${rawStatus && rawStatus !== 'all' ? '&' : '?'}search=${search}` : ''}`;
+  const baseHref = `/applications${rawStatus && rawStatus !== 'all' ? `?status=${rawStatus}` : ''}${search ? `${rawStatus && rawStatus !== 'all' ? '&' : '?'}search=${search}` : ''}`;
 
   return (
     <AdminPageShell

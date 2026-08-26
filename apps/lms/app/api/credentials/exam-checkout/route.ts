@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
   const userId = auth.id;
 
   const body = await req.json();
@@ -93,7 +93,12 @@ export async function POST(req: NextRequest) {
   const amountCents = decision.amountCents ?? credential.exam_fee_cents ?? 0;
   if (amountCents <= 0) {
     return NextResponse.json(
-      { error: 'Exam fee amount not configured for this credential. Contact ' + PLATFORM_DEFAULTS.supportPhone + '.' },
+      {
+        error:
+          'Exam fee amount not configured for this credential. Contact ' +
+          PLATFORM_DEFAULTS.supportPhone +
+          '.',
+      },
       { status: 400 },
     );
   }

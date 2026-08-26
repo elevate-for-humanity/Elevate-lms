@@ -82,11 +82,11 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
   // Admin pages and data are authenticated and may contain sensitive records.
-  // Never cache navigations, APIs, RSC responses, auth paths or range/media data.
-  if (request.mode === 'navigate') {
-    event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() => caches.match('/offline.html')));
-    return;
-  }
+  // Never intercept navigations. A rejected fetch combined with a missing
+  // offline fallback makes respondWith resolve without a Response, which
+  // Chromium surfaces as ERR_FAILED. Let the browser own document navigation
+  // and its native redirect, retry, and error behavior.
+  if (request.mode === 'navigate') return;
 
   if (
     request.headers.has('range') ||

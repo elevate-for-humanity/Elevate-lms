@@ -10,7 +10,7 @@ import { withRuntime } from '@/lib/api/withRuntime';
  */
 async function _POST(request: NextRequest) {
   const auth = await apiAuthGuard(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   try {
     const body = await request.json();
@@ -35,4 +35,3 @@ async function _POST(request: NextRequest) {
 }
 
 export const POST = withRuntime(_POST);
-

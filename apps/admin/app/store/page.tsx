@@ -82,7 +82,7 @@ export default async function AdminStorePage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Store' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Store' }]} />
           <div className="flex justify-between items-center mt-4">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">Store Management</h1>

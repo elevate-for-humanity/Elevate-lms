@@ -9,7 +9,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string; stepId: string }> },
 ) {
   const auth = await apiRequireAdmin(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   const { stepId } = await params;
   const db = await requireAdminClient();
@@ -23,7 +23,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string; stepId: string }> },
 ) {
   const auth = await apiRequireAdmin(request);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
 
   const { stepId } = await params;
   const body = await request.json();

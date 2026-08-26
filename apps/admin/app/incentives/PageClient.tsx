@@ -66,7 +66,7 @@ export default function IncentivesPage() {
       <div className="min-h-screen bg-white flex items-center justify-center">
         {/* Hero Image */}
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Incentives' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Incentives' }]} />
         </div>
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>
@@ -76,7 +76,7 @@ export default function IncentivesPage() {
   return (
     <div className="min-h-screen bg-white py-8">
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Incentives' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Incentives' }]} />
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
@@ -281,7 +281,7 @@ export default function IncentivesPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <Link
-                        href={`/admin/incentives/${incentive.id}`}
+                        href={`/incentives/${incentive.id}`}
                         className="text-brand-blue-600 hover:text-brand-blue-900"
                       >
                         View

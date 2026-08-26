@@ -28,14 +28,14 @@ export function BillingSubnav({ items, basePath }: Props) {
 }
 
 export const ADMIN_BILLING_NAV: BillingNavItem[] = [
-  { href: '/admin/billing', label: 'Overview' },
-  { href: '/admin/billing/plans', label: 'Plans' },
-  { href: '/admin/billing/addons', label: 'Add-ons' },
-  { href: '/admin/billing/subscriptions', label: 'Subscriptions' },
-  { href: '/admin/billing/licenses', label: 'Licenses' },
-  { href: '/admin/billing/usage', label: 'Usage' },
-  { href: '/admin/billing/invoices', label: 'Invoices' },
-  { href: '/admin/billing/feature-flags', label: 'Feature flags' },
+  { href: '/billing', label: 'Overview' },
+  { href: '/billing/plans', label: 'Plans' },
+  { href: '/billing/addons', label: 'Add-ons' },
+  { href: '/billing/subscriptions', label: 'Subscriptions' },
+  { href: '/billing/licenses', label: 'Licenses' },
+  { href: '/billing/usage', label: 'Usage' },
+  { href: '/billing/invoices', label: 'Invoices' },
+  { href: '/billing/feature-flags', label: 'Feature flags' },
 ];
 
 export const ACCOUNT_BILLING_NAV: BillingNavItem[] = [

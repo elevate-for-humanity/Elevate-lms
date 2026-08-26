@@ -109,7 +109,7 @@ export default function InstructorCampaignsPage() {
       </section>
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Instructor', href: '/admin/instructor' }, { label: 'Campaigns' }]}
+          items={[{ label: 'Instructor', href: '/instructor' }, { label: 'Campaigns' }]}
         />
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

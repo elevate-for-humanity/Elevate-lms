@@ -12,6 +12,7 @@ import {
   updateAgenticProjectMetadata,
 } from '@/lib/agentic/project-service';
 import { startAgenticRun } from '@/lib/agentic/orchestrator';
+import { runAgenticExecutorOnce } from '@/lib/agentic/executor';
 import { runPersistedCourseProcurementHealthCheckWithClient } from '@/lib/course-builder/persisted-publish-service';
 
 export const runtime = 'nodejs';
@@ -35,7 +36,10 @@ export async function POST(req: NextRequest) {
     const projectId = text(body.projectId);
     if (!projectId) return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
 
-    const project = await loadAgenticProject({ projectId, userId: auth.id });
+    // Status polling also wakes queued work, preventing a cold background timer from stranding runs.
+  await runAgenticExecutorOnce();
+
+  const project = await loadAgenticProject({ projectId, userId: auth.id });
     if (!project || project.target_type !== 'course') {
       return NextResponse.json({ error: 'Course agent project not found.' }, { status: 404 });
     }
@@ -179,6 +183,9 @@ export async function POST(req: NextRequest) {
     metadata: { task_count: started.plan.tasks.length },
   });
 
+  // Wake the durable executor immediately; its claim is atomic and safe alongside the background poller.
+  await runAgenticExecutorOnce();
+
   return NextResponse.json({
     ok: true,
     projectId: created.project.id,
@@ -196,6 +203,9 @@ export async function GET(req: NextRequest) {
 
   const projectId = text(req.nextUrl.searchParams.get('projectId'));
   if (!projectId) return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
+
+  // Await one atomic executor pass so status polling durably advances queued work.
+  await runAgenticExecutorOnce();
 
   const project = await loadAgenticProject({ projectId, userId: auth.id });
   if (!project || project.target_type !== 'course') {

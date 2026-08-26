@@ -38,7 +38,7 @@ export default async function InternalDocsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Internal Docs' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Internal Docs' }]} />
 
         <div className="flex items-center justify-between mt-4 mb-6">
           <div>

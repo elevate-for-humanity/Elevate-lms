@@ -50,7 +50,7 @@ export default async function ProgramDashboardPage({ params }: { params: Promise
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <nav className="mb-4 text-sm text-slate-600"><Link href="/admin" className="hover:underline">Admin</Link><span className="px-2">/</span><Link href="/programs" className="hover:underline">Programs</Link><span className="px-2">/</span><span>{program.title}</span></nav>
+      <nav className="mb-4 text-sm text-slate-600"><Link href="/" className="hover:underline">Admin</Link><span className="px-2">/</span><Link href="/programs" className="hover:underline">Programs</Link><span className="px-2">/</span><span>{program.title}</span></nav>
       <div className="mb-8 flex items-center justify-between gap-4">
         <div><h1 className="text-3xl font-bold text-slate-950">{program.title}</h1><p className="mt-1 text-slate-600">{program.category || 'Program'} · {program.estimated_weeks || '—'} weeks · {program.estimated_hours || '—'} hours</p></div>
         <span className={`rounded-full px-3 py-1 text-sm font-medium ${program.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}`}>{program.status || 'draft'}</span>

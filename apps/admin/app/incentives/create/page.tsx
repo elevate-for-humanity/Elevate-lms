@@ -23,7 +23,7 @@ export default async function CreateIncentivePage() {
           <Breadcrumbs
             items={[
               { label: 'Admin', href: '/dashboard' },
-              { label: 'Incentives', href: '/admin/incentives' },
+              { label: 'Incentives', href: '/incentives' },
               { label: 'Create Incentive' },
             ]}
           />

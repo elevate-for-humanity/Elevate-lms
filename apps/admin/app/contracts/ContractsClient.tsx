@@ -292,7 +292,7 @@ export default function ContractsClient() {
             {contracts.map(c => (
               <Link
                 key={c.id}
-                href={`/admin/contracts/${c.id}`}
+                href={`/contracts/${c.id}`}
                 className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors group"
               >
                 <FileText className="w-5 h-5 text-slate-400 flex-shrink-0" />

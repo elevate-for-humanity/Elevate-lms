@@ -119,7 +119,7 @@ async function _POST(request: NextRequest) {
         type: 'alert',
         title: 'Stuck Partner Approvals',
         message: `${stuckPartners.length} partner(s) need attention - stuck in approval process`,
-        action_url: '/admin/partners?status=pending_user',
+        action_url: '/partners?status=pending_user',
         action_label: 'Review',
         metadata: {
           alert_type: 'stuck_approvals',

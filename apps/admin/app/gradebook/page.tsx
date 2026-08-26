@@ -34,7 +34,7 @@ export default async function AdminGradebookIndexPage() {
             courses.map((course) => (
               <Link
                 key={course.id}
-                href={`/admin/gradebook/${course.id}`}
+                href={`/gradebook/${course.id}`}
                 className="flex items-center justify-between bg-white rounded-xl border p-5 hover:shadow-sm transition group"
               >
                 <div className="flex items-center gap-4">

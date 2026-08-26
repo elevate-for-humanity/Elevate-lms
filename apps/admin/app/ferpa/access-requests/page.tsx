@@ -50,8 +50,8 @@ export default async function FerpaAccessRequestsPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'FERPA', href: '/admin/ferpa' },
+            { label: 'Admin', href: '/' },
+            { label: 'FERPA', href: '/ferpa' },
             { label: 'Access Requests' },
           ]}
         />
@@ -107,7 +107,7 @@ export default async function FerpaAccessRequestsPage() {
                     <td className="px-6 py-4 text-slate-600 max-w-xs truncate">{r.notes ?? '—'}</td>
                     <td className="px-6 py-4">
                       <Link
-                        href={`/admin/documents/${r.id}`}
+                        href={`/documents/${r.id}`}
                         className="text-brand-blue-600 hover:underline text-sm font-medium"
                       >
                         Review

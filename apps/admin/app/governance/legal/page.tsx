@@ -27,7 +27,7 @@ export default async function LegalGovernancePage() {
       {/* Hero Image */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Governance', href: '/admin/governance' }, { label: 'Legal & Entity Information' }]} />
+          <Breadcrumbs items={[{ label: 'Governance', href: '/governance' }, { label: 'Legal & Entity Information' }]} />
         </div>
       </div>
 
@@ -281,10 +281,10 @@ export default async function LegalGovernancePage() {
             {[
               { title: 'Terms of Service', href: '/terms-of-service', desc: 'User agreement for platform access and services' },
               { title: 'Privacy Policy', href: '/privacy-policy', desc: 'Data collection, use, sharing, and your rights' },
-              { title: 'Security & Data Protection', href: '/admin/governance/security', desc: 'How we protect personal and educational data' },
+              { title: 'Security & Data Protection', href: '/governance/security', desc: 'How we protect personal and educational data' },
               { title: 'Accessibility', href: '/accessibility', desc: 'WCAG 2.1 AA compliance and accommodations' },
               { title: 'Outcomes Methodology', href: '/outcomes', desc: 'How we measure and report student outcomes' },
-              { title: 'Governance Overview', href: '/admin/governance', desc: 'Full documentation index' },
+              { title: 'Governance Overview', href: '/governance', desc: 'Full documentation index' },
             ].map((doc) => (
               <Link
                 key={doc.href}

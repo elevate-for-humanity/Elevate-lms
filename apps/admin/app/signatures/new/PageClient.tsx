@@ -57,8 +57,8 @@ export default function NewSignaturePage() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'Signatures', href: '/admin/signatures' },
+            { label: 'Admin', href: '/' },
+            { label: 'Signatures', href: '/signatures' },
             { label: 'New Document' },
           ]}
         />

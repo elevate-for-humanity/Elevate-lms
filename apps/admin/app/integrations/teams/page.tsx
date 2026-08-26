@@ -21,7 +21,7 @@ export default async function TeamsIntegrationPage() {
         <Breadcrumbs
           items={[
             { label: 'Admin', href: '/dashboard' },
-            { label: 'Integrations', href: '/admin/integrations' },
+            { label: 'Integrations', href: '/integrations' },
             { label: 'Microsoft Teams' },
           ]}
         />

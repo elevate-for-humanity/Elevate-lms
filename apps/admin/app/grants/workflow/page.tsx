@@ -156,7 +156,7 @@ export default async function GrantWorkflowPage() {
                         Due: {new Date(grant.due_date).toLocaleDateString()}
                       </span>
                       <Link
-                        href={`/admin/grants/intake/${grant.id}`}
+                        href={`/grants/intake/${grant.id}`}
                         className="text-xs bg-brand-blue-600 text-white px-3 py-2 rounded-md hover:bg-brand-blue-700"
                       >
                         Start Draft

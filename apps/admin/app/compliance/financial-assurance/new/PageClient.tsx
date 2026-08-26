@@ -45,7 +45,7 @@ export default function NewFinancialAssurancePage() {
       <Breadcrumbs
         items={[
           { label: 'Admin', href: '/dashboard' },
-          { label: 'Financial Assurance', href: '/admin/compliance/financial-assurance' },
+          { label: 'Financial Assurance', href: '/compliance/financial-assurance' },
           { label: 'New Record' },
         ]}
       />

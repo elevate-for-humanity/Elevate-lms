@@ -186,7 +186,7 @@ export default async function DealsPage() {
                       </div>
                       <div className="flex items-center gap-3 mt-4 pt-4 border-t border-slate-100">
                         <Link
-                          href={`/admin/crm/deals/${deal.id}`}
+                          href={`/crm/deals/${deal.id}`}
                           className="px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors text-sm"
                         >
                           View Deal

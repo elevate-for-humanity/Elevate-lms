@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Bot, CheckCircle2, FileJson, Loader2, Save, Sparkles } from 'lucide-react';
+import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
 
 type Lesson = {
   id: string;
@@ -17,10 +18,12 @@ type Lesson = {
 type Module = { id: string; title: string; lessons: Lesson[] };
 
 type Experience = {
+  readingGuide?: any;
   content?: string;
   narrationScript?: string;
   visualPrompt?: string;
   flashcards?: any[];
+  quickClips?: any[];
   knowledgeChecks?: any[];
   scenario?: any;
   hotspots?: any[];
@@ -30,6 +33,11 @@ type Experience = {
   simulation?: any;
   decisionTree?: any;
   practicalTask?: any;
+  exercises?: any[];
+  resources?: any[];
+  glossary?: any[];
+  remediation?: any;
+  readiness?: any;
   interactiveVideo?: any;
 };
 
@@ -90,7 +98,7 @@ export default function CourseInteractionStudio({
     try {
       const res = await fetch('/api/admin/course-builder/ai-write', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: courseBuilderJsonHeaders('ai-write'),
         body: JSON.stringify({
           lessonTitle: selected.title,
           courseTitle,
@@ -106,22 +114,7 @@ export default function CourseInteractionStudio({
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? 'AI generation failed');
       const next = body.experience ?? body;
-      const sanitized: Experience = {
-        content: next.content,
-        narrationScript: next.narrationScript,
-        visualPrompt: next.visualPrompt,
-        flashcards: next.flashcards,
-        knowledgeChecks: next.knowledgeChecks,
-        scenario: next.scenario,
-        hotspots: next.hotspots,
-        dragDrop: next.dragDrop,
-        matching: next.matching,
-        caseStudy: next.caseStudy,
-        simulation: next.simulation,
-        decisionTree: next.decisionTree,
-        practicalTask: next.practicalTask,
-        interactiveVideo: next.interactiveVideo,
-      };
+      const sanitized = next as Experience;
       setExperience(sanitized);
       setJsonText(JSON.stringify(sanitized, null, 2));
       setMessage('Interactive lesson experience generated. Review it, then save.');

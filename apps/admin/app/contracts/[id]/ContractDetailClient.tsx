@@ -125,7 +125,7 @@ export default function ContractDetailClient({
       if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
       setStatus('review');
       // Redirect to prefill review page
-      window.location.href = `/admin/contracts/${contract.id}/prefill?run=${data.run_id}`;
+      window.location.href = `/contracts/${contract.id}/prefill?run=${data.run_id}`;
     } catch (err) {
       setPrefillError(err instanceof Error ? err.message : 'Prefill failed');
     } finally {
@@ -165,7 +165,7 @@ export default function ContractDetailClient({
           <div className="flex gap-2 flex-wrap">
             {canSign && latestRun && (
               <Link
-                href={`/admin/contracts/${contract.id}/sign?run=${latestRun.id}`}
+                href={`/contracts/${contract.id}/sign?run=${latestRun.id}`}
                 className="inline-flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800 transition-colors"
               >
                 <PenLine className="w-4 h-4" /> Sign
@@ -173,7 +173,7 @@ export default function ContractDetailClient({
             )}
             {latestRun && (
               <Link
-                href={`/admin/contracts/${contract.id}/prefill?run=${latestRun.id}`}
+                href={`/contracts/${contract.id}/prefill?run=${latestRun.id}`}
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
               >
                 <List className="w-4 h-4" /> Review fields
@@ -181,7 +181,7 @@ export default function ContractDetailClient({
             )}
             {latestRun?.status === 'approved' && (
               <Link
-                href={`/admin/contracts/${contract.id}/export?run=${latestRun.id}`}
+                href={`/contracts/${contract.id}/export?run=${latestRun.id}`}
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
               >
                 <Download className="w-4 h-4" /> Export
@@ -329,7 +329,7 @@ export default function ContractDetailClient({
                   return (
                     <Link
                       key={run.id}
-                      href={`/admin/contracts/${contract.id}/prefill?run=${run.id}`}
+                      href={`/contracts/${contract.id}/prefill?run=${run.id}`}
                       className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors group"
                     >
                       <Clock className="w-4 h-4 text-slate-400 flex-shrink-0" />
@@ -357,9 +357,9 @@ export default function ContractDetailClient({
           {/* Steps 3-5 */}
           <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 space-y-2">
             {[
-              { step: 3, label: 'Review & approve each field', href: latestRun ? `/admin/contracts/${contract.id}/prefill?run=${latestRun.id}` : null, active: !!latestRun },
-              { step: 4, label: 'Sign the document', href: canSign && latestRun ? `/admin/contracts/${contract.id}/sign?run=${latestRun.id}` : null, active: canSign },
-              { step: 5, label: 'Export final document', href: latestRun?.status === 'approved' ? `/admin/contracts/${contract.id}/export?run=${latestRun.id}` : null, active: latestRun?.status === 'approved' },
+              { step: 3, label: 'Review & approve each field', href: latestRun ? `/contracts/${contract.id}/prefill?run=${latestRun.id}` : null, active: !!latestRun },
+              { step: 4, label: 'Sign the document', href: canSign && latestRun ? `/contracts/${contract.id}/sign?run=${latestRun.id}` : null, active: canSign },
+              { step: 5, label: 'Export final document', href: latestRun?.status === 'approved' ? `/contracts/${contract.id}/export?run=${latestRun.id}` : null, active: latestRun?.status === 'approved' },
             ].map(({ step, label, href, active }) => (
               <div key={step} className="flex items-center gap-3">
                 <span className={`flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold flex-shrink-0 ${

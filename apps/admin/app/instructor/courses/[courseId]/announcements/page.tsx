@@ -123,7 +123,7 @@ export default function InstructorAnnouncementsPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
-          items={[{ label: 'Instructor', href: '/admin/instructor' }, { label: 'Announcements' }]}
+          items={[{ label: 'Instructor', href: '/instructor' }, { label: 'Announcements' }]}
         />
       </div>
       <div className="max-w-4xl mx-auto px-4 py-8">

@@ -13,7 +13,7 @@ export default function OrganizationProfilePage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-purple-700 to-blue-800 text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Organization', href: '/admin/organization' }, { label: 'Profile' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Organization', href: '/organization' }, { label: 'Profile' }]} />
           <div className="mt-6 flex items-center gap-6">
             <div className="w-20 h-20 bg-white rounded-xl flex items-center justify-center">
               <span className="text-3xl font-bold text-purple-600">EFH</span>

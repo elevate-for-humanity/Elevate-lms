@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: `Admin | Integrations | ${PLATFORM_DEFAULTS.orgName}`,
   description: `${PLATFORM_DEFAULTS.orgName} - Career training and workforce development programs.`,
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/integrations',
+    canonical: 'https://admin.elevateforhumanity.org/integrations',
   },
   robots: {
     index: false,

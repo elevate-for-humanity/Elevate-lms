@@ -196,7 +196,7 @@ export default function PrefillReviewClient({
       {/* Left: document preview */}
       <div className="hidden lg:flex flex-col w-1/2 border-r border-slate-200 overflow-hidden">
         <div className="flex-shrink-0 px-4 py-3 border-b border-slate-100 bg-white flex items-center gap-2">
-          <Link href={`/admin/contracts/${contractId}`} className="text-slate-400 hover:text-slate-600">
+          <Link href={`/contracts/${contractId}`} className="text-slate-400 hover:text-slate-600">
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <span className="text-sm font-semibold text-slate-700 truncate">{contractTitle}</span>
@@ -225,7 +225,7 @@ export default function PrefillReviewClient({
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Link href={`/admin/contracts/${contractId}`} className="text-slate-400 hover:text-slate-600 lg:hidden">
+                <Link href={`/contracts/${contractId}`} className="text-slate-400 hover:text-slate-600 lg:hidden">
                   <ArrowLeft className="w-4 h-4" />
                 </Link>
                 <h2 className="text-base font-bold text-slate-900">Review Fields</h2>
@@ -242,7 +242,7 @@ export default function PrefillReviewClient({
             </div>
             {missingCount === 0 && (
               <Link
-                href={`/admin/contracts/${contractId}/sign?run=${run.id}`}
+                href={`/contracts/${contractId}/sign?run=${run.id}`}
                 className="inline-flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800 transition-colors"
               >
                 <PenLine className="w-4 h-4" /> Proceed to sign
@@ -415,7 +415,7 @@ export default function PrefillReviewClient({
             <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-400">
               <AlertTriangle className="w-8 h-8" />
               <p className="text-sm">No fields found. Run extraction first.</p>
-              <Link href={`/admin/contracts/${contractId}`}
+              <Link href={`/contracts/${contractId}`}
                 className="text-sm text-slate-600 hover:underline flex items-center gap-1">
                 <ArrowLeft className="w-3.5 h-3.5" /> Back to contract
               </Link>
@@ -426,7 +426,7 @@ export default function PrefillReviewClient({
         {/* Footer */}
         {orderedFields.length > 0 && (
           <div className="flex-shrink-0 px-6 py-4 border-t border-slate-100 bg-white flex items-center justify-between gap-4 flex-wrap">
-            <Link href={`/admin/contracts/${contractId}`}
+            <Link href={`/contracts/${contractId}`}
               className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700">
               <ArrowLeft className="w-4 h-4" /> Back
             </Link>
@@ -438,7 +438,7 @@ export default function PrefillReviewClient({
               )}
               {missingCount === 0 && (
                 <Link
-                  href={`/admin/contracts/${contractId}/sign?run=${run.id}`}
+                  href={`/contracts/${contractId}/sign?run=${run.id}`}
                   className="inline-flex items-center gap-2 rounded-xl bg-green-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-800 transition-colors"
                 >
                   <PenLine className="w-4 h-4" /> Proceed to sign <ChevronRight className="w-4 h-4" />

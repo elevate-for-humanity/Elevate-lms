@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: 'Webhook Health | Elevate For Humanity',
   description: 'Monitor webhook ingestion health across all providers.',
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/system/webhooks',
+    canonical: 'https://admin.elevateforhumanity.org/system/webhooks',
   },
 };
 
@@ -33,7 +33,7 @@ export default async function WebhookHealthPage() {
       .eq('id', user.id)
       .maybeSingle();
     if (!profile || !['admin'].includes(profile.role)) {
-      redirect('/admin');
+      redirect('/');
     }
   }
 

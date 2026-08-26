@@ -10,48 +10,54 @@ import { usePathname } from 'next/navigation';
 const LoadingDiv = () => <div className="hidden" />;
 
 const StickyMobileCTA = dynamic(
-  () => import('@/components/programs/StickyMobileCTA').then((mod) => mod.default || mod.StickyMobileCTA || mod),
-  { ssr: false, loading: LoadingDiv }
+  () =>
+    import('@/components/programs/StickyMobileCTA').then(
+      (mod) => mod.default || mod.StickyMobileCTA || mod,
+    ),
+  { ssr: false, loading: LoadingDiv },
 );
 
 const BottomNav = dynamic(
   () => import('@/components/BottomNav').then((mod) => mod.BottomNav || mod.default || mod),
-  { ssr: false, loading: LoadingDiv }
+  { ssr: false, loading: LoadingDiv },
 );
 
 const ScrollUnlocker = dynamic(
   () => import('@/components/ScrollUnlocker').then((mod) => mod.default || mod),
-  { ssr: false, loading: LoadingDiv }
+  { ssr: false, loading: LoadingDiv },
 );
 
 const VersionGuard = dynamic(
   () => import('@/components/VersionGuard').then((mod) => mod.default || mod),
-  { ssr: false, loading: LoadingDiv }
+  { ssr: false, loading: LoadingDiv },
 );
 
 const SecurityMonitor = dynamic(
   () => import('@/components/SecurityMonitor').then((mod) => mod.default || mod),
-  { ssr: false, loading: LoadingDiv }
+  { ssr: false, loading: LoadingDiv },
 );
 
 const OfflineIndicator = dynamic(
-  () => import('@/components/offline-indicator').then((mod) => mod.OfflineIndicator || mod.default || mod),
-  { ssr: false, loading: LoadingDiv }
+  () =>
+    import('@/components/offline-indicator').then(
+      (mod) => mod.OfflineIndicator || mod.default || mod,
+    ),
+  { ssr: false, loading: LoadingDiv },
 );
 
 const SentryInit = dynamic(
   () => import('@/components/sentry-init').then((mod) => mod.default || mod),
-  { ssr: false, loading: LoadingDiv }
+  { ssr: false, loading: LoadingDiv },
 );
 
-const Toaster = dynamic(
-  () => import('@/components/ToasterWrapper').then((m) => m.default || m),
-  { ssr: false, loading: LoadingDiv }
-);
+const Toaster = dynamic(() => import('@/components/ToasterWrapper').then((m) => m.default || m), {
+  ssr: false,
+  loading: LoadingDiv,
+});
 
 const SearchDialog = dynamic(
   () => import('@/components/SearchDialog').then((mod) => mod.default || mod),
-  { ssr: false, loading: LoadingDiv }
+  { ssr: false, loading: LoadingDiv },
 );
 
 export default function ClientWidgets() {

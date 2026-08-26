@@ -53,8 +53,8 @@ export default async function BarberShopApplicationDetailPage({
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Breadcrumbs items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Barbershop Applications', href: '/admin/barber-shop-applications' },
+          { label: 'Admin', href: '/' },
+          { label: 'Barbershop Applications', href: '/barber-shop-applications' },
           { label: app.shop_legal_name ?? id },
         ]} />
 

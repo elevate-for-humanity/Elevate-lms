@@ -61,7 +61,7 @@ export default async function GovernanceContactPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <Breadcrumbs
-        items={[{ label: 'Governance', href: '/admin/governance' }, { label: 'Contact' }]}
+        items={[{ label: 'Governance', href: '/governance' }, { label: 'Contact' }]}
       />
       {/* Header */}
       <div className="bg-slate-900 text-white py-12">

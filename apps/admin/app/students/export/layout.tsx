@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: `Admin | Students | Export | ${PLATFORM_DEFAULTS.orgName}`,
   description: `${PLATFORM_DEFAULTS.orgName} - Career training and workforce development programs.`,
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/students/export',
+    canonical: 'https://admin.elevateforhumanity.org/students/export',
   },
   robots: {
     index: false,

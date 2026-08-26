@@ -96,7 +96,7 @@ export default async function AffiliatesPage() {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Hero Image */}
-      <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Affiliates' }]} />
+      <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Affiliates' }]} />
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Affiliate Management</h1>

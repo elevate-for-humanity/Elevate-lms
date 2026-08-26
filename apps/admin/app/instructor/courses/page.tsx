@@ -59,7 +59,7 @@ export default async function InstructorCoursesPage() {
       <div className="border-b bg-white">
         <div className="mx-auto max-w-6xl px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Instructor', href: '/admin/instructor' }, { label: 'Courses' }]}
+            items={[{ label: 'Instructor', href: '/instructor' }, { label: 'Courses' }]}
           />
         </div>
       </div>

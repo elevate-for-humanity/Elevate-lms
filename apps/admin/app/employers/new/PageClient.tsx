@@ -47,7 +47,7 @@ export default function NewEmployerPage() {
       <Breadcrumbs
         items={[
           { label: 'Admin', href: '/dashboard' },
-          { label: 'Employers', href: '/admin/employers' },
+          { label: 'Employers', href: '/employers' },
           { label: 'New Employer' },
         ]}
       />

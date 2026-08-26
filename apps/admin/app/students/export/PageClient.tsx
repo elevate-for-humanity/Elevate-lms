@@ -71,7 +71,7 @@ export default function ExportStudentsPage({ programs = [] }: { programs?: Progr
     <div className="min-h-screen bg-white py-8">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Export' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Export' }]} />
       </div>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">

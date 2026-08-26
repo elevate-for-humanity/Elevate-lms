@@ -16,7 +16,7 @@ export function StickyMobileCTA({
   phoneNumber = '(317) 314-3757',
   textNumber = '3143757',
   applyUrl = '/apply',
-  hideOnPaths = ['/apply', '/checkout', '/admin', '/portals']
+  hideOnPaths = ['/apply', '/checkout', '/admin', '/portals'],
 }: StickyMobileCTAProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -26,7 +26,7 @@ export function StickyMobileCTA({
 
   useEffect(() => {
     // Check if we should hide based on current path
-    const shouldHide = hideOnPaths.some(path => window.location.pathname.startsWith(path));
+    const shouldHide = hideOnPaths.some((path) => window.location.pathname.startsWith(path));
     if (shouldHide) {
       setIsHidden(true);
       return;
@@ -35,7 +35,7 @@ export function StickyMobileCTA({
     // Show after scrolling past hero (approximately 500px)
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Show sticky CTA after scrolling 500px
       if (currentScrollY > 500) {
         setHasScrolled(true);
@@ -69,7 +69,7 @@ export function StickyMobileCTA({
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
             <div className="p-4 border-b border-gray-100 flex items-center justify-between">
               <h3 className="font-bold text-gray-900">How can we help?</h3>
-              <button 
+              <button
                 onClick={() => setIsExpanded(false)}
                 className="p-1 hover:bg-gray-100 rounded-full"
                 aria-label="Close menu"
@@ -77,10 +77,10 @@ export function StickyMobileCTA({
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            
+
             <div className="p-4 space-y-3">
               {/* Text Admissions */}
-              <a 
+              <a
                 href={`sms:${textNumber}?body=Hi! I'm interested in Elevate training programs. Can you help me?`}
                 className="flex items-center gap-4 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors"
               >
@@ -94,7 +94,7 @@ export function StickyMobileCTA({
               </a>
 
               {/* Call Now */}
-              <a 
+              <a
                 href={`tel:${phoneNumber.replace(/[^0-9]/g, '')}`}
                 className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors"
               >
@@ -108,7 +108,7 @@ export function StickyMobileCTA({
               </a>
 
               {/* Apply Now */}
-              <Link 
+              <Link
                 href={applyUrl}
                 className="flex items-center gap-4 p-4 bg-brand-blue-600 rounded-xl hover:bg-brand-blue-700 transition-colors text-white"
               >
@@ -122,13 +122,23 @@ export function StickyMobileCTA({
               </Link>
 
               {/* Check Eligibility */}
-              <Link 
+              <Link
                 href="/check-eligibility"
                 className="flex items-center gap-4 p-4 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
               >
                 <div className="w-12 h-12 bg-gray-500 rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <div>
@@ -142,7 +152,7 @@ export function StickyMobileCTA({
       )}
 
       {/* Main Sticky Bar */}
-      <div 
+      <div
         className={`
           fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]
           transition-transform duration-300 ease-out
@@ -152,7 +162,7 @@ export function StickyMobileCTA({
       >
         <div className="flex items-center justify-between px-4 py-3">
           {/* Text Button */}
-          <a 
+          <a
             href={`sms:${textNumber}?body=Hi! I'm interested in Elevate training programs.`}
             className="flex flex-col items-center gap-1 p-2 text-green-600 hover:text-green-700"
           >
@@ -161,15 +171,11 @@ export function StickyMobileCTA({
           </a>
 
           {/* Expand Button */}
-          <button 
+          <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="flex flex-col items-center gap-1 p-2 text-gray-600 hover:text-gray-900"
           >
-            {isExpanded ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <ChevronUp className="w-6 h-6" />
-            )}
+            {isExpanded ? <X className="w-6 h-6" /> : <ChevronUp className="w-6 h-6" />}
             <span className="text-xs font-medium">Menu</span>
           </button>
 
@@ -183,17 +189,17 @@ export function StickyMobileCTA({
 
         {/* Progress indicator */}
         <div className="h-1 bg-gray-100">
-          <div 
+          <div
             className="h-full bg-brand-blue-600 transition-all duration-300"
-            style={{ 
-              width: `${Math.min((lastScrollY / (document?.body?.scrollHeight || 1)) * 100, 100)}%` 
+            style={{
+              width: `${Math.min((lastScrollY / (document?.body?.scrollHeight || 1)) * 100, 100)}%`,
             }}
           />
         </div>
       </div>
 
       {/* Desktop Sticky CTA (subtle) */}
-      <div 
+      <div
         className={`
           hidden md:block fixed bottom-4 right-4 z-50
           transition-all duration-300 ease-out
@@ -201,15 +207,15 @@ export function StickyMobileCTA({
         `}
       >
         <div className="flex gap-2">
-          <a 
+          <a
             href={`sms:${textNumber}`}
             className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full shadow-lg transition-all hover:scale-105"
           >
             <MessageCircle className="w-5 h-5" />
             <span className="font-medium">Text Us</span>
           </a>
-          
-          <a 
+
+          <a
             href={`tel:${phoneNumber.replace(/[^0-9]/g, '')}`}
             className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg transition-all hover:scale-105"
           >

@@ -14,9 +14,13 @@ const GPU_PROJECT_ID = process.env.NORTHFLANK_GPU_PROJECT_ID || 'elevate-media-g
 const GPU_REGION = process.env.NORTHFLANK_GPU_REGION || 'us-central';
 const SERVICE_ID = process.env.NORTHFLANK_GPU_SERVICE_ID || 'elevate-gpu-worker';
 const ADMIN_SERVICE_ID = process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin';
-const MODEL_VOLUME_ID = process.env.NORTHFLANK_GPU_MODEL_VOLUME_ID || 'elevate-gpu-models';
+const MODEL_VOLUME_ID = process.env.NORTHFLANK_GPU_MODEL_VOLUME_ID || 'elevate-gpu-models-rwx';
 const MODEL_VOLUME_MB = Number(process.env.NORTHFLANK_GPU_MODEL_VOLUME_MB || '153600');
-const MODEL_STORAGE_CLASS = process.env.NORTHFLANK_GPU_MODEL_STORAGE_CLASS || 'nvme';
+// Northflank GPU workloads only accept ReadWriteMany volumes. The platform's
+// managed RWX storage class is nf-multi-rw; access mode is immutable after
+// volume creation, so this intentionally uses a new volume ID.
+const MODEL_STORAGE_CLASS = process.env.NORTHFLANK_GPU_MODEL_STORAGE_CLASS || 'nf-multi-rw';
+const MODEL_ACCESS_MODE = 'ReadWriteMany';
 const GPU_TYPE = process.env.NORTHFLANK_GPU_TYPE || 'l4-24';
 const GPU_COUNT = Number(process.env.NORTHFLANK_GPU_COUNT || '1');
 // Confirmed by the Northflank API: nf-compute-* plans are rejected for managed GPU workloads.
@@ -83,17 +87,34 @@ async function preflight() {
 
 async function ensureVolume(): Promise<string> {
   const volumes = arrayFrom(await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, '/volumes')), 'volumes');
-  let volume = volumes.find((item) => item.id === MODEL_VOLUME_ID || item.name === 'Elevate GPU Models');
+  // Access mode is immutable, so never fall back to a display-name match: the
+  // legacy volume has the same old name but is ReadWriteOnce and cannot be
+  // attached to a GPU workload.
+  let volume = volumes.find((item) => item.id === MODEL_VOLUME_ID);
   if (!volume) {
     volume = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, '/volumes'), {
       method: 'POST',
       body: JSON.stringify({
-        name: 'Elevate GPU Models',
+        name: 'Elevate GPU Models RWX',
         mounts: [{ volumeMountPath: '', containerMountPath: '/models' }],
-        spec: { storageClassName: MODEL_STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
+        spec: {
+          accessMode: MODEL_ACCESS_MODE,
+          storageClassName: MODEL_STORAGE_CLASS,
+          storageSize: MODEL_VOLUME_MB,
+        },
       }),
     });
-    log('Created model volume', { id: volume.id, storageSize: MODEL_VOLUME_MB, storageClassName: MODEL_STORAGE_CLASS });
+    log('Created model volume', {
+      id: volume.id,
+      accessMode: MODEL_ACCESS_MODE,
+      storageSize: MODEL_VOLUME_MB,
+      storageClassName: MODEL_STORAGE_CLASS,
+    });
+  } else if (volume.spec?.accessMode && volume.spec.accessMode !== MODEL_ACCESS_MODE) {
+    throw new Error(
+      `GPU model volume ${volume.id || MODEL_VOLUME_ID} uses ${volume.spec.accessMode}; ` +
+      `${MODEL_ACCESS_MODE} is required and volume access mode cannot be changed in place.`,
+    );
   } else if (Number(volume.spec?.storageSize || 0) < MODEL_VOLUME_MB) {
     await nfFetch(projectApiPath(GPU_PROJECT_ID, `/volumes/${volume.id}`), {
       method: 'POST',
@@ -193,6 +214,26 @@ async function ensureService(volumeId: string) {
     throw error;
   }
   if (exists) {
+    // A previous deployment may still have the legacy RWO model volume
+    // attached at /models. Northflank rejects a deployment when two attached
+    // volumes resolve to the same container mount path, so detach only those
+    // conflicting legacy mounts before attaching the canonical RWX volume.
+    const volumes = arrayFrom(await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, '/volumes')), 'volumes');
+    for (const volume of volumes) {
+      if (String(volume.id || '') === volumeId) continue;
+      const detailResponse = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/volumes/${volume.id}`));
+      const detail = detailResponse.data || detailResponse;
+      const attached = arrayFrom(detail.attachedObjects).some(
+        (item) => item.id === SERVICE_ID && item.type === 'service',
+      );
+      const mounts = arrayFrom(detail.mounts).concat(arrayFrom(detail.spec?.mounts));
+      const conflicts = mounts.some((mount) => mount.containerMountPath === '/models');
+      if (!attached || !conflicts) continue;
+      await nfFetch(projectApiPath(GPU_PROJECT_ID, `/volumes/${volume.id}/detach`), {
+        method: 'POST', body: JSON.stringify({ nfObject: { id: SERVICE_ID, type: 'service' } }),
+      });
+      log('Detached conflicting legacy model volume', { id: volume.id });
+    }
     try {
       await nfFetch(projectApiPath(GPU_PROJECT_ID, `/volumes/${volumeId}/attach`), {
         method: 'POST', body: JSON.stringify({ nfObject: { id: SERVICE_ID, type: 'service' } }),
@@ -219,6 +260,42 @@ async function triggerExactBuild(): Promise<ExactBuild> {
   return { buildId: String(result.id), sha };
 }
 
+async function logBuildFailure(buildId: string, build: R): Promise<void> {
+  log('Build failure detail', {
+    id: build.id || buildId,
+    status: build.status,
+    message: build.message || null,
+    concluded: build.concluded,
+  });
+  try {
+    const query = new URLSearchParams({
+      buildId,
+      queryType: 'range',
+      duration: '3600',
+      lineLimit: '500',
+      direction: 'forward',
+    });
+    const entries = arrayFrom(
+      await nfFetch<R[]>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/build-logs?${query}`)),
+    );
+    const diagnosticPattern = /error|failed|failure|denied|not found|no space|unauthorized|manifest|timeout|timed out|tls|certificate|rate limit|\b429\b|\b5\d\d\b/i;
+    const safeLines = entries
+      .map((entry) => String(entry.log || '').replace(/^(stdout|stderr)\s+[A-Z]\s+/, ''))
+      .filter((line) => diagnosticPattern.test(line))
+      .slice(-80)
+      .map((line) => line
+        .replace(/https?:\/\/\S+/gi, '[url-redacted]')
+        .replace(/bearer\s+\S+/gi, 'Bearer [redacted]')
+        .replace(/\b(token|secret|password|api[_-]?key)\s*[=:]\s*\S+/gi, '$1=[redacted]')
+        .replace(/\b[0-9a-f]{32,}\b/gi, '[identifier-redacted]')
+        .replace(/[\r\n\t]+/g, ' ')
+        .slice(0, 1200));
+    safeLines.forEach((line) => console.error(`[gpu-build-diagnostic] ${line}`));
+  } catch (error) {
+    log('Unable to retrieve Northflank build logs', error instanceof Error ? error.message : String(error));
+  }
+}
+
 async function waitForExactBuild({ buildId, sha }: ExactBuild): Promise<void> {
   const deadline = Date.now() + BUILD_TIMEOUT_MS;
   const failed = new Set(['FAILURE', 'FAILED', 'ERROR', 'CRASHED', 'ABORTED', 'SUBMISSION_FAILURE', 'TIMEOUT']);
@@ -228,7 +305,10 @@ async function waitForExactBuild({ buildId, sha }: ExactBuild): Promise<void> {
     const build = response.data || response;
     const status = String(build.status || 'unknown').toUpperCase();
     if (status !== previous) { log(`Exact build ${buildId} status ${status}`); previous = status; }
-    if (failed.has(status)) throw new Error(`GPU build ${buildId} failed: ${status}`);
+    if (failed.has(status)) {
+      await logBuildFailure(buildId, build);
+      throw new Error(`GPU build ${buildId} failed: ${status}${build.message ? `: ${build.message}` : ''}`);
+    }
     if (status === 'SUCCESS') {
       if (!build.sha || String(build.sha).toLowerCase() !== sha.toLowerCase()) {
         throw new Error(`GPU build SHA mismatch: expected ${sha}, received ${build.sha || 'missing'}`);
@@ -387,6 +467,7 @@ async function main() {
     gpuPlan: GPU_DEPLOYMENT_PLAN,
     modelVolumeMb: MODEL_VOLUME_MB,
     modelStorageClass: MODEL_STORAGE_CLASS,
+    modelAccessMode: MODEL_ACCESS_MODE,
     deploymentEphemeralMb: GPU_DEPLOYMENT_EPHEMERAL_MB,
   });
   if (!execute) return;

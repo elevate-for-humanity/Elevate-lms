@@ -49,9 +49,9 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'CRM', href: '/admin/crm' },
-            { label: 'Leads', href: '/admin/crm/leads' },
+            { label: 'Admin', href: '/' },
+            { label: 'CRM', href: '/crm' },
+            { label: 'Leads', href: '/crm/leads' },
             { label: name },
           ]}
         />

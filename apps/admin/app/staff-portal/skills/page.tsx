@@ -96,7 +96,7 @@ export default async function StaffSkillsPage() {
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Staff Portal', href: '/admin/staff-portal' }, { label: 'Skills' }]}
+            items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'Skills' }]}
           />
         </div>
       </div>

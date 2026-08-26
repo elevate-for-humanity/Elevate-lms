@@ -714,7 +714,7 @@ export default function ProgramManagerClient({
           Preview program page
         </a>
         <a
-          href={`/admin/programs/${programCode}/dashboard`}
+          href={`/programs/${programCode}/dashboard`}
           className="text-sm text-brand-blue-600 hover:underline"
         >
           ← Back to program dashboard

@@ -217,7 +217,7 @@ export default async function WorkOneQueuePage() {
                       {/* Referral link status */}
                       {referralMap[app.id] ? (
                         <Link
-                          href={`/admin/referrals?status=all`}
+                          href={`/referrals?status=all`}
                           className="inline-flex items-center gap-1.5 text-xs font-semibold border border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition"
                         >
                           <Link2 className="w-3.5 h-3.5" />
@@ -226,7 +226,7 @@ export default async function WorkOneQueuePage() {
                         </Link>
                       ) : (
                         <Link
-                          href={`/admin/referrals`}
+                          href={`/referrals`}
                           className="inline-flex items-center gap-1.5 text-xs font-semibold border border-slate-200 text-slate-500 hover:border-amber-300 hover:text-amber-700 px-3 py-1.5 rounded-lg transition"
                         >
                           <Link2 className="w-3.5 h-3.5" /> No referral linked

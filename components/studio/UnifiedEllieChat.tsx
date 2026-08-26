@@ -16,6 +16,7 @@ import {
   Wrench,
   XCircle,
 } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 import {
   ELLIE_ROUTE_LABEL,
   fetchAiHealth,
@@ -94,7 +95,10 @@ function ToolActivity({ toolCalls }: { toolCalls: ToolCall[] }) {
       </summary>
       <div className="space-y-2 border-t border-gray-100 p-3">
         {toolCalls.map((call, index) => (
-          <details key={`${call.tool}-${index}`} className="rounded-lg border border-gray-100 bg-gray-50">
+          <details
+            key={`${call.tool}-${index}`}
+            className="rounded-lg border border-gray-100 bg-gray-50"
+          >
             <summary className="cursor-pointer px-3 py-2 text-xs font-medium text-gray-700">
               {call.tool}
             </summary>
@@ -129,19 +133,25 @@ function ActionCard({
   }
 
   return (
-    <div className={`mt-3 overflow-hidden rounded-xl border ${highImpact ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'}`}>
+    <div
+      className={`mt-3 overflow-hidden rounded-xl border ${highImpact ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'}`}
+    >
       <div className="px-4 py-3">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-gray-950">{action.label}</p>
-            {action.description && <p className="mt-1 text-xs leading-5 text-gray-600">{action.description}</p>}
+            {action.description && (
+              <p className="mt-1 text-xs leading-5 text-gray-600">{action.description}</p>
+            )}
           </div>
           <span className="shrink-0 rounded-full border border-current/10 bg-white/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-gray-600">
             {action.dangerLevel} impact
           </span>
         </div>
         {action.targetCount > 1 && (
-          <p className="mt-2 text-xs font-medium text-gray-700">Affects {action.targetCount} records.</p>
+          <p className="mt-2 text-xs font-medium text-gray-700">
+            Affects {action.targetCount} records.
+          </p>
         )}
       </div>
       <div className="flex gap-2 border-t border-black/5 bg-white/70 px-4 py-3">
@@ -192,7 +202,11 @@ export default function UnifiedEllieChat({
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  async function resolveAction(messageIndex: number, action: EllieAction, decision: 'approve' | 'reject') {
+  async function resolveAction(
+    messageIndex: number,
+    action: EllieAction,
+    decision: 'approve' | 'reject',
+  ) {
     try {
       const response = await fetch('/api/admin/ai-assistant/approve', {
         method: 'POST',
@@ -202,11 +216,17 @@ export default function UnifiedEllieChat({
       const data = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
       const outcome: NonNullable<ChatMessage['actionOutcome']> = response.ok
         ? {
-            status: decision === 'reject' ? 'rejected' : data.result?.success === false ? 'failed' : 'executed',
+            status:
+              decision === 'reject'
+                ? 'rejected'
+                : data.result?.success === false
+                  ? 'failed'
+                  : 'executed',
             message:
               decision === 'reject'
                 ? 'Action cancelled.'
-                : data.result?.message ?? (data.result?.success === false ? 'Action failed.' : 'Action completed.'),
+                : (data.result?.message ??
+                  (data.result?.success === false ? 'Action failed.' : 'Action completed.')),
           }
         : { status: 'failed', message: data.error ?? 'Action failed.' };
 
@@ -249,13 +269,19 @@ export default function UnifiedEllieChat({
       if (route === 'command') {
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: `▶ ${ELLIE_ROUTE_LABEL.command}\n`, provider: 'execute', route },
+          {
+            role: 'assistant',
+            content: `▶ ${ELLIE_ROUTE_LABEL.command}\n`,
+            provider: 'execute',
+            route,
+          },
         ]);
         await streamExecuteCommand(text, (line) => {
           setMessages((prev) => {
             const next = [...prev];
             const row = next[assistantIdx];
-            if (row?.role === 'assistant') next[assistantIdx] = { ...row, content: row.content + line };
+            if (row?.role === 'assistant')
+              next[assistantIdx] = { ...row, content: row.content + line };
             return next;
           });
         });
@@ -275,15 +301,22 @@ export default function UnifiedEllieChat({
           },
         ]);
       } else {
-        setMessages((prev) => [...prev, { role: 'assistant', content: '', provider: 'admin-ai', route }]);
-        const history = [...messages, userMsg].map((message) => ({ role: message.role, content: message.content }));
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: '', provider: 'admin-ai', route },
+        ]);
+        const history = [...messages, userMsg].map((message) => ({
+          role: message.role,
+          content: message.content,
+        }));
         await streamPlatformChat(history, {
           fileContext,
           onToken: (token) => {
             setMessages((prev) => {
               const next = [...prev];
               const row = next[assistantIdx];
-              if (row?.role === 'assistant') next[assistantIdx] = { ...row, content: row.content + token };
+              if (row?.role === 'assistant')
+                next[assistantIdx] = { ...row, content: row.content + token };
               return next;
             });
           },
@@ -330,7 +363,9 @@ export default function UnifiedEllieChat({
   return (
     <div className={`flex h-full min-h-0 flex-col ${shellClass}`}>
       {!embedded && (
-        <div className={`flex shrink-0 flex-wrap items-center gap-2 border-b px-4 py-3 ${headerClass}`}>
+        <div
+          className={`flex shrink-0 flex-wrap items-center gap-2 border-b px-4 py-3 ${headerClass}`}
+        >
           <Sparkles className="h-4 w-4 shrink-0 text-blue-500" aria-hidden="true" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">Admin AI</p>
@@ -369,7 +404,10 @@ export default function UnifiedEllieChat({
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           <p>
             No AI provider is currently healthy. Review the{' '}
-            <Link href="/admin/integrations/env-manager" className="font-semibold underline underline-offset-2">
+            <Link
+              href={getAdminUrl('/integrations/env-manager')}
+              className="font-semibold underline underline-offset-2"
+            >
               Environment Manager
             </Link>{' '}
             and deployment configuration.
@@ -383,9 +421,12 @@ export default function UnifiedEllieChat({
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 shadow-sm">
               <Bot className="h-7 w-7 text-gray-800" aria-hidden="true" />
             </div>
-            <h2 className="mt-5 text-xl font-semibold tracking-tight text-gray-950">What do you need done?</h2>
+            <h2 className="mt-5 text-xl font-semibold tracking-tight text-gray-950">
+              What do you need done?
+            </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
-              Ask in plain language. Admin AI routes the request to the correct internal tool, database contract, workflow, builder, or deployment capability.
+              Ask in plain language. Admin AI routes the request to the correct internal tool,
+              database contract, workflow, builder, or deployment capability.
             </p>
             <p className="mt-1 text-xs text-gray-500">AI provider status: {health}</p>
 
@@ -408,7 +449,10 @@ export default function UnifiedEllieChat({
         ) : (
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
             {messages.map((message, index) => (
-              <div key={index} className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                key={index}
+                className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
                 {message.role === 'assistant' && (
                   <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm">
                     <Bot className="h-4 w-4 text-gray-800" aria-hidden="true" />
@@ -433,7 +477,9 @@ export default function UnifiedEllieChat({
                     {message.role === 'assistant' && message.action ? (
                       <ActionCard
                         action={message.action}
-                        onDecision={(decision) => resolveAction(index, message.action as EllieAction, decision)}
+                        onDecision={(decision) =>
+                          resolveAction(index, message.action as EllieAction, decision)
+                        }
                       />
                     ) : null}
                     {message.actionOutcome ? (
@@ -501,7 +547,11 @@ export default function UnifiedEllieChat({
               onClick={() => void send()}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-900 text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" /> : <Send className="h-5 w-5" aria-hidden="true" />}
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+              ) : (
+                <Send className="h-5 w-5" aria-hidden="true" />
+              )}
             </button>
           </div>
           <p className="mt-2 text-center text-[11px] text-gray-500">

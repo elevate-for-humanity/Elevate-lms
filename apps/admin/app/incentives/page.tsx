@@ -135,7 +135,7 @@ export default async function IncentivesPage() {
                       </td>
                       <td className="px-6 py-4">
                         <Link
-                          href={`/admin/incentives/${inc.id}`}
+                          href={`/incentives/${inc.id}`}
                           className="text-sm text-blue-600 hover:underline"
                         >
                           View

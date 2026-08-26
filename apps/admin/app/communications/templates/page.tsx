@@ -71,7 +71,7 @@ export default async function TemplatesPage() {
               </p>
               <div className="flex gap-2">
                 <Link
-                  href={`/admin/communications/templates/${template.id}/edit`}
+                  href={`/communications/templates/${template.id}/edit`}
                   className="flex-1 text-center text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded flex items-center justify-center gap-1"
                 >
                   <Edit className="w-3 h-3" />

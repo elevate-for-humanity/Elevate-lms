@@ -485,7 +485,7 @@ export default async function ForecastPage() {
                     <tr key={pf.programId} className="hover:bg-slate-50 transition-colors">
                       <td className="px-6 py-3.5">
                         <Link
-                          href={`/admin/programs/${pf.programId}`}
+                          href={`/programs/${pf.programId}`}
                           className="font-medium text-slate-900 hover:text-blue-600 transition-colors"
                         >
                           {pf.programTitle}

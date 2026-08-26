@@ -19,7 +19,7 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const auth = await apiAuthGuard(request);
-    if (auth instanceof NextResponse) return auth;
+    if (auth.error) return auth.error;
 
     const body = await request.json();
     const {
@@ -69,7 +69,10 @@ Return ONLY valid JSON, no markdown.`;
     const completion = await aiChat({
       model: 'gpt-4.1',
       messages: [
-        { role: 'system', content: 'You are a site configuration generator. Return only valid JSON.' },
+        {
+          role: 'system',
+          content: 'You are a site configuration generator. Return only valid JSON.',
+        },
         { role: 'user', content: prompt },
       ],
       temperature: 0.7,
@@ -117,9 +120,24 @@ Return ONLY valid JSON, no markdown.`;
         ],
       },
       programs: siteConfig.programs || [
-        { name: 'Fundamentals', description: 'Build your foundation', duration: '4 weeks', level: 'Beginner' },
-        { name: 'Advanced', description: 'Take skills further', duration: '8 weeks', level: 'Intermediate' },
-        { name: 'Professional', description: 'Industry certification', duration: '12 weeks', level: 'Advanced' },
+        {
+          name: 'Fundamentals',
+          description: 'Build your foundation',
+          duration: '4 weeks',
+          level: 'Beginner',
+        },
+        {
+          name: 'Advanced',
+          description: 'Take skills further',
+          duration: '8 weeks',
+          level: 'Intermediate',
+        },
+        {
+          name: 'Professional',
+          description: 'Industry certification',
+          duration: '12 weeks',
+          level: 'Advanced',
+        },
       ],
       stats: siteConfig.stats || {
         students: 500,
@@ -128,7 +146,8 @@ Return ONLY valid JSON, no markdown.`;
         rating: '4.9',
       },
       testimonial: siteConfig.testimonial || {
-        quote: 'This program changed my career trajectory completely. The instructors were amazing.',
+        quote:
+          'This program changed my career trajectory completely. The instructors were amazing.',
         author: 'Recent Graduate',
       },
       navigation: [
@@ -162,7 +181,11 @@ Return ONLY valid JSON, no markdown.`;
       previewUrl: `/preview/${previewId}`,
     });
   } catch (error) {
-    logger.error('AI generation error', normalizeError(error, 'AI generation failed'), getErrorContext(error));
+    logger.error(
+      'AI generation error',
+      normalizeError(error, 'AI generation failed'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'Failed to generate site configuration' }, { status: 500 });
   }
 }
@@ -196,9 +219,24 @@ function getDefaultConfig(name: string, type: string) {
       ],
     },
     programs: [
-      { name: 'Fundamentals Course', description: 'Build your foundation', duration: '4 weeks', level: 'Beginner' },
-      { name: 'Advanced Training', description: 'Take your skills further', duration: '8 weeks', level: 'Intermediate' },
-      { name: 'Professional Certification', description: 'Industry-recognized credential', duration: '12 weeks', level: 'Advanced' },
+      {
+        name: 'Fundamentals Course',
+        description: 'Build your foundation',
+        duration: '4 weeks',
+        level: 'Beginner',
+      },
+      {
+        name: 'Advanced Training',
+        description: 'Take your skills further',
+        duration: '8 weeks',
+        level: 'Intermediate',
+      },
+      {
+        name: 'Professional Certification',
+        description: 'Industry-recognized credential',
+        duration: '12 weeks',
+        level: 'Advanced',
+      },
     ],
     navigation: [
       { label: 'Home', href: '/' },

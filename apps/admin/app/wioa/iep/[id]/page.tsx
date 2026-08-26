@@ -117,8 +117,8 @@ export default async function IepDetailPage({
         <Breadcrumbs
           items={[
             { label: 'Admin', href: '/dashboard' },
-            { label: 'WIOA', href: '/admin/wioa' },
-            { label: 'Employment Plans', href: '/admin/wioa/iep' },
+            { label: 'WIOA', href: '/wioa' },
+            { label: 'Employment Plans', href: '/wioa/iep' },
             { label: participant?.full_name ?? id.slice(0, 8) },
           ]}
         />

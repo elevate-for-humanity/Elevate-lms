@@ -37,7 +37,7 @@ export default async function CMIDashboardPage() {
   const supabase = await createClient();
   const db = (await requireAdminClient()) || supabase;
 
-  if (!supabase) redirect('/login?redirect=/admin/cmi');
+  if (!supabase) redirect('/login?redirect=/cmi');
 
   const {
     data: { user },
@@ -49,7 +49,7 @@ export default async function CMIDashboardPage() {
   const { data: profile } = await db.from('profiles').select('role').eq('id', user.id).single();
 
   if (!profile || !['admin', 'staff'].includes(profile.role)) {
-    redirect('/admin');
+    redirect('/');
   }
 
   // Fetch CMI students with linked application data.
@@ -198,7 +198,7 @@ export default async function CMIDashboardPage() {
                     <td className="px-6 py-4 text-slate-600">{enrolledDate}</td>
                     <td className="px-6 py-4">
                       <Link
-                        href={`/admin/cmi/${s.id}`}
+                        href={`/cmi/${s.id}`}
                         className="text-xs font-medium text-slate-700 hover:text-slate-900 underline underline-offset-2"
                       >
                         View

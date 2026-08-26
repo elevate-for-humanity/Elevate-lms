@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/curriculum',
+    canonical: 'https://admin.elevateforhumanity.org/curriculum',
   },
   title: 'Curriculum Management | Admin | Elevate For Humanity',
   description: 'Manage curriculum_lessons rows for all DB-driven LMS courses.',
@@ -100,7 +100,7 @@ export default async function CurriculumPage() {
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Curriculum' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Curriculum' }]} />
         </div>
       </div>
 
@@ -160,7 +160,7 @@ export default async function CurriculumPage() {
               {hvacCourseList.map((course) => (
                 <Link
                   key={course.id}
-                  href={`/admin/curriculum/${course.id}?table=training_lessons`}
+                  href={`/curriculum/${course.id}?table=training_lessons`}
                   className="flex items-center justify-between px-5 py-4 hover:bg-amber-50 transition group"
                 >
                   <div className="flex-1 min-w-0">

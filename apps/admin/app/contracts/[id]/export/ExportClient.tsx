@@ -71,7 +71,7 @@ export default function ExportClient({
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div>
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
-          <Link href={`/admin/contracts/${contractId}`} className="hover:text-slate-700 flex items-center gap-1">
+          <Link href={`/contracts/${contractId}`} className="hover:text-slate-700 flex items-center gap-1">
             <ArrowLeft className="w-3 h-3" /> {contractTitle}
           </Link>
           <ChevronRight className="w-3 h-3" />
@@ -87,7 +87,7 @@ export default function ExportClient({
           <div>
             <p className="text-sm font-semibold text-amber-800">No approved fields yet</p>
             <p className="text-xs text-amber-700 mt-0.5">
-              <Link href={`/admin/contracts/${contractId}/prefill?run=${runId}`} className="underline">
+              <Link href={`/contracts/${contractId}/prefill?run=${runId}`} className="underline">
                 Review and approve fields
               </Link>{' '}
               before exporting.
@@ -184,11 +184,11 @@ export default function ExportClient({
       )}
 
       <div className="flex gap-3">
-        <Link href={`/admin/contracts/${contractId}/sign?run=${runId}`}
+        <Link href={`/contracts/${contractId}/sign?run=${runId}`}
           className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700">
           <ArrowLeft className="w-4 h-4" /> Back to signature
         </Link>
-        <Link href={`/admin/contracts/${contractId}`}
+        <Link href={`/contracts/${contractId}`}
           className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 ml-4">
           Contract overview
         </Link>

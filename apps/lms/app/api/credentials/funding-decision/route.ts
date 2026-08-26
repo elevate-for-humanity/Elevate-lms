@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const auth = await apiAuthGuard(req);
-  if (auth instanceof NextResponse) return auth;
+  if (auth.error) return auth.error;
   const userId = auth.id;
 
   const attemptId = req.nextUrl.searchParams.get('attemptId');

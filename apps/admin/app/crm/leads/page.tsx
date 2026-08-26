@@ -251,7 +251,7 @@ export default async function CRMLeadsPage() {
                       </td>
                       <td className="py-3.5 px-5 text-right">
                         <Link
-                          href={`/admin/crm/leads/${l.id}`}
+                          href={`/crm/leads/${l.id}`}
                           className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
                         >
                           View <ArrowRight className="w-3 h-3" />

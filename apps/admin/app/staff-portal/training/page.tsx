@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/staff-portal/training',
+    canonical: 'https://admin.elevateforhumanity.org/staff-portal/training',
   },
   title: 'Staff Training',
   description: 'Complete training modules, track your progress, and earn completion certificates.',
@@ -65,7 +65,7 @@ export default async function StaffTrainingPage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Staff Portal', href: '/admin/staff-portal' }, { label: 'Training' }]}
+            items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'Training' }]}
           />
         </div>
       </div>

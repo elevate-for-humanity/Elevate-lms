@@ -119,7 +119,7 @@ export async function updateGrantOpportunity(id: string, formData: FormData) {
   });
 
   revalidatePath('/grants');
-  revalidatePath(`/admin/grants/${id}`);
+  revalidatePath(`/grants/${id}`);
   redirect('/grants');
 }
 

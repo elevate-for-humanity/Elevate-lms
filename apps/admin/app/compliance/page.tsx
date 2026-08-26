@@ -103,7 +103,7 @@ export default async function CompliancePage() {
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Compliance' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Compliance' }]} />
         </div>
       </div>
 

@@ -36,7 +36,7 @@ export default async function AdminLicensesPage() {
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Licenses' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Licenses' }]} />
         </div>
       </div>
 
@@ -89,7 +89,7 @@ export default async function AdminLicensesPage() {
                     <td className="px-4 py-3 text-slate-600">{l.max_programs ?? '—'}</td>
                     <td className="px-4 py-3 text-slate-600">{expStr}</td>
                     <td className="px-4 py-3">
-                      <Link href={`/admin/licenses/${l.id}`} className="text-xs font-semibold text-brand-blue-600 hover:underline">View</Link>
+                      <Link href={`/licenses/${l.id}`} className="text-xs font-semibold text-brand-blue-600 hover:underline">View</Link>
                     </td>
                   </tr>
                 );

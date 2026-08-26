@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 };
 
 const SECTIONS = [
-  { label: 'Background Jobs', description: 'View and retry failed background jobs', href: '/admin/system/jobs', icon: Activity },
-  { label: 'Webhooks', description: 'Monitor webhook delivery health and failures', href: '/admin/system/webhooks', icon: Webhook },
-  { label: 'System Health', description: 'Live service and API health checks', href: '/admin/system-health', icon: Server },
-  { label: 'Audit Logs', description: 'Full audit trail of admin actions', href: '/admin/audit-logs', icon: Shield },
+  { label: 'Background Jobs', description: 'View and retry failed background jobs', href: '/system/jobs', icon: Activity },
+  { label: 'Webhooks', description: 'Monitor webhook delivery health and failures', href: '/system/webhooks', icon: Webhook },
+  { label: 'System Health', description: 'Live service and API health checks', href: '/system-health', icon: Server },
+  { label: 'Audit Logs', description: 'Full audit trail of admin actions', href: '/audit-logs', icon: Shield },
   { label: 'Dev Studio', description: 'Terminal, editor, AI assistant, and deploy controls', href: '/dashboard', icon: Database },
-  { label: 'Settings', description: 'Platform configuration and integrations', href: '/admin/settings', icon: Settings },
+  { label: 'Settings', description: 'Platform configuration and integrations', href: '/settings', icon: Settings },
 ];
 
 export default async function SystemPage() {
@@ -26,7 +26,7 @@ export default async function SystemPage() {
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'System' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'System' }]} />
         </div>
       </div>
 

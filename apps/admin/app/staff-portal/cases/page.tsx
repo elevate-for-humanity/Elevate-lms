@@ -169,7 +169,7 @@ export default async function CaseFilesListPage() {
                       </td>
                       <td className="py-3 px-4">
                         <Link
-                          href={`/admin/staff-portal/cases/${caseFile.id}`}
+                          href={`/staff-portal/cases/${caseFile.id}`}
                           className="text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 text-sm font-medium"
                         >
                           View <ChevronRight className="w-4 h-4" />

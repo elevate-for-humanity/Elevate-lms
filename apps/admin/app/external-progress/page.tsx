@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/external-progress',
+    canonical: 'https://admin.elevateforhumanity.org/external-progress',
   },
   title: 'External Progress | Elevate For Humanity',
   description: 'Track external learning progress.',
@@ -34,7 +34,7 @@ export default async function ExternalProgressPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'External Progress' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'External Progress' }]} />
       </div>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">

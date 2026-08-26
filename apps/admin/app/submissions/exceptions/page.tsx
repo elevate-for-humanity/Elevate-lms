@@ -24,7 +24,7 @@ export default async function ExceptionQueuePage() {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/admin');
+  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/');
 
   const { data: tasks, error } = await db
     .from('sos_review_tasks')

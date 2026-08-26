@@ -32,9 +32,18 @@ import {
   Megaphone,
   BarChart3,
 } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 // Role definitions
-export type UserRole = 'admin' | 'student' | 'apprentice' | 'instructor' | 'employer' | 'partner' | 'staff' | 'case_manager';
+export type UserRole =
+  | 'admin'
+  | 'student'
+  | 'apprentice'
+  | 'instructor'
+  | 'employer'
+  | 'partner'
+  | 'staff'
+  | 'case_manager';
 
 interface NavItem {
   href: string;
@@ -54,16 +63,16 @@ const NAV_CONFIG: Record<UserRole, { items: NavItem[]; title: string }> = {
   admin: {
     title: 'Admin',
     items: [
-      { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { href: '/admin/operations', label: 'Operations', icon: Activity },
-      { href: '/admin/intelligence', label: 'Intelligence', icon: Bot },
-      { href: '/admin/students', label: 'Students', icon: Users },
-      { href: '/admin/programs', label: 'Programs', icon: BookOpen },
-      { href: '/admin/funding', label: 'Funding', icon: DollarSign },
-      { href: '/admin/program-holders', label: 'Partners', icon: Handshake },
-      { href: '/admin/crm', label: 'Marketing', icon: Megaphone },
-      { href: '/admin/compliance', label: 'Compliance', icon: Shield },
-      { href: '/admin/studio', label: 'Dev Studio', icon: Settings },
+      { href: getAdminUrl('/dashboard'), label: 'Dashboard', icon: LayoutDashboard },
+      { href: getAdminUrl('/operations'), label: 'Operations', icon: Activity },
+      { href: getAdminUrl('/intelligence'), label: 'Intelligence', icon: Bot },
+      { href: getAdminUrl('/students'), label: 'Students', icon: Users },
+      { href: getAdminUrl('/programs'), label: 'Programs', icon: BookOpen },
+      { href: getAdminUrl('/funding'), label: 'Funding', icon: DollarSign },
+      { href: getAdminUrl('/program-holders'), label: 'Partners', icon: Handshake },
+      { href: getAdminUrl('/crm'), label: 'Marketing', icon: Megaphone },
+      { href: getAdminUrl('/compliance'), label: 'Compliance', icon: Shield },
+      { href: getAdminUrl('/studio'), label: 'Dev Studio', icon: Settings },
     ],
   },
   student: {
@@ -151,7 +160,13 @@ const NAV_CONFIG: Record<UserRole, { items: NavItem[]; title: string }> = {
 // Clock icon for apprentice
 function Clock({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <circle cx="12" cy="12" r="10" />
       <polyline points="12,6 12,12 16,14" />
     </svg>
@@ -192,22 +207,32 @@ export function PlatformShell({
   const nav = NAV_CONFIG[role];
   const isActive = (href: string) => pathname === href || pathname?.startsWith(href + '/');
 
-  const userInitials = user.first_name && user.last_name
-    ? `${user.first_name[0]}${user.last_name[0]}`
-    : user.full_name
-      ? user.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)
-      : 'U';
+  const userInitials =
+    user.first_name && user.last_name
+      ? `${user.first_name[0]}${user.last_name[0]}`
+      : user.full_name
+        ? user.full_name
+            .split(' ')
+            .map((n) => n[0])
+            .join('')
+            .slice(0, 2)
+        : 'U';
 
-  const userName = user.full_name || (user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : 'User');
+  const userName =
+    user.full_name ||
+    (user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : 'User');
 
   // Generate breadcrumbs from pathname
   const autoBreadcrumbs: BreadcrumbItem[] = pathname
-    ? pathname.split('/').filter(Boolean).reduce((acc, segment, i, arr) => {
-        const href = '/' + arr.slice(0, i + 1).join('/');
-        const label = segment.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        acc.push({ label, href });
-        return acc;
-      }, [] as BreadcrumbItem[])
+    ? pathname
+        .split('/')
+        .filter(Boolean)
+        .reduce((acc, segment, i, arr) => {
+          const href = '/' + arr.slice(0, i + 1).join('/');
+          const label = segment.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+          acc.push({ label, href });
+          return acc;
+        }, [] as BreadcrumbItem[])
     : [];
 
   const finalBreadcrumbs = breadcrumbs.length > 0 ? breadcrumbs : autoBreadcrumbs;
@@ -260,7 +285,7 @@ export function PlatformShell({
                 </span>
               )}
             </Link>
-            
+
             {/* User Menu */}
             <div className="relative">
               <button
@@ -272,14 +297,17 @@ export function PlatformShell({
                 </div>
                 <ChevronDown className="w-4 h-4 text-slate-400 hidden sm:block" />
               </button>
-              
+
               {userMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50">
                   <div className="px-4 py-2 border-b border-slate-100">
                     <p className="font-medium text-slate-900">{userName}</p>
                     <p className="text-sm text-slate-500">{user.email}</p>
                   </div>
-                  <Link href="/lms/settings/profile" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
+                  <Link
+                    href="/lms/settings/profile"
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700"
+                  >
                     <Settings className="w-4 h-4" />
                     Settings
                   </Link>
@@ -304,7 +332,10 @@ export function PlatformShell({
                 <React.Fragment key={i}>
                   <span className="text-slate-300">/</span>
                   {crumb.href && i < finalBreadcrumbs.length - 1 ? (
-                    <Link href={crumb.href} className="text-slate-500 hover:text-slate-700 capitalize">
+                    <Link
+                      href={crumb.href}
+                      className="text-slate-500 hover:text-slate-700 capitalize"
+                    >
                       {crumb.label}
                     </Link>
                   ) : (
@@ -319,15 +350,19 @@ export function PlatformShell({
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className={`
+        <aside
+          className={`
           fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white transform transition-transform duration-200 ease-in-out
           lg:translate-x-0 lg:static lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)]
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}>
+        `}
+        >
           <div className="flex flex-col h-full">
             {/* Sidebar Header */}
             <div className="p-4 border-b border-slate-700">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">{nav.title}</h2>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                {nav.title}
+              </h2>
             </div>
 
             {/* Navigation */}
@@ -342,15 +377,19 @@ export function PlatformShell({
                     onClick={() => setSidebarOpen(false)}
                     className={`
                       flex items-center gap-3 px-4 py-3 mx-2 rounded-lg transition-colors
-                      ${active 
-                        ? 'bg-brand-blue-600 text-white' 
-                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'}
+                      ${
+                        active
+                          ? 'bg-brand-blue-600 text-white'
+                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      }
                     `}
                   >
                     <Icon className="w-5 h-5" />
                     <span className="flex-1">{item.label}</span>
                     {item.badge && (
-                      <span className="px-2 py-0.5 bg-brand-red-600 text-xs rounded-full">{item.badge}</span>
+                      <span className="px-2 py-0.5 bg-brand-red-600 text-xs rounded-full">
+                        {item.badge}
+                      </span>
                     )}
                   </Link>
                 );
@@ -359,7 +398,10 @@ export function PlatformShell({
 
             {/* Sidebar Footer */}
             <div className="p-4 border-t border-slate-700">
-              <Link href="/lms/support" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm">
+              <Link
+                href="/lms/support"
+                className="flex items-center gap-2 text-slate-400 hover:text-white text-sm"
+              >
                 <Bell className="w-4 h-4" />
                 Support
               </Link>
@@ -369,7 +411,7 @@ export function PlatformShell({
 
         {/* Overlay for mobile */}
         {sidebarOpen && (
-          <div 
+          <div
             className="fixed inset-0 bg-black/50 z-30 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
@@ -378,7 +420,9 @@ export function PlatformShell({
         {/* Main Content */}
         <main className="flex-1 min-w-0">
           <div className="p-6">
-            {mounted ? children : (
+            {mounted ? (
+              children
+            ) : (
               <div className="animate-pulse space-y-4">
                 <div className="h-8 bg-slate-200 rounded w-1/4" />
                 <div className="h-4 bg-slate-200 rounded w-1/2" />

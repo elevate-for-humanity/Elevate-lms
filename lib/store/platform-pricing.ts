@@ -140,7 +140,11 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     name: 'AI Power Pack',
     priceMonthly: 19,
     description: 'Advanced AI content generation and embedded chat tools.',
-    features: [PlatformFeature.AI_ADVANCED, PlatformFeature.AI_CONTENT, PlatformFeature.AI_CHAT_WIDGET],
+    features: [
+      PlatformFeature.AI_ADVANCED,
+      PlatformFeature.AI_CONTENT,
+      PlatformFeature.AI_CHAT_WIDGET,
+    ],
     bullets: ['Advanced AI generation', 'AI content tools', 'AI chat widget'],
   },
   {
@@ -149,7 +153,12 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     priceMonthly: 19,
     description: 'Conversational lead qualification, intake, interviews and admissions support.',
     features: [PlatformFeature.AI_PARIS],
-    bullets: ['Lead qualification', 'Conversational intake', 'Interview workflows', 'Sales and admissions guidance'],
+    bullets: [
+      'Lead qualification',
+      'Conversational intake',
+      'Interview workflows',
+      'Sales and admissions guidance',
+    ],
   },
   {
     slug: 'ellie-assistant',
@@ -165,7 +174,12 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     priceMonthly: 29,
     description: 'Administrative operations, documents, queues and workflow assistance.',
     features: [PlatformFeature.AI_LIZZY],
-    bullets: ['Operations support', 'Document assistance', 'Administrative queues', 'Workflow guidance'],
+    bullets: [
+      'Operations support',
+      'Document assistance',
+      'Administrative queues',
+      'Workflow guidance',
+    ],
   },
   {
     slug: 'zora-assistant',
@@ -173,7 +187,12 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     priceMonthly: 29,
     description: 'Compliance review, workforce documentation and audit assistance.',
     features: [PlatformFeature.AI_ZORA],
-    bullets: ['Compliance review', 'WIOA/workforce support', 'Credential checks', 'Audit assistance'],
+    bullets: [
+      'Compliance review',
+      'WIOA/workforce support',
+      'Credential checks',
+      'Audit assistance',
+    ],
   },
   {
     slug: 'ai-team',
@@ -186,7 +205,12 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
       PlatformFeature.AI_LIZZY,
       PlatformFeature.AI_ZORA,
     ],
-    bullets: ['PARIS Sales & Intake', 'ELLIE Learning & Support', 'LIZZY Operations', 'ZORA Compliance'],
+    bullets: [
+      'PARIS Sales & Intake',
+      'ELLIE Learning & Support',
+      'LIZZY Operations',
+      'ZORA Compliance',
+    ],
   },
   {
     slug: 'ai-voice',
@@ -201,7 +225,8 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     slug: 'text-messaging',
     name: 'Text Messaging',
     priceMonthly: 15,
-    description: 'SMS messaging for organizations that do not already have SMS included in their base plan.',
+    description:
+      'SMS messaging for organizations that do not already have SMS included in their base plan.',
     features: [PlatformFeature.SMS],
     bullets: ['SMS outreach', 'Alerts and reminders tied to platform workflows'],
     usageNote: 'Carrier/provider usage and messaging-policy limits may apply',
@@ -210,7 +235,8 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     slug: 'course-creation-learning-platform',
     name: 'Course Creation & Learning Platform',
     priceMonthly: 79,
-    description: 'Build, generate, publish and deliver complete instructor-led courses from one unified workspace.',
+    description:
+      'Build, generate, publish and deliver complete instructor-led courses from one unified workspace.',
     features: [
       PlatformFeature.COURSE_BUILDER,
       PlatformFeature.COURSE_FACTORY,
@@ -224,9 +250,11 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
       'AI instructor video and narration workflows',
       'Learner LMS delivery',
       'Certificates and student progress tracking',
-      'Unlimited course structures',
+      '2,500 Course Builder credits each month',
+      'Course structures remain available; AI generation and media use credits',
     ],
-    usageNote: 'AI media provider usage limits may apply',
+    usageNote:
+      'Includes 2,500 monthly credits. Additional credits require an upgrade or credit pack.',
   },
   {
     slug: 'online-courses-lms',
@@ -234,14 +262,15 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     priceMonthly: 29,
     description: 'Courses, certificates, and student tracking.',
     features: [PlatformFeature.LMS, PlatformFeature.CERTIFICATES],
-    bullets: ['Unlimited courses', 'Certificates', 'Student tracking'],
+    bullets: ['Published course delivery', 'Certificates', 'Student tracking'],
     hiddenFromMarketplace: true,
   },
   {
     slug: 'community-hub',
     name: 'Community Hub',
     priceMonthly: 39,
-    description: 'Community functionality retained while tenant-level paid access enforcement is completed.',
+    description:
+      'Community functionality retained while tenant-level paid access enforcement is completed.',
     features: [
       PlatformFeature.COMMUNITY,
       PlatformFeature.COMMUNITY_GROUPS,
@@ -249,7 +278,10 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
       PlatformFeature.COMMUNITY_GAMIFICATION,
       PlatformFeature.COMMUNITY_MEMBERSHIPS,
     ],
-    bullets: ['Community experience available for managed evaluation', 'Paid entitlement enforcement is not yet self-service'],
+    bullets: [
+      'Community experience available for managed evaluation',
+      'Paid entitlement enforcement is not yet self-service',
+    ],
     hiddenFromMarketplace: true,
   },
   {
@@ -266,8 +298,17 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     name: 'AI Course Factory',
     priceMonthly: 49,
     description: 'Generate course blueprints, lessons and assessments with AI.',
-    features: [PlatformFeature.COURSE_FACTORY, PlatformFeature.COURSE_BUILDER, PlatformFeature.AI_CONTENT],
-    bullets: ['AI blueprints', 'Lesson generation', 'Assessment generation', 'Course Builder access'],
+    features: [
+      PlatformFeature.COURSE_FACTORY,
+      PlatformFeature.COURSE_BUILDER,
+      PlatformFeature.AI_CONTENT,
+    ],
+    bullets: [
+      'AI blueprints',
+      'Lesson generation',
+      'Assessment generation',
+      'Course Builder access',
+    ],
     hiddenFromMarketplace: true,
   },
   {
@@ -314,7 +355,8 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     slug: 'white-label-mobile',
     name: 'White Label Mobile App',
     priceMonthly: 199,
-    description: 'Managed branded mobile/PWA capability retained for existing catalog compatibility.',
+    description:
+      'Managed branded mobile/PWA capability retained for existing catalog compatibility.',
     features: [PlatformFeature.WHITE_LABEL_MOBILE],
     bullets: ['Managed implementation', 'Branding and mobile/PWA scope confirmed before sale'],
     hiddenFromMarketplace: true,

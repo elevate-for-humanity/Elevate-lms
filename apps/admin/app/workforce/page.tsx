@@ -220,7 +220,7 @@ export default async function WorkforcePage() {
                 cases.slice(0, 5).map((c: any) => (
                   <Link
                     key={c.id}
-                    href={`/admin/workforce/cases/${c.id}`}
+                    href={`/workforce/cases/${c.id}`}
                     className="block p-4 hover:bg-gray-50"
                   >
                     <p className="font-medium">{c.case_number}</p>

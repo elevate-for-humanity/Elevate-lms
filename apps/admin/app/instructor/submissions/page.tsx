@@ -182,7 +182,7 @@ export default async function InstructorSubmissionsPage({
         <div className="max-w-7xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: 'Instructor', href: '/admin/instructor/dashboard' },
+              { label: 'Instructor', href: '/instructor/dashboard' },
               { label: 'Submissions' },
             ]}
           />

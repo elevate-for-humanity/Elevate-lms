@@ -6,7 +6,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/grants/revenue' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/grants/revenue' },
   title: 'Grant Revenue | Elevate For Humanity',
   description: 'Track grant revenue and funding allocations.',
 };
@@ -46,7 +46,7 @@ export default async function GrantRevenuePage() {
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-700">
               <li>
-                <Link href="/admin" className="hover:text-primary">
+                <Link href="/" className="hover:text-primary">
                   Admin
                 </Link>
               </li>

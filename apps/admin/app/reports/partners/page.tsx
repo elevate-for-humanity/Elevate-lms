@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/reports/partners' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/reports/partners' },
   title: 'Partner Reports | Elevate For Humanity',
   description: 'View partner performance and collaboration metrics.',
 };
@@ -60,7 +60,7 @@ export default async function PartnerReportsPage() {
         <div className="mb-4">
           <Breadcrumbs items={[
             { label: 'Admin', href: '/dashboard' },
-            { label: 'Reports', href: '/admin/reports' },
+            { label: 'Reports', href: '/reports' },
             { label: 'Partners' },
           ]} />
         </div>

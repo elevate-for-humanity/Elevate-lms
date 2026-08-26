@@ -67,8 +67,8 @@ export default async function EnrollmentDetailPage({ params }: { params: Promise
       <div className="max-w-4xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[
-            { label: 'Admin', href: '/admin' },
-            { label: 'Enrollments', href: '/admin/enrollments' },
+            { label: 'Admin', href: '/' },
+            { label: 'Enrollments', href: '/enrollments' },
             { label: enrollment.full_name || enrollment.email || id.slice(0, 8) },
           ]}
         />

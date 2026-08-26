@@ -45,7 +45,7 @@ export default async function DataGovernancePage() {
         <div className="max-w-4xl mx-auto px-4">
           <Breadcrumbs
             items={[
-              { label: 'Governance', href: '/admin/governance' },
+              { label: 'Governance', href: '/governance' },
               { label: 'Data Governance' },
             ]}
           />

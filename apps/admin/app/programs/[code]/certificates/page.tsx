@@ -48,7 +48,7 @@ export default async function ProgramCertificatesPage({
           </li>
           <li>/</li>
           <li>
-            <Link href={`/admin/programs/${code}/dashboard`} className="hover:text-brand-blue-600">
+            <Link href={`/programs/${code}/dashboard`} className="hover:text-brand-blue-600">
               {program.title}
             </Link>
           </li>

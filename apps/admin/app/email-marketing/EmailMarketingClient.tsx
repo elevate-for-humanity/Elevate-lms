@@ -36,7 +36,7 @@ export default function EmailMarketingPage({ stats }: EmailMarketingPageProps) {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Email Marketing' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Email Marketing' }]} />
       </div>
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">

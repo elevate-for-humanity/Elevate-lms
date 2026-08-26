@@ -6,7 +6,9 @@
  * Avoids writing under public/generated/ on ephemeral containers.
  */
 
-import { readFile, unlink } from 'fs/promises';
+import { execFile } from 'child_process';
+import { readFile, stat, unlink } from 'fs/promises';
+import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
 import { uploadToR2, isR2Configured } from '@/lib/cloudflare-r2';
@@ -19,6 +21,8 @@ const R2_KEY_PREFIX = 'course-videos';
 export type CourseVideoStorageBackend = 'auto' | 'supabase' | 'r2';
 
 const DEFAULT_R2_MIN_BYTES = 5 * 1024 * 1024; // 5 MB
+const SUPABASE_SAFE_VIDEO_BYTES = 450 * 1024 * 1024;
+const execFileAsync = promisify(execFile);
 
 export function resolveCourseVideoStorageBackend(): CourseVideoStorageBackend {
   const raw = (process.env.COURSE_VIDEO_STORAGE_BACKEND ?? 'auto').toLowerCase().trim();
@@ -154,9 +158,46 @@ export async function uploadLessonFileFromDisk(
   lessonId: string,
   ext: 'mp3' | 'mp4',
 ): Promise<string> {
-  const buf = await readFile(filePath);
+  let uploadPath = filePath;
+  let compressedPath: string | null = null;
+  if (ext === 'mp4' && (await stat(filePath)).size > SUPABASE_SAFE_VIDEO_BYTES) {
+    compressedPath = filePath.replace(/\.mp4$/i, '.upload.mp4');
+    await execFileAsync(
+      'ffmpeg',
+      [
+        '-y',
+        '-i', filePath,
+        '-vf', 'scale=min(1920\\,iw):-2',
+        '-c:v', 'libx264',
+        '-preset', 'medium',
+        '-crf', '27',
+        '-maxrate', '3M',
+        '-bufsize', '6M',
+        '-c:a', 'aac',
+        '-b:a', '128k',
+        '-movflags', '+faststart',
+        compressedPath,
+      ],
+      { timeout: 20 * 60 * 1000, maxBuffer: 2 * 1024 * 1024 },
+    );
+    uploadPath = compressedPath;
+    const uploadBytes = (await stat(uploadPath)).size;
+    if (uploadBytes > SUPABASE_SAFE_VIDEO_BYTES) {
+      throw new Error(
+        `Compressed lesson video is still too large for Supabase (${uploadBytes} bytes)`,
+      );
+    }
+    logger.info('[upload-lesson-media] compressed oversized lesson video', {
+      lessonId,
+      sourceBytes: (await stat(filePath)).size,
+      uploadBytes,
+    });
+  }
+  const buf = await readFile(uploadPath);
   const url = await uploadLessonMediaBuffer(buf, lessonId, ext);
-  await unlink(filePath).catch((err) => {
+  await Promise.all(
+    [filePath, compressedPath].filter(Boolean).map((target) => unlink(target as string)),
+  ).catch((err) => {
     logger.debug('[upload-lesson-media] temp file cleanup', { filePath, err });
   });
   return url;

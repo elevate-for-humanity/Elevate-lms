@@ -240,7 +240,7 @@ export default function PayrollClient({ staffCount, payrollRuns: initial, w9Queu
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <nav className="text-sm mb-2 text-slate-500">
-            <Link href="/admin" className="hover:text-brand-blue-600">
+            <Link href="/" className="hover:text-brand-blue-600">
               Admin
             </Link>
             {' / '}
@@ -303,10 +303,10 @@ export default function PayrollClient({ staffCount, payrollRuns: initial, w9Queu
       {/* Quick links */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         {[
-          { label: 'Employees', href: '/admin/hr/employees', icon: Users },
-          { label: 'Time & Attendance', href: '/admin/hr/time', icon: Clock },
-          { label: 'Payroll Cards', href: '/admin/payroll-cards', icon: DollarSign },
-          { label: 'Leave Management', href: '/admin/hr/leave', icon: Calendar },
+          { label: 'Employees', href: '/hr/employees', icon: Users },
+          { label: 'Time & Attendance', href: '/hr/time', icon: Clock },
+          { label: 'Payroll Cards', href: '/payroll-cards', icon: DollarSign },
+          { label: 'Leave Management', href: '/hr/leave', icon: Calendar },
         ].map(({ label, href, icon: Icon }) => (
           <Link
             key={href}

@@ -202,7 +202,7 @@ export default function SocialMediaSettingsClient() {
                 ) : connected && !expired ? (
                   <>
                     <a
-                      href={`/admin/social-media/campaigns/new?platform=${id}`}
+                      href={`/social-media/campaigns/new?platform=${id}`}
                       className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                     >
                       <Send className="w-3 h-3" /> Post

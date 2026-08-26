@@ -85,7 +85,7 @@ export default async function HRPage() {
   const modules = [
     {
       name: 'Employees',
-      href: '/admin/hr/employees',
+      href: '/hr/employees',
       icon: Users,
       value: (employeeCount || 0).toString(),
       sub: `${activeEmployees} active`,
@@ -94,7 +94,7 @@ export default async function HRPage() {
     },
     {
       name: 'Leave Requests',
-      href: '/admin/hr/leave',
+      href: '/hr/leave',
       icon: Calendar,
       value: (pendingLeaveCount || 0).toString(),
       sub: 'pending approval',
@@ -103,7 +103,7 @@ export default async function HRPage() {
     },
     {
       name: 'Time Off',
-      href: '/admin/hr/time',
+      href: '/hr/time',
       icon: Clock,
       value: (pendingTimeOffCount || 0).toString(),
       sub: 'pending approval',
@@ -112,7 +112,7 @@ export default async function HRPage() {
     },
     {
       name: 'Payroll',
-      href: '/admin/hr/payroll',
+      href: '/hr/payroll',
       icon: DollarSign,
       value:
         recentPayroll && recentPayroll.length > 0
@@ -128,7 +128,7 @@ export default async function HRPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'HR' }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'HR' }]} />
           <div className="flex justify-between items-center mt-4">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">HR Dashboard</h1>

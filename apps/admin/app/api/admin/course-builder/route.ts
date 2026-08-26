@@ -32,6 +32,17 @@ import { reviewCanonicalCourse, reviewCanonicalLessons } from '@/lib/course-buil
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
+import {
+  CourseBuilderCreditsError,
+  getCourseBuilderCreditBalance,
+  getCourseBuilderCreditOwner,
+} from '@/lib/course-builder/credits';
+import {
+  courseBuilderCreditErrorResponse as creditErrorResponse,
+  refundCourseBuilderRequestCredits as refundReservation,
+  reserveCourseBuilderRequestCredits,
+  type CreditReservation,
+} from '@/lib/course-builder/request-metering';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -89,6 +100,26 @@ async function loadCourse(courseId: string) {
   return data;
 }
 
+async function reserveCredits(input: {
+  req: NextRequest;
+  body: Record<string, any>;
+  userId: string;
+  effectiveRoles: string[];
+  operation: CreditReservation['operation'];
+}): Promise<CreditReservation | null> {
+  return reserveCourseBuilderRequestCredits({
+    request: input.req,
+    userId: input.userId,
+    effectiveRoles: input.effectiveRoles,
+    operation: input.operation,
+    metadata: {
+      course_id: input.body.courseId ?? null,
+      program_id: input.body.programId ?? null,
+      blueprint_id: input.body.blueprintId ?? null,
+    },
+  });
+}
+
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
@@ -113,7 +144,10 @@ export async function GET(req: NextRequest) {
           state: blueprint.state,
           slug: blueprint.programSlug,
           modules: blueprint.modules.length,
-          lessons: blueprint.modules.reduce((sum, courseModule) => sum + (courseModule.lessons?.length ?? 0), 0),
+          lessons: blueprint.modules.reduce(
+            (sum, courseModule) => sum + (courseModule.lessons?.length ?? 0),
+            0,
+          ),
           status: blueprint.status,
           socCode: blueprint.socCode ?? null,
         })),
@@ -125,11 +159,41 @@ export async function GET(req: NextRequest) {
       if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
       const course = await loadCourse(courseId);
       if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
-      return NextResponse.json({ ok: true, course, instructor: getInstructorForCourse(course.title) });
+      return NextResponse.json({
+        ok: true,
+        course,
+        instructor: getInstructorForCourse(course.title),
+      });
     }
 
-    return NextResponse.json({ error: `Unsupported Course Builder GET action: ${action}` }, { status: 400 });
+    if (action === 'credits') {
+      const db = await requireAdminClient();
+      const owner = await getCourseBuilderCreditOwner({
+        db,
+        userId: auth.id,
+        effectiveRoles: auth.effectiveRoles,
+      });
+      if (owner.operator) return NextResponse.json({ ok: true, operator: true, metered: false });
+      if (!owner.tenantId)
+        throw new CourseBuilderCreditsError(
+          'Course Builder billing owner is missing',
+          'TENANT_REQUIRED',
+        );
+      return NextResponse.json({
+        ok: true,
+        operator: false,
+        metered: true,
+        credits: await getCourseBuilderCreditBalance(db, owner.tenantId),
+      });
+    }
+
+    return NextResponse.json(
+      { error: `Unsupported Course Builder GET action: ${action}` },
+      { status: 400 },
+    );
   } catch (error) {
+    const credits = creditErrorResponse(error);
+    if (credits) return credits;
     logger.error('[course-builder] GET action failed', error);
     return NextResponse.json({ error: 'Course Builder action failed' }, { status: 500 });
   }
@@ -152,15 +216,27 @@ export async function POST(req: NextRequest) {
 
   if (action === 'generate-from-blueprint') {
     if (!body.blueprintId || !body.programId) {
-      return NextResponse.json({ error: 'blueprintId and programId are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'blueprintId and programId are required' },
+        { status: 400 },
+      );
     }
+    let reservation: CreditReservation | null = null;
     try {
+      reservation = await reserveCredits({
+        req,
+        body,
+        userId: auth.id,
+        effectiveRoles: auth.effectiveRoles,
+        operation: 'generate-from-blueprint',
+      });
       const blueprints = await loadAllBlueprints();
       const blueprint = blueprints.find((item) => item.id === body.blueprintId);
       if (!blueprint) return NextResponse.json({ error: 'Blueprint not found' }, { status: 404 });
       const progress: Array<{ stage: string; message: string; progress?: number }> = [];
       const result = await courseFactory(
         {
+          courseId: typeof body.courseId === 'string' ? body.courseId.trim() : undefined,
           programId: body.programId,
           blueprint,
           mode: ['replace', 'missing-only', 'refresh'].includes(body.mode) ? body.mode : 'refresh',
@@ -175,16 +251,29 @@ export async function POST(req: NextRequest) {
         },
         (stage, message, percent) => progress.push({ stage, message, progress: percent }),
       );
+      if (!result.ok) await refundReservation(reservation, auth.id, 'blueprint_generation_failed');
       return NextResponse.json({ ...result, progress }, { status: result.ok ? 200 : 422 });
     } catch (error) {
+      await refundReservation(reservation, auth.id, 'blueprint_generation_exception');
+      const credits = creditErrorResponse(error);
+      if (credits) return credits;
       logger.error('[course-builder] Blueprint generation failed', error);
       return NextResponse.json({ error: 'Course generation failed' }, { status: 500 });
     }
   }
 
   if (action === 'queue-media') {
-    if (!body.courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+    if (!body.courseId)
+      return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+    let reservation: CreditReservation | null = null;
     try {
+      reservation = await reserveCredits({
+        req,
+        body,
+        userId: auth.id,
+        effectiveRoles: auth.effectiveRoles,
+        operation: 'queue-media',
+      });
       const course = await loadCourse(body.courseId);
       if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
       const result = await queueCourseMedia({
@@ -195,6 +284,7 @@ export async function POST(req: NextRequest) {
         force: body.force === true,
         limit: typeof body.limit === 'number' ? body.limit : null,
       });
+      if (result.failed > 0) await refundReservation(reservation, auth.id, 'media_queue_failed');
       return NextResponse.json({
         ok: result.failed === 0,
         course,
@@ -202,6 +292,9 @@ export async function POST(req: NextRequest) {
         result,
       });
     } catch (error) {
+      await refundReservation(reservation, auth.id, 'media_queue_exception');
+      const credits = creditErrorResponse(error);
+      if (credits) return credits;
       logger.error('[course-builder] Media queue failed', error);
       return NextResponse.json({ error: 'Unable to queue course media' }, { status: 500 });
     }
@@ -215,7 +308,10 @@ export async function POST(req: NextRequest) {
       });
     } catch (error) {
       logger.error('[course-builder] Program configuration failed', error);
-      return NextResponse.json({ ok: false, error: 'Failed to save course configuration' }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Failed to save course configuration' },
+        { status: 400 },
+      );
     }
   }
   if (action === 'save-module') {
@@ -263,7 +359,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, package: await linkCourseScormPackage(body, auth.id) });
     } catch (error) {
       logger.error('[course-builder] SCORM link failed', error);
-      return NextResponse.json({ ok: false, error: 'Failed to link SCORM package' }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Failed to link SCORM package' },
+        { status: 400 },
+      );
     }
   }
   if (action === 'review-course') {
@@ -301,7 +400,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(result, { status: result.ok ? 200 : 400 });
     } catch (error) {
       logger.error('[course-builder] Governance audit failed', error);
-      return NextResponse.json({ ok: false, error: 'Course governance audit failed' }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: 'Course governance audit failed' },
+        { status: 400 },
+      );
     }
   }
 
@@ -330,7 +432,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(result, { status: result.ok ? 200 : 422 });
     } catch (error) {
       logger.error('[course-builder] Persisted publication failed', error);
-      return NextResponse.json({ ok: false, error: 'Failed to publish persisted course' }, { status: 500 });
+      return NextResponse.json(
+        { ok: false, error: 'Failed to publish persisted course' },
+        { status: 500 },
+      );
     }
   }
 
@@ -339,30 +444,66 @@ export async function POST(req: NextRequest) {
     if (!courseId) {
       return NextResponse.json({ ok: false, error: 'courseId is required' }, { status: 400 });
     }
+    let reservation: CreditReservation | null = null;
     try {
+      reservation = await reserveCredits({
+        req,
+        body,
+        userId: auth.id,
+        effectiveRoles: auth.effectiveRoles,
+        operation: action,
+      });
       const result = await repairCanonicalCourse(courseId);
+      if (!result.ok) await refundReservation(reservation, auth.id, 'course_repair_failed');
       return NextResponse.json({ ok: result.ok, result }, { status: result.ok ? 200 : 422 });
     } catch (error) {
+      await refundReservation(reservation, auth.id, 'course_repair_exception');
+      const credits = creditErrorResponse(error);
+      if (credits) return credits;
       logger.error('[course-builder] Course repair failed', error);
       return NextResponse.json({ ok: false, error: 'Course repair failed' }, { status: 500 });
     }
   }
 
   if (action !== 'generate') {
-    return NextResponse.json({ error: `Unsupported Course Builder action: ${action}` }, { status: 400 });
+    return NextResponse.json(
+      { error: `Unsupported Course Builder action: ${action}` },
+      { status: 400 },
+    );
   }
 
   const title = typeof body.title === 'string' ? body.title.trim() : '';
   const topic = typeof body.topic === 'string' ? body.topic.trim() : '';
   const programId = typeof body.programId === 'string' ? body.programId.trim() : '';
   if (!title || !topic || !programId) {
-    return NextResponse.json({ error: 'title, topic, and programId are required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'title, topic, and programId are required' },
+      { status: 400 },
+    );
   }
   if (body.moduleCount != null && (body.moduleCount < 1 || body.moduleCount > 40)) {
     return NextResponse.json({ error: 'moduleCount must be between 1 and 40' }, { status: 400 });
   }
   if (body.lessonsPerModule != null && (body.lessonsPerModule < 1 || body.lessonsPerModule > 20)) {
-    return NextResponse.json({ error: 'lessonsPerModule must be between 1 and 20' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'lessonsPerModule must be between 1 and 20' },
+      { status: 400 },
+    );
+  }
+
+  let generationReservation: CreditReservation | null = null;
+  try {
+    generationReservation = await reserveCredits({
+      req,
+      body,
+      userId: auth.id,
+      effectiveRoles: auth.effectiveRoles,
+      operation: 'generate',
+    });
+  } catch (error) {
+    const credits = creditErrorResponse(error);
+    if (credits) return credits;
+    throw error;
   }
 
   const encoder = new TextEncoder();
@@ -391,11 +532,11 @@ export async function POST(req: NextRequest) {
             videoMode: body.includeVideos === false ? 'off' : 'queue',
             dryRun: Boolean(body.dryRun),
           },
-          (stage, message, progress) =>
-            write({ stage: toPipelineStage(stage), message, progress }),
+          (stage, message, progress) => write({ stage: toPipelineStage(stage), message, progress }),
         );
 
-        let governance: Awaited<ReturnType<typeof normalizeGeneratedCourseForGovernance>> | null = null;
+        let governance: Awaited<ReturnType<typeof normalizeGeneratedCourseForGovernance>> | null =
+          null;
         if (result.ok && result.courseId && !result.dryRun) {
           write({
             stage: 'validate',
@@ -403,6 +544,9 @@ export async function POST(req: NextRequest) {
             progress: 96,
           });
           governance = await normalizeGeneratedCourseForGovernance(result.courseId);
+        }
+        if (!result.ok) {
+          await refundReservation(generationReservation, auth.id, 'course_generation_failed');
         }
         write({
           stage: 'complete',
@@ -420,8 +564,12 @@ export async function POST(req: NextRequest) {
           },
         });
       } catch (error) {
+        await refundReservation(generationReservation, auth.id, 'course_generation_exception');
         logger.error('[course-builder] Course Factory error', error);
-        write({ stage: 'error', message: 'Course generation failed. Review server logs for details.' });
+        write({
+          stage: 'error',
+          message: 'Course generation failed. Review server logs for details.',
+        });
       } finally {
         controller.close();
       }

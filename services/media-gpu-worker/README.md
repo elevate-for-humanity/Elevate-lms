@@ -20,6 +20,10 @@ Required:
 - NVIDIA CUDA-capable GPU
 - persistent `/models` volume
 
+The production model volume must use Northflank `ReadWriteMany` access mode
+with the `nf-multi-rw` storage class. Northflank rejects `ReadWriteOnce`
+volumes for GPU workloads, even when the service has one instance.
+
 Production defaults:
 
 - `GPU_VIDEO_PROVIDER=wan`

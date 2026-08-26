@@ -8,7 +8,7 @@
  *   WebKit does not expose beforeinstallprompt.
  * - Auto-hides when already installed.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePwaInstall } from '@/hooks/usePwaInstall';
 
 interface PwaInstallBannerProps {
@@ -24,8 +24,14 @@ export function PwaInstallBanner({
 }: PwaInstallBannerProps) {
   const { canInstall, isInstalled, promptInstall, dismiss, platform } = usePwaInstall();
   const [showIosHelp, setShowIosHelp] = useState(false);
+  const [pageSettled, setPageSettled] = useState(false);
 
-  if (isInstalled) return null;
+  useEffect(() => {
+    const timer = window.setTimeout(() => setPageSettled(true), 8000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (!pageSettled || isInstalled) return null;
   if (typeof window !== 'undefined' && localStorage.getItem(storageKey)) return null;
 
   const isIos = platform === 'ios';

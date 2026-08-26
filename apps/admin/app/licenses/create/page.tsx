@@ -26,7 +26,7 @@ export default async function CreateLicensePage() {
           <Breadcrumbs
             items={[
               { label: 'Admin', href: '/dashboard' },
-              { label: 'Licenses', href: '/admin/licenses' },
+              { label: 'Licenses', href: '/licenses' },
               { label: 'Create License' },
             ]}
           />

@@ -143,8 +143,8 @@ export default function ApplicationQueue({
   function setFilter(status: string) {
     const url =
       status === 'all'
-        ? '/admin/provider-applications'
-        : `/admin/provider-applications?status=${status}`;
+        ? '/provider-applications'
+        : `/provider-applications?status=${status}`;
     startTransition(() => router.push(url));
   }
 
@@ -510,7 +510,7 @@ export default function ApplicationQueue({
                   {app.tenant_id && (
                     <div className="text-sm">
                       <a
-                        href={`/admin/providers/${app.tenant_id}`}
+                        href={`/providers/${app.tenant_id}`}
                         className="text-brand-blue-600 hover:underline text-sm font-medium"
                       >
                         View provider tenant →

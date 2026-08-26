@@ -37,7 +37,7 @@ export default async function AdminWaitlistPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Waitlist' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Waitlist' }]} />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">

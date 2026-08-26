@@ -176,7 +176,7 @@ export default async function ProgramAnalyticsPage() {
                   <tr key={p.id} className="hover:bg-slate-50">
                     <td className="py-3.5 px-5">
                       <Link
-                        href={`/admin/programs/${p.id}`}
+                        href={`/programs/${p.id}`}
                         className="font-semibold text-slate-900 hover:text-brand-blue-700"
                       >
                         {p.title ?? '—'}

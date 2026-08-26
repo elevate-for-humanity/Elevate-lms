@@ -37,7 +37,7 @@ async function _POST(request: NextRequest) {
       const { apiRequireAdmin } = await import('@/lib/admin/guards');
       try {
         const auth = await apiRequireAdmin(request);
-        if (auth instanceof NextResponse) return auth;
+        if (auth.error) return auth.error;
       } catch (e) {
         return e instanceof Response
           ? e
@@ -140,16 +140,20 @@ async function _POST(request: NextRequest) {
 
     // 7. Send setup guide email immediately after welcome email.
     // setTimeout is not safe in serverless — the function is frozen after response.
-    await resend.emails.send({
-      from: `${PLATFORM_DEFAULTS.orgName} <onboarding@${PLATFORM_DEFAULTS.canonicalDomain}>`,
-      to: contactEmail,
-      subject: '📚 Quick Start Guide - Set Up Your Platform',
-      html: generateSetupGuideEmail({
-        organizationName,
-        contactName,
-        adminUrl,
-      }),
-    }).catch(() => { /* non-fatal — welcome email already sent */ });
+    await resend.emails
+      .send({
+        from: `${PLATFORM_DEFAULTS.orgName} <onboarding@${PLATFORM_DEFAULTS.canonicalDomain}>`,
+        to: contactEmail,
+        subject: '📚 Quick Start Guide - Set Up Your Platform',
+        html: generateSetupGuideEmail({
+          organizationName,
+          contactName,
+          adminUrl,
+        }),
+      })
+      .catch(() => {
+        /* non-fatal — welcome email already sent */
+      });
 
     return NextResponse.json({
       success: true,

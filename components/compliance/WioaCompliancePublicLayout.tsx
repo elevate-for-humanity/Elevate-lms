@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export function WioaCompliancePublicLayout({
   title,
@@ -34,11 +35,17 @@ export function WioaCompliancePublicLayout({
         <div className="max-w-3xl mx-auto text-sm text-slate-600">
           <p>
             Staff complete and sign forms in the{' '}
-            <Link href="/login?redirect=/admin/compliance/wioa-etpl" className="text-brand-blue-600 hover:underline">
+            <Link
+              href={getAdminUrl('/login?redirect=/compliance/wioa-etpl')}
+              className="text-brand-blue-600 hover:underline"
+            >
               admin compliance portal
             </Link>
             . Questions:{' '}
-            <a href={`mailto:${PLATFORM_DEFAULTS.supportEmail}`} className="text-brand-blue-600 hover:underline">
+            <a
+              href={`mailto:${PLATFORM_DEFAULTS.supportEmail}`}
+              className="text-brand-blue-600 hover:underline"
+            >
               {PLATFORM_DEFAULTS.supportEmail}
             </a>
           </p>

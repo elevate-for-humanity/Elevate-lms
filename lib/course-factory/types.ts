@@ -17,6 +17,8 @@ export type PublishStatus = 'draft' | 'published' | 'archived';
 export type LessonType = 'lesson' | 'checkpoint' | 'quiz' | 'exam' | 'lab' | 'assignment';
 
 export interface FactoryInput {
+  /** Required when upgrading an already-persisted authored curriculum. */
+  courseId?: string;
   programId?: string;
   programSlug?: string;
   blueprint?: CredentialBlueprint;

@@ -98,7 +98,7 @@ export default async function AccreditationReportPage() {
           <Breadcrumbs
             items={[
               { label: 'Admin', href: '/dashboard' },
-              { label: 'Accreditation', href: '/admin/accreditation' },
+              { label: 'Accreditation', href: '/accreditation' },
               { label: 'Report' },
             ]}
           />

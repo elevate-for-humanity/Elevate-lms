@@ -144,7 +144,7 @@ const runtimeRoots = [
   'data',
   'lib',
   'middleware.ts',
-  'next.config.js',
+  'next.config.mjs',
   'next.config.mjs',
   'package.json',
 ].map((rel) => path.join(ROOT, rel));

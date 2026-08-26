@@ -23,11 +23,11 @@ const TOOL_SECTIONS = [
     iconBg: 'bg-slate-700',
     description: 'Database migrations, imports, and exports.',
     tools: [
-      { label: 'Migrations', href: '/admin/migrations', desc: 'Run and track database migrations' },
-      { label: 'Data Import', href: '/admin/data-import', desc: 'Bulk import students, programs, or records' },
-      { label: 'Course Import', href: '/admin/course-import', desc: 'Import course content from external sources' },
-      { label: 'Import', href: '/admin/import', desc: 'General import utility' },
-      { label: 'Hours Export', href: '/admin/hours-export', desc: 'Export participant hours for reporting' },
+      { label: 'Migrations', href: '/migrations', desc: 'Run and track database migrations' },
+      { label: 'Data Import', href: '/data-import', desc: 'Bulk import students, programs, or records' },
+      { label: 'Course Import', href: '/course-import', desc: 'Import course content from external sources' },
+      { label: 'Import', href: '/import', desc: 'General import utility' },
+      { label: 'Hours Export', href: '/hours-export', desc: 'Export participant hours for reporting' },
     ],
   },
   {
@@ -36,12 +36,12 @@ const TOOL_SECTIONS = [
     iconBg: 'bg-blue-600',
     description: 'Monitor system status, health checks, and performance.',
     tools: [
-      { label: 'Monitoring Dashboard', href: '/admin/monitoring', desc: 'System health, uptime, and support bundle' },
-      { label: 'System Health', href: '/admin/system-health', desc: 'Database, Redis, and service status' },
-      { label: 'Monitoring Setup', href: '/admin/monitoring/setup', desc: 'Configure alerts and thresholds' },
-      { label: 'Activity Feed', href: '/admin/activity', desc: 'Real-time event log across all systems' },
-      { label: 'Audit Logs', href: '/admin/audit-logs', desc: 'Full audit trail of all admin actions' },
-      { label: 'Compliance Audit', href: '/admin/compliance-audit', desc: 'Compliance event log and reporting' },
+      { label: 'Monitoring Dashboard', href: '/monitoring', desc: 'System health, uptime, and support bundle' },
+      { label: 'System Health', href: '/system-health', desc: 'Database, Redis, and service status' },
+      { label: 'Monitoring Setup', href: '/monitoring/setup', desc: 'Configure alerts and thresholds' },
+      { label: 'Activity Feed', href: '/activity', desc: 'Real-time event log across all systems' },
+      { label: 'Audit Logs', href: '/audit-logs', desc: 'Full audit trail of all admin actions' },
+      { label: 'Compliance Audit', href: '/compliance-audit', desc: 'Compliance event log and reporting' },
     ],
   },
   {
@@ -50,14 +50,14 @@ const TOOL_SECTIONS = [
     iconBg: 'bg-amber-600',
     description: 'Background job queues and scheduled tasks.',
     tools: [
-      { label: 'Enrollment Jobs', href: '/admin/enrollment-jobs', desc: 'Enrollment processing queue' },
-      { label: 'Payout Queue', href: '/admin/payout-queue', desc: 'Pending payouts and disbursements' },
-      { label: 'Review Queue', href: '/admin/review-queue', desc: 'Items pending admin review' },
-      { label: 'WorkOne Queue', href: '/admin/workone-queue', desc: 'WorkOne referral processing queue' },
-      { label: 'Workforce Referrals', href: '/admin/referrals', desc: 'Agency workforce referral submissions' },
-      { label: 'Booth Rental Applications', href: '/admin/shops', desc: 'Booth/suite rental signups and billing' },
-      { label: 'System Jobs', href: '/admin/system/jobs', desc: 'Scheduled background jobs' },
-      { label: 'System Webhooks', href: '/admin/system/webhooks', desc: 'Webhook delivery logs and retries' },
+      { label: 'Enrollment Jobs', href: '/enrollment-jobs', desc: 'Enrollment processing queue' },
+      { label: 'Payout Queue', href: '/payout-queue', desc: 'Pending payouts and disbursements' },
+      { label: 'Review Queue', href: '/review-queue', desc: 'Items pending admin review' },
+      { label: 'WorkOne Queue', href: '/workone-queue', desc: 'WorkOne referral processing queue' },
+      { label: 'Workforce Referrals', href: '/referrals', desc: 'Agency workforce referral submissions' },
+      { label: 'Booth Rental Applications', href: '/shops', desc: 'Booth/suite rental signups and billing' },
+      { label: 'System Jobs', href: '/system/jobs', desc: 'Scheduled background jobs' },
+      { label: 'System Webhooks', href: '/system/webhooks', desc: 'Webhook delivery logs and retries' },
     ],
   },
   {
@@ -66,10 +66,10 @@ const TOOL_SECTIONS = [
     iconBg: 'bg-teal-600',
     description: 'Support tickets, calendar, and tutorial content.',
     tools: [
-      { label: 'Support Tickets', href: '/admin/submissions', desc: 'View and respond to support ticket submissions' },
-      { label: 'Calendar Events', href: '/admin/automation', desc: 'Manage calendar_events — orientations, sessions, deadlines' },
-      { label: 'Tutorials', href: '/admin/docs', desc: 'Platform tutorial content management' },
-      { label: 'Suboffice Applications', href: '/admin/provider-applications', desc: 'Suboffice/satellite location applications' },
+      { label: 'Support Tickets', href: '/submissions', desc: 'View and respond to support ticket submissions' },
+      { label: 'Calendar Events', href: '/automation', desc: 'Manage calendar_events — orientations, sessions, deadlines' },
+      { label: 'Tutorials', href: '/docs', desc: 'Platform tutorial content management' },
+      { label: 'Suboffice Applications', href: '/provider-applications', desc: 'Suboffice/satellite location applications' },
     ],
   },
   {
@@ -78,11 +78,11 @@ const TOOL_SECTIONS = [
     iconBg: 'bg-indigo-600',
     description: 'App trial management, upgrades, and store configuration.',
     tools: [
-      { label: 'Store', href: '/admin/store', desc: 'App store listings and pricing' },
-      { label: 'App Trials', href: '/admin/store', desc: 'Start or check trial status for sam-gov, grants, website-builder' },
-      { label: 'Licenses', href: '/admin/licenses', desc: 'License assignments and expirations' },
-      { label: 'License Requests', href: '/admin/license-requests', desc: 'Pending license upgrade requests' },
-      { label: 'Promo Codes', href: '/admin/promo-codes', desc: 'Discount and promo code management' },
+      { label: 'Store', href: '/store', desc: 'App store listings and pricing' },
+      { label: 'App Trials', href: '/store', desc: 'Start or check trial status for sam-gov, grants, website-builder' },
+      { label: 'Licenses', href: '/licenses', desc: 'License assignments and expirations' },
+      { label: 'License Requests', href: '/license-requests', desc: 'Pending license upgrade requests' },
+      { label: 'Promo Codes', href: '/promo-codes', desc: 'Discount and promo code management' },
       { label: 'Commercialization Checklist', href: '/docs', desc: 'MVP gate, hardening gate, pricing tiers, and 10-minute buyer demo plan' },
       { label: 'Admin Remediation TODO', href: '/docs', desc: 'Priority-ordered execution list for reliability, prefill completion, and commercialization hardening' },
       { label: 'DevStudio Dispatch Checklist', href: '/docs', desc: 'Verify GitHub Actions dispatch for build/deploy/test commands' },
@@ -94,9 +94,9 @@ const TOOL_SECTIONS = [
     iconBg: 'bg-purple-600',
     description: 'API keys, webhooks, and third-party integrations.',
     tools: [
-      { label: 'API Keys', href: '/admin/api-keys', desc: 'Manage API keys and access tokens' },
-      { label: 'Integrations', href: '/admin/integrations', desc: 'Third-party service integrations' },
-      { label: 'Webhooks', href: '/admin/system/webhooks', desc: 'Webhook configuration and logs' },
+      { label: 'API Keys', href: '/api-keys', desc: 'Manage API keys and access tokens' },
+      { label: 'Integrations', href: '/integrations', desc: 'Third-party service integrations' },
+      { label: 'Webhooks', href: '/system/webhooks', desc: 'Webhook configuration and logs' },
     ],
   },
   {
@@ -105,12 +105,12 @@ const TOOL_SECTIONS = [
     iconBg: 'bg-emerald-700',
     description: 'Developer utilities, debugging, and studio tools.',
     tools: [
-      { label: 'Operations Hub', href: '/admin/operations', desc: 'Cron jobs, workflows, dead letters, and admin alerts' },
+      { label: 'Operations Hub', href: '/operations', desc: 'Cron jobs, workflows, dead letters, and admin alerts' },
       { label: 'Dev Studio', href: '/studio', desc: 'Container, deploy, secrets, terminal, and live preview' },
-      { label: 'Automation', href: '/admin/automation', desc: 'Workflow automation rules' },
+      { label: 'Automation', href: '/automation', desc: 'Workflow automation rules' },
       { label: 'Workflows', href: '/studio/workflows', desc: 'Automated workflow definitions' },
       { label: 'Studio', href: '/studio', desc: 'Course Studio — builder, curriculum, video, and AI copilot' },
-      { label: 'HVAC AI Instructor', href: '/admin/integrations/gemini', desc: 'Marcus Johnson — Gemini-powered HVAC lesson instructor' },
+      { label: 'HVAC AI Instructor', href: '/integrations/gemini', desc: 'Marcus Johnson — Gemini-powered HVAC lesson instructor' },
       { label: 'Sentry Test', href: '/api/sentry-test', desc: 'Dev only — trigger a test error to verify Sentry capture' },
     ],
   },
@@ -120,10 +120,10 @@ const TOOL_SECTIONS = [
     iconBg: 'bg-red-600',
     description: 'Security settings, compliance tools, and governance.',
     tools: [
-      { label: 'Governance', href: '/admin/governance', desc: 'Governance policies and controls' },
-      { label: 'Governance — Security', href: '/admin/governance/security', desc: 'Security policy configuration' },
-      { label: 'FERPA', href: '/admin/ferpa', desc: 'FERPA compliance management' },
-      { label: 'Compliance', href: '/admin/compliance', desc: 'Compliance checklist and status' },
+      { label: 'Governance', href: '/governance', desc: 'Governance policies and controls' },
+      { label: 'Governance — Security', href: '/governance/security', desc: 'Security policy configuration' },
+      { label: 'FERPA', href: '/ferpa', desc: 'FERPA compliance management' },
+      { label: 'Compliance', href: '/compliance', desc: 'Compliance checklist and status' },
     ],
   },
 ];
@@ -135,7 +135,7 @@ export default async function AdvancedToolsPage() {
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-6 py-5">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Advanced Tools' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Advanced Tools' }]} />
         <div className="flex items-center gap-3 mt-3">
           <div className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center">
             <Wrench className="w-5 h-5 text-white" />
@@ -193,12 +193,12 @@ export default async function AdvancedToolsPage() {
           </div>
           <div className="flex flex-wrap gap-3">
             {[
-              { label: 'Operations', href: '/admin/operations' },
-              { label: 'Settings', href: '/admin/settings' },
+              { label: 'Operations', href: '/operations' },
+              { label: 'Settings', href: '/settings' },
               { label: 'Users', href: '/students' },
-              { label: 'Licenses', href: '/admin/licenses' },
-              { label: 'Tenants', href: '/admin/tenants' },
-              { label: 'Monitoring', href: '/admin/monitoring' },
+              { label: 'Licenses', href: '/licenses' },
+              { label: 'Tenants', href: '/tenants' },
+              { label: 'Monitoring', href: '/monitoring' },
             ].map(({ label, href }) => (
               <Link
                 key={href}

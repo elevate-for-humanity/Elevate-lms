@@ -33,8 +33,8 @@ const VISUAL_STORY = [
     body: 'Theory, sanitation, client safety, professional practice, and technical knowledge support what happens in the shop.',
   },
   {
-    image: '/images/pages/barber-hands-on-bright.webp',
-    alt: 'Barber apprentice practicing supervised haircutting and grooming skills',
+    image: '/images/pages/barber-fade.webp',
+    alt: 'Close view of clipper technique used for a clean, professional fade',
     label: 'Hands-on Barbering',
     title: 'Build skill through supervised practice.',
     body: 'Apprentices develop barbering skills through real practice, documented competencies, and structured supervision.',

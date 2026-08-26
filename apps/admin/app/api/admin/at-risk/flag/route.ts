@@ -14,27 +14,30 @@ export async function POST(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  const { studentId, enrollmentId } = await request.json();
-  if (!studentId) return safeError('studentId required', 400);
+  const { studentId, userId, riskId } = await request.json();
+  const learnerId = userId ?? studentId;
+  if (!learnerId) return safeError('userId required', 400);
 
   const db = await requireAdminClient();
 
   const { error } = await db
     .from('profiles')
     .update({ enrollment_status: 'at_risk', updated_at: new Date().toISOString() })
-    .eq('id', studentId);
+    .eq('id', learnerId);
 
   if (error) return safeInternalError(error, 'Failed to flag student');
 
   // Non-fatal audit/intervention write. Supabase returns database errors in the
   // result object rather than via Promise.catch on the query builder.
-  await db.from('student_interventions').insert({
-    student_id: studentId,
-    enrollment_id: enrollmentId ?? null,
-    intervention_type: 'flagged_for_review',
+  const { error: interventionError } = await db.from('student_interventions').insert({
+    user_id: learnerId,
+    at_risk_id: riskId ?? null,
+    intervention_type: 'other',
+    status: 'pending',
     notes: 'Admin-flagged from at-risk dashboard',
-    created_at: new Date().toISOString(),
+    created_by: auth.id,
   });
+  if (interventionError) return safeInternalError(interventionError, 'Student was flagged but the intervention record could not be created');
 
   return NextResponse.json({ ok: true });
 }

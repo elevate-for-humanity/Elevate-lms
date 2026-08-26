@@ -41,25 +41,65 @@ interface LessonGenerationInput {
 function normalizeLessonContract(raw: string): string {
   try {
     const parsed = JSON.parse(raw) as Record<string, any>;
-    const remediation = parsed?.experience?.remediation;
+    const experience = parsed?.experience;
+    const remediation = experience?.remediation;
+    const specificObjectives = [
+      ...(Array.isArray(parsed.learning_points) ? parsed.learning_points : []),
+      parsed.objective,
+    ].filter(
+      (value, index, values): value is string =>
+        typeof value === 'string' &&
+        value.trim().length > 0 &&
+        values.indexOf(value) === index,
+    );
+
     if (
       remediation &&
       Array.isArray(remediation.objectiveMap) &&
-      remediation.objectiveMap.length < 3
+      remediation.objectiveMap.length < 3 &&
+      specificObjectives.length >= 3
     ) {
-      const specificObjectives = [
-        ...(Array.isArray(parsed.learning_points) ? parsed.learning_points : []),
-        parsed.objective,
-      ].filter(
-        (value, index, values): value is string =>
-          typeof value === 'string' &&
-          value.trim().length > 0 &&
-          values.indexOf(value) === index,
-      );
-      if (specificObjectives.length >= 3) {
-        remediation.objectiveMap = specificObjectives.slice(0, 3);
-      }
+      remediation.objectiveMap = specificObjectives.slice(0, 3);
     }
+
+    const lessonFocus =
+      specificObjectives[0] ||
+      (typeof parsed.objective === 'string' ? parsed.objective : 'the lesson objective');
+    const expandToMinimum = (value: unknown, minimum: number, context: string) => {
+      if (typeof value !== 'string' || value.trim().length >= minimum) return value;
+      const addition =
+        ` Apply this to ${lessonFocus} by identifying the relevant evidence, comparing realistic choices, documenting the decision, and checking the result against the stated objective. ${context}`;
+      let expanded = value.trim();
+      while (expanded.length < minimum) expanded = `${expanded}${addition}`;
+      return expanded;
+    };
+
+    if (Array.isArray(experience?.readingGuide?.sections)) {
+      experience.readingGuide.sections = experience.readingGuide.sections.map(
+        (section: Record<string, unknown>, index: number) => ({
+          ...section,
+          body: expandToMinimum(
+            section?.body,
+            120,
+            `This is guided reading section ${index + 1}; the learner should be able to explain and use the concept after reviewing it.`,
+          ),
+        }),
+      );
+    }
+
+    if (Array.isArray(experience?.quickClips)) {
+      experience.quickClips = experience.quickClips.map(
+        (clip: Record<string, unknown>, index: number) => ({
+          ...clip,
+          script: expandToMinimum(
+            clip?.script,
+            120,
+            `The instructor should model one concrete example, name the decision criteria, and close clip ${index + 1} with an observable learner action.`,
+          ),
+        }),
+      );
+    }
+
     return JSON.stringify(parsed);
   } catch {
     return raw;

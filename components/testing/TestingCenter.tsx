@@ -277,7 +277,7 @@ function ExamFinder() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="relative w-10 h-10">
-                      <Image src={provider.logo} alt={provider.name} fill className="object-contain" />
+                      <Image src={provider.logo} alt={provider.name} fill className="object-contain" sizes="100vw" />
                     </div>
                     <span className="font-bold text-slate-900">{provider.name}</span>
                   </div>
@@ -381,7 +381,7 @@ function WhatToExpect() {
         <div className="space-y-3">
           {bring.map((item, i) => (
             <div key={i} className="flex items-start gap-3">
-              <Image src={ICONS.check} alt="Check" width={20} height={20} className="object-contain shrink-0 mt-0.5" />
+              <Image src={ICONS.check} alt="Check" width={20} height={20} className="object-contain shrink-0 mt-0.5" sizes="(max-width: 768px) 100vw, 50vw" />
               <span className="text-green-800">{item.item}</span>
             </div>
           ))}
@@ -479,7 +479,7 @@ function ProviderCard({ provider }: { provider: typeof PROVIDERS[0] }) {
           src={provider.heroImage}
           alt={provider.name}
           fill
-          className="object-cover"
+          className="object-cover" sizes="100vw"
         />
         <div className={`absolute inset-0 bg-gradient-to-t ${provider.accent} opacity-60`} />
         <div className="absolute inset-0 flex items-center justify-center">
@@ -488,7 +488,7 @@ function ProviderCard({ provider }: { provider: typeof PROVIDERS[0] }) {
               src={provider.logo}
               alt={`${provider.name} logo`}
               fill
-              className="object-contain"
+              className="object-contain" sizes="100vw"
             />
           </div>
         </div>
@@ -501,7 +501,7 @@ function ProviderCard({ provider }: { provider: typeof PROVIDERS[0] }) {
         <div className="space-y-2 mb-6">
           {provider.certifications.slice(0, 2).map((cert, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
-              <Image src={ICONS.check} alt="Check" width={16} height={16} className="object-contain shrink-0" />
+              <Image src={ICONS.check} alt="Check" width={16} height={16} className="object-contain shrink-0" sizes="(max-width: 768px) 100vw, 50vw" />
               <span className="text-slate-700">{cert.name}</span>
             </div>
           ))}
@@ -560,7 +560,7 @@ function EmployerTesting() {
                 'Private testing sessions',
               ].map((service, i) => (
                 <div key={i} className="flex items-center gap-3">
-                  <Image src={ICONS.checkWhite} alt="Check" width={20} height={20} className="object-contain shrink-0" />
+                  <Image src={ICONS.checkWhite} alt="Check" width={20} height={20} className="object-contain shrink-0" sizes="(max-width: 768px) 100vw, 50vw" />
                   <span className="text-white/90">{service}</span>
                 </div>
               ))}
@@ -593,7 +593,7 @@ function EmployerTesting() {
                   'Education',
                 ].map((type, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <Image src={ICONS.checkWhite} alt="Check" width={16} height={16} className="object-contain" />
+                    <Image src={ICONS.checkWhite} alt="Check" width={16} height={16} className="object-contain" sizes="(max-width: 768px) 100vw, 50vw" />
                     <span className="text-white/90">{type}</span>
                   </div>
                 ))}
@@ -629,7 +629,7 @@ function TrustIndicators() {
           className="text-center p-4 bg-slate-50 rounded-xl"
         >
           <div className="relative w-12 h-12 mx-auto mb-3">
-            <Image src={point.icon} alt={point.title} fill className="object-contain" />
+            <Image src={point.icon} alt={point.title} fill className="object-contain" sizes="100vw" />
           </div>
           <p className="font-bold text-slate-900 text-sm">{point.title}</p>
           <p className="text-xs text-slate-600 mt-1">{point.desc}</p>

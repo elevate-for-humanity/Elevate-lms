@@ -16,15 +16,16 @@ export async function POST(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  const { studentId, enrollmentId } = await request.json();
-  if (!studentId) return safeError('studentId required', 400);
+  const { studentId, userId, riskId } = await request.json();
+  const learnerId = userId ?? studentId;
+  if (!learnerId) return safeError('userId required', 400);
 
   const db = await requireAdminClient();
 
   const { data: profile, error } = await db
     .from('profiles')
     .select('id, full_name, email, first_name')
-    .eq('id', studentId)
+    .eq('id', learnerId)
     .maybeSingle();
 
   if (error) return safeInternalError(error, 'Failed to load student');
@@ -48,17 +49,23 @@ export async function POST(request: NextRequest) {
 
   // Non-fatal intervention write. Supabase surfaces table/database failures in
   // the resolved result rather than via Promise.catch on the query builder.
-  await db
+  const { error: interventionError } = await db
     .from('student_interventions')
-    .upsert({
-      student_id: studentId,
-      enrollment_id: enrollmentId ?? null,
-      intervention_type: 'follow_up_email',
+    .insert({
+      user_id: learnerId,
+      at_risk_id: riskId ?? null,
+      intervention_type: 'email',
+      status: 'completed',
       notes: 'Admin-triggered follow-up from at-risk dashboard',
-      created_at: new Date().toISOString(),
+      outcome: 'Re-engagement email sent',
+      completed_at: new Date().toISOString(),
+      created_by: auth.id,
     })
     .select()
     .maybeSingle();
+  if (interventionError) {
+    return safeInternalError(interventionError, 'Email sent but the intervention record could not be created');
+  }
 
   return NextResponse.json({ ok: true });
 }

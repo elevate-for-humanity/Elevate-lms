@@ -83,7 +83,9 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   const bulletPoints = Array.isArray(job.bullet_points) ? job.bullet_points : [];
   const sceneData = job.scene_data && typeof job.scene_data === 'object' ? (job.scene_data as Record<string, unknown>) : {};
   const isMicroclip = job.asset_kind === 'microclip';
-  const renderId = isMicroclip ? `${job.lesson_id}-${safeAssetKey(job.asset_key ?? job.id)}` : job.lesson_id;
+  // Every render is an immutable candidate. Approval, not rendering, changes
+  // the learner-facing lesson URL.
+  const renderId = `${job.lesson_id}-${safeAssetKey(job.asset_key ?? job.id)}-${job.id}`;
   const characters = mediaCharacters(sceneData);
   const storyboard = directMedia({
     title: job.lesson_title,
@@ -195,13 +197,14 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
             });
           }
 
-          await enforceMediaQuality({
+          const qualityEvidence = await enforceMediaQuality({
             videoUrl,
             expectedDurationSeconds: outputSeconds,
             expectedSceneCount: 1,
             sceneData: storyboard,
             provider: generated.provider,
             providerModel: model,
+            expectedScript: script,
           });
           await markComplete(job.id, {
             video_url: videoUrl,
@@ -210,6 +213,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
             provider_model: model,
             scene_count: 1,
             scene_data: storyboard,
+            quality_evidence: qualityEvidence,
           });
           return;
         }
@@ -292,13 +296,14 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       return;
     }
     const completedStoryboard = result.sceneData ?? storyboard;
-    await enforceMediaQuality({
+    const qualityEvidence = await enforceMediaQuality({
       videoUrl: result.videoUrl,
       expectedDurationSeconds: result.duration ?? 0,
       expectedSceneCount: storyboard.scenes.length,
       sceneData: completedStoryboard,
       provider: REMOTION_PROVIDER,
       providerModel: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
+      expectedScript: script,
     });
     await markComplete(job.id, {
       video_url: result.videoUrl,
@@ -308,6 +313,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       provider_model: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
       scene_count: storyboard.scenes.length,
       scene_data: completedStoryboard,
+      quality_evidence: qualityEvidence,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

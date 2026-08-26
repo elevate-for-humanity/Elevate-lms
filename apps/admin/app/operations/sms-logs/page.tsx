@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { smsService } from '@/lib/notifications/sms';
+import { SmsComposer } from './SmsComposer';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,6 +67,8 @@ export default async function SmsDeliveryPage() {
           Twilio delivery attempts recorded by the notification service. Recipients are masked.
         </p>
       </div>
+
+      <SmsComposer enabled={smsService.isEnabled()} />
 
       <section className="grid gap-4 sm:grid-cols-3" aria-label="SMS delivery summary">
         {[

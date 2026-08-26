@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Volume2, VolumeX } from 'lucide-react';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 export interface HeroVideoCta {
   label: string;
@@ -30,6 +31,8 @@ export interface HeroVideoProps {
   ctas?: HeroVideoCta[];
   trustIndicators?: string[];
   transcript?: string;
+  /** Read the approved transcript aloud when the video has no narration track. */
+  narrateTranscript?: boolean;
   analyticsName?: string;
   className?: string;
   children?: React.ReactNode;
@@ -55,6 +58,7 @@ export default function HeroVideo({
   ctas,
   trustIndicators,
   transcript,
+  narrateTranscript = false,
   analyticsName,
   className = '',
   children,
@@ -72,6 +76,7 @@ export default function HeroVideo({
   const [videoReady, setVideoReady] = useState(false);
   const [audioFailed, setAudioFailed] = useState(false);
   const soundRequestedRef = useRef(false);
+  const transcriptVoice = useNaturalVoice();
   const transcriptId = useId();
 
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
@@ -116,6 +121,7 @@ export default function HeroVideo({
     if (!muted) {
       soundRequestedRef.current = false;
       audio?.pause();
+      transcriptVoice.stop();
       if (video) video.muted = true;
       setMuted(true);
       return;
@@ -137,6 +143,24 @@ export default function HeroVideo({
           audio.currentTime = 0;
         }
         await audio.play();
+      } else if (narrateTranscript && transcript) {
+        if (video) {
+          video.muted = true;
+          if (video.paused) await video.play();
+        }
+        const started = await transcriptVoice.play(transcript, {
+          style: 'commercial',
+          rate: 0.96,
+          onEnded: () => {
+            soundRequestedRef.current = false;
+            setMuted(true);
+          },
+          onError: () => {
+            soundRequestedRef.current = false;
+            setMuted(true);
+          },
+        });
+        if (!started) throw new Error('Transcript narration could not start.');
       } else if (video) {
         video.muted = false;
         video.volume = 1;
@@ -289,7 +313,7 @@ export default function HeroVideo({
           </div>
         ) : null}
 
-        {(voiceoverSrc && !audioFailed) || showVideo ? (
+        {(voiceoverSrc && !audioFailed) || (narrateTranscript && transcript) || showVideo ? (
           <button
             type="button"
             onClick={() => void toggleSound()}

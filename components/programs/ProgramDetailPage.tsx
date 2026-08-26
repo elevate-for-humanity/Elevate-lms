@@ -208,6 +208,7 @@ export default function ProgramDetailPage({
                   ctas={bannerCtas}
                   trustIndicators={safeTrustIndicators}
                   transcript={safeTranscript}
+                  narrateTranscript={p.slug === 'cna' && !voiceoverSrc}
                 />
               );
             }

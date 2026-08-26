@@ -181,7 +181,7 @@ describe('agency_referral_confirmations — column contract', () => {
   it('confirmation_type CHECK covers all 8 types', () => {
     const types = ['receipt','enrollment','attendance','completion','placement','no_show','declined','unable_to_reach'];
     for (const type of types) {
-      expect(allMigrationsSql).toMatch(new RegExp(`'${type}''));
+      expect(allMigrationsSql).toMatch(new RegExp("'" + type + "'"));
     }
   });
 

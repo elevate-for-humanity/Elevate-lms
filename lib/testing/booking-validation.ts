@@ -5,7 +5,7 @@
  * any formatting, email, or DB layer. Empty strings are rejected, not
  * passed through to crash downstream.
  *
- * Design rule: if a field is optional (e.g. preferredDate when using Calendly),
+ * Design rule: if a field is optional because the paid slot supplies the date,
  * it must be explicitly marked optional here and normalized to null — never
  * allowed to propagate as "".
  */
@@ -20,7 +20,7 @@ export interface BookingInput {
   phone?: string | null;
   organization?: string | null;
   participantCount?: number | null;
-  /** ISO date string YYYY-MM-DD. Optional when scheduling via Calendly. */
+  /** ISO date string YYYY-MM-DD. Optional when a paid slot supplies the date. */
   preferredDate?: string | null;
   preferredTime?: string | null;
   alternateDate?: string | null;
@@ -170,7 +170,7 @@ export function validateBookingInput(body: Record<string, unknown>): ValidationR
  * Never receives raw user input — that's already been validated.
  */
 export function formatBookingDate(date: string | null | undefined): string {
-  if (!date) return 'To be scheduled via Calendly';
+  if (!date) return 'Scheduled from the selected paid appointment slot';
   return new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',

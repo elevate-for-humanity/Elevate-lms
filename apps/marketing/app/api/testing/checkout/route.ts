@@ -5,6 +5,8 @@ import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { MINIMUM_BOOKING_NOTICE_HOURS } from '@/lib/testing/booking-validation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -90,6 +92,34 @@ export async function POST(request: NextRequest) {
   const addOnSelected =
     body.addOn === true && bookingType === 'individual' && Boolean(provider.addOn);
 
+  const slotId = body.slotId?.trim() || '';
+  if (!slotId) {
+    return NextResponse.json(
+      { error: 'Select an available appointment at least 24 hours in advance before checkout.' },
+      { status: 422 },
+    );
+  }
+
+  const earliestStart = new Date(
+    Date.now() + MINIMUM_BOOKING_NOTICE_HOURS * 60 * 60 * 1000,
+  ).toISOString();
+  const admin = await requireAdminClient();
+  const { data: slot, error: slotError } = await admin
+    .from('testing_slots')
+    .select('id, exam_type, start_time, capacity, booked_count, is_cancelled')
+    .eq('id', slotId)
+    .eq('exam_type', providerKey)
+    .eq('is_cancelled', false)
+    .gte('start_time', earliestStart)
+    .maybeSingle();
+
+  if (slotError || !slot || slot.booked_count >= slot.capacity) {
+    return NextResponse.json(
+      { error: 'That appointment is unavailable or does not meet the 24-hour notice requirement.' },
+      { status: 409 },
+    );
+  }
+
   const lineItems: any[] = [
     {
       quantity: participantCount,
@@ -137,7 +167,7 @@ export async function POST(request: NextRequest) {
         participant_count: String(participantCount),
         add_on: addOnSelected ? 'true' : 'false',
         pending_booking_id: '',
-        slot_id: body.slotId?.trim() || '',
+        slot_id: slot.id,
       },
     });
 

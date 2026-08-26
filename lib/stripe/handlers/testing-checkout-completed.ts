@@ -7,15 +7,15 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { getStripeServer } from '@/lib/stripe/get-stripe-server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { logger } from '@/lib/logger';
-import { TESTING_CENTER, TESTING_EMAIL, CALENDLY_CONFIG } from '@/lib/testing/testing-config';
+import { TESTING_CENTER, TESTING_EMAIL } from '@/lib/testing/testing-config';
 import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
-import { createSchedulingLink, getEventTypes } from '@/lib/testing/calendly';
 import {
   TestingEnforcementMeta,
   TestingSessionMeta,
   parseWebhookMeta,
 } from '@/lib/stripe/webhook-schemas';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { MINIMUM_BOOKING_NOTICE_HOURS } from '@/lib/testing/booking-validation';
 
 const FROM = TESTING_EMAIL.from;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl;
@@ -164,28 +164,21 @@ export async function handleTestingCheckoutSession(
     ).join('');
 
     const hasAddOn = meta.add_on === 'true';
-    let calendlySchedulingUrl = CALENDLY_CONFIG.testingUrl;
-    try {
-      const eventTypes = await getEventTypes();
-      const testingEvent =
-        eventTypes.find((e) => e.slug === 'testing' || e.slug === '60min') ?? eventTypes[0];
-      if (testingEvent) {
-        calendlySchedulingUrl = await createSchedulingLink({ eventTypeUri: testingEvent.uri });
-      }
-    } catch (err) {
-      logger.warn('[testing/checkout] Calendly link fallback', { err });
-    }
-
     const rawSlotId = meta.slot_id || null;
     let slotId: string | null = null;
     if (rawSlotId) {
+      const earliestStart = new Date(
+        Date.now() + MINIMUM_BOOKING_NOTICE_HOURS * 60 * 60 * 1000,
+      ).toISOString();
       const { data: slotRow } = await db
         .from('testing_slots')
-        .select('id')
+        .select('id, capacity, booked_count')
         .eq('id', rawSlotId)
+        .eq('exam_type', meta.exam_type)
         .eq('is_cancelled', false)
+        .gte('start_time', earliestStart)
         .maybeSingle();
-      slotId = slotRow?.id ?? null;
+      slotId = slotRow && slotRow.booked_count < slotRow.capacity ? slotRow.id : null;
     }
 
     const { error: insertErr } = await db.from('exam_bookings').insert({
@@ -203,7 +196,7 @@ export async function handleTestingCheckoutSession(
       confirmation_code: confirmationCode,
       add_on: hasAddOn,
       add_on_paid: hasAddOn,
-      calendly_scheduling_url: calendlySchedulingUrl,
+      calendly_scheduling_url: null,
       slot_id: slotId,
     });
 
@@ -222,7 +215,8 @@ export async function handleTestingCheckoutSession(
         from: FROM,
         subject: `Exam Booking Confirmed — ${confirmationCode} | Elevate Testing Center`,
         html: `<p>Hi ${firstName || 'there'}, your exam booking is confirmed. Code: <strong>${confirmationCode}</strong></p>
-<p><a href="${calendlySchedulingUrl}">Schedule your exam date →</a></p>
+<p><a href="${SITE_URL}/testing/book?session_id=${session.id}">Add your paid appointment to Google Calendar →</a></p>
+<p>Appointments require at least 24 hours advance notice. After adding the appointment, call ${TESTING_CENTER.phone} to confirm.</p>
 <p>Location: ${TESTING_CENTER.address}</p>`,
       }).catch((err) => logger.warn('[testing/checkout] Email failed', { err }));
     }

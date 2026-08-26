@@ -74,7 +74,7 @@ const HeroBadge = ({ badge, index }: { badge: TrustBadge; index: number }) => (
       alt={badge.imgAlt}
       width={20}
       height={20}
-      className="object-contain"
+      className="object-contain" sizes="(max-width: 768px) 100vw, 50vw"
     />
     <div className="text-xs">
       <div className="font-semibold">{badge.label}</div>
@@ -151,7 +151,7 @@ export function TrustBadges({ variant = 'section', className = '' }: TrustBadges
             alt={badge.imgAlt}
             width={24}
             height={24}
-            className="object-contain"
+            className="object-contain" sizes="(max-width: 768px) 100vw, 50vw"
           />
           <span className="font-semibold text-sm">{badge.label}</span>
         </motion.div>

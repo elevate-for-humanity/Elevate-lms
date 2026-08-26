@@ -28,7 +28,7 @@ Week after week your skills improve. Month after month your clientele grows.
 
 Learn precision cutting, straight razor shaves, and beard design. Earn while you learn through our DOL-registered apprenticeship.
 
-No tuition. No debt. Just real skills for a real career.
+Program terms and costs are reviewed during enrollment.
 
 Apply today and start your journey.`,
     duration: 45, // seconds
@@ -41,7 +41,7 @@ Apply today and start your journey.`,
 
 Transform your passion for beauty into a thriving career. Work alongside professional stylists in real salons, learning hair coloring, cutting, makeup artistry, and more.
 
-Our apprenticeship model means you earn while you learn. No expensive tuition. No starting from zero.
+Build real skills through supervised workplace learning. Program terms and costs are reviewed during enrollment.
 
 Build your skills, build your confidence, build your future.
 
@@ -58,7 +58,7 @@ Discover the art of skincare. Learn facials, chemical peels, dermaplaning, and t
 
 Work in luxury spas, dermatology offices, or wellness centers. The demand for skilled estheticians has never been higher.
 
-Financial assistance available. Career support included.
+Contact enrollment for current tuition and payment options. Career support is available.
 
 Apply now and begin your transformation.`,
     duration: 38,
@@ -73,7 +73,7 @@ Build real skills in nail care, manicures, pedicures, gel extensions, and nail a
 
 Quick certification. Flexible schedule. Real career opportunities.
 
-Financial aid available for eligible students.
+Contact enrollment for current tuition and payment options.
 
 Start building your future today.`,
     duration: 32,
@@ -88,7 +88,7 @@ Start a meaningful career in healthcare. Our certified nursing assistant trainin
 
 Learn vital signs, patient care, and communication skills. Complete your certification and start working in weeks.
 
-Funding available. Job placement support included.
+This is a self-funded program. Contact enrollment for current tuition and payment options.
 
 Apply today and begin your healthcare journey.`,
     duration: 42,
@@ -103,7 +103,7 @@ Learn heating, ventilation, air conditioning, and refrigeration. The trades need
 
 Hands-on training. Industry certifications. Real career pathways.
 
-Funding available for eligible students.
+Contact enrollment for current tuition and payment options.
 
 Start your skilled trades career today.`,
     duration: 38,

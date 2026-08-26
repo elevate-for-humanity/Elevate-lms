@@ -23,7 +23,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, '..');
 
 // Your Pexels API key
-const PEXELS_API_KEY = process.env.PEXELS_API_KEY || 'IJJFHHBQ7lP0Dmn9vDvPWjLrfQTZhmVyWWYou0UD1fnXgkAdXrzdEZpw';
+const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 
 // All programs with scripts
 const PROGRAMS = [
@@ -31,7 +31,7 @@ const PROGRAMS = [
     id: 'barber',
     title: 'Master the Art of Barbering',
     tagline: 'DOL Registered Apprenticeship',
-    script: `Welcome to Elevate for Humanity's Barber Apprenticeship. Learn precision cutting, straight razor shaves, and beard design. Earn while you learn through our DOL-registered apprenticeship. No tuition. No debt. Just real skills for a real career. Apply today and start your journey.`,
+    script: `Welcome to Elevate for Humanity's Barber Apprenticeship. Learn precision cutting, straight razor shaves, and beard design. Build real skills through supervised workplace learning. Program terms and costs are reviewed during enrollment. Apply today and start your journey.`,
     voice: 'en-US-GuyNeural',
     searchTerms: ['barber shop scissors', 'hair cutting men', 'barber training']
   },
@@ -95,7 +95,7 @@ const PROGRAMS = [
     id: 'phlebotomy',
     title: 'Draw Your Path Forward',
     tagline: 'Phlebotomy Certification',
-    script: `Welcome to Elevate for Humanity's Phlebotomy Program. Learn to draw blood safely and professionally. Work in hospitals, labs, and clinics. Quick certification. High demand for skilled phlebotomists. Financial aid available. Apply now and start your healthcare career.`,
+    script: `Welcome to Elevate for Humanity's Phlebotomy Program. Learn to draw blood safely and professionally. Work in hospitals, labs, and clinics. Quick certification. Build practical phlebotomy skills for healthcare settings. Contact enrollment for current tuition and payment options. Apply now and start your healthcare career.`,
     voice: 'en-US-JennyNeural',
     searchTerms: ['phlebotomy blood draw', 'medical lab', 'healthcare worker']
   },

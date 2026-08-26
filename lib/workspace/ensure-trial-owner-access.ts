@@ -186,11 +186,24 @@ export async function ensureTrialOwnerAccess(
   }
   await recordStage(db, input.workspaceId, 'builder_ready', input.source, input.reference).catch(() => {});
 
-  const fallbackLogin = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(builderUrl)}`;
+  // Generate the customer-facing credential link only after provisioning is
+  // complete. This prevents most of the one-time token lifetime from being
+  // consumed by workspace setup and sends every new owner through password
+  // creation before the builder opens.
+  const passwordRedirect = `https://www.elevateforhumanity.org/auth/set-password?redirect=${encodeURIComponent(builderUrl)}`;
+  const passwordLink = await db.auth.admin.generateLink({
+    type: 'recovery',
+    email: ownerEmail,
+    options: { redirectTo: passwordRedirect },
+  });
+  if (passwordLink.error || !passwordLink.data?.properties?.action_link) {
+    return fail('builder_ready', 'Password setup link could not be created.', passwordLink.error ?? undefined);
+  }
+
   return {
     ok: true,
     userId: authUser.id,
-    loginUrl: generated.data?.properties?.action_link ?? fallbackLogin,
+    loginUrl: passwordLink.data.properties.action_link,
     builderUrl,
   };
 }

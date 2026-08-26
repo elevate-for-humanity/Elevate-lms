@@ -23,7 +23,7 @@ export const VIDEO_HEROES = {
   // Program Categories
   barber: `${R2}/barber-hero-final.mp4`,
   barberApprenticeship: `${R2}/barber-hero-final.mp4`,
-  healthcare: `${R2}/cna-hero.mp4`,
+  healthcare: `${R2}/6130025-hd_1280_720_30fps.mp4`,
   skilledTrades: `${R2}/hvac-hero-final.mp4`,
   technology: `${R2}/hero-home-fast.mp4`,
 
@@ -197,14 +197,14 @@ export const PAGE_HEROES: Record<string, PageHeroConfig> = {
     image: '/images/pages/cna-clinical.jpg',
     variant: 'split',
     height: 'medium',
-    badge: 'WIOA Funded',
+    badge: 'Self-Funded',
     metadata: [
       { label: 'Duration', value: '4-6 weeks' },
       { label: 'Format', value: 'Hybrid' },
-      { label: 'Cost', value: 'Free if eligible' },
+      { label: 'Cost', value: 'Self-funded' },
     ],
     ctaPrimary: { label: 'Apply Now', href: '/apply?program=cna' },
-    ctaSecondary: { label: 'Check Eligibility', href: '/wioa-eligibility' },
+    ctaSecondary: { label: 'Payment Options', href: '/contact?program=cna' },
   },
 
   // Esthetician Apprenticeship

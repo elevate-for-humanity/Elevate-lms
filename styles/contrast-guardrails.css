@@ -15,8 +15,12 @@
   text-underline-offset: 0.16em;
 }
 
-.efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) :is(.text-slate-400, .text-gray-400) {
+.efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) :is(.text-slate-300, .text-gray-300, .text-zinc-300, .text-slate-400, .text-gray-400, .text-zinc-400) {
   color: #475569 !important;
+}
+
+.efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) :is(.opacity-40, .opacity-50, .opacity-60, .opacity-70) {
+  opacity: 1 !important;
 }
 
 .efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) :is(.text-slate-500, .text-gray-500) {

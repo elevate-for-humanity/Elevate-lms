@@ -160,14 +160,27 @@ export default function ParisOSPage() {
     addMessage('user', command);
     addMessage('narration', `Dispatching ${agentType} agent...`);
 
+    const correlationId = crypto.randomUUID();
     try {
       const res = await fetch('/api/paris/execute', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-correlation-id': correlationId,
+        },
         body: JSON.stringify({ agentType, command }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.message || 'Execution failed');
+      const responseText = await res.text();
+      let data: Record<string, any> = {};
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        data = { message: responseText.slice(0, 500) };
+      }
+      if (!res.ok || !data.success) {
+        const traceId = data.traceId || data.correlationId || res.headers.get('x-correlation-id') || correlationId;
+        throw new Error(`${data.message || res.statusText || 'Execution failed'} (HTTP ${res.status}, correlation ${traceId})`);
+      }
 
       addMessage('ai', data.message);
       if (data.actions?.length) {
@@ -188,7 +201,9 @@ export default function ParisOSPage() {
         });
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unknown error';
+      const msg = err instanceof Error
+        ? `${err.message}${err.message.includes('correlation') ? '' : ` (correlation ${correlationId})`}`
+        : `Unknown error (correlation ${correlationId})`;
       setError(msg);
       addMessage('error', `Error: ${msg}`);
     } finally {

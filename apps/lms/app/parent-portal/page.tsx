@@ -85,6 +85,8 @@ export default async function ParentPortalPage() {
         'student_id, profiles!parent_student_links_student_id_fkey(full_name), program_enrollments(enrollment_state, programs(title))',
       )
       .eq('parent_id', user.id)
+      .eq('verified', true)
+      .eq('status', 'verified')
       .limit(10);
 
     if (data) {

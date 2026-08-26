@@ -67,6 +67,9 @@ jobs:
             .
 
       - name: Smoke Marketing container
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
         run: |
           chmod +x scripts/smoke-test-container.sh
-          scripts/smoke-test-container.sh elevate-marketing:staging-gate marketing-staging-smoke 3100
+          HEALTH_PATH=/api/ready scripts/smoke-test-container.sh elevate-marketing:staging-gate marketing-staging-smoke 3100

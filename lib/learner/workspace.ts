@@ -11,7 +11,6 @@ export type LearnerRequirement = {
   priority: string;
   status: string;
   evidence_url: string | null;
-  completed_at: string | null;
 };
 
 export type LearnerOnboardingStep = {
@@ -50,11 +49,11 @@ export async function loadLearnerWorkspace(userId: string, role = 'student'): Pr
 
   const [profileResult, progressResult, requirementResult, agreementResult, binderResult] = await Promise.all([
     supabase.from('profiles').select('full_name,phone,onboarding_completed').eq('id', userId).maybeSingle(),
-    supabase.from('onboarding_progress').select('is_complete,current_step,completed_at,profile_completed,profile_completed_at,agreements_completed,agreements_completed_at,handbook_acknowledged,handbook_acknowledged_at,documents_uploaded,documents_uploaded_at,status,step').eq('user_id', userId).maybeSingle(),
+    supabase.from('onboarding_progress').select('completed_at,profile_completed,profile_completed_at,agreements_completed,agreements_completed_at,handbook_acknowledged,handbook_acknowledged_at,documents_uploaded,documents_uploaded_at,status,step').eq('user_id', userId).maybeSingle(),
     primaryEnrollment
       ? supabase
           .from('enrollment_requirements')
-          .select('id,requirement_type,title,description,due_date,priority,status,evidence_url,completed_at')
+          .select('id,requirement_type,title,description,due_date,priority,status,evidence_url')
           .eq('enrollment_id', primaryEnrollment.enrollment_id)
           .order('due_date', { ascending: true, nullsFirst: false })
       : Promise.resolve({ data: [] as LearnerRequirement[], error: null }),
@@ -95,7 +94,7 @@ export async function loadLearnerWorkspace(userId: string, role = 'student'): Pr
   );
   const pendingRequirements = requirements.filter((row) => row.status === 'completed');
   const profileComplete = Boolean(progress?.profile_completed || (profileResult.data?.full_name && profileResult.data?.phone));
-  const orientationComplete = progress?.is_complete === true;
+  const orientationComplete = progress?.status === 'completed' || Boolean(progress?.completed_at);
 
   const onboardingSteps: LearnerOnboardingStep[] = [
     { id: 'profile', title: 'Complete your profile', description: 'Confirm your name and contact information.', href: '/lms/profile', status: profileComplete ? 'complete' : 'missing', completedAt: progress?.profile_completed_at ?? null, blocking: true },

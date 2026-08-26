@@ -30,7 +30,7 @@ export const CNA: ProgramSchema = {
   selfPayCost: '$1,850',
   regularPrice: '$2,500',
   salePrice: '$1,850',
-  badge: 'Self-Funded'
+  badge: 'Self-Funded',
   badgeColor: 'blue',
 
   credentials: [
@@ -196,9 +196,9 @@ export const CNA: ProgramSchema = {
         'Federal law establishing minimum training and competency standards for nursing assistants in Medicare/Medicaid facilities.',
     },
     {
-      standard: 'FSSA IMPACT Program',
+      standard: 'CNA Enrollment Funding',
       description:
-        'Eligible training provider under the Indiana FSSA IMPACT program for SNAP and TANF recipients pursuing healthcare careers.',
+        'This CNA program is self-funded. Government or grant funding is not currently offered; contact enrollment for current tuition and payment options.',
     },
   ],
 
@@ -233,7 +233,7 @@ export const CNA: ProgramSchema = {
     {
       question: 'Is the state exam included?',
       answer:
-        'Yes. The Indiana state CNA written and skills exam is proctored on-site at Elevate during Week 4. The exam fee is included in tuition or covered by funding when applicable.',
+        'Yes. The Indiana state CNA written and skills exam is proctored on-site at Elevate during Week 4. The exam fee is included in the listed tuition.',
     },
     {
       question: 'What funding is available?',

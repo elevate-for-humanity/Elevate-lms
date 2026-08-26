@@ -124,7 +124,19 @@ export function createBrowserClient(): SupabaseClient<any> {
   }
 
   try {
-    const client = createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey);
+    const hostname = typeof window === 'undefined' ? '' : window.location.hostname;
+    const sharedPortalSession =
+      hostname === 'elevateforhumanity.org' || hostname.endsWith('.elevateforhumanity.org');
+    const client = createSupabaseBrowserClient(supabaseUrl, supabaseAnonKey, {
+      cookieOptions: sharedPortalSession
+        ? {
+            domain: '.elevateforhumanity.org',
+            path: '/',
+            secure: true,
+            sameSite: 'lax',
+          }
+        : { path: '/', sameSite: 'lax' },
+    });
 
     // Silently clear stale sessions when the refresh token is invalid or expired.
     // Without this, Supabase logs "Invalid Refresh Token: Refresh Token Not Found"

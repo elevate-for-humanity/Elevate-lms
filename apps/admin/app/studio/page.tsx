@@ -23,7 +23,7 @@ export default async function StudioPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 text-gray-950">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto min-w-0 max-w-7xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <Link
             href="/dashboard"
@@ -35,7 +35,7 @@ export default async function StudioPage() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 shadow-sm">
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-              Admin + MFA governed
+              Protected admin tools
             </span>
             <Link
               href="/system-health"
@@ -46,7 +46,7 @@ export default async function StudioPage() {
           </div>
         </div>
 
-        <section className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+        <section className="min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm sm:rounded-3xl">
           <div className="border-b border-gray-100 px-5 py-5 sm:px-7">
             <div className="flex items-start gap-3">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-gray-50">
@@ -64,16 +64,16 @@ export default async function StudioPage() {
             </div>
           </div>
 
-          <div className="h-[68vh] min-h-[620px] max-h-[900px]">
+          <div className="h-[calc(100dvh-10rem)] min-h-[500px] min-w-0 max-h-[760px] sm:h-[68vh] sm:min-h-[620px] sm:max-h-[900px]">
             <UnifiedEllieChat embedded />
           </div>
         </section>
 
         <details className="mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-4 text-sm font-semibold text-gray-800 marker:hidden">
+          <summary className="flex min-w-0 cursor-pointer list-none flex-wrap items-center gap-2 px-4 py-4 text-sm font-semibold text-gray-800 marker:hidden sm:px-5">
             <Wrench className="h-4 w-4" aria-hidden="true" />
             Advanced capability surfaces
-            <span className="ml-1 text-xs font-normal text-gray-500">for direct inspection and troubleshooting</span>
+            <span className="min-w-0 text-xs font-normal text-gray-500 sm:ml-1">for direct inspection and troubleshooting</span>
           </summary>
           <div className="border-t border-gray-100 p-5">
             <p className="mb-5 max-w-3xl text-sm leading-6 text-gray-600">

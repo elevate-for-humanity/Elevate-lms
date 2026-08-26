@@ -59,12 +59,12 @@ function requestId(): string {
  * Wrap a Next.js App Router handler with API-layer audit logging.
  * The handler signature is unchanged — this is transparent.
  */
-export function withApiAudit(
+export function withApiAudit<TRequest extends Request, TArgs extends unknown[]>(
   endpoint: string,
-  handler: (req: Request, ...args: any[]) => Promise<Response>,
+  handler: (req: TRequest, ...args: TArgs) => Promise<Response>,
   options?: WithApiAuditOptions,
 ) {
-  return async function auditedHandler(req: Request, ...args: any[]): Promise<Response> {
+  return async function auditedHandler(req: TRequest, ...args: TArgs): Promise<Response> {
     const start = Date.now();
     const rid = requestId();
 
@@ -130,7 +130,7 @@ export function withApiAudit(
         request_id: rid,
         result,
         status_code: statusCode,
-        error_summary: errorSummary,
+        ...(errorSummary === undefined ? {} : { error_summary: errorSummary }),
         duration_ms: Date.now() - start,
       };
 
@@ -164,6 +164,6 @@ export function withApiAudit(
     // Fire-and-forget for all routes — response is already constructed above.
     void fireAudit();
 
-    return response!;
+    return response;
   };
 }

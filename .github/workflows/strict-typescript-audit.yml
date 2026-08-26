@@ -1,0 +1,52 @@
+name: Strict TypeScript Audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '**/tsconfig*.json'
+      - '.github/workflows/strict-typescript-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  strict-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [marketing, admin, lms]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Core strict audit
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm --filter @elevate/${{ matrix.app }} exec tsc --noEmit --pretty false --strict 2>&1 | tee strict-core-${{ matrix.app }}.log
+      - name: Enhanced strict audit
+        if: always()
+        shell: bash
+        run: |
+          set -o pipefail
+          pnpm --filter @elevate/${{ matrix.app }} exec tsc --noEmit --pretty false --strict --exactOptionalPropertyTypes --noUncheckedIndexedAccess 2>&1 | tee strict-enhanced-${{ matrix.app }}.log
+      - name: Upload line-level diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: strict-typescript-${{ matrix.app }}
+          path: strict-*.log
+          retention-days: 14

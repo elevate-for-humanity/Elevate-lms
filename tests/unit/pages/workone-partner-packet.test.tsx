@@ -5,7 +5,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import WorkOnePartnerPacketPage from '@/app/workone-partner-packet/page';
+import WorkOnePartnerPacketPage from '@/apps/marketing/app/workone-partner-packet/page';
 
 describe('WorkOnePartnerPacketPage', () => {
   it('renders the page without crashing', () => {

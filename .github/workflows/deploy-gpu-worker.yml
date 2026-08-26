@@ -1,3 +1,4 @@
+# Production redeploy trigger: Wan inference diagnostics
 name: Deploy GPU Video Worker
 
 on:

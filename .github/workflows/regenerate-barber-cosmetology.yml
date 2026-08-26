@@ -37,7 +37,7 @@ jobs:
     timeout-minutes: 180
     concurrency:
       group: barber-cosmetology-course-regeneration
-      cancel-in-progress: false
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
         with:

@@ -14,7 +14,12 @@ export interface LessonSceneDraft {
   id: string;
   order: number;
   /** What the learner will know or be able to do after this scene */
-  instructionalObjective?: string;
+  instructionalObjective: string;
+  dolCompetencyId: string;
+  stateRequirement: string;
+  examDomain: string;
+  demonstrationStep: string;
+  evidenceExpectation: string;
   narration: string;
   caption: string;
   subcaption?: string;

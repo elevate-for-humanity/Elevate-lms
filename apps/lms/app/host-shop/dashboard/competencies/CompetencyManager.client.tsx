@@ -9,6 +9,13 @@ type RecordRow = {
   date_completed: string | null;
   verified_by_name: string | null;
   notes: string | null;
+  requires_practical_evidence?: boolean;
+  performance_subject?: 'student' | 'patron' | 'mannequin' | null;
+  evidence_type?: string | null;
+  evidence_url?: string | null;
+  practical_performed_at?: string | null;
+  evidence_review_status?: string | null;
+  verified_by_license_number?: string | null;
 };
 
 type Competency = {
@@ -82,6 +89,31 @@ export default function CompetencyManager() {
   );
 
   async function setCompetency(apprentice: Apprentice, competency: Competency, completed: boolean) {
+    let evidence: Record<string, string> = {};
+    if (completed && /(trim|cut|shav|apply|clean|steriliz|disinfect|massage|wax|extraction|tint|manicur|pedicur|nail|skin|hair|protective covering|tool|equipment)/i.test(`${competency.category} ${competency.description}`)) {
+      const performanceSubject = window.prompt('Who was the practical performed on? Enter student, patron, or mannequin.');
+      if (!performanceSubject || !['student', 'patron', 'mannequin'].includes(performanceSubject.toLowerCase())) {
+        setError('Practical sign-off cancelled: select student, patron, or mannequin.');
+        return;
+      }
+      const evidenceUrl = window.prompt('Paste the photo, video, checklist, or observation evidence URL.');
+      if (!evidenceUrl?.trim()) {
+        setError('Practical sign-off cancelled: evidence is required.');
+        return;
+      }
+      const instructorLicenseNumber = window.prompt('Enter your current Indiana instructor or professional license number.');
+      if (!instructorLicenseNumber?.trim()) {
+        setError('Practical sign-off cancelled: verifier license number is required.');
+        return;
+      }
+      evidence = {
+        performanceSubject: performanceSubject.toLowerCase(),
+        evidenceType: 'observation',
+        evidenceUrl: evidenceUrl.trim(),
+        performedAt: new Date().toISOString().slice(0, 10),
+        instructorLicenseNumber: instructorLicenseNumber.trim(),
+      };
+    }
     const key = `${apprentice.enrollmentId}:${competency.id}`;
     setSavingKey(key);
     setError(null);
@@ -93,6 +125,7 @@ export default function CompetencyManager() {
           enrollmentId: apprentice.enrollmentId,
           competencyId: competency.id,
           completed,
+          ...evidence,
         }),
       });
       const body = await response.json();
@@ -120,7 +153,7 @@ export default function CompetencyManager() {
           <p className="text-xs font-bold uppercase tracking-wider text-brand-blue-700">DOL Appendix A</p>
           <h1 className="mt-1 text-2xl font-bold text-slate-900">Competency Sign-Offs</h1>
           <p className="mt-1 text-sm text-slate-600">
-            Check off only competencies you personally verified. Completion date and verifier identity are stored in the apprentice record.
+            Check off only competencies you personally observed. Indiana practical services also require the performance subject, dated evidence, and your current license number before approval.
           </p>
         </div>
         <button
@@ -206,7 +239,7 @@ export default function CompetencyManager() {
                           <p className="mt-1 text-sm font-medium leading-relaxed text-slate-900">{competency.description}</p>
                           {isComplete ? (
                             <p className="mt-2 text-xs text-brand-green-700">
-                              Completed {record?.date_completed || ''} · Initials {initials(record?.verified_by_name)} · Verified by {record?.verified_by_name || 'mentor'}
+                              Completed {record?.date_completed || ''} · {record?.performance_subject ? `Performed on ${record.performance_subject} · ` : ''}Initials {initials(record?.verified_by_name)} · Verified by {record?.verified_by_name || 'mentor'}
                             </p>
                           ) : null}
                         </div>

@@ -40,6 +40,13 @@ export default async function ProgramHolderDetailPage({
     : { data: [] as any[] };
   const programById = new Map((programs ?? []).map((program: any) => [program.id, program]));
 
+  const { data: roster, error: rosterError } = await db
+    .from('program_enrollments')
+    .select('id,user_id,full_name,email,status,enrollment_state,program_id,enrolled_at,progress_percent,at_risk')
+    .eq('program_holder_id', id)
+    .order('enrolled_at', { ascending: false });
+  const learners = roster ?? [];
+
   const canDecide = ['admin', 'super_admin'].includes(String(profile.role ?? ''));
 
   async function updateStatus(formData: FormData) {
@@ -89,16 +96,30 @@ export default async function ProgramHolderDetailPage({
         {messages.error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-bold text-rose-800">{messages.error}</div>}
         {messages.success && <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-emerald-800">{messages.success}</div>}
 
-        <section className="grid gap-4 md:grid-cols-4">
+        <section className="grid gap-4 md:grid-cols-5">
           {[
             ['Organization', displayName, Building2],
             ['Programs', String(assignments?.length ?? 0), BookOpen],
+            ['Learners', String(learners.length), Users],
             ['Contact email', holder.contact_email || 'Not provided', Mail],
             ['Contact phone', holder.contact_phone || 'Not provided', Phone],
           ].map(([label, value, Icon]) => {
             const CardIcon = Icon as typeof Building2;
             return <div key={String(label)} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><CardIcon className="h-5 w-5 text-violet-700" /><div className="mt-3 text-xs font-black uppercase tracking-wide text-slate-500">{String(label)}</div><div className="mt-1 break-words text-sm font-black text-slate-950">{String(value)}</div></div>;
           })}
+        </section>
+
+        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-6 py-4">
+            <div><h2 className="flex items-center gap-2 text-lg font-black text-slate-950"><Users className="h-5 w-5 text-violet-700" />Learner roster</h2><p className="mt-1 text-sm font-medium text-slate-600">Learners connected through canonical program enrollments.</p></div>
+            <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-black text-violet-900">{learners.length} learner{learners.length === 1 ? '' : 's'}</span>
+          </div>
+          {rosterError ? <p className="p-6 text-sm font-bold text-rose-700">The learner roster could not be loaded.</p> : learners.length ? (
+            <div className="overflow-x-auto"><table className="min-w-full divide-y divide-slate-200 text-left text-sm"><thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-600"><tr><th className="px-5 py-3">Learner</th><th className="px-5 py-3">Program</th><th className="px-5 py-3">State</th><th className="px-5 py-3">Progress</th><th className="px-5 py-3">Enrolled</th></tr></thead><tbody className="divide-y divide-slate-100">{learners.map((learner: any) => {
+              const program = programById.get(learner.program_id) as any;
+              return <tr key={learner.id} className={learner.at_risk ? 'bg-amber-50' : 'bg-white'}><td className="px-5 py-4"><Link href={`/students/${learner.user_id}`} className="font-black text-brand-blue-700 hover:underline">{learner.full_name || learner.email || 'Learner'}</Link><p className="mt-1 text-xs text-slate-500">{learner.email || 'No email recorded'}</p></td><td className="px-5 py-4 font-semibold text-slate-800">{program?.title || program?.name || 'Program'}</td><td className="px-5 py-4 capitalize text-slate-700">{String(learner.enrollment_state || learner.status || 'unknown').replaceAll('_', ' ')}</td><td className="px-5 py-4 font-bold text-slate-800">{Number(learner.progress_percent || 0)}%</td><td className="px-5 py-4 text-slate-600">{learner.enrolled_at ? new Date(learner.enrolled_at).toLocaleDateString() : '—'}</td></tr>;
+            })}</tbody></table></div>
+          ) : <p className="p-8 text-center text-sm font-semibold text-slate-500">No learners are currently assigned to this Program Holder.</p>}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1fr_340px]">

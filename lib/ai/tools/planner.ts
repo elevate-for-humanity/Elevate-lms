@@ -83,6 +83,12 @@ export function planAIToolFromCommand(
   if (/\b(list|show|find|search)\b.*\bstudents?\b/.test(lower)) {
     return { name: 'students.search', input: asAIRecord(context.toolInput) };
   }
+  if (/\b(assign|start|create)\b.*\b(ai[- ]?(counselor|coach|coaching)|student[- ]?success intervention)\b/.test(lower)) {
+    return {
+      name: 'risk.assignCounselor',
+      input: { ...asAIRecord(context.toolInput), ...(id ? { userId: id } : {}) },
+    };
+  }
   if (/\b(list|show|find|search)\b.*\benrollments?\b/.test(lower)) {
     return { name: 'enrollments.search', input: asAIRecord(context.toolInput) };
   }

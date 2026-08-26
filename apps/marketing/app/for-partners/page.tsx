@@ -38,7 +38,7 @@ export default function ForPartnersPage() {
           <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-5">Build the Workforce Together</h1>
           <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto mb-8">Elevate connects training providers, employers, workforce agencies, and government entities into a single compliance-ready system.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/partners" className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3.5 rounded-lg transition-colors text-sm">Become a Partner</Link>
+            <Link href="/apply/program-holder" className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-black px-8 py-3.5 rounded-lg transition-colors text-sm">Become a Program Holder</Link>
             <Link href="/partner-operating-model" className="border-2 border-white/40 text-white font-bold px-8 py-3.5 rounded-lg hover:bg-white/10 transition-colors text-sm">View Operating Model</Link>
           </div>
         </div>

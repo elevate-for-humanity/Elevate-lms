@@ -60,12 +60,15 @@ def ensure_repo() -> None:
             current = ""
     if current != WAN_GIT_REF:
         run(["git", "fetch", "--depth", "1", "origin", WAN_GIT_REF], cwd=WAN_REPO)
-        run(["git", "checkout", "--force", "--detach", "FETCH_HEAD"], cwd=WAN_REPO)
-        current = run(["git", "rev-parse", "HEAD"], cwd=WAN_REPO, capture=True)
+
+    # A --no-checkout clone can already report the pinned HEAD while leaving
+    # the persistent worktree empty. Always materialize the pinned tree.
+    run(["git", "reset", "--hard", WAN_GIT_REF], cwd=WAN_REPO)
+    current = run(["git", "rev-parse", "HEAD"], cwd=WAN_REPO, capture=True)
     if current != WAN_GIT_REF:
         raise RuntimeError(f"Wan revision mismatch: expected {WAN_GIT_REF}, got {current}")
-    if not (WAN_REPO / "generate.py").exists():
-        raise RuntimeError("Pinned Wan checkout is missing generate.py")
+    if not (WAN_REPO / "generate.py").is_file():
+        raise RuntimeError("Pinned Wan checkout is missing generate.py after worktree reset")
 
 
 def ensure_venv() -> None:

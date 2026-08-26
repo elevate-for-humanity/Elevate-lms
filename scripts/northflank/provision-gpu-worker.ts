@@ -422,7 +422,9 @@ async function waitForReady(publicUrl: string, secret: string): Promise<R> {
       if (response.ok && body.ready === true) return body;
       if (body.bootstrap?.state === 'failed') throw new Error(`Model bootstrap failed: ${body.bootstrap?.detail || 'unknown error'}`);
     } catch (error) {
-      log('Readiness waiting', error instanceof Error ? error.message : String(error));
+      const message = error instanceof Error ? error.message : String(error);
+      if (message.startsWith('Model bootstrap failed:')) throw error;
+      log('Readiness waiting', message);
     }
     await sleep(20_000);
   }

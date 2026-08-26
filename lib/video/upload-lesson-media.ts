@@ -14,6 +14,7 @@ import path from 'path';
 import { uploadToR2, isR2Configured } from '@/lib/cloudflare-r2';
 import { isStorageConfigured } from '@/lib/storage/file-storage';
 import { logger } from '@/lib/logger';
+import { videoEncoderArgs } from './ffmpeg-runtime';
 
 const SUPABASE_BUCKET = 'course-videos';
 const R2_KEY_PREFIX = 'course-videos';
@@ -168,9 +169,7 @@ export async function uploadLessonFileFromDisk(
         '-y',
         '-i', filePath,
         '-vf', 'scale=min(1280\\,iw):-2',
-        '-c:v', 'libx264',
-        '-preset', 'veryfast',
-        '-crf', '27',
+        ...videoEncoderArgs(27),
         '-maxrate', '3M',
         '-bufsize', '6M',
         '-c:a', 'aac',

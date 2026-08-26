@@ -102,23 +102,26 @@ jobs:
       - name: Verify health probe configuration
         run: pnpm tsx scripts/northflank/verify-health-checks.ts --all
 
+      # Northflank's shared BuildKit storage cannot reliably export three large
+      # monorepo images concurrently. Build sequentially, but do not deploy any
+      # service until every exact-SHA build has completed and been verified.
       - name: Trigger Marketing build
         id: marketing
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_MARKETING_SERVICE_ID"
+
+      - name: Wait for Marketing
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --build-id "${{ steps.marketing.outputs.build_id }}" --timeout-ms 3600000
 
       - name: Trigger LMS build
         id: lms
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_LMS_SERVICE_ID"
 
+      - name: Wait for LMS
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --build-id "${{ steps.lms.outputs.build_id }}" --timeout-ms 3600000
+
       - name: Trigger Admin build
         id: admin
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
-
-      - name: Wait for Marketing
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --build-id "${{ steps.marketing.outputs.build_id }}" --timeout-ms 3600000
-
-      - name: Wait for LMS
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --build-id "${{ steps.lms.outputs.build_id }}" --timeout-ms 3600000
 
       - name: Wait for Admin
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin.outputs.build_id }}" --timeout-ms 3600000

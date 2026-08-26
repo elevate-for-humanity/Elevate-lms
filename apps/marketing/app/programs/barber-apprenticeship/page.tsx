@@ -6,6 +6,7 @@ import HeroPicture from '@/components/marketing/HeroPicture';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
+import BarberPaymentPlanner from '@/components/programs/beauty/BarberPaymentPlanner';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
@@ -25,21 +26,21 @@ const FLOW = [
 
 const VISUAL_STORY = [
   {
-    image: '/images/pages/comp-pathway-classroom.webp',
-    alt: 'Barber apprentice completing related technical instruction in a classroom setting',
+    image: '/images/pages/barber-hands-on-bright.webp',
+    alt: 'Licensed barber teaching an apprentice in a bright working barbershop',
     label: 'Related Technical Instruction',
     title: 'Learn the why behind the work.',
     body: 'Theory, sanitation, client safety, professional practice, and technical knowledge support what happens in the shop.',
   },
   {
-    image: '/images/pages/barber-apprenticeship-hero.jpg',
+    image: '/images/pages/barber-hands-on-bright.webp',
     alt: 'Barber apprentice practicing supervised haircutting and grooming skills',
     label: 'Hands-on Barbering',
     title: 'Build skill through supervised practice.',
     body: 'Apprentices develop barbering skills through real practice, documented competencies, and structured supervision.',
   },
   {
-    image: '/images/pages/shop-hero.webp',
+    image: '/images/partners/kountry-kutz-official.webp',
     alt: 'Licensed host barbershop supporting apprenticeship training',
     label: 'Host Shop Experience',
     title: 'Train in the environment where the job happens.',
@@ -86,7 +87,7 @@ export default async function BarberApprenticeshipPage() {
               <Link href={program.cta.applyHref} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 text-sm font-black text-white hover:bg-brand-red-700">
                 Apply for Barber Apprenticeship <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-slate-300 bg-white px-7 py-3.5 text-sm font-black text-slate-950 hover:border-slate-500 hover:bg-slate-50">
+              <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-brand-blue-700 bg-white px-7 py-3.5 text-sm font-black text-brand-blue-900 hover:bg-sky-50">
                 Become a Host Shop <Building2 className="h-4 w-4" />
               </Link>
             </div>
@@ -164,18 +165,34 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-slate-950 px-4 py-14 text-white">
+      <section className="border-y border-orange-200 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-4 py-14 sm:py-18" aria-labelledby="barber-payment-heading">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">Plan your payment</p>
+            <h2 id="barber-payment-heading" className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">See the price, calculate a plan, and choose how to pay.</h2>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700 sm:text-lg">Review the self-pay tuition, adjust the available payment-plan estimate, or continue to the BNPL options supported through the secure Stripe checkout flow. Approval and installment terms are determined by the selected provider.</p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link href="/programs/barber-apprenticeship/payment-setup" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white hover:bg-brand-red-700">Open Payment Calculator</Link>
+              <Link href="/programs/barber-apprenticeship/payment/bnpl" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-700 bg-white px-7 py-3.5 font-black text-brand-blue-900 hover:bg-sky-50">View BNPL Options</Link>
+              <Link href={program.cta.applyHref} className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-400 bg-white px-7 py-3.5 font-black text-slate-950 hover:bg-slate-50">Apply Before Checkout</Link>
+            </div>
+          </div>
+          <BarberPaymentPlanner />
+        </div>
+      </section>
+
+      <section className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-14 text-slate-950">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300 sm:text-sm">Skills you build</p>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">Skills you build</p>
             <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Training that connects theory to the shop floor.</h2>
           </div>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {program.curriculum.map((module, index) => (
-              <article key={module.title} className="rounded-2xl border border-white/15 bg-white/5 p-5">
-                <p className="text-xs font-black uppercase tracking-widest text-red-300">Module {index + 1}</p>
-                <h3 className="mt-2 text-xl font-black text-white">{module.title}</h3>
-                <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-200">
+              <article key={module.title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <p className="text-xs font-black uppercase tracking-widest text-brand-red-700">Module {index + 1}</p>
+                <h3 className="mt-2 text-xl font-black text-slate-950">{module.title}</h3>
+                <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-700">
                   {module.topics.slice(0, 4).map((topic) => <li key={topic}>• {topic}</li>)}
                 </ul>
               </article>
@@ -199,13 +216,13 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      <section className="bg-slate-950 px-4 py-14 text-white">
+      <section className="border-t border-sky-200 bg-gradient-to-r from-brand-blue-50 via-white to-orange-50 px-4 py-14 text-slate-950">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-black sm:text-4xl">Ready to start the barber apprenticeship?</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">Apply as an apprentice or start the host-shop process. Funding and placement are verified separately before enrollment is finalized.</p>
+          <p className="mx-auto mt-4 max-w-2xl text-base font-semibold leading-7 text-slate-700 sm:text-lg">Apply as an apprentice or start the host-shop process. Funding and placement are verified separately before enrollment is finalized.</p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link href={program.cta.applyHref} className="rounded-xl bg-brand-red-600 px-8 py-4 font-black text-white hover:bg-brand-red-700">Apply Now</Link>
-            <Link href="/partners/host-shops" className="rounded-xl bg-white px-8 py-4 font-black text-slate-950 hover:bg-slate-100">Host a Barber Apprentice</Link>
+            <Link href="/partners/host-shops" className="rounded-xl border-2 border-brand-blue-700 bg-white px-8 py-4 font-black text-brand-blue-900 hover:bg-sky-50">Host a Barber Apprentice</Link>
           </div>
         </div>
       </section>

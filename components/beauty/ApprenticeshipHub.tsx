@@ -374,7 +374,7 @@ export default function ApprenticeshipHub() {
                   alt="Barber apprenticeship training"
                   width={600}
                   height={400}
-                  className="w-full h-auto"
+                  className="w-full h-auto" sizes="(max-width: 768px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
                   <div className="text-white">

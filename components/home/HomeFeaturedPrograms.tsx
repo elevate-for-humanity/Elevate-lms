@@ -2,7 +2,7 @@
 
 /**
  * HomeFeaturedPrograms - Premium hero section highlighting HVAC, CDL, and Apprenticeships
- * 
+ *
  * Features:
  * - Animated card carousel/grid
  * - Premium visual design with REAL images
@@ -124,7 +124,7 @@ export default function HomeFeaturedPrograms() {
             Start Your Career in Weeks
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Industry-recognized credentials, hands-on training, and job placement support. 
+            Industry-recognized credentials, hands-on training, and job placement support.
             Many programs are funded through WIOA and Workforce Ready Grant.
           </p>
         </motion.div>
@@ -181,14 +181,14 @@ function FeaturedProgramCard({ program, index }: { program: FeaturedProgram; ind
     >
       {/* Header with gradient accent */}
       <div className={`h-3 ${program.bgColor.replace('50', '500')}`} />
-      
+
       {/* Image */}
       <div className="relative h-40 overflow-hidden">
-        <Image 
-          src={program.image} 
-          alt={program.title} 
-          fill 
-          className="object-cover" 
+        <Image
+          src={program.image}
+          alt={program.title}
+          fill
+          className="object-cover" sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         <div className="absolute bottom-4 left-4 right-4">

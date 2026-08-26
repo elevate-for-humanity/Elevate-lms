@@ -51,7 +51,7 @@ export default function CareerServicesPage() {
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <Image src="/images/pages/career-services-page-1.webp" alt="Career Services - Elevate for Humanity" fill className="object-cover" />
+          <Image src="/images/pages/career-services-page-1.webp" alt="Career Services - Elevate for Humanity" fill className="object-cover" sizes="100vw" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
@@ -83,7 +83,7 @@ export default function CareerServicesPage() {
             {SERVICES.map((service) => (
               <div key={service.title} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
                 <div className="relative h-48 bg-slate-200">
-                  <Image src={service.image} alt={service.title} fill className="object-cover" />
+                  <Image src={service.image} alt={service.title} fill className="object-cover" sizes="100vw" />
                 </div>
                 <div className="p-8">
                   <div className="flex items-center gap-4 mb-4">
@@ -152,7 +152,7 @@ export default function CareerServicesPage() {
               </Link>
             </div>
             <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/pages/team-collaboration.webp" alt="Employer partnership" fill className="object-cover" />
+              <Image src="/images/pages/team-collaboration.webp" alt="Employer partnership" fill className="object-cover" sizes="100vw" />
             </div>
           </div>
         </div>

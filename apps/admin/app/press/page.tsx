@@ -64,7 +64,7 @@ export default async function PressPage() {
                         src={post.featured_image}
                         alt={post.title}
                         fill
-                        className="object-cover"
+                        className="object-cover" sizes="100vw"
                       />
                     </div>
                   )}

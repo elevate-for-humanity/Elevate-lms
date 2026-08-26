@@ -112,7 +112,7 @@ export default async function PartnersPage() {
           alt={`Partner with ${PLATFORM_DEFAULTS.orgName}`}
           fill
           className="object-cover"
-          priority
+          priority sizes="100vw"
         />
         
         <div className="relative z-10 mx-auto max-w-6xl px-6 py-16 text-white">

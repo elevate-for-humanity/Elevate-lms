@@ -74,7 +74,7 @@ export default async function TeamPage() {
                   alt={member.name}
                   width={80}
                   height={80}
-                  className="rounded-full object-cover shrink-0 self-start"
+                  className="rounded-full object-cover shrink-0 self-start" sizes="(max-width: 768px) 100vw, 50vw"
                 />
               )}
               <div>

@@ -140,7 +140,7 @@ export default function PartnerDirectoryPage() {
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <Image src="/images/pages/partners-hero.webp" alt="Partner Directory - Elevate for Humanity" fill className="object-cover" />
+          <Image src="/images/pages/partners-hero.webp" alt="Partner Directory - Elevate for Humanity" fill className="object-cover" sizes="100vw" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">

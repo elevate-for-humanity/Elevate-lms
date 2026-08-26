@@ -5,17 +5,6 @@ import { Clock, CheckCircle2, AlertCircle, TrendingUp, User } from 'lucide-react
 
 export const dynamic = 'force-dynamic';
 
-// DOL OJT requirements by program
-const OJT_REQUIREMENTS: Record<string, number> = {
-  'barber-apprenticeship':          2000,
-  'cosmetology-apprenticeship':     1500,
-  'esthetician-apprenticeship':     1000,
-  'nail-technician-apprenticeship':  600,
-  'culinary-apprenticeship':        2000,
-  'emt-apprenticeship':             1000,
-};
-const DEFAULT_OJT_HOURS = 2000;
-
 function pct(completed: number, required: number) {
   return Math.min(100, Math.round((completed / required) * 100));
 }
@@ -56,18 +45,26 @@ export default async function StudentHoursPage() {
     ...rows.map((r: any) => r.submitted_by),
   ].filter(Boolean))];
 
-  const { data: profiles } = allIds.length
-    ? await db.from('profiles').select('id, full_name, email').in('id', allIds)
-    : { data: [] };
+  const [{ data: profiles }, { data: apprenticeRequirements }] = allIds.length
+    ? await Promise.all([
+        db.from('profiles').select('id, full_name, email').in('id', allIds),
+        db.from('apprentices').select('user_id, total_hours_required').in('user_id', allIds),
+      ])
+    : [{ data: [] }, { data: [] }];
   const nameMap: Record<string, string> = {};
   (profiles ?? []).forEach((p: any) => { nameMap[p.id] = p.full_name?.trim() || p.email || p.id.slice(0, 8); });
+  const apprenticeRequirementMap: Record<string, number> = {};
+  (apprenticeRequirements ?? []).forEach((row: any) => {
+    const hours = Number(row.total_hours_required);
+    if (row.user_id && Number.isFinite(hours) && hours > 0) apprenticeRequirementMap[row.user_id] = hours;
+  });
 
   // Resolve program slugs from program_id (stored as UUID in this table)
   const programIds = [...new Set(rows.map((r: any) => r.program_id).filter(Boolean))];
   const { data: programs } = programIds.length
-    ? await db.from('programs').select('id, slug, title').in('id', programIds.map((id: string) => id.toLowerCase()))
+    ? await db.from('programs').select('id, slug, title, total_hours, training_hours, estimated_hours').in('id', programIds.map((id: string) => id.toLowerCase()))
     : { data: [] };
-  const programMap: Record<string, { slug: string; title: string }> = {};
+  const programMap: Record<string, { slug: string; title: string; total_hours?: number; training_hours?: number; estimated_hours?: number }> = {};
   (programs ?? []).forEach((p: any) => { programMap[p.id.toLowerCase()] = p; });
 
   // Aggregate by student
@@ -95,7 +92,9 @@ export default async function StudentHoursPage() {
         name: nameMap[sid] || sid.slice(0, 8),
         program_slug: prog.slug,
         program_title: prog.title,
-        required_hours: OJT_REQUIREMENTS[prog.slug] ?? DEFAULT_OJT_HOURS,
+        required_hours:
+          apprenticeRequirementMap[sid] ??
+          Number(prog.total_hours || prog.training_hours || prog.estimated_hours || 0),
         total_hours: 0,
         approved_hours: 0,
         pending_hours: 0,
@@ -150,9 +149,9 @@ export default async function StudentHoursPage() {
           <p className="text-xs text-slate-400 mt-0.5">entries</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">DOL Requirement</p>
-          <p className="text-3xl font-bold text-slate-900 mt-1">2,000</p>
-          <p className="text-xs text-slate-400 mt-0.5">hrs (barber)</p>
+          <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">Program Requirements</p>
+          <p className="text-3xl font-bold text-slate-900 mt-1">Dynamic</p>
+          <p className="text-xs text-slate-400 mt-0.5">per apprentice/program</p>
         </div>
       </div>
 
@@ -166,7 +165,7 @@ export default async function StudentHoursPage() {
       ) : (
         <div className="space-y-6">
           {students.map((student) => {
-            const p = pct(student.approved_hours, student.required_hours);
+            const p = student.required_hours > 0 ? pct(student.approved_hours, student.required_hours) : 0;
             const remaining = Math.max(0, student.required_hours - student.approved_hours);
             const weeksLeft = remaining > 0 ? Math.ceil(remaining / 40) : 0;
 

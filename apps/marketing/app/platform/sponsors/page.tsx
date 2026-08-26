@@ -76,7 +76,7 @@ export default async function SponsorLicensingPage() {
             <div className="bg-white rounded-3xl shadow-lg border-2 border-slate-200 p-8 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-                  <Image src="/images/pages/platform-page-10.webp" alt="Starter" width={24} height={24} className="w-6 h-6 text-brand-blue-600" />
+                  <Image src="/images/pages/platform-page-10.webp" alt="Starter" width={24} height={24} className="w-6 h-6 text-brand-blue-600" sizes="(max-width: 768px) 100vw, 50vw" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black">Starter</h3>
@@ -158,7 +158,7 @@ export default async function SponsorLicensingPage() {
 
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                  <Image src="/images/pages/platform-page-1.webp" alt="Growth" width={24} height={24} className="w-6 h-6 text-white" />
+                  <Image src="/images/pages/platform-page-1.webp" alt="Growth" width={24} height={24} className="w-6 h-6 text-white" sizes="(max-width: 768px) 100vw, 50vw" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-slate-900">

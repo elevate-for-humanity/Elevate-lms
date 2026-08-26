@@ -24,4 +24,10 @@ describe('OpenHands engineering delegation', () => {
     const planned = planAIToolFromCommand('Run all platform tests');
     expect(planned?.name).toBe('workflows.runTests');
   });
+
+  it('routes an AI counselor assignment to the governed student-success tool', () => {
+    const userId = '9f5f71a6-1f75-4c40-8de4-4e091ade32fb';
+    const planned = planAIToolFromCommand(`Assign AI counselor to learner ${userId}`);
+    expect(planned).toEqual({ name: 'risk.assignCounselor', input: { userId } });
+  });
 });

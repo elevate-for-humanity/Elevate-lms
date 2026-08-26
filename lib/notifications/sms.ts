@@ -13,6 +13,35 @@ export interface SMSResult {
   error?: string;
 }
 
+async function auditSMSDelivery(
+  recipient: string,
+  messageLength: number,
+  result: SMSResult,
+): Promise<void> {
+  try {
+    const { getAdminClient } = await import('@/lib/supabase/admin');
+    const db = await getAdminClient();
+    if (!db) return;
+    const { error } = await db.from('delivery_logs').insert({
+      channel: 'sms',
+      recipient,
+      status: result.success ? 'sent' : 'failed',
+      provider_message_id: result.messageId ?? null,
+      error_message: result.error ?? null,
+      sent_at: result.success ? new Date().toISOString() : null,
+      metadata: {
+        provider: 'twilio',
+        message_length: messageLength,
+      },
+    });
+    if (error) logger.warn('[SMS] delivery audit insert failed', { error: error.message });
+  } catch (error) {
+    logger.warn('[SMS] delivery audit unavailable', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
 export class SMSService {
   private static instance: SMSService;
   private accountSid: string | undefined;
@@ -41,7 +70,9 @@ export class SMSService {
   async send(notification: SMSNotification): Promise<SMSResult> {
     const cleanPhone = notification.to.replace(/\D/g, '');
     if (cleanPhone.length < 10) {
-      return { success: false, error: 'Invalid phone number' };
+      const result = { success: false, error: 'Invalid phone number' };
+      await auditSMSDelivery(notification.to, notification.message.length, result);
+      return result;
     }
 
     const formattedPhone = cleanPhone.startsWith('1') ? `+${cleanPhone}` : `+1${cleanPhone}`;
@@ -51,7 +82,9 @@ export class SMSService {
         to: formattedPhone,
         messageLength: notification.message.length,
       });
-      return { success: false, error: 'SMS service unavailable — Twilio not configured' };
+      const result = { success: false, error: 'SMS service unavailable — Twilio not configured' };
+      await auditSMSDelivery(formattedPhone, notification.message.length, result);
+      return result;
     }
 
     try {
@@ -78,14 +111,20 @@ export class SMSService {
           to: formattedPhone,
           status: response.status,
         });
-        return { success: false, error: data.message || 'SMS send failed' };
+        const result = { success: false, error: data.message || 'SMS send failed' };
+        await auditSMSDelivery(formattedPhone, notification.message.length, result);
+        return result;
       }
 
       logger.info('SMS sent successfully', { to: formattedPhone, messageId: data.sid });
-      return { success: true, messageId: data.sid };
+      const result = { success: true, messageId: data.sid };
+      await auditSMSDelivery(formattedPhone, notification.message.length, result);
+      return result;
     } catch (error) {
       logger.error('SMS send exception', error as Error, { to: formattedPhone });
-      return { success: false, error: (error as Error).message };
+      const result = { success: false, error: (error as Error).message };
+      await auditSMSDelivery(formattedPhone, notification.message.length, result);
+      return result;
     }
   }
 

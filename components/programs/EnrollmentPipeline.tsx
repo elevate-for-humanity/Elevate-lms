@@ -38,7 +38,12 @@ export default function EnrollmentPipeline({
       </p>
 
       {/* Pipeline steps */}
-      <div className="flex items-start overflow-x-auto pb-2 gap-0">
+      <div
+        className="flex items-start overflow-x-auto pb-2 gap-0 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
+        role="region"
+        aria-label="Enrollment steps"
+        tabIndex={0}
+      >
         {STEPS.map((step, i) => (
           <div key={step.label} className="flex items-center flex-shrink-0">
             <div className="flex flex-col items-center">

@@ -111,6 +111,11 @@ jobs:
           exit 1
       - name: Run canonical application-flow tests
         run: pnpm exec playwright test tests/e2e/canonical-application-flow.spec.ts --config playwright.config.ts
+        env:
+          # Match the production-mode server started above. Without this,
+          # Playwright targets localhost and may start a second dev server,
+          # so the compliance test does not exercise the built application.
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
       - name: Upload test results
         if: failure()
         uses: actions/upload-artifact@v4

@@ -3,6 +3,7 @@ import 'server-only';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { emitPlatformEvent } from '@/lib/platform/orchestration/events';
 import { logger } from '@/lib/logger';
+import { getPlatformHealth } from '@/lib/platform/platform-health';
 import { getAITool, type AIAgentId, type AIToolDefinition } from './registry';
 
 export type AIToolExecutionContext = {
@@ -226,6 +227,44 @@ export async function executeRegisteredAITool(
         approvalRequired: true,
         requiredConfirmation: required,
         error: 'Human approval is required before this tool can execute.',
+      };
+    }
+  }
+
+  // Health checks execute inside the Admin container. Calling the public Admin
+  // origin from that same container makes a needless ingress/DNS round trip and
+  // has failed in production as a generic `fetch failed`. Use the canonical
+  // health service directly; the API route delegates to this same function.
+  if (tool.name === 'system.health') {
+    const startedAt = new Date().toISOString();
+    const eventId = await emitAuditEvent(tool, context, input, 'started');
+    try {
+      const payload = await getPlatformHealth();
+      await writeToolRun(tool, context, input, {
+        status: 'completed', output: payload, startedAt,
+        completedAt: new Date().toISOString(),
+      });
+      await emitAuditEvent(tool, context, input, 'completed', {
+        execution: 'in_process', source_event_id: eventId,
+      });
+      return {
+        ok: true, status: 'completed', httpStatus: 200, tool: tool.name,
+        risk: tool.risk, classification: tool.classification,
+        approvalRequired: false, payload, traceId: eventId,
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      await writeToolRun(tool, context, input, {
+        status: 'failed', error: message, startedAt,
+        completedAt: new Date().toISOString(),
+      });
+      await emitAuditEvent(tool, context, input, 'failed', {
+        execution: 'in_process', error: message, source_event_id: eventId,
+      });
+      return {
+        ok: false, status: 'failed', httpStatus: 500, tool: tool.name,
+        risk: tool.risk, classification: tool.classification,
+        approvalRequired: false, error: message, traceId: eventId,
       };
     }
   }

@@ -45,6 +45,10 @@ function applicationFields(formData: FormData) {
 export async function createWOTCApplication(formData: FormData): Promise<void> {
   const { db, user } = await requireWotcAdmin();
   const { fields, ssnLast4 } = applicationFields(formData);
+  const startDate = new Date(`${fields.start_date}T00:00:00Z`);
+  if (!fields.start_date || Number.isNaN(startDate.getTime()) || startDate.getUTCFullYear() > 2025) {
+    throw new Error('Form 8850 is obsolete and WOTC applications are limited to eligible hires who started on or before December 31, 2025.');
+  }
   const draft = Boolean(formData.get('saveAsDraft'));
   const { data, error } = await db.from('wotc_applications').insert({
     ...fields,

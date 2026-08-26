@@ -2,7 +2,7 @@ import { requireAdmin } from '@/lib/auth';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { DollarSign, Clock, Search, FileText, TrendingUp, Plus, Circle } from 'lucide-react';
+import { DollarSign, Clock, Search, FileText, TrendingUp, Circle, AlertTriangle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
@@ -68,6 +68,22 @@ export default async function WOTCAdminPage() {
         <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Wotc' }]} />
       </div>
       <div className="max-w-7xl mx-auto">
+        <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-5 text-amber-950">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <h2 className="font-bold">Form 8850 is no longer in use</h2>
+              <p className="mt-1 text-sm">
+                The IRS marked Form 8850 obsolete on March 19, 2026 after the Work Opportunity Tax
+                Credit expired for employees hired after December 31, 2025. Existing records remain
+                available for historical administration, but this system will not generate an obsolete
+                federal form or accept new 2026 applications.
+              </p>
+              <a href="https://www.irs.gov/forms-pubs/about-form-8850" target="_blank" rel="noreferrer"
+                className="mt-2 inline-block text-sm font-bold underline">View current IRS status</a>
+            </div>
+          </div>
+        </div>
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">WOTC Management</h1>
@@ -75,13 +91,6 @@ export default async function WOTCAdminPage() {
               Work Opportunity Tax Credit applications and certifications
             </p>
           </div>
-          <Link
-            href="/wotc/new"
-            className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            New Application
-          </Link>
         </div>
 
         <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -129,13 +138,6 @@ export default async function WOTCAdminPage() {
               <p className="text-slate-700 mb-6">
                 Get started by creating your first WOTC application.
               </p>
-              <Link
-                href="/wotc/new"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
-              >
-                <Plus className="w-4 h-4" />
-                Create Application
-              </Link>
             </div>
           ) : (
             <table className="w-full">

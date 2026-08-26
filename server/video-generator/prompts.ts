@@ -1,9 +1,16 @@
-export const SCENE_GENERATION_SYSTEM_PROMPT = `You are writing scene plans for a DOL-registered barber apprenticeship training video.
+export const SCENE_GENERATION_SYSTEM_PROMPT = `You are writing scene plans for a standards-governed career and technical education video.
 
 HARD RULES — violating any of these will cause the output to be rejected:
 - Return valid JSON only. No markdown fences. No commentary.
 - Create exactly the number of scenes specified in the user prompt.
-- Every scene must directly support the lesson's stated instructional objective. No trivia. No history unless the lesson is explicitly about history. No symbolic filler (barber poles, shop culture, etc.) unless the lesson objective requires it.
+- Every scene must directly support the lesson's stated instructional objective. No trivia.
+- Treat the supplied SOURCE AUTHORITY block as binding. Never invent state rules, exam facts, DOL competencies, hour requirements, passing scores, or approval claims.
+- Keep authorities separate: DOL Appendix A governs registered apprenticeship competencies/RTI; the state board governs practice and licensure; the exam outline governs test preparation; Credential Engine describes public metadata.
+- For a practical lesson, the scene plan must include preparation/PPE, safety and sanitation, a complete procedure demonstration, close-up critical steps, correct-versus-incorrect technique, learner practice, evidence capture, and verifier checklist.
+- Practical scenes must state whether practice may be performed on a student, patron/customer, or mannequin. Do not imply authorization beyond the supplied state requirement.
+- A video is instruction, not proof of competency. Never state that watching the video completes RTI, a DOL competency, state practical performance, or licensure.
+- Every output scene must include dolCompetencyId, stateRequirement, examDomain, demonstrationStep, and evidenceExpectation. Use null only when the source block explicitly says not applicable.
+- No trivia. No history unless the lesson is explicitly about history. No symbolic filler (barber poles, shop culture, etc.) unless the lesson objective requires it.
 - Each scene must have a distinct instructionalObjective — what the learner will know or be able to do after this scene.
 - caption: 4–9 words. On-screen text. Concrete, not motivational. Bad: "Excellence in Every Cut". Good: "Disinfect tools between every client".
 - subcaption: 4–12 words. One supporting line. Optional but recommended.
@@ -95,6 +102,17 @@ export function buildSceneGenerationUserPrompt(opts: {
   seed: string;
   lessonType?: 'intro' | 'skill' | 'theory' | 'review';
   sceneCount?: number;
+  occupationTitle?: string;
+  dolCompetencyId?: string | null;
+  dolCompetencyDescription?: string | null;
+  rtiRequirement?: string | null;
+  rtiHours?: number | null;
+  stateAuthority?: string | null;
+  stateStandardVersion?: string | null;
+  stateRequirement?: string | null;
+  examDomain?: string | null;
+  passingScore?: number | null;
+  requiresPracticalEvidence?: boolean;
 }): string {
   const isIntro =
     opts.lessonType === 'intro' ||
@@ -107,6 +125,17 @@ export function buildSceneGenerationUserPrompt(opts: {
     : `\nGenerate ${sceneCount} scenes that follow a clear instructional arc: establish context → teach core concept → show application → recap. Every scene must map directly to the lesson objective.`;
 
   return `Generate a scene plan for this barber apprenticeship lesson.
+
+SOURCE AUTHORITY:
+OCCUPATION: ${opts.occupationTitle ?? 'Not supplied'}
+DOL APPENDIX A COMPETENCY: ${opts.dolCompetencyId ?? 'Not applicable'} — ${opts.dolCompetencyDescription ?? 'Not supplied'}
+RELATED TECHNICAL INSTRUCTION: ${opts.rtiRequirement ?? 'Not supplied'}${opts.rtiHours ? ` (${opts.rtiHours} governed hours)` : ''}
+STATE AUTHORITY: ${opts.stateAuthority ?? 'Not supplied'}
+STATE STANDARD VERSION: ${opts.stateStandardVersion ?? 'Not supplied'}
+STATE REQUIREMENT: ${opts.stateRequirement ?? 'Not supplied'}
+EXAM DOMAIN: ${opts.examDomain ?? 'Not supplied'}
+PASSING SCORE: ${opts.passingScore ?? 'Do not state a score'}
+PRACTICAL EVIDENCE REQUIRED: ${opts.requiresPracticalEvidence ? 'Yes — show learner practice, evidence capture, and licensed verifier review' : 'No state practical evidence requirement supplied'}
 
 LESSON ID: ${opts.lessonId}
 TITLE: ${opts.title}
@@ -127,6 +156,11 @@ Return JSON matching this exact shape — one object per scene, no extras:
       "id": "scene-1",
       "order": 1,
       "instructionalObjective": "Learner can describe what a barber does and why licensure matters",
+      "dolCompetencyId": "${opts.dolCompetencyId ?? 'not-applicable'}",
+      "stateRequirement": "${opts.stateRequirement ?? 'not-supplied'}",
+      "examDomain": "${opts.examDomain ?? 'not-supplied'}",
+      "demonstrationStep": "Exact physical action demonstrated in this scene, or not-applicable for theory",
+      "evidenceExpectation": "What the learner submits or what the licensed verifier observes",
       "narration": "Barbering is a licensed trade. Every day, barbers perform haircuts, fades, shaves, and beard trims for paying clients. In Indiana, doing that work legally requires a state-issued license — and this apprenticeship is how you earn it.",
       "caption": "What barbers do every day",
       "subcaption": "Licensed trade. Real clients. Real skills.",

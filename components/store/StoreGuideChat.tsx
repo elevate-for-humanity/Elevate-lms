@@ -70,7 +70,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
   if (!open) {
     return (
       <button type="button" onClick={() => setOpen(true)} className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-brand-orange-600 px-4 py-3 font-semibold text-white shadow-lg">
-        <Image src="/images/pages/store-guide-1.webp" alt="Store guide" width={24} height={24} className="rounded-full" /> Need help?
+        <Image src="/images/pages/store-guide-1.webp" alt="Store guide" width={24} height={24} className="rounded-full" sizes="(max-width: 768px) 100vw, 50vw" /> Need help?
       </button>
     );
   }
@@ -80,7 +80,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
       <button type="button" aria-label="Close store guide" className="fixed inset-0 z-50 bg-black/50" onClick={() => { stop(); setOpen(false); }} />
       <section className="fixed left-1/2 top-1/2 z-[51] w-[92%] max-w-md -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-white shadow-2xl">
         <header className="flex items-center gap-3 border-b border-slate-300 p-4">
-          <Image src="/images/pages/store-guide-1.webp" alt="Store guide" width={52} height={52} className="rounded-full" />
+          <Image src="/images/pages/store-guide-1.webp" alt="Store guide" width={52} height={52} className="rounded-full" sizes="(max-width: 768px) 100vw, 50vw" />
           <div className="flex-1"><h2 className="font-bold text-slate-950">Store Guide</h2><p className="text-sm font-medium text-slate-700">{speaking ? 'Speaking naturally…' : storeGuideFlow.welcomeMessage}</p></div>
           <button type="button" onClick={toggle} aria-label={muted ? 'Unmute natural voice' : 'Mute natural voice'}>{muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</button>
           <button type="button" onClick={() => { stop(); setOpen(false); }} aria-label="Close"><X className="h-5 w-5" /></button>

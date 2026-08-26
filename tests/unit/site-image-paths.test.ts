@@ -30,7 +30,7 @@ describe('resolveSiteImagePath', () => {
   });
 
   it('returns fallback for null/empty src', () => {
-    expect(resolveSiteImagePath(null)).toBe('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/prog-hero-main-2.webp');
-    expect(resolveSiteImagePath('')).toBe('https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/prog-hero-main-2.webp');
+    expect(resolveSiteImagePath(null)).toBe('/images/heroes/hero-homepage.webp');
+    expect(resolveSiteImagePath('')).toBe('/images/heroes/hero-homepage.webp');
   });
 });

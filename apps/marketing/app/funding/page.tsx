@@ -108,7 +108,7 @@ export default function FundingPage() {
           Review the exact program, then complete the WorkOne or responsible-agency process before relying on workforce funding for tuition or other costs.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="rounded-lg bg-white px-6 py-3 font-bold text-slate-900 hover:bg-slate-100">
+          <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="rounded-lg bg-white px-6 py-3 font-bold !text-slate-950 hover:bg-slate-100">
             Indiana Career Connect
           </a>
           <Link href="/apply/student" className="rounded-lg bg-brand-red-600 px-6 py-3 font-bold text-white hover:bg-brand-red-700">

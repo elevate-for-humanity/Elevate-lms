@@ -9,6 +9,12 @@ export type RegistryCredentialType =
 export type RegistryDeliveryType = 'In Person' | 'Online Only' | 'Hybrid';
 
 export interface CredentialRegistryRecord {
+  /** Stable CTID returned/generated for this credential. Preserve it for updates and deletion. */
+  ctid: string;
+  /** CTID of Elevate's separately published Organization record. */
+  organizationCtid: string;
+  registryEnvironment: 'sandbox' | 'production';
+  lastPublishedAt: string;
   credentialName: string;
   credentialType: RegistryCredentialType | '';
   description: string;
@@ -43,6 +49,10 @@ export interface RegistryValidation {
 }
 
 export const EMPTY_CREDENTIAL_REGISTRY_RECORD: CredentialRegistryRecord = {
+  ctid: '',
+  organizationCtid: '',
+  registryEnvironment: 'production',
+  lastPublishedAt: '',
   credentialName: '',
   credentialType: '',
   description: '',
@@ -99,6 +109,19 @@ export function validateCredentialRegistryRecord(
   if (!record.occupations.length) missing.push('Related occupations');
 
   const warnings: string[] = [];
+  const ctidPattern = /^ce-[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (record.ctid && !ctidPattern.test(record.ctid)) {
+    warnings.push('Credential CTID must use the ce-UUID format.');
+  }
+  if (record.organizationCtid && !ctidPattern.test(record.organizationCtid)) {
+    warnings.push('Organization CTID must use the ce-UUID format.');
+  }
+  if (!record.organizationCtid) {
+    warnings.push('Add Elevate’s published Organization CTID before linking production records.');
+  }
+  if (!record.ctid) {
+    warnings.push('For a new credential, generate or capture its CTID and preserve it before future updates.');
+  }
   if (record.description.trim().length > 0 && record.description.trim().length < 100) {
     warnings.push('Credential description should be at least 100 characters for useful comparison.');
   }
@@ -123,6 +146,10 @@ export function validateCredentialRegistryRecord(
 }
 
 const CSV_COLUMNS: Array<[string, keyof CredentialRegistryRecord]> = [
+  ['CTID', 'ctid'],
+  ['Organization CTID', 'organizationCtid'],
+  ['Registry Environment', 'registryEnvironment'],
+  ['Last Published At', 'lastPublishedAt'],
   ['Credential Name', 'credentialName'],
   ['Credential Type', 'credentialType'],
   ['Credential Description', 'description'],
@@ -160,4 +187,12 @@ export function toCredentialRegistryCsv(records: CredentialRegistryRecord[]): st
     CSV_COLUMNS.map(([, key]) => csvCell(record[key])).join(','),
   );
   return [header, ...rows].join('\r\n');
+}
+
+
+export function credentialRegistryResourceUri(ctid: string): string | null {
+  if (!ctid) return null;
+  const normalized = ctid.trim();
+  if (!/^ce-[0-9a-f-]{36}$/i.test(normalized)) return null;
+  return `https://credentialengineregistry.org/resources/${normalized}`;
 }

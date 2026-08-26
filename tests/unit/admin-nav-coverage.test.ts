@@ -3,8 +3,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { DEFAULT_NAV } from '@/lib/admin/nav-config';
 
-// Check both: root level app/admin (LMS container) and apps/admin (admin container)
-const ADMIN_APP_DIR_ROOT = path.join(process.cwd(), 'app/admin');
 const ADMIN_APP_DIR_ADMIN = path.join(process.cwd(), 'apps/admin/app/admin');
 
 /** Static routes only — skip dynamic [param] segments (matches sync-admin-nav-config.mjs). */
@@ -31,8 +29,8 @@ function walkAdminRoutes(dir: string, segments: string[] = []): string[] {
 }
 
 describe('admin DEFAULT_NAV coverage', () => {
-  it('includes every static app/admin page route (LMS container)', () => {
-    const staticRoutes = walkAdminRoutes(ADMIN_APP_DIR_ROOT);
+  it('includes every static route owned by the canonical admin container', () => {
+    const staticRoutes = walkAdminRoutes(ADMIN_APP_DIR_ADMIN);
     const navHrefs = new Set<string>();
 
     for (const section of DEFAULT_NAV) {
@@ -47,7 +45,8 @@ describe('admin DEFAULT_NAV coverage', () => {
       console.log('Admin routes missing from DEFAULT_NAV:', missing);
     }
 
-    // LMS container should have studio, programs, and other admin routes
+    // The admin surface lives only in apps/admin after multi-app consolidation.
     expect(staticRoutes.length).toBeGreaterThan(10);
+    expect(missing).toEqual([]);
   });
 });

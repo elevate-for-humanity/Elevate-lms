@@ -65,7 +65,15 @@ jobs:
 
       - name: Regenerate both courses through canonical Course Factory
         id: regenerate
-        run: pnpm tsx scripts/course-factory/regenerate-barber-cosmetology.ts
+        shell: bash
+        run: |
+          set +e
+          set -o pipefail
+          pnpm tsx scripts/course-factory/regenerate-barber-cosmetology.ts 2>&1 | tee /tmp/course-regeneration.log
+          code=${PIPESTATUS[0]}
+          stage="$(grep 'COURSE_REGENERATION_FAILURE_STAGE' /tmp/course-regeneration.log | tail -n 1 | awk '{print $2}')"
+          echo "failure_stage=${stage:-none}" >> "$GITHUB_OUTPUT"
+          exit "$code"
 
       - name: Verify apprenticeship architecture
         id: audit
@@ -78,6 +86,7 @@ jobs:
           CREDENTIALS_OUTCOME: ${{ steps.credentials.outcome }}
           REGENERATION_OUTCOME: ${{ steps.regenerate.outcome }}
           AUDIT_OUTCOME: ${{ steps.audit.outcome }}
+          FAILURE_STAGE: ${{ steps.regenerate.outputs.failure_stage }}
         with:
           script: |
             const ok = process.env.REGENERATION_OUTCOME === 'success' && process.env.AUDIT_OUTCOME === 'success';
@@ -91,5 +100,6 @@ jobs:
                 `Credentials gate: ${process.env.CREDENTIALS_OUTCOME || 'not-run'}`,
                 `Course Factory: ${process.env.REGENERATION_OUTCOME || 'not-run'}`,
                 `Architecture audit: ${process.env.AUDIT_OUTCOME || 'not-run'}`,
+                `Failure stage: ${process.env.FAILURE_STAGE || 'none'}`,
               ].join('\n'),
             });

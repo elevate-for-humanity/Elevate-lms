@@ -335,17 +335,19 @@ async function main() {
     assessment_questions: structure.assessments,
     expected_main_videos: EXPECTED_MAIN_VIDEOS,
     expected_microclips: EXPECTED_MICROCLIPS,
-    build_mode: 'missing-only',
+    build_mode: 'ai-refresh',
   });
 
-  // Studio's controller is the application-facing authority. Existing ESB
-  // content is repaired missing-only; it is never replaced by acceptance.
+  // Studio's controller is the application-facing authority. The canonical
+  // persisted ESB baseline contains generic scaffolding, so acceptance must
+  // author the complete strict package through the AI path before media is
+  // queued. Refresh preserves the canonical course identity and learner state.
   const build = await courseBuilderController({
     courseId: COURSE_ID,
     programId: structure.course.program_id ?? undefined,
     blueprint,
-    mode: 'missing-only',
-    contentSource: 'curriculum_lessons',
+    mode: 'refresh',
+    contentSource: 'ai',
     videoMode: 'queue',
   });
   if (!build.ok || !build.courseId)

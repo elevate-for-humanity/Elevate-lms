@@ -41,6 +41,8 @@ async function allowed(email: string) {
   return true;
 }
 
+// Password link is generated after provisioning so the one-time token is fresh.
+
 async function sendWelcome(params: {
   email: string;
   orgName: string;

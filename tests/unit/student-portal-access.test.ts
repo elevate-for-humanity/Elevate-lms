@@ -97,54 +97,18 @@ describe('enrollment state contract', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Fix 3: access_granted_at auto-set on enrollment completion
-// ---------------------------------------------------------------------------
+describe('canonical enforced enrollment route', () => {
+  const src = read('apps/lms/app/api/enrollments/create-enforced/route.ts');
 
-describe('submit-documents route — auto-grants LMS access', () => {
-  const src = read('app/api/enrollment/submit-documents/route.ts');
-
-  it('sets access_granted_at in the enrollment update', () => {
-    expect(src).toContain('access_granted_at: now');
+  it('requires authenticated intake and funding validation before activation', () => {
+    expect(src).toContain('validateEnrollmentEligibility');
+    expect(src).toContain(".eq('status', 'completed')");
+    expect(src).toContain("status: 'active', payment_status: 'paid'");
   });
 
-  it('sets enrollment_state to active', () => {
-    expect(src).toContain("enrollment_state: 'active'");
-  });
-
-  it('no longer looks for removed documents_complete state', () => {
-    expect(src).not.toContain("'documents_complete'");
-  });
-
-  it('no longer looks for removed confirmed state', () => {
-    expect(src).not.toContain("'confirmed'");
-  });
-
-  it('uses canonical PRE_DOCUMENTS_STATES from enrollment-flow', () => {
-    expect(src).toContain('PRE_DOCUMENTS_STATES');
-    expect(src).not.toContain("'orientation_complete'");
-  });
-});
-
-describe('documents/complete route — auto-grants LMS access', () => {
-  const src = read('app/api/enrollment/documents/complete/route.ts');
-
-  it('sets access_granted_at in the enrollment update', () => {
-    expect(src).toContain('access_granted_at: now');
-  });
-
-  it('sets enrollment_state to active', () => {
-    expect(src).toContain("enrollment_state: 'active'");
-  });
-
-  it('no longer treats documents_complete as an already-submitted state', () => {
-    // Old code: if (enrollment_state === 'documents_complete' || 'active') -> already submitted
-    // Fixed: only 'active' means already submitted
-    const alreadySubmittedBlock = src.slice(
-      src.indexOf('Documents already submitted'),
-      src.indexOf('Documents already submitted') + 200,
-    );
-    expect(alreadySubmittedBlock).not.toContain('documents_complete');
+  it('does not restore the retired document-completion enrollment endpoints', () => {
+    expect(fs.existsSync(path.resolve('app/api/enrollment/submit-documents/route.ts'))).toBe(false);
+    expect(fs.existsSync(path.resolve('app/api/enrollment/documents/complete/route.ts'))).toBe(false);
   });
 });
 

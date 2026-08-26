@@ -141,9 +141,10 @@ describe('canonical Course Factory media architecture', () => {
     expect(root).toContain('cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images');
   });
 
-  it('repairs the existing ESB course missing-only and never replaces it', () => {
+  it('refreshes the existing ESB course through AI and never replaces its identity', () => {
     const acceptance = read('scripts/course-factory/build-esb-acceptance.ts');
-    expect(acceptance).toContain("mode: 'missing-only'");
+    expect(acceptance).toContain("mode: 'refresh'");
+    expect(acceptance).toContain("contentSource: 'ai'");
     expect(acceptance).not.toContain("mode: 'replace'");
     expect(acceptance).toContain("build.courseId !== COURSE_ID");
   });

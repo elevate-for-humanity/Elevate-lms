@@ -168,7 +168,15 @@ def _run_ltx(req: GenerateRequest, output: Path, image: str | None) -> None:
         cmd += ["--seed", str(req.seed)]
     if image:
         cmd += ["--conditioning_media_paths", image, "--conditioning_start_frames", "0"]
-    subprocess.run(cmd, cwd=repo, check=True, timeout=int(os.getenv("GPU_JOB_TIMEOUT_SECONDS", "1800")))
+    subprocess.run(
+        cmd,
+        cwd=repo,
+        check=True,
+        timeout=int(os.getenv("GPU_JOB_TIMEOUT_SECONDS", "1800")),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
 
 
 def _wan_frame_count(duration_seconds: int) -> int:
@@ -268,7 +276,8 @@ async def generate(req: GenerateRequest, authorization: str | None = Header(defa
         output.unlink(missing_ok=True)
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
-        raise HTTPException(status_code=502, detail=f"{provider} inference failed") from exc
+        diagnostic = (exc.stdout or str(exc))[-2000:].replace("\\n", " ").replace("\\r", " ")
+        raise HTTPException(status_code=502, detail=f"{provider} inference failed: {diagnostic}") from exc
     except Exception as exc:
         output.unlink(missing_ok=True)
         if torch.cuda.is_available():

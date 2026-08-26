@@ -253,12 +253,30 @@ export async function markComplete(
     .from('video_jobs')
     .update(completionPatch)
     .eq('id', jobId)
-    .select('lesson_id, asset_kind, asset_key')
+    .select('course_id, lesson_id, asset_kind, asset_key, script')
     .single();
 
   if (job?.lesson_id && job.asset_kind === 'lesson') {
     const { data: lesson } = await supabase.from('course_lessons').select('video_url').eq('id', job.lesson_id).maybeSingle();
     await supabase.from('video_jobs').update({ previous_video_url: lesson?.video_url ?? null }).eq('id', jobId);
+    const candidateVersion = {
+      course_id: job.course_id,
+      lesson_id: job.lesson_id,
+      video_job_id: jobId,
+      video_url: result.video_url,
+      duration_seconds: result.duration_seconds ?? null,
+      scene_count: result.scene_count ?? null,
+      quality_evidence: result.quality_evidence ?? {},
+      procedure_schema: result.scene_data ?? {},
+      transcript: job.script ?? null,
+      status: 'candidate',
+    };
+    const { data: existingVersion } = await supabase
+      .from('lesson_video_versions').select('id').eq('video_job_id', jobId).maybeSingle();
+    const versionResult = existingVersion?.id
+      ? await supabase.from('lesson_video_versions').update(candidateVersion).eq('id', existingVersion.id)
+      : await supabase.from('lesson_video_versions').insert(candidateVersion);
+    if (versionResult.error) throw versionResult.error;
   } else if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, {
       status: 'complete',

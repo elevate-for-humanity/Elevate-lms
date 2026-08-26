@@ -130,7 +130,7 @@ export const footerNavigation = {
       { label: 'Platform Licensing', href: '/partners/licensing' },
       { label: 'Workforce Boards', href: '/resources#workforce' },
       { label: 'Training Providers', href: '/resources#partners' },
-      { label: 'Become a Partner', href: '/partners/apply' },
+      { label: 'Become a Program Holder', href: '/apply/program-holder' },
     ],
   },
   company: {

@@ -127,18 +127,17 @@ export default function PartnersPage() {
         </div>
       </section>
 
-      {/* Become a Partner CTA */}
+      {/* Program Holder CTA */}
       <section className="py-20 bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Handshake className="w-16 h-16 mx-auto mb-6 opacity-80" />
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Become a Partner</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Become a Program Holder</h2>
           <p className="text-xl text-blue-100 mb-8">
-            Whether you're an employer seeking talent, a workforce agency, or a training organization — 
-            we'd love to explore how we can work together.
+            Apply to deliver workforce training through Elevate&apos;s program-holder network, or explore the separate employer partnership pathway.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/contact" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-              Contact Us <ArrowRight className="ml-2 w-5 h-5" />
+            <Link href="/apply/program-holder" className="inline-flex items-center bg-brand-orange-500 hover:bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+              Apply as a Program Holder <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link href="/for-employers" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
               Employer Info

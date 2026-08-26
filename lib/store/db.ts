@@ -310,9 +310,11 @@ export async function getProducts(options?: {
   return data || [];
 }
 
-export async function getProduct(slug: string): Promise<Product | null> {
+export async function getProduct(identifier: string): Promise<Product | null> {
   const supabase = await createClient();
   if (!supabase) return null;
+
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(identifier);
 
   const { data, error } = await supabase
     .from('products')
@@ -323,7 +325,7 @@ export async function getProduct(slug: string): Promise<Product | null> {
       product_variants (*)
     `,
     )
-    .eq('slug', slug)
+    .eq(isUuid ? 'id' : 'slug', identifier)
     .eq('is_active', true)
     .maybeSingle();
 
@@ -339,8 +341,8 @@ export async function getProduct(slug: string): Promise<Product | null> {
  * Get a product by slug, mapped to the CatalogProduct shape for checkout/store pages.
  * This is the canonical way to look up products — replaces the hardcoded getProductBySlug.
  */
-export async function getCatalogProduct(slug: string): Promise<CatalogProduct | null> {
-  const product = await getProduct(slug);
+export async function getCatalogProduct(identifier: string): Promise<CatalogProduct | null> {
+  const product = await getProduct(identifier);
   if (!product) return null;
   return toCatalogProduct(product);
 }

@@ -161,9 +161,9 @@ export const headerNavigation: NavGroup[] = [
     label: 'For Partners',
     items: [
       {
-        label: 'Become a Partner',
-        href: '/about/partners',
-        description: 'Training provider partnerships',
+        label: 'Become a Program Holder',
+        href: '/apply/program-holder',
+        description: 'Apply to deliver training programs',
       },
       {
         label: '🔥 License Platform',
@@ -413,7 +413,7 @@ export const footerNavigation = {
     title: 'Partners & Employers',
     links: [
       { label: 'Hire Talent', href: '/employer/dashboard' },
-      { label: 'Become a Partner', href: '/partners' },
+      { label: 'Become a Program Holder', href: '/apply/program-holder' },
       { label: '⭐ License Platform', href: '/pricing/platform' },
       { label: 'Apprenticeship Licensing', href: '/pricing/sponsor-licensing' },
       { label: 'Apprenticeships', href: '/employer/apprenticeships' },

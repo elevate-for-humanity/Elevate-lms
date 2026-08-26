@@ -31,10 +31,11 @@ export const BARBER_PRICING = {
   billingDay: 5, // Friday (0=Sunday, 5=Friday)
   billingTimezone: 'America/Indiana/Indianapolis',
   billingHour: 10, // 10:00 AM local
-  // Legacy fields kept for backward compatibility
-  setupFeeRate: 0.35,
+  // Legacy fields kept for backward compatibility. Derive them from the same
+  // authoritative minimum down payment so older consumers cannot show stale math.
+  setupFeeRate: _barberMinFee / 4980,
   setupFee: _barberMinFee,
-  remainingBalance: 4380,
+  remainingBalance: 4980 - _barberMinFee,
 } as const;
 
 // Stripe price IDs — resolved via centralized config (lib/stripe/prices.ts)
@@ -67,15 +68,17 @@ export function calculateWeeklyPayment(
   const hoursRemaining = Math.max(0, totalHoursRequired - transferredHoursVerified);
   const weeksRemaining = paymentTermWeeks;
   const remainingBalance = Math.max(0, fullPrice - downPayment);
-  const weeklyPaymentDollars = Math.round((remainingBalance / weeksRemaining) * 100) / 100;
-  const weeklyPaymentCents = Math.round(weeklyPaymentDollars * 100);
+  const remainingBalanceCents = Math.round(remainingBalance * 100);
+  const weeklyPaymentCents = Math.ceil(remainingBalanceCents / weeksRemaining);
+  const weeklyPaymentDollars = weeklyPaymentCents / 100;
 
   return {
     hoursRemaining,
     weeksRemaining,
     weeklyPaymentDollars,
     weeklyPaymentCents,
-    totalWeeklyPayments: weeklyPaymentDollars * weeksRemaining,
+    // The final invoice is capped to the exact remaining balance.
+    totalWeeklyPayments: remainingBalance,
   };
 }
 

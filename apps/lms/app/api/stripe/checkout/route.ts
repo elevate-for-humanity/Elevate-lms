@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { getCatalogProduct } from '@/lib/store/db';
-import { STRIPE_PRICE_IDS, isPriceConfigured } from '@/lib/stripe/price-map';
+import { STRIPE_PRICE_IDS } from '@/lib/stripe/price-map';
 import { createClient } from '@/lib/supabase/server';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -67,9 +67,10 @@ async function handler(req: Request) {
     if (!product) return NextResponse.redirect(new URL(`${storeUrl}?error=invalid-product`, req.url), 303);
 
     const productUrl = `${siteUrl}/platform/${product.slug}`;
-    if (!isPriceConfigured(productId)) return NextResponse.redirect(new URL(`${productUrl}?error=payment-unavailable`, req.url), 303);
-
-    const priceId = STRIPE_PRICE_IDS[productId];
+    // Keep the amount charged aligned with the Supabase catalog. The static map
+    // is only a migration fallback for legacy rows without stripe_price_id.
+    const priceId = product.stripePriceId || STRIPE_PRICE_IDS[productId] || null;
+    if (!priceId) return NextResponse.redirect(new URL(`${productUrl}?error=payment-unavailable`, req.url), 303);
     const planName = ({ starter: 'starter', professional: 'professional', enterprise: 'enterprise' } as Record<string, string>)[productId] || 'starter';
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {

@@ -3,7 +3,7 @@ import type Stripe from 'stripe';
 
 import { getStripe } from '@/lib/stripe/client';
 import { getCatalogProduct } from '@/lib/store/db';
-import { STRIPE_PRICE_IDS, isPriceConfigured } from '@/lib/stripe/price-map';
+import { STRIPE_PRICE_IDS } from '@/lib/stripe/price-map';
 import { createClient } from '@/lib/supabase/server';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -87,11 +87,12 @@ async function handler(req: Request) {
     }
 
     const productUrl = `${siteUrl}/platform/${product.slug}`;
-    if (!isPriceConfigured(productId)) {
+    // The catalog record is the source of truth. The static map remains only as
+    // a migration fallback for older rows that have not received a Stripe price.
+    const priceId = product.stripePriceId || STRIPE_PRICE_IDS[productId] || null;
+    if (!priceId) {
       return NextResponse.redirect(new URL(`${productUrl}?error=payment-unavailable`, req.url), 303);
     }
-
-    const priceId = STRIPE_PRICE_IDS[productId];
     const planNameMap: Record<string, string> = {
       starter: 'starter',
       professional: 'professional',

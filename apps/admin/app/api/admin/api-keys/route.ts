@@ -25,20 +25,18 @@ export async function POST(request: NextRequest) {
   // Generate a secure key — only shown once, store the hash
   const rawKey = 'efh_' + randomBytes(32).toString('hex');
   const keyHash = createHash('sha256').update(rawKey).digest('hex');
-  // Store the first 12 chars of the raw key in the name for display identification
-  // Format: "My Key Name [efh_XXXXXXXX]"
   const displayPrefix = rawKey.slice(0, 12);
-  const nameWithPrefix = `${name} [${displayPrefix}]`;
 
   const { data, error } = await db
     .from('api_keys')
     .insert({
-      name: nameWithPrefix,
+      name,
+      key_prefix: displayPrefix,
       key_hash: keyHash,
       created_by: auth.id,
-      is_active: true,
+      status: 'active',
     })
-    .select('id, name, created_at')
+    .select('id, name, key_prefix, status, created_at, last_used_at')
     .single();
 
   if (error) return safeInternalError(error, 'Failed to create API key');
@@ -58,7 +56,10 @@ export async function DELETE(request: NextRequest) {
   const db = await requireAdminClient();
   if (!db) return safeError('Database unavailable', 503);
 
-  const { error } = await db.from('api_keys').delete().eq('id', id);
+  const { error } = await db
+    .from('api_keys')
+    .update({ status: 'revoked', updated_at: new Date().toISOString() })
+    .eq('id', id);
   if (error) return safeInternalError(error, 'Failed to revoke API key');
 
   return NextResponse.json({ success: true });

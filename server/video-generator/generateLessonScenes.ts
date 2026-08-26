@@ -23,6 +23,17 @@ export async function generateLessonScenes(opts: {
   title: string;
   content: string;
   seed?: string;
+  occupationTitle?: string;
+  dolCompetencyId?: string | null;
+  dolCompetencyDescription?: string | null;
+  rtiRequirement?: string | null;
+  rtiHours?: number | null;
+  stateAuthority?: string | null;
+  stateStandardVersion?: string | null;
+  stateRequirement?: string | null;
+  examDomain?: string | null;
+  passingScore?: number | null;
+  requiresPracticalEvidence?: boolean;
 }): Promise<LessonRenderPlanDraft> {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const plainContent = stripHtml(opts.content);
@@ -33,6 +44,17 @@ export async function generateLessonScenes(opts: {
     title: opts.title,
     content: plainContent,
     seed,
+    occupationTitle: opts.occupationTitle,
+    dolCompetencyId: opts.dolCompetencyId,
+    dolCompetencyDescription: opts.dolCompetencyDescription,
+    rtiRequirement: opts.rtiRequirement,
+    rtiHours: opts.rtiHours,
+    stateAuthority: opts.stateAuthority,
+    stateStandardVersion: opts.stateStandardVersion,
+    stateRequirement: opts.stateRequirement,
+    examDomain: opts.examDomain,
+    passingScore: opts.passingScore,
+    requiresPracticalEvidence: opts.requiresPracticalEvidence,
   });
 
   let lastError: Error | null = null;

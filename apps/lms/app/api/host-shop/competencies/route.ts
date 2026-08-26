@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolveApprenticeshipRuntimeContext } from '@/lib/apprenticeship/runtime-context';
 import { loadRegisteredApprenticeshipProgress } from '@/lib/apprenticeship/progress-service';
+import { getIndianaPracticalEvidenceRequirement, validatePracticalEvidence } from '@/lib/apprenticeship/state-practical-evidence';
 
 export const dynamic = 'force-dynamic';
 
@@ -133,6 +134,13 @@ export async function PATCH(req: NextRequest) {
   const competencyId = typeof body?.competencyId === 'string' ? body.competencyId.trim() : '';
   const completed = Boolean(body?.completed);
   const notes = typeof body?.notes === 'string' ? body.notes.trim().slice(0, 4000) : null;
+  const performanceSubject = typeof body?.performanceSubject === 'string' ? body.performanceSubject.trim() : null;
+  const evidenceType = typeof body?.evidenceType === 'string' ? body.evidenceType.trim() : null;
+  const evidenceUrl = typeof body?.evidenceUrl === 'string' ? body.evidenceUrl.trim().slice(0, 2000) : null;
+  const performedAt = typeof body?.performedAt === 'string' ? body.performedAt.trim() : null;
+  const instructorLicenseNumber = typeof body?.instructorLicenseNumber === 'string'
+    ? body.instructorLicenseNumber.trim().slice(0, 100)
+    : null;
   if (!enrollmentId || !competencyId) return NextResponse.json({ error: 'enrollmentId and competencyId are required' }, { status: 400 });
 
   let runtime;
@@ -142,8 +150,24 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Registered program contract unavailable' }, { status: 409 });
   }
   if (!runtime?.contract) return NextResponse.json({ error: 'Enrollment is not bound to an active registered-program standard' }, { status: 409 });
-  if (!runtime.contract.standard.competencies.some((item) => item.id === competencyId)) {
+  const competency = runtime.contract.standard.competencies.find((item) => item.id === competencyId);
+  if (!competency) {
     return NextResponse.json({ error: 'Competency is not part of the active approved registered-program standard' }, { status: 400 });
+  }
+  const practical = getIndianaPracticalEvidenceRequirement(competency);
+  const evidenceValidation = validatePracticalEvidence({
+    required: completed && practical.required,
+    performanceSubject,
+    evidenceUrl,
+    performedAt,
+    instructorLicenseNumber,
+  });
+  if (!evidenceValidation.valid) {
+    return NextResponse.json({
+      error: 'Indiana practical evidence is incomplete',
+      missing: evidenceValidation.missing,
+      requirement: practical,
+    }, { status: 422 });
   }
 
   const shopIds = await getAuthorizedShopIds(db, user.id, isPlatformAdmin, membershipPartnerId);
@@ -167,9 +191,20 @@ export async function PATCH(req: NextRequest) {
     verified_by: user.id,
     verified_by_name: verifiedName,
     notes,
+    requires_practical_evidence: practical.required,
+    performance_subject: completed && practical.required ? performanceSubject : null,
+    evidence_type: completed && practical.required ? (evidenceType || 'observation') : null,
+    evidence_url: completed && practical.required ? evidenceUrl : null,
+    practical_performed_at: completed && practical.required ? performedAt : null,
+    evidence_review_status: completed && practical.required ? 'approved' : 'not_required',
+    verified_by_license_number: completed && practical.required ? instructorLicenseNumber : null,
+    state_authority: practical.authority,
+    state_standard_version: practical.standardVersion,
+    state_requirement_citation: practical.citation,
+    evidence_verified_at: completed && practical.required ? new Date().toISOString() : null,
     updated_at: new Date().toISOString(),
   }, { onConflict: 'enrollment_id,competency_id' })
-    .select('id, enrollment_id, competency_id, completed, date_completed, verified_by, verified_by_name, notes, updated_at').single();
+    .select('id, enrollment_id, competency_id, completed, date_completed, verified_by, verified_by_name, notes, requires_practical_evidence, performance_subject, evidence_type, evidence_url, practical_performed_at, evidence_review_status, verified_by_license_number, state_standard_version, updated_at').single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ record, verifierInitials: initials(verifiedName), standardVersionKey: runtime.contract.standardVersionKey });
 }

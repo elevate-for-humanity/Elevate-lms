@@ -167,9 +167,9 @@ export async function uploadLessonFileFromDisk(
       [
         '-y',
         '-i', filePath,
-        '-vf', 'scale=min(1920\\,iw):-2',
+        '-vf', 'scale=min(1280\\,iw):-2',
         '-c:v', 'libx264',
-        '-preset', 'medium',
+        '-preset', 'veryfast',
         '-crf', '27',
         '-maxrate', '3M',
         '-bufsize', '6M',

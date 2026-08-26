@@ -19,6 +19,11 @@ const validEvidence: MediaQualityEvidence = {
   transcriptUrl: 'https://assets.example/lesson.txt',
   provider: 'remotion',
   providerModel: 'SlideLesson',
+  narrationCoverage: 1,
+  visualEvidenceCoverage: 1,
+  repeatedVisualMaximum: 1,
+  requiredProcedurePhases: ['procedure'],
+  deliveredProcedurePhases: ['procedure'],
 };
 
 describe('canonical media completion quality gate', () => {

@@ -31,6 +31,13 @@ docker rm -f "$CONTAINER_NAME" \
 
 echo "Starting smoke-test container: $CONTAINER_NAME"
 
+RUNTIME_ENV_ARGS=()
+for NAME in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY; do
+  if [[ -n "${!NAME:-}" ]]; then
+    RUNTIME_ENV_ARGS+=(--env "${NAME}=${!NAME}")
+  fi
+done
+
 docker run \
   --detach \
   --name "$CONTAINER_NAME" \
@@ -40,6 +47,7 @@ docker run \
   --env HOSTNAME=0.0.0.0 \
   --env DATABASE_URL="${SMOKE_DATABASE_URL:-postgresql://invalid:invalid@127.0.0.1:5432/invalid}" \
   --env NEXT_PUBLIC_SITE_URL="http://127.0.0.1:${HOST_PORT}" \
+  "${RUNTIME_ENV_ARGS[@]}" \
   "$IMAGE"
 
 START_TIME="$(date +%s)"

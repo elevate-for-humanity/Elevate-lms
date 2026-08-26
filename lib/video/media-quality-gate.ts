@@ -28,6 +28,11 @@ export interface MediaQualityEvidence {
   transcriptUrl?: string;
   provider?: string;
   providerModel?: string;
+  narrationCoverage: number;
+  visualEvidenceCoverage: number;
+  repeatedVisualMaximum: number;
+  requiredProcedurePhases: string[];
+  deliveredProcedurePhases: string[];
 }
 
 export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
@@ -64,7 +69,23 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   if (!evidence.transcriptUrl) failures.push('transcript URL is missing');
   if (!evidence.provider) failures.push('provider evidence is missing');
   if (!evidence.providerModel) failures.push('provider model evidence is missing');
+  if (evidence.narrationCoverage < 0.97) failures.push(`narration coverage ${(evidence.narrationCoverage * 100).toFixed(1)}% is below 97%`);
+  if (evidence.visualEvidenceCoverage < 0.75) failures.push(`visual evidence coverage ${(evidence.visualEvidenceCoverage * 100).toFixed(1)}% is below 75%`);
+  if (evidence.repeatedVisualMaximum > 3) failures.push(`one visual is repeated across ${evidence.repeatedVisualMaximum} scenes`);
+  const missingPhases = evidence.requiredProcedurePhases.filter((phase) => !evidence.deliveredProcedurePhases.includes(phase));
+  if (missingPhases.length) failures.push(`missing procedure phases: ${missingPhases.join(', ')}`);
   return failures;
+}
+
+function normalizedWords(value: string): string[] {
+  return value.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+}
+
+function narrationCoverage(script: string, storyboard: MediaStoryboard): number {
+  const expected = normalizedWords(script);
+  if (!expected.length) return 1;
+  const delivered = new Set(normalizedWords(storyboard.scenes.map((scene) => scene.dialogue || scene.action).join(' ')));
+  return expected.filter((word) => delivered.has(word)).length / expected.length;
 }
 
 function longestMetric(output: string, key: 'freeze_duration' | 'black_duration'): number {
@@ -88,6 +109,7 @@ export async function enforceMediaQuality(input: {
   sceneData: MediaStoryboard;
   provider?: string;
   providerModel?: string;
+  expectedScript: string;
 }): Promise<MediaQualityEvidence> {
   const response = await fetch(input.videoUrl, { signal: AbortSignal.timeout(60_000) });
   if (!response.ok) throw new Error(`MP4 returned HTTP ${response.status}`);
@@ -104,6 +126,12 @@ export async function enforceMediaQuality(input: {
       streams?: Array<{ codec_type?: string }>;
     };
     const streams = probe.streams ?? [];
+    const evidenceScenes = input.sceneData.scenes.filter((scene) => Boolean(scene.requiredVisualEvidence));
+    const visualKeys = input.sceneData.scenes.map((scene) => scene.referenceImageUrl || scene.sourceVideoUrl || scene.action.trim().toLowerCase());
+    const counts = new Map<string, number>();
+    visualKeys.forEach((key) => counts.set(key, (counts.get(key) ?? 0) + 1));
+    const deliveredProcedurePhases = [...new Set(input.sceneData.scenes.map((scene) => scene.procedurePhase).filter((value): value is NonNullable<typeof value> => Boolean(value)))];
+    const requiredProcedurePhases = [...new Set(input.sceneData.scenes.map((scene) => scene.procedurePhase).filter((value): value is NonNullable<typeof value> => Boolean(value)))];
 
     const [{ stderr: sceneOutput }, { stderr: freezeOutput }, { stderr: blackOutput }] = await Promise.all([
       execFileAsync('ffmpeg', ['-hide_banner', '-i', videoPath, '-filter:v', "select='gt(scene,0.12)',showinfo", '-f', 'null', '-'], { timeout: 120_000, maxBuffer: 8_000_000 }),
@@ -126,6 +154,11 @@ export async function enforceMediaQuality(input: {
       transcriptUrl: input.sceneData.transcriptUrl,
       provider: input.provider,
       providerModel: input.providerModel,
+      narrationCoverage: narrationCoverage(input.expectedScript, input.sceneData),
+      visualEvidenceCoverage: input.sceneData.scenes.length ? evidenceScenes.length / input.sceneData.scenes.length : 0,
+      repeatedVisualMaximum: Math.max(0, ...counts.values()),
+      requiredProcedurePhases,
+      deliveredProcedurePhases,
     };
     const failures = mediaQualityFailures(evidence);
     if (failures.length) throw new Error(`Media quality gate failed: ${failures.join('; ')}`);

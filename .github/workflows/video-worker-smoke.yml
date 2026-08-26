@@ -1,5 +1,7 @@
 name: Video Worker Scheduler
 
+# Queue checkpoint: full barber instructional candidate retry
+
 # Canonical Course Builder render-queue trigger. Keep this workflow thin: the Admin runtime owns rendering.
 # A main-branch workflow update also performs an immediate bounded queue check.
 on:

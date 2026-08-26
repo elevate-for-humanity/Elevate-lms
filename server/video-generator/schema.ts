@@ -28,7 +28,12 @@ export const SceneTransitionSchema = z.enum(['cut', 'fade', 'crossfade']);
 export const LessonSceneDraftSchema = z.object({
   id: z.string().min(1),
   order: z.number().int().positive(),
-  instructionalObjective: z.string().min(5).max(200).optional(),
+  instructionalObjective: z.string().min(5).max(200),
+  dolCompetencyId: z.string().min(1).max(120),
+  stateRequirement: z.string().min(1).max(500),
+  examDomain: z.string().min(1).max(200),
+  demonstrationStep: z.string().min(3).max(500),
+  evidenceExpectation: z.string().min(3).max(500),
   narration: z.string().min(20).max(800),
   caption: z.string().min(3).max(80),
   subcaption: z.string().max(120).optional(),

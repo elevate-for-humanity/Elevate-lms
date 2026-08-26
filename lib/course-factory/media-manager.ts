@@ -105,6 +105,11 @@ export async function resetCanonicalMediaJob(
       video_url: null,
       audio_url: null,
       error_message: options.reason ?? job.error_message,
+      review_status: 'not_ready',
+      reviewed_by: null,
+      reviewed_at: null,
+      review_notes: null,
+      quality_evidence: null,
       updated_at: now,
     })
     .eq('id', job.id)
@@ -115,7 +120,8 @@ export async function resetCanonicalMediaJob(
   if (identity.assetKind === 'lesson') {
     await db
       .from('course_lessons')
-      .update({ video_status: 'queued', video_url: null, video_error: null })
+      // Keep the approved learner-facing asset live while its replacement is rendered.
+      .update({ video_error: null })
       .eq('id', identity.lessonId);
   } else if (identity.assetKey) {
     const { data: lesson, error: lessonError } = await db

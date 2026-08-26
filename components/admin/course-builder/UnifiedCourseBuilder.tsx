@@ -3,8 +3,9 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { BookOpen, Bot, Boxes, Loader2, RefreshCw, Sparkles, Video } from 'lucide-react';
+import { Award, BookOpen, Bot, Boxes, Loader2, RefreshCw, Sparkles, Video } from 'lucide-react';
 import CourseInstructorMediaPanel from '@/components/admin/course-builder/CourseInstructorMediaPanel';
+import CredentialRegistryPanel from '@/components/admin/course-builder/CredentialRegistryPanel';
 import { runCourseFactoryPipeline } from '@/components/admin/course-builder/runCourseFactoryPipeline';
 import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
 
@@ -12,7 +13,7 @@ const AutomaticCourseBuilder = dynamic(() => import('@/components/course/Automat
   ssr: false,
 });
 
-type Tab = 'courses' | 'ai' | 'blueprints' | 'media';
+type Tab = 'courses' | 'ai' | 'blueprints' | 'media' | 'registry';
 type CourseRow = {
   id: string;
   title: string;
@@ -41,6 +42,7 @@ const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'ai', label: 'AI Generate', icon: Sparkles },
   { id: 'blueprints', label: 'Blueprints', icon: Boxes },
   { id: 'media', label: 'Video + Audio', icon: Video },
+  { id: 'registry', label: 'Credential Registry', icon: Award },
 ];
 
 export default function UnifiedCourseBuilder() {
@@ -161,6 +163,7 @@ export default function UnifiedCourseBuilder() {
           />
         )}
         {tab === 'media' && <CourseInstructorMediaPanel courseId={courseId} />}
+        {tab === 'registry' && <CredentialRegistryPanel course={selectedCourse} />}
       </main>
     </div>
   );

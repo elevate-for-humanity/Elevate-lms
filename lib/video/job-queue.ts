@@ -7,6 +7,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import type { MediaQualityEvidence } from './media-quality-gate';
 
 export type VideoJobStatus = 'draft' | 'queued' | 'rendering' | 'complete' | 'failed';
 export type VideoAssetKind = 'lesson' | 'microclip';
@@ -36,6 +37,10 @@ export interface VideoJob {
   completed_at: string | null;
   created_at: string;
   updated_at: string;
+  review_status: 'not_ready' | 'pending_review' | 'approved' | 'rejected';
+  previous_video_url: string | null;
+  quality_evidence: MediaQualityEvidence | null;
+  procedure_schema: unknown | null;
 }
 
 export interface CreateJobInput {
@@ -81,7 +86,6 @@ async function syncLessonJobLink(
       video_job_id: job.id,
       video_status: job.status,
       video_error: job.status === 'failed' ? job.error_message : null,
-      ...(job.status === 'complete' && job.video_url ? { video_url: job.video_url } : {}),
     })
     .eq('id', job.lesson_id);
 }
@@ -203,9 +207,7 @@ export async function markRendering(jobId: string): Promise<void> {
     .select('lesson_id, asset_kind, asset_key')
     .single();
 
-  if (job?.lesson_id && job.asset_kind === 'lesson') {
-    await supabase.from('course_lessons').update({ video_status: 'rendering' }).eq('id', job.lesson_id);
-  } else if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
+  if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, { status: 'rendering', error: null });
   }
 }
@@ -220,6 +222,7 @@ export async function markComplete(
     scene_data?: unknown;
     provider?: string;
     provider_model?: string;
+    quality_evidence?: MediaQualityEvidence;
   },
 ): Promise<void> {
   const supabase = db();
@@ -236,6 +239,12 @@ export async function markComplete(
     last_provider: result.provider ?? null,
     last_provider_model: result.provider_model ?? null,
     provider: result.provider ?? null,
+    review_status: 'pending_review',
+    reviewed_by: null,
+    reviewed_at: null,
+    review_notes: null,
+    quality_evidence: result.quality_evidence ?? null,
+    procedure_schema: result.scene_data ?? null,
   };
   // A renderer that returns no replacement storyboard must not erase the
   // canonical plan that was attached when the job was queued.
@@ -248,17 +257,8 @@ export async function markComplete(
     .single();
 
   if (job?.lesson_id && job.asset_kind === 'lesson') {
-    await supabase
-      .from('course_lessons')
-      .update({
-        video_status: 'complete',
-        video_url: result.video_url,
-        video_error: null,
-        video_generated_at: now,
-        duration_seconds: result.duration_seconds ?? null,
-        ...(result.scene_data != null ? { scene_data: result.scene_data } : {}),
-      })
-      .eq('id', job.lesson_id);
+    const { data: lesson } = await supabase.from('course_lessons').select('video_url').eq('id', job.lesson_id).maybeSingle();
+    await supabase.from('video_jobs').update({ previous_video_url: lesson?.video_url ?? null }).eq('id', jobId);
   } else if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, {
       status: 'complete',
@@ -295,12 +295,7 @@ export async function markFailed(
     .select('lesson_id, asset_kind, asset_key')
     .single();
 
-  if (job?.lesson_id && job.asset_kind === 'lesson') {
-    await supabase
-      .from('course_lessons')
-      .update({ video_status: 'failed', video_error: errorMessage })
-      .eq('id', job.lesson_id);
-  } else if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
+  if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, { status: 'failed', error: errorMessage });
   }
 

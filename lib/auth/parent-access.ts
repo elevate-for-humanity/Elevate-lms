@@ -42,5 +42,9 @@ export async function requireParentStudentAccess(studentId: string) {
     .maybeSingle();
   if (!link) redirect('/parent-portal/dashboard?error=student-access-denied');
 
-  return { ...access, studentId, relationship: link.relationship || 'guardian', db: access.supabase };
+  // The verified relationship is the authorization boundary. Use the server-only
+  // client after that check so the detail view can read governed progress tables
+  // without widening their RLS policies to every authenticated parent account.
+  const db = await requireAdminClient();
+  return { ...access, studentId, relationship: link.relationship || 'guardian', db };
 }

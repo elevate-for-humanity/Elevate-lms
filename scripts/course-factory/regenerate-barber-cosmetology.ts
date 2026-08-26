@@ -58,7 +58,7 @@ async function main() {
         console.log(`[${programSlug}] ${stage} ${progress ?? ''} ${message}`),
     );
 
-    failureStage = `${programSlug}-validation`;
+    failureStage = `${programSlug}-validation-${result.status ?? 'unknown'}`;
     if (!result.ok) {
       throw new Error(
         `${programSlug} regeneration failed: ${JSON.stringify(result.errors ?? result.generationFailures ?? result)}`,

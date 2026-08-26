@@ -13,7 +13,8 @@ const statusColors: Record<string, string> = {
 interface ApiKey {
   id: string;
   name: string;
-  is_active: boolean;
+  key_prefix: string | null;
+  status: string;
   created_at: string;
   last_used_at: string | null;
 }
@@ -66,7 +67,9 @@ export function ApiKeysClient({ apiKeys: initialKeys, totalKeys, activeKeys }: P
     try {
       const res = await fetch(`/api/admin/api-keys?id=${id}`, { method: 'DELETE' });
       if (res.ok) {
-        setKeys((prev) => prev.filter((k) => k.id !== id));
+        setKeys((prev) => prev.map((key) => (
+          key.id === id ? { ...key, status: 'revoked' } : key
+        )));
         router.refresh();
       }
     } finally {
@@ -167,8 +170,7 @@ export function ApiKeysClient({ apiKeys: initialKeys, totalKeys, activeKeys }: P
             </thead>
             <tbody className="divide-y divide-slate-200">
               {keys.map((apiKey) => {
-                const prefix = apiKey.name.match(/\[(efh_[^\]]+)\]/)?.[1] ?? 'efh_';
-                const displayName = apiKey.name.replace(/\s*\[efh_[^\]]+\]$/, '');
+                const prefix = apiKey.key_prefix ?? 'efh_';
                 return (
                   <tr key={apiKey.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4">
@@ -176,7 +178,7 @@ export function ApiKeysClient({ apiKeys: initialKeys, totalKeys, activeKeys }: P
                         <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                           <Key className="w-5 h-5 text-slate-700" />
                         </div>
-                        <span className="font-medium text-slate-900">{displayName}</span>
+                        <span className="font-medium text-slate-900">{apiKey.name}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -197,15 +199,15 @@ export function ApiKeysClient({ apiKeys: initialKeys, totalKeys, activeKeys }: P
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          apiKey.is_active ? statusColors.active : statusColors.revoked
+                          apiKey.status === 'active' ? statusColors.active : statusColors.revoked
                         }`}
                       >
-                        {apiKey.is_active ? 'active' : 'revoked'}
+                        {apiKey.status}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
-                        {apiKey.is_active && (
+                        {apiKey.status === 'active' && (
                           <button
                             onClick={() => handleRevoke(apiKey.id)}
                             disabled={revoking === apiKey.id}

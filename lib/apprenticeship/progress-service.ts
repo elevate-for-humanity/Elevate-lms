@@ -39,7 +39,7 @@ export async function loadRegisteredApprenticeshipProgress(
   const [competencyResult, rtiResult, hourResult] = await Promise.all([
     db
       .from('apprentice_competency_records')
-      .select('id,enrollment_id,competency_id,completed,date_completed,verified_by,verified_by_name,notes,updated_at')
+      .select('id,enrollment_id,competency_id,completed,date_completed,verified_by,verified_by_name,notes,requires_practical_evidence,performance_subject,evidence_type,evidence_url,practical_performed_at,evidence_review_status,verified_by_license_number,state_standard_version,updated_at')
       .eq('enrollment_id', context.enrollment.id),
     db
       .from('apprenticeship_rti_entries')

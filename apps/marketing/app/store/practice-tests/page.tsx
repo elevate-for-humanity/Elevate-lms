@@ -77,7 +77,7 @@ export default function PracticeTestsPage() {
             alt="Practice Tests" 
             fill 
             className="object-cover object-top"
-            priority
+            priority sizes="100vw"
           />
         </div>
 

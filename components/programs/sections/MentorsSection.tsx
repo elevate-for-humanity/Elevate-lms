@@ -52,7 +52,7 @@ export function MentorsSection({
                   src={mentor.photo}
                   alt={mentor.name}
                   fill
-                  className="object-cover"
+                  className="object-cover" sizes="100vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
               </div>

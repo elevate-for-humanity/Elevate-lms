@@ -215,12 +215,14 @@ export default async function WOTCAdminPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <Link
-                        href={`/wotc/${app.id}`}
-                        className="px-4 py-2 bg-brand-blue-600 text-white text-sm rounded-lg hover:bg-brand-blue-700 transition"
-                      >
-                        View
-                      </Link>
+                      <div className="flex flex-wrap gap-2">
+                        <Link href={`/wotc/${app.id}`} className="px-4 py-2 bg-brand-blue-600 text-white text-sm rounded-lg hover:bg-brand-blue-700 transition">View</Link>
+                        {app.start_date && new Date(`${app.start_date}T00:00:00Z`).getUTCFullYear() <= 2025 && (
+                          <form action={`/api/admin/wotc/${app.id}/packet`} method="post">
+                            <button className="px-4 py-2 border border-amber-700 text-amber-900 text-sm font-semibold rounded-lg hover:bg-amber-50">Download historical packet</button>
+                          </form>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

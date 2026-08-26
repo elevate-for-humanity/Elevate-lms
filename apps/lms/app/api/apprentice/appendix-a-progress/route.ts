@@ -23,7 +23,7 @@ export async function GET() {
   if (!contract) return NextResponse.json({ enrollment: null, standard: null, records: [], rtiProviders: [] });
 
   const { data: records, error: recordError } = await db.from('apprentice_competency_records')
-    .select('id, enrollment_id, competency_id, completed, date_completed, verified_by_name, notes, updated_at')
+    .select('id, enrollment_id, competency_id, completed, date_completed, verified_by_name, notes, requires_practical_evidence, performance_subject, evidence_type, evidence_url, practical_performed_at, evidence_review_status, verified_by_license_number, state_authority, state_standard_version, state_requirement_citation, updated_at')
     .eq('enrollment_id', enrollment.id).order('updated_at', { ascending: false });
   if (recordError) return NextResponse.json({ error: recordError.message }, { status: 500 });
 

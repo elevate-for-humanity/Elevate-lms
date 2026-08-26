@@ -80,7 +80,7 @@ export const VIDEO_REGISTRY: Record<string, VideoRecord> = {
     id: 'cna-hero',
     title: 'CNA training program',
     description: 'Dedicated CNA program hero. Self-funded program; no funding claims.',
-    video_url: `${R2}/6130025-hd_1280_720_30fps.mp4`,
+    video_url: `${R2}/6290542-hd_1280_720_30fps.mp4`,
     thumbnail_url: '/images/pages/comp-pathway-healthcare.webp',
     duration: 'PT45S',
     upload_date: '2025-01-01',

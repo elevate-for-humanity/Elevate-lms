@@ -46,7 +46,7 @@ export function TestimonialsSection({
               className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200"
             >
               <div className="relative h-48">
-                <Image src={story.photo} alt={story.name} fill className="object-cover" />
+                <Image src={story.photo} alt={story.name} fill className="object-cover" sizes="100vw" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
               </div>
               <div className="p-6">

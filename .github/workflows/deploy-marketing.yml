@@ -1,9 +1,6 @@
 name: Deploy Marketing (www)
 
 on:
-  # Temporary recovery trigger; remove after the latest main deployment is verified.
-  schedule:
-    - cron: '*/5 * * * *'
   push:
     branches:
       - main
@@ -219,8 +216,7 @@ jobs:
 
             html_ok=false
             if grep -qi '<html' /tmp/www-home.html \
-              && grep -q 'Workforce Training &amp; Technology\|Workforce Training & Technology' /tmp/www-home.html \
-              && grep -q 'Career Training, Registered Apprenticeships &amp; Workforce Technology in Indiana\|Career Training, Registered Apprenticeships & Workforce Technology in Indiana' /tmp/www-home.html \
+              && grep -q 'Career training, registered apprenticeships, testing, and workforce pathways' /tmp/www-home.html \
               && grep -q '/audio/heroes/home.mp3' /tmp/www-home.html \
               && grep -q 'Barber Apprenticeship' /tmp/www-barber.html \
               && grep -q 'Esthetician Apprenticeship Pathway' /tmp/www-esthetics.html \

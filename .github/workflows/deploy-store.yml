@@ -1,9 +1,6 @@
 name: Deploy Store → production
 
 on:
-  # Temporary recovery trigger; remove after the latest main deployment is verified.
-  schedule:
-    - cron: '*/5 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
@@ -25,7 +22,7 @@ on:
 
 concurrency:
   group: store-production
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read

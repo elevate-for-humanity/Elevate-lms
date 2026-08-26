@@ -58,9 +58,8 @@ function assertCanonicalRoleSet(src: string, pagePath: string): void {
   const match = src.match(/await requireRole\(\s*(\[[^\]]+\])/);
   if (!match) return; // call exists but couldn't parse — skip role set check
   const roleArray = match[1];
-  expect(roleArray, `${pagePath}: role set must include 'employer'').toContain("'employer'");
-  expect(roleArray, `${pagePath}: role set must include 'admin'').toContain("'admin'");
-  expect(roleArray, `${pagePath}: role set must include 'admin'').toContain("'admin'");
+  expect(roleArray, `${pagePath}: role set must include employer`).toContain("'employer'");
+  expect(roleArray, `${pagePath}: role set must include admin`).toContain("'admin'");
 }
 
 // ---------------------------------------------------------------------------
@@ -68,48 +67,47 @@ function assertCanonicalRoleSet(src: string, pagePath: string): void {
 // ---------------------------------------------------------------------------
 
 const STANDARD_PAGES = [
-  'app/employer/analytics/page.tsx',
-  'app/employer/applications/page.tsx',
-  'app/employer/apprentices/page.tsx',
-  'app/employer/candidates/page.tsx',
-  'app/employer/company/page.tsx',
-  'app/employer/documents/page.tsx',
-  'app/employer/documents/upload/page.tsx',
-  'app/employer/jobs/page.tsx',
-  'app/employer/opportunities/page.tsx',
-  'app/employer/placements/page.tsx',
-  'app/employer/post-job/page.tsx',
-  'app/employer/postings/page.tsx',
-  'app/employer/settings/page.tsx',
-  'app/employer/wotc/page.tsx',
-  'app/employer/compliance/page.tsx',
-  'app/employer/verification/page.tsx',
-  'app/employer/shop/create/page.tsx',
-  'app/employer/apprenticeships/new/page.tsx',
+  'apps/lms/app/employer/analytics/page.tsx',
+  'apps/lms/app/employer/applications/page.tsx',
+  'apps/lms/app/employer/apprentices/page.tsx',
+  'apps/lms/app/employer/candidates/page.tsx',
+  'apps/lms/app/employer/company/page.tsx',
+  'apps/lms/app/employer/documents/page.tsx',
+  'apps/lms/app/employer/documents/upload/page.tsx',
+  'apps/lms/app/employer/jobs/page.tsx',
+  'apps/lms/app/employer/opportunities/page.tsx',
+  'apps/lms/app/employer/placements/page.tsx',
+  'apps/lms/app/employer/post-job/page.tsx',
+  'apps/lms/app/employer/postings/page.tsx',
+  'apps/lms/app/employer/settings/page.tsx',
+  'apps/lms/app/employer/wotc/page.tsx',
+  'apps/lms/app/employer/compliance/page.tsx',
+  'apps/lms/app/employer/verification/page.tsx',
+  'apps/lms/app/employer/shop/create/page.tsx',
+  'apps/lms/app/employer/apprenticeships/new/page.tsx',
 ];
 
 // Pages with extended role sets (superset of standard — still must include
 // employer + admin + admin).
 const EXTENDED_ROLE_PAGES = [
   // staff added
-  'app/employer/apprenticeships/page.tsx',
-  'app/employer/reports/page.tsx',
-  'app/employer/reports/submit/page.tsx',
+  'apps/lms/app/employer/apprenticeships/page.tsx',
+  'apps/lms/app/employer/reports/page.tsx',
+  'apps/lms/app/employer/reports/submit/page.tsx',
   // sponsor added
-  'app/employer/hours/page.tsx',
+  'apps/lms/app/employer/hours/page.tsx',
 ];
 
 // Dashboard already uses requireRole — included to prevent regression.
 const ALREADY_MIGRATED = [
-  'app/employer/dashboard/page.tsx',
+  'apps/lms/app/employer/dashboard/page.tsx',
 ];
 
 // Dynamic route pages — auth-only (no role check needed beyond login gate,
 // but must not expose data to unauthenticated users).
 const AUTH_ONLY_PAGES = [
-  'app/employer/postings/[id]/page.tsx',
-  'app/employer/programs/[id]/page.tsx',
-  'app/employer/apprenticeships/[placement_id]/weekly-report/new/page.tsx',
+  'apps/lms/app/employer/postings/[id]/page.tsx',
+  'apps/lms/app/employer/programs/[id]/page.tsx',
 ];
 
 // ---------------------------------------------------------------------------

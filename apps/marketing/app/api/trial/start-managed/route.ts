@@ -54,13 +54,16 @@ async function sendWelcome(params: {
     to: params.email,
     subject: `Your 14-day Elevate platform trial — ${params.orgName}`,
     html: `
-      <h1>Your organization trial is ready.</h1>
-      <p><strong>${params.orgName}</strong></p>
-      <p>Sign in first. PARIS will interview you and build your website from your answers.</p>
-      <p><a href="${params.loginUrl}" style="display:inline-block;padding:12px 20px;background:#dc2626;color:#fff;text-decoration:none;border-radius:8px;font-weight:700">Sign in and build with PARIS</a></p>
-      <p>Website Builder: ${params.builderUrl}</p>
-      <p>Trial ends: ${new Date(params.trialEndsAt).toLocaleDateString('en-US')}</p>
-      <p>Reference: ${params.reference}</p>
+      <div style="background:#ffffff;color:#0f172a;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:500;line-height:1.6;padding:24px">
+        <h1 style="color:#0f172a;font-size:28px;font-weight:800;line-height:1.2">Your organization trial is ready.</h1>
+        <p style="color:#0f172a"><strong>${params.orgName}</strong></p>
+        <p style="color:#0f172a">Create your password now. After setup, you will go directly to the Website Builder and PARIS will begin the interview for your first draft.</p>
+        <p><a href="${params.loginUrl}" style="display:inline-block;padding:14px 22px;background:#b91c1c;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:800">Create password and start PARIS interview</a></p>
+        <p style="color:#334155">This is a one-time security link. If it expires, request a new password link from the login page.</p>
+        <p style="color:#334155">Website Builder: ${params.builderUrl}</p>
+        <p style="color:#334155">Trial ends: ${new Date(params.trialEndsAt).toLocaleDateString('en-US')}</p>
+        <p style="color:#334155">Reference: ${params.reference}</p>
+      </div>
     `,
   });
 }
@@ -178,12 +181,13 @@ async function _POST(request: NextRequest) {
       existingUrl,
       loginUrl: access.loginUrl,
       requiresAuthentication: true,
+      requiresPasswordSetup: true,
       requiresParisInterview: websiteMode === 'new',
       onboardingComplete: true,
       recommendedCapabilities,
       message: websiteMode === 'new'
-        ? 'Trial workspace and owner access are ready. Sign in, then PARIS will build the first website draft.'
-        : 'Trial workspace and owner access are ready. Sign in to import and rebuild your existing website.',
+        ? 'Trial workspace and owner access are ready. Create your password, then PARIS will begin the website interview.'
+        : 'Trial workspace and owner access are ready. Create your password, then import and rebuild your existing website.',
     });
   } catch (error) {
     logger.error('[trial] provisioning failed', error instanceof Error ? error : new Error(String(error)), { reference });

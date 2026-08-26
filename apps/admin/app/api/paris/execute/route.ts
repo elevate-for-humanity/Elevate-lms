@@ -66,6 +66,10 @@ export async function POST(req: NextRequest) {
     role: 'authorized platform assistance',
   };
   const correlationId = req.headers.get('x-correlation-id') ?? crypto.randomUUID();
+  const respond = (payload: Record<string, unknown>, status = 200) => NextResponse.json(
+    { ...payload, correlationId },
+    { status, headers: { 'x-correlation-id': correlationId, 'cache-control': 'no-store' } },
+  );
   const tenantId = typeof context.tenantId === 'string'
     ? context.tenantId
     : await resolveTenantIdForUser(auth.id).catch(() => null);
@@ -149,7 +153,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (result.status === 'approval_required') {
-      return NextResponse.json({
+      return respond({
         success: false,
         executed: false,
         approvalRequired: true,
@@ -162,11 +166,11 @@ export async function POST(req: NextRequest) {
           : result.message,
         traceId: result.traceId ?? correlationId,
         taskId: durableTask?.id ?? null,
-      }, { status: 409 });
+      }, 409);
     }
 
     if (!result.ok) {
-      return NextResponse.json({
+      return respond({
         success: false,
         executed: false,
         agent: agentConfig.label,
@@ -176,7 +180,7 @@ export async function POST(req: NextRequest) {
         data: result.payload ?? null,
         traceId: result.traceId ?? correlationId,
         taskId: durableTask?.id ?? null,
-      }, { status: result.status === 'blocked' ? 403 : 500 });
+      }, result.status === 'blocked' ? 403 : 500);
     }
 
     logger.info('[paris/execute] canonical command completed', {
@@ -189,7 +193,7 @@ export async function POST(req: NextRequest) {
       correlationId,
     });
 
-    return NextResponse.json({
+    return respond({
       success: true,
       executed: result.executed,
       agent: agentConfig.label,
@@ -216,12 +220,11 @@ export async function POST(req: NextRequest) {
       agentType,
       correlationId,
     });
-    return NextResponse.json({
+    return respond({
       success: false,
       executed: false,
       message: 'The AI execution service could not complete this request.',
-      correlationId,
       taskId: durableTask?.id ?? null,
-    }, { status: 500 });
+    }, 500);
   }
 }

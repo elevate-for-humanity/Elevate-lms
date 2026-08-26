@@ -78,8 +78,8 @@ export default function TutoringClient({ tutors }: { tutors: { id: string; full_
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[
-            { label: 'Student Portal', href: '/learner/dashboard' },
-            { label: 'Resources', href: '/lms/resources' },
+            { label: 'Student Portal', href: 'https://app.elevateforhumanity.org/lms/dashboard' },
+            { label: 'Resources', href: 'https://app.elevateforhumanity.org/lms/resources' },
             { label: 'Tutoring Center' },
           ]} />
         </div>
@@ -195,7 +195,7 @@ export default function TutoringClient({ tutors }: { tutors: { id: string; full_
           <h2 className="text-3xl font-bold mb-4">Need Help With Your Coursework?</h2>
           <p className="text-lg mb-8">Log in to the LMS to book a tutoring session, or contact support.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/lms/courses" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-xl hover:bg-slate-100 transition text-lg shadow-lg">
+            <Link href="https://app.elevateforhumanity.org/lms/courses" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-xl hover:bg-slate-100 transition text-lg shadow-lg">
               Go to LMS <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/contact" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent text-slate-900 font-bold rounded-xl hover:bg-white/10 transition text-lg border-2 border-white">

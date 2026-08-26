@@ -126,7 +126,7 @@ export default async function PartnersPage() {
             <Link href="/contact" className="rounded-md bg-white px-6 py-3 text-black font-semibold hover:bg-gray-200">
               Partner Intake
             </Link>
-            <Link href="/pathways" className="rounded-md border border-white px-6 py-3 font-semibold hover:bg-white hover:text-black">
+            <Link href="/programs" className="rounded-md border border-white px-6 py-3 font-semibold hover:bg-white hover:text-black">
               View Workforce Pathways
             </Link>
           </div>

@@ -31,7 +31,7 @@ export default async function OnboardingPage() {
       .eq('id', user.id)
       .maybeSingle();
     if (data?.role === 'student') redirect('/onboarding/learner');
-    else if (data?.role === 'program_holder') redirect('/program-holder/onboarding');
+    else if (data?.role === 'program_holder') redirect('https://app.elevateforhumanity.org/program-holder/onboarding');
     else if (data?.role === 'admin' || data?.role === 'super_admin')
       redirect('https://admin.elevateforhumanity.org/dashboard');
   }
@@ -107,7 +107,7 @@ export default async function OnboardingPage() {
               </div>
             </Link>
             <Link
-              href="/program-holder/onboarding"
+              href="https://app.elevateforhumanity.org/program-holder/onboarding"
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-40 overflow-hidden">
@@ -198,7 +198,7 @@ export default async function OnboardingPage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/signup"
+              href="/login"
               className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-white text-lg"
             >
               Sign Up Now

@@ -45,7 +45,7 @@ function BillingRequiredContent() {
               successfully processed.
             </p>
             <a
-              href="/learner/dashboard"
+              href="https://app.elevateforhumanity.org/lms/dashboard"
               className="inline-block bg-brand-orange-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-brand-orange-700 transition-colors"
             >
               Go to Dashboard

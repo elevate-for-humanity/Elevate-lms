@@ -26,7 +26,7 @@ const PROGRAMS = [
     who: 'Current SNAP recipients in Indiana.',
     covers:
       'Full tuition and supportive services at no cost. Elevate is a SNAP E&T approved provider.',
-    href: '/snap-et-partner',
+    href: '/snap/snap-et',
   },
   {
     name: 'Pell Grant',

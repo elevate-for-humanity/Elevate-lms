@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import TestingCart, { AddExamToCartButton } from '@/components/testing/TestingCart';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import {
   ACTIVE_PROVIDERS,
@@ -209,13 +210,21 @@ export default function TestingPage() {
                           >
                             <span className="font-medium text-slate-700">{name}</span>
                             {cents ? (
-                              <Link
-                                href={`/testing/checkout?provider=${encodeURIComponent(provider.key)}&exam=${encodeURIComponent(name)}`}
-                                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-red-600 px-3 py-2 text-xs font-bold text-white hover:bg-brand-red-700"
-                              >
-                                Pay {`${(cents / 100).toFixed(0)}`}
-                                <ArrowRight className="h-3.5 w-3.5" />
-                              </Link>
+                              <div className="flex flex-wrap items-center justify-end gap-2">
+                                <Link
+                                  href={`/testing/checkout?provider=${encodeURIComponent(provider.key)}&exam=${encodeURIComponent(name)}`}
+                                  className="inline-flex items-center gap-1.5 rounded-lg bg-brand-red-600 px-3 py-2 text-xs font-bold text-white hover:bg-brand-red-700"
+                                >
+                                  Pay {`${(cents / 100).toFixed(2)}`} now
+                                  <ArrowRight className="h-3.5 w-3.5" />
+                                </Link>
+                                <AddExamToCartButton
+                                  examType={provider.key}
+                                  examName={name}
+                                  amountCents={cents}
+                                  active
+                                />
+                              </div>
                             ) : (
                               <span className="text-xs font-semibold text-slate-500">Not configured</span>
                             )}
@@ -244,6 +253,11 @@ export default function TestingPage() {
                 </article>
               );
             })}
+          </div>
+
+          <div className="mx-auto mt-12 max-w-2xl">
+            <h2 className="mb-4 text-2xl font-black text-slate-950">Your testing cart</h2>
+            <TestingCart />
           </div>
         </div>
       </section>

@@ -67,7 +67,7 @@ export default function HealthcareTrainingIndianapolisPage() {
       <BreadcrumbStructuredData
         items={[
           { name: 'Home', url: '/' },
-          { name: 'Workforce Training Indianapolis', url: '/workforce-training-indianapolis' },
+          { name: 'Workforce Training Indianapolis', url: '/programs' },
           { name: 'Healthcare Training Indianapolis', url: '/healthcare-training-indianapolis' },
         ]}
       />
@@ -183,13 +183,13 @@ export default function HealthcareTrainingIndianapolisPage() {
             'Registered-apprenticeship coordination where an approved occupation and employer structure apply',
             'Incumbent-worker training discussions based on employer requirements',
           ],
-          cta: { label: 'Employer Partnership Inquiry', href: '/employer-workforce-partnerships-indiana' },
+          cta: { label: 'Employer Partnership Inquiry', href: '/employer' },
         }}
         faqs={faqs}
         relatedLinks={[
-          { label: 'Main Training Hub', href: '/workforce-training-indianapolis' },
-          { label: 'WIOA & Funded Training', href: '/wioa-funded-training-indiana' },
-          { label: 'Employer Partnerships', href: '/employer-workforce-partnerships-indiana' },
+          { label: 'Main Training Hub', href: '/programs' },
+          { label: 'WIOA & Funded Training', href: '/wioa-eligibility' },
+          { label: 'Employer Partnerships', href: '/employer' },
           { label: 'CNA Program', href: '/programs/cna' },
           { label: 'Healthcare Programs', href: '/programs/healthcare' },
           { label: 'Apply Now', href: '/apply' },

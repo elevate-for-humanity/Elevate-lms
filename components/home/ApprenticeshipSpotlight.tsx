@@ -145,7 +145,7 @@ export function ApprenticeshipSpotlight() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href="/apply/barbering-apprenticeship">
+          <Link href="/apply/student?program=barber-apprenticeship">
             <Button className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-bold text-lg px-8 py-4">
               Apply for Barbering Apprenticeship
             </Button>

@@ -176,7 +176,7 @@ export default function InstructorCredentialsPage() {
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: 'Instructional Framework', href: '/admin/instructor-credentials' },
+              { label: 'Instructional Framework', href: 'https://admin.elevateforhumanity.org/instructor-credentials' },
               { label: 'Instructor Credentials' },
             ]}
           />
@@ -444,7 +444,7 @@ export default function InstructorCredentialsPage() {
               WorkOne Partner Packet
             </Link>
             <Link
-              href="/pathways/training-model"
+              href="/instructional-framework"
               className="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-white transition"
             >
               How Training Works

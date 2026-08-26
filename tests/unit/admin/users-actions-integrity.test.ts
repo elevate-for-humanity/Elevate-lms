@@ -49,7 +49,7 @@ describe('admin/users/actions.ts integrity contracts', () => {
   it('deleteUser: blocks self-deletion', () => {
     const deleteFn = src.slice(src.indexOf('export async function deleteUser'));
     const hasSelfGuard =
-      deleteFn.includes('actorId') &&
+      (deleteFn.includes('actorId') || deleteFn.includes('actor.id')) &&
       (deleteFn.includes('Cannot delete your own') || deleteFn.includes('self'));
     expect(hasSelfGuard).toBe(true);
   });

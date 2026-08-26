@@ -10,8 +10,8 @@ export const siteConfig = {
     apply: '/apply',
     login: '/login',
     checkout: '/store',
-    lms: '/lms',
-    studentPortal: '/lms/dashboard',
+    lms: 'https://app.elevateforhumanity.org/lms',
+    studentPortal: 'https://app.elevateforhumanity.org/lms/dashboard',
   },
   social: {
     facebook: 'https://www.facebook.com/elevateforhumanity',

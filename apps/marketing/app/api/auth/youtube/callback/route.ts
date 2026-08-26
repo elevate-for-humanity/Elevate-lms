@@ -22,7 +22,7 @@ async function _GET(request: NextRequest) {
 
   if (error) {
     return NextResponse.redirect(
-      new URL(`/admin/settings/social-media?error=${error}`, request.url),
+      new URL(`https://admin.elevateforhumanity.org/settings/social-media?error=${error}`, request.url),
     );
   }
 
@@ -32,13 +32,13 @@ async function _GET(request: NextRequest) {
   const storedState = request.cookies.get('oauth_state_youtube')?.value;
   if (!storedState || !returnedState || storedState !== returnedState) {
     return NextResponse.redirect(
-      new URL('/admin/settings/social-media?error=invalid_state', request.url),
+      new URL('https://admin.elevateforhumanity.org/settings/social-media?error=invalid_state', request.url),
     );
   }
 
   if (!code) {
     return NextResponse.redirect(
-      new URL('/admin/settings/social-media?error=no_code', request.url),
+      new URL('https://admin.elevateforhumanity.org/settings/social-media?error=no_code', request.url),
     );
   }
 
@@ -64,7 +64,7 @@ async function _GET(request: NextRequest) {
 
     if (!tokenResponse.ok || tokenData.error) {
       return NextResponse.redirect(
-        new URL('/admin/settings/social-media?error=token_failed', request.url),
+        new URL('https://admin.elevateforhumanity.org/settings/social-media?error=token_failed', request.url),
       );
     }
 
@@ -87,7 +87,7 @@ async function _GET(request: NextRequest) {
 
     if (!user) {
       return NextResponse.redirect(
-        new URL('/admin/settings/social-media?error=unauthorized', request.url),
+        new URL('https://admin.elevateforhumanity.org/settings/social-media?error=unauthorized', request.url),
       );
     }
 
@@ -104,19 +104,19 @@ async function _GET(request: NextRequest) {
 
     if (saveError) {
       return NextResponse.redirect(
-        new URL('/admin/settings/social-media?error=save_failed', request.url),
+        new URL('https://admin.elevateforhumanity.org/settings/social-media?error=save_failed', request.url),
       );
     }
 
     // Clear the state cookie — it is single-use.
     const successResponse = NextResponse.redirect(
-      new URL('/admin/settings/social-media?success=youtube_connected', request.url),
+      new URL('https://admin.elevateforhumanity.org/settings/social-media?success=youtube_connected', request.url),
     );
     successResponse.cookies.set('oauth_state_youtube', '', { maxAge: 0, path: '/' });
     return successResponse;
   } catch (error) {
     return NextResponse.redirect(
-      new URL('/admin/settings/social-media?error=unexpected', request.url),
+      new URL('https://admin.elevateforhumanity.org/settings/social-media?error=unexpected', request.url),
     );
   }
 }

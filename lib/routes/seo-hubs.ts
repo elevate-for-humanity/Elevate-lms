@@ -51,7 +51,7 @@ export const SEO_HUBS: SeoHubConfig[] = [
   // 1. Main Authority Hub
   // ──────────────────────────────────────────────────────────────────────
   {
-    slug: '/workforce-training-indianapolis',
+    slug: '/programs',
     title: 'Workforce Training Indianapolis | Funded Career Certifications | Elevate for Humanity',
     description:
       'Indianapolis workforce training provider. WIOA-funded, state-approved career certifications in healthcare, skilled trades, and IT. Serving Indianapolis and all of Indiana.',
@@ -70,12 +70,12 @@ export const SEO_HUBS: SeoHubConfig[] = [
     ],
     programCategories: ['healthcare', 'skilled-trades', 'technology', 'business'],
     internalLinks: [
-      { label: 'WIOA & Funded Training', href: '/wioa-funded-training-indiana' },
+      { label: 'WIOA & Funded Training', href: '/wioa-eligibility' },
       { label: 'Healthcare Programs', href: '/healthcare-training-indianapolis' },
       { label: 'Skilled Trades Programs', href: '/skilled-trades-training-indiana' },
-      { label: 'IT & Digital Skills', href: '/it-certification-training-indianapolis' },
-      { label: 'Employer Partnerships', href: '/employer-workforce-partnerships-indiana' },
-      { label: 'Agency Referrals', href: '/agency-referral-workforce-training-indiana' },
+      { label: 'IT & Digital Skills', href: '/programs/technology' },
+      { label: 'Employer Partnerships', href: '/employer' },
+      { label: 'Agency Referrals', href: '/for-agencies' },
       { label: 'All Programs', href: '/programs' },
       { label: 'Apply Now', href: '/apply' },
     ],
@@ -90,7 +90,7 @@ export const SEO_HUBS: SeoHubConfig[] = [
   // 2. WIOA / Funding Hub
   // ──────────────────────────────────────────────────────────────────────
   {
-    slug: '/wioa-funded-training-indiana',
+    slug: '/wioa-eligibility',
     title: 'WIOA Funded Training Indiana | Free Job Training Indianapolis | Elevate for Humanity',
     description:
       'Understand WIOA funding for career training in Indiana. Workforce Ready Grant, FSSA IMPACT, WorkOne referrals. Eligibility determined by your local workforce agency.',
@@ -109,11 +109,11 @@ export const SEO_HUBS: SeoHubConfig[] = [
     ],
     programCategories: ['healthcare', 'skilled-trades', 'technology'],
     internalLinks: [
-      { label: 'Main Training Hub', href: '/workforce-training-indianapolis' },
+      { label: 'Main Training Hub', href: '/programs' },
       { label: 'Healthcare Programs', href: '/healthcare-training-indianapolis' },
       { label: 'Skilled Trades Programs', href: '/skilled-trades-training-indiana' },
-      { label: 'IT & Digital Skills', href: '/it-certification-training-indianapolis' },
-      { label: 'Agency Referrals', href: '/agency-referral-workforce-training-indiana' },
+      { label: 'IT & Digital Skills', href: '/programs/technology' },
+      { label: 'Agency Referrals', href: '/for-agencies' },
       { label: 'How Funding Works', href: '/funding/how-it-works' },
       { label: 'Apply Now', href: '/apply' },
       { label: 'Contact Us', href: '/contact' },
@@ -148,9 +148,9 @@ export const SEO_HUBS: SeoHubConfig[] = [
     ],
     programCategories: ['healthcare'],
     internalLinks: [
-      { label: 'Main Training Hub', href: '/workforce-training-indianapolis' },
-      { label: 'WIOA & Funded Training', href: '/wioa-funded-training-indiana' },
-      { label: 'Employer Partnerships', href: '/employer-workforce-partnerships-indiana' },
+      { label: 'Main Training Hub', href: '/programs' },
+      { label: 'WIOA & Funded Training', href: '/wioa-eligibility' },
+      { label: 'Employer Partnerships', href: '/employer' },
       { label: 'CNA Program', href: '/programs/cna' },
       { label: 'Healthcare Programs', href: '/programs/healthcare' },
       { label: 'Apply Now', href: '/apply' },
@@ -185,9 +185,9 @@ export const SEO_HUBS: SeoHubConfig[] = [
     ],
     programCategories: ['skilled-trades'],
     internalLinks: [
-      { label: 'Main Training Hub', href: '/workforce-training-indianapolis' },
-      { label: 'WIOA & Funded Training', href: '/wioa-funded-training-indiana' },
-      { label: 'Employer Partnerships', href: '/employer-workforce-partnerships-indiana' },
+      { label: 'Main Training Hub', href: '/programs' },
+      { label: 'WIOA & Funded Training', href: '/wioa-eligibility' },
+      { label: 'Employer Partnerships', href: '/employer' },
       { label: 'HVAC Technician Program', href: '/programs/hvac-technician' },
       { label: 'Apprenticeships', href: '/apprenticeships' },
       { label: 'Apply Now', href: '/apply' },
@@ -203,7 +203,7 @@ export const SEO_HUBS: SeoHubConfig[] = [
   // 5. IT / Digital Skills Hub
   // ──────────────────────────────────────────────────────────────────────
   {
-    slug: '/it-certification-training-indianapolis',
+    slug: '/programs/technology',
     title: 'IT Certification Training Indianapolis | CompTIA, Cybersecurity & Digital Skills | Elevate for Humanity',
     description:
       'CompTIA, Microsoft, cybersecurity, and digital skills training in Indianapolis. Industry-recognized certifications. WIOA funding may be available for eligible Indiana residents.',
@@ -222,9 +222,9 @@ export const SEO_HUBS: SeoHubConfig[] = [
     ],
     programCategories: ['technology'],
     internalLinks: [
-      { label: 'Main Training Hub', href: '/workforce-training-indianapolis' },
-      { label: 'WIOA & Funded Training', href: '/wioa-funded-training-indiana' },
-      { label: 'Employer Partnerships', href: '/employer-workforce-partnerships-indiana' },
+      { label: 'Main Training Hub', href: '/programs' },
+      { label: 'WIOA & Funded Training', href: '/wioa-eligibility' },
+      { label: 'Employer Partnerships', href: '/employer' },
       { label: 'IT Help Desk Program', href: '/programs/it-help-desk' },
       { label: 'Cybersecurity Program', href: '/programs/cybersecurity-analyst' },
       { label: 'Apply Now', href: '/apply' },
@@ -240,7 +240,7 @@ export const SEO_HUBS: SeoHubConfig[] = [
   // 6. Employer / OJT Hub
   // ──────────────────────────────────────────────────────────────────────
   {
-    slug: '/employer-workforce-partnerships-indiana',
+    slug: '/employer',
     title: 'Employer Workforce Partnerships Indiana | OJT, Apprenticeships & Wage Reimbursement | Elevate for Humanity',
     description:
       'Partner with Elevate for Humanity for OJT wage reimbursement, registered apprenticeships, WOTC tax credits, and trained workforce candidates across Indiana.',
@@ -259,11 +259,11 @@ export const SEO_HUBS: SeoHubConfig[] = [
     ],
     programCategories: ['healthcare', 'skilled-trades', 'technology'],
     internalLinks: [
-      { label: 'Main Training Hub', href: '/workforce-training-indianapolis' },
-      { label: 'Agency Referrals', href: '/agency-referral-workforce-training-indiana' },
+      { label: 'Main Training Hub', href: '/programs' },
+      { label: 'Agency Referrals', href: '/for-agencies' },
       { label: 'Healthcare Programs', href: '/healthcare-training-indianapolis' },
       { label: 'Skilled Trades Programs', href: '/skilled-trades-training-indiana' },
-      { label: 'IT Programs', href: '/it-certification-training-indianapolis' },
+      { label: 'IT Programs', href: '/programs/technology' },
       { label: 'All Programs', href: '/programs' },
       { label: 'Contact Us', href: '/contact' },
     ],
@@ -278,7 +278,7 @@ export const SEO_HUBS: SeoHubConfig[] = [
   // 7. Agency / Referral Hub
   // ──────────────────────────────────────────────────────────────────────
   {
-    slug: '/agency-referral-workforce-training-indiana',
+    slug: '/for-agencies',
     title: 'Agency Referral Workforce Training Indiana | WorkOne & FSSA IMPACT Partner | Elevate for Humanity',
     description:
       'Workforce agency referral partner in Indiana. WorkOne referrals accepted. FSSA IMPACT training provider. ETPL-approved. WIOA-compliant documentation and outcome reporting available.',
@@ -297,9 +297,9 @@ export const SEO_HUBS: SeoHubConfig[] = [
     ],
     programCategories: ['healthcare', 'skilled-trades', 'technology'],
     internalLinks: [
-      { label: 'Main Training Hub', href: '/workforce-training-indianapolis' },
-      { label: 'WIOA & Funded Training', href: '/wioa-funded-training-indiana' },
-      { label: 'Employer Partnerships', href: '/employer-workforce-partnerships-indiana' },
+      { label: 'Main Training Hub', href: '/programs' },
+      { label: 'WIOA & Funded Training', href: '/wioa-eligibility' },
+      { label: 'Employer Partnerships', href: '/employer' },
       { label: 'Healthcare Programs', href: '/healthcare-training-indianapolis' },
       { label: 'Skilled Trades Programs', href: '/skilled-trades-training-indiana' },
       { label: 'All Programs', href: '/programs' },

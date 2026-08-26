@@ -121,7 +121,7 @@ export default function CreateCoursePage() {
         return;
       }
 
-      router.push('/admin/staff-portal/courses');
+      router.push('https://admin.elevateforhumanity.org/staff-portal/courses');
     } catch {
       setError('Failed to create course. Please try again.');
     } finally {
@@ -135,8 +135,8 @@ export default function CreateCoursePage() {
         <div className="max-w-4xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: 'Staff Portal', href: '/admin/staff-portal' },
-              { label: 'Courses', href: '/admin/staff-portal/courses' },
+              { label: 'Staff Portal', href: 'https://admin.elevateforhumanity.org/staff-portal' },
+              { label: 'Courses', href: 'https://admin.elevateforhumanity.org/staff-portal/courses' },
               { label: 'Create Course' },
             ]}
           />

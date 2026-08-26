@@ -92,7 +92,7 @@ export default async function PartnerLearningPage({ params }: Props) {
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-6 py-6">
           <Link
-            href="/learner/dashboard"
+            href="https://app.elevateforhumanity.org/lms/dashboard"
             className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />

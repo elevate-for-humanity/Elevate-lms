@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
   const { data: auditFailures, error: auditError } = await supabase
     .from('audit_failures')
-    .select('id, endpoint, error_message, created_at, resolved')
+    .select('id, context, error_message, created_at, resolved')
     .eq('resolved', false)
     .order('created_at', { ascending: false })
     .limit(25);
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
   const errors = rows.map((row) => ({
     id: row.id,
     timestamp: row.created_at,
-    endpoint: row.endpoint ?? 'audit_pipeline',
+    endpoint: row.context ?? 'audit_pipeline',
     error: row.error_message ?? 'Audit write failed',
     statusCode: 500,
     ip: '—',

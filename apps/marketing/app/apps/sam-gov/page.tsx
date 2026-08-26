@@ -107,7 +107,7 @@ export default async function SamGovPage({
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-white border-b"><div className="max-w-6xl mx-auto px-4 py-3"><Breadcrumbs items={[{ label: 'Apps', href: '/apps' }, { label: 'SAM.gov' }]} /></div></div>
+      <div className="bg-white border-b"><div className="max-w-6xl mx-auto px-4 py-3"><Breadcrumbs items={[{ label: 'Apps', href: '/platform' }, { label: 'SAM.gov' }]} /></div></div>
       <SamGovApp user={user} subscription={subscription} entities={entities || []} documents={documents} alerts={alerts} trialDaysRemaining={trialDaysRemaining} setupContext={setupContext} />
     </div>
   );

@@ -122,7 +122,7 @@ export default function ContractsPage() {
               </div>
 
               <Link
-                href="/contracts/workforce-mou"
+                href="/contracts"
                 className="inline-flex items-center gap-2 bg-brand-green-600 hover:bg-brand-green-700 text-white px-6 py-3 rounded-xl font-bold transition w-full justify-center"
               >
                 <Download className="w-5 h-5" />

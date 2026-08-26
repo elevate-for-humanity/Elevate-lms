@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function StudentResourcesPage() {
   const resources = [
-    { title: 'Learning Guides', href: '/lms/library', desc: 'Study materials and tutorials' },
+    { title: 'Learning Guides', href: 'https://app.elevateforhumanity.org/lms/library', desc: 'Study materials and tutorials' },
     { title: 'Career Services', href: '/career-services', desc: 'Job search and resume help' },
     { title: 'Technical Support', href: '/help', desc: 'Get help with your account' },
     { title: 'Financial Aid', href: '/funding', desc: 'Scholarships and payment plans' },

@@ -9,14 +9,14 @@ export const metadata: Metadata = {
 };
 
 const tutorials = [
-  { title: 'Getting Started with Elevate', duration: '5 min', category: 'Basics', href: '/help/tutorials/getting-started' },
-  { title: 'Completing Your Application', duration: '8 min', category: 'Application', href: '/help/tutorials/application' },
-  { title: 'Navigating Your Dashboard', duration: '6 min', category: 'Dashboard', href: '/help/tutorials/dashboard' },
-  { title: 'Submitting Assignments', duration: '7 min', category: 'Coursework', href: '/help/tutorials/assignments' },
-  { title: 'Using the AI Tutor', duration: '4 min', category: 'AI Tools', href: '/help/tutorials/ai-tutor' },
-  { title: 'Accessing Career Services', duration: '5 min', category: 'Career', href: '/help/tutorials/career-services' },
-  { title: 'Payment & Billing', duration: '6 min', category: 'Billing', href: '/help/tutorials/billing' },
-  { title: 'Mobile App Tutorial', duration: '5 min', category: 'Mobile', href: '/help/tutorials/mobile' },
+  { title: 'Getting Started with Elevate', duration: '5 min', category: 'Basics', href: '/help/tutorials' },
+  { title: 'Completing Your Application', duration: '8 min', category: 'Application', href: '/help/tutorials' },
+  { title: 'Navigating Your Dashboard', duration: '6 min', category: 'Dashboard', href: '/help/tutorials' },
+  { title: 'Submitting Assignments', duration: '7 min', category: 'Coursework', href: '/help/tutorials' },
+  { title: 'Using the AI Tutor', duration: '4 min', category: 'AI Tools', href: '/help/tutorials' },
+  { title: 'Accessing Career Services', duration: '5 min', category: 'Career', href: '/help/tutorials' },
+  { title: 'Payment & Billing', duration: '6 min', category: 'Billing', href: '/help/tutorials' },
+  { title: 'Mobile App Tutorial', duration: '5 min', category: 'Mobile', href: '/help/tutorials' },
 ];
 
 export default function TutorialsPage() {

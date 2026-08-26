@@ -477,7 +477,7 @@ export default function ProgramPageLayout({
                         </div>
                         <div className="w-full bg-slate-100 rounded-full h-2.5">
                           <div
-                            className="bg-white h-2.5 rounded-full transition-all"
+                            className="bg-brand-blue-700 h-2.5 rounded-full transition-all"
                             style={{ width: `${pct}%` }}
                           />
                         </div>

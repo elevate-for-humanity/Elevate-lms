@@ -30,7 +30,7 @@ export default function LicensingPage() {
                 <li>✓ Student tracking & analytics</li>
                 <li>✓ Certificate generation</li>
               </ul>
-              <Link href="/store/contact" className="block text-center bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-emerald-700">Request Quote</Link>
+              <Link href="/contact" className="block text-center bg-emerald-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-emerald-700">Request Quote</Link>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-8 border-t-4 border-blue-500">
@@ -42,7 +42,7 @@ export default function LicensingPage() {
                 <li>✓ API access & integrations</li>
                 <li>✓ Dedicated support</li>
               </ul>
-              <Link href="/store/contact?type=white-label" className="block text-center bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700">Learn More</Link>
+              <Link href="/contact?type=white-label" className="block text-center bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700">Learn More</Link>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-8 border-t-4 border-amber-500">

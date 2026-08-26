@@ -102,7 +102,7 @@ async function _GET(request: NextRequest, { params }: { params: Promise<{ course
 
   const { data: protectedFields, error: protectedError } = await supabase
     .from('course_lessons')
-    .select('id, content, video_url, quiz_questions, passing_score, resources')
+    .select('id, content, video_url, quiz_questions, passing_score, topics:key_terms, resources')
     .in('id', lessonIds);
 
   if (protectedError) {

@@ -184,7 +184,7 @@ export default function BankingPage() {
                   </li>
                 </ul>
                 <Link
-                  href="/banking/prepaid-card"
+                  href="/banking"
                   className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-colors"
                 >
                   See Details

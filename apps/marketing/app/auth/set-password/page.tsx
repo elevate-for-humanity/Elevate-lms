@@ -13,7 +13,7 @@ export default function SetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [portal, setPortal] = useState('/learner/dashboard');
+  const [portal, setPortal] = useState('https://app.elevateforhumanity.org/lms/dashboard');
   const [userRole, setUserRole] = useState<string | null>(null);
   const [error, setError] = useState('');
 

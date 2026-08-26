@@ -71,8 +71,8 @@ export default function AddStudentPage() {
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: 'Staff Portal', href: '/admin/staff-portal' },
-              { label: 'Students', href: '/admin/staff-portal/students' },
+              { label: 'Staff Portal', href: 'https://admin.elevateforhumanity.org/staff-portal' },
+              { label: 'Students', href: 'https://admin.elevateforhumanity.org/staff-portal/students' },
               { label: 'Add Student' },
             ]}
           />

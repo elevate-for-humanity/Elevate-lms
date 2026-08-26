@@ -64,7 +64,7 @@ export default function GovernanceSecurityPage() {
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Governance', href: '/governance' },
+            { label: 'Governance', href: '/governance/operational-controls' },
             { label: 'Security & Data Protection' },
           ]}
         />

@@ -5,7 +5,7 @@
  * any formatting, email, or DB layer. Empty strings are rejected, not
  * passed through to crash downstream.
  *
- * Design rule: if a field is optional (e.g. preferredDate when using Calendly),
+ * Design rule: if a field is optional because the paid slot supplies the date,
  * it must be explicitly marked optional here and normalized to null — never
  * allowed to propagate as "".
  */
@@ -20,7 +20,7 @@ export interface BookingInput {
   phone?: string | null;
   organization?: string | null;
   participantCount?: number | null;
-  /** ISO date string YYYY-MM-DD. Optional when scheduling via Calendly. */
+  /** ISO date string YYYY-MM-DD. Optional when a paid slot supplies the date. */
   preferredDate?: string | null;
   preferredTime?: string | null;
   alternateDate?: string | null;
@@ -45,6 +45,7 @@ export interface ValidationResult {
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const MINIMUM_BOOKING_NOTICE_HOURS = 24;
 
 function normalizeDate(raw: unknown): string | null {
   if (!raw || typeof raw !== 'string' || raw.trim() === '') return null;
@@ -114,6 +115,15 @@ export function validateBookingInput(body: Record<string, unknown>): ValidationR
     errors.push({ field: 'alternateDate', message: 'Invalid date format — use YYYY-MM-DD' });
   }
 
+  if (preferredDate) {
+    const requestedTime = normalizeString(body.preferredTime) || '00:00';
+    const requestedAt = new Date(`${preferredDate}T${requestedTime}:00`);
+    const earliestAllowed = new Date(Date.now() + MINIMUM_BOOKING_NOTICE_HOURS * 60 * 60 * 1000);
+    if (Number.isNaN(requestedAt.getTime()) || requestedAt < earliestAllowed) {
+      errors.push({ field: 'preferredDate', message: 'Testing appointments require at least 24 hours advance notice' });
+    }
+  }
+
   // participantCount must be a positive integer
   let participantCount: number | null = null;
   if (body.participantCount != null) {
@@ -160,7 +170,7 @@ export function validateBookingInput(body: Record<string, unknown>): ValidationR
  * Never receives raw user input — that's already been validated.
  */
 export function formatBookingDate(date: string | null | undefined): string {
-  if (!date) return 'To be scheduled via Calendly';
+  if (!date) return 'Scheduled from the selected paid appointment slot';
   return new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',

@@ -17,7 +17,7 @@ const navSections = [
       { name: 'Skilled Trades', href: '/programs/skilled-trades' },
       { name: 'Technology', href: '/programs/technology' },
       { name: 'Apprenticeships', href: '/apprenticeships' },
-      { name: 'Short Courses', href: '/courses' },
+      { name: 'Short Courses', href: '/store' },
     ],
   },
   {

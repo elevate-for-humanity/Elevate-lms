@@ -112,7 +112,7 @@ export default function TakeAttendancePage() {
 
     setSaved(true);
     setSaving(false);
-    if (!draft) setTimeout(() => router.push('/admin/staff-portal/attendance'), 1500);
+    if (!draft) setTimeout(() => router.push('https://admin.elevateforhumanity.org/staff-portal/attendance'), 1500);
   };
 
   if (loading) {
@@ -139,8 +139,8 @@ export default function TakeAttendancePage() {
         <div className="max-w-5xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: 'Staff Portal', href: '/admin/staff-portal' },
-              { label: 'Attendance', href: '/admin/staff-portal/attendance' },
+              { label: 'Staff Portal', href: 'https://admin.elevateforhumanity.org/staff-portal' },
+              { label: 'Attendance', href: 'https://admin.elevateforhumanity.org/staff-portal/attendance' },
               { label: 'Take Attendance' },
             ]}
           />

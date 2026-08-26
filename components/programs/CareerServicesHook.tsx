@@ -31,7 +31,7 @@ export function CareerServicesHook({ programName, programSlug }: CareerServicesH
       icon: Users,
       title: 'Employer Info Session',
       description: 'Learn about hiring partners and job opportunities',
-      href: '/career-services/networking-events',
+      href: '/career-services',
       color: 'green',
     },
     {

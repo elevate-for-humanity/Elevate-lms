@@ -44,7 +44,7 @@ const JOURNEY_OPTIONS: JourneyOption[] = [
     headline: 'Build My Workforce',
     subtext: 'Hire apprenticeship graduates, sponsor employee training, or post job opportunities.',
     cta: 'Partner With Us',
-    href: '/partners/employers',
+    href: '/employer',
     audience: 'Business owners, HR departments, workforce managers',
     features: ['Pre-screened candidates', 'Customized training', 'WIOA employer partnerships']
   },
@@ -54,7 +54,7 @@ const JOURNEY_OPTIONS: JourneyOption[] = [
     headline: 'Partner with Elevate',
     subtext: 'Refer participants, access program data, or build custom workforce solutions.',
     cta: 'Agency Portal',
-    href: '/partners/government',
+    href: '/for-agencies',
     audience: 'WorkOne, VR, workforce boards, economic development',
     features: ['WIOA approved provider', 'DOL registered apprenticeship', 'Compliance reporting']
   }

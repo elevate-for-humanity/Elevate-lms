@@ -2,13 +2,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, BadgeCheck, BookOpen, Building2, Clock3, Scissors, ShieldCheck } from 'lucide-react';
-import HeroVideo from '@/components/marketing/HeroVideo';
+import HeroPicture from '@/components/marketing/HeroPicture';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
-import { getHeroVideoForPageKey } from '@/lib/video/registry';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -16,8 +15,6 @@ export const fetchCache = 'force-no-store';
 
 const BARBER_HERO_IMAGE =
   'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-hero-new.webp';
-
-const BARBER_HERO_VIDEO = getHeroVideoForPageKey('barber-apprenticeship');
 
 const FLOW = [
   { icon: BookOpen, title: 'Learn the theory', body: 'Complete verified Related Technical Instruction alongside your hands-on training.' },
@@ -67,14 +64,12 @@ export default async function BarberApprenticeshipPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
 
-      <HeroVideo
-        videoSrcDesktop={BARBER_HERO_VIDEO?.video_url}
-        videoSrcMobile={BARBER_HERO_VIDEO?.video_url}
-        posterImage={BARBER_HERO_VIDEO?.thumbnail_url || BARBER_HERO_IMAGE}
-        voiceoverSrc="/videos/barber-voiceover.mp3"
+      <HeroPicture
+        src={BARBER_HERO_IMAGE}
+        alt="Barber apprentice receiving supervised hands-on training in an approved host shop"
         analyticsName="barber-apprenticeship"
-        heightClassName="h-[38vh] min-h-[320px] max-h-[520px]"
-        overlayMode="none"
+        heightStyle="h-[38vh] min-h-[320px] max-h-[520px]"
+        transcript="Barber apprenticeship training in a professional shop environment."
       />
 
       <section className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12">

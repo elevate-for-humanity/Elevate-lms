@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const partnerTypes = [
-  { icon: Building2, title: 'Employer', desc: 'Hire trained graduates, sponsor apprenticeships, or offer on-the-job training.', href: '/partners/employer' },
+  { icon: Building2, title: 'Employer', desc: 'Hire trained graduates, sponsor apprenticeships, or offer on-the-job training.', href: '/employer' },
   { icon: GraduationCap, title: 'Training Provider', desc: 'Join our network of credentialed providers to expand your reach.', href: '/partners/training-provider' },
   { icon: Heart, title: 'Community Organization', desc: 'Refer participants and help underserved populations access training.', href: '/partners/reentry' },
   { icon: Briefcase, title: 'Host Shop', desc: 'Host apprentices in your salon or barbershop and build your team.', href: '/partners/host-shops' },

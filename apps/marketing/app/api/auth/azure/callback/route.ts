@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
   if (process.env.AZURE_AD_ENABLED !== 'true') return DISABLED_RESPONSE();
 
   const rawNext = req.nextUrl.searchParams.get('next') ?? '';
-  const next = validateRedirect(rawNext, '/learner/dashboard');
+  const next = validateRedirect(rawNext, 'https://app.elevateforhumanity.org/lms/dashboard');
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
 
   const supabase = await createClient();

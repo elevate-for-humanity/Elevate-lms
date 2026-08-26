@@ -66,19 +66,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Install Playwright
-        run: pnpm exec playwright install chromium --with-deps
+        run: pnpm exec playwright install chromium webkit --with-deps
       - name: Build application
         run: pnpm run ci:build
         env:
           NODE_OPTIONS: '--max-old-space-size=6144'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       - name: Build marketing app
         run: pnpm --filter @elevate/marketing build --no-lint
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       - name: Start server
         run: pnpm --filter @elevate/marketing run start &
@@ -88,6 +90,7 @@ jobs:
           HOSTNAME: 127.0.0.1
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
           NEXTAUTH_SECRET: ci-test-secret-do-not-use-in-production
           NEXTAUTH_URL: http://127.0.0.1:3000
@@ -133,19 +136,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Install Playwright
-        run: pnpm exec playwright install chromium --with-deps
+        run: pnpm exec playwright install chromium webkit --with-deps
       - name: Build application
         run: pnpm run ci:build
         env:
           NODE_OPTIONS: '--max-old-space-size=6144'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       - name: Build marketing app
         run: pnpm --filter @elevate/marketing build --no-lint
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       - name: Start server
         run: pnpm --filter @elevate/marketing run start &
@@ -155,6 +160,7 @@ jobs:
           HOSTNAME: 127.0.0.1
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
           NEXTAUTH_SECRET: ci-test-secret-do-not-use-in-production
           NEXTAUTH_URL: http://127.0.0.1:3000

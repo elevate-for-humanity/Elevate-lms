@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   }
 
   const rawNext = req.nextUrl.searchParams.get('next') ?? '';
-  const next = validateRedirect(rawNext, '/lms/dashboard');
+  const next = validateRedirect(rawNext, 'https://app.elevateforhumanity.org/lms/dashboard');
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
 
   const supabase = await createClient();

@@ -43,7 +43,7 @@ export default async function DocumentsLayout({
 
   // Already submitted documents — redirect to dashboard
   if (enrollment.documents_submitted_at) {
-    redirect('/apprentice');
+    redirect('https://app.elevateforhumanity.org/apprentice');
   }
 
   return <>{children}</>;

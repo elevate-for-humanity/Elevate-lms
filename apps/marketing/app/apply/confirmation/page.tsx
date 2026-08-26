@@ -219,7 +219,7 @@ export default async function ConfirmationPage({
               {/* Enrolled — show account creation */}
               {isEnrolled && (
                 <Link
-                  href="/signup?redirect=/onboarding/learner"
+                  href="/login?redirect=/onboarding/learner"
                   className="inline-flex items-center justify-center bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm"
                 >
                   Create My Account <ArrowRight className="w-4 h-4 ml-2" />

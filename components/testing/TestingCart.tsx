@@ -69,45 +69,45 @@ export default function TestingCart() {
 
   if (items.length === 0) {
     return (
-      <div className="bg-[#111114] border border-white/5 rounded-2xl p-8 text-center">
-        <ShoppingCart className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-        <p className="text-slate-400">Your cart is empty.</p>
+      <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center">
+        <ShoppingCart className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
+        <p className="text-slate-700">Your cart is empty.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#111114] border border-white/5 rounded-2xl overflow-hidden flex flex-col h-full max-h-[600px]">
-      <div className="p-4 border-b border-white/5 flex items-center justify-between bg-white/5">
-        <h3 className="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
+    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col h-full max-h-[600px]">
+      <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <h3 className="font-bold text-slate-950 flex items-center gap-2 text-sm uppercase tracking-wider">
           <ShoppingCart className="w-4 h-4" />
           Test Checkout
         </h3>
-        <button onClick={clearCart} className="text-[10px] text-slate-500 hover:text-white uppercase font-bold">
+        <button onClick={clearCart} className="text-[10px] text-slate-500 hover:text-slate-950 uppercase font-bold">
           Clear All
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
+          <div key={item.id} className="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-white/5">
             <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-bold text-white truncate">{item.name}</h4>
+              <h4 className="text-sm font-bold text-slate-950 truncate">{item.name}</h4>
               <p className="text-xs text-slate-500">${item.price}</p>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                className="w-6 h-6 rounded bg-white/10 flex items-center justify-center hover:bg-white/20"
+                className="w-6 h-6 rounded bg-slate-200 flex items-center justify-center hover:bg-slate-300"
               >
-                <Minus className="w-3 h-3 text-white" />
+                <Minus className="w-3 h-3 text-slate-950" />
               </button>
-              <span className="text-sm font-bold text-white min-w-[20px] text-center">{item.quantity}</span>
+              <span className="text-sm font-bold text-slate-950 min-w-[20px] text-center">{item.quantity}</span>
               <button
                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                className="w-6 h-6 rounded bg-white/10 flex items-center justify-center hover:bg-white/20"
+                className="w-6 h-6 rounded bg-slate-200 flex items-center justify-center hover:bg-slate-300"
               >
-                <Plus className="w-3 h-3 text-white" />
+                <Plus className="w-3 h-3 text-slate-950" />
               </button>
               <button
                 onClick={() => removeItem(item.id)}
@@ -120,10 +120,10 @@ export default function TestingCart() {
         ))}
       </div>
 
-      <div className="p-4 bg-white/5 border-t border-white/5">
+      <div className="p-4 bg-slate-50 border-t border-slate-200">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-slate-400 text-sm">Total</span>
-          <span className="text-xl font-black text-white">${total.toFixed(2)}</span>
+          <span className="text-slate-700 text-sm">Total</span>
+          <span className="text-xl font-black text-slate-950">${total.toFixed(2)}</span>
         </div>
         
         <button

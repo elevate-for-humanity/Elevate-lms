@@ -78,7 +78,7 @@ export default function CNAEnrollPage() {
 
       // Step 2: Route to payment
       if (paymentOption === 'payment-plan') {
-        window.location.href = `/lms/payments/checkout?program=cna&amount=${customDown}&type=down-payment&enrollment=${data.enrollmentId}`;
+        window.location.href = `https://app.elevateforhumanity.org/lms/payments/checkout?program=cna&amount=${customDown}&type=down-payment&enrollment=${data.enrollmentId}`;
         return;
       }
 

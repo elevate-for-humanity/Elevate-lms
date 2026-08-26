@@ -73,10 +73,10 @@ export default function ClientWidgets() {
   // The learner mobile shell follows the same six core destinations as LMS desktop:
   // Home, Community, Learn, Events, Progress, AI Team.
   const showBottomNav =
-    pathname?.startsWith('/lms') ||
-    pathname?.startsWith('/lms/dashboard') ||
+    pathname?.startsWith('https://app.elevateforhumanity.org/lms') ||
+    pathname?.startsWith('https://app.elevateforhumanity.org/lms/dashboard') ||
     pathname?.startsWith('/account/ai-team') ||
-    pathname?.startsWith('/lms/achievements') ||
+    pathname?.startsWith('https://app.elevateforhumanity.org/lms/achievements') ||
     pathname?.startsWith('/leaderboard') ||
     pathname?.startsWith('/profile') ||
     pathname?.startsWith('/settings') ||
@@ -89,7 +89,7 @@ export default function ClientWidgets() {
     pathname?.startsWith('/learner') ||
     pathname?.startsWith('/employer') ||
     pathname?.startsWith('/partner') ||
-    pathname?.startsWith('/program-holder') ||
+    pathname?.startsWith('https://app.elevateforhumanity.org/program-holder') ||
     pathname?.startsWith('/staff-portal');
 
   useEffect(() => {

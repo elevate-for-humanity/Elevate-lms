@@ -79,7 +79,7 @@ function TrialForm() {
 
   if (result) {
     const trialEnd = result.trialEndsAt ? new Date(result.trialEndsAt).toLocaleDateString() : 'See your account';
-    const workspaceTarget = result.dashboardUrl || result.tenantUrl || '/dashboard';
+    const workspaceTarget = result.dashboardUrl || result.tenantUrl || '/portals';
     return (
       <main className="min-h-[70vh] bg-slate-50 px-4 py-16">
         <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">

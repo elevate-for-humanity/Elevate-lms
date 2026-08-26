@@ -27,7 +27,7 @@ export default function AIJobMatchPage() {
             <p className="text-xl text-blue-100 leading-relaxed mb-8">
               Our AI analyzes your skills, experience, and career goals to find the perfect job matches from our employer network.
             </p>
-            <Link href="/lms/ai/job-match" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+            <Link href="https://app.elevateforhumanity.org/lms/ai/job-match" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
               Start Job Match
             </Link>
           </div>
@@ -88,7 +88,7 @@ export default function AIJobMatchPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Find Your Perfect Job</h2>
           <p className="text-slate-600 mb-8">Take 2 minutes to get matched with your ideal position.</p>
-          <Link href="/lms/ai/job-match" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
+          <Link href="https://app.elevateforhumanity.org/lms/ai/job-match" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
             Start Matching Now
           </Link>
         </div>

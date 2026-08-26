@@ -43,14 +43,14 @@ export default async function HostShopsPage() {
 
   return (
     <main className="min-h-screen bg-white text-slate-950">
-      <section className="bg-slate-950 px-4 py-16 text-white sm:py-20">
+      <section className="border-b border-brand-blue-200 bg-brand-blue-50 px-4 py-16 text-slate-950 sm:py-20">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-red-300">Apprenticeship Host Site Network</p>
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">Apprenticeship Host Site Network</p>
           <h1 className="mt-4 max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">Meet the businesses training the next generation.</h1>
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">Approved barbershops, salons, spas, and beauty businesses provide supervised work-based learning while Elevate manages registered-program governance, RTI, records, and compliance workflows.</p>
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-700">Approved barbershops, salons, spas, and beauty businesses provide supervised work-based learning while Elevate manages registered-program governance, RTI, records, and compliance workflows.</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={HOST_SITE_APPLY_HREF} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Become a Host Site</Link>
-            <a href={ROUTES.hostShopPortal} className="rounded-xl border border-white/25 px-6 py-3 font-black text-white hover:bg-white/10">Host Site Portal</a>
+            <a href={ROUTES.hostShopPortal} className="rounded-xl border-2 border-brand-blue-700 bg-white px-6 py-3 font-black text-brand-blue-800 hover:bg-brand-blue-100">Host Site Portal</a>
           </div>
         </div>
       </section>
@@ -91,7 +91,7 @@ export default async function HostShopsPage() {
                         {shop.email ? <a href={`mailto:${shop.email}`} className="mt-3 flex items-center gap-2 break-all text-sm font-semibold text-slate-700"><Mail className="h-4 w-4 shrink-0 text-brand-red-700" /> {shop.email}</a> : null}
                         {shop.supervisor ? <p className="mt-3 text-sm font-semibold text-slate-600">Approved supervisor: {shop.supervisor}</p> : null}
                         <div className="mt-6 flex flex-wrap gap-3">
-                          {profileHref ? <Link href={profileHref} className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-slate-800">View Host Site profile</Link> : null}
+                          {profileHref ? <Link href={profileHref} className="rounded-xl bg-brand-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-800">View Host Site profile</Link> : null}
                           {shop.website ? <a href={shop.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-sm font-black">Visit business website <ExternalLink className="h-4 w-4" /></a> : null}
                           {shop.googleMapsUrl ? <a href={shop.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-black">Google Maps</a> : null}
                         </div>
@@ -126,10 +126,10 @@ export default async function HostShopsPage() {
         </div>
       </section>
 
-      <section className="bg-slate-950 px-4 py-14 text-center text-white">
+      <section className="border-y border-brand-red-200 bg-brand-red-50 px-4 py-14 text-center text-slate-950">
         <div className="mx-auto max-w-4xl">
           <h2 className="text-3xl font-black">Want your business in the Host Site network?</h2>
-          <p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-300">Submit one application. Elevate verifies the worksite, supervisor, licenses, insurance, and program fit before a location is published or assigned apprentices.</p>
+          <p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-700">Submit one application. Elevate verifies the worksite, supervisor, licenses, insurance, and program fit before a location is published or assigned apprentices.</p>
           <Link href={HOST_SITE_APPLY_HREF} className="mt-7 inline-flex rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white">Start Host Site Application</Link>
         </div>
       </section>

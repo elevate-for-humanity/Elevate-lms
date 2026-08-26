@@ -48,7 +48,7 @@ export default function Page() {
                 <p className="font-medium text-slate-900">Employer Dashboard</p>
                 <p className="text-slate-500 text-sm">Manage postings and candidates</p>
               </Link>
-              <Link href="/post-job" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+              <Link href="https://app.elevateforhumanity.org/employer/jobs" className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
                 <p className="font-medium text-slate-900">Post a Job</p>
                 <p className="text-slate-500 text-sm">Create a new job listing</p>
               </Link>

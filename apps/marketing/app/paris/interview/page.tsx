@@ -527,7 +527,7 @@ export default function PARSInterviewPage() {
 
   const handleClose = () => {
     if (typeof window !== 'undefined') {
-      window.location.href = '/dashboard';
+      window.location.href = '/portals';
     }
   };
 

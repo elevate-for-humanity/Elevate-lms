@@ -228,3 +228,88 @@
 .efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) {
   color: #0f172a;
 }
+
+/* A light card can be nested inside a dark CTA or hero. The card owns its
+ * foreground; an outer dark-surface rule must never turn it white-on-white. */
+.efh-contrast
+  :is(.bg-white, .bg-slate-50, .bg-gray-50)
+  :is(
+    .text-slate-500,
+    .text-slate-600,
+    .text-slate-700,
+    .text-slate-800,
+    .text-slate-900,
+    .text-slate-950,
+    .text-gray-500,
+    .text-gray-600,
+    .text-gray-700,
+    .text-gray-800,
+    .text-gray-900
+  ) {
+  color: #0f172a !important;
+}
+
+/* White text on the framework's 500/600 green and blue shades misses AA for
+ * normal-size labels. Keep the hue but use the accessible brand depth. */
+.efh-contrast :is(.bg-green-500, .bg-green-600) {
+  background-color: #166534 !important;
+}
+
+.efh-contrast :is(.bg-blue-500, .bg-blue-600, .bg-brand-blue-500, .bg-brand-blue-600) {
+  background-color: #1e40af !important;
+}
+
+/* Orange remains a brand accent, but white text requires the darker AA-safe shade. */
+.efh-contrast :is(.bg-orange-600, .bg-brand-orange-500, .bg-brand-orange-600) {
+  background-color: #c2410c !important;
+}
+
+.efh-contrast :is(.text-orange-600, .text-brand-orange-500, .text-brand-orange-600) {
+  color: #9a3412 !important;
+}
+
+/* Interface and compliance text must remain readable on phones. */
+.efh-contrast
+  :is(
+    .text-\[8px\],
+    .text-\[9px\],
+    .text-\[10px\],
+    .text-\[11px\],
+    .text-\[0\.5rem\],
+    .text-\[0\.6rem\],
+    .text-\[0\.625rem\],
+    .text-\[0\.6875rem\]
+  ) {
+  font-size: 0.75rem !important;
+  line-height: 1rem !important;
+}
+
+.efh-contrast
+  :is(
+    .bg-black,
+    .bg-slate-950,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-gray-950,
+    .bg-gray-900,
+    .bg-zinc-950,
+    .bg-zinc-900
+  )
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .text-black,
+    .text-slate-950,
+    .text-slate-900,
+    .text-slate-800,
+    .text-gray-950,
+    .text-gray-900,
+    .text-zinc-950,
+    .text-zinc-900
+  ) {
+  color: #f8fafc !important;
+}

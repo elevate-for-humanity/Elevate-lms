@@ -19,7 +19,7 @@ export const siteConfig = {
     login: '/login',
     checkout: '/store',
     enrollment: '/enrollment',
-    lms: '/lms/courses',
-    studentPortal: '/lms/dashboard',
+    lms: 'https://app.elevateforhumanity.org/lms/courses',
+    studentPortal: 'https://app.elevateforhumanity.org/lms/dashboard',
   },
 };

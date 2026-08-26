@@ -151,7 +151,7 @@ export default async function BeautyEnrollmentSuccessPage({ params }: Props) {
           Start Orientation →
         </Link>
         <Link
-          href="/lms"
+          href="https://app.elevateforhumanity.org/lms"
           className="block w-full bg-slate-700 hover:bg-slate-600 text-white text-center py-4 rounded-xl font-bold transition-all mb-6"
         >
           <BookOpen className="inline w-4 h-4 mr-2" />

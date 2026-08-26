@@ -79,9 +79,9 @@ export default function EstheticianDocumentsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ program: 'esthetician-apprenticeship' }),
       });
-      router.push('/apprentice');
+      router.push('https://app.elevateforhumanity.org/apprentice');
     } catch {
-      router.push('/apprentice');
+      router.push('https://app.elevateforhumanity.org/apprentice');
     }
   };
 

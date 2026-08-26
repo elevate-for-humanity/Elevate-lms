@@ -54,6 +54,7 @@ export default function TuitionCalculator({
           <div className="flex items-center gap-1">
             <DollarSign className="w-3.5 h-3.5 text-slate-400" />
             <input
+              aria-label="Down payment amount"
               type="number"
               value={downPayment}
               onChange={(e) => setDownPayment(Math.max(minDown, Math.min(totalPrice, Number(e.target.value) || 0)))}
@@ -62,6 +63,7 @@ export default function TuitionCalculator({
           </div>
         </div>
         <input
+          aria-label="Down payment slider"
           type="range"
           min={minDown}
           max={totalPrice}
@@ -86,6 +88,7 @@ export default function TuitionCalculator({
           </div>
         </div>
         <input
+          aria-label="Payment plan duration in weeks"
           type="range"
           min={4}
           max={maxWeeks}

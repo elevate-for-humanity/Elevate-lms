@@ -20,13 +20,13 @@ export async function MarketingChromeBoundary({ children }: { children: React.Re
   const operational = isOperationalPath(pathname);
 
   if (operational) {
-    return <main id="main-content" tabIndex={-1} className="min-h-dvh focus:outline-none">{children}</main>;
+    return <div id="main-content" tabIndex={-1} className="min-h-dvh focus:outline-none">{children}</div>;
   }
 
   return (
     <>
       <Header />
-      <main id="main-content" tabIndex={-1} className="site-main focus:outline-none">{children}</main>
+      <div id="main-content" tabIndex={-1} className="site-main focus:outline-none">{children}</div>
       <SiteFooter />
     </>
   );

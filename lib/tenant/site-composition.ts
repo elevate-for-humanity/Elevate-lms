@@ -212,7 +212,14 @@ export function legacyPages(config: TenantSiteConfig): TenantSitePage[] {
 }
 
 export function ensureComposableSiteConfig(config: TenantSiteConfig): TenantSiteConfig {
-  const pages = sanitizePages(config.pages?.length ? config.pages : legacyPages(config));
+  const desiredCatalogHref = config.products?.length ? '/shop' : '/programs';
+  const sourcePages = config.pages?.length ? structuredClone(config.pages) : legacyPages(config);
+  const generatedCatalog = sourcePages.find((page) => page.id === 'page_catalog');
+  if (generatedCatalog && generatedCatalog.slug !== desiredCatalogHref) {
+    const replacement = legacyPages(config).find((page) => page.id === 'page_catalog');
+    if (replacement) Object.assign(generatedCatalog, replacement);
+  }
+  const pages = sanitizePages(sourcePages);
   const navigation = pages
     .filter((page) => page.showInNavigation !== false)
     .map((page) => ({ label: page.navLabel || page.title, href: page.slug }));

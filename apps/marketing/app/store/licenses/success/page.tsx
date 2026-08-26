@@ -30,21 +30,21 @@ const NEXT_STEPS = [
     icon: Users,
     title: 'Invite Team Members',
     description: 'Add admins, instructors, and staff to your organization.',
-    href: '/admin/users/invite',
+    href: 'https://admin.elevateforhumanity.org/users/invite',
     cta: 'Invite Team',
   },
   {
     icon: Palette,
     title: 'Add Logo & Branding',
     description: 'Upload your logo and customize colors.',
-    href: '/admin/settings/branding',
+    href: 'https://admin.elevateforhumanity.org/settings/branding',
     cta: 'Customize',
   },
   {
     icon: BookOpen,
     title: 'Import Programs & Courses',
     description: 'Create courses or import existing content.',
-    href: '/admin/courses',
+    href: 'https://admin.elevateforhumanity.org/courses',
     cta: 'Add Content',
   },
   {
@@ -58,7 +58,7 @@ const NEXT_STEPS = [
     icon: Globe,
     title: 'Connect Domain (Optional)',
     description: 'Use your own domain or our subdomain.',
-    href: '/admin/settings/domain',
+    href: 'https://admin.elevateforhumanity.org/settings/domain',
     cta: 'Configure',
   },
 ];
@@ -243,7 +243,7 @@ function SuccessContent() {
             Access your admin dashboard to start setting up your platform.
           </p>
           <Link
-            href="/dashboards"
+            href="/portals"
             className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-50 transition-colors"
           >
             Open Dashboards

@@ -116,7 +116,7 @@ export default function LegalOnboardingPage() {
         logger.warn('Supplemental onboarding status write failed', { auditError });
       }
 
-      router.push('/learner/dashboard');
+      router.push('https://app.elevateforhumanity.org/lms/dashboard');
     } catch {
       setError('Failed to complete onboarding. Please try again or contact support.');
     } finally {

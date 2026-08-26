@@ -257,12 +257,12 @@ export default function ProgramDetailPage({
                     <span
                       className={`inline-block text-xs font-bold text-white px-3 py-1 rounded-full ${
                         p.badgeColor === 'orange'
-                          ? 'bg-brand-orange-500'
+                          ? 'bg-orange-700'
                           : p.badgeColor === 'green'
-                            ? 'bg-brand-green-500'
+                            ? 'bg-green-800'
                             : p.badgeColor === 'red'
-                              ? 'bg-brand-red-500'
-                              : 'bg-brand-blue-500'
+                              ? 'bg-red-700'
+                              : 'bg-blue-700'
                       }`}
                     >
                       {p.badge}
@@ -541,7 +541,7 @@ export default function ProgramDetailPage({
                       </p>
                     </div>
                     <div className="flex-shrink-0">
-                      <span className="flex items-center gap-1 text-brand-green-600 text-xs font-semibold">
+                      <span className="flex items-center gap-1 text-green-800 text-xs font-semibold">
                         <span
                           aria-hidden
                           className="w-1.5 h-1.5 rounded-full bg-brand-red-500 inline-block"
@@ -678,7 +678,7 @@ export default function ProgramDetailPage({
                   </div>
                   <Link
                     href="/check-eligibility"
-                    className="block w-full text-center bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm"
+                    className="block w-full text-center bg-green-800 hover:bg-green-900 text-white font-bold py-3.5 rounded-xl transition-colors text-sm"
                   >
                     Start Funding Review
                   </Link>

@@ -43,7 +43,7 @@ export function ProgramAppointmentBanner() {
             Start Inquiry
           </Link>
           <Link
-            href="/next-steps"
+            href="/apply"
             className="inline-flex items-center justify-center rounded-xl border border-amber-900/30 bg-white px-4 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-100"
           >
             Next Steps Checklist

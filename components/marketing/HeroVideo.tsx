@@ -71,8 +71,7 @@ export default function HeroVideo({
   const [videoEnabled, setVideoEnabled] = useState(deferVideoMs <= 0);
   const [videoReady, setVideoReady] = useState(false);
   const [audioFailed, setAudioFailed] = useState(false);
-  const [userActivated, setUserActivated] = useState(false);
-  const [manualAudioOverride, setManualAudioOverride] = useState(false);
+  const soundRequestedRef = useRef(false);
   const transcriptId = useId();
 
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
@@ -94,7 +93,6 @@ export default function HeroVideo({
     setVideoReady(false);
     setAudioFailed(false);
     setMuted(true);
-    setManualAudioOverride(false);
 
     const video = videoRef.current;
     if (!videoEnabled || !video || !desktopSource) return;
@@ -102,36 +100,6 @@ export default function HeroVideo({
     video.muted = true;
     void video.play().catch(() => {});
   }, [desktopSource, mobileSource, videoEnabled]);
-
-  useEffect(() => {
-    const unlock = () => setUserActivated(true);
-    window.addEventListener('pointerdown', unlock, { passive: true, once: true });
-    window.addEventListener('touchstart', unlock, { passive: true, once: true });
-    window.addEventListener('keydown', unlock, { once: true });
-    window.addEventListener('wheel', unlock, { passive: true, once: true });
-
-    return () => {
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('touchstart', unlock);
-      window.removeEventListener('keydown', unlock);
-      window.removeEventListener('wheel', unlock);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!voiceoverSrc || audioFailed || !userActivated || manualAudioOverride) return;
-
-    const audio = audioRef.current;
-    const video = videoRef.current;
-    if (!audio) return;
-
-    if (video) {
-      video.muted = true;
-      if (video.paused) void video.play().catch(() => {});
-    }
-
-    void audio.play().then(() => setMuted(false)).catch(() => setMuted(true));
-  }, [audioFailed, manualAudioOverride, userActivated, voiceoverSrc]);
 
   useEffect(
     () => () => {
@@ -144,10 +112,9 @@ export default function HeroVideo({
   async function toggleSound() {
     const video = videoRef.current;
     const audio = audioRef.current;
-    setUserActivated(true);
-    setManualAudioOverride(true);
 
     if (!muted) {
+      soundRequestedRef.current = false;
       audio?.pause();
       if (video) video.muted = true;
       setMuted(true);
@@ -155,14 +122,19 @@ export default function HeroVideo({
     }
 
     try {
+      soundRequestedRef.current = true;
       if (voiceoverSrc && audio && !audioFailed) {
         if (video) {
           video.muted = true;
           if (video.paused) await video.play();
-          const targetTime = video.currentTime || 0;
-          audio.currentTime = Number.isFinite(audio.duration) && audio.duration > 0
-            ? Math.min(targetTime, audio.duration)
-            : targetTime;
+        }
+        // Narration is its own short presentation, not the video's native
+        // soundtrack. Never seek it to the looping video's current time.
+        if (
+          audio.ended ||
+          (Number.isFinite(audio.duration) && audio.currentTime >= audio.duration - 0.25)
+        ) {
+          audio.currentTime = 0;
         }
         await audio.play();
       } else if (video) {
@@ -172,6 +144,7 @@ export default function HeroVideo({
       }
       setMuted(false);
     } catch {
+      soundRequestedRef.current = false;
       if (video) video.muted = true;
       setMuted(true);
     }
@@ -247,9 +220,13 @@ export default function HeroVideo({
             preload="metadata"
             aria-hidden="true"
             className="hidden"
-            onEnded={() => setMuted(true)}
+            onEnded={() => {
+              soundRequestedRef.current = false;
+              setMuted(true);
+            }}
             onError={() => {
               setAudioFailed(true);
+              soundRequestedRef.current = false;
               setMuted(true);
             }}
           />

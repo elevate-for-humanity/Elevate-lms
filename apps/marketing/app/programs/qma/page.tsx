@@ -1,22 +1,20 @@
 import { loadProgramForPage } from "@/lib/programs/load-program-page";
 import ProgramDetailPage from "@/components/programs/ProgramDetailPage";
 import heroBanners from "@/content/heroBanners";
-import { notFound } from "next/navigation";
+import { QMA } from "@/data/programs/qma";
 
 export const revalidate = 3600;
 
 export default async function QmaPage() {
   const loaded = await loadProgramForPage("qma");
-  if (!loaded) return notFound();
-  const p = loaded.program;
+  const p = loaded?.program ?? QMA;
   const banner = heroBanners["qma"] ?? null;
   return <ProgramDetailPage program={p} banner={banner} />;
 }
 
 export async function generateMetadata() {
   const loaded = await loadProgramForPage("qma");
-  if (!loaded) return { title: "QMA" };
-  const p = loaded.program;
+  const p = loaded?.program ?? QMA;
   return {
     title: p.metaTitle ?? p.title ?? "QMA",
     description: p.metaDescription ?? p.subtitle ?? "",

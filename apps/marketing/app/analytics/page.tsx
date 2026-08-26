@@ -44,7 +44,7 @@ export default async function AnalyticsPage() {
 
   const allowedRoles = ['admin', 'super_admin', 'staff'];
   if (!profile || !allowedRoles.includes(profile.role)) {
-    redirect('/lms/dashboard');
+    redirect('https://app.elevateforhumanity.org/lms/dashboard');
   }
 
   const [
@@ -129,7 +129,7 @@ export default async function AnalyticsPage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Analytics' }]}
+            items={[{ label: 'Admin', href: 'https://admin.elevateforhumanity.org/dashboard' }, { label: 'Analytics' }]}
           />
         </div>
       </div>

@@ -49,7 +49,7 @@ export default async function StaffCoursesPage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Staff Portal', href: '/admin/staff-portal' }, { label: 'Courses' }]}
+            items={[{ label: 'Staff Portal', href: 'https://admin.elevateforhumanity.org/staff-portal' }, { label: 'Courses' }]}
           />
         </div>
       </div>
@@ -121,7 +121,7 @@ export default async function StaffCoursesPage() {
                       </td>
                       <td className="p-4">
                         <Link
-                          href={`/admin/staff-portal/courses/${course.slug || course.id}`}
+                          href={`https://admin.elevateforhumanity.org/staff-portal/courses/${course.slug || course.id}`}
                           className="text-brand-blue-600 hover:underline text-sm"
                         >
                           Manage

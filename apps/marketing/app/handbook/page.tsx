@@ -41,10 +41,10 @@ export default function HandbookPage() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/dashboard" className="text-2xl font-black text-gray-900">
+            <Link href="/portals" className="text-2xl font-black text-gray-900">
               ELEVATE<span className="text-amber-500">.</span>
             </Link>
-            <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
+            <Link href="/portals" className="text-gray-600 hover:text-gray-900">
               Back to Dashboard
             </Link>
           </div>
@@ -187,7 +187,7 @@ export default function HandbookPage() {
             © 2024 Elevate for Humanity Career & Technical Institute
           </p>
           <div className="flex justify-center gap-6 mt-4 text-sm text-gray-400">
-            <Link href="/dashboard" className="hover:text-white">Dashboard</Link>
+            <Link href="/portals" className="hover:text-white">Dashboard</Link>
             <Link href="/support" className="hover:text-white">Support</Link>
             <Link href="/contact" className="hover:text-white">Contact</Link>
           </div>

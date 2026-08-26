@@ -24,6 +24,11 @@ import fs from 'fs';
 import path from 'path';
 import { BROLL_MAP, pickBrollKey } from './broll-map';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import {
+  resolveBundledFont,
+  selectVideoEncoder,
+  videoEncoderShellArgs,
+} from './ffmpeg-runtime';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -73,15 +78,9 @@ export interface PipelineOptions {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const FONT_FALLBACK = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
-const FONT_BOLD = fs.existsSync('/workspaces/Elevate-lms/public/fonts/Inter-Bold.otf') ? '/workspaces/Elevate-lms/public/fonts/Inter-Bold.otf' : FONT_FALLBACK;
-const FONT_REGULAR = fs.existsSync('/workspaces/Elevate-lms/public/fonts/Inter-Regular.otf') ? '/workspaces/Elevate-lms/public/fonts/Inter-Regular.otf' : FONT_FALLBACK;
-const FONT_SEMI = fs.existsSync('/workspaces/Elevate-lms/public/fonts/Inter-SemiBold.otf') ? '/workspaces/Elevate-lms/public/fonts/Inter-SemiBold.otf' : FONT_FALLBACK;
-
-// Font paths resolved at module load time — constants already have fallback applied
 function fontPath(variant: 'bold' | 'regular' | 'semi'): string {
-  const map: Record<string, string> = { bold: FONT_BOLD, regular: FONT_REGULAR, semi: FONT_SEMI };
-  return map[variant] ?? FONT_FALLBACK;
+  const map = { bold: 'Bold', regular: 'Regular', semi: 'SemiBold' } as const;
+  return resolveBundledFont(map[variant]);
 }
 
 /** Strip markdown, truncate to maxChars */
@@ -275,7 +274,7 @@ function generateBrandCard(
   ].join(';');
 
   execSync(
-    `ffmpeg -y -f lavfi -i "color=c=${bg}:size=1280x720:rate=30" -vf "${filter}" -t 3 -c:v libx264 -preset fast -crf 20 -an "${outPath}" 2>/dev/null`,
+    `ffmpeg -y -f lavfi -i "color=c=${bg}:size=1280x720:rate=30" -vf "${filter}" -t 3 ${videoEncoderShellArgs(20)} -an "${outPath}" 2>/dev/null`,
     { stdio: 'pipe', timeout: 30000 },
   );
 }
@@ -295,6 +294,8 @@ export async function processLesson(
   opts: PipelineOptions = {},
 ): Promise<string> {
   const log = opts.onProgress ?? (() => {});
+  const encoder = selectVideoEncoder();
+  log(`  [media] ${encoder.encoder}: ${encoder.reason}`);
   const slug = lesson.slug || `lesson-${lesson.id.slice(0, 8)}`;
 
   // ── 1. TTS narration ──────────────────────────────────────────────────────
@@ -364,7 +365,7 @@ export async function processLesson(
   execSync(
     `ffmpeg -y -f concat -safe 0 -i "${concatPath}" -t ${duration} ` +
       `-vf "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,setsar=1,${profile.colorGrade}" ` +
-      `-c:v libx264 -preset fast -crf 23 -an "${brollAssembled}" 2>/dev/null`,
+      `${videoEncoderShellArgs(23)} -an "${brollAssembled}" 2>/dev/null`,
     { stdio: 'pipe', timeout: 300000 },
   );
 
@@ -418,7 +419,7 @@ export async function processLesson(
 
   execSync(
     `ffmpeg -y -i "${brollAssembled}" -vf "${vfChain}${subtitleFilter}" ` +
-      `-c:v libx264 -preset fast -crf 22 -an "${overlaidBroll}" 2>/dev/null`,
+      `${videoEncoderShellArgs(22)} -an "${overlaidBroll}" 2>/dev/null`,
     { stdio: 'pipe', timeout: 300000 },
   );
 
@@ -434,7 +435,7 @@ export async function processLesson(
 
   const videoNoAudio = path.join(tmpDir, `${slug}-noaudio.mp4`);
   execSync(
-    `ffmpeg -y -f concat -safe 0 -i "${finalConcatPath}" -c:v libx264 -preset fast -crf 22 -an "${videoNoAudio}" 2>/dev/null`,
+    `ffmpeg -y -f concat -safe 0 -i "${finalConcatPath}" ${videoEncoderShellArgs(22)} -an "${videoNoAudio}" 2>/dev/null`,
     { stdio: 'pipe', timeout: 120000 },
   );
 

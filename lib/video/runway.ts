@@ -16,6 +16,7 @@ import fs from 'fs/promises';
 import fssync from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import { videoEncoderShellArgs } from './ffmpeg-runtime';
 
 const RUNWAY_API = 'https://api.dev.runwayml.com/v1';
 const RUNWAY_MODEL = 'gen4.5';
@@ -155,7 +156,7 @@ export function stitchClips(clipPaths: string[], outputPath: string): void {
   const listFile = outputPath + '.list.txt';
   fssync.writeFileSync(listFile, clipPaths.map((p) => `file '${p}'`).join('\n'));
   execSync(
-    `ffmpeg -y -f concat -safe 0 -i "${listFile}" -c:v libx264 -preset fast -crf 20 "${outputPath}"`,
+    `ffmpeg -y -f concat -safe 0 -i "${listFile}" ${videoEncoderShellArgs(20)} "${outputPath}"`,
     { stdio: 'pipe' },
   );
   fssync.unlinkSync(listFile);
@@ -167,7 +168,7 @@ export function stitchClips(clipPaths: string[], outputPath: string): void {
 export function muxAudioOverVideo(videoPath: string, audioPath: string, outputPath: string): void {
   execSync(
     `ffmpeg -y -stream_loop -1 -i "${videoPath}" -i "${audioPath}" ` +
-      `-c:v libx264 -preset fast -crf 20 -c:a aac -b:a 128k -shortest "${outputPath}"`,
+      `${videoEncoderShellArgs(20)} -c:a aac -b:a 128k -shortest "${outputPath}"`,
     { stdio: 'pipe' },
   );
 }

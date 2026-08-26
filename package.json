@@ -337,6 +337,7 @@
     "mobile:ios": "pnpm build && pnpm exec cap open ios",
     "video:server": "ts-node server/index.ts",
     "video:test": "ts-node server/test-video-generation.ts",
+    "video:diagnostics": "tsx scripts/video-runtime-diagnostics.ts",
     "video:generate-samples": "ts-node server/generate-template-videos.ts",
     "video:download-media": "ts-node server/download-sample-media.ts",
     "generate-covers": "node scripts/generate-course-covers.mjs",

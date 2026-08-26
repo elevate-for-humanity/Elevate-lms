@@ -60,7 +60,7 @@ jobs:
           IFS=',' read -ra SERVICE_LIST <<< "$SERVICES"
           for service in "${SERVICE_LIST[@]}"; do
             case "$service" in
-              marketing|admin|lms|all) ;;
+              marketing|admin|lms|store|all) ;;
               *) echo "::error::Unsupported service: $service"; exit 1 ;;
             esac
           done
@@ -84,6 +84,7 @@ jobs:
               marketing) workflow='deploy-marketing.yml' ;;
               admin) workflow='deploy-admin.yml' ;;
               lms) workflow='deploy-lms.yml' ;;
+              store) workflow='deploy-store.yml' ;;
               *) echo "::error::Unsupported service: $service"; exit 1 ;;
             esac
 
@@ -97,6 +98,7 @@ jobs:
             dispatch_service marketing
             dispatch_service admin
             dispatch_service lms
+            dispatch_service store
           else
             IFS=',' read -ra SERVICE_LIST <<< "$SERVICES"
             for service in "${SERVICE_LIST[@]}"; do

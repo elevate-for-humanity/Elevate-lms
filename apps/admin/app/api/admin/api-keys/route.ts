@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       created_by: auth.id,
       is_active: true,
     })
-    .select('id, name, created_at')
+    .select('id, name, is_active, created_at, last_used_at')
     .single();
 
   if (error) return safeInternalError(error, 'Failed to create API key');

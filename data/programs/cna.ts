@@ -4,14 +4,13 @@ export const CNA: ProgramSchema = {
   slug: 'cna',
   title: 'Certified Nursing Assistant (CNA)',
   subtitle:
-    'Indiana state CNA certification in 4 weeks. Clinical rotations at licensed healthcare facilities. State exam proctored on-site. FSSA IMPACT funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850).',
+    'Indiana state CNA certification training in 4 weeks. Clinical rotations at licensed healthcare facilities. State exam preparation included. This is a self-funded program. Contact enrollment for current tuition and payment options.',
   sector: 'healthcare',
   category: 'Healthcare',
   programType: 'workforce',
 
   heroImage: '/images/pages/healthcare-hero.webp',
   heroImageAlt: 'CNA student assisting a patient at a licensed healthcare facility in Indianapolis',
-  videoSrc: '/videos/cna-hero.mp4',
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
@@ -27,11 +26,11 @@ export const CNA: ProgramSchema = {
   schedule: 'Mon–Fri, 30–40 hours per week',
   cohortSize: '8–12 participants per cohort',
   fundingStatement:
-    'FSSA IMPACT funding available for eligible participants (SNAP/TANF recipients). Covers tuition, books, and state exam fees when approved. Eligibility is not guaranteed. Self-pay: $2,500 (Sale: $1,850). BNPL available.',
+    'This is a self-funded program. Government or grant funding is not currently offered for CNA enrollment. Contact enrollment for current tuition and payment options.',
   selfPayCost: '$1,850',
   regularPrice: '$2,500',
   salePrice: '$1,850',
-  badge: 'FSSA Eligible',
+  badge: 'Self-Funded'
   badgeColor: 'blue',
 
   credentials: [
@@ -239,7 +238,7 @@ export const CNA: ProgramSchema = {
     {
       question: 'What funding is available?',
       answer:
-        'CNA is funded through the FSSA IMPACT program for eligible SNAP and TANF recipients. Many students pay $0. Eligibility is determined through FSSA intake. Self-pay tuition is $2,500 (currently on sale for $1,850). BNPL financing available through Affirm, Sezzle, Klarna, and more.',
+        'CNA is a self-funded program. Government or grant funding is not currently offered. Contact enrollment for current tuition and payment options.',
     },
     {
       question: 'Where are the clinical rotations?',
@@ -266,18 +265,18 @@ export const CNA: ProgramSchema = {
 
   metaTitle: 'CNA Program — Indiana State Certification in 4 Weeks | Elevate for Humanity',
   metaDescription:
-    'Indiana state CNA certification in 4 weeks. Clinical rotations at licensed facilities. State exam proctored on-site. FSSA IMPACT funding available for eligible participants. Self-pay: $2,500 (Sale: $1,850). Indianapolis.',
+    'Indiana state CNA certification training in 4 weeks with clinical rotations and state exam preparation. Self-funded program. Contact enrollment for current tuition and payment options.',
 
   enrollmentType: 'internal',
   deliveryModel: 'internal',
-  fundingOptions: ['impact', 'self_pay'],
+  fundingOptions: ['self_pay'],
 
 
   funding: {
-    wioa_eligible: true,
-    fssa_eligible: true,
-    wrg_eligible: true,
-    jobReadyIndyEligible: true,
-    fundingNotes: 'Indiana ETPL-listed. FSSA IMPACT covers eligible SNAP/TANF recipients. WIOA Title I Adult/Dislocated Worker funding available.',
+    wioa_eligible: false,
+    fssa_eligible: false,
+    wrg_eligible: false,
+    jobReadyIndyEligible: false,
+    fundingNotes: 'Self-funded only. Government or grant funding is not currently offered for CNA enrollment.',
   },
 };

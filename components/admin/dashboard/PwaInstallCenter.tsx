@@ -49,7 +49,10 @@ export function PwaInstallCenter() {
   }, []);
 
   const installAdmin = async () => {
-    if (!installPrompt) return;
+    if (!installPrompt) {
+      window.location.assign('/install');
+      return;
+    }
     await installPrompt.prompt();
     await installPrompt.userChoice;
     setInstallPrompt(null);
@@ -68,15 +71,15 @@ export function PwaInstallCenter() {
           </div>
         </div>
       </div>
-      <div className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-3 sm:p-8">
+      <div className="grid min-w-0 grid-cols-1 gap-4 p-4 sm:grid-cols-2 sm:p-8 xl:grid-cols-3">
         {apps.map((app) => (
-          <article key={app.name} className="flex min-w-0 flex-col rounded-2xl border border-slate-200 bg-slate-50 p-5">
+          <article key={app.name} className="flex min-w-0 max-w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
             <h3 className="font-black text-slate-950">{app.name}</h3>
             <p className="mt-2 flex-1 text-sm font-medium leading-5 text-slate-700">{app.description}</p>
             <div className="mt-5 flex flex-wrap gap-2">
-              {app.local && installPrompt && !installed ? (
+              {app.local && !installed ? (
                 <button type="button" onClick={installAdmin} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-2 text-sm font-black text-white hover:bg-slate-800">
-                  <Download className="h-4 w-4" /> Install
+                  <Download className="h-4 w-4" /> {installPrompt ? 'Install Admin' : 'How to install'}
                 </button>
               ) : null}
               {app.local && installed ? (

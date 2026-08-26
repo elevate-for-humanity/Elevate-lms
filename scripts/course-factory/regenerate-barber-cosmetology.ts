@@ -11,6 +11,7 @@ const AI_SECRET_KEYS = [
 ] as const;
 
 const TARGETS = ['barber-apprenticeship', 'cosmetology-apprenticeship'] as const;
+let failureStage = 'startup';
 
 async function hydrateProductionAISecrets() {
   const db = await requireAdminClient();
@@ -40,9 +41,11 @@ async function hydrateProductionAISecrets() {
 }
 
 async function main() {
+  failureStage = 'ai-secret-hydration';
   await hydrateProductionAISecrets();
 
   for (const programSlug of TARGETS) {
+    failureStage = `${programSlug}-course-factory`;
     console.log(`\n=== Regenerating ${programSlug} ===`);
     const result = await courseFactory(
       {
@@ -55,6 +58,7 @@ async function main() {
         console.log(`[${programSlug}] ${stage} ${progress ?? ''} ${message}`),
     );
 
+    failureStage = `${programSlug}-validation`;
     if (!result.ok) {
       throw new Error(
         `${programSlug} regeneration failed: ${JSON.stringify(result.errors ?? result.generationFailures ?? result)}`,
@@ -76,6 +80,7 @@ async function main() {
 }
 
 main().catch((error) => {
+  console.error(`COURSE_REGENERATION_FAILURE_STAGE ${failureStage}`);
   console.error(error);
   process.exit(1);
 });

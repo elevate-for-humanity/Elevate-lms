@@ -3,6 +3,7 @@ import 'server-only';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { QuizQuestion } from './types';
+import { generatedAssessmentSchema, generatedLessonContentSchema } from './ai-contracts';
 
 export type LessonGenerationCheckpoint = {
   objective: string;
@@ -104,17 +105,27 @@ export async function loadLessonGenerationCheckpoint(
       return null;
     }
 
-    return {
+    const strictCheckpoint = generatedLessonContentSchema.safeParse({
       objective: objectives[0],
-      content: JSON.stringify({
-        html,
-        learning_points: points,
-        scenario,
-        experience,
-      }),
+      content: html,
       learning_points: points,
       scenario,
       quiz_questions: quizQuestions,
+      experience,
+    });
+    if (!strictCheckpoint.success) return null;
+
+    return {
+      objective: strictCheckpoint.data.objective,
+      content: JSON.stringify({
+        html: strictCheckpoint.data.content,
+        learning_points: strictCheckpoint.data.learning_points,
+        scenario: strictCheckpoint.data.scenario,
+        experience: strictCheckpoint.data.experience,
+      }),
+      learning_points: strictCheckpoint.data.learning_points,
+      scenario: strictCheckpoint.data.scenario,
+      quiz_questions: strictCheckpoint.data.quiz_questions,
     };
   } catch (error) {
     logger.warn('[course-factory/checkpoint] cached lesson read skipped', {
@@ -244,7 +255,10 @@ export async function loadAssessmentCheckpoint(
       .eq('id', target.id)
       .maybeSingle();
     if (error || !Array.isArray(data?.quiz_questions) || data.quiz_questions.length < count) return null;
-    return data.quiz_questions.slice(0, count) as QuizQuestion[];
+    const strictCheckpoint = generatedAssessmentSchema.safeParse({
+      questions: data.quiz_questions.slice(0, count),
+    });
+    return strictCheckpoint.success ? strictCheckpoint.data.questions : null;
   } catch {
     return null;
   }

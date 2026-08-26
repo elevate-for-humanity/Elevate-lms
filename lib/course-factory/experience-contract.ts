@@ -13,6 +13,71 @@ export const ExperienceKnowledgeCheckSchema = z.object({
   explanation: z.string().trim().min(1),
 });
 
+
+const TimestampSchema = z.number().min(0);
+
+const InteractiveVideoCheckpointSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('quiz'),
+    timestamp: TimestampSchema,
+    question: z.string().trim().min(1),
+    options: z.array(z.string().trim().min(1)).min(2),
+    answer: z.number().int().min(0),
+    explanation: z.string().trim().min(1).optional(),
+  }),
+  z.object({
+    type: z.literal('hotspot'),
+    timestamp: TimestampSchema,
+    prompt: z.string().trim().min(1),
+    areas: z.array(z.object({
+      label: z.string().trim().min(1),
+      correct: z.boolean(),
+      info: z.string().trim().min(1),
+    })).min(2).refine((areas) => areas.some((area) => area.correct), {
+      message: 'At least one hotspot area must be correct.',
+    }),
+  }),
+  z.object({
+    type: z.literal('scenario'),
+    timestamp: TimestampSchema,
+    situation: z.string().trim().min(1),
+    choices: z.array(z.object({
+      text: z.string().trim().min(1),
+      feedback: z.string().trim().min(1),
+      correct: z.boolean(),
+    })).min(2).refine((choices) => choices.some((choice) => choice.correct), {
+      message: 'At least one scenario choice must be correct.',
+    }),
+  }),
+  z.object({
+    type: z.literal('reflection'),
+    timestamp: TimestampSchema,
+    prompt: z.string().trim().min(1),
+    minChars: z.number().int().min(1).max(5000).optional(),
+  }),
+  z.object({
+    type: z.literal('key-concept'),
+    timestamp: TimestampSchema,
+    concept: z.string().trim().min(1),
+    bullets: z.array(z.string().trim().min(1)).optional(),
+  }),
+]);
+
+const TimedTranscriptSegmentSchema = z.object({
+  start: z.number().min(0),
+  end: z.number().min(0),
+  text: z.string().trim().min(1),
+}).refine((segment) => segment.end >= segment.start, {
+  message: 'Transcript segment end must be after its start.',
+});
+
+export const InteractiveVideoExperienceSchema = z.object({
+  checkpoints: z.array(InteractiveVideoCheckpointSchema).min(1),
+  transcript: z.array(TimedTranscriptSegmentSchema).min(1),
+  requiredWatchPercent: z.number().int().min(1).max(100).default(95),
+  minimumSeatTimeSeconds: z.number().int().min(0).optional(),
+});
+
 export const CourseExperienceSchema = z
   .object({
     // Long-form reading layer (commercial eBook-equivalent experience).
@@ -119,7 +184,7 @@ export const CourseExperienceSchema = z
     matching: z.unknown().optional(),
     simulation: z.unknown().optional(),
     decisionTree: z.unknown().optional(),
-    interactiveVideo: z.unknown().optional(),
+    interactiveVideo: InteractiveVideoExperienceSchema.optional(),
   })
   .passthrough();
 

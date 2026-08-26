@@ -47,7 +47,7 @@ jobs:
         run: node scripts/audit-portal-contracts.mjs
       - name: Portal/database schema drift — live production contract
         if: github.event_name != 'pull_request'
-        run: pnpm audit:schema:strict
+        run: pnpm exec tsx scripts/audit-schema-drift.ts --baseline scripts/schema-drift-baseline.json --fail-on-new-drift
       - name: Supabase write payloads — live production contract
         if: github.event_name != 'pull_request'
         run: pnpm tsx scripts/audit-supabase-mutations.ts

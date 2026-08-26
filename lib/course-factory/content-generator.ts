@@ -38,6 +38,34 @@ interface LessonGenerationInput {
   standardsBlock?: string;
 }
 
+function normalizeLessonContract(raw: string): string {
+  try {
+    const parsed = JSON.parse(raw) as Record<string, any>;
+    const remediation = parsed?.experience?.remediation;
+    if (
+      remediation &&
+      Array.isArray(remediation.objectiveMap) &&
+      remediation.objectiveMap.length < 3
+    ) {
+      const specificObjectives = [
+        ...(Array.isArray(parsed.learning_points) ? parsed.learning_points : []),
+        parsed.objective,
+      ].filter(
+        (value, index, values): value is string =>
+          typeof value === 'string' &&
+          value.trim().length > 0 &&
+          values.indexOf(value) === index,
+      );
+      if (specificObjectives.length >= 3) {
+        remediation.objectiveMap = specificObjectives.slice(0, 3);
+      }
+    }
+    return JSON.stringify(parsed);
+  } catch {
+    return raw;
+  }
+}
+
 export async function generateLessonContent(
   input: LessonGenerationInput,
 ): Promise<GeneratedLessonContent> {
@@ -179,7 +207,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
       });
 
       const parsed = parseStrictAIJson(
-        response.content,
+        normalizeLessonContract(response.content),
         generatedLessonContentSchema,
         'Lesson generation',
       );

@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireAdmin } from '@/lib/authGuards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getAllLiveVideos } from '@/lib/video/registry';
+import { VideoCandidateActions } from './VideoCandidateActions';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Videos Management | Elevate For Humanity' };
@@ -25,6 +26,10 @@ export default async function VideosPage() {
     .select('id,title,description,url,video_url,thumbnail_url,duration_seconds,published,category,created_at')
     .eq('published', true)
     .order('created_at', { ascending: false });
+  const { data: candidates } = await db.from('video_jobs')
+    .select('id,lesson_title,video_url,duration_seconds,quality_evidence,completed_at')
+    .eq('asset_kind', 'lesson').eq('status', 'complete').eq('review_status', 'pending_review')
+    .order('completed_at', { ascending: false });
 
   const uploaded = (uploadedVideos ?? [])
     .map((video) => ({
@@ -68,6 +73,22 @@ export default async function VideosPage() {
             </div>
           </div>
         </section>
+
+        {(candidates?.length ?? 0) > 0 && <section className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
+          <h2 className="text-xl font-black text-slate-950">Replacement videos awaiting approval</h2>
+          <p className="mt-1 text-sm text-slate-700">These candidates are not visible to learners until you approve them.</p>
+          <div className="mt-4 grid gap-5 lg:grid-cols-2">
+            {candidates!.map((candidate) => {
+              const quality = candidate.quality_evidence as { narrationCoverage?: number; visualEvidenceCoverage?: number; expectedSceneCount?: number } | null;
+              return <article key={candidate.id} className="rounded-xl border border-amber-200 bg-white p-4 shadow-sm">
+                <h3 className="font-black text-slate-950">{candidate.lesson_title}</h3>
+                <video controls preload="metadata" className="mt-3 aspect-video w-full rounded-lg bg-black" src={candidate.video_url ?? undefined} />
+                <p className="mt-2 text-xs font-bold text-slate-600">{quality?.expectedSceneCount ?? '—'} scenes · {Math.round((quality?.narrationCoverage ?? 0) * 100)}% narration · {Math.round((quality?.visualEvidenceCoverage ?? 0) * 100)}% visual evidence</p>
+                <VideoCandidateActions jobId={candidate.id} />
+              </article>;
+            })}
+          </div>
+        </section>}
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><Video className="h-5 w-5 text-brand-blue-700" /><p className="mt-3 text-2xl font-black text-slate-950">{rows.length}</p><p className="text-xs font-bold text-slate-500">Playable videos</p></div>

@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/regenerate-barber-cosmetology.yml'
+  issues:
+    types: [reopened]
   workflow_dispatch:
 
 permissions:
@@ -25,6 +27,12 @@ env:
 
 jobs:
   regenerate:
+    if: >-
+      github.event_name != 'issues' ||
+      (github.event.issue.number == 928 &&
+       github.event.issue.title == 'RUN BARBER COSMETOLOGY COURSE REGENERATION' &&
+       github.actor == 'elevateforhumanity' &&
+       github.event.issue.author_association == 'OWNER')
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:
@@ -33,6 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           clean: true
 
       - uses: pnpm/action-setup@v4

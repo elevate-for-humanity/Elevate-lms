@@ -1,13 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { canonicalRoutes, legacyRouteAliases } from '@/lib/routes/canonical-routes';
 
 describe('canonical program redirects', () => {
-  const raw = readFileSync(join(process.cwd(), 'lib/routes/canonical-routes.json'), 'utf8');
-  const parsed = JSON.parse(raw) as {
-    legacyAliases: { source: string; destination: string }[];
-  };
-  const redirects = parsed.legacyAliases;
+  const redirects = legacyRouteAliases;
 
   const programRedirects = redirects.filter(
     (r) => r.source.startsWith('/programs/') && r.destination !== '/programs',
@@ -23,17 +18,13 @@ describe('canonical program redirects', () => {
     expect(bad.map((r) => r.source)).toEqual([]);
   });
 
-  it('does not redirect /programs/business-administration away from its canonical URL', () => {
-    const bad = redirects.find((r) => r.source === '/programs/business-administration');
-    expect(bad).toBeUndefined();
+  it('keeps the current program destinations in the canonical map', () => {
+    expect(canonicalRoutes.programs.cdlTraining).toBe('/programs/cdl-training');
+    expect(canonicalRoutes.programs.hvacTechnician).toBe('/programs/hvac-technician');
+    expect(canonicalRoutes.programs.barberApprenticeship).toBe('/programs/barber-apprenticeship');
   });
 
-  it('legacy slugs redirect to real program or funding pages', () => {
-    const map = new Map(programRedirects.map((r) => [r.source, r.destination]));
-    expect(map.get('/programs/cpr-aed')).toBe('/programs/cpr-first-aid');
-    expect(map.get('/programs/reentry-specialist')).toBeUndefined();
-    // /programs/wioa redirects to /wioa-eligibility (the funding page)
-    expect(map.get('/programs/wioa')).toBe('/wioa-eligibility');
-    expect(map.get('/programs/workforce-readiness')).toBe('/programs/reentry-specialist');
+  it('does not reintroduce retired program aliases', () => {
+    expect(programRedirects).toEqual([]);
   });
 });

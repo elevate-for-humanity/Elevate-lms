@@ -167,7 +167,12 @@ export function validateBlueprint(blueprint: CredentialBlueprint): ValidationRes
   if (blueprint.generationRules?.requiresFinalExam) {
     const hasFinal = lessons.some((lesson) => {
       const slug = lesson.slug.toLowerCase();
-      return inferStepType(slug) === 'exam' && (slug.includes('final') || slug.includes('course-exam'));
+      const title = lesson.title.toLowerCase();
+      const explicitFinal = slug.includes('final') || slug.includes('course-exam') || title.includes('final');
+      const cumulativeCredentialExam =
+        title.includes('full practice exam') &&
+        (title.includes('universal') || title.includes('cumulative'));
+      return (inferStepType(slug) === 'exam' && explicitFinal) || cumulativeCredentialExam;
     });
     if (!hasFinal) allErrors.push({ type: 'error', field: 'finalExam', message: 'Course requires a cumulative final exam' });
   }

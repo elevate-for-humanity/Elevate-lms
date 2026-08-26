@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { randomBytes } from 'node:crypto';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/client';
@@ -26,6 +27,12 @@ import { syncPlatformSubscriptionLifecycle } from '@/lib/platform/subscription-l
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+function checkoutIntegrationIdentifier(): string {
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+  const suffix = Array.from(randomBytes(8), (byte) => alphabet[byte % alphabet.length]).join('');
+  return `elevate_platform_${suffix}`;
+}
 
 function storeOrigin(request: NextRequest): string {
   const requestedOrigin = request.nextUrl.origin.replace(/\/$/, '');
@@ -247,6 +254,7 @@ export async function POST(request: NextRequest) {
 
   const origin = storeOrigin(request);
   const session = await stripe.checkout.sessions.create({
+    integration_identifier: checkoutIntegrationIdentifier(),
     mode: 'subscription',
     line_items: [
       { price: basePrice.id, quantity: 1 },

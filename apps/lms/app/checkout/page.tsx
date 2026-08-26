@@ -4,12 +4,13 @@ import { createClient } from '@/lib/supabase/server';
 import { getStripe, stripeCall } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { PRICES } from '@/lib/stripe/prices';
 
 export const dynamic = 'force-dynamic';
 
 const PLANS = {
-  starter: { name: 'Starter', priceId: process.env.STRIPE_PRICE_STARTER || 'price_starter_monthly' },
-  pro: { name: 'Pro', priceId: process.env.STRIPE_PRICE_PRO || 'price_pro_monthly' },
+  starter: { name: 'Starter', priceId: PRICES.STARTER_MONTHLY },
+  pro: { name: 'Professional', priceId: PRICES.PROFESSIONAL_MONTHLY },
 } as const;
 
 type PlanKey = keyof typeof PLANS;
@@ -46,7 +47,6 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
 
     const session = await stripeCall(() => stripe.checkout.sessions.create({
       mode: 'subscription',
-      payment_method_types: ['card'],
       line_items: [{ price: PLANS[plan].priceId, quantity: 1 }],
       success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/pricing/sponsor-licensing?canceled=true`,

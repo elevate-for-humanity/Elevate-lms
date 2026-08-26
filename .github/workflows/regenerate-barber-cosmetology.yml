@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/regenerate-barber-cosmetology.yml'
+      - 'scripts/course-factory/regenerate-barber-cosmetology.ts'
   issues:
     types: [reopened]
   workflow_dispatch:
@@ -55,28 +56,14 @@ jobs:
 
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Require production credentials
+      - name: Require production database credentials
         shell: bash
         run: |
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
-          test -n "$OPENAI_API_KEY$GROQ_API_KEY$GEMINI_API_KEY$ANTHROPIC_API_KEY"
 
-      - name: Regenerate Barber in preservation mode
-        shell: bash
-        run: |
-          set -o pipefail
-          pnpm tsx scripts/course-factory.ts --barber 2>&1 | tee /tmp/barber-regeneration.log
-          test "$(grep -c 'Course ID:' /tmp/barber-regeneration.log)" -eq 1
-          test "$(grep -c 'FAILED\|ERROR' /tmp/barber-regeneration.log || true)" -eq 0
-
-      - name: Regenerate Cosmetology in preservation mode
-        shell: bash
-        run: |
-          set -o pipefail
-          pnpm tsx scripts/course-factory.ts --cosmo 2>&1 | tee /tmp/cosmetology-regeneration.log
-          test "$(grep -c 'Course ID:' /tmp/cosmetology-regeneration.log)" -eq 1
-          test "$(grep -c 'FAILED\|ERROR' /tmp/cosmetology-regeneration.log || true)" -eq 0
+      - name: Regenerate both courses through canonical Course Factory
+        run: pnpm tsx scripts/course-factory/regenerate-barber-cosmetology.ts
 
       - name: Verify apprenticeship architecture
         run: pnpm tsx scripts/audit-apprenticeship-architecture.ts

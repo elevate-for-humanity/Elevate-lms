@@ -317,3 +317,13 @@
   ) {
   color: #f8fafc !important;
 }
+
+/* A light control nested in a dark section keeps its explicitly dark label.
+   This must follow the dark-surface rule above so CTA text never becomes
+   white-on-white (for example the Indiana Career Connect button). */
+.efh-contrast
+  :is(.bg-black, .bg-slate-950, .bg-slate-900, .bg-slate-800, .bg-gray-950, .bg-gray-900)
+  :is(.bg-white, .bg-slate-50, .bg-gray-50)
+  :is(.text-black, .text-slate-950, .text-slate-900, .text-slate-800, .text-gray-950, .text-gray-900) {
+  color: #0f172a !important;
+}

@@ -5,7 +5,6 @@ import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
-import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -28,8 +27,9 @@ export default async function EstheticianApprenticeshipPage() {
   // Supabase remains the publication authority. The exact published slug must
   // exist, but this dedicated route always renders the canonical apprenticeship
   // schema so it can never inherit the separate five-week esthetician program.
-  const published = await loadProgramForPage('esthetician-apprenticeship');
-  if (!published) return notFound();
+  await loadProgramForPage('esthetician-apprenticeship');
+  // This dedicated public route has a governed static definition and must stay
+  // available during a transient CMS/Supabase read failure.
 
   const normalizedProgram = normalizePublicProgram({
     ...ESTHETICIAN_APPRENTICESHIP,

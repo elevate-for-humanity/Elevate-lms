@@ -4,19 +4,21 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
+import { getStaticProgram } from '@/data/programs';
 
 export const revalidate = 3600;
 
 export default async function CosmetologyApprenticeshipPage() {
   const loaded = await loadProgramForPage('cosmetology-apprenticeship');
-  if (!loaded) return notFound();
+  const program = loaded?.program ?? getStaticProgram('cosmetology-apprenticeship');
+  if (!program) return notFound();
   const banner = heroBanners['cosmetology-apprenticeship'] ?? null;
-  const structuredData = buildBeautyProgramStructuredData(loaded.program);
+  const structuredData = buildBeautyProgramStructuredData(program);
   const heroOverride = banner?.videoSrcDesktop ? (
     <HeroVideo
       videoSrcDesktop={banner.videoSrcDesktop}
       videoSrcMobile={banner.videoSrcMobile ?? banner.videoSrcDesktop}
-      posterImage={banner.posterImage || loaded.program.heroImage}
+      posterImage={banner.posterImage || program.heroImage}
       voiceoverSrc={banner.voiceoverSrc}
       microLabel={banner.microLabel}
       analyticsName={banner.analyticsName}
@@ -34,8 +36,8 @@ export default async function CosmetologyApprenticeshipPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
-      <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride}>
-        <BeautyApprenticeshipAuthority program={loaded.program} />
+      <ProgramDetailPage program={program} banner={banner} heroOverride={heroOverride}>
+        <BeautyApprenticeshipAuthority program={program} />
       </ProgramDetailPage>
     </>
   );

@@ -67,16 +67,18 @@ export default async function HomePage() {
   return (
     <>
       <StructuredData />
-      <h1 className="sr-only">
-        Career training, registered apprenticeships, testing, and workforce pathways
-      </h1>
-      <HomeHeroVideo banner={banner} />
-      <HomeCareerPathways />
-      <HomeApprenticeshipInfra />
-      <HomeFunding />
-      <HomeFinalCTA />
-      <HomeTrustBar />
-      <HomeMobileActions />
+      <main>
+        <h1 className="sr-only">
+          Career training, registered apprenticeships, testing, and workforce pathways
+        </h1>
+        <HomeHeroVideo banner={banner} />
+        <HomeCareerPathways />
+        <HomeApprenticeshipInfra />
+        <HomeFunding />
+        <HomeFinalCTA />
+        <HomeTrustBar />
+        <HomeMobileActions />
+      </main>
     </>
   );
 }

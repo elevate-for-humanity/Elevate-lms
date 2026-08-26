@@ -187,7 +187,7 @@ export async function ensureTrialOwnerAccess(
   await recordStage(db, input.workspaceId, 'builder_ready', input.source, input.reference).catch(() => {});
 
   // Generate the customer-facing credential link only after all workspace provisioning is
-  // complete. This prevents most of the one-time token lifetime from being
+  // complete. This preserves the one-time token lifetime instead of spending it during
   // consumed by workspace setup and sends every new owner through password
   // creation before the builder opens.
   const passwordRedirect = `https://www.elevateforhumanity.org/auth/set-password?redirect=${encodeURIComponent(builderUrl)}`;

@@ -84,9 +84,12 @@ interface TranscriptSegment {
 interface InteractiveVideoPlayerProps {
   videoUrl: string;
   title: string;
+  lessonId?: string;
+  courseId?: string;
   checkpoints?: Checkpoint[];
   quizzes?: VideoQuiz[];
   transcript?: TranscriptSegment[];
+  validationErrors?: string[];
   onProgress?: (progress: number) => void;
   onComplete?: () => void;
 }
@@ -94,9 +97,12 @@ interface InteractiveVideoPlayerProps {
 export default function InteractiveVideoPlayer({
   videoUrl,
   title,
-  checkpoints: _checkpoints,
+  lessonId: lessonRecordId,
+  courseId,
+  checkpoints = [],
   quizzes = [],
   transcript = [],
+  validationErrors = [],
   onProgress,
   onComplete,
 }: InteractiveVideoPlayerProps) {
@@ -116,8 +122,30 @@ export default function InteractiveVideoPlayer({
   const [activeTab, setActiveTab] = useState<'transcript' | 'notes' | 'resources'>('transcript');
   const [showCaptions, setShowCaptions] = useState(false);
   const [currentCaption, setCurrentCaption] = useState('');
-  const [lessonId, setLessonId] = useState<string | null>(null);
+  const [videoId, setVideoId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const [activeCheckpoint, setActiveCheckpoint] = useState<Checkpoint | null>(null);
+  const [checkpointResponse, setCheckpointResponse] = useState('');
+  const [checkpointChoice, setCheckpointChoice] = useState<number | null>(null);
+  const [checkpointFeedback, setCheckpointFeedback] = useState('');
+  const [completedCheckpointKeys, setCompletedCheckpointKeys] = useState<Set<string>>(new Set());
+
+  const checkpointKey = (checkpoint: Checkpoint) =>
+    `${checkpoint.type}:${checkpoint.timestamp}`;
+  const checkpointQuizzes: VideoQuiz[] = checkpoints
+    .filter((checkpoint): checkpoint is CheckpointQuiz => checkpoint.type === 'quiz')
+    .map((checkpoint) => ({
+      id: checkpointKey(checkpoint),
+      timestamp: checkpoint.timestamp,
+      question: checkpoint.question,
+      options: checkpoint.options,
+      correctAnswer: checkpoint.answer,
+      explanation: checkpoint.explanation,
+    }));
+  const effectiveQuizzes = [...quizzes, ...checkpointQuizzes.filter(
+    (checkpoint) => !quizzes.some((quiz) => quiz.id === checkpoint.id),
+  )];
+  const nonQuizCheckpoints = checkpoints.filter((checkpoint) => checkpoint.type !== 'quiz');
 
   // Detect media type from URL
   const isAudioOnly = /\.(mp3|wav|ogg|aac|m4a)(\?|$)/i.test(videoUrl);
@@ -133,7 +161,7 @@ export default function InteractiveVideoPlayer({
 
       // Extract lesson ID from video URL or use title
       const id = videoUrl.split('/').pop()?.split('.')[0] || title;
-      setLessonId(id);
+      setVideoId(id);
 
       const { data } = await supabase
         .from('video_notes')
@@ -175,12 +203,12 @@ export default function InteractiveVideoPlayer({
     setNotes([...notes, note]);
     setNewNote('');
 
-    if (user && lessonId) {
+    if (user && videoId) {
       await supabase
         .from('video_notes')
         .insert({
           user_id: user.id,
-          video_id: lessonId,
+          video_id: videoId,
           timestamp: currentTime,
           content: newNote,
         })
@@ -195,12 +223,12 @@ export default function InteractiveVideoPlayer({
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (user && lessonId) {
+    if (user && videoId) {
       await supabase
         .from('video_progress')
         .upsert({
           user_id: user.id,
-          video_id: lessonId,
+          video_id: videoId,
           progress_percent: progress,
           last_position: currentTime,
           updated_at: new Date().toISOString(),
@@ -209,19 +237,37 @@ export default function InteractiveVideoPlayer({
     }
   };
 
-  // Check for quizzes at current timestamp
+  // Pause once for each required timestamped interaction.
   useEffect(() => {
-    const quiz = quizzes.find((q) => Math.abs(q.timestamp - currentTime) < 0.5 && !showQuiz);
+    if (!isPlaying || showQuiz || activeCheckpoint) return;
 
-    if (quiz && isPlaying) {
+    const quiz = effectiveQuizzes.find(
+      (item) =>
+        Math.abs(item.timestamp - currentTime) < 0.75 &&
+        !completedCheckpointKeys.has(`quiz:${item.timestamp}`),
+    );
+    if (quiz) {
       setCurrentQuiz(quiz);
       setShowQuiz(true);
       setIsPlaying(false);
-      if (videoRef.current) {
-        videoRef.current.pause();
-      }
+      videoRef.current?.pause();
+      return;
     }
-  }, [currentTime, quizzes, showQuiz, isPlaying]);
+
+    const checkpoint = nonQuizCheckpoints.find(
+      (item) =>
+        Math.abs(item.timestamp - currentTime) < 0.75 &&
+        !completedCheckpointKeys.has(checkpointKey(item)),
+    );
+    if (checkpoint) {
+      setActiveCheckpoint(checkpoint);
+      setCheckpointResponse('');
+      setCheckpointChoice(null);
+      setCheckpointFeedback('');
+      setIsPlaying(false);
+      videoRef.current?.pause();
+    }
+  }, [activeCheckpoint, completedCheckpointKeys, currentTime, effectiveQuizzes, isPlaying, nonQuizCheckpoints, showQuiz]);
 
   // Update caption based on current time
   useEffect(() => {
@@ -289,7 +335,7 @@ export default function InteractiveVideoPlayer({
       }
 
       // Fire onComplete once when 95%+ reached
-      if (pct >= 95 && !completeFiredRef.current) {
+      if (pct >= 95 && allCheckpointsComplete && !completeFiredRef.current) {
         completeFiredRef.current = true;
         onCompleteRef.current?.();
       }
@@ -371,21 +417,78 @@ export default function InteractiveVideoPlayer({
 
   const submitQuizAnswer = () => {
     if (quizAnswer !== null && currentQuiz) {
+      const isCorrect = quizAnswer === currentQuiz.correctAnswer;
       setShowQuizResult(true);
+      void fetch('/api/lms/video-quiz-results', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lessonId: lessonRecordId,
+          question: currentQuiz.question,
+          selectedAnswer: quizAnswer,
+          correctAnswer: currentQuiz.correctAnswer,
+          isCorrect,
+          timestamp: currentQuiz.timestamp,
+        }),
+      }).catch(() => {});
 
-      // Au after showing result
+      if (!isCorrect) return;
+      setCompletedCheckpointKeys((current) => new Set(current).add(`quiz:${currentQuiz.timestamp}`));
       setTimeout(() => {
         setShowQuiz(false);
         setShowQuizResult(false);
         setQuizAnswer(null);
         setCurrentQuiz(null);
         setIsPlaying(true);
-        if (videoRef.current) {
-          videoRef.current.play().then(()=>{}, ()=>{});
-        }
-      }, 3000);
+        videoRef.current?.play().then(()=>{}, ()=>{});
+      }, 1500);
     }
   };
+
+  const retryQuiz = () => {
+    setShowQuizResult(false);
+    setQuizAnswer(null);
+  };
+
+  const completeActiveCheckpoint = () => {
+    if (!activeCheckpoint) return;
+    let valid = false;
+    let feedback = '';
+
+    if (activeCheckpoint.type === 'key-concept') valid = true;
+    if (activeCheckpoint.type === 'reflection') {
+      valid = checkpointResponse.trim().length >= (activeCheckpoint.minChars ?? 1);
+      if (!valid) feedback = `Write at least ${activeCheckpoint.minChars ?? 1} characters before continuing.`;
+    }
+    if (activeCheckpoint.type === 'hotspot' && checkpointChoice !== null) {
+      const area = activeCheckpoint.areas[checkpointChoice];
+      valid = !!area?.correct;
+      feedback = area?.info || (valid ? 'Correct.' : 'Review the demonstration and try again.');
+    }
+    if (activeCheckpoint.type === 'scenario' && checkpointChoice !== null) {
+      const choice = activeCheckpoint.choices[checkpointChoice];
+      valid = !!choice?.correct;
+      feedback = choice?.feedback || (valid ? 'Correct.' : 'Review the safety decision and try again.');
+    }
+
+    setCheckpointFeedback(feedback);
+    if (!valid) return;
+
+    const completed = activeCheckpoint;
+    setCompletedCheckpointKeys((current) => new Set(current).add(checkpointKey(completed)));
+    setTimeout(() => {
+      setActiveCheckpoint(null);
+      setCheckpointChoice(null);
+      setCheckpointResponse('');
+      setCheckpointFeedback('');
+      setIsPlaying(true);
+      videoRef.current?.play().then(()=>{}, ()=>{});
+    }, feedback ? 1200 : 0);
+  };
+
+  const allCheckpointsComplete =
+    checkpoints.length === 0 ||
+    checkpoints.every((checkpoint) => completedCheckpointKeys.has(checkpointKey(checkpoint)));
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -397,6 +500,11 @@ export default function InteractiveVideoPlayer({
 
   return (
     <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
+      {validationErrors.length > 0 && (
+        <div className="border-b border-amber-300 bg-amber-50 p-3 text-sm text-amber-900" role="alert">
+          This lesson has {validationErrors.length} interaction configuration issue{validationErrors.length === 1 ? '' : 's'}. An instructor has been notified.
+        </div>
+      )}
       <div className="relative">
         {/* Media Element — video or audio with graceful fallback */}
         {loadError ? (
@@ -436,7 +544,7 @@ export default function InteractiveVideoPlayer({
               onError={() => setLoadError(true)}
               onEnded={() => {
                 setIsPlaying(false);
-                if (onComplete) onComplete();
+                if (allCheckpointsComplete && onComplete) onComplete();
               }}
             />
           </div>
@@ -453,7 +561,7 @@ export default function InteractiveVideoPlayer({
             onError={() => setLoadError(true)}
             onEnded={() => {
               setIsPlaying(false);
-              if (onComplete) onComplete();
+              if (allCheckpointsComplete && onComplete) onComplete();
             }}
           />
         )}
@@ -463,6 +571,70 @@ export default function InteractiveVideoPlayer({
           <div className="absolute bottom-20 left-0 right-0 flex justify-center px-4">
             <div className="bg-black bg-opacity-80 text-white px-4 py-2 rounded text-center max-w-3xl">
               {currentCaption}
+            </div>
+          </div>
+        )}
+
+        {/* Structured checkpoint overlay */}
+        {activeCheckpoint && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/90 p-4" role="dialog" aria-modal="true" aria-label="Required video checkpoint">
+            <div className="w-full max-w-2xl rounded-xl bg-white p-6 text-slate-900">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-brand-blue-700">
+                Required {activeCheckpoint.type.replace('-', ' ')}
+              </p>
+              {activeCheckpoint.type === 'key-concept' && (
+                <>
+                  <h3 className="text-xl font-bold">{activeCheckpoint.concept}</h3>
+                  {activeCheckpoint.bullets?.length ? (
+                    <ul className="mt-4 list-disc space-y-2 pl-6">
+                      {activeCheckpoint.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                  ) : null}
+                </>
+              )}
+              {activeCheckpoint.type === 'reflection' && (
+                <>
+                  <h3 className="text-xl font-bold">{activeCheckpoint.prompt}</h3>
+                  <textarea
+                    autoFocus
+                    value={checkpointResponse}
+                    onChange={(event) => setCheckpointResponse(event.target.value)}
+                    className="mt-4 min-h-32 w-full rounded-lg border border-slate-300 p-3"
+                    aria-label="Reflection response"
+                  />
+                </>
+              )}
+              {activeCheckpoint.type === 'hotspot' && (
+                <>
+                  <h3 className="text-xl font-bold">{activeCheckpoint.prompt}</h3>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {activeCheckpoint.areas.map((area, index) => (
+                      <button key={area.label} type="button" onClick={() => setCheckpointChoice(index)}
+                        className={`rounded-lg border-2 p-4 text-left ${checkpointChoice === index ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200'}`}>
+                        {area.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+              {activeCheckpoint.type === 'scenario' && (
+                <>
+                  <h3 className="text-xl font-bold">{activeCheckpoint.situation}</h3>
+                  <div className="mt-4 space-y-3">
+                    {activeCheckpoint.choices.map((choice, index) => (
+                      <button key={choice.text} type="button" onClick={() => setCheckpointChoice(index)}
+                        className={`w-full rounded-lg border-2 p-4 text-left ${checkpointChoice === index ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-slate-200'}`}>
+                        {choice.text}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+              {checkpointFeedback ? <p className="mt-4 rounded-lg bg-slate-100 p-3" role="status">{checkpointFeedback}</p> : null}
+              <button type="button" onClick={completeActiveCheckpoint}
+                className="mt-5 w-full rounded-lg bg-brand-blue-600 px-4 py-3 font-semibold text-white">
+                {activeCheckpoint.type === 'key-concept' ? 'I understand — continue' : 'Submit and continue'}
+              </button>
             </div>
           </div>
         )}
@@ -520,6 +692,11 @@ export default function InteractiveVideoPlayer({
                     {quizAnswer === currentQuiz.correctAnswer ? '• Correct!' : '✗ Incorrect'}
                   </p>
                   {currentQuiz.explanation && <p className="text-sm">{currentQuiz.explanation}</p>}
+                  {quizAnswer !== currentQuiz.correctAnswer && (
+                    <button type="button" onClick={retryQuiz} className="mt-3 rounded-lg bg-brand-blue-600 px-4 py-2 font-semibold text-white">
+                      Review and try again
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -553,14 +730,22 @@ export default function InteractiveVideoPlayer({
                 background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(currentTime / duration) * 100}%, #4b5563 ${(currentTime / duration) * 100}%, #4b5563 100%)`,
               }}
             />
-            {/* Quiz markers */}
+            {/* Interaction markers */}
             <div className="relative h-2">
-              {quizzes.map((quiz) => (
+              {effectiveQuizzes.map((quiz) => (
                 <div
                   key={quiz.id}
                   className="absolute w-2 h-2 bg-yellow-400 rounded-full -mt-1"
                   style={{ left: `${(quiz.timestamp / duration) * 100}%` }}
                   title={`Quiz at ${formatTime(quiz.timestamp)}`}
+                />
+              ))}
+              {nonQuizCheckpoints.map((checkpoint) => (
+                <div
+                  key={checkpointKey(checkpoint)}
+                  className="absolute h-2 w-2 rounded-full bg-cyan-400 -mt-3"
+                  style={{ left: `${(checkpoint.timestamp / duration) * 100}%` }}
+                  title={`${checkpoint.type} at ${formatTime(checkpoint.timestamp)}`}
                 />
               ))}
             </div>

@@ -3,6 +3,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { AlertTriangle, Clock, ChevronRight, ArrowRight, Brain, BookOpen, Phone, Mail, MessageSquare, TrendingDown, Users, Zap } from 'lucide-react';
+import { AssignAICounselorButton } from './AssignAICounselorButton';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -17,11 +18,11 @@ const RISK_STYLES: Record<string, string> = {
 
 // Coaching intervention types
 const INTERVENTIONS = [
-  { id: 'tutor', label: 'Schedule Tutoring', icon: BookOpen, color: 'blue' },
-  { id: 'call', label: 'Phone Outreach', icon: Phone, color: 'green' },
-  { id: 'email', label: 'Send Email', icon: Mail, color: 'purple' },
-  { id: 'sms', label: 'SMS Reminder', icon: MessageSquare, color: 'amber' },
-  { id: 'coach', label: 'AI Coaching', icon: Brain, color: 'indigo' },
+  { id: 'tutor', label: 'Schedule Tutoring', icon: BookOpen, href: '/appointments' },
+  { id: 'call', label: 'Phone Outreach', icon: Phone, href: '/crm' },
+  { id: 'email', label: 'Send Email', icon: Mail, href: '/email-marketing/campaigns/new' },
+  { id: 'sms', label: 'SMS Reminder', icon: MessageSquare, href: '/operations/sms-logs' },
+  { id: 'coach', label: 'AI Coaching', icon: Brain, href: '#flagged-learners' },
 ];
 
 // RTI Tiers
@@ -108,16 +109,16 @@ export default async function AtRiskPage() {
             <Zap className="w-4 h-4 text-amber-500" />
             Quick Intervention Actions
           </h2>
-          <div className="grid grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             {INTERVENTIONS.map((action) => {
               const Icon = action.icon;
               return (
                 <Link
                   key={action.id}
-                  href={`/email-marketing/campaigns/new?tool=${action.id}`}
-                  className={`flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 hover:border-${action.color}-300 hover:bg-${action.color}-50 transition-all text-center`}
+                  href={action.href}
+                  className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 p-4 text-center transition-all hover:border-indigo-300 hover:bg-indigo-50"
                 >
-                  <Icon className={`w-6 h-6 text-${action.color}-600`} />
+                  <Icon className="h-6 w-6 text-indigo-700" />
                   <span className="text-xs font-medium text-slate-700">{action.label}</span>
                 </Link>
               );
@@ -167,7 +168,7 @@ export default async function AtRiskPage() {
 
         {/* Student Tables */}
         <div className="grid grid-cols-1 gap-6">
-          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div id="flagged-learners" className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-semibold text-slate-900 text-sm">Flagged for Intervention</h2>
             <span className="text-xs text-slate-400">{flaggedCount} students</span>
           </div>
@@ -180,7 +181,7 @@ export default async function AtRiskPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
-                  {['Student', 'Risk Level', 'Reason', 'Flagged', ''].map((h) => (
+                  {['Student', 'Risk Level', 'Reason', 'Flagged', 'Action'].map((h) => (
                     <th
                       key={h}
                       className="text-left py-3 px-5 text-[10px] font-bold uppercase tracking-widest text-slate-400"
@@ -213,14 +214,7 @@ export default async function AtRiskPage() {
                         {r.created_at ? new Date(r.created_at).toLocaleDateString() : '—'}
                       </td>
                       <td className="py-3.5 px-5 text-right">
-                        {p?.id && (
-                          <Link
-                            href={`/students/${p.id}`}
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
-                          >
-                            View <ArrowRight className="w-3 h-3" />
-                          </Link>
-                        )}
+                        {p?.id ? <div className="flex items-center justify-end gap-2"><Link href={`/students/${p.id}`} className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700">View <ArrowRight className="w-3 h-3" /></Link><AssignAICounselorButton userId={p.id} riskId={r.id} learnerName={p.full_name || p.email || 'learner'} reason={r.reason || r.notes} /></div> : null}
                       </td>
                     </tr>
                   );
@@ -246,7 +240,7 @@ export default async function AtRiskPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
-                  {['Student', 'Enrolled', 'Days Since Enrolled', ''].map((h) => (
+                  {['Student', 'Enrolled', 'Days Since Enrolled', 'Action'].map((h) => (
                     <th
                       key={h}
                       className="text-left py-3 px-5 text-[10px] font-bold uppercase tracking-widest text-slate-400"
@@ -281,14 +275,7 @@ export default async function AtRiskPage() {
                         )}
                       </td>
                       <td className="py-3.5 px-5 text-right">
-                        {p?.id && (
-                          <Link
-                            href={`/students/${p.id}`}
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
-                          >
-                            View <ArrowRight className="w-3 h-3" />
-                          </Link>
-                        )}
+                        {p?.id ? <div className="flex items-center justify-end gap-2"><Link href={`/students/${p.id}`} className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700">View <ArrowRight className="w-3 h-3" /></Link><AssignAICounselorButton userId={p.id} learnerName={p.full_name || p.email || 'learner'} reason={`No recent activity for ${days ?? 14} days`} /></div> : null}
                       </td>
                     </tr>
                   );

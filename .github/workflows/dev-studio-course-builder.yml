@@ -14,18 +14,6 @@ on:
           - hvac-technician
   issues:
     types: [opened, reopened]
-  push:
-    branches: [main]
-    paths:
-      - 'lib/devstudio/course-builder-controller.ts'
-      - 'lib/course-builder/**'
-      - 'lib/course-factory/**'
-      - 'lib/curriculum/blueprints/**'
-      - 'scripts/course-factory/build-business-program.ts'
-      - 'scripts/course-factory/build-esb-acceptance.ts'
-      - 'scripts/check-course-factory-authority.mjs'
-      - 'scripts/check-studio-architecture.mjs'
-      - 'scripts/audit-course-builder-procurement.mjs'
 
 permissions:
   contents: read

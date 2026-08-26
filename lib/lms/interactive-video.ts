@@ -96,8 +96,9 @@ export function normalizeInteractiveVideoExperience(value: unknown): Interactive
 
     if (type === 'scenario') {
       const situation = text(item.situation ?? item.context ?? item.question);
-      const choices = Array.isArray(item.choices ?? item.options)
-        ? (item.choices ?? item.options as unknown[]).flatMap((choice) => {
+      const rawChoices = item.choices ?? item.options;
+      const choices = Array.isArray(rawChoices)
+        ? rawChoices.flatMap((choice) => {
             const candidate = record(choice);
             if (!candidate) return [];
             const choiceText = text(candidate.text);

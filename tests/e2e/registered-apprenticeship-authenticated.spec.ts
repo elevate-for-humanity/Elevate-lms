@@ -142,7 +142,21 @@ test.describe('Host Shop production workspace', () => {
     const testCompleted = !originalCompleted;
 
     const mutate = await page.request.patch(`${BASE}/api/host-shop/competencies`, {
-      data: { enrollmentId: apprentice.enrollmentId, competencyId: competency.id, completed: testCompleted, notes: 'Automated reversible E2E verification' },
+      data: {
+        enrollmentId: apprentice.enrollmentId,
+        competencyId: competency.id,
+        completed: testCompleted,
+        notes: 'Automated reversible E2E verification',
+        ...(testCompleted
+          ? {
+              performanceSubject: 'mannequin',
+              evidenceType: 'observation',
+              evidenceUrl: `https://qa.invalid/apprenticeship-evidence/${apprentice.enrollmentId}/${competency.id}`,
+              performedAt: new Date().toISOString().slice(0, 10),
+              instructorLicenseNumber: 'QA-E2E-IN-0001',
+            }
+          : {}),
+      },
       failOnStatusCode: false,
     });
     expect(mutate.status()).toBe(200);

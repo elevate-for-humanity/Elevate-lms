@@ -19,6 +19,7 @@ import CommercialLessonExperience from '@/components/lms/CommercialLessonExperie
 import { ExplainSimply } from '@/components/lms/ai/ExplainSimply';
 import { TranslateToggle } from '@/components/lms/ai/TranslateToggle';
 import { lessonUuidToSimulationKey } from '@/lib/lms/hvac-simulations';
+import { normalizeInteractiveVideoExperience } from '@/lib/lms/interactive-video';
 import {
   HVAC_LEGACY_RUNTIME_ALLOWED,
   HVAC_LEGACY_RETIREMENT_TARGET,
@@ -101,6 +102,7 @@ export default function LessonContentRenderer({
       const videoFile = (lesson.video_file ?? content.video?.videoFile) as string;
       const transcript = (lesson.video_transcript ?? content.video?.transcript ?? content.transcript ?? '') as string;
       const simKey = lessonUuidToSimulationKey[lessonId];
+      const videoRuntime = normalizeInteractiveVideoExperience(learningExperience);
 
       if (simKey) {
         return (
@@ -141,6 +143,11 @@ export default function LessonContentRenderer({
           <InteractiveVideoPlayer
             videoUrl={videoFile}
             title={lesson.title as string}
+            lessonId={lessonId}
+            courseId={courseId}
+            checkpoints={videoRuntime.checkpoints}
+            transcript={videoRuntime.transcript}
+            validationErrors={videoRuntime.validationErrors}
             onComplete={() => {
               if (!isCompleted) onComplete();
             }}

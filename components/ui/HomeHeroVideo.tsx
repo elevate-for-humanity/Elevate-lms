@@ -24,7 +24,10 @@ export interface HomeHeroVideoProps {
 }
 
 const HOME_MEDIA_REVISION = process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 12) || 'home-hero';
-const HOME_VOICEOVER = '/videos/voiceover.mp3';
+// This asset is part of the canonical shared public bundle. The former
+// /videos/voiceover.mp3 path did not exist, so the homepage sound control
+// always fell back to a failed audio request.
+const HOME_VOICEOVER = '/audio/heroes/home.mp3';
 const HOME_FIRST_FRAME = '/images/heroes/hero-home-first-frame.webp';
 
 function withMediaRevision(src?: string) {
@@ -43,7 +46,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       analyticsName={banner.analyticsName}
       overlayMode="none"
       heightClassName="h-[38vh] min-h-[320px] max-h-[520px]"
-      deferVideoMs={900}
+      deferVideoMs={0}
     />
   );
 }

@@ -5,7 +5,7 @@ import { join } from 'node:path';
 describe('barber LMS course pages', () => {
   it('import barber constants used in course detail page', () => {
     const src = readFileSync(
-      join(process.cwd(), 'app/lms/(app)/courses/[courseId]/page.tsx'),
+      join(process.cwd(), 'apps/lms/app/lms/(app)/courses/[courseId]/page.tsx'),
       'utf8',
     );
     expect(src).toContain("from '@/lib/barber/constants'");
@@ -15,7 +15,7 @@ describe('barber LMS course pages', () => {
   });
 
   it('import barber constants used in courses list page', () => {
-    const src = readFileSync(join(process.cwd(), 'app/lms/(app)/courses/page.tsx'), 'utf8');
+    const src = readFileSync(join(process.cwd(), 'apps/lms/app/lms/(app)/courses/page.tsx'), 'utf8');
     expect(src).toContain("from '@/lib/barber/constants'");
     expect(src).toContain("from '@/lib/barber/branding'");
   });

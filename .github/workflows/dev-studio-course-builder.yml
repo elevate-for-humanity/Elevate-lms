@@ -11,12 +11,12 @@ on:
         options:
           - business-administration
           - esb
+          - hvac-technician
   issues:
     types: [opened, reopened]
   push:
     branches: [main]
     paths:
-      - '.github/workflows/dev-studio-course-builder.yml'
       - 'lib/devstudio/course-builder-controller.ts'
       - 'lib/course-builder/**'
       - 'lib/course-factory/**'
@@ -56,7 +56,8 @@ jobs:
     if: >-
       github.event_name != 'issues' ||
       github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE' ||
-      github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE'
+      github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE' ||
+      github.event.issue.title == 'RUN HVAC COURSE BUILDER ACCEPTANCE'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:
@@ -126,6 +127,9 @@ jobs:
           elif [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN ESB COURSE BUILDER ACCEPTANCE" ]; then
             target="esb"
           fi
+          if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN HVAC COURSE BUILDER ACCEPTANCE" ]; then
+            target="hvac-technician"
+          fi
           echo "program=$target" >> "$GITHUB_OUTPUT"
 
       - name: Authorize one-time ESB media run for issue 923
@@ -140,6 +144,9 @@ jobs:
         run: |
           if [ "${{ steps.target.outputs.program }}" = "esb" ]; then
             pnpm tsx scripts/course-factory/build-esb-acceptance.ts
+          elif [ "${{ steps.target.outputs.program }}" = "hvac-technician" ]; then
+            pnpm tsx scripts/course-builder/run.ts --course hvac-technician --mode refresh
+            pnpm tsx scripts/check-hvac-content.ts
           else
             pnpm tsx scripts/course-factory/build-business-program.ts
           fi

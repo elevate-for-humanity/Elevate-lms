@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Award, Scissors, ShieldCheck } from 'lucide-react';
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
@@ -47,19 +48,28 @@ const beautyPathways = [
 export default function BarberBeautyProgramsPage() {
   return (
     <main className="min-h-screen bg-white">
-      <section className="bg-slate-950 text-white px-6 py-16">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-brand-red-400 text-xs uppercase tracking-widest font-bold mb-3">
+      <section className="overflow-hidden border-b border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-6 py-14 sm:py-20">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
+          <div>
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-red-700">
             Personal Services Training
           </p>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-5">
             Barber Apprenticeship & Beauty Training Pathways
           </h1>
-          <p className="text-slate-300 text-lg max-w-3xl leading-relaxed">
+          <p className="max-w-3xl text-lg leading-relaxed text-slate-700">
             Elevate separates Registered Apprenticeship status from other beauty training pathways.
             A program is described as federally registered only when it exists in the canonical
             RAPIDS program registry and supporting sponsor standards.
           </p>
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+            <Link href="/programs/barber-apprenticeship/apply" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Apply as an Apprentice</Link>
+            <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-700 bg-white px-6 py-3 font-black text-brand-blue-800 hover:bg-sky-50">Become a Host Shop</Link>
+          </div>
+          </div>
+          <div className="relative min-h-[320px] overflow-hidden rounded-3xl border-4 border-white shadow-xl sm:min-h-[420px]">
+            <Image src="/images/pexels/cosmetology.webp" alt="Barber and beauty apprentice receiving supervised hands-on training" fill priority className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+          </div>
         </div>
       </section>
 

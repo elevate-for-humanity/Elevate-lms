@@ -62,7 +62,7 @@ const EXPERIENCE = [
 export default function ApprenticeshipsPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950">
-      <section className="relative isolate h-[38vh] min-h-[360px] max-h-[520px] overflow-hidden bg-slate-950">
+      <section className="relative isolate min-h-[520px] overflow-hidden bg-sky-50">
         <Image
           src="/images/pages/admin-apprenticeships-hero.webp"
           alt="Apprentice receiving supervised hands-on training"
@@ -71,22 +71,21 @@ export default function ApprenticeshipsPage() {
           className="object-cover object-center"
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/94 via-slate-950/72 to-slate-950/20" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-slate-950/15" aria-hidden="true" />
-        <div className="relative z-10 mx-auto flex h-full max-w-7xl items-end px-5 pb-10 pt-24 sm:px-8 sm:pb-12 lg:px-10">
-          <div className="max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-red-300">Learn by doing</p>
-            <h1 className="mt-4 text-4xl font-black leading-[1.02] tracking-tight text-white sm:text-5xl lg:text-6xl">
+        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent" aria-hidden="true" />
+        <div className="relative z-10 mx-auto flex min-h-[520px] max-w-7xl items-center px-5 py-24 sm:px-8 lg:px-10">
+          <div className="max-w-3xl rounded-3xl border border-white/80 bg-white/90 p-6 shadow-xl backdrop-blur-sm sm:p-9">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">Learn by doing</p>
+            <h1 className="mt-4 text-4xl font-black leading-[1.02] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
               Apprenticeship puts training where the work happens.
             </h1>
-            <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-white/90 sm:text-xl sm:leading-8">
+            <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-slate-800 sm:text-xl sm:leading-8">
               Build real skills through supervised work-based learning, structured instruction, progress tracking, and a clear path toward occupation-specific requirements.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <a href="#programs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white hover:bg-brand-red-700">
                 Explore Apprenticeships <ArrowRight className="h-4 w-4" />
               </a>
-              <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/70 bg-slate-950/30 px-7 py-3.5 font-black text-white backdrop-blur-sm hover:bg-white hover:text-slate-950">
+              <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-700 bg-white px-7 py-3.5 font-black text-brand-blue-800 hover:bg-sky-50">
                 Find Host-Site Information
               </Link>
             </div>
@@ -138,14 +137,14 @@ export default function ApprenticeshipsPage() {
         </div>
       </section>
 
-      <section className="bg-slate-950 px-4 py-14 text-white sm:py-20">
+      <section className="border-y border-orange-200 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-4 py-14 text-slate-950 sm:py-20">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
             <div className="relative min-h-[340px] overflow-hidden rounded-3xl sm:min-h-[440px]">
               <Image src="/images/pages/apprenticeship-sponsor-page-1.webp" alt="Apprentice working with an on-site supervisor" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
             </div>
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-red-300">How it works</p>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">How it works</p>
               <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">A clear path from application to documented progress.</h2>
               <div className="mt-7 space-y-5">
                 {[
@@ -154,9 +153,9 @@ export default function ApprenticeshipsPage() {
                   ['03', 'Train and learn', 'Complete supervised on-the-job learning together with the required instruction and competencies.'],
                   ['04', 'Track the record', 'Hours, skills, documents, and program milestones remain visible in the apprenticeship workflow.'],
                 ].map(([n, title, body]) => (
-                  <div key={n} className="flex gap-4 border-b border-white/10 pb-5 last:border-0">
-                    <span className="text-sm font-black text-red-300">{n}</span>
-                    <div><h3 className="font-black text-white">{title}</h3><p className="mt-1 text-sm font-medium leading-6 text-slate-300 sm:text-base">{body}</p></div>
+                  <div key={n} className="flex gap-4 border-b border-slate-200 pb-5 last:border-0">
+                    <span className="text-sm font-black text-brand-red-700">{n}</span>
+                    <div><h3 className="font-black text-slate-950">{title}</h3><p className="mt-1 text-sm font-medium leading-6 text-slate-700 sm:text-base">{body}</p></div>
                   </div>
                 ))}
               </div>

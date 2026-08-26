@@ -88,7 +88,7 @@ export default async function EstheticianApprenticeshipPage() {
       videoSrcDesktop={safeBanner.videoSrcDesktop}
       videoSrcMobile={safeBanner.videoSrcMobile ?? safeBanner.videoSrcDesktop}
       posterImage={safeBanner.posterImage || program.heroImage}
-      voiceoverSrc={undefined}
+      voiceoverSrc={safeBanner.voiceoverSrc}
       microLabel={SAFE_HERO_COPY.microLabel}
       analyticsName={safeBanner.analyticsName}
       belowHeroHeadline={SAFE_HERO_COPY.belowHeroHeadline}

@@ -101,8 +101,11 @@ async function _GET(request: Request) {
       if (completionDates[0] === today || completionDates[0] === yesterday) {
         streak = 1;
         for (let i = 1; i < completionDates.length; i++) {
-          const prev = new Date(completionDates[i - 1]);
-          const curr = new Date(completionDates[i]);
+          const previousDate = completionDates[i - 1];
+          const currentDate = completionDates[i];
+          if (!previousDate || !currentDate) continue;
+          const prev = new Date(previousDate);
+          const curr = new Date(currentDate);
           const diffDays = Math.round((prev.getTime() - curr.getTime()) / 86400000);
           if (diffDays === 1) {
             streak++;
@@ -202,6 +205,12 @@ async function _POST(request: Request) {
       .maybeSingle();
 
     if (error) return safeInternalError(error, 'Failed to award badge');
+    if (!awarded) {
+      return safeInternalError(
+        new Error('Badge insert returned no record'),
+        'Failed to award badge',
+      );
+    }
 
     return NextResponse.json(
       {

@@ -152,7 +152,7 @@ export function assembleIntegratedCourseBuild(
     instructor: {
       name: 'Elevate Instructional Team',
       title: 'Credential Course Instructor',
-      avatar: '/images/instructors/elevate-instructional-team.jpg',
+      avatar: '/images/logo.png',
       voice: 'professional-encouraging',
       personality: 'Practical, supportive, and mastery-focused',
       bio: 'Course content is AI-assisted and reviewed by authorized subject-matter experts before publication.',

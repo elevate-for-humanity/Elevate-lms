@@ -84,6 +84,9 @@ const nextConfig = {
       { source: '/apprenticeships/ipla-exam', destination: '/testing', permanent: true },
       { source: '/partners/barber-host-shop', destination: '/partners/host-shops', permanent: true },
       { source: '/partners/barber-host-shop/apply', destination: '/partners/host-shop/apply', permanent: true },
+      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/login', permanent: true },
+      { source: '/student/login', destination: 'https://app.elevateforhumanity.org/login', permanent: true },
+      { source: '/videos/cna-hero', destination: '/programs/cna', permanent: true },
       { source: '/student-portal', destination: '/platform/student-portal', permanent: true },
     ];
   },

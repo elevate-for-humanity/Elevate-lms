@@ -21,7 +21,7 @@ export const resend = {
       if (!apiKey) throw new Error('SENDGRID_API_KEY not configured');
 
       const toArr = Array.isArray(data.to) ? data.to : [data.to];
-      const fromParsed = parseFrom(data.from);
+      const fromParsed = parseSendGridFrom(data.from);
 
       const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
         method: 'POST',
@@ -51,9 +51,11 @@ export const resend = {
   },
 };
 
-function parseFrom(from: string): { email: string; name?: string } {
+export function parseSendGridFrom(from: string): { email: string; name?: string } {
   const match = from.match(/^(.+?)\s*<(.+?)>$/);
-  if (match) return { name: match[1].trim(), email: match[2].trim() };
+  const name = match?.[1]?.trim();
+  const email = match?.[2]?.trim();
+  if (name && email) return { name, email };
   return { email: from };
 }
 

@@ -136,13 +136,12 @@ export async function generateMultipleAudio(
   try {
     const audioPaths: string[] = [];
 
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
+    for (const [i, segment] of segments.entries()) {
       const outputPath = path.join(outputDir, `segment-${i + 1}.mp3`);
 
       await generateAndSaveAudio(segment.text, outputPath, {
-        voice: segment.voice,
-        speed: segment.speed,
+        ...(segment.voice !== undefined ? { voice: segment.voice } : {}),
+        ...(segment.speed !== undefined ? { speed: segment.speed } : {}),
       });
 
       audioPaths.push(outputPath);

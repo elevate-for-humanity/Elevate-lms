@@ -95,21 +95,25 @@ function configuredDefaultProvider(): string {
   if (configured) return configured;
   // No explicit preference: lead with the first provider in the configured
   // order (self-hosted first by default).
-  return chatProviderOrder()[0];
+  return chatProviderOrder()[0] ?? 'elevate';
 }
 
 function resolveChatProvider(): AIProvider {
   const preferred = configuredDefaultProvider() as AIProviderName;
 
   if (preferred !== 'none' && chatProviders[preferred] && !disabledChatProviders.has(preferred)) {
-    const provider = chatProviders[preferred]();
+    const createProvider = chatProviders[preferred];
+    if (!createProvider) throw new Error(`Unknown AI chat provider: ${preferred}`);
+    const provider = createProvider();
     if (provider.isAvailable()) return provider;
     logger.warn(`AI provider "${preferred}" not available, trying fallbacks`);
   }
 
   for (const name of chatProviderOrder()) {
     if (name === preferred || disabledChatProviders.has(name)) continue;
-    const provider = chatProviders[name]();
+    const createProvider = chatProviders[name];
+    if (!createProvider) continue;
+    const provider = createProvider();
     if (provider.isAvailable()) {
       logger.info(`AI: using fallback provider "${name}"`);
       return provider;
@@ -135,20 +139,26 @@ function resolveChatCandidates(options: ChatCompletionOptions): AIProvider[] {
   );
 
   return names
-    .map((name) => chatProviders[name]())
+    .map((name) => chatProviders[name])
+    .filter((createProvider): createProvider is () => AIProvider => Boolean(createProvider))
+    .map((createProvider) => createProvider())
     .filter((provider) => provider.isAvailable());
 }
 
 function resolveImageProvider(): AIImageProvider {
   const preferred = (process.env.AI_IMAGE_PROVIDER || 'dalle') as AIImageProviderName;
   if (preferred !== 'none' && imageProviders[preferred]) {
-    const provider = imageProviders[preferred]();
+    const createProvider = imageProviders[preferred];
+    if (!createProvider) throw new Error(`Unknown AI image provider: ${preferred}`);
+    const provider = createProvider();
     if (provider.isAvailable()) return provider;
   }
 
   for (const name of ['dalle', 'stability', 'azure']) {
     if (name === preferred) continue;
-    const provider = imageProviders[name]();
+    const createProvider = imageProviders[name];
+    if (!createProvider) continue;
+    const provider = createProvider();
     if (provider.isAvailable()) return provider;
   }
 
@@ -382,10 +392,10 @@ export async function* aiChatWithTools(options: {
     return;
   }
   for await (const delta of aiChatStream({
-    model: options.model,
+    ...(options.model ? { model: options.model } : {}),
     messages: options.messages,
-    temperature: options.temperature,
-    maxTokens: options.maxTokens,
+    ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
+    ...(options.maxTokens !== undefined ? { maxTokens: options.maxTokens } : {}),
   })) {
     yield { type: 'delta', content: delta };
   }

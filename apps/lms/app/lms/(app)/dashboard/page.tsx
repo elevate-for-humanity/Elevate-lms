@@ -523,9 +523,9 @@ export default async function StudentDashboard() {
       {activeCourseIsAvailable ? (
         <ParisFloatingWrapper
           surface="learner"
-          courseTitle={activeCourse?.title}
-          nextLessonTitle={nextLesson?.title}
           courseProgress={courseProgress}
+          {...(activeCourse?.title ? { courseTitle: activeCourse.title } : {})}
+          {...(nextLesson?.title ? { nextLessonTitle: nextLesson.title } : {})}
         />
       ) : null}
     </div>

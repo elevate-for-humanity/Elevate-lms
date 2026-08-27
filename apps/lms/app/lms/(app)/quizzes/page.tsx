@@ -130,11 +130,9 @@ export default async function QuizzesPage() {
           subtitle={`${stats.available} quizzes available. ${stats.completed} completed with ${stats.avgScore}% average score.`}
           image="/images/pages/training-classroom.webp"
           eyebrow="Test Your Knowledge"
-          cta={
-            stats.available > stats.completed
-              ? { label: 'Start Next Quiz', href: '#available-quizzes' }
-              : undefined
-          }
+          {...(stats.available > stats.completed
+            ? { cta: { label: 'Start Next Quiz', href: '#available-quizzes' } }
+            : {})}
         />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

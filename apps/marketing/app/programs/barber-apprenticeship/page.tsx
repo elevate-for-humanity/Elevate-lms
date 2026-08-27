@@ -2,13 +2,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, BadgeCheck, BookOpen, Building2, Clock3, Scissors, ShieldCheck } from 'lucide-react';
-import HeroPicture from '@/components/marketing/HeroPicture';
+import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
 import BarberPaymentPlanner from '@/components/programs/beauty/BarberPaymentPlanner';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
+import heroBanners from '@/content/heroBanners';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -53,6 +54,7 @@ export default async function BarberApprenticeshipPage() {
   if (!loaded) return notFound();
 
   const program = loaded.program;
+  const heroBanner = heroBanners['barber-apprenticeship'];
   const structuredData = buildBeautyProgramStructuredData({
     ...program,
     heroImage: BARBER_HERO_IMAGE,
@@ -65,12 +67,15 @@ export default async function BarberApprenticeshipPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
 
-      <HeroPicture
-        src={BARBER_HERO_IMAGE}
-        alt="Barber apprentice receiving supervised hands-on training in an approved host shop"
+      <HeroVideo
+        videoSrcDesktop={heroBanner?.videoSrcDesktop}
+        videoSrcMobile={heroBanner?.videoSrcMobile ?? heroBanner?.videoSrcDesktop}
+        posterImage={BARBER_HERO_IMAGE}
+        voiceoverSrc={heroBanner?.voiceoverSrc}
         analyticsName="barber-apprenticeship"
-        heightStyle="h-[clamp(420px,58vh,720px)]"
-        transcript="Barber apprenticeship training in a professional shop environment."
+        heightClassName="h-[clamp(420px,58vh,720px)]"
+        overlayMode="none"
+        transcript={heroBanner?.transcript ?? 'Barber apprenticeship training in a professional shop environment.'}
       />
 
       <section className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12">

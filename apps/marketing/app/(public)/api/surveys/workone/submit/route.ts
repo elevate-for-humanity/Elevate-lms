@@ -33,15 +33,18 @@ async function proxyRequest(
     if (cookie) headers.set('cookie', cookie);
     headers.set('x-forwarded-host', request.headers.get('host') ?? 'www.elevateforhumanity.org');
 
-    const body = method === 'POST' ? await request.arrayBuffer() : undefined;
-
-    const response = await fetch(targetUrl, {
+    const requestInit: RequestInit = {
       method,
       headers,
-      body: body && body.byteLength > 0 ? body : undefined,
       cache: 'no-store',
       redirect: 'manual',
-    });
+    };
+    if (method === 'POST') {
+      const body = await request.arrayBuffer();
+      if (body.byteLength > 0) requestInit.body = body;
+    }
+
+    const response = await fetch(targetUrl, requestInit);
 
     const responseHeaders = new Headers();
     const respContentType = response.headers.get('content-type');

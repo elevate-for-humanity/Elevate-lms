@@ -74,6 +74,10 @@ function WorkOneSurveyContent() {
   const handleNext = () => {
     if (!survey) return;
     const question = survey.questions[currentStep];
+    if (!question) {
+      setError('This survey has no question at the current step. Please request a new survey link.');
+      return;
+    }
     if (question.required && !answers[question.id]) {
       alert('Please answer this question to continue');
       return;
@@ -189,6 +193,17 @@ function WorkOneSurveyContent() {
   if (!survey) return null;
 
   const currentQuestion = survey.questions[currentStep];
+  if (!currentQuestion) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Survey Configuration Error</h1>
+          <p className="text-gray-600">This survey has no available questions. Please request a new survey link.</p>
+        </div>
+      </div>
+    );
+  }
   const progress = ((currentStep + 1) / survey.questions.length) * 100;
   const isLastStep = currentStep === survey.questions.length - 1;
 

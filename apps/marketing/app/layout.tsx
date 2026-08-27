@@ -86,6 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
       </head>
       <body className="efh-contrast">
+        <SkipToContent />
         <SupabaseConfigBootstrap />
         <MarketingPwaClient />
         <ChunkRecovery />
@@ -93,7 +94,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <FirstPartyTraffic />
         <AssociateFormLabels />
         <I18nProvider>
-          <SkipToContent />
           <MarketingChromeBoundary>{children}</MarketingChromeBoundary>
         </I18nProvider>
         <CookieConsent />

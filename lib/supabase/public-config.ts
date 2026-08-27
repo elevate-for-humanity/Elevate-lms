@@ -41,14 +41,17 @@ export function resolveServerSupabaseRawEnv(): { url?: string; anonKey?: string 
   const anonKey =
     process.env.SUPABASE_ANON_KEY?.trim() ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
-  return { url, anonKey };
+  return {
+    ...(url ? { url } : {}),
+    ...(anonKey ? { anonKey } : {}),
+  };
 }
 
 /** Read from process.env (runtime Northflank + optional build-time NEXT_PUBLIC_*). */
 export function getServerPublicSupabaseConfig(): SupabasePublicConfig | null {
   const { url, anonKey } = resolveServerSupabaseRawEnv();
-  if (isPlaceholderSupabaseConfig(url, anonKey)) return null;
-  return { url: url!, anonKey: anonKey! };
+  if (!url || !anonKey || isPlaceholderSupabaseConfig(url, anonKey)) return null;
+  return { url, anonKey };
 }
 
 /** Browser: prefer runtime injection, then build-time inlined env (if not placeholder). */
@@ -70,8 +73,8 @@ export function getBrowserPublicSupabaseConfig(): SupabasePublicConfig | null {
   const anonKey =
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
     process.env.SUPABASE_ANON_KEY?.trim();
-  if (isPlaceholderSupabaseConfig(url, anonKey)) return null;
-  return { url: url!, anonKey: anonKey! };
+  if (!url || !anonKey || isPlaceholderSupabaseConfig(url, anonKey)) return null;
+  return { url, anonKey };
 }
 
 export function isSupabaseAuthConfigured(): boolean {

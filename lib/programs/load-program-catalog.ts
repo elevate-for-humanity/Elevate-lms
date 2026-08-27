@@ -134,7 +134,7 @@ export async function loadProgramCatalog(client: SupabaseClient, params: LoadPro
 
 export async function loadPublishedProgramsListing(
   client: SupabaseClient,
-  options?: { suppressSlugs?: Set<string>; suppressFallbackWarning?: boolean },
+  options?: { suppressSlugs?: Set<string> },
 ): Promise<{ programs: ProgramsListingItem[]; error?: string; source: 'database' }> {
   const { data, error } = await basePublishedQuery(client).order('title', { ascending: true });
   if (error) {

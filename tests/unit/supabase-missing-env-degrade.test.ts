@@ -16,7 +16,7 @@ describe('missing Supabase env degradation', () => {
     expect(guardIndex).toBeLessThan(createClientIndex);
   });
 
-  it('suppresses public programs fallback warnings when Supabase is not configured', () => {
+  it('keeps the public program catalog database-only when Supabase is not configured', () => {
     const publicPageSource = readFileSync(
       join(process.cwd(), 'lib/programs/public-programs-page.ts'),
       'utf8',
@@ -26,9 +26,9 @@ describe('missing Supabase env degradation', () => {
       'utf8',
     );
 
-    expect(publicPageSource).toContain('isPublicSupabaseConfigured');
-    expect(publicPageSource).toContain('suppressFallbackWarning: !isPublicSupabaseConfigured()');
-    expect(catalogSource).toContain('suppressFallbackWarning?: boolean');
-    expect(catalogSource).toContain('if (!options?.suppressFallbackWarning)');
+    expect(publicPageSource).toContain('createPublicClient()');
+    expect(publicPageSource).toContain("catalogSource: 'database'");
+    expect(catalogSource).toContain("source: 'database'");
+    expect(catalogSource).not.toContain("from '@/data/programs'");
   });
 });

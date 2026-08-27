@@ -139,6 +139,7 @@ export default function UnifiedCourseBuilder() {
         {tab === 'courses' && (
           <CourseCatalog
             courses={courses}
+            onChanged={loadCourses}
             onCreated={async (id) => {
               await loadCourses();
               setCourseId(id);
@@ -171,11 +172,42 @@ export default function UnifiedCourseBuilder() {
 
 function CourseCatalog({
   courses,
+  onChanged,
   onCreated,
 }: {
   courses: CourseRow[];
+  onChanged: () => void | Promise<void>;
   onCreated: (id: string) => void | Promise<void>;
 }) {
+  const [busyId, setBusyId] = useState('');
+  const [error, setError] = useState('');
+
+  async function mutate(course: CourseRow, action: 'clone' | 'publish' | 'unpublish' | 'delete') {
+    if (action === 'delete' && !window.confirm(`Delete ${course.title}? This cannot be undone.`)) return;
+    setBusyId(course.id);
+    setError('');
+    try {
+      const endpoint = action === 'clone'
+        ? `/api/admin/courses/${course.id}/clone`
+        : action === 'publish'
+          ? `/api/admin/lms/courses/${course.id}/publish`
+          : `/api/admin/lms/courses/${course.id}`;
+      const response = await fetch(endpoint, {
+        method: action === 'delete' ? 'DELETE' : action === 'unpublish' ? 'PATCH' : 'POST',
+        ...(action === 'unpublish'
+          ? { headers: courseBuilderJsonHeaders(), body: JSON.stringify({ status: 'draft' }) }
+          : {}),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error ?? `${action} failed`);
+      await onChanged();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : `${action} failed`);
+    } finally {
+      setBusyId('');
+    }
+  }
+
   return (
     <div className="grid gap-5 xl:grid-cols-[1fr_420px]">
       <section className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
@@ -183,19 +215,26 @@ function CourseCatalog({
         <p className="mt-1 text-sm text-slate-400">
           Every course opens the same session, state provider, mutation layer and feature workspace.
         </p>
+        {error ? <p role="alert" className="mt-3 rounded-lg bg-red-950/60 px-3 py-2 text-sm text-red-200">{error}</p> : null}
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {courses.map((course) => (
-            <Link
+            <article
               key={course.id}
-              href={`/studio/courses/${course.id}`}
               className="rounded-xl border border-slate-700 bg-slate-950 p-4 hover:border-cyan-500"
             >
-              <div className="font-bold text-white">{course.title}</div>
+              <Link href={`/studio/courses/${course.id}`} className="font-bold text-white hover:text-cyan-300">{course.title}</Link>
               <div className="mt-1 text-xs text-slate-400">
                 {course.status ?? 'draft'} · {course.duration_hours ?? '—'} hours
               </div>
-              <div className="mt-3 text-xs font-bold text-cyan-400">Open complete course →</div>
-            </Link>
+              <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
+                <Link href={`/studio/courses/${course.id}`} className="rounded-md bg-cyan-500 px-2.5 py-1.5 text-slate-950">Open</Link>
+                <button disabled={busyId === course.id} onClick={() => void mutate(course, course.status === 'published' ? 'unpublish' : 'publish')} className="rounded-md border border-slate-600 px-2.5 py-1.5 text-slate-200 disabled:opacity-50">
+                  {course.status === 'published' ? 'Unpublish' : 'Publish'}
+                </button>
+                <button disabled={busyId === course.id} onClick={() => void mutate(course, 'clone')} className="rounded-md border border-slate-600 px-2.5 py-1.5 text-slate-200 disabled:opacity-50">Clone</button>
+                <button disabled={busyId === course.id} onClick={() => void mutate(course, 'delete')} className="rounded-md border border-red-800 px-2.5 py-1.5 text-red-300 disabled:opacity-50">Delete</button>
+              </div>
+            </article>
           ))}
           {!courses.length && <p className="text-sm text-slate-400">No courses found.</p>}
         </div>

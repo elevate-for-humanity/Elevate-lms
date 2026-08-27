@@ -141,11 +141,13 @@ describe('canonical Course Factory media architecture', () => {
     expect(acceptance).toContain('EXPECTED_MICROCLIPS = 70');
   });
 
-  it('keeps speculative instructional GPU rendering disabled by default', () => {
+  it('enables all available instructional GPU scenes through the compositor', () => {
     const worker = read('lib/video/process-video-job.ts');
     const renderer = read('lib/video/remotion-render.ts');
-    expect(worker).toContain("process.env.ENABLE_GPU_INSTRUCTIONAL_SCENES === 'true'");
-    expect(renderer).toContain("process.env.ENABLE_GPU_INSTRUCTIONAL_SCENES === 'true'");
+    expect(worker).not.toContain('ENABLE_DIRECT_GPU_MICROCLIPS');
+    expect(renderer).not.toContain('ENABLE_GPU_INSTRUCTIONAL_SCENES');
+    expect(renderer).toContain('const canGenerateMotion = await gpuVideoAvailable()');
+    expect(worker).toContain('const result = await renderStoryboardVideo');
   });
 
   it('compresses Supabase-bound GPU buffers as well as disk renders', () => {

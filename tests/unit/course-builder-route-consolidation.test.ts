@@ -42,6 +42,20 @@ describe('Admin UI route consolidation', () => {
     expect(existsSync(path.join(root, 'apps/admin/app/course-builder/page.tsx'))).toBe(true);
   });
 
+  it('keeps legacy CourseBuilderClient operations wired into the canonical builder', () => {
+    const canonical = readFileSync(
+      path.join(root, 'components/admin/course-builder/UnifiedCourseBuilder.tsx'),
+      'utf8',
+    );
+    expect(existsSync(path.join(root, 'apps/admin/app/admin/course-builder/CourseBuilderClient.tsx'))).toBe(false);
+    expect(canonical).toContain('/api/admin/courses/${course.id}/clone');
+    expect(canonical).toContain('/api/admin/lms/courses/${course.id}/publish');
+    expect(canonical).toContain("method: action === 'delete' ? 'DELETE'");
+    expect(canonical).toContain("JSON.stringify({ status: 'draft' })");
+    expect(canonical).toContain('runCourseFactoryPipeline');
+    expect(canonical).toContain('CourseInstructorMediaPanel');
+  });
+
   it('does not expose retired /admin UI links or redirects from executable source', () => {
     const violations: string[] = [];
     for (const sourceRoot of SOURCE_ROOTS) {

@@ -14,7 +14,7 @@ import { markComplete, markFailed, type VideoJob } from './job-queue';
 import { enforceMediaQuality } from './media-quality-gate';
 import { directMedia, scenePrompt, type MediaCharacterReference } from './media-director';
 import { recordMediaProvenance } from './media-provenance';
-import { inferDomainKey, renderLessonVideo, renderStoryboardVideo } from './remotion-render';
+import { renderStoryboardVideo } from './remotion-render';
 import { uploadLessonMediaBuffer } from './upload-lesson-media';
 
 const REMOTION_PROVIDER = 'remotion';
@@ -107,7 +107,6 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     // or multi-scene evidence required by the canonical quality gate. Keep this
     // expensive path opt-in until it can satisfy that same completion contract.
     if (
-      process.env.ENABLE_GPU_INSTRUCTIONAL_SCENES === 'true' &&
       isMicroclip &&
       storyboard.scenes.length === 1 &&
       (await gpuVideoAvailable())
@@ -208,25 +207,14 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
             });
           }
 
-          const qualityEvidence = await enforceMediaQuality({
-            videoUrl,
-            expectedDurationSeconds: outputSeconds,
-            expectedSceneCount: 1,
-            sceneData: storyboard,
-            provider: generated.provider,
-            providerModel: model,
-            expectedScript: script,
+          // The GPU clip is a scene candidate, not a terminal lesson asset.
+          // Feed it through the compositor below so captions, transcript,
+          // compression, and final quality evidence are always produced.
+          Object.assign(scene, {
+            sourceVideoUrl: videoUrl,
+            resolvedProvider: generated.provider,
+            resolvedModel: model,
           });
-          await markComplete(job.id, {
-            video_url: videoUrl,
-            duration_seconds: outputSeconds,
-            provider: generated.provider,
-            provider_model: model,
-            scene_count: 1,
-            scene_data: storyboard,
-            quality_evidence: qualityEvidence,
-          });
-          return;
         }
       } catch (gpuError) {
         const gpuMessage = gpuError instanceof Error ? gpuError.message : String(gpuError);
@@ -271,33 +259,12 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       }
     }
 
-    const result = storyboard.scenes.length > 1
-      ? await renderStoryboardVideo({
-          lessonId: renderId,
-          courseTitle,
-          storyboard,
-          instructorId: instructor.id,
-        })
-      : await renderLessonVideo({
-          lessonId: renderId,
-          title: job.lesson_title,
-          moduleTitle: courseTitle,
-          objective: bulletPoints[0] ?? job.lesson_title,
-          keyPoints: bulletPoints.length
-            ? bulletPoints.slice(0, 5)
-            : script.split(/\.\s+/).filter(Boolean).slice(0, 5),
-          example: isMicroclip ? script : script.slice(0, 700),
-          summary: isMicroclip
-            ? 'Review the key idea, then apply it in the lesson activity.'
-            : script.slice(-500),
-          quizTeaser: isMicroclip
-            ? 'Return to the lesson and apply this concept.'
-            : 'Complete the knowledge check and review any missed objectives to continue.',
-          domainKey: inferDomainKey(courseTitle, job.lesson_title),
-          instructorId: instructor.id,
-          courseName: courseTitle,
-          visualPrompt: scenePrompt(primaryScene, storyboard.characters),
-        });
+    const result = await renderStoryboardVideo({
+      lessonId: renderId,
+      courseTitle,
+      storyboard,
+      instructorId: instructor.id,
+    });
     if (!result.success || !result.videoUrl) {
       await markFailed(job.id, result.error ?? 'Render returned no playable video URL', {
         provider: REMOTION_PROVIDER,

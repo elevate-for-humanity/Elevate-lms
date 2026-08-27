@@ -408,12 +408,10 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
   try {
     await mkdir(paths.outputDir, { recursive: true });
     const scenes: SceneData[] = [];
-    // Scene-level GPU generation is intentionally opt-in. The compositor can
-    // deliver validated stock/deterministic visuals without consuming GPU, and
-    // generated scene buffers must not be attempted speculatively in production.
-    const canGenerateMotion =
-      process.env.ENABLE_GPU_INSTRUCTIONAL_SCENES === 'true' &&
-      await gpuVideoAvailable();
+    // GPU instructional scenes flow through
+    // the compositor, captions/transcript generation, compression, and the
+    // canonical quality gate.
+    const canGenerateMotion = await gpuVideoAvailable();
     const resolvedStoryboard: MediaStoryboard = structuredClone(input.storyboard);
 
     for (const [index, scene] of input.storyboard.scenes.entries()) {

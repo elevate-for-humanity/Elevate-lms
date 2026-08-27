@@ -48,7 +48,6 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   }
   if (evidence.videoStreams < 1) failures.push('MP4 has no decodable video stream');
   if (evidence.audioStreams < 1) failures.push('MP4 has no narration/audio stream');
-  if (evidence.expectedSceneCount < 2) failures.push('instructional asset requires at least two purposeful scenes');
   if (evidence.storyboardSceneCount !== evidence.expectedSceneCount) {
     failures.push(
       `storyboard mismatch: expected ${evidence.expectedSceneCount} scenes, preserved ${evidence.storyboardSceneCount}`,

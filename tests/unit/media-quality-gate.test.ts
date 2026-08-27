@@ -52,7 +52,7 @@ describe('canonical media completion quality gate', () => {
     ]));
   });
 
-  it('rejects silent, tiny, single-scene, and unattributed output', () => {
+  it('rejects silent, tiny, and unattributed output while permitting a validated microclip scene', () => {
     const failures = mediaQualityFailures({
       ...validEvidence,
       bytes: 12,
@@ -65,7 +65,6 @@ describe('canonical media completion quality gate', () => {
     expect(failures).toEqual(expect.arrayContaining([
       expect.stringContaining('too small'),
       'MP4 has no narration/audio stream',
-      'instructional asset requires at least two purposeful scenes',
       'provider evidence is missing',
       'provider model evidence is missing',
     ]));

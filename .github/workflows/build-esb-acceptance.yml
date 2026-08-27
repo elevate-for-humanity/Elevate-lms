@@ -196,6 +196,10 @@ jobs:
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           tail -n 420 /tmp/course-acceptance.log > /tmp/course-acceptance-tail.log || true
+          # Always expose the captured generator output in Actions. The command is
+          # intentionally wrapped so later evidence steps can run, but hiding this
+          # log made a real generator failure look like a false final-gate failure.
+          cat /tmp/course-acceptance-tail.log
           exit 0
 
       - name: Verify full Admin and LMS applications after course build

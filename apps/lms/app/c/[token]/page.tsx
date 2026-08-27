@@ -34,6 +34,13 @@ interface ValidationResult {
 async function validateToken(token: string): Promise<ValidationResult> {
   try {
     const supabase = await createServerSupabaseClient();
+    if (!supabase) {
+      logger.error('Credential verification database is not configured');
+      return {
+        status: 'invalid',
+        errorMessage: 'Credential verification is temporarily unavailable.',
+      };
+    }
 
     // Lookup share token
     const { data: shareLink, error } = await supabase

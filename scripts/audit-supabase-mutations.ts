@@ -55,6 +55,51 @@ function skipQuoted(source: string, index: number): number {
   return index;
 }
 
+/**
+ * Advance past one object-property value. The previous scanner resumed token
+ * parsing immediately after the property colon, so ternaries such as
+ * \`error instanceof Error ? error.message : String(error)\` were misread as a
+ * property named \`message\`. The same bug produced impossible column names such
+ * as \`null\`, \`false\`, and \`now\`.
+ */
+function skipPropertyValue(source: string, index: number): number {
+  let braces = 0;
+  let brackets = 0;
+  let parentheses = 0;
+
+  while (index < source.length) {
+    const ch = source[index];
+    if (ch === '"' || ch === "'" || ch === '\\`') {
+      index = skipQuoted(source, index);
+      continue;
+    }
+    if (ch === '/' && source[index + 1] === '/') {
+      const end = source.indexOf('\\n', index + 2);
+      index = end < 0 ? source.length : end + 1;
+      continue;
+    }
+    if (ch === '/' && source[index + 1] === '*') {
+      const end = source.indexOf('*/', index + 2);
+      index = end < 0 ? source.length : end + 2;
+      continue;
+    }
+
+    if (ch === '{') braces += 1;
+    else if (ch === '}') {
+      if (braces === 0 && brackets === 0 && parentheses === 0) return index;
+      braces -= 1;
+    } else if (ch === '[') brackets += 1;
+    else if (ch === ']') brackets -= 1;
+    else if (ch === '(') parentheses += 1;
+    else if (ch === ')') parentheses -= 1;
+    else if (ch === ',' && braces === 0 && brackets === 0 && parentheses === 0) {
+      return index + 1;
+    }
+    index += 1;
+  }
+  return index;
+}
+
 function topLevelObjectKeys(source: string, openBrace: number): string[] {
   const keys: string[] = [];
   let depth = 0;
@@ -117,7 +162,7 @@ function topLevelObjectKeys(source: string, openBrace: number): string[] {
       while (i < source.length && /\s/.test(source[i])) i += 1;
       if (source[i] === ':') {
         keys.push(key.toLowerCase());
-        i += 1;
+        i = skipPropertyValue(source, i + 1);
         continue;
       }
       // Shorthand object properties are valid but cannot be distinguished

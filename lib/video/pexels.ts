@@ -8,6 +8,7 @@
 
 import { logger } from '@/lib/logger';
 
+const DEFAULT_TOPIC_QUERY = 'professional learning education';
 const TOPIC_QUERIES: Record<string, string> = {
   foundations: 'community support people helping',
   ethics: 'professional meeting office trust',
@@ -19,7 +20,7 @@ const TOPIC_QUERIES: Record<string, string> = {
   electrical: 'electrical wiring professional',
   barber: 'barbershop professional grooming',
   business: 'diverse small business owners planning marketing finance customer service',
-  default: 'professional learning education',
+  default: DEFAULT_TOPIC_QUERY,
 };
 
 interface PexelsPhoto {
@@ -47,7 +48,7 @@ export async function getPexelsImage(
     return getPollinationsImage(domainKey, options.query);
   }
 
-  const query = options.query?.trim() || TOPIC_QUERIES[domainKey] || TOPIC_QUERIES.default;
+  const query = options.query?.trim() || TOPIC_QUERIES[domainKey] || DEFAULT_TOPIC_QUERY;
   const { orientation = 'landscape', perPage = 10 } = options;
 
   try {
@@ -71,6 +72,7 @@ export async function getPexelsImage(
     if (!data.photos?.length) return getPollinationsImage(domainKey, options.query);
 
     const photo = data.photos[Math.floor(Math.random() * data.photos.length)];
+    if (!photo) return getPollinationsImage(domainKey, options.query);
     return photo.src.large2x ?? photo.src.landscape;
   } catch (err) {
     logger.warn('[pexels] fetch error', { err });
@@ -79,7 +81,7 @@ export async function getPexelsImage(
 }
 
 export function getPollinationsImage(domainKey: string, customPrompt?: string): string {
-  const prompt = customPrompt?.trim() || TOPIC_QUERIES[domainKey] || TOPIC_QUERIES.default;
+  const prompt = customPrompt?.trim() || TOPIC_QUERIES[domainKey] || DEFAULT_TOPIC_QUERY;
   const encoded = encodeURIComponent(
     `${prompt}, professional, cinematic lighting, high quality, 16:9`,
   );
@@ -153,6 +155,7 @@ export async function getPexelsVideoClip(
     );
     const pool = suitable.length ? suitable : data.videos;
     const video = pool[Math.floor(Math.random() * pool.length)];
+    if (!video) return null;
 
     const orientationMatches = (file: PexelsVideoFile) => {
       if (orientation === 'portrait') return file.height > file.width;

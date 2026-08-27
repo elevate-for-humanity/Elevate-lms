@@ -3,11 +3,15 @@ import { createHash } from 'node:crypto';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ShieldCheck } from 'lucide-react';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 import { getHostShopBoard } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { resolveRegisteredProgramContract } from '@/lib/apprenticeship/registered-program-contract';
+import {
+  resolveRegisteredProgramContract,
+  type RegisteredProgramContract,
+} from '@/lib/apprenticeship/registered-program-contract';
 import {
   buildHostShopApprenticeshipOrientation,
   getApprenticeApplicationUrl,
@@ -33,8 +37,11 @@ const REQUIRED_POLICIES = [
   'transfer-credit-sponsor-approval',
 ] as const;
 
-async function loadRegisteredContracts(db: any, board: Awaited<ReturnType<typeof getHostShopBoard>>) {
-  const contracts = [];
+async function loadRegisteredContracts(
+  db: SupabaseClient,
+  board: Awaited<ReturnType<typeof getHostShopBoard>>,
+): Promise<RegisteredProgramContract[]> {
+  const contracts: RegisteredProgramContract[] = [];
   for (const program of board.registeredPrograms) {
     if (!program.programSlug) continue;
     const contract = await resolveRegisteredProgramContract(db, { programSlug: program.programSlug, partnerId: board.partner.id });
@@ -58,7 +65,8 @@ async function completeOrientation(formData: FormData) {
 
   const db = await requireAdminClient();
   const contracts = await loadRegisteredContracts(db, board);
-  if (!contracts.length) redirect('/host-shop/orientation?error=registered_standard');
+  const primaryContract = contracts[0];
+  if (!primaryContract) redirect('/host-shop/orientation?error=registered_standard');
   if (board.unconfiguredPrograms.length > 0) redirect('/host-shop/orientation?error=registered_standard');
 
   const { data: profile } = await db.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
@@ -76,7 +84,7 @@ async function completeOrientation(formData: FormData) {
     signerName,
     signerUserId: user.id,
     orientationVersion: HOST_SHOP_ORIENTATION_VERSION,
-    sponsorRegistration: contracts[0].sponsor.registrationNumber,
+    sponsorRegistration: primaryContract.sponsor.registrationNumber,
     registeredOccupations: contracts.map((contract) => ({
       standardKey: contract.standardKey,
       standardVersionKey: contract.standardVersionKey,

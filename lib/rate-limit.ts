@@ -97,15 +97,22 @@ function parseWindowMs(window: string): number {
   const match = window.trim().match(/^(\d+)\s*([smhd])$/i);
   if (!match) return 60_000;
 
-  const value = Number(match[1]);
-  const unit = match[2].toLowerCase();
+  const valueToken = match[1];
+  const unitToken = match[2];
+  if (valueToken === undefined || unitToken === undefined) return 60_000;
+
+  const value = Number(valueToken);
+  if (!Number.isSafeInteger(value) || value <= 0) return 60_000;
+
+  const unit = unitToken.toLowerCase();
   const multipliers: Record<string, number> = {
     s: 1_000,
     m: 60_000,
     h: 3_600_000,
     d: 86_400_000,
   };
-  return value * multipliers[unit];
+  const multiplier = multipliers[unit];
+  return multiplier === undefined ? 60_000 : value * multiplier;
 }
 
 const FIXED_WINDOW_SCRIPT = `

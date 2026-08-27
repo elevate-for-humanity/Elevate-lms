@@ -141,7 +141,10 @@ async function _POST(req: Request) {
         dbSaved = true;
       }
     } catch (dbErr) {
-      logger.warn('Database unavailable for contact form (non-blocking):', dbErr);
+      logger.warn(
+        'Database unavailable for contact form (non-blocking):',
+        dbErr instanceof Error ? dbErr : String(dbErr),
+      );
     }
 
     // Send email notification (non-blocking but important fallback when DB unavailable)

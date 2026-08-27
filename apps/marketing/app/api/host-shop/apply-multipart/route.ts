@@ -188,6 +188,15 @@ export async function POST(request: NextRequest) {
       uploadedPaths.push(path);
     }
 
+    const shopLicenseDocument = uploaded.shopLicense;
+    const liabilityInsuranceDocument = uploaded.insurance;
+    const workersCompDocument = uploaded.workersComp;
+    const supervisorLicenseDocument = uploaded.supervisorLicense;
+    const einDocument = uploaded.ein;
+    if (!shopLicenseDocument || !liabilityInsuranceDocument || !workersCompDocument || !supervisorLicenseDocument || !einDocument) {
+      throw new Error('Required host-shop compliance uploads were not persisted.');
+    }
+
     const fullAddress = [address1, address2, city, state, zip].filter(Boolean).join(', ');
     const businessType = BUSINESS_TYPE_MAP[industryType] || 'other';
     const now = new Date().toISOString();
@@ -272,11 +281,11 @@ export async function POST(request: NextRequest) {
         numberOfEmployees: numberOfEmployees || null,
         programs,
         documents: {
-          shopLicense: uploaded.shopLicense,
-          insurance: uploaded.insurance,
-          workersComp: uploaded.workersComp,
-          supervisorLicense: uploaded.supervisorLicense,
-          ein: uploaded.ein,
+          shopLicense: shopLicenseDocument,
+          insurance: liabilityInsuranceDocument,
+          workersComp: workersCompDocument,
+          supervisorLicense: supervisorLicenseDocument,
+          ein: einDocument,
           localBusiness: uploaded.localBusiness || null,
         },
       });

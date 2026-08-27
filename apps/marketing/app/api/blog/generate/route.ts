@@ -88,7 +88,10 @@ async function _POST(request: NextRequest) {
       max_tokens: 2000,
     });
 
-    const content = completion.choices[0].message.content;
+    const content = completion.choices[0]?.message.content?.trim();
+    if (!content) {
+      return NextResponse.json({ error: 'The content generator returned an empty response' }, { status: 502 });
+    }
 
     // Generate title and excerpt
     const metaCompletion = await openai.chat.completions.create({
@@ -107,7 +110,11 @@ async function _POST(request: NextRequest) {
       max_tokens: 200,
     });
 
-    const meta = JSON.parse(metaCompletion.choices[0].message.content || '{}');
+    const metaContent = metaCompletion.choices[0]?.message.content;
+    if (!metaContent) {
+      return NextResponse.json({ error: 'The metadata generator returned an empty response' }, { status: 502 });
+    }
+    const meta = JSON.parse(metaContent);
 
     // Generate slug from title
     const slug = meta.title

@@ -171,7 +171,7 @@ export async function addSignature(
     .select('id')
     .maybeSingle();
 
-  if (error) {
+  if (error || !signature) {
     logger.error('[addSignature] Error:', error);
     return {
       success: false,
@@ -233,8 +233,8 @@ export async function transitionCaseStatus(
   }
 
   await auditLog({
-    actorId,
-    actorRole,
+    ...(actorId ? { actorId } : {}),
+    ...(actorRole ? { actorRole } : {}),
     action: AuditAction.CASE_STATUS_CHANGED,
     entity: AuditEntity.ENROLLMENT_CASE,
     entityId: caseId,
@@ -289,7 +289,7 @@ export async function completeTask(
     .select('case_id, task_type, title, assigned_to_role')
     .maybeSingle();
 
-  if (error) {
+  if (error || !task) {
     logger.error('[completeTask] Error:', error);
     return false;
   }

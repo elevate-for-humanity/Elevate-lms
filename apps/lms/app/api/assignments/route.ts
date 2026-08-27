@@ -25,6 +25,9 @@ async function _GET(request: Request) {
     const courseId = searchParams.get('courseId');
 
     const supabase = await createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Assignment service unavailable' }, { status: 503 });
+    }
 
     let query = supabase
       .from('assignments')
@@ -91,6 +94,9 @@ async function _POST(request: Request) {
     }
 
     const supabase = await createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Assignment service unavailable' }, { status: 503 });
+    }
 
     const { data: assignment, error } = await supabase
       .from('assignments')

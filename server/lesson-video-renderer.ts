@@ -8,7 +8,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import type { LessonSlide } from '../lib/autopilot/lesson-script-generator';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { cleanupSlideImageTemp, getSlideImageLocalPath } from '@/lib/video/slide-image-cache';
@@ -138,7 +138,7 @@ async function renderSlideFrame(
 
   const accent =
     slide.segment === 'concept'
-      ? CONCEPT_ACCENTS[slideIndex % CONCEPT_ACCENTS.length]
+      ? (CONCEPT_ACCENTS[slideIndex % CONCEPT_ACCENTS.length] ?? '#3b82f6')
       : SEGMENT_COLORS[slide.segment] || '#f59e0b';
 
   // ── LEFT — visual panel ───────────────────────────────────────────────────
@@ -276,10 +276,10 @@ async function renderSlideFrame(
   let bulletY = divY + 30;
   const maxBulletW = TXT_W - TXT_PAD * 2 - 40;
 
-  for (let bi = 0; bi < bullets.length; bi++) {
+  for (const [bi, bullet] of bullets.entries()) {
     const isActive = bi === activeBulletIndex;
     const isDone = bi < activeBulletIndex;
-    const bLines = wrapText(ctx, bullets[bi], maxBulletW);
+    const bLines = wrapText(ctx, bullet, maxBulletW);
     const rowH = bLines.length * 46 + 20;
 
     // Active row highlight
@@ -311,8 +311,9 @@ async function renderSlideFrame(
     });
 
     // Pointer line for active bullet
-    if (isActive && imagePath && bi < pointerTargets.length) {
-      const [rx, ry] = pointerTargets[bi];
+    const pointerTarget = pointerTargets[bi];
+    if (isActive && imagePath && pointerTarget) {
+      const [rx, ry] = pointerTarget;
       drawPointerLine(ctx, dotY, rx, ry, accent);
     }
 
@@ -357,7 +358,7 @@ async function getFFmpeg() {
   const ffmpeg = (await import(/* webpackIgnore: true */ 'fluent-ffmpeg')).default;
   try {
     const ffmpegPath = (await import(/* webpackIgnore: true */ '@ffmpeg-installer/ffmpeg')).path;
-    ffmpeg.setFfmpegPath(ffmpegPath);
+    if (ffmpegPath) ffmpeg.setFfmpegPath(ffmpegPath);
   } catch {
     /* use system ffmpeg */
   }
@@ -370,6 +371,10 @@ export async function renderLessonVideo(
   outputPath: string,
   opts: RenderOptions,
 ): Promise<{ duration: number; fileSize: number }> {
+  if (slides.length === 0) {
+    throw new Error('Lesson video rendering requires at least one slide');
+  }
+
   const ffmpeg = await getFFmpeg();
   const tempDir = path.join(path.dirname(outputPath), `slides-${Date.now()}`);
   await fs.mkdir(tempDir, { recursive: true });
@@ -378,9 +383,11 @@ export async function renderLessonVideo(
     ffmpeg.ffprobe(audioPath, (err: any, meta: any) => {
       if (err) {
         try {
-          const out = execSync(`ffprobe -v quiet -print_format json -show_format "${audioPath}"`, {
-            encoding: 'utf-8',
-          });
+          const out = execFileSync(
+            'ffprobe',
+            ['-v', 'quiet', '-print_format', 'json', '-show_format', audioPath],
+            { encoding: 'utf-8' },
+          );
           const dur = JSON.parse(out)?.format?.duration;
           if (dur) return resolve(Math.ceil(parseFloat(dur)));
         } catch {
@@ -405,7 +412,14 @@ export async function renderLessonVideo(
   );
   const totalAssigned = slideDurations.reduce((s, d) => s + d, 0);
   const diff = audioDuration - totalAssigned;
-  if (diff !== 0) slideDurations[slideDurations.indexOf(Math.max(...slideDurations))] += diff;
+  if (diff !== 0) {
+    const longestIndex = slideDurations.indexOf(Math.max(...slideDurations));
+    const longestDuration = slideDurations[longestIndex];
+    if (longestDuration === undefined) {
+      throw new Error('Lesson video rendering could not allocate slide durations');
+    }
+    slideDurations[longestIndex] = longestDuration + diff;
+  }
 
   const slideImages = await Promise.all(
     slides.map((slide) => fetchSlideImage(slide.imagePrompt).catch(() => null)),
@@ -415,15 +429,24 @@ export async function renderLessonVideo(
   const framePaths: string[] = [];
   const frameDurations: number[] = [];
 
-  for (let i = 0; i < slides.length; i++) {
-    const slide = slides[i];
+  for (const [i, slide] of slides.entries()) {
     const totalDur = slideDurations[i];
+    if (totalDur === undefined) {
+      throw new Error(`Lesson video rendering is missing a duration for slide ${i + 1}`);
+    }
     const bulletCount = Math.max(1, slide.bullets.slice(0, 4).length);
     const introTime = Math.max(1, Math.round(totalDur * 0.12));
     const perBullet = Math.max(1, Math.round((totalDur - introTime) / bulletCount));
 
     // Intro frame
-    const introBuf = await renderSlideFrame(slide, i, slides.length, opts, slideImages[i], -1);
+    const introBuf = await renderSlideFrame(
+      slide,
+      i,
+      slides.length,
+      opts,
+      slideImages[i] ?? null,
+      -1,
+    );
     const introPath = path.join(tempDir, `f${i}-intro.png`);
     await fs.writeFile(introPath, introBuf);
     framePaths.push(introPath);
@@ -431,7 +454,14 @@ export async function renderLessonVideo(
 
     // Per-bullet frames
     for (let bi = 0; bi < bulletCount; bi++) {
-      const buf = await renderSlideFrame(slide, i, slides.length, opts, slideImages[i], bi);
+      const buf = await renderSlideFrame(
+        slide,
+        i,
+        slides.length,
+        opts,
+        slideImages[i] ?? null,
+        bi,
+      );
       const fp = path.join(tempDir, `f${i}-b${bi}.png`);
       await fs.writeFile(fp, buf);
       framePaths.push(fp);
@@ -444,11 +474,15 @@ export async function renderLessonVideo(
 
   // Render each frame as a clip
   const slideVideos: string[] = [];
-  for (let i = 0; i < framePaths.length; i++) {
+  for (const [i, framePath] of framePaths.entries()) {
+    const frameDuration = frameDurations[i];
+    if (frameDuration === undefined) {
+      throw new Error(`Lesson video rendering is missing a duration for frame ${i + 1}`);
+    }
     const sv = path.join(tempDir, `clip-${i}.mp4`);
     await new Promise<void>((resolve, reject) => {
       ffmpeg()
-        .input(framePaths[i])
+        .input(framePath)
         .inputOptions(['-loop', '1'])
         .outputOptions([
           '-c:v',
@@ -460,7 +494,7 @@ export async function renderLessonVideo(
           '-r',
           '30',
           '-t',
-          Math.max(1, frameDurations[i]).toString(),
+          Math.max(1, frameDuration).toString(),
           '-pix_fmt',
           'yuv420p',
           '-an',
@@ -475,11 +509,11 @@ export async function renderLessonVideo(
 
   // TS wrap for concat
   const tsPaths: string[] = [];
-  for (let i = 0; i < slideVideos.length; i++) {
+  for (const [i, slideVideo] of slideVideos.entries()) {
     const ts = path.join(tempDir, `clip-${i}.ts`);
     await new Promise<void>((resolve, reject) => {
       ffmpeg()
-        .input(slideVideos[i])
+        .input(slideVideo)
         .outputOptions(['-c', 'copy', '-bsf:v', 'h264_mp4toannexb', '-f', 'mpegts'])
         .output(ts)
         .on('end', () => resolve())
@@ -501,15 +535,17 @@ export async function renderLessonVideo(
   });
 
   // Re-encode video so the muxer can write moov at the front (+faststart).
-  // Use execSync (blocking) — fluent-ffmpeg's async wrapper can exit before the
+  // Use execFileSync (blocking) — fluent-ffmpeg's async wrapper can exit before the
   // child process finishes on long videos, leaving a corrupt file with no moov atom.
   const tmpOut = outputPath + '.tmp.mp4';
-  execSync(
-    `ffmpeg -y -i "${silentVideo}" -i "${audioPath}" ` +
-      `-c:v libx264 -crf 22 -preset fast -pix_fmt yuv420p ` +
-      `-c:a aac -b:a 128k -ar 48000 ` +
-      `-shortest -movflags +faststart ` +
-      `"${tmpOut}"`,
+  execFileSync(
+    'ffmpeg',
+    [
+      '-y', '-i', silentVideo, '-i', audioPath,
+      '-c:v', 'libx264', '-crf', '22', '-preset', 'fast', '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac', '-b:a', '128k', '-ar', '48000',
+      '-shortest', '-movflags', '+faststart', tmpOut,
+    ],
     { stdio: 'pipe' },
   );
   // Atomic rename so a partial encode never overwrites a good file

@@ -1,5 +1,10 @@
 export type VoiceName = 'alloy' | 'ash' | 'ballad' | 'coral' | 'echo' | 'onyx' | 'sage' | 'shimmer';
-export type VideoStyle = 'barber_broll' | 'barbershop_lifestyle' | 'tools_closeup' | 'mixed';
+export type VideoStyle =
+  | 'trade_demonstration'
+  | 'clinical_demonstration'
+  | 'technical_diagram'
+  | 'workplace_scenario'
+  | 'mixed';
 export type SceneLayout =
   | 'full_frame'
   | 'lower_third'

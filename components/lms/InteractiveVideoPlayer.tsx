@@ -125,8 +125,8 @@ export default function InteractiveVideoPlayer({
   const [activeTab, setActiveTab] = useState<'transcript' | 'notes' | 'resources'>('transcript');
   const [showCaptions, setShowCaptions] = useState(false);
   const [currentCaption, setCurrentCaption] = useState('');
-  const [videoId, setVideoId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const [persistenceError, setPersistenceError] = useState<string | null>(null);
   const [activeCheckpoint, setActiveCheckpoint] = useState<Checkpoint | null>(null);
   const [checkpointResponse, setCheckpointResponse] = useState('');
   const [checkpointChoice, setCheckpointChoice] = useState<number | null>(null);
@@ -163,32 +163,34 @@ export default function InteractiveVideoPlayer({
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user || !lessonRecordId || !courseId) return;
 
-      // Extract lesson ID from video URL or use title
-      const id = videoUrl.split('/').pop()?.split('.')[0] || title;
-      setVideoId(id);
-
-      const { data } = await supabase
-        .from('video_notes')
-        .select('*')
+      const { data, error } = await supabase
+        .from('learner_video_notes')
+        .select('id, body, position_seconds, created_at')
         .eq('user_id', user.id)
-        .eq('video_id', id)
-        .order('timestamp', { ascending: true });
+        .eq('course_id', courseId)
+        .eq('lesson_id', lessonRecordId)
+        .order('position_seconds', { ascending: true });
+
+      if (error) {
+        setPersistenceError('Your saved video notes could not be loaded. Refresh the page or contact support.');
+        return;
+      }
 
       if (data) {
         setNotes(
           data.map((n) => ({
             id: n.id,
-            timestamp: n.timestamp,
-            content: n.content,
+            timestamp: Number(n.position_seconds),
+            content: n.body,
             createdAt: new Date(n.created_at),
           })),
         );
       }
     };
-    loadNotes();
-  }, [videoUrl, title]);
+    void loadNotes();
+  }, [courseId, lessonRecordId]);
 
   // Save note to database
   const saveNote = async () => {
@@ -199,27 +201,31 @@ export default function InteractiveVideoPlayer({
       data: { user },
     } = await supabase.auth.getUser();
 
-    const note: VideoNote = {
-      id: Date.now().toString(),
-      timestamp: currentTime,
-      content: newNote,
-      createdAt: new Date(),
-    };
-
-    setNotes([...notes, note]);
-    setNewNote('');
-
-    if (user && videoId) {
-      await supabase
-        .from('video_notes')
-        .insert({
-          user_id: user.id,
-          video_id: videoId,
-          timestamp: currentTime,
-          content: newNote,
-        })
-        .then(()=>{}, ()=>{});
+    if (!user || !lessonRecordId || !courseId) {
+      setPersistenceError('Sign in and open this lesson from your enrolled course before saving notes.');
+      return;
     }
+
+    const body = newNote.trim();
+    const { data, error } = await supabase
+      .from('learner_video_notes')
+      .insert({ user_id: user.id, course_id: courseId, lesson_id: lessonRecordId, body, position_seconds: currentTime })
+      .select('id, body, position_seconds, created_at')
+      .single();
+
+    if (error || !data) {
+      setPersistenceError('Your note was not saved. Confirm your course access and try again.');
+      return;
+    }
+
+    setNotes((current) => [...current, {
+      id: data.id,
+      timestamp: Number(data.position_seconds),
+      content: data.body,
+      createdAt: new Date(data.created_at),
+    }]);
+    setNewNote('');
+    setPersistenceError(null);
   };
 
   // Save progress to database
@@ -229,18 +235,27 @@ export default function InteractiveVideoPlayer({
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (user && videoId) {
-      await supabase
-        .from('video_progress')
-        .upsert({
-          user_id: user.id,
-          video_id: videoId,
-          progress_percent: progress,
-          last_position: currentTime,
-          updated_at: new Date().toISOString(),
-        })
-        .then(()=>{}, ()=>{});
+    if (!user || !lessonRecordId || !courseId) return;
+
+    const now = new Date().toISOString();
+    const { error } = await supabase
+      .from('learner_video_progress')
+      .upsert({
+        user_id: user.id,
+        course_id: courseId,
+        lesson_id: lessonRecordId,
+        progress_percent: progress,
+        last_position_seconds: currentTime,
+        completed: progress >= 95,
+        completed_at: progress >= 95 ? now : null,
+        updated_at: now,
+      }, { onConflict: 'user_id,lesson_id' });
+
+    if (error) {
+      setPersistenceError('Playback progress could not be saved. Keep this page open and try again.');
+      return;
     }
+    setPersistenceError(null);
   };
 
   // Pause once for each required timestamped interaction.
@@ -408,19 +423,6 @@ export default function InteractiveVideoPlayer({
     }
   };
 
-  const addNote = () => {
-    if (newNote.trim()) {
-      const note: VideoNote = {
-        id: `note-${Date.now()}`,
-        timestamp: currentTime,
-        content: newNote,
-        createdAt: new Date(),
-      };
-      setNotes([...notes, note]);
-      setNewNote('');
-    }
-  };
-
   const submitQuizAnswer = () => {
     if (quizAnswer !== null && currentQuiz) {
       const isCorrect = quizAnswer === currentQuiz.correctAnswer;
@@ -510,6 +512,11 @@ export default function InteractiveVideoPlayer({
       {validationErrors.length > 0 && (
         <div className="border-b border-amber-300 bg-amber-50 p-3 text-sm text-amber-900" role="alert">
           This lesson has {validationErrors.length} interaction configuration issue{validationErrors.length === 1 ? '' : 's'}. An instructor has been notified.
+        </div>
+      )}
+      {persistenceError && (
+        <div className="border-b border-red-300 bg-red-50 p-3 text-sm text-red-900" role="alert">
+          {persistenceError}
         </div>
       )}
       <div className="relative">
@@ -888,12 +895,14 @@ export default function InteractiveVideoPlayer({
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >,
                   ) => setNewNote(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && addNote()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') void saveNote();
+                  }}
                   placeholder="Add a note at current timestamp..."
                   className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded text-white"
                 />
                 <button
-                  onClick={addNote}
+                  onClick={() => void saveNote()}
                   className="px-4 py-2 bg-brand-blue-600 rounded hover:bg-brand-blue-700"
                 >
                   Add Note

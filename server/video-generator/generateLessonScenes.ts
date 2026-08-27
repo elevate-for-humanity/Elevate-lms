@@ -1,6 +1,7 @@
-import OpenAI from 'openai';
+import { aiChat } from '@/lib/ai/ai-service';
 import { LessonRenderPlanDraftSchema } from './schema';
 import { SCENE_GENERATION_SYSTEM_PROMPT, buildSceneGenerationUserPrompt } from './prompts';
+import { resolveInstructionalDomainProfile } from './domain-profiles';
 import type { LessonRenderPlanDraft } from './types';
 
 const MAX_ATTEMPTS = 3;
@@ -22,6 +23,7 @@ export async function generateLessonScenes(opts: {
   lessonId: string;
   title: string;
   content: string;
+  domainKey?: string | null;
   seed?: string;
   occupationTitle?: string;
   dolCompetencyId?: string | null;
@@ -35,15 +37,16 @@ export async function generateLessonScenes(opts: {
   passingScore?: number | null;
   requiresPracticalEvidence?: boolean;
 }): Promise<LessonRenderPlanDraft> {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const plainContent = stripHtml(opts.content);
   const seed = opts.seed ?? `${opts.lessonId}-${Date.now()}`;
+  const profile = resolveInstructionalDomainProfile(opts.domainKey);
 
   const userPrompt = buildSceneGenerationUserPrompt({
     lessonId: opts.lessonId,
     title: opts.title,
     content: plainContent,
     seed,
+    profile,
     occupationTitle: opts.occupationTitle,
     dolCompetencyId: opts.dolCompetencyId,
     dolCompetencyDescription: opts.dolCompetencyDescription,
@@ -60,17 +63,16 @@ export async function generateLessonScenes(opts: {
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const res = await openai.chat.completions.create({
-      model: 'gpt-4o',
+    const res = await aiChat({
       messages: [
         { role: 'system', content: SCENE_GENERATION_SYSTEM_PROMPT },
         { role: 'user', content: userPrompt },
       ],
       temperature: 0.7,
-      max_tokens: 4000,
+      maxTokens: 4000,
     });
 
-    const raw = res.choices[0].message.content ?? '';
+    const raw = res.content ?? '';
     const cleaned = raw
       .replace(/^```json?\s*/i, '')
       .replace(/\s*```$/i, '')

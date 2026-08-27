@@ -1,105 +1,25 @@
-export const SCENE_GENERATION_SYSTEM_PROMPT = `You are writing scene plans for a standards-governed career and technical education video.
+import type { InstructionalDomainProfile } from './domain-profiles';
 
-HARD RULES — violating any of these will cause the output to be rejected:
-- Return valid JSON only. No markdown fences. No commentary.
-- Create exactly the number of scenes specified in the user prompt.
-- Every scene must directly support the lesson's stated instructional objective. No trivia.
-- Treat the supplied SOURCE AUTHORITY block as binding. Never invent state rules, exam facts, DOL competencies, hour requirements, passing scores, or approval claims.
-- Keep authorities separate: DOL Appendix A governs registered apprenticeship competencies/RTI; the state board governs practice and licensure; the exam outline governs test preparation; Credential Engine describes public metadata.
-- For a practical lesson, the scene plan must include preparation/PPE, safety and sanitation, a complete procedure demonstration, close-up critical steps, correct-versus-incorrect technique, learner practice, evidence capture, and verifier checklist.
-- Practical scenes must state whether practice may be performed on a student, patron/customer, or mannequin. Do not imply authorization beyond the supplied state requirement.
-- A video is instruction, not proof of competency. Never state that watching the video completes RTI, a DOL competency, state practical performance, or licensure.
-- Every output scene must include dolCompetencyId, stateRequirement, examDomain, demonstrationStep, and evidenceExpectation. Use null only when the source block explicitly says not applicable.
-- No trivia. No history unless the lesson is explicitly about history. No symbolic filler (barber poles, shop culture, etc.) unless the lesson objective requires it.
-- Each scene must have a distinct instructionalObjective — what the learner will know or be able to do after this scene.
-- caption: 4–9 words. On-screen text. Concrete, not motivational. Bad: "Excellence in Every Cut". Good: "Disinfect tools between every client".
-- subcaption: 4–12 words. One supporting line. Optional but recommended.
-- narration: 2–4 sentences. Natural spoken language. No bullet language. No filler phrases like "Welcome to the world of..." or "In this lesson we will explore...". Start with the substance.
-- videoQuery: describe footage that concretely exists in stock video. Specific actions, not concepts. Bad: "barber professionalism". Good: "barber disinfecting clippers at workstation".
-- Do NOT repeat videoQuery values across scenes in the same lesson.
+export const SCENE_GENERATION_SYSTEM_PROMPT = `You create original, standards-governed career and technical education video plans.
 
-VISUAL FOCUS — this is the most important field. It drives clip selection directly.
-- visualFocus must describe the EXACT physical action happening on screen, not the topic.
-- It must match the narration word-for-word in terms of the action being performed.
-- Use the exact action phrases below when the narration covers that topic:
-
-  Narration about Barbicide / disinfectant jars / submerging tools:
-    → "barber submerging combs and scissors into Barbicide disinfectant jar"
-
-  Narration about washing hands / hand hygiene:
-    → "barber washing hands with soap at sink close up"
-
-  Narration about wiping down / disinfecting surfaces / chair / counter:
-    → "barber spraying and wiping down barber chair with disinfectant"
-
-  Narration about sweeping / hair on floor / floor cleanup:
-    → "barber sweeping hair off floor with broom"
-
-  Narration about cleaning clippers / brushes / combs / implements:
-    → "barber cleaning clippers with brush and sanitizing spray"
-
-  Narration about gloves:
-    → "barber putting on disposable gloves close up"
-
-  Narration about setting up / preparing the station:
-    → "barber arranging tools on workstation before client"
-
-  Narration about client consultation / talking to client:
-    → "barber talking to client in mirror during consultation"
-
-  Narration about cutting hair / clippers / fades / tapers:
-    → "barber cutting hair with clippers close up"
-
-  Narration about beard trimming:
-    → "barber trimming beard with clippers close up"
-
-  Narration about straight razor / shaving:
-    → "barber applying straight razor shave to client face"
-
-  Narration about neckline:
-    → "barber trimming neckline with clippers close up"
-
-- NEVER use a generic visual focus like "barber working" or "barbershop scene" when the narration describes a specific action.
-- NEVER assign a sweeping/floor clip to a scene about disinfection.
-- NEVER assign a handwashing clip to a scene about Barbicide or tool submersion.
-- Each scene's visualFocus must be distinct — no two scenes in the same lesson may have the same visualFocus.`;
-
-/**
- * Fixed 8-scene spine for introduction/overview lessons.
- * Prevents GPT from free-associating "barber topics" instead of following a lesson arc.
- */
-const INTRO_LESSON_SCENE_SPINE = `
-You must follow this exact 8-scene structure. Do not add scenes. Do not remove scenes. Do not reorder them.
-
-Scene 1 — What barbers do every day
-  Services performed. Who they serve. Why it matters as a career. No history. No culture. Just the job.
-
-Scene 2 — Barbering as a licensed profession
-  Licensing requirement in Indiana. Why licensure exists. What it protects (client safety, professional standards).
-
-Scene 3 — How the apprenticeship works
-  DOL-registered apprenticeship model. On-the-job learning + related technical instruction. Hours requirement.
-
-Scene 4 — Professional standards from day one
-  What is expected of an apprentice immediately: sanitation, punctuality, dress, conduct, client safety mindset.
-
-Scene 5 — Tools and their purpose
-  Core tools: clippers, guards, combs, shears, razor. What each is used for. Why tool knowledge comes before client work.
-
-Scene 6 — Client communication is a technical skill
-  Consultation before every service. Listening, confirming, managing expectations. Why this is not optional.
-
-Scene 7 — What success looks like in this program
-  Concrete milestones: competency sign-offs, checkpoint quizzes, hours logged, state board prep. What "done" means.
-
-Scene 8 — Recap and what comes next
-  Summarize scenes 1–7 in one sentence each. Preview the next lesson topic. No new content.`;
+HARD RULES:
+- Return valid JSON only. No markdown or commentary.
+- Every scene must teach a stated lesson objective. Never use decorative filler.
+- Treat the supplied source-authority block as binding. Never invent laws, standards, required hours, passing scores, funding eligibility, approval, licensure, or employment claims.
+- Keep DOL apprenticeship requirements, state practice rules, certification exams, Credential Engine metadata, and institution requirements separate.
+- A video is instruction, not proof of competency or authorization to practice.
+- Practical instruction must include preparation/PPE, safety and sanitation, a complete procedure, critical close-ups, correct-versus-incorrect technique, learner practice, evidence capture, and verifier expectations when supported by the source authority.
+- Narration must be natural, specific, concise, and free of motivational filler.
+- visualFocus and videoQuery must describe the exact physical action or diagram required by the narration.
+- Do not repeat visualFocus or videoQuery within one lesson.
+- Do not reproduce proprietary textbook language, images, diagrams, videos, or test questions.`;
 
 export function buildSceneGenerationUserPrompt(opts: {
   lessonId: string;
   title: string;
   content: string;
   seed: string;
+  profile: InstructionalDomainProfile;
   lessonType?: 'intro' | 'skill' | 'theory' | 'review';
   sceneCount?: number;
   occupationTitle?: string;
@@ -114,20 +34,23 @@ export function buildSceneGenerationUserPrompt(opts: {
   passingScore?: number | null;
   requiresPracticalEvidence?: boolean;
 }): string {
-  const isIntro =
-    opts.lessonType === 'intro' ||
-    opts.lessonId.endsWith('-1') ||
-    opts.lessonId.endsWith('lesson-1');
   const sceneCount = opts.sceneCount ?? 8;
+  const isIntro = opts.lessonType === 'intro';
+  const arc = isIntro
+    ? opts.profile.introductionArc.map((item, index) => `Scene ${index + 1}: ${item}`).join('\n')
+    : `Create ${sceneCount} scenes in this arc: establish context; teach the concept; demonstrate or visualize it; show correct application; check understanding; recap.`;
 
-  const spineBlock = isIntro
-    ? INTRO_LESSON_SCENE_SPINE
-    : `\nGenerate ${sceneCount} scenes that follow a clear instructional arc: establish context → teach core concept → show application → recap. Every scene must map directly to the lesson objective.`;
+  return `Create an original ${opts.profile.label} instructional video plan.
 
-  return `Generate a scene plan for this barber apprenticeship lesson.
+DOMAIN PROFILE:
+KEY: ${opts.profile.key}
+STYLE: ${opts.profile.videoStyle}
+VISUAL VOCABULARY: ${opts.profile.visualVocabulary.join('; ')}
+SAFETY FOCUS: ${opts.profile.safetyFocus.join('; ')}
+PROHIBITED CLAIMS: ${opts.profile.prohibitedClaims.join('; ')}
 
 SOURCE AUTHORITY:
-OCCUPATION: ${opts.occupationTitle ?? 'Not supplied'}
+OCCUPATION: ${opts.occupationTitle ?? opts.profile.label}
 DOL APPENDIX A COMPETENCY: ${opts.dolCompetencyId ?? 'Not applicable'} — ${opts.dolCompetencyDescription ?? 'Not supplied'}
 RELATED TECHNICAL INSTRUCTION: ${opts.rtiRequirement ?? 'Not supplied'}${opts.rtiHours ? ` (${opts.rtiHours} governed hours)` : ''}
 STATE AUTHORITY: ${opts.stateAuthority ?? 'Not supplied'}
@@ -135,43 +58,17 @@ STATE STANDARD VERSION: ${opts.stateStandardVersion ?? 'Not supplied'}
 STATE REQUIREMENT: ${opts.stateRequirement ?? 'Not supplied'}
 EXAM DOMAIN: ${opts.examDomain ?? 'Not supplied'}
 PASSING SCORE: ${opts.passingScore ?? 'Do not state a score'}
-PRACTICAL EVIDENCE REQUIRED: ${opts.requiresPracticalEvidence ? 'Yes — show learner practice, evidence capture, and licensed verifier review' : 'No state practical evidence requirement supplied'}
+PRACTICAL EVIDENCE REQUIRED: ${opts.requiresPracticalEvidence ? 'Yes' : 'Not supplied'}
 
 LESSON ID: ${opts.lessonId}
 TITLE: ${opts.title}
 SEED: ${opts.seed}
 CONTENT:
 ${opts.content.slice(0, 3000)}
-${spineBlock}
 
-Return JSON matching this exact shape — one object per scene, no extras:
-{
-  "lessonId": "${opts.lessonId}",
-  "title": "${opts.title}",
-  "voice": "onyx",
-  "videoStyle": "barber_broll",
-  "targetResolution": "1920x1080",
-  "scenes": [
-    {
-      "id": "scene-1",
-      "order": 1,
-      "instructionalObjective": "Learner can describe what a barber does and why licensure matters",
-      "dolCompetencyId": "${opts.dolCompetencyId ?? 'not-applicable'}",
-      "stateRequirement": "${opts.stateRequirement ?? 'not-supplied'}",
-      "examDomain": "${opts.examDomain ?? 'not-supplied'}",
-      "demonstrationStep": "Exact physical action demonstrated in this scene, or not-applicable for theory",
-      "evidenceExpectation": "What the learner submits or what the licensed verifier observes",
-      "narration": "Barbering is a licensed trade. Every day, barbers perform haircuts, fades, shaves, and beard trims for paying clients. In Indiana, doing that work legally requires a state-issued license — and this apprenticeship is how you earn it.",
-      "caption": "What barbers do every day",
-      "subcaption": "Licensed trade. Real clients. Real skills.",
-      "videoQuery": "barber cutting hair with clippers client chair",
-      "visualFocus": "Barber actively cutting a client's hair with clippers, client seated in barber chair",
-      "layout": "lower_third",
-      "minClipSeconds": 6,
-      "maxClipSeconds": 12,
-      "transitionIn": "fade",
-      "transitionOut": "cut"
-    }
-  ]
-}`;
+SCENE ARC:
+${arc}
+
+Return exactly ${sceneCount} scenes using this JSON shape:
+{"lessonId":"${opts.lessonId}","title":"${opts.title}","voice":"onyx","videoStyle":"${opts.profile.videoStyle}","targetResolution":"1920x1080","scenes":[{"id":"scene-1","order":1,"instructionalObjective":"Observable learner outcome","dolCompetencyId":"${opts.dolCompetencyId ?? 'not-applicable'}","stateRequirement":"${opts.stateRequirement ?? 'not-supplied'}","examDomain":"${opts.examDomain ?? 'not-supplied'}","demonstrationStep":"Exact action or diagram","evidenceExpectation":"Required learner or verifier evidence","narration":"Two to four original instructional sentences.","caption":"Concrete on-screen instruction","subcaption":"One supporting line","videoQuery":"Specific obtainable footage or diagram","visualFocus":"Exact visible action","layout":"lower_third","minClipSeconds":6,"maxClipSeconds":12,"transitionIn":"fade","transitionOut":"cut"}]}`;
 }

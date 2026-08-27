@@ -11,9 +11,10 @@ export const VoiceNameSchema = z.enum([
   'shimmer',
 ]);
 export const VideoStyleSchema = z.enum([
-  'barber_broll',
-  'barbershop_lifestyle',
-  'tools_closeup',
+  'trade_demonstration',
+  'clinical_demonstration',
+  'technical_diagram',
+  'workplace_scenario',
   'mixed',
 ]);
 export const SceneLayoutSchema = z.enum([

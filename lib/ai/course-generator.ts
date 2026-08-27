@@ -23,6 +23,14 @@ export interface GeneratedQuizQuestion {
   options: string[]; // 4 options, A–D
   correct_index: number; // 0-based
   explanation: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+export interface GeneratedVideoSegment {
+  title: string;
+  narration: string;
+  visual_direction: string;
+  duration_seconds: number;
 }
 
 export interface GeneratedLesson {
@@ -38,6 +46,11 @@ export interface GeneratedLesson {
    * Max 3 — more than 3 triggers stuffing penalty in the validator.
    */
   competency_keys: string[];
+  learning_objectives: string[];
+  scenario: string;
+  practice_exercise: string;
+  remediation_guidance: string;
+  video_segments: GeneratedVideoSegment[];
   quiz_questions: GeneratedQuizQuestion[];
   duration_minutes: number;
 }
@@ -80,6 +93,9 @@ Rules:
 - Lesson body content should be 200–400 words of practical instruction.
 - Key takeaways: 3–5 concise bullet points per lesson.
 - Quiz questions: multiple choice, 4 options each, one correct answer.
+- Assessment difficulty: approximately 30% easy, 50% medium, and 20% hard across the course.
+- Every lesson must include measurable objectives, a workplace scenario, guided practice, and remediation guidance.
+- Video scripts must be segmented into short scenes with narration, visual direction, and timing.
 - Reflection prompts: one actionable question per lesson.
 - Always respond with valid JSON only. No markdown fences, no commentary.`;
 }
@@ -128,13 +144,26 @@ Return a single JSON object with this exact structure:
       "key_takeaways": ["string", ...],
       "reflection_prompt": "string (one open-ended question for learner reflection)",
       "competency_keys": ["string", ...],
+      "learning_objectives": ["2–4 measurable objectives using Bloom action verbs"],
+      "scenario": "credential-relevant workplace scenario",
+      "practice_exercise": "guided learn-by-doing exercise with observable outcome",
+      "remediation_guidance": "targeted next steps when the learner misses this lesson's checks",
+      "video_segments": [
+        {
+          "title": "short scene title",
+          "narration": "spoken script for this scene",
+          "visual_direction": "specific demonstration, diagram, annotation, or on-screen emphasis",
+          "duration_seconds": 60
+        }
+      ],
       "duration_minutes": number,
       "quiz_questions": [
         {
           "question": "string",
           "options": ["A. ...", "B. ...", "C. ...", "D. ..."],
           "correct_index": 0,
-          "explanation": "string"
+          "explanation": "string",
+          "difficulty": "easy|medium|hard"
         }
       ]
     }
@@ -199,6 +228,25 @@ function validateCourse(data: unknown): GeneratedCourse {
         competency_keys: Array.isArray(lesson.competency_keys)
           ? (lesson.competency_keys as unknown[]).map(String).slice(0, 3)
           : [],
+        learning_objectives: Array.isArray(lesson.learning_objectives)
+          ? (lesson.learning_objectives as unknown[]).map(String).filter(Boolean).slice(0, 4)
+          : [],
+        scenario: String(lesson.scenario || '').trim(),
+        practice_exercise: String(lesson.practice_exercise || '').trim(),
+        remediation_guidance: String(lesson.remediation_guidance || '').trim(),
+        video_segments: Array.isArray(lesson.video_segments)
+          ? (lesson.video_segments as unknown[]).map((segment: unknown, segmentIndex: number) => {
+              const value = (segment || {}) as Record<string, unknown>;
+              return {
+                title: String(value.title || `Scene ${segmentIndex + 1}`).trim(),
+                narration: String(value.narration || '').trim(),
+                visual_direction: String(value.visual_direction || '').trim(),
+                duration_seconds: typeof value.duration_seconds === 'number'
+                  ? Math.max(15, Math.min(180, value.duration_seconds))
+                  : 60,
+              };
+            }).filter((segment) => segment.narration && segment.visual_direction)
+          : [],
         duration_minutes:
           typeof lesson.duration_minutes === 'number' ? lesson.duration_minutes : 30,
         quiz_questions: Array.isArray(lesson.quiz_questions)
@@ -209,6 +257,9 @@ function validateCourse(data: unknown): GeneratedCourse {
                 options: Array.isArray(qObj.options) ? (qObj.options as unknown[]).map(String) : [],
                 correct_index: typeof qObj.correct_index === 'number' ? qObj.correct_index : 0,
                 explanation: String(qObj.explanation || '').trim(),
+                difficulty: (['easy', 'medium', 'hard'].includes(String(qObj.difficulty))
+                  ? qObj.difficulty
+                  : 'medium') as GeneratedQuizQuestion['difficulty'],
               };
             })
           : [],

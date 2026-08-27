@@ -22,7 +22,10 @@ const R2_KEY_PREFIX = 'course-videos';
 export type CourseVideoStorageBackend = 'auto' | 'supabase' | 'r2';
 
 const DEFAULT_R2_MIN_BYTES = 5 * 1024 * 1024; // 5 MB
-const SUPABASE_SAFE_VIDEO_BYTES = 450 * 1024 * 1024;
+// Keep standard uploads below the production project's effective request
+// ceiling. The bucket metadata permits larger objects, but the Storage API
+// rejects large single-request MP4 uploads with 413 before that bucket limit.
+export const SUPABASE_SAFE_VIDEO_BYTES = 45 * 1024 * 1024;
 const execFileAsync = promisify(execFile);
 
 export function resolveCourseVideoStorageBackend(): CourseVideoStorageBackend {

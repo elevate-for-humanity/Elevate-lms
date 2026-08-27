@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
+  SUPABASE_SAFE_VIDEO_BYTES,
   shouldUploadCourseMediaToR2,
   resolveCourseVideoStorageBackend,
 } from '@/lib/video/upload-lesson-media';
@@ -22,6 +23,10 @@ describe('upload-lesson-media routing', () => {
 
   it('defaults backend to auto', () => {
     expect(resolveCourseVideoStorageBackend()).toBe('auto');
+  });
+
+  it('compresses Supabase-bound video before the production request ceiling', () => {
+    expect(SUPABASE_SAFE_VIDEO_BYTES).toBe(45 * 1024 * 1024);
   });
 
   it('auto keeps small video on supabase path when R2 unset', () => {

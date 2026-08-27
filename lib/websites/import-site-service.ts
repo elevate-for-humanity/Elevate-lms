@@ -56,6 +56,7 @@ export function assertSafePublicImportUrl(url: URL) {
     const octets = ipv4.slice(1).map(Number);
     if (octets.some((octet) => octet < 0 || octet > 255)) throw new Error('Invalid IP address');
     const [a, b] = octets;
+    if (a === undefined || b === undefined) throw new Error('Invalid IP address');
     const privateRange =
       a === 10 ||
       a === 127 ||
@@ -88,8 +89,8 @@ function bestImageSrc($: cheerio.CheerioAPI, el: any, baseUrl: string): string |
     const candidates = srcset
       .split(',')
       .map((candidate) => candidate.trim().split(/\s+/)[0])
-      .filter(Boolean);
-    return toAbsoluteUrl(candidates[candidates.length - 1], baseUrl);
+      .filter((candidate): candidate is string => Boolean(candidate));
+    return toAbsoluteUrl(candidates.at(-1), baseUrl);
   }
   return undefined;
 }
@@ -103,7 +104,7 @@ function canonicalImageKey(value?: string): string | undefined {
       .toLowerCase();
     return `${url.hostname.toLowerCase()}${pathname}`;
   } catch {
-    return value.split('?')[0].split('#')[0].trim().toLowerCase() || undefined;
+    return value.split(/[?#]/, 1)[0]?.trim().toLowerCase() || undefined;
   }
 }
 
@@ -123,10 +124,12 @@ function dedupeProductMedia(products: ScrapedWebsiteProduct[], reservedImages: s
   return products.map((product) => {
     const key = canonicalImageKey(product.image);
     if (!key || looksLikeSharedChromeImage(product.image)) {
-      return { ...product, image: undefined };
+      const { image: _image, ...withoutImage } = product;
+      return withoutImage;
     }
     if (used.has(key)) {
-      return { ...product, image: undefined };
+      const { image: _image, ...withoutImage } = product;
+      return withoutImage;
     }
     used.add(key);
     return product;
@@ -166,7 +169,13 @@ function dedupeConfiguredImages(config: any) {
 }
 
 function currencyValues(text: string): string[] {
-  return [...text.matchAll(/\$\s*([0-9]+(?:\.[0-9]{1,2})?)/g)].map((match) => match[1]);
+  return [...text.matchAll(/\$\s*([0-9]+(?:\.[0-9]{1,2})?)/g)]
+    .map((match) => match[1])
+    .filter((value): value is string => value !== undefined);
+}
+
+function stripQueryAndFragment(value: string): string {
+  return value.split(/[?#]/, 1)[0] ?? value;
 }
 
 function productContainer($: cheerio.CheerioAPI, anchor: any) {
@@ -187,7 +196,7 @@ function collectProductsFromHtml(
     const href = toAbsoluteUrl(rawHref, pageUrl);
     if (!href) return;
 
-    const normalizedHref = href.split('?')[0].split('#')[0];
+    const normalizedHref = stripQueryAndFragment(href);
     const container = productContainer($, anchor);
     const scope = container.length ? container : $(anchor).parent();
     const heading = scope.find('h1, h2, h3, .card__heading, .product-title, .product__title').first().text().trim();
@@ -201,14 +210,17 @@ function collectProductsFromHtml(
     const image = imageEl.length ? bestImageSrc($, imageEl, pageUrl) : undefined;
     const previous = byHref.get(normalizedHref);
 
+    const price = previous?.price || prices.at(-1) || prices[0];
+    const compareAtPrice = previous?.compareAtPrice || (prices.length > 1 ? prices[0] : undefined);
+    const resolvedImage = previous?.image || image;
     byHref.set(normalizedHref, {
       name: previous?.name || name,
       description: previous?.description || '',
-      price: previous?.price || prices[prices.length - 1] || prices[0],
-      compareAtPrice: previous?.compareAtPrice || (prices.length > 1 ? prices[0] : undefined),
-      image: previous?.image || image,
+      ...(price ? { price } : {}),
+      ...(compareAtPrice ? { compareAtPrice } : {}),
+      ...(resolvedImage ? { image: resolvedImage } : {}),
       href: normalizedHref,
-      category: previous?.category,
+      ...(previous?.category ? { category: previous.category } : {}),
     });
   });
 
@@ -249,13 +261,15 @@ async function enrichProduct(product: ScrapedWebsiteProduct, origin: string): Pr
     const ogImage = toAbsoluteUrl($('meta[property="og:image"]').attr('content'), productUrl.href);
     const image = [ogImage, productMediaImage, product.image].find((candidate) => candidate && !looksLikeSharedChromeImage(candidate));
 
+    const price = product.price || prices.at(-1) || prices[0];
+    const compareAtPrice = product.compareAtPrice || (prices.length > 1 ? prices[0] : undefined);
     return {
       ...product,
       name: name.slice(0, 180),
       description: description || product.description,
-      price: product.price || prices[prices.length - 1] || prices[0],
-      compareAtPrice: product.compareAtPrice || (prices.length > 1 ? prices[0] : undefined),
-      image,
+      ...(price ? { price } : {}),
+      ...(compareAtPrice ? { compareAtPrice } : {}),
+      ...(image ? { image } : {}),
     };
   } catch (error) {
     logger.debug('[website-import] product detail skipped', { url: product.href, error: String(error) });
@@ -345,13 +359,15 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedWebs
       $('meta[property="og:description"]').attr('content') ||
       $('p').first().text().trim().slice(0, 300);
 
-    result.logo = toAbsoluteUrl(
+    const logo = toAbsoluteUrl(
       $('img[alt*="logo" i], img[class*="logo" i], header img').first().attr('src'),
       baseUrl,
     );
-    result.heroImage =
+    if (logo) result.logo = logo;
+    const heroImage =
       toAbsoluteUrl($('meta[property="og:image"]').attr('content'), baseUrl) ||
       bestImageSrc($, $('main img, section img').first(), baseUrl);
+    if (heroImage) result.heroImage = heroImage;
 
     $('nav a, header a, .nav a, .menu a, .navigation a').each((_, el) => {
       const href = $(el).attr('href');
@@ -373,7 +389,7 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedWebs
 
     const fontRegex = /font-family\s*:\s*([^;}]+)/gi;
     result.fonts = [...styleContent.matchAll(fontRegex)]
-      .map((match) => match[1].replace(/["']/g, '').trim())
+      .map((match) => (match[1] ?? '').replace(/["']/g, '').trim())
       .filter((value, index, self) => value && self.indexOf(value) === index)
       .slice(0, 8);
 
@@ -480,11 +496,11 @@ async function analyzeAndGenerateConfig(scrapedData: ScrapedWebsiteData): Promis
     scrapedData.products.slice(0, 30).map((product) => ({
       name: product.name,
       description: product.description,
-      price: product.price,
-      compareAtPrice: product.compareAtPrice,
-      image: product.image,
+      ...(product.price ? { price: product.price } : {}),
+      ...(product.compareAtPrice ? { compareAtPrice: product.compareAtPrice } : {}),
+      ...(product.image ? { image: product.image } : {}),
       href: product.href,
-      category: product.category,
+      ...(product.category ? { category: product.category } : {}),
     })),
     [scrapedData.logo || '', scrapedData.heroImage || ''].filter(Boolean),
   );
@@ -550,16 +566,16 @@ async function analyzeAndGenerateConfig(scrapedData: ScrapedWebsiteData): Promis
         primaryColor: scrapedData.colors[0] || '#7c3f58',
         secondaryColor: scrapedData.colors[1] || '#6f7f56',
         accentColor: scrapedData.colors[2] || '#c99048',
-        logoText: scrapedData.title.split('|')[0].split('-')[0].trim(),
-        logoImage: scrapedData.logo,
+        logoText: scrapedData.title.split(/[|-]/, 1)[0]?.trim() || scrapedData.title,
+        ...(scrapedData.logo ? { logoImage: scrapedData.logo } : {}),
         tagline: scrapedData.description.slice(0, 120),
       },
       homepage: {
-        heroTitle: scrapedData.title.split('|')[0].trim(),
+        heroTitle: scrapedData.title.split('|', 1)[0]?.trim() || scrapedData.title,
         heroSubtitle: scrapedData.description,
         heroCtaText: isStore ? 'Shop Products' : 'Get Started',
         heroCtaHref: isStore ? '/shop' : '/programs',
-        heroImage: scrapedData.heroImage,
+        ...(scrapedData.heroImage ? { heroImage: scrapedData.heroImage } : {}),
         features: isStore
           ? []
           : scrapedData.programs.slice(0, 4).map((item) => ({ title: item.name, description: item.description })),

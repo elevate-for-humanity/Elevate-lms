@@ -308,7 +308,7 @@ async function _POST(request: NextRequest) {
     // events (refund, subscription changes) are fail-closed: if we cannot
     // record the event, we skip all mutations and return 200 so Stripe
     // retries on the next attempt.
-    let existingEvent = null;
+    let existingEvent: { id: string; status: string } | null = null;
     let idempotencyAvailable = true;
     try {
       const { data } = await supabase
@@ -1015,14 +1015,17 @@ async function _POST(request: NextRequest) {
                 },
               });
             } catch (logErr) {
-              logger.warn('[webhook] Failed to record in webhook_events_processed:', logErr);
+              logger.warn(
+                '[webhook] Failed to record in webhook_events_processed:',
+                normalizeError(logErr, 'Webhook reconciliation record failed'),
+              );
             }
 
             // Flag certificates issued to this student
             await flagCertificatesOnRefund({
               supabase,
               studentId: userId,
-              enrollmentId: enrollmentId || undefined,
+              ...(enrollmentId ? { enrollmentId } : {}),
               reason: 'refunded',
               paymentProvider: 'stripe',
               paymentReference: charge.id,
@@ -1067,10 +1070,11 @@ async function _POST(request: NextRequest) {
         .eq('stripe_event_id', event.id);
       finalizeWebhookEvent('stripe', event.id, 'processed').then(()=>{}, ()=>{});
     } catch (updateErr) {
-      logger.warn('[webhook] Failed to update status:', updateErr);
-      logger.warn('Failed to update webhook status:', updateErr);
+      const normalizedUpdateError = normalizeError(updateErr, 'Webhook status update failed');
+      logger.warn('[webhook] Failed to update status:', normalizedUpdateError);
+      logger.warn('Failed to update webhook status:', normalizedUpdateError);
     }
-  } catch (processingError: any) {
+  } catch (processingError: unknown) {
     // Outer catch - something unexpected happened
     const errMsg =
       processingError instanceof Error ? processingError.message : String(processingError);
@@ -1090,10 +1094,16 @@ async function _POST(request: NextRequest) {
         .eq('stripe_event_id', event.id);
       finalizeWebhookEvent('stripe', event.id, 'errored', errMsg).then(()=>{}, ()=>{});
     } catch (updateErr) {
-      logger.warn('[webhook] Failed to update failure status:', updateErr);
+      logger.warn(
+        '[webhook] Failed to update failure status:',
+        normalizeError(updateErr, 'Webhook failure status update failed'),
+      );
     }
 
-    logger.error('Webhook processing error:', processingError);
+    logger.error(
+      'Webhook processing error:',
+      normalizeError(processingError, 'Webhook processing error'),
+    );
   }
 
   // ALWAYS return 200 after signature verification to stop Stripe retries

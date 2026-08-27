@@ -27,8 +27,11 @@ function parseCSV(text: string): { headers: string[]; rows: Record<string, strin
   const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(Boolean);
   if (lines.length < 2) return { headers: [], rows: [] };
 
-  const headers = lines[0].split(',').map((h) => h.trim().replace(/^"|"$/g, '').toLowerCase());
-  const rows = lines.slice(1).map((line) => {
+  const [headerLine, ...dataLines] = lines;
+  if (!headerLine) return { headers: [], rows: [] };
+
+  const headers = headerLine.split(',').map((h) => h.trim().replace(/^"|"$/g, '').toLowerCase());
+  const rows = dataLines.map((line) => {
     // Simple CSV parse — handles quoted fields
     const vals: string[] = [];
     let cur = '';
@@ -84,19 +87,26 @@ export async function POST(request: NextRequest) {
 
   // Build email → user_id map for all emails in the CSV
   const emails = [...new Set(rows.map((r) => r.email).filter(Boolean))];
-  const { data: profiles } = await db
+  const { data: profiles, error: profilesError } = await db
     .from('profiles')
     .select('id, email')
     .in('email', emails);
 
-  const emailToId = new Map((profiles ?? []).map((p: any) => [p.email, p.id]));
+  if (profilesError) {
+    return safeInternalError(profilesError, 'Failed to resolve certification import users');
+  }
+
+  const emailToId = new Map(
+    (profiles ?? [])
+      .filter((profile) => typeof profile.email === 'string')
+      .map((profile) => [profile.email.toLowerCase(), profile.id]),
+  );
 
   let imported = 0;
   let skipped = 0;
   const errors: string[] = [];
 
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
+  for (const [i, row] of rows.entries()) {
     const lineNum = i + 2; // 1-based + header
 
     if (!row.email) { errors.push(`Line ${lineNum}: missing email`); skipped++; continue; }
@@ -109,7 +119,7 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
-    const userId = emailToId.get(row.email);
+    const userId = emailToId.get(row.email.toLowerCase());
     if (!userId) {
       errors.push(`Line ${lineNum}: no user found for email "${row.email}"`);
       skipped++;

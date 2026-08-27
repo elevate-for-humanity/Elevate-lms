@@ -21,6 +21,9 @@ async function _GET(request: Request) {
     }
 
     const supabase = await createServerSupabaseClient();
+    if (!supabase) {
+      return safeError('Certificate service unavailable', 503);
+    }
 
     const { data: certificates, error } = await supabase
       .from('certificates')
@@ -66,6 +69,9 @@ async function _POST(request: Request) {
     }
 
     const supabase = await createServerSupabaseClient();
+    if (!supabase) {
+      return safeError('Certificate service unavailable', 503);
+    }
 
     const { data: existing, error: existingError } = await supabase
       .from('certificates')

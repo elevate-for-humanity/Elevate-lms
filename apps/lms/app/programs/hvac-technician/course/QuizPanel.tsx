@@ -28,7 +28,14 @@ export function QuizPanel({
   const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null));
 
   const q = questions[current];
-  const isCorrect = selected === q?.correctAnswer;
+  if (!q) {
+    return (
+      <div role="status" className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
+        No quiz questions are available for {lessonTitle}. Please return to the lesson and try again.
+      </div>
+    );
+  }
+  const isCorrect = selected === q.correctAnswer;
   const passingScore = Math.ceil(questions.length * 0.7);
 
   const handleSelect = (idx: number) => {

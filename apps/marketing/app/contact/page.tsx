@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Hero */}
       <section className="bg-gradient-to-br from-brand-blue-700 via-brand-blue-800 to-brand-blue-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -277,7 +277,7 @@ export default function ContactPage() {
             <div className="bg-slate-50 rounded-xl p-6">
               <h3 className="font-bold text-slate-900 mb-2">Is training really free?</h3>
               <p className="text-slate-600 text-sm">
-                Many participants qualify for WIOA funding, state grants, or employer sponsorship. We help you navigate funding options at no cost.
+                Funding depends on the program and each workforce agency’s eligibility, available funds, and written authorization. Applying is free, but tuition is not guaranteed to be covered.
               </p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
@@ -289,7 +289,7 @@ export default function ContactPage() {
             <div className="bg-slate-50 rounded-xl p-6">
               <h3 className="font-bold text-slate-900 mb-2">Can employers partner with you?</h3>
               <p className="text-slate-600 text-sm">
-                Yes! We help employers build customized apprenticeship programs, access tax credits, and connect with pre-screened talent.
+                Yes. We help employers explore apprenticeship partnerships and workforce services. Any tax credit, funding, or candidate eligibility is determined by the responsible agency and applicable program rules.
               </p>
             </div>
           </div>
@@ -300,6 +300,6 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

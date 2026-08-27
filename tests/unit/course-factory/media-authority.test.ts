@@ -66,6 +66,12 @@ describe('canonical Course Factory media architecture', () => {
     expect(manager).toContain("String(clip.id) === identity.assetKey");
   });
 
+  it('resets retry evidence without violating the production NOT NULL contract', () => {
+    const manager = read('lib/course-factory/media-manager.ts');
+    expect(manager).toContain('quality_evidence: {}');
+    expect(manager).not.toContain('quality_evidence: null');
+  });
+
   it('uses one global renderer with optional course-scoped candidate selection', () => {
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
     expect(worker).toContain('requestedOptions');

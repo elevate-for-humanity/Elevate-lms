@@ -109,7 +109,9 @@ export async function resetCanonicalMediaJob(
       reviewed_by: null,
       reviewed_at: null,
       review_notes: null,
-      quality_evidence: null,
+      // Production enforces quality_evidence NOT NULL. A retry has no valid
+      // evidence yet, so reset it to the canonical empty JSON object.
+      quality_evidence: {},
       updated_at: now,
     })
     .eq('id', job.id)

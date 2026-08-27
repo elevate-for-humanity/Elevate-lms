@@ -35,4 +35,13 @@ describe('historical WOTC packet generation', () => {
       .rejects.toThrow('December 31, 2025');
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it('rejects incomplete official templates instead of generating a corrupt packet', async () => {
+    const [irs, eta] = await Promise.all([template(1), template(1)]);
+    vi.stubGlobal('fetch', vi.fn()
+      .mockResolvedValueOnce(new Response(irs, { status: 200 }))
+      .mockResolvedValueOnce(new Response(eta, { status: 200 })));
+
+    await expect(generateWotcPacket(input)).rejects.toThrow('required form pages');
+  });
 });

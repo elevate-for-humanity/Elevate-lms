@@ -41,10 +41,16 @@ export async function generateWotcPacket(input: WotcPacketInput): Promise<Uint8A
   const out = await PDFDocument.create();
   const irsPages = await out.copyPages(irs, irs.getPageIndices());
   const etaPages = await out.copyPages(eta, eta.getPageIndices());
+  const p1 = irsPages[0];
+  const p2 = irsPages[1];
+  const e1 = etaPages[0];
+  const e2 = etaPages[1];
+  if (!p1 || !p2 || !e1 || !e2) {
+    throw new Error('Official historical WOTC templates do not contain the required form pages.');
+  }
   [...irsPages, ...etaPages].forEach((page) => out.addPage(page));
   await out.embedFont(StandardFonts.Helvetica);
 
-  const [p1, p2, e1, e2] = out.getPages();
   historicalStamp(p1); historicalStamp(p2); historicalStamp(e1); historicalStamp(e2);
   const a = input.applicant, employer = input.employer, job = input.employment;
   const name = `${a.firstName} ${a.middleInitial ?? ''} ${a.lastName}`.replace(/\s+/g, ' ').trim();

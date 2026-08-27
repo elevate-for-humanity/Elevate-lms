@@ -8,7 +8,7 @@ import {
 describe('sanitizePlatformValue', () => {
   it('rejects literal PLATFORM_DEFAULTS placeholders', () => {
     expect(isPlatformPlaceholderString('{PLATFORM_DEFAULTS.orgName}')).toBe(true);
-    expect(isPlatformPlaceholderString(`${PLATFORM_DEFAULTS.orgName}`)).toBe(true);
+    expect(isPlatformPlaceholderString('${PLATFORM_DEFAULTS.orgName}')).toBe(true);
     expect(sanitizePlatformValue('{PLATFORM_DEFAULTS.orgName}', 'Fallback Org')).toBe(
       'Fallback Org',
     );

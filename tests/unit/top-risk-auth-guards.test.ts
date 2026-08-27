@@ -33,9 +33,11 @@ describe('Top-risk routes have auth guards', () => {
   });
 
   it('/api/stripe/connect/create requires apiRequireAdmin', () => {
-    const src = readRoute('apps/lms/app/api/stripe/connect/create/route.ts');
-    expect(src).toContain("import { apiRequireAdmin } from '@/lib/admin/guards'");
-    expect(src).toContain('await apiRequireAdmin(');
+    const route = readRoute('apps/lms/app/api/stripe/connect/create/route.ts');
+    const handler = readRoute('lib/api/stripe/shared-route-handlers.ts');
+    expect(route).toContain('postConnectCreate as POST');
+    expect(handler).toContain("import { apiRequireAdmin } from '@/lib/admin/guards'");
+    expect(handler).toContain('await apiRequireAdmin(');
   });
 
   it('/api/store/licenses/create-payment-intent requires apiAuthGuard', () => {

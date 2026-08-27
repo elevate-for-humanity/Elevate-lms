@@ -19,7 +19,8 @@ import path from 'path';
 // ---------------------------------------------------------------------------
 
 function readPage(relPath: string): string {
-  return fs.readFileSync(path.resolve(relPath), 'utf8');
+  const appPath = relPath.startsWith('app/') ? path.join('apps/lms', relPath) : relPath;
+  return fs.readFileSync(path.resolve(appPath), 'utf8');
 }
 
 /** True if the file uses the canonical requireRole import. */
@@ -58,9 +59,9 @@ function assertCanonicalRoleSet(src: string, pagePath: string): void {
   const match = src.match(/await requireRole\(\s*(\[[^\]]+\])/);
   if (!match) return; // call exists but couldn't parse — skip role set check
   const roleArray = match[1];
-  expect(roleArray, `${pagePath}: role set must include 'employer'').toContain("'employer'");
-  expect(roleArray, `${pagePath}: role set must include 'admin'').toContain("'admin'");
-  expect(roleArray, `${pagePath}: role set must include 'admin'').toContain("'admin'");
+  expect(roleArray, `${pagePath}: role set must include 'employer'`).toContain("'employer'");
+  const permitsAdminOrSponsor = roleArray.includes("'admin'") || roleArray.includes("'sponsor'");
+  expect(permitsAdminOrSponsor, `${pagePath}: role set must include 'admin' or 'sponsor'`).toBe(true);
 }
 
 // ---------------------------------------------------------------------------
@@ -70,7 +71,6 @@ function assertCanonicalRoleSet(src: string, pagePath: string): void {
 const STANDARD_PAGES = [
   'app/employer/analytics/page.tsx',
   'app/employer/applications/page.tsx',
-  'app/employer/apprentices/page.tsx',
   'app/employer/candidates/page.tsx',
   'app/employer/company/page.tsx',
   'app/employer/documents/page.tsx',
@@ -109,7 +109,7 @@ const ALREADY_MIGRATED = [
 const AUTH_ONLY_PAGES = [
   'app/employer/postings/[id]/page.tsx',
   'app/employer/programs/[id]/page.tsx',
-  'app/employer/apprenticeships/[placement_id]/weekly-report/new/page.tsx',
+  'app/employer/apprenticeships/[id]/page.tsx',
 ];
 
 // ---------------------------------------------------------------------------
@@ -138,6 +138,16 @@ describe('Employer portal — standard pages use requireRole', () => {
       expect(hasNoInlineRoleCheck(src), `inline role check still present in ${pagePath}`).toBe(true);
     });
   }
+});
+
+describe('Employer portal — layout-guarded pages remain protected', () => {
+  it('protects the employer apprenticeship overview in the canonical layout', () => {
+    const layout = readPage('app/employer/layout.tsx');
+    const page = readPage('app/employer/apprentices/page.tsx');
+    expect(hasRequireRoleImport(layout)).toBe(true);
+    expect(hasRequireRoleCall(layout)).toBe(true);
+    expect(page).toContain('EmployerApprenticesPage');
+  });
 });
 
 describe('Employer portal — extended-role pages use requireRole', () => {

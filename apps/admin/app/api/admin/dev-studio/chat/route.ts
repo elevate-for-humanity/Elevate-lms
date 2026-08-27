@@ -9,6 +9,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -44,7 +45,7 @@ type ToolCallRecord = { tool: string; args: Record<string, unknown>; result: str
 type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
 type ChatProvider = 'auto' | 'groq' | 'openai' | 'gemini' | 'anthropic';
 
-const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, string[]> = {
+const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, ...string[]]> = {
   groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
   openai: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'],
   gemini: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'],
@@ -941,9 +942,9 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         title,
         topic: description,
         audience,
-        hours,
-        state,
-        credential,
+        ...(hours !== undefined ? { hours } : {}),
+        ...(state !== undefined ? { state } : {}),
+        ...(credential !== undefined ? { credential } : {}),
         moduleCount,
         lessonsPerModule,
         contentSource: 'ai',
@@ -1011,7 +1012,9 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         title: String(course.title),
         topic: String(course.description || course.subtitle || course.title),
         audience: String(course.audience || 'adult workforce learners'),
-        hours: Number(course.duration_hours || 0) || undefined,
+        ...(Number(course.duration_hours || 0) > 0
+          ? { hours: Number(course.duration_hours) }
+          : {}),
         moduleCount,
         lessonsPerModule,
         contentSource: 'ai',
@@ -1204,8 +1207,10 @@ async function _POST(req: NextRequest) {
             typeof (message as { role?: unknown }).role === 'string' &&
             typeof (message as { content?: unknown }).content === 'string',
         )
-        .filter((message) => ['user', 'assistant', 'system'].includes(message.role))
-        .map((message) => ({
+        .filter((message: { role: string; content: string }) =>
+          ['user', 'assistant', 'system'].includes(message.role),
+        )
+        .map((message: { role: string; content: string }) => ({
           role: message.role as ChatMessage['role'],
           content: message.content,
         }));
@@ -1258,6 +1263,7 @@ async function _POST(req: NextRequest) {
           });
 
           const choice = initial.choices[0];
+          if (!choice) throw new Error('Groq returned no completion choice');
           const toolCallRequests = (choice?.message?.tool_calls ?? []).filter(
             (toolCall) => toolCall.type === 'function',
           );
@@ -1298,8 +1304,8 @@ async function _POST(req: NextRequest) {
 
           provider = 'groq';
           model = selectedModel;
-        } catch (err) {
-          logger.warn('[devstudio/chat] Groq failed', err);
+        } catch (err: unknown) {
+          logger.warn('[devstudio/chat] Groq failed', normalizeError(err));
         }
       }
 
@@ -1316,6 +1322,7 @@ async function _POST(req: NextRequest) {
             max_tokens: 4096,
           });
           const choice = initial.choices[0];
+          if (!choice) throw new Error('OpenAI returned no completion choice');
           const toolCallRequests = (choice?.message?.tool_calls ?? []).filter(
             (toolCall) => toolCall.type === 'function',
           );
@@ -1345,8 +1352,8 @@ async function _POST(req: NextRequest) {
           }
           provider = 'openai';
           model = selectedModel;
-        } catch (err) {
-          logger.warn('[devstudio/chat] OpenAI failed', err);
+        } catch (err: unknown) {
+          logger.warn('[devstudio/chat] OpenAI failed', normalizeError(err));
         }
       }
 
@@ -1394,8 +1401,8 @@ async function _POST(req: NextRequest) {
           }
           provider = 'anthropic';
           model = selectedModel;
-        } catch (err) {
-          logger.warn('[devstudio/chat] Anthropic failed', err);
+        } catch (err: unknown) {
+          logger.warn('[devstudio/chat] Anthropic failed', normalizeError(err));
         }
       }
 
@@ -1415,8 +1422,8 @@ async function _POST(req: NextRequest) {
           assistantMessage = result.content ?? null;
           provider = result.provider ?? 'gemini';
           model = selectedModel;
-        } catch (err) {
-          logger.warn('[devstudio/chat] Gemini failed', err);
+        } catch (err: unknown) {
+          logger.warn('[devstudio/chat] Gemini failed', normalizeError(err));
         }
       }
     }
@@ -1432,8 +1439,8 @@ async function _POST(req: NextRequest) {
         assistantMessage = fallbackResult.content ?? null;
         provider = 'aiChat-fallback';
         model = 'gpt-4.1-mini';
-      } catch (err) {
-        logger.warn('[devstudio/chat] aiChat fallback failed', err);
+      } catch (err: unknown) {
+        logger.warn('[devstudio/chat] aiChat fallback failed', normalizeError(err));
       }
     }
 
@@ -1476,8 +1483,8 @@ async function _POST(req: NextRequest) {
           model,
         });
         if (logError) logger.warn('[devstudio/chat] DB log insert failed', { reason: logError.message });
-      } catch (err) {
-        logger.warn('[devstudio/chat] DB log failed', err);
+      } catch (err: unknown) {
+        logger.warn('[devstudio/chat] DB log failed', normalizeError(err));
       }
     })();
 

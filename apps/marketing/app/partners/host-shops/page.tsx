@@ -4,6 +4,7 @@ import { ExternalLink, Mail, MapPin, Phone, ShieldCheck } from 'lucide-react';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { ROUTES } from '@/lib/navigation/routes';
 import { getApprovedShops, PROGRAM_LABELS } from '@/lib/programs/host-shops';
+import { BARBER_PRICING } from '@/lib/programs/pricing';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,11 +26,26 @@ const REQUIREMENTS = [
 ];
 
 const APPROVAL_STEPS = [
-  ['Apply', 'Submit the business location, supervising professional, occupations, and required documents.'],
+  ['Apply at no cost', 'Submit the business location, supervising professional, occupations, and required documents. There is no Host Site application or placement fee.'],
   ['Verify', 'Elevate verifies licenses, insurance, worksite readiness, and supervisor eligibility.'],
   ['Approve & onboard', 'Approved sites receive Host Site onboarding and portal access.'],
   ['Place & supervise', 'Apprentices are matched by occupation, location, capacity, and current availability.'],
 ] as const;
+
+const CALLER_CHECKLIST = [
+  'Choose the apprenticeship occupation(s) your shop can support.',
+  'Confirm an eligible licensed supervisor is available at the training site.',
+  'Gather the business/shop license, supervisor license, liability insurance, workers’ compensation certificate or exemption, and EIN verification or W-9.',
+  'Confirm the shop can employ, pay, supervise, and retain the apprentice and keep payroll and training records.',
+  'Submit the no-cost Host Site application.',
+  'Meet with Elevate for document verification, worksite review, training-plan setup, and portal onboarding.',
+  'Before hiring, ask the local WorkOne office to screen the candidate and employer for OJT reimbursement eligibility and obtain written authorization.',
+] as const;
+
+const barberWeeklyEstimate = Math.ceil(
+  ((BARBER_PRICING.fullPrice - BARBER_PRICING.minDownPayment) * 100) /
+    BARBER_PRICING.paymentTermWeeks,
+) / 100;
 
 function address(shop: Awaited<ReturnType<typeof getApprovedShops>>[number]) {
   return [shop.address, shop.city, shop.state, shop.zip].filter(Boolean).join(', ');
@@ -51,6 +67,97 @@ export default async function HostShopsPage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href={HOST_SITE_APPLY_HREF} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Become a Host Site</Link>
             <a href={ROUTES.hostShopPortal} className="rounded-xl border-2 border-brand-blue-700 bg-white px-6 py-3 font-black text-brand-blue-800 hover:bg-brand-blue-100">Host Site Portal</a>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-slate-200 bg-white px-4 py-14" aria-labelledby="host-site-overview">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-4xl">
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Host Site overview</p>
+            <h2 id="host-site-overview" className="mt-2 text-3xl font-black sm:text-4xl">Train an apprentice, grow your team, and keep the process clear.</h2>
+            <p className="mt-4 text-lg leading-8 text-slate-700">
+              An approved Host Site is the apprentice’s employer and supervised work-based learning location.
+              Elevate administers the apprenticeship program, Related Technical Instruction, progress records,
+              and compliance workflow. The shop provides paid employment, day-to-day supervision, practical
+              experience, accurate records, and a safe licensed workplace.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <article className="rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-6">
+              <p className="text-sm font-black uppercase tracking-wider text-emerald-800">Host Site cost</p>
+              <h3 className="mt-2 text-3xl font-black text-emerald-950">$0 to apply or participate</h3>
+              <p className="mt-3 text-sm leading-6 text-emerald-950">
+                Elevate does not charge a Host Site application or apprentice-placement fee. The employer
+                remains responsible for apprentice wages, payroll obligations, insurance, tools, supplies,
+                supervision, and normal business costs. Optional software or services are separate if selected.
+              </p>
+            </article>
+            <article className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <p className="text-sm font-black uppercase tracking-wider text-brand-red-700">Barber apprentice tuition</p>
+              <h3 className="mt-2 text-3xl font-black">{`${BARBER_PRICING.fullPrice.toLocaleString('en-US')}`}</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-700">
+                Current self-pay barber tuition: at least {`${BARBER_PRICING.minDownPayment.toLocaleString('en-US')}`} down,
+                then about {`${barberWeeklyEstimate.toFixed(2)}`} weekly for {BARBER_PRICING.paymentTermWeeks} weeks
+                (the final payment is adjusted to the exact balance). Approved workforce funding may cover eligible
+                participant costs. Tuition is paid to Elevate—not to the Host Site.
+              </p>
+            </article>
+            <article className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <p className="text-sm font-black uppercase tracking-wider text-brand-red-700">How the shop earns</p>
+              <h3 className="mt-2 text-2xl font-black">Business revenue plus a trained employee</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-700">
+                The shop may earn its ordinary client-service and retail revenue from work completed under proper
+                supervision while building a skilled employee. The apprentice must be paid under the approved wage
+                schedule and applicable law. Elevate does not promise a commission, guaranteed revenue, or profit.
+              </p>
+            </article>
+          </div>
+
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <article className="rounded-2xl border border-blue-300 bg-blue-50 p-6">
+              <p className="text-sm font-black uppercase tracking-wider text-brand-blue-800">Workforce reimbursement</p>
+              <h3 className="mt-2 text-2xl font-black text-slate-950">Eligible shops may receive an OJT wage reimbursement.</h3>
+              <p className="mt-3 leading-7 text-slate-700">
+                Indiana WorkOne says approved On-the-Job Training arrangements can reimburse an employer for up to
+                50% of an eligible new employee’s wages during training, generally for up to six months. The current
+                state overview says the job must pay at least $13.50 per hour and the employer must commit to retaining
+                the employee for at least six months after training.
+              </p>
+              <p className="mt-3 text-sm font-bold leading-6 text-slate-800">
+                This is a conditional direct reimbursement—not an automatic rebate. The apprentice and employer must
+                qualify, WorkOne must approve the training plan before covered work begins, and payroll/training evidence
+                must be retained. WOTC is a separate federal tax credit requiring targeted-group certification.
+              </p>
+              <a href="https://www.in.gov/dwd/business-services/grants-credits-and-reimbursements/on-the-job-training/" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex rounded-xl border-2 border-brand-blue-700 bg-white px-5 py-3 text-sm font-black text-brand-blue-900">
+                Review Indiana OJT reimbursement
+              </a>
+            </article>
+
+            <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <p className="text-sm font-black uppercase tracking-wider text-brand-red-700">Caller-ready checklist</p>
+              <h3 className="mt-2 text-2xl font-black">What to have ready</h3>
+              <ol className="mt-5 space-y-3">
+                {CALLER_CHECKLIST.map((item, index) => (
+                  <li key={item} className="flex gap-3 text-sm font-semibold leading-6 text-slate-700">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-950 text-xs font-black text-white">{index + 1}</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ol>
+            </article>
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3 rounded-2xl bg-slate-950 p-6 text-white sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-2xl font-black">Ready to become a Host Site?</h3>
+              <p className="mt-1 text-sm leading-6 text-slate-200">Apply at no cost. Have your five required documents ready for the fastest review.</p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link href={HOST_SITE_APPLY_HREF} className="rounded-xl bg-brand-red-600 px-6 py-3 text-center font-black text-white hover:bg-brand-red-700">Start No-Cost Application</Link>
+              <a href="tel:+13173142050" className="rounded-xl border-2 border-white px-6 py-3 text-center font-black text-white hover:bg-white hover:text-slate-950">Call (317) 314-2050</a>
+            </div>
           </div>
         </div>
       </section>

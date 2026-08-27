@@ -12,6 +12,7 @@ on:
       - 'scripts/check-course-media-authority.mjs'
       - 'scripts/audit-course-builder-procurement.mjs'
       - 'tests/unit/course-factory/media-authority.test.ts'
+      - 'tests/unit/course-builder-route-consolidation.test.ts'
       - '.github/workflows/build-esb-acceptance.yml'
       - 'lib/ai/ai-service.ts'
       - 'lib/ai/providers/**'
@@ -32,6 +33,7 @@ on:
       - 'apps/admin/app/api/admin/courses/**'
       - 'apps/admin/app/api/admin/dev-studio/chat/route.ts'
       - 'apps/admin/app/api/internal/videos/process-queue/route.ts'
+      - 'components/admin/course-builder/UnifiedCourseBuilder.tsx'
   issues:
     types: [opened, reopened]
 

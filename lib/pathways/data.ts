@@ -42,6 +42,7 @@ export type Pathway = {
 const REGISTERED_BARBER = getRegisteredProgramStandard('barber-apprenticeship');
 if (!REGISTERED_BARBER) throw new Error('REGISTERED_BARBER_STANDARD_MISSING');
 const BARBER = PROGRAMS['barber-apprenticeship'];
+if (!BARBER) throw new Error('CANONICAL_BARBER_PROGRAM_MISSING');
 
 export const PATHWAYS: Pathway[] = [
   {

@@ -108,19 +108,27 @@ export default function UniversalHostSiteApplyPage() {
           </p>
           <h1 className="mt-2 text-3xl font-black sm:text-5xl">Become an approved apprenticeship Host Site</h1>
           <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-700">
-            One application covers Barber, Cosmetology, Esthetics, and Nail Technician host sites.
+            One no-cost application covers Barber, Cosmetology, Esthetics, and Nail Technician host sites.
             Elevate verifies the business, licensed supervisor, insurance, workers&apos; compensation,
-            worksite capacity, and compliance documents before approval.
+            worksite capacity, and compliance documents before approval. There is no Host Site application
+            or apprentice-placement fee.
           </p>
         </div>
       </section>
 
       <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
+        <div className="rounded-xl border-2 border-emerald-300 bg-emerald-50 p-5 text-sm leading-6 text-emerald-950">
+          <strong>No-cost Host Site application:</strong> Elevate charges no application or placement fee.
+          The Host Site is still responsible for apprentice wages, payroll obligations, insurance, supervision,
+          tools, supplies, and normal employer costs. Workforce wage reimbursement is conditional and must be
+          approved by WorkOne before covered training begins.
+        </div>
+
         <div className="rounded-xl border border-blue-300 bg-blue-50 p-5 text-sm leading-6 text-blue-950">
           <strong>Prepare five required documents:</strong> current business/shop license,
           commercial/general liability insurance COI, workers&apos; compensation certificate or valid
           exemption, supervising professional license, and EIN verification or W-9. Files upload
-          directly as PDF/JPG/PNG/WEBP; they are not converted to oversized base64 JSON.
+          directly as PDF/JPG/PNG/WEBP.
         </div>
 
         {error ? (

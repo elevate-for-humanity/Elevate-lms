@@ -93,16 +93,24 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
             existingEnrollmentId,
             error: updateErr?.message,
           });
+          if (!userId) {
+            logger.error(
+              '[webhook/checkout] Cannot recreate enrollment without a user ID',
+              undefined,
+              { existingEnrollmentId },
+            );
+            return;
+          }
           // Fall through to createOrUpdateEnrollment as safety net
           result = await createOrUpdateEnrollment(supabase, {
-            userId: userId ?? '',
+            userId,
             programId,
-            programSlug,
-            courseId,
+            ...(programSlug ? { programSlug } : {}),
+            ...(courseId ? { courseId } : {}),
             fundingSource,
             amountPaidCents,
             stripeCheckoutSessionId: session.id,
-            email: customerEmail,
+            ...(customerEmail ? { email: customerEmail } : {}),
           });
         } else {
           result = { id: updated.id, action: 'updated' };
@@ -118,12 +126,12 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
         result = await createOrUpdateEnrollment(supabase, {
           userId,
           programId,
-          programSlug,
-          courseId,
+          ...(programSlug ? { programSlug } : {}),
+          ...(courseId ? { courseId } : {}),
           fundingSource,
           amountPaidCents,
           stripeCheckoutSessionId: session.id,
-          email: customerEmail,
+          ...(customerEmail ? { email: customerEmail } : {}),
         });
       }
 
@@ -136,7 +144,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
         action: AuditAction.ENROLLMENT_CREATED,
         entity: AuditEntity.ENROLLMENT,
         entityId: result.id,
-        actorId: userId,
+        ...(userId ? { actorId: userId } : {}),
         metadata: {
           program_id: programId,
           program_slug: programSlug,
@@ -449,7 +457,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
           await sendLicenseWelcomeEmail({
             email: customerEmail,
             planName: planName,
-            tenantId,
+            ...(tenantId ? { tenantId } : {}),
             dashboardUrl: `${PLATFORM_DEFAULTS.siteUrl}/dashboard`,
           });
         } catch (emailErr) {
@@ -599,7 +607,7 @@ function getLicenseFeatures(tier: string): string[] {
     ],
   };
   
-  return tierFeatures[tier] || tierFeatures.starter;
+  return tierFeatures[tier] ?? tierFeatures.starter ?? [];
 }
 
 function getLicenseMaxUsers(tier: string): number {

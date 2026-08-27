@@ -172,6 +172,38 @@ export default function CourseLifecycleWorkspace() {
     }
   }
 
+  async function exportScorm(format: '1.2' | '2004') {
+    if (!courseId) return;
+    setBusy(`export-scorm-${format}`);
+    setMessage('');
+    try {
+      const response = await fetch(
+        `/api/admin/course-builder/scorm/export?courseId=${encodeURIComponent(courseId)}&format=${encodeURIComponent(format)}`,
+        { cache: 'no-store' },
+      );
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || 'SCORM export failed');
+      }
+      const blob = await response.blob();
+      const disposition = response.headers.get('content-disposition') ?? '';
+      const filename = disposition.match(/filename="([^"]+)"/)?.[1] ?? `course-scorm-${format.replace('.', '')}.zip`;
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+      setMessage(`SCORM ${format} package downloaded.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'SCORM export failed');
+    } finally {
+      setBusy('');
+    }
+  }
+
   async function linkScorm() {
     if (!courseId || !selectedPackageId) return;
     setBusy('scorm');
@@ -234,6 +266,10 @@ export default function CourseLifecycleWorkspace() {
 
               <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
                 <div className="flex items-center gap-2"><PackageOpen className="h-5 w-5 text-cyan-400" /><h2 className="text-lg font-bold">SCORM attachment</h2></div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <ActionButton label="Export SCORM 1.2" icon={<PackageOpen className="h-4 w-4" />} busy={busy === 'export-scorm-1.2'} disabled={!courseId || !!busy} onClick={() => exportScorm('1.2')} />
+                  <ActionButton label="Export SCORM 2004" icon={<PackageOpen className="h-4 w-4" />} busy={busy === 'export-scorm-2004'} disabled={!courseId || !!busy} onClick={() => exportScorm('2004')} />
+                </div>
                 <div className="mt-4 flex gap-2"><select value={selectedPackageId} onChange={(event) => setSelectedPackageId(event.target.value)} className="min-h-10 flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-white"><option value="">Choose an available SCORM package…</option>{availablePackages.map((pkg) => <option key={pkg.id} value={pkg.id}>{pkg.title || pkg.id} — {pkg.scorm_version || pkg.version || 'SCORM'}</option>)}</select><button onClick={linkScorm} disabled={!selectedPackageId || !!busy} className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-40">{busy === 'scorm' ? 'Linking…' : 'Link'}</button></div>
                 <div className="mt-4 space-y-2">{linkedPackages.length ? linkedPackages.map((pkg) => <div key={pkg.id} className="rounded-lg border border-slate-700 bg-slate-950 p-3"><div className="font-semibold">{pkg.title || 'Untitled SCORM package'}</div><div className="text-xs text-slate-500">{pkg.scorm_version || pkg.version || 'SCORM'} · {pkg.active === false ? 'inactive' : 'active'}</div>{pkg.launch_url ? <a className="mt-2 inline-block text-xs font-bold text-cyan-400 hover:underline" href={pkg.launch_url} target="_blank" rel="noreferrer">Open launch URL</a> : null}</div>) : <p className="text-sm text-slate-500">No SCORM packages are linked to this course.</p>}</div>
               </div>

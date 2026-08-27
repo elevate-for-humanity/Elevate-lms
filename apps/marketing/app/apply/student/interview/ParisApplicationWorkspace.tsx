@@ -236,6 +236,35 @@ export default function ParisApplicationWorkspace({
     }
   }
 
+  async function sendDraft() {
+    const value = input.trim();
+    if (!value || sending) return;
+
+    if (session?.state.pendingConfirmation) {
+      const normalized = value.toLowerCase();
+      if (['yes', 'y', 'confirm', 'correct', 'sí', 'si', 'confirmar', 'correcto'].includes(normalized)) {
+        setInput('');
+        setDraftInputMode('text');
+        await chooseAction('confirm');
+        return;
+      }
+      if (['no', 'n', 'change', 'edit', 'cambiar', 'editar', 'incorrect'].includes(normalized)) {
+        setInput('');
+        setDraftInputMode('text');
+        await chooseAction('change');
+        return;
+      }
+      setError(
+        locale === 'es'
+          ? 'Escriba Sí para confirmar o Cambiar para corregir la respuesta.'
+          : 'Type Yes to confirm or Change to correct the answer.',
+      );
+      return;
+    }
+
+    await sendAnswer(value, draftInputMode);
+  }
+
   async function chooseAction(action: 'confirm' | 'change') {
     setSending(true);
     setError('');
@@ -424,8 +453,8 @@ export default function ParisApplicationWorkspace({
           </div>
 
           {!session.readyForSubmission || session.state.pendingConfirmation ? (
-            <div className="border-t border-slate-200 bg-white p-4 sm:p-5">
-              <div className="flex gap-2">
+            <div className="sticky bottom-0 z-10 border-t border-slate-200 bg-white p-4 shadow-[0_-8px_20px_rgba(15,23,42,0.08)] sm:p-5">
+              <div className="flex items-end gap-2">
                 <button
                   type="button"
                   onClick={startVoice}
@@ -435,23 +464,30 @@ export default function ParisApplicationWorkspace({
                 >
                   {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                 </button>
-                <input
+                <textarea
+                  aria-label={t.typeAnswer}
                   value={input}
-                  onChange={(event) => setInput(event.target.value)}
+                  onChange={(event) => setInput(event.target.value.slice(0, 2000))}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' && !event.shiftKey) {
                       event.preventDefault();
-                      void sendAnswer(input, draftInputMode);
+                      void sendDraft();
                     }
                   }}
-                  disabled={sending || Boolean(session.state.pendingConfirmation)}
-                  placeholder={listening ? t.listening : t.typeAnswer}
-                  className="h-12 min-w-0 flex-1 rounded-xl border border-slate-300 px-4 text-sm text-slate-950 focus:border-brand-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 disabled:bg-slate-100"
+                  disabled={sending}
+                  placeholder={
+                    session.state.pendingConfirmation
+                      ? (locale === 'es' ? 'Escriba Sí o Cambiar…' : 'Type Yes or Change…')
+                      : (listening ? t.listening : t.typeAnswer)
+                  }
+                  className="min-h-12 max-h-32 min-w-0 flex-1 resize-y rounded-xl border-2 border-slate-400 px-4 py-3 text-base text-slate-950 focus:border-brand-red-600 focus:outline-none focus:ring-2 focus:ring-red-100 disabled:bg-slate-100"
+                  rows={2}
+                  maxLength={2000}
                 />
                 <button
                   type="button"
-                  onClick={() => void sendAnswer(input, draftInputMode)}
-                  disabled={sending || !input.trim() || Boolean(session.state.pendingConfirmation)}
+                  onClick={() => void sendDraft()}
+                  disabled={sending || !input.trim()}
                   className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-brand-red-600 text-white hover:bg-brand-red-700 disabled:opacity-50"
                   aria-label={t.send}
                 >

@@ -64,9 +64,10 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
   const planId = typeof body.planId === 'string' ? body.planId : '';
   const interval: BillingInterval = body.interval === 'annual' ? 'annual' : 'monthly';
-  const addonSlugs = Array.isArray(body.addonSlugs)
-    ? [...new Set(body.addonSlugs.filter((v: unknown): v is string => typeof v === 'string'))]
-    : [];
+  const rawAddonSlugs: unknown[] = Array.isArray(body.addonSlugs) ? body.addonSlugs : [];
+  const addonSlugs = [
+    ...new Set(rawAddonSlugs.filter((value): value is string => typeof value === 'string')),
+  ];
 
   const plan = getBasePlan(planId);
   if (!plan) return NextResponse.json({ error: 'Invalid subscription plan' }, { status: 400 });

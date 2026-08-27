@@ -162,26 +162,30 @@ async function _POST(request: NextRequest) {
 
           // Check for expiration
           const expMatch = text.match(/EXP[:\s]*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/);
-          if (expMatch) {
-            const expDate = parseLooseDate(expMatch[1]);
+          const expirationText = expMatch?.[1];
+          if (expirationText) {
+            const expDate = parseLooseDate(expirationText);
             if (expDate && expDate < new Date()) {
               checks.push({
                 name: 'ID not expired',
                 passed: false,
-                detail: `ID appears to be expired (${expMatch[1]}). Please upload a current ID.`,
+                detail: `ID appears to be expired (${expirationText}). Please upload a current ID.`,
               });
             } else if (expDate) {
               checks.push({
                 name: 'ID not expired',
                 passed: true,
-                detail: `Expires ${expMatch[1]}`,
+                detail: `Expires ${expirationText}`,
               });
             }
           }
         }
       } catch (ocrError) {
         // Tesseract not available or failed — non-fatal, route to manual review
-        logger.warn('[ValidateDocument] OCR failed, routing to manual review', ocrError);
+        logger.warn(
+          '[ValidateDocument] OCR failed, routing to manual review',
+          normalizeError(ocrError, 'OCR failed'),
+        );
         checks.push({
           name: 'Document readability',
           passed: true,
@@ -264,6 +268,7 @@ function getImageDimensions(buffer: Buffer): { width: number; height: number } |
         continue;
       }
       const marker = buffer[offset + 1];
+      if (marker === undefined) return null;
       // SOF markers: C0-C3, C5-C7, C9-CB, CD-CF
       if (
         (marker >= 0xc0 && marker <= 0xc3) ||
@@ -291,9 +296,11 @@ function parseLooseDate(dateStr: string): Date | null {
     const cleaned = dateStr.replace(/[/-]/g, '/');
     const parts = cleaned.split('/');
     if (parts.length !== 3) return null;
-    const month = parseInt(parts[0], 10);
-    const day = parseInt(parts[1], 10);
-    let year = parseInt(parts[2], 10);
+    const [monthText, dayText, yearText] = parts;
+    if (!monthText || !dayText || !yearText) return null;
+    const month = parseInt(monthText, 10);
+    const day = parseInt(dayText, 10);
+    let year = parseInt(yearText, 10);
     if (year < 100) year += 2000;
     if (month < 1 || month > 12 || day < 1 || day > 31) return null;
     return new Date(year, month - 1, day);

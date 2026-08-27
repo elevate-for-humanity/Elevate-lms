@@ -215,7 +215,7 @@ export default function BarberApprenticeshipClient({
         </div>
       </section>
 
-      <FeaturedHostPartners />
+      <FeaturedHostPartners programSlug="barber-apprenticeship" />
       <BarberWorkforceNetworkMap />
 
       <section className="px-4 py-14 sm:px-6 sm:py-16">

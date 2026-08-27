@@ -19,10 +19,23 @@ function phoneHref(phone: string) {
   return `tel:${phone.replace(/[^0-9+]/g, '')}`;
 }
 
-export default function FeaturedHostPartners() {
+export default function FeaturedHostPartners({ programSlug }: { programSlug?: string }) {
+  const requiredBusinessType = programSlug === 'barber-apprenticeship'
+    ? 'BarberShop'
+    : programSlug === 'cosmetology-apprenticeship'
+      ? 'HairSalon'
+      : undefined;
+  const shops = programSlug
+    ? FEATURED_BEAUTY_HOST_PARTNERS.filter((shop) =>
+        shop.programs.includes(programSlug) &&
+        (!requiredBusinessType || shop.businessType === requiredBusinessType))
+    : FEATURED_BEAUTY_HOST_PARTNERS;
+
+  if (!shops.length) return null;
+
   return (
     <>
-      <HostShopShowcase />
+      <HostShopShowcase shops={shops} />
 
       <section className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 sm:py-16" id="host-shops">
         <div className="mx-auto max-w-6xl">
@@ -37,7 +50,7 @@ export default function FeaturedHostPartners() {
           </p>
 
           <div className="mt-10 grid gap-6 lg:grid-cols-2">
-            {FEATURED_BEAUTY_HOST_PARTNERS.map((shop) => {
+            {shops.map((shop) => {
               const image = shop.media?.[0];
               const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
               return (

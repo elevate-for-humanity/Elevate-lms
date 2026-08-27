@@ -4,12 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Play } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
+import type { FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
 
-const ROTATION_MS = 4000;
+const ROTATION_MS = 8000;
 
-export default function HostShopShowcase() {
-  const shops = useMemo(() => FEATURED_BEAUTY_HOST_PARTNERS, []);
+export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner[] }) {
   const slides = useMemo(() => shops.flatMap((shop) =>
     shop.media?.length
       ? shop.media.map((media) => ({ shop, media }))
@@ -17,7 +16,9 @@ export default function HostShopShowcase() {
   ), [shops]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [interacting, setInteracting] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -28,12 +29,22 @@ export default function HostShopShowcase() {
   }, []);
 
   useEffect(() => {
-    if (paused || reduceMotion || slides.length < 2) return;
+    if (paused || interacting || reduceMotion || slides.length < 2) return;
     const timer = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % slides.length);
     }, ROTATION_MS);
     return () => window.clearInterval(timer);
-  }, [paused, reduceMotion, slides.length]);
+  }, [interacting, paused, reduceMotion, slides.length]);
+
+  useEffect(() => {
+    if (!slides.length) return;
+    const nextSlides = [1, 2].map((offset) => slides[(activeIndex + offset) % slides.length]);
+    nextSlides.forEach((slide) => {
+      if (!slide?.media?.src) return;
+      const preload = new window.Image();
+      preload.src = slide.media.src;
+    });
+  }, [activeIndex, slides]);
 
   if (!slides.length) return null;
 
@@ -46,7 +57,16 @@ export default function HostShopShowcase() {
   }
 
   return (
-    <section aria-labelledby="host-shop-showcase-heading" className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-12 text-slate-950 sm:px-6 sm:py-16">
+    <section
+      aria-labelledby="host-shop-showcase-heading"
+      className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-12 text-slate-950 sm:px-6 sm:py-16"
+      onMouseEnter={() => setInteracting(true)}
+      onMouseLeave={() => setInteracting(false)}
+      onFocusCapture={() => setInteracting(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setInteracting(false);
+      }}
+    >
       <div className="mx-auto max-w-6xl">
         <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -63,6 +83,7 @@ export default function HostShopShowcase() {
             onClick={() => setPaused((value) => !value)}
             className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-xl border-2 border-brand-blue-700 bg-white px-4 py-2 text-sm font-black text-brand-blue-900 hover:bg-sky-50 sm:self-auto"
             aria-label={paused ? 'Resume host shop slideshow' : 'Pause host shop slideshow'}
+            aria-pressed={paused}
           >
             {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
             {paused ? 'Play' : 'Pause'}
@@ -72,7 +93,7 @@ export default function HostShopShowcase() {
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
           <div className="grid min-h-[430px] lg:grid-cols-[1.15fr_0.85fr]">
             <div className="relative min-h-[300px] overflow-hidden bg-slate-100 lg:min-h-[430px]">
-              {image ? (
+              {image && !failedImages.has(image.src) ? (
                 <Image
                   key={image.src}
                   src={image.src}
@@ -81,6 +102,11 @@ export default function HostShopShowcase() {
                   priority={activeIndex === 0}
                   sizes="(max-width: 1024px) 100vw, 58vw"
                   className={image.kind === 'flyer' ? 'object-contain bg-white p-4' : 'object-cover'}
+                  onError={() => setFailedImages((current) => {
+                    const next = new Set(current);
+                    next.add(image.src);
+                    return next;
+                  })}
                 />
               ) : (
                 <div className="absolute inset-0 flex flex-col justify-end bg-[radial-gradient(circle_at_top_left,rgba(185,28,28,0.32),transparent_42%),linear-gradient(145deg,#1e293b,#020617)] px-8 py-10 sm:px-12 sm:py-12">

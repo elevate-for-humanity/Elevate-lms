@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
+import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import { getStaticProgram } from '@/data/programs';
@@ -38,6 +39,7 @@ export default async function CosmetologyApprenticeshipPage() {
       />
       <ProgramDetailPage program={program} banner={banner} heroOverride={heroOverride}>
         <BeautyApprenticeshipAuthority program={program} />
+        <FeaturedHostPartners programSlug="cosmetology-apprenticeship" />
       </ProgramDetailPage>
     </>
   );

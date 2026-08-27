@@ -216,7 +216,7 @@ export default async function BarberApprenticeshipPage() {
             <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Train where the work happens.</h2>
             <p className="mt-3 text-base leading-7 text-slate-700">Approved host shops provide the supervised work setting. Placement availability is verified during enrollment and is not implied by a public listing.</p>
           </div>
-          <FeaturedHostPartners />
+          <FeaturedHostPartners programSlug="barber-apprenticeship" />
           <div className="mt-10"><BarberWorkforceNetworkMap /></div>
         </div>
       </section>

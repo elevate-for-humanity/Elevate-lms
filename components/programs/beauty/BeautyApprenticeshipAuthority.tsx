@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { ArrowRight, BadgeCheck, Building2, CircleDollarSign, GraduationCap, MapPin, ShieldCheck } from 'lucide-react';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
-import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
 
 function totalHours(program: ProgramSchema): number {
   return Object.values(program.hoursBreakdown).reduce((sum, value) => sum + value, 0);
@@ -109,7 +108,6 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
 
   return (
     <>
-    <HostShopShowcase />
     <section className="bg-white px-4 py-14 sm:py-16" aria-labelledby={`${program.slug}-authority-heading`}>
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-8 lg:grid-cols-[1.08fr_.92fr] lg:items-start">

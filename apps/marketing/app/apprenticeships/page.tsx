@@ -6,6 +6,7 @@ import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
+import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 
 export const metadata: Metadata = {
   title: 'Apprenticeship Programs | Elevate for Humanity',
@@ -97,7 +98,7 @@ export default function ApprenticeshipsPage() {
         </div>
       </section>
 
-      <HostShopShowcase />
+      <HostShopShowcase shops={FEATURED_BEAUTY_HOST_PARTNERS} />
 
       <section id="programs" className="px-4 py-14 sm:py-20">
         <div className="mx-auto max-w-6xl">

@@ -49,11 +49,6 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A family-oriented Main Street barbershop serving New Palestine with classic cuts, modern grooming, and an apprenticeship training environment.',
     media: [
       {
-        src: '/images/partners/kountry-kutz-official.webp',
-        alt: 'Kountry Kutz Barbershop official shop image',
-        kind: 'photo',
-      },
-      {
         src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
         alt: 'Kountry Kutz approved barber apprenticeship site announcement',
         kind: 'flyer',
@@ -78,11 +73,6 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A full-service Indianapolis barber studio offering precision cuts, grooming, hair-loss consultation, and professional mentorship in a working shop environment.',
     media: [
-      {
-        src: '/images/partners/cals-kutz-official.webp',
-        alt: 'Cal’s Kutz Studio official business photo',
-        kind: 'photo',
-      },
       {
         src: '/images/partners/cals-kutz-confidence-restored.webp',
         alt: 'Cals Kutz Studio Confidence Restored hair replacement promotion',
@@ -109,14 +99,9 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A multicultural Bloomington barbershop focused on professional grooming, customer service, hair and scalp care, and hands-on barber development.',
     media: [
       {
-        src: '/images/partners/razors-image-official.webp',
-        alt: "Razor's Image Barbershop official gallery photo",
-        kind: 'photo',
-      },
-      {
-        src: '/images/partners/razors-image-storefront.webp',
-        alt: "Razor's Image Barbershop storefront in Bloomington, Indiana",
-        kind: 'photo',
+        src: '/images/partners/razors-image-apprenticeship-flyer.webp',
+        alt: "Original Razor's Image Barber Apprenticeship Program artwork",
+        kind: 'flyer',
       },
     ],
     resourceUrl:
@@ -142,7 +127,6 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     note: 'Traditional New Castle barbershop and apprenticeship host shop.',
     marketingBlurb:
       'A traditional New Castle barbershop known for classic barber services including haircuts, razor line-ups, fades, and straight-razor shaves.',
-    media: [{ src: '/images/partners/b52s-official.webp', alt: 'B-52s Barbershop official shop photo', kind: 'photo' }],
     onlineListingUrl: 'https://www.bestprosintown.com/in/new-castle/b-52s-barber-shop-/',
     onlineListingLabel: 'View B-52s shop profile & photos',
   },

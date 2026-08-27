@@ -66,13 +66,18 @@ export default async function CalendarPage() {
       if (coursesError) throw coursesError;
 
       const courseTitles = new Map((courses ?? []).map((course) => [String(course.id), String(course.title)]));
-      upcomingAssignments = (assignments ?? []).map((assignment) => ({
-        id: String(assignment.id),
-        title: String(assignment.title),
-        due_date: String(assignment.due_date),
-        course_id: assignment.course_id ? String(assignment.course_id) : null,
-        courseTitle: assignment.course_id ? courseTitles.get(String(assignment.course_id)) : undefined,
-      }));
+      upcomingAssignments = (assignments ?? []).map((assignment) => {
+        const courseTitle = assignment.course_id
+          ? courseTitles.get(String(assignment.course_id))
+          : undefined;
+        return {
+          id: String(assignment.id),
+          title: String(assignment.title),
+          due_date: String(assignment.due_date),
+          course_id: assignment.course_id ? String(assignment.course_id) : null,
+          ...(courseTitle ? { courseTitle } : {}),
+        };
+      });
     }
   } catch (error) {
     logger.error('[calendar] canonical assignment load failed', error);

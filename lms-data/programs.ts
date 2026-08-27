@@ -21,9 +21,6 @@ const cnaProgram: Program = {
     'Gain hands-on healthcare experience and prepare for Indiana CNA certification. This pathway blends HSI/Choice Medical CNA core training with CareerSafe healthcare safety basics and National Drug workplace training, plus soft skills support tied to local healthcare employers.',
   deliveryEngine: 'NATIVE',
   salePrice: computeSalePrice(cnaPartnerIds, 1.5),
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: cnaPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -46,9 +43,6 @@ const barberProgram: Program = {
     'Milady barber theory plus in-shop apprenticeship hours under licensed barbers. Learners build real client experience, sanitation skills, and business habits while moving toward licensure. This pathway combines Milady barbering online theory with National Drug workplace training for barber/beauty environments. This apprenticeship program is FREE - you earn while you learn.',
   deliveryEngine: 'NATIVE',
   salePrice: 0,
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: barberPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -71,9 +65,6 @@ const hvacProgram: Program = {
     'This pathway introduces learners to residential and light commercial HVAC systems, safety, tools, troubleshooting, and customer interaction. It combines CareerSafe OSHA training with drug-free workplace standards and can connect to employer partners for entry-level helper roles or OJT.',
   deliveryEngine: 'NATIVE',
   salePrice: computeSalePrice(hvacPartnerIds, 1.5),
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: hvacPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -96,9 +87,6 @@ const cdlProgram: Program = {
     'This pathway focuses on CDL test prep, DOT drug & alcohol awareness, transportation safety, trip planning, and soft skills for transportation careers. It includes National Drug DOT compliance training and CareerSafe transportation safety, and can connect learners to third-party CDL schools and employers needing drivers or support roles.',
   deliveryEngine: 'NATIVE',
   salePrice: computeSalePrice(cdlPartnerIds, 1.5),
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: cdlPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -121,9 +109,6 @@ const customerServiceProgram: Program = {
     'This pathway builds communication, de-escalation, documentation, and system navigation skills needed for contact center, front desk, or customer-facing roles in multiple industries. It combines Rise customer service fundamentals with Certiport certification prep and professional communication training.',
   deliveryEngine: 'NATIVE',
   salePrice: computeSalePrice(customerServicePartnerIds, 1.5),
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: customerServicePartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -146,9 +131,6 @@ const itProgram: Program = {
     'This pathway covers hardware basics, operating systems, troubleshooting, tickets, and customer support. It uses Certiport IT Specialist content for core IT and networking concepts, and can align with industry-recognized IT support certifications for remote or on-site helpdesk roles.',
   deliveryEngine: 'NATIVE',
   salePrice: computeSalePrice(itPartnerIds, 1.5),
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: itPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -171,9 +153,6 @@ const entrepreneurshipProgram: Program = {
     'This pathway is for learners who want to turn ideas into income. It combines Certiport ESB content with Elevate coaching around planning, marketing, money management, and execution.',
   deliveryEngine: 'NATIVE',
   salePrice: computeSalePrice(entrepreneurshipPartnerIds, 1.5),
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: entrepreneurshipPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -196,9 +175,6 @@ const buildingMaintenanceProgram: Program = {
     'This pathway prepares learners for building and facilities maintenance roles. Topics include basic electrical, plumbing, painting, safety checks, and work order systems while working alongside experienced maintenance staff. It combines CareerSafe building safety training with drug-free workplace standards. This apprenticeship program is FREE - you earn while you learn.',
   deliveryEngine: 'NATIVE',
   salePrice: 0,
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: buildingMaintPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -221,9 +197,6 @@ const taxProgram: Program = {
     'This pathway trains learners to support free tax preparation through IRS VITA/TCE standards and basic individual tax prep. It blends IRS Link & Learn training, ethics, intake/interview skills, and practice with real returns in a supervised environment. Includes IRS VITA certification training and Rise customer service for tax professionals.',
   deliveryEngine: 'NATIVE',
   salePrice: computeSalePrice(taxPartnerIds, 1.5),
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: taxPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -246,9 +219,6 @@ const businessEmsProgram: Program = {
     'This apprenticeship pathway focuses on business, office, scheduling, and customer service skills in environments that support emergency or health-related services. Learners gain experience in documentation, communication, and coordination while working alongside experienced staff. This apprenticeship program is FREE - you earn while you learn.',
   deliveryEngine: 'NATIVE',
   salePrice: 0,
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: businessEmsPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -271,9 +241,6 @@ const nailsProgram: Program = {
     'This pathway blends nail technology theory with in-salon apprenticeship hours. Learners practice manicures, pedicures, nail art, sanitation, and customer experience while preparing for state board requirements and building a client base. This apprenticeship program is FREE - you earn while you learn.',
   deliveryEngine: 'NATIVE',
   salePrice: 0,
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: nailsPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -296,9 +263,6 @@ const estheticianProgram: Program = {
     'This apprenticeship pathway focuses on facials, skin analysis, basic treatments, and spa customer service. Learners combine esthetics theory with supervised spa hours to prepare for state board and real-world employment. This apprenticeship program is FREE - you earn while you learn.',
   deliveryEngine: 'NATIVE',
   salePrice: 0,
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: estheticianPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -321,9 +285,6 @@ const culinaryProgram: Program = {
     'This pathway prepares learners for culinary and food service roles by combining kitchen safety, prep, line work, and service skills with real restaurant or institutional kitchen experience. This apprenticeship program is FREE - you earn while you learn.',
   deliveryEngine: 'NATIVE',
   salePrice: 0,
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: culinaryPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,
@@ -346,9 +307,6 @@ const businessTechProgram: Program = {
     'This apprenticeship pathway combines digital tools, office systems, scheduling, customer support, and basic data/reporting. Learners support real businesses while building skills that apply to admin, coordinator, and support roles. This apprenticeship program is FREE - you earn while you learn.',
   deliveryEngine: 'NATIVE',
   salePrice: 0,
-  stripeProductId: undefined,
-  stripePriceId: undefined,
-  stripePriceIdPlan: undefined,
   partnerRequirements: businessTechPartnerIds.map((id) => ({
     partnerCourseId: id,
     required: true,

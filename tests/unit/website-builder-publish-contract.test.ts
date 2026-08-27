@@ -15,6 +15,7 @@ describe('Website Builder publish contract', () => {
     legacy.homepage.heroImageAlt = 'Meri-Gold-Round botanical wellness collection';
     legacy.products = [{
       name: 'Signature Botanical Oil',
+      offerId: 'offer_signature_botanical_oil',
       description: 'A botanical personal-care oil.',
       price: '45.00',
       href: '/shop',

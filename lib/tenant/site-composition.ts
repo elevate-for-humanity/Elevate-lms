@@ -141,7 +141,7 @@ export function legacyPages(config: TenantSiteConfig): TenantSitePage[] {
     title: 'Home',
     navLabel: 'Home',
     showInNavigation: true,
-    seo: config.seo,
+    ...(config.seo ? { seo: config.seo } : {}),
     sections: [
       {
         id: 'home_hero',
@@ -243,7 +243,7 @@ export function applySiteOperations(config: TenantSiteConfig, operations: ParisS
   const next = ensureComposableSiteConfig(config);
   let pages = next.pages ? structuredClone(next.pages) : [];
   let branding = { ...next.branding };
-  let seo = { ...next.seo };
+  let seo: TenantSiteConfig['seo'] = next.seo ? { ...next.seo } : undefined;
 
   const findPageIndex = (op: ParisSiteOperation) => pages.findIndex((page) =>
     (op.pageId && page.id === op.pageId) ||
@@ -262,35 +262,40 @@ export function applySiteOperations(config: TenantSiteConfig, operations: ParisS
       }
       case 'delete_page': {
         const index = findPageIndex(op);
-        if (index >= 0 && pages[index].slug !== '/') pages.splice(index, 1);
+        const page = pages[index];
+        if (page && page.slug !== '/') pages.splice(index, 1);
         break;
       }
       case 'rename_page': {
         const index = findPageIndex(op);
-        if (index >= 0) {
-          if (op.title) pages[index].title = safeText(op.title, 180);
-          if (op.navLabel) pages[index].navLabel = safeText(op.navLabel, 100);
-          if (op.slug && pages[index].slug !== '/') pages[index].slug = normalizePageSlug(op.slug);
+        const page = pages[index];
+        if (page) {
+          if (op.title) page.title = safeText(op.title, 180);
+          if (op.navLabel) page.navLabel = safeText(op.navLabel, 100);
+          if (op.slug && page.slug !== '/') page.slug = normalizePageSlug(op.slug);
         }
         break;
       }
       case 'add_section': {
         const index = findPageIndex(op);
-        const section = sanitizeSection(op.section, pages[index]?.sections.length || 0);
-        if (index >= 0 && section) {
-          const at = typeof op.index === 'number' ? Math.max(0, Math.min(op.index, pages[index].sections.length)) : pages[index].sections.length;
-          pages[index].sections.splice(at, 0, section);
+        const page = pages[index];
+        const section = sanitizeSection(op.section, page?.sections.length ?? 0);
+        if (page && section) {
+          const at = typeof op.index === 'number' ? Math.max(0, Math.min(op.index, page.sections.length)) : page.sections.length;
+          page.sections.splice(at, 0, section);
         }
         break;
       }
       case 'update_section': {
         const index = findPageIndex(op);
-        if (index < 0 || !op.sectionId) break;
-        const sectionIndex = pages[index].sections.findIndex((section) => section.id === op.sectionId);
+        const page = pages[index];
+        if (!page || !op.sectionId) break;
+        const sectionIndex = page.sections.findIndex((section) => section.id === op.sectionId);
         if (sectionIndex < 0) break;
-        const current = pages[index].sections[sectionIndex];
+        const current = page.sections[sectionIndex];
+        if (!current) break;
         const patch = safeObject(op.value);
-        pages[index].sections[sectionIndex] = {
+        page.sections[sectionIndex] = {
           ...current,
           ...(patch.type && SECTION_TYPES.includes(patch.type as TenantSiteSectionType) ? { type: patch.type as TenantSiteSectionType } : {}),
           ...(patch.visible !== undefined ? { visible: patch.visible !== false } : {}),
@@ -301,16 +306,19 @@ export function applySiteOperations(config: TenantSiteConfig, operations: ParisS
       }
       case 'remove_section': {
         const index = findPageIndex(op);
-        if (index >= 0 && op.sectionId) pages[index].sections = pages[index].sections.filter((section) => section.id !== op.sectionId);
+        const page = pages[index];
+        if (page && op.sectionId) page.sections = page.sections.filter((section) => section.id !== op.sectionId);
         break;
       }
       case 'move_section': {
         const index = findPageIndex(op);
-        if (index < 0 || !op.sectionId || typeof op.index !== 'number') break;
-        const sectionIndex = pages[index].sections.findIndex((section) => section.id === op.sectionId);
+        const page = pages[index];
+        if (!page || !op.sectionId || typeof op.index !== 'number') break;
+        const sectionIndex = page.sections.findIndex((section) => section.id === op.sectionId);
         if (sectionIndex < 0) break;
-        const [section] = pages[index].sections.splice(sectionIndex, 1);
-        pages[index].sections.splice(Math.max(0, Math.min(op.index, pages[index].sections.length)), 0, section);
+        const [section] = page.sections.splice(sectionIndex, 1);
+        if (!section) break;
+        page.sections.splice(Math.max(0, Math.min(op.index, page.sections.length)), 0, section);
         break;
       }
       case 'update_brand': {
@@ -318,12 +326,20 @@ export function applySiteOperations(config: TenantSiteConfig, operations: ParisS
         break;
       }
       case 'update_seo': {
-        seo = { ...seo, ...safeObject(op.value) } as TenantSiteConfig['seo'];
+        const patch = safeObject(op.value);
+        const keywords = patch.keywords === undefined
+          ? seo?.keywords
+          : safeStringArray(patch.keywords, 20);
+        seo = {
+          title: safeText(patch.title, 180) || seo?.title || branding.logoText,
+          description: safeText(patch.description, 500) || seo?.description || '',
+          ...(keywords ? { keywords } : {}),
+        };
         break;
       }
     }
   }
 
   pages = sanitizePages(pages);
-  return ensureComposableSiteConfig({ ...next, branding, seo, pages });
+  return ensureComposableSiteConfig({ ...next, branding, ...(seo ? { seo } : {}), pages });
 }

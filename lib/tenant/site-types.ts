@@ -1,5 +1,7 @@
 export type TenantSiteProduct = {
   name: string;
+  /** Canonical persisted offer used to create checkout for this product. */
+  offerId?: string;
   description?: string;
   price?: string;
   compareAtPrice?: string;

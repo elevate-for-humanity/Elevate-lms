@@ -361,7 +361,7 @@ export default function UnifiedEllieChat({
     : 'border-gray-700 bg-gray-950 text-white placeholder:text-gray-500 focus:border-blue-500';
 
   return (
-    <div className={`flex h-full min-h-0 flex-col ${shellClass}`}>
+    <div className={`flex h-full min-h-0 min-w-0 flex-col overflow-hidden ${shellClass}`}>
       {!embedded && (
         <div
           className={`flex shrink-0 flex-wrap items-center gap-2 border-b px-4 py-3 ${headerClass}`}
@@ -415,9 +415,9 @@ export default function UnifiedEllieChat({
         </div>
       )}
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-6">
+      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 sm:px-6 sm:py-5">
         {messages.length === 0 ? (
-          <div className="mx-auto flex max-w-3xl flex-col items-center py-8 text-center sm:py-12">
+          <div className="mx-auto flex w-full min-w-0 max-w-3xl flex-col items-center py-5 text-center sm:py-12">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 shadow-sm">
               <Bot className="h-7 w-7 text-gray-800" aria-hidden="true" />
             </div>
@@ -430,7 +430,7 @@ export default function UnifiedEllieChat({
             </p>
             <p className="mt-1 text-xs text-gray-500">AI provider status: {health}</p>
 
-            <div className="mt-7 grid w-full gap-2 sm:grid-cols-2">
+            <div className="mt-5 grid w-full min-w-0 grid-cols-1 gap-2 sm:mt-7 sm:grid-cols-2">
               {QUICK.map((quick) => (
                 <button
                   key={quick.label}
@@ -439,7 +439,7 @@ export default function UnifiedEllieChat({
                     setInput(quick.text);
                     inputRef.current?.focus();
                   }}
-                  className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-left text-sm font-medium text-gray-800 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2"
+                  className="w-full min-w-0 rounded-xl border border-gray-200 bg-white px-4 py-3 text-left text-sm font-medium text-gray-800 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2"
                 >
                   {quick.label}
                 </button>
@@ -523,9 +523,9 @@ export default function UnifiedEllieChat({
         )}
       </div>
 
-      <div className={`shrink-0 border-t p-4 ${inputAreaClass}`}>
-        <div className="mx-auto max-w-3xl">
-          <div className="flex items-end gap-2 rounded-2xl border border-gray-300 bg-white p-2 shadow-sm focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100">
+      <div className={`min-w-0 shrink-0 border-t p-3 sm:p-4 ${inputAreaClass}`}>
+        <div className="mx-auto w-full min-w-0 max-w-3xl">
+          <div className="flex w-full min-w-0 items-end gap-2 rounded-2xl border border-gray-300 bg-white p-2 shadow-sm focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100">
             <textarea
               ref={inputRef}
               value={input}
@@ -538,7 +538,7 @@ export default function UnifiedEllieChat({
               }}
               rows={2}
               placeholder="Tell Admin AI what you need done…"
-              className={`min-h-[52px] flex-1 resize-none rounded-xl border px-3 py-2 text-sm outline-none ${inputClass}`}
+              className={`min-h-[52px] min-w-0 w-full flex-1 resize-none rounded-xl border px-3 py-2 text-sm outline-none ${inputClass}`}
             />
             <button
               type="button"

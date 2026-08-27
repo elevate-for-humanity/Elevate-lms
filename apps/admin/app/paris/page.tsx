@@ -223,10 +223,10 @@ export default function ParisOSPage() {
   }, [handleCommand]);
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen min-w-0 overflow-x-hidden bg-slate-900">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="border-b border-slate-700 bg-slate-800 px-3 py-4 sm:px-6">
+        <div className="mx-auto flex min-w-0 max-w-7xl flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-white" />
@@ -260,7 +260,7 @@ export default function ParisOSPage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mx-auto min-w-0 max-w-7xl px-3 py-6 sm:px-4 sm:py-8">
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-500/20 text-yellow-400 rounded-full text-sm font-medium mb-4">
             <Sparkles className="w-4 h-4" />
@@ -283,7 +283,7 @@ export default function ParisOSPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="mb-8 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-4">
           {COMMAND_CATEGORIES.map((cat) => (
             <button
               key={cat.id}
@@ -328,20 +328,20 @@ export default function ParisOSPage() {
         )}
 
         <div className="bg-slate-800 border border-slate-700 rounded-2xl p-5">
-          <div className="flex gap-3">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row">
             <input
               type="text"
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type a command (e.g. 'Build a Medical Assistant course')..."
-              className="flex-1 bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-yellow-500 transition-colors"
+              className="min-w-0 w-full flex-1 rounded-xl border border-slate-600 bg-slate-700 px-4 py-3 text-sm text-white placeholder-slate-400 transition-colors focus:border-yellow-500 focus:outline-none"
               disabled={isProcessing}
             />
             <button
               onClick={() => handleCommand(inputValue, activeCategory ?? 'course-orchestrator')}
               disabled={isProcessing || !inputValue.trim()}
-              className="px-5 py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+              className="flex min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 px-5 py-3 font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto"
             >
               {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               {isProcessing ? 'Executing...' : 'Execute'}
@@ -423,7 +423,7 @@ export default function ParisOSPage() {
           </div>
         )}
 
-        <div className="mt-8 grid grid-cols-4 gap-4">
+        <div className="mt-8 grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {[
             { label: 'Total Executions', value: stats.total, color: 'text-white' },
             { label: 'Successful', value: stats.completed, color: 'text-green-400' },

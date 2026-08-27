@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
+import { ADMIN_ROLES } from '@/lib/rbac/role-matrix';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { getPlatformHealth } from '@/lib/platform/platform-health';
 import SystemHealthClient from './SystemHealthClient';
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SystemHealthPage() {
-  await requireRole(['admin']);
+  await requireRole(ADMIN_ROLES);
   const snapshot = await getPlatformHealth();
 
   return (

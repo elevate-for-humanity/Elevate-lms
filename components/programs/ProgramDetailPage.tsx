@@ -148,7 +148,7 @@ export default function ProgramDetailPage({
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white">
       {/* A. HERO */}
       <section>
         {heroOverride ??
@@ -951,7 +951,7 @@ export default function ProgramDetailPage({
       </section>
 
       {children && <div>{children}</div>}
-    </div>
+    </main>
   );
 }
 

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { getAdminClient } from '@/lib/supabase/admin';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import BillingCard, { type BillingSummary } from '@/components/learner/BillingCard';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { APPRENTICE_PORTAL_CONFIGS } from '@/components/portal/ApprenticePortalShell';
@@ -27,11 +27,11 @@ function summary(program: 'barber' | 'cosmetology', sub: SubscriptionRow): Billi
   return {
     program,
     paymentStatus: sub.payment_status ?? 'pending_payment_method',
-    weeklyPaymentCents: sub.weekly_payment_cents,
-    remainingBalance: sub.remaining_balance,
-    fullTuitionAmount: sub.full_tuition_amount,
-    amountPaidAtCheckout: sub.amount_paid_at_checkout,
-    nextPaymentDate: sub.next_payment_date,
+    weeklyPaymentCents: sub.weekly_payment_cents ?? null,
+    remainingBalance: sub.remaining_balance ?? null,
+    fullTuitionAmount: sub.full_tuition_amount ?? null,
+    amountPaidAtCheckout: sub.amount_paid_at_checkout ?? null,
+    nextPaymentDate: sub.next_payment_date ?? null,
     fullyPaid: sub.fully_paid ?? false,
     setupFeePaid: sub.setup_fee_paid ?? false,
   };
@@ -71,7 +71,7 @@ export default async function ApprenticeBillingPage() {
 
   const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
   const portalPath = (programSlug && APPRENTICE_PORTAL_CONFIGS[programSlug]?.portalPath) || '/apprentice';
-  const db = await getAdminClient();
+  const db = await requireAdminClient();
 
   if (programSlug === 'barber-apprenticeship') {
     const { data } = await db

@@ -110,7 +110,7 @@ function StepIndicator({ current }: { current: number }) {
   );
 }
 
-function FieldError({ msg }: { msg?: string }) {
+function FieldError({ msg }: { msg: string | undefined }) {
   if (!msg) return null;
   return <p className="mt-1 text-sm text-red-600">{msg}</p>;
 }

@@ -91,15 +91,15 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
   let steps: PlanStep[];
 
   if (g.includes('enrollment') || g.includes('enroll')) {
-    steps = GOAL_TEMPLATES.fix_enrollment_failures({});
+    steps = GOAL_TEMPLATES.fix_enrollment_failures!({});
   } else if (g.includes('deploy') || g.includes('deployment')) {
-    steps = GOAL_TEMPLATES.pre_deployment_check({});
+    steps = GOAL_TEMPLATES.pre_deployment_check!({});
   } else if (g.includes('health') || g.includes('audit') || g.includes('check')) {
-    steps = GOAL_TEMPLATES.platform_health_check({});
+    steps = GOAL_TEMPLATES.platform_health_check!({});
   } else if ((g.includes('program') || g.includes('verify')) && params.slug) {
-    steps = GOAL_TEMPLATES.verify_program(params);
+    steps = GOAL_TEMPLATES.verify_program!(params);
   } else if (g.includes('onboard') && params.slug) {
-    steps = GOAL_TEMPLATES.onboard_new_program(params);
+    steps = GOAL_TEMPLATES.onboard_new_program!(params);
   } else {
     steps = [
       { id: 's1', order: 1, title: 'Get platform state', command: 'Get live platform state', status: 'pending', expected_output: 'Current platform state' },

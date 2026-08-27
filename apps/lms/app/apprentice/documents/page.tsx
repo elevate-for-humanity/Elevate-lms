@@ -7,6 +7,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import UploadDocuments from './UploadDocuments';
+import { getDocumentUploadGuidance } from './document-guidance';
 
 export const metadata: Metadata = {
   title: 'Documents | Apprentice Portal',
@@ -28,7 +29,7 @@ export default async function ApprenticeDocumentsPage() {
   const [{ data: requirements }, { data: documents }] = await Promise.all([
     admin
       .from('apprentice_document_types')
-      .select('id,name,document_type,is_required,accepted_formats,max_file_size_mb,display_order')
+      .select('id,name,description,document_type,is_required,accepted_formats,max_file_size_mb,display_order')
       .eq('program_slug', programSlug)
       .order('display_order', { ascending: true }),
     admin
@@ -86,6 +87,7 @@ export default async function ApprenticeDocumentsPage() {
                     <FileText className="mt-1 h-6 w-6 shrink-0" />
                     <div>
                       <h2 className="font-black">{requirement.name}</h2>
+                      {getDocumentUploadGuidance(requirement) ? <p className="mt-1 max-w-3xl text-sm leading-6">{getDocumentUploadGuidance(requirement)}</p> : null}
                       <p className="mt-1 text-sm font-semibold">{requirement.is_required ? 'Required' : 'Optional'} · Accepted: {(requirement.accepted_formats ?? []).join(', ').toUpperCase()} · Max {requirement.max_file_size_mb || 10} MB</p>
                       {document?.file_name ? <p className="mt-2 text-xs font-semibold">Latest upload: {document.file_name}</p> : null}
                     </div>

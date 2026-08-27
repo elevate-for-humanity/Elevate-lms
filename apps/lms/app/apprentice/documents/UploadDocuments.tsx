@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { AlertCircle, CheckCircle, Upload } from 'lucide-react';
+import { getDocumentUploadGuidance } from './document-guidance';
 
 interface DocumentType {
   id: string;
   name: string;
   document_type: string;
+  description?: string | null;
 }
 
 export default function UploadDocuments({ programSlug }: { programSlug: string }) {
@@ -18,6 +20,10 @@ export default function UploadDocuments({ programSlug }: { programSlug: string }
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [loadingTypes, setLoadingTypes] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const selectedRequirement = documentTypes.find((document) => document.id === selectedDocType);
+  const selectedGuidance = selectedRequirement
+    ? getDocumentUploadGuidance(selectedRequirement)
+    : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -88,6 +94,12 @@ export default function UploadDocuments({ programSlug }: { programSlug: string }
         ) : (
           <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-900">No document requirements are configured for this apprenticeship.</p>
         )}
+        {selectedGuidance ? (
+          <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+            <p className="font-black">What to upload</p>
+            <p className="mt-1">{selectedGuidance}</p>
+          </div>
+        ) : null}
       </div>
 
       <div

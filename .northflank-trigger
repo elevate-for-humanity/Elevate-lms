@@ -1,5 +1,5 @@
 # Trigger Northflank VCS build
-# Production deploy requested from current main
-merge_sha=6ab77091a9a4a9bbf8c3da3c0fafa0300ff8193d
-requested_at=2026-08-26T21:08:00Z
-services=all
+# Production deploy requested for media worker safety fixes
+merge_sha=60c1cc6616beb54c5f957d649646bb5ff8598cd2
+requested_at=2026-08-27T16:23:00Z
+services=admin

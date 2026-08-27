@@ -40,7 +40,7 @@ async function _POST(request: NextRequest) {
 
     // Dedup — same email delivered twice by SendGrid retries
     const { shouldProcess, confident } = await claimWebhookEvent(
-      'sendgrid-inbound' as any,
+      'sendgrid-inbound',
       eventId,
       'email.received',
       { from, to, subject },
@@ -73,7 +73,7 @@ async function _POST(request: NextRequest) {
     if (!result.success) {
       logger.error('[SendGrid Inbound] Forward failed:', result.error);
       await finalizeWebhookEvent(
-        'sendgrid-inbound' as any,
+        'sendgrid-inbound',
         eventId,
         'errored',
         String(result.error),
@@ -81,7 +81,7 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Forward failed' }, { status: 500 });
     }
 
-    await finalizeWebhookEvent('sendgrid-inbound' as any, eventId, 'processed');
+    await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed');
     logger.info('[SendGrid Inbound] Forwarded successfully', { forwardTo, subject });
     return NextResponse.json({ ok: true });
   } catch (err) {

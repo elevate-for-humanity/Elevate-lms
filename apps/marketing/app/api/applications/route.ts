@@ -14,6 +14,7 @@ import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { organization } from '@/lib/config/organization';
+import { normalizeApplicationModalityPreference } from '@/lib/applications/modality-preference';
 // approveApplication is called by /api/admin/applications/[id]/approve - not here
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -163,6 +164,19 @@ async function _POST(req: Request) {
       body.fundingSource ||
       null;
     body.zip = body.zip || body.zipCode || body.postalCode || '';
+
+    const rawModalityPreference = body.modalityPreference ?? body.modality_preference;
+    const modalityPreference = normalizeApplicationModalityPreference(rawModalityPreference);
+    if (
+      typeof rawModalityPreference === 'string' &&
+      rawModalityPreference.trim() !== '' &&
+      !modalityPreference
+    ) {
+      return NextResponse.json(
+        { error: 'Invalid modality preference. Choose in-person, virtual, or hybrid.' },
+        { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
 
     // Honeypot field for commodity bots.
     if (body.website && String(body.website).trim() !== '') {
@@ -430,7 +444,7 @@ async function _POST(req: Request) {
       county_of_residence: body.countyOfResidence || null,
       household_income: body.householdIncome ? Number(body.householdIncome) : null,
       family_size: body.familySize ? Number(body.familySize) : null,
-      modality_preference: body.modalityPreference || null,
+      modality_preference: modalityPreference,
     };
 
     let { data, error }: any = await supabase

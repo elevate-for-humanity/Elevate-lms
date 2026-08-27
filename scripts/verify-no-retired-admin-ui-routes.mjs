@@ -22,19 +22,30 @@ if (fs.existsSync(retiredTree)) {
   violations.push('apps/admin/app/admin exists; retired parallel Admin UI tree must not exist');
 }
 
-// Retired private /admin aliases must not be preserved as compatibility
-// redirects on any deployed service. Callers must use the canonical Admin host
-// and root route directly.
+// Retired private /admin route trees remain forbidden. Marketing may retain
+// exactly one public compatibility redirect to the canonical Admin login so
+// stale public links fail safely instead of rendering a 404.
 for (const configPath of [
   'apps/admin/next.config.mjs',
   'apps/lms/next.config.mjs',
   'apps/marketing/next.config.mjs',
 ]) {
   const config = read(configPath);
-  for (const forbidden of ["source: '/admin'", "source: '/admin/", "source: '/dev-studio/:path*'"]) {
+  for (const forbidden of ["source: '/admin/", "source: '/dev-studio/:path*'"]) {
     if (config.includes(forbidden)) {
       violations.push(`${configPath} contains retired private alias ${forbidden}`);
     }
+  }
+
+  const hasAdminAlias = config.includes("source: '/admin'");
+  const isCanonicalMarketingAlias =
+    configPath === 'apps/marketing/next.config.mjs' &&
+    config.includes(
+      "{ source: '/admin', destination: 'https://admin.elevateforhumanity.org/login', permanent: true }",
+    );
+
+  if (hasAdminAlias && !isCanonicalMarketingAlias) {
+    violations.push(`${configPath} contains a non-canonical /admin compatibility alias`);
   }
 }
 

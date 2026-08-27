@@ -31,6 +31,20 @@ const FALLBACK_RESPONSES: Record<string, string[]> = {
   ],
 };
 
+function getFallbackResponse(mode: unknown): string {
+  const key = typeof mode === 'string' ? mode : 'chat';
+  const responses = FALLBACK_RESPONSES[key] ?? FALLBACK_RESPONSES.chat ?? [];
+  return (
+    responses[Math.floor(Math.random() * responses.length)] ??
+    'The AI tutor is temporarily unavailable. Please use your course materials or contact your instructor.'
+  );
+}
+
+function getSystemPrompt(mode: unknown): string {
+  const key = typeof mode === 'string' ? mode : 'chat';
+  return SYSTEM_PROMPTS[key] ?? SYSTEM_PROMPTS.chat ?? 'Provide accurate, practical tutoring help.';
+}
+
 async function callGemini(
   messages: Array<{ role: string; content: string }>,
   systemPrompt: string,
@@ -108,9 +122,8 @@ async function _POST(request: NextRequest) {
 
   // No AI keys configured — return fallback
   if (!geminiKey && !openaiKey) {
-    const responses = FALLBACK_RESPONSES[mode as string] || FALLBACK_RESPONSES.chat;
     return NextResponse.json({
-      message: responses[Math.floor(Math.random() * responses.length)],
+      message: getFallbackResponse(mode),
       conversationId: null,
       fallback: true,
     });
@@ -135,7 +148,7 @@ async function _POST(request: NextRequest) {
     // Add user message
     messages.push({ role: 'user', content: message });
 
-    const systemPrompt = SYSTEM_PROMPTS[mode as string] || SYSTEM_PROMPTS.chat;
+    const systemPrompt = getSystemPrompt(mode);
     let aiContent: string | null = null;
 
     // Try Gemini first (free), fall back to OpenAI
@@ -169,9 +182,8 @@ async function _POST(request: NextRequest) {
 
     // Both failed — return fallback
     if (!aiContent) {
-      const responses = FALLBACK_RESPONSES[mode as string] || FALLBACK_RESPONSES.chat;
       return NextResponse.json({
-        message: responses[Math.floor(Math.random() * responses.length)],
+        message: getFallbackResponse(mode),
         conversationId: null,
         fallback: true,
       });

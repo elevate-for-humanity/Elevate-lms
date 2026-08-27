@@ -18,6 +18,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
+import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -79,12 +80,16 @@ export async function POST(req: NextRequest) {
 
     const email = profile?.nameID ?? (profile as Record<string, unknown>)?.email as string;
     if (!email || !email.includes('@')) {
-      logger.error('[saml/callback] No email in SAML profile', undefined, { profile });
+      logger.error('[saml/callback] No email in validated SAML profile');
       return NextResponse.redirect(`${loginUrl}?error=saml_no_email`);
     }
 
     // Upsert user in Supabase Auth
     const admin = await getAdminClient();
+    if (!admin) {
+      logger.error('[saml/callback] Supabase admin client not configured');
+      return NextResponse.redirect(`${loginUrl}?error=saml_session_unavailable`);
+    }
     const { data: existing } = await admin.auth.admin.listUsers() as { data: { users?: Array<{ id: string; email?: string }> } | null };
     const existingUser = existing?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
 
@@ -106,10 +111,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate a magic link to establish a real Supabase session
+    const redirectTo = validateRedirect(relayState ?? '', `${siteUrl}/auth/callback`);
     const { data: link, error: linkErr } = await admin.auth.admin.generateLink({
       type: 'magiclink',
       email,
-      options: { redirectTo: relayState || `${siteUrl}/auth/callback` },
+      options: { redirectTo },
     });
 
     if (linkErr || !link?.properties?.action_link) {

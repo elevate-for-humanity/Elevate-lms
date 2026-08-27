@@ -20,6 +20,9 @@ function rows(result: Result): any[] {
 function failed(result: Result): boolean {
   return result.status === 'rejected' || Boolean(result.status === 'fulfilled' && result.value.error);
 }
+function resultAt(results: Result[], index: number): Result {
+  return results[index] ?? { status: 'rejected', reason: new Error(`OPERATIONS_QUERY_RESULT_MISSING:${index}`) };
+}
 function health(failedCount: number, warnAt = 2): Health {
   return failedCount === 0 ? 'ok' : failedCount <= warnAt ? 'warn' : 'fail';
 }
@@ -50,7 +53,20 @@ export default async function OperationsPage() {
     db.from('admin_alerts').select('id,alert_type,severity,message,created_at,resolved').eq('resolved', false).order('created_at', { ascending: false }).limit(10),
   ]) as Result[];
 
-  const [cronTotal, cronFailed, cronRecent, workflowRuns, workflowFailed, deadLetters, deadLettersRecent, stepLogs, activeWorkflows, openAlerts, criticalAlerts, recentCronRuns, recentDeadLetters, recentAlerts] = results;
+  const cronTotal = resultAt(results, 0);
+  const cronFailed = resultAt(results, 1);
+  const cronRecent = resultAt(results, 2);
+  const workflowRuns = resultAt(results, 3);
+  const workflowFailed = resultAt(results, 4);
+  const deadLetters = resultAt(results, 5);
+  const deadLettersRecent = resultAt(results, 6);
+  const stepLogs = resultAt(results, 7);
+  const activeWorkflows = resultAt(results, 8);
+  const openAlerts = resultAt(results, 9);
+  const criticalAlerts = resultAt(results, 10);
+  const recentCronRuns = resultAt(results, 11);
+  const recentDeadLetters = resultAt(results, 12);
+  const recentAlerts = resultAt(results, 13);
   const summary: Array<{ label: string; status: Health; value: string }> = [
     { label: 'Cron (24h)', status: health(count(cronFailed)), value: `${count(cronTotal)} runs · ${count(cronFailed)} failed` },
     { label: 'Workflows (24h)', status: health(count(workflowFailed), 3), value: `${count(workflowRuns)} runs · ${count(workflowFailed)} failed` },
@@ -61,7 +77,7 @@ export default async function OperationsPage() {
   const cronRows = rows(recentCronRuns);
   const deadRows = rows(recentDeadLetters);
   const alertRows = rows(recentAlerts);
-  const quickLinks = [
+  const quickLinks: Array<readonly [label: string, href: string]> = [
     ['Mission Control', '/mission-control'],
     ['System Health', '/system-health'],
     ['Workflows', '/studio/workflows'],

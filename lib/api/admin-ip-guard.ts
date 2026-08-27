@@ -24,15 +24,29 @@ function ipInCidr(ip: string, cidr: string): boolean {
   if (!cidr.includes('/')) return ip === cidr;
 
   const [network, prefixStr] = cidr.split('/');
-  const prefix = parseInt(prefixStr, 10);
+  if (network === undefined || prefixStr === undefined) return false;
 
-  const ipParts = ip.split('.').map(Number);
-  const netParts = network.split('.').map(Number);
+  const prefix = Number(prefixStr);
+  if (!Number.isInteger(prefix) || prefix < 0 || prefix > 32) return false;
 
-  if (ipParts.length !== 4 || netParts.length !== 4) return false;
+  const parseIpv4 = (value: string): number | null => {
+    const parts = value.split('.');
+    if (parts.length !== 4) return null;
 
-  const ipInt = (ipParts[0] << 24) | (ipParts[1] << 16) | (ipParts[2] << 8) | ipParts[3];
-  const netInt = (netParts[0] << 24) | (netParts[1] << 16) | (netParts[2] << 8) | netParts[3];
+    let result = 0;
+    for (const part of parts) {
+      if (!/^\d{1,3}$/.test(part)) return null;
+      const octet = Number(part);
+      if (!Number.isInteger(octet) || octet < 0 || octet > 255) return null;
+      result = (result << 8) | octet;
+    }
+
+    return result >>> 0;
+  };
+
+  const ipInt = parseIpv4(ip);
+  const netInt = parseIpv4(network);
+  if (ipInt === null || netInt === null) return false;
   const mask = prefix === 0 ? 0 : (~0 << (32 - prefix)) >>> 0;
 
   return (ipInt & mask) === (netInt & mask);

@@ -40,6 +40,15 @@ type ServiceStatus = {
   deployedSHA?: string;
 };
 
+type VerificationResult = 'valid' | 'retryable' | 'invalid';
+
+const RETRYABLE_DEPLOYMENT_STATUSES = new Set([
+  'PENDING',
+  'IN_PROGRESS',
+  'DEPLOYING',
+  'ROLLING_OUT',
+]);
+
 const ALL_SERVICES = [
   'elevate-marketing',
   'elevate-admin',
@@ -132,7 +141,7 @@ async function verifyService(
   projectId: string,
   serviceId: string,
   expectedSha: string,
-): Promise<boolean> {
+): Promise<VerificationResult> {
   const service = await nfFetch<ServiceStatus>(
     projectApiPath(projectId, `/services/${serviceId}`),
   );
@@ -165,7 +174,7 @@ async function verifyService(
   const BUILD_FAILURE_STATUSES = new Set(['FAILURE', 'FAILED', 'CRASHED', 'ABORTED', 'ERROR']);
   if (BUILD_FAILURE_STATUSES.has(buildStatus)) {
     console.error(`${serviceId}: latest build failed. The previous image may still be serving traffic.`);
-    return false;
+    return 'invalid';
   }
 
   // Runtime HTTP health is the source of truth. Northflank deployment.internal.deployedSHA
@@ -175,18 +184,30 @@ async function verifyService(
     if (!northflankMatches) {
       console.warn(`${serviceId}: Northflank metadata SHA is stale (${northflankSha ?? 'null'}), but runtime confirms ${expectedSha.slice(0, 7)}. Trusting runtime.`);
     }
-    return true;
+    return 'valid';
   }
 
-  // Runtime doesn't match — this is a real problem.
+  const normalizedDeploymentStatus = deploymentStatus.toUpperCase();
+  if (RETRYABLE_DEPLOYMENT_STATUSES.has(normalizedDeploymentStatus)) {
+    console.warn(
+      `${serviceId}: deployment is ${deploymentStatus}; the runtime may still route to the retiring revision.`,
+    );
+    return 'retryable';
+  }
+
+  // Runtime doesn't match after the deployment left a transitional state.
   if (!northflankMatches) {
     console.error(`${serviceId}: neither Northflank metadata nor runtime commit matches ${expectedSha.slice(0, 7)}.`);
-    return false;
+    return 'invalid';
   }
 
   // Northflank matches but runtime doesn't — unusual state, fail.
   console.error(`${serviceId}: Northflank metadata matches but runtime reports ${runtime.commit ?? 'null'}.`);
-  return false;
+  return 'invalid';
+}
+
+function wait(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 async function main(): Promise<void> {
@@ -209,8 +230,14 @@ async function main(): Promise<void> {
 
   for (const serviceId of services) {
     try {
-      const valid = await verifyService(projectId, serviceId, expectedSha);
-      if (!valid) failed = true;
+      let result: VerificationResult = 'invalid';
+      for (let attempt = 1; attempt <= 20; attempt += 1) {
+        result = await verifyService(projectId, serviceId, expectedSha);
+        if (result !== 'retryable') break;
+        console.log(`${serviceId}: convergence check ${attempt}/20 did not reach the new runtime; retrying in 15s.`);
+        if (attempt < 20) await wait(15_000);
+      }
+      if (result !== 'valid') failed = true;
     } catch (error) {
       failed = true;
       console.error(`${serviceId}: verification error`, error);

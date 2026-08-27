@@ -64,7 +64,7 @@ export async function getCurrentUserWithRole(): Promise<{
     return {
       user: {
         id: user.id,
-        email: user.email || undefined,
+        ...(user.email ? { email: user.email } : {}),
         role: null,
       },
       profile: null,
@@ -74,7 +74,7 @@ export async function getCurrentUserWithRole(): Promise<{
   return {
     user: {
       id: user.id,
-      email: user.email || undefined,
+      ...(user.email ? { email: user.email } : {}),
       role: (profile?.role || null) as AppRole | string | null,
     },
     profile,
@@ -191,8 +191,13 @@ const ROLE_HIERARCHY: Record<string, number> = {
 export async function requireRoleLevel(minRole: string): Promise<{ user: any; profile: any }> {
   const { user, profile } = await requireRole(Object.keys(ROLE_HIERARCHY));
 
-  const userLevel = ROLE_HIERARCHY[profile.role] || 0;
-  const requiredLevel = ROLE_HIERARCHY[minRole] || 0;
+  const profileRole = typeof profile.role === 'string' ? profile.role : null;
+  const userLevel = profileRole === null ? undefined : ROLE_HIERARCHY[profileRole];
+  const requiredLevel = ROLE_HIERARCHY[minRole];
+
+  if (userLevel === undefined || requiredLevel === undefined) {
+    throw new Error('FORBIDDEN');
+  }
 
   if (userLevel < requiredLevel) {
     throw new Error('FORBIDDEN');

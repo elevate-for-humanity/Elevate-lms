@@ -63,6 +63,12 @@ const PROVIDERS: ProviderEntry[] = [
   },
 ];
 
+function firstOrThrow<T>(items: T[], message: string): T {
+  const first = items[0];
+  if (first === undefined) throw new Error(message);
+  return first;
+}
+
 function getAvailableProviders(): Array<ProviderEntry & { provider: AIProvider }> {
   return PROVIDERS.flatMap((entry) => {
     const provider = entry.create();
@@ -165,7 +171,10 @@ export async function runElevateCouncil(options: {
   }
 
   if (contributions.length === 1) {
-    const only = contributions[0];
+    const only = firstOrThrow(
+      contributions,
+      'Elevate AI Council contribution disappeared before response construction.',
+    );
     return {
       content: only.content,
       provider: only.provider,
@@ -176,7 +185,9 @@ export async function runElevateCouncil(options: {
     };
   }
 
-  const synthesisProvider = active.find((entry) => entry.name === 'openai') ?? active[0];
+  const synthesisProvider =
+    active.find((entry) => entry.name === 'openai') ??
+    firstOrThrow(active, 'Elevate AI Council provider disappeared before synthesis.');
   try {
     const synthesis = await synthesisProvider.provider.chat({
       messages: [
@@ -205,7 +216,10 @@ export async function runElevateCouncil(options: {
       error: error instanceof Error ? error.message : String(error),
     });
 
-    const fallback = contributions[0];
+    const fallback = firstOrThrow(
+      contributions,
+      'Elevate AI Council contribution disappeared before fallback.',
+    );
     return {
       content: fallback.content,
       provider: `${fallback.provider}:council-fallback`,

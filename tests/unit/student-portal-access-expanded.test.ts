@@ -154,7 +154,7 @@ describe('hasLmsAccess — state consistency with proxy.ts', () => {
 // ---------------------------------------------------------------------------
 
 describe('onboarding/learner page — null profile handling', () => {
-  const src = read('app/onboarding/learner/page.tsx');
+  const src = read('apps/marketing/app/onboarding/learner/page.tsx');
 
   it('uses requireAdminClient for profile fetch (bypasses RLS for new accounts)', () => {
     expect(src).toContain('requireAdminClient');

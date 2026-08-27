@@ -191,7 +191,7 @@ describe('GET /api/courses/[courseId]/lessons/public', () => {
     // The fix removed getAdminClient from this route.
     // Verify by checking the route source does not import it.
     const { readFileSync } = await import('fs');
-    const src = readFileSync('app/api/courses/[courseId]/lessons/public/route.ts', 'utf8');
+    const src = readFileSync('apps/lms/app/api/courses/[courseId]/lessons/public/route.ts', 'utf8');
     expect(src).not.toContain('getAdminClient');
     expect(src).not.toContain('isKnownCourse');
   });
@@ -230,7 +230,7 @@ describe('GET /api/courses/[courseId]/modules', () => {
 
   it('route source has explicit getUser() auth check', async () => {
     const { readFileSync } = await import('fs');
-    const src = readFileSync('app/api/courses/[courseId]/modules/route.ts', 'utf8');
+    const src = readFileSync('apps/lms/app/api/courses/[courseId]/modules/route.ts', 'utf8');
     expect(src).toContain('getUser');
     expect(src).toContain('401');
   });

@@ -58,9 +58,9 @@ function skipQuoted(source: string, index: number): number {
 /**
  * Advance past one object-property value. The previous scanner resumed token
  * parsing immediately after the property colon, so ternaries such as
- * \`error instanceof Error ? error.message : String(error)\` were misread as a
- * property named \`message\`. The same bug produced impossible column names such
- * as \`null\`, \`false\`, and \`now\`.
+ * `error instanceof Error ? error.message : String(error)` were misread as a
+ * property named `message`. The same bug produced impossible column names such
+ * as `null`, `false`, and `now`.
  */
 function skipPropertyValue(source: string, index: number): number {
   let braces = 0;
@@ -69,12 +69,12 @@ function skipPropertyValue(source: string, index: number): number {
 
   while (index < source.length) {
     const ch = source[index];
-    if (ch === '"' || ch === "'" || ch === '\\`') {
+    if (ch === '"' || ch === "'" || ch === '`') {
       index = skipQuoted(source, index);
       continue;
     }
     if (ch === '/' && source[index + 1] === '/') {
-      const end = source.indexOf('\\n', index + 2);
+      const end = source.indexOf('\n', index + 2);
       index = end < 0 ? source.length : end + 1;
       continue;
     }
@@ -99,7 +99,6 @@ function skipPropertyValue(source: string, index: number): number {
   }
   return index;
 }
-
 function topLevelObjectKeys(source: string, openBrace: number): string[] {
   const keys: string[] = [];
   let depth = 0;

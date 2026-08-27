@@ -195,7 +195,10 @@ function CourseCatalog({
       const response = await fetch(endpoint, {
         method: action === 'delete' ? 'DELETE' : action === 'unpublish' ? 'PATCH' : 'POST',
         ...(action === 'unpublish'
-          ? { headers: courseBuilderJsonHeaders(), body: JSON.stringify({ status: 'draft' }) }
+          ? {
+              headers: courseBuilderJsonHeaders(`course-unpublish:${course.id}`),
+              body: JSON.stringify({ status: 'draft' }),
+            }
           : {}),
       });
       const payload = await response.json().catch(() => ({}));

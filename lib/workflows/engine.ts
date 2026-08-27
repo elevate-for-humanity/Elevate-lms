@@ -128,12 +128,13 @@ async function execWebhookCall(config: Record<string, unknown>, ctx: RunContext)
   }
 
   try {
-    const res = await fetch(validated.url, {
+    const requestInit: RequestInit = {
       method,
       headers,
-      body: method !== 'GET' ? JSON.stringify(r.body ?? {}) : undefined,
+      ...(method !== 'GET' ? { body: JSON.stringify(r.body ?? {}) } : {}),
       signal: AbortSignal.timeout(10_000),
-    });
+    };
+    const res = await fetch(validated.url, requestInit);
     return {
       ok: res.ok,
       output: {
@@ -171,6 +172,9 @@ function execCondition(
   if (!match) return { ok: false, output: { error: `Unsupported condition expression: ${expr}` } };
 
   const [, path, op, rawExpected] = match;
+  if (path === undefined || op === undefined || rawExpected === undefined) {
+    return { ok: false, output: { error: `Unsupported condition expression: ${expr}` } };
+  }
   const expected = rawExpected.trim().replace(/^["']|["']$/g, '');
   const actual = path.split('.').reduce<unknown>(
     (obj, key) => (obj && typeof obj === 'object' ? (obj as Record<string, unknown>)[key] : undefined),
@@ -458,7 +462,12 @@ export async function executeWorkflow(
     return { runId: '', status: 'failed', stepsRun: 0, error: runErr?.message };
   }
 
-  const runId = run.id;
+  const runId = typeof run.id === 'string' && run.id.trim() ? run.id : null;
+  if (!runId) {
+    const error = new Error('Workflow run record did not return a valid identifier');
+    logger.error('[WORKFLOW FAILED] invalid run record', error, { workflowId, trace_id: trace });
+    return { runId: '', status: 'failed', stepsRun: 0, error: error.message };
+  }
   const ctx: RunContext = {
     workflowId,
     runId,
@@ -573,5 +582,10 @@ export async function executeWorkflow(
     });
   }
 
-  return { runId, status: finalStatus, stepsRun: stepsDone, error: errorMessage };
+  return {
+    runId,
+    status: finalStatus,
+    stepsRun: stepsDone,
+    ...(errorMessage ? { error: errorMessage } : {}),
+  };
 }

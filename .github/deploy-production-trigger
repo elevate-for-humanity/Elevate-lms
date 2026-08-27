@@ -1,2 +1,2 @@
 Deploy current protected main to production.
-Triggered 2026-08-23 to ship the shared hero video visibility repair while preserving the mounted poster fix.
+Triggered 2026-08-27 to deploy removal of the hardcoded legacy course catalog, persisted-course integrity enforcement, and hardened SCORM exports to Northflank.

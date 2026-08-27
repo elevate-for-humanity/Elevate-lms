@@ -389,6 +389,7 @@
     "install:ci": "pnpm install --frozen-lockfile --strict-peer-dependencies=false",
     "lockfile:sync": "pnpm install --lockfile-only --strict-peer-dependencies=false",
     "lockfile:check": "pnpm install --frozen-lockfile --strict-peer-dependencies=false",
+    "typecheck": "pnpm run typecheck:all",
     "typecheck:marketing": "pnpm --filter @elevate/marketing exec tsc --noEmit",
     "typecheck:admin": "pnpm --filter @elevate/admin exec tsc --noEmit",
     "typecheck:lms": "pnpm --filter @elevate/lms exec tsc --noEmit",

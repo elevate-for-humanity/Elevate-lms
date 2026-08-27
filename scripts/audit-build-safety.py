@@ -28,7 +28,10 @@ def warn(msg):
     WARNINGS.append(msg)
 
 def is_client(src):
-    return "'use client'" in src[:300] or '"use client"' in src[:300]
+    # Client directives may legitimately follow a leading file-level docblock.
+    # Limit the scan to the file preamble so mentions later in implementation
+    # text cannot incorrectly classify a server component as a client module.
+    return "'use client'" in src[:2000] or '"use client"' in src[:2000]
 
 def is_api_route(path):
     return path.startswith('app/api/')

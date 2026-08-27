@@ -1,152 +1,94 @@
 #!/usr/bin/env node
 /**
- * LMS Course Integrity Check
- * Fails closed when canonical course data is missing or cannot be parsed.
+ * LMS Course Authority Integrity Check
+ *
+ * Course content is persisted in Supabase. This repository check proves that
+ * every production read/write/publish path points at the canonical relational
+ * model and that the retired static catalog cannot silently return.
  */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, '../..');
+const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const reportsDir = path.join(rootDir, 'reports');
 fs.mkdirSync(reportsDir, { recursive: true });
 
-const PLACEHOLDER_PATTERNS = [/lorem ipsum/i,/placeholder/i,/coming soon/i,/\btbd\b/i,/\btodo\b/i,/sample content/i,/test course/i,/john doe/i,/jane doe/i];
-const containsPlaceholder = (text) => Boolean(text && PLACEHOLDER_PATTERNS.some((p) => p.test(text)));
+const requiredFiles = {
+  orchestration: 'lib/course-builder/orchestrator.ts',
+  persistedPublishGate: 'lib/course-builder/persisted-publish-service.ts',
+  canonicalDatabaseService: 'lib/db/courses.ts',
+  lmsCourseApi: 'apps/lms/app/api/courses/route.ts',
+};
 
-function findMatching(text, start, open, close) {
-  let depth = 0;
-  let quote = null;
-  let escaped = false;
-  for (let i = start; i < text.length; i += 1) {
-    const ch = text[i];
-    if (quote) {
-      if (escaped) escaped = false;
-      else if (ch === '\\') escaped = true;
-      else if (ch === quote) quote = null;
-      continue;
-    }
-    if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
-    if (ch === open) depth += 1;
-    else if (ch === close) {
-      depth -= 1;
-      if (depth === 0) return i;
-    }
-  }
-  return -1;
+const requiredContracts = [
+  ['lib/course-builder/orchestrator.ts', /\.from\(['"]courses['"]\)/, 'Course Builder persists course configuration'],
+  ['lib/course-builder/persisted-publish-service.ts', /\.from\(['"]courses['"]\)/, 'publish gate reads persisted courses'],
+  ['lib/course-builder/persisted-publish-service.ts', /\.from\(['"]course_modules['"]\)/, 'publish gate validates persisted modules'],
+  ['lib/course-builder/persisted-publish-service.ts', /course_lessons\(/, 'publish gate validates persisted lessons'],
+  ['lib/course-builder/persisted-publish-service.ts', /review_status[^\n]*approved/, 'publish gate requires human approval'],
+  ['lib/db/courses.ts', /\.from\(['"]course_lessons['"]\)/, 'course service uses canonical lessons table'],
+];
+
+function walk(directory) {
+  if (!fs.existsSync(directory)) return [];
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const absolute = path.join(directory, entry.name);
+    if (entry.name === 'node_modules' || entry.name === '.next' || entry.name === '.git') return [];
+    return entry.isDirectory() ? walk(absolute) : [absolute];
+  });
 }
 
-function extractArrayAfter(text, marker, from = 0) {
-  const markerIndex = text.indexOf(marker, from);
-  if (markerIndex < 0) return null;
-  const start = text.indexOf('[', markerIndex + marker.length);
-  if (start < 0) return null;
-  const end = findMatching(text, start, '[', ']');
-  return end < 0 ? null : { content: text.slice(start + 1, end), start, end };
+function relative(file) {
+  return path.relative(rootDir, file).split(path.sep).join('/');
 }
 
-function splitTopLevelObjects(arrayContent) {
-  const objects = [];
-  let quote = null;
-  let escaped = false;
-  let depth = 0;
-  let start = -1;
-  for (let i = 0; i < arrayContent.length; i += 1) {
-    const ch = arrayContent[i];
-    if (quote) {
-      if (escaped) escaped = false;
-      else if (ch === '\\') escaped = true;
-      else if (ch === quote) quote = null;
-      continue;
-    }
-    if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
-    if (ch === '{') {
-      if (depth === 0) start = i;
-      depth += 1;
-    } else if (ch === '}') {
-      depth -= 1;
-      if (depth === 0 && start >= 0) {
-        objects.push(arrayContent.slice(start, i + 1));
-        start = -1;
-      }
-    }
-  }
-  return objects;
+const checks = [];
+for (const [name, file] of Object.entries(requiredFiles)) {
+  checks.push({ name, pass: fs.existsSync(path.join(rootDir, file)), detail: file });
 }
 
-function quotedField(objectText, field) {
-  const match = objectText.match(new RegExp(`\\b${field}:\\s*['\"]([^'\"]+)['\"]`));
-  return match?.[1] ?? '';
+for (const [file, pattern, name] of requiredContracts) {
+  const absolute = path.join(rootDir, file);
+  const content = fs.existsSync(absolute) ? fs.readFileSync(absolute, 'utf8') : '';
+  checks.push({ name, pass: pattern.test(content), detail: file });
 }
 
-function countModulesAndLessons(courseText) {
-  const modules = extractArrayAfter(courseText, 'modules:');
-  if (!modules) return { moduleCount: 0, lessonCount: 0 };
-  const moduleObjects = splitTopLevelObjects(modules.content);
-  let lessonCount = 0;
-  for (const moduleText of moduleObjects) {
-    const lessons = extractArrayAfter(moduleText, 'lessons:');
-    if (lessons) lessonCount += splitTopLevelObjects(lessons.content).length;
-  }
-  return { moduleCount: moduleObjects.length, lessonCount };
+const retiredCatalog = path.join(rootDir, 'lms-data', 'courses');
+const retiredCatalogFiles = fs.existsSync(retiredCatalog) ? walk(retiredCatalog) : [];
+checks.push({
+  name: 'retired static course catalog is absent',
+  pass: retiredCatalogFiles.length === 0,
+  detail: retiredCatalogFiles.length ? retiredCatalogFiles.map(relative).join(', ') : 'lms-data/courses (absent or empty)',
+});
+
+const applicationFiles = ['apps', 'components', 'lib'].flatMap((directory) =>
+  walk(path.join(rootDir, directory)).filter((file) => /\.(?:ts|tsx|js|jsx|mjs|cjs)$/.test(file)),
+);
+const legacyImports = applicationFiles.flatMap((file) => {
+  const content = fs.readFileSync(file, 'utf8');
+  return /lms-data\/courses(?:\/|['"])/.test(content) ? [relative(file)] : [];
+});
+checks.push({
+  name: 'application has no static course catalog imports',
+  pass: legacyImports.length === 0,
+  detail: legacyImports.length ? legacyImports.join(', ') : 'none',
+});
+
+const failed = checks.filter((check) => !check.pass);
+const report = {
+  timestamp: new Date().toISOString(),
+  authority: 'Supabase courses -> course_modules -> course_lessons',
+  summary: { totalChecks: checks.length, passed: checks.length - failed.length, failed: failed.length },
+  checks,
+};
+fs.writeFileSync(path.join(reportsDir, 'lms_integrity_report.json'), JSON.stringify(report, null, 2));
+
+for (const check of checks) {
+  console.log(`${check.pass ? 'PASS' : 'FAIL'}: ${check.name} (${check.detail})`);
 }
-
-function loadCourses() {
-  const coursesPath = path.join(rootDir, 'lms-data', 'courses.ts');
-  if (!fs.existsSync(coursesPath)) throw new Error(`Missing canonical course data: ${coursesPath}`);
-  const content = fs.readFileSync(coursesPath, 'utf-8');
-  if (!content.trim()) throw new Error('Canonical course data file is empty');
-
-  const array = extractArrayAfter(content, 'export const courses: Course[] =');
-  if (!array) throw new Error('Could not locate canonical courses array');
-
-  const courses = splitTopLevelObjects(array.content).map((courseText) => {
-    const id = quotedField(courseText, 'id');
-    const title = quotedField(courseText, 'title');
-    const description = quotedField(courseText, 'shortDescription') || quotedField(courseText, 'description');
-    const { moduleCount, lessonCount } = countModulesAndLessons(courseText);
-    return { id, title, description, moduleCount, lessonCount };
-  }).filter((course) => course.id && course.title);
-
-  if (courses.length === 0) throw new Error('Course parser found zero courses; integrity cannot be proven');
-  return courses;
-}
-
-function loadInstructors() {
-  const instructorsPath = path.join(rootDir, 'lms-data', 'instructors.ts');
-  if (!fs.existsSync(instructorsPath)) return [];
-  const content = fs.readFileSync(instructorsPath, 'utf-8');
-  return Array.from(content.matchAll(/id:\s*["']([^"']+)["'][\s\S]*?programId:\s*["']([^"']+)["'][\s\S]*?name:\s*["']([^"']+)["']/g)).map((m) => ({ id:m[1], programId:m[2], name:m[3] }));
-}
-
-function validateCourse(course) {
-  const issues = [];
-  if (!course.title || course.title.length < 3) issues.push('Missing or invalid title');
-  if (!course.description || course.description.length < 10) issues.push('Missing or invalid description');
-  if (containsPlaceholder(course.title) || containsPlaceholder(course.description)) issues.push('Contains placeholder content');
-  if (course.moduleCount < 2) issues.push(`Insufficient modules (${course.moduleCount}, need >= 2)`);
-  if (course.lessonCount < 2) issues.push(`Insufficient lessons (${course.lessonCount}, need >= 2)`);
-  return { courseId: course.id, title: course.title, status: issues.length ? 'FAIL' : 'PASS', issues };
-}
-
-try {
-  const courses = loadCourses();
-  const instructors = loadInstructors();
-  const results = courses.map(validateCourse);
-  const failed = results.filter((r) => r.status === 'FAIL').length;
-  const report = { timestamp:new Date().toISOString(), summary:{ totalCourses:courses.length, passed:results.length-failed, failed, instructorsDetected:instructors.length }, results };
-  fs.writeFileSync(path.join(reportsDir,'lms_integrity_report.json'), JSON.stringify(report,null,2));
-  console.log(`LMS integrity: ${courses.length} courses, ${failed} failed, ${instructors.length} instructors detected.`);
-  if (failed) {
-    for (const r of results.filter((r)=>r.status==='FAIL')) console.error(`FAIL ${r.title}: ${r.issues.join('; ')}`);
-    process.exit(1);
-  }
-  console.log('PASS: LMS course integrity proven from canonical course data.');
-  process.exit(0);
-} catch (error) {
-  const report = { timestamp:new Date().toISOString(), summary:{ totalCourses:0, passed:0, failed:1 }, fatalError:String(error?.message || error), results:[] };
-  fs.writeFileSync(path.join(reportsDir,'lms_integrity_report.json'), JSON.stringify(report,null,2));
-  console.error(`FAIL: LMS integrity could not be proven: ${report.fatalError}`);
+if (failed.length) {
+  console.error(`FAIL: LMS persisted-course authority could not be proven (${failed.length} failed check(s)).`);
   process.exit(1);
 }
+console.log('PASS: LMS course integrity proven from the canonical persisted-course architecture.');

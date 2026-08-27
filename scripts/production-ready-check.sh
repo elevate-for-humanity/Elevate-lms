@@ -62,15 +62,11 @@ test_check "Robots blocks AI scrapers" "grep -q 'GPTBot' public/robots.txt"
 echo ""
 
 echo -e "${BLUE}4. LMS Courses${NC}"
-COURSE_FILES=$(find lms-data/courses -name "program-*.ts" | wc -l)
-IMPORTED_COURSES=$(grep -c "import.*Course.*from.*program-" lms-data/courses/index.ts || echo "0")
-echo "  Course files: $COURSE_FILES"
-echo "  Imported: $IMPORTED_COURSES"
-if [ "$COURSE_FILES" -eq "$IMPORTED_COURSES" ]; then
-    echo -e "  ${GREEN}✅ All courses imported${NC}"
+if node scripts/integrity/lms.mjs; then
+    echo -e "  ${GREEN}✅ Persisted course authority verified${NC}"
     ((PASS++))
 else
-    echo -e "  ${RED}❌ Missing $(($COURSE_FILES - $IMPORTED_COURSES)) course imports${NC}"
+    echo -e "  ${RED}❌ Persisted course authority verification failed${NC}"
     ((FAIL++))
 fi
 echo ""

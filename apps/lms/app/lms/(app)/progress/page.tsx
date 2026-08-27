@@ -122,7 +122,9 @@ export default async function ProgressPage() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const lastActivity = new Date(activityDates[0].updated_at);
+      const firstActivity = activityDates[0];
+      if (!firstActivity) throw new Error('ACTIVITY_DATE_MISSING');
+      const lastActivity = new Date(firstActivity.updated_at);
       lastActivity.setHours(0, 0, 0, 0);
 
       // Check if last activity was today or yesterday
@@ -131,8 +133,11 @@ export default async function ProgressPage() {
       );
       if (diffDays <= 1) {
         for (let i = 1; i < activityDates.length; i++) {
-          const current = new Date(activityDates[i].updated_at);
-          const prev = new Date(activityDates[i - 1].updated_at);
+          const currentActivity = activityDates[i];
+          const previousActivity = activityDates[i - 1];
+          if (!currentActivity || !previousActivity) continue;
+          const current = new Date(currentActivity.updated_at);
+          const prev = new Date(previousActivity.updated_at);
           current.setHours(0, 0, 0, 0);
           prev.setHours(0, 0, 0, 0);
 

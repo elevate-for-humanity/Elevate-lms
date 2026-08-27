@@ -123,11 +123,14 @@ export async function sendEmail(options: EmailOptions): Promise<EmailSendResult>
   }
 
   const result = await sendViaSendGrid(sendgridKey, {
-    ...options,
     from,
     replyTo,
     to: toArr,
-    bcc: bccArr,
+    subject: options.subject,
+    html: options.html,
+    ...(options.text ? { text: options.text } : {}),
+    ...(options.attachments ? { attachments: options.attachments } : {}),
+    ...(bccArr ? { bcc: bccArr } : {}),
   });
   await auditTransportDelivery(options, result, from, 'sendgrid');
   return result;
@@ -216,7 +219,8 @@ async function sendViaSendGrid(
 /** Parse "Name <email>" format into SendGrid {email, name} object */
 function parseSendGridFrom(from: string): { email: string; name?: string } {
   const match = from.match(/^(.+?)\s*<(.+?)>$/);
-  if (match) return { name: match[1].trim(), email: match[2].trim() };
+  const [, name, email] = match ?? [];
+  if (name && email) return { name: name.trim(), email: email.trim() };
   return { email: from };
 }
 
@@ -227,7 +231,10 @@ export async function trySendEmail(
   options: EmailOptions,
 ): Promise<{ ok: boolean; error?: string }> {
   const result = await sendEmail(options);
-  return { ok: result.success, error: result.error };
+  return {
+    ok: result.success,
+    ...(result.error ? { error: result.error } : {}),
+  };
 }
 
 export async function sendWelcomeEmail(params: {

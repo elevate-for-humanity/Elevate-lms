@@ -63,9 +63,8 @@ function canonicalProgram(
 }
 
 const ALL_PROGRAMS: Record<string, ProgramApplicationConfig> = {
-  // Beauty apprenticeship chooser pages intentionally remain dedicated because
-  // they split apprentice and Host Site enrollment before entering the canonical
-  // student application.
+  // Barber retains its dedicated chooser. Cosmetology, Esthetician, and Nail
+  // apprentice intake use the canonical PARIS application and published pricing.
   'barber-apprenticeship': {
     slug: 'barber-apprenticeship',
     name: 'Barber Apprenticeship',
@@ -90,40 +89,20 @@ const ALL_PROGRAMS: Record<string, ProgramApplicationConfig> = {
     'purple',
     { supportsWioa: true, supportsBnpl: true },
   ),
-  'esthetician-apprenticeship': {
-    slug: 'esthetician-apprenticeship',
-    name: 'Esthetician Apprenticeship',
-    shortName: 'Esthetician',
-    formEngine: 'dedicated',
-    formPath: '/programs/esthetician-apprenticeship/apply',
-    color: 'pink',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-      depositCents: 112000,
-      fullTuitionCents: 320000,
-      stripeDepositLink: 'https://buy.stripe.com/cNicN52UU4QS4NZ1AZgIo06',
-      stripeFullLink: 'https://buy.stripe.com/bJedR91QQgzAfsD0wVgIo05',
-    },
-  },
-  'nail-technician-apprenticeship': {
-    slug: 'nail-technician-apprenticeship',
-    name: 'Nail Technician Apprenticeship',
-    shortName: 'Nail Tech',
-    formEngine: 'dedicated',
-    formPath: '/programs/nail-technician-apprenticeship/apply',
-    color: 'rose',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-      depositCents: 175000,
-      fullTuitionCents: 500000,
-      stripeDepositLink: 'https://buy.stripe.com/cNicN52UU4QS4NZ1AZgIo06',
-      stripeFullLink: 'https://buy.stripe.com/bJedR91QQgzAfsD0wVgIo05',
-    },
-  },
+  'esthetician-apprenticeship': canonicalProgram(
+    'esthetician-apprenticeship',
+    'Esthetician Apprenticeship',
+    'Esthetician',
+    'pink',
+    { supportsWioa: true, supportsBnpl: true },
+  ),
+  'nail-technician-apprenticeship': canonicalProgram(
+    'nail-technician-apprenticeship',
+    'Nail Technician Apprenticeship',
+    'Nail Tech',
+    'rose',
+    { supportsWioa: true, supportsBnpl: true },
+  ),
 
   // HVAC is a canonical student application. The former dedicated HVAC page is
   // a compatibility redirect only and must never be selected as the form engine.

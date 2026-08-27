@@ -108,6 +108,23 @@ function CheckoutPageInner() {
     }
   }, [method]);
 
+  if (!programData) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md text-center">
+          <h1 className="text-2xl font-bold text-black mb-4">Program Not Found</h1>
+          <p className="text-black mb-6">The program you're trying to purchase doesn't exist.</p>
+          <Link
+            href="/programs"
+            className="inline-block px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
+          >
+            View All Programs
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const handleStripeCheckout = async () => {
     setLoading(true);
     setError(null);
@@ -225,23 +242,6 @@ function CheckoutPageInner() {
       setLoading(false);
     }
   };
-
-  if (!programData) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md text-center">
-          <h1 className="text-2xl font-bold text-black mb-4">Program Not Found</h1>
-          <p className="text-black mb-6">The program you're trying to purchase doesn't exist.</p>
-          <Link
-            href="/programs"
-            className="inline-block px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
-          >
-            View All Programs
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 py-12 px-4">

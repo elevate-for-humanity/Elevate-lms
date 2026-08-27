@@ -49,11 +49,11 @@ function mediaCharacters(sceneData: Record<string, unknown>): MediaCharacterRefe
     .filter((value): value is Record<string, unknown> => Boolean(value && typeof value === 'object'))
     .map((value, index) => ({
       id: typeof value.id === 'string' && value.id ? value.id : `character-${index + 1}`,
-      name: typeof value.name === 'string' ? value.name : undefined,
-      referenceImageUrl: typeof value.reference_image_url === 'string' ? value.reference_image_url : undefined,
-      appearancePrompt: typeof value.appearance_prompt === 'string' ? value.appearance_prompt : undefined,
-      voiceId: typeof value.voice_id === 'string' ? value.voice_id : undefined,
-      consentRecordId: typeof value.consent_record_id === 'string' ? value.consent_record_id : undefined,
+      ...(typeof value.name === 'string' ? { name: value.name } : {}),
+      ...(typeof value.reference_image_url === 'string' ? { referenceImageUrl: value.reference_image_url } : {}),
+      ...(typeof value.appearance_prompt === 'string' ? { appearancePrompt: value.appearance_prompt } : {}),
+      ...(typeof value.voice_id === 'string' ? { voiceId: value.voice_id } : {}),
+      ...(typeof value.consent_record_id === 'string' ? { consentRecordId: value.consent_record_id } : {}),
     }));
 }
 
@@ -97,11 +97,14 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   });
 
   try {
+    const primaryScene = storyboard.scenes[0];
+    if (!primaryScene) throw new Error('MEDIA_STORYBOARD_EMPTY');
+
     // A single GPU clip is a valid terminal asset only for a single-scene plan.
     // Multi-scene instructional clips must continue to the compositor so the
     // remaining objective-aligned scenes are not discarded.
     if (isMicroclip && storyboard.scenes.length === 1 && (await gpuVideoAvailable())) {
-      const scene = storyboard.scenes[0];
+      const scene = primaryScene;
       const requestedDuration = Math.min(15, Math.max(1, scene.durationSeconds));
       const gpuStartedAt = Date.now();
       let generated: Awaited<ReturnType<typeof generateGpuVideo>> = null;
@@ -112,10 +115,10 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
           width: storyboard.width,
           height: storyboard.height,
           durationSeconds: requestedDuration,
-          seed: scene.seed,
-          imageUrl: scene.referenceImageUrl,
-          sourceVideoUrl: scene.sourceVideoUrl,
-          negativePrompt: scene.negativePrompt,
+          ...(scene.seed !== undefined ? { seed: scene.seed } : {}),
+          ...(scene.referenceImageUrl ? { imageUrl: scene.referenceImageUrl } : {}),
+          ...(scene.sourceVideoUrl ? { sourceVideoUrl: scene.sourceVideoUrl } : {}),
+          ...(scene.negativePrompt ? { negativePrompt: scene.negativePrompt } : {}),
         });
         if (generated) {
           const buffer = await downloadGpuVideoAsset(generated);
@@ -260,7 +263,6 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       }
     }
 
-    const primaryScene = storyboard.scenes[0];
     const result = storyboard.scenes.length > 1
       ? await renderStoryboardVideo({
           lessonId: renderId,
@@ -307,8 +309,8 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     });
     await markComplete(job.id, {
       video_url: result.videoUrl,
-      audio_url: result.audioUrl ?? undefined,
-      duration_seconds: result.duration,
+      ...(result.audioUrl ? { audio_url: result.audioUrl } : {}),
+      ...(result.duration !== undefined ? { duration_seconds: result.duration } : {}),
       provider: REMOTION_PROVIDER,
       provider_model: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
       scene_count: storyboard.scenes.length,

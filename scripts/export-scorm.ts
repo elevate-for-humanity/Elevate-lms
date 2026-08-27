@@ -53,6 +53,7 @@ const SCORM_API_JS = `
 // SCORM 1.2 / 2004 API wrapper
 var API = null;
 var API_1484_11 = null;
+var scormStartedAt = Date.now();
 
 function findAPI(win) {
   var attempts = 0;
@@ -81,6 +82,37 @@ function scormSetScore(score) {
     API_1484_11.SetValue("cmi.score.raw", String(score));
     API_1484_11.SetValue("cmi.score.min", "0");
     API_1484_11.SetValue("cmi.score.max", "100");
+    API_1484_11.SetValue("cmi.score.scaled", String(Math.max(-1, Math.min(1, score / 100))));
+  }
+}
+
+function scormRecordInteraction(index, interaction) {
+  var result = interaction.correct ? "correct" : "incorrect";
+  if (API) {
+    var legacy = "cmi.interactions." + index;
+    API.LMSSetValue(legacy + ".id", String(interaction.id));
+    API.LMSSetValue(legacy + ".type", "choice");
+    API.LMSSetValue(legacy + ".student_response", String(interaction.response));
+    API.LMSSetValue(legacy + ".result", result);
+  } else if (API_1484_11) {
+    var modern = "cmi.interactions." + index;
+    API_1484_11.SetValue(modern + ".id", String(interaction.id));
+    API_1484_11.SetValue(modern + ".type", "choice");
+    API_1484_11.SetValue(modern + ".timestamp", new Date().toISOString());
+    API_1484_11.SetValue(modern + ".learner_response", String(interaction.response));
+    API_1484_11.SetValue(modern + ".result", result);
+  }
+}
+
+function scormSessionTime() {
+  var totalSeconds = Math.max(0, Math.round((Date.now() - scormStartedAt) / 1000));
+  if (API) {
+    var hours = String(Math.floor(totalSeconds / 3600)).padStart(4, "0");
+    var minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+    var seconds = String(totalSeconds % 60).padStart(2, "0");
+    API.LMSSetValue("cmi.core.session_time", hours + ":" + minutes + ":" + seconds);
+  } else if (API_1484_11) {
+    API_1484_11.SetValue("cmi.session_time", "PT" + totalSeconds + "S");
   }
 }
 
@@ -96,8 +128,9 @@ function scormSetComplete(passed) {
 }
 
 function scormFinish() {
-  if (API) { API.LMSFinish(""); }
-  else if (API_1484_11) { API_1484_11.Terminate(""); }
+  scormSessionTime();
+  if (API) { API.LMSCommit(""); API.LMSFinish(""); }
+  else if (API_1484_11) { API_1484_11.Commit(""); API_1484_11.Terminate(""); }
 }
 
 window.addEventListener("load", scormInit);
@@ -117,7 +150,7 @@ function generateLessonHTML(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${lesson.title}</title>
+  <title>${escapeHtml(lesson.title)}</title>
   <script src="../shared/scorm-api.js"><\/script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -175,12 +208,12 @@ function generateLessonHTML(
 </head>
 <body>
   <div class="container">
-    <h1>${lesson.title}</h1>
+    <h1>${escapeHtml(lesson.title)}</h1>
     <p class="subtitle">Lesson ${lesson.lesson_number} — ${escapeHtml(courseTitle)}</p>
     
     <div class="video-wrap">
       <video id="player" controls preload="metadata">
-        <source src="${lesson.video_url}" type="video/mp4">
+        <source src="${escapeHtml(lesson.video_url)}" type="video/mp4">
       </video>
     </div>
     
@@ -194,7 +227,7 @@ function generateLessonHTML(
   
   <script>
     // Captions
-    var captions = ${JSON.stringify(captions)};
+    var captions = ${serializeForInlineScript(captions)};
     var video = document.getElementById("player");
     var tbody = document.getElementById("transcript-body");
     
@@ -204,7 +237,14 @@ function generateLessonHTML(
       div.dataset.idx = i;
       var m = Math.floor(seg.start / 60);
       var s = Math.floor(seg.start % 60);
-      div.innerHTML = '<span class="seg-time">' + m + ':' + (s < 10 ? '0' : '') + s + '</span><span class="seg-text">' + seg.text + '</span>';
+      var time = document.createElement("span");
+      time.className = "seg-time";
+      time.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+      var text = document.createElement("span");
+      text.className = "seg-text";
+      text.textContent = String(seg.text || "");
+      div.appendChild(time);
+      div.appendChild(text);
       div.onclick = function() { video.currentTime = seg.start; video.play(); };
       tbody.appendChild(div);
     });
@@ -223,11 +263,20 @@ function generateLessonHTML(
     });
     
     // Quiz
-    var questions = ${JSON.stringify(quiz)};
+    var questions = ${serializeForInlineScript(quiz)};
     var currentQ = 0;
     var correctCount = 0;
     var answered = [];
     var quizDiv = document.getElementById("quiz");
+
+    function escapeMarkup(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
     
     function renderQuestion() {
       if (currentQ >= questions.length) { renderResults(); return; }
@@ -235,9 +284,9 @@ function generateLessonHTML(
       var pct = ((currentQ + 1) / questions.length * 100).toFixed(0);
       var html = '<h2>Lesson Quiz</h2><p class="quiz-info">Question ' + (currentQ + 1) + ' of ' + questions.length + ' — 80% to pass</p>';
       html += '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
-      html += '<p class="question">' + q.question + '</p>';
+      html += '<p class="question">' + escapeMarkup(q.question) + '</p>';
       q.options.forEach(function(opt, i) {
-        html += '<div class="option" data-idx="' + i + '" onclick="selectAnswer(' + i + ')"><span class="option-letter">' + String.fromCharCode(65 + i) + '</span><span>' + opt + '</span></div>';
+        html += '<div class="option" data-idx="' + i + '" onclick="selectAnswer(' + i + ')"><span class="option-letter">' + String.fromCharCode(65 + i) + '</span><span>' + escapeMarkup(opt) + '</span></div>';
       });
       html += '<div id="feedback" style="display:none"></div>';
       quizDiv.innerHTML = html;
@@ -249,6 +298,11 @@ function generateLessonHTML(
       var isCorrect = idx === q.correctAnswer;
       if (isCorrect) correctCount++;
       answered.push({ q: currentQ, selected: idx, correct: isCorrect });
+      scormRecordInteraction(currentQ, {
+        id: q.id || ('question-' + (currentQ + 1)),
+        response: idx,
+        correct: isCorrect
+      });
       
       opts.forEach(function(el, i) {
         el.onclick = null;
@@ -261,10 +315,10 @@ function generateLessonHTML(
       fb.style.display = "block";
       if (isCorrect) {
         fb.className = "feedback correct";
-        fb.innerHTML = '<h3>Correct!</h3><p>' + (q.explanation || '') + '</p>';
+        fb.innerHTML = '<h3>Correct!</h3><p>' + escapeMarkup(q.explanation || '') + '</p>';
       } else {
         fb.className = "feedback wrong";
-        fb.innerHTML = '<h3>Not quite.</h3><p>The correct answer is: <strong>' + q.options[q.correctAnswer] + '</strong></p><p>' + (q.explanation || '') + '</p>';
+        fb.innerHTML = '<h3>Not quite.</h3><p>The correct answer is: <strong>' + escapeMarkup(q.options[q.correctAnswer]) + '</strong></p><p>' + escapeMarkup(q.explanation || '') + '</p>';
       }
       
       var isLast = currentQ === questions.length - 1;
@@ -320,6 +374,7 @@ function generateManifest(
       </item>\n`;
       resources += `    <resource identifier="res_${id}" type="webcontent" adlcp:scormType="sco" href="lessons/lesson-${l.lesson_number}.html">
       <file href="lessons/lesson-${l.lesson_number}.html"/>
+      <file href="shared/scorm-api.js"/>
     </resource>\n`;
     }
 
@@ -359,6 +414,7 @@ ${resources}
       </item>\n`;
     resources += `    <resource identifier="res_${id}" type="webcontent" adlcp:scormtype="sco" href="lessons/lesson-${l.lesson_number}.html">
       <file href="lessons/lesson-${l.lesson_number}.html"/>
+      <file href="shared/scorm-api.js"/>
     </resource>\n`;
   }
 
@@ -384,6 +440,13 @@ ${resources}
 
 function escapeHtml(s: string): string {
   return escapeXml(s);
+}
+
+function serializeForInlineScript(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/</g, '\\u003c')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
 }
 
 function escapeXml(s: string): string {

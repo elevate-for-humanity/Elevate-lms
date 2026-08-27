@@ -1,5 +1,5 @@
 /**
- * SCORM 1.2 + 2004 export for HVAC EPA 608 course.
+ * Reusable SCORM 1.2 + 2004 exporter for any Course Builder course.
  *
  * Generates a zip file containing:
  *   - imsmanifest.xml (course structure)
@@ -8,27 +8,44 @@
  *   - Shared assets (CSS, JS)
  *
  * Usage:
- *   DOTENV_CONFIG_PATH=.env.local npx tsx scripts/export-scorm.ts
- *   DOTENV_CONFIG_PATH=.env.local npx tsx scripts/export-scorm.ts --format 2004
+ *   DOTENV_CONFIG_PATH=.env.local npx tsx scripts/export-scorm.ts --course-id <uuid>
+ *   DOTENV_CONFIG_PATH=.env.local npx tsx scripts/export-scorm.ts --course-id <uuid> --format 2004
  */
 
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import * as fs from 'fs';
 import * as path from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const COURSE_ID = 'f0593164-55be-5867-98e7-8a86770a8dd0';
-const OUT_DIR = path.resolve('temp/scorm-export');
-const GEN_DIR = path.resolve('temp/generated-lessons');
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const args = process.argv.slice(2);
-const format =
-  args.includes('--format') && args[args.indexOf('--format') + 1] === '2004' ? '2004' : '1.2';
+
+function option(name: string): string | undefined {
+  const index = args.indexOf(name);
+  return index >= 0 ? args[index + 1] : undefined;
+}
+
+const courseId = option('--course-id');
+if (!courseId) {
+  console.error('Missing required --course-id <uuid>');
+  process.exit(1);
+}
+
+const requestedFormat = option('--format');
+const format = requestedFormat === '2004' ? '2004' : '1.2';
+const outDir = path.resolve(option('--output-dir') ?? 'temp/scorm-export');
+const generatedAssetsDir = path.resolve(
+  option('--assets-dir') ?? path.join('temp/generated-lessons', courseId),
+);
+
+function packageSlug(value: string): string {
+  const normalized = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return normalized || `course-${courseId.slice(0, 8)}`;
+}
 
 // ── SCORM API wrapper ──────────────────────────────────────────────────
 
@@ -93,6 +110,7 @@ function generateLessonHTML(
   lesson: { title: string; lesson_number: number; video_url: string },
   quiz: any[],
   captions: any[],
+  courseTitle: string,
 ): string {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -158,7 +176,7 @@ function generateLessonHTML(
 <body>
   <div class="container">
     <h1>${lesson.title}</h1>
-    <p class="subtitle">Lesson ${lesson.lesson_number} — HVAC EPA 608 Certification</p>
+    <p class="subtitle">Lesson ${lesson.lesson_number} — ${escapeHtml(courseTitle)}</p>
     
     <div class="video-wrap">
       <video id="player" controls preload="metadata">
@@ -289,6 +307,8 @@ function generateLessonHTML(
 function generateManifest(
   lessons: { lesson_number: number; title: string }[],
   scormFormat: string,
+  packageIdentifier: string,
+  courseTitle: string,
 ): string {
   if (scormFormat === '2004') {
     let items = '';
@@ -304,7 +324,7 @@ function generateManifest(
     }
 
     return `<?xml version="1.0" encoding="UTF-8"?>
-<manifest identifier="elevate-hvac-608" version="1.0"
+<manifest identifier="${escapeXml(packageIdentifier)}" version="1.0"
   xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"
   xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"
   xmlns:adlseq="http://www.adlnet.org/xsd/adlseq_v1p3"
@@ -316,7 +336,7 @@ function generateManifest(
   </metadata>
   <organizations default="elevate_org">
     <organization identifier="elevate_org">
-      <title>HVAC Technician Training — EPA 608 Certification</title>
+      <title>${escapeXml(courseTitle)}</title>
 ${items}
     </organization>
   </organizations>
@@ -343,7 +363,7 @@ ${resources}
   }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<manifest identifier="elevate-hvac-608" version="1.0"
+<manifest identifier="${escapeXml(packageIdentifier)}" version="1.0"
   xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
   xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2">
   <metadata>
@@ -352,7 +372,7 @@ ${resources}
   </metadata>
   <organizations default="elevate_org">
     <organization identifier="elevate_org">
-      <title>HVAC Technician Training — EPA 608 Certification</title>
+      <title>${escapeXml(courseTitle)}</title>
 ${items}
     </organization>
   </organizations>
@@ -360,6 +380,10 @@ ${items}
 ${resources}
   </resources>
 </manifest>`;
+}
+
+function escapeHtml(s: string): string {
+  return escapeXml(s);
 }
 
 function escapeXml(s: string): string {
@@ -375,19 +399,33 @@ function escapeXml(s: string): string {
 async function main() {
   console.log(`\n=== SCORM ${format} Export ===\n`);
 
-  const { data: lessons } = await supabase
+  const { data: course, error: courseError } = await supabase
+    .from('training_courses')
+    .select('id, title, course_name')
+    .eq('id', courseId)
+    .single();
+
+  if (courseError || !course) {
+    console.error(`Course not found: ${courseId}`);
+    process.exit(1);
+  }
+
+  const courseTitle = course.title || course.course_name || `Course ${courseId}`;
+  const packageIdentifier = `elevate-${packageSlug(courseTitle)}-${courseId.slice(0, 8)}`;
+
+  const { data: lessons, error: lessonsError } = await supabase
     .from('training_lessons')
     .select('id, lesson_number, title, video_url')
-    .eq('course_id', COURSE_ID)
+    .eq('course_id', courseId)
     .order('lesson_number');
 
-  if (!lessons) {
-    console.error('No lessons found');
+  if (lessonsError || !lessons?.length) {
+    console.error(`No lessons found for course: ${courseId}`);
     process.exit(1);
   }
 
   // Clean and create output dirs
-  const exportDir = path.join(OUT_DIR, `scorm-${format.replace('.', '')}`);
+  const exportDir = path.join(outDir, `${packageSlug(courseTitle)}-scorm-${format.replace('.', '')}`);
   if (fs.existsSync(exportDir)) fs.rmSync(exportDir, { recursive: true });
   fs.mkdirSync(path.join(exportDir, 'lessons'), { recursive: true });
   fs.mkdirSync(path.join(exportDir, 'shared'), { recursive: true });
@@ -398,7 +436,7 @@ async function main() {
   // Generate lesson HTML files
   let count = 0;
   for (const lesson of lessons) {
-    const lessonDir = path.join(GEN_DIR, `lesson-${lesson.lesson_number}`);
+    const lessonDir = path.join(generatedAssetsDir, `lesson-${lesson.lesson_number}`);
 
     let quiz: any[] = [];
     let captions: any[] = [];
@@ -417,6 +455,7 @@ async function main() {
       },
       quiz,
       captions,
+      courseTitle,
     );
 
     fs.writeFileSync(path.join(exportDir, 'lessons', `lesson-${lesson.lesson_number}.html`), html);
@@ -424,12 +463,16 @@ async function main() {
   }
 
   // Write manifest
-  fs.writeFileSync(path.join(exportDir, 'imsmanifest.xml'), generateManifest(lessons, format));
+  fs.writeFileSync(
+    path.join(exportDir, 'imsmanifest.xml'),
+    generateManifest(lessons, format, packageIdentifier, courseTitle),
+  );
 
   // Create zip
-  const zipName = `Elevate-HVAC-EPA608-SCORM${format.replace('.', '')}.zip`;
-  const zipPath = path.join(OUT_DIR, zipName);
-  execSync(`cd "${exportDir}" && zip -r "${zipPath}" . 2>/dev/null`);
+  const zipName = `${packageSlug(courseTitle)}-SCORM${format.replace('.', '')}.zip`;
+  const zipPath = path.join(outDir, zipName);
+  fs.mkdirSync(outDir, { recursive: true });
+  execFileSync('zip', ['-r', zipPath, '.'], { cwd: exportDir, stdio: 'ignore' });
 
   const zipSize = fs.statSync(zipPath).size;
   console.log(`Lessons exported: ${count}`);

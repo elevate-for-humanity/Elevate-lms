@@ -20,6 +20,7 @@
  *   AZURE_TENANT_ID     — Directory (tenant) ID
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 import { createClient } from '@/lib/supabase/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -94,20 +95,31 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // Decode the JWT payload (no signature verification needed — Azure signs it,
-    // and we're only using it to get the email to look up/create the Supabase user.
-    // The token was delivered server-to-server via form_post, not from the browser.)
-    const [, payloadB64] = idToken.split('.');
-    const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
-    const email: string = payload.email ?? payload.preferred_username ?? payload.upn;
+    const tenantIssuer = `https://login.microsoftonline.com/${tenantId}/v2.0`;
+    const legacyTenantIssuer = `https://sts.windows.net/${tenantId}/`;
+    const azureKeys = createRemoteJWKSet(
+      new URL(`https://login.microsoftonline.com/${tenantId}/discovery/v2.0/keys`),
+    );
+    const { payload } = await jwtVerify(idToken, azureKeys, {
+      audience: clientId,
+      issuer: [tenantIssuer, legacyTenantIssuer],
+      algorithms: ['RS256'],
+      maxTokenAge: '10m',
+    });
+    const emailClaim = payload.email ?? payload.preferred_username ?? payload.upn;
+    const email = typeof emailClaim === 'string' ? emailClaim : '';
 
     if (!email || !email.includes('@')) {
-      logger.error('[azure/callback] No email in Azure id_token', undefined, { payload });
+      logger.error('[azure/callback] No email in verified Azure id_token');
       return NextResponse.redirect(`${loginUrl}?error=azure_no_email`);
     }
 
     // Upsert user and generate a Supabase magic link to establish session
     const admin = await getAdminClient();
+    if (!admin) {
+      logger.error('[azure/callback] Supabase admin client not configured');
+      return NextResponse.redirect(`${loginUrl}?error=azure_session_unavailable`);
+    }
     const { data: existing } = await admin.auth.admin.listUsers() as { data: { users?: Array<{ email?: string }> } | null };
     const existingUser = existing?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
 
@@ -115,7 +127,10 @@ export async function POST(req: NextRequest) {
       await admin.auth.admin.createUser({
         email,
         email_confirm: true,
-        user_metadata: { sso_provider: 'azure_ad', azure_oid: payload.oid },
+        user_metadata: {
+          sso_provider: 'azure_ad',
+          ...(typeof payload.oid === 'string' ? { azure_oid: payload.oid } : {}),
+        },
       });
     }
 

@@ -39,9 +39,11 @@ test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
 
   test('homepage supports keyboard navigation and skip navigation', async ({ page }) => {
     await page.goto('/');
-    await page.keyboard.press('Tab');
+    await page.waitForLoadState('domcontentloaded');
 
     const skipLink = page.locator('.skip-to-main');
+    await skipLink.waitFor({ state: 'attached' });
+    await page.keyboard.press('Tab');
     await expect(skipLink).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.locator('#main-content')).toBeFocused();

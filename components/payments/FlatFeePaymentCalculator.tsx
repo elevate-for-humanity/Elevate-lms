@@ -20,6 +20,13 @@ interface PaymentPlan {
   label: string;
 }
 
+interface SelectedPaymentPlan {
+  downPayment: number;
+  planMonths: number;
+  monthlyAmount: number;
+  totalPrice: number;
+}
+
 interface FlatFeePaymentCalculatorProps {
   programName: string;
   programFee: number;
@@ -75,7 +82,7 @@ export function FlatFeePaymentCalculator({
   };
 
   const handleContinue = async () => {
-    let planData: any = null;
+    let planData: SelectedPaymentPlan | null = null;
 
     if (balance <= 0) {
       planData = {
@@ -107,12 +114,15 @@ export function FlatFeePaymentCalculator({
           .from('payment_plan_selections')
           .insert({
             user_id: user?.id || null,
-            program_name: programName,
-            program_fee: programFee,
-            down_payment: planData.downPayment,
-            plan_months: planData.planMonths,
-            monthly_amount: planData.monthlyAmount,
-            selected_at: new Date().toISOString(),
+            amount: planData.totalPrice,
+            status: 'selected',
+            description: JSON.stringify({
+              programName,
+              programFee,
+              downPayment: planData.downPayment,
+              planMonths: planData.planMonths,
+              monthlyAmount: planData.monthlyAmount,
+            }),
           })
           .catch(() => {});
       } catch {

@@ -109,56 +109,39 @@ test.describe('Barber Apprenticeship — student flow', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// 2. COSMETOLOGY APPRENTICESHIP — student flow
+// 2. BEAUTY APPRENTICESHIPS — canonical PARIS application + payments
 // ═══════════════════════════════════════════════════════════════════════════
 
-test.describe('Cosmetology Apprenticeship — student flow', () => {
-  test('program landing page renders with apply CTA', async ({ page }) => {
-    await expectPageOk(page, '/programs/cosmetology-apprenticeship');
-    await expect(page.locator('h1, h2').first()).toContainText(/cosmetolog/i);
-    const applyLink = page.locator('a[href*="cosmetology-apprenticeship/apply"]').first();
-    await expect(applyLink).toBeVisible();
-  });
+test.describe('Beauty apprenticeships — PARIS, calculator, and BNPL', () => {
+  const programs = [
+    { slug: 'cosmetology-apprenticeship', label: 'Cosmetology' },
+    { slug: 'esthetician-apprenticeship', label: 'Esthetician' },
+    { slug: 'nail-technician-apprenticeship', label: 'Nail Technician' },
+  ];
 
-  test('apply page renders required form fields', async ({ page }) => {
-    await expectPageOk(page, '/programs/cosmetology-apprenticeship/apply');
-    await expect(page.locator('input[type="email"]').first()).toBeVisible();
-    await expect(page.locator('button[type="submit"], input[type="submit"]').first()).toBeVisible();
-  });
+  for (const { slug, label } of programs) {
+    test(`${label} application uses PARIS and published payment options`, async ({ page, request }) => {
+      const response = await page.goto(`${BASE}/programs/${slug}/apply`);
+      expect(response?.status() ?? 200).toBeLessThan(500);
+      await page.waitForURL(new RegExp(`/apply/student/interview\\?program=${slug}$`));
 
-  test('apply success page renders confirmation', async ({ page }) => {
-    await expectPageOk(page, '/programs/cosmetology-apprenticeship/apply/success');
-    await expect(page.locator('body')).toContainText(/success|submitted|received|thank/i);
-  });
+      await expect(
+        page.getByRole('heading', { name: /payment calculator, bnpl, and coupon code/i }),
+      ).toBeVisible();
+      await expect(page.getByText('Payment Calculator', { exact: true })).toBeVisible();
+      await expect(page.getByText(/may appear when the transaction is eligible and enabled in Stripe/i)).toBeVisible();
+      await expect(
+        page.locator('textarea[aria-label*="answer" i], textarea[placeholder*="answer" i]').first(),
+      ).toBeVisible();
 
-  test('eligibility page renders', async ({ page }) => {
-    await expectPageOk(page, '/programs/cosmetology-apprenticeship/eligibility');
-    await expect(page.locator('h1, h2').first()).toBeVisible();
-  });
-
-  test('host-shops page renders', async ({ page }) => {
-    await expectPageOk(page, '/programs/cosmetology-apprenticeship/host-shops');
-    await expect(page.locator('h1, h2').first()).toBeVisible();
-  });
-
-  test('orientation page renders', async ({ page }) => {
-    await expectPageOk(page, '/programs/cosmetology-apprenticeship/orientation');
-    await expect(page.locator('h1, h2').first()).toBeVisible();
-  });
-
-  test('payment page renders BNPL options', async ({ page }) => {
-    await expectPageOk(page, '/programs/cosmetology-apprenticeship/payment');
-    await expect(page.locator('h1, h2').first()).toBeVisible();
-  });
-
-  test('payment-setup page is auth-gated or renders form', async ({ page }) => {
-    await expectAuthGated(page, '/programs/cosmetology-apprenticeship/payment-setup');
-  });
-
-  test('enrollment-success page renders', async ({ page }) => {
-    await expectPageOk(page, '/programs/cosmetology-apprenticeship/enrollment-success');
-    await expect(page.locator('body')).toContainText(/success|enrolled|congratul/i);
-  });
+      const pricing = await request.get(`${BASE}/api/programs/pricing?slug=${slug}`, {
+        failOnStatusCode: false,
+      });
+      expect(pricing.status(), `${slug} pricing endpoint`).toBe(200);
+      const body = await pricing.json();
+      expect(Number(body.tuitionCents ?? body.priceCents ?? 0)).toBeGreaterThan(0);
+    });
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════════════

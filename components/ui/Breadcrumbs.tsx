@@ -57,10 +57,14 @@ export function generateBreadcrumbs(pathname: string, customLabels?: Record<stri
   let currentPath = '';
   for (let i = 0; i < segments.length; i++) {
     const segment = segments[i];
+    if (!segment) continue;
     currentPath += `/${segment}`;
     if (segment.startsWith('(') && segment.endsWith(')')) continue;
     const label = customLabels?.[segment] || segment.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    items.push({ label, href: i < segments.length - 1 ? currentPath : undefined });
+    items.push({
+      label,
+      ...(i < segments.length - 1 ? { href: currentPath } : {}),
+    });
   }
   return items;
 }

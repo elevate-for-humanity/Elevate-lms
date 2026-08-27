@@ -18,6 +18,7 @@ import {
   Calendar,
   Save,
   Loader2,
+  type LucideIcon,
 } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import {
@@ -550,10 +551,15 @@ function ReportBuilder() {
 // ─── Email Templates ────────────────────────────────────────────
 
 function EmailTemplateViewer() {
-  const [selected, setSelected] = useState(EMAIL_TEMPLATES[0]);
+  const initialTemplate = EMAIL_TEMPLATES[0];
+  if (!initialTemplate) {
+    throw new Error('At least one email template must be configured');
+  }
+
+  const [selected, setSelected] = useState(initialTemplate);
   const [copied, setCopied] = useState<string | null>(null);
 
-  const iconMap: Record<string, any> = {
+  const iconMap: Record<string, LucideIcon> = {
     'partnership-outreach': Handshake,
     'workforce-board-followup': Building2,
     'employer-recruitment': Users,

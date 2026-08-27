@@ -352,6 +352,7 @@ export function blueprintToDashboard(
 ): LearnerDashboard {
   const currentModule = moduleProgress.find(m => m.moduleSlug === progress.currentModuleSlug);
   const currentLesson = lessonProgress.find(l => l.lessonSlug === progress.currentLessonSlug);
+  const firstModule = blueprint.modules[0];
   
   // Find next uncompleted lesson
   const nextLesson = findNextLesson(blueprint.modules, lessonProgress);
@@ -365,14 +366,16 @@ export function blueprintToDashboard(
     programSlug: context.programSlug,
     enrollmentType: context.enrollmentType,
     progress,
-    currentModule: currentModule || createEmptyModuleProgress(blueprint.modules[0]),
-    currentLesson: currentLesson || createEmptyLessonProgress(blueprint.modules[0]?.lessons[0]),
-    nextLesson,
+    currentModule: currentModule || createEmptyModuleProgress(firstModule),
+    currentLesson: currentLesson || createEmptyLessonProgress(firstModule?.lessons?.[0]),
+    ...(nextLesson ? { nextLesson } : {}),
     competencies: competencyProgress,
-    certification,
+    ...(certification ? { certification } : {}),
     practiceExams: practiceExams || [],
     recentAttempts: [],
-    apprenticeship: context.enrollmentType === 'apprentice' ? apprenticeship : undefined,
+    ...(context.enrollmentType === 'apprentice' && apprenticeship
+      ? { apprenticeship }
+      : {}),
     gamification,
     notifications: { unread: 0, recent: [] },
   };
@@ -470,7 +473,7 @@ export function getRequiredInteractions(
   const interactions: RequiredInteraction[] = [];
   
   if (specs.includeKnowledgeChecks) {
-    for (let i = 0; i < specs.knowledgeCheckCount; i++) {
+    for (let i = 0; i < (specs.knowledgeCheckCount ?? 0); i++) {
       interactions.push({
         type: 'knowledge-check',
         count: i + 1,
@@ -481,7 +484,7 @@ export function getRequiredInteractions(
   }
   
   if (specs.includeScenarios) {
-    for (let i = 0; i < specs.scenarioCount; i++) {
+    for (let i = 0; i < (specs.scenarioCount ?? 0); i++) {
       interactions.push({
         type: 'scenario',
         count: i + 1,
@@ -494,7 +497,7 @@ export function getRequiredInteractions(
   if (specs.includeFlashcards) {
     interactions.push({
       type: 'flashcard',
-      count: specs.flashcardCount,
+      count: specs.flashcardCount ?? 0,
       lessonSlug,
       position: 'end',
     });

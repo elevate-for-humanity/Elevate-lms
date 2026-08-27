@@ -99,8 +99,8 @@ function textChunks(text: string, count: number): string[] {
   const target = Math.max(120, Math.ceil(text.length / count));
   let cursor = 0;
   for (const sentence of sentences) {
-    if (cursor < count - 1 && chunks[cursor].length >= target) cursor += 1;
-    chunks[cursor] = `${chunks[cursor]} ${sentence}`.trim();
+    if (cursor < count - 1 && (chunks[cursor]?.length ?? 0) >= target) cursor += 1;
+    chunks[cursor] = `${chunks[cursor] ?? ''} ${sentence}`.trim();
   }
   if (chunks.every((chunk) => chunk.length >= 120)) return chunks;
 
@@ -203,7 +203,8 @@ function normalizedTerms(
         const section = sections.find((entry) =>
           entry.body.toLowerCase().includes(term.toLowerCase()),
         );
-        terms.push({ term, definition: section?.body ?? objectives[0] });
+        const definition = section?.body ?? objectives[0];
+        if (definition) terms.push({ term, definition });
       } else if (item && typeof item === 'object') {
         const record = item as Record<string, unknown>;
         const term = clean(record.term ?? record.name ?? record.label);
@@ -268,6 +269,13 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
     );
   }
 
+  const [section0, section1, section2] = sections;
+  const [objective0, objective1] = objectives;
+  const [question0, question1] = questions;
+  if (!section0 || !section1 || !section2 || !objective0 || !objective1 || !question0 || !question1) {
+    throw new Error(`${input.lessonTitle}: authored lesson structure is incomplete`);
+  }
+
   const glossary = normalizedTerms(input.keyTerms, objectives, sections);
   if (glossary.length < 4)
     throw new Error(`${input.lessonTitle}: at least four lesson-specific terms are required`);
@@ -303,9 +311,9 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
       feedback:
         index === question.correctAnswer
           ? String(question.explanation)
-          : `Review ${sections[index % sections.length].heading} and compare this choice with the lesson evidence.`,
+          : `Review ${sections[index % sections.length]?.heading ?? section0.heading} and compare this choice with the lesson evidence.`,
     }));
-  const summary = clean(`${sections[0].body} ${sections[1].body}`).slice(0, 700);
+  const summary = clean(`${section0.body} ${section1.body}`).slice(0, 700);
   const narrationScript = clean(
     `${input.lessonTitle}. ${objectives.join(' ')} ${sections.map((section) => `${section.heading}. ${section.body}`).join(' ')}`,
   ).slice(0, 12000);
@@ -319,37 +327,37 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
     },
     content: sourceText,
     narrationScript,
-    visualPrompt: `Create a bright Elevate for Humanity instructional scene for “${input.lessonTitle}” in ${input.moduleTitle}. Show an adult learner actively demonstrating: ${objectives[0]} Include visible work evidence, accessible captions, warm brand colors, and a clear successful outcome.`,
+    visualPrompt: `Create a bright Elevate for Humanity instructional scene for “${input.lessonTitle}” in ${input.moduleTitle}. Show an adult learner actively demonstrating: ${objective0} Include visible work evidence, accessible captions, warm brand colors, and a clear successful outcome.`,
     flashcards,
     quickClips: sections.slice(0, 2).map((section, index) => ({
       id: `${input.lessonSlug}-clip-${index + 1}`,
       title: section.heading,
-      objective: objectives[index] ?? objectives[0],
+      objective: objectives[index] ?? objective0,
       durationSeconds: 180,
       script: clean(`${section.heading}. ${section.body}`).slice(0, 3000),
-      visualPrompt: `Bright Elevate micro-lesson illustrating ${section.heading} for ${input.lessonTitle}, with the learner applying ${objectives[index] ?? objectives[0]} and showing the completed evidence.`,
+      visualPrompt: `Bright Elevate micro-lesson illustrating ${section.heading} for ${input.lessonTitle}, with the learner applying ${objectives[index] ?? objective0} and showing the completed evidence.`,
     })),
     knowledgeChecks: checks,
     scenario: {
       title: `${input.lessonTitle}: applied decision`,
-      context: sections[1].body,
-      question: questions[0].question,
-      options: optionSet(questions[0]),
+      context: section1.body,
+      question: question0.question,
+      options: optionSet(question0),
     },
     caseStudy: {
       title: `${input.lessonTitle}: evidence case`,
-      context: sections[2].body,
-      question: questions[1].question,
-      options: optionSet(questions[1]),
+      context: section2.body,
+      question: question1.question,
+      options: optionSet(question1),
     },
     exercises: [
       {
         id: `${input.lessonSlug}-exercise-1`,
-        title: `Apply ${objectiveLabel(objectives[0])}`,
+        title: `Apply ${objectiveLabel(objective0)}`,
         instructions: [
-          `Use the ${sections[0].heading} section to identify the facts and criteria that matter.`,
-          `Complete an example that demonstrates this objective: ${objectives[0]}`,
-          `Compare your result with the evidence and method explained in ${sections[1].heading}.`,
+          `Use the ${section0.heading} section to identify the facts and criteria that matter.`,
+          `Complete an example that demonstrates this objective: ${objective0}`,
+          `Compare your result with the evidence and method explained in ${section1.heading}.`,
         ],
         expectedArtifact: `A completed ${input.lessonTitle} work product with the supporting lesson evidence identified.`,
         autoGrade: {
@@ -362,11 +370,11 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
       title: `${input.lessonTitle} practical application`,
       description: `Demonstrate the lesson objectives through an observable application of ${input.lessonTitle}.`,
       instructions: [
-        `Review the required method and evidence in ${sections[0].heading}.`,
-        `Perform or document the application described by: ${objectives[0]}`,
-        `Check the completed work against ${objectives[1]} and record the result.`,
+        `Review the required method and evidence in ${section0.heading}.`,
+        `Perform or document the application described by: ${objective0}`,
+        `Check the completed work against ${objective1} and record the result.`,
       ],
-      evidence: `Submit the completed work product and an explanation connecting it to ${sections[0].heading} and ${sections[1].heading}.`,
+      evidence: `Submit the completed work product and an explanation connecting it to ${section0.heading} and ${section1.heading}.`,
     },
     resources: sections.slice(0, 2).map((section, index) => ({
       type: index === 0 ? 'worksheet' : 'reference',
@@ -384,7 +392,7 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
       objectiveMap: objectives.slice(0, 3),
       targetedActions: objectives.slice(0, 3).map((objective, index) => ({
         objective,
-        action: `Review ${sections[index % sections.length].heading}, replay its narrated clip, complete the lesson exercise, and retry the objective-aligned question.`,
+        action: `Review ${sections[index % sections.length]?.heading ?? section0.heading}, replay its narrated clip, complete the lesson exercise, and retry the objective-aligned question.`,
       })),
     },
     readiness: {
@@ -441,10 +449,11 @@ function compileBlueprintLesson(
       { cause: error },
     );
   }
+  const objective = lesson.objective ?? compiled.objectives[0];
   return {
     ...lesson,
     stepType: inferStepType(lesson.slug),
-    objective: lesson.objective ?? compiled.objectives[0],
+    ...(objective ? { objective } : {}),
     learningObjectives: compiled.objectives,
     content: JSON.stringify({
       ...content,

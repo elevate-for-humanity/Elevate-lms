@@ -163,13 +163,17 @@ const CANONICAL_PACKAGED_INSTRUCTOR_IMAGE = '/images/instructors/marcus-johnson.
 const CANONICAL_TALKING_INSTRUCTOR_IMAGE =
   'https://www.elevateforhumanity.org/images/brandon-instructor.png';
 
-const DEFAULT_INSTRUCTOR: InstructorConfig = INSTRUCTOR_CONFIGS['marcus-johnson'];
+function requiredInstructor(id: string): InstructorConfig {
+  const instructor = INSTRUCTOR_CONFIGS[id];
+  if (!instructor) throw new Error(`REMOTION_INSTRUCTOR_MISSING:${id}`);
+  return instructor;
+}
+
+const DEFAULT_INSTRUCTOR = requiredInstructor('marcus-johnson');
 
 function getInstructor(instructorId?: string): InstructorConfig {
-  if (instructorId && INSTRUCTOR_CONFIGS[instructorId]) {
-    return INSTRUCTOR_CONFIGS[instructorId];
-  }
-  return DEFAULT_INSTRUCTOR;
+  const instructor = instructorId ? INSTRUCTOR_CONFIGS[instructorId] : undefined;
+  return instructor ?? DEFAULT_INSTRUCTOR;
 }
 
 // ── Segment frame calculator ──────────────────────────────────────────────────
@@ -290,10 +294,8 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
 
     // ── Step 2: Fetch background image ────────────────────────────────────────
     logger.info(`[RemotionRender] Fetching background image (domain: ${domainKey})`);
-    const backgroundImageSrc =
-      (await getPexelsImage(domainKey, {
-        query: input.visualPrompt?.replace(/[^a-zA-Z0-9 ,'-]/g, ' ').slice(0, 180),
-      })) ?? undefined;
+    const imageQuery = input.visualPrompt?.replace(/[^a-zA-Z0-9 ,'-]/g, ' ').slice(0, 180);
+    const backgroundImageSrc = await getPexelsImage(domainKey, imageQuery ? { query: imageQuery } : {});
 
     // ── Step 3: Build Remotion props ──────────────────────────────────────────
     const segmentFrames = calcSegmentFrames(duration);
@@ -306,9 +308,9 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
       keyPoints: input.keyPoints,
       example: input.example,
       summary: input.summary,
-      quizTeaser: input.quizTeaser,
+      ...(input.quizTeaser ? { quizTeaser: input.quizTeaser } : {}),
       audioSrc: audioUrl, // browser-readable durable narration asset
-      backgroundImageSrc,
+      ...(backgroundImageSrc ? { backgroundImageSrc } : {}),
       instructorName: instructor.name,
       instructorTitle: instructor.title,
       instructorImageSrc: CANONICAL_PACKAGED_INSTRUCTOR_IMAGE,
@@ -330,7 +332,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
     const composition = await selectComposition({
       serveUrl: bundleUrl,
-      browserExecutable,
+      ...(browserExecutable ? { browserExecutable } : {}),
       id: 'ElevateLesson',
       inputProps: compositionProps,
     });
@@ -351,7 +353,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     await renderMedia({
       composition,
       serveUrl: bundleUrl,
-      browserExecutable,
+      ...(browserExecutable ? { browserExecutable } : {}),
       codec: 'h264',
       outputLocation: paths.videoPath,
       inputProps: compositionProps,
@@ -433,8 +435,10 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
           if (completed.result_url) {
             clipUrl = completed.result_url;
             lipSyncedInstructor = true;
+            const currentScene = resolvedStoryboard.scenes[index];
+            if (!currentScene) throw new Error(`MEDIA_SCENE_MISSING:${index}`);
             resolvedStoryboard.scenes[index] = {
-              ...resolvedStoryboard.scenes[index],
+              ...currentScene,
               sourceVideoUrl: clipUrl,
               referenceImageUrl: CANONICAL_TALKING_INSTRUCTOR_IMAGE,
               resolvedProvider: 'd-id',
@@ -461,12 +465,12 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
           generated = await generateGpuVideo({
             prompt: scenePrompt(scene, input.storyboard.characters),
             operation: imageUrl ? 'imageToVideo' : 'textToVideo',
-            imageUrl: imageUrl || undefined,
+            ...(imageUrl ? { imageUrl } : {}),
             width: input.storyboard.width,
             height: input.storyboard.height,
             durationSeconds: Math.min(15, Math.max(4, scene.durationSeconds)),
-            seed: scene.seed,
-            negativePrompt: scene.negativePrompt,
+            ...(scene.seed !== undefined ? { seed: scene.seed } : {}),
+            ...(scene.negativePrompt ? { negativePrompt: scene.negativePrompt } : {}),
           });
           if (generated) {
             const buffer = await downloadGpuVideoAsset(generated);
@@ -475,10 +479,12 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
               `${input.lessonId}-scene-${index + 1}`,
               'mp4',
             );
+            const currentScene = resolvedStoryboard.scenes[index];
+            if (!currentScene) throw new Error(`MEDIA_SCENE_MISSING:${index}`);
             resolvedStoryboard.scenes[index] = {
-              ...resolvedStoryboard.scenes[index],
+              ...currentScene,
               operation: imageUrl ? 'imageToVideo' : 'textToVideo',
-              referenceImageUrl: imageUrl || undefined,
+              ...(imageUrl ? { referenceImageUrl: imageUrl } : {}),
               sourceVideoUrl: clipUrl,
               resolvedProvider: generated.provider,
               resolvedModel: generated.provider === 'wan' ? 'Wan' : 'LTX-Video',
@@ -501,26 +507,21 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
           perPage: 8,
         });
       }
+      const currentScene = resolvedStoryboard.scenes[index];
+      if (!currentScene) throw new Error(`MEDIA_SCENE_MISSING:${index}`);
+      const resolvedProvider = instructionalLayout
+        ? 'remotion'
+        : currentScene.resolvedProvider ||
+          (clipUrl ? 'pexels' : imageUrl?.includes('pollinations') ? 'pollinations' : imageUrl ? 'pexels' : undefined);
+      const resolvedModel = instructionalLayout
+        ? `deterministic-${instructionalLayout.kind}`
+        : currentScene.resolvedModel || (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined);
       resolvedStoryboard.scenes[index] = {
-        ...resolvedStoryboard.scenes[index],
-        referenceImageUrl: imageUrl || undefined,
-        sourceVideoUrl: clipUrl || undefined,
-        resolvedProvider:
-          instructionalLayout
-            ? 'remotion'
-            : resolvedStoryboard.scenes[index].resolvedProvider ||
-              (clipUrl
-                ? 'pexels'
-                : imageUrl?.includes('pollinations')
-                  ? 'pollinations'
-                  : imageUrl
-                    ? 'pexels'
-                    : undefined),
-        resolvedModel:
-          instructionalLayout
-            ? `deterministic-${instructionalLayout.kind}`
-            : resolvedStoryboard.scenes[index].resolvedModel ||
-              (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined),
+        ...currentScene,
+        ...(imageUrl ? { referenceImageUrl: imageUrl } : {}),
+        ...(clipUrl ? { sourceVideoUrl: clipUrl } : {}),
+        ...(resolvedProvider ? { resolvedProvider } : {}),
+        ...(resolvedModel ? { resolvedModel } : {}),
       };
       const narrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60) + 1;
       const durationSeconds = Math.max(scene.durationSeconds, narrationSeconds, 4);
@@ -558,7 +559,7 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
     const selected = await selectComposition({
       serveUrl: bundleUrl,
-      browserExecutable,
+      ...(browserExecutable ? { browserExecutable } : {}),
       id: 'SlideLesson',
       inputProps: props,
     });
@@ -566,7 +567,7 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
     await renderMedia({
       composition,
       serveUrl: bundleUrl,
-      browserExecutable,
+      ...(browserExecutable ? { browserExecutable } : {}),
       codec: 'h264',
       outputLocation: paths.videoPath,
       inputProps: props,
@@ -620,8 +621,7 @@ export async function renderLessonVideoBatch(
 ): Promise<BatchRenderResult[]> {
   const results: BatchRenderResult[] = [];
 
-  for (let i = 0; i < lessons.length; i++) {
-    const lesson = lessons[i];
+  for (const [i, lesson] of lessons.entries()) {
     onProgress?.(i, lessons.length, lesson);
 
     const result = await renderLessonVideo(lesson);
@@ -633,7 +633,8 @@ export async function renderLessonVideoBatch(
     }
   }
 
-  onProgress?.(lessons.length, lessons.length, lessons[lessons.length - 1]);
+  const lastLesson = lessons.at(-1);
+  if (lastLesson) onProgress?.(lessons.length, lessons.length, lastLesson);
   return results;
 }
 

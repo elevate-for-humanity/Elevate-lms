@@ -34,16 +34,23 @@ async function fetchPublishedDbProgram(slug: string): Promise<PublishedDbProgram
   const db = createPublicClient();
   if (!db) return null;
 
-  const { data: row } = await db
-    .from('programs')
-    .select('slug,title,description,short_description,credential,duration_weeks,image_url,category,published,is_active,status')
-    .eq('slug', slug)
-    .eq('published', true)
-    .eq('is_active', true)
-    .neq('status', 'archived')
-    .maybeSingle();
+  try {
+    const { data: row } = await db
+      .from('programs')
+      .select('slug,title,description,short_description,credential,duration_weeks,image_url,category,published,is_active,status')
+      .eq('slug', slug)
+      .eq('published', true)
+      .eq('is_active', true)
+      .neq('status', 'archived')
+      .maybeSingle();
 
-  return row ? (row as PublishedDbProgramRow) : null;
+    return row ? (row as PublishedDbProgramRow) : null;
+  } catch {
+    // Dedicated, governed program routes provide their own static fallback.
+    // A transient CMS/network failure must not turn those public routes into a
+    // server error before the route can apply that fallback.
+    return null;
+  }
 }
 
 export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgramPage | null> {

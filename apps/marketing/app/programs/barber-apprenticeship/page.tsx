@@ -69,7 +69,7 @@ export default async function BarberApprenticeshipPage() {
         src={BARBER_HERO_IMAGE}
         alt="Barber apprentice receiving supervised hands-on training in an approved host shop"
         analyticsName="barber-apprenticeship"
-        heightStyle="h-[38vh] min-h-[320px] max-h-[520px]"
+        heightStyle="h-[clamp(420px,58vh,720px)]"
         transcript="Barber apprenticeship training in a professional shop environment."
       />
 

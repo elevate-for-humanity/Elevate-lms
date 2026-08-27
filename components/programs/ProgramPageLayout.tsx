@@ -197,7 +197,7 @@ export default function ProgramPageLayout({
         }
         if (c.heroImage) {
           return (
-            <div className="relative h-[38vh] min-h-[280px] max-h-[520px] w-full overflow-hidden">
+            <div className="relative h-[clamp(420px,58vh,720px)] w-full overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
               <Image
                 src={c.heroImage}

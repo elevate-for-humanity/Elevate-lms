@@ -694,7 +694,7 @@ export function PremiumTestingCenter() {
     <main className="bg-white">
       
       {/* ===== CINEMATIC HERO ===== */}
-      <section className="relative h-[38vh] min-h-[360px] max-h-[520px] flex items-center overflow-hidden bg-slate-900">
+      <section className="relative h-[clamp(420px,58vh,720px)] flex items-center overflow-hidden bg-slate-900">
         <div className="absolute inset-0">
           <Image
             src="/images/pages/testing-page-1.webp"

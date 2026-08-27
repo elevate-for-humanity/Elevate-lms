@@ -39,7 +39,7 @@ export default function BarberCompetencyRubricPage() {
         </div>
       </div>
 
-      <section className="relative isolate h-[38vh] min-h-[320px] max-h-[520px] overflow-hidden bg-slate-950">
+      <section className="relative isolate h-[clamp(420px,58vh,720px)] overflow-hidden bg-slate-950">
         <Image
           src="/images/barber-hero-new.webp"
           alt="Barber apprentice demonstrating a supervised technical skill"

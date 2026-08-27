@@ -33,7 +33,7 @@ export interface HeroPictureProps {
   analyticsName?: string;
   className?: string;
   children?: React.ReactNode;
-  /** Canonical default is 38vh / 260–520px. Override only intentionally. */
+  /** Canonical site-wide hero height. Override only for a documented layout need. */
   heightStyle?: string;
   priority?: boolean;
 }
@@ -56,7 +56,7 @@ export default function HeroPicture({
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
-  const canonicalHeight = 'h-[38vh] min-h-[260px] max-h-[520px]';
+  const canonicalHeight = 'h-[clamp(420px,58vh,720px)]';
 
   return (
     <div className={`w-full ${className}`}>

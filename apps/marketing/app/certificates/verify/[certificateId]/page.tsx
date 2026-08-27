@@ -73,7 +73,7 @@ export default async function VerifyCertificatePage({
     return (
       <div className="min-h-screen bg-slate-50">
         {/* Hero Section */}
-        <section className="relative h-[38vh] min-h-[220px] max-h-[420px] w-full flex items-center justify-center text-white overflow-hidden">
+        <section className="relative h-[clamp(420px,58vh,720px)] w-full flex items-center justify-center text-white overflow-hidden">
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="

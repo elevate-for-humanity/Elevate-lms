@@ -86,7 +86,7 @@ export default async function BookingPage() {
       </div>
 
       <section className="relative w-full">
-        <div className="relative h-[38vh] min-h-[320px] max-h-[520px] w-full overflow-hidden">
+        <div className="relative h-[clamp(420px,58vh,720px)] w-full overflow-hidden">
           <Image
             src="/images/hero/hero-career-services.webp"
             alt="Elevate for Humanity appointment and advising team"

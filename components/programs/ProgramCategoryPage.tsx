@@ -87,7 +87,7 @@ export default function ProgramCategoryPage({
   return (
     <div className="min-h-screen bg-white">
       {/* Hero — video frame only, no text overlay */}
-      <section className="relative w-full h-[38vh] min-h-[280px] max-h-[520px] overflow-hidden">
+      <section className="relative h-[clamp(420px,58vh,720px)] w-full overflow-hidden">
         <UltraVideoPlayer
           src={heroVideoSrc}
           autoPlayOnMount

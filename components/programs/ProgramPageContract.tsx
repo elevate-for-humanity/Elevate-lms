@@ -146,7 +146,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       </div>
 
       {/* HERO */}
-      <section className="relative h-[38vh] min-h-[320px] max-h-[520px] flex items-center">
+      <section className="relative h-[clamp(420px,58vh,720px)] flex items-center">
         {config.heroVideo ? (
           <UltraVideoPlayer
             src={config.heroVideo}

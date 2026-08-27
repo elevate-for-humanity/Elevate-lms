@@ -97,7 +97,7 @@ export default function WritingCenterPage() {
       </div>
 
       {/* Hero Image */}
-      <section className="relative h-[38vh] min-h-[320px] max-h-[520px] overflow-hidden">
+      <section className="relative h-[clamp(420px,58vh,720px)] overflow-hidden">
         <Image
           src="/images/hero-banner.webp"
           alt="Student receiving writing assistance at the Elevate Writing Center"

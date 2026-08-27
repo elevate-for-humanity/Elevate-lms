@@ -40,7 +40,7 @@ export default async function CareerCounselingPage() {
 
       {/* Hero — standard size, title below */}
       <section className="relative w-full">
-        <div className="relative h-[38vh] min-h-[320px] max-h-[520px] w-full overflow-hidden">
+        <div className="relative h-[clamp(420px,58vh,720px)] w-full overflow-hidden">
           <Image
             src="/images/pages/career-counseling-page-1.webp"
             alt="Career counseling and guidance"

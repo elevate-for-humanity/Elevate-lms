@@ -11,11 +11,12 @@ function clean(value: string): string {
 
 /** Registrable/root domain used when code derives service hosts such as admin.*. */
 function canonicalDomain(value: string): string {
-  const domain = String(value || '')
+  const normalized = String(value || '')
     .trim()
     .toLowerCase()
     .replace(/^https?:\/\//, '')
-    .split('/')[0]
+  const [hostname = ''] = normalized.split('/');
+  const domain = hostname
     .replace(/\.$/, '')
     .replace(/^www\./, '');
   return domain || 'elevateforhumanity.org';

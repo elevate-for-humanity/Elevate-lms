@@ -18,7 +18,7 @@ export function generateId(): string {
  * Generate a short ID (first 8 characters of UUID)
  */
 export function generateShortId(): string {
-  return uuidv4().split('-')[0];
+  return uuidv4().slice(0, 8);
 }
 
 /**

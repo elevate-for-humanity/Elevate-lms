@@ -26,6 +26,9 @@ async function _POST(request: Request, { params }: { params: Promise<{ id: strin
     const { submissionText, submissionUrl, filePath } = body;
 
     const supabase = await createServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Assignment service unavailable' }, { status: 503 });
+    }
 
     // Check if submission already exists
     const { data: existing } = await supabase

@@ -103,7 +103,15 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     // A single GPU clip is a valid terminal asset only for a single-scene plan.
     // Multi-scene instructional clips must continue to the compositor so the
     // remaining objective-aligned scenes are not discarded.
-    if (isMicroclip && storyboard.scenes.length === 1 && (await gpuVideoAvailable())) {
+    // Direct GPU microclips do not currently produce the captions, transcript,
+    // or multi-scene evidence required by the canonical quality gate. Keep this
+    // expensive path opt-in until it can satisfy that same completion contract.
+    if (
+      process.env.ENABLE_GPU_INSTRUCTIONAL_SCENES === 'true' &&
+      isMicroclip &&
+      storyboard.scenes.length === 1 &&
+      (await gpuVideoAvailable())
+    ) {
       const scene = primaryScene;
       const requestedDuration = Math.min(15, Math.max(1, scene.durationSeconds));
       const gpuStartedAt = Date.now();

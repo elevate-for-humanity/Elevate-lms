@@ -7,7 +7,7 @@
  */
 
 import { execFile } from 'child_process';
-import { readFile, stat, unlink } from 'fs/promises';
+import { mkdtemp, readFile, rm, stat, unlink, writeFile } from 'fs/promises';
 import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
@@ -27,6 +27,40 @@ const DEFAULT_R2_MIN_BYTES = 5 * 1024 * 1024; // 5 MB
 // rejects large single-request MP4 uploads with 413 before that bucket limit.
 export const SUPABASE_SAFE_VIDEO_BYTES = 45 * 1024 * 1024;
 const execFileAsync = promisify(execFile);
+
+async function compressVideoBufferForSupabase(buffer: Buffer): Promise<Buffer> {
+  if (buffer.length <= SUPABASE_SAFE_VIDEO_BYTES) return buffer;
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), 'elevate-video-upload-'));
+  const sourcePath = path.join(tempDir, 'source.mp4');
+  const outputPath = path.join(tempDir, 'upload.mp4');
+  try {
+    await writeFile(sourcePath, buffer);
+    await execFileAsync(
+      'ffmpeg',
+      [
+        '-y', '-i', sourcePath,
+        '-vf', 'scale=min(1280\\,iw):-2',
+        ...videoEncoderArgs(27),
+        '-maxrate', '3M', '-bufsize', '6M',
+        '-c:a', 'aac', '-b:a', '128k',
+        '-movflags', '+faststart',
+        outputPath,
+      ],
+      { timeout: 20 * 60 * 1000, maxBuffer: 2 * 1024 * 1024 },
+    );
+    const compressed = await readFile(outputPath);
+    if (compressed.length > SUPABASE_SAFE_VIDEO_BYTES) {
+      throw new Error(`Compressed video is still too large for Supabase (${compressed.length} bytes)`);
+    }
+    logger.info('[upload-lesson-media] compressed oversized video buffer', {
+      sourceBytes: buffer.length,
+      uploadBytes: compressed.length,
+    });
+    return compressed;
+  } finally {
+    await rm(tempDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
 
 export function resolveCourseVideoStorageBackend(): CourseVideoStorageBackend {
   const raw = (process.env.COURSE_VIDEO_STORAGE_BACKEND ?? 'auto').toLowerCase().trim();
@@ -134,7 +168,10 @@ export async function uploadCourseVideosObject(
       logger.warn('[upload-lesson-media] R2 upload failed, falling back to Supabase', { err });
     }
   }
-  return uploadCourseVideosToSupabase(buffer, storagePath, contentType);
+  const uploadBuffer = contentType.startsWith('video/')
+    ? await compressVideoBufferForSupabase(buffer)
+    : buffer;
+  return uploadCourseVideosToSupabase(uploadBuffer, storagePath, contentType);
 }
 
 export async function uploadLessonMediaBuffer(

@@ -132,12 +132,26 @@ describe('canonical Course Factory media architecture', () => {
     expect(acceptance).toContain('EXPECTED_MEDIA = 105');
   });
 
-  it('authorizes course-scoped recovery for Business acceptance without replacing completed assets', () => {
+  it('uses bounded course-scoped recovery for Business acceptance without replacing completed assets', () => {
     const acceptance = read('scripts/course-factory/build-business-program.ts');
-    expect(acceptance).toContain("recoverCourseMediaJobs({ courseId, force: true })");
+    expect(acceptance).toContain('recoverCourseMediaJobs({ courseId })');
+    expect(acceptance).not.toContain("recoverCourseMediaJobs({ courseId, force: true })");
     expect(acceptance).toContain('Authorized media recovery left blocked jobs');
     expect(acceptance).toContain('EXPECTED_MAIN_VIDEOS = 35');
     expect(acceptance).toContain('EXPECTED_MICROCLIPS = 70');
+  });
+
+  it('keeps speculative instructional GPU rendering disabled by default', () => {
+    const worker = read('lib/video/process-video-job.ts');
+    const renderer = read('lib/video/remotion-render.ts');
+    expect(worker).toContain("process.env.ENABLE_GPU_INSTRUCTIONAL_SCENES === 'true'");
+    expect(renderer).toContain("process.env.ENABLE_GPU_INSTRUCTIONAL_SCENES === 'true'");
+  });
+
+  it('compresses Supabase-bound GPU buffers as well as disk renders', () => {
+    const uploader = read('lib/video/upload-lesson-media.ts');
+    expect(uploader).toContain('compressVideoBufferForSupabase(buffer)');
+    expect(uploader).toContain('compressed oversized video buffer');
   });
 
   it('normalizes packaged instructor paths to a durable URL before Remotion rendering', () => {

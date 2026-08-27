@@ -80,7 +80,10 @@ export async function resetCanonicalMediaJob(
 
   const job = data as VideoJob;
   if (job.status === 'complete' && !options.force) return job;
-  if ((job.retry_count ?? 0) >= COURSE_MEDIA_MAX_RETRIES && !options.force) {
+  // Force may bypass backoff and terminal classification for an operator repair,
+  // but it must never bypass the hard retry ceiling. Otherwise deterministic
+  // renderer failures loop forever and repeatedly consume paid GPU capacity.
+  if ((job.retry_count ?? 0) >= COURSE_MEDIA_MAX_RETRIES) {
     throw new Error(`Retry limit reached for media job ${job.id}`);
   }
   if (job.status === 'failed' && !isCourseMediaFailureRetryable(job.error_message) && !options.force) {

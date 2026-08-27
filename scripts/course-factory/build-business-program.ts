@@ -433,7 +433,7 @@ async function main() {
   // Reset only failed/stale media belonging to the canonical Business course
   // after the renderer/runtime defect has been corrected. Completed assets
   // remain untouched, and canonical job identities prevent duplicates.
-  const recovery = await recoverCourseMediaJobs({ courseId, force: true });
+  const recovery = await recoverCourseMediaJobs({ courseId });
   console.log('[Business Course Builder] authorized course-scoped media recovery', recovery);
   if (recovery.blocked.length) {
     fail(`Authorized media recovery left blocked jobs: ${recovery.blocked.map((item) => `${item.jobId}: ${item.reason}`).join(' | ')}`);

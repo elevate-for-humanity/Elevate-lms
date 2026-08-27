@@ -6,6 +6,13 @@ import { logAuditEvent } from '@/lib/audit';
 // Resolved at request time — null when STRIPE_SECRET_KEY is absent (build/test)
 const stripe = getStripe();
 
+function requireStripe(): Stripe {
+  if (!stripe) {
+    throw new Error('Stripe is not configured');
+  }
+  return stripe;
+}
+
 // =====================================================
 // PAYMENT TYPES
 // =====================================================
@@ -28,7 +35,7 @@ export interface Payment {
   stripe_customer_id?: string;
   course_id?: string;
   description?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -62,9 +69,9 @@ export async function getOrCreateStripeCustomer(
   }
   // Create new Stripe customer
   if (!stripe) throw new Error('Stripe not configured');
-  const customer = await stripe.customers.create({
+  const customer = await requireStripe().customers.create({
     email,
-    name,
+    ...(name ? { name } : {}),
     metadata: {
       user_id: userId,
     },
@@ -85,7 +92,7 @@ export async function updateStripeCustomer(
     address?: Stripe.AddressParam;
   },
 ): Promise<void> {
-  await stripe.customers.update(customerId, updates);
+  await requireStripe().customers.update(customerId, updates);
 }
 // =====================================================
 // PAYMENT INTENT CREATION
@@ -124,7 +131,7 @@ export async function createCoursePaymentIntent(
     finalAmount = discount.finalAmount;
   }
   // Create payment intent
-  const paymentIntent = await stripe.paymentIntents.create({
+  const paymentIntent = await requireStripe().paymentIntents.create({
     amount: Math.round(finalAmount * 100), // Convert to cents
     currency,
     customer: customerId,
@@ -183,7 +190,7 @@ export async function createSubscriptionPaymentIntent(
     profile.email,
     `${profile.first_name} ${profile.last_name}`,
   );
-  const paymentIntent = await stripe.paymentIntents.create({
+  const paymentIntent = await requireStripe().paymentIntents.create({
     amount: Math.round(amount * 100),
     currency,
     customer: customerId,
@@ -229,7 +236,7 @@ export async function confirmPayment(
 ): Promise<{ success: boolean; enrollmentId?: string }> {
   const supabase = await createClient();
   // Get payment intent from Stripe
-  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  const paymentIntent = await requireStripe().paymentIntents.retrieve(paymentIntentId);
   if (paymentIntent.status !== 'succeeded') {
     return { success: false };
   }
@@ -314,10 +321,14 @@ export async function processRefund(
     return { success: false };
   }
   // Create refund in Stripe
-  const refund = await stripe.refunds.create({
+  const refundReason: Stripe.RefundCreateParams.Reason | undefined =
+    reason === 'duplicate' || reason === 'fraudulent' || reason === 'requested_by_customer'
+      ? reason
+      : undefined;
+  const refund = await requireStripe().refunds.create({
     payment_intent: payment.stripe_payment_intent_id,
-    amount: amount ? Math.round(amount * 100) : undefined,
-    reason: reason as any,
+    ...(amount ? { amount: Math.round(amount * 100) } : {}),
+    ...(refundReason ? { reason: refundReason } : {}),
   });
   // Update payment status
   await supabase
@@ -347,7 +358,7 @@ export async function processRefund(
  * Get customer payment methods
  */
 export async function getPaymentMethods(customerId: string): Promise<Stripe.PaymentMethod[]> {
-  const paymentMethods = await stripe.paymentMethods.list({
+  const paymentMethods = await requireStripe().paymentMethods.list({
     customer: customerId,
     type: 'card',
   });
@@ -360,7 +371,7 @@ export async function attachPaymentMethod(
   paymentMethodId: string,
   customerId: string,
 ): Promise<void> {
-  await stripe.paymentMethods.attach(paymentMethodId, {
+  await requireStripe().paymentMethods.attach(paymentMethodId, {
     customer: customerId,
   });
 }
@@ -368,7 +379,7 @@ export async function attachPaymentMethod(
  * Detach payment method from customer
  */
 export async function detachPaymentMethod(paymentMethodId: string): Promise<void> {
-  await stripe.paymentMethods.detach(paymentMethodId);
+  await requireStripe().paymentMethods.detach(paymentMethodId);
 }
 /**
  * Set default payment method
@@ -377,7 +388,7 @@ export async function setDefaultPaymentMethod(
   customerId: string,
   paymentMethodId: string,
 ): Promise<void> {
-  await stripe.customers.update(customerId, {
+  await requireStripe().customers.update(customerId, {
     invoice_settings: {
       default_payment_method: paymentMethodId,
     },
@@ -421,17 +432,19 @@ export async function createSubscription(
   if (paymentMethodId) {
     subscriptionData.default_payment_method = paymentMethodId;
   }
-  const subscription = await stripe.subscriptions.create(subscriptionData);
+  const subscription = await requireStripe().subscriptions.create(subscriptionData);
+  const subscriptionPeriod = subscription.items.data[0];
+  if (!subscriptionPeriod) {
+    throw new Error('Stripe subscription has no billing period');
+  }
   // Save subscription to database
   await supabase.from('subscriptions').insert({
     user_id: userId,
     stripe_subscription_id: subscription.id,
     stripe_customer_id: customerId,
     status: subscription.status,
-    current_period_start: new Date(
-      (subscription as any).current_period_start * 1000,
-    ).toISOString(),
-    current_period_end: new Date((subscription as any).current_period_end * 1000).toISOString(),
+    current_period_start: new Date(subscriptionPeriod.current_period_start * 1000).toISOString(),
+    current_period_end: new Date(subscriptionPeriod.current_period_end * 1000).toISOString(),
   });
   return subscription;
 }
@@ -444,9 +457,9 @@ export async function cancelSubscription(
 ): Promise<void> {
   const supabase = await createClient();
   if (immediately) {
-    await stripe.subscriptions.cancel(subscriptionId);
+    await requireStripe().subscriptions.cancel(subscriptionId);
   } else {
-    await stripe.subscriptions.update(subscriptionId, {
+    await requireStripe().subscriptions.update(subscriptionId, {
       cancel_at_period_end: true,
     });
   }
@@ -466,7 +479,7 @@ export async function cancelSubscription(
  */
 export async function getPaymentHistory(userId: string, limit: number = 50): Promise<Payment[]> {
   const supabase = await createClient();
-  const { data, error }: any = await supabase
+  const { data, error } = await supabase
     .from('payments')
     .select('*')
     .eq('user_id', userId)
@@ -480,7 +493,7 @@ export async function getPaymentHistory(userId: string, limit: number = 50): Pro
  */
 export async function getPayment(paymentId: string): Promise<Payment | null> {
   const supabase = await createClient();
-  const { data, error }: any = await supabase
+  const { data, error } = await supabase
     .from('payments')
     .select('*')
     .eq('id', paymentId)
@@ -499,7 +512,7 @@ export function verifyWebhookSignature(
   signature: string,
   secret: string,
 ): Stripe.Event {
-  return stripe.webhooks.constructEvent(payload, signature, secret);
+  return requireStripe().webhooks.constructEvent(payload, signature, secret);
 }
 /**
  * Handle Stripe webhook event
@@ -519,16 +532,18 @@ export async function handleStripeWebhook(event: Stripe.Event): Promise<void> {
     }
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription;
+      const subscriptionPeriod = subscription.items.data[0];
+      if (!subscriptionPeriod) {
+        throw new Error('Stripe subscription update has no billing period');
+      }
       await supabase
         .from('subscriptions')
         .update({
           status: subscription.status,
           current_period_start: new Date(
-            (subscription as any).current_period_start * 1000,
+            subscriptionPeriod.current_period_start * 1000,
           ).toISOString(),
-          current_period_end: new Date(
-            (subscription as any).current_period_end * 1000,
-          ).toISOString(),
+          current_period_end: new Date(subscriptionPeriod.current_period_end * 1000).toISOString(),
         })
         .eq('stripe_subscription_id', subscription.id);
       break;

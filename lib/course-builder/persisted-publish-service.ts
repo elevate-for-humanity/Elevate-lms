@@ -15,6 +15,8 @@ function hasContent(value: unknown): boolean {
 
 /**
  * Canonical persisted-course procurement gate.
+ * Static repository catalogs are intentionally unsupported; persisted records
+ * and their authorized review evidence are the only publication authority.
  * Automated validation proves completeness, but AI-authored instructional
  * material still requires an authorized human review before publication.
  */

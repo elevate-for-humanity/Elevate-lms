@@ -149,8 +149,14 @@ for (const file of files) {
   let fromMatch: RegExpExecArray | null;
   while ((fromMatch = fromRe.exec(source)) !== null) {
     const table = fromMatch[1].toLowerCase();
-    const nextFrom = source.indexOf('.from(', fromMatch.index + fromMatch[0].length);
-    const chainEnd = nextFrom >= 0 ? Math.min(nextFrom, fromMatch.index + 5000) : Math.min(source.length, fromMatch.index + 5000);
+    const scanStart = fromMatch.index + fromMatch[0].length;
+    const nextFrom = source.indexOf('.from(', scanStart);
+    const statementEnd = source.indexOf(';', scanStart);
+    const chainEnd = Math.min(
+      nextFrom >= 0 ? nextFrom : source.length,
+      statementEnd >= 0 ? statementEnd + 1 : source.length,
+      fromMatch.index + 5000,
+    );
     const chain = source.slice(fromMatch.index, chainEnd);
     const mutationRe = /\.(insert|update|upsert)\(\s*(?:\[\s*)?\{/g;
     let mutationMatch: RegExpExecArray | null;

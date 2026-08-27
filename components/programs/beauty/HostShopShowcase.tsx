@@ -10,6 +10,11 @@ const ROTATION_MS = 4000;
 
 export default function HostShopShowcase() {
   const shops = useMemo(() => FEATURED_BEAUTY_HOST_PARTNERS, []);
+  const slides = useMemo(() => shops.flatMap((shop) =>
+    shop.media?.length
+      ? shop.media.map((media) => ({ shop, media }))
+      : [{ shop, media: undefined }]
+  ), [shops]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -23,22 +28,21 @@ export default function HostShopShowcase() {
   }, []);
 
   useEffect(() => {
-    if (paused || reduceMotion || shops.length < 2) return;
+    if (paused || reduceMotion || slides.length < 2) return;
     const timer = window.setInterval(() => {
-      setActiveIndex((current) => (current + 1) % shops.length);
+      setActiveIndex((current) => (current + 1) % slides.length);
     }, ROTATION_MS);
     return () => window.clearInterval(timer);
-  }, [paused, reduceMotion, shops.length]);
+  }, [paused, reduceMotion, slides.length]);
 
-  if (!shops.length) return null;
+  if (!slides.length) return null;
 
-  const shop = shops[activeIndex];
-  const image = shop.media?.[0];
+  const { shop, media: image } = slides[activeIndex];
   const externalUrl = shop.websiteUrl ?? shop.onlineListingUrl ?? shop.socialUrl;
   const externalLabel = shop.websiteLabel ?? shop.onlineListingLabel ?? shop.socialLabel ?? 'Visit shop online';
 
   function go(delta: number) {
-    setActiveIndex((current) => (current + delta + shops.length) % shops.length);
+    setActiveIndex((current) => (current + delta + slides.length) % slides.length);
   }
 
   return (
@@ -88,7 +92,7 @@ export default function HostShopShowcase() {
 
             <div className="flex flex-col justify-center p-7 text-slate-950 sm:p-9 lg:p-10" aria-live="polite">
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
-                Featured host shop {activeIndex + 1} of {shops.length}
+                Host Shop gallery image {activeIndex + 1} of {slides.length}
               </p>
               <h3 className="mt-3 text-3xl font-black tracking-tight">{shop.dba ?? shop.name}</h3>
               {shop.dba ? <p className="mt-1 text-sm text-slate-600">Legal name: {shop.name}</p> : null}
@@ -121,13 +125,13 @@ export default function HostShopShowcase() {
 
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 px-5 py-4 sm:px-7">
             <div className="flex gap-2" aria-label="Choose a host shop slide">
-              {shops.map((item, index) => (
+              {slides.map(({ shop: item, media }, index) => (
                 <button
-                  key={item.slug}
+                  key={`${item.slug}-${media?.src ?? 'no-media'}`}
                   type="button"
                   onClick={() => setActiveIndex(index)}
                   className={`h-2.5 rounded-full transition-all ${index === activeIndex ? 'w-8 bg-brand-red-600' : 'w-2.5 bg-slate-300 hover:bg-slate-400'}`}
-                  aria-label={`Show ${item.dba ?? item.name}`}
+                  aria-label={`Show ${item.dba ?? item.name}${media ? ` — ${media.alt}` : ''}`}
                   aria-current={index === activeIndex ? 'true' : undefined}
                 />
               ))}

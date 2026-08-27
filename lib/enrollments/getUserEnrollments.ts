@@ -1,7 +1,8 @@
 /**
  * Unified enrollment resolver for learner dashboards.
  *
- * Internal/program access is sourced exactly once from program_enrollments.
+ * Program access is sourced from program_enrollments. Direct course assignments
+ * are sourced from course_enrollments and de-duplicated by course id.
  * Partner LMS access remains separate because it is a different delivery concern.
  * Legacy training_enrollments / student_enrollments aliases are intentionally not
  * queried here; compatibility surfaces must never become a second authority.
@@ -143,6 +144,41 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     };
     enrollment.continue_url = getContinueLearningUrl(mode, enrollment);
     results.push(enrollment);
+  }
+
+  const { data: courseEnrollments, error: courseEnrollmentError } = await supabase
+    .from('course_enrollments')
+    .select('id,student_id,course_id,status,progress,created_at,updated_at')
+    .eq('student_id', userId);
+
+  if (courseEnrollmentError) return { enrollments: results, error: courseEnrollmentError.message };
+
+  const directCourseIds = [...new Set((courseEnrollments ?? []).map((row) => row.course_id).filter(Boolean))] as string[];
+  const missingCourseIds = directCourseIds.filter((id) => !coursesById.has(id));
+  if (missingCourseIds.length) {
+    const { data: directCourses, error: directCoursesError } = await supabase
+      .from('courses')
+      .select('id,title,course_name,description,short_description,duration_hours')
+      .in('id', missingCourseIds);
+    if (directCoursesError) return { enrollments: results, error: directCoursesError.message };
+    for (const course of (directCourses ?? []) as CourseRow[]) coursesById.set(course.id, course);
+  }
+
+  const representedCourseIds = new Set(results.map((item) => item.course_id).filter(Boolean));
+  for (const row of courseEnrollments ?? []) {
+    if (!row.course_id || representedCourseIds.has(row.course_id)) continue;
+    const course = coursesById.get(row.course_id) ?? null;
+    results.push({
+      source_table: 'course_enrollments', enrollment_id: row.id, user_key: row.student_id,
+      program_id: null, program_slug: null, program_title: null, course_id: row.course_id,
+      course_title: course?.title ?? course?.course_name ?? null,
+      course_description: course?.description ?? course?.short_description ?? null,
+      duration_hours: course?.duration_hours ?? null, provider_id: null, provider_name: null,
+      status: row.status || 'active', progress: Number(row.progress ?? 0), delivery_mode: 'internal',
+      inferred_delivery_mode: false, continue_url: `/lms/courses/${row.course_id}`,
+      created_at: row.created_at, updated_at: row.updated_at ?? null,
+    });
+    representedCourseIds.add(row.course_id);
   }
 
   const { data: partnerEnrollments, error: partnerError } = await supabase

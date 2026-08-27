@@ -87,14 +87,14 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
     } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase
+    const { error } = await supabase
       .from('resumes')
       .upsert({
         user_id: user.id,
         resume_data: data,
         updated_at: new Date().toISOString(),
-      })
-      .catch(() => {});
+      });
+    if (error) throw error;
   };
 
   const handleSave = async () => {
@@ -296,9 +296,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     placeholder="Start Date"
                     value={exp.start_date}
                     onChange={(
-                      e: React.ChangeEvent<
-                        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-                      >,
+                      e: React.ChangeEvent<HTMLInputElement>,
                     ) => {
                       const updated = [...resumeData.work_experience];
                       updated[index].start_date = e.target.value;
@@ -311,11 +309,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     placeholder="End Date"
                     value={exp.end_date}
                     disabled={exp.current}
-                    onChange={(
-                      e: React.ChangeEvent<
-                        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-                      >,
-                    ) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const updated = [...resumeData.work_experience];
                       updated[index].end_date = e.target.value;
                       setResumeData({ ...resumeData, work_experience: updated });
@@ -327,11 +321,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                   <input
                     type="checkbox"
                     checked={exp.current}
-                    onChange={(
-                      e: React.ChangeEvent<
-                        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-                      >,
-                    ) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const updated = [...resumeData.work_experience];
                       updated[index].current = e.target.checked;
                       setResumeData({ ...resumeData, work_experience: updated });

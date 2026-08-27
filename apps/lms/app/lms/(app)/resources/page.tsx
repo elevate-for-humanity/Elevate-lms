@@ -42,7 +42,7 @@ const resourceCategories = [
       {
         title: 'Resume Builder',
         description: 'Create a professional resume with our guided template',
-        href: '/career-services',
+        href: '/lms/resume-builder',
         type: 'tool',
       },
       {

@@ -19,6 +19,8 @@ interface Message {
   content: string;
 }
 
+const STORAGE_PREFIX = 'elevate:paris:conversation:';
+
 interface ParisChatProps {
   onComplete?: (recommendations: string[]) => void;
   showHeader?: boolean;
@@ -71,6 +73,27 @@ export default function ParisChat({
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    try {
+      const saved = window.sessionStorage.getItem(`${STORAGE_PREFIX}${surface}`);
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.every((item) => item?.role && typeof item?.content === 'string')) {
+        setMessages(parsed.slice(-20));
+      }
+    } catch {
+      // Storage availability must never block the assistant.
+    }
+  }, [surface]);
+
+  useEffect(() => {
+    try {
+      window.sessionStorage.setItem(`${STORAGE_PREFIX}${surface}`, JSON.stringify(messages.slice(-20)));
+    } catch {
+      // Keep the conversation in component memory when storage is unavailable.
+    }
+  }, [messages, surface]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

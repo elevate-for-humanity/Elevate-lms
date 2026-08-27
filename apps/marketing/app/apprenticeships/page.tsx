@@ -5,6 +5,7 @@ import { ArrowRight, BriefcaseBusiness, GraduationCap, MapPin, ShieldCheck } fro
 import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
+import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
 
 export const metadata: Metadata = {
   title: 'Apprenticeship Programs | Elevate for Humanity',
@@ -95,6 +96,8 @@ export default function ApprenticeshipsPage() {
           ))}
         </div>
       </section>
+
+      <HostShopShowcase />
 
       <section id="programs" className="px-4 py-14 sm:py-20">
         <div className="mx-auto max-w-6xl">

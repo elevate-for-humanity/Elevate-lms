@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { updateProfile } from './actions';
+import { ProfilePhotoEditor } from './ProfilePhotoEditor';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,6 +79,7 @@ export default async function ProfilePage() {
             </div>
           </div>
         </div>
+        <div className="mb-6"><ProfilePhotoEditor currentUrl={profile?.avatar_url} name={profile?.full_name || 'Learner'} /></div>
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h2 className="text-lg font-semibold mb-4">Edit Profile</h2>
           <form action={updateProfile} className="space-y-4">

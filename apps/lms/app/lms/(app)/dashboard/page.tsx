@@ -21,7 +21,6 @@ import { requireRole } from '@/lib/auth/require-role';
 import { NotificationBell } from '@/components/lms/NotificationBell';
 import { GlobalSearch } from '@/components/lms/GlobalSearch';
 import WorkOneChecklistSection from '@/components/workone/WorkOneChecklist';
-import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import { loadLearnerWorkspace } from '@/lib/learner/workspace';
 import { getActiveJobs } from '@/lib/data/jobs';
@@ -520,14 +519,6 @@ export default async function StudentDashboard() {
         </div>
       </div>
 
-      {activeCourseIsAvailable ? (
-        <ParisFloatingWrapper
-          surface="learner"
-          courseProgress={courseProgress}
-          {...(activeCourse?.title ? { courseTitle: activeCourse.title } : {})}
-          {...(nextLesson?.title ? { nextLessonTitle: nextLesson.title } : {})}
-        />
-      ) : null}
     </div>
   );
 }

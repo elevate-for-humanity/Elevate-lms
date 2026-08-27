@@ -7,6 +7,7 @@ export type DeliveryMode = 'internal' | 'partner' | 'hybrid';
 
 export type EnrollmentSource =
   | 'enrollments'
+  | 'course_enrollments'
   | 'program_enrollments'
   | 'partner_enrollments'
   | 'partner_lms_enrollments';
@@ -45,6 +46,7 @@ function inferFromSource(source: EnrollmentSource): DeliveryMode {
       return 'partner';
     case 'program_enrollments':
       return 'hybrid';
+    case 'course_enrollments':
     case 'enrollments':
     default:
       return 'internal';

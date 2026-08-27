@@ -15,6 +15,7 @@
 
 import { aiChat } from '@/lib/ai';
 import { logger } from '@/lib/logger';
+import { getRAGContext } from '@/lib/platform/rag';
 
 // ─── Output types ─────────────────────────────────────────────────────────────
 
@@ -273,8 +274,32 @@ function validateCourse(data: unknown): GeneratedCourse {
 // ─── Main generator ────────────────────────────────────────────────────────────
 
 export async function generateCourse(opts: CourseGeneratorOptions): Promise<GeneratedCourse> {
+  // Ground generation in the existing Supabase/pgvector knowledge base. The
+  // helper degrades to an empty string when embeddings or Supabase are not
+  // configured, so course creation remains available through provider failover.
+  const ragContext = await getRAGContext([
+    opts.courseTitle,
+    opts.prompt,
+    opts.audience,
+    opts.difficulty,
+  ].filter(Boolean).join('\n'));
+
+  const systemPrompt = [
+    buildSystemPrompt(),
+    ragContext
+      ? [
+          '',
+          'Use the retrieved source material below as evidence. Preserve credential',
+          'names, versions, exam domains, safety requirements, and compliance facts.',
+          'Do not invent requirements that are not supported by the retrieved context.',
+          '',
+          ragContext,
+        ].join('\n')
+      : '',
+  ].filter(Boolean).join('\n');
+
   const messages = [
-    { role: 'system' as const, content: buildSystemPrompt() },
+    { role: 'system' as const, content: systemPrompt },
     { role: 'user' as const, content: buildUserPrompt(opts) },
   ];
 

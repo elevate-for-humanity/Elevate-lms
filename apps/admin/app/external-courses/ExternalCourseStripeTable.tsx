@@ -32,34 +32,45 @@ const PAYER_LABELS: Record<PayerRule, string> = {
   always_elevate: 'Elevate always pays',
 };
 
+function createRowState(item: Item): RowState {
+  return {
+    cost_cents: item.cost_cents != null ? String(item.cost_cents) : '0',
+    payer_rule: item.payer_rule ?? 'always_student',
+    syncing: false,
+    synced: false,
+    error: null,
+  };
+}
+
+function isPayerRule(value: string): value is PayerRule {
+  return value in PAYER_LABELS;
+}
+
 export default function ExternalCourseStripeTable({ items }: { items: Item[] }) {
   const [rows, setRows] = useState<Record<string, RowState>>(() => {
     const init: Record<string, RowState> = {};
     for (const item of items) {
-      init[item.id] = {
-        cost_cents: item.cost_cents != null ? String(item.cost_cents) : '0',
-        payer_rule: item.payer_rule ?? 'always_student',
-        syncing: false,
-        synced: false,
-        error: null,
-      };
+      init[item.id] = createRowState(item);
     }
     return init;
   });
 
-  function update(id: string, patch: Partial<RowState>) {
-    setRows((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
+  function update(item: Item, patch: Partial<RowState>) {
+    setRows((prev) => ({
+      ...prev,
+      [item.id]: { ...(prev[item.id] ?? createRowState(item)), ...patch },
+    }));
   }
 
   async function syncRow(item: Item) {
-    const row = rows[item.id];
+    const row = rows[item.id] ?? createRowState(item);
     const cost = parseInt(row.cost_cents, 10);
     if (isNaN(cost) || cost < 0) {
-      update(item.id, { error: 'Cost must be a non-negative integer (cents)' });
+      update(item, { error: 'Cost must be a non-negative integer (cents)' });
       return;
     }
 
-    update(item.id, { syncing: true, error: null, synced: false });
+    update(item, { syncing: true, error: null, synced: false });
 
     try {
       const res = await fetch(`/api/admin/external-courses/${item.id}/sync-stripe`, {
@@ -69,12 +80,12 @@ export default function ExternalCourseStripeTable({ items }: { items: Item[] }) 
       });
       const json = await res.json();
       if (!res.ok) {
-        update(item.id, { syncing: false, error: json.error ?? 'Sync failed' });
+        update(item, { syncing: false, error: json.error ?? 'Sync failed' });
         return;
       }
-      update(item.id, { syncing: false, synced: true });
+      update(item, { syncing: false, synced: true });
     } catch {
-      update(item.id, { syncing: false, error: 'Network error' });
+      update(item, { syncing: false, error: 'Network error' });
     }
   }
 
@@ -100,7 +111,7 @@ export default function ExternalCourseStripeTable({ items }: { items: Item[] }) 
         </thead>
         <tbody className="divide-y divide-slate-100">
           {items.map((item) => {
-            const row = rows[item.id];
+            const row = rows[item.id] ?? createRowState(item);
             const isSynced = !!item.stripe_product_id || row.synced;
 
             return (
@@ -137,7 +148,7 @@ export default function ExternalCourseStripeTable({ items }: { items: Item[] }) 
                       step={1}
                       value={row.cost_cents}
                       onChange={(e) =>
-                        update(item.id, { cost_cents: e.target.value, synced: false })
+                        update(item, { cost_cents: e.target.value, synced: false })
                       }
                       className="w-24 border border-slate-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                     />
@@ -153,9 +164,11 @@ export default function ExternalCourseStripeTable({ items }: { items: Item[] }) 
                 <td className="px-4 py-3">
                   <select
                     value={row.payer_rule}
-                    onChange={(e) =>
-                      update(item.id, { payer_rule: e.target.value as PayerRule, synced: false })
-                    }
+                    onChange={(e) => {
+                      if (isPayerRule(e.target.value)) {
+                        update(item, { payer_rule: e.target.value, synced: false });
+                      }
+                    }}
                     className="border border-slate-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                   >
                     {(Object.keys(PAYER_LABELS) as PayerRule[]).map((k) => (

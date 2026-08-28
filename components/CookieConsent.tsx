@@ -15,6 +15,7 @@ function persistConsent(choice: ConsentChoice) {
   document.cookie = `${CONSENT_COOKIE}=${choice}; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
   localStorage.setItem(CONSENT_STORAGE, choice);
   localStorage.setItem('cookie-consent-date', new Date().toISOString());
+  window.dispatchEvent(new CustomEvent('efh:cookie-consent', { detail: { choice } }));
 }
 
 export default function CookieConsent() {
@@ -131,8 +132,12 @@ export default function CookieConsent() {
               <h2 id="cookie-consent-title" className="font-semibold text-slate-950">
                 Cookie preferences
               </h2>
-              <p id="cookie-consent-description" className="mt-1 text-sm leading-relaxed text-slate-700">
-                Necessary cookies keep the site working. Analytics and advertising cookies are optional and remain off unless you accept them.{' '}
+              <p
+                id="cookie-consent-description"
+                className="mt-1 text-sm leading-relaxed text-slate-700"
+              >
+                Necessary cookies keep the site working. Analytics and advertising cookies are
+                optional and remain off unless you accept them.{' '}
                 <Link
                   href="/legal/privacy"
                   className="font-medium text-brand-blue-700 underline underline-offset-2 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
@@ -164,7 +169,9 @@ export default function CookieConsent() {
                 className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2"
                 aria-label="Close and use necessary cookies only"
               >
-                <span aria-hidden="true" className="text-xl leading-none">×</span>
+                <span aria-hidden="true" className="text-xl leading-none">
+                  ×
+                </span>
               </button>
             </div>
           </div>

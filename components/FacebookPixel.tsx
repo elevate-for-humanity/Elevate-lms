@@ -1,145 +1,131 @@
 'use client';
 
-import React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
-import { useEffect, useState } from 'react';
-import Script from 'next/script';
+type MetaPixelFunction = ((...args: unknown[]) => void) & {
+  callMethod?: (...args: unknown[]) => void;
+  queue?: unknown[][];
+  loaded?: boolean;
+  version?: string;
+  push?: (...args: unknown[]) => void;
+};
 
 declare global {
   interface Window {
-    fbq?: (...args: any[]) => void;
-    _fbq?: (...args: any[]) => void;
+    fbq?: MetaPixelFunction;
+    _fbq?: MetaPixelFunction;
   }
 }
 
-const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
+const META_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
+const CONSENT_KEY = 'cookie-consent';
+const CONSENT_EVENT = 'efh:cookie-consent';
+const SCRIPT_ID = 'meta-pixel-script';
 
+function hasMarketingConsent(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(CONSENT_KEY) === 'accepted';
+  } catch {
+    return false;
+  }
+}
+
+function initializePixel(): void {
+  if (!META_PIXEL_ID || typeof window === 'undefined' || window.fbq) return;
+
+  const fbq = function (...args: unknown[]) {
+    if (fbq.callMethod) fbq.callMethod(...args);
+    else fbq.queue?.push(args);
+  } as MetaPixelFunction;
+
+  fbq.push = fbq;
+  fbq.loaded = true;
+  fbq.version = '2.0';
+  fbq.queue = [];
+  window.fbq = fbq;
+  window._fbq = fbq;
+  fbq('init', META_PIXEL_ID);
+
+  if (!document.getElementById(SCRIPT_ID)) {
+    const script = document.createElement('script');
+    script.id = SCRIPT_ID;
+    script.async = true;
+    script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+    document.head.appendChild(script);
+  }
+}
+
+/** Loads Meta Pixel only after affirmative optional-cookie consent. */
 export default function FacebookPixel() {
-  const [mounted, setMounted] = useState(false);
-  const [pathname, setPathname] = useState<string>('');
+  const pathname = usePathname();
+  const [enabled, setEnabled] = useState(false);
+  const previousPath = useRef<string | null>(null);
 
-  // Mount on client only
   useEffect(() => {
-    setMounted(true);
+    const syncConsent = () => setEnabled(hasMarketingConsent());
+    syncConsent();
+    window.addEventListener(CONSENT_EVENT, syncConsent);
+    return () => window.removeEventListener(CONSENT_EVENT, syncConsent);
   }, []);
 
-  // Get pathname safely after mount
   useEffect(() => {
-    if (mounted && typeof window !== 'undefined') {
-      try {
-        setPathname(window.location.pathname);
-      } catch (error) {
-        /* Error handled silently */
-      }
-    }
-  }, [mounted]);
+    if (!enabled || !META_PIXEL_ID) return;
+    initializePixel();
+    if (previousPath.current === pathname) return;
+    previousPath.current = pathname;
+    window.fbq?.('track', 'PageView');
+  }, [enabled, pathname]);
 
-  // Track page views on route change (only after mounted)
-  useEffect(() => {
-    if (!mounted || !FB_PIXEL_ID || typeof window === 'undefined') return;
-
-    try {
-      // Track page view
-      if (window.fbq) {
-        window.fbq('track', 'PageView');
-      }
-    } catch (error) {
-      /* Error handled silently */
-      // Silently fail - don't break the app
-    }
-  }, [mounted, pathname]);
-
-  // Critical: server render and first client render both return null
-  if (!mounted || !FB_PIXEL_ID || typeof window === 'undefined') return null;
-
-  try {
-    return (
-      <>
-        <Script id="fb-pixel" strategy="lazyOnload">
-          {`
-            try {
-              !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window, document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '${FB_PIXEL_ID}');
-              fbq('track', 'PageView');
-            } catch (error) { /* Error handled silently */ }
-          `}
-        </Script>
-
-        <noscript>
-          {/* Tracking pixel - empty alt is intentional for decorative/tracking images */}
-          {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
-          <img
-            height="1"
-            width="1"
-            style={{ display: 'none' }}
-            src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
-            alt="Tracking pixel"
-            aria-hidden="true"
-            role="presentation"
-          />
-        </noscript>
-      </>
-    );
-  } catch (error) {
-    /* Error handled silently */
-    return null;
-  }
+  return null;
 }
 
-// Helper functions for tracking events
-export const trackFacebookEvent = (eventName: string, data?: Record<string, any>) => {
-  if (typeof window !== 'undefined' && window.fbq) {
-    window.fbq('track', eventName, data);
-  }
-};
+export function trackFacebookEvent(eventName: string, data?: Record<string, unknown>) {
+  if (!META_PIXEL_ID || !hasMarketingConsent() || typeof window === 'undefined') return;
+  initializePixel();
+  window.fbq?.('track', eventName, data ?? {});
+}
 
-// Predefined events
-export const trackCourseView = (courseId: string, courseName: string) => {
+export function trackFacebookCustomEvent(eventName: string, data?: Record<string, unknown>) {
+  if (!META_PIXEL_ID || !hasMarketingConsent() || typeof window === 'undefined') return;
+  initializePixel();
+  window.fbq?.('trackCustom', eventName, data ?? {});
+}
+
+export const trackCourseView = (courseId: string, courseName: string, value = 0) =>
   trackFacebookEvent('ViewContent', {
     content_name: courseName,
     content_category: 'Course',
     content_ids: [courseId],
     content_type: 'product',
+    value,
+    currency: 'USD',
   });
-};
 
-export const trackEnrollment = (courseId: string, courseName: string, value?: number) => {
+export const trackEnrollmentStart = (courseId: string, courseName: string, value = 0) =>
   trackFacebookEvent('InitiateCheckout', {
     content_name: courseName,
     content_category: 'Course',
     content_ids: [courseId],
-    value: value || 0,
+    content_type: 'product',
+    value,
     currency: 'USD',
   });
-};
 
-export const trackCourseCompletion = (courseId: string, courseName: string) => {
-  trackFacebookEvent('Purchase', {
-    content_name: courseName,
-    content_category: 'Course',
-    content_ids: [courseId],
-    value: 0,
-    currency: 'USD',
+export const trackApplicationLead = (programId: string, programName: string) =>
+  trackFacebookEvent('Lead', {
+    content_name: programName,
+    content_category: 'Program Application',
+    content_ids: [programId],
   });
-};
 
-export const trackSignup = (method: string = 'email') => {
+export const trackSignup = (method = 'email') =>
   trackFacebookEvent('CompleteRegistration', {
     content_name: 'User Signup',
     status: 'completed',
     method,
   });
-};
 
-export const trackSearch = (searchQuery: string) => {
-  trackFacebookEvent('Search', {
-    search_string: searchQuery,
-  });
-};
+export const trackSearch = (searchQuery: string) =>
+  trackFacebookEvent('Search', { search_string: searchQuery });

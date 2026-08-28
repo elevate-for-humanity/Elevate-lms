@@ -60,6 +60,18 @@ function safeGtag(command: string, ...args: any[]) {
   }
 }
 
+function safeMetaPixel(eventName: string, params: Record<string, unknown> = {}, custom = false) {
+  if (typeof window === 'undefined') return;
+  const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
+  if (!fbq) return;
+  try {
+    if (window.localStorage.getItem('cookie-consent') !== 'accepted') return;
+    fbq(custom ? 'trackCustom' : 'track', eventName, params);
+  } catch {
+    // Analytics must never interrupt an applicant or learner workflow.
+  }
+}
+
 // Track generic event
 export function trackEvent({
   action,
@@ -143,6 +155,13 @@ export const StoreFunnelEvents = {
       value: price,
       contentGroup: 'store',
     });
+    safeMetaPixel('ViewContent', {
+      content_ids: [productId],
+      content_name: productName,
+      content_type: 'product',
+      value: price || 0,
+      currency: 'USD',
+    });
   },
 
   // Checkout started
@@ -153,6 +172,12 @@ export const StoreFunnelEvents = {
       label: productId,
       value: value,
       contentGroup: 'store',
+    });
+    safeMetaPixel('InitiateCheckout', {
+      content_ids: [productId],
+      content_type: 'product',
+      value: value || 0,
+      currency: 'USD',
     });
   },
 
@@ -165,6 +190,12 @@ export const StoreFunnelEvents = {
       product_id: productId,
       currency: 'USD',
       content_group: 'store',
+    });
+    safeMetaPixel('Purchase', {
+      content_ids: productId ? [productId] : [],
+      content_type: 'product',
+      value,
+      currency: 'USD',
     });
   },
 };
@@ -236,6 +267,7 @@ export const EnrollmentEvents = {
       category: 'enrollment',
       label: programId,
     });
+    safeMetaPixel('ApplicationStart', { content_ids: programId ? [programId] : [] }, true);
   },
 
   // Application submit
@@ -245,6 +277,10 @@ export const EnrollmentEvents = {
       category: 'enrollment',
       label: programId,
     });
+    safeMetaPixel('Lead', {
+      content_ids: programId ? [programId] : [],
+      content_category: 'Program Application',
+    });
   },
 
   // Enrollment complete
@@ -253,6 +289,11 @@ export const EnrollmentEvents = {
       action: 'enrollment_complete',
       category: 'enrollment',
       label: programName,
+    });
+    safeMetaPixel('CompleteRegistration', {
+      content_ids: [programId],
+      content_name: programName,
+      content_category: 'Enrollment',
     });
   },
 };

@@ -19,6 +19,7 @@ import { FirstPartyTraffic } from '@/components/analytics/FirstPartyTraffic';
 import { SkipToContent } from '@/components/accessibility/SkipToContent';
 import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLabels';
 import CookieConsent from '@/components/CookieConsent';
+import FacebookPixel from '@/components/FacebookPixel';
 
 const siteUrl = 'https://www.elevateforhumanity.org';
 const logoUrl = `${siteUrl}/images/logo.png`;
@@ -34,9 +35,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   manifest: '/manifest-marketing.json',
   keywords: [
-    'career training Indianapolis', 'registered apprenticeship Indiana', 'workforce training Indiana',
-    'barber apprenticeship', 'beauty apprenticeship', 'HVAC training', 'CDL training',
-    'business training', 'ETPL training provider', 'workforce funding', 'employer training partnerships',
+    'career training Indianapolis',
+    'registered apprenticeship Indiana',
+    'workforce training Indiana',
+    'barber apprenticeship',
+    'beauty apprenticeship',
+    'HVAC training',
+    'CDL training',
+    'business training',
+    'ETPL training provider',
+    'workforce funding',
+    'employer training partnerships',
   ],
   icons: {
     icon: [{ url: '/favicon.png', type: 'image/png', sizes: '192x192' }],
@@ -44,14 +53,24 @@ export const metadata: Metadata = {
     apple: [{ url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' }],
   },
   openGraph: {
-    type: 'website', siteName: 'Elevate for Humanity', url: siteUrl,
+    type: 'website',
+    siteName: 'Elevate for Humanity',
+    url: siteUrl,
     title: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
-    description: 'Find a career path, understand your training and funding options, and connect with apprenticeship and employer opportunities in one place.',
+    description:
+      'Find a career path, understand your training and funding options, and connect with apprenticeship and employer opportunities in one place.',
     images: [{ url: logoUrl, width: 256, height: 256, alt: 'Elevate for Humanity logo' }],
   },
   robots: {
-    index: true, follow: true,
-    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
   },
 };
 
@@ -66,13 +85,27 @@ const organizationJsonLd = {
   logo: { '@type': 'ImageObject', url: logoUrl, contentUrl: logoUrl, width: 256, height: 256 },
   image: logoUrl,
   telephone: '+1-317-314-3757',
-  address: { '@type': 'PostalAddress', addressLocality: 'Indianapolis', addressRegion: 'IN', addressCountry: 'US' },
-  description: 'Career and technical education provider connecting learners with training, registered apprenticeships, testing and credential pathways, workforce funding navigation, employers, and supportive services.',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Indianapolis',
+    addressRegion: 'IN',
+    addressCountry: 'US',
+  },
+  description:
+    'Career and technical education provider connecting learners with training, registered apprenticeships, testing and credential pathways, workforce funding navigation, employers, and supportive services.',
   knowsAbout: [
-    'Registered Apprenticeship', 'Career and Technical Training', 'Barber and Beauty Apprenticeships',
-    'HVAC Training', 'Commercial Driver Training', 'Business and Entrepreneurship Training',
-    'Testing and Proctoring', 'Credentialing', 'Workforce Development', 'Work-Based Learning',
-    'WIOA', 'Employer Services',
+    'Registered Apprenticeship',
+    'Career and Technical Training',
+    'Barber and Beauty Apprenticeships',
+    'HVAC Training',
+    'Commercial Driver Training',
+    'Business and Entrepreneurship Training',
+    'Testing and Proctoring',
+    'Credentialing',
+    'Workforce Development',
+    'Work-Based Learning',
+    'WIOA',
+    'Employer Services',
   ],
 };
 
@@ -83,7 +116,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <SupabasePublicConfigScript />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
       </head>
       <body className="efh-contrast">
         <SkipToContent />
@@ -91,6 +127,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MarketingPwaClient />
         <ChunkRecovery />
         <GoogleAnalytics />
+        <FacebookPixel />
         <FirstPartyTraffic />
         <AssociateFormLabels />
         <I18nProvider>

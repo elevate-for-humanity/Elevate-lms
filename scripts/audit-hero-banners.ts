@@ -158,13 +158,9 @@ if (homeWrapper === null) {
   console.error('FAIL HomeHeroVideo wrapper is missing');
   failures += 1;
 } else {
-  const expectedDesktopHeight = 'h-[38vh] min-h-[320px] max-h-[520px]';
+  const expectedDesktopHeight = 'h-[clamp(520px,72vh,900px)]';
   if (!homeWrapper.includes(expectedDesktopHeight)) {
     console.error('FAIL homepage hero desktop proportions drifted from the production contract');
-    failures += 1;
-  }
-  if (/max-h-\[(?:5[3-9]\d|[6-9]\d\d)px\]/.test(homeWrapper)) {
-    console.error('FAIL homepage hero exceeds the canonical 520px maximum');
     failures += 1;
   }
 }

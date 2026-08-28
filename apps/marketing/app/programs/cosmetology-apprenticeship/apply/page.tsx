@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import BeautyApplicationChoice from '@/components/apply/BeautyApplicationChoice';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,5 +19,5 @@ export const metadata: Metadata = {
  * this compatibility route must not duplicate program facts, prices, or forms.
  */
 export default function CosmetologyApplyPage() {
-  redirect('/apply/student/interview?program=cosmetology-apprenticeship');
+  return <BeautyApplicationChoice programSlug="cosmetology-apprenticeship" programTitle="Cosmetology Apprenticeship Applications" />;
 }

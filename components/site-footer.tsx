@@ -52,7 +52,6 @@ export function SiteFooter() {
             <li><Link href={ROUTES.programs} className={linkClass}>All Programs</Link></li>
             <li><Link href={ROUTES.programsHealthcare} className={linkClass}>Healthcare</Link></li>
             <li><Link href="/programs/skilled-trades" className={linkClass}>Skilled Trades</Link></li>
-            <li><Link href={ROUTES.programsCosmetology} className={linkClass}>Cosmetology Apprenticeship</Link></li>
             <li><Link href={ROUTES.programsTechnology} className={linkClass}>Technology</Link></li>
             <li><Link href={ROUTES.storeDemo} className={linkClass}>Platform Demo</Link></li>
           </FooterGroup>
@@ -119,7 +118,6 @@ export function SiteFooter() {
 
           <FooterGroup title="Get Started">
             <li><Link href={ROUTES.apply} className={linkClass}>Apply Now</Link></li>
-            <li><Link href={ROUTES.eligibility} className={linkClass}>Check Eligibility</Link></li>
             <li><Link href={ROUTES.contact} className={linkClass}>Contact Admissions</Link></li>
             <li><a href={ROUTES.login} className={linkClass}>Student Login</a></li>
             <li><a href={ROUTES.adminLogin} target="_blank" rel="noopener noreferrer" className={`${linkClass} inline-flex items-center gap-1`}>Admin Portal <ExternalLink className="h-3 w-3" /></a></li>

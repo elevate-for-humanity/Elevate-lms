@@ -82,7 +82,7 @@ export default function ApprenticeshipsPage() {
         trustIndicators={hero.trustIndicators}
         transcript={hero.transcript}
         analyticsName="apprenticeships"
-        heightClassName="aspect-[16/9] h-auto min-h-[280px] max-h-[600px] sm:aspect-[21/9]"
+        heightClassName="h-[clamp(520px,72vh,900px)]"
         mediaFit="cover"
       />
 

@@ -15,11 +15,19 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { organization } from '@/lib/config/organization';
 import { normalizeApplicationModalityPreference } from '@/lib/applications/modality-preference';
+import { getStripe } from '@/lib/stripe/client';
 // approveApplication is called by /api/admin/applications/[id]/approve - not here
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
+
+const PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS = new Set([
+  'barber-apprenticeship',
+  'cosmetology-apprenticeship',
+  'nail-technician-apprenticeship',
+  'esthetician-apprenticeship',
+]);
 
 function getAllowedOrigins(): Set<string> {
   const configured = (process.env.APPLICATION_INTAKE_ALLOWED_ORIGINS || '')
@@ -260,6 +268,35 @@ async function _POST(req: Request) {
         },
         { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
+    }
+
+    const applicationIntent = body.applicationIntent === 'enrollment' ? 'enrollment' : 'inquiry';
+    if (applicationIntent === 'enrollment' && PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(program)) {
+      const paymentSessionId = String(body.paymentSessionId || '').trim();
+      if (!paymentSessionId) {
+        return NextResponse.json(
+          { error: 'Verified payment is required before this enrollment application can be submitted.' },
+          { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
+      const stripe = getStripe();
+      if (!stripe) {
+        return NextResponse.json(
+          { error: 'Payment verification is temporarily unavailable.' },
+          { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
+      const paymentSession = await stripe.checkout.sessions.retrieve(paymentSessionId);
+      const paid = ['paid', 'no_payment_required'].includes(paymentSession.payment_status || '');
+      const paidProgram = paymentSession.metadata?.program_slug || '';
+      const paidEmail = (paymentSession.customer_details?.email || paymentSession.customer_email || '').toLowerCase().trim();
+      const applicantEmail = String(body.email || '').toLowerCase().trim();
+      if (!paid || paidProgram !== program || (paidEmail && paidEmail !== applicantEmail)) {
+        return NextResponse.json(
+          { error: 'Payment could not be verified for this applicant and program.' },
+          { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
     }
 
     // Program state gate - reject submissions for waitlisted or closed programs

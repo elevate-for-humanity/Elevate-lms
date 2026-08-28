@@ -73,7 +73,7 @@ export default async function BarberApprenticeshipPage() {
         posterImage={BARBER_HERO_IMAGE}
         voiceoverSrc={heroBanner?.voiceoverSrc}
         analyticsName="barber-apprenticeship"
-        heightClassName="h-[clamp(420px,58vh,720px)]"
+        heightClassName="h-[clamp(520px,72vh,900px)]"
         overlayMode="none"
         transcript={heroBanner?.transcript ?? 'Barber apprenticeship training in a professional shop environment.'}
       />

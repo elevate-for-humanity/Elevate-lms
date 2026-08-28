@@ -57,7 +57,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     id: 'platform',
     name: 'Platform',
-    href: '/online-apps',
+    href: '/platform',
     subItems: [
       { name: 'Platform Overview', href: '/platform', isSectionLink: true },
       { name: 'Online Apps & Portals', href: '/online-apps', isSectionLink: true },
@@ -131,7 +131,6 @@ export const NAV_ITEMS: NavItem[] = [
     subItems: [
       { name: 'Mission', href: ROUTES.about, isSectionLink: true },
       { name: 'Apprenticeship Sponsor of Record', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
-      { name: 'Contact', href: ROUTES.contact, isSectionLink: true },
     ],
   },
 ];

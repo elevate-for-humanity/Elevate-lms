@@ -80,7 +80,6 @@ const footerLinks = {
     { name: 'DMCA', href: '/dmca' },
     { name: 'Equal Opportunity', href: '/equal-opportunity' },
     { name: 'Grievance', href: '/grievance' },
-    { name: 'Acceptable Use', href: '/legal' },
     { name: 'Creator Agreement', href: '/legal/creator-agreement' },
     { name: 'Data Sharing', href: '/legal/data-sharing' },
     { name: 'Disclosures', href: '/legal/disclosures' },
@@ -90,7 +89,6 @@ const footerLinks = {
     { name: 'FERPA Consent', href: '/legal/ferpa-consent' },
     { name: 'License Agreement', href: '/legal/license-agreement' },
     { name: 'Marketplace Terms', href: '/legal/marketplace-terms' },
-    { name: 'MOU', href: '/legal/partner-mou' },
     { name: 'Participation Agreement', href: '/legal/participation-agreement' },
     { name: 'Partner MOU', href: '/legal/partner-mou' },
     { name: 'Program Host Agreement', href: '/legal/program-host-agreement' },
@@ -124,7 +122,6 @@ const footerLinks = {
     { name: 'Workforce MOU', href: '/contracts/workforce-mou' },
     { name: 'Operational Controls', href: '/governance/operational-controls' },
     { name: 'Operational Security', href: '/governance/security' },
-    { name: 'Institutional Governance', href: '/institutional-governance' },
     { name: 'Legal Entity Structure', href: '/legal-entity-structure' },
     { name: 'Legal Governance', href: '/legal' },
   ],
@@ -338,4 +335,3 @@ export default function ServerFooter() {
     </footer>
   );
 }
-

@@ -13,7 +13,10 @@ import {
   Send,
   ShieldCheck,
   UserRound,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import {
   TRANSFER_HOURS_EVIDENCE_ACCEPT,
   uploadTransferHoursEvidence,
@@ -110,9 +113,13 @@ function transferHours(value: string | undefined) {
 export default function ParisApplicationWorkspace({
   programs,
   initialProgram,
+  applicationIntent = 'inquiry',
+  paymentSessionId = '',
 }: {
   programs: ProgramOption[];
   initialProgram?: string;
+  applicationIntent?: 'inquiry' | 'enrollment';
+  paymentSessionId?: string;
 }) {
   const router = useRouter();
   const [session, setSession] = useState<InterviewResponse | null>(null);
@@ -123,9 +130,12 @@ export default function ParisApplicationWorkspace({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [listening, setListening] = useState(false);
+  const [speechEnabled, setSpeechEnabled] = useState(false);
   const [transferEvidence, setTransferEvidence] = useState<File | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const initializedProgram = useRef(false);
+  const spokenMessageId = useRef('');
+  const parisVoice = useNaturalVoice();
 
   const locale = session?.state.locale ?? 'en';
   const t = useMemo(
@@ -220,6 +230,28 @@ export default function ParisApplicationWorkspace({
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [session?.messages.length]);
+
+  useEffect(() => {
+    if (!speechEnabled || !session?.messages.length) return;
+    const latest = [...session.messages].reverse().find((message) => message.role === 'assistant');
+    if (!latest || latest.id === spokenMessageId.current) return;
+    spokenMessageId.current = latest.id;
+    void parisVoice.play(latest.content, { style: 'assistant', rate: 0.96 });
+  }, [parisVoice, session?.messages, speechEnabled]);
+
+  function toggleParisSpeech() {
+    if (speechEnabled) {
+      parisVoice.stop();
+      setSpeechEnabled(false);
+      return;
+    }
+    setSpeechEnabled(true);
+    const latest = session?.messages ? [...session.messages].reverse().find((message) => message.role === 'assistant') : null;
+    if (latest) {
+      spokenMessageId.current = latest.id;
+      void parisVoice.play(latest.content, { style: 'assistant', rate: 0.96 });
+    }
+  }
 
   async function sendAnswer(value: string, inputMode: 'text' | 'voice' = 'text') {
     if (!value.trim() || sending) return;
@@ -324,6 +356,10 @@ export default function ParisApplicationWorkspace({
 
   async function submitApplication() {
     if (!session?.readyForSubmission || !session.applicationPayload || submitting) return;
+    if (applicationIntent === 'enrollment' && !paymentSessionId) {
+      setError('Complete the verified payment or BNPL checkout before submitting this enrollment application.');
+      return;
+    }
     const answers = session.state.answers;
     const claimed = transferHours(answers.transferHours);
     if (isApprenticeship(answers.program) && claimed > 0 && !transferEvidence) {
@@ -349,7 +385,11 @@ export default function ParisApplicationWorkspace({
           'X-Idempotency-Key': makeIdempotencyKey(session.projectId),
         },
         cache: 'no-store',
-        body: JSON.stringify(session.applicationPayload),
+        body: JSON.stringify({
+          ...session.applicationPayload,
+          applicationIntent,
+          paymentSessionId: paymentSessionId || undefined,
+        }),
       });
       const data = (await response.json().catch(() => ({}))) as {
         ok?: boolean;
@@ -400,6 +440,15 @@ export default function ParisApplicationWorkspace({
           <p className="mt-0.5 text-xs text-slate-300">{t.subtitle}</p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={toggleParisSpeech}
+            className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-800"
+            aria-pressed={speechEnabled}
+          >
+            {speechEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            {speechEnabled ? 'PARIS voice on' : 'Hear PARIS'}
+          </button>
           <div className="hidden text-right sm:block">
             <p className="text-xs font-bold">{session.progress.percent}%</p>
             <p className="text-[11px] text-slate-400">{t.saved}</p>
@@ -412,9 +461,9 @@ export default function ParisApplicationWorkspace({
         </div>
       </div>
 
-      <div className="grid min-h-[650px] lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="flex min-h-[650px] flex-col border-b border-slate-200 lg:border-b-0 lg:border-r">
-          <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6" aria-live="polite">
+      <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="flex h-[min(72vh,720px)] min-h-[520px] min-w-0 flex-col border-b border-slate-200 lg:border-b-0 lg:border-r">
+          <div ref={scrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6" aria-live="polite">
             {session.messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-6 ${message.role === 'user' ? 'bg-brand-red-600 text-white' : 'border border-slate-200 bg-white text-slate-800 shadow-sm'}`}>
@@ -461,6 +510,7 @@ export default function ParisApplicationWorkspace({
                   disabled={sending || listening}
                   className={`inline-flex h-12 w-12 flex-none items-center justify-center rounded-xl border ${listening ? 'border-brand-red-500 bg-red-50 text-brand-red-700' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}
                   aria-label={listening ? t.listening : 'Speak answer'}
+                  title={locale === 'es' ? 'Responder usando el micrófono' : 'Answer using the microphone'}
                 >
                   {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                 </button>
@@ -558,14 +608,20 @@ export default function ParisApplicationWorkspace({
             <div className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 flex-none" /><p>{t.review}</p></div>
           </div>
 
+          {applicationIntent === 'enrollment' && !paymentSessionId ? (
+            <div className="mt-4 rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-sm font-bold leading-6 text-amber-950">
+              Complete the verified deposit, full-payment, or eligible BNPL checkout below before submitting this enrollment application.
+            </div>
+          ) : null}
+
           {session.readyForSubmission ? (
             <button
               type="button"
               onClick={() => void submitApplication()}
-              disabled={submitting}
+              disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)}
               className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3.5 text-sm font-black text-white hover:bg-brand-red-700 disabled:opacity-60"
             >
-              {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> {t.submitting}</> : <><UserRound className="h-4 w-4" /> {t.submit}</>}
+              {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> {t.submitting}</> : <><UserRound className="h-4 w-4" /> {applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment required to submit' : t.submit}</>}
             </button>
           ) : null}
           {error && session.readyForSubmission ? <p className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}

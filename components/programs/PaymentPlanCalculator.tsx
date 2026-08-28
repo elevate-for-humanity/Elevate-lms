@@ -32,6 +32,7 @@ interface Props {
   programSlug: string;
   stripeDepositUrl?: string;
   stripeFullUrl?: string;
+  successUrl?: string;
 }
 
 function fmt(cents: number) {
@@ -40,7 +41,7 @@ function fmt(cents: number) {
   }).format(cents / 100);
 }
 
-export default function PaymentPlanCalculator({ programSlug }: Props) {
+export default function PaymentPlanCalculator({ programSlug, successUrl }: Props) {
   const [pricing, setPricing] = useState<ProgramPricing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -84,7 +85,9 @@ export default function PaymentPlanCalculator({ programSlug }: Props) {
           slug: programSlug,
           checkoutMode: mode,
           amountCents: mode === 'deposit' ? depositCents : pricing.tuition_cents,
-          successUrl: `${window.location.origin}/programs/${programSlug}/enrollment-success?session_id={CHECKOUT_SESSION_ID}`,
+          successUrl: successUrl
+            ? `${window.location.origin}${successUrl}${successUrl.includes('?') ? '&' : '?'}session_id={CHECKOUT_SESSION_ID}&payment=success`
+            : `${window.location.origin}/programs/${programSlug}/enrollment-success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/programs/${programSlug}`,
           couponCode: couponCode.trim() || undefined,
         }),

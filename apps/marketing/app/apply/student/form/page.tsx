@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { resolveSlug } from '@/lib/program-registry';
 import StudentApplicationForm from '../StudentApplicationForm';
+import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,10 +16,12 @@ export const metadata: Metadata = {
 export default async function StandardStudentApplicationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ program?: string }>;
+  searchParams: Promise<{ program?: string; intent?: string; session_id?: string }>;
 }) {
   const params = await searchParams;
   const initialProgram = resolveSlug(params?.program || '') || '';
+  const applicationIntent = params?.intent === 'enrollment' ? 'enrollment' : 'inquiry';
+  const paymentSessionId = params?.session_id || '';
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950">
@@ -43,14 +46,33 @@ export default async function StandardStudentApplicationPage({
               </p>
             </div>
             <Link
-              href={`/apply/student/interview${initialProgram ? `?program=${encodeURIComponent(initialProgram)}` : ''}`}
+              href={`/apply/student/interview?${new URLSearchParams({
+                ...(initialProgram ? { program: initialProgram } : {}),
+                intent: applicationIntent,
+                ...(paymentSessionId ? { session_id: paymentSessionId } : {}),
+              }).toString()}`}
               className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-red-700"
             >
               Use PARIS instead
             </Link>
           </div>
-          <StudentApplicationForm initialProgram={initialProgram} />
+          <StudentApplicationForm
+            initialProgram={initialProgram}
+            applicationIntent={applicationIntent}
+            paymentSessionId={paymentSessionId}
+          />
         </div>
+        {applicationIntent === 'enrollment' && initialProgram ? (
+          <section className="mt-8" aria-labelledby="standard-application-payment">
+            <h2 id="standard-application-payment" className="mb-4 text-2xl font-black text-slate-950">
+              Required payment verification
+            </h2>
+            <PaymentPlanCalculator
+              programSlug={initialProgram}
+              successUrl={`/apply/student/form?program=${encodeURIComponent(initialProgram)}&intent=enrollment`}
+            />
+          </section>
+        ) : null}
       </div>
     </main>
   );

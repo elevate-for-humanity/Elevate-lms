@@ -12,6 +12,8 @@ const WORKONE_INTAKE_URL = 'https://WorkOneIndy.as.me/IntakeApptwithCN';
 
 interface StudentApplicationFormProps {
   initialProgram?: string;
+  applicationIntent?: 'inquiry' | 'enrollment';
+  paymentSessionId?: string;
 }
 
 type SubmissionResult = {
@@ -157,7 +159,11 @@ function createEmptyForm(initialProgram: string): StudentForm {
   };
 }
 
-export default function StudentApplicationForm({ initialProgram = '' }: StudentApplicationFormProps) {
+export default function StudentApplicationForm({
+  initialProgram = '',
+  applicationIntent = 'inquiry',
+  paymentSessionId = '',
+}: StudentApplicationFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<StudentForm>(() => createEmptyForm(initialProgram));
   const [submissionKey] = useState(createSubmissionKey);
@@ -261,6 +267,14 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
     e.preventDefault();
     setResult(null);
 
+    if (applicationIntent === 'enrollment' && !paymentSessionId) {
+      setResult({
+        success: false,
+        error: 'Complete the verified payment or BNPL checkout before submitting this enrollment application.',
+      });
+      return;
+    }
+
     const priorErrors = [1, 2, 3].map(validateStep).find(Boolean);
     if (priorErrors) {
       setResult({ success: false, error: priorErrors });
@@ -328,6 +342,8 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
       workOneAppointmentUrl: requiresWorkOne ? WORKONE_INTAKE_URL : undefined,
       source: 'student-application',
       applicationCertification: true,
+      applicationIntent,
+      paymentSessionId: paymentSessionId || undefined,
     };
 
     try {
@@ -580,7 +596,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
 
       <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:justify-between">
         {step > 1 ? <button type="button" onClick={previousStep} className="rounded-xl border-2 border-slate-300 px-6 py-3 font-bold text-slate-900">Back</button> : <span />}
-        {step < 5 ? <button type="button" onClick={nextStep} className="rounded-xl bg-brand-red-600 px-8 py-3 font-extrabold text-white hover:bg-brand-red-700">Continue</button> : <button type="submit" disabled={submitting} className="rounded-xl bg-brand-red-600 px-8 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:bg-slate-600">{submitting ? 'Submitting…' : 'Submit Application'}</button>}
+        {step < 5 ? <button type="button" onClick={nextStep} className="rounded-xl bg-brand-red-600 px-8 py-3 font-extrabold text-white hover:bg-brand-red-700">Continue</button> : <button type="submit" disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)} className="rounded-xl bg-brand-red-600 px-8 py-3 font-extrabold text-white hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-600">{submitting ? 'Submitting…' : applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment Required to Submit' : 'Submit Application'}</button>}
       </div>
     </form>
   );

@@ -52,10 +52,12 @@ async function loadApplicationPrograms() {
 export default async function ParisStudentApplicationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ program?: string }>;
+  searchParams: Promise<{ program?: string; intent?: string; session_id?: string }>;
 }) {
   const params = await searchParams;
   const initialProgram = resolveSlug(params?.program || '') || '';
+  const applicationIntent = params?.intent === 'enrollment' ? 'enrollment' : 'inquiry';
+  const paymentSessionId = params?.session_id || '';
   const programs = await loadApplicationPrograms();
 
   return (
@@ -83,20 +85,30 @@ export default async function ParisStudentApplicationPage({
                 Talk with PARIS while your application builds beside you.
               </h1>
               <p className="mt-3 text-sm leading-6 text-slate-700 sm:text-base">
-                Answer one relevant question at a time by typing or speaking. Switch between English
-                and Spanish without losing your place. Important identity, program, funding, and
-                transfer-hour answers require confirmation before they are treated as complete.
+                Choose PARIS for a guided conversation or use the standard application form. With
+                PARIS, turn on “Hear PARIS” to hear each question, answer through the microphone, or
+                type directly into the message box. Switch between English and Spanish without losing
+                your place.
               </p>
             </div>
             <Link
-              href={`/apply/student/form${initialProgram ? `?program=${encodeURIComponent(initialProgram)}` : ''}`}
+              href={`/apply/student/form?${new URLSearchParams({
+                ...(initialProgram ? { program: initialProgram } : {}),
+                intent: applicationIntent,
+                ...(paymentSessionId ? { session_id: paymentSessionId } : {}),
+              }).toString()}`}
               className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 hover:border-slate-400 hover:bg-slate-50"
             >
               Use standard form instead
             </Link>
           </div>
 
-          <ParisApplicationWorkspace programs={programs} initialProgram={initialProgram} />
+          <ParisApplicationWorkspace
+            programs={programs}
+            initialProgram={initialProgram}
+            applicationIntent={applicationIntent}
+            paymentSessionId={paymentSessionId}
+          />
 
           {initialProgram && (
             <section className="mt-8" aria-labelledby="application-payment-options">
@@ -111,7 +123,10 @@ export default async function ParisStudentApplicationPage({
                   Applying is free. Use this calculator only if you plan to self-pay; workforce-funding eligibility is reviewed separately.
                 </p>
               </div>
-              <PaymentPlanCalculator programSlug={initialProgram} />
+              <PaymentPlanCalculator
+                programSlug={initialProgram}
+                successUrl={`/apply/student/interview?program=${encodeURIComponent(initialProgram)}&intent=enrollment`}
+              />
             </section>
           )}
 

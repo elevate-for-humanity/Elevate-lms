@@ -41,21 +41,28 @@ export default function BarberApplyIndexPage() {
             Apprenticeship applications
           </p>
           <h1 className="mt-2 text-3xl font-black sm:text-4xl">Choose the correct Barber application</h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-700">
-            Apprentices complete the full student application. Barbershops use the universal Host
+          <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">
+            Future apprentices can submit a free inquiry or complete the paid enrollment application. Barbershops use the universal Host
             Site compliance application with business licensing, insurance, workers&apos;
             compensation, supervisor-license, EIN/W-9, and worksite verification.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-4xl gap-6 px-4 py-10 md:grid-cols-2">
+      <section className="mx-auto grid max-w-6xl gap-6 px-4 py-10 md:grid-cols-3">
         <ApplicationCard
           image="/images/pages/barber-fade.webp"
-          title="I’m an Apprentice"
-          description="Complete the full student application for the Barber Apprenticeship, including funding, host-shop information, and transfer-hour evidence when applicable."
-          href="/apply/student?program=barber-apprenticeship"
-          cta="Start Student Application"
+          title="Free Inquiry"
+          description="Ask questions and request admissions follow-up. This does not require payment and does not create an enrollment."
+          href="/programs/barber-apprenticeship/request-info"
+          cta="Submit Free Inquiry"
+        />
+        <ApplicationCard
+          image="/images/pages/barber-apprentice-learning.webp"
+          title="Enrollment Application"
+          description="Review payment and BNPL choices, complete verified checkout, then apply with PARIS or the standard form."
+          href="/apply/student/interview?program=barber-apprenticeship&intent=enrollment"
+          cta="Start Enrollment"
         />
         <ApplicationCard
           image="/images/pages/barber-apprentice-learning.webp"
@@ -66,7 +73,7 @@ export default function BarberApplyIndexPage() {
         />
       </section>
 
-      <section className="mx-auto max-w-4xl px-4 pb-10">
+      <section className="mx-auto max-w-6xl px-4 pb-10">
         <div className="rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm leading-6 text-blue-950">
           Self-pay applicants can review the server-priced $600 minimum deposit, pay-in-full,
           payment estimate, and available BNPL options from the Barber program page. Payment does

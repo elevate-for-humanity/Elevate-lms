@@ -217,17 +217,6 @@ export default function ParisApplicationWorkspace({
   }, []);
 
   useEffect(() => {
-    if (!session || initializedProgram.current || !initialProgram) return;
-    if (session.state.answers.program) {
-      initializedProgram.current = true;
-      return;
-    }
-    if (session.nextQuestion?.field !== 'program') return;
-    initializedProgram.current = true;
-    void sendAnswer(initialProgram, 'text');
-  }, [session, initialProgram]);
-
-  useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [session?.messages.length]);
 
@@ -268,6 +257,20 @@ export default function ParisApplicationWorkspace({
     }
   }
 
+  useEffect(() => {
+    if (!session || initializedProgram.current || !initialProgram) return;
+    if (session.state.answers.program) {
+      initializedProgram.current = true;
+      return;
+    }
+    if (session.nextQuestion?.field !== 'program') return;
+    initializedProgram.current = true;
+    void sendAnswer(initialProgram, 'text');
+    // This one-time initialization is gated by initializedProgram. Including
+    // sendAnswer's render-local identity would retrigger the effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, initialProgram]);
+
   async function sendDraft() {
     const value = input.trim();
     if (!value || sending) return;
@@ -294,7 +297,7 @@ export default function ParisApplicationWorkspace({
       return;
     }
 
-    await sendAnswer(value, draftInputMode);
+    await sendAnswer(input, draftInputMode);
   }
 
   async function chooseAction(action: 'confirm' | 'change') {

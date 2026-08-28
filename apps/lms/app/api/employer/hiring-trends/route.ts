@@ -11,7 +11,7 @@ async function _GET(request: Request) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const auth = await requireApiRole(['employer', 'admin', 'admin']);
+    const auth = await requireApiRole(['employer', 'admin']);
     if (auth instanceof NextResponse) return auth;
 
     // Employer needs cross-user apprentice data; role gate is the auth boundary
@@ -43,16 +43,18 @@ async function _GET(request: Request) {
     for (let i = 5; i >= 0; i--) {
       const d = new Date();
       d.setMonth(d.getMonth() - i);
-      hiringData[months[d.getMonth()]] = { hires: 0, applications: 0 };
+      const month = months[d.getMonth()];
+      if (month) hiringData[month] = { hires: 0, applications: 0 };
     }
 
     // Aggregate from real data only — no synthetic fallbacks
     (apprentices || []).forEach((a) => {
       const month = months[new Date(a.created_at).getMonth()];
-      if (hiringData[month]) {
-        hiringData[month].applications++;
+      const totals = month ? hiringData[month] : undefined;
+      if (totals) {
+        totals.applications++;
         if (a.status === 'active' || a.status === 'completed') {
-          hiringData[month].hires++;
+          totals.hires++;
         }
       }
     });

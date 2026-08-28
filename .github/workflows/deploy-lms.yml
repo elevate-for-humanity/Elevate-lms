@@ -33,6 +33,7 @@ on:
       - 'components/lms/**'
       - 'components/portal/**'
       - 'components/auth/**'
+      - 'components/career/**'
       - 'components/pwa/**'
       - 'components/SocialLearningCommunity.tsx'
       - 'components/careers/**'

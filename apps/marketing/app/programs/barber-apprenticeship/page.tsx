@@ -73,7 +73,7 @@ export default async function BarberApprenticeshipPage() {
         posterImage={BARBER_HERO_IMAGE}
         voiceoverSrc={heroBanner?.voiceoverSrc}
         analyticsName="barber-apprenticeship"
-        heightClassName="h-[clamp(520px,72vh,900px)]"
+        heightClassName="h-[clamp(360px,55vh,600px)]"
         overlayMode="none"
         transcript={heroBanner?.transcript ?? 'Barber apprenticeship training in a professional shop environment.'}
       />
@@ -112,7 +112,7 @@ export default async function BarberApprenticeshipPage() {
       <section className="px-4 py-14 sm:py-18">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-            <div className="relative min-h-[320px] max-h-[520px] overflow-hidden rounded-3xl bg-slate-100 sm:min-h-[400px]">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[420px]">
               <Image
                 src="/images/pages/barber-hero-main.webp"
                 alt="Barber apprentice practicing supervised haircutting and grooming skills"

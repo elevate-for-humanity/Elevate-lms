@@ -9,10 +9,10 @@ import type { FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-par
 const ROTATION_MS = 8000;
 
 export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner[] }) {
+  // Shops without verified media remain in the directory below, but do not
+  // become empty decorative slides in the rotating gallery.
   const slides = useMemo(() => shops.flatMap((shop) =>
-    shop.media?.length
-      ? shop.media.map((media) => ({ shop, media }))
-      : [{ shop, media: undefined }]
+    (shop.media ?? []).map((media) => ({ shop, media }))
   ), [shops]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -71,7 +71,7 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
         <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-red-700">Meet the host-shop network</p>
-            <h2 id="host-shop-showcase-heading" className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
+            <h2 id="host-shop-showcase-heading" className="mt-2 max-w-4xl text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl">
               Train in real shops. Discover the businesses behind the apprenticeship.
             </h2>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">
@@ -91,9 +91,19 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
         </div>
 
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
-          <div className="grid min-h-[430px] lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="relative min-h-[300px] overflow-hidden bg-slate-100 lg:min-h-[430px]">
-              {image && !failedImages.has(image.src) ? (
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[390px]">
+              {image?.kind === 'video' ? (
+                <video
+                  key={image.src}
+                  src={image.src}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="h-full w-full bg-black object-contain"
+                  aria-label={image.alt}
+                />
+              ) : image && !failedImages.has(image.src) ? (
                 <Image
                   key={image.src}
                   src={image.src}
@@ -101,7 +111,7 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
                   fill
                   priority={activeIndex === 0}
                   sizes="(max-width: 1024px) 100vw, 58vw"
-                  className={image.kind === 'flyer' ? 'object-contain bg-white p-4' : 'object-cover'}
+                  className="object-contain bg-white"
                   onError={() => setFailedImages((current) => {
                     const next = new Set(current);
                     next.add(image.src);
@@ -120,7 +130,7 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
                 Host Shop gallery image {activeIndex + 1} of {slides.length}
               </p>
-              <h3 className="mt-3 text-3xl font-black tracking-tight">{shop.dba ?? shop.name}</h3>
+              <h3 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{shop.dba ?? shop.name}</h3>
               {shop.dba ? <p className="mt-1 text-sm text-slate-600">Legal name: {shop.name}</p> : null}
               <p className="mt-5 text-base leading-7 text-slate-700">{shop.marketingBlurb ?? shop.note}</p>
               <p className="mt-5 flex items-start gap-2 text-sm font-semibold text-slate-800">

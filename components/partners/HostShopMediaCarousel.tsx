@@ -1,6 +1,5 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
 import { useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, ExternalLink, PlayCircle } from 'lucide-react';
 
@@ -54,11 +53,11 @@ export default function HostShopMediaCarousel({
 
   return (
     <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl">
-      <div className="relative aspect-[4/3] w-full bg-slate-100 sm:aspect-[16/10] lg:aspect-[4/3]">
+      <div className="relative aspect-[4/3] w-full bg-white sm:aspect-[16/10] lg:max-h-[560px]">
         {active.type === 'video' ? (
           <video src={active.url} controls playsInline preload="metadata" className="h-full w-full object-contain bg-black" aria-label={active.alt || `${shopName} video`} />
         ) : (
-          <img src={active.url} alt={active.alt || `${shopName} promotional image`} className="h-full w-full object-cover" loading="lazy" decoding="async" />
+          <img src={active.url} alt={active.alt || `${shopName} promotional image`} className="h-full w-full object-contain" loading="lazy" decoding="async" />
         )}
         {media.length > 1 ? (
           <>

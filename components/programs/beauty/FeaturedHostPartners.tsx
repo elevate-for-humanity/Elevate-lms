@@ -51,7 +51,7 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
 
           <div className="mt-10 grid gap-6 lg:grid-cols-2">
             {shops.map((shop) => {
-              const image = shop.media?.[0];
+              const image = shop.media?.find((media) => media.kind !== 'video');
               const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
               return (
                 <article
@@ -59,13 +59,13 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
                   className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
                 >
                   {image ? (
-                    <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                    <div className="relative aspect-[4/3] max-h-[440px] overflow-hidden bg-white sm:aspect-[16/10]">
                       <Image
                         src={image.src}
                         alt={image.alt}
                         fill
                         sizes="(max-width: 1024px) 100vw, 50vw"
-                        className={image.kind === 'flyer' ? 'object-contain bg-white p-3' : 'object-cover'}
+                        className="object-contain bg-white"
                       />
                     </div>
                   ) : null}

@@ -45,7 +45,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       transcript={banner.transcript}
       analyticsName={banner.analyticsName}
       overlayMode="none"
-      heightClassName="h-[clamp(520px,72vh,900px)]"
+      heightClassName="h-[clamp(400px,62vh,680px)]"
       deferVideoMs={0}
     />
   );

@@ -63,7 +63,7 @@ export default function HeroVideo({
   className = '',
   children,
   mediaFit = 'cover',
-  heightClassName = 'h-[clamp(520px,72vh,900px)]',
+  heightClassName = 'h-[clamp(380px,58vh,620px)]',
   overlayMode = 'default',
   deferVideoMs = 0,
 }: HeroVideoProps) {

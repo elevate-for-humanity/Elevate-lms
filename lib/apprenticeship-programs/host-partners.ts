@@ -5,7 +5,7 @@
 export type FeaturedHostPartnerMedia = {
   src: string;
   alt: string;
-  kind?: 'photo' | 'flyer';
+  kind?: 'photo' | 'flyer' | 'video';
 };
 
 export type FeaturedHostPartner = {
@@ -148,6 +148,13 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     note: 'Sullivan host salon partner supporting barber and beauty apprenticeship pathways.',
     marketingBlurb:
       'A community salon and barber shop in downtown Sullivan offering hair services and traditional barbering in a local, client-focused setting.',
+    media: [
+      { src: '/images/partners/style-and-scissor-salon/contact-card.webp', alt: 'Style and Scissor Salon contact card for owner Cori Meid', kind: 'photo' },
+      { src: '/images/partners/style-and-scissor-salon/logo.webp', alt: 'Style and Scissor Salon scissors and comb logo', kind: 'photo' },
+      { src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp', alt: 'Pink nail designs completed at Style and Scissor Salon', kind: 'photo' },
+      { src: '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp', alt: 'Nail art portfolio from Style and Scissor Salon', kind: 'photo' },
+      { src: '/images/partners/style-and-scissor-salon/melissas-nails.webp', alt: 'Melissa nail designs from Style and Scissor Salon', kind: 'photo' },
+    ],
     onlineListingUrl: 'https://www.fresha.com/pl/lvp/style-and-scissor-salon-west-hopewell-street-farmersburg-l1E0B7',
     onlineListingLabel: 'View Style and Scissor details',
   },
@@ -192,11 +199,16 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     zip: '46637',
     address: '1740 S Bend Ave, Suite A',
     phone: '(269) 240-7923',
-    programs: ['barber-apprenticeship'],
+    programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
     note: 'South Bend host salon partner at its current South Bend Avenue location.',
     marketingBlurb:
       'A South Bend salon offering appointment-based hair services while participating in Elevate’s growing apprenticeship host-shop network.',
-    media: [{ src: '/images/partners/salon-saloon-official.webp', alt: 'Salon Saloon official business image', kind: 'photo' }],
+    media: [
+      { src: '/images/partners/salon-saloon/team-sign.webp', alt: 'Salon Saloon team in front of the salon sign', kind: 'photo' },
+      { src: '/images/partners/salon-saloon/team-interior.webp', alt: 'Salon Saloon team inside the South Bend salon', kind: 'photo' },
+      { src: '/images/partners/salon-saloon/team-studio.webp', alt: 'Salon Saloon team in the studio service area', kind: 'photo' },
+      { src: '/videos/partners/salon-saloon-tour.mp4', alt: 'Salon Saloon team and salon tour', kind: 'video' },
+    ],
     websiteUrl: 'https://tory-103460.square.site/',
     websiteLabel: 'Book / view Salon Saloon online',
   },

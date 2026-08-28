@@ -6,15 +6,18 @@ export function HomeApprenticeshipInfra() {
   return (
     <section className="bg-slate-50 px-4 py-14 sm:py-18" aria-labelledby="home-apprenticeship-heading">
       <div className="mx-auto grid max-w-6xl gap-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid-cols-[1.08fr_0.92fr] lg:items-stretch">
-        <div className="relative min-h-[360px] sm:min-h-[460px] lg:min-h-[560px]">
+        <div className="relative aspect-[3/2] bg-slate-950 lg:aspect-auto lg:min-h-[480px]">
           <Image
-            src="/images/pages/apprenticeships-page-1.webp"
-            alt="Apprentice learning on the job with an experienced workplace mentor"
+            src="/images/partners/salon-saloon/team-sign.webp"
+            alt="Salon Saloon team at an Elevate participating Host Salon"
             fill
-            className="object-cover object-center"
+            className="object-contain object-center"
             sizes="(max-width: 1024px) 100vw, 55vw"
             loading="lazy"
           />
+          <div className="absolute left-4 top-4 rounded-full bg-black/80 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-white shadow-lg backdrop-blur-sm sm:left-6 sm:top-6">
+            Salon Saloon • Elevate Host Salon
+          </div>
         </div>
 
         <div className="flex items-center px-6 py-9 sm:px-9 sm:py-12 lg:px-10">

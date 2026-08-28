@@ -1,6 +1,6 @@
 name: Deploy Admin
 
-# Deployment checkpoint: instructional video candidate review gate
+# Deployment checkpoint: strict-boundary repair convergence
 
 on:
   push:

@@ -76,9 +76,20 @@ describe('canonical Course Factory media architecture', () => {
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
     expect(worker).toContain('requestedOptions');
     expect(worker).toContain('maxJobs ?? maxConcurrent');
-    expect(worker).toContain("candidateQuery.eq('course_id', courseId)");
+    expect(worker).toContain("db.rpc('claim_video_jobs'");
+    expect(worker).toContain('p_course_id: courseId');
     expect(worker).toContain('processClaimedVideoJob(job)');
     expect(worker).toContain('activeBeforeClaim');
+  });
+
+  it('claims work atomically and renews an expiring database lease', () => {
+    const migration = read('supabase/migrations/20260828190000_harden_video_worker_lifecycle.sql');
+    const renderer = read('lib/video/process-video-job.ts');
+    expect(migration).toContain('for update skip locked');
+    expect(migration).toContain('lease_token = gen_random_uuid()');
+    expect(migration).toContain('heartbeat_video_job');
+    expect(renderer).toContain('heartbeatJob(job)');
+    expect(renderer).toContain('clearInterval(heartbeatTimer)');
   });
 
   it('allows an authenticated ESB acceptance run to promote only one draft asset', () => {
@@ -154,6 +165,22 @@ describe('canonical Course Factory media architecture', () => {
     const uploader = read('lib/video/upload-lesson-media.ts');
     expect(uploader).toContain('compressVideoBufferForSupabase(buffer)');
     expect(uploader).toContain('compressed oversized video buffer');
+  });
+
+  it('uses Supabase resumable uploads instead of retrying a 413 whole-file request', () => {
+    const uploader = read('lib/video/upload-lesson-media.ts');
+    expect(uploader).toContain('/storage/v1/upload/resumable');
+    expect(uploader).toContain("'Tus-Resumable': '1.0.0'");
+    expect(uploader).toContain("'Content-Type': 'application/offset+octet-stream'");
+    expect(uploader).toContain('SUPABASE_TUS_CHUNK_BYTES = 6 * 1024 * 1024');
+    expect(uploader).toContain('resumableOffset');
+  });
+
+  it('classifies terminal failures and records dead-letter state', () => {
+    const queue = read('lib/video/job-queue.ts');
+    expect(queue).toContain('classifyVideoFailure');
+    expect(queue).toContain('dead_lettered_at');
+    expect(queue).toContain('next_retry_at');
   });
 
   it('normalizes packaged instructor paths to a durable URL before Remotion rendering', () => {

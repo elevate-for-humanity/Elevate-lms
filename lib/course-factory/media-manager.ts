@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import type { VideoAssetKind, VideoJob } from '@/lib/video/job-queue';
+import { classifyVideoFailure, type VideoAssetKind, type VideoJob } from '@/lib/video/job-queue';
 
 export const COURSE_MEDIA_MAX_RETRIES = 3;
 export const COURSE_MEDIA_STALE_RENDER_MS = 45 * 60 * 1000;
@@ -41,11 +41,10 @@ export function canonicalMediaIdentityKey(
 }
 
 export function isCourseMediaFailureRetryable(message: string | null): boolean {
-  const text = (message ?? '').toLowerCase();
-  if (!text) return true;
-  if (text.includes('unauthorized') || text.includes('forbidden') || text.includes('invalid api key')) return false;
-  if (text.includes('missing course') || text.includes('lesson not found')) return false;
-  return true;
+  if (!message) return true;
+  return !['configuration', 'authorization', 'not_found', 'content'].includes(
+    classifyVideoFailure(message),
+  );
 }
 
 export function courseMediaRetryDelayMs(retryCount: number): number {
@@ -115,6 +114,12 @@ export async function resetCanonicalMediaJob(
       // Production enforces quality_evidence NOT NULL. A retry has no valid
       // evidence yet, so reset it to the canonical empty JSON object.
       quality_evidence: {},
+      lease_token: null,
+      lease_expires_at: null,
+      heartbeat_at: null,
+      failure_class: null,
+      next_retry_at: null,
+      dead_lettered_at: null,
       updated_at: now,
     })
     .eq('id', job.id)
@@ -173,7 +178,13 @@ export async function recoverCourseMediaJobs(input: { courseId?: string | null; 
   const blocked: Array<{ jobId: string; reason: string }> = [];
 
   for (const row of (data ?? []) as VideoJob[]) {
-    const stale = row.status === 'rendering' && row.started_at && new Date(row.started_at).getTime() < staleBefore;
+    const leaseExpired = row.status === 'rendering' && row.lease_expires_at
+      ? new Date(row.lease_expires_at).getTime() < now
+      : false;
+    const legacyStale = row.status === 'rendering' && !row.lease_expires_at && row.started_at
+      ? new Date(row.started_at).getTime() < staleBefore
+      : false;
+    const stale = leaseExpired || legacyStale;
     const eligibleFailed =
       row.status === 'failed' &&
       isCourseMediaFailureRetryable(row.error_message) &&
@@ -307,7 +318,11 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
   const expectedTotal = requiredLessonVideos + requiredMicroclips;
   const now = Date.now();
   const staleRendering = rows.filter(
-    (row) => row.status === 'rendering' && row.started_at && now - new Date(row.started_at).getTime() > COURSE_MEDIA_STALE_RENDER_MS,
+    (row) => row.status === 'rendering' && (
+      row.lease_expires_at
+        ? new Date(row.lease_expires_at).getTime() < now
+        : Boolean(row.started_at && now - new Date(row.started_at).getTime() > COURSE_MEDIA_STALE_RENDER_MS)
+    ),
   ).length;
   const completeRows = rows.filter((row) => row.status === 'complete' && Boolean(row.video_url));
   let playable = options.verifyUrls ? 0 : completeRows.length;

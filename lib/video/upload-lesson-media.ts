@@ -22,6 +22,8 @@ const R2_KEY_PREFIX = 'course-videos';
 export type CourseVideoStorageBackend = 'auto' | 'supabase' | 'r2';
 
 const DEFAULT_R2_MIN_BYTES = 5 * 1024 * 1024; // 5 MB
+const SUPABASE_TUS_CHUNK_BYTES = 6 * 1024 * 1024;
+const SUPABASE_TUS_RETRY_DELAYS_MS = [0, 3_000, 5_000, 10_000, 20_000] as const;
 // Keep standard uploads below the production project's effective request
 // ceiling. The bucket metadata permits larger objects, but the Storage API
 // rejects large single-request MP4 uploads with 413 before that bucket limit.
@@ -137,6 +139,121 @@ async function uploadCourseVideosToSupabase(
   return lessonMediaPublicUrl(storagePath);
 }
 
+function storageDirectUrl(supabaseUrl: string): string {
+  const parsed = new URL(supabaseUrl);
+  const projectRef = parsed.hostname.split('.')[0];
+  if (!projectRef) throw new Error('Unable to resolve Supabase project reference');
+  return `${parsed.protocol}//${projectRef}.storage.supabase.co`;
+}
+
+function tusMetadata(value: string): string {
+  return Buffer.from(value, 'utf8').toString('base64');
+}
+
+async function resumableOffset(uploadUrl: string, headers: Record<string, string>): Promise<number> {
+  const response = await fetch(uploadUrl, {
+    method: 'HEAD',
+    headers: { ...headers, 'Tus-Resumable': '1.0.0' },
+  });
+  if (!response.ok) throw new Error(`Resumable upload offset check failed: HTTP ${response.status}`);
+  const offset = Number(response.headers.get('upload-offset'));
+  if (!Number.isFinite(offset) || offset < 0) throw new Error('Resumable upload returned an invalid offset');
+  return offset;
+}
+
+/**
+ * Supabase Storage's documented TUS path for server-side generated media.
+ * Chunks are fixed at 6 MiB, retries resume from the server-confirmed offset,
+ * and the direct Storage hostname avoids the API gateway's whole-body ceiling.
+ */
+async function uploadCourseVideosToSupabaseResumable(
+  buffer: Buffer,
+  storagePath: string,
+  contentType: string,
+): Promise<string> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '');
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceKey) throw new Error('Supabase storage credentials are not configured');
+
+  const authHeaders = {
+    Authorization: `Bearer ${serviceKey}`,
+    apikey: serviceKey,
+    'x-upsert': 'true',
+  };
+  const createResponse = await fetch(`${storageDirectUrl(supabaseUrl)}/storage/v1/upload/resumable`, {
+    method: 'POST',
+    headers: {
+      ...authHeaders,
+      'Tus-Resumable': '1.0.0',
+      'Upload-Length': String(buffer.length),
+      'Upload-Metadata': [
+        `bucketName ${tusMetadata(SUPABASE_BUCKET)}`,
+        `objectName ${tusMetadata(storagePath)}`,
+        `contentType ${tusMetadata(contentType)}`,
+        `cacheControl ${tusMetadata('31536000')}`,
+      ].join(','),
+    },
+  });
+  if (!createResponse.ok) {
+    const detail = await createResponse.text();
+    throw new Error(`Resumable upload session failed (${storagePath}): HTTP ${createResponse.status} ${detail.slice(0, 200)}`);
+  }
+  const location = createResponse.headers.get('location');
+  if (!location) throw new Error(`Resumable upload session returned no location (${storagePath})`);
+  const uploadUrl = new URL(location, storageDirectUrl(supabaseUrl)).toString();
+
+  let offset = Number(createResponse.headers.get('upload-offset') ?? '0');
+  while (offset < buffer.length) {
+    const end = Math.min(offset + SUPABASE_TUS_CHUNK_BYTES, buffer.length);
+    const chunk = buffer.subarray(offset, end);
+    let uploaded = false;
+    let lastError: unknown;
+    for (const delayMs of SUPABASE_TUS_RETRY_DELAYS_MS) {
+      if (delayMs) await new Promise((resolve) => setTimeout(resolve, delayMs));
+      try {
+        const response = await fetch(uploadUrl, {
+          method: 'PATCH',
+          headers: {
+            ...authHeaders,
+            'Tus-Resumable': '1.0.0',
+            'Upload-Offset': String(offset),
+            'Content-Type': 'application/offset+octet-stream',
+          },
+          body: new Uint8Array(chunk),
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${(await response.text()).slice(0, 200)}`);
+        const nextOffset = Number(response.headers.get('upload-offset'));
+        if (!Number.isFinite(nextOffset) || nextOffset <= offset) {
+          throw new Error('Resumable upload did not advance the server offset');
+        }
+        offset = nextOffset;
+        uploaded = true;
+        break;
+      } catch (error) {
+        lastError = error;
+        try {
+          offset = await resumableOffset(uploadUrl, authHeaders);
+          if (offset >= end) {
+            uploaded = true;
+            break;
+          }
+        } catch (offsetError) {
+          lastError = offsetError;
+        }
+      }
+    }
+    if (!uploaded) {
+      throw new Error(`Resumable upload failed at byte ${offset}: ${lastError instanceof Error ? lastError.message : String(lastError)}`);
+    }
+  }
+
+  logger.info('[upload-lesson-media] resumable Supabase upload complete', {
+    storagePath,
+    bytes: buffer.length,
+  });
+  return lessonMediaPublicUrl(storagePath);
+}
+
 async function uploadCourseVideosToR2(
   buffer: Buffer,
   storagePath: string,
@@ -167,6 +284,9 @@ export async function uploadCourseVideosObject(
     } catch (err) {
       logger.warn('[upload-lesson-media] R2 upload failed, falling back to Supabase', { err });
     }
+  }
+  if (contentType.startsWith('video/') && buffer.length > SUPABASE_TUS_CHUNK_BYTES) {
+    return uploadCourseVideosToSupabaseResumable(buffer, storagePath, contentType);
   }
   const uploadBuffer = contentType.startsWith('video/')
     ? await compressVideoBufferForSupabase(buffer)

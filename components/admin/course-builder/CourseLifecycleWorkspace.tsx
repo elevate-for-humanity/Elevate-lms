@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, GitBranch, Loader2, PackageOpen, RefreshCw, RotateCcw, Send, ShieldCheck } from 'lucide-react';
+import CoursePipelineDiagram from './CoursePipelineDiagram';
 
 type Course = {
   id: string;
@@ -251,6 +252,7 @@ export default function CourseLifecycleWorkspace() {
 
         {!course ? <div className="rounded-2xl border border-slate-800 bg-slate-900 p-10 text-center text-slate-400">Select a course to manage its lifecycle.</div> : (
           <>
+            <CoursePipelineDiagram courseId={courseId} />
             <section className="grid gap-4 lg:grid-cols-2">
               <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-cyan-400" /><h2 className="text-lg font-bold">Review state</h2></div>

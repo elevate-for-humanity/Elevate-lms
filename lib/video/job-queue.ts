@@ -37,10 +37,51 @@ export interface VideoJob {
   completed_at: string | null;
   created_at: string;
   updated_at: string;
+  lease_token: string | null;
+  lease_expires_at: string | null;
+  heartbeat_at: string | null;
+  failure_class: VideoFailureClass | null;
+  next_retry_at: string | null;
+  dead_lettered_at: string | null;
   review_status: 'not_ready' | 'pending_review' | 'approved' | 'rejected';
   previous_video_url: string | null;
   quality_evidence: MediaQualityEvidence | null;
   procedure_schema: unknown | null;
+}
+
+export type VideoFailureClass =
+  | 'transient'
+  | 'configuration'
+  | 'authorization'
+  | 'storage'
+  | 'renderer'
+  | 'quality'
+  | 'content'
+  | 'not_found'
+  | 'unknown';
+
+export function classifyVideoFailure(message: string): VideoFailureClass {
+  const text = message.toLowerCase();
+  if (/413|request entity too large|upload|storage|bucket|tus/.test(text)) return 'storage';
+  if (/unauthorized|forbidden|invalid api key|401|403/.test(text)) return 'authorization';
+  if (/not configured|missing .*key|missing .*url|configuration/.test(text)) return 'configuration';
+  if (/lesson not found|course not found|not found/.test(text)) return 'not_found';
+  if (/quality|frozen|black frame|visual change|narration coverage|caption/.test(text)) return 'quality';
+  if (/storyboard|script|scene|content/.test(text)) return 'content';
+  if (/render|ffmpeg|remotion|chromium|gpu|cuda|codec/.test(text)) return 'renderer';
+  if (/timeout|timed out|rate limit|429|502|503|504|network|connection|econn/.test(text)) return 'transient';
+  return 'unknown';
+}
+
+export async function heartbeatJob(job: Pick<VideoJob, 'id' | 'lease_token'>): Promise<boolean> {
+  if (!job.lease_token) return false;
+  const { data, error } = await db().rpc('heartbeat_video_job', {
+    p_job_id: job.id,
+    p_lease_token: job.lease_token,
+    p_lease_seconds: 900,
+  });
+  if (error) throw error;
+  return data === true;
 }
 
 export interface CreateJobInput {
@@ -247,6 +288,12 @@ export async function markComplete(
     review_notes: null,
     quality_evidence: result.quality_evidence ?? null,
     procedure_schema: result.scene_data ?? null,
+    lease_token: null,
+    lease_expires_at: null,
+    heartbeat_at: now,
+    failure_class: null,
+    next_retry_at: null,
+    dead_lettered_at: null,
   };
   // A renderer that returns no replacement storyboard must not erase the
   // canonical plan that was attached when the job was queued.
@@ -318,6 +365,19 @@ export async function markFailed(
 ): Promise<void> {
   const supabase = db();
   const now = new Date().toISOString();
+  const failureClass = classifyVideoFailure(errorMessage);
+  const { data: current } = await supabase
+    .from('video_jobs')
+    .select('retry_count')
+    .eq('id', jobId)
+    .maybeSingle();
+  const retryCount = Number(current?.retry_count ?? 0);
+  const terminalFailure =
+    retryCount >= 3 ||
+    ['configuration', 'authorization', 'not_found', 'content'].includes(failureClass);
+  const nextRetryAt = terminalFailure
+    ? null
+    : new Date(Date.now() + Math.min(60_000 * (2 ** retryCount), 15 * 60_000)).toISOString();
   const { data: job } = await supabase
     .from('video_jobs')
     .update({
@@ -328,6 +388,12 @@ export async function markFailed(
       last_failure_at: now,
       last_provider: evidence.provider ?? null,
       last_provider_model: evidence.provider_model ?? null,
+      lease_token: null,
+      lease_expires_at: null,
+      heartbeat_at: now,
+      failure_class: failureClass,
+      next_retry_at: nextRetryAt,
+      dead_lettered_at: terminalFailure ? now : null,
     })
     .eq('id', jobId)
     .select('lesson_id, asset_kind, asset_key')

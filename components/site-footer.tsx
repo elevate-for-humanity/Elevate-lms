@@ -42,7 +42,7 @@ export function SiteFooter() {
             </p>
             <Link href="/rise-forward-foundation" className="mt-3 inline-flex text-sm font-black text-emerald-800 hover:underline">Learn about Rise Forward Foundation</Link>
             <div className="mt-5 flex gap-3">
-              <a href="https://facebook.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700 text-white hover:bg-blue-800" aria-label="Facebook"><Facebook className="h-5 w-5" /></a>
+              <a href="https://www.facebook.com/profile.php?id=61571046346179" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700 text-white hover:bg-blue-800" aria-label="Elevate for Humanity on Facebook"><Facebook className="h-5 w-5" /></a>
               <a href="https://linkedin.com/company/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-800 text-white hover:bg-blue-900" aria-label="LinkedIn"><Linkedin className="h-5 w-5" /></a>
               <a href="https://instagram.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-white hover:bg-slate-800" aria-label="Instagram"><Instagram className="h-5 w-5" /></a>
             </div>

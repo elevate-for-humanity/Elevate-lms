@@ -43,7 +43,7 @@ export const siteConfig = {
 
   // Social
   social: {
-    facebook: 'https://www.facebook.com/share/1BUqvUAnCo/',
+    facebook: 'https://www.facebook.com/profile.php?id=61571046346179',
     instagram: 'https://instagram.com/elevateforhumanity',
     linkedin: 'https://linkedin.com/company/elevate-for-humanity',
     youtube: 'https://youtube.com/@elevateforhumanity',

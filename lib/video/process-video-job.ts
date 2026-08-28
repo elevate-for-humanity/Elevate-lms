@@ -10,7 +10,7 @@ import {
   generateGpuVideo,
   gpuVideoAvailable,
 } from './gpu-video-client';
-import { markComplete, markFailed, type VideoJob } from './job-queue';
+import { heartbeatJob, markComplete, markFailed, type VideoJob } from './job-queue';
 import { enforceMediaQuality } from './media-quality-gate';
 import { directMedia, scenePrompt, type MediaCharacterReference } from './media-director';
 import { recordMediaProvenance } from './media-provenance';
@@ -172,6 +172,22 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     characters,
     defaultDurationSeconds: 5,
   });
+
+  let heartbeatRunning = false;
+  const heartbeatTimer = job.lease_token
+    ? setInterval(() => {
+        if (heartbeatRunning) return;
+        heartbeatRunning = true;
+        void heartbeatJob(job)
+          .then((renewed) => {
+            if (!renewed) logger.warn('[video-worker] Rendering lease was not renewed', { jobId: job.id });
+          })
+          .catch((error) => {
+            logger.error('[video-worker] Rendering heartbeat failed', error, { jobId: job.id });
+          })
+          .finally(() => { heartbeatRunning = false; });
+      }, 60_000)
+    : null;
 
   try {
     const primaryScene = storyboard.scenes[0];
@@ -373,5 +389,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     const message = error instanceof Error ? error.message : String(error);
     logger.error('[video-worker] Render failed', error, { jobId: job.id });
     await markFailed(job.id, message, { provider: 'video-worker' });
+  } finally {
+    if (heartbeatTimer) clearInterval(heartbeatTimer);
   }
 }

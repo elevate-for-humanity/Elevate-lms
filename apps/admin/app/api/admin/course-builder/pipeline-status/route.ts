@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
         .from('course_lessons')
         .select('id, content, learning_objectives, video_status, video_url')
         .eq('course_id', courseId),
-      db.from('video_jobs').select('id, status').eq('course_id', courseId),
+      db.from('video_jobs').select('id, status, review_status, retry_count, failure_class, error_message, lease_expires_at, dead_lettered_at').eq('course_id', courseId),
     ]);
 
     if (modulesRes.error) {
@@ -113,12 +113,23 @@ export async function GET(request: NextRequest) {
     let queuedJobs = 0;
     let runningJobs = 0;
     let failedJobs = 0;
+    let approvedJobs = 0;
+    let staleJobs = 0;
+    let storageFailures = 0;
+    let retryBudgetExhausted = 0;
+    let deadLetterJobs = 0;
+    const now = Date.now();
 
     for (const job of jobs) {
       const state = String(job.status ?? '').toLowerCase();
       if (state === 'queued') queuedJobs += 1;
       else if (state === 'rendering' || state === 'running' || state === 'processing') runningJobs += 1;
       else if (VIDEO_FAILED_STATES.has(state)) failedJobs += 1;
+      if (job.review_status === 'approved') approvedJobs += 1;
+      if (job.lease_expires_at && new Date(job.lease_expires_at).getTime() < now && state === 'rendering') staleJobs += 1;
+      if (job.failure_class === 'storage' || /413|request entity too large/i.test(job.error_message ?? '')) storageFailures += 1;
+      if (Number(job.retry_count ?? 0) >= 3) retryBudgetExhausted += 1;
+      if (job.dead_lettered_at) deadLetterJobs += 1;
     }
 
     const buildReady = moduleCount > 0 && lessonCount > 0 && lessonsMissingContent === 0;
@@ -157,6 +168,11 @@ export async function GET(request: NextRequest) {
         queuedJobs,
         runningJobs,
         failedJobs,
+        approvedJobs,
+        staleJobs,
+        storageFailures,
+        retryBudgetExhausted,
+        deadLetterJobs,
       },
       nextAction: isComplete
         ? 'Course generation pipeline complete.'

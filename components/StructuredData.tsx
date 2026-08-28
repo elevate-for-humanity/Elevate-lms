@@ -47,7 +47,7 @@ export default function StructuredData() {
       availableLanguage: ['English'],
     },
     sameAs: [
-      'https://facebook.com/elevateforhumanity',
+      'https://www.facebook.com/profile.php?id=61571046346179',
       'https://linkedin.com/company/elevateforhumanity',
       'https://instagram.com/elevateforhumanity',
       'https://www.youtube.com/@elevateforhumanity',

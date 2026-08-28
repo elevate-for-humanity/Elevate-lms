@@ -1,7 +1,7 @@
 import { after, NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { markRendering, type VideoJob } from '@/lib/video/job-queue';
+import type { VideoJob } from '@/lib/video/job-queue';
 import { processClaimedVideoJob } from '@/lib/video/process-video-job';
 
 export const runtime = 'nodejs';
@@ -128,43 +128,21 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  let candidateQuery = db
-    .from('video_jobs')
-    .select('*')
-    .eq('status', 'queued');
-  if (courseId) candidateQuery = candidateQuery.eq('course_id', courseId);
-  const { data: candidates, error: queueError } = await candidateQuery
-    .order('asset_kind', { ascending: true })
-    .order('queued_at', { ascending: true })
-    .order('id', { ascending: true })
-    .limit(availableSlots);
-
-  if (queueError) {
-    return NextResponse.json({ error: 'Unable to read the video queue' }, { status: 500 });
+  // Postgres owns the concurrency boundary. FOR UPDATE SKIP LOCKED prevents
+  // separate Admin instances from rendering the same canonical asset.
+  const { data: claimedRows, error: claimError } = await db.rpc('claim_video_jobs', {
+    p_limit: availableSlots,
+    p_course_id: courseId,
+    p_lease_seconds: 900,
+  });
+  if (claimError) {
+    logger.error('[video-worker] Atomic queue claim failed', claimError);
+    return NextResponse.json({ error: 'Unable to claim the video queue' }, { status: 500 });
   }
-  if (!candidates?.length) {
+  if (!claimedRows?.length) {
     return NextResponse.json({ ok: true, started: 0, reason: 'queue-empty', courseId });
   }
-
-  const claimedJobs: VideoJob[] = [];
-  for (const candidate of candidates) {
-    const startedAt = new Date().toISOString();
-    const { data: claimed, error: claimError } = await db
-      .from('video_jobs')
-      .update({ status: 'rendering', started_at: startedAt, updated_at: startedAt })
-      .eq('id', candidate.id)
-      .eq('status', 'queued')
-      .select('*')
-      .maybeSingle();
-
-    if (claimError || !claimed) continue;
-    await markRendering(claimed.id);
-    claimedJobs.push(claimed as VideoJob);
-  }
-
-  if (!claimedJobs.length) {
-    return NextResponse.json({ ok: true, started: 0, reason: 'already-claimed', courseId });
-  }
+  const claimedJobs = claimedRows as VideoJob[];
 
   after(async () => {
     const results = await Promise.allSettled(claimedJobs.map((job) => processClaimedVideoJob(job)));

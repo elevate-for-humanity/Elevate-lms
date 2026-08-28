@@ -42,6 +42,8 @@ interface ResumeBuilderProps {
   onSave: (data: ResumeData) => Promise<void>;
 }
 
+type WorkExperience = ResumeData['work_experience'][number];
+
 export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
   const [resumeData, setResumeData] = useState<ResumeData>({
     personal_info: initialData?.personal_info || {
@@ -125,10 +127,19 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
   };
 
   const removeWorkExperience = (index: number) => {
-    setResumeData({
-      ...resumeData,
-      work_experience: resumeData.work_experience.filter((_, i) => i !== index),
-    });
+    setResumeData((current) => ({
+      ...current,
+      work_experience: current.work_experience.filter((_, i) => i !== index),
+    }));
+  };
+
+  const updateWorkExperience = (index: number, changes: Partial<WorkExperience>) => {
+    setResumeData((current) => ({
+      ...current,
+      work_experience: current.work_experience.map((experience, currentIndex) =>
+        currentIndex === index ? { ...experience, ...changes } : experience,
+      ),
+    }));
   };
 
   return (
@@ -253,11 +264,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     e: React.ChangeEvent<
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >,
-                  ) => {
-                    const updated = [...resumeData.work_experience];
-                    updated[index].title = e.target.value;
-                    setResumeData({ ...resumeData, work_experience: updated });
-                  }}
+                  ) => updateWorkExperience(index, { title: e.target.value })}
                   className="bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
                 <input
@@ -268,11 +275,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     e: React.ChangeEvent<
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >,
-                  ) => {
-                    const updated = [...resumeData.work_experience];
-                    updated[index].company = e.target.value;
-                    setResumeData({ ...resumeData, work_experience: updated });
-                  }}
+                  ) => updateWorkExperience(index, { company: e.target.value })}
                   className="bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
                 <input
@@ -283,11 +286,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     e: React.ChangeEvent<
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >,
-                  ) => {
-                    const updated = [...resumeData.work_experience];
-                    updated[index].location = e.target.value;
-                    setResumeData({ ...resumeData, work_experience: updated });
-                  }}
+                  ) => updateWorkExperience(index, { location: e.target.value })}
                   className="bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
                 <div className="flex gap-2">
@@ -297,11 +296,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     value={exp.start_date}
                     onChange={(
                       e: React.ChangeEvent<HTMLInputElement>,
-                    ) => {
-                      const updated = [...resumeData.work_experience];
-                      updated[index].start_date = e.target.value;
-                      setResumeData({ ...resumeData, work_experience: updated });
-                    }}
+                    ) => updateWorkExperience(index, { start_date: e.target.value })}
                     className="flex-1 bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                   />
                   <input
@@ -309,11 +304,9 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     placeholder="End Date"
                     value={exp.end_date}
                     disabled={exp.current}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const updated = [...resumeData.work_experience];
-                      updated[index].end_date = e.target.value;
-                      setResumeData({ ...resumeData, work_experience: updated });
-                    }}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      updateWorkExperience(index, { end_date: e.target.value })
+                    }
                     className="flex-1 bg-slate-800 text-white rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-brand-orange-500 disabled:opacity-50"
                   />
                 </div>
@@ -321,11 +314,12 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                   <input
                     type="checkbox"
                     checked={exp.current}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const updated = [...resumeData.work_experience];
-                      updated[index].current = e.target.checked;
-                      setResumeData({ ...resumeData, work_experience: updated });
-                    }}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      updateWorkExperience(index, {
+                        current: e.target.checked,
+                        ...(e.target.checked ? { end_date: '' } : {}),
+                      })
+                    }
                     className="rounded"
                   />
                   I currently work here
@@ -337,11 +331,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
                     e: React.ChangeEvent<
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >,
-                  ) => {
-                    const updated = [...resumeData.work_experience];
-                    updated[index].description = e.target.value;
-                    setResumeData({ ...resumeData, work_experience: updated });
-                  }}
+                  ) => updateWorkExperience(index, { description: e.target.value })}
                   className="col-span-2 bg-slate-800 text-white rounded-lg p-2 min-h-[80px] focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
                 />
               </div>

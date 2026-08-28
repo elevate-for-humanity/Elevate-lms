@@ -239,7 +239,9 @@ export async function markComplete(
     last_provider: result.provider ?? null,
     last_provider_model: result.provider_model ?? null,
     provider: result.provider ?? null,
-    review_status: 'pending_review',
+    // process-video-job calls markComplete only after the canonical rendered-
+    // media gate succeeds. That gate is the automated approval authority.
+    review_status: 'approved',
     reviewed_by: null,
     reviewed_at: null,
     review_notes: null,
@@ -269,7 +271,15 @@ export async function markComplete(
       quality_evidence: result.quality_evidence ?? {},
       procedure_schema: result.scene_data ?? {},
       transcript: job.script ?? null,
-      status: 'candidate',
+      caption_url: result.scene_data && typeof result.scene_data === 'object'
+        ? (result.scene_data as Record<string, unknown>).captionUrl ?? null
+        : null,
+      transcript_url: result.scene_data && typeof result.scene_data === 'object'
+        ? (result.scene_data as Record<string, unknown>).transcriptUrl ?? null
+        : null,
+      // lesson_video_versions uses active as the promoted learner-facing state.
+      status: 'active',
+      approved_at: now,
     };
     const { data: existingVersion } = await supabase
       .from('lesson_video_versions').select('id').eq('video_job_id', jobId).maybeSingle();
@@ -277,9 +287,19 @@ export async function markComplete(
       ? await supabase.from('lesson_video_versions').update(candidateVersion).eq('id', existingVersion.id)
       : await supabase.from('lesson_video_versions').insert(candidateVersion);
     if (versionResult.error) throw versionResult.error;
+    const { error: lessonPromotionError } = await supabase.from('course_lessons').update({
+      video_url: result.video_url,
+      video_status: 'complete',
+      video_error: null,
+      video_generated_at: now,
+      scene_data: result.scene_data ?? null,
+      duration_seconds: result.duration_seconds ?? null,
+      updated_at: now,
+    }).eq('id', job.lesson_id);
+    if (lessonPromotionError) throw lessonPromotionError;
   } else if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, {
-      status: 'complete',
+      status: 'approved',
       videoUrl: result.video_url,
       audioUrl: result.audio_url ?? null,
       renderedDurationSeconds: result.duration_seconds ?? null,

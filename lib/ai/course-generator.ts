@@ -275,8 +275,8 @@ function validateCourse(data: unknown): GeneratedCourse {
 
 export async function generateCourse(opts: CourseGeneratorOptions): Promise<GeneratedCourse> {
   // Ground generation in the existing Supabase/pgvector knowledge base. The
-  // helper degrades to an empty string when embeddings or Supabase are not
-  // configured, so course creation remains available through provider failover.
+  // helper returns an empty string only when no matching evidence exists. AI
+  // generation itself remains bound to the one configured provider authority.
   const ragContext = await getRAGContext([
     opts.courseTitle,
     opts.prompt,
@@ -307,14 +307,13 @@ export async function generateCourse(opts: CourseGeneratorOptions): Promise<Gene
   try {
     const result = await aiChat({
       messages,
-      model: 'gpt-4.1',
       temperature: 0.7,
       maxTokens: 8000,
     });
     raw = result.content;
   } catch (err) {
     logger.error('[CourseGenerator] AI call failed', err);
-    throw new Error('AI generation failed. Check OPENAI_API_KEY is configured.', { cause: err });
+    throw new Error('AI generation failed through the configured provider. Repair the canonical AI provider configuration.', { cause: err });
   }
 
   // Attempt parse; retry once with repair if it fails
@@ -334,7 +333,6 @@ export async function generateCourse(opts: CourseGeneratorOptions): Promise<Gene
               'Your response was not valid JSON. Return only the JSON object, no other text.',
           },
         ],
-        model: 'gpt-4.1',
         temperature: 0.2,
         maxTokens: 8000,
       });

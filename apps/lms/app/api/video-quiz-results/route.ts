@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 
 type QuizAnswerBody = {
   lessonId?: unknown;
+  courseId?: unknown;
   question?: unknown;
   selectedAnswer?: unknown;
   correctAnswer?: unknown;
@@ -30,6 +31,7 @@ export async function POST(request: NextRequest) {
 
   const body = (await request.json().catch(() => null)) as QuizAnswerBody | null;
   const lessonId = typeof body?.lessonId === 'string' ? body.lessonId.trim() : '';
+  const courseId = typeof body?.courseId === 'string' ? body.courseId.trim() : '';
   const question = typeof body?.question === 'string' ? body.question.trim() : '';
   const selectedAnswer = integer(body?.selectedAnswer);
   const correctAnswer = integer(body?.correctAnswer);
@@ -39,6 +41,7 @@ export async function POST(request: NextRequest) {
 
   if (
     !lessonId ||
+    !courseId ||
     !question ||
     question.length > 2000 ||
     selectedAnswer === null ||
@@ -61,9 +64,18 @@ export async function POST(request: NextRequest) {
   }
 
   const db = await requireAdminClient();
+  const { data: lesson, error: lessonError } = await db
+    .from('course_lessons')
+    .select('course_id')
+    .eq('id', lessonId)
+    .maybeSingle();
+  if (lessonError || !lesson || lesson.course_id !== courseId) {
+    return NextResponse.json({ error: 'The lesson does not belong to the requested course.' }, { status: 400 });
+  }
   const { error } = await db.from('interactive_video_quiz_answers').upsert(
     {
       user_id: user.id,
+      course_id: courseId,
       lesson_id: lessonId,
       question,
       selected_answer: selectedAnswer,

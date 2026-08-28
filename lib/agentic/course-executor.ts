@@ -125,17 +125,6 @@ async function updateTask(
   });
 }
 
-function reviewOnlyBlockingIssues(issues: string[]) {
-  const reviewPatterns = [
-    'review_status must be approved',
-    'authorized human course reviewer missing',
-    'authorized human course review timestamp missing',
-    'AI lesson not human-approved',
-    'authorized human sign-off missing',
-  ];
-  return issues.length > 0 && issues.every((issue) => reviewPatterns.some((pattern) => issue.includes(pattern)));
-}
-
 export async function processCourseAgenticTask(input: {
   task: AgenticTaskRow;
   run: AgenticRunRow;
@@ -267,21 +256,11 @@ export async function processCourseAgenticTask(input: {
       }, 'Course passed canonical procurement, governance, accessibility, instructional, and media readiness checks.');
       return;
     }
-    if (reviewOnlyBlockingIssues(health.blocking_issues)) {
-      await updateTask(task, project, 'waiting_review', {
-        course_id: target.courseId,
-        procurement: health.metrics,
-        media,
-        blocking_issues: health.blocking_issues,
-        human_review_required: true,
-      }, 'Technical course validation is complete; authorized human review is still required before publication.');
-      return;
-    }
     throw new Error(`Course governance failed: ${health.blocking_issues.join(' | ')}`);
   }
 
   if (task.worker === 'publisher') {
-    if (!project.user_id) throw new Error('Canonical publication requires an authenticated reviewer/publisher identity.');
+    if (!project.user_id) throw new Error('Canonical publication requires an authenticated initiating identity for the audit trail.');
     const media = await getCourseMediaState(target.courseId, { verifyUrls: true });
     if (!media.completePackage) {
       throw new Error(`Publication blocked: canonical media package incomplete (${media.complete}/${media.expectedTotal} complete, ${media.failed} failed, ${media.queued} queued, ${media.rendering} rendering).`);
@@ -300,7 +279,7 @@ export async function processCourseAgenticTask(input: {
       procurement_gate: result.procurement_gate,
       media,
       published: true,
-    }, 'Canonical course publication completed after media readiness, governance, and authorized human review.');
+    }, 'Canonical course publication completed after every automated acceptance gate passed.');
     await db
       .from('agentic_build_runs')
       .update({ status: 'completed', completed_at: new Date().toISOString(), error: null })

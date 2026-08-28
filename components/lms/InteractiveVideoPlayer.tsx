@@ -132,6 +132,7 @@ export default function InteractiveVideoPlayer({
   const [checkpointChoice, setCheckpointChoice] = useState<number | null>(null);
   const [checkpointFeedback, setCheckpointFeedback] = useState('');
   const [completedCheckpointKeys, setCompletedCheckpointKeys] = useState<Set<string>>(new Set());
+  const resumePositionRef = useRef(0);
 
   const effectiveQuizzes = useMemo(() => {
     const checkpointQuizzes: VideoQuiz[] = checkpoints
@@ -192,6 +193,42 @@ export default function InteractiveVideoPlayer({
     void loadNotes();
   }, [courseId, lessonRecordId]);
 
+  // Restore durable playback and checkpoint state before allowing completion.
+  useEffect(() => {
+    const loadPlaybackState = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !lessonRecordId || !courseId) return;
+
+      const [progressResult, quizResult, checkpointResult] = await Promise.all([
+        supabase.from('learner_video_progress')
+          .select('last_position_seconds')
+          .eq('user_id', user.id).eq('course_id', courseId).eq('lesson_id', lessonRecordId)
+          .maybeSingle(),
+        supabase.from('interactive_video_quiz_answers')
+          .select('timestamp_sec,is_correct')
+          .eq('user_id', user.id).eq('course_id', courseId).eq('lesson_id', lessonRecordId)
+          .eq('is_correct', true),
+        supabase.from('learner_video_checkpoint_responses')
+          .select('checkpoint_key')
+          .eq('user_id', user.id).eq('course_id', courseId).eq('lesson_id', lessonRecordId)
+          .eq('completed', true),
+      ]);
+
+      const failure = progressResult.error || quizResult.error || checkpointResult.error;
+      if (failure) {
+        setPersistenceError('Saved playback and checkpoint progress could not be loaded. Refresh and try again.');
+        return;
+      }
+      resumePositionRef.current = Number(progressResult.data?.last_position_seconds ?? 0);
+      setCompletedCheckpointKeys(new Set([
+        ...(quizResult.data ?? []).map((row) => `quiz:${Number(row.timestamp_sec)}`),
+        ...(checkpointResult.data ?? []).map((row) => row.checkpoint_key),
+      ]));
+    };
+    void loadPlaybackState();
+  }, [courseId, lessonRecordId]);
+
   // Save note to database
   const saveNote = async () => {
     if (!newNote.trim()) return;
@@ -246,8 +283,8 @@ export default function InteractiveVideoPlayer({
         lesson_id: lessonRecordId,
         progress_percent: progress,
         last_position_seconds: currentTime,
-        completed: progress >= 95,
-        completed_at: progress >= 95 ? now : null,
+        completed: progress >= 95 && allCheckpointsComplete,
+        completed_at: progress >= 95 && allCheckpointsComplete ? now : null,
         updated_at: now,
       }, { onConflict: 'user_id,lesson_id' });
 
@@ -374,14 +411,25 @@ export default function InteractiveVideoPlayer({
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
+      const resumeAt = Math.min(resumePositionRef.current, Math.max(0, videoRef.current.duration - 0.25));
+      if (resumeAt > 0) {
+        videoRef.current.currentTime = resumeAt;
+        setCurrentTime(resumeAt);
+      }
       syncAudioOutput();
     }
   };
 
   const handleSeek = (time: number) => {
     if (videoRef.current) {
-      videoRef.current.currentTime = time;
-      setCurrentTime(time);
+      const blockingCheckpoint = checkpoints
+        .filter((checkpoint) => !completedCheckpointKeys.has(getCheckpointKey(checkpoint)))
+        .map((checkpoint) => checkpoint.timestamp)
+        .filter((timestamp) => timestamp > currentTime && timestamp < time)
+        .sort((left, right) => left - right)[0];
+      const allowedTime = blockingCheckpoint ?? time;
+      videoRef.current.currentTime = allowedTime;
+      setCurrentTime(allowedTime);
     }
   };
 
@@ -409,7 +457,7 @@ export default function InteractiveVideoPlayer({
 
   const skip = (seconds: number) => {
     if (videoRef.current) {
-      videoRef.current.currentTime += seconds;
+      handleSeek(Math.max(0, Math.min(duration, videoRef.current.currentTime + seconds)));
     }
   };
 
@@ -423,11 +471,11 @@ export default function InteractiveVideoPlayer({
     }
   };
 
-  const submitQuizAnswer = () => {
+  const submitQuizAnswer = async () => {
     if (quizAnswer !== null && currentQuiz) {
       const isCorrect = quizAnswer === currentQuiz.correctAnswer;
       setShowQuizResult(true);
-      void fetch('/api/lms/video-quiz-results', {
+      const response = await fetch('/api/video-quiz-results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -439,7 +487,12 @@ export default function InteractiveVideoPlayer({
           isCorrect,
           timestamp: currentQuiz.timestamp,
         }),
-      }).catch(() => {});
+      }).catch(() => null);
+      if (!response?.ok) {
+        setPersistenceError('Your quiz response was not saved. Check your connection and submit it again.');
+        return;
+      }
+      setPersistenceError(null);
 
       if (!isCorrect) return;
       setCompletedCheckpointKeys((current) => new Set(current).add(`quiz:${currentQuiz.timestamp}`));
@@ -459,7 +512,7 @@ export default function InteractiveVideoPlayer({
     setQuizAnswer(null);
   };
 
-  const completeActiveCheckpoint = () => {
+  const completeActiveCheckpoint = async () => {
     if (!activeCheckpoint) return;
     let valid = false;
     let feedback = '';
@@ -483,8 +536,40 @@ export default function InteractiveVideoPlayer({
     setCheckpointFeedback(feedback);
     if (!valid) return;
 
+    if (!lessonRecordId || !courseId) {
+      setPersistenceError('Open this video from your enrolled course before completing checkpoints.');
+      return;
+    }
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setPersistenceError('Sign in before completing this checkpoint.');
+      return;
+    }
     const completed = activeCheckpoint;
-    setCompletedCheckpointKeys((current) => new Set(current).add(getCheckpointKey(completed)));
+    const checkpointKey = getCheckpointKey(completed);
+    const { error } = await supabase.from('learner_video_checkpoint_responses').upsert({
+      user_id: user.id,
+      course_id: courseId,
+      lesson_id: lessonRecordId,
+      checkpoint_key: checkpointKey,
+      checkpoint_type: completed.type,
+      response: completed.type === 'reflection'
+        ? { text: checkpointResponse.trim() }
+        : completed.type === 'key-concept'
+          ? { acknowledged: true }
+          : { selectedIndex: checkpointChoice },
+      is_correct: completed.type === 'reflection' || completed.type === 'key-concept' ? null : true,
+      completed: true,
+      completed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id,lesson_id,checkpoint_key' });
+    if (error) {
+      setPersistenceError('Your checkpoint response was not saved. Confirm course access and try again.');
+      return;
+    }
+    setPersistenceError(null);
+    setCompletedCheckpointKeys((current) => new Set(current).add(checkpointKey));
     setTimeout(() => {
       setActiveCheckpoint(null);
       setCheckpointChoice(null);

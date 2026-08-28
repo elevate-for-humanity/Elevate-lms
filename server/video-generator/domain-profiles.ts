@@ -84,8 +84,24 @@ export const INSTRUCTIONAL_DOMAIN_PROFILES: Record<InstructionalDomainKey, Instr
 };
 
 export function resolveInstructionalDomainProfile(domainKey?: string | null): InstructionalDomainProfile {
-  const normalized = domainKey?.trim().toLowerCase().replace(/[\s-]+/g, '_') as InstructionalDomainKey | undefined;
-  return normalized && INSTRUCTIONAL_DOMAIN_PROFILES[normalized]
-    ? INSTRUCTIONAL_DOMAIN_PROFILES[normalized]
-    : INSTRUCTIONAL_DOMAIN_PROFILES.general;
+  const normalized = domainKey?.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_') ?? '';
+  if (INSTRUCTIONAL_DOMAIN_PROFILES[normalized as InstructionalDomainKey]) {
+    return INSTRUCTIONAL_DOMAIN_PROFILES[normalized as InstructionalDomainKey];
+  }
+
+  // These aliases resolve persisted occupation/compliance identifiers, not
+  // human-facing course titles. A lesson-level competency such as
+  // `infection_control` must be paired with its persisted course profile by
+  // the caller rather than guessed here.
+  const aliases: Array<[RegExp, InstructionalDomainKey]> = [
+    [/(^|_)(barber|barbering)(_|$)/, 'barbering'],
+    [/(^|_)(cosmetology|cosmetologist)(_|$)/, 'cosmetology'],
+    [/(^|_)(esthetic|esthetics|esthetician)(_|$)/, 'esthetics'],
+    [/(^|_)(nail_technology|nail_technician|manicurist)(_|$)/, 'nail_technology'],
+    [/(^|_)(hvac|epa_?608|refrigeration)(_|$)/, 'hvac_epa608'],
+    [/(^|_)(healthcare|medical|clinical|nursing|cna)(_|$)/, 'healthcare'],
+    [/(^|_)(business|workforce|entrepreneurship)(_|$)/, 'business'],
+  ];
+  const resolved = aliases.find(([pattern]) => pattern.test(normalized))?.[1] ?? 'general';
+  return INSTRUCTIONAL_DOMAIN_PROFILES[resolved];
 }

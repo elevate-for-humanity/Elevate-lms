@@ -26,6 +26,18 @@ describe('instructional video domain profiles', () => {
     expect(resolveInstructionalDomainProfile('unknown-course')).toMatchObject({ key: 'general' });
   });
 
+  it.each([
+    ['indiana_barber_apprenticeship', 'barbering'],
+    ['indiana_cosmetologist_license', 'cosmetology'],
+    ['esthetician_state_board', 'esthetics'],
+    ['manicurist_apprenticeship', 'nail_technology'],
+    ['epa_608_universal', 'hvac_epa608'],
+    ['cna_clinical_skills', 'healthcare'],
+    ['business_workforce_certificate', 'business'],
+  ])('resolves persisted compliance profile %s to %s', (profileKey, expected) => {
+    expect(resolveInstructionalDomainProfile(profileKey).key).toBe(expected);
+  });
+
   it('creates cosmetology instruction without barber-only language', () => {
     const prompt = buildSceneGenerationUserPrompt({
       lessonId: 'cos-lesson-1',

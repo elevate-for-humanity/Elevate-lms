@@ -16,6 +16,8 @@ import { directMedia, scenePrompt, type MediaCharacterReference } from './media-
 import { recordMediaProvenance } from './media-provenance';
 import { renderStoryboardVideo } from './remotion-render';
 import { uploadLessonMediaBuffer } from './upload-lesson-media';
+import { generateLessonScenes } from '@/server/video-generator/generateLessonScenes';
+import type { LessonRenderPlanDraft } from '@/server/video-generator/types';
 
 const REMOTION_PROVIDER = 'remotion';
 const REMOTION_MODEL = 'ElevateLesson';
@@ -26,6 +28,16 @@ async function hydrateMediaRuntimeSecrets(): Promise<void> {
   );
   if (!missing.length) return;
   const db = createAdminClient();
+  const { data: runtimeSettings } = await db
+    .from('platform_settings')
+    .select('key,value')
+    .in('key', ['AI_PROVIDER', 'AI_TRANSCRIPTION_MODEL'])
+    .eq('is_active', true);
+  for (const setting of runtimeSettings ?? []) {
+    if (!process.env[setting.key]?.trim() && typeof setting.value === 'string' && setting.value.trim()) {
+      process.env[setting.key] = setting.value.trim();
+    }
+  }
   for (const key of missing) {
     try {
       const { data, error } = await db.rpc('get_platform_secret', { p_key: key });
@@ -57,6 +69,35 @@ function mediaCharacters(sceneData: Record<string, unknown>): MediaCharacterRefe
     }));
 }
 
+function generatedSceneData(plan: LessonRenderPlanDraft): Record<string, unknown> {
+  return {
+    instructional_plan_version: '1.0',
+    voice: plan.voice,
+    video_style: plan.videoStyle,
+    target_resolution: plan.targetResolution,
+    scenes: plan.scenes.map((scene) => ({
+      id: scene.id,
+      duration_seconds: scene.maxClipSeconds ?? scene.minClipSeconds ?? 8,
+      subject: plan.title,
+      environment: scene.videoQuery,
+      action: scene.demonstrationStep,
+      visual_prompt: scene.visualFocus ?? scene.videoQuery,
+      visual_style: plan.videoStyle,
+      dialogue: scene.narration,
+      procedure_phase: scene.instructionalObjective,
+      required_visual_evidence: scene.evidenceExpectation,
+      shot_size: /close|detail|inspect/i.test(scene.visualFocus ?? '') ? 'close-up' : 'medium-close',
+      camera_move: 'dolly-in',
+      transition: scene.transitionOut === 'crossfade' ? 'crossfade' : 'cut',
+      source_authority: {
+        dol_competency_id: scene.dolCompetencyId,
+        state_requirement: scene.stateRequirement,
+        exam_domain: scene.examDomain,
+      },
+    })),
+  };
+}
+
 /** Render one already-claimed canonical video job. GPU generation is an optional
  * rendering mechanic for microclips; Remotion is the common fallback. Both
  * report terminal state through the same video_jobs identity. */
@@ -65,7 +106,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   const db = createAdminClient();
   const { data: course } = await db
     .from('courses')
-    .select('title,org_id')
+    .select('title,org_id,program_id,compliance_profile_key,governing_body,governing_region,governing_standard_version')
     .eq('id', job.course_id)
     .maybeSingle();
   const courseTitle = course?.title ?? 'Elevate LMS';
@@ -81,7 +122,43 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   const instructor = getInstructorForCourse(courseTitle);
   const script = job.script?.trim() || job.lesson_title;
   const bulletPoints = Array.isArray(job.bullet_points) ? job.bullet_points : [];
-  const sceneData = job.scene_data && typeof job.scene_data === 'object' ? (job.scene_data as Record<string, unknown>) : {};
+  const persistedSceneData = job.scene_data && typeof job.scene_data === 'object' ? (job.scene_data as Record<string, unknown>) : {};
+  const { data: lesson } = await db
+    .from('course_lessons')
+    .select('content,content_json,domain_key,compliance_profile_key,lesson_type,evidence_type')
+    .eq('id', job.lesson_id)
+    .maybeSingle();
+  const { data: program } = course?.program_id
+    ? await db
+        .from('programs')
+        .select('occupation_code,category,track,type')
+        .eq('id', course.program_id)
+        .maybeSingle()
+    : { data: null };
+  const domainProfileKey = [
+    persistedSceneData.domain_profile_key,
+    lesson?.compliance_profile_key,
+    course?.compliance_profile_key,
+    program?.occupation_code,
+    program?.track,
+    program?.category,
+    program?.type,
+  ].find((value): value is string => typeof value === 'string' && value.trim().length > 0) ?? null;
+  const suppliedScenes = Array.isArray(persistedSceneData.scenes) && persistedSceneData.scenes.length > 0;
+  const generatedPlan = suppliedScenes
+    ? null
+    : await generateLessonScenes({
+        lessonId: job.lesson_id,
+        title: job.lesson_title,
+        content: script,
+        domainKey: domainProfileKey,
+        occupationTitle: typeof program?.track === 'string' ? program.track : undefined,
+        stateAuthority: course?.governing_body ?? undefined,
+        stateStandardVersion: course?.governing_standard_version ?? undefined,
+        stateRequirement: typeof lesson?.compliance_profile_key === 'string' ? lesson.compliance_profile_key : undefined,
+        requiresPracticalEvidence: lesson?.evidence_type === 'practical' || lesson?.lesson_type === 'lab',
+      });
+  const sceneData = generatedPlan ? generatedSceneData(generatedPlan) : persistedSceneData;
   const isMicroclip = job.asset_kind === 'microclip';
   // Every render is an immutable candidate. Approval, not rendering, changes
   // the learner-facing lesson URL.

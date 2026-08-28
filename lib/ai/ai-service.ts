@@ -43,26 +43,30 @@ const imageProviders: Record<string, () => AIImageProvider> = {
   stability: () => new StabilityProvider(),
 };
 
-// Provider precedence is fully configurable via AI_PROVIDER_ORDER
-// (comma-separated). The default is self-hosted/free-first: the platform-owned
-// GPU worker leads when configured, then Cloudflare Workers AI and the other
-// low-cost paths, with OpenAI last and optional.
-const DEFAULT_CHAT_PROVIDER_ORDER = ['elevate', 'cloudflare', 'groq', 'gemini', 'google', 'anthropic', 'azure', 'openai'];
+// One configured provider is authoritative. AI_PROVIDER is preferred; the
+// first AI_PROVIDER_ORDER entry remains a migration-compatible way to select
+// that same single authority. Course generation must repair a failed provider,
+// never produce divergent artifacts through a silent provider substitution.
+const PROVIDER_DISCOVERY_ORDER = ['elevate', 'cloudflare', 'groq', 'gemini', 'google', 'anthropic', 'azure', 'openai'];
+let discoveredProviderName: string | null = null;
 
-function chatProviderOrder(): string[] {
-  const configured = process.env.AI_PROVIDER_ORDER?.trim();
-  if (!configured) return DEFAULT_CHAT_PROVIDER_ORDER;
-  const names = configured
-    .split(',')
+function configuredProviderName(): string {
+  const explicit = process.env.AI_PROVIDER?.trim().toLowerCase();
+  if (explicit) return explicit;
+  if (discoveredProviderName) return discoveredProviderName;
+  const ordered = process.env.AI_PROVIDER_ORDER?.split(',')
     .map((name) => name.trim().toLowerCase())
-    .filter((name) => name && name !== 'none' && Boolean(chatProviders[name]));
-  const deduped = names.filter((name, index) => names.indexOf(name) === index);
-  // Append any providers not explicitly listed so an override can never
-  // silently remove a working fallback path.
-  for (const name of DEFAULT_CHAT_PROVIDER_ORDER) {
-    if (!deduped.includes(name)) deduped.push(name);
-  }
-  return deduped;
+    .filter((name) => name && name !== 'none') ?? [];
+  const candidates = [...ordered, ...PROVIDER_DISCOVERY_ORDER]
+    .filter((name, index, names) => names.indexOf(name) === index);
+  const discovered = candidates.find((name) => {
+    const createProvider = chatProviders[name];
+    return Boolean(createProvider && createProvider().isAvailable());
+  });
+  if (!discovered) return ordered[0] ?? PROVIDER_DISCOVERY_ORDER[0]!;
+  discoveredProviderName = discovered;
+  logger.warn(`[aiChat] AI_PROVIDER is not explicitly set; locking this process to discovered provider "${discovered}"`);
+  return discovered;
 }
 const CIRCUIT_RECOVERY_WAIT_MS = 31_000;
 const disabledChatProviders = new Set<string>();
@@ -91,11 +95,7 @@ function disableProviderForProcess(providerName: string, error: unknown): void {
 }
 
 function configuredDefaultProvider(): string {
-  const configured = process.env.AI_PROVIDER?.trim().toLowerCase();
-  if (configured) return configured;
-  // No explicit preference: lead with the first provider in the configured
-  // order (self-hosted first by default).
-  return chatProviderOrder()[0] ?? 'elevate';
+  return configuredProviderName();
 }
 
 function resolveChatProvider(): AIProvider {
@@ -106,43 +106,18 @@ function resolveChatProvider(): AIProvider {
     if (!createProvider) throw new Error(`Unknown AI chat provider: ${preferred}`);
     const provider = createProvider();
     if (provider.isAvailable()) return provider;
-    logger.warn(`AI provider "${preferred}" not available, trying fallbacks`);
+    throw new Error(`Configured AI provider "${preferred}" is unavailable; repair its canonical configuration`);
   }
 
-  for (const name of chatProviderOrder()) {
-    if (name === preferred || disabledChatProviders.has(name)) continue;
-    const createProvider = chatProviders[name];
-    if (!createProvider) continue;
-    const provider = createProvider();
-    if (provider.isAvailable()) {
-      logger.info(`AI: using fallback provider "${name}"`);
-      return provider;
-    }
-  }
-
-  throw new Error(
-    'No AI chat provider available. Configure the Elevate LLM worker (ELEVATE_LLM_URL/ELEVATE_LLM_SECRET), Cloudflare Workers AI credentials, GROQ_API_KEY, GEMINI_API_KEY, GOOGLE_CLOUD_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY, or AZURE_OPENAI_API_KEY.',
-  );
+  throw new Error(`Configured AI provider "${preferred}" is unknown or disabled; repair AI_PROVIDER configuration`);
 }
 
-function resolveChatCandidates(options: ChatCompletionOptions): AIProvider[] {
-  const explicit = options.provider && options.provider !== 'none' && chatProviders[options.provider]
-    ? String(options.provider)
-    : null;
-  const preferred = explicit || configuredDefaultProvider();
-  const names = [preferred, ...chatProviderOrder()].filter(
-    (name, index, list) =>
-      name !== 'none' &&
-      Boolean(chatProviders[name]) &&
-      !disabledChatProviders.has(name) &&
-      list.indexOf(name) === index,
-  );
-
-  return names
-    .map((name) => chatProviders[name])
-    .filter((createProvider): createProvider is () => AIProvider => Boolean(createProvider))
-    .map((createProvider) => createProvider())
-    .filter((provider) => provider.isAvailable());
+function resolveConfiguredChatProvider(options: ChatCompletionOptions): AIProvider {
+  const configured = configuredDefaultProvider();
+  if (options.provider && options.provider !== 'none' && options.provider !== configured) {
+    throw new Error(`Provider override "${options.provider}" is not allowed; configured authority is "${configured}"`);
+  }
+  return resolveChatProvider();
 }
 
 function resolveImageProvider(): AIImageProvider {
@@ -166,55 +141,45 @@ function resolveImageProvider(): AIImageProvider {
 }
 
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
-  let providers = resolveChatCandidates(options);
-  if (!providers.length) {
-    throw new Error('No AI chat provider available in the configured free-first or paid provider pools.');
-  }
-
-  let lastError: unknown;
+  let provider = resolveConfiguredChatProvider(options);
   const allowCircuitRecoveryWait = process.env.AI_CIRCUIT_RECOVERY_WAIT === '1';
   const passes = allowCircuitRecoveryWait ? 2 : 1;
 
   for (let pass = 0; pass < passes; pass += 1) {
-    for (const provider of providers) {
-      if (disabledChatProviders.has(provider.name)) continue;
-      try {
-        const providerOptions = { ...options, provider: provider.name as AIProviderName };
-        const result = await withResilience(() => provider.chat(providerOptions), {
-          circuitBreaker: CircuitBreaker.for(`ai:${provider.name}`, {
-            failureThreshold: 5,
-            resetTimeoutMs: 30_000,
-          }),
-          attempts: 2,
-          baseDelayMs: 1000,
-          label: `aiChat:${provider.name}`,
-          shouldRetry: (err) => {
-            const msg = err instanceof Error ? err.message : String(err);
-            return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
-          },
-        });
-        return { ...result, provider: provider.name };
-      } catch (error) {
-        lastError = error;
-        if (isTerminalProviderError(error)) disableProviderForProcess(provider.name, error);
-        logger.warn(`[aiChat] provider "${provider.name}" failed; trying next configured provider`, {
-          error: error instanceof Error ? error.message : String(error),
-        });
-      }
-    }
-
-    if (pass === 0 && allowCircuitRecoveryWait && lastError instanceof CircuitOpenError) {
-      logger.warn('[aiChat] configured provider attempts ended with an open circuit; waiting for provider recovery window', {
-        waitMs: CIRCUIT_RECOVERY_WAIT_MS,
+    try {
+      const providerOptions = { ...options, provider: provider.name as AIProviderName };
+      const result = await withResilience(() => provider.chat(providerOptions), {
+        circuitBreaker: CircuitBreaker.for(`ai:${provider.name}`, {
+          failureThreshold: 5,
+          resetTimeoutMs: 30_000,
+        }),
+        attempts: 2,
+        baseDelayMs: 1000,
+        label: `aiChat:${provider.name}`,
+        shouldRetry: (err) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
+        },
       });
-      await sleep(CIRCUIT_RECOVERY_WAIT_MS);
-      providers = resolveChatCandidates(options);
-      continue;
+      return { ...result, provider: provider.name };
+    } catch (error) {
+      if (isTerminalProviderError(error)) disableProviderForProcess(provider.name, error);
+      if (pass === 0 && allowCircuitRecoveryWait && error instanceof CircuitOpenError) {
+        logger.warn('[aiChat] configured provider attempts ended with an open circuit; waiting for provider recovery window', {
+          waitMs: CIRCUIT_RECOVERY_WAIT_MS,
+        });
+        await sleep(CIRCUIT_RECOVERY_WAIT_MS);
+        provider = resolveConfiguredChatProvider(options);
+        continue;
+      }
+      throw new Error(
+        `Configured AI provider "${provider.name}" failed; repair that provider before retrying: ${error instanceof Error ? error.message : String(error)}`,
+        { cause: error },
+      );
     }
-    break;
   }
 
-  throw lastError instanceof Error ? lastError : new Error('All configured AI chat providers failed');
+  throw new Error(`Configured AI provider "${provider.name}" did not recover`);
 }
 
 export async function* aiChatStream(options: ChatCompletionOptions): AsyncIterable<string> {

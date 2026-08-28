@@ -10,6 +10,7 @@ import { getSocCode } from '@/lib/onet/soc-map';
 import { fetchOnetOccupation, isOnetConfigured } from '@/lib/industry/onet';
 import { fetchCareerOneStopData, isCareerOneStopConfigured } from '@/lib/industry/careeronestop';
 import { logger } from '@/lib/logger';
+import { getRAGContext } from '@/lib/platform/rag';
 
 export type CourseEvidenceContext = {
   standardsBlock: string;
@@ -46,6 +47,21 @@ export async function buildCourseEvidenceContext(args: {
   ];
 
   const socCode = args.programSlug ? getSocCode(args.programSlug) : null;
+
+  const ragQuery = [
+    blueprint.credentialTitle,
+    args.programSlug ?? blueprint.programSlug,
+    blueprint.state ?? args.state,
+    ...blueprint.modules.map((module) => module.domainKey ?? module.title),
+  ].filter(Boolean).join(' | ');
+  const ragContext = await getRAGContext(ragQuery);
+  if (ragContext.trim()) {
+    sources.push('Supabase-pgvector-RAG');
+    lines.push(ragContext);
+  } else {
+    warnings.push('Supabase RAG returned no evidence for this course build');
+  }
+
   if (!socCode) {
     warnings.push(`No SOC mapping exists for ${args.programSlug ?? blueprint.programSlug ?? 'course'}`);
   } else {

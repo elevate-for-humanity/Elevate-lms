@@ -12,7 +12,7 @@
 import type { SupabaseClient } from '@/lib/supabase';
 import type { QuizQuestion } from './schema';
 import { logger } from '@/lib/logger';
-import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
+import { aiChat } from '@/lib/ai/ai-service';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { z } from 'zod';
 
@@ -116,19 +116,13 @@ async function requestQuestionBatch(input: {
   idPrefix: string;
 }): Promise<GeneratedQuestion[]> {
   await hydrateProcessEnv();
-  if (!isOpenAIConfigured()) {
-    throw new Error('Assessment generation requires OPENAI_API_KEY; placeholders are not permitted for published assessments');
-  }
-
-  const client = getOpenAIClient();
   const competencyText = input.competencyKeys?.length
     ? `Competencies to cover: ${input.competencyKeys.join(', ')}.`
     : 'Cover the stated domain comprehensively.';
 
-  const response = await client.chat.completions.create({
-    model: 'gpt-4o-mini',
+  const response = await aiChat({
     temperature: 0.25,
-    response_format: { type: 'json_object' },
+    maxTokens: 5000,
     messages: [
       {
         role: 'system',
@@ -152,7 +146,7 @@ async function requestQuestionBatch(input: {
     ],
   });
 
-  const raw = response.choices[0]?.message?.content;
+  const raw = response.content;
   if (!raw) throw new Error('Assessment AI returned an empty response');
 
   let decoded: unknown;

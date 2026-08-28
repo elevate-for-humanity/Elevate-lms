@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { execFile } from 'node:child_process';
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
@@ -80,10 +80,10 @@ function normalizedWords(value: string): string[] {
   return value.toLowerCase().match(/[a-z0-9]+/g) ?? [];
 }
 
-function narrationCoverage(script: string, storyboard: MediaStoryboard): number {
+function narrationCoverage(script: string, deliveredTranscript: string): number {
   const expected = normalizedWords(script);
   if (!expected.length) return 1;
-  const delivered = new Set(normalizedWords(storyboard.scenes.map((scene) => scene.dialogue || scene.action).join(' ')));
+  const delivered = new Set(normalizedWords(deliveredTranscript));
   return expected.filter((word) => delivered.has(word)).length / expected.length;
 }
 
@@ -94,11 +94,43 @@ function longestMetric(output: string, key: 'freeze_duration' | 'black_duration'
   return [...output.matchAll(expression)].reduce((longest, match) => Math.max(longest, Number(match[1]) || 0), 0);
 }
 
-async function requireTextAsset(url: string, label: string): Promise<void> {
+async function requireTextAsset(url: string, label: string): Promise<string> {
   const response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
   if (!response.ok) throw new Error(`${label} returned HTTP ${response.status}`);
   const content = (await response.text()).trim();
   if (!content) throw new Error(`${label} is empty`);
+  return content;
+}
+
+async function transcribeRenderedAudio(videoPath: string, workDir: string): Promise<string> {
+  const provider = process.env.AI_PROVIDER?.trim().toLowerCase();
+  if (provider !== 'openai') {
+    throw new Error(`Rendered-audio transcription is not configured for canonical provider "${provider || 'unset'}"`);
+  }
+  const model = process.env.AI_TRANSCRIPTION_MODEL?.trim();
+  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  if (!model) throw new Error('AI_TRANSCRIPTION_MODEL is not configured');
+  if (!apiKey) throw new Error('OPENAI_API_KEY is not configured for rendered-audio validation');
+
+  const audioPath = join(workDir, 'rendered-audio.wav');
+  await execFileAsync('ffmpeg', [
+    '-hide_banner', '-loglevel', 'error', '-y', '-i', videoPath,
+    '-vn', '-ac', '1', '-ar', '16000', audioPath,
+  ], { timeout: 120_000, maxBuffer: 2_000_000 });
+  const form = new FormData();
+  form.append('file', new Blob([await readFile(audioPath)], { type: 'audio/wav' }), 'rendered-audio.wav');
+  form.append('model', model);
+  form.append('response_format', 'text');
+  const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}` },
+    body: form,
+    signal: AbortSignal.timeout(180_000),
+  });
+  if (!response.ok) throw new Error(`Rendered-audio transcription returned HTTP ${response.status}`);
+  const transcript = (await response.text()).trim();
+  if (!transcript) throw new Error('Rendered-audio transcription is empty');
+  return transcript;
 }
 
 export async function enforceMediaQuality(input: {
@@ -125,6 +157,7 @@ export async function enforceMediaQuality(input: {
       streams?: Array<{ codec_type?: string }>;
     };
     const streams = probe.streams ?? [];
+    const actualTranscript = await transcribeRenderedAudio(videoPath, workDir);
     const evidenceScenes = input.sceneData.scenes.filter((scene) => Boolean(scene.requiredVisualEvidence));
     const visualKeys = input.sceneData.scenes.map((scene) => scene.referenceImageUrl || scene.sourceVideoUrl || scene.action.trim().toLowerCase());
     const counts = new Map<string, number>();
@@ -153,7 +186,7 @@ export async function enforceMediaQuality(input: {
       transcriptUrl: input.sceneData.transcriptUrl,
       provider: input.provider,
       providerModel: input.providerModel,
-      narrationCoverage: narrationCoverage(input.expectedScript, input.sceneData),
+      narrationCoverage: narrationCoverage(input.expectedScript, actualTranscript),
       visualEvidenceCoverage: input.sceneData.scenes.length ? evidenceScenes.length / input.sceneData.scenes.length : 0,
       repeatedVisualMaximum: Math.max(0, ...counts.values()),
       requiredProcedurePhases,
@@ -161,10 +194,16 @@ export async function enforceMediaQuality(input: {
     };
     const failures = mediaQualityFailures(evidence);
     if (failures.length) throw new Error(`Media quality gate failed: ${failures.join('; ')}`);
-    await Promise.all([
+    const [captions, transcript] = await Promise.all([
       requireTextAsset(input.sceneData.captionUrl!, 'captions'),
       requireTextAsset(input.sceneData.transcriptUrl!, 'transcript'),
     ]);
+    if (narrationCoverage(actualTranscript, captions) < 0.9) {
+      throw new Error('Media quality gate failed: captions do not cover rendered narration');
+    }
+    if (narrationCoverage(actualTranscript, transcript) < 0.9) {
+      throw new Error('Media quality gate failed: transcript does not cover rendered narration');
+    }
     return evidence;
   } finally {
     await rm(workDir, { recursive: true, force: true }).catch(() => undefined);

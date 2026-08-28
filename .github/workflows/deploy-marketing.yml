@@ -1,5 +1,7 @@
 name: Deploy Marketing (www)
 
+# Deployment checkpoint: strict-boundary repair convergence
+
 on:
   push:
     branches:

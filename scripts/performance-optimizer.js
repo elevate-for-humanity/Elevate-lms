@@ -159,7 +159,7 @@ class PerformanceOptimizer {
       logo: 'https://elevateforhumanity.org/images/logo.png',
       sameAs: [
         'https://www.linkedin.com/company/elevate-for-humanity',
-        'https://www.facebook.com/elevateforhumanity',
+        'https://www.facebook.com/61578240192934/',
       ],
       address: {
         '@type': 'PostalAddress',

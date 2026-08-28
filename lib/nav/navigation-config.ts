@@ -231,7 +231,7 @@ export const quickActions = {
  * Social Media Links
  */
 export const socialLinks = {
-  facebook: 'https://www.facebook.com/profile.php?id=61571046346179',
+  facebook: 'https://www.facebook.com/61578240192934/',
   instagram: 'https://instagram.com/elevateforhumanity',
   linkedin: 'https://www.linkedin.com/in/elevate-for-humanity-b5a2b3339/',
 };

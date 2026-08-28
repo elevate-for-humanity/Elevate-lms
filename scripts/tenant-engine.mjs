@@ -262,7 +262,7 @@ async function processTenant(t) {
     name: 'Elevate for Humanity Career & Training Institute',
     url: BASE,
     sameAs: [
-      'https://www.facebook.com/elevateforhumanity',
+      'https://www.facebook.com/61578240192934/',
       'https://www.linkedin.com/company/elevateforhumanity',
     ],
     contactPoint: [
@@ -388,4 +388,3 @@ console.table(
     blog: r.sections.blog || 0,
   }))
 );
-

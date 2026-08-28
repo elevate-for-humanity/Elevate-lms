@@ -14,7 +14,7 @@ export const siteConfig = {
     studentPortal: 'https://app.elevateforhumanity.org/lms/dashboard',
   },
   social: {
-    facebook: 'https://www.facebook.com/elevateforhumanity',
+    facebook: 'https://www.facebook.com/61578240192934/',
     instagram: 'https://www.instagram.com/elevateforhumanity',
     linkedin: 'https://www.linkedin.com/company/elevate-for-humanity',
   },

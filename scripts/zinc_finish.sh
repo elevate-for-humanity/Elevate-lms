@@ -127,7 +127,7 @@ export const footerSections = [
 ];
 
 export const socialLinks = {
-  facebook: "https://facebook.com/elevateforhumanity",
+  facebook: "https://www.facebook.com/61578240192934/",
   linkedin: "https://linkedin.com/company/elevate-for-humanity",
   youtube: "https://www.youtube.com/@elevateforhumanity",
   instagram: "https://instagram.com/elevateforhumanity",

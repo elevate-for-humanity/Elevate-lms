@@ -535,7 +535,7 @@ export const footerNavigation = {
       { label: 'IPLA Exam', href: '/apprenticeships/ipla-exam' },
     ],
   },
-  quickLinks:   {
+  quickLinks: {
     title: 'Quick Links',
     links: [
       { label: 'Agencies', href: '/agencies' },
@@ -706,7 +706,7 @@ export const utilityNavigation = {
  * SOCIAL MEDIA LINKS
  */
 export const socialLinks = {
-  facebook: 'https://www.facebook.com/profile.php?id=61571046346179',
+  facebook: 'https://www.facebook.com/61578240192934/',
   // twitter: 'https://twitter.com/elevate4humanity', // Removed per user request
   linkedin: 'https://linkedin.com/company/elevate-for-humanity',
   instagram: 'https://instagram.com/elevateforhumanity',

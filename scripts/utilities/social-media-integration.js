@@ -149,7 +149,7 @@ class SocialMediaIntegration {
         status: 'success',
         platform: 'facebook',
         postId: 'fb_' + Date.now(),
-        url: 'https://facebook.com/elevateforhumanity/posts/' + Date.now(),
+        url: 'https://www.facebook.com/61578240192934/posts/' + Date.now(),
         message: 'Posted to Facebook successfully',
       };
     } catch (error) {

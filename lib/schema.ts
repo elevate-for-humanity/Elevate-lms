@@ -38,7 +38,7 @@ export const organizationSchema: WithContext<Organization> = {
     email: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
   },
   sameAs: [
-    'https://www.facebook.com/profile.php?id=61571046346179',
+    'https://www.facebook.com/61578240192934/',
     'https://www.linkedin.com/company/elevateforhumanity',
     'https://www.instagram.com/elevateforhumanity',
   ],

@@ -50,7 +50,7 @@ async function _POST(req: NextRequest) {
         process.env.NEXT_PUBLIC_LMS_URL ||
         process.env.NEXT_PUBLIC_APP_URL ||
         'https://app.elevateforhumanity.org'
-      ).replace(/\/$/, '')}/lms/payments`,
+      ).replace(/\/$/, '')}/apprentice/billing`,
     });
 
     return NextResponse.json({ url: session.url });

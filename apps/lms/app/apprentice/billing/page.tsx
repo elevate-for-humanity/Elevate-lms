@@ -24,9 +24,13 @@ type SubscriptionRow = {
 };
 
 function summary(program: 'barber' | 'cosmetology', sub: SubscriptionRow): BillingSummary {
+  const hasSubscription = !!sub.stripe_subscription_id;
   return {
     program,
-    paymentStatus: sub.payment_status ?? 'pending_payment_method',
+    paymentStatus:
+      !sub.fully_paid && !hasSubscription
+        ? 'pending_payment_method'
+        : sub.payment_status ?? 'pending_payment_method',
     weeklyPaymentCents: sub.weekly_payment_cents ?? null,
     remainingBalance: sub.remaining_balance ?? null,
     fullTuitionAmount: sub.full_tuition_amount ?? null,
@@ -34,6 +38,7 @@ function summary(program: 'barber' | 'cosmetology', sub: SubscriptionRow): Billi
     nextPaymentDate: sub.next_payment_date ?? null,
     fullyPaid: sub.fully_paid ?? false,
     setupFeePaid: sub.setup_fee_paid ?? false,
+    hasSubscription,
   };
 }
 

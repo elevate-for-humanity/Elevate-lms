@@ -14,6 +14,7 @@ export interface BillingSummary {
   nextPaymentDate: string | null;
   fullyPaid: boolean;
   setupFeePaid: boolean;
+  hasSubscription: boolean;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
@@ -71,6 +72,7 @@ function fmtDate(iso: string | null): string {
 export default function BillingCard({ billing }: { billing: BillingSummary }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [authorized, setAuthorized] = useState(false);
 
   const statusCfg = STATUS_CONFIG[billing.paymentStatus] ?? {
     label: billing.paymentStatus,
@@ -88,14 +90,20 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
     setLoading(true);
     setError('');
     try {
-      const endpoint =
-        billing.program === 'barber'
-          ? '/api/barber/update-payment'
-          : '/api/cosmetology/update-payment';
-      const res = await fetch(endpoint, { method: 'POST' });
+      const needsSetup = !billing.hasSubscription;
+      if (needsSetup && !authorized) {
+        setError('Review and accept the automatic-payment authorization before continuing.');
+        return;
+      }
+      const endpoint = needsSetup ? '/api/billing/setup' : '/api/billing/portal';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: needsSetup ? JSON.stringify({ authorized: true }) : undefined,
+      });
       const json = await res.json();
       if (!res.ok) {
-        setError(json.error ?? 'Unable to open billing portal. Please contact support.');
+        setError(json.error ?? 'Unable to open secure Stripe billing. Please contact support.');
         return;
       }
       window.location.href = json.url;
@@ -228,14 +236,36 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
 
         {/* Update payment method — only if not paid in full and has Stripe */}
         {!billing.fullyPaid && billing.paymentStatus !== 'cancelled' && (
-          <button
-            onClick={handleUpdatePayment}
-            disabled={loading}
-            className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition"
-          >
-            <CreditCard className="w-4 h-4" />
-            {loading ? 'Opening portal…' : 'Update Payment Method'}
-          </button>
+          <div className="space-y-3 pt-2">
+            {!billing.hasSubscription && (
+              <label className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={authorized}
+                  onChange={(event) => setAuthorized(event.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-slate-400"
+                />
+                <span>
+                  I authorize Elevate for Humanity to securely save my payment method with
+                  Stripe and automatically charge the weekly tuition amount shown above until
+                  the remaining balance is paid or the finite payment schedule ends. I understand
+                  I will receive receipts and can update my payment method from this dashboard.
+                </span>
+              </label>
+            )}
+            <button
+              onClick={handleUpdatePayment}
+              disabled={loading || (!billing.hasSubscription && !authorized)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition"
+            >
+              <CreditCard className="w-4 h-4" />
+              {loading
+                ? 'Opening secure Stripe page…'
+                : billing.hasSubscription
+                  ? 'Update Payment Method'
+                  : 'Authorize & Add Card'}
+            </button>
+          </div>
         )}
       </div>
     </div>

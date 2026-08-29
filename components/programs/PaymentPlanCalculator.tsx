@@ -11,6 +11,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp, Tag } from 'lucide-react';
 import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 
@@ -42,6 +43,8 @@ function fmt(cents: number) {
 }
 
 export default function PaymentPlanCalculator({ programSlug, successUrl }: Props) {
+  const searchParams = useSearchParams();
+  const applicationReference = searchParams.get('ref') || undefined;
   const [pricing, setPricing] = useState<ProgramPricing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -90,6 +93,7 @@ export default function PaymentPlanCalculator({ programSlug, successUrl }: Props
             : `${window.location.origin}/programs/${programSlug}/enrollment-success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/programs/${programSlug}`,
           couponCode: couponCode.trim() || undefined,
+          applicationReference,
         }),
       });
       const data = await res.json();

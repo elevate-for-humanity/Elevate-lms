@@ -385,7 +385,7 @@ async function _POST(req: Request) {
     // create a second admissions record.
     const { data: activeApp } = await supabase
       .from('applications')
-      .select('id, reference_number, status, program_interest')
+      .select('id, reference_number, status, program_interest, funding_type, payment_status')
       .eq('email', body.email.toLowerCase().trim())
       .eq('program_interest', program)
       .not('status', 'in', '("rejected","withdrawn","duplicate")')
@@ -405,7 +405,11 @@ async function _POST(req: Request) {
           nextStepUrl:
             activeApp.status === 'pending_workone' || activeApp.status === 'pending_funding'
               ? `/apply/pending-workone?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
-              : `/apply/track?id=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`,
+              : String(activeApp.funding_type || '').startsWith('self_pay') &&
+                  activeApp.payment_status !== 'paid' &&
+                  PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(activeApp.program_interest ?? program)
+                ? `/programs/${encodeURIComponent(activeApp.program_interest ?? program)}/payment-setup?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
+                : `/apply/track?id=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`,
         },
         { status: 200, headers: corsHeadersForOrigin(origin, allowedOrigins) },
       );
@@ -876,9 +880,14 @@ async function _POST(req: Request) {
       logger.warn('[Applications] Failed to queue automation job', queueError instanceof Error ? queueError.message : String(queueError));
     }
 
+    const requiresSelfPayCheckout =
+      String(fundingType || '').startsWith('self_pay') &&
+      PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(data.program_interest ?? program);
     const nextStepUrl = needsWorkOne
       ? `/apply/pending-workone?ref=${encodeURIComponent(referenceNumber)}&funding=${encodeURIComponent(fundingType || 'workone')}`
-      : `/apply/success?ref=${encodeURIComponent(referenceNumber)}&program=${encodeURIComponent(data.program_interest ?? program)}`;
+      : requiresSelfPayCheckout
+        ? `/programs/${encodeURIComponent(data.program_interest ?? program)}/payment-setup?ref=${encodeURIComponent(referenceNumber)}`
+        : `/apply/success?ref=${encodeURIComponent(referenceNumber)}&program=${encodeURIComponent(data.program_interest ?? program)}`;
 
     return NextResponse.json(
       {

@@ -340,7 +340,7 @@ export function ApprenticePortalShell({
               <div className="flex-1">
                 <p className="font-semibold text-red-800 text-sm">Action required — payment method needed</p>
                 <p className="text-red-700 text-xs mt-0.5">
-                  A card is required to stay enrolled. Your tuition is billed weekly — without a card on file your enrollment will be paused and your hours will stop counting.
+                  A payment method and authorization are required for an active self-pay plan. Future training access may be paused under your enrollment agreement if billing is not completed; previously approved hours remain on your record.
                 </p>
               </div>
               <Link
@@ -382,8 +382,8 @@ export function ApprenticePortalShell({
                 </p>
                 <p className="text-amber-700 text-xs mt-0.5">
                   {subStatus === 'past_due'
-                    ? 'Your weekly tuition payment failed — this usually happens when a card expires or has insufficient funds. Update your card now so your enrollment stays active and your hours keep counting toward your license.'
-                    : 'A card is required to stay enrolled. Your tuition is billed weekly — without a card on file your enrollment will be paused and your hours will stop counting.'}
+                    ? 'Your weekly tuition payment failed — this usually happens when a card expires or has insufficient funds. Update your card to keep future training access active. Previously approved hours remain on your record.'
+                    : 'A payment method and authorization are required for an active self-pay plan. Future training access may be paused under your enrollment agreement if billing is not completed; previously approved hours remain on your record.'}
                 </p>
               </div>
               <Link

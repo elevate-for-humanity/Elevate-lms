@@ -397,7 +397,11 @@ export default function StudentApplicationForm({
         if (ref) q.set('ref', ref);
         if (prog) q.set('program', prog);
         const suffix = q.toString() ? `?${q.toString()}` : '';
-        setTimeout(() => router.push(`/apply/success${suffix}`), 1200);
+        const nextStepUrl =
+          typeof data.nextStepUrl === 'string' && data.nextStepUrl.startsWith('/')
+            ? data.nextStepUrl
+            : `/apply/success${suffix}`;
+        setTimeout(() => router.push(nextStepUrl), 1200);
       } else {
         setResult({
           success: false,

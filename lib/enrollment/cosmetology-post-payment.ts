@@ -49,7 +49,7 @@ export async function runCosmetologyPostPayment(
       updated_at: new Date().toISOString(),
     })
     .eq('id', applicationId)
-    .select('id, email, first_name, last_name, phone, status, enrollment_id')
+    .select('id, email, first_name, last_name, phone, status, enrollment_id, user_id')
     .maybeSingle();
 
   if (appErr || !app) {
@@ -135,8 +135,9 @@ export async function runCosmetologyPostPayment(
               email: studentEmail,
               full_name: studentName,
               phone: app.phone ?? null,
-              status: 'active',
-              enrollment_state: 'enrolled',
+              status: 'enrolled_pending_approval',
+              enrollment_state: 'payment_confirmed',
+              payment_status: 'paid',
               funding_source: 'self_pay',
               amount_paid_cents: amountPaidCents,
               stripe_checkout_session_id: stripeSessionId,
@@ -170,7 +171,22 @@ export async function runCosmetologyPostPayment(
       }
     }
   } else {
-    steps['create_enrollment'] = 'skipped';
+    const { error: updateEnrollmentErr } = await db
+      .from('program_enrollments')
+      .update({
+        student_id: app.user_id ?? undefined,
+        user_id: app.user_id ?? undefined,
+        course_id: COSMETOLOGY_COURSE_ID,
+        status: 'enrolled_pending_approval',
+        enrollment_state: 'payment_confirmed',
+        payment_status: 'paid',
+        amount_paid_cents: amountPaidCents,
+        stripe_checkout_session_id: stripeSessionId,
+        stripe_payment_intent_id: stripePaymentIntentId ?? null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', enrollmentId);
+    steps['create_enrollment'] = updateEnrollmentErr ? 'failed' : 'skipped';
   }
 
   // ── Step 3: Create follow-up reminder for admin ───────────────────────────

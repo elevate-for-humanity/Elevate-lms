@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
     successUrl?: string;
     cancelUrl?: string;
     couponCode?: string;
+    applicationReference?: string;
   };
   try {
     body = await request.json();
@@ -82,6 +83,28 @@ export async function POST(request: NextRequest) {
 
   const slug = body.slug?.trim();
   if (!slug) return NextResponse.json({ error: 'Program slug is required.' }, { status: 400 });
+
+  const applicationReference = body.applicationReference?.trim() || null;
+  let applicationId: string | null = null;
+  let applicantUserId: string | null = null;
+  let applicantEmail: string | null = null;
+  let applicantName: string | null = null;
+  let applicantPhone: string | null = null;
+  if (applicationReference) {
+    const { data: application } = await admin
+      .from('applications')
+      .select('id, user_id, email, first_name, last_name, phone, program_interest, funding_type')
+      .eq('reference_number', applicationReference)
+      .maybeSingle();
+    if (!application || application.program_interest !== slug || !String(application.funding_type || '').startsWith('self_pay')) {
+      return NextResponse.json({ error: 'This payment link does not match the submitted application.' }, { status: 400 });
+    }
+    applicationId = application.id;
+    applicantUserId = application.user_id;
+    applicantEmail = application.email;
+    applicantName = [application.first_name, application.last_name].filter(Boolean).join(' ') || null;
+    applicantPhone = application.phone;
+  }
 
   const pricing = await resolvePricing(slug);
   if (!pricing) {
@@ -133,7 +156,10 @@ export async function POST(request: NextRequest) {
     .insert({
       program_id: programRow.id,
       program_slug: slug,
-      user_id: null,
+      user_id: applicantUserId,
+      email: applicantEmail,
+      full_name: applicantName,
+      phone: applicantPhone,
       funding_source: 'self_pay',
       status: 'checkout_pending',
       payment_status: 'pending',
@@ -147,6 +173,13 @@ export async function POST(request: NextRequest) {
   if (pendingError || !pendingEnrollment?.id) {
     logger.error('[program-checkout] Pending enrollment insert failed', pendingError?.message ?? 'unknown', { slug });
     return NextResponse.json({ error: 'Unable to prepare enrollment checkout.' }, { status: 500 });
+  }
+
+  if (applicationId) {
+    await admin
+      .from('applications')
+      .update({ enrollment_id: pendingEnrollment.id, payment_status: 'pending' })
+      .eq('id', applicationId);
   }
 
   const couponCode = body.couponCode?.trim();
@@ -216,6 +249,8 @@ export async function POST(request: NextRequest) {
         amount_charged_cents: String(chargeCents),
         coupon_code: couponCode || '',
         source: 'marketing_program_page',
+        application_id: applicationId || '',
+        application_reference: applicationReference || '',
       },
     });
 

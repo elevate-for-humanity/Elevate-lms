@@ -86,15 +86,26 @@ export default async function SocialMediaPage() {
                     ? account.profile_data as Record<string, unknown>
                     : null;
                   const accountName = typeof profile?.name === 'string' ? profile.name : 'Account not identified';
+                  const canConnectWithMeta = !isConnected && ['facebook', 'instagram'].includes(account.platform);
                   return (
                     <div key={`${account.platform}-${accountName}`} className="flex items-center justify-between gap-4 py-4">
                       <div>
                         <p className="font-bold capitalize text-slate-900">{account.platform}</p>
                         <p className="text-sm text-slate-500">{accountName}</p>
                       </div>
-                      <span className={`rounded-full px-3 py-1 text-xs font-bold ${isConnected ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
-                        {isConnected ? 'Connected' : 'Needs connection'}
-                      </span>
+                      <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+                        <span className={`rounded-full px-3 py-1 text-xs font-bold ${isConnected ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
+                          {isConnected ? 'Connected' : 'Needs connection'}
+                        </span>
+                        {canConnectWithMeta ? (
+                          <Link
+                            href="/api/auth/facebook/authorize"
+                            className="rounded-lg bg-[#1877F2] px-3 py-2 text-xs font-bold text-white hover:bg-[#166fe5] focus:outline-none focus:ring-2 focus:ring-[#1877F2] focus:ring-offset-2"
+                          >
+                            Connect {account.platform === 'instagram' ? 'with Meta' : 'Facebook'}
+                          </Link>
+                        ) : null}
+                      </div>
                     </div>
                   );
                 })

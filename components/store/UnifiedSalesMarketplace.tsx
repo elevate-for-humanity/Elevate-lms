@@ -97,12 +97,12 @@ export function UnifiedSalesMarketplace() {
   }, [query, family]);
 
   return (
-    <section className="bg-slate-950 py-16 font-medium text-white" id="marketplace">
+    <section className="border-y border-cyan-100 bg-gradient-to-b from-white via-cyan-50/50 to-rose-50 py-16 font-medium text-slate-950" id="marketplace">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-300">One platform. Three clear buying paths.</p>
-          <h2 className="mt-5 text-3xl font-black tracking-tight text-white sm:text-5xl">Choose the part of Elevate you need now</h2>
-          <p className="mt-4 text-base font-semibold leading-7 text-slate-100 sm:text-lg">Start with business operations, education and workforce, or a managed enterprise scope. Add capabilities without rebuilding your organization in another system.</p>
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">One platform. Three clear buying paths.</p>
+          <h2 className="mt-5 text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">Choose the part of Elevate you need now</h2>
+          <p className="mt-4 text-base font-semibold leading-7 text-slate-700 sm:text-lg">Start with business operations, education and workforce, or a managed enterprise scope. Add capabilities without rebuilding your organization in another system.</p>
         </div>
 
         <div className="mx-auto mt-8 grid max-w-5xl gap-3 md:grid-cols-3">
@@ -114,22 +114,22 @@ export function UnifiedSalesMarketplace() {
                 type="button"
                 aria-pressed={selected}
                 onClick={() => setFamily(key)}
-                className={`rounded-2xl border p-5 text-left transition ${selected ? 'border-brand-red-400 bg-white text-slate-950 shadow-lg' : 'border-white/20 bg-white/10 text-white hover:bg-white/15'}`}
+                className={`rounded-2xl border p-5 text-left transition ${selected ? 'border-brand-red-400 bg-white text-slate-950 shadow-lg' : 'border-slate-200 bg-white text-slate-950 shadow-sm hover:border-orange-300 hover:shadow-md'}`}
               >
                 <span className="block text-lg font-black">{familyMeta[key].label}</span>
-                <span className={`mt-2 block text-sm leading-6 ${selected ? 'text-slate-600' : 'text-slate-200'}`}>{familyMeta[key].description}</span>
+                <span className={`mt-2 block text-sm leading-6 ${selected ? 'text-slate-600' : 'text-slate-600'}`}>{familyMeta[key].description}</span>
               </button>
             );
           })}
         </div>
 
         <div className="mx-auto mt-7 grid max-w-5xl gap-3 sm:grid-cols-[1fr_auto]">
-          <label className="block"><span className="sr-only">Search platform capabilities</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search website builder, CRM, PARIS, testing, apprenticeship..." className="w-full rounded-xl border border-white/30 bg-white px-5 py-3.5 text-base font-bold text-slate-950 outline-none ring-brand-red-500 placeholder:text-slate-600 focus:ring-2" /></label>
-          <button type="button" aria-pressed={family === 'all'} onClick={() => setFamily('all')} className={`rounded-xl px-5 py-3 text-sm font-black ${family === 'all' ? 'bg-brand-red-600 text-white' : 'border border-white/30 bg-white/10 text-white hover:bg-white/20'}`}>View All</button>
+          <label className="block"><span className="sr-only">Search platform capabilities</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search website builder, CRM, PARIS, testing, apprenticeship..." className="w-full rounded-xl border border-slate-300 bg-white px-5 py-3.5 text-base font-bold text-slate-950 outline-none ring-brand-red-500 placeholder:text-slate-600 focus:ring-2" /></label>
+          <button type="button" aria-pressed={family === 'all'} onClick={() => setFamily('all')} className={`rounded-xl px-5 py-3 text-sm font-black ${family === 'all' ? 'bg-brand-red-600 text-white' : 'border border-slate-300 bg-white/10 text-white hover:bg-white/20'}`}>View All</button>
         </div>
 
         {family !== 'all' ? (
-          <div className="mx-auto mt-6 max-w-5xl rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200">
+          <div className="mx-auto mt-6 max-w-5xl rounded-xl border border-cyan-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm">
             Showing {familyMeta[family].label}. Use search or View All when you already know the capability you need.
           </div>
         ) : null}
@@ -145,22 +145,22 @@ export function UnifiedSalesMarketplace() {
             const availability = publicAvailability(capability);
             const action = primaryAction(capability);
             return (
-              <article key={capability.key} className="flex min-h-[390px] flex-col overflow-hidden rounded-2xl border border-white/20 bg-slate-900 shadow-lg">
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-800">{image ? <Image src={image} alt={`${capabilityName} platform capability`} fill sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" className="object-cover" placeholder="empty" /> : <div className="flex h-full items-center justify-center bg-slate-800 p-8 text-center"><span className="text-2xl font-black text-white">{capabilityName}</span></div>}</div>
+              <article key={capability.key} className="flex min-h-[390px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5">
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">{image ? <Image src={image} alt={`${capabilityName} platform capability`} fill sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" className="object-cover" placeholder="empty" /> : <div className="flex h-full items-center justify-center bg-gradient-to-br from-cyan-100 to-rose-100 p-8 text-center"><span className="text-2xl font-black text-slate-950">{capabilityName}</span></div>}</div>
                 <div className="flex flex-1 flex-col p-6">
-                  <div className="flex items-start justify-between gap-4"><span className="text-xs font-black uppercase tracking-wide text-slate-100">{categoryMeta[capability.category].label}</span><span className="rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-black uppercase tracking-wide text-white">{availabilityLabel(availability)}</span></div>
-                  <h3 className="mt-4 text-xl font-black text-white">{capabilityName}</h3>
-                  <p className="mt-2 flex-1 text-sm font-semibold leading-6 text-slate-100">{capabilityDescription}</p>
-                  <p className="mt-4 text-sm font-black text-white">{priceFor(capability)}</p>
+                  <div className="flex items-start justify-between gap-4"><span className="text-xs font-black uppercase tracking-wide text-rose-700">{categoryMeta[capability.category].label}</span><span className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-black uppercase tracking-wide text-cyan-900">{availabilityLabel(availability)}</span></div>
+                  <h3 className="mt-4 text-xl font-black text-slate-950">{capabilityName}</h3>
+                  <p className="mt-2 flex-1 text-sm font-semibold leading-6 text-slate-700">{capabilityDescription}</p>
+                  <p className="mt-4 text-sm font-black text-slate-950">{priceFor(capability)}</p>
                   {availability === 'beta' ? <p className="mt-2 text-xs font-semibold text-amber-200">Beta availability may change while the capability is being finalized.</p> : null}
-                  <div className="mt-5 flex flex-wrap gap-2"><Link href={action.href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2.5 text-sm font-black text-white hover:bg-brand-red-500">{action.label}</Link><Link href={`/store/demo/capability/${String(capability.key)}`} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-black text-white hover:bg-white/20">See How It Works</Link></div>
+                  <div className="mt-5 flex flex-wrap gap-2"><Link href={action.href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2.5 text-sm font-black text-slate-950 hover:bg-brand-red-500">{action.label}</Link><Link href={`/store/demo/capability/${String(capability.key)}`} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-black text-slate-950 hover:bg-white/20">See How It Works</Link></div>
                 </div>
               </article>
             );
           })}
         </div>
-        {items.length === 0 ? <div className="mt-10 rounded-2xl border border-white/20 bg-white/10 p-8 text-center font-semibold text-slate-100">No matching capability in this buying path. Try View All or a broader search.</div> : null}
-        <div className="mt-12 grid gap-4 rounded-3xl border border-brand-red-500/40 bg-slate-900 p-7 md:grid-cols-[1fr_auto] md:items-center"><div><h3 className="text-2xl font-black text-white">Not sure what to choose?</h3><p className="mt-2 font-semibold text-slate-100">Use guided setup or start the 14-day trial. Your workspace can preserve the capabilities selected during onboarding.</p></div><div className="flex flex-wrap gap-3"><Link href="#guided-setup" className="rounded-xl border border-white/40 px-5 py-3 font-black text-white hover:bg-white/10">Use Guided Setup</Link><Link href="/store/trial" className="rounded-xl bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100">Start Free Trial</Link></div></div>
+        {items.length === 0 ? <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-8 text-center font-semibold text-slate-700">No matching capability in this buying path. Try View All or a broader search.</div> : null}
+        <div className="mt-12 grid gap-4 rounded-3xl border border-orange-200 bg-white p-7 shadow-lg md:grid-cols-[1fr_auto] md:items-center"><div><h3 className="text-2xl font-black text-slate-950">Not sure what to choose?</h3><p className="mt-2 font-semibold text-slate-700">Use guided setup or start the 14-day trial. Your workspace can preserve the capabilities selected during onboarding.</p></div><div className="flex flex-wrap gap-3"><Link href="#guided-setup" className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-50">Use Guided Setup</Link><Link href="/store/trial" className="rounded-xl bg-brand-red-700 px-5 py-3 font-black text-white hover:bg-brand-red-800">Start Free Trial</Link></div></div>
       </div>
     </section>
   );

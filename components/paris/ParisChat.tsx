@@ -13,6 +13,7 @@ import {
   User,
   Wrench,
 } from 'lucide-react';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -25,7 +26,7 @@ interface ParisChatProps {
   onComplete?: (recommendations: string[]) => void;
   showHeader?: boolean;
   className?: string;
-  surface?: 'public' | 'learner';
+  surface?: 'public' | 'learner' | 'store';
   courseTitle?: string | null;
   nextLessonTitle?: string | null;
   courseProgress?: number | null;
@@ -47,6 +48,13 @@ I can help you find the current program, funding, apprenticeship, testing, or ap
 Choose a pathway below or type your question.`,
 };
 
+const STORE_GREETING: Message = {
+  role: 'assistant',
+  content: `Hi — I'm PARIS, your Elevate platform advisor.
+
+I'll ask a few focused questions, recommend the smallest setup that fits, explain useful add-ons, and walk you through the relevant demos. What are you trying to accomplish first?`,
+};
+
 function learnerGreeting(courseTitle?: string | null, nextLessonTitle?: string | null): Message {
   return {
     role: 'assistant',
@@ -66,8 +74,10 @@ export default function ParisChat({
   courseProgress,
 }: ParisChatProps) {
   const learnerSurface = surface === 'learner';
+  const storeSurface = surface === 'store';
+  const voice = useNaturalVoice();
   const [messages, setMessages] = useState<Message[]>([
-    learnerSurface ? learnerGreeting(courseTitle, nextLessonTitle) : PUBLIC_GREETING,
+    learnerSurface ? learnerGreeting(courseTitle, nextLessonTitle) : storeSurface ? STORE_GREETING : PUBLIC_GREETING,
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -132,6 +142,9 @@ export default function ParisChat({
       }
 
       setMessages((previous) => [...previous, { role: 'assistant', content: data.reply }]);
+      if (storeSurface) {
+        void voice.play(data.reply, { voice: 'coral', style: 'commercial', rate: 0.96 });
+      }
       onComplete?.([]);
     } catch {
       setMessages((previous) => [
@@ -140,14 +153,16 @@ export default function ParisChat({
           role: 'assistant',
           content: learnerSurface
             ? 'I cannot retrieve your course guidance right now. Please continue from your learner dashboard or contact your instructor. I will not guess about your progress or graded work.'
-            : 'I cannot retrieve a verified answer right now. Please use the Program Directory at https://www.elevateforhumanity.org/programs or contact Admissions at https://www.elevateforhumanity.org/contact.',
+            : storeSurface
+              ? 'I cannot reach the live advisor right now. You can still compare current plans at /store/plans or explore the interactive demos at /store/demos.'
+              : 'I cannot retrieve a verified answer right now. Please use the Program Directory at https://www.elevateforhumanity.org/programs or contact Admissions at https://www.elevateforhumanity.org/contact.',
         },
       ]);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  }, [courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, surface]);
+  }, [courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, storeSurface, surface, voice]);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -170,8 +185,8 @@ export default function ParisChat({
               <GraduationCap className="h-6 w-6" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-lg font-bold">{learnerSurface ? 'PARIS Learning Assistant' : 'PARIS'}</h2>
-              <p className="text-sm text-slate-200">{learnerSurface ? courseTitle || 'Course guidance and study support' : 'Admissions & career navigation'}</p>
+              <h2 className="text-lg font-bold">{learnerSurface ? 'PARIS Learning Assistant' : storeSurface ? 'PARIS Platform Advisor' : 'PARIS'}</h2>
+              <p className="text-sm text-slate-200">{learnerSurface ? courseTitle || 'Course guidance and study support' : storeSurface ? 'Interview, recommendation, demos and answers' : 'Admissions & career navigation'}</p>
             </div>
           </div>
         </div>
@@ -234,7 +249,28 @@ export default function ParisChat({
           </div>
         )}
 
-        {!isLoading && messages.length === 1 && !learnerSurface && (
+        {!isLoading && messages.length === 1 && storeSurface && (
+          <div className="grid gap-2">
+            {[
+              'Interview me and recommend the best Elevate setup.',
+              'I need a website and more customers. What should I start with?',
+              'Walk me through the platform and explain useful add-ons.',
+            ].map((prompt) => (
+              <button
+                type="button"
+                key={prompt}
+                onClick={() => void sendToApi(prompt)}
+                className="flex min-h-12 items-center gap-3 rounded-xl border border-cyan-200 bg-white px-4 py-3 text-left font-semibold text-slate-950 shadow-sm transition hover:bg-cyan-50"
+              >
+                <Bot className="h-5 w-5 shrink-0 text-cyan-700" aria-hidden="true" />
+                <span>{prompt}</span>
+                <ArrowRight className="ml-auto h-4 w-4 shrink-0" aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {!isLoading && messages.length === 1 && !learnerSurface && !storeSurface && (
           <div className="grid gap-2 sm:grid-cols-2">
             {PATHWAYS.map(({ id, label, icon: Icon }) => (
               <button
@@ -262,7 +298,7 @@ export default function ParisChat({
             value={input}
             onChange={(event) => setInput(event.target.value.slice(0, 2000))}
             onKeyDown={handleKeyDown}
-            placeholder={learnerSurface ? 'Ask about your course or next lesson…' : 'Ask about a program, funding, testing, or apprenticeship…'}
+            placeholder={learnerSurface ? 'Ask about your course or next lesson…' : storeSurface ? 'Tell PARIS about your business or ask a platform question…' : 'Ask about a program, funding, testing, or apprenticeship…'}
             className="min-h-[52px] max-h-40 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-4 py-3 text-sm text-slate-950 focus:border-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-200"
             rows={2}
             disabled={isLoading}

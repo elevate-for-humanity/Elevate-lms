@@ -30,7 +30,7 @@ export function HomeApprenticeshipSales() {
 
           <div className="mt-7 flex flex-wrap gap-2">
             {PROGRAMS.map((program) => (
-              <Link key={program.href} href={program.href} className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-extrabold text-white transition hover:bg-white hover:text-slate-950">
+              <Link key={program.href} href={program.href} className="rounded-full border border-white/25 bg-slate-800/80 px-4 py-2 text-sm font-extrabold text-white transition hover:bg-slate-50 hover:text-slate-950">
                 {program.label}
               </Link>
             ))}

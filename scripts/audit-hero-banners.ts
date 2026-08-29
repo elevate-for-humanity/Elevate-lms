@@ -158,7 +158,7 @@ if (homeWrapper === null) {
   console.error('FAIL HomeHeroVideo wrapper is missing');
   failures += 1;
 } else {
-  const expectedDesktopHeight = 'h-[clamp(520px,72vh,900px)]';
+  const expectedDesktopHeight = 'h-[clamp(400px,62vh,680px)]';
   if (!homeWrapper.includes(expectedDesktopHeight)) {
     console.error('FAIL homepage hero desktop proportions drifted from the production contract');
     failures += 1;

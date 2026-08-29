@@ -74,7 +74,7 @@ export async function runElevateCouncil(options: {
 
   return {
     content: result.content,
-    provider: result.provider,
+    provider: result.provider || getActiveProviderName(),
     model: result.model,
     contributors: [],
     contributions: [],

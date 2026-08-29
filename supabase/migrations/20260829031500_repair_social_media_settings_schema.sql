@@ -24,6 +24,11 @@ set
   updated_at = now()
 where access_token is null;
 
+-- Remove synthetic smoke-test rows. Only supported provider identifiers belong
+-- in the canonical OAuth settings table.
+delete from public.social_media_settings
+where lower(trim(platform)) not in ('facebook', 'instagram', 'linkedin', 'youtube');
+
 create unique index if not exists social_media_settings_platform_key
   on public.social_media_settings (platform);
 
@@ -48,4 +53,3 @@ create policy social_media_settings_tenant_update
 
 comment on table public.social_media_settings is
   'Canonical OAuth credentials and public profile metadata for social publishing integrations';
-

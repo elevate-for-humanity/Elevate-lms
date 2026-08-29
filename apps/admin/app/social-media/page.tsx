@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { FileText, Megaphone, Radio, Send, Settings } from 'lucide-react';
+import { CheckCircle2, FileText, Megaphone, Radio, Send, Settings, XCircle } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,10 +22,20 @@ export default async function SocialMediaPage() {
       .eq('share_to_social', true),
   ]);
 
-  const accounts = accountsRes.data ?? [];
+  const supportedPlatforms = ['facebook', 'instagram', 'linkedin', 'youtube'] as const;
+  const rawAccounts = accountsRes.data ?? [];
+  const accountByPlatform = new Map(
+    rawAccounts
+      .filter((account) => supportedPlatforms.includes(account.platform as typeof supportedPlatforms[number]))
+      .map((account) => [account.platform, account]),
+  );
+  const accounts = supportedPlatforms.map((platform) => ({
+    platform,
+    account: accountByPlatform.get(platform),
+  }));
   const connected = accounts.filter((account) =>
-    account.enabled !== false && Boolean(account.access_token) &&
-    (!account.expires_at || new Date(account.expires_at) > new Date()),
+    account.account?.enabled !== false && Boolean(account.account?.access_token) &&
+    (!account.account?.expires_at || new Date(account.account.expires_at) > new Date()),
   );
 
   const stats = [
@@ -76,41 +86,36 @@ export default async function SocialMediaPage() {
               Draft preparation works independently from external publishing. Publishing should remain blocked until a selected platform has an active authenticated account.
             </p>
             <div className="mt-5 divide-y divide-slate-100">
-              {accounts.length === 0 ? (
-                <p className="py-4 text-sm text-slate-500">No social accounts are configured.</p>
-              ) : (
-                accounts.map((account) => {
-                  const isConnected = account.enabled !== false && Boolean(account.access_token) &&
-                    (!account.expires_at || new Date(account.expires_at) > new Date());
-                  const profile = account.profile_data && typeof account.profile_data === 'object'
+              {accounts.map(({ platform, account }) => {
+                  const isConnected = account?.enabled !== false && Boolean(account?.access_token) &&
+                    (!account?.expires_at || new Date(account.expires_at) > new Date());
+                  const profile = account?.profile_data && typeof account.profile_data === 'object'
                     ? account.profile_data as Record<string, unknown>
                     : null;
-                  const accountName = typeof profile?.name === 'string' ? profile.name : 'Account not identified';
-                  const canConnectWithMeta = !isConnected && ['facebook', 'instagram'].includes(account.platform);
+                  const accountName = typeof profile?.name === 'string'
+                    ? profile.name
+                    : typeof profile?.username === 'string'
+                      ? profile.username
+                      : null;
                   return (
-                    <div key={`${account.platform}-${accountName}`} className="flex items-center justify-between gap-4 py-4">
-                      <div>
-                        <p className="font-bold capitalize text-slate-900">{account.platform}</p>
-                        <p className="text-sm text-slate-500">{accountName}</p>
+                    <div key={platform} className="grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4">
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-900">{platform === 'youtube' ? 'YouTube' : platform.charAt(0).toUpperCase() + platform.slice(1)}</p>
+                        <p className="truncate text-sm text-slate-500">{accountName ?? (isConnected ? 'Connected account' : 'No account connected')}</p>
                       </div>
-                      <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
-                        <span className={`rounded-full px-3 py-1 text-xs font-bold ${isConnected ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
+                      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                        <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${isConnected ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-700'}`}>
+                          {isConnected ? <CheckCircle2 className="h-3.5 w-3.5" /> : <XCircle className="h-3.5 w-3.5" />}
                           {isConnected ? 'Connected' : 'Needs connection'}
                         </span>
-                        {canConnectWithMeta ? (
-                          <Link
-                            href="/api/auth/facebook/authorize"
-                            className="rounded-lg bg-[#1877F2] px-3 py-2 text-xs font-bold text-white hover:bg-[#166fe5] focus:outline-none focus:ring-2 focus:ring-[#1877F2] focus:ring-offset-2"
-                          >
-                            Connect {account.platform === 'instagram' ? 'with Meta' : 'Facebook'}
-                          </Link>
-                        ) : null}
                       </div>
                     </div>
                   );
-                })
-              )}
+                })}
             </div>
+            <Link href="/settings/social-media" className="mt-5 inline-flex rounded-lg bg-brand-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-blue-800 focus:outline-none focus:ring-2 focus:ring-brand-blue-700 focus:ring-offset-2">
+              Manage account connections
+            </Link>
           </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -118,7 +123,7 @@ export default async function SocialMediaPage() {
             <dl className="mt-5 space-y-4 text-sm">
               <div className="flex items-center justify-between gap-4">
                 <dt className="text-slate-500">Configured accounts</dt>
-                <dd className="font-bold text-slate-900">{accounts.length}</dd>
+                <dd className="font-bold text-slate-900">{rawAccounts.filter((account) => supportedPlatforms.includes(account.platform as typeof supportedPlatforms[number])).length}</dd>
               </div>
               <div className="flex items-center justify-between gap-4">
                 <dt className="text-slate-500">Connected accounts</dt>

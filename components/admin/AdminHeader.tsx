@@ -202,7 +202,6 @@ export default function AdminHeader() {
                     <div className="border-b border-slate-100 px-4 py-3">
                       <p className="flex items-center gap-1.5 text-xs font-black text-emerald-700"><ShieldCheck className="h-3.5 w-3.5" /> Authenticated session</p>
                     </div>
-                    <Link href="/profile" className="flex min-h-11 items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"><User className="h-3.5 w-3.5" /> Profile</Link>
                     <Link href="/settings" className="flex min-h-11 items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"><Settings className="h-3.5 w-3.5" /> Settings</Link>
                     <hr className="my-1.5" />
                     <form action="/api/auth/signout" method="post">

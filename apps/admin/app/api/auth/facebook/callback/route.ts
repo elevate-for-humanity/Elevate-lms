@@ -6,7 +6,12 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-type MetaPage = { id?: string; name?: string; access_token?: string };
+type MetaPage = {
+  id?: string;
+  name?: string;
+  access_token?: string;
+  instagram_business_account?: { id?: string; name?: string; username?: string };
+};
 
 function settingsRedirect(request: NextRequest, key: 'success' | 'error', value: string) {
   return NextResponse.redirect(new URL(`/settings/social-media?${key}=${encodeURIComponent(value)}`, request.nextUrl.origin));
@@ -41,7 +46,7 @@ export async function GET(request: NextRequest) {
   if (!tokenResponse.ok || !tokenPayload.access_token) return settingsRedirect(request, 'error', 'token_exchange_failed');
 
   const pagesUrl = new URL(`https://graph.facebook.com/${version}/me/accounts`);
-  pagesUrl.searchParams.set('fields', 'id,name,access_token');
+  pagesUrl.searchParams.set('fields', 'id,name,access_token,instagram_business_account{id,name,username}');
   pagesUrl.searchParams.set('access_token', tokenPayload.access_token);
   const pagesResponse = await fetch(pagesUrl);
   const pagesPayload = await pagesResponse.json().catch(() => ({})) as { data?: MetaPage[] };
@@ -57,11 +62,30 @@ export async function GET(request: NextRequest) {
   const expiresAt = tokenPayload.expires_in
     ? new Date(Date.now() + tokenPayload.expires_in * 1000).toISOString()
     : null;
-  const { error } = await db.from('social_media_settings').upsert({
+  const now = new Date().toISOString();
+  const settings: Array<{
+    platform: string;
+    access_token: string;
+    expires_at: string | null;
+    organization_id: string;
+    profile_data: Record<string, unknown>;
+    updated_by: string;
+    updated_at: string;
+    enabled: boolean;
+  }> = [{
     platform: 'facebook', access_token: page.access_token, expires_at: expiresAt,
     organization_id: page.id, profile_data: { id: page.id, name: page.name },
-    updated_by: auth.id, updated_at: new Date().toISOString(), enabled: true,
-  }, { onConflict: 'platform' });
+    updated_by: auth.id, updated_at: now, enabled: true,
+  }];
+  if (page.instagram_business_account?.id) {
+    settings.push({
+      platform: 'instagram', access_token: page.access_token, expires_at: expiresAt,
+      organization_id: page.instagram_business_account.id,
+      profile_data: page.instagram_business_account,
+      updated_by: auth.id, updated_at: now, enabled: true,
+    });
+  }
+  const { error } = await db.from('social_media_settings').upsert(settings, { onConflict: 'platform' });
   if (error) return settingsRedirect(request, 'error', 'connection_save_failed');
 
   const response = settingsRedirect(request, 'success', 'facebook_connected');

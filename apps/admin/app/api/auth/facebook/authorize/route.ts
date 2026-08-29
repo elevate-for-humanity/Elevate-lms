@@ -22,7 +22,10 @@ export async function GET(request: NextRequest) {
   const authUrl = new URL(`https://www.facebook.com/${version}/dialog/oauth`);
   authUrl.searchParams.set('client_id', clientId);
   authUrl.searchParams.set('redirect_uri', redirectUri);
-  authUrl.searchParams.set('scope', 'pages_show_list,pages_read_engagement,pages_manage_posts');
+  authUrl.searchParams.set(
+    'scope',
+    'pages_show_list,pages_read_engagement,pages_manage_posts,instagram_basic,instagram_content_publish',
+  );
   authUrl.searchParams.set('response_type', 'code');
   authUrl.searchParams.set('state', state);
 

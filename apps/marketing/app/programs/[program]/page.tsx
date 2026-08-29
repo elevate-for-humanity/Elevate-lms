@@ -133,6 +133,52 @@ export default async function PublicProgramPage({
         }}
       />
       <ProgramDetailPage program={resolved} banner={banner} />
+      {resolved.slug === 'cpr-first-aid' ? (
+        <section
+          aria-labelledby="cpr-provider-contact"
+          className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8"
+        >
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-wide text-red-700">
+              CPR training contact
+            </p>
+            <h2 id="cpr-provider-contact" className="mt-2 text-2xl font-bold text-slate-950">
+              Sharon Douglas — CentTech
+            </h2>
+            <dl className="mt-5 grid gap-4 text-base text-slate-700 sm:grid-cols-3">
+              <div>
+                <dt className="font-semibold text-slate-950">Email</dt>
+                <dd className="mt-1">
+                  <a className="font-medium text-blue-700 underline" href="mailto:sharen710@gmail.com">
+                    info@centtech.org
+                  </a>
+                </dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-slate-950">Phone</dt>
+                <dd className="mt-1">
+                  <a className="font-medium text-blue-700 underline" href="tel:+13176467806">
+                    317-646-7806
+                  </a>
+                </dd>
+              </div>
+              <div>
+                <dt className="font-semibold text-slate-950">Website</dt>
+                <dd className="mt-1">
+                  <a
+                    className="font-medium text-blue-700 underline"
+                    href="https://www.centtech.org"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    www.centtech.org
+                  </a>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }

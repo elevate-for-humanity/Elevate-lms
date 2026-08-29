@@ -30,6 +30,7 @@ interface ParisChatProps {
   courseTitle?: string | null;
   nextLessonTitle?: string | null;
   courseProgress?: number | null;
+  voiceEnabled?: boolean;
 }
 
 const PATHWAYS = [
@@ -72,6 +73,7 @@ export default function ParisChat({
   courseTitle,
   nextLessonTitle,
   courseProgress,
+  voiceEnabled = false,
 }: ParisChatProps) {
   const learnerSurface = surface === 'learner';
   const storeSurface = surface === 'store';
@@ -142,7 +144,7 @@ export default function ParisChat({
       }
 
       setMessages((previous) => [...previous, { role: 'assistant', content: data.reply }]);
-      if (storeSurface) {
+      if (storeSurface && voiceEnabled) {
         void voice.play(data.reply, { voice: 'coral', style: 'commercial', rate: 0.96 });
       }
       onComplete?.([]);
@@ -162,7 +164,7 @@ export default function ParisChat({
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  }, [courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, storeSurface, surface, voice]);
+  }, [courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, storeSurface, surface, voice, voiceEnabled]);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();

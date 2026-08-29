@@ -54,6 +54,11 @@ function embedUrl(value: string) {
   return `https://www.google.com/maps?q=${encodeURIComponent(value)}&z=14&output=embed`;
 }
 
+function hasPublicContactEmail(value: string | null | undefined): value is string {
+  const email = value?.trim().toLowerCase();
+  return Boolean(email && !email.startsWith('pending-contact+'));
+}
+
 export default async function HostShopsPage() {
   const approvedShops = await getApprovedShops();
 
@@ -195,7 +200,7 @@ export default async function HostShopsPage() {
                         <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700">{shop.description || 'Approved worksite participating in supervised apprenticeship training through Elevate.'}</p>
                         {shopAddress ? <p className="mt-5 flex items-start gap-2 text-sm font-bold text-slate-700"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /> {shopAddress}</p> : null}
                         {shop.phone ? <a href={`tel:${shop.phone}`} className="mt-3 flex items-center gap-2 text-sm font-semibold text-slate-700"><Phone className="h-4 w-4 text-brand-red-700" /> {shop.phone}</a> : null}
-                        {shop.email ? <a href={`mailto:${shop.email}`} className="mt-3 flex items-center gap-2 break-all text-sm font-semibold text-slate-700"><Mail className="h-4 w-4 shrink-0 text-brand-red-700" /> {shop.email}</a> : null}
+                        {hasPublicContactEmail(shop.email) ? <a href={`mailto:${shop.email}`} className="mt-3 flex items-center gap-2 break-all text-sm font-semibold text-slate-700"><Mail className="h-4 w-4 shrink-0 text-brand-red-700" /> {shop.email}</a> : null}
                         {shop.supervisor ? <p className="mt-3 text-sm font-semibold text-slate-600">Approved supervisor: {shop.supervisor}</p> : null}
                         <div className="mt-6 flex flex-wrap gap-3">
                           {profileHref ? <Link href={profileHref} className="rounded-xl bg-brand-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-800">View Host Site profile</Link> : null}

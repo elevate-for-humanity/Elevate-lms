@@ -261,18 +261,18 @@ export default function DevContainerPanel() {
 
   return (
     <section className="flex min-h-[720px] flex-col bg-white text-slate-900">
-      <header className="border-b border-slate-200 bg-slate-950 px-4 py-4 text-white">
+      <header className="border-b border-slate-200 bg-white px-4 py-4 text-slate-950">
         <div className="flex flex-wrap items-center gap-3">
           <div className="mr-auto">
             <h2 className="font-bold">Container Control Plane</h2>
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs text-slate-500">
               Canonical Admin APIs only · GitHub configuration · platform_secrets · Northflank sync
             </p>
           </div>
           <button
             type="button"
             onClick={() => void Promise.all([loadConfig(), loadEnvironment()])}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-900"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
           >
             <RefreshCw className="h-4 w-4" /> Refresh
           </button>
@@ -283,7 +283,7 @@ export default function DevContainerPanel() {
             type="button"
             onClick={() => setTab('configuration')}
             className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold ${
-              tab === 'configuration' ? 'bg-cyan-500 text-slate-950' : 'bg-slate-900 text-slate-300'
+              tab === 'configuration' ? 'bg-cyan-100 text-cyan-900 ring-1 ring-cyan-300' : 'bg-slate-100 text-slate-600'
             }`}
           >
             <Code2 className="h-4 w-4" /> DevContainer
@@ -292,7 +292,7 @@ export default function DevContainerPanel() {
             type="button"
             onClick={() => setTab('environment')}
             className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold ${
-              tab === 'environment' ? 'bg-cyan-500 text-slate-950' : 'bg-slate-900 text-slate-300'
+              tab === 'environment' ? 'bg-cyan-100 text-cyan-900 ring-1 ring-cyan-300' : 'bg-slate-100 text-slate-600'
             }`}
           >
             <KeyRound className="h-4 w-4" /> Environment
@@ -337,7 +337,7 @@ export default function DevContainerPanel() {
                 value={editedRaw}
                 onChange={(event) => setEditedRaw(event.target.value)}
                 spellCheck={false}
-                className="min-h-[520px] flex-1 resize-none rounded-xl border border-slate-300 bg-slate-950 p-4 font-mono text-xs leading-5 text-slate-100 outline-none focus:border-cyan-500"
+                className="min-h-[520px] flex-1 resize-none rounded-xl border border-slate-300 bg-slate-50 p-4 font-mono text-xs leading-5 text-slate-900 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
                 aria-label="devcontainer.json editor"
               />
 

@@ -65,10 +65,12 @@ export const storeGuideFlow: GuideFlow = {
         },
         {
           id: 'see-demos',
-          label: 'Show me what the whole platform does',
+          label: 'Let PARIS walk me through the platform',
           icon: 'graduation-cap',
-          route: '/store/demos',
-          description: 'Browse interactive role and product demos before choosing a plan.',
+          route: '#marketplace',
+          startTour: true,
+          tourId: 'paris-platform-sales-tour',
+          description: 'PARIS will speak, navigate the Store, explain subscription families, and show you where to try each product.',
         },
         {
           id: 'not-sure',
@@ -132,6 +134,42 @@ export interface DestinationTour {
 }
 
 export const destinationTours: Record<string, DestinationTour> = {
+  'paris-platform-sales-tour': {
+    id: 'paris-platform-sales-tour',
+    name: 'Platform Sales Walkthrough',
+    steps: [
+      {
+        target: '[data-paris-tour="subscription-families"]',
+        title: 'Choose the way you want to start',
+        content: 'Elevate combines websites, customer management, training, workforce operations, and business tools. Start with the subscription family that matches your main outcome; PARIS can narrow it with a short interview.',
+        placement: 'bottom',
+      },
+      {
+        target: '[data-paris-tour="product-search"]',
+        title: 'Find the exact capability',
+        content: 'Search by the work you need done, such as website, CRM, courses, apprenticeships, compliance, grants, or marketing. You do not have to know a product name.',
+        placement: 'bottom',
+      },
+      {
+        target: '[data-paris-tour="product-cards"]',
+        title: 'See what each product actually does',
+        content: 'Every product card explains the outcome, shows a unique visual preview, and identifies the current starting price or plan relationship.',
+        placement: 'top',
+      },
+      {
+        target: '[data-paris-tour="product-actions"]',
+        title: 'Try before you choose',
+        content: 'Use Watch Live Demo to operate the workflow yourself, or Explore Product for the full feature and fit explanation. Ask PARIS any question while you compare.',
+        placement: 'top',
+      },
+      {
+        target: '[data-paris-tour="start-plan"]',
+        title: 'Build the smallest setup that fits',
+        content: 'Compare current plans, start with the essentials, and add only the capabilities your organization needs. PARIS can recommend the base plan and relevant add-ons from your interview.',
+        placement: 'top',
+      },
+    ],
+  },
   'shop-tour': {
     id: 'shop-tour',
     name: 'Shop Tour',

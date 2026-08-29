@@ -38,7 +38,7 @@ function settingsRedirect(request: NextRequest, key: 'success' | 'error', value:
 }
 
 export async function GET(request: NextRequest) {
-  const limited = await applyRateLimit(request, 'strict');
+  const limited = await applyRateLimit(request, 'auth');
   if (limited) return limited;
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;

@@ -17,6 +17,7 @@ on:
       - 'scripts/northflank/**'
       - 'scripts/course-factory/**'
       - 'scripts/verify-admin-instrumentation-boundary.mjs'
+      - 'scripts/guard-admin-routes.sh'
       - 'instrumentation.ts'
       - 'scripts/verify-no-retired-admin-ui-routes.mjs'
       - 'scripts/verify-portal-production-contracts.mjs'

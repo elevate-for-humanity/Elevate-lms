@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { CAPABILITY_CATALOG, type CapabilityCategory, type PlatformCapability } from '@/lib/platform/capability-catalog';
 import { BASE_PLANS, ADD_ON_MARKETPLACE } from '@/lib/store/platform-pricing';
@@ -37,17 +36,40 @@ const familyMeta: Record<StoreFamily, { label: string; description: string; cate
   },
 };
 
-const CAPABILITY_IMAGES: Record<string, string> = {
-  website_builder: '/images/pages/comp-layout-hero.webp', crm: '/images/pages/admin-campaigns-hero.webp', booking: '/images/pages/booking-page-1.webp',
-  forms: '/images/pages/admin-applications-hero.webp', email_marketing: '/images/pages/admin-email-marketing-d2.webp', sms: '/images/pages/admin-live-chat-detail.webp',
-  invoicing: '/images/pages/banking-page-1.webp', seo_autopilot: '/images/pages/admin-analytics-hero.webp', marketing_autopilot: '/images/pages/admin-email-campaigns-new-detail.webp',
-  ai_paris: '/images/pages/ai-tutor-page-1.webp', ai_ellie: '/images/pages/adult-learner.webp', ai_lizzy: '/images/pages/admin-ai-studio-hero.webp',
-  ai_zora: '/images/pages/admin-compliance-audit-hero.webp', ai_orchestrator: '/images/pages/admin-ai-console-hero.webp', course_builder: '/images/pages/comp-pathway-classroom.webp',
-  course_factory: '/images/pages/admin-courses-partners-hero.webp', lms: '/images/heroes/lms-analytics.webp', student_management: '/images/pages/admin-applicants-detail.webp',
-  testing_center: '/images/pages/competency-test-hero.webp', workforce: '/images/pages/admin-wioa-hero.webp', apprenticeship: '/images/pages/apprenticeship-structure.webp',
-  employer_portal: '/images/pages/admin-employers-hero.webp', compliance: '/images/pages/compliance-page-1.webp', sam_gov_manager: '/images/pages/agencies-page-1.webp',
-  grants_discovery: '/images/pages/admin-grants-workflow-detail.webp', dev_studio: '/images/pages/admin-dev-studio-detail.webp',
+const previewStyles: Record<CapabilityCategory, string> = {
+  business: 'from-cyan-500 via-sky-600 to-indigo-700',
+  ai: 'from-fuchsia-500 via-rose-500 to-orange-500',
+  education: 'from-emerald-500 via-teal-600 to-cyan-700',
+  workforce: 'from-amber-500 via-orange-600 to-rose-600',
+  compliance: 'from-violet-600 via-indigo-700 to-slate-800',
+  apps: 'from-blue-500 via-cyan-600 to-teal-700',
+  enterprise: 'from-slate-600 via-slate-800 to-slate-950',
 };
+
+function ProductPreview({ capability, name }: { capability: PlatformCapability; name: string }) {
+  const cues = capability.keywords.filter((word) => word.length > 2).slice(0, 3);
+  return (
+    <div className={`group relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br ${previewStyles[capability.category]} p-5 text-white`}>
+      <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-white/15 blur-2xl transition duration-700 group-hover:scale-150" />
+      <div className="absolute -bottom-14 -left-10 h-32 w-32 rounded-full bg-black/15 blur-2xl transition duration-700 group-hover:scale-150" />
+      <div className="relative flex h-full flex-col rounded-2xl border border-white/25 bg-white/10 p-4 shadow-2xl backdrop-blur-sm transition duration-500 group-hover:-translate-y-1 group-hover:bg-white/15">
+        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.16em]">
+          <span>{categoryMeta[capability.category].label}</span>
+          <span className="rounded-full bg-emerald-300 px-2 py-1 text-emerald-950">Live preview</span>
+        </div>
+        <p className="mt-3 line-clamp-2 text-xl font-black leading-tight">{name}</p>
+        <div className="mt-auto grid grid-cols-3 gap-2">
+          {cues.map((cue, index) => (
+            <div key={cue} className="rounded-lg border border-white/20 bg-white/15 p-2 transition duration-300 group-hover:-translate-y-0.5" style={{ transitionDelay: `${index * 70}ms` }}>
+              <span className="block h-1.5 w-8 rounded-full bg-white/80" />
+              <span className="mt-2 block truncate text-[10px] font-bold capitalize text-white/90">{cue.replaceAll('_', ' ')}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 type PublicAvailability = 'live' | 'beta' | 'enterprise';
 
@@ -141,12 +163,11 @@ export function UnifiedSalesMarketplace() {
             const capabilityDescription = isUnifiedLearningPlatform
               ? 'Build course structures, generate evidence-grounded lessons and assessments with AI, create instructor-led media, publish to the learner LMS, issue certificates and track student progress from one connected system.'
               : capability.description;
-            const image = CAPABILITY_IMAGES[String(capability.key)];
             const availability = publicAvailability(capability);
             const action = primaryAction(capability);
             return (
               <article key={capability.key} className="flex min-h-[390px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5">
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">{image ? <Image src={image} alt={`${capabilityName} platform capability`} fill sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" className="object-cover transition duration-500 hover:scale-105" placeholder="empty" unoptimized /> : <div className="flex h-full items-center justify-center bg-gradient-to-br from-cyan-100 to-rose-100 p-8 text-center"><span className="text-2xl font-black text-slate-950">{capabilityName}</span></div>}</div>
+                <ProductPreview capability={capability} name={capabilityName} />
                 <div className="flex flex-1 flex-col p-6">
                   <div className="flex items-start justify-between gap-4"><span className="text-xs font-black uppercase tracking-wide text-rose-700">{categoryMeta[capability.category].label}</span><span className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-black uppercase tracking-wide text-cyan-900">{availabilityLabel(availability)}</span></div>
                   <h3 className="mt-4 text-xl font-black text-slate-950">{capabilityName}</h3>

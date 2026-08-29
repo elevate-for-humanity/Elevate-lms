@@ -6,6 +6,24 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+function getPublicAdminOrigin(request: NextRequest) {
+  const configuredOrigin = process.env.ADMIN_APP_URL?.trim() || process.env.NEXT_PUBLIC_ADMIN_URL?.trim();
+  if (configuredOrigin) return new URL(configuredOrigin).origin;
+
+  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
+  const host = forwardedHost || request.headers.get('host');
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim();
+  const protocol = forwardedProto || (process.env.NODE_ENV === 'production' ? 'https' : request.nextUrl.protocol.replace(':', ''));
+
+  if (host && !host.startsWith('0.0.0.0') && !host.startsWith('localhost')) {
+    return `${protocol}://${host}`;
+  }
+
+  return process.env.NODE_ENV === 'production'
+    ? 'https://admin.elevateforhumanity.org'
+    : request.nextUrl.origin;
+}
+
 export async function GET(request: NextRequest) {
   const limited = await applyRateLimit(request, 'strict');
   if (limited) return limited;
@@ -15,7 +33,7 @@ export async function GET(request: NextRequest) {
   const clientId = process.env.FACEBOOK_CLIENT_ID;
   if (!clientId) return NextResponse.json({ error: 'Facebook application is not configured' }, { status: 503 });
 
-  const origin = request.nextUrl.origin;
+  const origin = getPublicAdminOrigin(request);
   const redirectUri = `${origin}/api/auth/facebook/callback`;
   const state = randomBytes(24).toString('hex');
   const version = process.env.META_GRAPH_API_VERSION?.trim() || 'v26.0';

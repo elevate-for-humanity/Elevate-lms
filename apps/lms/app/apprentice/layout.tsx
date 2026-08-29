@@ -78,7 +78,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
           </a>
         </div>
       )}
-      {nav && <ApprenticeSubNav programSlug={nav.programSlug} config={nav.config} />}
+      {nav && <ApprenticeSubNav programSlug={nav.programSlug} portalPath={nav.config.portalPath} />}
       <div className="mt-4">{children}</div>
     </PlatformShell>
   );

@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { ApprenticePortalConfig } from '@/components/portal/ApprenticePortalShell';
 import {
   apprenticeshipDocumentsPath,
   apprenticeshipLmsCoursePath,
@@ -26,10 +25,10 @@ function isActive(pathname: string, href: string, tabId: string): boolean {
 
 export function ApprenticeSubNav({
   programSlug,
-  config,
+  portalPath,
 }: {
   programSlug: string;
-  config: ApprenticePortalConfig;
+  portalPath: string;
 }) {
   const pathname = usePathname() ?? '';
   const lmsCourseHref = apprenticeshipLmsCoursePath(programSlug);
@@ -38,7 +37,7 @@ export function ApprenticeSubNav({
   const rtiCourseLabelShort = apprenticeshipRtiLabel(programSlug, true) ?? 'Online Course';
 
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard', href: config.portalPath },
+    { id: 'dashboard', label: 'Dashboard', href: portalPath },
     { id: 'orientation', label: 'Orientation', href: orientationHref },
     ...(lmsCourseHref ? [{ id: 'course', label: rtiCourseLabelShort, href: lmsCourseHref }] : []),
     { id: 'hours', label: 'Hours', href: '/apprentice/hours' },

@@ -16,6 +16,12 @@ Date: 2026-08-29
 | Funding conversion | Proposed language implied state-backed funding slots could be captured. | Removed. The plugin cannot promise or determine funding and must require responsible-agency authorization. | Corrected |
 | Existing-customer private actions | Internal account-bound builders exist, but MCP-compatible OAuth 2.1 discovery, token verification, scopes, and reviewer credentials do not. | Public tools remain anonymous and read-only. Account writes are not exposed until compliant OAuth is implemented and reviewed. | Intentionally gated |
 | Public directory submission | No submission packet existed. | Listing copy, safety boundaries, starter prompts, five positive tests, and three negative tests are documented in `SUBMISSION.md`. | Code ready; portal steps remain |
+| “Live today” launch claim | The supplied copy says the suite is already live in the marketplace. | Do not publish this claim until OpenAI review is approved and a working public listing URL exists. | Corrected |
+| Social reply: funding screening | The supplied reply says LIZZY instantly screens eligibility. | Say LIZZY explains possible pathways and next steps; only the responsible agency can determine eligibility and authorization. | Corrected |
+| Social reply: ZORA | The supplied reply promises compliance execution, RAPIDS tracking, revenue, and rebates. | Describe a general Host Shop/apprenticeship recordkeeping checklist; do not imply approval, reimbursement, or direct RAPIDS actions. | Corrected |
+| In-chat subscription funnel | The supplied campaign says users will immediately purchase digital subscriptions through redirects. | Keep public tools informational. Do not promote or transact digital products inside the ChatGPT plugin. | Corrected |
+| Marketplace engagement payout | The supplied campaign says usage automatically earns OpenAI credits. | Removed. No public launch copy should promise an engagement payout without a written program offer from OpenAI to Elevate. | Corrected |
+| Analytics and conversion attribution | The supplied campaign assumes builder analytics, named internal webhooks, Stripe conversion, and OpenAI payout data are connected. | Track production MCP calls and separately configured first-party attribution only; do not claim unavailable dashboards or nonexistent endpoints. | Partially available |
 
 ## External completion items
 
@@ -26,6 +32,7 @@ These cannot be completed safely from repository code alone:
 3. Enter the exact domain-verification token supplied by the submission portal.
 4. Provide final logo/screenshots and confirm public privacy, terms, website, and support URLs.
 5. Submit the plugin for review and publish it after OpenAI approval.
+6. Replace the placeholder in `LAUNCH_COPY.md` with the approved public listing URL, then publish the announcement.
 
 ## Validation reached
 

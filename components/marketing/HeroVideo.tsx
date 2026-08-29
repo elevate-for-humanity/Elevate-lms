@@ -80,6 +80,8 @@ export default function HeroVideo({
   const soundRequestedRef = useRef(false);
   const transcriptVoice = useNaturalVoice();
   const transcriptId = useId();
+  const sectionRef = useRef<HTMLElement>(null);
+  const scrollNarrationAttemptedRef = useRef(false);
 
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
   const desktopSource = videoSrcDesktop || videoSrcMobile || '';
@@ -115,6 +117,31 @@ export default function HeroVideo({
     },
     [],
   );
+
+  useEffect(() => {
+    if (!voiceoverSrc || audioFailed) return;
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting || entry.intersectionRatio < 0.55 || scrollNarrationAttemptedRef.current) return;
+      scrollNarrationAttemptedRef.current = true;
+      const audio = audioRef.current;
+      if (!audio) return;
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        soundRequestedRef.current = true;
+        setMuted(false);
+      }).catch(() => {
+        // Browsers may require a tap before audible playback. The visible
+        // Play audio control remains available when that policy applies.
+        scrollNarrationAttemptedRef.current = false;
+      });
+    }, { threshold: [0.55] });
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [audioFailed, voiceoverSrc]);
 
   async function toggleSound() {
     const video = videoRef.current;
@@ -183,6 +210,7 @@ export default function HeroVideo({
   return (
     <div className={`w-full ${className}`}>
       <section
+        ref={sectionRef}
         className={`relative isolate w-full overflow-hidden flex items-end bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >

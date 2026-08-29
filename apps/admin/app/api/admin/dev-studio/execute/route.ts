@@ -4,6 +4,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { aiChat } from '@/lib/ai/ai-service';
 import { getAITool, getAIToolCatalogForPrompt, listAIToolsForAgent } from '@/lib/ai/tools/registry';
+import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
 import { executeRegisteredAITool } from '@/lib/ai/tools/executor';
 import { getAdminUrl } from '@/lib/utils/siteUrl';
 import { logger } from '@/lib/logger';
@@ -71,6 +72,9 @@ function heuristicPlan(command: string): PlannedCommand | null {
 }
 
 async function classifyCommand(command: string): Promise<PlannedCommand> {
+  const deterministic = planAIToolFromCommand(command);
+  if (deterministic) return { tool: deterministic.name, input: deterministic.input };
+
   const heuristic = heuristicPlan(command);
   if (heuristic) return heuristic;
 

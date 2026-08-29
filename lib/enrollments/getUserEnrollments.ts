@@ -69,7 +69,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   const { data: programEnrollments, error: programEnrollmentError } = await supabase
     .from('program_enrollments')
     .select(
-      'id,user_id,student_id,course_id,program_id,program_slug,status,progress_percent,created_at,updated_at',
+      'id,user_id,student_id,course_id,program_id,program_slug,title,description,status,progress_percent,created_at,updated_at',
     )
     .or(`user_id.eq.${userId},student_id.eq.${userId}`);
 
@@ -127,10 +127,10 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
       program_id: row.program_id ?? null,
       program_slug: program?.slug ?? row.program_slug ?? null,
       program_title:
-        program?.title ?? program?.name ?? (row.program_slug ? formatProgramSlug(row.program_slug) : null),
+        program?.title ?? program?.name ?? row.title ?? (row.program_slug ? formatProgramSlug(row.program_slug) : null),
       course_id: row.course_id ?? null,
       course_title: course?.title ?? course?.course_name ?? null,
-      course_description: course?.description ?? course?.short_description ?? null,
+      course_description: course?.description ?? course?.short_description ?? row.description ?? null,
       duration_hours: course?.duration_hours ?? null,
       provider_id: null,
       provider_name: null,

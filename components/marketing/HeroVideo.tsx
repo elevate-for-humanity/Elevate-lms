@@ -42,6 +42,7 @@ export interface HeroVideoProps {
   demoSlideSeconds?: number;
   heightClassName?: string;
   overlayMode?: 'default' | 'none';
+  soundButtonVariant?: 'pill' | 'prominent';
   /** Delay mounting remote video sources so the first visual frame can paint without competing network work. */
   deferVideoMs?: number;
 }
@@ -65,6 +66,7 @@ export default function HeroVideo({
   mediaFit = 'cover',
   heightClassName = 'h-[clamp(380px,58vh,620px)]',
   overlayMode = 'default',
+  soundButtonVariant = 'pill',
   deferVideoMs = 0,
 }: HeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -318,10 +320,14 @@ export default function HeroVideo({
             type="button"
             onClick={() => void toggleSound()}
             aria-label={muted ? 'Play hero audio' : 'Pause hero audio'}
-            className="absolute bottom-4 right-4 z-40 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/70 bg-slate-950/45 px-4 py-2 text-xs font-black text-white backdrop-blur-sm transition hover:bg-slate-950/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+            className={`absolute right-4 z-40 inline-flex min-h-11 items-center justify-center gap-2 border px-4 py-2 text-xs font-black text-white shadow-lg transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
+              soundButtonVariant === 'prominent'
+                ? 'top-4 rounded-lg border-red-300 bg-brand-red-700 hover:bg-brand-red-800'
+                : 'bottom-4 rounded-full border-white/70 bg-slate-950/45 backdrop-blur-sm hover:bg-slate-950/70'
+            }`}
           >
             {muted ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            <span>{muted ? 'Play audio' : 'Pause audio'}</span>
+            <span>{muted ? 'Turn sound on' : 'Turn sound off'}</span>
           </button>
         ) : null}
       </section>

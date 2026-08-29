@@ -14,7 +14,7 @@ export default async function SocialMediaPage() {
     db.from('social_media_posts').select('id', { count: 'exact', head: true }).in('status', ['queued', 'scheduled']),
     db.from('social_media_posts').select('id', { count: 'exact', head: true }).eq('status', 'published'),
     db.from('social_campaigns').select('id', { count: 'exact', head: true }),
-    db.from('social_media_accounts').select('platform,account_name,is_active,access_token'),
+    db.from('social_media_settings').select('platform,profile_data,enabled,access_token,expires_at'),
     db
       .from('blog_posts')
       .select('id', { count: 'exact', head: true })
@@ -23,7 +23,10 @@ export default async function SocialMediaPage() {
   ]);
 
   const accounts = accountsRes.data ?? [];
-  const connected = accounts.filter((account) => account.is_active && Boolean(account.access_token));
+  const connected = accounts.filter((account) =>
+    account.enabled !== false && Boolean(account.access_token) &&
+    (!account.expires_at || new Date(account.expires_at) > new Date()),
+  );
 
   const stats = [
     { label: 'Blog-ready articles', value: blogRes.count ?? 0, icon: FileText },
@@ -77,12 +80,17 @@ export default async function SocialMediaPage() {
                 <p className="py-4 text-sm text-slate-500">No social accounts are configured.</p>
               ) : (
                 accounts.map((account) => {
-                  const isConnected = account.is_active && Boolean(account.access_token);
+                  const isConnected = account.enabled !== false && Boolean(account.access_token) &&
+                    (!account.expires_at || new Date(account.expires_at) > new Date());
+                  const profile = account.profile_data && typeof account.profile_data === 'object'
+                    ? account.profile_data as Record<string, unknown>
+                    : null;
+                  const accountName = typeof profile?.name === 'string' ? profile.name : 'Account not identified';
                   return (
-                    <div key={`${account.platform}-${account.account_name}`} className="flex items-center justify-between gap-4 py-4">
+                    <div key={`${account.platform}-${accountName}`} className="flex items-center justify-between gap-4 py-4">
                       <div>
                         <p className="font-bold capitalize text-slate-900">{account.platform}</p>
-                        <p className="text-sm text-slate-500">{account.account_name}</p>
+                        <p className="text-sm text-slate-500">{accountName}</p>
                       </div>
                       <span className={`rounded-full px-3 py-1 text-xs font-bold ${isConnected ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
                         {isConnected ? 'Connected' : 'Needs connection'}

@@ -34,7 +34,7 @@ interface HomeHeroSlide {
 
 const HOME_MEDIA_REVISION = process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 12) || 'home-hero';
 const HOME_FIRST_FRAME = '/images/heroes/hero-home-first-frame.webp';
-const HOME_SLIDE_SECONDS = 8;
+const HOME_SLIDE_SECONDS = 5;
 
 const HOME_NARRATION =
   'Welcome to Elevate for Humanity, where career training, registered apprenticeships, workforce support, and technology come together in one connected platform. Whether you want to begin a new career, earn while you learn, grow your business, host an apprentice, or build and manage training online, Elevate can help you take the next step. Explore hands-on pathways in healthcare, skilled trades, transportation, barbering, beauty, business, and technology. Eligible participants can also learn about available workforce funding pathways and payment options before enrolling. Shop and salon owners can join at no cost as apprenticeship host sites, train new talent inside their businesses, receive program support from Elevate, and may qualify for eligible workforce incentives. Apprentices gain supervised experience, documented skills, and the opportunity to earn wages while completing their pathway. Elevate also provides online applications, learner and employer portals, course-building tools, website and app development, testing support, and workforce-management technology. Explore a program, apply for training, become a host site, or request a demonstration. Your next opportunity can start right here with Elevate for Humanity.';
@@ -45,7 +45,7 @@ function withMediaRevision(src?: string) {
 }
 
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
-  const slides: HomeHeroSlide[] = [
+  const slides = ([
     {
       type: 'video',
       src: withMediaRevision(banner.videoSrcDesktop),
@@ -71,7 +71,9 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       alt: 'Beauty professional working with a client in a salon',
       label: 'Beauty apprenticeship pathways',
     },
-  ].filter((slide) => slide.type === 'image' || Boolean(slide.src || slide.mobileSrc));
+  ] satisfies HomeHeroSlide[]).filter(
+    (slide) => slide.type === 'image' || Boolean(slide.src || slide.mobileSrc),
+  );
 
   const [activeSlide, setActiveSlide] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -115,6 +117,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         narrateTranscript
         analyticsName={banner.analyticsName}
         overlayMode="none"
+        soundButtonVariant="prominent"
         heightClassName="h-[clamp(400px,62vh,680px)]"
         deferVideoMs={slide.type === 'video' ? 250 : 0}
       />
@@ -125,7 +128,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             type="button"
             onClick={() => selectSlide(activeSlide - 1)}
             aria-label="Show previous hero slide"
-            className="absolute left-3 top-[clamp(180px,28vh,310px)] z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-slate-950/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-slate-950/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="absolute left-0 top-1/2 z-50 inline-flex h-16 w-11 -translate-y-1/2 items-center justify-center rounded-r-lg border-y border-r border-white/80 bg-slate-950/65 text-white shadow-lg transition hover:bg-slate-950/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <span aria-hidden="true" className="text-4xl font-light leading-none">‹</span>
           </button>
@@ -133,12 +136,12 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             type="button"
             onClick={() => selectSlide(activeSlide + 1)}
             aria-label="Show next hero slide"
-            className="absolute right-3 top-[clamp(180px,28vh,310px)] z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-slate-950/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-slate-950/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="absolute right-0 top-1/2 z-50 inline-flex h-16 w-11 -translate-y-1/2 items-center justify-center rounded-l-lg border-y border-l border-white/80 bg-slate-950/65 text-white shadow-lg transition hover:bg-slate-950/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <span aria-hidden="true" className="text-4xl font-light leading-none">›</span>
           </button>
 
-          <div className="absolute left-1/2 top-[clamp(340px,55vh,620px)] z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-slate-950/60 px-3 py-2 shadow-lg backdrop-blur-sm">
+          <div className="absolute bottom-5 left-1/2 z-50 flex w-[min(88vw,32rem)] -translate-x-1/2 items-center gap-2 rounded-lg border border-white/40 bg-slate-950/55 px-3 py-2 shadow-lg backdrop-blur-sm">
             {slides.map((item, index) => (
               <button
                 key={`${item.type}-${item.src}-${index}`}
@@ -146,8 +149,8 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
                 onClick={() => selectSlide(index)}
                 aria-label={`Show slide ${index + 1}: ${item.label}`}
                 aria-current={index === activeSlide ? 'true' : undefined}
-                className={`h-2.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                  index === activeSlide ? 'w-8 bg-white' : 'w-2.5 bg-white/55 hover:bg-white/80'
+                className={`h-1.5 flex-1 rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                  index === activeSlide ? 'bg-white' : 'bg-white/35 hover:bg-white/70'
                 }`}
               />
             ))}
@@ -155,7 +158,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
               type="button"
               onClick={() => setPaused((value) => !value)}
               aria-label={paused ? 'Resume hero slideshow' : 'Pause hero slideshow'}
-              className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="ml-1 inline-flex h-8 min-w-10 items-center justify-center rounded-md border border-white/50 px-2 text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <span aria-hidden="true" className="text-sm font-black leading-none">{paused ? '▶' : 'Ⅱ'}</span>
             </button>

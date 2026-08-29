@@ -116,6 +116,16 @@ export async function middleware(req: NextRequest) {
 
   if (isPublicPath(pathname)) return NextResponse.next();
 
+  // Scheduled social publishing has no browser session. Admit only the exact
+  // route with the scheduler secret; the route handler verifies it again.
+  if (
+    pathname === '/api/internal/social-media/process' &&
+    process.env.CRON_SECRET &&
+    req.headers.get('authorization') === `Bearer ${process.env.CRON_SECRET}`
+  ) {
+    return NextResponse.next();
+  }
+
   const ipBlocked = checkAdminIP(req);
   if (ipBlocked) return ipBlocked;
 

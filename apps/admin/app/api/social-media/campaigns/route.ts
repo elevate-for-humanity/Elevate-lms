@@ -53,10 +53,10 @@ const _POST = withAuth(
 
     if (status === 'active') {
       const { data: connected, error: accountError } = await db
-        .from('social_media_accounts')
+        .from('social_media_settings')
         .select('platform')
         .in('platform', platforms)
-        .eq('is_active', true)
+        .eq('enabled', true)
         .not('access_token', 'is', null);
 
       if (accountError) {

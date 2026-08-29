@@ -7,6 +7,7 @@ import { toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -45,61 +46,6 @@ function getSystemPrompt(mode: unknown): string {
   return SYSTEM_PROMPTS[key] ?? SYSTEM_PROMPTS.chat ?? 'Provide accurate, practical tutoring help.';
 }
 
-async function callGemini(
-  messages: Array<{ role: string; content: string }>,
-  systemPrompt: string,
-) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-
-  // Convert chat history to Gemini format
-  const contents = messages.map((m) => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: m.content }],
-  }));
-
-  const body = {
-    system_instruction: {
-      parts: [{ text: systemPrompt }],
-    },
-    contents,
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 2048,
-    },
-  };
-
-  // Try models in order of preference
-  const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
-
-  for (const model of models) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (text) return text;
-    }
-
-    // If 429 (rate limit), try next model
-    if (response.status === 429) continue;
-
-    // Other errors — don't retry
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      logger.error(`Gemini ${model} error`, normalizeError(err, 'Gemini chat error'), getErrorContext(err));
-      break;
-    }
-  }
-
-  return null;
-}
-
 async function _POST(request: NextRequest) {
 
   const supabase = await createClient();
@@ -117,11 +63,8 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Message required' }, { status: 400 });
   }
 
-  const geminiKey = process.env.GEMINI_API_KEY;
-  const openaiKey = process.env.OPENAI_API_KEY;
-
-  // No AI keys configured — return fallback
-  if (!geminiKey && !openaiKey) {
+  // The tutor uses the same configured provider authority as every other AI surface.
+  if (!isAIAvailable()) {
     return NextResponse.json({
       message: getFallbackResponse(mode),
       conversationId: null,
@@ -151,36 +94,26 @@ async function _POST(request: NextRequest) {
     const systemPrompt = getSystemPrompt(mode);
     let aiContent: string | null = null;
 
-    // Try Gemini first (free), fall back to OpenAI
-    if (geminiKey) {
-      aiContent = await callGemini(messages, systemPrompt);
-    }
-
-    // Fall back to OpenAI if Gemini fails and key exists
-    if (!aiContent && openaiKey) {
-      const openaiMessages = [{ role: 'system', content: systemPrompt }, ...messages];
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${openaiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4.1',
-          messages: openaiMessages,
-          temperature: 0.7,
-          max_tokens: 1000,
-        }),
+    try {
+      const result = await aiChat({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages.map((entry) => ({
+            role: entry.role === 'assistant' ? 'assistant' as const : 'user' as const,
+            content: entry.content,
+          })),
+        ],
+        temperature: 0.7,
+        maxTokens: 1200,
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        aiContent = data.choices?.[0]?.message?.content;
-      }
+      aiContent = result.content;
+    } catch (providerError) {
+      logger.error(
+        'Canonical AI tutor provider error',
+        providerError instanceof Error ? providerError : new Error(String(providerError)),
+      );
     }
 
-    // Both failed — return fallback
     if (!aiContent) {
       return NextResponse.json({
         message: getFallbackResponse(mode),

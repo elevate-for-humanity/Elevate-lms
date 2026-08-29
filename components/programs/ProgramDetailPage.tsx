@@ -31,6 +31,8 @@ import {
   Award,
   ExternalLink,
   Layers,
+  CheckCircle2,
+  WalletCards,
 } from 'lucide-react';
 import type { FundingType, ProgramSchema } from '@/lib/programs/program-schema';
 import {
@@ -387,6 +389,43 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
+      {/* DECISION PANEL — answers the questions visitors need before applying */}
+      <section className="border-b border-slate-200 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-4 py-12 sm:py-16">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.05fr_.95fr]">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">Know Before You Apply</p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Is this program right for you?</h2>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {(p.admissionRequirements ?? []).slice(0, 6).map((requirement) => (
+                <div key={requirement} className="flex gap-3 rounded-2xl bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-800">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />
+                  <span>{requirement}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <DecisionFact label="Length" value={`${p.durationWeeks} weeks`} />
+              <DecisionFact label="Schedule" value={`${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`} />
+              <DecisionFact label="Training" value={totalHours > 0 ? `${totalHours} hours` : hoursRange} />
+              <DecisionFact label="Credential" value={`${p.credentials.length} included`} />
+            </div>
+          </div>
+
+          <aside className="rounded-3xl bg-slate-950 p-6 text-white shadow-xl sm:p-8">
+            <WalletCards className="h-8 w-8 text-orange-300" aria-hidden="true" />
+            <p className="mt-5 text-xs font-black uppercase tracking-[0.16em] text-orange-300">Price & Enrollment</p>
+            <div className="mt-2 text-4xl font-black">{p.selfPayCost}</div>
+            {bnplDepositStart && <p className="mt-2 text-sm font-semibold text-slate-200">Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.</p>}
+            {estimatedWeeklyAfterDeposit && <p className="mt-1 text-sm text-slate-300">Estimated from ${estimatedWeeklyAfterDeposit.toLocaleString()} per week across the published program length. Final terms depend on checkout selections and provider approval.</p>}
+            <div className="mt-6 grid gap-3">
+              <Link href={p.cta.applyHref || `/apply?program=${p.slug}`} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Apply to This Program</Link>
+              <Link href={`/programs/${p.slug}/payment/bnpl`} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100">See BNPL & Payment Options</Link>
+              <Link href={requestInfoHref} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-6 py-3 font-black text-white hover:bg-white/10">Get Program Information</Link>
+            </div>
+          </aside>
+        </div>
+      </section>
+
       {/* CREDIBILITY STRIP */}
       <section className="py-8 border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -468,20 +507,18 @@ export default function ProgramDetailPage({
       <section className="py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-extrabold text-slate-900 mb-2">What You&apos;ll Learn</h2>
-          <p className="text-slate-500 text-sm mb-8">
-            Full curriculum broken down by module. Every topic is covered in class and assessed
-            before you advance.
-          </p>
+          <p className="text-slate-500 text-sm mb-8">Select a module to see its topics. Details stay available without crowding the page.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {(p.curriculum ?? []).map((mod, i) => (
-              <div key={i} className="rounded-xl border border-slate-200 bg-white p-5">
-                <div className="flex items-center gap-2 mb-3">
+              <details key={i} className="group rounded-xl border border-slate-200 bg-white p-5 open:shadow-md">
+                <summary className="flex cursor-pointer list-none items-center gap-2">
                   <span className="w-6 h-6 rounded-full text-[11px] font-extrabold flex items-center justify-center flex-shrink-0 bg-slate-900 text-white">
                     {i + 1}
                   </span>
-                  <h3 className="font-bold text-sm text-slate-900">{mod.title}</h3>
-                </div>
-                <ul className="space-y-1.5">
+                  <h3 className="flex-1 font-bold text-sm text-slate-900">{mod.title}</h3>
+                  <span className="text-lg font-black text-brand-red-700 group-open:rotate-45">+</span>
+                </summary>
+                <ul className="mt-4 space-y-1.5 border-t border-slate-100 pt-4">
                   {(mod.topics ?? []).map((t, j) => (
                     <li key={j} className="flex items-start gap-2 text-xs text-slate-600">
                       <span className="mt-0.5 text-slate-400 flex-shrink-0">·</span>
@@ -489,7 +526,7 @@ export default function ProgramDetailPage({
                     </li>
                   ))}
                 </ul>
-              </div>
+              </details>
             ))}
           </div>
         </div>
@@ -964,6 +1001,15 @@ function SectionHeader({ icon: Icon, title }: { icon: any; title: string }) {
         <Icon className="w-5 h-5 text-slate-700" />
       </div>
       <h2 className="text-xl font-bold text-slate-900">{title}</h2>
+    </div>
+  );
+}
+
+function DecisionFact({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="text-xs font-bold uppercase tracking-wider text-slate-500">{label}</div>
+      <div className="mt-1 text-base font-extrabold text-slate-950">{value}</div>
     </div>
   );
 }

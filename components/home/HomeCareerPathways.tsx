@@ -56,7 +56,7 @@ const PATHWAYS = [
     title: 'Beauty Apprenticeships',
     description:
       'Turn your interest in hair, skin, nails, and client service into supervised workplace training in the beauty industry.',
-    image: '/images/pexels/cosmetology.webp',
+    image: '/images/pages/cosmetology-apprenticeship-hero.webp',
     imageAlt: 'Beauty professional working with a client in a salon',
     ctaHref: '/barber-and-beauty-apprenticeships',
     badge: 'Beauty Industry',
@@ -64,14 +64,14 @@ const PATHWAYS = [
   },
   {
     slug: 'host-shop',
-    title: 'Become a Host Shop',
+    title: 'Host an Apprentice — Sign Up Free',
     description:
-      'Own a barbershop, salon, nail studio, or beauty business? Help train the next generation while Elevate supports the apprenticeship process.',
-    image: '/images/pexels/nail-tech.webp',
-    imageAlt: 'Beauty and barber industry professionals working with clients in a licensed shop',
+      'Grow your salon, barbershop, spa, or nail business with an apprentice while Elevate supports onboarding, training records, and program administration. There is no cost for a business to apply or enroll as a Host Shop.',
+    image: '/images/partners/salon-saloon/team-sign.webp',
+    imageAlt: 'Salon Saloon team at an Elevate participating Host Salon',
     ctaHref: '/partners/host-shops',
     badge: 'For Shop Owners',
-    cta: 'Become a Host Shop',
+    cta: 'See Host Shop Benefits & Sign Up',
   },
 ] as const;
 
@@ -93,24 +93,34 @@ export function HomeCareerPathways() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {PATHWAYS.map((p) => (
-            <article key={p.slug} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+            <article key={p.slug} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md ring-1 ring-black/[0.02] transition hover:-translate-y-1 hover:shadow-2xl">
               <Link href={p.ctaHref} className="block h-full">
-                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                <div className="relative aspect-[4/3] overflow-hidden bg-white">
                   <Image
                     src={p.image}
                     alt={p.imageAlt}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    className="object-cover brightness-105 contrast-105 saturate-110 transition duration-500 group-hover:scale-[1.04] group-hover:brightness-110"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     loading="lazy"
                   />
-                  <div className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-950 shadow-sm">
-                    {p.badge}
-                  </div>
+                  {p.slug !== 'host-shop' && (
+                    <div className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wide text-slate-950 shadow-sm">
+                      {p.badge}
+                    </div>
+                  )}
                 </div>
                 <div className="p-6 sm:p-7">
                   <h3 className="text-2xl font-black leading-tight text-slate-950">{p.title}</h3>
                   <p className="mt-3 text-base leading-7 text-slate-700">{p.description}</p>
+                  {p.slug === 'host-shop' && (
+                    <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-slate-800">
+                      <li>• Build and train your future workforce</li>
+                      <li>• Earn revenue from supervised client services</li>
+                      <li>• Get help with apprenticeship records and compliance</li>
+                      <li>• Explore available workforce rebates and tax-credit eligibility</li>
+                    </ul>
+                  )}
                   <span className="mt-5 inline-flex items-center gap-2 text-base font-extrabold text-brand-red-700">
                     {p.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>

@@ -9,7 +9,7 @@ import { BARBER_PRICING } from '@/lib/programs/pricing';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Approved Apprenticeship Host Sites | Elevate for Humanity',
+  title: 'Approved Apprenticeship Host Sites',
   description: 'Meet approved Elevate apprenticeship Host Sites, explore each partner location, and apply to host or train through the network.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/host-shops' },
 };

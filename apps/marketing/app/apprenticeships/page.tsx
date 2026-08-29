@@ -9,7 +9,7 @@ import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
 import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 
 export const metadata: Metadata = {
-  title: 'Apprenticeship Programs | Elevate for Humanity',
+  title: 'Apprenticeship Programs',
   description:
     'Explore Elevate apprenticeship pathways in barbering, cosmetology, esthetics, and nail technology, including supervised work-based learning, related instruction, progress tracking, and licensing pathways.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/apprenticeships' },

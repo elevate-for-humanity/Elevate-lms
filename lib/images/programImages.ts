@@ -358,6 +358,66 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     hero: `${P}/cdl-loading-dock.webp`,
     alt: 'Forklift operator certification training',
   },
+  'jri-badge-1-mindsets': {
+    card: '/hero-images/jri-hero.webp',
+    hero: '/hero-images/jri-hero.webp',
+    alt: 'Job Ready Indy learner developing a career-ready mindset',
+  },
+  'jri-badge-2-self-management': {
+    card: `${P}/career-services-page-11.webp`,
+    hero: `${P}/career-services-hero.webp`,
+    alt: 'Job Ready Indy learner building self-management skills',
+  },
+  'jri-badge-3-learning-strategies': {
+    card: `${P}/community-page-3.webp`,
+    hero: `${P}/adult-learner.webp`,
+    alt: 'Job Ready Indy learner practicing effective learning strategies',
+  },
+  'jri-badge-4-social-skills': {
+    card: '/images/business/collaboration-1.webp',
+    hero: '/images/business/team-4.webp',
+    alt: 'Job Ready Indy learners practicing workplace communication',
+  },
+  'jri-badge-5-workplace-skills': {
+    card: '/images/business/partnership-1.webp',
+    hero: `${P}/business-sector.webp`,
+    alt: 'Job Ready Indy learner practicing workplace skills',
+  },
+  'jri-badge-6-launch-a-career': {
+    card: '/images/business/team-3.webp',
+    hero: `${P}/about-employer-partners.webp`,
+    alt: 'Job Ready Indy learner preparing to launch a career',
+  },
+  'jri-introduction': {
+    card: `${P}/jri-hero.webp`,
+    hero: '/hero-images/jri-hero.webp',
+    alt: 'Introduction to the Job Ready Indy career-readiness pathway',
+  },
+  'nha-medical-assistant': {
+    card: '/images/healthcare/healthcare-professional-portrait-2.jpg',
+    hero: `${P}/medical-assistant-real.webp`,
+    alt: 'NHA medical assistant learner preparing for clinical work',
+  },
+  'nha-pharmacy-technician': {
+    card: `${P}/pharmacy-technician.webp`,
+    hero: '/hero-images/healthcare-category.webp',
+    alt: 'NHA pharmacy technician learner preparing medications',
+  },
+  'nha-phlebotomy': {
+    card: `${P}/phlebotomy-real.webp`,
+    hero: `${P}/phlebotomy-draw.webp`,
+    alt: 'NHA phlebotomy technician learner practicing blood collection',
+  },
+  'life-coach-certification-wioa': {
+    card: `${P}/peer-recovery.webp`,
+    hero: '/images/team/instructors/instructor-recovery.webp',
+    alt: 'Life coach learner practicing a supportive coaching conversation',
+  },
+  'building-maintenance-wrg': {
+    card: '/images/building-maintenance.webp',
+    hero: `${P}/construction-trades.webp`,
+    alt: 'Building maintenance technician working on facility systems',
+  },
 };
 
 export function getProgramCardImage(slug: string): string {

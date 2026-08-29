@@ -42,9 +42,13 @@ const addOns: CommerceCatalogItem[] = ADD_ON_MARKETPLACE.map((addon) => ({
   name: addon.name,
   description: addon.description,
   category:
-    addon.slug.includes('workforce') || addon.slug.includes('apprenticeship') || addon.slug.includes('employer')
+    addon.slug.includes('workforce') ||
+    addon.slug.includes('apprenticeship') ||
+    addon.slug.includes('employer')
       ? 'workforce'
-      : addon.slug.includes('lms') || addon.slug.includes('student') || addon.slug.includes('testing')
+      : addon.slug.includes('lms') ||
+          addon.slug.includes('student') ||
+          addon.slug.includes('testing')
         ? 'education'
         : addon.slug.includes('ai')
           ? 'ai'
@@ -70,9 +74,30 @@ const platformPlans: CommerceCatalogItem[] = Object.values(BASE_PLANS).map((plan
 
 const platformProducts: CommerceCatalogItem[] = [
   {
+    id: 'standalone-platform-builds',
+    name: 'Standalone Website & Learning Platform Builds',
+    description:
+      'Independent branded deployments with website builder, unlimited-course builder, course runner, client portal and PARIS.',
+    category: 'enterprise',
+    href: '/store/implementation-packages',
+    priceLabel: 'From $750 down',
+    billingType: 'license',
+    status: 'sellable',
+    keywords: [
+      'standalone website',
+      'course builder',
+      'unlimited courses',
+      'client portal',
+      'paris',
+      'white label',
+      'implementation',
+    ],
+  },
+  {
     id: 'ai-assistants',
     name: 'AI Assistants',
-    description: 'Role-based AI assistance for admissions, student support, operations, compliance, and routing.',
+    description:
+      'Role-based AI assistance for admissions, student support, operations, compliance, and routing.',
     category: 'ai',
     href: '/store/ai-assistants',
     billingType: 'addon',
@@ -92,7 +117,8 @@ const platformProducts: CommerceCatalogItem[] = [
   {
     id: 'course-builder',
     name: 'Course Builder',
-    description: 'Create and manage courses, modules, lessons, quizzes, and AI-assisted curriculum content.',
+    description:
+      'Create and manage courses, modules, lessons, quizzes, and AI-assisted curriculum content.',
     category: 'education',
     href: '/store/course-builder',
     billingType: 'contact',
@@ -102,7 +128,8 @@ const platformProducts: CommerceCatalogItem[] = [
   {
     id: 'dev-studio',
     name: 'Dev Studio',
-    description: 'Unified development, deployment, health, workflow, container, and AI operations workspace.',
+    description:
+      'Unified development, deployment, health, workflow, container, and AI operations workspace.',
     category: 'operations',
     href: '/store/dev-studio',
     billingType: 'contact',
@@ -112,7 +139,8 @@ const platformProducts: CommerceCatalogItem[] = [
   {
     id: 'testing-center',
     name: 'Testing Center',
-    description: 'Testing operations, scheduling, credential tracking, and related testing workflows.',
+    description:
+      'Testing operations, scheduling, credential tracking, and related testing workflows.',
     category: 'education',
     href: '/store/testing',
     billingType: 'addon',
@@ -142,7 +170,8 @@ const platformProducts: CommerceCatalogItem[] = [
   {
     id: 'platform-licensing',
     name: 'Platform Licensing',
-    description: 'Managed and enterprise licensing options for organizations that need broader deployment and support.',
+    description:
+      'Managed and enterprise licensing options for organizations that need broader deployment and support.',
     category: 'enterprise',
     href: '/store/licenses',
     billingType: 'license',

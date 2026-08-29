@@ -94,9 +94,9 @@ async function handler(req: Request) {
         userId: user?.id || '',
         courseTitle: course.title,
       },
-      automatic_tax: {
-        enabled: true,
-      },
+      // Education/course tuition is intentionally excluded from Stripe Tax.
+      // Do not inherit the taxable platform-store configuration here.
+      automatic_tax: { enabled: false },
     });
 
     if (!session.url) {

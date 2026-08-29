@@ -126,9 +126,8 @@ async function _POST(req: Request) {
         total_program_cost: programInfo.totalPrice.toString(),
         user_id: user?.id || '',
       },
-      automatic_tax: {
-        enabled: true,
-      },
+      // Program tuition and enrollment payments are not taxed.
+      automatic_tax: { enabled: false },
     });
 
     if (!session.url) {

@@ -1,8 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Check, CreditCard, Loader2, Sparkles, Tag } from 'lucide-react';
-import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
+import { useEffect, useMemo, useState } from 'react';
+import { CalendarDays, Check, CreditCard, Loader2, Sparkles, Tag } from 'lucide-react';
 
 type Provider = {
   key: string;
@@ -19,6 +18,14 @@ type Provider = {
     amountCents: number;
     includes: string[];
   };
+};
+
+type TestingSlot = {
+  id: string;
+  startTime: string;
+  endTime: string;
+  location: string | null;
+  spotsRemaining: number;
 };
 
 function money(cents: number) {
@@ -47,6 +54,9 @@ export default function TestingCheckoutClient({
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [slots, setSlots] = useState<TestingSlot[]>([]);
+  const [slotId, setSlotId] = useState('');
+  const [slotsLoading, setSlotsLoading] = useState(false);
 
   const provider = useMemo(() => providers.find((p) => p.key === providerKey) ?? null, [providers, providerKey]);
   const exam = useMemo(
@@ -59,12 +69,37 @@ export default function TestingCheckoutClient({
     setProviderKey(key);
     setExamName(next?.exams[0]?.name ?? '');
     setAddOn(false);
+    setSlotId('');
   }
+
+  useEffect(() => {
+    if (!providerKey) return;
+    const controller = new AbortController();
+    setSlotsLoading(true);
+    setSlots([]);
+    setSlotId('');
+    fetch(`/api/testing/slots/public?examType=${encodeURIComponent(providerKey)}`, {
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Appointments are unavailable.');
+        const available = Array.isArray(data.slots) ? data.slots : [];
+        setSlots(available);
+        if (available.length === 1) setSlotId(available[0].id);
+      })
+      .catch((fetchError) => {
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') return;
+        setError(fetchError instanceof Error ? fetchError.message : 'Appointments are unavailable.');
+      })
+      .finally(() => setSlotsLoading(false));
+    return () => controller.abort();
+  }, [providerKey]);
 
   const examSubtotal = (exam?.amountCents ?? 0) * quantity;
   const addOnAmount = addOn && provider?.addOn ? provider.addOn.amountCents : 0;
   const total = examSubtotal + addOnAmount;
-  const checkoutReady = Boolean(provider && exam && exam.amountCents && exam.amountCents > 0);
+  const checkoutReady = Boolean(provider && exam && exam.amountCents && exam.amountCents > 0 && slotId);
 
   async function checkout() {
     if (!provider || !exam || !checkoutReady || loading) return;
@@ -80,6 +115,7 @@ export default function TestingCheckoutClient({
           bookingType: quantity > 1 ? 'organization' : 'individual',
           participantCount: quantity,
           addOn,
+          slotId,
         }),
       });
       const data = await response.json();
@@ -141,6 +177,28 @@ export default function TestingCheckoutClient({
           <p className="mt-2 text-sm text-slate-500">For employer or cohort groups, checkout multiplies the exact exam fee by the participant count.</p>
         </div>
 
+        <div className="mt-7">
+          <label htmlFor="testing-slot" className="flex items-center gap-2 text-base font-bold text-slate-800">
+            <CalendarDays className="h-5 w-5" /> Appointment
+          </label>
+          <select
+            id="testing-slot"
+            value={slotId}
+            onChange={(event) => setSlotId(event.target.value)}
+            disabled={slotsLoading || slots.length === 0}
+            className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base disabled:bg-slate-100"
+          >
+            <option value="">{slotsLoading ? 'Loading appointments…' : slots.length ? 'Select an appointment' : 'No appointments currently available'}</option>
+            {slots.map((slot) => (
+              <option key={slot.id} value={slot.id}>
+                {new Date(slot.startTime).toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' })}
+                {slot.location ? ` — ${slot.location}` : ''} ({slot.spotsRemaining} open)
+              </option>
+            ))}
+          </select>
+          {!slotsLoading && !slots.length ? <p className="mt-2 text-sm font-semibold text-amber-700">No eligible appointment is published for this provider. Contact the testing center before paying.</p> : null}
+        </div>
+
         {provider?.addOn ? (
           <div className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-5">
             <div className="flex items-start gap-3">
@@ -190,9 +248,9 @@ export default function TestingCheckoutClient({
           {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <CreditCard className="h-5 w-5" />}
           {loading ? 'Opening Checkout…' : 'Continue to Secure Checkout'}
         </button>
-        {!checkoutReady ? <p className="mt-3 text-sm text-amber-700">This exam needs an individual published price before online checkout can be used.</p> : null}
+        {!checkoutReady ? <p className="mt-3 text-sm text-amber-700">Select a priced exam and an available appointment before checkout.</p> : null}
         {error ? <p className="mt-3 text-sm font-semibold text-red-700">{error}</p> : null}
-        <p className="mt-4 text-sm leading-relaxed text-slate-500">{BNPL_PROVIDER_NAMES} may be offered when eligible and enabled in Stripe. Approval and installment terms are determined by the payment provider.</p>
+        <p className="mt-4 text-sm leading-relaxed text-slate-500">Eligible installment options are displayed by Stripe at checkout when available for the purchase amount and customer. Approval and terms are determined by the payment provider.</p>
       </aside>
     </div>
   );

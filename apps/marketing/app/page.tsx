@@ -3,7 +3,8 @@ import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
-import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
+import { HomeApprenticeshipSales } from '@/components/home/HomeApprenticeshipSales';
+import { HomeWebsiteBuilderSales } from '@/components/home/HomeWebsiteBuilderSales';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeMobileActions } from '@/components/home/HomeMobileActions';
@@ -73,7 +74,8 @@ export default async function HomePage() {
         </h1>
         <HomeHeroVideo banner={banner} />
         <HomeCareerPathways />
-        <HomeApprenticeshipInfra />
+        <HomeApprenticeshipSales />
+        <HomeWebsiteBuilderSales />
         <HomeFunding />
         <HomeFinalCTA />
         <HomeTrustBar />

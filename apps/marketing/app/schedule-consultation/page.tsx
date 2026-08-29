@@ -25,6 +25,12 @@ const TIME_SLOTS = [
 
 const MEETING_TYPES = [
   {
+    value: 'website-app-build',
+    label: 'Website, App & Subscription Build Consultation',
+    duration: '30 min',
+    desc: 'Plan a website, customer app, subscriptions, booking, courses, CRM, or automation',
+  },
+  {
     value: 'enrollment',
     label: 'Enrollment Consultation',
     duration: '30 min',

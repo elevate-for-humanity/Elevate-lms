@@ -102,7 +102,9 @@ export default function HeroVideo({
     setVideoFailed(false);
     setVideoReady(false);
     setAudioFailed(false);
-    setMuted(true);
+    // Visual slide/source changes must not interrupt active narration or make
+    // the sound control claim it is muted while the narration is still playing.
+    if (!soundRequestedRef.current) setMuted(true);
 
     const video = videoRef.current;
     if (!videoEnabled || !video || !desktopSource) return;

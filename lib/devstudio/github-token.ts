@@ -24,13 +24,13 @@ export async function ensureDevStudioSecrets(): Promise<void> {
  * cache made a newly-rotated GitHub token remain stale for up to five minutes.
  */
 export async function getGitHubToken(): Promise<string | null> {
-  await ensureDevStudioSecrets();
+  // Capture the deployment value before hydration. hydrateProcessEnv may load
+  // a canonical fallback into process.env, but must not replace a valid token
+  // supplied directly by the production service.
+  const deployedToken = process.env.GITHUB_TOKEN;
+  if (looksLikeToken(deployedToken)) return deployedToken.trim();
 
-  // In production, the deployment environment is authoritative. This prevents
-  // a stale platform_secrets row from replacing a freshly rotated Northflank
-  // value during hydrateProcessEnv().
-  const fromEnv = process.env.GITHUB_TOKEN;
-  if (looksLikeToken(fromEnv)) return fromEnv.trim();
+  await ensureDevStudioSecrets();
 
   const fromCanonicalStore = await getSecret('GITHUB_TOKEN');
   if (looksLikeToken(fromCanonicalStore)) {

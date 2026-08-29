@@ -7,7 +7,7 @@ import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 const CANONICAL_URL = 'https://www.elevateforhumanity.org/barber-and-beauty-apprenticeships';
 
 export const metadata: Metadata = {
-  title: 'Barber Apprenticeship & Beauty Training Pathways | Elevate for Humanity',
+  title: 'Barber Apprenticeship & Beauty Training Pathways',
   description:
     'Explore Elevate for Humanity barber apprenticeship and beauty training pathways. Federal Registered Apprenticeship claims are limited to programs in Elevate’s canonical RAPIDS registry.',
   alternates: { canonical: CANONICAL_URL },
@@ -38,7 +38,7 @@ const beautyPathways = [
   },
   {
     title: 'Esthetics Training Pathway',
-    href: '/programs/esthetician',
+    href: '/programs/esthetician-apprenticeship',
     status: 'Training pathway',
     description:
       'Program details are available for training and enrollment review. No federal RAPIDS claim is made on this page.',

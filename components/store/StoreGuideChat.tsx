@@ -64,7 +64,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
   if (!open) {
     return (
       <button type="button" onClick={() => setOpen(true)} className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-rose-600 to-orange-500 px-5 py-3 font-bold text-white shadow-xl shadow-orange-900/20 transition hover:-translate-y-0.5 hover:shadow-2xl">
-        <Image src="/images/pages/store-guide-1.webp" alt="Store guide" width={24} height={24} className="rounded-full" sizes="(max-width: 768px) 100vw, 50vw" /> Ask PARIS
+        <Image src="/images/brand/logo-icon.svg" alt="PARIS by Elevate" width={24} height={24} className="rounded-full" sizes="(max-width: 768px) 100vw, 50vw" /> Ask PARIS
       </button>
     );
   }
@@ -75,7 +75,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
       className="fixed bottom-4 right-4 z-[51] w-[calc(100%-2rem)] max-w-sm overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-2xl shadow-orange-950/20 sm:bottom-6 sm:right-6"
     >
         <header className="flex items-center gap-3 bg-gradient-to-r from-cyan-50 via-white to-orange-50 p-4">
-          <Image src="/images/pages/store-guide-1.webp" alt="PARIS Store Advisor" width={52} height={52} className="rounded-full ring-4 ring-white shadow-md" sizes="52px" />
+          <Image src="/images/brand/logo-icon.svg" alt="PARIS Store Advisor" width={52} height={52} className="rounded-full ring-4 ring-white shadow-md" sizes="52px" />
           <div className="flex-1"><p className="text-xs font-black uppercase tracking-[0.16em] text-rose-700">Your personal Store advisor</p><h2 className="text-lg font-black text-slate-950">PARIS</h2><p className="text-sm font-semibold text-slate-700">{speaking ? 'Explaining your best option…' : 'Tell me what you need. I’ll recommend the right product, demo, and plan.'}</p></div>
           <button type="button" onClick={toggle} aria-label={muted ? 'Unmute natural voice' : 'Mute natural voice'}>{muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</button>
           <button type="button" onClick={() => { stop(); setOpen(false); }} aria-label="Close"><X className="h-5 w-5" /></button>

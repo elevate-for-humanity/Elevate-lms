@@ -4,8 +4,6 @@ export const revalidate = 300;
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, PlayCircle, Sparkles } from 'lucide-react';
-import heroBanners from '@/content/heroBanners';
-import HeroVideo from '@/components/marketing/HeroVideo';
 import StoreFAQ from './StoreFAQ';
 import { ROICalculator } from '@/components/store/ROICalculator';
 import { UnifiedSalesMarketplace } from '@/components/store/UnifiedSalesMarketplace';
@@ -46,56 +44,25 @@ const ROLE_DEMOS = [
 ];
 
 export default function StorePage() {
-  const hero = heroBanners.store;
-
   return (
     <main className="min-h-screen bg-white font-medium text-slate-950">
-      <section className="border-b border-cyan-100 bg-gradient-to-b from-cyan-50 via-white to-rose-50 py-6 sm:py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="overflow-hidden rounded-3xl border border-white bg-white shadow-2xl shadow-cyan-900/10 ring-1 ring-slate-200">
-            <HeroVideo
-              videoSrcDesktop={hero.videoSrcDesktop}
-              videoSrcMobile={hero.videoSrcMobile}
-              posterImage={hero.posterImage || '/images/pages/store-licensing-hero.webp'}
-              voiceoverSrc={hero.voiceoverSrc}
-              analyticsName="store-commercial"
-              mediaFit="cover"
-              overlayMode="none"
-              heightClassName="h-[clamp(460px,64vh,760px)]"
-            />
+      <section className="overflow-hidden border-b border-slate-200 bg-gradient-to-br from-cyan-50 via-white to-rose-50 px-4 py-10 sm:py-14">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[.9fr_1.1fr]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-red-700">Elevate Business Operating Platform</p>
+            <h1 className="mt-4 text-4xl font-black leading-tight text-slate-950 sm:text-6xl">Start with what you need. Grow in one connected workspace.</h1>
+            <p className="mt-5 max-w-xl text-lg font-semibold leading-8 text-slate-700">Website, CRM, AI assistants, education, workforce, testing, and operations—connected around one customer record.</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/store/trial" className="rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800">Start Free Trial</Link>
+              <Link href="#role-demos" className="rounded-xl border-2 border-slate-300 bg-white px-6 py-3 font-black text-slate-950 hover:border-brand-red-600">See Role Demos</Link>
+            </div>
+            <p className="mt-4 text-sm font-semibold text-slate-600">14 days · no card required · build new or connect an existing website</p>
           </div>
-        </div>
-      </section>
-
-      <section className="border-b border-slate-200 bg-white py-10 sm:py-12">
-        <div className="mx-auto max-w-5xl px-5 text-center">
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-red-700">
-            Elevate Business Operating Platform
-          </p>
-          <h1 className="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">
-            Start with what you need. Keep one connected workspace as you grow.
-          </h1>
-          <p className="mx-auto mt-4 max-w-3xl text-base font-semibold leading-7 text-slate-800 sm:text-lg">
-            Website, CRM, AI assistants, education, workforce, testing and operations in one
-            connected platform.
-          </p>
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/store/trial"
-              className="rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800"
-            >
-              Start Free Trial
-            </Link>
-            <Link
-              href="#role-demos"
-              className="rounded-xl border-2 border-slate-800 px-6 py-3 font-black text-slate-950 hover:bg-slate-100"
-            >
-              See Role Demos
-            </Link>
+          <div className="grid h-[500px] grid-cols-2 grid-rows-2 gap-3 rounded-3xl bg-white p-3 shadow-2xl ring-1 ring-slate-200">
+            <img src="/images/pages/platform-page-1.webp" alt="Elevate connected platform workspace" className="row-span-2 h-full w-full rounded-2xl object-cover object-left" />
+            <img src="/images/pages/store-recommendations.webp" alt="Elevate guided product recommendations" className="h-full w-full rounded-2xl object-cover" />
+            <img src="/images/pages/store-addons-analytics-hero.webp" alt="Elevate analytics and business insights" className="h-full w-full rounded-2xl object-cover" />
           </div>
-          <p className="mt-4 text-sm font-semibold text-slate-600">
-            14 days · no card required · build new or connect an existing website
-          </p>
         </div>
       </section>
 

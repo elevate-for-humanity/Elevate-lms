@@ -274,61 +274,17 @@ export function resetProviders(): void {
   disabledChatProviders.clear();
 }
 
-function preferredReasoningProvider(): 'anthropic' | 'azure' | 'default' {
-  const configured = process.env.AI_REASONING_PROVIDER?.trim().toLowerCase();
-  if (configured === 'anthropic' || configured === 'claude') return 'anthropic';
-  if (configured === 'azure') return 'azure';
-  if (new AnthropicProvider().isAvailable()) return 'anthropic';
-  if (new AzureProvider().isAvailable()) return 'azure';
-  return 'default';
-}
-
+/**
+ * Reasoning uses the same configured provider authority as every other chat
+ * request. Callers may request a reasoning-oriented model through options, but
+ * they may not open a second provider route or fallback chain.
+ */
 export async function aiReason(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
-  const preferred = preferredReasoningProvider();
-  if (preferred === 'anthropic') {
-    const provider = new AnthropicProvider();
-    try {
-      const result = await withResilience(() => provider.chat({ ...options, provider: 'anthropic' }), {
-        circuitBreaker: CircuitBreaker.for('ai:anthropic', { failureThreshold: 5, resetTimeoutMs: 30_000 }),
-        attempts: 2,
-        baseDelayMs: 1500,
-        label: 'aiReason:anthropic',
-        shouldRetry: (err) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          return !msg.includes('401') && !msg.includes('400');
-        },
-      });
-      return { ...result, provider: provider.name };
-    } catch (error) {
-      logger.warn('[aiReason] Claude reasoning failed; trying fallback', { error: error instanceof Error ? error.message : String(error) });
-    }
-  }
-
-  if (preferred === 'azure' || new AzureProvider().isAvailable()) {
-    const provider = new AzureProvider();
-    if (provider.isAvailable()) {
-      try {
-        const result = await withResilience(() => provider.reason(options), {
-          circuitBreaker: CircuitBreaker.for('ai:azure', { failureThreshold: 5, resetTimeoutMs: 30_000 }),
-          attempts: 2,
-          baseDelayMs: 2000,
-          label: 'aiReason:azure',
-          shouldRetry: (err) => {
-            const msg = err instanceof Error ? err.message : String(err);
-            return !msg.includes('401') && !msg.includes('400');
-          },
-        });
-        return { ...result, provider: provider.name };
-      } catch (error) {
-        logger.warn('[aiReason] Azure reasoning failed; falling back to standard AI', { error: error instanceof Error ? error.message : String(error) });
-      }
-    }
-  }
   return aiChat(options);
 }
 
 export function isReasoningAvailable(): boolean {
-  return new AnthropicProvider().isAvailable() || new AzureProvider().isAvailable() || isAIAvailable();
+  return isAIAvailable();
 }
 
 export type ToolDefinition = {

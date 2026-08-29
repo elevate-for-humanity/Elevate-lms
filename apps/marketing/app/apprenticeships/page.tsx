@@ -84,6 +84,7 @@ export default function ApprenticeshipsPage() {
         analyticsName="apprenticeships"
         heightClassName="h-[clamp(520px,72vh,900px)]"
         mediaFit="cover"
+        overlayMode="soft"
       />
 
       <section className="border-b border-slate-200 bg-white px-4 py-10 sm:py-12">

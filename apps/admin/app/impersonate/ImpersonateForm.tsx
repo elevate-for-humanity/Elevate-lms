@@ -34,7 +34,7 @@ export default function ImpersonateForm() {
         `Now viewing as: ${data.impersonating.name} (${data.impersonating.email}). Session expires ${new Date(data.impersonating.expires_at).toLocaleTimeString()}.`,
       );
       window.location.assign(
-        `https://app.elevateforhumanity.org/api/admin/preview?user_id=${encodeURIComponent(data.impersonating.user_id)}`,
+        `https://app.elevateforhumanity.org/admin-preview?user_id=${encodeURIComponent(data.impersonating.user_id)}`,
       );
     } catch {
       setError('Request failed');

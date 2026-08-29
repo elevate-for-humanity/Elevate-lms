@@ -29,6 +29,11 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
     if (muted || !text.trim()) return;
     void naturalVoice.play(text, { voice: 'coral', style: 'assistant', rate: 1 });
   };
+  function openGuide() {
+    setOpen(true);
+    speak("Hi, I'm PARIS, your Elevate Store guide. What are you trying to do? I can show you the best product, a live demo, and the right starting plan.");
+  }
+
   const toggle = () => {
     setMuted((value) => {
       if (!value) stop();
@@ -62,8 +67,8 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
 
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-rose-600 to-orange-500 px-5 py-3 font-bold text-white shadow-xl shadow-orange-900/20 transition hover:-translate-y-0.5 hover:shadow-2xl">
-        <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-black text-rose-700 shadow-inner" aria-hidden="true">P<span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></span><span><span className="block text-left text-[10px] font-black uppercase tracking-widest text-white/80">Store guide</span>Ask PARIS</span>
+      <button type="button" onClick={openGuide} className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-rose-600 to-orange-500 px-5 py-3 font-bold text-white shadow-xl shadow-orange-900/20 transition hover:-translate-y-0.5 hover:shadow-2xl">
+        <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-black text-rose-700 shadow-inner" aria-hidden="true">P<span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></span><span><span className="block text-left text-[10px] font-black uppercase tracking-widest text-white/80">Store guide · tap to hear</span>Ask PARIS</span>
       </button>
     );
   }

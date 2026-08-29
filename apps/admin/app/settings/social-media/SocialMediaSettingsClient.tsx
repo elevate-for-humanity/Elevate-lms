@@ -170,6 +170,8 @@ export default function SocialMediaSettingsClient() {
             (status?.profile_data as any)?.username ||
             (status?.profile_data as any)?.data?.name ||
             null;
+          const authorizedBy = status?.profile_data?.authorized_by as { id?: string; name?: string } | undefined;
+          const publishesTo = status?.profile_data?.publishes_to as { id?: string; name?: string; username?: string } | undefined;
 
           return (
             <div key={id} className={`grid gap-4 rounded-xl border bg-white p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center ${connected ? border : 'border-gray-200'}`}>
@@ -193,6 +195,20 @@ export default function SocialMediaSettingsClient() {
                   </div>
                   {connected && profileName && (
                     <p className="mt-0.5 truncate text-xs text-gray-500">{profileName}</p>
+                  )}
+                  {(id === 'facebook' || id === 'instagram') && (
+                    <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+                      <div className="rounded-lg bg-slate-50 p-2.5">
+                        <dt className="font-semibold text-slate-500">Authorized by</dt>
+                        <dd className="mt-1 font-bold text-slate-800">{authorizedBy?.name ?? (connected ? 'Reconnect to record identity' : 'Not connected')}</dd>
+                        {authorizedBy?.id && <dd className="mt-0.5 text-slate-500">Profile ID {authorizedBy.id}</dd>}
+                      </div>
+                      <div className="rounded-lg bg-slate-50 p-2.5">
+                        <dt className="font-semibold text-slate-500">Publishes to</dt>
+                        <dd className="mt-1 font-bold text-slate-800">{publishesTo?.name ?? publishesTo?.username ?? profileName ?? 'Not connected'}</dd>
+                        {(publishesTo?.id ?? status?.profile_data?.id) && <dd className="mt-0.5 text-slate-500">Destination ID {publishesTo?.id ?? String(status?.profile_data?.id)}</dd>}
+                      </div>
+                    </dl>
                   )}
                   {!connected && (
                     <p className="mt-0.5 text-xs leading-relaxed text-gray-500">{capabilities.join(' · ')}</p>

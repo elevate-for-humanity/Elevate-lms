@@ -6,10 +6,17 @@ import { BookOpen, Clock, CheckCircle, ArrowRight, TrendingUp, Award, Target } f
 import { SimpleAddToCartButton } from '@/components/store/SimpleAddToCartButton';
 
 export const metadata: Metadata = {
-  title: 'Practice Tests',
-  description: 'Boost your certification exam pass rate with our comprehensive practice tests and exam prep materials.',
+  title: 'Certification Practice Tests & Exam Prep',
+  description: 'Shop certification practice tests and exam-prep materials for Microsoft Office, ACT WorkKeys, EPA 608, OSHA 10, CNA, and other workforce credentials.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/practice-tests',
+  },
+  robots: { index: true, follow: true },
+  openGraph: {
+    title: 'Certification Practice Tests & Exam Prep | Elevate Store',
+    description: 'Practice tests and exam-prep products for workforce and industry credentials.',
+    url: 'https://www.elevateforhumanity.org/store/practice-tests',
+    type: 'website',
   },
 };
 
@@ -62,8 +69,34 @@ const benefits = [
 ];
 
 export default function PracticeTestsPage() {
+  const productListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Elevate certification practice tests',
+    url: 'https://www.elevateforhumanity.org/store/practice-tests',
+    itemListElement: practiceTests.map((test, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Product',
+        name: test.name,
+        description: `Practice test for ${test.exams}`,
+        sku: test.id,
+        brand: { '@type': 'Brand', name: 'Elevate for Humanity' },
+        offers: {
+          '@type': 'Offer',
+          priceCurrency: 'USD',
+          price: test.price,
+          availability: 'https://schema.org/InStock',
+          url: 'https://www.elevateforhumanity.org/store/practice-tests',
+        },
+      },
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productListJsonLd) }} />
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Practice Tests" }]} />
       </div>
@@ -98,14 +131,14 @@ export default function PracticeTestsPage() {
               </h1>
 
               <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
-                Comprehensive practice tests with real exam questions, detailed explanations,
-                and performance tracking to boost your pass rate.
+                Certification-focused practice questions, detailed explanations, and performance
+                tracking to help you prepare before test day.
               </p>
 
               <div className="flex flex-wrap justify-center gap-6 text-slate-600">
                 <div className="flex items-center gap-2">
                   <Award className="w-5 h-5 text-brand-red-600" />
-                  <span>94% Pass Rate</span>
+                  <span>Certification-focused preparation</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-brand-red-600" />
@@ -164,9 +197,6 @@ export default function PracticeTestsPage() {
               <div key={test.id} className="bg-white rounded-xl p-5 border border-slate-200 hover:shadow-lg hover:border-brand-red-200 transition-all">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-slate-500">{test.exams}</span>
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
-                    +{test.passRate} Pass Rate
-                  </span>
                 </div>
 
                 <h3 className="font-bold text-slate-900 mb-2">{test.name}</h3>

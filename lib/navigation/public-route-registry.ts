@@ -24,7 +24,7 @@ export type PublicRouteDefinition = {
   index: true;
 };
 
-const changed = '2026-08-20T00:00:00-04:00';
+const changed = '2026-08-29T00:00:00-04:00';
 
 export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
   { path: ROUTES.home, label: 'Home', category: 'Main', changeFrequency: 'weekly', priority: 1, lastModified: changed, index: true },
@@ -85,6 +85,10 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
   { path: '/store/dev-studio', label: 'Dev Studio', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
   { path: '/store/ai-studio', label: 'AI Studio', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
   { path: '/store/testing', label: 'Testing App', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
+  { path: '/store/practice-tests', label: 'Practice Tests', category: 'Store', changeFrequency: 'weekly', priority: 0.82, lastModified: changed, index: true },
+  { path: '/store/guides', label: 'Store Guides', category: 'Store', changeFrequency: 'monthly', priority: 0.75, lastModified: changed, index: true },
+  { path: '/store/guides/licensing', label: 'Platform Licensing Guide', category: 'Store', changeFrequency: 'monthly', priority: 0.82, lastModified: changed, index: true },
+  { path: '/store/licenses', label: 'Platform Licenses', category: 'Store', changeFrequency: 'weekly', priority: 0.85, lastModified: changed, index: true },
   { path: '/store/compliance', label: 'Compliance Controls', category: 'Store', changeFrequency: 'monthly', priority: 0.8, lastModified: changed, index: true },
   { path: '/store/compliance/wioa', label: 'WIOA Reporting Tools', category: 'Store', changeFrequency: 'monthly', priority: 0.75, lastModified: changed, index: true },
 

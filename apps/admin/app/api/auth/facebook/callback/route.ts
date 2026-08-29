@@ -31,6 +31,8 @@ type MetaPage = {
   instagram_business_account?: { id?: string; name?: string; username?: string };
 };
 
+type MetaIdentity = { id?: string; name?: string };
+
 function settingsRedirect(request: NextRequest, key: 'success' | 'error', value: string) {
   return NextResponse.redirect(new URL(`/settings/social-media?${key}=${encodeURIComponent(value)}`, getPublicAdminOrigin(request)));
 }
@@ -63,6 +65,13 @@ export async function GET(request: NextRequest) {
   const tokenPayload = await tokenResponse.json().catch(() => ({})) as { access_token?: string; expires_in?: number };
   if (!tokenResponse.ok || !tokenPayload.access_token) return settingsRedirect(request, 'error', 'token_exchange_failed');
 
+  const identityUrl = new URL(`https://graph.facebook.com/${version}/me`);
+  identityUrl.searchParams.set('fields', 'id,name');
+  identityUrl.searchParams.set('access_token', tokenPayload.access_token);
+  const identityResponse = await fetch(identityUrl);
+  const identity = await identityResponse.json().catch(() => ({})) as MetaIdentity;
+  if (!identityResponse.ok || !identity.id) return settingsRedirect(request, 'error', 'identity_lookup_failed');
+
   const pagesUrl = new URL(`https://graph.facebook.com/${version}/me/accounts`);
   pagesUrl.searchParams.set('fields', 'id,name,access_token,instagram_business_account{id,name,username}');
   pagesUrl.searchParams.set('access_token', tokenPayload.access_token);
@@ -92,14 +101,24 @@ export async function GET(request: NextRequest) {
     enabled: boolean;
   }> = [{
     platform: 'facebook', access_token: page.access_token, expires_at: expiresAt,
-    organization_id: page.id, profile_data: { id: page.id, name: page.name },
+    organization_id: page.id,
+    profile_data: {
+      id: page.id, name: page.name,
+      authorized_by: { id: identity.id, name: identity.name },
+      publishes_to: { id: page.id, name: page.name, type: 'facebook_page' },
+    },
     updated_by: auth.id, updated_at: now, enabled: true,
   }];
   if (page.instagram_business_account?.id) {
     settings.push({
       platform: 'instagram', access_token: page.access_token, expires_at: expiresAt,
       organization_id: page.instagram_business_account.id,
-      profile_data: page.instagram_business_account,
+      profile_data: {
+        ...page.instagram_business_account,
+        authorized_by: { id: identity.id, name: identity.name },
+        publishes_to: { ...page.instagram_business_account, type: 'instagram_business_account' },
+        connected_via: { id: page.id, name: page.name, type: 'facebook_page' },
+      },
       updated_by: auth.id, updated_at: now, enabled: true,
     });
   }

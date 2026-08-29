@@ -85,7 +85,9 @@ const storeJsonLd = {
       { '@type': 'ListItem', position: 7, name: 'Dev Studio', url: `${STORE_URL}/dev-studio` },
       { '@type': 'ListItem', position: 8, name: 'Testing', url: `${STORE_URL}/testing` },
       { '@type': 'ListItem', position: 9, name: 'Licensing', url: `${STORE_URL}/licenses` },
-      { '@type': 'ListItem', position: 10, name: 'Demos', url: `${STORE_URL}/demos` },
+      { '@type': 'ListItem', position: 10, name: 'Practice Tests', url: `${STORE_URL}/practice-tests` },
+      { '@type': 'ListItem', position: 11, name: 'Licensing Guide', url: `${STORE_URL}/guides/licensing` },
+      { '@type': 'ListItem', position: 12, name: 'Demos', url: `${STORE_URL}/demo` },
     ],
   },
 };

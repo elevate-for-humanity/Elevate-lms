@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function ImpersonateForm() {
-  const router = useRouter();
   const [userId, setUserId] = useState('');
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,7 +33,9 @@ export default function ImpersonateForm() {
       setSuccess(
         `Now viewing as: ${data.impersonating.name} (${data.impersonating.email}). Session expires ${new Date(data.impersonating.expires_at).toLocaleTimeString()}.`,
       );
-      router.refresh();
+      window.location.assign(
+        `https://app.elevateforhumanity.org/api/admin/preview?user_id=${encodeURIComponent(data.impersonating.user_id)}`,
+      );
     } catch {
       setError('Request failed');
     } finally {
@@ -51,7 +51,7 @@ export default function ImpersonateForm() {
       setSuccess('');
       setUserId('');
       setReason('');
-      router.refresh();
+      window.location.reload();
     } finally {
       setLoading(false);
     }

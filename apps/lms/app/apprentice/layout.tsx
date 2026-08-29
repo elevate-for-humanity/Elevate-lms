@@ -7,6 +7,8 @@ import { resolveApprenticeNavConfig } from '@/lib/portal/apprentice-nav-config';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -32,13 +34,15 @@ export default async function Layout({ children }: { children: React.ReactNode }
     redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   }
 
-  const { data: profile } = await supabase
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const { data: profile } = await db
     .from('profiles')
     .select('id, role, full_name, first_name, last_name, avatar_url')
-    .eq('id', user.id)
+    .eq('id', subject.userId)
     .maybeSingle();
 
-  const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
+  const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   const privileged = ['admin', 'super_admin', 'staff'].includes(String(profile?.role || ''));
 
   if (!privileged && !programSlug) {
@@ -54,8 +58,8 @@ export default async function Layout({ children }: { children: React.ReactNode }
   return (
     <PlatformShell
       user={{
-        id: user.id,
-        email: user.email || '',
+        id: subject.userId,
+        email: subject.previewing ? '' : user.email || '',
         full_name: profile?.full_name || undefined,
         first_name: profile?.first_name || undefined,
         last_name: profile?.last_name || undefined,
@@ -64,6 +68,16 @@ export default async function Layout({ children }: { children: React.ReactNode }
       role="apprentice"
       breadcrumbs={breadcrumbs}
     >
+      {subject.previewing && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <span>
+            Admin preview: viewing {profile?.full_name || 'this learner'}&apos;s apprentice dashboard.
+          </span>
+          <a className="font-semibold underline" href="/api/admin/preview?end=1">
+            Exit preview
+          </a>
+        </div>
+      )}
       {nav && <ApprenticeSubNav programSlug={nav.programSlug} config={nav.config} />}
       <div className="mt-4">{children}</div>
     </PlatformShell>

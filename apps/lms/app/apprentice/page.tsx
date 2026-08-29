@@ -11,6 +11,7 @@ import { getProgramHeroImage } from '@/lib/images/programImages';
 import { resolveApprenticeshipRuntimeContext } from '@/lib/apprenticeship/runtime-context';
 import { loadRegisteredApprenticeshipProgress } from '@/lib/apprenticeship/progress-service';
 import { resolveApplicableWage } from '@/lib/apprenticeship/registered-program-contract';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const metadata: Metadata = { title: 'Apprentice Dashboard', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
@@ -20,21 +21,22 @@ export default async function ApprenticePortalPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/apprentice');
 
-  const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');
 
-  const db = await requireAdminClient();
   const runtime = await resolveApprenticeshipRuntimeContext(db, {
-    userId: user.id,
+    userId: subject.userId,
     programSlug,
     requireRegisteredStandard: false,
   });
   if (!runtime) redirect('/lms/dashboard?notice=apprentice-enrollment-required');
 
   const [{ data: profile }, { data: docs }, certsRes] = await Promise.all([
-    db.from('profiles').select('full_name,first_name,last_name').eq('id', user.id).maybeSingle(),
-    db.from('documents').select('id,status,verification_status').eq('user_id', user.id),
-    db.from('program_completion_certificates').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+    db.from('profiles').select('full_name,first_name,last_name').eq('id', subject.userId).maybeSingle(),
+    db.from('documents').select('id,status,verification_status').eq('user_id', subject.userId),
+    db.from('program_completion_certificates').select('id', { count: 'exact', head: true }).eq('user_id', subject.userId),
   ]);
 
   const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Apprentice';
@@ -51,7 +53,7 @@ export default async function ApprenticePortalPage() {
     const [courseRes, lessonCountRes, progressCountRes] = await Promise.all([
       db.from('courses').select('title,slug').eq('id', runtime.enrollment.course_id).maybeSingle(),
       db.from('course_lessons').select('id', { count: 'exact', head: true }).eq('course_id', runtime.enrollment.course_id).eq('is_published', true),
-      db.from('lesson_progress').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('course_id', runtime.enrollment.course_id).eq('completed', true),
+      db.from('lesson_progress').select('id', { count: 'exact', head: true }).eq('user_id', subject.userId).eq('course_id', runtime.enrollment.course_id).eq('completed', true),
     ]);
     courseTitle = courseRes.data?.title || courseTitle;
     courseHref = courseOverviewPath(runtime.enrollment.course_id);

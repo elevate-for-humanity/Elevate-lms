@@ -26,6 +26,12 @@ export async function ensureDevStudioSecrets(): Promise<void> {
 export async function getGitHubToken(): Promise<string | null> {
   await ensureDevStudioSecrets();
 
+  // In production, the deployment environment is authoritative. This prevents
+  // a stale platform_secrets row from replacing a freshly rotated Northflank
+  // value during hydrateProcessEnv().
+  const fromEnv = process.env.GITHUB_TOKEN;
+  if (looksLikeToken(fromEnv)) return fromEnv.trim();
+
   const fromCanonicalStore = await getSecret('GITHUB_TOKEN');
   if (looksLikeToken(fromCanonicalStore)) {
     const token = fromCanonicalStore.trim();
@@ -33,8 +39,7 @@ export async function getGitHubToken(): Promise<string | null> {
     return token;
   }
 
-  const fromEnv = process.env.GITHUB_TOKEN;
-  return looksLikeToken(fromEnv) ? fromEnv.trim() : null;
+  return null;
 }
 
 export async function getGitHubHeaders(): Promise<HeadersInit> {

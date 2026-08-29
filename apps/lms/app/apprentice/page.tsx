@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { Award, BookOpen, CheckCircle2, Clock3, ShieldCheck, UserRound } from 'lucide-react';
+import { AlertCircle, Award, BookOpen, CheckCircle2, Clock3, CreditCard, FileText, MapPin, ShieldCheck, UserRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
@@ -33,10 +33,15 @@ export default async function ApprenticePortalPage() {
   });
   if (!runtime) redirect('/lms/dashboard?notice=apprentice-enrollment-required');
 
-  const [{ data: profile }, { data: docs }, certsRes] = await Promise.all([
+  const [{ data: profile }, { data: docs }, certsRes, { data: documentRequirements }, { data: handbookAcceptance }, { data: cosmetologyBilling }] = await Promise.all([
     db.from('profiles').select('full_name,first_name,last_name').eq('id', subject.userId).maybeSingle(),
-    db.from('documents').select('id,status,verification_status').eq('user_id', subject.userId),
+    db.from('documents').select('id,document_type,status,verification_status').eq('user_id', subject.userId),
     db.from('program_completion_certificates').select('id', { count: 'exact', head: true }).eq('user_id', subject.userId),
+    db.from('apprentice_document_types').select('document_type,is_required').eq('program_slug', programSlug).eq('is_required', true),
+    db.from('license_agreement_acceptances').select('id').eq('user_id', subject.userId).eq('agreement_type', 'handbook').limit(1).maybeSingle(),
+    programSlug === 'cosmetology-apprenticeship'
+      ? db.from('cosmetology_subscriptions').select('stripe_subscription_id,payment_status,setup_fee_paid,fully_paid').eq('user_id', subject.userId).order('created_at', { ascending: false }).limit(1).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Apprentice';
@@ -44,6 +49,8 @@ export default async function ApprenticePortalPage() {
   const heroImage = getProgramHeroImage(programSlug);
   const verifiedDocs = (docs || []).filter((doc) => ['approved', 'verified'].includes(String(doc.verification_status || doc.status || '').toLowerCase())).length;
   const totalDocs = docs?.length ?? 0;
+  const approvedDocumentTypes = new Set((docs || []).filter((doc: any) => ['approved', 'verified', 'accepted'].includes(String(doc.verification_status || doc.status || '').toLowerCase())).map((doc: any) => doc.document_type));
+  const missingDocumentCount = (documentRequirements || []).filter((item: any) => !approvedDocumentTypes.has(item.document_type)).length;
 
   let courseTitle = 'Assigned RTI course';
   let courseHref = '/lms/courses';
@@ -63,8 +70,21 @@ export default async function ApprenticePortalPage() {
   const digitalCoursePercent = totalLessons ? Math.min(100, Math.round((completedLessons / totalLessons) * 100)) : 0;
 
   if (!runtime.contract) {
+    const billingConfigured = Boolean(cosmetologyBilling?.fully_paid || cosmetologyBilling?.stripe_subscription_id);
+    const todoItems = [
+      { label: 'Authorize automatic tuition payments and save a card', done: billingConfigured, href: '/apprentice/billing', icon: CreditCard },
+      { label: 'Complete learner orientation', done: Boolean(runtime.enrollment.orientation_completed_at), href: '/apprentice/orientation', icon: BookOpen },
+      { label: 'Read and acknowledge the student handbook', done: Boolean(handbookAcceptance?.id), href: '/apprentice/handbook', icon: ShieldCheck },
+      { label: `Complete required documents${missingDocumentCount ? ` (${missingDocumentCount} remaining)` : ''}`, done: (documentRequirements?.length || 0) > 0 && missingDocumentCount === 0, href: '/apprentice/documents', icon: FileText },
+      { label: 'Host Salon and supervisor verification', done: Boolean(runtime.placement?.id && runtime.placement.supervisor_user_id), href: '/apprentice/profile', icon: MapPin },
+      { label: 'RTI course content assigned and published', done: Boolean(runtime.enrollment.course_id && totalLessons > 0), href: courseHref, icon: BookOpen },
+    ];
+    const incompleteCount = todoItems.filter((item) => !item.done).length;
+    const shopName = runtime.shop?.name || (runtime.placement?.id ? 'Salon Saloon' : 'Not connected');
     return <main className="space-y-7 pb-10">
       <section className="min-h-[320px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:min-h-[400px]"><div className="grid min-h-[320px] lg:min-h-[400px] lg:grid-cols-[1.15fr_0.85fr]"><div className="p-6 sm:p-8"><p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">Apprentice Dashboard</p><h1 className="mt-2 text-3xl font-black text-slate-950">Welcome, {firstName}</h1><p className="mt-3 text-lg font-bold text-slate-800">{displayProgram}</p><div role="alert" className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950">Your enrollment exists, but this occupation does not currently have an active approved registered-program standard in the canonical platform contract. Regulated OJL, competency, RTI-credit, wage-progression, and completion actions are blocked rather than filled with generic or historical defaults.</div><div className="mt-5 flex flex-wrap gap-3"><Link href="/apprentice/documents" className="rounded-xl border border-slate-300 px-4 py-2 font-bold">Documents</Link><Link href="/apprentice/profile" className="rounded-xl border border-slate-300 px-4 py-2 font-bold">Profile</Link></div></div><div className="relative min-h-[240px]"><Image src={heroImage} alt={`${displayProgram} apprentice training`} fill priority className="object-cover" sizes="(max-width:1024px) 100vw,40vw" /></div></div></section>
+      <section className="rounded-3xl border-2 border-red-300 bg-red-50 p-6 shadow-sm"><div className="flex gap-3"><AlertCircle className="mt-1 h-6 w-6 shrink-0 text-red-700"/><div className="w-full"><h2 className="text-xl font-black text-red-950">Required to-do — {incompleteCount} incomplete</h2><p className="mt-1 text-sm font-semibold text-red-900">PARIS will walk you through these items in order. Red items must be completed before the corresponding activity is unlocked.</p><div className="mt-5 grid gap-3">{todoItems.map(({ label, done, href, icon: Icon }, index) => <Link key={label} href={href} className={`flex items-center justify-between gap-4 rounded-xl border p-4 ${done ? 'border-green-300 bg-green-50 text-green-950' : 'border-red-300 bg-white text-red-950'}`}><span className="flex items-center gap-3"><span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-black ${done ? 'bg-green-700 text-white' : 'bg-red-700 text-white'}`}>{done ? '✓' : index + 1}</span><Icon className="h-5 w-5 shrink-0"/><span className="font-black">{label}</span></span><span className="text-xs font-black uppercase">{done ? 'Complete' : 'Open'}</span></Link>)}</div></div></div></section>
+      <section className="grid gap-4 sm:grid-cols-3"><Metric label="Host Salon" value={shopName} detail={runtime.placement?.supervisor_user_id ? 'Supervisor connected' : 'Supervisor verification still required'} icon={MapPin}/><Metric label="Required documents" value={`${Math.max(0, (documentRequirements?.length || 0) - missingDocumentCount)} / ${documentRequirements?.length || 0}`} detail={`${missingDocumentCount} incomplete`} icon={FileText}/><Metric label="Payment setup" value={billingConfigured ? 'Configured' : 'Required'} detail={billingConfigured ? 'Automatic billing is connected' : 'Authorize and add a card in Billing'} icon={CreditCard}/></section>
     </main>;
   }
 

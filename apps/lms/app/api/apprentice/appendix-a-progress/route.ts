@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getRegisteredProgramStandard, resolveRegisteredProgramContract } from '@/lib/apprenticeship/registered-program-contract';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,9 +12,10 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
   const { data: enrollments, error } = await db.from('program_enrollments')
     .select('id, user_id, program_id, program_slug, status, created_at')
-    .eq('user_id', user.id).in('status', ['active', 'enrolled', 'in_progress']).order('created_at', { ascending: false });
+    .eq('user_id', subject.userId).in('status', ['active', 'enrolled', 'in_progress']).order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const enrollment = (enrollments || []).find((row: any) => getRegisteredProgramStandard(row.program_slug));

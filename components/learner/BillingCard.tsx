@@ -69,7 +69,7 @@ function fmtDate(iso: string | null): string {
   });
 }
 
-export default function BillingCard({ billing }: { billing: BillingSummary }) {
+export default function BillingCard({ billing, readOnly = false }: { billing: BillingSummary; readOnly?: boolean }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [authorized, setAuthorized] = useState(false);
@@ -155,6 +155,20 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
         </div>
 
         <div className="flex items-center justify-between text-sm">
+          <span className="text-slate-600">Enrollment Deposit Paid</span>
+          <span className="font-semibold text-brand-green-700">
+            {billing.setupFeePaid ? fmtDollars(billing.amountPaidAtCheckout) : 'Not paid'}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-slate-600">Automatic Drafts</span>
+          <span className={`font-semibold ${billing.hasSubscription ? 'text-brand-green-700' : 'text-red-700'}`}>
+            {billing.hasSubscription ? 'Authorized and active' : 'Card and authorization required'}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between text-sm">
           <span className="text-slate-600">Remaining Balance</span>
           <span
             className={`font-semibold ${
@@ -235,7 +249,7 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
         )}
 
         {/* Update payment method — only if not paid in full and has Stripe */}
-        {!billing.fullyPaid && billing.paymentStatus !== 'cancelled' && (
+        {!billing.fullyPaid && billing.paymentStatus !== 'cancelled' && !readOnly && (
           <div className="space-y-3 pt-2">
             {!billing.hasSubscription && (
               <label className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700">
@@ -265,6 +279,11 @@ export default function BillingCard({ billing }: { billing: BillingSummary }) {
                   ? 'Update Payment Method'
                   : 'Authorize & Add Card'}
             </button>
+          </div>
+        )}
+        {readOnly && !billing.fullyPaid && !billing.hasSubscription && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
+            Admin preview is read-only. Logan will see the authorization checkbox and “Authorize &amp; Add Card” button here when she signs in to her own account.
           </div>
         )}
       </div>

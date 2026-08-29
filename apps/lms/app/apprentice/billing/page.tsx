@@ -6,6 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import BillingCard, { type BillingSummary } from '@/components/learner/BillingCard';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { APPRENTICE_PORTAL_CONFIGS } from '@/components/portal/ApprenticePortalShell';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { AlertTriangle, ArrowLeft, ChevronRight, CreditCard, DollarSign } from 'lucide-react';
 
 export const metadata: Metadata = { title: 'Billing | Apprentice Portal', description: 'Update your payment method and view tuition status.' };
@@ -54,7 +55,7 @@ function BillingFallback({ portalPath, message }: { portalPath: string; message:
   );
 }
 
-function SubscriptionBilling({ billing, portalPath, needsPaymentMethod }: { billing: BillingSummary; portalPath: string; needsPaymentMethod: boolean }) {
+function SubscriptionBilling({ billing, portalPath, needsPaymentMethod, previewing }: { billing: BillingSummary; portalPath: string; needsPaymentMethod: boolean; previewing: boolean }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
       <Link href={portalPath} className="inline-flex items-center gap-2 text-sm text-slate-700 hover:text-slate-950"><ArrowLeft className="h-4 w-4" /> Back to dashboard</Link>
@@ -64,7 +65,7 @@ function SubscriptionBilling({ billing, portalPath, needsPaymentMethod }: { bill
           <div className="text-sm text-red-800"><p className="mb-1 font-semibold">Payment method required</p><p>Add or update your payment method to keep the tuition account current.</p></div>
         </div>
       ) : null}
-      <BillingCard billing={billing} />
+      <BillingCard billing={billing} readOnly={previewing} />
     </div>
   );
 }
@@ -74,33 +75,34 @@ export default async function ApprenticeBillingPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/apprentice/billing');
 
-  const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
-  const portalPath = (programSlug && APPRENTICE_PORTAL_CONFIGS[programSlug]?.portalPath) || '/apprentice';
   const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
+  const portalPath = (programSlug && APPRENTICE_PORTAL_CONFIGS[programSlug]?.portalPath) || '/apprentice';
 
   if (programSlug === 'barber-apprenticeship') {
     const { data } = await db
       .from('barber_subscriptions')
       .select('payment_status,weekly_payment_cents,remaining_balance,full_tuition_amount,amount_paid_at_checkout,next_payment_date,fully_paid,setup_fee_paid,stripe_subscription_id')
-      .eq('user_id', user.id)
+      .eq('user_id', subject.userId)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
     const sub = data as SubscriptionRow | null;
     if (!sub) return <BillingFallback portalPath={portalPath} message="No barber tuition account was found. Contact support if you recently enrolled." />;
-    return <SubscriptionBilling billing={summary('barber', sub)} portalPath={portalPath} needsPaymentMethod={!sub.fully_paid && !sub.stripe_subscription_id && !sub.setup_fee_paid} />;
+    return <SubscriptionBilling billing={summary('barber', sub)} portalPath={portalPath} needsPaymentMethod={!sub.fully_paid && !sub.stripe_subscription_id} previewing={subject.previewing} />;
   }
 
   if (programSlug === 'cosmetology-apprenticeship') {
     const { data } = await db
       .from('cosmetology_subscriptions')
       .select('payment_status,weekly_payment_cents,remaining_balance,full_tuition_amount,amount_paid_at_checkout,next_payment_date,fully_paid,setup_fee_paid,stripe_subscription_id')
-      .eq('user_id', user.id)
+      .eq('user_id', subject.userId)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
     const sub = data as SubscriptionRow | null;
-    if (sub) return <SubscriptionBilling billing={summary('cosmetology', sub)} portalPath={portalPath} needsPaymentMethod={!sub.fully_paid && !sub.stripe_subscription_id && !sub.setup_fee_paid} />;
+    if (sub) return <SubscriptionBilling billing={summary('cosmetology', sub)} portalPath={portalPath} needsPaymentMethod={!sub.fully_paid && !sub.stripe_subscription_id} previewing={subject.previewing} />;
   }
 
   return (

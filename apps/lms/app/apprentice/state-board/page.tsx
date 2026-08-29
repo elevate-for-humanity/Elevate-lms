@@ -19,6 +19,8 @@ import {
   APPRENTICESHIP_REQUIRED_HOURS,
   getApprenticeshipRequiredHours,
 } from '@/lib/compliance/apprenticeship';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,28 +35,21 @@ export default async function StateBoardExamPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/apprentice/state-board');
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
 
   // Canonical enrollment source
-  const { data: programEnrollment } = await supabase
+  const { data: programEnrollment } = await db
     .from('program_enrollments')
-    .select('program_slug, enrolled_at, status')
-    .eq('user_id', user.id)
+    .select('program_slug, enrolled_at, status, required_hours, transfer_hours, lms_completed, practical_skills_verified')
+    .eq('user_id', subject.userId)
     .in('program_slug', Object.keys(APPRENTICESHIP_REQUIRED_HOURS))
     .eq('status', 'active')
     .order('enrolled_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  // Canonical enrollment fields used for state-board readiness.
-  const { data: legacyEnrollment } = await supabase
-    .from('program_enrollments')
-    .select(
-      'program_slug, required_hours, transfer_hours, lms_completed, practical_skills_verified',
-    )
-    .eq('student_id', user.id)
-    .maybeSingle();
-
-  const programSlug = programEnrollment?.program_slug ?? legacyEnrollment?.program_slug ?? null;
+  const programSlug = programEnrollment?.program_slug ?? null;
 
   const configuredRequiredHours = getApprenticeshipRequiredHours(programSlug);
 
@@ -62,22 +57,22 @@ export default async function StateBoardExamPage() {
     redirect('/programs');
   }
 
-  const requiredHours = legacyEnrollment?.required_hours ?? configuredRequiredHours;
+  const requiredHours = programEnrollment?.required_hours ?? configuredRequiredHours;
 
   // Hours from apprentice_hours (canonical PWA source) — approved only
-  const { data: approvedRows } = await supabase
-    .from('apprenticeship_hours')
-    .select('hours')
-    .eq('user_id', user.id)
+  const { data: approvedRows } = await db
+    .from('hour_entries')
+    .select('accepted_hours,hours_claimed')
+    .eq('user_id', subject.userId)
     .eq('status', 'approved');
 
-  const pwaHours = (approvedRows ?? []).reduce((sum, r) => sum + (r.hours ?? 0), 0);
-  const transferHours = legacyEnrollment?.transfer_hours ?? 0;
+  const pwaHours = (approvedRows ?? []).reduce((sum, r) => sum + Number(r.accepted_hours || r.hours_claimed || 0), 0);
+  const transferHours = programEnrollment?.transfer_hours ?? 0;
   const totalHours = pwaHours + transferHours;
 
   const hoursComplete = totalHours >= requiredHours;
-  const lmsComplete = legacyEnrollment?.lms_completed ?? false;
-  const skillsVerified = legacyEnrollment?.practical_skills_verified ?? false;
+  const lmsComplete = programEnrollment?.lms_completed ?? false;
+  const skillsVerified = programEnrollment?.practical_skills_verified ?? false;
   const isReady = hoursComplete && lmsComplete;
 
   let examInfo = null as (typeof IPLA_EXAM_INFO)[keyof typeof IPLA_EXAM_INFO] | null;

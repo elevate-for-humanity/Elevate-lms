@@ -2,13 +2,12 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
-import { ApprenticeSubNav } from '@/components/portal/ApprenticeSubNav';
-import { resolveApprenticeNavConfig } from '@/lib/portal/apprentice-nav-config';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -49,7 +48,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
     redirect('/lms/dashboard?notice=apprentice-access-required');
   }
 
-  const nav = resolveApprenticeNavConfig(programSlug);
   const breadcrumbs = generateBreadcrumbs(pathname).map((crumb) => {
     if (crumb.label === 'Apprentice') return { label: 'Apprentice Portal', href: crumb.href };
     return crumb;
@@ -78,8 +76,12 @@ export default async function Layout({ children }: { children: React.ReactNode }
           </a>
         </div>
       )}
-      {nav && <ApprenticeSubNav programSlug={nav.programSlug} portalPath={nav.config.portalPath} />}
       <div className="mt-4">{children}</div>
+      <ParisFloatingWrapper
+        surface="learner"
+        courseTitle={programSlug === 'cosmetology-apprenticeship' ? 'Cosmetology Apprenticeship' : programSlug?.replace(/[-_]/g, ' ') || 'Apprenticeship'}
+        nextLessonTitle="Complete the required items highlighted in red on your apprentice dashboard"
+      />
     </PlatformShell>
   );
 }

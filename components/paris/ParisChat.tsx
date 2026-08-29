@@ -59,9 +59,9 @@ I'll ask a few focused questions, recommend the smallest setup that fits, explai
 function learnerGreeting(courseTitle?: string | null, nextLessonTitle?: string | null): Message {
   return {
     role: 'assistant',
-    content: `Hi — I'm PARIS, your Elevate learning assistant${courseTitle ? ` for ${courseTitle}` : ''}.
+    content: `Hi — I'm PARIS, your Elevate learner guide${courseTitle ? ` for ${courseTitle}` : ''}.
 
-I can explain course concepts, help you study, and guide you to your next step${nextLessonTitle ? `: ${nextLessonTitle}` : ''}. I will support your learning, but I will not complete graded assignments or assessments for you.`,
+I can guide you through onboarding, the red to-do items on your dashboard, billing setup, required documents, handbook rules, attendance and geofenced timekeeping, RTI coursework, and study help. Your next step is${nextLessonTitle ? `: ${nextLessonTitle}` : ' shown on your dashboard'}. I will support your learning, but I will not approve compliance records or complete graded work for you.`,
   };
 }
 

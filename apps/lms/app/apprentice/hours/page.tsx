@@ -7,6 +7,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const metadata: Metadata = {
   title: 'Apprentice Hours',
@@ -22,9 +24,11 @@ export default async function ApprenticeHoursPage() {
   } = await supabase.auth.getUser();
 
   if (!user) redirect('/login?redirect=/apprentice/hours');
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
 
   // Fetch hours from consolidated hour_entries table
-  const { data: hoursData, error } = await supabase
+  const { data: hoursData, error } = await db
     .from('hour_entries')
     .select(
       `
@@ -39,7 +43,7 @@ export default async function ApprenticeHoursPage() {
       created_at
     `,
     )
-    .eq('user_id', user.id)
+    .eq('user_id', subject.userId)
     .order('work_date', { ascending: false })
     .limit(20);
 
@@ -54,10 +58,10 @@ export default async function ApprenticeHoursPage() {
     .reduce((sum, log: any) => sum + (log.accepted_hours || log.hours_claimed || 0), 0);
 
   // Resolve required hours from the learner's active enrollment
-  const { data: activeEnrollment } = await supabase
+  const { data: activeEnrollment } = await db
     .from('program_enrollments')
     .select('program_slug')
-    .eq('user_id', user.id)
+    .eq('user_id', subject.userId)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();

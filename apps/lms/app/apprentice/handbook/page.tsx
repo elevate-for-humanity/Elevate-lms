@@ -1,8 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { BookOpen, CheckCircle2, Clock3, DollarSign, ShieldCheck, Users } from 'lucide-react';
 import { AcknowledgeHandbookButton } from './AcknowledgeHandbookButton';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
+import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 
 export const metadata: Metadata = {
   title: 'Registered Barber Apprentice Handbook',
@@ -11,8 +16,17 @@ export const metadata: Metadata = {
 };
 export const dynamic = 'force-dynamic';
 
-export default function ApprenticeHandbookPage() {
-  const contract = getRegisteredProgramStandard('barber-apprenticeship');
+export default async function ApprenticeHandbookPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/apprentice/handbook');
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
+  if (programSlug === 'cosmetology-apprenticeship') {
+    return <CosmetologyHandbook previewing={subject.previewing} />;
+  }
+  const contract = getRegisteredProgramStandard(programSlug || 'barber-apprenticeship');
   if (!contract) throw new Error('REGISTERED_BARBER_CONTRACT_MISSING');
   const standard = contract.standard;
 
@@ -37,6 +51,45 @@ export default function ApprenticeHandbookPage() {
       </div>
     </main>
   );
+}
+
+function CosmetologyHandbook({ previewing }: { previewing: boolean }) {
+  return (
+    <main className="min-h-screen bg-slate-50 pb-12">
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-pink-800">Learner operating guide</p>
+          <h1 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Cosmetology Apprenticeship Student Handbook</h1>
+          <p className="mt-3 max-w-3xl font-medium leading-7 text-slate-700">Your rules for attendance, verified work time, related technical instruction, payments, conduct, records, and Host Salon participation. Occupation-specific registration terms appear only after an approved standard is attached to the enrollment.</p>
+          <div className="mt-5 flex flex-wrap gap-2 text-sm font-bold"><span className="rounded-full bg-pink-100 px-3 py-2 text-pink-950">144 RTI hours</span><span className="rounded-full bg-slate-100 px-3 py-2">Host Salon: Salon Saloon</span></div>
+        </div>
+      </section>
+      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
+        <Policy title="Attendance and participation">
+          Attend every scheduled RTI session and every agreed Host Salon shift. Clock in and out accurately, complete assigned learning, and notify the instructor and Host Salon before an absence or late arrival. Missed RTI or supervised work must be documented and made up when required; attendance alone does not prove competency.
+        </Policy>
+        <Policy title="Geofencing and truthful time records">
+          Use the dashboard timeclock only while physically present at the approved Host Salon. Allow location access when clocking in and out. Never share credentials, spoof location, backdate time, duplicate entries, or report hours not worked. A location result is evidence—not automatic approval—and the Host Salon must review submitted work time. If location services fail, stop and report the problem instead of creating a false entry.
+        </Policy>
+        <Policy title="Payments and automatic billing">
+          Self-pay learners must review the disclosed tuition schedule, authorize automatic payments, and save a payment method through Stripe. Receipts and payment progress appear in Billing. Report a failed or changed card promptly. Any access action for nonpayment follows the signed enrollment agreement; completed and approved learner records are retained.
+          <Link href="/apprentice/billing" className="mt-4 inline-flex rounded-xl bg-pink-700 px-4 py-2.5 font-black text-white">Set up or review payments</Link>
+        </Policy>
+        <Policy title="Conduct, safety, and salon rules">
+          Follow sanitation, infection-control, client privacy, dress, safety, equipment, and professional-conduct rules. Work only within the learner scope and under required supervision. Harassment, discrimination, falsified records, unsafe practice, retaliation, and misuse of client information are prohibited. Follow the Host Salon’s lawful site rules when they are more specific.
+        </Policy>
+        <Policy title="Required records and onboarding">
+          Complete orientation, acknowledge this handbook, sign the learner apprenticeship and enrollment agreements, and upload every document marked required in the dashboard. Staff employment agreements and the internal digital binder are not learner-facing documents. Report changes to your address, employment, Host Salon, supervisor, or schedule.
+          <Link href="/apprentice/documents" className="mt-4 inline-flex rounded-xl border border-slate-300 bg-white px-4 py-2.5 font-black text-slate-900">Open required documents</Link>
+        </Policy>
+        <section className="rounded-3xl border-2 border-pink-300 bg-pink-50 p-6"><div className="flex gap-3"><ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-pink-800"/><div><h2 className="font-black text-pink-950">Handbook acknowledgment required</h2><p className="mt-1 text-sm font-semibold leading-6 text-pink-950">Review every section, then acknowledge receipt. Agreements requiring signatures remain separate required documents.</p><div className="mt-4">{previewing ? <p className="rounded-lg bg-white p-3 text-sm font-bold text-slate-700">Preview mode: Logan must complete this acknowledgment from her own account.</p> : <AcknowledgeHandbookButton />}</div></div></div></section>
+      </div>
+    </main>
+  );
+}
+
+function Policy({ title, children }: { title: string; children: React.ReactNode }) {
+  return <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><h2 className="text-2xl font-black text-slate-950">{title}</h2><div className="mt-3 font-medium leading-7 text-slate-700">{children}</div></section>;
 }
 
 function Fact({ icon: Icon, label, value, detail }: { icon: React.ElementType; label: string; value: string; detail: string }) { return <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><Icon className="h-5 w-5 text-cyan-800"/><p className="mt-3 text-xs font-black uppercase tracking-wide text-slate-600">{label}</p><p className="mt-1 text-xl font-black text-slate-950">{value}</p><p className="mt-2 text-xs font-medium leading-5 text-slate-600">{detail}</p></article>; }

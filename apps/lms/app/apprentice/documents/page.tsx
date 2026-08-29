@@ -8,6 +8,7 @@ import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-pr
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import UploadDocuments from './UploadDocuments';
 import { getDocumentUploadGuidance } from './document-guidance';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const metadata: Metadata = {
   title: 'Documents | Apprentice Portal',
@@ -23,7 +24,8 @@ export default async function ApprenticeDocumentsPage() {
   if (!user) redirect('/login?redirect=/apprentice/documents');
 
   const admin = await requireAdminClient();
-  const programSlug = await resolveApprenticeProgramSlug(admin, user.id);
+  const subject = await resolvePortalPreviewSubject(admin, user.id);
+  const programSlug = await resolveApprenticeProgramSlug(admin, subject.userId);
   if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');
 
   const [{ data: requirements }, { data: documents }] = await Promise.all([
@@ -35,7 +37,7 @@ export default async function ApprenticeDocumentsPage() {
     admin
       .from('documents')
       .select('id,document_type,file_name,status,verification_status,created_at,metadata')
-      .eq('user_id', user.id)
+      .eq('user_id', subject.userId)
       .order('created_at', { ascending: false }),
   ]);
 
@@ -65,11 +67,11 @@ export default async function ApprenticeDocumentsPage() {
           </div>
         </div>
 
-        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+        {!subject.previewing ? <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
           <h2 className="text-xl font-black">Upload or replace a document</h2>
           <p className="mt-1 text-sm text-slate-600">Approved evidence is locked. Missing, pending, or rejected evidence can be uploaded through the secure document endpoint.</p>
           <div className="mt-5"><UploadDocuments programSlug={programSlug} /></div>
-        </section>
+        </section> : <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">Admin preview is read-only. Logan can upload these documents from her own account.</div>}
 
         <section className="mt-6 grid gap-4">
           {rows.map(({ requirement, document, status }: any) => {

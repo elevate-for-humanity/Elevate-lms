@@ -34,6 +34,9 @@ interface TimeclockContext {
   allowedSites: { id: string; name: string; lat: number; lng: number; radius_m: number }[];
   hoursCompleted: number;
   hoursRequired: number;
+  canClock: boolean;
+  previewing?: boolean;
+  configurationMessage?: string | null;
   activeShift: {
     entryId: string;
     clockInAt: string;
@@ -471,7 +474,7 @@ export default function TimeclockPage() {
               <div
                 className="bg-white h-2 rounded-full transition-all"
                 style={{
-                  width: `${Math.min(100, (context.hoursCompleted / context.hoursRequired) * 100)}%`,
+                  width: `${context.hoursRequired > 0 ? Math.min(100, (context.hoursCompleted / context.hoursRequired) * 100) : 0}%`,
                 }}
               />
             </div>
@@ -508,7 +511,7 @@ export default function TimeclockPage() {
               <div className="flex items-center">
                 <AlertTriangle className="w-5 h-5 mr-2 text-yellow-600" />
                 <span className="text-sm text-yellow-700">
-                  No work site assigned. Please contact your program coordinator.
+                  {context.configurationMessage || 'No verified work site is assigned. Please contact your program coordinator.'}
                 </span>
               </div>
             </div>
@@ -606,7 +609,7 @@ export default function TimeclockPage() {
             {!isClockedIn ? (
               <button
                 onClick={() => handleAction('clock_in')}
-                disabled={actionLoading !== null || location.loading || !selectedSiteId}
+                disabled={actionLoading !== null || location.loading || !selectedSiteId || !context.canClock}
                 className="w-full flex items-center justify-center px-6 py-4 bg-brand-green-600 hover:bg-brand-green-700 disabled:bg-slate-400 text-white font-bold rounded-lg transition-colors"
               >
                 {actionLoading === 'clock_in' ? (
@@ -770,4 +773,3 @@ export default function TimeclockPage() {
     </div>
   );
 }
-

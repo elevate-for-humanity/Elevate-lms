@@ -17,12 +17,14 @@ export async function requireCreator() {
     .eq('user_id', user.id)
     .maybeSingle();
 
+  // A missing or pending creator record is an access state, not an application
+  // crash. Send the user back to their workspace with a useful notice.
   if (!creator) {
-    throw new Error('Not a creator - apply at /marketplace/apply');
+    redirect('/lms/dashboard?notice=creator-access-required');
   }
 
   if (creator.status !== 'approved') {
-    throw new Error('Creator account not approved yet');
+    redirect('/lms/dashboard?notice=creator-approval-pending');
   }
 
   return { user, creator };

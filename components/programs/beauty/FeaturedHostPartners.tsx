@@ -51,9 +51,10 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
 
           <div className="mt-10 grid gap-6 lg:grid-cols-2">
             {shops.map((shop) => {
+              const stillMedia = shop.media?.filter((media) => media.kind !== 'video') ?? [];
               const image = shop.slug === 'razors-image-barbershop'
                 ? { src: '/images/partners/razors-image-video-poster.webp', alt: "Razor's Image host barbershop representative", kind: 'photo' as const }
-                : shop.media?.find((media) => media.kind !== 'video');
+                : stillMedia[1] ?? stillMedia[0];
               const video = shop.slug === 'razors-image-barbershop'
                 ? { src: '/videos/partners/razors-image-host-barbershop.mp4', alt: "Razor's Image owner describing the barber apprenticeship opportunity", kind: 'video' as const }
                 : shop.media?.find((media) => media.kind === 'video');

@@ -60,7 +60,8 @@ export default function StorePage() {
               voiceoverSrc={hero.voiceoverSrc}
               analyticsName="store-commercial"
               mediaFit="cover"
-              heightClassName="h-[clamp(520px,72vh,900px)]"
+              overlayMode="none"
+              heightClassName="h-[clamp(460px,64vh,760px)]"
             />
           </div>
         </div>

@@ -5,6 +5,7 @@ import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeApprenticeshipSales } from '@/components/home/HomeApprenticeshipSales';
 import { HomeWebsiteBuilderSales } from '@/components/home/HomeWebsiteBuilderSales';
+import { HomeSocialAppCTA } from '@/components/home/HomeSocialAppCTA';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeMobileActions } from '@/components/home/HomeMobileActions';
@@ -76,6 +77,7 @@ export default async function HomePage() {
         <HomeCareerPathways />
         <HomeApprenticeshipSales />
         <HomeWebsiteBuilderSales />
+        <HomeSocialAppCTA />
         <HomeFunding />
         <HomeFinalCTA />
         <HomeTrustBar />

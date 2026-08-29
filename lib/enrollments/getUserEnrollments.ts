@@ -184,11 +184,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   const { data: partnerEnrollments, error: partnerError } = await supabase
     .from('partner_lms_enrollments')
     .select(
-      `
-      id, student_id, course_id, provider_id, status, progress_percentage, enrolled_at, created_at, updated_at, metadata,
-      partner_lms_courses (id, course_name, course_description, description, duration_hours),
-      partner_lms_providers (id, provider_name, website_url)
-    `,
+      'id,student_id,course_id,provider_id,status,progress_percentage,enrolled_at,created_at,updated_at,metadata',
     )
     .eq('student_id', userId);
 
@@ -196,19 +192,35 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     return { enrollments: results, error: partnerError.message };
   }
 
-  const partnerCourseIds = [...new Set((partnerEnrollments ?? []).map((row) => row.course_id).filter((id): id is string => Boolean(id) && !coursesById.has(id)))];
-  if (partnerCourseIds.length) {
-    const { data: partnerCourseFallbacks, error: fallbackError } = await supabase
+  const partnerCourseIds = [...new Set((partnerEnrollments ?? []).map((row) => row.course_id).filter((id): id is string => Boolean(id)))];
+  const partnerProviderIds = [...new Set((partnerEnrollments ?? []).map((row) => row.provider_id).filter((id): id is string => Boolean(id)))];
+  const [partnerCoursesResult, partnerProvidersResult] = await Promise.all([
+    partnerCourseIds.length
+      ? supabase.from('partner_lms_courses').select('id,course_name,course_description,description,duration_hours').in('id', partnerCourseIds)
+      : Promise.resolve({ data: [], error: null }),
+    partnerProviderIds.length
+      ? supabase.from('partner_lms_providers').select('id,provider_name,website_url').in('id', partnerProviderIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+  const partnerCoursesById = new Map<string, any>(
+    (partnerCoursesResult.data ?? []).map((course: any) => [course.id, course]),
+  );
+  const partnerProvidersById = new Map<string, any>(
+    (partnerProvidersResult.data ?? []).map((provider: any) => [provider.id, provider]),
+  );
+
+  const internalFallbackCourseIds = partnerCourseIds.filter((id) => !partnerCoursesById.has(id) && !coursesById.has(id));
+  if (internalFallbackCourseIds.length) {
+    const { data: partnerCourseFallbacks } = await supabase
       .from('courses')
       .select('id,title,course_name,description,short_description,duration_hours')
-      .in('id', partnerCourseIds);
-    if (fallbackError) return { enrollments: results, error: fallbackError.message };
+      .in('id', internalFallbackCourseIds);
     for (const course of (partnerCourseFallbacks ?? []) as CourseRow[]) coursesById.set(course.id, course);
   }
 
   for (const row of partnerEnrollments ?? []) {
-    const course = row.partner_lms_courses as any;
-    const provider = row.partner_lms_providers as any;
+    const course = row.course_id ? partnerCoursesById.get(row.course_id) ?? null : null;
+    const provider = row.provider_id ? partnerProvidersById.get(row.provider_id) ?? null : null;
     const internalCourse = row.course_id ? coursesById.get(row.course_id) ?? null : null;
     const { mode, inferred } = resolveDeliveryMode('partner_lms_enrollments', null);
     const enrollment: NormalizedEnrollment = {

@@ -20,7 +20,8 @@ export function CertificateTemplate({
 }: CertificateProps) {
   return (
     <div
-      id={`certificate-${certificateNumber}`}\n      className="relative mx-auto aspect-[22/17] w-full max-w-[1056px] bg-white p-[clamp(1rem,4.5vw,3rem)]"
+      id={`certificate-${certificateNumber}`}
+      className="relative mx-auto aspect-[22/17] w-full max-w-[1056px] bg-white p-[clamp(1rem,4.5vw,3rem)]"
     >
       {/* Border */}
       <div className="absolute inset-[clamp(0.6rem,3vw,2rem)] rounded-lg border-[clamp(3px,0.75vw,8px)] border-brand-blue-600">

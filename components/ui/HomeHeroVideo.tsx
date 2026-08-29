@@ -34,7 +34,7 @@ interface HomeHeroSlide {
 
 const HOME_MEDIA_REVISION = process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 12) || 'home-hero';
 const HOME_FIRST_FRAME = '/images/heroes/hero-home-first-frame.webp';
-const HOME_SLIDE_SECONDS = 5;
+const HOME_SLIDE_SECONDS = 4;
 
 const HOME_NARRATION =
   'Welcome to Elevate for Humanity, where career training, registered apprenticeships, workforce support, and technology come together in one connected platform. Whether you want to begin a new career, earn while you learn, grow your business, host an apprentice, or build and manage training online, Elevate can help you take the next step. Explore hands-on pathways in healthcare, skilled trades, transportation, barbering, beauty, business, and technology. Eligible participants can also learn about available workforce funding pathways and payment options before enrolling. Shop and salon owners can join at no cost as apprenticeship host sites, train new talent inside their businesses, receive program support from Elevate, and may qualify for eligible workforce incentives. Apprentices gain supervised experience, documented skills, and the opportunity to earn wages while completing their pathway. Elevate also provides online applications, learner and employer portals, course-building tools, website and app development, testing support, and workforce-management technology. Explore a program, apply for training, become a host site, or request a demonstration. Your next opportunity can start right here with Elevate for Humanity.';
@@ -55,21 +55,27 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     },
     {
       type: 'image',
-      src: '/images/partners/salon-saloon/team-sign.webp',
-      alt: 'Salon Saloon team at an Elevate participating Host Salon',
-      label: 'Host shops train the next generation',
+      src: '/images/pages/barber-apprentice-learning.webp',
+      alt: 'Barber apprentice practicing a precision haircut in a working shop',
+      label: 'Earn while you learn in a real workplace',
     },
     {
       type: 'image',
-      src: '/images/pages/barber-hero-main.webp',
-      alt: 'Barber apprentice serving a client in a working barbershop',
-      label: 'Earn while you learn',
+      src: '/images/healthcare/hero-program-medical-assistant.webp',
+      alt: 'Healthcare trainees practicing patient support in a clinical setting',
+      label: 'Train for an in-demand healthcare career',
     },
     {
       type: 'image',
-      src: '/images/pexels/cosmetology.webp',
-      alt: 'Beauty professional working with a client in a salon',
-      label: 'Beauty apprenticeship pathways',
+      src: '/images/pages/apprenticeship-hero.webp',
+      alt: 'Apprentice learning practical skills with guidance from an experienced mentor',
+      label: 'Build job-ready skills with a mentor',
+    },
+    {
+      type: 'image',
+      src: '/images/hero/hero-tech-careers.webp',
+      alt: 'Technology learner building practical digital skills on a laptop',
+      label: 'Build practical technology skills',
     },
   ] satisfies HomeHeroSlide[]).filter(
     (slide) => slide.type === 'image' || Boolean(slide.src || slide.mobileSrc),

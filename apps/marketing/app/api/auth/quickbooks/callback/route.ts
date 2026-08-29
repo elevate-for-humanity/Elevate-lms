@@ -29,10 +29,29 @@ export async function GET(request: NextRequest) {
   const base    = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   const adminBase = base.replace('www.', 'admin.');
   const redirect  = (msg: string) =>
-    NextResponse.redirect(`${adminBase}/admin/integrations/quickbooks?${msg}`);
+    NextResponse.redirect(`${adminBase}/integrations/quickbooks?${msg}`);
 
   if (error)  return redirect(`error=${error}`);
   if (!code)  return redirect('error=no_code');
+  if (!state) return redirect('error=invalid_state');
+
+  try {
+    const { getAdminClient } = await import('@/lib/supabase/admin');
+    const supabase = await getAdminClient();
+    if (!supabase) return redirect('error=state_unavailable');
+    const { data: stateRow } = await supabase
+      .from('app_settings')
+      .select('value, updated_at')
+      .eq('key', 'QB_OAUTH_STATE')
+      .maybeSingle();
+    const stateAge = stateRow?.updated_at ? Date.now() - new Date(stateRow.updated_at).getTime() : Number.POSITIVE_INFINITY;
+    if (stateRow?.value !== state || stateAge > 10 * 60 * 1000) {
+      return redirect('error=invalid_state');
+    }
+    await supabase.from('app_settings').delete().eq('key', 'QB_OAUTH_STATE');
+  } catch {
+    return redirect('error=state_unavailable');
+  }
 
   const clientId     = process.env.QB_CLIENT_ID;
   const clientSecret = process.env.QB_CLIENT_SECRET;
@@ -78,7 +97,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.redirect(
-      `${adminBase}/admin/integrations/quickbooks?success=connected&company=${realm}`,
+      `${adminBase}/integrations/quickbooks?success=connected&company=${realm}`,
     );
   } catch (err) {
     logger.error('[QB callback] unexpected error:', err);

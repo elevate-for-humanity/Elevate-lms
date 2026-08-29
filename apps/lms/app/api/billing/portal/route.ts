@@ -21,17 +21,19 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // stripe_customer_id on program_enrollments is text (Stripe cus_xxx format)
-    const { data: enrollment } = await supabase
-      .from('program_enrollments')
-      .select('stripe_customer_id')
-      .eq('user_id', user.id)
-      .not('stripe_customer_id', 'is', null)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    const [{ data: profile }, { data: enrollment }] = await Promise.all([
+      supabase.from('profiles').select('stripe_customer_id').eq('id', user.id).maybeSingle(),
+      supabase
+        .from('program_enrollments')
+        .select('stripe_customer_id')
+        .eq('user_id', user.id)
+        .not('stripe_customer_id', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
-    const stripeCustomerId = enrollment?.stripe_customer_id;
+    const stripeCustomerId = profile?.stripe_customer_id || enrollment?.stripe_customer_id;
 
     if (!stripeCustomerId) {
       return NextResponse.json({ error: 'No billing account found' }, { status: 404 });
@@ -44,7 +46,11 @@ async function _POST(req: NextRequest) {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,
-      return_url: `${process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl}/apprentice`,
+      return_url: `${(
+        process.env.NEXT_PUBLIC_LMS_URL ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        'https://app.elevateforhumanity.org'
+      ).replace(/\/$/, '')}/lms/payments`,
     });
 
     return NextResponse.json({ url: session.url });

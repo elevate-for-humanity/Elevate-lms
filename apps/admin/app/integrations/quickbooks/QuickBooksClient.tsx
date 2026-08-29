@@ -92,7 +92,7 @@ export default function QuickBooksClient() {
         </Link>
         <div>
           <h1 className="text-2xl font-bold text-slate-900">QuickBooks Online</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Sync payroll and expenses with QuickBooks</p>
+          <p className="text-sm text-slate-500 mt-0.5">Verify accounting data and employee records with QuickBooks Online</p>
         </div>
       </div>
 
@@ -135,7 +135,7 @@ export default function QuickBooksClient() {
         {!status.connected && (
           <div className="space-y-3">
             <p className="text-sm text-slate-600">
-              Connect your QuickBooks Online account to sync payroll runs and expenses.
+              Connect QuickBooks Online to verify the company, employee records, and expenses. Payroll-run sync requires separate Intuit Payroll API access.
             </p>
             {!authUrl ? (
               <button onClick={getAuthUrl}
@@ -164,8 +164,8 @@ export default function QuickBooksClient() {
             className="w-full flex items-center gap-3 p-4 border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-50 transition-colors text-left">
             <Users className="w-5 h-5 text-blue-500 shrink-0" />
             <div className="flex-1">
-              <p className="font-medium text-slate-800 text-sm">Sync Payroll</p>
-              <p className="text-xs text-slate-500">Pull employee records from QuickBooks</p>
+              <p className="font-medium text-slate-800 text-sm">Verify Employees</p>
+              <p className="text-xs text-slate-500">Pull employee records through QuickBooks Online Accounting</p>
             </div>
             {syncing === 'sync_payroll' && <Loader2 className="w-4 h-4 animate-spin text-slate-400" />}
           </button>

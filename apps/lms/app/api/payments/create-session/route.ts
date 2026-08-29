@@ -139,29 +139,13 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    // Configure payment methods based on amount
-    const paymentMethodTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [
-      'card',
-      'link',
-    ];
-
-    // Add BNPL options based on amount
-    // Klarna supports up to $10,000; Afterpay up to $2,000 — both cover CNA at $1,850
-    if (price >= 35 && price <= 10000) {
-      paymentMethodTypes.push('klarna');
-    }
-    if (price >= 35 && price <= 2000) {
-      paymentMethodTypes.push('afterpay_clearpay');
-    }
-    if (price <= 7500) {
-      paymentMethodTypes.push('cashapp');
-    }
-
-    // Add bank transfer
-    paymentMethodTypes.push('us_bank_account');
-
     // Base URL for redirects
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+    const lmsUrl = (
+      process.env.NEXT_PUBLIC_LMS_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      'https://app.elevateforhumanity.org'
+    ).replace(/\/$/, '');
 
     // Look up the most recent application for this user+program so we can
     // embed application_id in metadata — required for reconciliation.
@@ -176,10 +160,9 @@ async function _POST(request: NextRequest) {
 
     // Common session configuration
     const commonConfig: Partial<Stripe.Checkout.SessionCreateParams> = {
-      payment_method_types: paymentMethodTypes,
       customer: customerId,
       client_reference_id: user.id,
-      success_url: `${baseUrl}/enroll/success?session_id={CHECKOUT_SESSION_ID}&program=${program.slug}`,
+      success_url: `${lmsUrl}/lms/payments?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/programs/${program.slug}/enroll`,
       metadata: {
         kind: 'program_enrollment',
@@ -279,6 +262,7 @@ async function _POST(request: NextRequest) {
           },
         ],
         payment_intent_data: {
+          setup_future_usage: 'off_session',
           metadata: {
             program_id: programId,
             program_name: program.title,

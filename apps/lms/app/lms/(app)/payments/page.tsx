@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { CreditCard, CheckCircle, Clock, AlertCircle, DollarSign, ArrowRight } from 'lucide-react';
+import { CreditCard, CheckCircle, Clock, AlertCircle, DollarSign, ArrowRight, ExternalLink } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -29,10 +29,22 @@ export default async function PaymentsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/payments');
 
-  const [{ data: paymentLogs }, { data: enrollments }] = await Promise.all([
+  const [{ data: paymentLogs }, { data: enrollments }, { data: invoices }] = await Promise.all([
     supabase.from('payment_logs').select('id, amount, currency, status, payment_option, stripe_payment_intent_id, completed_at, created_at, metadata').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
     supabase.from('program_enrollments').select('id, amount_paid_cents, funding_source, stripe_payment_intent_id, status, enrolled_at, programs ( id, title )').eq('user_id', user.id).order('enrolled_at', { ascending: false }).limit(50),
+    supabase.from('invoices').select('id, invoice_number, amount, total, status, due_date, paid_at, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(50),
   ]);
+
+  const openInvoices = (invoices ?? []).filter((invoice: any) =>
+    ['pending', 'open', 'unpaid', 'overdue', 'past_due'].includes(String(invoice.status).toLowerCase()),
+  );
+  const nextInvoice = [...openInvoices].sort((a: any, b: any) =>
+    new Date(a.due_date || a.created_at).getTime() - new Date(b.due_date || b.created_at).getTime(),
+  )[0] as any;
+  const amountDue = openInvoices.reduce(
+    (sum: number, invoice: any) => sum + Number(invoice.total ?? invoice.amount ?? 0),
+    0,
+  );
 
   const logs = (paymentLogs ?? []).map((row: any) => ({
     id: row.id,
@@ -74,7 +86,8 @@ export default async function PaymentsPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <div className="mb-8 flex items-center gap-3"><CreditCard className="h-6 w-6 text-slate-700" /><h1 className="text-2xl font-bold text-slate-950">Payments & Billing</h1></div>
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-3"><CreditCard className="h-6 w-6 text-slate-700" /><h1 className="text-2xl font-bold text-slate-950">Payments & Billing</h1></div><Link href="/lms/settings/billing" className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">Update card <ExternalLink className="h-4 w-4" /></Link></div>
+      {openInvoices.length ? <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50 p-5"><div className="flex flex-wrap items-center justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-wide text-amber-800">Payment due</p><p className="mt-1 text-2xl font-bold text-slate-950">${amountDue.toFixed(2)}</p><p className="mt-1 text-sm text-slate-700">{nextInvoice?.due_date ? `Next due ${fmtDate(nextInvoice.due_date)}` : 'Open invoice — payment required'}</p></div><Link href="/lms/settings/billing" className="rounded-lg bg-slate-950 px-5 py-2.5 text-sm font-bold text-white hover:bg-slate-800">Pay now or update card</Link></div><p className="mt-3 text-xs text-amber-900">Past-due accounts may be placed on a temporary course-access hold. Your completed work and records are preserved.</p></div> : null}
       {payments.length ? <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3"><div className="rounded-xl border bg-white p-4"><p className="text-xs text-slate-500">Total Paid</p><p className="text-xl font-bold">{fmt(totalPaid)}</p></div><div className="rounded-xl border bg-white p-4"><p className="text-xs text-slate-500">Transactions</p><p className="text-xl font-bold">{payments.length}</p></div><div className="col-span-2 rounded-xl border bg-white p-4 sm:col-span-1"><p className="text-xs text-slate-500">Last Payment</p><p className="text-xl font-bold">{payments[0] ? fmtDate(payments[0].date) : '—'}</p></div></div> : null}
       {!payments.length ? (
         <div className="rounded-xl border border-slate-200 bg-white p-10 text-center"><DollarSign className="mx-auto mb-3 h-10 w-10 text-slate-300" /><p className="font-medium text-slate-600">No payment records yet.</p><Link href="/lms/courses" className="mt-6 inline-block rounded-lg bg-brand-blue-600 px-5 py-2.5 text-sm font-semibold text-white">View My Programs</Link></div>

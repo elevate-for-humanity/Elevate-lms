@@ -86,23 +86,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Configure payment methods - Klarna, Afterpay, etc.
-    const paymentMethodTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = [
-      'card',
-      'klarna',
-      'afterpay_clearpay',
-      'us_bank_account',
-      'cashapp',
-      'link',
-    ];
-
     const baseUrl = ((process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl);
+    const lmsUrl = (
+      process.env.NEXT_PUBLIC_LMS_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      'https://app.elevateforhumanity.org'
+    ).replace(/\/$/, '');
 
     let sessionConfig: Stripe.Checkout.SessionCreateParams = {
-      payment_method_types: paymentMethodTypes,
       customer: customerId,
       client_reference_id: user?.id,
-      success_url: `${baseUrl}/enroll/success?session_id={CHECKOUT_SESSION_ID}&program=${program.slug}`,
+      success_url: `${lmsUrl}/lms/payments?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/programs/${program.slug}`,
       metadata: {
         // Standardized metadata for grant/license compliance
@@ -176,6 +170,7 @@ export async function POST(request: NextRequest) {
           },
         ],
         payment_intent_data: {
+          setup_future_usage: 'off_session',
           metadata: {
             program_id: programId,
             program_name: program.title,

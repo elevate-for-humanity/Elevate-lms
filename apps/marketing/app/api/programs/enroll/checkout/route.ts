@@ -127,6 +127,11 @@ export async function POST(request: NextRequest) {
     const customerEmail = profile?.email || user.email || '';
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+    const lmsUrl = (
+      process.env.NEXT_PUBLIC_LMS_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      'https://app.elevateforhumanity.org'
+    ).replace(/\/$/, '');
 
     // Build line items
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
@@ -163,7 +168,7 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       customer_email: customerEmail,
       line_items: lineItems,
-      success_url: `${siteUrl}/enroll/success?session_id={CHECKOUT_SESSION_ID}&program=${program.slug}`,
+      success_url: `${lmsUrl}/lms/payments?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/programs/${program.slug}`,
       metadata: {
         // CANONICAL METADATA CONTRACT
@@ -181,14 +186,10 @@ export async function POST(request: NextRequest) {
                 program_id: program.id,
                 student_id: user.id,
               },
+              setup_future_usage: 'off_session',
             }
           : undefined,
     };
-
-    // Only add payment method types for paid checkouts
-    if (amountCents > 0) {
-      sessionParams.payment_method_types = ['card'];
-    }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
 

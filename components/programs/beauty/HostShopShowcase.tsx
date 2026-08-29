@@ -110,7 +110,7 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
                   controls
                   playsInline
                   preload="metadata"
-                  className="h-full w-full bg-black object-contain"
+                  className="host-showcase-media-enter h-full w-full bg-black object-contain"
                   aria-label={image.alt}
                 />
               ) : image && !failedImages.has(image.src) ? (
@@ -121,7 +121,7 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
                   fill
                   priority={activeIndex === 0}
                   sizes="(max-width: 1024px) 100vw, 58vw"
-                  className="object-contain bg-white"
+                  className="host-showcase-media-enter object-contain bg-white"
                   onError={() => setFailedImages((current) => {
                     const next = new Set(current);
                     next.add(image.src);
@@ -203,6 +203,19 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
           </div>
         </div>
       </div>
+      <style jsx>{`
+        .host-showcase-media-enter {
+          animation: host-showcase-fade 650ms ease-out both;
+          transform-origin: center;
+        }
+        @keyframes host-showcase-fade {
+          from { opacity: 0; transform: scale(1.02); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .host-showcase-media-enter { animation: none; }
+        }
+      `}</style>
     </section>
   );
 }

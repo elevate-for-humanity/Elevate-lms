@@ -79,6 +79,7 @@ export default function HeroVideo({
   const [audioFailed, setAudioFailed] = useState(false);
   const soundRequestedRef = useRef(false);
   const transcriptVoice = useNaturalVoice();
+  const prepareTranscriptVoice = transcriptVoice.prepare;
   const transcriptId = useId();
   const sectionRef = useRef<HTMLElement>(null);
   const scrollNarrationAttemptedRef = useRef(false);
@@ -117,6 +118,11 @@ export default function HeroVideo({
     },
     [],
   );
+
+  useEffect(() => {
+    if (!narrateTranscript || !transcript) return;
+    void prepareTranscriptVoice(transcript, { style: 'commercial', rate: 0.96 });
+  }, [narrateTranscript, prepareTranscriptVoice, transcript]);
 
   useEffect(() => {
     if (!voiceoverSrc || audioFailed) return;

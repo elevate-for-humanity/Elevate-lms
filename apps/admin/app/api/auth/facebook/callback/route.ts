@@ -6,6 +6,24 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+function getPublicAdminOrigin(request: NextRequest) {
+  const configuredOrigin = process.env.ADMIN_APP_URL?.trim() || process.env.NEXT_PUBLIC_ADMIN_URL?.trim();
+  if (configuredOrigin) return new URL(configuredOrigin).origin;
+
+  const forwardedHost = request.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
+  const host = forwardedHost || request.headers.get('host');
+  const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim();
+  const protocol = forwardedProto || (process.env.NODE_ENV === 'production' ? 'https' : request.nextUrl.protocol.replace(':', ''));
+
+  if (host && !host.startsWith('0.0.0.0') && !host.startsWith('localhost')) {
+    return `${protocol}://${host}`;
+  }
+
+  return process.env.NODE_ENV === 'production'
+    ? 'https://admin.elevateforhumanity.org'
+    : request.nextUrl.origin;
+}
+
 type MetaPage = {
   id?: string;
   name?: string;
@@ -14,7 +32,7 @@ type MetaPage = {
 };
 
 function settingsRedirect(request: NextRequest, key: 'success' | 'error', value: string) {
-  return NextResponse.redirect(new URL(`/settings/social-media?${key}=${encodeURIComponent(value)}`, request.nextUrl.origin));
+  return NextResponse.redirect(new URL(`/settings/social-media?${key}=${encodeURIComponent(value)}`, getPublicAdminOrigin(request)));
 }
 
 export async function GET(request: NextRequest) {
@@ -34,7 +52,7 @@ export async function GET(request: NextRequest) {
   if (!code || !clientId || !clientSecret) return settingsRedirect(request, 'error', 'facebook_not_configured');
 
   const version = process.env.META_GRAPH_API_VERSION?.trim() || 'v26.0';
-  const redirectUri = `${request.nextUrl.origin}/api/auth/facebook/callback`;
+  const redirectUri = `${getPublicAdminOrigin(request)}/api/auth/facebook/callback`;
   const tokenUrl = new URL(`https://graph.facebook.com/${version}/oauth/access_token`);
   tokenUrl.searchParams.set('client_id', clientId);
   tokenUrl.searchParams.set('client_secret', clientSecret);

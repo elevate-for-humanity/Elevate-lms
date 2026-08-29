@@ -25,13 +25,17 @@ function getPublicAdminOrigin(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const limited = await applyRateLimit(request, 'strict');
+  const limited = await applyRateLimit(request, 'auth');
   if (limited) return limited;
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  const clientId = process.env.FACEBOOK_CLIENT_ID;
-  if (!clientId) return NextResponse.json({ error: 'Facebook application is not configured' }, { status: 503 });
+  const clientId = process.env.FACEBOOK_CLIENT_ID?.trim();
+  const clientSecret = process.env.FACEBOOK_CLIENT_SECRET?.trim();
+  const pageId = process.env.FACEBOOK_PAGE_ID?.trim();
+  if (!clientId || !clientSecret || !pageId) {
+    return NextResponse.redirect(new URL('/settings/social-media?error=meta_runtime_not_ready', getPublicAdminOrigin(request)));
+  }
 
   const origin = getPublicAdminOrigin(request);
   const redirectUri = `${origin}/api/auth/facebook/callback`;
@@ -49,7 +53,8 @@ export async function GET(request: NextRequest) {
 
   const response = NextResponse.redirect(authUrl);
   response.cookies.set('oauth_state_facebook', state, {
-    httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 600, path: '/',
+    httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 1200, path: '/',
   });
+  response.headers.set('Cache-Control', 'no-store');
   return response;
 }

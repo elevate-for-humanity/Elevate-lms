@@ -15,6 +15,16 @@ interface PlatformStatus {
   expired?: boolean;
 }
 
+interface MetaConfigStatus {
+  ready: boolean;
+  service: string;
+  callbackUrl: string;
+  graphVersion: string;
+  clientId: { configured: boolean; canonicalConfigured: boolean; runtimeMatchesCanonical: boolean };
+  clientSecret: { configured: boolean; canonicalConfigured: boolean; runtimeMatchesCanonical: boolean };
+  pageId: { configured: boolean; canonicalConfigured: boolean; runtimeMatchesCanonical: boolean };
+}
+
 const PLATFORMS = [
   {
     id: 'facebook',
@@ -69,6 +79,7 @@ const PLATFORMS = [
 export default function SocialMediaSettingsClient() {
   const [statuses, setStatuses] = useState<Record<string, PlatformStatus>>({});
   const [loading, setLoading] = useState(true);
+  const [metaConfig, setMetaConfig] = useState<MetaConfigStatus | null>(null);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
 
@@ -80,13 +91,17 @@ export default function SocialMediaSettingsClient() {
   const loadStatuses = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/social-media/status');
+      const [res, configRes] = await Promise.all([
+        fetch('/api/admin/social-media/status', { cache: 'no-store' }),
+        fetch('/api/admin/social-media/config', { cache: 'no-store' }),
+      ]);
       if (res.ok) {
         const data = await res.json();
         const map: Record<string, PlatformStatus> = {};
         for (const s of data.statuses ?? []) map[s.platform] = s;
         setStatuses(map);
       }
+      if (configRes.ok) setMetaConfig(await configRes.json());
     } finally {
       setLoading(false);
     }
@@ -159,6 +174,43 @@ export default function SocialMediaSettingsClient() {
           </div>
         )}
       </div>
+
+      {!loading && metaConfig && (
+        <section className={`mb-6 rounded-xl border p-4 ${metaConfig.ready ? 'border-green-200 bg-green-50' : 'border-amber-300 bg-amber-50'}`}>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-slate-900">Meta production configuration</h2>
+              <p className="mt-1 text-xs text-slate-600">Credentials are scoped to the Admin container. Secrets are never displayed here.</p>
+            </div>
+            <span className={`rounded-full px-3 py-1 text-xs font-bold ${metaConfig.ready ? 'bg-green-600 text-white' : 'bg-amber-600 text-white'}`}>
+              {metaConfig.ready ? 'Ready for OAuth' : 'Configuration required'}
+            </span>
+          </div>
+          <dl className="mt-4 grid gap-2 text-xs sm:grid-cols-3">
+            {([
+              ['App ID', metaConfig.clientId],
+              ['App Secret', metaConfig.clientSecret],
+              ['Page ID', metaConfig.pageId],
+            ] as const).map(([label, value]) => (
+              <div key={label} className="rounded-lg border border-black/5 bg-white/80 p-3">
+                <dt className="font-semibold text-slate-600">{label}</dt>
+                <dd className={`mt-1 font-bold ${value.configured ? 'text-green-700' : 'text-red-700'}`}>
+                  {value.configured ? 'Loaded in Admin' : 'Missing from Admin'}
+                </dd>
+                {value.canonicalConfigured && !value.runtimeMatchesCanonical && (
+                  <dd className="mt-1 text-amber-700">Saved value differs from this running container</dd>
+                )}
+              </div>
+            ))}
+          </dl>
+          <p className="mt-3 break-all text-xs text-slate-600"><span className="font-semibold">Meta callback:</span> {metaConfig.callbackUrl}</p>
+          {!metaConfig.ready && (
+            <a href="/integrations/env-manager" className="mt-3 inline-flex rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-800">
+              Open Configuration Manager
+            </a>
+          )}
+        </section>
+      )}
 
       <div className="space-y-3">
         {PLATFORMS.map(({ id, label, Icon, color, bg, border, authorizeUrl, connectBg, capabilities, available }) => {
@@ -236,7 +288,7 @@ export default function SocialMediaSettingsClient() {
                       Disconnect
                     </button>
                   </>
-                ) : available ? (
+                ) : available && (id !== 'facebook' && id !== 'instagram' || metaConfig?.ready) ? (
                   <a
                     href={authorizeUrl}
                     className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white rounded-lg transition-colors ${connectBg}`}
@@ -244,6 +296,10 @@ export default function SocialMediaSettingsClient() {
                     <ExternalLink className="w-3 h-3" />
                     {id === 'instagram' ? 'Connect with Meta' : 'Connect'}
                   </a>
+                ) : available ? (
+                  <span className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-800">
+                    Configure Admin first
+                  </span>
                 ) : (
                   <span className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600">
                     OAuth setup required

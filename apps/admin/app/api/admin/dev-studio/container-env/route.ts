@@ -9,6 +9,8 @@ import {
   getNorthflankSecretGroupId,
   getNorthflankServices,
   isNorthflankReady,
+  type NorthflankServiceKey,
+  upsertNorthflankServiceSecretVariable,
   upsertNorthflankSecretVariable,
 } from '@/lib/northflank/runtime';
 
@@ -16,6 +18,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const INFRA_OWNED_KEYS = new Set(['PORT', 'HOSTNAME', 'NODE_ENV', 'SERVICE_ROLE', 'SERVICE_NAME']);
+const ADMIN_ONLY_PREFIXES = /^(FACEBOOK|INSTAGRAM|LINKEDIN|YOUTUBE|GOOGLE|META_)/;
 
 function isValidKey(key: string) {
   return /^[A-Z][A-Z0-9_]{1,127}$/.test(key);
@@ -77,6 +80,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => null);
     const key = String(body?.key ?? '').trim().toUpperCase();
     const suppliedValue = typeof body?.value === 'string' ? body.value : '';
+    const requestedService = typeof body?.service === 'string' ? body.service.trim() : '';
 
     if (!isValidKey(key)) return safeError('Valid ENV-style key is required', 400);
     if (INFRA_OWNED_KEYS.has(key)) return safeError(`${key} is infrastructure-owned and cannot be changed from Studio`, 409);
@@ -122,8 +126,14 @@ export async function POST(req: NextRequest) {
     const projectId = getNorthflankProjectId();
     if (!projectId) return safeError('Northflank project id is not configured', 503);
 
-    const result = await upsertNorthflankSecretVariable(projectId, key, resolvedValue);
-    const services = getNorthflankServices().map((service) => service.key);
+    const serviceKeys = new Set(getNorthflankServices().map((service) => service.key));
+    const targetService = (requestedService || (ADMIN_ONLY_PREFIXES.test(key) ? 'admin' : '')) as NorthflankServiceKey | '';
+    if (targetService && !serviceKeys.has(targetService)) return safeError('Unknown target service', 400);
+
+    const result = targetService
+      ? await upsertNorthflankServiceSecretVariable(projectId, targetService, key, resolvedValue)
+      : await upsertNorthflankSecretVariable(projectId, key, resolvedValue);
+    const services = targetService ? [targetService] : [...serviceKeys];
 
     return NextResponse.json({
       success: true,

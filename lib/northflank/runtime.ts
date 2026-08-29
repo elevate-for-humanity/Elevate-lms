@@ -179,6 +179,68 @@ export async function upsertNorthflankSecretVariable(
   return { groupId, variableCount: Object.keys(variables).length };
 }
 
+/**
+ * Update a secret group attached to exactly one production service. Integration
+ * credentials must not be inherited by unrelated public-facing containers.
+ */
+export async function upsertNorthflankServiceSecretVariable(
+  projectId: string,
+  serviceKey: NorthflankServiceKey,
+  key: string,
+  value: string,
+): Promise<{ groupId: string; variableCount: number; serviceId: string }> {
+  const service = getNorthflankServices().find((candidate) => candidate.key === serviceKey);
+  if (!service) throw new Error(`Unknown Northflank service: ${serviceKey}`);
+
+  const groupId = `elevate-${serviceKey}-runtime-secrets`;
+  let variables: Record<string, string> = {};
+  try {
+    const group = await northflankFetch<Record<string, unknown>>(projectId, `/secrets/${groupId}`);
+    variables = extractVariables(group);
+  } catch {
+    await northflankFetch(projectId, '/secrets', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: groupId,
+        description: `Elevate ${service.label} service-scoped runtime secrets`,
+        priority: 20,
+        type: 'secret',
+        secretType: 'environment',
+        restrictions: {
+          restricted: true,
+          nfObjects: [{ id: service.id, type: 'service' }],
+          tagMatchCondition: 'or',
+        },
+        secrets: { variables: {} },
+      }),
+    });
+  }
+
+  variables[key] = value;
+  for (const infraKey of ['PORT', 'HOSTNAME', 'NODE_ENV', 'SERVICE_ROLE', 'SERVICE_NAME']) {
+    delete variables[infraKey];
+  }
+
+  await northflankFetch(projectId, `/secrets/${groupId}`, {
+    method: 'POST',
+    body: JSON.stringify({
+      name: groupId,
+      description: `Elevate ${service.label} service-scoped runtime secrets`,
+      priority: 20,
+      type: 'secret',
+      secretType: 'environment',
+      restrictions: {
+        restricted: true,
+        nfObjects: [{ id: service.id, type: 'service' }],
+        tagMatchCondition: 'or',
+      },
+      secrets: { variables },
+    }),
+  });
+
+  return { groupId, variableCount: Object.keys(variables).length, serviceId: service.id };
+}
+
 export function isNorthflankReady(): boolean {
   return Boolean(
     getNorthflankProjectId() &&

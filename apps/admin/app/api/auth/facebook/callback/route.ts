@@ -33,6 +33,10 @@ type MetaPage = {
 
 type MetaIdentity = { id?: string; name?: string };
 
+async function metaFetch(url: URL) {
+  return fetch(url, { signal: AbortSignal.timeout(15_000), cache: 'no-store' });
+}
+
 function settingsRedirect(request: NextRequest, key: 'success' | 'error', value: string) {
   return NextResponse.redirect(new URL(`/settings/social-media?${key}=${encodeURIComponent(value)}`, getPublicAdminOrigin(request)));
 }
@@ -61,7 +65,13 @@ export async function GET(request: NextRequest) {
   tokenUrl.searchParams.set('redirect_uri', redirectUri);
   tokenUrl.searchParams.set('code', code);
 
-  const tokenResponse = await fetch(tokenUrl);
+  let tokenResponse: Response;
+  try {
+    tokenResponse = await metaFetch(tokenUrl);
+  } catch (error) {
+    console.error('[meta-oauth] Token exchange request failed', { timeout: error instanceof DOMException && error.name === 'TimeoutError' });
+    return settingsRedirect(request, 'error', 'meta_token_exchange_timeout');
+  }
   const tokenPayload = await tokenResponse.json().catch(() => ({})) as {
     access_token?: string;
     expires_in?: number;
@@ -86,14 +96,24 @@ export async function GET(request: NextRequest) {
   const identityUrl = new URL(`https://graph.facebook.com/${version}/me`);
   identityUrl.searchParams.set('fields', 'id,name');
   identityUrl.searchParams.set('access_token', tokenPayload.access_token);
-  const identityResponse = await fetch(identityUrl);
+  let identityResponse: Response;
+  try {
+    identityResponse = await metaFetch(identityUrl);
+  } catch {
+    return settingsRedirect(request, 'error', 'meta_identity_timeout');
+  }
   const identity = await identityResponse.json().catch(() => ({})) as MetaIdentity;
   if (!identityResponse.ok || !identity.id) return settingsRedirect(request, 'error', 'identity_lookup_failed');
 
   const pagesUrl = new URL(`https://graph.facebook.com/${version}/me/accounts`);
   pagesUrl.searchParams.set('fields', 'id,name,access_token,instagram_business_account{id,name,username}');
   pagesUrl.searchParams.set('access_token', tokenPayload.access_token);
-  const pagesResponse = await fetch(pagesUrl);
+  let pagesResponse: Response;
+  try {
+    pagesResponse = await metaFetch(pagesUrl);
+  } catch {
+    return settingsRedirect(request, 'error', 'meta_pages_timeout');
+  }
   const pagesPayload = await pagesResponse.json().catch(() => ({})) as { data?: MetaPage[] };
   if (!pagesResponse.ok || !Array.isArray(pagesPayload.data)) return settingsRedirect(request, 'error', 'page_lookup_failed');
 

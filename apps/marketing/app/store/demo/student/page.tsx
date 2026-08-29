@@ -90,7 +90,20 @@ export default function StudentDemoPage() {
         ) : (
           <section className="rounded-2xl border border-slate-200 bg-white p-6">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><h2 className="text-2xl font-black">{selected.title}</h2><p className="text-sm text-slate-500">Five interactive sample lessons</p></div><button onClick={() => setSelectedCourse(null)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold">Back to courses</button></div>
-            <div className="mt-6 space-y-3">{[1,2,3,4,5].map((lesson) => { const done = completed[`${selected.id}-${lesson}`]; return <div key={lesson} className="flex flex-col justify-between gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center"><div className="flex items-center gap-3">{done ? <CheckCircle className="h-6 w-6 text-green-600" /> : <Play className="h-6 w-6 text-blue-600" />}<div><p className="font-bold">Lesson {lesson}: Sample learning activity</p><p className="text-sm text-slate-500">Video + knowledge check · demo only</p></div></div><button onClick={() => startLesson(lesson)} className={`rounded-lg px-4 py-2 text-sm font-bold ${done ? 'bg-green-100 text-green-800' : 'bg-blue-700 text-white'}`}>{done ? 'Replay sample' : 'Start lesson'}</button></div>; })}</div>
+            <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950">
+              <video
+                className="aspect-[8/3] w-full bg-black object-cover"
+                controls
+                playsInline
+                preload="metadata"
+                aria-label={`${selected.title} sample lesson video`}
+              >
+                <source src="/videos/courses/elevate-esb-hero.mp4" type="video/mp4" />
+                Your browser does not support HTML video. The lesson activities remain available below.
+              </video>
+              <p className="px-4 py-3 text-sm font-semibold text-slate-200">Sample Elevate lesson video · playback is optional and lesson controls remain accessible.</p>
+            </div>
+            <div className="mt-6 space-y-3">{[1,2,3,4,5].map((lesson) => { const done = completed[`${selected.id}-${lesson}`]; return <div key={lesson} className="flex flex-col justify-between gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center"><div className="flex items-center gap-3">{done ? <CheckCircle className="h-6 w-6 text-green-600" /> : <Play className="h-6 w-6 text-blue-600" />}<div><p className="font-bold">Lesson {lesson}: Sample learning activity</p><p className="text-sm text-slate-500">Lesson activity + knowledge check · demo only</p></div></div><button onClick={() => startLesson(lesson)} className={`rounded-lg px-4 py-2 text-sm font-bold ${done ? 'bg-green-100 text-green-800' : 'bg-blue-700 text-white'}`}>{done ? 'Replay sample' : 'Start lesson'}</button></div>; })}</div>
           </section>
         )}
 

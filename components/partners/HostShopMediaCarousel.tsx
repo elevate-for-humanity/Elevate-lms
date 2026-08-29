@@ -55,9 +55,9 @@ export default function HostShopMediaCarousel({
     <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl">
       <div className="relative aspect-[4/3] w-full bg-white sm:aspect-[16/10] lg:max-h-[560px]">
         {active.type === 'video' ? (
-          <video src={active.url} controls playsInline preload="metadata" className="h-full w-full object-contain bg-black" aria-label={active.alt || `${shopName} video`} />
+          <video key={active.url} src={active.url} controls playsInline preload="metadata" className="host-shop-media-enter h-full w-full object-contain bg-black" aria-label={active.alt || `${shopName} video`} />
         ) : (
-          <img src={active.url} alt={active.alt || `${shopName} promotional image`} className="h-full w-full object-contain" loading="lazy" decoding="async" />
+          <img key={active.url} src={active.url} alt={active.alt || `${shopName} promotional image`} className="host-shop-media-enter h-full w-full object-contain" loading="lazy" decoding="async" />
         )}
         {media.length > 1 ? (
           <>
@@ -71,6 +71,19 @@ export default function HostShopMediaCarousel({
         <span>{media.length > 1 ? `${safeIndex + 1} of ${media.length}` : 'Verified business media'}</span>
         {active.source ? <a href={active.source} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-bold text-slate-900 hover:underline">Media source <ExternalLink className="h-3.5 w-3.5" /></a> : null}
       </div>
+      <style jsx>{`
+        .host-shop-media-enter {
+          animation: host-shop-media-fade 650ms ease-out both;
+          transform-origin: center;
+        }
+        @keyframes host-shop-media-fade {
+          from { opacity: 0; transform: scale(1.025); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .host-shop-media-enter { animation: none; }
+        }
+      `}</style>
     </div>
   );
 }

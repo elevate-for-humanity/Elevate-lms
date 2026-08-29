@@ -361,7 +361,7 @@ export default async function StaffDashboard() {
             >
               Customer Service
             </Link>
-            <Link href="/staff-portal/dashboard"
+            <Link href="/staff-portal/processes"
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >

@@ -12,6 +12,17 @@ type PlayOptions = {
   onError?: () => void;
 };
 
+const naturalVoiceCache = new Map<string, Promise<Blob>>();
+
+function naturalVoiceCacheKey(text: string, options: PlayOptions) {
+  return JSON.stringify([
+    text,
+    options.voice || 'coral',
+    options.style || 'default',
+    options.rate || 1,
+  ]);
+}
+
 function chooseBrowserVoice(): SpeechSynthesisVoice | null {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
   const voices = window.speechSynthesis.getVoices();
@@ -26,21 +37,39 @@ function chooseBrowserVoice(): SpeechSynthesisVoice | null {
   );
 }
 
+async function requestNaturalVoiceBlob(text: string, options: PlayOptions): Promise<Blob> {
+  const key = naturalVoiceCacheKey(text, options);
+  const cached = naturalVoiceCache.get(key);
+  if (cached) return cached;
+
+  const request = fetch('/api/voice/natural', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
+      cache: 'no-store',
+      body: JSON.stringify({
+        text,
+        voice: options.voice || 'coral',
+        style: options.style || 'default',
+        rate: options.rate || 1,
+      }),
+    })
+    .then(async (response) => {
+      if (!response.ok) throw new Error(`Natural voice request failed (${response.status})`);
+      const blob = await response.blob();
+      if (!blob.size) throw new Error('Natural voice returned empty audio.');
+      return blob;
+    })
+    .catch((error) => {
+      naturalVoiceCache.delete(key);
+      throw error;
+    });
+
+  naturalVoiceCache.set(key, request);
+  return request;
+}
+
 async function requestNaturalVoice(text: string, options: PlayOptions): Promise<HTMLAudioElement> {
-  const response = await fetch('/api/voice/natural', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
-    cache: 'no-store',
-    body: JSON.stringify({
-      text,
-      voice: options.voice || 'coral',
-      style: options.style || 'default',
-      rate: options.rate || 1,
-    }),
-  });
-  if (!response.ok) throw new Error(`Natural voice request failed (${response.status})`);
-  const blob = await response.blob();
-  if (!blob.size) throw new Error('Natural voice returned empty audio.');
+  const blob = await requestNaturalVoiceBlob(text, options);
   const url = URL.createObjectURL(blob);
   const audio = new Audio(url);
   audio.preload = 'auto';
@@ -179,6 +208,17 @@ export function useNaturalVoice() {
     }
   }, [stop]);
 
+  const prepare = useCallback(async (text: string, options: PlayOptions = {}) => {
+    const clean = text.trim().slice(0, 2400);
+    if (!clean || typeof window === 'undefined') return false;
+    try {
+      await requestNaturalVoiceBlob(clean, options);
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
   const pause = useCallback(() => {
     if (audioRef.current && !audioRef.current.paused) {
       audioRef.current.pause();
@@ -218,6 +258,7 @@ export function useNaturalVoice() {
 
   return {
     play,
+    prepare,
     pause,
     resume,
     stop,

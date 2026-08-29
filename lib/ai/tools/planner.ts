@@ -45,6 +45,12 @@ function isEngineeringCommand(lower: string): boolean {
   return engineeringNoun && engineeringVerb;
 }
 
+function isLiveBrowserWork(lower: string): boolean {
+  const browserTarget = /\b(live (site|website|page|dashboard)|cloud browser|browser|production (site|page|dashboard)|host shop dashboard)\b/.test(lower);
+  const action = /\b(open|audit|check|inspect|test|verify|fix|repair|click through|walk through)\b/.test(lower);
+  return browserTarget && action;
+}
+
 /**
  * Deterministic planner for operational commands.
  *
@@ -128,10 +134,15 @@ export function planAIToolFromCommand(
   if (isOpenHandsStatusCommand(lower)) {
     return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
   }
-  if (isEngineeringCommand(lower)) {
+  if (isLiveBrowserWork(lower) || isEngineeringCommand(lower)) {
     return {
       name: 'openhands.execute',
-      input: { ...asAIRecord(context.toolInput), task: command },
+      input: {
+        ...asAIRecord(context.toolInput),
+        task: isLiveBrowserWork(lower)
+          ? `Use the configured authenticated cloud-browser and repository capabilities to complete this request end to end. Inspect the live page, capture evidence, repair implementation defects, run relevant checks, and verify the live result. Do not stop at advice when an executable capability is available. User request: ${command}`
+          : command,
+      },
     };
   }
 

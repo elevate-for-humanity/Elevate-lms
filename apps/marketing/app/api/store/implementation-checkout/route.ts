@@ -5,6 +5,8 @@ import { getStripe } from '@/lib/stripe/client';
 import { ensureCanonicalStripePrice } from '@/lib/stripe/resolve-canonical-price';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { getImplementationPackage } from '@/lib/store/implementation-packages';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -48,6 +50,43 @@ export async function POST(request: NextRequest) {
 
   const amountCents =
     paymentChoice === 'full' ? selectedPackage.totalCents : selectedPackage.depositCents;
+  let db;
+  try {
+    db = await requireAdminClient();
+  } catch {
+    return NextResponse.json(
+      { error: 'Order service is temporarily unavailable.' },
+      { status: 503 },
+    );
+  }
+
+  const { data: pendingOrder, error: pendingOrderError } = await db
+    .from('implementation_orders')
+    .insert({
+      package_id: selectedPackage.id,
+      package_name: selectedPackage.name,
+      payment_choice: paymentChoice,
+      status: 'pending',
+      package_total_cents: selectedPackage.totalCents,
+      checkout_amount_cents: amountCents,
+      amount_paid_cents: 0,
+      balance_due_cents: selectedPackage.totalCents,
+      installment_count: paymentChoice === 'deposit' ? selectedPackage.installmentCount : 0,
+      installment_amount_cents: paymentChoice === 'deposit' ? selectedPackage.installmentCents : 0,
+      installments_paid: 0,
+      metadata: { source: 'elevate_store', delivery_window: selectedPackage.deliveryWindow },
+    })
+    .select('id')
+    .single();
+  if (pendingOrderError || !pendingOrder?.id) {
+    logger.error(
+      '[implementation/checkout] pending order insert failed',
+      pendingOrderError ?? undefined,
+      { packageId: selectedPackage.id, paymentChoice },
+    );
+    return NextResponse.json({ error: 'Unable to prepare your order.' }, { status: 500 });
+  }
+
   const origin = checkoutOrigin(request);
   const metadata = {
     kind: 'implementation_package',
@@ -59,6 +98,7 @@ export async function POST(request: NextRequest) {
     deposit_cents: String(selectedPackage.depositCents),
     installment_count: String(selectedPackage.installmentCount),
     installment_cents: String(selectedPackage.installmentCents),
+    implementation_order_id: pendingOrder.id,
   };
 
   let price: Stripe.Price;
@@ -79,6 +119,11 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch {
+    await db
+      .from('implementation_orders')
+      .delete()
+      .eq('id', pendingOrder.id)
+      .eq('status', 'pending');
     return NextResponse.json(
       { error: 'The selected package checkout is temporarily unavailable.' },
       { status: 503 },
@@ -109,8 +154,28 @@ export async function POST(request: NextRequest) {
   try {
     const session = await stripe.checkout.sessions.create(params);
     if (!session.url) throw new Error('Stripe did not return a checkout URL.');
+    const { error: sessionLinkError } = await db
+      .from('implementation_orders')
+      .update({ stripe_checkout_session_id: session.id, updated_at: new Date().toISOString() })
+      .eq('id', pendingOrder.id)
+      .eq('status', 'pending');
+    if (sessionLinkError) {
+      logger.warn('[implementation/checkout] Stripe session link will be reconciled by webhook', {
+        orderId: pendingOrder.id,
+        stripeSessionId: session.id,
+        error: sessionLinkError.message,
+      });
+    }
     return NextResponse.json({ checkoutUrl: session.url });
-  } catch {
+  } catch (error) {
+    await db
+      .from('implementation_orders')
+      .delete()
+      .eq('id', pendingOrder.id)
+      .eq('status', 'pending');
+    logger.error('[implementation/checkout] Stripe session creation failed', error, {
+      orderId: pendingOrder.id,
+    });
     return NextResponse.json(
       { error: 'Unable to start secure checkout. Please try again.' },
       { status: 500 },

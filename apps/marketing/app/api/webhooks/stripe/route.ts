@@ -39,7 +39,8 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { createEnrollmentCase, submitCaseForSignatures } from '@/lib/workflow/case-management';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { createOrUpdateEnrollment, linkOrphanedEnrollments } from '@/lib/enrollment-service';
-import { handleCheckoutSessionCompleted } from '@/lib/stripe/handlers/checkout-session-completed';
+import { handleCheckoutSessionCompleted } from '@/lib/stripe/handlers/checkout-session-completed-with-store';
+import { markImplementationCheckoutStatus } from '@/lib/store/finalize-implementation-purchase';
 import { processCareerCourseStripeEvent } from '@/lib/payments/career-course-webhook';
 import {
   getBillingAuthority,
@@ -129,10 +130,9 @@ async function flagCertificatesForRefund(
 
     if (fetchErr) {
       // certificates table may use user_id instead of student_id in some rows
-      logger.warn(
-        '[webhook] Certificate lookup by student_id failed, trying user_id:',
-        { message: fetchErr.message },
-      );
+      logger.warn('[webhook] Certificate lookup by student_id failed, trying user_id:', {
+        message: fetchErr.message,
+      });
       let fallbackQuery = db
         .from('certificates')
         .select('id, certificate_number, funding_status')
@@ -211,7 +211,9 @@ async function _POST(request: NextRequest) {
   if (!stripeClient) {
     // Return 200 — misconfiguration, not a bad request. Retrying won't help and
     // returning 503 causes Stripe to disable the endpoint after repeated failures.
-    logger.error('[webhook] Stripe client not initialized — STRIPE_SECRET_KEY missing after hydration');
+    logger.error(
+      '[webhook] Stripe client not initialized — STRIPE_SECRET_KEY missing after hydration',
+    );
     return NextResponse.json({ received: true, warning: 'stripe_not_configured' }, { status: 200 });
   }
 
@@ -301,7 +303,10 @@ async function _POST(request: NextRequest) {
   }
 
   // Unified event tracking (secondary to stripe_webhook_events)
-  claimWebhookEvent('stripe', event.id, event.type, { livemode: event.livemode }).then(()=>{}, ()=>{});
+  claimWebhookEvent('stripe', event.id, event.type, { livemode: event.livemode }).then(
+    () => {},
+    () => {},
+  );
 
   // Wrap ALL post-verify logic in try/catch to prevent 500s
   try {
@@ -491,6 +496,11 @@ async function _POST(request: NextRequest) {
             paymentStatus: asyncSession.payment_status,
           });
 
+          if (asyncSession.metadata?.kind === 'implementation_package') {
+            await handleCheckoutSessionCompleted(event, { stripe: stripeClient, supabase });
+            break;
+          }
+
           // Re-dispatch to the same enrollment logic as checkout.session.completed
           // by constructing a synthetic completed event and recursing through the switch
           // Instead, directly handle the two enrollment paths:
@@ -559,12 +569,28 @@ async function _POST(request: NextRequest) {
 
         case 'checkout.session.async_payment_failed': {
           const failedSession = event.data.object as Stripe.Checkout.Session;
+          await markImplementationCheckoutStatus({
+            db: supabase,
+            session: failedSession,
+            status: 'payment_failed',
+          });
           logger.warn('[webhook] Async payment failed', {
             sessionId: failedSession.id,
             customerEmail: failedSession.customer_email,
             metadata: failedSession.metadata,
           });
           // No enrollment to deactivate since we deferred on session.completed
+          break;
+        }
+
+        case 'checkout.session.expired': {
+          const expiredSession = event.data.object as Stripe.Checkout.Session;
+          await markImplementationCheckoutStatus({
+            db: supabase,
+            session: expiredSession,
+            status: 'cancelled',
+          });
+          logger.info('[webhook] Checkout session expired', { sessionId: expiredSession.id });
           break;
         }
 
@@ -603,28 +629,54 @@ async function _POST(request: NextRequest) {
             // Non-enrollment payment failure — write admin alert and notify
             const customerEmail = (failedPayment as any).receipt_email ?? null;
             const errorMsg = failedPayment.last_payment_error?.message ?? 'Payment failed';
-            const amount = failedPayment.amount ? `$${(failedPayment.amount / 100).toFixed(2)}` : 'unknown amount';
+            const amount = failedPayment.amount
+              ? `$${(failedPayment.amount / 100).toFixed(2)}`
+              : 'unknown amount';
 
-            supabase?.from('admin_alerts').insert({
-              alert_type: 'payment_failed',
-              severity: 'high',
-              message: `Payment failed: ${amount} — ${errorMsg}`,
-              metadata: { stripe_event_id: event.id, payment_intent_id: failedPayment.id, customer_email: customerEmail },
-              details: { error: errorMsg, amount: failedPayment.amount, currency: failedPayment.currency },
-            }).then(undefined, (err) => logger.error('[Stripe] Failed to insert payment_failed admin alert', { error: String(err) }));
+            supabase
+              ?.from('admin_alerts')
+              .insert({
+                alert_type: 'payment_failed',
+                severity: 'high',
+                message: `Payment failed: ${amount} — ${errorMsg}`,
+                metadata: {
+                  stripe_event_id: event.id,
+                  payment_intent_id: failedPayment.id,
+                  customer_email: customerEmail,
+                },
+                details: {
+                  error: errorMsg,
+                  amount: failedPayment.amount,
+                  currency: failedPayment.currency,
+                },
+              })
+              .then(undefined, (err) =>
+                logger.error('[Stripe] Failed to insert payment_failed admin alert', {
+                  error: String(err),
+                }),
+              );
 
             sendEmail({
               to: 'elevate4humanityedu@gmail.com',
               subject: `Payment Failed: ${amount}`,
               html: `<p>A payment of ${amount} failed.</p><p>Error: ${errorMsg}</p><p>Stripe PaymentIntent: ${failedPayment.id}</p>`,
-            }).catch((err) => logger.error('[Stripe] Failed to send payment_failed admin email', { error: String(err) }));
+            }).catch((err) =>
+              logger.error('[Stripe] Failed to send payment_failed admin email', {
+                error: String(err),
+              }),
+            );
 
             if (customerEmail) {
               sendEmail({
                 to: customerEmail,
                 subject: 'Your payment could not be processed',
                 html: `<p>We were unable to process your payment of ${amount}.</p><p>Reason: ${errorMsg}</p><p>Please update your payment method or contact support.</p>`,
-              }).catch((err) => logger.error('[Stripe] Failed to send payment_failed customer email', { customerEmail, error: String(err) }));
+              }).catch((err) =>
+                logger.error('[Stripe] Failed to send payment_failed customer email', {
+                  customerEmail,
+                  error: String(err),
+                }),
+              );
             }
           }
           break;
@@ -796,27 +848,50 @@ async function _POST(request: NextRequest) {
           // Admin alert for all invoice payment failures
           {
             const customerEmail = (invoice as any).customer_email ?? null;
-            const amount = invoice.amount_due ? `$${(invoice.amount_due / 100).toFixed(2)}` : 'unknown amount';
-            supabase?.from('admin_alerts').insert({
-              alert_type: 'invoice_payment_failed',
-              severity: 'high',
-              message: `Invoice payment failed: ${amount}`,
-              metadata: { stripe_event_id: event.id, invoice_id: invoice.id, subscription_id: (invoice as any).subscription ?? null, customer_email: customerEmail },
-              details: { amount: invoice.amount_due, currency: invoice.currency },
-            }).then(undefined, (err) => logger.error('[Stripe] Failed to insert invoice_payment_failed admin alert', { error: String(err) }));
+            const amount = invoice.amount_due
+              ? `$${(invoice.amount_due / 100).toFixed(2)}`
+              : 'unknown amount';
+            supabase
+              ?.from('admin_alerts')
+              .insert({
+                alert_type: 'invoice_payment_failed',
+                severity: 'high',
+                message: `Invoice payment failed: ${amount}`,
+                metadata: {
+                  stripe_event_id: event.id,
+                  invoice_id: invoice.id,
+                  subscription_id: (invoice as any).subscription ?? null,
+                  customer_email: customerEmail,
+                },
+                details: { amount: invoice.amount_due, currency: invoice.currency },
+              })
+              .then(undefined, (err) =>
+                logger.error('[Stripe] Failed to insert invoice_payment_failed admin alert', {
+                  error: String(err),
+                }),
+              );
 
             sendEmail({
               to: 'elevate4humanityedu@gmail.com',
               subject: `Invoice Payment Failed: ${amount}`,
               html: `<p>Invoice payment of ${amount} failed.</p><p>Invoice ID: ${invoice.id}</p><p>Customer: ${customerEmail ?? 'unknown'}</p>`,
-            }).catch((err) => logger.error('[Stripe] Failed to send invoice_payment_failed admin email', { error: String(err) }));
+            }).catch((err) =>
+              logger.error('[Stripe] Failed to send invoice_payment_failed admin email', {
+                error: String(err),
+              }),
+            );
 
             if (customerEmail) {
               sendEmail({
                 to: customerEmail,
                 subject: 'Your invoice payment failed',
                 html: `<p>We were unable to collect your payment of ${amount}.</p><p>Please update your payment method or contact support.</p>`,
-              }).catch((err) => logger.error('[Stripe] Failed to send invoice_payment_failed customer email', { customerEmail, error: String(err) }));
+              }).catch((err) =>
+                logger.error('[Stripe] Failed to send invoice_payment_failed customer email', {
+                  customerEmail,
+                  error: String(err),
+                }),
+              );
             }
           }
 
@@ -1072,7 +1147,10 @@ async function _POST(request: NextRequest) {
       const errStack = switchErr instanceof Error ? switchErr.stack : undefined;
       logger.error('[webhook] Event handler error:', undefined, { message: errMsg });
       if (errStack) logger.error('[webhook] Stack:', undefined, { stack: errStack });
-      logger.error('Event handler error:', switchErr instanceof Error ? switchErr : new Error(String(switchErr)));
+      logger.error(
+        'Event handler error:',
+        switchErr instanceof Error ? switchErr : new Error(String(switchErr)),
+      );
     }
 
     // Update webhook event status to processed
@@ -1081,7 +1159,10 @@ async function _POST(request: NextRequest) {
         .from('stripe_webhook_events')
         .update({ status: 'processed', processed_at: new Date().toISOString() })
         .eq('stripe_event_id', event.id);
-      finalizeWebhookEvent('stripe', event.id, 'processed').then(()=>{}, ()=>{});
+      finalizeWebhookEvent('stripe', event.id, 'processed').then(
+        () => {},
+        () => {},
+      );
     } catch (updateErr) {
       logger.warn('[webhook] Failed to update status:', updateErr);
       logger.warn('Failed to update webhook status:', updateErr);
@@ -1104,7 +1185,10 @@ async function _POST(request: NextRequest) {
           processed_at: new Date().toISOString(),
         })
         .eq('stripe_event_id', event.id);
-      finalizeWebhookEvent('stripe', event.id, 'errored', errMsg).then(()=>{}, ()=>{});
+      finalizeWebhookEvent('stripe', event.id, 'errored', errMsg).then(
+        () => {},
+        () => {},
+      );
     } catch (updateErr) {
       logger.warn('[webhook] Failed to update failure status:', updateErr);
     }
@@ -1124,7 +1208,8 @@ export async function GET() {
   return NextResponse.json({
     ok: true,
     endpoint: '/api/webhooks/stripe',
-    message: 'Register this URL in Stripe Dashboard; signing secret → STRIPE_WEBHOOK_SECRET in runtime env or secret group.',
+    message:
+      'Register this URL in Stripe Dashboard; signing secret → STRIPE_WEBHOOK_SECRET in runtime env or secret group.',
   });
 }
 

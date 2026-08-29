@@ -20,39 +20,37 @@ export function CertificateTemplate({
 }: CertificateProps) {
   return (
     <div
-      id="certificate-template"
-      className="bg-white p-12 relative"
-      style={{ width: '1056px', height: '816px' }}
+      id={`certificate-${certificateNumber}`}\n      className="relative mx-auto aspect-[22/17] w-full max-w-[1056px] bg-white p-[clamp(1rem,4.5vw,3rem)]"
     >
       {/* Border */}
-      <div className="absolute inset-8 border-8 border-brand-blue-600 rounded-lg">
-        <div className="absolute inset-2 border-2 border-brand-blue-400 rounded-lg" />
+      <div className="absolute inset-[clamp(0.6rem,3vw,2rem)] rounded-lg border-[clamp(3px,0.75vw,8px)] border-brand-blue-600">
+        <div className="absolute inset-[clamp(2px,0.5vw,0.5rem)] rounded-lg border-2 border-brand-blue-400" />
       </div>
 
       {/* Content */}
-      <div className="relative h-full flex flex-col items-center justify-center text-center px-16">
+      <div className="relative flex h-full flex-col items-center justify-center px-[clamp(1rem,6vw,4rem)] text-center">
         {/* Logo/Icon */}
-        <div className="w-24 h-24 bg-brand-blue-600 rounded-full flex items-center justify-center mb-6">
-          <Award aria-label="award" className="w-12 h-12 text-white" />
+        <div className="mb-[clamp(0.4rem,2vw,1.5rem)] flex size-[clamp(2.5rem,9vw,6rem)] items-center justify-center rounded-full bg-brand-blue-600">
+          <Award aria-label="award" className="size-[clamp(1.25rem,4.5vw,3rem)] text-white" />
         </div>
 
         {/* Title */}
-        <h1 className="text-5xl font-bold text-black mb-4">Certificate of Completion</h1>
+        <h1 className="mb-[clamp(0.25rem,1.5vw,1rem)] text-[clamp(1.25rem,4.5vw,3rem)] font-bold leading-tight text-black">Certificate of Completion</h1>
 
         {/* Subtitle */}
-        <p className="text-xl text-black mb-8">This certifies that</p>
+        <p className="mb-[clamp(0.35rem,2.5vw,2rem)] text-[clamp(0.7rem,1.9vw,1.25rem)] text-black">This certifies that</p>
 
         {/* Student Name */}
-        <h2 className="text-6xl font-bold text-brand-blue-600 mb-8 border-b-4 border-brand-blue-600 pb-4 px-8">
+        <h2 className="mb-[clamp(0.4rem,2.5vw,2rem)] border-b-[clamp(2px,0.4vw,4px)] border-brand-blue-600 px-[clamp(0.5rem,3vw,2rem)] pb-[clamp(0.25rem,1.4vw,1rem)] text-[clamp(1.4rem,5.5vw,3.75rem)] font-bold leading-tight text-brand-blue-600">
           {studentName}
         </h2>
 
         {/* Course Info */}
-        <p className="text-xl text-black mb-4">has successfully completed</p>
-        <h3 className="text-3xl font-bold text-black mb-8">{courseName}</h3>
+        <p className="mb-[clamp(0.2rem,1vw,1rem)] text-[clamp(0.7rem,1.9vw,1.25rem)] text-black">has successfully completed</p>
+        <h3 className="mb-[clamp(0.35rem,2.5vw,2rem)] text-[clamp(0.9rem,2.8vw,1.875rem)] font-bold leading-tight text-black">{courseName}</h3>
 
         {/* Date */}
-        <p className="text-lg text-black mb-12">
+        <p className="mb-[clamp(0.5rem,3vw,3rem)] text-[clamp(0.65rem,1.7vw,1.125rem)] text-black">
           Completed on{' '}
           {new Date(completionDate).toLocaleDateString('en-US', {
             timeZone: 'UTC',
@@ -63,11 +61,11 @@ export function CertificateTemplate({
         </p>
 
         {/* Signature Section */}
-        <div className="flex justify-center gap-24 w-full mt-auto">
+        <div className="mt-auto flex w-full justify-center gap-[clamp(1rem,9vw,6rem)]">
           <div className="text-center">
-            <div className="border-t-2 border-slate-900 pt-2 px-8">
-              <p className="font-bold text-black">{instructorName}</p>
-              <p className="text-sm text-black">
+            <div className="border-t-2 border-slate-900 px-[clamp(0.5rem,3vw,2rem)] pt-[clamp(0.2rem,0.8vw,0.5rem)]">
+              <p className="text-[clamp(0.65rem,1.5vw,1rem)] font-bold text-black">{instructorName}</p>
+              <p className="text-[clamp(0.5rem,1.2vw,0.875rem)] text-black">
                 {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
               </p>
             </div>
@@ -75,9 +73,9 @@ export function CertificateTemplate({
         </div>
 
         {/* Certificate Number */}
-        <div className="mt-8">
-          <p className="text-xs text-slate-500">Certificate Number: {certificateNumber}</p>
-          <p className="text-xs text-slate-500">
+        <div className="mt-[clamp(0.35rem,2.5vw,2rem)]">
+          <p className="text-[clamp(0.45rem,1vw,0.75rem)] text-slate-500">Certificate Number: {certificateNumber}</p>
+          <p className="text-[clamp(0.45rem,1vw,0.75rem)] text-slate-500">
             Verify at: www.elevateforhumanity.org/verify/{certificateNumber}
           </p>
         </div>
@@ -98,7 +96,7 @@ export function CertificatePreview({
     const html2canvas = (await import(/* webpackIgnore: true */ 'html2canvas')).default;
     const { jsPDF } = await import(/* webpackIgnore: true */ 'jspdf');
 
-    const element = document.getElementById('certificate-template');
+    const element = document.getElementById(`certificate-${certificateNumber}`);
     if (!element) return;
 
     // Capture the certificate as canvas
@@ -133,11 +131,8 @@ export function CertificatePreview({
   return (
     <div>
       {/* Certificate Display */}
-      <div className="bg-slate-100 p-8 rounded-lg mb-6 overflow-auto">
-        <div
-          className="inline-block"
-          style={{ transform: 'scale(0.5)', transformOrigin: 'top left' }}
-        >
+      <div className="mb-6 overflow-hidden rounded-lg bg-slate-100 p-2 sm:p-4">
+        <div className="mx-auto w-full max-w-[1056px]">
           <CertificateTemplate
             studentName={studentName}
             courseName={courseName}

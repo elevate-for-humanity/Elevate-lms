@@ -6,9 +6,18 @@ import { PORTAL_PREVIEW_COOKIE } from '@/lib/admin/portal-preview';
 const ADMIN_ROLES = new Set(['admin', 'super_admin']);
 
 export async function GET(request: NextRequest) {
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
+  const targetUserId = request.nextUrl.searchParams.get('user_id')?.trim();
   const userDb = await createClient();
   const { data: { user } } = await userDb.auth.getUser();
-  if (!user) return NextResponse.redirect(new URL('/login?redirect=/api/admin/preview', request.url));
+  if (!user) {
+    const previewPath = targetUserId
+      ? `/api/admin/preview?user_id=${encodeURIComponent(targetUserId)}`
+      : '/api/admin/preview';
+    return NextResponse.redirect(
+      `${appUrl}/login?redirect=${encodeURIComponent(previewPath)}`,
+    );
+  }
 
   const db = await requireAdminClient();
   const { data: actor } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
@@ -22,7 +31,6 @@ export async function GET(request: NextRequest) {
     return response;
   }
 
-  const targetUserId = request.nextUrl.searchParams.get('user_id')?.trim();
   if (!targetUserId) return NextResponse.json({ error: 'user_id is required' }, { status: 400 });
 
   const { data: target } = await db.from('profiles').select('id,role').eq('id', targetUserId).maybeSingle();
@@ -30,7 +38,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Eligible preview user not found' }, { status: 404 });
   }
 
-  const response = NextResponse.redirect(new URL('/apprentice', request.url));
+  const response = NextResponse.redirect(`${appUrl}/apprentice`);
   response.cookies.set(PORTAL_PREVIEW_COOKIE, target.id, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

@@ -51,14 +51,43 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
 
           <div className="mt-10 grid gap-6 lg:grid-cols-2">
             {shops.map((shop) => {
-              const image = shop.media?.find((media) => media.kind !== 'video');
+              const image = shop.slug === 'razors-image-barbershop'
+                ? { src: '/images/partners/razors-image-video-poster.webp', alt: "Razor's Image host barbershop representative", kind: 'photo' as const }
+                : shop.media?.find((media) => media.kind !== 'video');
+              const video = shop.slug === 'razors-image-barbershop'
+                ? { src: '/videos/partners/razors-image-host-barbershop.mp4', alt: "Razor's Image owner describing the barber apprenticeship opportunity", kind: 'video' as const }
+                : shop.media?.find((media) => media.kind === 'video');
               const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
               return (
                 <article
                   key={shop.slug}
                   className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
                 >
-                  {image ? (
+                  {video ? (
+                    <div className="bg-slate-950 px-4 py-5 sm:px-6">
+                      <div className="mx-auto max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-black shadow-xl">
+                        <video
+                          controls
+                          playsInline
+                          preload="metadata"
+                          poster={image?.src}
+                          aria-label={video.alt}
+                          className="aspect-[9/16] max-h-[680px] w-full bg-black object-contain"
+                        >
+                          <source src={video.src} type="video/mp4" />
+                          Your browser does not support embedded video.
+                        </video>
+                      </div>
+                      <div className="mx-auto mt-4 max-w-xl text-center text-white">
+                        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-red-300">
+                          Participating host barbershop
+                        </p>
+                        <p className="mt-2 text-sm font-semibold leading-6 text-slate-200">
+                          Razor&apos;s Image provides an approved workplace training environment. Elevate for Humanity administers the DOL-registered Barber Apprenticeship; enrollment, eligibility, placement, wages, and licensing remain subject to the applicable program and employer requirements.
+                        </p>
+                      </div>
+                    </div>
+                  ) : image ? (
                     <div className="relative aspect-[4/3] max-h-[440px] overflow-hidden bg-white sm:aspect-[16/10]">
                       <Image
                         src={image.src}

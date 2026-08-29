@@ -6,14 +6,24 @@ import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Play } from 'lu
 import { useEffect, useMemo, useState } from 'react';
 import type { FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
 
-const ROTATION_MS = 8000;
+const ROTATION_MS = 4500;
+
+const FEATURED_PHOTO_BY_SHOP: Record<string, { src: string; alt: string; kind: 'photo' }> = {
+  'kountry-kutz-barbershop': { src: '/images/partners/kountry-kutz-interior.webp', alt: 'Interior of Kountry Kutz apprenticeship host barbershop', kind: 'photo' },
+  'cals-kutz-studio': { src: '/images/partners/cals-kutz-official.webp', alt: 'Cals Kutz Studio apprenticeship host barbershop', kind: 'photo' },
+  'razors-image-barbershop': { src: '/images/partners/razors-image-video-poster.webp', alt: "Razor's Image host barbershop representative", kind: 'photo' },
+  'b-52s-barber-shop': { src: '/images/partners/b52s-official.webp', alt: "B-52's Barbershop in New Castle", kind: 'photo' },
+};
 
 export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner[] }) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
-  const slides = useMemo(() => shops.flatMap((shop) =>
-    (shop.media ?? []).map((media) => ({ shop, media }))
-  ), [shops]);
+  // Keep the rotation representative and brisk: one real photo per shop,
+  // instead of letting shops with large portfolios dominate the carousel.
+  const slides = useMemo(() => shops.flatMap((shop) => {
+    const media = FEATURED_PHOTO_BY_SHOP[shop.slug] ?? shop.media?.find((item) => item.kind !== 'video');
+    return media ? [{ shop, media }] : [];
+  }), [shops]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [interacting, setInteracting] = useState(false);

@@ -16,6 +16,7 @@ const PROTECTED_PREFIXES = [
   '/lms/support',
   '/learner',
   '/apprentice',
+  '/admin-preview',
   '/host-shop/dashboard',
   '/parent-portal/dashboard',
   '/parent-portal/student',

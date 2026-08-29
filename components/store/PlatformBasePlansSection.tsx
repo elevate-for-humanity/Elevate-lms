@@ -20,7 +20,7 @@ export function PlatformBasePlansSection({
   headline = 'Base plans',
   subheadline = 'Start simple. Add workforce, LMS, and apprenticeship modules when you are ready.',
 }: Props) {
-  const [interval, setInterval] = useState<BillingInterval>('monthly');
+  const [interval, setBillingInterval] = useState<BillingInterval>('monthly');
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,8 +66,8 @@ export function PlatformBasePlansSection({
 
         <div className="mb-10 flex justify-center">
           <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1">
-            <button type="button" onClick={() => setInterval('monthly')} className={`rounded-md px-5 py-2 text-sm font-semibold ${interval === 'monthly' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'}`}>Monthly</button>
-            <button type="button" onClick={() => setInterval('annual')} className={`rounded-md px-5 py-2 text-sm font-semibold ${interval === 'annual' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'}`}>Annual <span className="ml-1 text-xs text-brand-green-600">save ~17%</span></button>
+            <button type="button" aria-pressed={interval === 'monthly'} onClick={() => setBillingInterval('monthly')} className={`rounded-md px-5 py-2 text-sm font-semibold ${interval === 'monthly' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'}`}>Monthly</button>
+            <button type="button" aria-pressed={interval === 'annual'} onClick={() => setBillingInterval('annual')} className={`rounded-md px-5 py-2 text-sm font-semibold ${interval === 'annual' ? 'bg-white text-slate-900 shadow' : 'text-slate-600'}`}>Annual <span className="ml-1 text-xs text-brand-green-600">save ~17%</span></button>
           </div>
         </div>
 

@@ -70,7 +70,7 @@ export default function ApprenticeshipsPage() {
       <HeroVideo
         videoSrcDesktop={hero.videoSrcDesktop}
         videoSrcMobile={hero.videoSrcMobile}
-        posterImage={hero.posterImage || '/images/pages/admin-apprenticeships-hero.webp'}
+        posterImage="/images/pages/apprenticeship-sponsor-page-1.webp"
         voiceoverSrc={hero.voiceoverSrc}
         microLabel="Earn while you learn"
         belowHeroHeadline="Apprenticeship puts training where the work happens."

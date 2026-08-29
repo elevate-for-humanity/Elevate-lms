@@ -109,7 +109,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       aria-roledescription="carousel"
       aria-label="Elevate for Humanity homepage highlights"
     >
-      <div key={`${slide.type}-${slide.src}-${activeSlide}`} className="home-hero-slide-enter">
+      <div className="home-hero-slide-enter">
         <HeroVideo
           videoSrcDesktop={slide.type === 'video' ? slide.src : undefined}
           videoSrcMobile={slide.type === 'video' ? slide.mobileSrc : undefined}

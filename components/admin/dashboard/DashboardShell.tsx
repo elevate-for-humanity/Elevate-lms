@@ -58,7 +58,7 @@ function OperationalShortcuts() {
     { title: 'Applications', description: 'Review submitted applications and resolve intake decisions.', href: '/applications' },
     { title: 'Students', description: 'Open learner records, enrollments, documents, and progress.', href: '/students' },
     { title: 'Programs', description: 'Manage published programs, courses, credentials, and curriculum.', href: '/programs' },
-    { title: 'Operations', description: 'Review system health, workflows, alerts, and release conditions.', href: '/operations' },
+    { title: 'Cost Intelligence', description: 'Control Northflank, GPU, retry, stale-job, and storage waste.', href: '/operations/infrastructure-costs' },
   ] as const;
   return (
     <section className="mb-8">

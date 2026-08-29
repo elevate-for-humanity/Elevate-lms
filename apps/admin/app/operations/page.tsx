@@ -78,6 +78,7 @@ export default async function OperationsPage() {
   const deadRows = rows(recentDeadLetters);
   const alertRows = rows(recentAlerts);
   const quickLinks: Array<readonly [label: string, href: string]> = [
+    ['Infrastructure Costs', '/operations/infrastructure-costs'],
     ['Mission Control', '/mission-control'],
     ['System Health', '/system-health'],
     ['Workflows', '/studio/workflows'],

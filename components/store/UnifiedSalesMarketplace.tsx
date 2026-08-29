@@ -105,7 +105,7 @@ export function UnifiedSalesMarketplace() {
           <p className="mt-4 text-base font-semibold leading-7 text-slate-700 sm:text-lg">Choose a product, see the live demo, understand the monthly price and start with the smallest plan that solves your problem. Every product stays connected as your business grows.</p>
         </div>
 
-        <div className="mx-auto mt-8 grid max-w-5xl gap-3 md:grid-cols-3">
+        <div data-paris-tour="subscription-families" className="mx-auto mt-8 grid max-w-5xl gap-3 md:grid-cols-3">
           {(Object.keys(familyMeta) as StoreFamily[]).map((key) => {
             const selected = family === key;
             return (
@@ -123,7 +123,7 @@ export function UnifiedSalesMarketplace() {
           })}
         </div>
 
-        <div className="mx-auto mt-7 grid max-w-5xl gap-3 sm:grid-cols-[1fr_auto]">
+        <div data-paris-tour="product-search" className="mx-auto mt-7 grid max-w-5xl gap-3 sm:grid-cols-[1fr_auto]">
           <label className="block"><span className="sr-only">Search platform capabilities</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search website builder, CRM, PARIS, testing, apprenticeship..." className="w-full rounded-xl border border-slate-300 bg-white px-5 py-3.5 text-base font-bold text-slate-950 outline-none ring-brand-red-500 placeholder:text-slate-600 focus:ring-2" /></label>
           <button type="button" aria-pressed={family === 'all'} onClick={() => setFamily('all')} className={`rounded-xl px-5 py-3 text-sm font-black ${family === 'all' ? 'bg-brand-red-600 text-white' : 'border border-slate-300 bg-white/10 text-white hover:bg-white/20'}`}>View All</button>
         </div>
@@ -134,7 +134,7 @@ export function UnifiedSalesMarketplace() {
           </div>
         ) : null}
 
-        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div data-paris-tour="product-cards" className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {items.map((capability) => {
             const isUnifiedLearningPlatform = capability.key === 'course_builder';
             const capabilityName = isUnifiedLearningPlatform ? 'Course Creation & Learning Platform' : capability.name;
@@ -153,14 +153,14 @@ export function UnifiedSalesMarketplace() {
                   <p className="mt-2 flex-1 text-sm font-semibold leading-6 text-slate-700">{capabilityDescription}</p>
                   <p className="mt-4 text-sm font-black text-slate-950">{priceFor(capability)}</p>
                   {availability === 'beta' ? <p className="mt-2 text-xs font-semibold text-amber-200">Beta availability may change while the capability is being finalized.</p> : null}
-                  <div className="mt-5 flex flex-wrap gap-2"><Link href={action.href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2.5 text-sm font-black text-slate-950 hover:bg-brand-red-500">{action.label}</Link><Link href={`/store/demo/capability/${String(capability.key)}`} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-black text-slate-950 hover:bg-white/20">Watch Live Demo</Link></div>
+                  <div data-paris-tour="product-actions" className="mt-5 flex flex-wrap gap-2"><Link href={action.href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2.5 text-sm font-black text-slate-950 hover:bg-brand-red-500">{action.label}</Link><Link href={`/store/demo/capability/${String(capability.key)}`} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-black text-slate-950 hover:bg-white/20">Watch Live Demo</Link></div>
                 </div>
               </article>
             );
           })}
         </div>
         {items.length === 0 ? <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-8 text-center font-semibold text-slate-700">No matching capability in this buying path. Try View All or a broader search.</div> : null}
-        <div className="mt-12 grid gap-4 rounded-3xl border border-orange-200 bg-white p-7 shadow-lg md:grid-cols-[1fr_auto] md:items-center"><div><h3 className="text-2xl font-black text-slate-950">Not sure what to choose?</h3><p className="mt-2 font-semibold text-slate-700">Use guided setup or start the 14-day trial. Your workspace can preserve the capabilities selected during onboarding.</p></div><div className="flex flex-wrap gap-3"><Link href="#guided-setup" className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-50">Use Guided Setup</Link><Link href="/store/trial" className="rounded-xl bg-brand-red-700 px-5 py-3 font-black text-white hover:bg-brand-red-800">Start Free Trial</Link></div></div>
+        <div data-paris-tour="start-plan" className="mt-12 grid gap-4 rounded-3xl border border-orange-200 bg-white p-7 shadow-lg md:grid-cols-[1fr_auto] md:items-center"><div><h3 className="text-2xl font-black text-slate-950">Not sure what to choose?</h3><p className="mt-2 font-semibold text-slate-700">Use guided setup or start the 14-day trial. Your workspace can preserve the capabilities selected during onboarding.</p></div><div className="flex flex-wrap gap-3"><Link href="#guided-setup" className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-50">Use Guided Setup</Link><Link href="/store/trial" className="rounded-xl bg-brand-red-700 px-5 py-3 font-black text-white hover:bg-brand-red-800">Start Free Trial</Link></div></div>
       </div>
     </section>
   );

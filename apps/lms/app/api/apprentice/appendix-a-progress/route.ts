@@ -9,10 +9,9 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { data: enrollments, error } = await db.from('program_enrollments')
     .select('id, user_id, program_id, program_slug, status, created_at')
     .eq('user_id', subject.userId).in('status', ['active', 'enrolled', 'in_progress']).order('created_at', { ascending: false });

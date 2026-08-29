@@ -20,6 +20,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAuditEvent } from '@/lib/audit';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
 import { cookies } from 'next/headers';
+import { createPortalPreviewHandoff } from '@/lib/admin/portal-preview-handoff';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -98,6 +99,7 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     success: true,
+    preview_url: `https://app.elevateforhumanity.org/api/admin/preview?handoff=${encodeURIComponent(createPortalPreviewHandoff(auth.id, target_user_id))}`,
     impersonating: {
       user_id: target_user_id,
       name: target.full_name,

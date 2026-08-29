@@ -29,12 +29,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const h = await headers();
   const pathname = h.get('x-pathname') || (await cookies()).get('__efh_pathname')?.value || '/apprentice';
 
-  if (!user) {
-    redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
-  }
-
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   const { data: profile } = await db
     .from('profiles')
     .select('id, role, full_name, first_name, last_name, avatar_url')
@@ -57,7 +54,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
     <PlatformShell
       user={{
         id: subject.userId,
-        email: subject.previewing ? '' : user.email || '',
+        email: subject.previewing ? '' : user?.email || '',
         full_name: profile?.full_name || undefined,
         first_name: profile?.first_name || undefined,
         last_name: profile?.last_name || undefined,

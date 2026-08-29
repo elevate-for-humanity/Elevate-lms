@@ -165,7 +165,7 @@ export default function TimeclockPage() {
 
   // Fetch recent shift history once context is loaded
   useEffect(() => {
-    if (!context) return;
+    if (!context || context.previewing) return;
     setHistoryLoading(true);
     const supabase = createClient();
     supabase

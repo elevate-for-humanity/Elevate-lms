@@ -73,10 +73,9 @@ function SubscriptionBilling({ billing, portalPath, needsPaymentMethod, previewi
 export default async function ApprenticeBillingPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apprentice/billing');
-
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/billing');
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   const portalPath = (programSlug && APPRENTICE_PORTAL_CONFIGS[programSlug]?.portalPath) || '/apprentice';
 

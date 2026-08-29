@@ -52,10 +52,9 @@ export default async function ApprenticeOrientationPage({
   const params = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apprentice/orientation');
-
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/orientation');
   const resolvedProgram = await resolveApprenticeProgramSlug(db, subject.userId);
   const programSlug = params.program || resolvedProgram;
   if (!programSlug) redirect('/apprentice?notice=apprentice-access-required');

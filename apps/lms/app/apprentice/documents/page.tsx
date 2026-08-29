@@ -21,10 +21,9 @@ const approvedStates = new Set(['approved', 'accepted', 'verified']);
 export default async function ApprenticeDocumentsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apprentice/documents');
-
   const admin = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(admin, user.id);
+  const subject = await resolvePortalPreviewSubject(admin, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/documents');
   const programSlug = await resolveApprenticeProgramSlug(admin, subject.userId);
   if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');
 

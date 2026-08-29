@@ -33,9 +33,8 @@ export default function ImpersonateForm() {
       setSuccess(
         `Now viewing as: ${data.impersonating.name} (${data.impersonating.email}). Session expires ${new Date(data.impersonating.expires_at).toLocaleTimeString()}.`,
       );
-      window.location.assign(
-        `https://app.elevateforhumanity.org/admin-preview?user_id=${encodeURIComponent(data.impersonating.user_id)}`,
-      );
+      if (!data.preview_url) throw new Error('Secure preview handoff was not created');
+      window.location.assign(data.preview_url);
     } catch {
       setError('Request failed');
     } finally {

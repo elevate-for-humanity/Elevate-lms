@@ -19,9 +19,9 @@ export const dynamic = 'force-dynamic';
 export default async function ApprenticeHandbookPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apprentice/handbook');
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/handbook');
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   if (programSlug === 'cosmetology-apprenticeship') {
     return <CosmetologyHandbook previewing={subject.previewing} />;

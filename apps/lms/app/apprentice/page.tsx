@@ -19,10 +19,9 @@ export const dynamic = 'force-dynamic';
 export default async function ApprenticePortalPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apprentice');
-
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice');
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');
 
@@ -82,7 +81,18 @@ export default async function ApprenticePortalPage() {
     const incompleteCount = todoItems.filter((item) => !item.done).length;
     const shopName = runtime.shop?.name || (runtime.placement?.id ? 'Salon Saloon' : 'Not connected');
     return <main className="space-y-7 pb-10">
-      <section className="min-h-[320px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:min-h-[400px]"><div className="grid min-h-[320px] lg:min-h-[400px] lg:grid-cols-[1.15fr_0.85fr]"><div className="p-6 sm:p-8"><p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">Apprentice Dashboard</p><h1 className="mt-2 text-3xl font-black text-slate-950">Welcome, {firstName}</h1><p className="mt-3 text-lg font-bold text-slate-800">{displayProgram}</p><div role="alert" className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm font-semibold leading-6 text-amber-950">Your enrollment exists, but this occupation does not currently have an active approved registered-program standard in the canonical platform contract. Regulated OJL, competency, RTI-credit, wage-progression, and completion actions are blocked rather than filled with generic or historical defaults.</div><div className="mt-5 flex flex-wrap gap-3"><Link href="/apprentice/documents" className="rounded-xl border border-slate-300 px-4 py-2 font-bold">Documents</Link><Link href="/apprentice/profile" className="rounded-xl border border-slate-300 px-4 py-2 font-bold">Profile</Link></div></div><div className="relative min-h-[240px]"><Image src={heroImage} alt={`${displayProgram} apprentice training`} fill priority className="object-cover" sizes="(max-width:1024px) 100vw,40vw" /></div></div></section>
+      <section className="relative min-h-[390px] overflow-hidden rounded-3xl bg-fuchsia-950 shadow-xl ring-1 ring-fuchsia-900/20">
+        <Image src={heroImage} alt={`${displayProgram} apprentice training`} fill priority className="object-cover object-center" sizes="100vw" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-fuchsia-950/90 to-fuchsia-900/20" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/70 to-transparent" />
+        <div className="relative z-10 flex min-h-[390px] max-w-3xl flex-col justify-center p-7 text-white sm:p-10 lg:p-12">
+          <span className="w-fit rounded-full border border-pink-300/50 bg-pink-500/20 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-pink-100 backdrop-blur">Cosmetology Apprentice Portal</span>
+          <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">Welcome, {firstName}</h1>
+          <p className="mt-3 text-xl font-bold text-pink-100">{displayProgram}</p>
+          <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-slate-100 sm:text-base">Track your Salon Saloon training, 144 RTI hours, tuition progress, documents, competencies, and State Board readiness in one place.</p>
+          <div className="mt-6 flex flex-wrap gap-3"><Link href="/apprentice/billing" className="rounded-xl bg-pink-600 px-5 py-3 font-black text-white shadow-lg hover:bg-pink-500">Complete payment setup</Link><Link href="/apprentice/documents" className="rounded-xl border border-white/50 bg-white/10 px-5 py-3 font-black text-white backdrop-blur hover:bg-white/20">Required documents</Link></div>
+        </div>
+      </section>
       <section className="rounded-3xl border-2 border-red-300 bg-red-50 p-6 shadow-sm"><div className="flex gap-3"><AlertCircle className="mt-1 h-6 w-6 shrink-0 text-red-700"/><div className="w-full"><h2 className="text-xl font-black text-red-950">Required to-do — {incompleteCount} incomplete</h2><p className="mt-1 text-sm font-semibold text-red-900">PARIS will walk you through these items in order. Red items must be completed before the corresponding activity is unlocked.</p><div className="mt-5 grid gap-3">{todoItems.map(({ label, done, href, icon: Icon }, index) => <Link key={label} href={href} className={`flex items-center justify-between gap-4 rounded-xl border p-4 ${done ? 'border-green-300 bg-green-50 text-green-950' : 'border-red-300 bg-white text-red-950'}`}><span className="flex items-center gap-3"><span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-black ${done ? 'bg-green-700 text-white' : 'bg-red-700 text-white'}`}>{done ? '✓' : index + 1}</span><Icon className="h-5 w-5 shrink-0"/><span className="font-black">{label}</span></span><span className="text-xs font-black uppercase">{done ? 'Complete' : 'Open'}</span></Link>)}</div></div></div></section>
       <section className="grid gap-4 sm:grid-cols-3"><Metric label="Host Salon" value={shopName} detail={runtime.placement?.supervisor_user_id ? 'Supervisor connected' : 'Supervisor verification still required'} icon={MapPin}/><Metric label="Required documents" value={`${Math.max(0, (documentRequirements?.length || 0) - missingDocumentCount)} / ${documentRequirements?.length || 0}`} detail={`${missingDocumentCount} incomplete`} icon={FileText}/><Metric label="Payment setup" value={billingConfigured ? 'Configured' : 'Required'} detail={billingConfigured ? 'Automatic billing is connected' : 'Authorize and add a card in Billing'} icon={CreditCard}/></section>
     </main>;

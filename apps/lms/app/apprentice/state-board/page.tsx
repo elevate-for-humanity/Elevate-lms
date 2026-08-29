@@ -34,9 +34,9 @@ export default async function StateBoardExamPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apprentice/state-board');
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/state-board');
 
   // Canonical enrollment source
   const { data: programEnrollment } = await db

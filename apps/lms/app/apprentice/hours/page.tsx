@@ -23,9 +23,9 @@ export default async function ApprenticeHoursPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login?redirect=/apprentice/hours');
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/hours');
 
   // Fetch hours from consolidated hour_entries table
   const { data: hoursData, error } = await db

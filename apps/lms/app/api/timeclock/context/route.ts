@@ -15,10 +15,9 @@ async function _GET(request: NextRequest) {
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
   const db = await requireAdminClient();
-  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { data: apprentice } = await db
     .from('apprentices')

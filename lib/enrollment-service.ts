@@ -47,6 +47,36 @@ export type EnrollmentResult = {
 const TERMINAL_STATUSES = new Set(['active', 'completed']);
 
 /**
+ * Idempotent post-payment access repair shared by every paid learner path.
+ * Dashboard access is data-driven from the active profile/enrollment; a
+ * separate dashboard row is intentionally not created.
+ */
+export async function ensurePaidEnrollmentAccess(
+  supabase: SupabaseClient,
+  userId: string,
+  enrollmentId: string,
+): Promise<void> {
+  const now = new Date().toISOString();
+  const [{ error: enrollmentError }, { error: profileError }, binder] = await Promise.all([
+    supabase.from('program_enrollments').update({
+      status: 'active',
+      enrollment_state: 'enrolled',
+      enrollment_confirmed_at: now,
+      updated_at: now,
+    }).eq('id', enrollmentId).eq('user_id', userId),
+    supabase.from('profiles').update({
+      enrollment_status: 'active',
+      portal_type: 'apprentice',
+    }).eq('id', userId),
+    ensureDigitalBinder({ db: supabase, userId, enrollmentId }),
+  ]);
+
+  if (enrollmentError) throw new Error(`ENROLLMENT_ACTIVATION_FAILED: ${enrollmentError.message}`);
+  if (profileError) throw new Error(`PROFILE_ACTIVATION_FAILED: ${profileError.message}`);
+  if (!binder.binderId) throw new Error('DIGITAL_BINDER_PROVISIONING_FAILED');
+}
+
+/**
  * Normalise funding_source to the canonical set of values.
  * Prevents 'self-pay' / 'self_pay' / 'Funded' drift across routes.
  */
@@ -90,7 +120,9 @@ export async function createOrUpdateEnrollment(
     fullName,
   } = input;
 
-  const resolvedStatus = status ?? (isDeposit ? 'deposit_paid' : 'active');
+  // A verified deposit is still a successful payment and grants enrollment
+  // access. Billing status separately records that installments remain.
+  const resolvedStatus = status ?? (amountPaidCents > 0 ? 'active' : isDeposit ? 'deposit_paid' : 'active');
   const resolvedPaymentStatus =
     paymentStatus ?? (isDeposit ? 'deposit_paid' : amountPaidCents === 0 ? 'waived' : 'paid');
   const resolvedFundingSource = normalizeFundingSource(fundingSource);
@@ -104,6 +136,10 @@ export async function createOrUpdateEnrollment(
       .maybeSingle();
 
     if (existing && TERMINAL_STATUSES.has(existing.status)) {
+      // Webhooks are retried and manual payments can be reconciled after an
+      // enrollment exists. Repair the binder on every verified payment instead
+      // of assuming the first provisioning attempt completed every side effect.
+      await ensurePaidEnrollmentAccess(supabase, userId, existing.id);
       logger.info(
         `[enrollment-service] Already ${existing.status}: program ${programId} for user ${userId}`,
       );
@@ -151,20 +187,15 @@ export async function createOrUpdateEnrollment(
       `[enrollment-service] ${action}: ${enrollment.id} (program ${programId} for user ${userId})`,
     );
 
-    // Create digital binder for new enrollments
-    if (action === 'created' && userId) {
+    // Idempotently activate dashboard routing and create/repair the binder for
+    // every verified paid enrollment, including deposits and webhook retries.
+    if (userId) {
       try {
-        const { binderId, created } = await ensureDigitalBinder({
-          db: supabase,
-          userId,
-          enrollmentId: enrollment.id,
-        });
-        if (created) {
-          logger.info('[enrollment-service] Digital binder created', { binderId, enrollmentId: enrollment.id });
-        }
+        await ensurePaidEnrollmentAccess(supabase, userId, enrollment.id);
+        logger.info('[enrollment-service] Paid learner access ready', { enrollmentId: enrollment.id, userId });
       } catch (binderError) {
-        // Non-fatal: log but don't fail enrollment
-        logger.warn('[enrollment-service] Digital binder creation failed', binderError);
+        // Payment is durable; surface provisioning failure for retry/repair.
+        logger.warn('[enrollment-service] Paid learner access repair failed', binderError);
       }
     }
 
@@ -172,16 +203,21 @@ export async function createOrUpdateEnrollment(
     const HVAC_PROGRAM_ID = '4226f7f6-fbc1-44b5-83e8-b12ea149e4c7';
     if (action === 'created' && programId === HVAC_PROGRAM_ID) {
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? PLATFORM_DEFAULTS.siteUrl;
-      fetch(`${baseUrl}/api/program-holder/new-student-notify`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-internal-secret': 'elevate-internal-2026' },
-        body: JSON.stringify({
-          studentName: fullName ?? null,
-          studentEmail: email ?? null,
-          studentPhone: null,
-          programName: 'HVAC EPA 608 Certification',
-        }),
-      }).catch(() => {}); // fire-and-forget — don't block enrollment
+      const internalSecret = process.env.INTERNAL_API_SECRET ?? process.env.CRON_SECRET;
+      if (internalSecret) {
+        fetch(`${baseUrl}/api/program-holder/new-student-notify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-internal-secret': internalSecret },
+          body: JSON.stringify({
+            studentName: fullName ?? null,
+            studentEmail: email ?? null,
+            studentPhone: null,
+            programName: 'HVAC EPA 608 Certification',
+          }),
+        }).catch(() => {}); // fire-and-forget — don't block enrollment
+      } else {
+        logger.warn('[enrollment-service] Program-holder notification skipped: internal secret missing');
+      }
     }
 
     return { id: enrollment.id, action };

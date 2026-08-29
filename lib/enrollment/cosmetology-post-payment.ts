@@ -11,6 +11,7 @@
 import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@/lib/supabase';
 import { provisionAccount } from '@/lib/enrollment/provision-account';
+import { ensureDigitalBinder } from '@/lib/enrollment/ensure-digital-binder';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 const COSMETOLOGY_PROGRAM_SLUG = 'cosmetology-apprenticeship';
@@ -135,8 +136,10 @@ export async function runCosmetologyPostPayment(
               email: studentEmail,
               full_name: studentName,
               phone: app.phone ?? null,
-              status: 'enrolled_pending_approval',
-              enrollment_state: 'payment_confirmed',
+              // Verified payment is the enrollment gate. Staff review may audit
+              // records later, but it does not block learner access.
+              status: 'active',
+              enrollment_state: 'enrolled',
               payment_status: 'paid',
               funding_source: 'self_pay',
               amount_paid_cents: amountPaidCents,
@@ -177,8 +180,8 @@ export async function runCosmetologyPostPayment(
         student_id: app.user_id ?? undefined,
         user_id: app.user_id ?? undefined,
         course_id: COSMETOLOGY_COURSE_ID,
-        status: 'enrolled_pending_approval',
-        enrollment_state: 'payment_confirmed',
+        status: 'active',
+        enrollment_state: 'enrolled',
         payment_status: 'paid',
         amount_paid_cents: amountPaidCents,
         stripe_checkout_session_id: stripeSessionId,
@@ -189,7 +192,29 @@ export async function runCosmetologyPostPayment(
     steps['create_enrollment'] = updateEnrollmentErr ? 'failed' : 'skipped';
   }
 
-  // ── Step 3: Create follow-up reminder for admin ───────────────────────────
+  // ── Step 3: Repair dashboard routing + digital binder idempotently ────────
+  if (enrollmentId) {
+    const { data: enrolled } = await db
+      .from('program_enrollments')
+      .select('user_id')
+      .eq('id', enrollmentId)
+      .maybeSingle();
+
+    if (enrolled?.user_id) {
+      await Promise.all([
+        db.from('profiles').update({
+          enrollment_status: 'active',
+          portal_type: 'apprentice',
+        }).eq('id', enrolled.user_id),
+        ensureDigitalBinder({ db, userId: enrolled.user_id, enrollmentId }),
+      ]);
+      steps['dashboard_and_binder'] = 'ok';
+    } else {
+      steps['dashboard_and_binder'] = 'failed';
+    }
+  }
+
+  // ── Step 4: Create follow-up reminder for admin ───────────────────────────
   try {
     const { data: lead } = await db
       .from('crm_leads')
@@ -225,7 +250,7 @@ export async function runCosmetologyPostPayment(
     steps['crm_reminder'] = 'failed';
   }
 
-  // ── Step 4: Welcome + credentials email ──────────────────────────────────
+  // ── Step 5: Welcome + credentials email ──────────────────────────────────
   // provisionAccount already sends this for new users.
   // For existing users (profile already existed), send enrollment confirmation now.
   if (steps['provision_account'] === 'skipped') {
@@ -255,7 +280,7 @@ export async function runCosmetologyPostPayment(
       .eq('id', applicationId);
   } catch { /* non-fatal */ }
 
-  // ── Step 5: Send internal admin notification ───────────────────────────────
+  // ── Step 6: Send internal admin notification ───────────────────────────────
   try {
     const { sendEmail } = await import('@/lib/email/sendgrid');
     const adminUrl = `${siteUrl}/admin/applications`;

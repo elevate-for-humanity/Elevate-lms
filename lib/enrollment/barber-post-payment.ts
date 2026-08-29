@@ -11,6 +11,7 @@
 import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@/lib/supabase';
 import { provisionAccount } from '@/lib/enrollment/provision-account';
+import { ensureDigitalBinder } from '@/lib/enrollment/ensure-digital-binder';
 import { cachePortalTypeForEnrollment } from '@/lib/portal/router';
 import { BARBER_COURSE_ID } from '@/lib/barber/constants';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -185,7 +186,29 @@ export async function runBarberPostPayment(
     steps['create_enrollment'] = 'skipped'; // already linked
   }
 
-  // ── Step 3: Create follow-up reminder for admin ───────────────────────────
+  // ── Step 3: Repair dashboard routing + digital binder idempotently ────────
+  if (enrollmentId) {
+    const { data: enrolled } = await db
+      .from('program_enrollments')
+      .select('user_id')
+      .eq('id', enrollmentId)
+      .maybeSingle();
+
+    if (enrolled?.user_id) {
+      await Promise.all([
+        db.from('profiles').update({
+          enrollment_status: 'active',
+          portal_type: 'apprentice',
+        }).eq('id', enrolled.user_id),
+        ensureDigitalBinder({ db, userId: enrolled.user_id, enrollmentId }),
+      ]);
+      steps['dashboard_and_binder'] = 'ok';
+    } else {
+      steps['dashboard_and_binder'] = 'failed';
+    }
+  }
+
+  // ── Step 4: Create follow-up reminder for admin ───────────────────────────
   try {
     // Find CRM lead
     const { data: lead } = await db

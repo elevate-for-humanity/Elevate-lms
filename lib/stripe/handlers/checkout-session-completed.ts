@@ -15,14 +15,17 @@ import type Stripe from 'stripe';
 import type { StripeEventHandler } from './types';
 import {
   createOrUpdateEnrollment,
+  ensurePaidEnrollmentAccess,
   linkOrphanedEnrollments,
   normalizeFundingSource,
 } from '@/lib/enrollment-service';
 import { runBarberPostPayment } from '@/lib/enrollment/barber-post-payment';
+import { runCosmetologyPostPayment } from '@/lib/enrollment/cosmetology-post-payment';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { logger } from '@/lib/logger';
 import * as Sentry from '@sentry/nextjs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { provisionAccount } from '@/lib/enrollment/provision-account';
 
 export const handleCheckoutSessionCompleted: StripeEventHandler = async (
   event,
@@ -46,7 +49,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
   // ── CANONICAL PROGRAM ENROLLMENT ──────────────────────────────────────────
   if (kind === 'program_enrollment') {
     try {
-      const userId = session.metadata?.student_id ?? session.metadata?.user_id;
+      let userId = session.metadata?.student_id ?? session.metadata?.user_id;
       const programId = session.metadata?.program_id;
       const programSlug = session.metadata?.program_slug;
       const courseId = session.metadata?.course_id ?? undefined;
@@ -56,6 +59,32 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
       // Set by create-session when a pre-existing enrollment record exists (e.g. CNA public form).
       // When present, update that row directly instead of creating a second record.
       const existingEnrollmentId = session.metadata?.existing_enrollment_id ?? null;
+
+      if (!userId && existingEnrollmentId) {
+        const { data: existingEnrollment } = await supabase
+          .from('program_enrollments')
+          .select('user_id')
+          .eq('id', existingEnrollmentId)
+          .maybeSingle();
+        userId = existingEnrollment?.user_id ?? undefined;
+      }
+
+      if (!userId && customerEmail) {
+        const programTitle = (programSlug ?? 'training program')
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, (c: string) => c.toUpperCase());
+        const account = await provisionAccount({
+          db: supabase,
+          email: customerEmail,
+          fullName: session.customer_details?.name ?? customerEmail.split('@')[0],
+          phone: session.customer_details?.phone ?? null,
+          programName: programTitle,
+          programSlug: programSlug ?? 'program',
+          postLoginUrl: '/apprentice',
+          enrollmentStatus: 'active',
+        });
+        userId = account.userId ?? undefined;
+      }
 
       if (!programId) {
         logger.error('[webhook/checkout] program_enrollment missing required metadata', undefined, {
@@ -76,7 +105,7 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
           .update({
             status: 'active',
             payment_status: 'paid',
-            enrollment_state: 'confirmed',
+            enrollment_state: 'enrolled',
             enrollment_confirmed_at: now,
             stripe_checkout_session_id: session.id,
             amount_paid_cents: amountPaidCents,
@@ -140,6 +169,15 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
         return;
       }
 
+      if (!userId) {
+        logger.error('[webhook/checkout] Paid enrollment could not be linked to a learner account', undefined, {
+          enrollmentId: result.id,
+          customerEmail,
+        });
+        return;
+      }
+      await ensurePaidEnrollmentAccess(supabase, userId, result.id);
+
       await auditLog({
         action: AuditAction.ENROLLMENT_CREATED,
         entity: AuditEntity.ENROLLMENT,
@@ -158,6 +196,29 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
       logger.info(
         `[webhook/checkout] program_enrollment ${result.action}: ${programSlug} for ${userId}`,
       );
+
+      // The generic enrollment update records the money. Cosmetology also has
+      // an application/onboarding pipeline that must run so the application,
+      // CRM follow-up, account email, and admin notification stay in sync.
+      const applicationId = session.metadata?.application_id;
+      if (programSlug === 'cosmetology-apprenticeship' && applicationId) {
+        const paymentIntentId =
+          typeof session.payment_intent === 'string' ? session.payment_intent : null;
+        const postPayment = await runCosmetologyPostPayment({
+          db: supabase,
+          applicationId,
+          stripeSessionId: session.id,
+          stripePaymentIntentId: paymentIntentId,
+          amountPaidCents,
+        });
+        if (!postPayment.success) {
+          logger.error('[webhook/checkout] Cosmetology post-payment pipeline failed', undefined, {
+            applicationId,
+            error: postPayment.error,
+            steps: postPayment.steps,
+          });
+        }
+      }
 
       // Send enrollment confirmation email
       if (customerEmail && result.action !== 'already_active') {

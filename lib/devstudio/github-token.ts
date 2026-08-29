@@ -5,12 +5,17 @@
 
 import { getSecret, hydrateProcessEnv } from '@/lib/secrets';
 
-function looksLikeToken(value: string | undefined | null): value is string {
-  if (!value) return false;
-  const trimmed = value.trim();
-  if (trimmed.length < 10) return false;
-  if (/placeholder/i.test(trimmed)) return false;
-  return true;
+function normalizeToken(value: string | undefined | null): string | null {
+  if (!value) return null;
+  let token = value.trim();
+
+  // Accept values copied from shell snippets or authorization headers.
+  token = token.replace(/^(['"])(.*)\1$/, '$2').trim();
+  token = token.replace(/^(?:token|bearer)\s+/i, '').trim();
+
+  if (token.length < 10) return null;
+  if (/placeholder/i.test(token)) return null;
+  return token;
 }
 
 /** Load current runtime secrets into process.env before GitHub calls. */
@@ -27,16 +32,15 @@ export async function getGitHubToken(): Promise<string | null> {
   // Capture the deployment value before hydration. hydrateProcessEnv may load
   // a canonical fallback into process.env, but must not replace a valid token
   // supplied directly by the production service.
-  const deployedToken = process.env.GITHUB_TOKEN;
-  if (looksLikeToken(deployedToken)) return deployedToken.trim();
+  const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
+  if (deployedToken) return deployedToken;
 
   await ensureDevStudioSecrets();
 
-  const fromCanonicalStore = await getSecret('GITHUB_TOKEN');
-  if (looksLikeToken(fromCanonicalStore)) {
-    const token = fromCanonicalStore.trim();
-    process.env.GITHUB_TOKEN = token;
-    return token;
+  const fromCanonicalStore = normalizeToken(await getSecret('GITHUB_TOKEN'));
+  if (fromCanonicalStore) {
+    process.env.GITHUB_TOKEN = fromCanonicalStore;
+    return fromCanonicalStore;
   }
 
   return null;

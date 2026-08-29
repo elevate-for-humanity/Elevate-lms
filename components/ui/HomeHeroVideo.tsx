@@ -1,5 +1,7 @@
 'use client';
 
+import { useCallback, useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 
 export interface HeroBanner {
@@ -23,12 +25,20 @@ export interface HomeHeroVideoProps {
   banner: HeroBanner;
 }
 
+interface HomeHeroSlide {
+  type: 'video' | 'image';
+  src?: string;
+  mobileSrc?: string;
+  alt: string;
+  label: string;
+}
+
 const HOME_MEDIA_REVISION = process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 12) || 'home-hero';
-// This asset is part of the canonical shared public bundle. The former
-// /videos/voiceover.mp3 path did not exist, so the homepage sound control
-// always fell back to a failed audio request.
-const HOME_VOICEOVER = '/audio/heroes/home.mp3';
 const HOME_FIRST_FRAME = '/images/heroes/hero-home-first-frame.webp';
+const HOME_SLIDE_SECONDS = 8;
+
+const HOME_NARRATION =
+  'Welcome to Elevate for Humanity, where career training, registered apprenticeships, workforce support, and technology come together in one connected platform. Whether you want to begin a new career, earn while you learn, grow your business, host an apprentice, or build and manage training online, Elevate can help you take the next step. Explore hands-on pathways in healthcare, skilled trades, transportation, barbering, beauty, business, and technology. Eligible participants can also learn about available workforce funding pathways and payment options before enrolling. Shop and salon owners can join at no cost as apprenticeship host sites, train new talent inside their businesses, receive program support from Elevate, and may qualify for eligible workforce incentives. Apprentices gain supervised experience, documented skills, and the opportunity to earn wages while completing their pathway. Elevate also provides online applications, learner and employer portals, course-building tools, website and app development, testing support, and workforce-management technology. Explore a program, apply for training, become a host site, or request a demonstration. Your next opportunity can start right here with Elevate for Humanity.';
 
 function withMediaRevision(src?: string) {
   if (!src) return undefined;
@@ -36,17 +46,127 @@ function withMediaRevision(src?: string) {
 }
 
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
+  const slides: HomeHeroSlide[] = [
+    {
+      type: 'video',
+      src: withMediaRevision(banner.videoSrcDesktop),
+      mobileSrc: withMediaRevision(banner.videoSrcMobile),
+      alt: 'Elevate for Humanity career training and apprenticeship opportunities',
+      label: 'Career training and apprenticeships',
+    },
+    {
+      type: 'image',
+      src: '/images/partners/salon-saloon/team-sign.webp',
+      alt: 'Salon Saloon team at an Elevate participating Host Salon',
+      label: 'Host shops train the next generation',
+    },
+    {
+      type: 'image',
+      src: '/images/pages/barber-hero-main.webp',
+      alt: 'Barber apprentice serving a client in a working barbershop',
+      label: 'Earn while you learn',
+    },
+    {
+      type: 'image',
+      src: '/images/pexels/cosmetology.webp',
+      alt: 'Beauty professional working with a client in a salon',
+      label: 'Beauty apprenticeship pathways',
+    },
+  ].filter((slide) => slide.type === 'image' || Boolean(slide.src || slide.mobileSrc));
+
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const slide = slides[activeSlide] ?? slides[0];
+
+  const selectSlide = useCallback(
+    (index: number) => {
+      setActiveSlide((index + slides.length) % slides.length);
+    },
+    [slides.length],
+  );
+
+  useEffect(() => {
+    if (paused || slides.length < 2) return;
+    const timer = window.setInterval(
+      () => setActiveSlide((current) => (current + 1) % slides.length),
+      HOME_SLIDE_SECONDS * 1000,
+    );
+    return () => window.clearInterval(timer);
+  }, [paused, slides.length]);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mediaQuery.matches) setPaused(true);
+  }, []);
+
+  if (!slide) return null;
+
   return (
-    <HeroVideo
-      videoSrcDesktop={withMediaRevision(banner.videoSrcDesktop)}
-      videoSrcMobile={withMediaRevision(banner.videoSrcMobile)}
-      mountedFrameImage={HOME_FIRST_FRAME}
-      voiceoverSrc={withMediaRevision(banner.voiceoverSrc || HOME_VOICEOVER)}
-      transcript={banner.transcript}
-      analyticsName={banner.analyticsName}
-      overlayMode="none"
-      heightClassName="h-[clamp(400px,62vh,680px)]"
-      deferVideoMs={0}
-    />
+    <div
+      className="relative"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Elevate for Humanity homepage highlights"
+    >
+      <HeroVideo
+        videoSrcDesktop={slide.type === 'video' ? slide.src : undefined}
+        videoSrcMobile={slide.type === 'video' ? slide.mobileSrc : undefined}
+        mountedFrameImage={slide.type === 'video' ? HOME_FIRST_FRAME : slide.src}
+        transcript={HOME_NARRATION}
+        narrateTranscript
+        analyticsName={banner.analyticsName}
+        overlayMode="none"
+        heightClassName="h-[clamp(400px,62vh,680px)]"
+        deferVideoMs={slide.type === 'video' ? 250 : 0}
+      />
+
+      {slides.length > 1 ? (
+        <>
+          <button
+            type="button"
+            onClick={() => selectSlide(activeSlide - 1)}
+            aria-label="Show previous hero slide"
+            className="absolute left-3 top-[clamp(180px,28vh,310px)] z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-slate-950/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-slate-950/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <button
+            type="button"
+            onClick={() => selectSlide(activeSlide + 1)}
+            aria-label="Show next hero slide"
+            className="absolute right-3 top-[clamp(180px,28vh,310px)] z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-slate-950/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-slate-950/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
+
+          <div className="absolute left-1/2 top-[clamp(340px,55vh,620px)] z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-slate-950/60 px-3 py-2 shadow-lg backdrop-blur-sm">
+            {slides.map((item, index) => (
+              <button
+                key={`${item.type}-${item.src}-${index}`}
+                type="button"
+                onClick={() => selectSlide(index)}
+                aria-label={`Show slide ${index + 1}: ${item.label}`}
+                aria-current={index === activeSlide ? 'true' : undefined}
+                className={`h-2.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                  index === activeSlide ? 'w-8 bg-white' : 'w-2.5 bg-white/55 hover:bg-white/80'
+                }`}
+              />
+            ))}
+            <button
+              type="button"
+              onClick={() => setPaused((value) => !value)}
+              aria-label={paused ? 'Resume hero slideshow' : 'Pause hero slideshow'}
+              className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            >
+              {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+            </button>
+          </div>
+
+          <p className="sr-only" aria-live="polite">
+            Slide {activeSlide + 1} of {slides.length}: {slide.label}
+          </p>
+        </>
+      ) : null}
+    </div>
   );
 }

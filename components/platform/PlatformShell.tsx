@@ -276,7 +276,7 @@ export function PlatformShell({
           role={sidebarOpen ? 'dialog' : undefined}
           aria-modal={sidebarOpen ? true : undefined}
           aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation`}
-          className={`fixed inset-y-0 left-0 z-[70] w-[min(20rem,calc(100vw-2.5rem))] max-w-full transform bg-slate-950 text-white shadow-2xl transition-transform duration-200 ease-in-out lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100dvh-4rem)] lg:w-64 lg:shrink-0 lg:translate-x-0 lg:shadow-none ${
+          className={`fixed inset-y-0 left-0 z-[70] w-[min(20rem,calc(100vw-2.5rem))] max-w-full transform bg-slate-950 text-white shadow-2xl transition-transform duration-200 ease-in-out lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100dvh-4rem)] lg:!w-64 lg:shrink-0 lg:translate-x-0 lg:shadow-none ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >

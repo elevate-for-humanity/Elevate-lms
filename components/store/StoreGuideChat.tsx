@@ -2,9 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Volume2, VolumeX, X } from 'lucide-react';
+import { MessageCircle, Sparkles, Volume2, VolumeX, X } from 'lucide-react';
 import { GUIDE_STORAGE_KEYS, GuideChoice, storeGuideFlow } from '@/lib/guide/flows';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import ParisChat from '@/components/paris/ParisChat';
 
 type Props = { onStartTour?: (tourId: string) => void; forceOpen?: boolean };
 
@@ -16,6 +17,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
   const [choice, setChoice] = useState<GuideChoice | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [mode, setMode] = useState<'recommend' | 'chat'>('recommend');
   const speaking = naturalVoice.isPlaying || naturalVoice.isLoading;
 
   useEffect(() => {
@@ -30,6 +32,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
     void naturalVoice.play(text, { voice: 'coral', style: 'assistant', rate: 1 });
   };
   function openGuide() {
+    setMode('recommend');
     setOpen(true);
     speak("Hi, I'm PARIS, your Elevate Store guide. What are you trying to do? I can show you the best product, a live demo, and the right starting plan.");
   }
@@ -84,6 +87,25 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
           <button type="button" onClick={toggle} aria-label={muted ? 'Unmute natural voice' : 'Mute natural voice'}>{muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</button>
           <button type="button" onClick={() => { stop(); setOpen(false); }} aria-label="Close"><X className="h-5 w-5" /></button>
         </header>
+        <div className="grid grid-cols-2 border-y border-slate-200 bg-white p-2">
+          <button
+            type="button"
+            onClick={() => setMode('recommend')}
+            className={`inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-bold ${mode === 'recommend' ? 'bg-orange-100 text-orange-900' : 'text-slate-600 hover:bg-slate-50'}`}
+          >
+            <Sparkles className="h-4 w-4" /> Quick interview
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('chat')}
+            className={`inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-bold ${mode === 'chat' ? 'bg-cyan-100 text-cyan-900' : 'text-slate-600 hover:bg-slate-50'}`}
+          >
+            <MessageCircle className="h-4 w-4" /> Ask anything
+          </button>
+        </div>
+        {mode === 'chat' ? (
+          <ParisChat surface="store" showHeader={false} voiceEnabled={!muted} className="h-[52vh] min-h-[360px]" />
+        ) : (
         <div className="max-h-[52vh] overflow-y-auto p-4 sm:p-5">
           {!confirmed ? (
             <>
@@ -110,6 +132,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
           )}
           {naturalVoice.error ? <p className="mt-4 text-sm font-semibold text-red-800">Natural voice is temporarily unavailable; the guide remains fully usable by text.</p> : null}
         </div>
+        )}
       </section>
   );
 }

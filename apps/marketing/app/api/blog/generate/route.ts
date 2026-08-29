@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@/lib/supabase/server';
-import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
+import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -60,20 +60,14 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    // Check if OpenAI is configured
-    if (!isOpenAIConfigured()) {
+    if (!isAIAvailable()) {
       return NextResponse.json(
-        { error: 'OpenAI API key not configured in environment variables' },
-        { status: 500 },
+        { error: 'The canonical AI provider is not configured' },
+        { status: 503 },
       );
     }
 
-    // Get OpenAI client
-    const openai = getOpenAIClient();
-
-    // Generate blog post using OpenAI
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4.1',
+    const completion = await aiChat({
       messages: [
         {
           role: 'system',
@@ -85,17 +79,16 @@ async function _POST(request: NextRequest) {
         },
       ],
       temperature: 0.7,
-      max_tokens: 2000,
+      maxTokens: 2400,
     });
 
-    const content = completion.choices[0]?.message.content?.trim();
+    const content = completion.content?.trim();
     if (!content) {
       return NextResponse.json({ error: 'The content generator returned an empty response' }, { status: 502 });
     }
 
     // Generate title and excerpt
-    const metaCompletion = await openai.chat.completions.create({
-      model: 'gpt-4.1',
+    const metaCompletion = await aiChat({
       messages: [
         {
           role: 'system',
@@ -107,14 +100,14 @@ async function _POST(request: NextRequest) {
         },
       ],
       temperature: 0.7,
-      max_tokens: 200,
+      maxTokens: 300,
     });
 
-    const metaContent = metaCompletion.choices[0]?.message.content;
+    const metaContent = metaCompletion.content;
     if (!metaContent) {
       return NextResponse.json({ error: 'The metadata generator returned an empty response' }, { status: 502 });
     }
-    const meta = JSON.parse(metaContent);
+    const meta = JSON.parse(metaContent.replace(/```json?/g, '').replace(/```/g, '').trim());
 
     // Generate slug from title
     const slug = meta.title

@@ -420,7 +420,7 @@ export default function ProgramDetailPage({
             <div className="mt-6 grid gap-3">
               <Link href={p.cta.applyHref || `/apply?program=${p.slug}`} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Apply to This Program</Link>
               <Link href={`/programs/${p.slug}/payment/bnpl`} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100">See BNPL & Payment Options</Link>
-              <Link href={requestInfoHref} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-6 py-3 font-black text-white hover:bg-white/10">Get Program Information</Link>
+              <Link href={requestInfoHref} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-6 py-3 font-black text-white hover:bg-slate-800">Get Program Information</Link>
             </div>
           </aside>
         </div>

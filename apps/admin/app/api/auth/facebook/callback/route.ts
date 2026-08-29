@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
   if (request.nextUrl.searchParams.get('error')) return settingsRedirect(request, 'error', 'authorization_declined');
 
   const code = request.nextUrl.searchParams.get('code');
-  const clientId = process.env.FACEBOOK_CLIENT_ID;
-  const clientSecret = process.env.FACEBOOK_CLIENT_SECRET;
+  const clientId = process.env.FACEBOOK_CLIENT_ID?.trim();
+  const clientSecret = process.env.FACEBOOK_CLIENT_SECRET?.trim();
   if (!code || !clientId || !clientSecret) return settingsRedirect(request, 'error', 'facebook_not_configured');
 
   const version = process.env.META_GRAPH_API_VERSION?.trim() || 'v26.0';
@@ -62,8 +62,26 @@ export async function GET(request: NextRequest) {
   tokenUrl.searchParams.set('code', code);
 
   const tokenResponse = await fetch(tokenUrl);
-  const tokenPayload = await tokenResponse.json().catch(() => ({})) as { access_token?: string; expires_in?: number };
-  if (!tokenResponse.ok || !tokenPayload.access_token) return settingsRedirect(request, 'error', 'token_exchange_failed');
+  const tokenPayload = await tokenResponse.json().catch(() => ({})) as {
+    access_token?: string;
+    expires_in?: number;
+    error?: { code?: number; message?: string; type?: string };
+  };
+  if (!tokenResponse.ok || !tokenPayload.access_token) {
+    const message = tokenPayload.error?.message?.toLowerCase() ?? '';
+    const configurationError = message.includes('client secret') || message.includes('client_id');
+    console.error('[meta-oauth] Token exchange rejected', {
+      status: tokenResponse.status,
+      code: tokenPayload.error?.code,
+      type: tokenPayload.error?.type,
+      configurationError,
+    });
+    return settingsRedirect(
+      request,
+      'error',
+      configurationError ? 'meta_app_credentials_mismatch' : 'token_exchange_failed',
+    );
+  }
 
   const identityUrl = new URL(`https://graph.facebook.com/${version}/me`);
   identityUrl.searchParams.set('fields', 'id,name');

@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 
 export interface HeroBanner {
@@ -128,7 +127,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             aria-label="Show previous hero slide"
             className="absolute left-3 top-[clamp(180px,28vh,310px)] z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-slate-950/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-slate-950/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <span aria-hidden="true" className="text-4xl font-light leading-none">‹</span>
           </button>
           <button
             type="button"
@@ -136,7 +135,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             aria-label="Show next hero slide"
             className="absolute right-3 top-[clamp(180px,28vh,310px)] z-50 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-slate-950/55 text-white shadow-lg backdrop-blur-sm transition hover:bg-slate-950/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            <ChevronRight className="h-6 w-6" />
+            <span aria-hidden="true" className="text-4xl font-light leading-none">›</span>
           </button>
 
           <div className="absolute left-1/2 top-[clamp(340px,55vh,620px)] z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-slate-950/60 px-3 py-2 shadow-lg backdrop-blur-sm">
@@ -158,7 +157,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
               aria-label={paused ? 'Resume hero slideshow' : 'Pause hero slideshow'}
               className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
-              {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+              <span aria-hidden="true" className="text-sm font-black leading-none">{paused ? '▶' : 'Ⅱ'}</span>
             </button>
           </div>
 

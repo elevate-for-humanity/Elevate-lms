@@ -5,8 +5,8 @@
  * Only authenticated admins can read or write.
  */
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { apiRequireRoles } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
@@ -15,23 +15,11 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-async function requireSuperAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: 'Unauthorized', status: 401 as const };
-  const { data: profile } = await supabase
-    .from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile || !['admin'].includes(profile.role)) {
-    return { error: 'Forbidden', status: 403 as const };
-  }
-  return { user, profile };
-}
-
 async function _GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
-  const auth = await requireSuperAdmin();
-  if ('error' in auth) return safeError(auth.error, auth.status);
+  const auth = await apiRequireRoles(request, ['admin', 'super_admin'], { adminOverride: false });
+  if (auth.error) return auth.error;
 
   try {
     const db = await requireAdminClient();
@@ -50,8 +38,8 @@ async function _GET(request: Request) {
 async function _POST(request: Request) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
-  const auth = await requireSuperAdmin();
-  if ('error' in auth) return safeError(auth.error, auth.status);
+  const auth = await apiRequireRoles(request, ['admin', 'super_admin'], { adminOverride: false });
+  if (auth.error) return auth.error;
 
   try {
     const body = await request.json().catch(() => null);
@@ -71,7 +59,7 @@ async function _POST(request: Request) {
         value_enc: value,
         description: description ?? null,
         category: category ?? 'general',
-        updated_by: auth.user.id,
+        updated_by: auth.id,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'key' });
 
@@ -80,7 +68,7 @@ async function _POST(request: Request) {
       return safeError('Failed to save secret', 500);
     }
 
-    logger.info('[platform-secrets] upserted', { key, actor: auth.user.id });
+    logger.info('[platform-secrets] upserted', { key, actor: auth.id });
     return NextResponse.json({ success: true, key });
   } catch (err) {
     return safeInternalError(err, 'Failed to save secret');
@@ -90,8 +78,8 @@ async function _POST(request: Request) {
 async function _DELETE(request: Request) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
-  const auth = await requireSuperAdmin();
-  if ('error' in auth) return safeError(auth.error, auth.status);
+  const auth = await apiRequireRoles(request, ['admin', 'super_admin'], { adminOverride: false });
+  if (auth.error) return auth.error;
 
   try {
     const { searchParams } = new URL(request.url);
@@ -102,7 +90,7 @@ async function _DELETE(request: Request) {
     const { error } = await db.from('platform_secrets').delete().eq('key', key);
     if (error) return safeError('Failed to delete secret', 500);
 
-    logger.info('[platform-secrets] deleted', { key, actor: auth.user.id });
+    logger.info('[platform-secrets] deleted', { key, actor: auth.id });
     return NextResponse.json({ success: true });
   } catch (err) {
     return safeInternalError(err, 'Failed to delete secret');
@@ -112,8 +100,8 @@ async function _DELETE(request: Request) {
 async function _PATCH(request: Request) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
-  const auth = await requireSuperAdmin();
-  if ('error' in auth) return safeError(auth.error, auth.status);
+  const auth = await apiRequireRoles(request, ['admin', 'super_admin'], { adminOverride: false });
+  if (auth.error) return auth.error;
 
   try {
     const body = await request.json().catch(() => null);

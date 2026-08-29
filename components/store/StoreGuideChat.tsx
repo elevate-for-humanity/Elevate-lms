@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Volume2, VolumeX, X } from 'lucide-react';
 import { GUIDE_STORAGE_KEYS, GuideChoice, storeGuideFlow } from '@/lib/guide/flows';
@@ -11,7 +11,6 @@ type Props = { onStartTour?: (tourId: string) => void; forceOpen?: boolean };
 
 export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props) {
   const router = useRouter();
-  const pathname = usePathname();
   const naturalVoice = useNaturalVoice();
   const [open, setOpen] = useState(false);
   const [questionId, setQuestionId] = useState('main');
@@ -21,15 +20,8 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
   const speaking = naturalVoice.isPlaying || naturalVoice.isLoading;
 
   useEffect(() => {
-    if (forceOpen) {
-      setOpen(true);
-      return;
-    }
-    if (pathname?.startsWith('/store/demo')) return;
-    if (typeof window === 'undefined' || localStorage.getItem(GUIDE_STORAGE_KEYS.COMPLETED)) return;
-    const timer = window.setTimeout(() => setOpen(true), 500);
-    return () => window.clearTimeout(timer);
-  }, [forceOpen, pathname]);
+    if (forceOpen) setOpen(true);
+  }, [forceOpen]);
 
   const currentQuestion = storeGuideFlow.questions.find((question) => question.id === questionId);
 
@@ -80,7 +72,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
   return (
     <section
       aria-label="PARIS Store Advisor"
-      className="fixed bottom-4 right-4 z-[51] w-[calc(100%-2rem)] max-w-md overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-2xl shadow-orange-950/20 sm:bottom-6 sm:right-6"
+      className="fixed bottom-4 right-4 z-[51] w-[calc(100%-2rem)] max-w-sm overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-2xl shadow-orange-950/20 sm:bottom-6 sm:right-6"
     >
         <header className="flex items-center gap-3 bg-gradient-to-r from-cyan-50 via-white to-orange-50 p-4">
           <Image src="/images/pages/store-guide-1.webp" alt="PARIS Store Advisor" width={52} height={52} className="rounded-full ring-4 ring-white shadow-md" sizes="52px" />
@@ -88,7 +80,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
           <button type="button" onClick={toggle} aria-label={muted ? 'Unmute natural voice' : 'Mute natural voice'}>{muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</button>
           <button type="button" onClick={() => { stop(); setOpen(false); }} aria-label="Close"><X className="h-5 w-5" /></button>
         </header>
-        <div className="max-h-[62vh] overflow-y-auto p-4 sm:p-5">
+        <div className="max-h-[52vh] overflow-y-auto p-4 sm:p-5">
           {!confirmed ? (
             <>
               <h3 className="text-lg font-bold text-slate-950">{currentQuestion?.question}</h3>

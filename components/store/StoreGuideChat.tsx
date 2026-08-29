@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Volume2, VolumeX, X } from 'lucide-react';
 import { GUIDE_STORAGE_KEYS, GuideChoice, storeGuideFlow } from '@/lib/guide/flows';
@@ -11,6 +11,7 @@ type Props = { onStartTour?: (tourId: string) => void; forceOpen?: boolean };
 
 export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const naturalVoice = useNaturalVoice();
   const [open, setOpen] = useState(false);
   const [questionId, setQuestionId] = useState('main');
@@ -24,10 +25,11 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
       setOpen(true);
       return;
     }
+    if (pathname?.startsWith('/store/demo')) return;
     if (typeof window === 'undefined' || localStorage.getItem(GUIDE_STORAGE_KEYS.COMPLETED)) return;
     const timer = window.setTimeout(() => setOpen(true), 500);
     return () => window.clearTimeout(timer);
-  }, [forceOpen]);
+  }, [forceOpen, pathname]);
 
   const currentQuestion = storeGuideFlow.questions.find((question) => question.id === questionId);
 

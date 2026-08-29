@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "elevate-suite": {
+      "type": "http",
+      "url": "https://www.elevateforhumanity.org/mcp"
+    }
+  }
+}

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { BadgeCheck, BookOpenCheck, BriefcaseBusiness, Building2, ClipboardCheck, FileArchive, GraduationCap, ShieldCheck, TimerReset, UsersRound } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Platform Demo | Elevate for Humanity',
+  title: 'Platform Demo,
   description: 'A public, synthetic demonstration of Elevate workforce, apprenticeship, compliance, and training workflows.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/platform/demo' },
 };

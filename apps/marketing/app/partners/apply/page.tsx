@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Building2, GraduationCap, Users, Heart, Phone, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Apply for Partnership | Elevate for Humanity',
+  title: 'Apply for Partnership,
   description: 'Apply to become an Elevate partner. Join employers, training providers, and community organizations building workforce solutions.',
 };
 

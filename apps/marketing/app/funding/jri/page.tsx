@@ -6,7 +6,7 @@ import { ArrowRight, FileCheck2, Heart, ShieldCheck, Users } from 'lucide-react'
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Justice-Involved Participant Funding Guidance | Elevate for Humanity',
+  title: 'Justice-Involved Participant Funding Guidance,
   description:
     'Guidance for justice-involved participants seeking training and supportive-service funding. Eligibility, program approval, covered costs, and authorization must be verified by the responsible source.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/jri' },

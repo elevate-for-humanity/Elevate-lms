@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'NRF Foundation Partnership | Elevate for Humanity',
+  title: 'NRF Foundation Partnership,
   description: 'Partner with the NRF Foundation to provide retail workforce training and certification programs.',
 };
 

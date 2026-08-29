@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Nail Technician Apprenticeship | Elevate for Humanity',
+  title: 'Nail Technician Apprenticeship,
   description: 'Apply for our nail technician apprenticeship program. Learn manicures, pedicures, and nail art while earning.',
 };
 

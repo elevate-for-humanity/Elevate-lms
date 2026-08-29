@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Refer a Student | Elevate for Humanity',
+  title: 'Refer a Student,
   description: 'Refer someone to Elevate workforce training programs and help transform lives through career-focused education.',
 };
 

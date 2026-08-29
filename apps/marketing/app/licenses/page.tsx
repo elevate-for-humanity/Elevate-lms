@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'Platform Licensing | Elevate for Humanity',
+  title: 'Platform Licensing,
   description:
     'Operate your organization on enterprise platforms built and managed by Elevate for Humanity. Managed LMS and restricted source-use licensing.',
   alternates: {

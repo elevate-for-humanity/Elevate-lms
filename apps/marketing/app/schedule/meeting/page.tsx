@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Schedule a Meeting | Elevate for Humanity',
+  title: 'Schedule a Meeting,
   description: 'Book a one-on-one consultation with Elevate for Humanity. Schedule time for program inquiries, employer partnerships, or student support.',
 };
 

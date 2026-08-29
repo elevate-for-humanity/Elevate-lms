@@ -12,7 +12,7 @@ import {
 import { RAPIDS_SPONSOR_LABEL } from '@/lib/workforce-ids';
 
 export const metadata: Metadata = {
-  title: 'Workforce Partnership Packet | Elevate for Humanity',
+  title: 'Workforce Partnership Packet,
   description:
     'Workforce partnership information based on current documented program, apprenticeship, funding, and enrollment records. Funding is never inferred from provider status alone.',
   alternates: {

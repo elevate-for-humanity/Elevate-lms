@@ -47,7 +47,7 @@ export default async function CosmetologyApprenticeshipPage() {
 
 export async function generateMetadata() {
   return {
-    title: 'Cosmetology Apprenticeship Program | Indiana | Elevate for Humanity',
+    title: 'Cosmetology Apprenticeship Program | Indiana,
     description:
       'Indiana cosmetology apprenticeship pathway with 2,000 hours of supervised salon training, related instruction, host-site placement, progress tracking and licensing preparation. Current funding status is verified per program before enrollment.',
     keywords: [

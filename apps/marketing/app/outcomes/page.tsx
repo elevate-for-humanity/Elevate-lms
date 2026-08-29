@@ -5,7 +5,7 @@ import { BarChart3, Users, Briefcase, Award, TrendingUp, AlertCircle, Calendar }
 import { createClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: 'Outcomes & Methodology | Elevate for Humanity',
+  title: 'Outcomes & Methodology,
   description: 'How we measure and report student outcomes, job placement rates, and program effectiveness.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/outcomes' },
 };

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Custom Program Development | Elevate for Humanity',
+  title: 'Custom Program Development,
   description: 'Work with us to create a custom workforce training program tailored to your industry and organizational needs.',
 };
 

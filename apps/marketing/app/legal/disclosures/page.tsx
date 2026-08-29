@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { siteConfig } from '@/lib/config/site';
 
 export const metadata: Metadata = {
-  title: 'Required Disclosures | Elevate for Humanity',
+  title: 'Required Disclosures,
   description: 'Public disclosures for Elevate for Humanity education, workforce, funding, apprenticeship, and credential pathways.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/legal/disclosures' },
 };

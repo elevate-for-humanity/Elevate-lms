@@ -11,7 +11,7 @@ import {
 } from '@/lib/bnpl-config';
 
 export const metadata: Metadata = {
-  title: 'Tuition Payment Options | Elevate for Humanity',
+  title: 'Tuition Payment Options,
   description:
     'Review self-pay tuition options, Elevate installment estimates, and currently configured third-party payment providers. Public funding requires separate eligibility and written authorization.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/pay' },

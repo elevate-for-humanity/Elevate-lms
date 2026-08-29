@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ComplianceBar } from '@/components/ComplianceBar';
 
 export const metadata: Metadata = {
-  title: 'Platform Architecture | Elevate for Humanity',
+  title: 'Platform Architecture,
   description: 'Technical architecture for the Elevate for Humanity workforce platform across Marketing, LMS, Admin, Supabase, Stripe, and Northflank.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/platform/architecture' },
 };

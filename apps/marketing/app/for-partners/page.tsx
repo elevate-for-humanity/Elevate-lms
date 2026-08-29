@@ -6,7 +6,7 @@ import { ArrowRight, CheckCircle, Building2, Users, FileText, BarChart3 } from '
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'For Partners | Elevate for Humanity',
+  title: 'For Partners,
   description: 'Partner with Elevate for Humanity as a training provider, employer, workforce agency, or government entity.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners' },
   robots: { index: false, follow: false },

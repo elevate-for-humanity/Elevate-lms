@@ -14,7 +14,7 @@ if (!REGISTERED_BARBER) throw new Error('REGISTERED_BARBER_STANDARD_MISSING');
 const BARBER = PROGRAMS['barber-apprenticeship'];
 
 export const metadata: Metadata = {
-  title: 'Barber Apprenticeship Competency Verification | Elevate for Humanity',
+  title: 'Barber Apprenticeship Competency Verification,
   description:
     'Review the competency-verification framework used with Elevate’s Barber Registered Apprenticeship and the separate Indiana licensing-hour requirements.',
   alternates: {

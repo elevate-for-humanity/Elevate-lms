@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
-  title: 'Dev Studio | Elevate for Humanity',
+  title: 'Dev Studio,
   description: 'AI-powered development environment for the Elevate platform.',
   alternates: { canonical: '/store/dev-studio' },
 };

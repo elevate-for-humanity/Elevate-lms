@@ -19,7 +19,7 @@ import { WorkforceSystemDiagram } from '@/components/marketing/WorkforceSystemDi
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'For Workforce Agencies | Elevate for Humanity',
+  title: 'For Workforce Agencies,
   description:
     'WorkOne case managers, DWD staff, and workforce boards: participant tracking, workforce documentation, credential records, employer-placement reporting, and registered-apprenticeship workflows in one system.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/for-agencies' },

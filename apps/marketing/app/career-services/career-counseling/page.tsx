@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Career Counseling | Elevate for Humanity',
+  title: 'Career Counseling,
   description: 'Get personalized career counseling to find the right training program and career path for your goals.',
 };
 

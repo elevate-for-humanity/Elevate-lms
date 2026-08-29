@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Enterprise Platform Review | Elevate for Humanity',
+  title: 'Enterprise Platform Review,
   description:
     'Buyer-facing review of Elevate for Humanity platform architecture, security, compliance controls, licensing scope, and validation requirements.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/licenses/enterprise-review' },

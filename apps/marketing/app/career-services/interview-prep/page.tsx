@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Interview Prep | Elevate for Humanity',
+  title: 'Interview Prep,
   description: 'Get ready for your job interview with our free interview preparation resources and coaching.',
 };
 

@@ -9,7 +9,7 @@ import {
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Workforce-Funding Program Records | Elevate for Humanity',
+  title: 'Workforce-Funding Program Records,
   description:
     'Review program-specific workforce-funding records. Funding eligibility and awards remain participant-, program-, agency-, and authorization-specific.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/grant-programs' },

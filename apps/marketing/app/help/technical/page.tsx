@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Monitor, Wifi, Download, Lock, RefreshCw, HelpCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Technical Help | Elevate for Humanity',
+  title: 'Technical Help,
   description: 'Get help with technical issues, browser settings, and platform requirements.',
 };
 

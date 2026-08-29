@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Users, Building2, GraduationCap, Briefcase, Heart, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Join Our Partner Network | Elevate for Humanity',
+  title: 'Join Our Partner Network,
   description: 'Partner with Elevate to transform workforce development in your community. Join employers, training providers, and community organizations.',
 };
 

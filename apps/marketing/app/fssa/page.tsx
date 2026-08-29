@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Users, Briefcase, GraduationCap, Heart, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'FSSA Resources | Elevate for Humanity',
+  title: 'FSSA Resources,
   description: 'Access FSSA-funded workforce development programs and resources in Indiana.',
 };
 

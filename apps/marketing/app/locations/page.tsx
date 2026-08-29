@@ -10,7 +10,7 @@ import heroBanners from '@/content/heroBanners';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Locations | Elevate for Humanity',
+  title: 'Locations,
   description:
     'Visit Elevate for Humanity at our Indianapolis locations. Find directions, hours, and contact information.',
   alternates: {

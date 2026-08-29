@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Attendance Policy | Elevate for Humanity',
+  title: 'Attendance Policy,
   description:
     'Attendance requirements for hybrid programs at Elevate for Humanity. Understand expectations for online and in-person components.',
   alternates: {

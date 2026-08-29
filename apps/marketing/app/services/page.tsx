@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Support Services | Elevate for Humanity',
+  title: 'Support Services,
   description: 'Tax services, career counseling, job placement, and comprehensive support.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/services',

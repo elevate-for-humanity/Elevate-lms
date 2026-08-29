@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Upload, FileSpreadsheet, Users, BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Data Import Tools | Elevate for Humanity',
+  title: 'Data Import Tools,
   description: 'Administrative data-import documentation for authorized platform users.',
   robots: { index: false, follow: false },
 };

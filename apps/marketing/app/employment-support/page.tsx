@@ -6,7 +6,7 @@ import { ArrowRight, Users, FileText, Mic, Handshake, Bus, HeartHandshake } from
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/employment-support' },
-  title: 'Employment & Participant Support | Elevate for Humanity',
+  title: 'Employment & Participant Support,
   description:
     'One-on-one employment support services including job readiness, applications, interview prep, employer matching, and retention support.',
 };

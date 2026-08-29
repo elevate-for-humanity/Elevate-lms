@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Employer Onboarding | Elevate for Humanity',
+  title: 'Employer Onboarding,
   description: 'Welcome to the Elevate employer partnership program. Get started hiring trained talent.',
 };
 

@@ -8,7 +8,7 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'Student Support Services | Elevate for Humanity',
+  title: 'Student Support Services,
   description:
     'Access academic support, financial aid, career services, counseling, and more. We are here to help you succeed throughout your educational journey.',
   keywords: [

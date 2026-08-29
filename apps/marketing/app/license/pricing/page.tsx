@@ -4,7 +4,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Pricing | Elevate for Humanity',
+  title: 'Pricing,
   description: 'Transparent pricing for workforce development licensing, training programs, and enterprise solutions.',
 };
 

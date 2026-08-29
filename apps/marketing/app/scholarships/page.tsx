@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ROUTES } from '@/lib/navigation/routes';
 
 export const metadata: Metadata = {
-  title: 'Scholarships & Funding | Elevate for Humanity',
+  title: 'Scholarships & Funding,
   description: 'Review funding and scholarship options for Elevate for Humanity training programs.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/scholarships' },
 };

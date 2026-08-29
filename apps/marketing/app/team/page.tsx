@@ -8,7 +8,7 @@ import { TEAM } from '@/data/team';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Our Team | Elevate for Humanity',
+  title: 'Our Team,
   description:
     'Meet the educators, workforce specialists, and community advocates behind Elevate for Humanity.',
 };

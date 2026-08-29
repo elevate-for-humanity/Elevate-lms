@@ -35,7 +35,6 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
   { path: ROUTES.apprenticeshipsHowItWorks, label: 'How Apprenticeships Work', category: 'Apprenticeships', changeFrequency: 'monthly', priority: 0.85, lastModified: changed, index: true },
   { path: ROUTES.programsBeauty, label: 'Barber & Beauty Apprenticeships', category: 'Apprenticeships', changeFrequency: 'weekly', priority: 0.95, lastModified: changed, index: true },
   { path: ROUTES.apprenticeshipsHostShop, label: 'Become a Host Shop', category: 'Apprenticeships', changeFrequency: 'weekly', priority: 0.9, lastModified: changed, index: true },
-  { path: '/host-shops', label: 'Host Shops', category: 'Apprenticeships', changeFrequency: 'weekly', priority: 0.9, lastModified: changed, index: true },
   { path: ROUTES.apprenticeshipSponsor, label: 'Apprenticeship Sponsor', category: 'Apprenticeships', changeFrequency: 'monthly', priority: 0.85, lastModified: changed, index: true },
 
   { path: ROUTES.programsHealthcare, label: 'Healthcare Programs', category: 'Programs', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },

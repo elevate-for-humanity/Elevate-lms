@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { CheckCircle, Users, BookOpen, Award, BarChart3, Shield, Clock, Globe } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Platform Features | Elevate for Humanity',
+  title: 'Platform Features,
   description: 'Discover the powerful features of our workforce development platform including LMS, assessments, and career services.',
 };
 

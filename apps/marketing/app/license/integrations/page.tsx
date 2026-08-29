@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Integrations | Elevate for Humanity',
+  title: 'Integrations,
   description: 'Connect Elevate with your existing tools including Stripe, HRIS systems, job boards, and more.',
 };
 

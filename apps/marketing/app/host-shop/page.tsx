@@ -1,7 +1,7 @@
 import { permanentRedirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Host Site Partnerships | Elevate for Humanity',
+  title: 'Host Site Partnerships,
   robots: { index: false, follow: true },
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/host-shops' },
 };

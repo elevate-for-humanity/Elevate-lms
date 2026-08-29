@@ -1,7 +1,7 @@
 import { permanentRedirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Terms of Service | Elevate for Humanity',
+  title: 'Terms of Service,
   description: 'Legacy Terms of Service URL retained for bookmarks and external references.',
   robots: { index: false, follow: true },
   alternates: { canonical: 'https://www.elevateforhumanity.org/terms-of-service' },

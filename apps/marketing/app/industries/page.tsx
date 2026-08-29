@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Industries We Serve | Elevate for Humanity',
+  title: 'Industries We Serve,
   description: 'Elevate for Humanity serves healthcare, skilled trades, beauty, and business industries with workforce training programs designed for real career outcomes.',
 };
 

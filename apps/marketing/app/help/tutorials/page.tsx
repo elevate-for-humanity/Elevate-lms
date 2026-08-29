@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Play, Clock, BookOpen, Video } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Tutorials | Elevate for Humanity',
+  title: 'Tutorials,
   description: 'Step-by-step video tutorials to help you navigate the Elevate platform.',
 };
 

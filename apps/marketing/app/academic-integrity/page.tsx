@@ -7,7 +7,7 @@ import { Shield, AlertTriangle, BookOpen, FileText, Users, Phone, CheckCircle } 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Academic Integrity Policy | Elevate for Humanity',
+  title: 'Academic Integrity Policy,
   description: 'Academic honesty, plagiarism policy, and code of conduct',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/academic-integrity',

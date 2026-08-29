@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Prepare for Workforce Funding Review | Elevate for Humanity',
+  title: 'Prepare for Workforce Funding Review,
   description:
     'Prepare for a WorkOne or agency funding review. This route does not determine eligibility or issue funding approval.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/check-eligibility' },

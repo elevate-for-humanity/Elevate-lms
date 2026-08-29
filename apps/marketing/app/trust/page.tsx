@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Accessibility, BadgeCheck, Database, FileCheck2, LockKeyhole, Scale, ShieldCheck } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Trust Center | Elevate for Humanity',
+  title: 'Trust Center,
   description: 'Institutional evidence, approvals, security, accessibility, governance, privacy, and procurement resources for Elevate for Humanity.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/trust' },
 };

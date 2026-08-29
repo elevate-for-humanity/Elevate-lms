@@ -4,7 +4,7 @@ import PublicLandingPage from '@/components/marketing/PublicLandingPage';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Community Services | Elevate for Humanity',
+  title: 'Community Services,
   description:
     'Free community services for Indiana residents: VITA tax preparation, financial literacy, consumer education, reentry support, and workforce navigation.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/community-services' },

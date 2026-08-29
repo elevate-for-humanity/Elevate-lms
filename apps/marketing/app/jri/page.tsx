@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { organization } from '@/lib/config/organization';
 
 export const metadata: Metadata = {
-  title: 'Job Ready Indy | Elevate for Humanity',
+  title: 'Job Ready Indy,
   description:
     'Elevate for Humanity is an approved Job Ready Indy provider supporting employability skills, workforce readiness, and connections to eligible career training and funding resources in Indianapolis.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/jri' },

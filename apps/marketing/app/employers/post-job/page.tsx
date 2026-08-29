@@ -4,7 +4,7 @@ import Link from 'next/link';
 const EMPLOYER_PORTAL = 'https://app.elevateforhumanity.org/employer';
 
 export const metadata: Metadata = {
-  title: 'Post a Job | Elevate for Humanity',
+  title: 'Post a Job,
   description: 'Employer entry point for posting jobs, hiring trained candidates, and apprenticeship partnerships.',
 };
 

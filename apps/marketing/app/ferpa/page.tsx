@@ -8,7 +8,7 @@ import { FileText, Shield, Users, ClipboardList, CheckCircle, Clock } from 'luci
 import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const metadata: Metadata = {
-  title: 'FERPA Portal | Elevate for Humanity',
+  title: 'FERPA Portal,
   description: 'Family Educational Rights and Privacy Act compliance portal for authorized personnel.',
 };
 

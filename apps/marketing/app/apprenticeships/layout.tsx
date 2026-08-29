@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Registered Apprenticeship Programs in Indiana | Elevate for Humanity',
+  title: 'Registered Apprenticeship Programs in Indiana,
   description:
     'Explore Indiana apprenticeship pathways in barbering, cosmetology, esthetics, and nail technology with supervised host-site training, related instruction, progress tracking, and licensing preparation.',
   keywords: [

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Esthetician Apprenticeship | Elevate for Humanity',
+  title: 'Esthetician Apprenticeship,
   description: 'Apply for our esthetician apprenticeship program. Learn skin care while earning and get licensed.',
 };
 

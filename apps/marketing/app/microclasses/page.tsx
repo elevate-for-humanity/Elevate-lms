@@ -12,7 +12,7 @@ import {
 import { canonicalRoutes } from '@/lib/routes/canonical-routes';
 
 export const metadata: Metadata = {
-  title: 'Microclasses | Elevate for Humanity',
+  title: 'Microclasses,
   description:
     'Job-ready certifications in hours. CPR, First Aid, ServSafe and more. Free with WIOA or pay as low as $18.',
   alternates: {

@@ -1,7 +1,7 @@
 import { permanentRedirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Apprenticeship Host Sites | Elevate for Humanity',
+  title: 'Apprenticeship Host Sites,
   robots: { index: false, follow: true },
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/host-shops' },
 };

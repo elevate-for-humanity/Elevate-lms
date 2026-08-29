@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/funding/wioa',
   },
-  title: 'WIOA Training Funding | Elevate for Humanity',
+  title: 'WIOA Training Funding,
   description:
     'Understand the WIOA training-funding process in Indiana, how WorkOne determines eligibility, and how to verify whether a specific Elevate program may be funded.',
 };

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Play, Calendar, Users, Video, ArrowRight, Clock } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Webinars | Elevate for Humanity',
+  title: 'Webinars,
   description: 'Join our free webinars to learn about workforce training, career pathways, and funding options.',
 };
 

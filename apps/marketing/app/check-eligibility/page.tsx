@@ -5,7 +5,7 @@ import EligibilityScreener from '@/components/funding/EligibilityScreenerClient'
 import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
 
 export const metadata: Metadata = {
-  title: 'Prepare for Workforce Funding Review | Elevate for Humanity',
+  title: 'Prepare for Workforce Funding Review,
   description:
     'Prepare for a WorkOne or agency funding review. This page does not determine eligibility or issue WIOA, Workforce Ready Grant, JRI, or other funding approval.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/check-eligibility' },

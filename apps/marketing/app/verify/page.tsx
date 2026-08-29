@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ShieldCheck, FileCheck, Download } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Verify Credentials | Elevate for Humanity',
+  title: 'Verify Credentials,
   description: 'Verify credentials and certificates earned through Elevate for Humanity workforce programs.',
 };
 

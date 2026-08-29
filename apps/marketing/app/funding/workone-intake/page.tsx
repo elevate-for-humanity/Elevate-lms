@@ -8,7 +8,7 @@ const WORKONE_ORIENTATION_URL =
   'https://workoneindy.as.me/schedule/e8f310c0/appointment/91381838/calendar/9483996?calendarIds=9483996';
 
 export const metadata: Metadata = {
-  title: 'WorkOne Funding Intake | Elevate for Humanity',
+  title: 'WorkOne Funding Intake,
   description:
     'Complete your Elevate funding intake, schedule your WorkOne orientation, and keep your workforce-funding progress connected to your application.',
   alternates: {

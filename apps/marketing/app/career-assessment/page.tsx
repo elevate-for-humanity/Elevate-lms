@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-  title: 'Career Interest Assessment | Elevate for Humanity',
+  title: 'Career Interest Assessment,
   description:
     'Discover which career training programs match your interests. Take the free O*NET Interest Profiler — powered by the U.S. Department of Labor.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/career-assessment' },

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Shield, FileText, Users, Scale, Accessibility, CheckCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Equal Opportunity | Elevate for Humanity',
+  title: 'Equal Opportunity,
   description: 'Elevate for Humanity is committed to equal opportunity and non-discrimination in all programs and services.',
 };
 

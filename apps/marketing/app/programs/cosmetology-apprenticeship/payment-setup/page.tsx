@@ -2,7 +2,7 @@ import Link from 'next/link';
 import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 
 export const metadata = {
-  title: 'Cosmetology Apprenticeship Payment Options | Elevate for Humanity',
+  title: 'Cosmetology Apprenticeship Payment Options,
   robots: { index: false, follow: false },
 };
 

@@ -5,7 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import LazyVideo from '@/components/ui/LazyVideo';
 
 export const metadata: Metadata = {
-  title: 'OJT & Employer Funding | Elevate for Humanity',
+  title: 'OJT & Employer Funding,
   description:
     'On-the-job training wage reimbursement, WOTC tax credits, and Registered Apprenticeship sponsorship for Indiana employers.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/ojt-and-funding' },

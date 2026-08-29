@@ -8,7 +8,7 @@ import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Standard Student Application | Elevate for Humanity',
+  title: 'Standard Student Application,
   description: 'Complete the standard Elevate student application form.',
   robots: { index: false, follow: true },
 };

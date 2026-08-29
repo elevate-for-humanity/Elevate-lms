@@ -7,7 +7,7 @@ import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-regis
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Tuition & Payment Guidance | Elevate for Humanity',
+  title: 'Tuition & Payment Guidance,
   description:
     'Review Elevate tuition and payment guidance. Current tuition and program-specific funding information are published on each program record.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/tuition' },

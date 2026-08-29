@@ -21,7 +21,7 @@ import {
 } from '@/lib/testing/proctoring-capabilities';
 
 export const metadata: Metadata = {
-  title: 'Testing & Credential Exams | Elevate for Humanity',
+  title: 'Testing & Credential Exams,
   description:
     'Workforce credential exams and proctor-supervised certification testing. Choose an available exam, review the configured retail price, and continue to checkout.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing' },

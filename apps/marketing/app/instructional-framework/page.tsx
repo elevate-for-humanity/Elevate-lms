@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Instructional Delivery Framework | Elevate for Humanity',
+  title: 'Instructional Delivery Framework,
   description:
     'Official instructional architecture for Elevate for Humanity. RTI delivery, OJT structure, provider tiers, competency tracking, and LMS documentation for registered apprenticeship and workforce training programs.',
   alternates: {

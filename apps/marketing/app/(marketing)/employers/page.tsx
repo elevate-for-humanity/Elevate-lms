@@ -12,7 +12,7 @@ import {
 import HeroPicture from '@/components/marketing/HeroPicture';
 
 export const metadata: Metadata = {
-  title: 'For Employers | Workforce Solutions | Elevate for Humanity',
+  title: 'For Employers | Workforce Solutions,
   description:
     'Partner with Elevate for Humanity for candidate referrals, work-based learning, registered apprenticeship support, and documented workforce-training pathways.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/employers' },

@@ -5,7 +5,7 @@ import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-regis
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Indiana Workforce Funding Guidance | Elevate for Humanity',
+  title: 'Indiana Workforce Funding Guidance,
   description:
     'Indiana workforce-funding guidance with program- and participant-specific disclosures. Elevate does not guarantee eligibility, awards, reimbursements, or covered costs.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/state-programs' },

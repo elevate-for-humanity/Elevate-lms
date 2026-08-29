@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
 
   return {
-    title: `${post.title} | Elevate For Humanity Blog`,
+    title: `${post.title} | Elevate for Humanity`,
     description: post.excerpt,
     alternates: {
       canonical: `${PLATFORM_DEFAULTS.siteUrl}/blog/${slug}`,
@@ -163,6 +163,10 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         <div className="mb-8 pb-8 border-b border-slate-200">
           <SocialShare url={postUrl} title={post.title} description={post.excerpt} />
         </div>
+
+        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-8 leading-tight">
+          {post.title}
+        </h1>
 
         <div
           className="prose prose-lg max-w-none prose-headings:text-black prose-p:text-slate-900 prose-a:text-brand-blue-600 prose-strong:text-black"

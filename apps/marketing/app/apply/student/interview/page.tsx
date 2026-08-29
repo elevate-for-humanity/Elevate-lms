@@ -11,7 +11,7 @@ import PaymentPlanCalculator from '@/components/programs/PaymentPlanCalculator';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'PARIS Guided Application | Elevate for Humanity',
+  title: 'PARIS Guided Application,
   description:
     'Complete your Elevate career-training application with PARIS by text or voice, in English or Spanish, while your progress is saved.',
   alternates: {

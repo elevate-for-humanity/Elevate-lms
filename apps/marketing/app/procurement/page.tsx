@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Accessibility, Activity, Boxes, Database, FileLock2, FileText, KeyRound, LifeBuoy, Network, ShieldCheck } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Procurement Center | Elevate for Humanity',
+  title: 'Procurement Center,
   description: 'Buyer-oriented procurement, architecture, security, accessibility, implementation, data ownership, and auditability resources for the Elevate platform.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/procurement' },
 };

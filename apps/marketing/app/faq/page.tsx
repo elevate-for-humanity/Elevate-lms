@@ -4,7 +4,7 @@ import { FAQSearch } from '@/components/faq/FAQSearch';
 import { MessageSquare } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'FAQ | Elevate for Humanity',
+  title: 'FAQ,
   description:
     'Frequently asked questions about Elevate career training, enrollment, funding review, apprenticeships, credentials, and career services.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/faq' },

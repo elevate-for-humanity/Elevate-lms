@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Success Stories - Real People, Real Results | Elevate for Humanity',
+  title: 'Success Stories - Real People, Real Results,
   description: 'Read approved stories from graduates who advanced through Elevate workforce training.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/success-stories' },
   openGraph: {

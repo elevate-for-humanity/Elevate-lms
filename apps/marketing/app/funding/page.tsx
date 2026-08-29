@@ -8,7 +8,7 @@ import {
 } from '@/lib/programs/funding-registry';
 
 export const metadata: Metadata = {
-  title: 'Workforce Funding | Elevate for Humanity',
+  title: 'Workforce Funding,
   description:
     'Review Elevate programs with current program-level workforce-funding evidence. Participant eligibility, allowable costs, available funds, and authorization are determined by the responsible agency.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { publicRouteGroups } from '@/lib/navigation/public-route-registry';
 
 export const metadata: Metadata = {
-  title: 'Sitemap | Elevate for Humanity',
+  title: 'Sitemap,
   description: 'Browse the public programs, funding, apprenticeships, testing, store, employer, and institutional pages on Elevate for Humanity.',
   alternates: { canonical: '/sitemap' },
 };

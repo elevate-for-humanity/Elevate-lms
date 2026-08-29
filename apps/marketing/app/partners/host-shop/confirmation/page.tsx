@@ -3,7 +3,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
-  title: 'Host Site Application Received | Elevate for Humanity',
+  title: 'Host Site Application Received,
   robots: { index: false, follow: false },
 };
 

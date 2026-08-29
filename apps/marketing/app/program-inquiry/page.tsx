@@ -8,7 +8,7 @@ import { normalizeProgramInterest } from '@/lib/intake/normalize-program-interes
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Program Inquiry | Elevate for Humanity',
+  title: 'Program Inquiry,
   description: 'Ask questions about Elevate career training without starting an enrollment application.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/program-inquiry' },
 };

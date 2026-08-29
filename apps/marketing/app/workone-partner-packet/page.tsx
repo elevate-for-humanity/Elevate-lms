@@ -11,7 +11,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'WorkOne Partner Packet | Elevate for Humanity',
+  title: 'WorkOne Partner Packet,
   description:
     'Program-specific workforce referral information for Elevate for Humanity. Public WIOA, ETPL, and Workforce Ready Grant statements are limited to programs in the verified funding registry.',
   alternates: {

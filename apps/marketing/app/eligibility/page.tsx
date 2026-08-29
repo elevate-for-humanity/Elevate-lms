@@ -4,7 +4,7 @@ import { ArrowRight, Building2, DollarSign, FileCheck2, GraduationCap, ShieldChe
 import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
 
 export const metadata: Metadata = {
-  title: 'Funding Eligibility Review | Elevate for Humanity',
+  title: 'Funding Eligibility Review,
   description:
     'Start a workforce-funding eligibility review. Screening does not guarantee WIOA, Workforce Ready Grant, employer, or other third-party funding.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/eligibility' },

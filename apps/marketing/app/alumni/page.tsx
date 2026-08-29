@@ -4,7 +4,7 @@ import PublicLandingPage from '@/components/marketing/PublicLandingPage';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Alumni Network | Elevate for Humanity',
+  title: 'Alumni Network,
   description:
     'Elevate for Humanity alumni network. Career support, continuing education, mentorship, and community for program graduates.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/alumni' },

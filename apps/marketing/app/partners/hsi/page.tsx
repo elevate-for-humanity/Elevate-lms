@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'HSI Partnership | Elevate for Humanity',
+  title: 'HSI Partnership,
   description: 'Partner with Elevate as a Hispanic-Serving Institution to expand workforce development opportunities for Hispanic students.',
 };
 

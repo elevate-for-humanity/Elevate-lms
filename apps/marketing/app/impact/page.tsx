@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Documented Activity | Elevate for Humanity',
+  title: 'Documented Activity,
   description:
     'Operational activity counts from current platform records. This page does not publish unsupported placement, wage, funding, or success-rate claims.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/impact' },

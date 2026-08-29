@@ -5,7 +5,7 @@ import { resolveSlug } from '@/lib/program-registry';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Apply for Career Training | Elevate for Humanity',
+  title: 'Apply for Career Training,
   description:
     'Complete your Elevate career-training application with PARIS by text or voice, in English or Spanish, while your progress is saved.',
   alternates: {

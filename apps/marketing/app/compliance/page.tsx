@@ -6,7 +6,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 
 export const revalidate = 3600;
 export const metadata: Metadata = {
-  title: 'Compliance & Credentials | Elevate for Humanity',
+  title: 'Compliance & Credentials,
   description:
     'Compliance posture, credential disclosure, and program-to-credential mapping for Elevate for Humanity workforce programs.',
   alternates: {

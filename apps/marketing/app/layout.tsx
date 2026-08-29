@@ -52,6 +52,7 @@ export const metadata: Metadata = {
     shortcut: [{ url: '/favicon.png', type: 'image/png', sizes: '192x192' }],
     apple: [{ url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' }],
   },
+  themeColor: '#3b82f6',
   openGraph: {
     type: 'website',
     siteName: 'Elevate for Humanity',

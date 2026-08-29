@@ -4,7 +4,7 @@ import { siteUrls } from '@/lib/utils/site-urls';
 export const dynamic = 'force-dynamic';
 export const metadata = {
   robots: { index: false, follow: false },
-  title: 'Sign In | Elevate for Humanity',
+  title: 'Sign In,
 };
 
 /**

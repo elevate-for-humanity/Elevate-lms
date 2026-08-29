@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/career-training-indiana',
   },
-  title: 'Career Training Indiana | Elevate for Humanity',
+  title: 'Career Training Indiana,
   description:
     'Indiana career training and workforce pathways with WIOA-aligned funding options, apprenticeship tracks, and credential programs.',
 };

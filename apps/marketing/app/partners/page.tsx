@@ -5,6 +5,9 @@ import { Building2, Users, GraduationCap, Handshake, ArrowRight } from 'lucide-r
 export const metadata: Metadata = {
   title: 'Partners',
   description: 'Partner with Elevate for Humanity. Employers, training providers, workforce agencies, and host shops.',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/partners',
+  },
 };
 
 export default function PartnersPage() {

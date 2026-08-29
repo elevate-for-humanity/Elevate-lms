@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { User, Mail, Lock, CreditCard, Bell, Shield, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Account Help | Elevate for Humanity',
+  title: 'Account Help,
   description: 'Help and support for your Elevate account.',
 };
 

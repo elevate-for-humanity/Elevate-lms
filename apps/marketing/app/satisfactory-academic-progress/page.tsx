@@ -6,7 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Satisfactory Academic Progress (SAP) Policy | Elevate for Humanity',
+  title: 'Satisfactory Academic Progress (SAP) Policy,
   description:
     'Academic progress requirements for students at Elevate for Humanity. Understand pace, completion, and standing requirements.',
   alternates: {

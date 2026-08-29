@@ -1,5 +1,6 @@
 'use client';
 import Turnstile from '@/components/Turnstile';
+import ApprenticeshipFundingNotice from '@/components/apply/ApprenticeshipFundingNotice';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -129,10 +130,11 @@ export default function ApprenticeForm({
       phone: '',
       hasHostShop: '',
       hostShopName: '',
-      fundingInterest: initialFunding ?? '',
+      fundingInterest: initialFunding ?? 'self-pay',
     };
   });
   const [smsConsent, setSmsConsent] = useState(false);
+  const [fundingApprovalConfirmed, setFundingApprovalConfirmed] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string>('');
   const [fundingEligibilityStatus, setFundingEligibilityStatus] =
     useState<EligibilityStatus | null>(null);
@@ -154,6 +156,7 @@ export default function ApprenticeForm({
   const handleFundingChange = (value: string) => {
     updateField('fundingInterest', value);
     setFundingEligibilityStatus(null);
+    setFundingApprovalConfirmed(false);
   };
 
   const fundedOptionsReady =
@@ -168,6 +171,12 @@ export default function ApprenticeForm({
   const handlePayNow = async () => {
     if (!formData.email || !formData.firstName || !formData.lastName || !formData.phone) {
       setError('Please fill in all required fields');
+      setErrorSeverity('info');
+      return;
+    }
+
+    if (!isSelfPay && !fundingApprovalConfirmed) {
+      setError('Confirm that your apprenticeship funding was approved or specifically made available to you by Elevate.');
       setErrorSeverity('info');
       return;
     }
@@ -234,6 +243,9 @@ export default function ApprenticeForm({
             : formData.fundingInterest,
           fundingEligibilityStatus: !isSelfPay
             ? (fundingEligibilityStatus ?? undefined)
+            : undefined,
+          apprenticeshipFundingApprovalAcknowledged: !isSelfPay
+            ? fundingApprovalConfirmed
             : undefined,
           source: 'barber-apply-page',
           paymentOption: isSelfPay ? paymentOption : undefined,
@@ -874,17 +886,17 @@ export default function ApprenticeForm({
 
                 {!completingExistingPayment && (
                   <div className="border-t border-slate-200 pt-6 mt-6">
+                    <ApprenticeshipFundingNotice />
                     <label className="block text-sm font-bold text-slate-800 mb-3">
                       How do you plan to pay for training? *
                     </label>
                     <div className="space-y-2">
                       {[
                         { value: 'self-pay', label: 'Self-pay', sub: 'Card, BNPL, or weekly payment plan — pay at checkout' },
-                        { value: 'wioa', label: 'WIOA Funding', sub: 'WorkOne — no tuition if eligible' },
-                        { value: 'wrg', label: 'Workforce Ready Grant / Next Level Jobs', sub: 'Indiana state grant — no tuition if eligible' },
-                        { value: 'fssa', label: 'FSSA IMPACT', sub: 'SNAP/TANF recipients referred by your case worker' },
-                        { value: 'employer', label: 'Employer-sponsored', sub: 'Host shop or employer pays tuition' },
-                        { value: 'unsure', label: 'Not sure', sub: 'Enrollment team will help you find funding' },
+                        { value: 'wioa', label: 'WIOA Funding — prior approval required', sub: 'Select only if approved or instructed by Elevate' },
+                        { value: 'wrg', label: 'Workforce Ready Grant — prior approval required', sub: 'Select only if approved or instructed by Elevate' },
+                        { value: 'fssa', label: 'FSSA IMPACT — prior approval required', sub: 'Select only if approved or instructed by Elevate' },
+                        { value: 'employer', label: 'Employer-sponsored — prior approval required', sub: 'Select only if your employer has approved payment' },
                       ].map((opt) => (
                         <label
                           key={opt.value}
@@ -909,6 +921,12 @@ export default function ApprenticeForm({
                         </label>
                       ))}
                     </div>
+                    {!isSelfPay && (
+                      <label className="mt-4 flex items-start gap-3 rounded-xl border-2 border-red-300 bg-red-50 p-4 text-sm font-bold text-red-950">
+                        <input type="checkbox" checked={fundingApprovalConfirmed} onChange={(event) => setFundingApprovalConfirmed(event.target.checked)} className="mt-1 h-5 w-5" />
+                        <span>I confirm that I already have written approval for this apprenticeship funding or an Elevate enrollment representative specifically told me it is available.</span>
+                      </label>
+                    )}
                     {(formData.fundingInterest === 'wioa' || formData.fundingInterest === 'wrg' || formData.fundingInterest === 'fssa') && (
                       <div className="mt-4">
                         <FundingEligibilityFlow
@@ -918,7 +936,7 @@ export default function ApprenticeForm({
                         />
                       </div>
                     )}
-                    {(formData.fundingInterest === 'employer' || formData.fundingInterest === 'unsure') && (
+                    {formData.fundingInterest === 'employer' && (
                       <div className="mt-4 bg-brand-green-50 border border-brand-green-200 rounded-xl p-4 flex items-start gap-3">
                         <Shield className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
                         <div>
@@ -1195,7 +1213,7 @@ export default function ApprenticeForm({
                         (!completingExistingPayment && !formData.fundingInterest) ||
                         (isSelfPay && !turnstileToken) ||
                         (transferHoursChoice === 'yes' && (!transferHoursDocument || transferHours <= 0)) ||
-                        (!isSelfPay && !completingExistingPayment && !fundedOptionsReady)
+                        (!isSelfPay && !completingExistingPayment && (!fundedOptionsReady || !fundingApprovalConfirmed))
                       }
                       className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
                     >

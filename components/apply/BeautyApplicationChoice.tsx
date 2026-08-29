@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { CreditCard, MessageCircleQuestion } from 'lucide-react';
+import ApprenticeshipFundingNotice from './ApprenticeshipFundingNotice';
 
 export default function BeautyApplicationChoice({
   programSlug,
@@ -16,6 +17,7 @@ export default function BeautyApplicationChoice({
         <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700">
           An inquiry is free and does not enroll you. The enrollment application requires verified payment before it can be submitted.
         </p>
+        <div className="mt-6"><ApprenticeshipFundingNotice /></div>
         <div className="mt-9 grid gap-6 md:grid-cols-2">
           <article className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
             <MessageCircleQuestion className="h-9 w-9 text-brand-blue-700" />

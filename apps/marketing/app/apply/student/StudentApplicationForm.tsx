@@ -7,6 +7,7 @@ import {
   TRANSFER_HOURS_EVIDENCE_ACCEPT,
   uploadTransferHoursEvidence,
 } from '@/lib/applications/upload-transfer-hours-evidence';
+import ApprenticeshipFundingNotice from '@/components/apply/ApprenticeshipFundingNotice';
 
 const WORKONE_INTAKE_URL = 'https://WorkOneIndy.as.me/IntakeApptwithCN';
 
@@ -66,6 +67,7 @@ type StudentForm = {
 type DraftData = {
   form: StudentForm;
   workOneAcknowledged: boolean;
+  apprenticeshipFundingConfirmed?: boolean;
 };
 
 const PROGRAMS = [
@@ -137,7 +139,7 @@ function createEmptyForm(initialProgram: string): StudentForm {
     hasHostShop: '',
     hostShopName: '',
     transferHours: '',
-    fundingSource: '',
+    fundingSource: initialProgram.includes('apprenticeship') ? 'self_pay' : '',
     fundingEligibilityStatus: '',
     hasWorkOneReferral: '',
     workoneCenter: '',
@@ -170,6 +172,7 @@ export default function StudentApplicationForm({
   const [step, setStep] = useState(1);
   const [showResume, setShowResume] = useState(false);
   const [workOneAcknowledged, setWorkOneAcknowledged] = useState(false);
+  const [apprenticeshipFundingConfirmed, setApprenticeshipFundingConfirmed] = useState(false);
   const [consentAcknowledged, setConsentAcknowledged] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<SubmissionResult | null>(null);
@@ -184,17 +187,26 @@ export default function StudentApplicationForm({
 
   const requiresWorkOne = form.fundingSource === 'wioa' || form.fundingSource === 'wrg';
   const isApprenticeship = form.program.includes('apprenticeship');
+  const apprenticeshipFundingSelected =
+    isApprenticeship && Boolean(form.fundingSource) && form.fundingSource !== 'self_pay';
   const transferHoursClaimed = Math.max(0, Number.parseInt(form.transferHours || '0', 10) || 0);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
     setResult(null);
+    if (name === 'program' && value.includes('apprenticeship')) {
+      setForm((prev) => ({ ...prev, program: value, fundingSource: 'self_pay' }));
+      setWorkOneAcknowledged(false);
+      setApprenticeshipFundingConfirmed(false);
+      return;
+    }
+    setForm((prev) => ({ ...prev, [name]: value }));
     if (name === 'fundingSource' && value !== 'wioa' && value !== 'wrg') {
       setWorkOneAcknowledged(false);
     }
+    if (name === 'fundingSource') setApprenticeshipFundingConfirmed(false);
     if (name === 'program' && !value.includes('apprenticeship')) {
       setTransferHoursDocument(null);
     }
@@ -204,13 +216,14 @@ export default function StudentApplicationForm({
   }
 
   function persist(nextStep = step) {
-    saveDraft({ form, workOneAcknowledged }, nextStep);
+    saveDraft({ form, workOneAcknowledged, apprenticeshipFundingConfirmed }, nextStep);
   }
 
   function resumeDraft() {
     if (!savedData) return;
     setForm(savedData.form);
     setWorkOneAcknowledged(savedData.workOneAcknowledged);
+    setApprenticeshipFundingConfirmed(Boolean(savedData.apprenticeshipFundingConfirmed));
     setTransferHoursDocument(null);
     setStep(Math.min(Math.max(savedStep || 1, 1), 5));
     setShowResume(false);
@@ -236,6 +249,9 @@ export default function StudentApplicationForm({
     }
     if (current === 3) {
       if (!form.fundingSource) return 'Select a funding/payment option or choose Not sure yet.';
+      if (apprenticeshipFundingSelected && !apprenticeshipFundingConfirmed) {
+        return 'Apprenticeship funding may only be selected when you already have written approval or Elevate specifically told you it is available.';
+      }
       if (requiresWorkOne && !workOneAcknowledged) {
         return 'For WIOA or Workforce Ready Grant, confirm that you scheduled or started the WorkOne intake process.';
       }
@@ -344,6 +360,9 @@ export default function StudentApplicationForm({
       applicationCertification: true,
       applicationIntent,
       paymentSessionId: paymentSessionId || undefined,
+      apprenticeshipFundingApprovalAcknowledged: apprenticeshipFundingSelected
+        ? apprenticeshipFundingConfirmed
+        : undefined,
     };
 
     try {
@@ -530,7 +549,9 @@ export default function StudentApplicationForm({
       {step === 3 && (
         <section className="space-y-5">
           <div><h3 className="text-xl font-black text-slate-950">Funding and eligibility</h3><p className="mt-1 text-sm text-slate-700">Funding eligibility is determined by the applicable workforce agency, not by submitting this form.</p></div>
-          <div><label className={labelClass}>How do you plan to pay? *</label><select name="fundingSource" required value={form.fundingSource} onChange={handleChange} className={fieldClass}><option value="">Select an option</option><option value="wioa">WIOA / WorkOne funding</option><option value="wrg">Workforce Ready Grant</option><option value="jri">Job Ready Indy / Reentry funding</option><option value="employer_sponsored">Employer sponsored</option><option value="self_pay">Self-pay / Payment plan</option><option value="not_sure">Not sure yet</option></select></div>
+          {isApprenticeship ? <ApprenticeshipFundingNotice /> : null}
+          <div><label className={labelClass}>How do you plan to pay? *</label><select name="fundingSource" required value={form.fundingSource} onChange={handleChange} className={fieldClass}><option value="">Select an option</option><option value="self_pay">Self-pay / Payment plan</option><option value="wioa">WIOA / WorkOne funding{isApprenticeship ? ' — prior approval required' : ''}</option><option value="wrg">Workforce Ready Grant{isApprenticeship ? ' — prior approval required' : ''}</option><option value="jri">Job Ready Indy / Reentry funding{isApprenticeship ? ' — prior approval required' : ''}</option><option value="employer_sponsored">Employer sponsored{isApprenticeship ? ' — prior approval required' : ''}</option>{!isApprenticeship ? <option value="not_sure">Not sure yet</option> : null}</select></div>
+          {apprenticeshipFundingSelected ? <label className="flex items-start gap-3 rounded-xl border-2 border-red-300 bg-red-50 p-4 text-sm font-bold text-red-950"><input type="checkbox" checked={apprenticeshipFundingConfirmed} onChange={(event) => setApprenticeshipFundingConfirmed(event.target.checked)} className="mt-1 h-5 w-5" /><span>I confirm that I already have written approval for this apprenticeship funding or an Elevate enrollment representative specifically told me it is available for my application.</span></label> : null}
           {requiresWorkOne && (
             <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-5 text-amber-950">
               <h4 className="font-black">WorkOne intake required for this funding path</h4>

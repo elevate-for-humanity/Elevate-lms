@@ -173,6 +173,28 @@ async function _POST(req: Request) {
       null;
     body.zip = body.zip || body.zipCode || body.postalCode || '';
 
+    const normalizedProgram = String(body.program || '').trim().toLowerCase();
+    const normalizedFunding = String(body.fundingType || '').trim().toLowerCase();
+    const isApprenticeshipApplication = normalizedProgram.includes('apprenticeship');
+    const isNonSelfPayApprenticeship =
+      isApprenticeshipApplication &&
+      normalizedFunding !== '' &&
+      !normalizedFunding.startsWith('self_pay') &&
+      !normalizedFunding.startsWith('self-pay');
+
+    if (
+      isNonSelfPayApprenticeship &&
+      body.apprenticeshipFundingApprovalAcknowledged !== true
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'Apprenticeship funding is not currently available. Choose self-pay unless you already have written approval or Elevate specifically told you funding is available.',
+        },
+        { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
     const rawModalityPreference = body.modalityPreference ?? body.modality_preference;
     const modalityPreference = normalizeApplicationModalityPreference(rawModalityPreference);
     if (

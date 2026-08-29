@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Volume2, VolumeX, X } from 'lucide-react';
@@ -64,7 +63,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
   if (!open) {
     return (
       <button type="button" onClick={() => setOpen(true)} className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-rose-600 to-orange-500 px-5 py-3 font-bold text-white shadow-xl shadow-orange-900/20 transition hover:-translate-y-0.5 hover:shadow-2xl">
-        <Image src="/images/brand/logo-icon.svg" alt="PARIS by Elevate" width={24} height={24} className="rounded-full" sizes="(max-width: 768px) 100vw, 50vw" /> Ask PARIS
+        <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-black text-rose-700 shadow-inner" aria-hidden="true">P<span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></span><span><span className="block text-left text-[10px] font-black uppercase tracking-widest text-white/80">Store guide</span>Ask PARIS</span>
       </button>
     );
   }
@@ -75,8 +74,8 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
       className="fixed bottom-4 right-4 z-[51] w-[calc(100%-2rem)] max-w-sm overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-2xl shadow-orange-950/20 sm:bottom-6 sm:right-6"
     >
         <header className="flex items-center gap-3 bg-gradient-to-r from-cyan-50 via-white to-orange-50 p-4">
-          <Image src="/images/brand/logo-icon.svg" alt="PARIS Store Advisor" width={52} height={52} className="rounded-full ring-4 ring-white shadow-md" sizes="52px" />
-          <div className="flex-1"><p className="text-xs font-black uppercase tracking-[0.16em] text-rose-700">Your personal Store advisor</p><h2 className="text-lg font-black text-slate-950">PARIS</h2><p className="text-sm font-semibold text-slate-700">{speaking ? 'Explaining your best option…' : 'Tell me what you need. I’ll recommend the right product, demo, and plan.'}</p></div>
+          <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rose-600 to-orange-400 text-xl font-black text-white ring-4 ring-white shadow-lg" aria-label="PARIS avatar">P<span className="absolute -right-0.5 -top-0.5 h-3.5 w-3.5 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></div>
+          <div className="flex-1"><p className="text-xs font-black uppercase tracking-[0.16em] text-rose-700">PARIS · Store Guide</p><h2 className="text-lg font-black text-slate-950">PARIS</h2><p className="text-sm font-semibold text-slate-700">{speaking ? 'Explaining your best option…' : 'Tell me what you need. I’ll recommend the right product, demo, and plan.'}</p></div>
           <button type="button" onClick={toggle} aria-label={muted ? 'Unmute natural voice' : 'Mute natural voice'}>{muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</button>
           <button type="button" onClick={() => { stop(); setOpen(false); }} aria-label="Close"><X className="h-5 w-5" /></button>
         </header>

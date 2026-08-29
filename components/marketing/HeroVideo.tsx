@@ -41,7 +41,7 @@ export interface HeroVideoProps {
   demoStartSeconds?: number;
   demoSlideSeconds?: number;
   heightClassName?: string;
-  overlayMode?: 'default' | 'none';
+  overlayMode?: 'default' | 'soft' | 'none';
   soundButtonVariant?: 'pill' | 'prominent';
   /** Delay mounting remote video sources so the first visual frame can paint without competing network work. */
   deferVideoMs?: number;
@@ -264,6 +264,11 @@ export default function HeroVideo({
           <>
             <div className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/90 via-slate-950/62 to-slate-950/20" aria-hidden="true" />
             <div className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/65 via-transparent to-slate-950/10" aria-hidden="true" />
+          </>
+        ) : overlayMode === 'soft' ? (
+          <>
+            <div className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/58 via-slate-950/24 to-transparent" aria-hidden="true" />
+            <div className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/38 via-transparent to-transparent" aria-hidden="true" />
           </>
         ) : null}
 

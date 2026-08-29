@@ -77,7 +77,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
     { id: 'rti', label: 'RTI', href: p('apprentice', 'rti'), icon: BookOpen },
     { id: 'handbook', label: 'Handbook', href: p('apprentice', 'handbook'), icon: ClipboardList },
     { id: 'state-board', label: 'State Board', href: p('apprentice', 'state-board'), icon: Shield },
-    { id: 'rti', label: 'RTI Courses', href: p('lms', 'courses'), icon: BookOpen },
+    { id: 'rti-courses', label: 'RTI Courses', href: p('lms', 'courses'), icon: BookOpen },
   ] }],
   employer: [{ id: 'operations', items: [
     { id: 'dashboard', label: 'Dashboard', href: p('employer'), icon: LayoutDashboard },

@@ -45,6 +45,23 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const body = await request.json();
   const db = await requireAdminClient();
 
+  if (body.status === 'active') {
+    const [{ count: triggerCount, error: triggerError }, { count: stepCount, error: stepError }] =
+      await Promise.all([
+        db.from('workflow_triggers').select('id', { count: 'exact', head: true }).eq('workflow_id', id),
+        db.from('workflow_steps').select('id', { count: 'exact', head: true }).eq('workflow_id', id),
+      ]);
+    if (triggerError || stepError) {
+      return NextResponse.json({ error: 'Unable to verify workflow configuration' }, { status: 503 });
+    }
+    if ((triggerCount ?? 0) < 1 || (stepCount ?? 0) < 1) {
+      return NextResponse.json(
+        { error: 'A workflow requires at least one trigger and one step before activation.' },
+        { status: 422 },
+      );
+    }
+  }
+
   const allowed = ['name', 'status', 'category', 'metadata'];
   const update: Record<string, unknown> = { updated_at: new Date().toISOString() };
   for (const key of allowed) {

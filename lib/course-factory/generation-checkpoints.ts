@@ -226,7 +226,7 @@ export async function persistLessonGenerationCheckpoint(input: {
     await db
       .from('courses')
       .update({
-        generation_status: 'content_generating',
+        generation_status: 'generating',
         generation_progress: progress,
         updated_at: now,
       })

@@ -166,7 +166,7 @@ export default async function ApprenticeOrientationPage({
             </button>
           </form>
         ) : subject.previewing && !completed ? (
-          <p className="mt-6 rounded-lg bg-amber-50 p-3 text-sm font-bold text-amber-900">Preview mode: Logan must mark orientation complete from her own account.</p>
+          <p className="mt-6 rounded-lg bg-amber-50 p-3 text-sm font-bold text-amber-900">Preview mode: This learner must mark orientation complete from their own account.</p>
         ) : (
           <Link href="/apprentice" className="mt-6 inline-flex rounded-xl bg-slate-950 px-6 py-3 font-black text-white hover:bg-slate-800">Return to apprentice dashboard</Link>
         )}

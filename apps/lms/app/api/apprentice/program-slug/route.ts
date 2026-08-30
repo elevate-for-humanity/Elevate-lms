@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,22 +19,22 @@ export async function GET(_req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   // Try apprentices table first (most direct)
-  const { data: apprentice } = await supabase
+  const { data: apprentice } = await db
     .from('apprentices')
     .select('program_id')
-    .eq('user_id', user.id)
+    .eq('user_id', subject.userId)
     .eq('status', 'active')
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
   if (apprentice?.program_id) {
-    const { data: apprenticeProgram } = await supabase
+    const { data: apprenticeProgram } = await db
       .from('programs')
       .select('slug')
       .eq('id', apprentice.program_id)
@@ -44,10 +46,10 @@ export async function GET(_req: NextRequest) {
   }
 
   // Fallback: program_enrollments
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await db
     .from('program_enrollments')
     .select('program_slug, program_id')
-    .eq('user_id', user.id)
+    .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
     .in('status', ['active', 'enrolled', 'in_progress'])
     .order('created_at', { ascending: false })
     .limit(1)
@@ -55,7 +57,7 @@ export async function GET(_req: NextRequest) {
 
   let slugFromEnrollment: string | null = enrollment?.program_slug ?? null;
   if (!slugFromEnrollment && enrollment?.program_id) {
-    const { data: enrollmentProgram } = await supabase
+    const { data: enrollmentProgram } = await db
       .from('programs')
       .select('slug')
       .eq('id', enrollment.program_id)

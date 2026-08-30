@@ -378,7 +378,7 @@ export default async function StateBoardExamPage() {
               Call {PLATFORM_DEFAULTS.supportPhone}
             </a>
             <a
-              href="/contact"
+              href="/lms/support"
               className="text-sm font-medium text-slate-700 bg-slate-100 border border-slate-200 px-4 py-2 rounded-lg hover:bg-slate-200 transition-colors"
             >
               Email support

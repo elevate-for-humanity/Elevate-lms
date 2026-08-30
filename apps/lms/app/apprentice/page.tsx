@@ -22,7 +22,25 @@ export default async function ApprenticePortalPage() {
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect('/login?redirect=/apprentice');
-  const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
+  const [{ data: subjectProfile }, programSlug] = await Promise.all([
+    db.from('profiles').select('role').eq('id', subject.userId).maybeSingle(),
+    resolveApprenticeProgramSlug(db, subject.userId),
+  ]);
+  if (!programSlug && !subject.previewing && ['admin', 'super_admin'].includes(String(subjectProfile?.role || ''))) {
+    const { data: enrollments } = await db
+      .from('program_enrollments')
+      .select('user_id,student_id,program_slug,status,enrollment_state,created_at')
+      .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
+      .in('program_slug', ['barber-apprenticeship', 'cosmetology-apprenticeship', 'esthetician-apprenticeship', 'nail-technician-apprenticeship', 'culinary-apprenticeship', 'electrical', 'plumbing'])
+      .order('created_at', { ascending: false })
+      .limit(100);
+    const learnerIds = Array.from(new Set((enrollments || []).map((row: any) => row.user_id || row.student_id).filter(Boolean)));
+    const { data: learnerProfiles } = learnerIds.length
+      ? await db.from('profiles').select('id,full_name,email').in('id', learnerIds)
+      : { data: [] };
+    const profileById = new Map((learnerProfiles || []).map((profile: any) => [profile.id, profile]));
+    return <main className="mx-auto max-w-5xl space-y-6 pb-10"><section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">Administrator access</p><h1 className="mt-2 text-3xl font-black text-slate-950">Open an apprentice dashboard</h1><p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">Select a learner to open the complete apprentice portal in audited, read-only preview mode. The learner&apos;s password and account session are not changed.</p></section><section className="grid gap-4 sm:grid-cols-2">{(enrollments || []).map((enrollment: any) => { const learnerId = enrollment.user_id || enrollment.student_id; const learner = profileById.get(learnerId) as any; if (!learner) return null; return <article key={`${learnerId}-${enrollment.program_slug}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><UserRound className="h-5 w-5 text-brand-red-700"/><h2 className="mt-3 text-lg font-black text-slate-950">{learner.full_name || 'Apprentice learner'}</h2><p className="mt-1 text-sm text-slate-600">{learner.email || 'Email not recorded'}</p><p className="mt-2 text-xs font-bold uppercase tracking-wide text-slate-500">{String(enrollment.program_slug).replace(/[-_]/g, ' ')} · {enrollment.enrollment_state || enrollment.status}</p><a href={`/api/admin/preview?user_id=${encodeURIComponent(learnerId)}`} className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white hover:bg-slate-800">Open read-only dashboard</a></article>; })}</section>{!learnerIds.length ? <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 font-bold text-amber-950">No active apprenticeship enrollments were found.</div> : null}</main>;
+  }
   if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');
 
   const runtime = await resolveApprenticeshipRuntimeContext(db, {

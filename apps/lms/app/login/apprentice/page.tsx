@@ -57,7 +57,7 @@ export default async function ApprenticeLoginPage() {
           </Link>
           <p className="text-xs text-slate-600">
             Need help?{' '}
-            <Link href="/contact" className="text-amber-400 hover:underline">Contact support</Link>
+            <a href="https://www.elevateforhumanity.org/contact" className="text-amber-400 hover:underline">Contact support</a>
           </p>
         </div>
       </div>

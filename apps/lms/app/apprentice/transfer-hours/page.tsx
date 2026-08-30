@@ -7,6 +7,8 @@ import {
   CheckCircle, Upload, Shield, Users, Zap
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const metadata: Metadata = {
   title: 'Transfer Hours | Apprentice Portal',
@@ -20,20 +22,19 @@ export default async function TransferHoursPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/apprentice/transfer-hours');
-  }
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user?.id);
+  if (!subject.userId) redirect('/login?redirect=/apprentice/transfer-hours');
 
   // Get apprentice profile
-  const { data: apprentice } = await supabase
+  const { data: apprentice } = await db
     .from('apprentices')
     .select('*, program:program_id(name, allows_transfer)')
-    .eq('user_id', user.id)
+    .eq('user_id', subject.userId)
     .maybeSingle();
 
   // Get transfer requests
-  const { data: transferRequests } = await supabase
+  const { data: transferRequests } = await db
     .from('hour_transfer_requests')
     .select('*')
     .eq('apprentice_id', apprentice?.id)
@@ -123,8 +124,8 @@ export default async function TransferHoursPage() {
                 <Zap className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">50%</p>
-                <p className="text-sm text-slate-500">Max Transfer</p>
+                <p className="text-lg font-bold text-slate-900">Sponsor review</p>
+                <p className="text-sm text-slate-500">Prior-credit limit</p>
               </div>
             </div>
           </div>
@@ -146,15 +147,15 @@ export default async function TransferHoursPage() {
             </div>
             <p className="text-white/90 mb-6 max-w-xl">
               If you have previous barber or cosmetology experience from employment or training, 
-              you may be eligible to transfer up to 50% of your required hours.
+              you may be eligible for prior credit after official records and the applicable program rules are reviewed.
             </p>
-            <Link
+            {subject.previewing ? <p className="rounded-xl bg-white/15 px-5 py-3 text-sm font-bold">Admin preview is read-only. This learner can start a transfer request from their own account.</p> : <Link
               href="/apprentice/transfer-hours/request"
               className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-xl font-bold hover:bg-white/90 transition shadow-lg"
             >
               Start Transfer Request
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </Link>}
           </div>
         </div>
 
@@ -232,12 +233,12 @@ export default async function TransferHoursPage() {
               </div>
               <h3 className="font-semibold text-slate-900 mb-2">No Transfer Requests Yet</h3>
               <p className="text-slate-500 mb-6">Start your first transfer request to get credit for your experience</p>
-              <Link
+              {!subject.previewing ? <Link
                 href="/apprentice/transfer-hours/request"
                 className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Start Your First Request <ArrowRight className="w-4 h-4" />
-              </Link>
+              </Link> : null}
             </div>
           )}
         </div>
@@ -285,4 +286,3 @@ export default async function TransferHoursPage() {
     </div>
   );
 }
-

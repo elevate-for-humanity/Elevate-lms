@@ -70,7 +70,7 @@ export default async function ApprenticeDocumentsPage() {
           <h2 className="text-xl font-black">Upload or replace a document</h2>
           <p className="mt-1 text-sm text-slate-600">Approved evidence is locked. Missing, pending, or rejected evidence can be uploaded through the secure document endpoint.</p>
           <div className="mt-5"><UploadDocuments programSlug={programSlug} /></div>
-        </section> : <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">Admin preview is read-only. Logan can upload these documents from her own account.</div>}
+        </section> : <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">Admin preview is read-only. This learner can upload these documents from their own account.</div>}
 
         <section className="mt-6 grid gap-4">
           {rows.map(({ requirement, document, status }: any) => {

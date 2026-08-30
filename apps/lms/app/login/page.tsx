@@ -11,6 +11,8 @@ import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
 
 const APPRENTICE_ROLES = new Set([
+  'student',
+  'learner',
   'apprentice',
   'barber_apprentice',
   'cosmetology_apprentice',

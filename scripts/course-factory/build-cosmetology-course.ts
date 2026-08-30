@@ -95,7 +95,9 @@ async function auditPackage(db: AdminDb, courseId: string) {
       db.from('course_modules').select('id,title,domain_key').eq('course_id', courseId),
       db
         .from('course_lessons')
-        .select('id,slug,content,content_json,learning_objectives,script,generation_status')
+        .select(
+          'id,slug,content,content_json,learning_objectives,script,quiz_questions,generation_status',
+        )
         .eq('course_id', courseId),
     ]);
   if (moduleError) fail(`Module audit failed: ${moduleError.message}`);
@@ -117,30 +119,34 @@ async function auditPackage(db: AdminDb, courseId: string) {
     if (!lesson.content_json || typeof lesson.content_json !== 'object') {
       fail(`${lesson.slug} is missing its interactive learning experience`);
     }
+    const isCheckpoint = lesson.slug.includes('checkpoint');
+    const isFinalExam = lesson.slug === 'cosmo-final-exam';
+    const questionCount = Array.isArray(lesson.quiz_questions) ? lesson.quiz_questions.length : 0;
+    if (isCheckpoint && questionCount < 10) {
+      fail(`${lesson.slug} has ${questionCount}/10 required checkpoint questions`);
+    }
+    if (isFinalExam && questionCount !== 25) {
+      fail(`${lesson.slug} has ${questionCount}/25 required final-exam questions`);
+    }
   }
 }
 
-async function updateJob(
-  db: AdminDb,
-  patch: Record<string, unknown>,
-) {
+async function updateJob(db: AdminDb, patch: Record<string, unknown>) {
   for (let attempt = 1; attempt <= 3; attempt += 1) {
-    const { error } = await db
-      .from('course_factory_jobs')
-      .upsert(
-        {
-          job_id: JOB_ID,
-          credential_slug: PROGRAM_SLUG,
-          credential_name: 'Indiana Cosmetology License',
-          metadata: {
-            course_id: COURSE_ID,
-            source: 'production-workflow',
-            github_run_id: process.env.GITHUB_RUN_ID ?? null,
-          },
-          ...patch,
+    const { error } = await db.from('course_factory_jobs').upsert(
+      {
+        job_id: JOB_ID,
+        credential_slug: PROGRAM_SLUG,
+        credential_name: 'Indiana Cosmetology License',
+        metadata: {
+          course_id: COURSE_ID,
+          source: 'production-workflow',
+          github_run_id: process.env.GITHUB_RUN_ID ?? null,
         },
-        { onConflict: 'job_id' },
-      );
+        ...patch,
+      },
+      { onConflict: 'job_id' },
+    );
     if (!error) return;
     console.warn(
       `[Cosmetology Course Builder] job ledger attempt ${attempt}/3 failed: ${error.message}`,
@@ -202,7 +208,9 @@ async function main() {
     checkpoint.moduleCount !== EXPECTED_MODULES ||
     checkpoint.lessonCount + checkpoint.skippedCount !== EXPECTED_LESSONS
   ) {
-    fail(`Deterministic structure checkpoint failed: ${JSON.stringify({ errors: checkpoint.errors, modules: checkpoint.moduleCount, insertedLessons: checkpoint.lessonCount, preservedLessons: checkpoint.skippedCount })}`);
+    fail(
+      `Deterministic structure checkpoint failed: ${JSON.stringify({ errors: checkpoint.errors, modules: checkpoint.moduleCount, insertedLessons: checkpoint.lessonCount, preservedLessons: checkpoint.skippedCount })}`,
+    );
   }
 
   const { error: checkpointStateError } = await db
@@ -348,3 +356,4 @@ main().catch(async (error) => {
   console.error(error);
   process.exit(1);
 });
+

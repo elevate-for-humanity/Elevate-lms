@@ -7,6 +7,11 @@ import { PORTAL_PREVIEW_COOKIE } from '@/lib/admin/portal-preview';
 export const dynamic = 'force-dynamic';
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin']);
+const HOST_SHOP_ROLES = new Set(['partner', 'host_shop', 'host_shop_admin', 'program_holder']);
+
+function previewDestination(role: unknown) {
+  return HOST_SHOP_ROLES.has(String(role || '')) ? '/host-shop/dashboard' : '/apprentice';
+}
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
 
 async function requirePreviewTarget(userId: string) {
@@ -42,7 +47,7 @@ async function startPreview(formData: FormData) {
     maxAge: 60 * 60,
     path: '/',
   });
-  redirect('/apprentice');
+  redirect(previewDestination(target.role));
 }
 
 export default async function AdminPreviewPage({

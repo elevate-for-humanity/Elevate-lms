@@ -1341,8 +1341,10 @@ html {
     line-height: 1.1;
   }
 
-  .flex-col button,
-  .flex-col .btn {
+  /* Stack only direct child actions. A descendant selector forced every nested
+     icon button (including the Studio chat send control) to full width. */
+  .flex-col > button,
+  .flex-col > .btn {
     width: 100%;
   }
 

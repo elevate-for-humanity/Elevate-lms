@@ -108,7 +108,6 @@ async function waitForServiceDeletion() {
 function deploymentPayload(volumeId: string): R {
   const gpu = { enabled: true, configuration: { gpuType: GPU_TYPE, gpuCount: GPU_COUNT, timesliced: false } };
   const command = [
-    '-lc',
     'exec python3 -m vllm.entrypoints.openai.api_server' +
       ' --model "$LLM_MODEL"' +
       ' --served-model-name elevate-local' +
@@ -130,7 +129,7 @@ function deploymentPayload(volumeId: string): R {
       external: { imagePath: VLLM_IMAGE },
       docker: {
         configType: 'customEntrypointCustomCommand',
-        customEntrypoint: '/bin/bash',
+        customEntrypoint: '/bin/bash -lc',
         customCommand: command,
       },
       gpu,

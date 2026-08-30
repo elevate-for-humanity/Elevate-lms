@@ -1,31 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
 
 export async function PATCH(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return safeError('Unauthorized', 401);
-
-  const db = await requireAdminClient();
-  if (!db)
-    return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
-
-  // Verify caller is a partner user
-  const { data: partnerUser } = await db
-    .from('partner_users')
-    .select('partner_id, role')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (!partnerUser) return safeError('Forbidden', 403);
+  let context;
+  try {
+    context = await requireCurrentHostShopPartner();
+  } catch (error) {
+    const code = error instanceof Error ? error.message : '';
+    if (code === 'HOST_SHOP_UNAUTHENTICATED') return safeError('Unauthorized', 401);
+    return safeError('Forbidden', 403);
+  }
+  const { db, partner } = context;
 
   let body: any;
   try {
@@ -45,7 +35,7 @@ export async function PATCH(request: NextRequest) {
     notification_preferences,
   } = body;
 
-  const orgId = partnerUser.partner_id;
+  const orgId = partner.id;
 
   try {
     const { error } = await db

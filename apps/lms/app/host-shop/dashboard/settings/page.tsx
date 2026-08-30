@@ -1,37 +1,26 @@
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
+import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
 import PartnerSettingsForm from './PartnerSettingsForm';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Settings | Partner Portal',
-  description: 'Manage your organization profile and preferences.',
+  title: 'Settings | Host Shop Portal',
+  description: 'Manage the selected Host Shop profile and notification preferences.',
 };
 
 export default async function PartnerSettingsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/partner/settings');
-
-  const { data: partnerUser } = await supabase
-    .from('partner_users')
-    .select('partner_id')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (!partnerUser) redirect('/unauthorized');
-
-  const orgId = partnerUser?.partner_id ?? null;
+  // Resolve the same canonical Host Shop context used by the rest of the
+  // workspace. This preserves owner access through partner_users and lets a
+  // platform administrator inspect the explicitly selected shop without an
+  // unrelated partner membership capturing the request.
+  const { user, db, partner } = await requireCurrentHostShopPartner();
+  const orgId = partner.id;
 
   const { data: org } = orgId
-    ? await supabase
+    ? await db
         .from('partners')
         .select(
           'name, city, state, address, contact_name, contact_email, contact_phone, notification_preferences',
@@ -40,7 +29,7 @@ export default async function PartnerSettingsPage() {
         .maybeSingle()
     : { data: null };
 
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('full_name, email')
     .eq('id', user.id)
@@ -75,13 +64,13 @@ export default async function PartnerSettingsPage() {
       </section>
       <div className="mb-6">
         <Breadcrumbs
-          items={[{ label: 'Partner', href: '/partner/attendance' }, { label: 'Settings' }]}
+          items={[{ label: 'Host Shop', href: '/host-shop/dashboard' }, { label: 'Settings' }]}
         />
       </div>
       <div className="max-w-3xl">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Partner Settings</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Host Shop Settings</h1>
             <p className="text-slate-700">Manage your organization profile and preferences</p>
           </div>
         </div>

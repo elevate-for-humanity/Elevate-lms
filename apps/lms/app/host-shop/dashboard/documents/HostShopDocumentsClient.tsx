@@ -1,12 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useState } from 'react';
 import { CheckCircle2, FileText, Loader2, Upload, XCircle } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-
-const ALLOWED_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png']);
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 type Requirement = {
   document_type: string;
@@ -49,78 +45,12 @@ function statusClass(status: string) {
   return 'bg-slate-100 text-slate-700';
 }
 
-function safeName(value: string) {
-  return value.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-120);
-}
-
 export default function HostShopDocumentsClient({
-  partnerId,
-  programType,
-  partnerState,
   requirements,
 }: Props) {
-  const router = useRouter();
-  const supabase = useMemo(() => createClient(), []);
   const [workingType, setWorkingType] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  async function upload(requirement: Requirement, file: File) {
-    setMessage(null);
-    setError(null);
-
-    if (!ALLOWED_TYPES.has(file.type)) {
-      setError('Upload a PDF, JPG, or PNG file.');
-      return;
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      setError('Files must be 10 MB or smaller.');
-      return;
-    }
-
-    setWorkingType(requirement.document_type);
-    let storagePath: string | null = null;
-
-    try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error('Your session expired. Sign in again.');
-
-      storagePath = `${user.id}/${partnerId}/${Date.now()}-${safeName(file.name)}`;
-      const { error: uploadError } = await supabase.storage
-        .from('partner-documents')
-        .upload(storagePath, file, { contentType: file.type, upsert: false });
-      if (uploadError) throw uploadError;
-
-      const { error: insertError } = await supabase.from('partner_documents').insert({
-        partner_id: partnerId,
-        document_type: requirement.document_type,
-        display_name: requirement.document_name || file.name,
-        file_name: file.name,
-        file_url: storagePath,
-        storage_bucket: 'partner-documents',
-        file_type: file.type,
-        file_size: file.size,
-        program_id: requirement.program_id || programType,
-        state: requirement.state || partnerState,
-        status: 'pending',
-      });
-
-      if (insertError) {
-        await supabase.storage.from('partner-documents').remove([storagePath]);
-        throw insertError;
-      }
-
-      setMessage(`${requirement.document_name || 'Document'} uploaded for review.`);
-      router.refresh();
-    } catch (uploadFailure) {
-      setError(uploadFailure instanceof Error ? uploadFailure.message : 'Document upload failed.');
-    } finally {
-      setWorkingType(null);
-    }
-  }
 
   async function viewDocument(document: PartnerDocument) {
     setMessage(null);
@@ -204,21 +134,13 @@ export default function HostShopDocumentsClient({
                       View
                     </button>
                   )}
-                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-blue-700 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-800">
-                    {working ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  <Link
+                    href="/host-shop/onboarding/documents"
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-blue-700 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-800"
+                  >
+                    <Upload className="h-4 w-4" />
                     {document ? 'Replace' : 'Upload'}
-                    <input
-                      className="sr-only"
-                      type="file"
-                      accept="application/pdf,image/jpeg,image/png"
-                      disabled={working}
-                      onChange={(event) => {
-                        const file = event.target.files?.[0];
-                        event.currentTarget.value = '';
-                        if (file) void upload(requirement, file);
-                      }}
-                    />
-                  </label>
+                  </Link>
                 </div>
               </div>
             </article>

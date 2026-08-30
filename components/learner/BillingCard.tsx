@@ -251,7 +251,12 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
         {/* Update payment method — only if not paid in full and has Stripe */}
         {!billing.fullyPaid && billing.paymentStatus !== 'cancelled' && !readOnly && (
           <div className="space-y-3 pt-2">
-            {!billing.hasSubscription && (
+            {!billing.hasSubscription && !billing.setupFeePaid && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
+                Pay the enrollment deposit first. Weekly automatic-payment authorization becomes available after the deposit is recorded.
+              </div>
+            )}
+            {!billing.hasSubscription && billing.setupFeePaid && (
               <label className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700">
                 <input
                   type="checkbox"
@@ -269,7 +274,7 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
             )}
             <button
               onClick={handleUpdatePayment}
-              disabled={loading || (!billing.hasSubscription && !authorized)}
+              disabled={loading || (!billing.hasSubscription && (!billing.setupFeePaid || !authorized))}
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition"
             >
               <CreditCard className="w-4 h-4" />
@@ -281,9 +286,9 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
             </button>
           </div>
         )}
-        {readOnly && !billing.fullyPaid && !billing.hasSubscription && (
+        {readOnly && !billing.fullyPaid && !billing.hasSubscription && billing.setupFeePaid && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
-            Admin preview is read-only. Logan will see the authorization checkbox and “Authorize &amp; Add Card” button here when she signs in to her own account.
+            Admin preview is read-only. The learner will see the authorization checkbox and “Authorize &amp; Add Card” button after the enrollment deposit is paid.
           </div>
         )}
       </div>

@@ -28,7 +28,7 @@ async function _POST(req: NextRequest) {
   const admin = await requireAdminClient();
   const { data: enrollment } = await admin
     .from('program_enrollments')
-    .select('id,user_id,program_slug,email,full_name,stripe_customer_id,stripe_subscription_id,funding_source,status')
+    .select('id,user_id,program_slug,email,full_name,stripe_customer_id,stripe_subscription_id,funding_source,status,amount_paid_cents,down_payment')
     .eq('user_id', user.id)
     .eq('funding_source', 'self_pay')
     .not('status', 'in', '(withdrawn,completed,cancelled)')
@@ -41,6 +41,14 @@ async function _POST(req: NextRequest) {
   }
   if (enrollment.stripe_subscription_id) {
     return NextResponse.json({ error: 'Automatic payments are already configured. Use Update Payment Method.' }, { status: 409 });
+  }
+
+  const requiredDepositCents = Math.max(0, Math.round(Number(enrollment.down_payment || 0) * 100));
+  const paidCents = Math.max(0, Number(enrollment.amount_paid_cents || 0));
+  if (requiredDepositCents > 0 && paidCents < requiredDepositCents) {
+    return NextResponse.json({
+      error: `The ${(requiredDepositCents / 100).toFixed(2)} enrollment deposit must be paid before weekly automatic payments can be authorized.`,
+    }, { status: 409 });
   }
 
   const stripe = getStripe();

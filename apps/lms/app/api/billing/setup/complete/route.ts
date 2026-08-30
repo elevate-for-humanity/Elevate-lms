@@ -47,11 +47,15 @@ export async function GET(req: NextRequest) {
 
   const admin = await requireAdminClient();
   const [{ data: enrollment }, { data: pricing }] = await Promise.all([
-    admin.from('program_enrollments').select('id,user_id,stripe_subscription_id,amount_paid_cents').eq('id', enrollmentId).eq('user_id', user.id).maybeSingle(),
+    admin.from('program_enrollments').select('id,user_id,stripe_subscription_id,amount_paid_cents,down_payment').eq('id', enrollmentId).eq('user_id', user.id).maybeSingle(),
     admin.from('program_pricing').select('tuition_cents').eq('program_slug', programSlug).eq('active', true).maybeSingle(),
   ]);
   if (!enrollment || enrollment.stripe_subscription_id || !pricing?.tuition_cents) {
     return NextResponse.redirect(`${appUrl}/apprentice/billing?setup=already-configured`);
+  }
+  const requiredDepositCents = Math.max(0, Math.round(Number(enrollment.down_payment || 0) * 100));
+  if (requiredDepositCents > 0 && Number(enrollment.amount_paid_cents || 0) < requiredDepositCents) {
+    return NextResponse.redirect(`${appUrl}/apprentice/billing?setup=deposit-required`);
   }
 
   const tuitionCents = Number(pricing.tuition_cents);

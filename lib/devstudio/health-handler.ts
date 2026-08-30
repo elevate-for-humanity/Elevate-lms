@@ -12,8 +12,10 @@ import {
   getNorthflankServices,
   isNorthflankReady,
 } from '@/lib/northflank/runtime';
-import { hydrateProcessEnv } from '@/lib/secrets';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import {
+  getDecryptedPlatformSecret,
+  hydrateNorthflankEnv,
+} from '@/lib/secrets';
 
 /**
  * Canonical Admin-owned Dev Studio health implementation.
@@ -26,52 +28,32 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
 
-  await hydrateProcessEnv().catch(() => undefined);
+  const requestedKeys = [
+    'GROQ_API_KEY',
+    'GEMINI_API_KEY',
+    'OPENAI_API_KEY',
+    'ANTHROPIC_API_KEY',
+    'GITHUB_TOKEN',
+  ] as const;
+  const selectedSecrets = Object.fromEntries(
+    await Promise.all(
+      requestedKeys.map(async (key) => [
+        key,
+        await getDecryptedPlatformSecret(key).catch(() => undefined),
+      ]),
+    ),
+  ) as Record<(typeof requestedKeys)[number], string | undefined>;
+  await hydrateNorthflankEnv().catch(() => undefined);
 
-  let dbGroq = false;
-  let dbGemini = false;
-  let dbOpenAI = false;
-  let dbAnthropic = false;
-  let dbGitHub = false;
-
-  try {
-    const db = await requireAdminClient();
-    const { data } = await db
-      .from('platform_secrets')
-      .select('key, value_enc')
-      .in('key', [
-        'GROQ_API_KEY',
-        'GEMINI_API_KEY',
-        'OPENAI_API_KEY',
-        'ANTHROPIC_API_KEY',
-        'GITHUB_TOKEN',
-      ]);
-
-    for (const row of data ?? []) {
-      const set = Boolean(row.value_enc && row.value_enc.length > 10);
-      if (row.key === 'GROQ_API_KEY') dbGroq = set;
-      if (row.key === 'GEMINI_API_KEY') dbGemini = set;
-      if (row.key === 'OPENAI_API_KEY') dbOpenAI = set;
-      if (row.key === 'ANTHROPIC_API_KEY') dbAnthropic = set;
-      if (row.key === 'GITHUB_TOKEN') dbGitHub = set;
-    }
-  } catch {
-    dbGroq = false;
-    dbGemini = false;
-    dbOpenAI = false;
-    dbAnthropic = false;
-    dbGitHub = false;
-  }
-
-  const hasGroq = isGroqConfigured() || dbGroq;
-  const hasGemini = isGeminiConfigured() || dbGemini;
-  const hasOpenAI = isOpenAIConfigured() || dbOpenAI;
-  const hasAnthropic = isAnthropicConfigured() || dbAnthropic;
+  const hasGroq = isGroqConfigured() || Boolean(selectedSecrets.GROQ_API_KEY);
+  const hasGemini = isGeminiConfigured() || Boolean(selectedSecrets.GEMINI_API_KEY);
+  const hasOpenAI = isOpenAIConfigured() || Boolean(selectedSecrets.OPENAI_API_KEY);
+  const hasAnthropic = isAnthropicConfigured() || Boolean(selectedSecrets.ANTHROPIC_API_KEY);
   const hasGitHub = Boolean(
     process.env.GITHUB_TOKEN ||
       process.env.GH_TOKEN ||
       process.env.GITHUB_PAT ||
-      dbGitHub,
+      selectedSecrets.GITHUB_TOKEN,
   );
   const aiConfigured = hasGroq || hasGemini || hasOpenAI || hasAnthropic;
   const northflankServices = getNorthflankServices().map((service) => ({

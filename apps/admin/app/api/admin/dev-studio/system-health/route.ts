@@ -12,8 +12,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { requireAdminClient } from '@/lib/supabase/admin';
-import { refreshSecrets } from '@/lib/secrets';
+import {
+  getDecryptedPlatformSecret,
+  hydrateNorthflankEnv,
+} from '@/lib/secrets';
 import { isGroqConfigured } from '@/lib/groq-client';
 import { isGeminiConfigured } from '@/lib/gemini-client';
 
@@ -35,36 +37,21 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
-  // Refresh secrets cache so recently-saved keys are visible
-  await refreshSecrets().catch(() => {});
-
   const mode        = (process.env.DEVSTUDIO_DEVCONTAINER_MODE ?? 'auto').toLowerCase();
   const hasGitHub   = Boolean(process.env.GITHUB_TOKEN);
   const hasOpenAI   = Boolean(process.env.OPENAI_API_KEY);
   const hasAnthropic = Boolean(process.env.ANTHROPIC_API_KEY);
-  let hasGroq       = isGroqConfigured();
-  let hasGemini     = isGeminiConfigured();
-  let dbOpenAI      = false;
-  let dbAnthropic   = false;
-  let dbGitHub      = false;
+  const keys = ['GROQ_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GITHUB_TOKEN'] as const;
+  const selectedSecrets = Object.fromEntries(
+    await Promise.all(keys.map(async (key) => [key, await getDecryptedPlatformSecret(key).catch(() => undefined)])),
+  ) as Record<(typeof keys)[number], string | undefined>;
+  await hydrateNorthflankEnv().catch(() => undefined);
 
-  // Also check platform_secrets table — keys saved via Secrets panel live there
-  // and won't be in process.env until the next deploy.
-  try {
-    const db = await requireAdminClient();
-    const { data } = await db
-      .from('platform_secrets')
-      .select('key, value_enc')
-      .in('key', ['GROQ_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GITHUB_TOKEN']);
-    for (const row of data ?? []) {
-      const set = !!(row.value_enc && row.value_enc.length > 10);
-      if (row.key === 'GROQ_API_KEY')      hasGroq     = hasGroq     || set;
-      if (row.key === 'GEMINI_API_KEY')    hasGemini   = hasGemini   || set;
-      if (row.key === 'OPENAI_API_KEY')    dbOpenAI    = set;
-      if (row.key === 'ANTHROPIC_API_KEY') dbAnthropic = set;
-      if (row.key === 'GITHUB_TOKEN')      dbGitHub    = set;
-    }
-  } catch { /* non-fatal */ }
+  const hasGroq = isGroqConfigured() || Boolean(selectedSecrets.GROQ_API_KEY);
+  const hasGemini = isGeminiConfigured() || Boolean(selectedSecrets.GEMINI_API_KEY);
+  const dbOpenAI = Boolean(selectedSecrets.OPENAI_API_KEY);
+  const dbAnthropic = Boolean(selectedSecrets.ANTHROPIC_API_KEY);
+  const dbGitHub = Boolean(selectedSecrets.GITHUB_TOKEN);
 
   const hasAnyAI = hasGroq || hasGemini || hasOpenAI || dbOpenAI || hasAnthropic || dbAnthropic;
   const githubOk = hasGitHub || dbGitHub;

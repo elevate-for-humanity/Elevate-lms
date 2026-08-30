@@ -67,12 +67,12 @@ async function preflight() {
 
 async function ensureVolume(): Promise<string> {
   const volumes = arrayFrom(await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, '/volumes')), 'volumes');
-  let volume = volumes.find((item) => item.id === MODEL_VOLUME_ID || item.name === 'Elevate LLM Models');
+  let volume = volumes.find((item) => item.id === MODEL_VOLUME_ID);
   if (!volume) {
     volume = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, '/volumes'), {
       method: 'POST',
       body: JSON.stringify({
-        name: 'Elevate LLM Models',
+        name: 'Elevate LLM Models RWX',
         mounts: [{ volumeMountPath: '', containerMountPath: '/models' }],
         spec: { accessMode: 'ReadWriteMany', storageClassName: MODEL_STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
       }),

@@ -213,7 +213,8 @@ async function waitForDeployment(): Promise<R> {
     if (failed.has(deploymentStatus(service) || '')) {
       throw new Error(`LLM service failed: ${status}`);
     }
-    if (buildStatus(service) === 'SUCCESS' && deploymentStatus(service) === 'COMPLETED') return service;
+    const build = buildStatus(service);
+    if ((!build || build === 'SUCCESS') && deploymentStatus(service) === 'COMPLETED') return service;
     await sleep(15_000);
   }
   throw new Error('Timed out waiting for LLM build/deployment');

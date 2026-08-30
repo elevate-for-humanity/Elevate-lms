@@ -329,10 +329,11 @@ async function main() {
   const volumeId = await ensureVolume();
   const workerSecret = crypto.randomBytes(32).toString('hex');
   console.log(`::add-mask::${workerSecret}`);
+  await ensureService(volumeId);
   await upsertSecretGroup(GPU_PROJECT_ID, 'elevate-llm-worker-env', SERVICE_ID, {
     LLM_WORKER_SECRET: workerSecret,
   });
-  await ensureService(volumeId);
+  await restart(GPU_PROJECT_ID, SERVICE_ID);
   const deployed = await waitForDeployment();
   const publicUrl = discoverPublicUrl(deployed) || await waitForPublicUrl();
   await upsertSecretGroup(WEB_PROJECT_ID, 'elevate-llm-client-env', ADMIN_SERVICE_ID, {

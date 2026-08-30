@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
+import { hydrateNorthflankEnv } from '@/lib/secrets';
 import {
   getNorthflankProjectId,
   getNorthflankService,
@@ -33,6 +34,10 @@ export async function GET(request: NextRequest) {
 
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
+
+  // Canonical Northflank credentials are encrypted in platform_secrets. Read
+  // only the two control-plane keys required by this endpoint before probing.
+  await hydrateNorthflankEnv().catch(() => undefined);
 
   const projectId = getNorthflankProjectId();
   if (!projectId || !isNorthflankReady()) {

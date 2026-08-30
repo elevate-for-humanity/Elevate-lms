@@ -2,9 +2,10 @@
  * timedFetch — fetch with hard timeout + circuit breaker for all Supabase clients.
  *
  * Transient Supabase Data API/PostgREST failures must not immediately cascade
- * into Admin/LMS outages. Safe reads get a small bounded retry budget; writes
- * are never replayed automatically. Final transient HTTP failures are thrown so
- * the circuit breaker records them instead of treating a 503 Response as success.
+ * into Admin/LMS outages. Safe reads get a small bounded retry budget and use
+ * the shared read circuit. Writes are never replayed automatically and must not
+ * poison that read circuit: an optional telemetry write must never prevent a
+ * later required canonical read from reaching Supabase.
  */
 import { breakers } from '@/lib/resilience';
 
@@ -68,7 +69,7 @@ export function timedFetch(input: RequestInfo | URL, init?: RequestInit): Promis
   const headers = normalizeHeaders(init?.headers);
   const maxAttempts = isSafeRead(method) ? SAFE_READ_MAX_ATTEMPTS : 1;
 
-  return breakers.supabase.call(async () => {
+  const execute = async () => {
     let lastError: unknown;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -101,5 +102,7 @@ export function timedFetch(input: RequestInfo | URL, init?: RequestInit): Promis
     throw lastError instanceof Error
       ? lastError
       : new Error('Supabase request failed after bounded retries');
-  });
+  };
+
+  return isSafeRead(method) ? breakers.supabase.call(execute) : execute();
 }

@@ -33,17 +33,62 @@ const CONFIG_KEYS = [
 
 type AdminDb = Awaited<ReturnType<typeof requireAdminClient>>;
 
+type DbResult<T> = { data: T | null; error: { message: string } | null };
+
 function fail(message: string): never {
   throw new Error(`[Cosmetology Course Builder] ${message}`);
+}
+
+function isTransientDatabaseError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  return /abort|circuit|fetch|network|timeout|timed out|502|503|504/i.test(message);
+}
+
+async function requiredDbOperation<T>(
+  label: string,
+  operation: () => PromiseLike<DbResult<T>>,
+): Promise<DbResult<T>> {
+  const delays = [2_000, 5_000, 16_000];
+  let last: DbResult<T> = { data: null, error: { message: `${label} did not run` } };
+
+  for (let attempt = 1; attempt <= delays.length + 1; attempt += 1) {
+    try {
+      last = await operation();
+    } catch (error) {
+      last = {
+        data: null,
+        error: { message: error instanceof Error ? error.message : String(error) },
+      };
+    }
+    if (!last.error) return last;
+    if (!isTransientDatabaseError(last.error.message) || attempt > delays.length) return last;
+
+    const delay = delays[attempt - 1];
+    console.warn(
+      `[Cosmetology Course Builder] ${label} transient failure ${attempt}/${delays.length + 1}; retrying in ${delay}ms: ${last.error.message}`,
+    );
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+
+  return last;
 }
 
 async function hydrateProductionProvider(db: AdminDb) {
   const available = new Set<string>();
   for (const key of CONFIG_KEYS) {
-    if (process.env[key]?.trim()) {
-      available.add(key);
-      continue;
-    }
+    if (process.env[key]?.trim()) available.add(key);
+  }
+
+  const configuredElevate =
+    available.has('ELEVATE_LLM_URL') && available.has('ELEVATE_LLM_SECRET');
+  if (configuredElevate) {
+    if (!process.env.AI_PROVIDER?.trim()) process.env.AI_PROVIDER = 'elevate';
+    console.log('[Cosmetology Course Builder] provider=elevate');
+    return;
+  }
+
+  for (const key of CONFIG_KEYS) {
+    if (available.has(key)) continue;
     const { data, error } = await db.rpc('get_platform_secret', { p_key: key });
     if (!error && typeof data === 'string' && data.trim()) {
       process.env[key] = data.trim();
@@ -132,30 +177,25 @@ async function auditPackage(db: AdminDb, courseId: string) {
 }
 
 async function updateJob(db: AdminDb, patch: Record<string, unknown>) {
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
-    const { error } = await db.from('course_factory_jobs').upsert(
-      {
-        job_id: JOB_ID,
-        credential_slug: PROGRAM_SLUG,
-        credential_name: 'Indiana Cosmetology License',
-        metadata: {
-          course_id: COURSE_ID,
-          source: 'production-workflow',
-          github_run_id: process.env.GITHUB_RUN_ID ?? null,
-        },
-        ...patch,
+  const { error } = await db.from('course_factory_jobs').upsert(
+    {
+      job_id: JOB_ID,
+      credential_slug: PROGRAM_SLUG,
+      credential_name: 'Indiana Cosmetology License',
+      metadata: {
+        course_id: COURSE_ID,
+        source: 'production-workflow',
+        github_run_id: process.env.GITHUB_RUN_ID ?? null,
       },
-      { onConflict: 'job_id' },
-    );
-    if (!error) return;
-    console.warn(
-      `[Cosmetology Course Builder] job ledger attempt ${attempt}/3 failed: ${error.message}`,
-    );
-    if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, attempt * 1500));
-  }
-  console.warn(
-    '[Cosmetology Course Builder] job ledger unavailable; continuing because telemetry cannot block canonical lesson generation.',
+      ...patch,
+    },
+    { onConflict: 'job_id' },
   );
+  if (error) {
+    console.warn(
+      `[Cosmetology Course Builder] job ledger unavailable; continuing because telemetry cannot block canonical lesson generation: ${error.message}`,
+    );
+  }
 }
 
 async function main() {
@@ -181,8 +221,12 @@ async function main() {
 
   const [{ data: program, error: programError }, { data: course, error: courseError }] =
     await Promise.all([
-      db.from('programs').select('id,slug').eq('slug', PROGRAM_SLUG).maybeSingle(),
-      db.from('courses').select('id,program_id,slug').eq('id', COURSE_ID).maybeSingle(),
+      requiredDbOperation('canonical program lookup', () =>
+        db.from('programs').select('id,slug').eq('slug', PROGRAM_SLUG).maybeSingle(),
+      ),
+      requiredDbOperation('canonical course lookup', () =>
+        db.from('courses').select('id,program_id,slug').eq('id', COURSE_ID).maybeSingle(),
+      ),
     ]);
   if (programError || !program?.id)
     fail(`Canonical program lookup failed: ${programError?.message ?? 'missing'}`);
@@ -356,4 +400,3 @@ main().catch(async (error) => {
   console.error(error);
   process.exit(1);
 });
-

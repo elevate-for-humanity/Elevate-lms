@@ -858,5 +858,5 @@ export async function DELETE(request: NextRequest) {
     .eq('user_id', auth.id)
     .eq('session_id', sessionId ?? 'default');
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ ok: true });
 }

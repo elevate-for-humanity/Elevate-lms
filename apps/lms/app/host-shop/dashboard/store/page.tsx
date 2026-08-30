@@ -59,7 +59,7 @@ export default async function HostShopStorePage() {
           >
             Open Elevate Store <ExternalLink className="h-4 w-4" />
           </a>
-          <Link href="/contact" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800 hover:bg-slate-50">
+          <Link href="https://www.elevateforhumanity.org/contact" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800 hover:bg-slate-50">
             Request a host-shop service
           </Link>
         </div>

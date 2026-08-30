@@ -123,3 +123,26 @@ export async function refreshSecrets(): Promise<void> {
   hydrated = false;
   await hydrateProcessEnv();
 }
+
+
+/**
+ * Hydrate only Northflank control-plane credentials.
+ * Values are decrypted by the restricted database function and never returned
+ * to a browser response.
+ */
+export async function hydrateNorthflankEnv(): Promise<void> {
+  const client = getBootstrapClient();
+  if (!client) return;
+
+  const keys = ['NORTHFLANK_API_TOKEN', 'NORTHFLANK_PROJECT_ID'] as const;
+  const values = await Promise.all(
+    keys.map(async (key) => {
+      const { data, error } = await client.rpc('get_platform_secret', { p_key: key });
+      return { key, value: error || typeof data !== 'string' ? null : data.trim() };
+    }),
+  );
+
+  for (const { key, value } of values) {
+    if (value) process.env[key] = value;
+  }
+}

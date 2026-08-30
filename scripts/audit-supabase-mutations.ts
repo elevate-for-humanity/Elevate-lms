@@ -25,20 +25,80 @@ if (!supabaseUrl || !serviceKey) {
   process.exit(1);
 }
 
-const response = await fetch(`${supabaseUrl}/rest/v1/`, {
-  headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
-});
-if (!response.ok) {
-  console.error(`❌ Could not load live Supabase schema: HTTP ${response.status}`);
-  process.exit(1);
+type TableSchema = Map<string, Set<string>>;
+
+function loadGeneratedSchema(generatedTypesPath: string): TableSchema {
+  const schema: TableSchema = new Map();
+  if (!fs.existsSync(generatedTypesPath)) return schema;
+
+  const lines = fs.readFileSync(generatedTypesPath, 'utf8').split('\n');
+  let inPublicSchema = false;
+  let inTables = false;
+  let currentTable: string | null = null;
+  let inRow = false;
+
+  for (const line of lines) {
+    if (line === '  public: {') {
+      inPublicSchema = true;
+      continue;
+    }
+    if (!inPublicSchema) continue;
+    if (line === '    Tables: {') {
+      inTables = true;
+      continue;
+    }
+    if (line === '    Views: {') break;
+    if (!inTables) continue;
+
+    const tableMatch = line.match(/^      "?([A-Za-z_][A-Za-z0-9_]*)"?: \{$/);
+    if (tableMatch) {
+      currentTable = tableMatch[1].toLowerCase();
+      schema.set(currentTable, new Set());
+      inRow = false;
+      continue;
+    }
+    if (currentTable && line === '        Row: {') {
+      inRow = true;
+      continue;
+    }
+    if (inRow && line === '        }') {
+      inRow = false;
+      continue;
+    }
+    if (!inRow || !currentTable) continue;
+
+    const columnMatch = line.match(/^          "?([A-Za-z_][A-Za-z0-9_]*)"?\??:/);
+    if (columnMatch) schema.get(currentTable)!.add(columnMatch[1].toLowerCase());
+  }
+  return schema;
 }
-const swagger = await response.json() as any;
-const schema = new Map<string, Set<string>>();
-for (const [tableName, definition] of Object.entries(swagger.definitions ?? {})) {
-  schema.set(
-    tableName.toLowerCase(),
-    new Set(Object.keys((definition as any).properties ?? {}).map((column) => column.toLowerCase())),
-  );
+
+let schema: TableSchema | null = null;
+let schemaSource = 'live Supabase';
+try {
+  const response = await fetch(`${supabaseUrl}/rest/v1/`, {
+    headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const swagger = await response.json() as any;
+  schema = new Map();
+  for (const [tableName, definition] of Object.entries(swagger.definitions ?? {})) {
+    schema.set(
+      tableName.toLowerCase(),
+      new Set(Object.keys((definition as any).properties ?? {}).map((column) => column.toLowerCase())),
+    );
+  }
+} catch (error) {
+  const detail = error instanceof Error ? error.message : String(error);
+  console.warn(`⚠️ Live Supabase schema unavailable (${detail}); using generated database types.`);
+  schema = loadGeneratedSchema(path.join(root, 'types', 'database.generated.ts'));
+  schemaSource = 'generated database types';
+}
+
+if (!schema || !schema.size) {
+  console.error('❌ No live or generated Supabase schema is available for mutation audit.');
+  process.exit(1);
 }
 
 function skipQuoted(source: string, index: number): number {
@@ -227,7 +287,7 @@ for (const file of files) {
   }
 }
 
-console.log(`Checked ${literalMutations} literal Supabase mutation payload(s) against ${schema.size} live tables.`);
+console.log(`Checked ${literalMutations} literal Supabase mutation payload(s) against ${schema.size} tables from ${schemaSource}.`);
 if (failures.length) {
   for (const failure of failures) {
     console.error(`❌ ${failure.file}:${failure.line} ${failure.operation} ${failure.table} — unknown columns: ${failure.unknown.join(', ')}`);

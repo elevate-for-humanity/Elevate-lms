@@ -51,6 +51,19 @@ export function lessonGenerationMaxTokens(): number {
   return Math.min(6500, Math.max(3500, configured));
 }
 
+/**
+ * Bound full-provider retries so malformed output cannot consume an open-ended
+ * GPU or API budget. Contract normalization runs locally before a retry.
+ */
+export function lessonGenerationMaxAttempts(): number {
+  const configured = Number.parseInt(
+    process.env.COURSE_FACTORY_LESSON_MAX_ATTEMPTS ?? '',
+    10,
+  );
+  if (!Number.isFinite(configured)) return 2;
+  return Math.min(3, Math.max(1, configured));
+}
+
 function normalizeLessonContract(raw: string): string {
   try {
     const parsed = JSON.parse(raw) as Record<string, any>;
@@ -299,7 +312,8 @@ The content must be original, job-ready, factually grounded, and aligned to the 
 `.trim();
 
   let lastError: unknown;
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
+  const maxAttempts = lessonGenerationMaxAttempts();
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
       const response = await aiChat({
         messages: [

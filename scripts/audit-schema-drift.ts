@@ -350,6 +350,35 @@ interface DriftResult {
   tableKnown: boolean;
 }
 
+type DriftSignatureParts = {
+  file: string;
+  table: string;
+  detail: string;
+};
+
+function parseDriftSignature(signature: string): DriftSignatureParts | null {
+  const parts = signature.split('|');
+  if (parts.length !== 3 || parts.some((part) => !part)) return null;
+  return { file: parts[0], table: parts[1], detail: parts[2] };
+}
+
+function isCoveredByBaseline(signature: string, baselineEntries: string[]): boolean {
+  const current = parseDriftSignature(signature);
+  if (!current) return baselineEntries.includes(signature);
+
+  return baselineEntries.some((entry) => {
+    const baseline = parseDriftSignature(entry);
+    if (!baseline || baseline.file !== current.file || baseline.table !== current.table) {
+      return false;
+    }
+    if (baseline.detail === 'TABLE_NOT_IN_SCHEMA') return true;
+    if (current.detail === 'TABLE_NOT_IN_SCHEMA') return false;
+
+    const baselineColumns = new Set(baseline.detail.split(','));
+    return current.detail.split(',').every((column) => baselineColumns.has(column));
+  });
+}
+
 function auditDrift(calls: SelectCall[], schema: TableSchema): DriftResult[] {
   const drifts: DriftResult[] = [];
   for (const call of calls) {
@@ -444,8 +473,9 @@ async function main() {
       process.exit(1);
     }
     const baselineEntries = Array.isArray(baseline?.entries) ? baseline.entries : [];
-    const baselineSet = new Set(baselineEntries);
-    newDriftSignatures = driftSignatures.filter((signature) => !baselineSet.has(signature));
+    newDriftSignatures = driftSignatures.filter(
+      (signature) => !isCoveredByBaseline(signature, baselineEntries),
+    );
     const resolvedCount = baselineEntries.filter((signature) => !currentSignatureSet.has(signature)).length;
     console.log(`Schema drift regression check: ${newDriftSignatures.length} new, ${resolvedCount} resolved, ${driftSignatures.length} current signatures.`);
   }

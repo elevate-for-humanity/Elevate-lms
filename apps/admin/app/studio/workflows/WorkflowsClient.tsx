@@ -37,6 +37,7 @@ const TYPE_BADGE: Record<string, string> = {
 const STATUS_BADGE: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
   inactive: 'bg-slate-100 text-slate-600',
+  incomplete: 'bg-amber-100 text-amber-800',
   paused: 'bg-yellow-100 text-yellow-800',
   error: 'bg-red-100 text-red-800',
   pending: 'bg-slate-100 text-slate-600',
@@ -108,6 +109,10 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
 
   async function handleToggleStatus(w: UnifiedWorkflow) {
     if (w.type !== 'general') return;
+    if ((w.trigger_count ?? 0) < 1 || (w.step_count ?? 0) < 1) {
+      toast.error('Add at least one trigger and one step before activation.');
+      return;
+    }
     const next = w.status === 'active' ? 'inactive' : 'active';
     await fetch(`/api/admin/workflows/${w.id}`, {
       method: 'PATCH',
@@ -120,6 +125,10 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
 
   async function handleRun(w: UnifiedWorkflow) {
     if (w.type !== 'general') return;
+    if ((w.step_count ?? 0) < 1) {
+      toast.error('This workflow has no executable steps.');
+      return;
+    }
     setRunningId(w.id);
     try {
       const res = await fetch('/api/admin/workflows/run', {
@@ -476,8 +485,8 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
                     {w.type === 'general' && (
                       <button
                         onClick={() => handleRun(w)}
-                        disabled={runningId === w.id}
-                        title="Run"
+                        disabled={runningId === w.id || (w.step_count ?? 0) < 1}
+                        title={(w.step_count ?? 0) < 1 ? 'Add a step before running' : 'Run'}
                         className={`p-1.5 rounded-lg border transition-colors disabled:opacity-50 ${
                           embedded ? 'border-[#333] text-slate-500 hover:text-white' : 'border-blue-200 text-blue-600 hover:bg-blue-50'
                         }`}

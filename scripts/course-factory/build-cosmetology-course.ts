@@ -1,6 +1,7 @@
 import { courseFactory } from '../../lib/course-factory';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { queueCourseLessonVideos } from '../../lib/course-factory/media-service';
+import { publishCourse } from '../../lib/course-factory/publisher';
 import { registerProgramCourse } from '../../lib/course-builder/program-resolver';
 import { requireAdminClient } from '../../lib/supabase/admin';
 
@@ -139,6 +140,44 @@ async function main() {
   if (course.slug !== PROGRAM_SLUG || course.program_id !== program.id) {
     fail('Canonical course identity does not match the cosmetology program');
   }
+
+  // Persist the approved structure before AI enrichment so lesson-level
+  // checkpoints have stable targets and a failed run can resume safely.
+  const checkpoint = await publishCourse({
+    programId: program.id,
+    courseSlug: PROGRAM_SLUG,
+    courseTitle: blueprint.title || blueprint.credentialTitle,
+    blueprint,
+    contentSource: 'blueprint',
+    mode: 'refresh',
+  });
+  if (
+    !checkpoint.success ||
+    checkpoint.courseId !== COURSE_ID ||
+    checkpoint.moduleCount !== EXPECTED_MODULES ||
+    checkpoint.lessonCount !== EXPECTED_LESSONS
+  ) {
+    fail(`Deterministic structure checkpoint failed: ${JSON.stringify(checkpoint.errors)}`);
+  }
+
+  const { error: checkpointStateError } = await db
+    .from('courses')
+    .update({
+      status: 'draft',
+      is_active: false,
+      published_at: null,
+      generation_status: 'content_generating',
+      generation_progress: 15,
+      total_lessons: EXPECTED_LESSONS,
+      review_status: 'draft',
+    })
+    .eq('id', COURSE_ID);
+  if (checkpointStateError) {
+    fail(`Structure checkpoint state update failed: ${checkpointStateError.message}`);
+  }
+  console.log(
+    `[Cosmetology Course Builder] checkpoint ready ${COURSE_ID}: ${EXPECTED_MODULES} modules/${EXPECTED_LESSONS} lessons`,
+  );
 
   const result = await courseFactory(
     {

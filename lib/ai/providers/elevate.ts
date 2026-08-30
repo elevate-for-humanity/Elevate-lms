@@ -1,5 +1,6 @@
 import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '../types';
 import { normalizeStructuredOutput } from './structured-output';
+import { requestsJson } from './structured-output';
 
 const DEFAULT_TIMEOUT_MS = 120_000;
 
@@ -71,6 +72,7 @@ export class ElevateProvider implements AIProvider {
         messages: options.messages,
         temperature: options.temperature ?? 0.5,
         max_tokens: options.maxTokens || 4096,
+        ...(requestsJson(options) ? { response_format: { type: 'json_object' } } : {}),
       }),
       signal: AbortSignal.timeout(requestTimeoutMs()),
     });

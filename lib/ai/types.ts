@@ -270,6 +270,8 @@ export interface ChatCompletionOptions {
   temperature?: number;
   maxTokens?: number;
   provider?: AIProviderName | string;
+  /** Require provider-native JSON output when supported. */
+  jsonMode?: boolean;
 }
 
 export interface ChatCompletionResult {

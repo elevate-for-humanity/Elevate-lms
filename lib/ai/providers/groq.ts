@@ -4,6 +4,7 @@ import type {
   ChatCompletionOptions,
   ChatCompletionResult,
 } from '../types';
+import { normalizeStructuredOutput, requestsJson } from './structured-output';
 
 /**
  * Groq provider — fast fallback inference for Elevate.
@@ -42,11 +43,12 @@ export class GroqProvider implements AIProvider {
       messages: options.messages,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens || 2048,
+      ...(requestsJson(options) ? { response_format: { type: 'json_object' as const } } : {}),
     });
 
     const choice = res.choices[0];
     return {
-      content: choice.message.content || '',
+      content: normalizeStructuredOutput(choice.message.content || '', options),
       model: res.model,
       usage: res.usage
         ? {

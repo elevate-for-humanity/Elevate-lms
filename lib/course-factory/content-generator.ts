@@ -332,6 +332,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
         ],
         temperature: attempt === 1 ? 0.65 : 0.35,
         maxTokens: lessonGenerationMaxTokens(),
+        jsonMode: true,
       });
 
       const parsed = parseStrictAIJson(
@@ -464,6 +465,7 @@ Return ONLY valid JSON.
       ],
       temperature: 0.7,
       maxTokens: 5000,
+      jsonMode: true,
     });
 
     const parsed = parseStrictAIJson(
@@ -528,6 +530,7 @@ Return ONLY valid JSON.
       ],
       temperature: 0.7,
       maxTokens: 8000,
+      jsonMode: true,
     });
 
     const parsed = parseStrictAIJson(
@@ -618,6 +621,7 @@ Return ONLY valid JSON:
       ],
       temperature: 0.6,
       maxTokens: 6000,
+      jsonMode: true,
     });
 
     const parsed = parseStrictAIJson(
@@ -679,6 +683,7 @@ Only map standards that are genuinely applicable to the lesson. Do not fabricate
       ],
       temperature: 0.5,
       maxTokens: 1000,
+      jsonMode: true,
     });
 
     return parseStrictAIJson(response.content, competencyMappingSchema, 'Competency mapping');

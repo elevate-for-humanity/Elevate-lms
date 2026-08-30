@@ -7,6 +7,7 @@ import type {
   ImageGenerationOptions,
   GeneratedImage,
 } from '../types';
+import { normalizeStructuredOutput, requestsJson } from './structured-output';
 
 /**
  * OpenAI provider — GPT models for chat, DALL-E for images.
@@ -39,11 +40,12 @@ export class OpenAIProvider implements AIProvider, AIImageProvider {
       messages: options.messages,
       temperature: options.temperature ?? 0.7,
       max_tokens: options.maxTokens || 2048,
+      ...(requestsJson(options) ? { response_format: { type: 'json_object' as const } } : {}),
     });
 
     const choice = res.choices[0];
     return {
-      content: choice.message.content || '',
+      content: normalizeStructuredOutput(choice.message.content || '', options),
       model: res.model,
       usage: res.usage
         ? {

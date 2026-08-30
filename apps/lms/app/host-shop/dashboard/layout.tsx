@@ -5,7 +5,7 @@ import { getMyPartnerContext, getSessionUser } from '@/lib/partner/access';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { getHostShopOnboardingPaths, resolveHostShopProgram } from '@/lib/partners/host-shop-onboarding';
 import { requireRole } from '@/lib/auth/require-role';
-import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { HOST_SHOP_ROLES, normalizeRole } from '@/lib/rbac/role-matrix';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +19,38 @@ export default async function HostShopDashboardLayout({ children }: { children: 
   // Relationship data alone is not permission to enter the Host Shop portal.
   // Apprentices can legitimately have an active placement at a shop, so enforce
   // the canonical role taxonomy before resolving partner/shop context.
-  await requireRole(HOST_SHOP_ROLES);
+  const auth = await requireRole(HOST_SHOP_ROLES);
+  const db = await requireAdminClient();
+  const { data: actorProfile } = await db
+    .from('profiles')
+    .select('id, role, full_name, first_name, last_name, avatar_url')
+    .eq('id', auth.user.id)
+    .maybeSingle();
+  const actorRole = normalizeRole(actorProfile?.role);
+  const isPlatformAdmin =
+    (actorRole !== null && ['super_admin', 'admin', 'org_admin'].includes(actorRole)) ||
+    auth.effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
+
+  // The dashboard page owns the administrator's audited-shop selection. Do not
+  // force platform administrators through an owner's membership or onboarding
+  // gates before that selection can be made.
+  if (isPlatformAdmin) {
+    return (
+      <PlatformShell
+        user={{
+          id: auth.user.id,
+          email: auth.user.email || '',
+          full_name: actorProfile?.full_name || undefined,
+          first_name: actorProfile?.first_name || undefined,
+          last_name: actorProfile?.last_name || undefined,
+          avatar_url: actorProfile?.avatar_url || undefined,
+        }}
+        role="host_shop"
+      >
+        {children}
+      </PlatformShell>
+    );
+  }
 
   const context = await getMyPartnerContext();
 
@@ -32,7 +63,6 @@ export default async function HostShopDashboardLayout({ children }: { children: 
   const partnerId = context.shops.find((row) => row.shop?.partner_id)?.shop?.partner_id;
   if (!partnerId) redirect('/host-shop/orientation?error=no_partner');
 
-  const db = await requireAdminClient();
   const { data: partner } = await db
     .from('partners')
     .select('id,partner_type,program_type,programs,onboarding_completed,mou_signed,documents_verified,status,approval_status,is_active')

@@ -392,6 +392,25 @@ interface GeneratedAssessment {
   questions: QuizQuestion[];
 }
 
+/**
+ * Some providers occasionally return the fourth answer as index 4 even though
+ * the contract is zero-based. Normalize only that unambiguous boundary case;
+ * every other invalid value still fails strict validation.
+ */
+function normalizeAssessmentAnswerIndexes(raw: string): string {
+  const parsed = JSON.parse(raw) as { questions?: Array<{ options?: unknown[]; correct?: unknown }> };
+  for (const question of parsed.questions ?? []) {
+    if (
+      Array.isArray(question.options) &&
+      question.options.length === 4 &&
+      question.correct === question.options.length
+    ) {
+      question.correct = question.options.length - 1;
+    }
+  }
+  return JSON.stringify(parsed);
+}
+
 export async function generateAssessment(
   input: AssessmentGenerationInput,
 ): Promise<GeneratedAssessment> {
@@ -448,7 +467,7 @@ Return ONLY valid JSON.
     });
 
     const parsed = parseStrictAIJson(
-      response.content,
+      normalizeAssessmentAnswerIndexes(response.content),
       generatedAssessmentSchema,
       'Assessment generation',
     );
@@ -512,7 +531,7 @@ Return ONLY valid JSON.
     });
 
     const parsed = parseStrictAIJson(
-      response.content,
+      normalizeAssessmentAnswerIndexes(response.content),
       generatedAssessmentSchema,
       'Final exam generation',
     );

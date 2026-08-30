@@ -5,6 +5,11 @@ import { PORTAL_PREVIEW_ACTOR_COOKIE, PORTAL_PREVIEW_COOKIE, PORTAL_PREVIEW_SESS
 import { createPortalPreviewHandoff, verifyPortalPreviewHandoff } from '@/lib/admin/portal-preview-handoff';
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin']);
+const HOST_SHOP_ROLES = new Set(['partner', 'host_shop', 'host_shop_admin', 'program_holder']);
+
+function previewDestination(role: unknown) {
+  return HOST_SHOP_ROLES.has(String(role || '')) ? '/host-shop/dashboard' : '/apprentice';
+}
 
 export async function GET(request: NextRequest) {
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
@@ -22,7 +27,7 @@ export async function GET(request: NextRequest) {
     if (!actor?.id || !ADMIN_ROLES.has(String(actor.role || '')) || !target?.id || ADMIN_ROLES.has(String(target.role || ''))) {
       return NextResponse.json({ error: 'Invalid preview handoff' }, { status: 403 });
     }
-    const response = NextResponse.redirect(`${appUrl}/apprentice`);
+    const response = NextResponse.redirect(`${appUrl}${previewDestination(target.role)}`);
     response.cookies.set(PORTAL_PREVIEW_COOKIE, target.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -78,7 +83,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Eligible preview user not found' }, { status: 404 });
   }
 
-  const response = NextResponse.redirect(`${appUrl}/apprentice`);
+  const response = NextResponse.redirect(`${appUrl}${previewDestination(target.role)}`);
   response.cookies.set(PORTAL_PREVIEW_COOKIE, target.id, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

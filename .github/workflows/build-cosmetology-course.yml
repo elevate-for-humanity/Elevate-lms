@@ -1,4 +1,5 @@
 name: Build Cosmetology Course
+# Dedicated production runner; subsequent main pushes are resumable through lesson checkpoints.
 
 on:
   workflow_dispatch:

@@ -8,7 +8,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { aiChat } from '@/lib/ai/ai-service';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { getDecryptedPlatformSecret } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ELLIE_ACTION_REGISTRY, type EllieActionType } from '@/lib/ellie/actions';
 
@@ -689,12 +689,28 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  // Load AI keys from platform_secrets / app_secrets into process.env.
-  // Must run before any provider resolution so DB-stored keys are visible.
-  await hydrateProcessEnv();
-
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
+
+  // Resolve only the provider credentials this endpoint is allowed to use.
+  // Never hydrate the complete encrypted platform_secrets table into env.
+  const providerKeys = [
+    'ELEVATE_LLM_SECRET',
+    'GROQ_API_KEY',
+    'GEMINI_API_KEY',
+    'GOOGLE_CLOUD_API_KEY',
+    'ANTHROPIC_API_KEY',
+    'OPENAI_API_KEY',
+    'OPENROUTER_API_KEY',
+    'DEEPSEEK_API_KEY',
+    'CLOUDFLARE_API_TOKEN',
+    'CLOUDFLARE_ACCOUNT_ID',
+    'AZURE_OPENAI_API_KEY',
+  ] as const;
+  await Promise.all(providerKeys.map(async (key) => {
+    const value = await getDecryptedPlatformSecret(key).catch(() => undefined);
+    if (value) process.env[key] = value;
+  }));
 
   const body = await request.json().catch(() => ({}));
   const userMessage: string = body.message ?? '';
@@ -842,5 +858,3 @@ export async function DELETE(request: NextRequest) {
     .eq('user_id', auth.id)
     .eq('session_id', sessionId ?? 'default');
 
-  return NextResponse.json({ ok: true });
-}

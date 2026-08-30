@@ -66,7 +66,10 @@ export default async function StudentsPage() {
     .order('created_at', { ascending: false })
     .limit(1000);
 
-  const students = (operationalStudents ?? []).slice(0, 50);
+  // The directory previously truncated to the 50 newest profiles, which hid
+  // valid active students such as older HVAC enrollments. The operational set
+  // is already bounded to 1,000 and filtered above, so render the full set.
+  const students = operationalStudents ?? [];
   const totalStudents = operationalStudents?.length ?? 0;
   const operationalStudentIds = (operationalStudents ?? []).map((student: any) => student.id);
 
@@ -169,7 +172,6 @@ export default async function StudentsPage() {
                           `${student.first_name || ''} ${student.last_name || ''}`.trim() ||
                           'Unnamed'}
                       </p>
-                      <p className="text-xs text-slate-400">{student.id.slice(0, 8)}…</p>
                     </div>
                   </div>
                   <div className="col-span-3 space-y-0.5 min-w-0">

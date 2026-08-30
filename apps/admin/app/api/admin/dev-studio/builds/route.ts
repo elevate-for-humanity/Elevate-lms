@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
+import { hydrateNorthflankEnv } from '@/lib/secrets';
 import {
   getNorthflankProjectId,
   getNorthflankServices,
@@ -30,6 +31,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
+
+  await hydrateNorthflankEnv().catch(() => {});
 
   const body = await req.json().catch(() => ({}));
   const db = await requireAdminClient();

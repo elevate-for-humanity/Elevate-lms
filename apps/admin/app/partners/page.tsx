@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
 };
 
 export default async function PartnersPage() {
-  await requireRole(['admin']);
-  const supabase = await createClient();
+  await requireRole(['super_admin', 'admin']);
+  const supabase = await requireAdminClient();
 
   const { count: activePartners } = await supabase
     .from('partners')
@@ -56,7 +56,7 @@ export default async function PartnersPage() {
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h3 className="text-sm font-medium text-black mb-2">Total Items</h3>
+                <h3 className="text-sm font-medium text-black mb-2">Total Partners</h3>
                 <p className="text-3xl font-bold text-brand-blue-600">{totalItems || 0}</p>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -81,7 +81,7 @@ export default async function PartnersPage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="text-2xl font-bold mb-4">Items</h2>
+              <h2 className="text-2xl font-bold mb-4">Partners</h2>
               {items && items.length > 0 ? (
                 <div className="space-y-4">
                   {items.map((item: any) => (
@@ -94,7 +94,7 @@ export default async function PartnersPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-black text-center py-8">No items found</p>
+                <p className="text-black text-center py-8">No partner records found</p>
               )}
             </div>
           </div>

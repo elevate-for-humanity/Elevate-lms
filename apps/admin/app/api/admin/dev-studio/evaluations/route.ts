@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       if (isMissingTable(error)) {
         return jsonOk({
+          ok: true,
           runs: [],
           source: null,
           notice: 'Evaluation storage is not provisioned yet.',
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return jsonOk({ runs, source: 'ai_eval_runs' });
+    return jsonOk({ ok: true, runs, source: 'ai_eval_runs' });
   } catch (error) {
     return safeInternalError(error, 'Failed to load evaluations');
   }

@@ -110,3 +110,14 @@ export function combinedServicePatchPath(projectId: string, serviceId: string): 
 export function combinedServicePath(projectId: string, serviceId: string): string {
   return serviceGetPath(projectId, serviceId);
 }
+
+
+/** Create a deployment-only service from an external or internal image. */
+export function deploymentServiceCreatePath(projectId: string): string {
+  return projectApiPath(projectId, '/services/deployment');
+}
+
+/** PATCH deployment-only service configuration. */
+export function deploymentServicePatchPath(projectId: string, serviceId: string): string {
+  return projectApiPath(projectId, `/services/deployment/${serviceId}`);
+}

@@ -24,7 +24,8 @@ function dollarsToCents(value: unknown): number {
   return Math.round(n(value) * 100);
 }
 function isTestRecord(...values: unknown[]): boolean {
-  return /\b(sample|test|demo|example|placeholder)\b/i.test(values.filter(Boolean).join(' '));
+  const value = values.filter(Boolean).join(' ');
+  return /\b(sample|test|demo|example|placeholder|qa[-_\s]?e2e)\b|@qa\.invalid\b|^[A-Za-z0-9_-]{30,}$/i.test(value);
 }
 function monthKey(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -75,7 +76,13 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     userId ? db.from('profiles').select('full_name,role').eq('id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
     db.from('applications').select('id,first_name,last_name,full_name,email,status,program_interest,program_slug,created_at,submitted_at').order('created_at', { ascending: false }).limit(300),
     db.from('program_enrollments').select('id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at,updated_at,amount_paid_cents,your_revenue_cents,funding_source,access_granted_at,revoked_at').order('created_at', { ascending: false }).limit(1000),
-    db.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
+    db
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', 'student')
+      .like('email', '%@%')
+      .not('email', 'ilike', '%@qa.invalid')
+      .not('full_name', 'ilike', '[QA%'),
     db.from('certificates').select('id', { count: 'exact', head: true }),
     db.from('program_holder_applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     db.from('program_holder_documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),

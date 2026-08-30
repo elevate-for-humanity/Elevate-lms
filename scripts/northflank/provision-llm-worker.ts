@@ -272,16 +272,11 @@ async function upsertSecretGroup(projectId: string, id: string, serviceId: strin
     restrictions: { restricted: true, nfObjects: [{ id: serviceId, type: 'service' }], tagMatchCondition: 'or' },
     secrets: { variables },
   };
-  try {
-    await nfFetch(projectApiPath(projectId, `/secrets/${id}`));
-    await nfFetch(projectApiPath(projectId, `/secrets/${id}`), { method: 'POST', body: JSON.stringify(payload) });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    if (!/404|not found/i.test(message)) throw error;
-    await nfFetch(projectApiPath(projectId, '/secrets'), { method: 'POST', body: JSON.stringify(payload) });
-  }
+  await nfFetch(projectApiPath(projectId, `/secrets/${id}`), {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
 }
-
 async function restart(projectId: string, serviceId: string) {
   await nfFetch(projectApiPath(projectId, `/services/${serviceId}/restart`), { method: 'POST', body: '{}' });
 }

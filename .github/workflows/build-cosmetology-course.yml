@@ -43,7 +43,7 @@ jobs:
     if: >-
       github.event_name != 'issues' ||
       (github.event.issue.number == 928 &&
-       github.event.issue.title == 'RUN BARBER COSMETOLOGY COURSE REGENERATION')
+       github.event.issue.title == 'RUN COSMETOLOGY COURSE PRODUCTION BUILD')
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:

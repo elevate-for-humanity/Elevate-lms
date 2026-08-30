@@ -9,6 +9,7 @@ import { HomeSocialAppCTA } from '@/components/home/HomeSocialAppCTA';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeMobileActions } from '@/components/home/HomeMobileActions';
+import { ScrollNarrator } from '@/components/home/ScrollNarrator';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 import { getApprovedHomeHeroAsset } from '@/lib/media/home-hero-asset';
@@ -82,6 +83,7 @@ export default async function HomePage() {
         <HomeFinalCTA />
         <HomeTrustBar />
         <HomeMobileActions />
+        <ScrollNarrator />
       </main>
     </>
   );

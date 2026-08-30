@@ -12,8 +12,8 @@ const PATHWAYS = [
     title: 'Business & Entrepreneurship',
     description:
       'Learn how to start, organize, market, and grow a business while building practical career and office skills you can use right away.',
-    image: '/images/business/office-admin.webp',
-    imageAlt: 'Business and entrepreneurship training with adults working together',
+    image: '/images/pages/business-meeting.webp',
+    imageAlt: 'Business and entrepreneurship team collaborating in a modern office',
     ctaHref: '/programs/business',
     badge: 'Business',
     cta: 'Explore Business Training',
@@ -23,8 +23,8 @@ const PATHWAYS = [
     title: 'HVAC Technician Training',
     description:
       'Train for hands-on work with heating and cooling systems, safety, diagnostics, installation, maintenance, and service calls.',
-    image: '/images/pages/hvac-technician.webp',
-    imageAlt: 'HVAC technician working with heating and cooling equipment',
+    image: '/images/hvac-hero.webp',
+    imageAlt: 'HVAC technician inspecting a residential air-conditioning system',
     ctaHref: '/programs/hvac-technician',
     badge: 'Skilled Trades',
     cta: 'Explore HVAC Training',
@@ -34,8 +34,8 @@ const PATHWAYS = [
     title: 'CDL Training',
     description:
       'Prepare for commercial driving with permit preparation, safety instruction, and coordinated behind-the-wheel training.',
-    image: '/images/pages/cdl-hero.webp',
-    imageAlt: 'Commercial truck driver training',
+    image: '/images/pages/cdl-cab-interior.webp',
+    imageAlt: 'Commercial driver training inside a truck cab',
     ctaHref: '/programs/cdl-training',
     badge: 'Transportation',
     cta: 'Explore CDL Training',

@@ -11,7 +11,8 @@ export const metadata = {
 };
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const ALLOWED_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp']);
+// Keep this list aligned with the private `partner-documents` Storage bucket.
+const ALLOWED_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png']);
 
 async function loadContext() {
   try {
@@ -157,7 +158,7 @@ export default async function HostShopDocumentsPage({ searchParams }: { searchPa
                   <form action={uploadHostShopDocument} className="mt-5 grid gap-4 border-t border-slate-200 pt-5 sm:grid-cols-[1fr_auto] sm:items-end">
                     <input type="hidden" name="documentType" value={requirement.document_type} />
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <label className="font-bold">File *<input type="file" name="file" required accept=".pdf,image/jpeg,image/png,image/webp" className="mt-2 block w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:font-bold file:text-white" /></label>
+                      <label className="font-bold">File *<input type="file" name="file" required accept=".pdf,image/jpeg,image/png" className="mt-2 block w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:font-bold file:text-white" /></label>
                       {requirement.requires_expiration ? <label className="font-bold">Expiration date *<input type="date" name="expirationDate" required className="mt-2 w-full rounded-xl border border-slate-400 px-4 py-3 font-medium" /></label> : null}
                     </div>
                     <button type="submit" className="min-h-11 rounded-xl bg-blue-700 px-5 py-3 font-black text-white hover:bg-blue-800">Upload</button>

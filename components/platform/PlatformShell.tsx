@@ -19,7 +19,6 @@ import type {
 } from '@/lib/navigation/navigation-config';
 import {
   getNavigationForRole,
-  generateBreadcrumbs,
   ROLE_DISPLAY_NAMES,
 } from '@/lib/navigation/navigation-config';
 
@@ -51,7 +50,6 @@ function isActiveHref(href: string, pathname: string): boolean {
 export function PlatformShell({
   user,
   role,
-  breadcrumbs,
   actions = [],
   children,
 }: PlatformShellProps) {
@@ -62,7 +60,6 @@ export function PlatformShell({
   const drawerRef = useRef<HTMLElement>(null);
 
   const sections = getNavigationForRole(role);
-  const autoBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -232,29 +229,6 @@ export function PlatformShell({
             </div>
           </div>
         </div>
-
-        {autoBreadcrumbs.length > 0 && (
-          <div className="max-w-full border-t border-slate-100 bg-slate-50 px-3 py-2 sm:px-4">
-            <nav
-              className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto whitespace-nowrap text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              aria-label="Breadcrumb"
-            >
-              <Link href="/" className="shrink-0 font-medium text-slate-600 hover:text-slate-900">Home</Link>
-              {autoBreadcrumbs.map((crumb, index) => (
-                <React.Fragment key={`${crumb.label}-${index}`}>
-                  <span className="shrink-0 text-slate-300">/</span>
-                  {crumb.href && index < autoBreadcrumbs.length - 1 ? (
-                    <Link href={crumb.href} className="shrink-0 font-medium text-slate-600 hover:text-slate-900">
-                      {crumb.label}
-                    </Link>
-                  ) : (
-                    <span className="shrink-0 font-bold text-slate-950">{crumb.label}</span>
-                  )}
-                </React.Fragment>
-              ))}
-            </nav>
-          </div>
-        )}
       </header>
 
       <div className="flex min-w-0">

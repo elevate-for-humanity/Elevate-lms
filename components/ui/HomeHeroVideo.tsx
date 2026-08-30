@@ -55,9 +55,9 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     },
     {
       type: 'image',
-      src: '/images/partners/salon-saloon/team-sign.webp',
-      alt: 'Salon Saloon team at an Elevate participating Host Salon',
-      label: 'Real people. Real workplace training.',
+      src: '/images/hero/hero-healthcare.jpg',
+      alt: 'Healthcare professional welcoming students to a hands-on career pathway',
+      label: 'Prepare for an in-demand healthcare career',
     },
     {
       type: 'image',
@@ -67,9 +67,9 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     },
     {
       type: 'image',
-      src: '/images/partners/salon-saloon/team-studio.webp',
-      alt: 'Salon Saloon team in the salon studio',
-      label: 'Build skills in a working salon',
+      src: '/images/pages/apprenticeships-page-2.webp',
+      alt: 'Apprentices developing practical skills with experienced professionals',
+      label: 'Build skills through hands-on apprenticeship training',
     },
   ] satisfies HomeHeroSlide[]).filter(
     (slide) => slide.type === 'image' || Boolean(slide.src || slide.mobileSrc),

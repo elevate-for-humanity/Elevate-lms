@@ -3,6 +3,8 @@ name: Build Cosmetology Course
 
 on:
   workflow_dispatch:
+  issues:
+    types: [reopened]
   push:
     branches: [main]
     paths:
@@ -38,6 +40,10 @@ env:
 
 jobs:
   build:
+    if: >-
+      github.event_name != 'issues' ||
+      (github.event.issue.number == 928 &&
+       github.event.issue.title == 'RUN BARBER COSMETOLOGY COURSE REGENERATION')
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:

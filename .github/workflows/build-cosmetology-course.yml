@@ -19,8 +19,10 @@ permissions:
 env:
   CI: true
   NODE_ENV: production
-  AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
-  AI_PROVIDER_ORDER: ${{ secrets.AI_PROVIDER_ORDER }}
+  # Long-form structured course generation uses the paid canonical provider.
+  # Cloudflare's free neuron allocation is reserved for short interactive work.
+  AI_PROVIDER: openai
+  AI_PROVIDER_ORDER: openai
   AI_CIRCUIT_RECOVERY_WAIT: '1'
   COURSE_FACTORY_LESSON_MAX_TOKENS: '6000'
   COURSE_FACTORY_LESSON_MAX_ATTEMPTS: '2'

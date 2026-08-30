@@ -9,6 +9,7 @@ vi.mock('@/lib/ai/ai-service', () => ({
 
 vi.mock('@/lib/course-factory/generation-checkpoints', () => ({
   loadAssessmentCheckpoint: vi.fn(),
+  loadPartialAssessmentCheckpoint: vi.fn().mockResolvedValue(null),
   loadLessonGenerationCheckpoint: vi.fn(),
   persistAssessmentCheckpoint: vi.fn(),
   persistLessonGenerationCheckpoint: vi.fn(),
@@ -40,7 +41,7 @@ describe('generateFinalExam gap repair', () => {
     expect(exam.questions).toHaveLength(25);
     expect(aiChatMock).toHaveBeenCalledTimes(2);
     expect(aiChatMock.mock.calls[1][0].messages[1].content).toContain(
-      'Generate exactly 1 additional original questions',
+      'Generate exactly 1 replacement questions',
     );
   });
 
@@ -48,6 +49,63 @@ describe('generateFinalExam gap repair', () => {
     aiChatMock
       .mockResolvedValueOnce(response(1, 24))
       .mockResolvedValueOnce(response(24, 1))
+      .mockResolvedValueOnce(response(25, 1));
+
+    const exam = await generateFinalExam('Indiana Cosmetology License', 8, 25);
+
+    expect(exam.questions).toHaveLength(25);
+    expect(aiChatMock).toHaveBeenCalledTimes(3);
+  });
+
+  it('normalizes provider aliases during a targeted repair', async () => {
+    aiChatMock.mockResolvedValueOnce(response(1, 23)).mockResolvedValueOnce({
+      content: JSON.stringify({
+        questions: [
+          {
+            question: 'Unique question 24?',
+            options: ['A', 'B', 'C', 'D'],
+            correct_index: 0,
+            rationale: 'The first option is correct.',
+          },
+          {
+            question: 'Unique question 25?',
+            options: ['A', 'B', 'C', 'D'],
+            correctAnswer: 'A',
+            feedback: 'The first option is correct.',
+          },
+        ],
+      }),
+    });
+
+    const exam = await generateFinalExam('Indiana Cosmetology License', 8, 25);
+
+    expect(exam.questions).toHaveLength(25);
+    expect(exam.questions[23]).toMatchObject({
+      correct: 0,
+      explanation: 'The first option is correct.',
+    });
+    expect(exam.questions[24]).toMatchObject({
+      correct: 0,
+      explanation: 'The first option is correct.',
+    });
+  });
+
+  it('keeps valid questions when another repair candidate is malformed', async () => {
+    aiChatMock
+      .mockResolvedValueOnce(response(1, 23))
+      .mockResolvedValueOnce({
+        content: JSON.stringify({
+          questions: [
+            {
+              question: 'Unique question 24?',
+              options: ['A', 'B', 'C', 'D'],
+              correct: 0,
+              explanation: 'The first option is correct.',
+            },
+            { question: 'Invalid question?', options: ['A', 'B'], correct: null },
+          ],
+        }),
+      })
       .mockResolvedValueOnce(response(25, 1));
 
     const exam = await generateFinalExam('Indiana Cosmetology License', 8, 25);

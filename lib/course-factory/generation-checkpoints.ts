@@ -3,7 +3,7 @@ import 'server-only';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { QuizQuestion } from './types';
-import { generatedAssessmentSchema, generatedLessonContentSchema } from './ai-contracts';
+import { generatedAssessmentSchema, generatedLessonContentSchema, quizQuestionSchema } from './ai-contracts';
 
 export type LessonGenerationCheckpoint = {
   objective: string;
@@ -264,6 +264,30 @@ export async function loadAssessmentCheckpoint(
   }
 }
 
+export async function loadPartialAssessmentCheckpoint(
+  courseTitle: string,
+  lessonSlug: string,
+): Promise<QuizQuestion[] | null> {
+  const target = await resolveLessonTarget(courseTitle, lessonSlug);
+  if (!target) return null;
+  try {
+    const db = await requireAdminClient();
+    const { data, error } = await db
+      .from('course_lessons')
+      .select('quiz_questions')
+      .eq('id', target.id)
+      .maybeSingle();
+    if (error || !Array.isArray(data?.quiz_questions)) return null;
+    const valid = data.quiz_questions.flatMap((candidate) => {
+      const parsed = quizQuestionSchema.safeParse(candidate);
+      return parsed.success ? [parsed.data] : [];
+    });
+    return valid.length ? valid : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function persistAssessmentCheckpoint(input: {
   courseTitle: string;
   lessonSlug: string;
@@ -282,3 +306,4 @@ export async function persistAssessmentCheckpoint(input: {
     // Best-effort checkpoint only. The canonical build remains authoritative.
   }
 }
+

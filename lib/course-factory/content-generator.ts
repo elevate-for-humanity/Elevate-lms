@@ -13,9 +13,11 @@ import {
   generatedBlueprintSchema,
   generatedLessonContentSchema,
   parseStrictAIJson,
+  quizQuestionSchema,
 } from './ai-contracts';
 import {
   loadAssessmentCheckpoint,
+  loadPartialAssessmentCheckpoint,
   loadLessonGenerationCheckpoint,
   persistAssessmentCheckpoint,
   persistLessonGenerationCheckpoint,
@@ -412,7 +414,18 @@ interface GeneratedAssessment {
  * the contract is zero-based. Normalize only that unambiguous boundary case;
  * every other invalid value still fails strict validation.
  */
-type ProviderQuestion = { options?: unknown[]; correct?: unknown };
+type ProviderQuestion = {
+  options?: unknown[];
+  correct?: unknown;
+  correct_index?: unknown;
+  correctIndex?: unknown;
+  correctAnswer?: unknown;
+  explanation?: unknown;
+  rationale?: unknown;
+  feedback?: unknown;
+  reason?: unknown;
+  answer_explanation?: unknown;
+};
 
 /**
  * Repair provider formatting without changing the correct answer.
@@ -435,7 +448,19 @@ export function normalizeFourOptionQuestions(raw: string): string {
     for (const question of questions ?? []) {
       if (!Array.isArray(question.options)) continue;
 
-      let correct = Number(question.correct);
+      const providerCorrect =
+        question.correct ??
+        question.correct_index ??
+        question.correctIndex ??
+        question.correctAnswer;
+      let correct = Number(providerCorrect);
+      if (!Number.isInteger(correct) && typeof providerCorrect === 'string') {
+        correct = question.options.findIndex(
+          (option) =>
+            String(option).trim().toLocaleLowerCase() ===
+            providerCorrect.trim().toLocaleLowerCase(),
+        );
+      }
       if (Number.isInteger(correct) && correct === question.options.length) {
         correct = question.options.length - 1;
       }
@@ -446,12 +471,24 @@ export function normalizeFourOptionQuestions(raw: string): string {
           const selected = question.options.filter((_, index) => index !== correct).slice(0, 3);
           selected.push(correctOption);
           question.options = selected;
-          question.correct = 3;
-          continue;
+          correct = 3;
         }
       }
 
       question.correct = correct;
+      question.explanation =
+        question.explanation ??
+        question.rationale ??
+        question.feedback ??
+        question.reason ??
+        question.answer_explanation;
+      delete question.correct_index;
+      delete question.correctIndex;
+      delete question.correctAnswer;
+      delete question.rationale;
+      delete question.feedback;
+      delete question.reason;
+      delete question.answer_explanation;
     }
   }
   return JSON.stringify(parsed);
@@ -558,6 +595,7 @@ export async function generateFinalExam(
   moduleCount: number,
   questionCount: number = 25,
   requiredDomains: string[] = [],
+  checkpointSlug?: string,
 ): Promise<GeneratedAssessment> {
   if (!isAIAvailable()) throw new Error('AI service not available');
 
@@ -587,7 +625,26 @@ Return ONLY valid JSON.
   let lastError: unknown;
   const questions: GeneratedAssessment['questions'] = [];
   const seenQuestions = new Set<string>();
-  const maxAttempts = 3;
+  const maxAttempts = 4;
+
+  if (checkpointSlug) {
+    const cached = await loadPartialAssessmentCheckpoint(courseTitle, checkpointSlug);
+    for (const question of cached ?? []) {
+      const key = question.question.trim().toLocaleLowerCase();
+      if (!seenQuestions.has(key)) {
+        seenQuestions.add(key);
+        questions.push(question);
+      }
+      if (questions.length === questionCount) break;
+    }
+    if (questions.length) {
+      logger.info('[course-factory/content-generator] Resuming partial final exam checkpoint', {
+        lesson: checkpointSlug,
+        questions: questions.length,
+        required: questionCount,
+      });
+    }
+  }
 
   // Providers occasionally stop one or two items short of a large JSON array.
   // Accumulate valid, unique items across bounded calls instead of discarding a
@@ -598,7 +655,7 @@ Return ONLY valid JSON.
       const repairPrompt =
         questions.length === 0
           ? prompt
-          : `Generate exactly ${missingCount} additional original questions for the final readiness exam for "${courseTitle}".\n\nDo not repeat any of these existing questions:\n${questions.map((question, index) => `${index + 1}. ${question.question}`).join('\n')}\n\nReturn ONLY valid JSON in the same contract, with exactly ${missingCount} questions, exactly four options per question, and zero-based correct indexes.`;
+          : `Generate exactly ${missingCount} replacement questions for the final readiness exam for "${courseTitle}".\n\nDo not repeat any of these existing questions:\n${questions.map((question, index) => `${index + 1}. ${question.question}`).join('\n')}\n\nReturn ONLY this JSON contract:\n{"questions":[{"question":"Complete question text","options":["A","B","C","D"],"correct":0,"explanation":"A substantive explanation of why the correct answer is right and the distractors are weaker"}]}\n\nUse the exact keys question, options, correct, and explanation. The correct value must be a zero-based integer. Do not use correct_index, correctAnswer, rationale, feedback, null, or omitted fields.`;
       const response = await aiChat({
         messages: [
           {
@@ -612,22 +669,32 @@ Return ONLY valid JSON.
           },
         ],
         temperature: attempt === 1 ? 0.7 : 0.3,
-        maxTokens: 8000,
+        maxTokens: Math.min(8000, Math.max(1200, missingCount * 450)),
         jsonMode: true,
       });
 
-      const parsed = parseStrictAIJson(
-        normalizeFourOptionQuestions(response.content),
-        generatedAssessmentSchema,
-        'Final exam generation',
-      );
-      for (const question of parsed.questions) {
+      const normalized = JSON.parse(normalizeFourOptionQuestions(response.content)) as {
+        questions?: unknown[];
+      };
+      const candidates = Array.isArray(normalized.questions) ? normalized.questions : [];
+      let invalidCount = 0;
+      for (const candidate of candidates) {
+        const parsedQuestion = quizQuestionSchema.safeParse(candidate);
+        if (!parsedQuestion.success) {
+          invalidCount += 1;
+          continue;
+        }
+        const question = parsedQuestion.data;
         const key = question.question.trim().toLocaleLowerCase();
         if (!seenQuestions.has(key)) {
           seenQuestions.add(key);
           questions.push(question);
         }
         if (questions.length === questionCount) break;
+      }
+
+      if (checkpointSlug && questions.length) {
+        await persistAssessmentCheckpoint({ courseTitle, lessonSlug: checkpointSlug, questions });
       }
 
       if (questions.length === questionCount) return { questions };
@@ -639,6 +706,7 @@ Return ONLY valid JSON.
         attempt,
         accumulated: questions.length,
         required: questionCount,
+        invalid: invalidCount,
       });
     } catch (error) {
       lastError = error;

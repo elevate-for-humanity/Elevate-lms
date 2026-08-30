@@ -268,6 +268,7 @@ async function enrichBlueprint(
               (module) =>
                 `${module.title}: ${(module.competencies ?? []).map((competency) => competency.competencyKey).join(', ') || module.domainKey || module.slug}`,
             ),
+          lesson.slug,
         );
         lesson.objective =
           lesson.objective || `Demonstrate cumulative readiness for ${courseTitle}.`;

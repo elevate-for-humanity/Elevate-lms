@@ -281,9 +281,20 @@ jobs:
           assert_redirect legal-privacy https://www.elevateforhumanity.org/legal/privacy https://www.elevateforhumanity.org/privacy
           assert_redirect verify-credentials https://www.elevateforhumanity.org/verify-credentials https://app.elevateforhumanity.org/verify-credentials
 
-          missing_status=$(curl -sS --max-time 20 -o /tmp/www-not-found.html -w '%{http_code}' https://www.elevateforhumanity.org/deployment-route-audit-not-found)
-          test "$missing_status" = "404"
-          grep -q 'right path' /tmp/www-not-found.html
+          # Northflank may briefly route the first post-deploy request through
+          # a draining replica. Require the real 404 UI, but allow the same
+          # bounded convergence window used by the deployment health check.
+          missing_ready=false
+          for attempt in $(seq 1 6); do
+            missing_status=$(curl -sS --max-time 20 -o /tmp/www-not-found.html -w '%{http_code}' https://www.elevateforhumanity.org/deployment-route-audit-not-found || true)
+            echo "404 recovery attempt ${attempt}/6: status=${missing_status:-request-failed}"
+            if [ "$missing_status" = "404" ] && grep -q 'right path' /tmp/www-not-found.html; then
+              missing_ready=true
+              break
+            fi
+            sleep 5
+          done
+          test "$missing_ready" = "true"
 
           curl -fsS --max-time 20 https://www.elevateforhumanity.org/legal/student-handbook -o /tmp/student-handbook.html
           ! grep -q 'Indianapolis, IN 46220, Indianapolis, IN 46220' /tmp/student-handbook.html

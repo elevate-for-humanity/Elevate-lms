@@ -106,10 +106,11 @@ jobs:
           console.log('Platform Doctor delta gate passed: no new static CRITICAL findings.');
           NODE
 
-      - name: Run Platform Doctor Strict (main)
+      - name: Block Platform Doctor regressions on main
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: node scripts/run-platform-doctor-strict.mjs
         env:
+          PLATFORM_DOCTOR_BASE_SHA: ${{ github.event.before }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

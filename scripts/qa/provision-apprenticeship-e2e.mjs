@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { randomBytes } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
+import { createQaAuthUser } from './supabase-auth-fixtures.mjs';
 
 const action = process.argv[2] || 'provision';
 const statePath = process.env.QA_E2E_STATE_PATH || '.qa-apprenticeship-e2e-state.json';
@@ -32,18 +33,19 @@ async function must(resultPromise, label) {
 async function createQaUser(kind, role, fullName) {
   const email = `${marker}-${kind}@qa.invalid`;
   const pass = password();
-  const { data, error } = await db.auth.admin.createUser({
+  const user = await createQaAuthUser({
+    db,
     email,
     password: pass,
-    email_confirm: true,
-    app_metadata: { qa_e2e: true, qa_run_id: runId, role },
-    user_metadata: { qa_e2e: true, qa_run_id: runId, full_name: fullName },
+    role,
+    fullName,
+    runId,
+    label: `create ${kind} auth user`,
   });
-  if (error || !data.user) throw new Error(`create ${kind} auth user: ${error?.message || 'no user returned'}`);
 
   await must(
     db.from('profiles').upsert({
-      id: data.user.id,
+      id: user.id,
       email,
       full_name: fullName,
       role,
@@ -52,16 +54,16 @@ async function createQaUser(kind, role, fullName) {
     }, { onConflict: 'id' }),
     `upsert ${kind} profile`,
   );
-  return { id: data.user.id, email, password: pass };
+  return { id: user.id, email, password: pass };
 }
 
 async function provision() {
-  const host = await createQaUser('host', 'host_shop', '[QA E2E] Host Shop Supervisor');
-  let apprentice;
-  let state = { runId, marker, host, apprentice: null, partnerId: null, shopId: null, enrollmentId: null, placementId: null };
+  let state = { runId, marker, host: null, apprentice: null, partnerId: null, shopId: null, enrollmentId: null, placementId: null };
 
   try {
-    apprentice = await createQaUser('apprentice', 'apprentice', '[QA E2E] Barber Apprentice');
+    const host = await createQaUser('host', 'host_shop', '[QA E2E] Host Shop Supervisor');
+    state.host = host;
+    const apprentice = await createQaUser('apprentice', 'apprentice', '[QA E2E] Barber Apprentice');
     state.apprentice = apprentice;
 
     const program = await must(

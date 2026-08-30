@@ -9,7 +9,7 @@
  * Run with --execute to apply. Without it, only preflight runs.
  */
 import crypto from 'node:crypto';
-import { nfFetch, projectApiPath } from './lib';
+import { combinedServiceCreatePath, combinedServicePatchPath, nfFetch, projectApiPath } from './lib';
 
 const WEB_PROJECT_ID = process.env.NORTHFLANK_PROJECT_ID || 'elevate-platform';
 const GPU_PROJECT_ID = process.env.NORTHFLANK_LLM_PROJECT_ID || 'elevate-media-gpu';
@@ -138,10 +138,10 @@ function servicePayload(volumeId: string): R {
 async function ensureService(volumeId: string) {
   const payload = servicePayload(volumeId);
   if (await serviceExists()) {
-    await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`), { method: 'PUT', body: JSON.stringify(payload) });
+    await nfFetch(combinedServicePatchPath(GPU_PROJECT_ID, SERVICE_ID), { method: 'PATCH', body: JSON.stringify(payload) });
     log('Updated LLM worker service');
   } else {
-    await nfFetch(projectApiPath(GPU_PROJECT_ID, '/services'), { method: 'POST', body: JSON.stringify(payload) });
+    await nfFetch(combinedServiceCreatePath(GPU_PROJECT_ID), { method: 'POST', body: JSON.stringify(payload) });
     log('Created LLM worker service');
   }
 }

@@ -6,8 +6,6 @@ on:
     paths:
       - '.github/workflows/regenerate-barber-cosmetology.yml'
       - 'scripts/course-factory/regenerate-barber-cosmetology.ts'
-  issues:
-    types: [reopened]
   workflow_dispatch:
 
 permissions:
@@ -29,10 +27,6 @@ env:
 
 jobs:
   regenerate:
-    if: >-
-      github.event_name != 'issues' ||
-      (github.event.issue.number == 928 &&
-       github.event.issue.title == 'RUN BARBER COSMETOLOGY COURSE REGENERATION')
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:

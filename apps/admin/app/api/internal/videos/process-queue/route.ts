@@ -3,6 +3,7 @@ import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { VideoJob } from '@/lib/video/job-queue';
 import { processClaimedVideoJob } from '@/lib/video/process-video-job';
+import { finalizeCourseAutomaticallyIfReadyWithClient } from '@/lib/course-builder/persisted-publish-service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -154,6 +155,23 @@ export async function POST(request: NextRequest) {
         });
       }
     });
+    const courseIds = [...new Set(claimedJobs.map((job) => job.course_id).filter(Boolean))];
+    for (const completedCourseId of courseIds) {
+      try {
+        const finalization = await finalizeCourseAutomaticallyIfReadyWithClient({
+          db,
+          courseId: completedCourseId,
+        });
+        logger.info('[video-worker] Automated course finalization checked', {
+          courseId: completedCourseId,
+          state: finalization.state,
+        });
+      } catch (finalizationError) {
+        logger.error('[video-worker] Automated course finalization failed', finalizationError, {
+          courseId: completedCourseId,
+        });
+      }
+    }
   });
 
   return NextResponse.json(

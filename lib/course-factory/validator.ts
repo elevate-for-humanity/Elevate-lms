@@ -10,6 +10,7 @@ import type { CredentialBlueprint, BlueprintModule } from '@/lib/curriculum/blue
 import { validateBlueprint as validateBlueprintStructure } from '@/lib/curriculum/blueprints/validateBlueprint';
 import { logger } from '@/lib/logger';
 import { CourseExperienceSchema } from './experience-contract';
+import { LearningIntelligenceSchema } from './learning-intelligence';
 
 export interface ValidationError {
   type: 'error' | 'warning';
@@ -112,6 +113,19 @@ function validateLesson(
             field: `experience.${issue.path.join('.')}`,
             message: issue.message,
           });
+        }
+      } else {
+        const intelligence = LearningIntelligenceSchema.safeParse(parsedExperience.data.intelligence);
+        if (!intelligence.success) {
+          for (const issue of intelligence.error.issues) {
+            errors.push({
+              type: 'error',
+              module: moduleSlug,
+              lesson: lesson.slug,
+              field: `experience.intelligence.${issue.path.join('.')}`,
+              message: issue.message,
+            });
+          }
         }
       }
     }

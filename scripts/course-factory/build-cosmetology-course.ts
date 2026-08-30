@@ -344,7 +344,7 @@ async function main() {
       status: 'draft',
       is_active: false,
       published_at: null,
-      generation_status: 'review',
+      generation_status: 'completed',
       generation_progress: 90,
       total_lessons: EXPECTED_LESSONS,
       review_status: 'draft',
@@ -354,9 +354,9 @@ async function main() {
 
   await updateJob(db, {
     status: 'completed',
-    stage: 'review',
+    stage: 'media',
     progress: 100,
-    message: 'Course package is complete and awaiting media acceptance and human review.',
+    message: 'Course package is complete; automated media and procurement acceptance will publish it when every gate passes.',
     completed_at: new Date().toISOString(),
     details: {
       course_id: COURSE_ID,
@@ -378,7 +378,7 @@ async function main() {
         microclipsQueued: media.microclipsQueued,
         dashboardConnection:
           'program_courses registered; active enrollments attach on approved publication',
-        publication: 'BLOCKED_PENDING_MEDIA_ACCEPTANCE_AND_HUMAN_REVIEW',
+        publication: 'PENDING_AUTOMATED_MEDIA_AND_PROCUREMENT_ACCEPTANCE',
       },
       null,
       2,

@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { compileLearningIntelligence, LearningIntelligenceSchema } from './learning-intelligence';
 
 function asRecord(value: unknown): Record<string, any> {
   if (value && typeof value === 'object' && !Array.isArray(value)) return value as Record<string, any>;
@@ -100,6 +101,21 @@ export async function normalizeGeneratedCourseForGovernance(
       const lessonType = String(lesson.lesson_type || '');
       const isAssessment = ['quiz', 'checkpoint', 'exam', 'final_exam'].includes(lessonType);
       const isPractical = Boolean(lesson.practical_required) || ['practical', 'lab', 'fieldwork', 'observation', 'practicum'].includes(lessonType);
+      const governedExperience = experience && Object.keys(experience).length
+        ? { ...experience }
+        : null;
+      if (governedExperience && !LearningIntelligenceSchema.safeParse(governedExperience.intelligence).success) {
+        governedExperience.intelligence = compileLearningIntelligence({
+          lessonSlug: String(lesson.slug || lesson.id),
+          lessonTitle: String(lesson.title || lesson.slug || 'Lesson'),
+          domainKey: domainKey || String(moduleDomain || 'course'),
+          competencyKeys: derivedCompetencies.map((competency: any) => String(competency.key)).filter(Boolean),
+          objectives,
+          masteryThreshold: Number(lesson.passing_score ?? governedExperience?.remediation?.passingScore ?? 80),
+          assessment: isAssessment,
+          practical: isPractical,
+        });
+      }
       const duration = Math.max(0, Number(lesson.duration_minutes ?? 0));
       moduleDurationMinutes += duration;
       totalDurationMinutes += duration;
@@ -118,6 +134,9 @@ export async function normalizeGeneratedCourseForGovernance(
         // Generation has completed successfully, but human approval remains separate.
         generation_status: 'verification_ready',
       };
+      if (governedExperience) {
+        update.content_json = { ...contentJson, experience: governedExperience };
+      }
 
       if (isPractical) {
         // The system may create the requirement, but it may not impersonate a human approval.

@@ -7,7 +7,7 @@ import { courseBuilderController } from '@/lib/devstudio/course-builder-controll
 import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
 import {
   publishPersistedCourseWithClient,
-  runPersistedCourseProcurementHealthCheckWithClient,
+  repairPersistedCourseAcceptanceWithClient,
 } from '@/lib/course-builder/persisted-publish-service';
 
 interface AgenticTaskRow {
@@ -246,17 +246,21 @@ export async function processCourseAgenticTask(input: {
       await updateTask(task, project, 'queued', { course_id: target.courseId, ...media }, 'QA is waiting for canonical Course Factory media readiness.');
       return;
     }
-    const health = await runPersistedCourseProcurementHealthCheckWithClient(db, target.courseId);
+    const health = await repairPersistedCourseAcceptanceWithClient({
+      db,
+      courseId: target.courseId,
+    });
     if (health.pass) {
       await updateTask(task, project, 'completed', {
         course_id: target.courseId,
         procurement: health.metrics,
         media,
         blocking_issues: [],
+        repairs: health.repairs,
       }, 'Course passed canonical procurement, governance, accessibility, instructional, and media readiness checks.');
       return;
     }
-    throw new Error(`Course governance failed: ${health.blocking_issues.join(' | ')}`);
+    throw new Error(`Automated course repair exhausted: ${health.blocking_issues.join(' | ')}`);
   }
 
   if (task.worker === 'publisher') {

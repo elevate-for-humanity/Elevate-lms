@@ -165,7 +165,7 @@ export async function createDraftCourse(db: SupabaseClient, input: CreateCourseI
 export async function publishCourse(
   db: SupabaseClient,
   courseId: string,
-  actorUserId: string,
+  actorUserId: string | null,
   label?: string,
 ) {
   const { data, error } = await db.rpc('publish_course', {

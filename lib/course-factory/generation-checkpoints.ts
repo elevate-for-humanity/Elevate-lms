@@ -4,6 +4,10 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { QuizQuestion } from './types';
 import { generatedAssessmentSchema, generatedLessonContentSchema, quizQuestionSchema } from './ai-contracts';
+import {
+  loadDurableGenerationCheckpoint,
+  persistDurableGenerationCheckpoint,
+} from './durable-generation-journal';
 
 export type LessonGenerationCheckpoint = {
   objective: string;
@@ -65,6 +69,29 @@ export async function loadLessonGenerationCheckpoint(
   courseTitle: string,
   lessonSlug: string,
 ): Promise<LessonGenerationCheckpoint | null> {
+  const journaled = await loadDurableGenerationCheckpoint<LessonGenerationCheckpoint>({
+    courseTitle,
+    lessonSlug,
+    kind: 'lesson',
+  });
+  if (journaled) {
+    let parsedContent: Record<string, any> | null = null;
+    try {
+      parsedContent = record(JSON.parse(journaled.content));
+    } catch {
+      parsedContent = null;
+    }
+    const strictJournal = generatedLessonContentSchema.safeParse({
+      objective: journaled.objective,
+      content: parsedContent?.html,
+      learning_points: journaled.learning_points,
+      scenario: journaled.scenario,
+      quiz_questions: journaled.quiz_questions,
+      experience: parsedContent?.experience,
+    });
+    if (strictJournal.success) return journaled;
+  }
+
   const target = await resolveLessonTarget(courseTitle, lessonSlug);
   if (!target) return null;
 
@@ -115,7 +142,7 @@ export async function loadLessonGenerationCheckpoint(
     });
     if (!strictCheckpoint.success) return null;
 
-    return {
+    const checkpoint = {
       objective: strictCheckpoint.data.objective,
       content: JSON.stringify({
         html: strictCheckpoint.data.content,
@@ -127,6 +154,13 @@ export async function loadLessonGenerationCheckpoint(
       scenario: strictCheckpoint.data.scenario,
       quiz_questions: strictCheckpoint.data.quiz_questions,
     };
+    await persistDurableGenerationCheckpoint({
+      courseTitle,
+      lessonSlug,
+      kind: 'lesson',
+      payload: checkpoint,
+    });
+    return checkpoint;
   } catch (error) {
     logger.warn('[course-factory/checkpoint] cached lesson read skipped', {
       courseTitle,
@@ -147,6 +181,25 @@ export async function persistLessonGenerationCheckpoint(input: {
   quizQuestions: QuizQuestion[];
   experience: Record<string, any>;
 }): Promise<void> {
+  const durableCheckpoint: LessonGenerationCheckpoint = {
+    objective: input.objective,
+    content: JSON.stringify({
+      html: input.html,
+      learning_points: input.learningPoints,
+      scenario: input.scenario,
+      experience: input.experience,
+    }),
+    learning_points: input.learningPoints,
+    scenario: input.scenario,
+    quiz_questions: input.quizQuestions,
+  };
+  await persistDurableGenerationCheckpoint({
+    courseTitle: input.courseTitle,
+    lessonSlug: input.lessonSlug,
+    kind: 'lesson',
+    payload: durableCheckpoint,
+  });
+
   const target = await resolveLessonTarget(input.courseTitle, input.lessonSlug);
   if (!target) return;
 
@@ -245,6 +298,16 @@ export async function loadAssessmentCheckpoint(
   lessonSlug: string,
   count: number,
 ): Promise<QuizQuestion[] | null> {
+  const journaled = await loadDurableGenerationCheckpoint<QuizQuestion[]>({
+    courseTitle,
+    lessonSlug,
+    kind: 'assessment',
+  });
+  if (journaled?.length >= count) {
+    const strictJournal = generatedAssessmentSchema.safeParse({ questions: journaled.slice(0, count) });
+    if (strictJournal.success) return strictJournal.data.questions;
+  }
+
   const target = await resolveLessonTarget(courseTitle, lessonSlug);
   if (!target) return null;
   try {
@@ -258,7 +321,14 @@ export async function loadAssessmentCheckpoint(
     const strictCheckpoint = generatedAssessmentSchema.safeParse({
       questions: data.quiz_questions.slice(0, count),
     });
-    return strictCheckpoint.success ? strictCheckpoint.data.questions : null;
+    if (!strictCheckpoint.success) return null;
+    await persistDurableGenerationCheckpoint({
+      courseTitle,
+      lessonSlug,
+      kind: 'assessment',
+      payload: strictCheckpoint.data.questions,
+    });
+    return strictCheckpoint.data.questions;
   } catch {
     return null;
   }
@@ -268,6 +338,19 @@ export async function loadPartialAssessmentCheckpoint(
   courseTitle: string,
   lessonSlug: string,
 ): Promise<QuizQuestion[] | null> {
+  const journaled = await loadDurableGenerationCheckpoint<QuizQuestion[]>({
+    courseTitle,
+    lessonSlug,
+    kind: 'assessment',
+  });
+  if (journaled?.length) {
+    const validJournal = journaled.flatMap((candidate) => {
+      const parsed = quizQuestionSchema.safeParse(candidate);
+      return parsed.success ? [parsed.data] : [];
+    });
+    if (validJournal.length) return validJournal;
+  }
+
   const target = await resolveLessonTarget(courseTitle, lessonSlug);
   if (!target) return null;
   try {
@@ -282,7 +365,14 @@ export async function loadPartialAssessmentCheckpoint(
       const parsed = quizQuestionSchema.safeParse(candidate);
       return parsed.success ? [parsed.data] : [];
     });
-    return valid.length ? valid : null;
+    if (!valid.length) return null;
+    await persistDurableGenerationCheckpoint({
+      courseTitle,
+      lessonSlug,
+      kind: 'assessment',
+      payload: valid,
+    });
+    return valid;
   } catch {
     return null;
   }
@@ -293,6 +383,13 @@ export async function persistAssessmentCheckpoint(input: {
   lessonSlug: string;
   questions: QuizQuestion[];
 }): Promise<void> {
+  await persistDurableGenerationCheckpoint({
+    courseTitle: input.courseTitle,
+    lessonSlug: input.lessonSlug,
+    kind: 'assessment',
+    payload: input.questions,
+  });
+
   const target = await resolveLessonTarget(input.courseTitle, input.lessonSlug);
   if (!target) return;
   try {
@@ -306,4 +403,3 @@ export async function persistAssessmentCheckpoint(input: {
     // Best-effort checkpoint only. The canonical build remains authoritative.
   }
 }
-

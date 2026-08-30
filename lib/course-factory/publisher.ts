@@ -8,6 +8,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 import type { BlueprintModule, BuildMode, ValidationResult } from './types';
+import { compileLearningIntelligence, LearningIntelligenceSchema } from './learning-intelligence';
 import { inferStepType } from './validator';
 
 export interface PublishInput {
@@ -117,11 +118,36 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               !Array.isArray(content.experience)
                 ? (content.experience as Record<string, any>)
                 : null;
+            const governedPractical = extra.practicalRequired ?? stepType === 'lab';
             const learningPoints = Array.isArray(content?.learning_points)
               ? content.learning_points.filter(
                   (point): point is string => typeof point === 'string' && point.trim().length > 0,
                 )
               : [];
+            if (experience && !LearningIntelligenceSchema.safeParse(experience.intelligence).success) {
+              const lessonObjectives = Array.isArray(lesson.learningObjectives)
+                ? lesson.learningObjectives.filter(
+                    (objective): objective is string => typeof objective === 'string' && objective.trim().length > 0,
+                  )
+                : [];
+              const competencyKeys = Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
+                ? lesson.competencyKeys
+                : (courseModule.competencies ?? []).map((competency) => competency.competencyKey);
+              experience.intelligence = compileLearningIntelligence({
+                lessonSlug: lesson.slug,
+                lessonTitle: lesson.title,
+                domainKey: lesson.domainKey ?? courseModule.domainKey ?? courseModule.slug,
+                competencyKeys,
+                objectives: lessonObjectives.length
+                  ? lessonObjectives
+                  : [lesson.objective, ...learningPoints].filter(
+                      (objective): objective is string => typeof objective === 'string' && objective.trim().length > 0,
+                    ),
+                masteryThreshold: lesson.passingScore,
+                assessment: ['checkpoint', 'quiz', 'exam'].includes(stepType),
+                practical: governedPractical,
+              });
+            }
             const practicalTask =
               experience?.practicalTask && typeof experience.practicalTask === 'object'
                 ? experience.practicalTask
@@ -152,8 +178,6 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
             const instructorNotes = Array.isArray(lesson.instructorNotes)
               ? lesson.instructorNotes.join('\n\n')
               : (lesson.instructorNotes ?? null);
-            const governedPractical = extra.practicalRequired ?? stepType === 'lab';
-
             return {
               slug: lesson.slug,
               title: lesson.title,
@@ -238,6 +262,7 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
                       reading_guide: experience.readingGuide ?? null,
                       glossary: experience.glossary ?? null,
                       readiness: experience.readiness ?? null,
+                      intelligence: experience.intelligence ?? null,
                     }
                   : null),
               // course_lessons_generation_status_check accepts queued/generating/generated/approved.

@@ -3,6 +3,8 @@ import type { SupabaseClient } from '../supabase';
 import { createClient } from '../supabase/server';
 import { publishCourse } from '../lms/course-service';
 import { logAdminAudit, AdminAction } from '../admin/audit-log';
+import { normalizeGeneratedCourseForGovernance } from '../course-factory/post-generation-governance';
+import { getCourseMediaState } from '../course-factory/media-manager';
 
 const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam', 'final_exam']);
 const PRACTICAL_TYPES = new Set(['practical', 'lab', 'fieldwork', 'observation', 'practicum']);
@@ -139,11 +141,41 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
 
 export async function runPersistedCourseProcurementHealthCheck(courseId: string) { return runPersistedCourseProcurementHealthCheckWithClient(await createClient(), courseId); }
 
-export async function publishPersistedCourseWithClient(input: { db: SupabaseClient; courseId: string; actorId: string; label?: string; request?: NextRequest; }) {
-  const health = await runPersistedCourseProcurementHealthCheckWithClient(input.db, input.courseId);
+export async function repairPersistedCourseAcceptanceWithClient(input: {
+  db: SupabaseClient;
+  courseId: string;
+  maxAttempts?: number;
+}) {
+  const maxAttempts = Math.max(1, Math.min(3, Math.round(input.maxAttempts ?? 2)));
+  const repairs: Array<{ attempt: number; blockingBefore: string[]; normalization: unknown }> = [];
+  let health = await runPersistedCourseProcurementHealthCheckWithClient(input.db, input.courseId);
+
+  for (let attempt = 1; !health.pass && attempt <= maxAttempts; attempt += 1) {
+    const blockingBefore = [...health.blocking_issues];
+    const normalization = await normalizeGeneratedCourseForGovernance(input.courseId);
+    repairs.push({ attempt, blockingBefore, normalization });
+    health = await runPersistedCourseProcurementHealthCheckWithClient(input.db, input.courseId);
+
+    // Stop a deterministic no-progress loop. Content generation itself already
+    // has bounded schema-repair retries and durable checkpoints upstream.
+    if (
+      !health.pass &&
+      health.blocking_issues.length === blockingBefore.length &&
+      health.blocking_issues.every((issue, index) => issue === blockingBefore[index])
+    ) break;
+  }
+
+  return { ...health, repairs, repaired: repairs.length > 0 };
+}
+
+export async function publishPersistedCourseWithClient(input: { db: SupabaseClient; courseId: string; actorId: string | null; label?: string; request?: NextRequest; }) {
+  const health = await repairPersistedCourseAcceptanceWithClient({
+    db: input.db,
+    courseId: input.courseId,
+  });
   if (!health.pass) {
-    await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { blocked: true, label: input.label, blocking_issues: health.blocking_issues, metrics: health.metrics }, req: input.request });
-    return { ok: false as const, error: 'PUBLISH_BLOCKED', blocking_issues: health.blocking_issues, metrics: health.metrics };
+    if (input.actorId) await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { repair_exhausted: true, label: input.label, blocking_issues: health.blocking_issues, metrics: health.metrics, repairs: health.repairs }, req: input.request });
+    return { ok: false as const, error: 'AUTOMATED_REPAIR_EXHAUSTED', blocking_issues: health.blocking_issues, metrics: health.metrics, repairs: health.repairs };
   }
   const { data: approvalId, error: approvalError } = await input.db.rpc('record_course_automated_approval', {
     p_course_id: input.courseId,
@@ -155,8 +187,47 @@ export async function publishPersistedCourseWithClient(input: { db: SupabaseClie
     throw new Error(`Automated approval audit failed: ${approvalError?.message ?? 'approval record was not created'}`);
   }
   const result = await publishCourse(input.db, input.courseId, input.actorId, input.label);
-  await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { label: input.label, lesson_count: (result as any)?.lessonCount, procurement_gate: health.metrics, review_mode: 'automated_acceptance_contract', automated_approval_id: approvalId }, req: input.request });
-  return { ok: true as const, procurement_gate: health.metrics, automated_approval_id: approvalId, ...result };
+  if (input.actorId) await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { label: input.label, lesson_count: (result as any)?.lessonCount, procurement_gate: health.metrics, review_mode: 'automated_acceptance_contract', automated_approval_id: approvalId, repairs: health.repairs }, req: input.request });
+  return { ok: true as const, procurement_gate: health.metrics, automated_approval_id: approvalId, repairs: health.repairs, ...result };
 }
 
 export async function publishPersistedCourse(input: { courseId: string; actorId: string; label?: string; request?: NextRequest; }) { return publishPersistedCourseWithClient({ ...input, db: await createClient() }); }
+
+/**
+ * Idempotent terminal step for AI-controlled course builds. Media completion
+ * invokes this function; it never starts paid work and never publishes a
+ * partial package.
+ */
+export async function finalizeCourseAutomaticallyIfReadyWithClient(input: {
+  db: SupabaseClient;
+  courseId: string;
+}) {
+  const { data: course, error } = await input.db
+    .from('courses')
+    .select('id,status,created_by,generation_status')
+    .eq('id', input.courseId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!course) return { ok: false as const, state: 'missing' as const };
+  if (course.status === 'published' || course.generation_status === 'published') {
+    return { ok: true as const, state: 'already_published' as const };
+  }
+  if (!['completed', 'review'].includes(String(course.generation_status ?? ''))) {
+    return { ok: false as const, state: 'generation_pending' as const };
+  }
+
+  const media = await getCourseMediaState(input.courseId, { verifyUrls: true });
+  if (!media.completePackage) {
+    return { ok: false as const, state: 'media_pending' as const, media };
+  }
+
+  const publication = await publishPersistedCourseWithClient({
+    db: input.db,
+    courseId: input.courseId,
+    actorId: typeof course.created_by === 'string' ? course.created_by : null,
+    label: 'AI Course Builder automated acceptance',
+  });
+  return publication.ok
+    ? { ok: true as const, state: 'published' as const, media, publication }
+    : { ok: false as const, state: 'repair_pending' as const, media, publication };
+}

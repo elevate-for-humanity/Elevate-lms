@@ -66,7 +66,7 @@ for (const capability of ['reviewCanonicalCourse','reviewCanonicalLessons','revi
   if (!reviewService.includes(capability)) failures.push(`Course Builder review service is missing ${capability}`);
 }
 const persistedPublish = readRequired('lib/course-builder/persisted-publish-service.ts');
-for (const capability of ['runPersistedCourseProcurementHealthCheck','publishPersistedCourse','publishCourse','review_status','reviewed_by','module_completion_rules']) {
+for (const capability of ['runPersistedCourseProcurementHealthCheck','repairPersistedCourseAcceptanceWithClient','normalizeGeneratedCourseForGovernance','publishPersistedCourse','publishCourse','review_status','reviewed_by','module_completion_rules']) {
   if (!persistedPublish.includes(capability)) failures.push(`Persisted Course Builder publication service is missing ${capability}`);
 }
 

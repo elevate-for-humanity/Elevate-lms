@@ -28,6 +28,7 @@ import {
 } from './content-generator';
 import { publishCourse } from './publisher';
 import { buildCourseEvidenceContext } from './evidence-context';
+import { compileLearningIntelligence } from './learning-intelligence';
 import { inferStepType, validateBlueprint } from './validator';
 import type { FactoryInput, FactoryOutput, FactoryStage, ProgressCallback } from './types';
 
@@ -75,7 +76,10 @@ function normalizeGeneratedSlug(slug: string, stepType: string, fallback: string
   return base;
 }
 
-function synchronizeLessonExperience(lesson: Record<string, any>): void {
+function synchronizeLessonExperience(
+  lesson: Record<string, any>,
+  courseModule: CredentialBlueprint['modules'][number],
+): void {
   if (typeof lesson.content !== 'string' || !lesson.content.trim()) return;
   let content: Record<string, any>;
   try {
@@ -109,6 +113,22 @@ function synchronizeLessonExperience(lesson: Record<string, any>): void {
       (_: unknown, index: number) => objectives[index % Math.max(objectives.length, 1)] ?? '',
     ),
   };
+  const stepType = inferStepType(String(lesson.slug ?? ''));
+  const moduleCompetencyKeys = (courseModule.competencies ?? [])
+    .map((competency) => competency.competencyKey)
+    .filter(Boolean);
+  content.experience.intelligence = compileLearningIntelligence({
+    lessonSlug: String(lesson.slug),
+    lessonTitle: String(lesson.title),
+    domainKey: String(lesson.domainKey || courseModule.domainKey || courseModule.slug),
+    competencyKeys: Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
+      ? lesson.competencyKeys
+      : moduleCompetencyKeys,
+    objectives,
+    masteryThreshold: lesson.passingScore ?? content.experience.remediation.passingScore,
+    assessment: isAssessmentStep(stepType),
+    practical: ['lab', 'assignment'].includes(stepType) || Boolean(lesson.practicalRequired),
+  });
   lesson.content = JSON.stringify(content);
 }
 
@@ -506,7 +526,7 @@ async function enrichBlueprint(
           explanation: question.explanation,
         }));
         assessmentsGenerated += 1;
-        synchronizeLessonExperience(lesson as unknown as Record<string, any>);
+        synchronizeLessonExperience(lesson as unknown as Record<string, any>, courseModule);
         continue;
       }
 
@@ -739,7 +759,7 @@ async function enrichBlueprint(
           explanation: question.explanation,
         }));
         assessmentsGenerated += 1;
-        synchronizeLessonExperience(lesson as unknown as Record<string, any>);
+        synchronizeLessonExperience(lesson as unknown as Record<string, any>, courseModule);
         continue;
       }
 
@@ -765,7 +785,7 @@ async function enrichBlueprint(
         correctAnswer: question.correct,
         explanation: question.explanation,
       }));
-      synchronizeLessonExperience(lesson as unknown as Record<string, any>);
+      synchronizeLessonExperience(lesson as unknown as Record<string, any>, courseModule);
     }
   }
 
@@ -969,4 +989,3 @@ export async function courseFactory(
     };
   }
 }
-

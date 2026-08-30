@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 import { getHostShopAdminPartnerOptions, getHostShopBoard, HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -61,9 +62,15 @@ export default async function HostShopDashboardView() {
   const isPlatformAdmin = effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
   if (!isPlatformAdmin) await ensureCanonicalPartner(user);
 
+  const db = await requireAdminClient();
+  const previewSubject = isPlatformAdmin
+    ? await resolvePortalPreviewSubject(db, user.id)
+    : { userId: user.id, previewing: false };
+  const boardUserId = previewSubject.previewing ? previewSubject.userId : user.id;
+
   let board: Awaited<ReturnType<typeof getHostShopBoard>> | null = null;
   try {
-    board = await getHostShopBoard(user.id);
+    board = await getHostShopBoard(boardUserId);
   } catch (error) {
     if (isPlatformAdmin && error instanceof Error && error.message === 'HOST_SHOP_ADMIN_PARTNER_REQUIRED') {
       const partners = (await getHostShopAdminPartnerOptions()).filter((partner: any) => partner.status === 'active' && partner.approval_status === 'approved' && partner.verification_status === 'verified' && partner.is_active !== false);
@@ -101,7 +108,6 @@ export default async function HostShopDashboardView() {
     { href: '/host-shop/dashboard/profile', title: 'Shop profile', detail: 'Maintain the approved shop profile, logo, flyer, and operating information.', image: '/images/pages/about-employer-partners.webp' },
   ];
   const partnerName = board.partner?.name || board.shops[0]?.name || '';
-  const db = await requireAdminClient();
   const { data: publicProfile } = partnerName
     ? await db.from('public_host_shops').select('media_gallery,video_url').ilike('display_name', `%${partnerName}%`).limit(1).maybeSingle()
     : { data: null };

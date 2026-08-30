@@ -258,8 +258,19 @@ async function enrichBlueprint(
       );
 
       if (stepType === 'exam') {
-        const finalExam = await generateFinalExam(courseTitle, enriched.modules.length, 25);
-        lesson.objective = lesson.objective || `Demonstrate cumulative readiness for ${courseTitle}.`;
+        const finalExam = await generateFinalExam(
+          courseTitle,
+          enriched.modules.length,
+          25,
+          enriched.modules
+            .filter((module) => inferStepType(module.slug) !== 'exam')
+            .map(
+              (module) =>
+                `${module.title}: ${(module.competencies ?? []).map((competency) => competency.competencyKey).join(', ') || module.domainKey || module.slug}`,
+            ),
+        );
+        lesson.objective =
+          lesson.objective || `Demonstrate cumulative readiness for ${courseTitle}.`;
         lesson.content = JSON.stringify({
           html: `<h2>${lesson.title}</h2><p>This cumulative assessment measures readiness across the complete course.</p>`,
           learning_points: [],
@@ -267,37 +278,223 @@ async function enrichBlueprint(
           experience: {
             readingGuide: {
               title: lesson.title,
-              summary: 'Complete this cumulative readiness assessment after reviewing all instructional modules and remediation guidance.',
+              summary:
+                'Complete this cumulative readiness assessment after reviewing all instructional modules and remediation guidance.',
               sections: [
-                { heading: 'Readiness', body: 'Use your lesson notes, practice activities, and remediation feedback to prepare for this cumulative assessment and demonstrate course-wide competency.' },
-                { heading: 'Assessment Strategy', body: 'Read every question carefully, apply the evidence and decision rules taught in the course, and select the response best supported by the instructional material.' },
-                { heading: 'After the Exam', body: 'Review any missed objectives, complete the targeted remediation actions, and retry only after you can explain why the corrected answer is supported.' },
+                {
+                  heading: 'Readiness',
+                  body: 'Use your lesson notes, practice activities, and remediation feedback to prepare for this cumulative assessment and demonstrate course-wide competency.',
+                },
+                {
+                  heading: 'Assessment Strategy',
+                  body: 'Read every question carefully, apply the evidence and decision rules taught in the course, and select the response best supported by the instructional material.',
+                },
+                {
+                  heading: 'After the Exam',
+                  body: 'Review any missed objectives, complete the targeted remediation actions, and retry only after you can explain why the corrected answer is supported.',
+                },
               ],
-              keyTakeaways: ['Apply course-wide evidence.', 'Use targeted remediation after missed objectives.', 'Demonstrate mastery before completion.'],
+              keyTakeaways: [
+                'Apply course-wide evidence.',
+                'Use targeted remediation after missed objectives.',
+                'Demonstrate mastery before completion.',
+              ],
             },
-            narrationScript: 'You have reached the cumulative readiness assessment. Use the concepts, calculations, scenarios, and practical decisions you practiced throughout the course. Read each item carefully and rely on evidence rather than guessing.',
-            visualPrompt: 'Professional learner completing a cumulative workforce readiness assessment at a modern computer workstation with organized notes and progress evidence visible.',
+            narrationScript:
+              'You have reached the cumulative readiness assessment. Use the concepts, calculations, scenarios, and practical decisions you practiced throughout the course. Read each item carefully and rely on evidence rather than guessing.',
+            visualPrompt:
+              'Professional learner completing a cumulative workforce readiness assessment at a modern computer workstation with organized notes and progress evidence visible.',
             flashcards: [
-              { id: 'exam-1', front: 'Readiness', back: 'Demonstrated ability to apply course competencies accurately and consistently.', tags: ['final'] },
-              { id: 'exam-2', front: 'Evidence', back: 'Information used to support a correct workplace or business decision.', tags: ['final'] },
-              { id: 'exam-3', front: 'Remediation', back: 'Targeted review and practice used to correct a weak objective.', tags: ['final'] },
-              { id: 'exam-4', front: 'Mastery', back: 'Performance at or above the required competency threshold.', tags: ['final'] },
-              { id: 'exam-5', front: 'Application', back: 'Using learned knowledge in a realistic decision or task.', tags: ['final'] },
-              { id: 'exam-6', front: 'Completion', back: 'Meeting all required instructional, assessment, and practical requirements.', tags: ['final'] },
+              {
+                id: 'exam-1',
+                front: 'Readiness',
+                back: 'Demonstrated ability to apply course competencies accurately and consistently.',
+                tags: ['final'],
+              },
+              {
+                id: 'exam-2',
+                front: 'Evidence',
+                back: 'Information used to support a correct workplace or business decision.',
+                tags: ['final'],
+              },
+              {
+                id: 'exam-3',
+                front: 'Remediation',
+                back: 'Targeted review and practice used to correct a weak objective.',
+                tags: ['final'],
+              },
+              {
+                id: 'exam-4',
+                front: 'Mastery',
+                back: 'Performance at or above the required competency threshold.',
+                tags: ['final'],
+              },
+              {
+                id: 'exam-5',
+                front: 'Application',
+                back: 'Using learned knowledge in a realistic decision or task.',
+                tags: ['final'],
+              },
+              {
+                id: 'exam-6',
+                front: 'Completion',
+                back: 'Meeting all required instructional, assessment, and practical requirements.',
+                tags: ['final'],
+              },
             ],
             quickClips: [
-              { id: 'final-review', title: 'Final readiness review', objective: 'Prepare for the cumulative assessment', durationSeconds: 120, script: 'Review the key objectives, calculations, scenarios, and practical decisions from every module. Focus additional time on any domain where your knowledge checks or practice assessments showed weakness.', visualPrompt: 'Instructor reviewing a concise course readiness checklist with a learner before a cumulative assessment.' },
-              { id: 'final-strategy', title: 'Assessment strategy', objective: 'Apply evidence-based test strategy', durationSeconds: 120, script: 'For each question, identify what competency is being measured, eliminate choices that conflict with course evidence, and select the response that best applies the standard or decision rule taught in the lessons.', visualPrompt: 'Learner applying a structured evidence-based assessment strategy at a computer.' },
+              {
+                id: 'final-review',
+                title: 'Final readiness review',
+                objective: 'Prepare for the cumulative assessment',
+                durationSeconds: 120,
+                script:
+                  'Review the key objectives, calculations, scenarios, and practical decisions from every module. Focus additional time on any domain where your knowledge checks or practice assessments showed weakness.',
+                visualPrompt:
+                  'Instructor reviewing a concise course readiness checklist with a learner before a cumulative assessment.',
+              },
+              {
+                id: 'final-strategy',
+                title: 'Assessment strategy',
+                objective: 'Apply evidence-based test strategy',
+                durationSeconds: 120,
+                script:
+                  'For each question, identify what competency is being measured, eliminate choices that conflict with course evidence, and select the response that best applies the standard or decision rule taught in the lessons.',
+                visualPrompt:
+                  'Learner applying a structured evidence-based assessment strategy at a computer.',
+              },
             ],
-            knowledgeChecks: finalExam.questions.slice(0, 3).map((question) => ({ question: question.question, options: question.options, correct: question.correct, explanation: question.explanation })),
-            scenario: { title: 'Readiness decision', context: 'A learner has completed all modules and practice activities but still has one weak domain.', question: 'What should the learner do before the final attempt?', options: [{ text: 'Complete targeted remediation for the weak domain.', isCorrect: true, feedback: 'Targeted remediation addresses the identified competency gap.' }, { text: 'Ignore the weak domain and guess.', isCorrect: false, feedback: 'Ignoring evidence does not demonstrate readiness.' }] },
-            caseStudy: { title: 'Evidence review', context: 'Practice results show strong performance in most domains and repeated errors in one objective.', question: 'Which conclusion is best supported?', options: [{ text: 'The learner needs focused review on the repeated weak objective.', isCorrect: true, feedback: 'Repeated errors are evidence for targeted remediation.' }, { text: 'The learner should skip all further review.', isCorrect: false, feedback: 'The evidence indicates a specific remaining gap.' }] },
-            exercises: [{ id: 'final-plan', title: 'Build a final review plan', instructions: ['List weak objectives from practice results.', 'Assign a specific review and retry action to each objective.'], expectedArtifact: 'A targeted final review plan.', autoGrade: { type: 'checklist', criteria: ['Weak objectives identified', 'Specific remediation actions assigned'] } }],
-            practicalTask: { title: 'Readiness evidence check', description: 'Verify that required course evidence is complete before the final attempt.', instructions: ['Review module completion.', 'Review practice assessment results.', 'Confirm practical evidence and remediation are complete.'], evidence: 'Completed readiness evidence checklist.' },
-            resources: [{ type: 'checklist', title: 'Final readiness checklist', description: 'Use this checklist before beginning the final assessment.', content: 'Confirm all modules, knowledge checks, exercises, practical evidence, and remediation actions are complete before starting the final assessment.' }, { type: 'reference', title: 'Assessment strategy reference', description: 'Use this reference to apply evidence-based decision making during the final assessment.', content: 'Identify the tested objective, recall the relevant evidence or rule, eliminate unsupported options, and select the strongest supported answer.' }],
-            glossary: [{ term: 'Readiness', definition: 'Demonstrated preparation to perform the required course competencies.' }, { term: 'Mastery', definition: 'Performance meeting or exceeding the required threshold.' }, { term: 'Evidence', definition: 'Observable information supporting a competency decision.' }, { term: 'Remediation', definition: 'Targeted corrective learning after a demonstrated gap.' }],
-            remediation: { passingScore: 80, reviewMessage: 'Review missed domains and complete targeted remediation before retrying.', objectiveMap: ['Course-wide knowledge', 'Applied decision making', 'Readiness evidence'], targetedActions: [{ objective: 'Missed final-exam objective', action: 'Return to the mapped lesson, review its reading and flashcards, complete the exercise, then retry the related practice check.' }] },
-            readiness: { domainKey: 'final_readiness', masteryThreshold: 80, evidenceSignals: ['module completion', 'practice assessment performance', 'practical evidence'] },
+            knowledgeChecks: finalExam.questions
+              .slice(0, 3)
+              .map((question) => ({
+                question: question.question,
+                options: question.options,
+                correct: question.correct,
+                explanation: question.explanation,
+              })),
+            scenario: {
+              title: 'Readiness decision',
+              context:
+                'A learner has completed all modules and practice activities but still has one weak domain.',
+              question: 'What should the learner do before the final attempt?',
+              options: [
+                {
+                  text: 'Complete targeted remediation for the weak domain.',
+                  isCorrect: true,
+                  feedback: 'Targeted remediation addresses the identified competency gap.',
+                },
+                {
+                  text: 'Ignore the weak domain and guess.',
+                  isCorrect: false,
+                  feedback: 'Ignoring evidence does not demonstrate readiness.',
+                },
+              ],
+            },
+            caseStudy: {
+              title: 'Evidence review',
+              context:
+                'Practice results show strong performance in most domains and repeated errors in one objective.',
+              question: 'Which conclusion is best supported?',
+              options: [
+                {
+                  text: 'The learner needs focused review on the repeated weak objective.',
+                  isCorrect: true,
+                  feedback: 'Repeated errors are evidence for targeted remediation.',
+                },
+                {
+                  text: 'The learner should skip all further review.',
+                  isCorrect: false,
+                  feedback: 'The evidence indicates a specific remaining gap.',
+                },
+              ],
+            },
+            exercises: [
+              {
+                id: 'final-plan',
+                title: 'Build a final review plan',
+                instructions: [
+                  'List weak objectives from practice results.',
+                  'Assign a specific review and retry action to each objective.',
+                ],
+                expectedArtifact: 'A targeted final review plan.',
+                autoGrade: {
+                  type: 'checklist',
+                  criteria: ['Weak objectives identified', 'Specific remediation actions assigned'],
+                },
+              },
+            ],
+            practicalTask: {
+              title: 'Readiness evidence check',
+              description:
+                'Verify that required course evidence is complete before the final attempt.',
+              instructions: [
+                'Review module completion.',
+                'Review practice assessment results.',
+                'Confirm practical evidence and remediation are complete.',
+              ],
+              evidence: 'Completed readiness evidence checklist.',
+            },
+            resources: [
+              {
+                type: 'checklist',
+                title: 'Final readiness checklist',
+                description: 'Use this checklist before beginning the final assessment.',
+                content:
+                  'Confirm all modules, knowledge checks, exercises, practical evidence, and remediation actions are complete before starting the final assessment.',
+              },
+              {
+                type: 'reference',
+                title: 'Assessment strategy reference',
+                description:
+                  'Use this reference to apply evidence-based decision making during the final assessment.',
+                content:
+                  'Identify the tested objective, recall the relevant evidence or rule, eliminate unsupported options, and select the strongest supported answer.',
+              },
+            ],
+            glossary: [
+              {
+                term: 'Readiness',
+                definition: 'Demonstrated preparation to perform the required course competencies.',
+              },
+              {
+                term: 'Mastery',
+                definition: 'Performance meeting or exceeding the required threshold.',
+              },
+              {
+                term: 'Evidence',
+                definition: 'Observable information supporting a competency decision.',
+              },
+              {
+                term: 'Remediation',
+                definition: 'Targeted corrective learning after a demonstrated gap.',
+              },
+            ],
+            remediation: {
+              passingScore: 80,
+              reviewMessage:
+                'Review missed domains and complete targeted remediation before retrying.',
+              objectiveMap: [
+                'Course-wide knowledge',
+                'Applied decision making',
+                'Readiness evidence',
+              ],
+              targetedActions: [
+                {
+                  objective: 'Missed final-exam objective',
+                  action:
+                    'Return to the mapped lesson, review its reading and flashcards, complete the exercise, then retry the related practice check.',
+                },
+              ],
+            },
+            readiness: {
+              domainKey: 'final_readiness',
+              masteryThreshold: 80,
+              evidenceSignals: [
+                'module completion',
+                'practice assessment performance',
+                'practical evidence',
+              ],
+            },
           },
         });
         lesson.quizQuestions = finalExam.questions.map((question, questionIndex) => ({
@@ -330,35 +527,207 @@ async function enrichBlueprint(
               title: lesson.title,
               summary: `Use this checkpoint to confirm mastery of the key concepts and applied decisions from ${courseModule.title} before continuing.`,
               sections: [
-                { heading: 'Review the Module', body: `Review the objectives, examples, flashcards, and applied exercises from ${courseModule.title}. Focus on concepts you cannot yet explain or apply without assistance.` },
-                { heading: 'Use Evidence', body: 'For each checkpoint question, connect the answer to a specific concept, rule, calculation, or decision method from the module rather than relying on guessing.' },
-                { heading: 'Remediate Gaps', body: 'When an answer is missed, identify the underlying objective, return to the named learning material, complete targeted practice, and retry after you can explain the correct reasoning.' },
+                {
+                  heading: 'Review the Module',
+                  body: `Review the objectives, examples, flashcards, and applied exercises from ${courseModule.title}. Focus on concepts you cannot yet explain or apply without assistance.`,
+                },
+                {
+                  heading: 'Use Evidence',
+                  body: 'For each checkpoint question, connect the answer to a specific concept, rule, calculation, or decision method from the module rather than relying on guessing.',
+                },
+                {
+                  heading: 'Remediate Gaps',
+                  body: 'When an answer is missed, identify the underlying objective, return to the named learning material, complete targeted practice, and retry after you can explain the correct reasoning.',
+                },
               ],
-              keyTakeaways: ['Verify module mastery.', 'Use evidence to answer questions.', 'Remediate weak objectives before continuing.'],
+              keyTakeaways: [
+                'Verify module mastery.',
+                'Use evidence to answer questions.',
+                'Remediate weak objectives before continuing.',
+              ],
             },
             narrationScript: `This checkpoint measures your readiness to continue after ${courseModule.title}. Use the concepts and applied practice from the module. If you miss an objective, complete the targeted review before retrying.`,
             visualPrompt: `Professional learner completing a module checkpoint for ${courseModule.title} using organized notes and evidence at a modern workstation.`,
             flashcards: [
-              { id: 'check-1', front: 'Checkpoint', back: 'A formative assessment used to verify readiness before progressing.', tags: ['checkpoint'] },
-              { id: 'check-2', front: 'Evidence', back: 'Information from instruction or practice that supports a decision.', tags: ['checkpoint'] },
-              { id: 'check-3', front: 'Mastery', back: 'Performance at or above the required learning threshold.', tags: ['checkpoint'] },
-              { id: 'check-4', front: 'Objective', back: 'A measurable skill or knowledge target for the module.', tags: ['checkpoint'] },
-              { id: 'check-5', front: 'Remediation', back: 'Focused review and practice used to correct a weak objective.', tags: ['checkpoint'] },
-              { id: 'check-6', front: 'Retry', back: 'A new attempt completed after targeted remediation.', tags: ['checkpoint'] },
+              {
+                id: 'check-1',
+                front: 'Checkpoint',
+                back: 'A formative assessment used to verify readiness before progressing.',
+                tags: ['checkpoint'],
+              },
+              {
+                id: 'check-2',
+                front: 'Evidence',
+                back: 'Information from instruction or practice that supports a decision.',
+                tags: ['checkpoint'],
+              },
+              {
+                id: 'check-3',
+                front: 'Mastery',
+                back: 'Performance at or above the required learning threshold.',
+                tags: ['checkpoint'],
+              },
+              {
+                id: 'check-4',
+                front: 'Objective',
+                back: 'A measurable skill or knowledge target for the module.',
+                tags: ['checkpoint'],
+              },
+              {
+                id: 'check-5',
+                front: 'Remediation',
+                back: 'Focused review and practice used to correct a weak objective.',
+                tags: ['checkpoint'],
+              },
+              {
+                id: 'check-6',
+                front: 'Retry',
+                back: 'A new attempt completed after targeted remediation.',
+                tags: ['checkpoint'],
+              },
             ],
             quickClips: [
-              { id: 'checkpoint-review', title: 'Checkpoint review', objective: 'Prepare for the module checkpoint', durationSeconds: 120, script: `Review the most important objectives from ${courseModule.title}. Use your lesson evidence to identify any concept you cannot yet explain, calculate, or apply confidently before beginning the checkpoint.`, visualPrompt: `Instructor reviewing key ${courseModule.title} objectives with a learner before a checkpoint.` },
-              { id: 'checkpoint-remediation', title: 'How to remediate a missed objective', objective: 'Use targeted remediation after a missed question', durationSeconds: 120, script: 'When you miss a checkpoint item, identify the mapped objective, return to the relevant reading and example, review the related flashcards, complete the applied exercise, and retry only when you can explain the reasoning.', visualPrompt: 'Learner following a targeted remediation checklist after a missed checkpoint objective.' },
+              {
+                id: 'checkpoint-review',
+                title: 'Checkpoint review',
+                objective: 'Prepare for the module checkpoint',
+                durationSeconds: 120,
+                script: `Review the most important objectives from ${courseModule.title}. Use your lesson evidence to identify any concept you cannot yet explain, calculate, or apply confidently before beginning the checkpoint.`,
+                visualPrompt: `Instructor reviewing key ${courseModule.title} objectives with a learner before a checkpoint.`,
+              },
+              {
+                id: 'checkpoint-remediation',
+                title: 'How to remediate a missed objective',
+                objective: 'Use targeted remediation after a missed question',
+                durationSeconds: 120,
+                script:
+                  'When you miss a checkpoint item, identify the mapped objective, return to the relevant reading and example, review the related flashcards, complete the applied exercise, and retry only when you can explain the reasoning.',
+                visualPrompt:
+                  'Learner following a targeted remediation checklist after a missed checkpoint objective.',
+              },
             ],
-            knowledgeChecks: assessment.questions.slice(0, 3).map((question) => ({ question: question.question, options: question.options, correct: question.correct, explanation: question.explanation })),
-            scenario: { title: 'Progression decision', context: 'A learner finishes the module but misses several questions tied to the same objective.', question: 'What is the correct next step?', options: [{ text: 'Complete targeted remediation for that objective before retrying.', isCorrect: true, feedback: 'Focused remediation addresses the demonstrated gap.' }, { text: 'Skip the objective and continue without review.', isCorrect: false, feedback: 'Progression should follow demonstrated mastery.' }] },
-            caseStudy: { title: 'Checkpoint evidence', context: 'A learner has strong practice results except for one repeated error pattern.', question: 'What does the evidence indicate?', options: [{ text: 'One objective needs additional focused practice.', isCorrect: true, feedback: 'Repeated errors identify a targeted gap.' }, { text: 'All learning should be restarted from the beginning.', isCorrect: false, feedback: 'The evidence supports targeted rather than blanket remediation.' }] },
-            exercises: [{ id: 'checkpoint-plan', title: 'Map missed objectives', instructions: ['Review practice evidence from the module.', 'Map each weak objective to a specific lesson and review action.'], expectedArtifact: 'A targeted module remediation plan.', autoGrade: { type: 'checklist', criteria: ['Weak objectives identified', 'Review actions mapped'] } }],
-            practicalTask: { title: 'Module readiness verification', description: 'Confirm required module evidence before progression.', instructions: ['Verify lesson completion.', 'Verify applied exercises.', 'Verify remediation for weak objectives.'], evidence: 'Completed module readiness checklist.' },
-            resources: [{ type: 'checklist', title: 'Module checkpoint checklist', description: 'Use before attempting the checkpoint.', content: `Confirm you can explain and apply the key objectives from ${courseModule.title}, then identify any objective needing additional review.` }, { type: 'reference', title: 'Targeted remediation guide', description: 'Use after a missed checkpoint objective.', content: 'Identify the objective, return to the mapped lesson, review the relevant reading and flashcards, complete the exercise, and retry the knowledge check.' }],
-            glossary: [{ term: 'Checkpoint', definition: 'A formative assessment used to verify readiness.' }, { term: 'Objective', definition: 'A measurable learning target.' }, { term: 'Mastery', definition: 'Performance at or above the required threshold.' }, { term: 'Remediation', definition: 'Targeted corrective learning for a demonstrated gap.' }],
-            remediation: { passingScore: 80, reviewMessage: 'Review weak objectives and complete targeted practice before retrying.', objectiveMap: ['Module knowledge', 'Applied decision making', 'Progression readiness'], targetedActions: [{ objective: 'Missed checkpoint objective', action: 'Return to the mapped lesson, review its reading and flashcards, complete the exercise, then retry the objective-aligned check.' }] },
-            readiness: { domainKey: lesson.domainKey || courseModule.domainKey || slugify(courseModule.title), masteryThreshold: 80, evidenceSignals: ['lesson completion', 'applied exercise completion', 'checkpoint performance'] },
+            knowledgeChecks: assessment.questions
+              .slice(0, 3)
+              .map((question) => ({
+                question: question.question,
+                options: question.options,
+                correct: question.correct,
+                explanation: question.explanation,
+              })),
+            scenario: {
+              title: 'Progression decision',
+              context:
+                'A learner finishes the module but misses several questions tied to the same objective.',
+              question: 'What is the correct next step?',
+              options: [
+                {
+                  text: 'Complete targeted remediation for that objective before retrying.',
+                  isCorrect: true,
+                  feedback: 'Focused remediation addresses the demonstrated gap.',
+                },
+                {
+                  text: 'Skip the objective and continue without review.',
+                  isCorrect: false,
+                  feedback: 'Progression should follow demonstrated mastery.',
+                },
+              ],
+            },
+            caseStudy: {
+              title: 'Checkpoint evidence',
+              context:
+                'A learner has strong practice results except for one repeated error pattern.',
+              question: 'What does the evidence indicate?',
+              options: [
+                {
+                  text: 'One objective needs additional focused practice.',
+                  isCorrect: true,
+                  feedback: 'Repeated errors identify a targeted gap.',
+                },
+                {
+                  text: 'All learning should be restarted from the beginning.',
+                  isCorrect: false,
+                  feedback: 'The evidence supports targeted rather than blanket remediation.',
+                },
+              ],
+            },
+            exercises: [
+              {
+                id: 'checkpoint-plan',
+                title: 'Map missed objectives',
+                instructions: [
+                  'Review practice evidence from the module.',
+                  'Map each weak objective to a specific lesson and review action.',
+                ],
+                expectedArtifact: 'A targeted module remediation plan.',
+                autoGrade: {
+                  type: 'checklist',
+                  criteria: ['Weak objectives identified', 'Review actions mapped'],
+                },
+              },
+            ],
+            practicalTask: {
+              title: 'Module readiness verification',
+              description: 'Confirm required module evidence before progression.',
+              instructions: [
+                'Verify lesson completion.',
+                'Verify applied exercises.',
+                'Verify remediation for weak objectives.',
+              ],
+              evidence: 'Completed module readiness checklist.',
+            },
+            resources: [
+              {
+                type: 'checklist',
+                title: 'Module checkpoint checklist',
+                description: 'Use before attempting the checkpoint.',
+                content: `Confirm you can explain and apply the key objectives from ${courseModule.title}, then identify any objective needing additional review.`,
+              },
+              {
+                type: 'reference',
+                title: 'Targeted remediation guide',
+                description: 'Use after a missed checkpoint objective.',
+                content:
+                  'Identify the objective, return to the mapped lesson, review the relevant reading and flashcards, complete the exercise, and retry the knowledge check.',
+              },
+            ],
+            glossary: [
+              {
+                term: 'Checkpoint',
+                definition: 'A formative assessment used to verify readiness.',
+              },
+              { term: 'Objective', definition: 'A measurable learning target.' },
+              { term: 'Mastery', definition: 'Performance at or above the required threshold.' },
+              {
+                term: 'Remediation',
+                definition: 'Targeted corrective learning for a demonstrated gap.',
+              },
+            ],
+            remediation: {
+              passingScore: 80,
+              reviewMessage:
+                'Review weak objectives and complete targeted practice before retrying.',
+              objectiveMap: [
+                'Module knowledge',
+                'Applied decision making',
+                'Progression readiness',
+              ],
+              targetedActions: [
+                {
+                  objective: 'Missed checkpoint objective',
+                  action:
+                    'Return to the mapped lesson, review its reading and flashcards, complete the exercise, then retry the objective-aligned check.',
+                },
+              ],
+            },
+            readiness: {
+              domainKey: lesson.domainKey || courseModule.domainKey || slugify(courseModule.title),
+              masteryThreshold: 80,
+              evidenceSignals: [
+                'lesson completion',
+                'applied exercise completion',
+                'checkpoint performance',
+              ],
+            },
           },
         });
         lesson.quizQuestions = assessment.questions.map((question, questionIndex) => ({
@@ -378,6 +747,11 @@ async function enrichBlueprint(
         moduleTitle: courseModule.title,
         courseTitle,
         state: input.state ?? enriched.state,
+        standardsBlock: [
+          `Required domain: ${lesson.domainKey || courseModule.domainKey || courseModule.slug}`,
+          `Required module competencies: ${(courseModule.competencies ?? []).map((competency) => competency.competencyKey).join(', ') || 'Apply the module objective'}`,
+          `Blueprint lesson identity: ${lesson.slug} — ${lesson.title}`,
+        ].join('\n'),
       });
       lesson.objective = generated.objective;
       lesson.content = generated.content;
@@ -429,14 +803,19 @@ export async function courseFactory(
 
     if (!blueprint) {
       const db = await requireAdminClient();
-      const loaded = await loadBlueprintWithProgram(db, { programId: input.programId, programSlug });
+      const loaded = await loadBlueprintWithProgram(db, {
+        programId: input.programId,
+        programSlug,
+      });
       blueprint = loaded?.blueprint ? cloneBlueprint(loaded.blueprint) : null;
       program = loaded?.program ?? null;
     }
 
     if (!blueprint) {
       if (!isAIAvailable()) {
-        throw new Error(`No registered blueprint found for ${programSlug}, and no AI provider is available.`);
+        throw new Error(
+          `No registered blueprint found for ${programSlug}, and no AI provider is available.`,
+        );
       }
       tracker.emit('blueprint', `Generating a new blueprint for ${programSlug}.`, 5);
       blueprint = await generateFreeFormBlueprint(input, programSlug);
@@ -446,7 +825,11 @@ export async function courseFactory(
 
     if (!program && input.programId) {
       const db = await requireAdminClient();
-      const { data } = await db.from('programs').select('*').eq('id', input.programId).maybeSingle();
+      const { data } = await db
+        .from('programs')
+        .select('*')
+        .eq('id', input.programId)
+        .maybeSingle();
       program = data;
     }
 
@@ -585,3 +968,4 @@ export async function courseFactory(
     };
   }
 }
+

@@ -9,7 +9,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { hydrateNorthflankEnv } from '@/lib/secrets';
 import {
   getNorthflankProjectId,
   getNorthflankService,
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
-  await hydrateProcessEnv().catch(() => {});
+  await hydrateNorthflankEnv().catch(() => {});
 
   const projectId = getNorthflankProjectId();
   const nfReady = isNorthflankReady();
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
-  await hydrateProcessEnv().catch(() => {});
+  await hydrateNorthflankEnv().catch(() => {});
 
   let body: { action: string; service: string };
   try {

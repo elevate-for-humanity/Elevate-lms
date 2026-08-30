@@ -32,6 +32,11 @@ interface HomeHeroSlide {
   label: string;
 }
 
+interface DynamicHomeHeroAsset {
+  publicUrl: string;
+  transcript?: string;
+}
+
 const HOME_MEDIA_REVISION = process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 12) || 'home-hero';
 const HOME_FIRST_FRAME = '/images/heroes/hero-home-first-frame.webp';
 const HOME_SLIDE_SECONDS = 3.5;
@@ -45,39 +50,69 @@ function withMediaRevision(src?: string) {
 }
 
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
-  const slides = ([
-    {
-      type: 'video',
-      src: withMediaRevision(banner.videoSrcDesktop),
-      mobileSrc: withMediaRevision(banner.videoSrcMobile),
-      alt: 'Elevate for Humanity career training and apprenticeship opportunities',
-      label: 'Career training and apprenticeships',
-    },
-    {
-      type: 'image',
-      src: '/images/hero/hero-healthcare.jpg',
-      alt: 'Healthcare professional welcoming students to a hands-on career pathway',
-      label: 'Prepare for an in-demand healthcare career',
-    },
-    {
-      type: 'image',
-      src: '/images/partners/salon-saloon/team-interior.webp',
-      alt: 'Salon Saloon team inside their professional salon',
-      label: 'Learn with experienced professionals',
-    },
-    {
-      type: 'image',
-      src: '/images/pages/apprenticeships-page-2.webp',
-      alt: 'Apprentices developing practical skills with experienced professionals',
-      label: 'Build skills through hands-on apprenticeship training',
-    },
-  ] satisfies HomeHeroSlide[]).filter(
-    (slide) => slide.type === 'image' || Boolean(slide.src || slide.mobileSrc),
-  );
+  const [dynamicAsset, setDynamicAsset] = useState<DynamicHomeHeroAsset | null>(null);
+  const resolvedVideoDesktop = dynamicAsset?.publicUrl || banner.videoSrcDesktop;
+  const resolvedVideoMobile = dynamicAsset?.publicUrl || banner.videoSrcMobile;
+  const slides = (
+    [
+      {
+        type: 'video',
+        src: withMediaRevision(resolvedVideoDesktop),
+        mobileSrc: withMediaRevision(resolvedVideoMobile),
+        alt: 'Elevate for Humanity career training and apprenticeship opportunities',
+        label: 'Career training and apprenticeships',
+      },
+      {
+        type: 'image',
+        src: '/images/hero/hero-healthcare.jpg',
+        alt: 'Healthcare professional welcoming students to a hands-on career pathway',
+        label: 'Prepare for an in-demand healthcare career',
+      },
+      {
+        type: 'image',
+        src: '/images/partners/salon-saloon/team-interior.webp',
+        alt: 'Salon Saloon team inside their professional salon',
+        label: 'Learn with experienced professionals',
+      },
+      {
+        type: 'image',
+        src: '/images/pages/apprenticeships-page-2.webp',
+        alt: 'Apprentices developing practical skills with experienced professionals',
+        label: 'Build skills through hands-on apprenticeship training',
+      },
+    ] satisfies HomeHeroSlide[]
+  ).filter((slide) => slide.type === 'image' || Boolean(slide.src || slide.mobileSrc));
 
   const [activeSlide, setActiveSlide] = useState(0);
   const [paused, setPaused] = useState(false);
   const slide = slides[activeSlide] ?? slides[0];
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 2_500);
+
+    void fetch('/api/public/home-hero', {
+      cache: 'force-cache',
+      credentials: 'omit',
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        return response.json() as Promise<{ asset?: DynamicHomeHeroAsset | null }>;
+      })
+      .then((payload) => {
+        if (payload?.asset?.publicUrl?.startsWith('https://')) {
+          setDynamicAsset(payload.asset);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => window.clearTimeout(timeout));
+
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, []);
 
   const selectSlide = useCallback(
     (index: number) => {
@@ -114,7 +149,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           videoSrcDesktop={slide.type === 'video' ? slide.src : undefined}
           videoSrcMobile={slide.type === 'video' ? slide.mobileSrc : undefined}
           mountedFrameImage={slide.type === 'video' ? HOME_FIRST_FRAME : slide.src}
-          transcript={HOME_NARRATION}
+          transcript={dynamicAsset?.transcript || banner.transcript || HOME_NARRATION}
           narrateTranscript
           analyticsName={banner.analyticsName}
           overlayMode="none"
@@ -132,7 +167,9 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             aria-label="Show previous hero slide"
             className="absolute left-0 top-1/2 z-50 inline-flex h-16 w-11 -translate-y-1/2 items-center justify-center rounded-r-lg border-y border-r border-white/80 bg-slate-950/65 text-white shadow-lg transition hover:bg-slate-950/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            <span aria-hidden="true" className="text-4xl font-light leading-none">‹</span>
+            <span aria-hidden="true" className="text-4xl font-light leading-none">
+              ‹
+            </span>
           </button>
           <button
             type="button"
@@ -140,7 +177,9 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             aria-label="Show next hero slide"
             className="absolute right-0 top-1/2 z-50 inline-flex h-16 w-11 -translate-y-1/2 items-center justify-center rounded-l-lg border-y border-l border-white/80 bg-slate-950/65 text-white shadow-lg transition hover:bg-slate-950/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            <span aria-hidden="true" className="text-4xl font-light leading-none">›</span>
+            <span aria-hidden="true" className="text-4xl font-light leading-none">
+              ›
+            </span>
           </button>
 
           <div className="absolute bottom-5 left-1/2 z-50 flex w-[min(88vw,32rem)] -translate-x-1/2 items-center gap-2 rounded-lg border border-white/40 bg-slate-950/55 px-3 py-2 shadow-lg backdrop-blur-sm">
@@ -162,7 +201,9 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
               aria-label={paused ? 'Resume hero slideshow' : 'Pause hero slideshow'}
               className="ml-1 inline-flex h-8 min-w-10 items-center justify-center rounded-md border border-white/50 px-2 text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
-              <span aria-hidden="true" className="text-sm font-black leading-none">{paused ? '▶' : 'Ⅱ'}</span>
+              <span aria-hidden="true" className="text-sm font-black leading-none">
+                {paused ? '▶' : 'Ⅱ'}
+              </span>
             </button>
           </div>
 
@@ -177,11 +218,19 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           transform-origin: center;
         }
         @keyframes home-hero-fade {
-          from { opacity: 0; transform: scale(1.018); }
-          to { opacity: 1; transform: scale(1); }
+          from {
+            opacity: 0;
+            transform: scale(1.018);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
         @media (prefers-reduced-motion: reduce) {
-          .home-hero-slide-enter { animation: none; }
+          .home-hero-slide-enter {
+            animation: none;
+          }
         }
       `}</style>
     </div>

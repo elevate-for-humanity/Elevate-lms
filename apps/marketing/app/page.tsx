@@ -12,7 +12,6 @@ import { HomeMobileActions } from '@/components/home/HomeMobileActions';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
-import { getApprovedHomeHeroAsset } from '@/lib/media/home-hero-asset';
 
 export const revalidate = 300;
 
@@ -56,17 +55,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function HomePage() {
-  const generatedHero = await getApprovedHomeHeroAsset();
-  const banner = generatedHero
-    ? {
-        ...heroBanners.home,
-        videoSrcDesktop: generatedHero.publicUrl,
-        videoSrcMobile: generatedHero.publicUrl,
-        transcript: generatedHero.transcript || heroBanners.home.transcript,
-      }
-    : heroBanners.home;
-
+export default function HomePage() {
   return (
     <>
       <StructuredData />
@@ -74,7 +63,7 @@ export default async function HomePage() {
         <h1 className="sr-only">
           Career training, registered apprenticeships, testing, and workforce pathways
         </h1>
-        <HomeHeroVideo banner={banner} />
+        <HomeHeroVideo banner={heroBanners.home} />
         <HomeCareerPathways />
         <HomeApprenticeshipSales />
         <HomeWebsiteBuilderSales />

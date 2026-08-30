@@ -2,6 +2,22 @@ import { createServerClient } from '@supabase/ssr';
 import type { NextRequest } from 'next/server';
 import { getServerPublicSupabaseConfig } from '@/lib/supabase/public-config';
 
+const MIDDLEWARE_SUPABASE_TIMEOUT_MS = 2_500;
+
+async function middlewareFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const abortFromCaller = () => controller.abort();
+  init?.signal?.addEventListener('abort', abortFromCaller, { once: true });
+  const timer = setTimeout(() => controller.abort(), MIDDLEWARE_SUPABASE_TIMEOUT_MS);
+
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+    init?.signal?.removeEventListener('abort', abortFromCaller);
+  }
+}
+
 type CookieMutation = {
   name: string;
   value: string;
@@ -16,6 +32,7 @@ export function createMiddlewareSupabaseClient(
   if (!config) throw new Error('Supabase public configuration is unavailable');
 
   return createServerClient(config.url, config.anonKey, {
+    global: { fetch: middlewareFetch },
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll,

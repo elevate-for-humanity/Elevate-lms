@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'public');
   if (rateLimited) return rateLimited;
 
-  const body = await request.json().catch(() => null) as Record<string, unknown> | null;
+  const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return NextResponse.json({ ok: false }, { status: 400 });
 
   const path = clean(body.path, 1000);
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   // page load add another doomed database request while operational traffic is
   // trying to recover.
   if (Date.now() < suppressWritesUntil) {
-    return NextResponse.json({ ok: true, recorded: false, deferred: true });
+    return NextResponse.json({ ok: true, recorded: false, deferred: true, degraded: true });
   }
 
   try {
@@ -55,12 +55,14 @@ export async function POST(request: NextRequest) {
     suppressWritesUntil = 0;
   } catch {
     analyticsFailures += 1;
-    suppressWritesUntil = Date.now() + Math.min(
-      ANALYTICS_OUTAGE_MAX_MS,
-      ANALYTICS_OUTAGE_BASE_MS * (2 ** Math.min(analyticsFailures - 1, 5)),
-    );
+    suppressWritesUntil =
+      Date.now() +
+      Math.min(
+        ANALYTICS_OUTAGE_MAX_MS,
+        ANALYTICS_OUTAGE_BASE_MS * 2 ** Math.min(analyticsFailures - 1, 5),
+      );
     // Analytics must never break the public experience.
-    return NextResponse.json({ ok: true, recorded: false });
+    return NextResponse.json({ ok: true, recorded: false, degraded: true });
   }
 
   return NextResponse.json({ ok: true, recorded: true });

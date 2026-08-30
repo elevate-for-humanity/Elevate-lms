@@ -9,6 +9,8 @@ import { describe, expect, it } from 'vitest';
 describe('deployed portal middleware auth coverage', () => {
   const lms = readFileSync(resolve(process.cwd(), 'apps/lms/middleware.ts'), 'utf8');
   const marketing = readFileSync(resolve(process.cwd(), 'apps/marketing/middleware.ts'), 'utf8');
+  const marketingHome = readFileSync(resolve(process.cwd(), 'apps/marketing/app/page.tsx'), 'utf8');
+  const homeHero = readFileSync(resolve(process.cwd(), 'components/ui/HomeHeroVideo.tsx'), 'utf8');
 
   const lmsProtectedPrefixes = [
     '/learner',
@@ -38,6 +40,17 @@ describe('deployed portal middleware auth coverage', () => {
     expect(lms).toContain('supabase.auth.getUser()');
     expect(lms).toMatch(/protectedPath\s*&&\s*\(error\s*\|\|\s*!user\)/);
     expect(lms).toContain("X-Robots-Tag', 'noindex, nofollow, noarchive'");
+  });
+
+  it('does not refresh Supabase sessions on public LMS entry points', () => {
+    expect(lms).toMatch(/if \(protectedPath\) \{[\s\S]*supabase\.auth\.getUser\(\)/);
+    expect(lms).not.toContain('hasSupabaseSession || protectedPath');
+  });
+
+  it('renders the marketing homepage before loading the optional database hero', () => {
+    expect(marketingHome).not.toContain('getApprovedHomeHeroAsset');
+    expect(marketingHome).toContain('<HomeHeroVideo banner={heroBanners.home} />');
+    expect(homeHero).toContain("fetch('/api/public/home-hero'");
   });
 
   it('validates the Supabase user before protected Marketing portal rendering', () => {

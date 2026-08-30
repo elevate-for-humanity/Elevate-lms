@@ -78,16 +78,15 @@ export async function middleware(req: NextRequest) {
   }
 
   const protectedPath = isProtectedPath(pathname);
-  const hasSupabaseSession = req.cookies
-    .getAll()
-    .some(({ name }) => name.startsWith('sb-') && name.includes('-auth-token'));
-
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', pathname);
 
   let response = NextResponse.next({ request: { headers: requestHeaders } });
 
-  if (hasSupabaseSession || protectedPath) {
+  // Public entry points (especially /login and /host-shop/login) must render
+  // without a network session refresh. A stale cross-subdomain cookie used to
+  // make the public login shell wait on Supabase during an outage.
+  if (protectedPath) {
     const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
       cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
       response = NextResponse.next({ request: { headers: requestHeaders } });

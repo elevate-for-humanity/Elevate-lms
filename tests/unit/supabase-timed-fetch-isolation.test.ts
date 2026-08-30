@@ -29,6 +29,18 @@ describe('Supabase timed fetch circuit isolation', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it('does not replay interactive reads by default', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response('temporarily unavailable', { status: 503 }));
+
+    await expect(timedFetch('https://example.supabase.co/rest/v1/programs')).rejects.toThrow(
+      'Supabase transient HTTP 503',
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it('does not let failed optional writes block a required read', async () => {
     const fetchMock = vi
       .spyOn(globalThis, 'fetch')

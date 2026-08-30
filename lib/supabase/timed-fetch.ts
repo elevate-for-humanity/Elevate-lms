@@ -9,8 +9,12 @@
  */
 import { breakers } from '@/lib/resilience';
 
-const DEFAULT_SUPABASE_FETCH_TIMEOUT_MS = 8_000;
-const DEFAULT_SAFE_READ_MAX_ATTEMPTS = 3;
+// Request-time rendering and authentication must never inherit batch-worker
+// retry budgets. Three eight-second attempts made a transient Data API outage
+// hold every page open for roughly 24.5 seconds. Batch workflows can still opt
+// into longer waits through the documented environment overrides.
+const DEFAULT_SUPABASE_FETCH_TIMEOUT_MS = 2_500;
+const DEFAULT_SAFE_READ_MAX_ATTEMPTS = 1;
 const TRANSIENT_STATUSES = new Set([502, 503, 504]);
 
 function normalizeHeaders(headers?: HeadersInit): Record<string, string> {
@@ -47,11 +51,7 @@ function fetchTimeoutMs(): number {
 }
 
 function safeReadMaxAttempts(): number {
-  return positiveInteger(
-    process.env.SUPABASE_READ_MAX_ATTEMPTS,
-    DEFAULT_SAFE_READ_MAX_ATTEMPTS,
-    5,
-  );
+  return positiveInteger(process.env.SUPABASE_READ_MAX_ATTEMPTS, DEFAULT_SAFE_READ_MAX_ATTEMPTS, 5);
 }
 
 function readCircuitEnabled(): boolean {
@@ -129,7 +129,5 @@ export function timedFetch(input: RequestInfo | URL, init?: RequestInit): Promis
       : new Error('Supabase request failed after bounded retries');
   };
 
-  return isSafeRead(method) && readCircuitEnabled()
-    ? breakers.supabase.call(execute)
-    : execute();
+  return isSafeRead(method) && readCircuitEnabled() ? breakers.supabase.call(execute) : execute();
 }

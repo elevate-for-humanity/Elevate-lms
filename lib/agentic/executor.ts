@@ -9,13 +9,19 @@ import { persistStudioAsset } from '@/lib/media/studio-assets';
 import { processCourseAgenticTask } from './course-executor';
 import { adaptiveBackoffMs } from '@/lib/resilience/adaptive-backoff';
 
-const POLL_MS = 15_000;
+const DEFAULT_POLL_MS = 60_000;
 const MAX_OUTAGE_BACKOFF_MS = 15 * 60_000;
 const HOME_HERO_KIND = 'homepage-hero-commercial';
 let started = false;
 let timer: NodeJS.Timeout | null = null;
 let polling = false;
 let consecutivePollFailures = 0;
+
+function pollIntervalMs(): number {
+  const configured = Number.parseInt(process.env.AGENTIC_EXECUTOR_POLL_MS ?? '', 10);
+  if (!Number.isFinite(configured) || configured < 15_000) return DEFAULT_POLL_MS;
+  return Math.min(configured, 5 * 60_000);
+}
 
 function homeHeroBrief(prompt: string): CommercialBrief {
   return {
@@ -126,7 +132,13 @@ async function processMarketingTask(task: any, run: any, project: any) {
         overlay: 'none',
         motion: 'fast readable cuts with restrained animated typography',
         mobile_safe: true,
-        scenes: ['Healthcare', 'Skilled Trades', 'Barber & Beauty', 'Business & Technology', 'Earn While You Learn'],
+        scenes: [
+          'Healthcare',
+          'Skilled Trades',
+          'Barber & Beauty',
+          'Business & Technology',
+          'Earn While You Learn',
+        ],
       },
     });
     return;
@@ -134,7 +146,8 @@ async function processMarketingTask(task: any, run: any, project: any) {
 
   if (task.worker === 'media-director') {
     const organizationId = await resolveOrganizationId(project.tenant_id);
-    if (!organizationId) throw new Error('No active organization is mapped to the agentic project tenant.');
+    if (!organizationId)
+      throw new Error('No active organization is mapped to the agentic project tenant.');
 
     const brief = homeHeroBrief(run.prompt);
     const { plan } = await createCommercialPlan(brief);
@@ -182,8 +195,10 @@ async function processMarketingTask(task: any, run: any, project: any) {
     const media = deps.find((row: any) => row.worker === 'media-director');
     const assetId = media?.output?.asset_id as string | undefined;
     const publicUrl = media?.output?.public_url as string | undefined;
-    if (!assetId || !publicUrl) throw new Error('Rendered hero asset is missing from the Media Director output.');
-    if (!/^https:\/\//.test(publicUrl)) throw new Error('Rendered hero asset does not have a secure public URL.');
+    if (!assetId || !publicUrl)
+      throw new Error('Rendered hero asset is missing from the Media Director output.');
+    if (!/^https:\/\//.test(publicUrl))
+      throw new Error('Rendered hero asset does not have a secure public URL.');
 
     const { data: asset, error } = await db
       .from('media_assets')
@@ -191,11 +206,13 @@ async function processMarketingTask(task: any, run: any, project: any) {
       .eq('id', assetId)
       .single();
     if (error || !asset) throw new Error('Rendered hero asset could not be loaded for QA.');
-    if (asset.mime_type !== 'video/mp4') throw new Error('Homepage hero output is not an MP4 video.');
+    if (asset.mime_type !== 'video/mp4')
+      throw new Error('Homepage hero output is not an MP4 video.');
     if (!asset.duration_seconds || asset.duration_seconds < 25 || asset.duration_seconds > 50) {
       throw new Error('Homepage hero duration is outside the approved commercial range.');
     }
-    if (!asset.transcript) throw new Error('Homepage hero is missing its accessibility transcript.');
+    if (!asset.transcript)
+      throw new Error('Homepage hero is missing its accessibility transcript.');
 
     await db
       .from('media_assets')
@@ -227,7 +244,8 @@ async function processMarketingTask(task: any, run: any, project: any) {
       .select('metadata')
       .eq('id', assetId)
       .single();
-    if (error || !asset) throw new Error('Homepage hero media asset is unavailable at publish time.');
+    if (error || !asset)
+      throw new Error('Homepage hero media asset is unavailable at publish time.');
     await db
       .from('media_assets')
       .update({
@@ -271,7 +289,9 @@ export async function runAgenticExecutorOnce(): Promise<boolean> {
     const db = await requireAdminClient();
     const { data: tasks, error } = await db
       .from('agentic_build_tasks')
-      .select('id, run_id, worker, action, dependencies, input, status, requires_approval, created_at')
+      .select(
+        'id, run_id, worker, action, dependencies, input, status, requires_approval, created_at',
+      )
       .eq('status', 'queued')
       .order('created_at', { ascending: true })
       .limit(10);
@@ -333,10 +353,11 @@ export function startAgenticExecutor() {
     timer = setTimeout(async () => {
       const healthy = await runAgenticExecutorOnce();
       consecutivePollFailures = healthy ? 0 : consecutivePollFailures + 1;
+      const normalPollMs = pollIntervalMs();
       const nextDelay = healthy
-        ? POLL_MS
+        ? normalPollMs
         : adaptiveBackoffMs(consecutivePollFailures, {
-            baseDelayMs: POLL_MS,
+            baseDelayMs: normalPollMs,
             maxDelayMs: MAX_OUTAGE_BACKOFF_MS,
           });
       if (!healthy) {

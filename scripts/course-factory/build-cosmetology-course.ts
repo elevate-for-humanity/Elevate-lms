@@ -200,9 +200,9 @@ async function main() {
     !checkpoint.success ||
     checkpoint.courseId !== COURSE_ID ||
     checkpoint.moduleCount !== EXPECTED_MODULES ||
-    checkpoint.lessonCount !== EXPECTED_LESSONS
+    checkpoint.lessonCount + checkpoint.skippedCount !== EXPECTED_LESSONS
   ) {
-    fail(`Deterministic structure checkpoint failed: ${JSON.stringify(checkpoint.errors)}`);
+    fail(`Deterministic structure checkpoint failed: ${JSON.stringify({ errors: checkpoint.errors, modules: checkpoint.moduleCount, insertedLessons: checkpoint.lessonCount, preservedLessons: checkpoint.skippedCount })}`);
   }
 
   const { error: checkpointStateError } = await db

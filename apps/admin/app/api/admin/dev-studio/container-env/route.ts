@@ -3,7 +3,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeDbError, safeError, safeInternalError } from '@/lib/api/safe-error';
-import { hydrateProcessEnv, refreshSecrets } from '@/lib/secrets';
+import { hydrateNorthflankEnv, refreshSecrets } from '@/lib/secrets';
 import {
   getNorthflankProjectId,
   getNorthflankSecretGroupId,
@@ -35,14 +35,11 @@ function inferCategory(key: string): string {
 
 async function readCanonicalValue(key: string) {
   const db = await requireAdminClient();
-  const { data, error } = await db
-    .from('platform_secrets')
-    .select('value_enc,scope')
-    .eq('key', key)
-    .maybeSingle();
+  const { data, error } = await db.rpc('get_platform_secret', { p_key: key });
   if (error) throw error;
-  if (data?.scope && data.scope !== 'runtime') return null;
-  return data?.value_enc?.trim() || process.env[key]?.trim() || null;
+  return typeof data === 'string' && data.trim()
+    ? data.trim()
+    : process.env[key]?.trim() || null;
 }
 
 export async function GET(req: NextRequest) {
@@ -53,7 +50,7 @@ export async function GET(req: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    await hydrateProcessEnv();
+    await hydrateNorthflankEnv();
     const services = getNorthflankServices();
     return NextResponse.json({
       provider: 'northflank',
@@ -76,7 +73,7 @@ export async function POST(req: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    await hydrateProcessEnv();
+    await hydrateNorthflankEnv();
     const body = await req.json().catch(() => null);
     const key = String(body?.key ?? '').trim().toUpperCase();
     const suppliedValue = typeof body?.value === 'string' ? body.value : '';
@@ -101,18 +98,12 @@ export async function POST(req: NextRequest) {
 
     // Direct pushes become canonical runtime values as well; this prevents the
     // deployment provider from receiving a value that the application DB does not know about.
-    const { error: saveError } = await db.from('platform_secrets').upsert(
-      {
-        key,
-        value_enc: resolvedValue,
-        scope: 'runtime',
-        category: inferCategory(key),
-        is_sensitive: true,
-        updated_by: auth.id,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'key' },
-    );
+    const { error: saveError } = await db.rpc('set_platform_secret', {
+      p_key: key,
+      p_value: resolvedValue,
+      p_description: `Updated through Dev Studio by ${auth.id}`,
+      p_category: inferCategory(key),
+    });
     if (saveError) return safeDbError(saveError, `Failed to persist ${key}`);
 
     const legacyDelete = await db.from('app_secrets').delete().eq('key', key);
@@ -121,7 +112,7 @@ export async function POST(req: NextRequest) {
     }
 
     await refreshSecrets();
-    await hydrateProcessEnv();
+    await hydrateNorthflankEnv();
 
     const projectId = getNorthflankProjectId();
     if (!projectId) return safeError('Northflank project id is not configured', 503);

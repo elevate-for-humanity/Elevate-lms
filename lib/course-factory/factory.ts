@@ -462,7 +462,7 @@ export async function courseFactory(
       9,
     );
 
-    const audit = validateBlueprint(blueprint);
+    const audit = validateBlueprint(blueprint, { requireGeneratedContent: false });
     if (!audit.valid) {
       return {
         ok: false,
@@ -488,7 +488,7 @@ export async function courseFactory(
         : await enrichBlueprint(blueprint, courseTitle, input, tracker);
 
     tracker.emit('validate', 'Validating the complete generated course package.', 80);
-    const packageAudit = validateBlueprint(enriched.blueprint);
+    const packageAudit = validateBlueprint(enriched.blueprint, { requireGeneratedContent: true });
     if (!packageAudit.valid) {
       return {
         ok: false,

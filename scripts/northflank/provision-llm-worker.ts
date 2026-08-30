@@ -16,9 +16,9 @@ const GPU_PROJECT_ID = process.env.NORTHFLANK_LLM_PROJECT_ID || 'elevate-media-g
 const GPU_REGION = process.env.NORTHFLANK_GPU_REGION || 'us-central';
 const SERVICE_ID = process.env.NORTHFLANK_LLM_SERVICE_ID || 'elevate-llm-worker';
 const ADMIN_SERVICE_ID = process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin';
-const MODEL_VOLUME_ID = process.env.NORTHFLANK_LLM_MODEL_VOLUME_ID || 'elevate-llm-models';
+const MODEL_VOLUME_ID = process.env.NORTHFLANK_LLM_MODEL_VOLUME_ID || 'elevate-llm-models-rwx';
 const MODEL_VOLUME_MB = Number(process.env.NORTHFLANK_LLM_MODEL_VOLUME_MB || '81920');
-const MODEL_STORAGE_CLASS = process.env.NORTHFLANK_GPU_MODEL_STORAGE_CLASS || 'nvme';
+const MODEL_STORAGE_CLASS = process.env.NORTHFLANK_GPU_MODEL_STORAGE_CLASS || 'nf-multi-rw';
 const GPU_TYPE = process.env.NORTHFLANK_GPU_TYPE || 'l4-24';
 const GPU_COUNT = Number(process.env.NORTHFLANK_GPU_COUNT || '1');
 const GPU_DEPLOYMENT_PLAN = process.env.NORTHFLANK_LLM_DEPLOYMENT_PLAN || `nf-gpu-${GPU_TYPE}-${GPU_COUNT}g`;
@@ -74,7 +74,7 @@ async function ensureVolume(): Promise<string> {
       body: JSON.stringify({
         name: 'Elevate LLM Models',
         mounts: [{ volumeMountPath: '', containerMountPath: '/models' }],
-        spec: { storageClassName: MODEL_STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
+        spec: { accessMode: 'ReadWriteMany', storageClassName: MODEL_STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
       }),
     });
     log('Created model volume', { id: volume.id, storageSize: MODEL_VOLUME_MB });

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import StudentAddForm from './StudentAddForm';
 
@@ -24,7 +24,10 @@ const fundingTypes = [
 
 export default async function AddStudentPage() {
   const auth = await requireStaffPortalAccess();
-  const supabase = await createClient();
+  // Access is authorized above. The staff enrollment workflow needs the
+  // canonical active-program catalog, which is intentionally not constrained
+  // by learner-facing RLS policies.
+  const supabase = await requireAdminClient();
 
   const { data: rawPrograms, error } = await supabase
     .from('programs')

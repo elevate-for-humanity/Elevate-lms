@@ -208,5 +208,9 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
+  // Supabase SSR authentication uses the full supabase-js client. Run the
+  // authorization boundary in Next.js' supported Node middleware runtime so
+  // Realtime's Node feature checks are not bundled into the Edge runtime.
+  runtime: 'nodejs',
   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

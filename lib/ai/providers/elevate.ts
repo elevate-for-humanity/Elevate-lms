@@ -3,6 +3,8 @@ import { normalizeStructuredOutput } from './structured-output';
 import { requestsJson } from './structured-output';
 
 const DEFAULT_TIMEOUT_MS = 120_000;
+const DEFAULT_CONTEXT_TOKENS = 8192;
+const COMPLETION_SAFETY_TOKENS = 512;
 
 function requestTimeoutMs(): number {
   const configured = Number.parseInt(process.env.ELEVATE_LLM_TIMEOUT_MS ?? '', 10);
@@ -10,6 +12,36 @@ function requestTimeoutMs(): number {
   return Math.min(900_000, Math.max(30_000, configured));
 }
 const SERVED_MODEL = 'elevate-local';
+
+function configuredContextTokens(): number {
+  const configured = Number.parseInt(process.env.ELEVATE_LLM_CONTEXT_TOKENS ?? '', 10);
+  if (!Number.isFinite(configured)) return DEFAULT_CONTEXT_TOKENS;
+  return Math.max(2048, configured);
+}
+
+/**
+ * vLLM rejects requests when prompt + requested completion exceeds the served
+ * model context window. Estimate conservatively and reserve a safety margin so
+ * callers can request rich output without needing to know the active model's
+ * context size.
+ */
+export function elevateCompletionBudget(options: ChatCompletionOptions): number {
+  const promptCharacters = options.messages.reduce(
+    (total, message) => total + message.content.length,
+    0,
+  );
+  const estimatedPromptTokens =
+    Math.ceil(promptCharacters / 3) + options.messages.length * 12;
+  const available = configuredContextTokens() - estimatedPromptTokens - COMPLETION_SAFETY_TOKENS;
+  if (available < 256) {
+    throw new Error(
+      `Elevate LLM prompt is too large for the configured ${configuredContextTokens()}-token context window`,
+    );
+  }
+
+  const requested = options.maxTokens ?? 4096;
+  return Math.max(1, Math.min(requested, available));
+}
 
 type OpenAIChatChoice = {
   message?: { content?: string | null };
@@ -71,7 +103,7 @@ export class ElevateProvider implements AIProvider {
         model: SERVED_MODEL,
         messages: options.messages,
         temperature: options.temperature ?? 0.5,
-        max_tokens: options.maxTokens || 4096,
+        max_tokens: elevateCompletionBudget(options),
         ...(requestsJson(options) ? { response_format: { type: 'json_object' } } : {}),
       }),
       signal: AbortSignal.timeout(requestTimeoutMs()),

@@ -109,6 +109,25 @@ function isPending(row: HourRow) {
 }
 
 async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerRecord> {
+  // Platform administrators audit a specifically selected Host Shop. Resolve
+  // that selection before ordinary memberships so an admin's unrelated partner
+  // membership cannot capture the request and send the session into onboarding.
+  const { data: profile } = await db.from('profiles').select('role').eq('id', userId).maybeSingle();
+  const role = normalizeRole(profile?.role);
+  if (role && ['admin', 'super_admin', 'org_admin'].includes(role)) {
+    const cookieStore = await cookies();
+    const selectedPartnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
+    if (!selectedPartnerId) throw new Error('HOST_SHOP_ADMIN_PARTNER_REQUIRED');
+
+    const { data: selectedPartner, error: selectedPartnerError } = await db
+      .from('partners')
+      .select('id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, city, state')
+      .eq('id', selectedPartnerId)
+      .maybeSingle();
+    if (selectedPartnerError || !selectedPartner) throw new Error('HOST_SHOP_ADMIN_PARTNER_REQUIRED');
+    return selectedPartner as PartnerRecord;
+  }
+
   const { data: partnerLinks, error: partnerLinkError } = await db
     .from('partner_users')
     .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, city, state)')
@@ -116,23 +135,11 @@ async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerR
     .eq('status', 'active');
 
   const partnerLink = (partnerLinks || []).find((row: any) => row?.partner_id && row?.partners);
-  if (!partnerLinkError && partnerLink?.partner_id && partnerLink.partners) return partnerLink.partners as unknown as PartnerRecord;
+  if (!partnerLinkError && partnerLink?.partner_id && partnerLink.partners) {
+    return partnerLink.partners as unknown as PartnerRecord;
+  }
 
-  const { data: profile } = await db.from('profiles').select('role').eq('id', userId).maybeSingle();
-  const role = normalizeRole(profile?.role);
-  if (!['admin', 'super_admin', 'org_admin'].includes(role)) throw new Error('HOST_SHOP_ACCESS_DENIED');
-
-  const cookieStore = await cookies();
-  const selectedPartnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
-  if (!selectedPartnerId) throw new Error('HOST_SHOP_ADMIN_PARTNER_REQUIRED');
-
-  const { data: selectedPartner, error: selectedPartnerError } = await db
-    .from('partners')
-    .select('id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, city, state')
-    .eq('id', selectedPartnerId)
-    .maybeSingle();
-  if (selectedPartnerError || !selectedPartner) throw new Error('HOST_SHOP_ADMIN_PARTNER_REQUIRED');
-  return selectedPartner as PartnerRecord;
+  throw new Error('HOST_SHOP_ACCESS_DENIED');
 }
 
 export async function getHostShopAdminPartnerOptions() {

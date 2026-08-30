@@ -1,15 +1,9 @@
 # Production redeploy trigger: Wan inference diagnostics
 name: Deploy GPU Video Worker
 
+# Paid L4 capacity must never start from an ordinary source push. Validation
+# remains automatic in gpu-worker-ci.yml; production capacity is explicit.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/deploy-gpu-worker.yml'
-      - 'services/media-gpu-worker/**'
-      - 'scripts/northflank/provision-gpu-worker.ts'
-      - 'scripts/northflank/lib.ts'
-      - 'lib/video/gpu-video-client.ts'
   workflow_dispatch:
     inputs:
       confirm_gpu_cost:
@@ -26,7 +20,7 @@ concurrency:
 
 jobs:
   deploy-gpu-worker:
-    if: github.event_name == 'push' || github.event.inputs.confirm_gpu_cost == 'DEPLOY_GPU'
+    if: github.event.inputs.confirm_gpu_cost == 'DEPLOY_GPU'
     name: Provision canonical GPU worker
     runs-on: ubuntu-latest
     environment: production

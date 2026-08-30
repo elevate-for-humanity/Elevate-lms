@@ -272,7 +272,7 @@ async function upsertSecretGroup(projectId: string, id: string, serviceId: strin
     restrictions: { restricted: true, nfObjects: [{ id: serviceId, type: 'service' }], tagMatchCondition: 'or' },
     secrets: { variables },
   };
-  await nfFetch(projectApiPath(projectId, `/secrets/${id}`), {
+  await nfFetch(projectApiPath(projectId, '/secrets'), {
     method: 'PUT',
     body: JSON.stringify(payload),
   });

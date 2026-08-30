@@ -44,6 +44,151 @@ function readBaseline(root: string): DriftBaseline | null {
 
 type TableSchema = Map<string, Set<string>>;
 
+function mergeGeneratedDatabaseTypes(schema: TableSchema, generatedTypesPath: string): boolean {
+  if (!fs.existsSync(generatedTypesPath)) return false;
+
+  const lines = fs.readFileSync(generatedTypesPath, 'utf8').split('\n');
+  let inPublicSchema = false;
+  let inRelations = false;
+  let currentRelation: string | null = null;
+  let inRow = false;
+
+  for (const line of lines) {
+    if (line === '  public: {') {
+      inPublicSchema = true;
+      continue;
+    }
+    if (!inPublicSchema) continue;
+
+    if (line === '    Tables: {' || line === '    Views: {') {
+      inRelations = true;
+      currentRelation = null;
+      inRow = false;
+      continue;
+    }
+    if (/^    (?:Functions|Enums|CompositeTypes): \{$/.test(line)) {
+      inRelations = false;
+      currentRelation = null;
+      inRow = false;
+      continue;
+    }
+    if (!inRelations) continue;
+
+    const relationMatch = line.match(/^      "?([A-Za-z_][A-Za-z0-9_]*)"?: \{$/);
+    if (relationMatch) {
+      currentRelation = relationMatch[1].toLowerCase();
+      if (!schema.has(currentRelation)) schema.set(currentRelation, new Set());
+      inRow = false;
+      continue;
+    }
+    if (currentRelation && line === '        Row: {') {
+      inRow = true;
+      continue;
+    }
+    if (inRow && line === '        }') {
+      inRow = false;
+      continue;
+    }
+    if (!inRow || !currentRelation) continue;
+
+    const columnMatch = line.match(/^          "?([A-Za-z_][A-Za-z0-9_]*)"?\??:/);
+    if (columnMatch) schema.get(currentRelation)!.add(columnMatch[1].toLowerCase());
+  }
+
+  return true;
+}
+
+function splitTopLevelCommaList(input: string): string[] {
+  const parts: string[] = [];
+  let start = 0;
+  let depth = 0;
+  let quote: "'" | '"' | null = null;
+
+  for (let i = 0; i < input.length; i += 1) {
+    const char = input[i];
+    if (quote) {
+      if (char === quote && input[i + 1] === quote) {
+        i += 1;
+      } else if (char === quote) {
+        quote = null;
+      }
+      continue;
+    }
+    if (char === "'" || char === '"') {
+      quote = char;
+    } else if (char === '(') {
+      depth += 1;
+    } else if (char === ')') {
+      depth = Math.max(0, depth - 1);
+    } else if (char === ',' && depth === 0) {
+      parts.push(input.slice(start, i));
+      start = i + 1;
+    }
+  }
+  parts.push(input.slice(start));
+  return parts;
+}
+
+function findTopLevelKeyword(input: string, start: number, keyword: string): number {
+  let depth = 0;
+  let quote: "'" | '"' | null = null;
+  const lower = input.toLowerCase();
+
+  for (let i = start; i < input.length; i += 1) {
+    const char = input[i];
+    if (quote) {
+      if (char === quote && input[i + 1] === quote) {
+        i += 1;
+      } else if (char === quote) {
+        quote = null;
+      }
+      continue;
+    }
+    if (char === "'" || char === '"') {
+      quote = char;
+      continue;
+    }
+    if (char === '(') {
+      depth += 1;
+      continue;
+    }
+    if (char === ')') {
+      depth = Math.max(0, depth - 1);
+      continue;
+    }
+    if (
+      depth === 0 &&
+      lower.startsWith(keyword, i) &&
+      !/[a-z0-9_]/i.test(input[i - 1] ?? '') &&
+      !/[a-z0-9_]/i.test(input[i + keyword.length] ?? '')
+    ) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function mergeMigrationViews(schema: TableSchema, sql: string): void {
+  const viewRe = /CREATE\s+(?:OR\s+REPLACE\s+)?VIEW\s+(?:public\.)?"?([A-Za-z_][A-Za-z0-9_]*)"?(?:\s*\([^)]*\))?\s+AS\s+SELECT\s+/gi;
+  let match: RegExpExecArray | null;
+
+  while ((match = viewRe.exec(sql)) !== null) {
+    const table = match[1].toLowerCase();
+    const selectStart = match.index + match[0].length;
+    const fromIndex = findTopLevelKeyword(sql, selectStart, 'from');
+    if (fromIndex === -1) continue;
+    if (!schema.has(table)) schema.set(table, new Set());
+
+    for (const rawExpression of splitTopLevelCommaList(sql.slice(selectStart, fromIndex))) {
+      const expression = rawExpression.replace(/--[^\n]*/g, '').trim();
+      const alias = expression.match(/\s+AS\s+"?([A-Za-z_][A-Za-z0-9_]*)"?\s*$/i);
+      const direct = expression.match(/(?:^|\.)(?:"?([A-Za-z_][A-Za-z0-9_]*)"?)(?:::[A-Za-z_][A-Za-z0-9_]*(?:\[\])?)?\s*$/);
+      const column = alias?.[1] ?? direct?.[1];
+      if (column) schema.get(table)!.add(column.toLowerCase());
+    }
+  }
+}
+
 async function fetchLiveSchema(supabaseUrl: string, serviceKey: string): Promise<TableSchema | null> {
   try {
     const res = await fetch(`${supabaseUrl.replace(/\/$/, '')}/rest/v1/`, {
@@ -107,6 +252,8 @@ function parseMigrations(migrationsDir: string): TableSchema {
         schema.get(t)!.add(lm[1].toLowerCase());
       }
     }
+
+    mergeMigrationViews(schema, sql);
   }
   return schema;
 }
@@ -221,6 +368,7 @@ function auditDrift(calls: SelectCall[], schema: TableSchema): DriftResult[] {
 async function main() {
   const root = path.resolve(__dirname, '..');
   const migrationsDir = path.join(root, 'supabase', 'migrations');
+  const generatedTypesPath = path.join(root, 'types', 'database.generated.ts');
   const baseline = readBaseline(root);
   const baselineUsesMigrations = baseline?.schemaSource?.startsWith('migrations') === true;
   const srcDirs = ['app', 'apps', 'lib', 'components', 'packages']
@@ -253,11 +401,13 @@ async function main() {
     } else {
       process.stdout.write(' failed, falling back to migrations\n');
       schema = parseMigrations(migrationsDir);
-      schemaSource = `migrations (${schema.size} tables — live schema unavailable)`;
+      const mergedGeneratedTypes = mergeGeneratedDatabaseTypes(schema, generatedTypesPath);
+      schemaSource = `migrations${mergedGeneratedTypes ? ' + generated types' : ''} (${schema.size} relations — live schema unavailable)`;
     }
   } else {
     schema = parseMigrations(migrationsDir);
-    schemaSource = `migrations (${schema.size} tables — live schema credentials unavailable)`;
+    const mergedGeneratedTypes = mergeGeneratedDatabaseTypes(schema, generatedTypesPath);
+    schemaSource = `migrations${mergedGeneratedTypes ? ' + generated types' : ''} (${schema.size} relations — live schema credentials unavailable)`;
   }
   console.log(` ${schemaSource}`);
 

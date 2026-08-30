@@ -41,7 +41,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          pnpm --filter @elevate/${{ matrix.app }} typecheck 2>&1 | tee canonical-typescript-${{ matrix.app }}.log
+          pnpm run typecheck:${{ matrix.app }} 2>&1 | tee canonical-typescript-${{ matrix.app }}.log
       - name: Enhanced strict debt audit
         if: always()
         continue-on-error: true

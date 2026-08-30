@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { Building2, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
 
 const MARKETING_HOST_SHOP_APPLICATION = 'https://www.elevateforhumanity.org/host-shop/apply';
 
@@ -64,12 +63,19 @@ export default function HostShopLoginPage() {
     setIsLoading(true);
     setError('');
     try {
-      const supabase = createClient();
-      const { error: magicLinkError } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      const response = await fetch('/api/auth/send-magic-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({
+          email: email.trim(),
+          redirectTo: '/host-shop/dashboard',
+        }),
       });
-      if (magicLinkError) throw new Error('We could not send the secure sign-in link. Please try again.');
+      if (!response.ok) {
+        const body = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error || 'We could not send the secure sign-in link. Please try again.');
+      }
       setMagicLinkSent(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to send a sign-in link.');

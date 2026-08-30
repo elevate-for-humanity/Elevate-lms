@@ -64,8 +64,8 @@ jobs:
               deployment: {
                 docker: {
                   configType: 'customEntrypointCustomCommand',
-                  customEntrypoint: '/bin/bash -lc',
-                  customCommand: command,
+                  customEntrypoint: '/bin/sh -c',
+                  customCommand: `'${command}'`,
                 },
               },
             }),

@@ -107,6 +107,9 @@ export function planAIToolFromCommand(
   if (/\b(system|platform)\b.*\b(health|status)\b|\bhealth check\b/.test(lower)) {
     return { name: 'system.health', input: {} };
   }
+  if (/\b(workflows?|course build|course generation)\b/.test(lower) && /\b(inspect|status|progress|state|check|report|current|running|failures?|completion)\b/.test(lower)) {
+    return { name: 'workflows.inspect', input: asAIRecord(context.toolInput) };
+  }
   if (/\b(analytics|metrics|dashboard numbers)\b/.test(lower)) {
     return { name: 'analytics.read', input: asAIRecord(context.toolInput) };
   }
@@ -149,7 +152,7 @@ export function planAIToolFromCommand(
   if (/\brun\b.*\btests?\b/.test(lower)) {
     return { name: 'workflows.runTests', input: asAIRecord(context.toolInput) };
   }
-  if (/\bdeploy\b/.test(lower)) {
+  if (/\bdeploy\b/.test(lower) && !/\b(?:do not|don't|dont|never|without)\s+(?:\w+\s+){0,2}deploy\b/.test(lower)) {
     return { name: 'deployments.autopilot', input: asAIRecord(context.toolInput) };
   }
   if (/\bapply\b.*\bmigrations?\b|\brun\b.*\bmigrations?\b/.test(lower)) {

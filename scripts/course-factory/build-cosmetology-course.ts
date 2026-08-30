@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import { courseFactory } from '../../lib/course-factory';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { queueCourseLessonVideos } from '../../lib/course-factory/media-service';
@@ -9,6 +11,9 @@ const PROGRAM_SLUG = 'cosmetology-apprenticeship';
 const COURSE_ID = '9ca9fb50-7119-46ea-ab81-9b0193c29c31';
 const EXPECTED_MODULES = 8;
 const EXPECTED_LESSONS = 40;
+const JOB_ID = process.env.GITHUB_RUN_ID
+  ? `cosmetology-production-${process.env.GITHUB_RUN_ID}`
+  : `cosmetology-production-${randomUUID()}`;
 const CONFIG_KEYS = [
   'AI_PROVIDER',
   'AI_PROVIDER_ORDER',
@@ -115,8 +120,39 @@ async function auditPackage(db: AdminDb, courseId: string) {
   }
 }
 
+async function updateJob(
+  db: AdminDb,
+  patch: Record<string, unknown>,
+) {
+  const { error } = await db
+    .from('course_factory_jobs')
+    .upsert(
+      {
+        job_id: JOB_ID,
+        credential_slug: PROGRAM_SLUG,
+        credential_name: 'Indiana Cosmetology License',
+        metadata: {
+          course_id: COURSE_ID,
+          source: 'production-workflow',
+          github_run_id: process.env.GITHUB_RUN_ID ?? null,
+        },
+        ...patch,
+      },
+      { onConflict: 'job_id' },
+    );
+  if (error) fail(`Course job ledger update failed: ${error.message}`);
+}
+
 async function main() {
   const db = await requireAdminClient();
+  await updateJob(db, {
+    status: 'running',
+    stage: 'initializing',
+    progress: 1,
+    message: 'Resolving the canonical course, provider, and resumable checkpoints.',
+    started_at: new Date().toISOString(),
+    error: null,
+  });
   await hydrateProductionProvider(db);
 
   const blueprint = await getBlueprintBySlug(PROGRAM_SLUG);
@@ -149,7 +185,7 @@ async function main() {
     courseTitle: blueprint.title || blueprint.credentialTitle,
     blueprint,
     contentSource: 'blueprint',
-    mode: 'refresh',
+    mode: 'missing-only',
   });
   if (
     !checkpoint.success ||
@@ -175,6 +211,12 @@ async function main() {
   if (checkpointStateError) {
     fail(`Structure checkpoint state update failed: ${checkpointStateError.message}`);
   }
+  await updateJob(db, {
+    status: 'running',
+    stage: 'generating',
+    progress: 15,
+    message: 'Canonical structure verified; enriching only incomplete lessons.',
+  });
   console.log(
     `[Cosmetology Course Builder] checkpoint ready ${COURSE_ID}: ${EXPECTED_MODULES} modules/${EXPECTED_LESSONS} lessons`,
   );
@@ -204,6 +246,12 @@ async function main() {
     fail(`Lesson generation failures: ${JSON.stringify(result.generationFailures)}`);
   }
 
+  await updateJob(db, {
+    status: 'running',
+    stage: 'validating',
+    progress: 80,
+    message: 'Lesson generation completed; validating the canonical package.',
+  });
   await auditPackage(db, COURSE_ID);
   const mapping = await registerProgramCourse(db, PROGRAM_SLUG, COURSE_ID);
   if (!mapping.ok) fail(`Program mapping failed: ${mapping.error}`);
@@ -230,6 +278,20 @@ async function main() {
     .eq('id', COURSE_ID);
   if (stateError) fail(`Final safe-state update failed: ${stateError.message}`);
 
+  await updateJob(db, {
+    status: 'completed',
+    stage: 'review',
+    progress: 100,
+    message: 'Course package is complete and awaiting media acceptance and human review.',
+    completed_at: new Date().toISOString(),
+    details: {
+      course_id: COURSE_ID,
+      modules: EXPECTED_MODULES,
+      lessons: EXPECTED_LESSONS,
+      lesson_videos_queued: media.queued,
+      microclips_queued: media.microclipsQueued,
+    },
+  });
   console.log('COSMETOLOGY_COURSE_BUILD_READY');
   console.log(
     JSON.stringify(

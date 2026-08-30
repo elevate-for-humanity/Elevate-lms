@@ -46,7 +46,7 @@ export default function EvaluationStudioPanel() {
 
     try {
       const response = await fetch(
-        '/api/admin/evaluations',
+        '/api/admin/dev-studio/evaluations',
         {
           credentials: 'include',
           cache: 'no-store',
@@ -54,7 +54,12 @@ export default function EvaluationStudioPanel() {
       );
 
 
-      const payload = await response.json();
+      const contentType = response.headers.get('content-type') ?? '';
+      const rawBody = await response.text();
+      if (!contentType.includes('application/json')) {
+        throw new Error(`Evaluation service returned HTTP ${response.status} instead of JSON.`);
+      }
+      const payload = rawBody ? JSON.parse(rawBody) : {};
 
 
       if (!response.ok || !payload.ok) {

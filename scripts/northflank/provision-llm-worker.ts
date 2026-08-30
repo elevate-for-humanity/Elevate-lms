@@ -165,11 +165,12 @@ async function ensureService(volumeId: string) {
     existing?.buildSettings ||
     existing?.billing?.buildPlan,
   );
-  if (existing && isBuildBacked) {
+  const hasTargetVolume = existing ? collectStrings(existing).includes(volumeId) : false;
+  if (existing && (isBuildBacked || !hasTargetVolume)) {
     await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`), { method: 'DELETE' });
     await waitForServiceDeletion();
     existing = null;
-    log('Removed failed build-backed LLM service; persistent model volume retained');
+    log('Recreated LLM service boundary for deployment-only image and GPU-compatible volume');
   }
 
   if (existing) {

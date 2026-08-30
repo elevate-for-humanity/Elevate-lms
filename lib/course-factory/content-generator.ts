@@ -490,42 +490,57 @@ Make questions original, job-relevant, scenario-rich, and aligned to the lesson 
 Return ONLY valid JSON.
 `.trim();
 
-  try {
-    const response = await aiChat({
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      const response = await aiChat({
       messages: [
         {
           role: 'system',
           content:
             'You are an expert in creating original assessments for workforce training. Create job-relevant questions that test practical knowledge without copying proprietary exam items. Return ONLY valid JSON.',
         },
-        { role: 'user', content: prompt },
+        {
+          role: 'user',
+          content:
+            attempt === 1
+              ? prompt
+              : `${prompt}\n\nThe previous response failed validation. Return exactly ${count} questions with exactly four options per question and zero-based correct indexes.`,
+        },
       ],
-      temperature: 0.7,
+      temperature: attempt === 1 ? 0.7 : 0.3,
       maxTokens: 5000,
       jsonMode: true,
-    });
+      });
 
-    const parsed = parseStrictAIJson(
-      normalizeFourOptionQuestions(response.content),
-      generatedAssessmentSchema,
-      'Assessment generation',
-    );
-    if (parsed.questions.length < count) {
-      throw new Error(
-        `Assessment generation returned ${parsed.questions.length}/${count} required questions`,
+      const parsed = parseStrictAIJson(
+        normalizeFourOptionQuestions(response.content),
+        generatedAssessmentSchema,
+        'Assessment generation',
       );
+      if (parsed.questions.length < count) {
+        throw new Error(
+          `Assessment generation returned ${parsed.questions.length}/${count} required questions`,
+        );
+      }
+      const questions = parsed.questions.slice(0, count);
+      await persistAssessmentCheckpoint({
+        courseTitle: input.courseTitle,
+        lessonSlug: input.lessonSlug,
+        questions,
+      });
+      return { questions };
+    } catch (error) {
+      lastError = error;
+      logger.warn('[course-factory/content-generator] Assessment contract retry', {
+        lesson: input.lessonSlug,
+        attempt,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-    const questions = parsed.questions.slice(0, count);
-    await persistAssessmentCheckpoint({
-      courseTitle: input.courseTitle,
-      lessonSlug: input.lessonSlug,
-      questions,
-    });
-    return { questions };
-  } catch (error) {
-    logger.error('[course-factory/content-generator] Assessment generation failed', error);
-    throw error;
   }
+  logger.error('[course-factory/content-generator] Assessment generation failed', lastError);
+  throw lastError instanceof Error ? lastError : new Error('Assessment generation failed');
 }
 
 export async function generateFinalExam(
@@ -555,36 +570,50 @@ Return JSON with exactly ${questionCount} questions:
 Return ONLY valid JSON.
 `.trim();
 
-  try {
-    const response = await aiChat({
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      const response = await aiChat({
       messages: [
         {
           role: 'system',
           content:
             'You are an expert assessment writer. Create comprehensive original final exams that test full course competency without copying proprietary certification questions. Return ONLY valid JSON.',
         },
-        { role: 'user', content: prompt },
+        {
+          role: 'user',
+          content:
+            attempt === 1
+              ? prompt
+              : `${prompt}\n\nThe previous response failed validation. Return exactly ${questionCount} questions with exactly four options per question and zero-based correct indexes.`,
+        },
       ],
-      temperature: 0.7,
+      temperature: attempt === 1 ? 0.7 : 0.3,
       maxTokens: 8000,
       jsonMode: true,
-    });
+      });
 
-    const parsed = parseStrictAIJson(
-      normalizeFourOptionQuestions(response.content),
-      generatedAssessmentSchema,
-      'Final exam generation',
-    );
-    if (parsed.questions.length < questionCount) {
-      throw new Error(
-        `Final exam generation returned ${parsed.questions.length}/${questionCount} required questions`,
+      const parsed = parseStrictAIJson(
+        normalizeFourOptionQuestions(response.content),
+        generatedAssessmentSchema,
+        'Final exam generation',
       );
+      if (parsed.questions.length < questionCount) {
+        throw new Error(
+          `Final exam generation returned ${parsed.questions.length}/${questionCount} required questions`,
+        );
+      }
+      return { questions: parsed.questions.slice(0, questionCount) };
+    } catch (error) {
+      lastError = error;
+      logger.warn('[course-factory/content-generator] Final exam contract retry', {
+        attempt,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-    return { questions: parsed.questions.slice(0, questionCount) };
-  } catch (error) {
-    logger.error('[course-factory/content-generator] Final exam generation failed', error);
-    throw error;
   }
+  logger.error('[course-factory/content-generator] Final exam generation failed', lastError);
+  throw lastError instanceof Error ? lastError : new Error('Final exam generation failed');
 }
 
 export interface BlueprintGenerationInput {

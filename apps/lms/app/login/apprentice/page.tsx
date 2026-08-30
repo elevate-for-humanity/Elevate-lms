@@ -6,6 +6,7 @@ import { Scissors, GraduationCap } from 'lucide-react';
 import ApprenticeLoginForm from './ApprenticeLoginForm';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
+import { siteUrls } from '@/lib/utils/site-urls';
 
 export const metadata: Metadata = {
   title: `Apprentice Login — ${PLATFORM_DEFAULTS.orgName}`,
@@ -57,7 +58,7 @@ export default async function ApprenticeLoginPage() {
           </Link>
           <p className="text-xs text-slate-600">
             Need help?{' '}
-            <a href="https://www.elevateforhumanity.org/contact" className="text-amber-400 hover:underline">Contact support</a>
+            <a href={siteUrls.contact} className="text-amber-400 hover:underline">Contact support</a>
           </p>
         </div>
       </div>

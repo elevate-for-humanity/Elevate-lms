@@ -46,6 +46,7 @@ export const siteUrls = {
 
   apply: `${SITE_URL}/apply`,
   enroll: `${SITE_URL}/enroll`,
+  contact: `${SITE_URL}/contact`,
   login: `${APP_URL}/login`,
   dashboard: `${APP_URL}/lms/dashboard`,
   employerPortal: `${APP_URL}/employer/dashboard`,

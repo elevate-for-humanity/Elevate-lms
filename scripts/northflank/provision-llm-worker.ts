@@ -129,8 +129,8 @@ function deploymentPayload(volumeId: string): R {
       external: { imagePath: VLLM_IMAGE },
       docker: {
         configType: 'customEntrypointCustomCommand',
-        customEntrypoint: '/bin/bash -lc',
-        customCommand: command,
+        customEntrypoint: '/bin/sh -c',
+        customCommand: `'${command}'`,
       },
       gpu,
       storage: { shmSize: 16384, ephemeralStorage: { storageSize: GPU_DEPLOYMENT_EPHEMERAL_MB } },

@@ -38,6 +38,18 @@ interface LessonGenerationInput {
   standardsBlock?: string;
 }
 
+const GOVERNED_COURSE_RULES = `
+GOVERNED COURSE RULES:
+- Teach the named lesson and mapped competency; never substitute adjacent trades or generic filler.
+- Separate instruction, guided examples, hands-on practice, knowledge checks, and remediation.
+- Use measurable learner actions and realistic workplace decisions with safety and infection-control consequences where applicable.
+- Explain why correct answers are correct and why distractors are unsafe, incomplete, or unsupported.
+- State licensing or regulatory requirements cautiously; do not invent hours, legal guarantees, official exam questions, or agency approval.
+- Keep all content original and brand-neutral; do not reproduce Milady or any proprietary textbook or test bank.
+- Support accessibility with plain language, meaningful headings, narration that works without visuals, and text instruction that works without video.
+- Produce complete, learner-ready content with no placeholders, TODOs, unsupported links, or promises of automatic licensure or state-board passage.
+`.trim();
+
 /**
  * Keep the complete lesson contract inside the smallest production provider's
  * request budget. The prompt is roughly 1.5k tokens; a 6k output allowance
@@ -56,10 +68,7 @@ export function lessonGenerationMaxTokens(): number {
  * GPU or API budget. Contract normalization runs locally before a retry.
  */
 export function lessonGenerationMaxAttempts(): number {
-  const configured = Number.parseInt(
-    process.env.COURSE_FACTORY_LESSON_MAX_ATTEMPTS ?? '',
-    10,
-  );
+  const configured = Number.parseInt(process.env.COURSE_FACTORY_LESSON_MAX_ATTEMPTS ?? '', 10);
   if (!Number.isFinite(configured)) return 2;
   return Math.min(3, Math.max(1, configured));
 }
@@ -68,7 +77,9 @@ function normalizeLessonContract(raw: string): string {
   try {
     const parsed = JSON.parse(raw) as Record<string, any>;
     const experience =
-      parsed.experience && typeof parsed.experience === 'object' && !Array.isArray(parsed.experience)
+      parsed.experience &&
+      typeof parsed.experience === 'object' &&
+      !Array.isArray(parsed.experience)
         ? parsed.experience
         : {};
     parsed.experience = experience;
@@ -137,7 +148,8 @@ function normalizeLessonContract(raw: string): string {
           )
         : [];
       while (takeaways.length < 3) {
-        const objective = specificObjectives[takeaways.length % Math.max(specificObjectives.length, 1)];
+        const objective =
+          specificObjectives[takeaways.length % Math.max(specificObjectives.length, 1)];
         takeaways.push(
           objective ??
             `Apply ${lessonFocus} using observable evidence and the lesson's documented decision process.`,
@@ -216,6 +228,8 @@ Generate a complete commercial-quality, self-paced workforce-training lesson for
 - Domain key: ${domainKey}
 ${input.state ? `- State: ${input.state}` : ''}
 ${input.standardsBlock ? `\nIndustry Standards:\n${input.standardsBlock}` : ''}
+
+${GOVERNED_COURSE_RULES}
 
 The lesson must be ORIGINAL Elevate for Humanity instructional content. Do not copy provider courseware, screenshots, proprietary question banks, or branded third-party lesson text. Do not imply that Elevate-authored content is official provider courseware.
 
@@ -415,11 +429,7 @@ export function normalizeFourOptionQuestions(raw: string): string {
     quiz_questions?: ProviderQuestion[];
     experience?: { knowledgeChecks?: ProviderQuestion[] };
   };
-  const groups = [
-    parsed.questions,
-    parsed.quiz_questions,
-    parsed.experience?.knowledgeChecks,
-  ];
+  const groups = [parsed.questions, parsed.quiz_questions, parsed.experience?.knowledgeChecks];
 
   for (const questions of groups) {
     for (const question of questions ?? []) {
@@ -433,9 +443,7 @@ export function normalizeFourOptionQuestions(raw: string): string {
       if (question.options.length > 4 && Number.isInteger(correct)) {
         const correctOption = question.options[correct];
         if (correctOption !== undefined) {
-          const selected = question.options
-            .filter((_, index) => index !== correct)
-            .slice(0, 3);
+          const selected = question.options.filter((_, index) => index !== correct).slice(0, 3);
           selected.push(correctOption);
           question.options = selected;
           question.correct = 3;
@@ -474,6 +482,8 @@ Generate ${count} assessment questions for:
 
 Question types: ${types.join(', ')}
 
+${GOVERNED_COURSE_RULES}
+
 Return JSON with:
 {
   "questions": [
@@ -494,23 +504,23 @@ Return ONLY valid JSON.
   for (let attempt = 1; attempt <= 2; attempt += 1) {
     try {
       const response = await aiChat({
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are an expert in creating original assessments for workforce training. Create job-relevant questions that test practical knowledge without copying proprietary exam items. Return ONLY valid JSON.',
-        },
-        {
-          role: 'user',
-          content:
-            attempt === 1
-              ? prompt
-              : `${prompt}\n\nThe previous response failed validation. Return exactly ${count} questions with exactly four options per question and zero-based correct indexes.`,
-        },
-      ],
-      temperature: attempt === 1 ? 0.7 : 0.3,
-      maxTokens: 5000,
-      jsonMode: true,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are an expert in creating original assessments for workforce training. Create job-relevant questions that test practical knowledge without copying proprietary exam items. Return ONLY valid JSON.',
+          },
+          {
+            role: 'user',
+            content:
+              attempt === 1
+                ? prompt
+                : `${prompt}\n\nThe previous response failed validation. Return exactly ${count} questions with exactly four options per question and zero-based correct indexes.`,
+          },
+        ],
+        temperature: attempt === 1 ? 0.7 : 0.3,
+        maxTokens: 5000,
+        jsonMode: true,
       });
 
       const parsed = parseStrictAIJson(
@@ -547,6 +557,7 @@ export async function generateFinalExam(
   courseTitle: string,
   moduleCount: number,
   questionCount: number = 25,
+  requiredDomains: string[] = [],
 ): Promise<GeneratedAssessment> {
   if (!isAIAvailable()) throw new Error('AI service not available');
 
@@ -554,6 +565,9 @@ export async function generateFinalExam(
 Generate a ${questionCount}-question original final readiness exam for: "${courseTitle}"
 
 This course has ${moduleCount} modules. Cover the complete course proportionally and test knowledge recall, application, quantitative reasoning where appropriate, and scenario-based decision making. Do not copy or paraphrase proprietary certification exam questions.
+${requiredDomains.length ? `Required domains (cover every domain):\n${requiredDomains.map((domain) => `- ${domain}`).join('\n')}` : ''}
+
+${GOVERNED_COURSE_RULES}
 
 Return JSON with exactly ${questionCount} questions:
 {
@@ -571,26 +585,35 @@ Return ONLY valid JSON.
 `.trim();
 
   let lastError: unknown;
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
+  const questions: GeneratedAssessment['questions'] = [];
+  const seenQuestions = new Set<string>();
+  const maxAttempts = 3;
+
+  // Providers occasionally stop one or two items short of a large JSON array.
+  // Accumulate valid, unique items across bounded calls instead of discarding a
+  // nearly-complete exam and regenerating the whole response.
+  for (let attempt = 1; attempt <= maxAttempts && questions.length < questionCount; attempt += 1) {
     try {
+      const missingCount = questionCount - questions.length;
+      const repairPrompt =
+        questions.length === 0
+          ? prompt
+          : `Generate exactly ${missingCount} additional original questions for the final readiness exam for "${courseTitle}".\n\nDo not repeat any of these existing questions:\n${questions.map((question, index) => `${index + 1}. ${question.question}`).join('\n')}\n\nReturn ONLY valid JSON in the same contract, with exactly ${missingCount} questions, exactly four options per question, and zero-based correct indexes.`;
       const response = await aiChat({
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You are an expert assessment writer. Create comprehensive original final exams that test full course competency without copying proprietary certification questions. Return ONLY valid JSON.',
-        },
-        {
-          role: 'user',
-          content:
-            attempt === 1
-              ? prompt
-              : `${prompt}\n\nThe previous response failed validation. Return exactly ${questionCount} questions with exactly four options per question and zero-based correct indexes.`,
-        },
-      ],
-      temperature: attempt === 1 ? 0.7 : 0.3,
-      maxTokens: 8000,
-      jsonMode: true,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are an expert assessment writer. Create comprehensive original final exams that test full course competency without copying proprietary certification questions. Return ONLY valid JSON.',
+          },
+          {
+            role: 'user',
+            content: repairPrompt,
+          },
+        ],
+        temperature: attempt === 1 ? 0.7 : 0.3,
+        maxTokens: 8000,
+        jsonMode: true,
       });
 
       const parsed = parseStrictAIJson(
@@ -598,12 +621,25 @@ Return ONLY valid JSON.
         generatedAssessmentSchema,
         'Final exam generation',
       );
-      if (parsed.questions.length < questionCount) {
-        throw new Error(
-          `Final exam generation returned ${parsed.questions.length}/${questionCount} required questions`,
-        );
+      for (const question of parsed.questions) {
+        const key = question.question.trim().toLocaleLowerCase();
+        if (!seenQuestions.has(key)) {
+          seenQuestions.add(key);
+          questions.push(question);
+        }
+        if (questions.length === questionCount) break;
       }
-      return { questions: parsed.questions.slice(0, questionCount) };
+
+      if (questions.length === questionCount) return { questions };
+
+      lastError = new Error(
+        `Final exam generation accumulated ${questions.length}/${questionCount} required unique questions`,
+      );
+      logger.warn('[course-factory/content-generator] Final exam gap repair required', {
+        attempt,
+        accumulated: questions.length,
+        required: questionCount,
+      });
     } catch (error) {
       lastError = error;
       logger.warn('[course-factory/content-generator] Final exam contract retry', {
@@ -766,3 +802,4 @@ Only map standards that are genuinely applicable to the lesson. Do not fabricate
     };
   }
 }
+

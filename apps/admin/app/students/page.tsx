@@ -56,18 +56,22 @@ export default async function StudentsPage() {
   const db = await requireAdminClient();
 
   // Load students with their most recent enrollment
-  const { data: students, count: totalStudents } = await db
+  const { data: operationalStudents } = await db
     .from('profiles')
-    .select(
-      'id, full_name, first_name, last_name, email, phone, created_at, role',
-      { count: 'exact' },
-    )
+    .select('id, full_name, first_name, last_name, email, phone, created_at, role')
     .eq('role', 'student')
+    .like('email', '%@%')
+    .not('email', 'ilike', '%@qa.invalid')
+    .not('full_name', 'ilike', '[QA%')
     .order('created_at', { ascending: false })
-    .limit(50);
+    .limit(1000);
 
-  // Load enrollments for these students to show real state
-  const studentIds = (students ?? []).map((s: any) => s.id);
+  const students = (operationalStudents ?? []).slice(0, 50);
+  const totalStudents = operationalStudents?.length ?? 0;
+  const operationalStudentIds = (operationalStudents ?? []).map((student: any) => student.id);
+
+  // Load enrollments for displayed students to show real state.
+  const studentIds = students.map((student: any) => student.id);
   const { data: enrollments } = studentIds.length > 0
     ? await db
         .from('program_enrollments')
@@ -86,18 +90,21 @@ export default async function StudentsPage() {
   const { count: activeEnrollments } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
-    .not('access_granted_at', 'is', null);
+    .not('access_granted_at', 'is', null)
+    .in('user_id', operationalStudentIds.length ? operationalStudentIds : ['00000000-0000-0000-0000-000000000000']);
 
   const { count: pendingApproval } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
     .is('access_granted_at', null)
-    .in('enrollment_state', ['active', 'enrolled', 'onboarding', 'orientation']);
+    .in('enrollment_state', ['active', 'enrolled', 'onboarding', 'orientation'])
+    .in('user_id', operationalStudentIds.length ? operationalStudentIds : ['00000000-0000-0000-0000-000000000000']);
 
   const { count: completedEnrollments } = await db
     .from('program_enrollments')
     .select('*', { count: 'exact', head: true })
-    .eq('enrollment_state', 'completed');
+    .eq('enrollment_state', 'completed')
+    .in('user_id', operationalStudentIds.length ? operationalStudentIds : ['00000000-0000-0000-0000-000000000000']);
 
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
@@ -105,6 +112,9 @@ export default async function StudentsPage() {
     .from('profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'student')
+    .like('email', '%@%')
+    .not('email', 'ilike', '%@qa.invalid')
+    .not('full_name', 'ilike', '[QA%')
     .gte('created_at', weekAgo.toISOString());
 
   return (

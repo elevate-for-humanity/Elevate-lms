@@ -17,7 +17,6 @@ import { AdminGreeting } from '@/components/admin/AdminGreeting';
 import type { AdminDashboardData } from './types';
 import { OperationalAlerts } from './OperationalAlerts';
 import { SystemHealthPanel } from './SystemHealthPanel';
-import { RealtimeKpiGrid } from './RealtimeKpiGrid';
 import { BlockedProgramsList } from './BlockedProgramsList';
 import { RecentApplicationsList } from './RecentApplicationsList';
 import { RecentPaymentsPanel } from './RecentPaymentsPanel';
@@ -97,7 +96,6 @@ export function AdminDashboardContent({ data, canAccessDevStudio = false }: { da
       <OperationalShortcuts />
       <DashboardPanelErrorBoundary name="Publish website"><PublishWebsitePanelLazy /></DashboardPanelErrorBoundary>
       <div className="mt-8"><StatsOverviewBar data={data} /></div>
-      {(data.kpis?.length ?? 0) > 0 && <div className="mt-6"><DashboardPanelErrorBoundary name="KPI cards"><RealtimeKpiGrid kpis={data.kpis} /></DashboardPanelErrorBoundary></div>}
       <div className="mt-6"><OperationalAlerts data={data} /></div>
       <div className="mt-8 grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-3"><div className="min-w-0 lg:col-span-2"><ReviewQueues data={data} /></div><div className="min-w-0 space-y-6"><EnrollmentFunnel data={data} /><RecentActivity items={data.recentActivity ?? []} />{(data.recentApplications?.length ?? 0) > 0 && <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div className="flex items-center gap-2"><Inbox className="h-4 w-4 text-slate-500" /><h2 className="font-bold text-slate-950">Recent applications</h2></div><Link href="/applications" className="text-xs font-semibold text-blue-700">View all</Link></div><RecentApplicationsList items={data.recentApplications} /></div>}<RecentPaymentsPanel payments={data.recentPayments} /></div></div>
       <div className="mt-8 grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-2">{(data.topPrograms?.length ?? 0) > 0 && <div className="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div className="flex items-center gap-2"><BookOpen className="h-4 w-4 text-slate-500" /><h2 className="font-bold text-slate-950">Top programs</h2></div><Link href="/programs" className="text-xs font-semibold text-blue-700">All programs</Link></div><div className="divide-y divide-slate-100">{data.topPrograms.slice(0, 6).map((program) => <Link key={program.id} href={`/programs/${encodeURIComponent(program.slug || program.id)}/manage`} className="flex min-h-12 items-center justify-between gap-4 px-5 py-3 hover:bg-slate-50"><p className="min-w-0 truncate text-sm font-semibold text-slate-950">{program.title}</p><span className="shrink-0 text-xs text-slate-600">{program.learners} enrolled</span></Link>)}</div></div>}{(data.blockedPrograms?.length ?? 0) > 0 && <BlockedProgramsList items={data.blockedPrograms} />}</div>

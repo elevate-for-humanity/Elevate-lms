@@ -646,6 +646,11 @@ Return ONLY valid JSON.
     }
   }
 
+  // A complete persisted checkpoint is already a valid final exam. Return it
+  // before entering the repair loop; otherwise the loop is skipped and the
+  // function incorrectly falls through to the terminal failure below.
+  if (questions.length === questionCount) return { questions };
+
   // Providers occasionally stop one or two items short of a large JSON array.
   // Accumulate valid, unique items across bounded calls instead of discarding a
   // nearly-complete exam and regenerating the whole response.
@@ -870,4 +875,3 @@ Only map standards that are genuinely applicable to the lesson. Do not fabricate
     };
   }
 }
-

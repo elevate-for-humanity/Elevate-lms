@@ -1,6 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { aiChatMock } = vi.hoisted(() => ({ aiChatMock: vi.fn() }));
+const { aiChatMock, loadPartialAssessmentCheckpointMock } = vi.hoisted(() => ({
+  aiChatMock: vi.fn(),
+  loadPartialAssessmentCheckpointMock: vi.fn(),
+}));
 
 vi.mock('@/lib/ai/ai-service', () => ({
   aiChat: aiChatMock,
@@ -9,7 +12,7 @@ vi.mock('@/lib/ai/ai-service', () => ({
 
 vi.mock('@/lib/course-factory/generation-checkpoints', () => ({
   loadAssessmentCheckpoint: vi.fn(),
-  loadPartialAssessmentCheckpoint: vi.fn().mockResolvedValue(null),
+  loadPartialAssessmentCheckpoint: loadPartialAssessmentCheckpointMock,
   loadLessonGenerationCheckpoint: vi.fn(),
   persistAssessmentCheckpoint: vi.fn(),
   persistLessonGenerationCheckpoint: vi.fn(),
@@ -31,7 +34,27 @@ function response(start: number, count: number) {
 }
 
 describe('generateFinalExam gap repair', () => {
-  beforeEach(() => aiChatMock.mockReset());
+  beforeEach(() => {
+    aiChatMock.mockReset();
+    loadPartialAssessmentCheckpointMock.mockReset();
+    loadPartialAssessmentCheckpointMock.mockResolvedValue(null);
+  });
+
+  it('returns a complete persisted checkpoint without spending another LLM call', async () => {
+    const checkpoint = JSON.parse(response(1, 25).content).questions;
+    loadPartialAssessmentCheckpointMock.mockResolvedValueOnce(checkpoint);
+
+    const exam = await generateFinalExam(
+      'Indiana Cosmetology License',
+      8,
+      25,
+      [],
+      'cosmo-final-exam',
+    );
+
+    expect(exam.questions).toHaveLength(25);
+    expect(aiChatMock).not.toHaveBeenCalled();
+  });
 
   it('keeps valid questions and requests only the missing remainder', async () => {
     aiChatMock.mockResolvedValueOnce(response(1, 24)).mockResolvedValueOnce(response(25, 1));
@@ -114,4 +137,3 @@ describe('generateFinalExam gap repair', () => {
     expect(aiChatMock).toHaveBeenCalledTimes(3);
   });
 });
-

@@ -2,9 +2,25 @@ import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 
+async function hasBillingOrganization(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  tenantId: string,
+): Promise<boolean> {
+  const { data } = await db
+    .from('organizations')
+    .select('id')
+    .eq('tenant_id', tenantId)
+    .limit(1)
+    .maybeSingle();
+  return Boolean(data?.id);
+}
+
 /**
- * Resolve organization/tenant id for SaaS feature gates.
- * Prefers profiles.tenant_id (canonical SaaS org id = tenants.id).
+ * Resolve the Store/SaaS tenant for feature gates and billing.
+ *
+ * Profile pointers remain the canonical fast path. Store ownership records are
+ * the fallback because an account can administer the standalone Elevate
+ * platform while separately owning a subscribed Store workspace.
  */
 export async function resolveTenantIdForUser(userId: string): Promise<string | null> {
   const db = await requireAdminClient();
@@ -23,6 +39,45 @@ export async function resolveTenantIdForUser(userId: string): Promise<string | n
       .eq('id', profile.organization_id)
       .maybeSingle();
     if (org?.tenant_id) return org.tenant_id as string;
+  }
+
+  // Canonical Store workspace ownership. Do not grant billing control to an
+  // ordinary member merely because they can use the workspace.
+  const { data: memberships } = await db
+    .from('tenant_memberships')
+    .select('tenant_id, role, created_at')
+    .eq('user_id', userId)
+    .in('role', ['owner', 'admin'])
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  for (const membership of memberships ?? []) {
+    if (
+      membership.tenant_id &&
+      (await hasBillingOrganization(db, membership.tenant_id as string))
+    ) {
+      return membership.tenant_id as string;
+    }
+  }
+
+  // Compatibility path for workspaces created through the newer tenant member
+  // lifecycle. It is intentionally restricted to active billing authorities.
+  const { data: tenantMembers } = await db
+    .from('tenant_members')
+    .select('tenant_id, tenant_role, status, created_at')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .in('tenant_role', ['owner', 'admin'])
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  for (const membership of tenantMembers ?? []) {
+    if (
+      membership.tenant_id &&
+      (await hasBillingOrganization(db, membership.tenant_id as string))
+    ) {
+      return membership.tenant_id as string;
+    }
   }
 
   return null;

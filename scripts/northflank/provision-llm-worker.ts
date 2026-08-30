@@ -9,7 +9,7 @@
  * Run with --execute to apply. Without it, only preflight runs.
  */
 import crypto from 'node:crypto';
-import { combinedServiceCreatePath, combinedServicePatchPath, nfFetch, projectApiPath } from './lib';
+import { deploymentServiceCreatePath, deploymentServicePatchPath, nfFetch, projectApiPath } from './lib';
 
 const WEB_PROJECT_ID = process.env.NORTHFLANK_PROJECT_ID || 'elevate-platform';
 const GPU_PROJECT_ID = process.env.NORTHFLANK_LLM_PROJECT_ID || 'elevate-media-gpu';
@@ -28,7 +28,7 @@ const BUILD_EPHEMERAL_MB = Number(process.env.NORTHFLANK_GPU_BUILD_EPHEMERAL_MB 
 const LLM_MODEL = process.env.LLM_MODEL || 'Qwen/Qwen2.5-7B-Instruct';
 const RUNTIME_PORT = 8080;
 const REPO = 'https://github.com/elevate-for-humanity/Elevate-lms';
-const DOCKERFILE = '/services/llm-gpu-worker/Dockerfile';
+const VLLM_IMAGE = process.env.NORTHFLANK_LLM_IMAGE || 'vllm/vllm-openai:v0.10.1.1';
 const BUILD_TIMEOUT_MS = Number(process.env.LLM_PROVISION_BUILD_TIMEOUT_MS || 60 * 60 * 1000);
 const READY_TIMEOUT_MS = Number(process.env.LLM_PROVISION_READY_TIMEOUT_MS || 60 * 60 * 1000);
 
@@ -91,34 +91,34 @@ async function serviceExists() {
   }
 }
 
-function servicePayload(volumeId: string): R {
+function deploymentPayload(volumeId: string): R {
   const gpu = { enabled: true, configuration: { gpuType: GPU_TYPE, gpuCount: GPU_COUNT, timesliced: false } };
+  const command = [
+    '-lc',
+    'exec python3 -m vllm.entrypoints.openai.api_server' +
+      ' --model "$LLM_MODEL"' +
+      ' --served-model-name elevate-local' +
+      ' --api-key "$LLM_WORKER_SECRET"' +
+      ' --host 0.0.0.0 --port "$PORT"' +
+      ' --gpu-memory-utilization "${GPU_MEMORY_UTILIZATION:-0.90}"' +
+      ' --max-model-len "${MAX_MODEL_LEN:-8192}"' +
+      ' --download-dir "$HF_HOME"' +
+      ' ${VLLM_EXTRA_ARGS:-}',
+  ].join(' ');
   return {
     name: SERVICE_ID,
     description: 'Elevate self-hosted LLM inference worker (vLLM, OpenAI-compatible)',
-    billing: { deploymentPlan: GPU_DEPLOYMENT_PLAN, buildPlan: BUILD_PLAN, gpu },
+    billing: { deploymentPlan: GPU_DEPLOYMENT_PLAN, gpu },
     infrastructure: { architecture: 'x86' },
-    buildSource: 'git',
-    disabledCI: true,
-    vcsData: { projectUrl: REPO, projectType: 'github', projectBranch: 'main' },
-    buildSettings: {
-      storage: { ephemeralStorage: { storageSize: BUILD_EPHEMERAL_MB } },
-      dockerfile: {
-        buildEngine: 'buildkit',
-        dockerFilePath: DOCKERFILE,
-        dockerWorkDir: '/',
-        buildkit: { useCache: true, cacheStorageSize: 16384 },
-      },
-    },
-    buildConfiguration: {
-      storage: { ephemeralStorage: { storageSize: BUILD_EPHEMERAL_MB } },
-      ciIgnoreFlagsEnabled: true,
-      ciIgnoreFlags: ['[skip ci]', '[ci skip]', '[northflank skip]', '[skip northflank]'],
-    },
     deployment: {
       type: 'deployment',
       instances: 1,
-      docker: { configType: 'default' },
+      external: { imagePath: VLLM_IMAGE },
+      docker: {
+        configType: 'customEntrypointCustomCommand',
+        customEntrypoint: '/bin/bash',
+        customCommand: command,
+      },
       gpu,
       storage: { shmSize: 16384, ephemeralStorage: { storageSize: GPU_DEPLOYMENT_EPHEMERAL_MB } },
       strategy: { type: 'recreate' },
@@ -136,16 +136,41 @@ function servicePayload(volumeId: string): R {
 }
 
 async function ensureService(volumeId: string) {
-  const payload = servicePayload(volumeId);
-  if (await serviceExists()) {
-    await nfFetch(combinedServicePatchPath(GPU_PROJECT_ID, SERVICE_ID), { method: 'PATCH', body: JSON.stringify(payload) });
-    log('Updated LLM worker service');
+  const payload = deploymentPayload(volumeId);
+  let existing: R | null = null;
+  try {
+    existing = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!/404|not found/i.test(message)) throw error;
+  }
+
+  const isBuildBacked = Boolean(
+    existing?.buildSource ||
+    existing?.vcsData ||
+    existing?.buildSettings ||
+    existing?.billing?.buildPlan,
+  );
+  if (existing && isBuildBacked) {
+    await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`), { method: 'DELETE' });
+    existing = null;
+    log('Removed failed build-backed LLM service; persistent model volume retained');
+  }
+
+  if (existing) {
+    await nfFetch(deploymentServicePatchPath(GPU_PROJECT_ID, SERVICE_ID), {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+    log('Updated deployment-only LLM worker service');
   } else {
-    await nfFetch(combinedServiceCreatePath(GPU_PROJECT_ID), { method: 'POST', body: JSON.stringify(payload) });
-    log('Created LLM worker service');
+    await nfFetch(deploymentServiceCreatePath(GPU_PROJECT_ID), {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    log('Created deployment-only LLM worker service');
   }
 }
-
 async function triggerBuild(): Promise<string | undefined> {
   const result = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/build`), { method: 'POST', body: '{}' });
   log('Triggered build', result);
@@ -177,7 +202,7 @@ async function reportBuildFailure(buildId?: string) {
 function buildStatus(service: R) { return service.status?.build?.status || service.build?.status || service.buildStatus; }
 function deploymentStatus(service: R) { return service.status?.deployment?.status || service.deployment?.status || service.deploymentStatus; }
 
-async function waitForDeployment(buildId?: string): Promise<R> {
+async function waitForDeployment(): Promise<R> {
   const deadline = Date.now() + BUILD_TIMEOUT_MS;
   const failed = new Set(['FAILURE', 'FAILED', 'ERROR', 'CRASHED']);
   let previous = '';
@@ -185,8 +210,7 @@ async function waitForDeployment(buildId?: string): Promise<R> {
     const service = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`));
     const status = `${buildStatus(service) || 'unknown'}/${deploymentStatus(service) || 'unknown'}`;
     if (status !== previous) { log(`Service status ${status}`); previous = status; }
-    if (failed.has(buildStatus(service) || '') || failed.has(deploymentStatus(service) || '')) {
-      await reportBuildFailure(buildId);
+    if (failed.has(deploymentStatus(service) || '')) {
       throw new Error(`LLM service failed: ${status}`);
     }
     if (buildStatus(service) === 'SUCCESS' && deploymentStatus(service) === 'COMPLETED') return service;
@@ -292,14 +316,19 @@ async function main() {
   if (!execute) return;
 
   const volumeId = await ensureVolume();
-  await ensureService(volumeId);
-  const buildId = await triggerBuild();
-  const deployed = await waitForDeployment(buildId);
-  const publicUrl = discoverPublicUrl(deployed) || await waitForPublicUrl();
   const workerSecret = crypto.randomBytes(32).toString('hex');
   console.log(`::add-mask::${workerSecret}`);
-  await wireSecrets(publicUrl, workerSecret);
-  await Promise.all([restart(GPU_PROJECT_ID, SERVICE_ID), restart(WEB_PROJECT_ID, ADMIN_SERVICE_ID)]);
+  await upsertSecretGroup(GPU_PROJECT_ID, 'elevate-llm-worker-env', SERVICE_ID, {
+    LLM_WORKER_SECRET: workerSecret,
+  });
+  await ensureService(volumeId);
+  const deployed = await waitForDeployment();
+  const publicUrl = discoverPublicUrl(deployed) || await waitForPublicUrl();
+  await upsertSecretGroup(WEB_PROJECT_ID, 'elevate-llm-client-env', ADMIN_SERVICE_ID, {
+    ELEVATE_LLM_URL: publicUrl,
+    ELEVATE_LLM_SECRET: workerSecret,
+  });
+  await restart(WEB_PROJECT_ID, ADMIN_SERVICE_ID);
   await acceptanceChat(publicUrl, workerSecret);
   log('LLM INFERENCE ACCEPTANCE PASSED', { gpuProject: GPU_PROJECT_ID, service: SERVICE_ID, publicUrl, model: LLM_MODEL });
 }

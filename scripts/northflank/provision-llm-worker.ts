@@ -91,6 +91,20 @@ async function serviceExists() {
   }
 }
 
+async function waitForServiceDeletion() {
+  for (let attempt = 0; attempt < 30; attempt++) {
+    try {
+      await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (/404|not found/i.test(message)) return;
+      throw error;
+    }
+    await sleep(2_000);
+  }
+  throw new Error(`Timed out waiting for Northflank to release service id ${SERVICE_ID}`);
+}
+
 function deploymentPayload(volumeId: string): R {
   const gpu = { enabled: true, configuration: { gpuType: GPU_TYPE, gpuCount: GPU_COUNT, timesliced: false } };
   const command = [
@@ -153,6 +167,7 @@ async function ensureService(volumeId: string) {
   );
   if (existing && isBuildBacked) {
     await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}`), { method: 'DELETE' });
+    await waitForServiceDeletion();
     existing = null;
     log('Removed failed build-backed LLM service; persistent model volume retained');
   }

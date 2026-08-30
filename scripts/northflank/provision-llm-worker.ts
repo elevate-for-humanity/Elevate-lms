@@ -146,15 +146,38 @@ async function ensureService(volumeId: string) {
   }
 }
 
-async function triggerBuild() {
+async function triggerBuild(): Promise<string | undefined> {
   const result = await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/build`), { method: 'POST', body: '{}' });
   log('Triggered build', result);
+  return typeof result.id === 'string' ? result.id : undefined;
+}
+
+async function reportBuildFailure(buildId?: string) {
+  const query = new URLSearchParams({ queryType: 'range', lineLimit: '250', direction: 'backward' });
+  if (buildId) query.set('buildId', buildId);
+  try {
+    const entries = arrayFrom(
+      await nfFetch<R>(projectApiPath(GPU_PROJECT_ID, `/services/${SERVICE_ID}/build-logs?${query}`)),
+    );
+    const lines = entries
+      .map((entry) => typeof entry.log === 'string' ? entry.log : '')
+      .filter(Boolean)
+      .reverse();
+    if (lines.length) {
+      console.error('[llm-provision] Northflank build log tail:\n' + lines.join('\n'));
+    } else {
+      console.error('[llm-provision] Northflank returned no build log lines');
+    }
+  } catch (error) {
+    console.error('[llm-provision] Unable to retrieve Northflank build logs',
+      error instanceof Error ? error.message : String(error));
+  }
 }
 
 function buildStatus(service: R) { return service.status?.build?.status || service.build?.status || service.buildStatus; }
 function deploymentStatus(service: R) { return service.status?.deployment?.status || service.deployment?.status || service.deploymentStatus; }
 
-async function waitForDeployment(): Promise<R> {
+async function waitForDeployment(buildId?: string): Promise<R> {
   const deadline = Date.now() + BUILD_TIMEOUT_MS;
   const failed = new Set(['FAILURE', 'FAILED', 'ERROR', 'CRASHED']);
   let previous = '';
@@ -163,6 +186,7 @@ async function waitForDeployment(): Promise<R> {
     const status = `${buildStatus(service) || 'unknown'}/${deploymentStatus(service) || 'unknown'}`;
     if (status !== previous) { log(`Service status ${status}`); previous = status; }
     if (failed.has(buildStatus(service) || '') || failed.has(deploymentStatus(service) || '')) {
+      await reportBuildFailure(buildId);
       throw new Error(`LLM service failed: ${status}`);
     }
     if (buildStatus(service) === 'SUCCESS' && deploymentStatus(service) === 'COMPLETED') return service;
@@ -269,8 +293,8 @@ async function main() {
 
   const volumeId = await ensureVolume();
   await ensureService(volumeId);
-  await triggerBuild();
-  const deployed = await waitForDeployment();
+  const buildId = await triggerBuild();
+  const deployed = await waitForDeployment(buildId);
   const publicUrl = discoverPublicUrl(deployed) || await waitForPublicUrl();
   const workerSecret = crypto.randomBytes(32).toString('hex');
   console.log(`::add-mask::${workerSecret}`);

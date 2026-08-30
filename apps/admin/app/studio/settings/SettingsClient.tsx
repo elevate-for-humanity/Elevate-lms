@@ -12,7 +12,8 @@ interface HealthStatus {
   hasAnthropic: boolean;
   hasGitHub: boolean;
   aiConfigured: boolean;
-  shell: { configured: boolean; ready: boolean };
+  execution?: { mode?: string; ready?: boolean; legacyShellRemoved?: boolean };
+  northflank?: { ready?: boolean; tokenPresent?: boolean; projectIdPresent?: boolean };
 }
 
 interface HealthCheck {
@@ -35,8 +36,8 @@ export default function SettingsClient() {
     const supabaseConfigured = isSupabaseAuthConfigured();
     results.push({
       name: 'Supabase',
-      status: supabaseConfigured ? 'healthy' : 'offline',
-      detail: supabaseConfigured ? 'Canonical Supabase client configured' : 'Supabase unavailable',
+      status: supabaseConfigured ? 'degraded' : 'offline',
+      detail: supabaseConfigured ? 'Configured; live database health is verified by the Admin health endpoint' : 'Supabase unavailable',
     });
 
     // Canonical Admin-owned Dev Studio health endpoint — granular provider + shell checks
@@ -47,37 +48,35 @@ export default function SettingsClient() {
 
       results.push({
         name: 'Groq',
-        status: health.hasGroq ? 'healthy' : 'offline',
-        detail: health.hasGroq ? 'API key configured' : 'GROQ_API_KEY missing',
+        status: health.hasGroq ? 'degraded' : 'offline',
+        detail: health.hasGroq ? 'Configured; not a live provider probe' : 'GROQ_API_KEY missing',
       });
       results.push({
         name: 'Gemini',
-        status: health.hasGemini ? 'healthy' : 'offline',
-        detail: health.hasGemini ? 'API key configured' : 'GEMINI_API_KEY missing',
+        status: health.hasGemini ? 'degraded' : 'offline',
+        detail: health.hasGemini ? 'Configured; not a live provider probe' : 'GEMINI_API_KEY missing',
       });
       results.push({
         name: 'OpenAI',
-        status: health.hasOpenAI ? 'healthy' : 'offline',
-        detail: health.hasOpenAI ? 'API key configured' : 'OPENAI_API_KEY missing',
+        status: health.hasOpenAI ? 'degraded' : 'offline',
+        detail: health.hasOpenAI ? 'Configured; not a live provider probe' : 'OPENAI_API_KEY missing',
       });
       results.push({
         name: 'Anthropic',
-        status: health.hasAnthropic ? 'healthy' : 'offline',
-        detail: health.hasAnthropic ? 'API key configured' : 'ANTHROPIC_API_KEY missing',
+        status: health.hasAnthropic ? 'degraded' : 'offline',
+        detail: health.hasAnthropic ? 'Configured; not a live provider probe' : 'ANTHROPIC_API_KEY missing',
       });
       results.push({
         name: 'GitHub Token',
-        status: health.hasGitHub ? 'healthy' : 'offline',
-        detail: health.hasGitHub ? 'Token configured' : 'GITHUB_TOKEN missing',
+        status: health.hasGitHub ? 'degraded' : 'offline',
+        detail: health.hasGitHub ? 'Configured; repository access is verified in Repository Workspace' : 'GITHUB_TOKEN missing',
       });
       results.push({
-        name: 'Shell WebSocket',
-        status: health.shell?.ready ? 'healthy' : health.shell?.configured ? 'degraded' : 'offline',
-        detail: health.shell?.ready
-          ? 'Connected and ready'
-          : health.shell?.configured
-            ? 'Configured, not ready'
-            : 'Not configured',
+        name: 'Admin-native execution',
+        status: health.execution?.ready ? 'degraded' : 'offline',
+        detail: health.execution?.ready
+          ? 'Configured; live execution evidence appears in Tasks and Deployments'
+          : 'Execution is unavailable until repository access is configured',
       });
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to reach /api/admin/dev-studio/health');
@@ -88,24 +87,31 @@ export default function SettingsClient() {
       });
     }
 
-    // Northflank connectivity check. This endpoint is retained until its
-    // namespace is independently consolidated; do not couple that migration
-    // to the already-proven health route migration.
+    // Use the same canonical service probe shown by Containers and System Health.
     try {
-      const res = await fetch('/api/admin/dev-studio/builds');
-      if (res.ok) {
-        const data = await res.json();
-        const hasToken = data.builds !== undefined;
-        results.push({
-          name: 'Northflank',
-          status: hasToken ? 'healthy' : 'degraded',
-          detail: hasToken ? 'Build API reachable' : 'NORTHFLANK_API_TOKEN may be missing',
-        });
-      } else {
-        results.push({ name: 'Northflank', status: 'degraded', detail: `Status ${res.status}` });
-      }
-    } catch {
-      results.push({ name: 'Northflank', status: 'offline', detail: 'Unable to reach build API' });
+      const res = await fetch('/api/admin/dev-studio/services', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const services = Array.isArray(data.services) ? data.services : [];
+      const probed = services.length > 0;
+      const allHealthy = probed && services.every(
+        (service: { healthy?: boolean }) => service.healthy === true,
+      );
+      results.push({
+        name: 'Northflank',
+        status: allHealthy ? 'healthy' : probed ? 'degraded' : 'offline',
+        detail: allHealthy
+          ? `${services.length} service health probes passed`
+          : probed
+            ? 'Configured, but one or more service probes are not healthy'
+            : 'No services returned by the canonical service endpoint',
+      });
+    } catch (northflankError) {
+      results.push({
+        name: 'Northflank',
+        status: 'offline',
+        detail: northflankError instanceof Error ? northflankError.message : 'Unable to reach service API',
+      });
     }
 
     setChecks(results);

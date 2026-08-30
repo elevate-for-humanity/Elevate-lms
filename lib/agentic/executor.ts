@@ -7,12 +7,15 @@ import { createCommercialPlan, type CommercialBrief } from '@/lib/media/commerci
 import { cleanupCommercialRender, renderCommercialVideo } from '@/lib/media/commercial-renderer';
 import { persistStudioAsset } from '@/lib/media/studio-assets';
 import { processCourseAgenticTask } from './course-executor';
+import { adaptiveBackoffMs } from '@/lib/resilience/adaptive-backoff';
 
 const POLL_MS = 15_000;
+const MAX_OUTAGE_BACKOFF_MS = 15 * 60_000;
 const HOME_HERO_KIND = 'homepage-hero-commercial';
 let started = false;
 let timer: NodeJS.Timeout | null = null;
 let polling = false;
+let consecutivePollFailures = 0;
 
 function homeHeroBrief(prompt: string): CommercialBrief {
   return {
@@ -261,8 +264,8 @@ async function processMarketingTask(task: any, run: any, project: any) {
   throw new Error(`Unsupported marketing campaign worker: ${task.worker}`);
 }
 
-export async function runAgenticExecutorOnce() {
-  if (polling) return;
+export async function runAgenticExecutorOnce(): Promise<boolean> {
+  if (polling) return true;
   polling = true;
   try {
     const db = await requireAdminClient();
@@ -313,8 +316,10 @@ export async function runAgenticExecutorOnce() {
       }
       break;
     }
+    return true;
   } catch (err) {
     console.error('[agentic-executor] poll failed', err);
+    return false;
   } finally {
     polling = false;
   }
@@ -323,8 +328,28 @@ export async function runAgenticExecutorOnce() {
 export function startAgenticExecutor() {
   if (started || process.env.ELEVATE_SERVICE !== 'admin') return;
   started = true;
-  void runAgenticExecutorOnce();
-  timer = setInterval(() => void runAgenticExecutorOnce(), POLL_MS);
-  timer.unref?.();
-  console.info('[agentic-executor] Admin agentic executor started');
+
+  const schedule = (delayMs: number) => {
+    timer = setTimeout(async () => {
+      const healthy = await runAgenticExecutorOnce();
+      consecutivePollFailures = healthy ? 0 : consecutivePollFailures + 1;
+      const nextDelay = healthy
+        ? POLL_MS
+        : adaptiveBackoffMs(consecutivePollFailures, {
+            baseDelayMs: POLL_MS,
+            maxDelayMs: MAX_OUTAGE_BACKOFF_MS,
+          });
+      if (!healthy) {
+        console.warn('[agentic-executor] database poll backing off', {
+          consecutiveFailures: consecutivePollFailures,
+          nextDelayMs: nextDelay,
+        });
+      }
+      schedule(nextDelay);
+    }, delayMs);
+    timer.unref?.();
+  };
+
+  schedule(0);
+  console.info('[agentic-executor] Admin agentic executor started with outage backoff');
 }

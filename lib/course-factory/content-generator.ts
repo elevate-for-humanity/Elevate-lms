@@ -54,8 +54,22 @@ export function lessonGenerationMaxTokens(): number {
 function normalizeLessonContract(raw: string): string {
   try {
     const parsed = JSON.parse(raw) as Record<string, any>;
-    const experience = parsed?.experience;
-    const remediation = experience?.remediation;
+    const experience =
+      parsed.experience && typeof parsed.experience === 'object' && !Array.isArray(parsed.experience)
+        ? parsed.experience
+        : {};
+    parsed.experience = experience;
+
+    // Some otherwise-valid provider responses place nested experience fields
+    // at the root. Normalize their location before strict validation rather
+    // than paying for another complete generation.
+    for (const key of ['resources', 'glossary', 'remediation', 'readiness'] as const) {
+      if (experience[key] == null && parsed[key] != null) {
+        experience[key] = parsed[key];
+        delete parsed[key];
+      }
+    }
+    const remediation = experience.remediation;
     const specificObjectives = [
       ...(Array.isArray(parsed.learning_points) ? parsed.learning_points : []),
       parsed.objective,
@@ -84,18 +98,46 @@ function normalizeLessonContract(raw: string): string {
       return expanded;
     };
 
-    if (Array.isArray(experience?.readingGuide?.sections)) {
-      experience.readingGuide.sections = experience.readingGuide.sections.map(
-        (section: Record<string, unknown>, index: number) => ({
-          ...section,
-          body: expandToMinimum(
-            section?.body,
-            120,
-            `This is guided reading section ${index + 1}; the learner should be able to explain and use the concept after reviewing it.`,
-          ),
-        }),
+    if (experience.readingGuide && typeof experience.readingGuide === 'object') {
+      experience.readingGuide.summary = expandToMinimum(
+        experience.readingGuide.summary,
+        80,
+        'The summary must clearly describe the knowledge and job-ready application the learner will gain.',
       );
+      if (Array.isArray(experience.readingGuide.sections)) {
+        experience.readingGuide.sections = experience.readingGuide.sections.map(
+          (section: Record<string, unknown>, index: number) => ({
+            ...section,
+            body: expandToMinimum(
+              section?.body,
+              120,
+              `This is guided reading section ${index + 1}; the learner should be able to explain and use the concept after reviewing it.`,
+            ),
+          }),
+        );
+      }
+
+      const takeaways = Array.isArray(experience.readingGuide.keyTakeaways)
+        ? experience.readingGuide.keyTakeaways.filter(
+            (value: unknown): value is string =>
+              typeof value === 'string' && value.trim().length > 0,
+          )
+        : [];
+      while (takeaways.length < 3) {
+        const objective = specificObjectives[takeaways.length % Math.max(specificObjectives.length, 1)];
+        takeaways.push(
+          objective ??
+            `Apply ${lessonFocus} using observable evidence and the lesson's documented decision process.`,
+        );
+      }
+      experience.readingGuide.keyTakeaways = takeaways;
     }
+
+    experience.narrationScript = expandToMinimum(
+      experience.narrationScript,
+      200,
+      'The narration should model a concrete example and end with the action the learner must demonstrate.',
+    );
 
     if (Array.isArray(experience?.quickClips)) {
       experience.quickClips = experience.quickClips.map(
@@ -106,8 +148,29 @@ function normalizeLessonContract(raw: string): string {
             120,
             `The instructor should model one concrete example, name the decision criteria, and close clip ${index + 1} with an observable learner action.`,
           ),
+          visualPrompt: expandToMinimum(
+            clip?.visualPrompt,
+            40,
+            `Show the learner applying ${lessonFocus} in a realistic cosmetology workplace setting.`,
+          ),
         }),
       );
+    }
+
+    if (experience.practicalTask && typeof experience.practicalTask === 'object') {
+      const instructions = Array.isArray(experience.practicalTask.instructions)
+        ? experience.practicalTask.instructions.filter(
+            (value: unknown): value is string =>
+              typeof value === 'string' && value.trim().length > 0,
+          )
+        : [];
+      const completionSteps = [
+        `Prepare the workspace, tools, and evidence needed to demonstrate ${lessonFocus}.`,
+        `Perform the task while following the lesson's safety and decision criteria.`,
+        'Document the result and verify it against the stated objective before submission.',
+      ];
+      while (instructions.length < 3) instructions.push(completionSteps[instructions.length]);
+      experience.practicalTask.instructions = instructions;
     }
 
     return JSON.stringify(parsed);

@@ -200,14 +200,6 @@ async function updateJob(db: AdminDb, patch: Record<string, unknown>) {
 
 async function main() {
   const db = await requireAdminClient();
-  await updateJob(db, {
-    status: 'running',
-    stage: 'initializing',
-    progress: 1,
-    message: 'Resolving the canonical course, provider, and resumable checkpoints.',
-    started_at: new Date().toISOString(),
-    error: null,
-  });
   await hydrateProductionProvider(db);
 
   const blueprint = await getBlueprintBySlug(PROGRAM_SLUG);
@@ -219,22 +211,33 @@ async function main() {
     fail('Registered blueprint is not the approved 8-module/40-lesson structure');
   }
 
-  const [{ data: program, error: programError }, { data: course, error: courseError }] =
-    await Promise.all([
-      requiredDbOperation('canonical program lookup', () =>
-        db.from('programs').select('id,slug').eq('slug', PROGRAM_SLUG).maybeSingle(),
-      ),
-      requiredDbOperation('canonical course lookup', () =>
-        db.from('courses').select('id,program_id,slug').eq('id', COURSE_ID).maybeSingle(),
-      ),
-    ]);
+  // Run required reads sequentially. Parallel failures amplify load and can
+  // trip shared infrastructure protection during a transient regional event.
+  const { data: program, error: programError } = await requiredDbOperation(
+    'canonical program lookup',
+    () => db.from('programs').select('id,slug').eq('slug', PROGRAM_SLUG).maybeSingle(),
+  );
   if (programError || !program?.id)
     fail(`Canonical program lookup failed: ${programError?.message ?? 'missing'}`);
+  const { data: course, error: courseError } = await requiredDbOperation(
+    'canonical course lookup',
+    () => db.from('courses').select('id,program_id,slug').eq('id', COURSE_ID).maybeSingle(),
+  );
   if (courseError || !course?.id)
     fail(`Canonical course lookup failed: ${courseError?.message ?? 'missing'}`);
   if (course.slug !== PROGRAM_SLUG || course.program_id !== program.id) {
     fail('Canonical course identity does not match the cosmetology program');
   }
+
+  // Telemetry starts only after the zero-cost database and identity preflight.
+  await updateJob(db, {
+    status: 'running',
+    stage: 'initializing',
+    progress: 1,
+    message: 'Canonical database preflight passed; resolving resumable checkpoints.',
+    started_at: new Date().toISOString(),
+    error: null,
+  });
 
   // Persist the approved structure before AI enrichment so lesson-level
   // checkpoints have stable targets and a failed run can resume safely.
@@ -290,7 +293,9 @@ async function main() {
       blueprint,
       mode: 'refresh',
       contentSource: 'ai',
-      videoMode: 'queue',
+      // Media is queued once, after the package audit. This prevents GPU work
+      // from starting for a course package that later fails validation.
+      videoMode: 'off',
     },
     (stage, message, progress) =>
       console.log(`[Cosmetology Course Builder] ${stage} ${progress ?? ''} ${message}`),

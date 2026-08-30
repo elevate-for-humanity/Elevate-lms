@@ -38,6 +38,19 @@ interface LessonGenerationInput {
   standardsBlock?: string;
 }
 
+/**
+ * Keep the complete lesson contract inside the smallest production provider's
+ * request budget. The prompt is roughly 1.5k tokens; a 6k output allowance
+ * leaves headroom under Groq's 8k TPM gate while remaining ample for the
+ * required 700-word lesson and interactive experience. GPU operators may tune
+ * downward, but not back into an unbounded request.
+ */
+export function lessonGenerationMaxTokens(): number {
+  const configured = Number.parseInt(process.env.COURSE_FACTORY_LESSON_MAX_TOKENS ?? '', 10);
+  if (!Number.isFinite(configured)) return 6000;
+  return Math.min(6500, Math.max(3500, configured));
+}
+
 function normalizeLessonContract(raw: string): string {
   try {
     const parsed = JSON.parse(raw) as Record<string, any>;
@@ -48,9 +61,7 @@ function normalizeLessonContract(raw: string): string {
       parsed.objective,
     ].filter(
       (value, index, values): value is string =>
-        typeof value === 'string' &&
-        value.trim().length > 0 &&
-        values.indexOf(value) === index,
+        typeof value === 'string' && value.trim().length > 0 && values.indexOf(value) === index,
     );
 
     if (
@@ -67,8 +78,7 @@ function normalizeLessonContract(raw: string): string {
       (typeof parsed.objective === 'string' ? parsed.objective : 'the lesson objective');
     const expandToMinimum = (value: unknown, minimum: number, context: string) => {
       if (typeof value !== 'string' || value.trim().length >= minimum) return value;
-      const addition =
-        ` Apply this to ${lessonFocus} by identifying the relevant evidence, comparing realistic choices, documenting the decision, and checking the result against the stated objective. ${context}`;
+      const addition = ` Apply this to ${lessonFocus} by identifying the relevant evidence, comparing realistic choices, documenting the decision, and checking the result against the stated objective. ${context}`;
       let expanded = value.trim();
       while (expanded.length < minimum) expanded = `${expanded}${addition}`;
       return expanded;
@@ -120,7 +130,8 @@ export async function generateLessonContent(
 
   if (!isAIAvailable()) throw new Error('AI service not available');
 
-  const domainKey = input.lesson.domainKey || input.moduleTitle.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+  const domainKey =
+    input.lesson.domainKey || input.moduleTitle.toLowerCase().replace(/[^a-z0-9]+/g, '_');
   const prompt = `
 Generate a complete commercial-quality, self-paced workforce-training lesson for:
 - Lesson: ${input.lesson.title}
@@ -243,7 +254,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
           },
         ],
         temperature: attempt === 1 ? 0.65 : 0.35,
-        maxTokens: 12000,
+        maxTokens: lessonGenerationMaxTokens(),
       });
 
       const parsed = parseStrictAIJson(

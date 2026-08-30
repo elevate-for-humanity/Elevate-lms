@@ -1,0 +1,72 @@
+name: Build Cosmetology Course
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-cosmetology-course.yml'
+      - 'scripts/course-factory/build-cosmetology-course.ts'
+      - 'lib/course-factory/content-generator.ts'
+      - 'lib/curriculum/blueprints/cosmetology.ts'
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+  NODE_ENV: production
+  AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
+  AI_PROVIDER_ORDER: ${{ secrets.AI_PROVIDER_ORDER }}
+  AI_CIRCUIT_RECOVERY_WAIT: '1'
+  COURSE_FACTORY_LESSON_MAX_TOKENS: '6000'
+  ELEVATE_LLM_URL: ${{ secrets.ELEVATE_LLM_URL }}
+  ELEVATE_LLM_SECRET: ${{ secrets.ELEVATE_LLM_SECRET }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  CLOUDFLARE_AI_API_TOKEN: ${{ secrets.CLOUDFLARE_AI_API_TOKEN }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_AI_MODEL: ${{ secrets.CLOUDFLARE_AI_MODEL }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  NODE_OPTIONS: --conditions=react-server
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    concurrency:
+      group: cosmetology-course-production-build
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Require production database credentials
+        run: |
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+
+      - name: Build canonical cosmetology course and queue media
+        run: pnpm tsx scripts/course-factory/build-cosmetology-course.ts
+
+      - name: Verify apprenticeship architecture
+        run: pnpm tsx scripts/audit-apprenticeship-architecture.ts

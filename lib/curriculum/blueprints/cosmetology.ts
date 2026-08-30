@@ -1,6 +1,6 @@
 /**
  * cosmetology Blueprint
- * 
+ *
  * © 2026 Elevate for Humanity
  * All Rights Reserved
  *
@@ -47,7 +47,7 @@ export const cosmetologyBlueprint: CredentialBlueprint = {
     template: 'elevate-slide',
     instructorName: 'Maria Santos',
     instructorTitle: 'Instructor',
-    instructorImagePath: 'https://example.com/default-instructor.jpg',
+    instructorImagePath: '/images/team/instructors/instructor-beauty.jpg',
     topBarColor: '#9333ea',
     accentColor: '#c084fc',
     backgroundColor: '#1e1b4b',
@@ -62,8 +62,20 @@ export const cosmetologyBlueprint: CredentialBlueprint = {
   },
 
   assessmentRules: [
-    { assessmentType: 'module', scope: 'all', minQuestions: 5, maxQuestions: 10, passingThreshold: 0.7 },
-    { assessmentType: 'final', scope: 'all', minQuestions: 25, maxQuestions: 50, passingThreshold: 0.75 },
+    {
+      assessmentType: 'module',
+      scope: 'all',
+      minQuestions: 5,
+      maxQuestions: 10,
+      passingThreshold: 0.7,
+    },
+    {
+      assessmentType: 'final',
+      scope: 'all',
+      minQuestions: 25,
+      maxQuestions: 50,
+      passingThreshold: 0.75,
+    },
   ],
 
   modules: [
@@ -456,9 +468,7 @@ export const cosmetologyBlueprint: CredentialBlueprint = {
       quizRequired: false,
       practicalRequired: true,
       isCritical: true,
-      requiredLessonTypes: [
-        { lessonType: 'exam', requiredCount: 1 },
-      ],
+      requiredLessonTypes: [{ lessonType: 'exam', requiredCount: 1 }],
       competencies: [],
       lessons: [
         {

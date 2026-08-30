@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
-import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { HOST_SHOP_ROLES, normalizeRole } from '@/lib/rbac/role-matrix';
 import { getHostShopAdminPartnerOptions, getHostShopBoard, HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
@@ -59,10 +59,14 @@ function PortalImageCard({ card }: { card: PortalCard }) {
 
 export default async function HostShopDashboardView() {
   const { user, effectiveRoles } = await requireRole(HOST_SHOP_ROLES);
-  const isPlatformAdmin = effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
+  const db = await requireAdminClient();
+  const { data: actorProfile } = await db.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  const authoritativeActorRole = normalizeRole(actorProfile?.role);
+  const isPlatformAdmin =
+    (authoritativeActorRole !== null && ['super_admin', 'admin', 'org_admin'].includes(authoritativeActorRole)) ||
+    effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
   if (!isPlatformAdmin) await ensureCanonicalPartner(user);
 
-  const db = await requireAdminClient();
   const previewSubject = isPlatformAdmin
     ? await resolvePortalPreviewSubject(db, user.id)
     : { userId: user.id, previewing: false };
@@ -72,7 +76,11 @@ export default async function HostShopDashboardView() {
   try {
     board = await getHostShopBoard(boardUserId);
   } catch (error) {
-    if (isPlatformAdmin && error instanceof Error && error.message === 'HOST_SHOP_ADMIN_PARTNER_REQUIRED') {
+    if (
+      isPlatformAdmin &&
+      error instanceof Error &&
+      ['HOST_SHOP_ADMIN_PARTNER_REQUIRED', 'HOST_SHOP_ACCESS_DENIED'].includes(error.message)
+    ) {
       const partners = (await getHostShopAdminPartnerOptions()).filter((partner: any) => partner.status === 'active' && partner.approval_status === 'approved' && partner.is_active !== false);
       return <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6"><section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"><div className="relative h-52 w-full"><Image src="/images/pages/barber-gallery-1.webp" alt="Host Shop apprenticeship workspace" fill priority className="object-cover" sizes="100vw" /></div><div className="p-7 sm:p-9"><p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Admin portal access</p><h1 className="mt-2 text-3xl font-black text-slate-950">Choose an active verified Host Shop</h1><form action={selectAdminPartner} className="mt-6 flex flex-col gap-3 sm:flex-row"><select name="partnerId" required className="min-h-12 flex-1 rounded-xl border border-slate-400 bg-white px-4 py-3 font-semibold"><option value="">Select Host Shop</option>{partners.map((partner: any) => <option key={partner.id} value={partner.id}>{partner.name} {partner.city ? `— ${partner.city}, ${partner.state || ''}` : ''} {partner.verification_status !== 'verified' ? '— verification pending' : ''}</option>)}</select><button className="min-h-12 rounded-xl bg-brand-blue-700 px-6 py-3 font-black text-white">Open Host Shop portal</button></form></div></section></main>;
     }

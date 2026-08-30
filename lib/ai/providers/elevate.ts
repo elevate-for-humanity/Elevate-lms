@@ -2,6 +2,12 @@ import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '..
 import { normalizeStructuredOutput } from './structured-output';
 
 const DEFAULT_TIMEOUT_MS = 120_000;
+
+function requestTimeoutMs(): number {
+  const configured = Number.parseInt(process.env.ELEVATE_LLM_TIMEOUT_MS ?? '', 10);
+  if (!Number.isFinite(configured)) return DEFAULT_TIMEOUT_MS;
+  return Math.min(900_000, Math.max(30_000, configured));
+}
 const SERVED_MODEL = 'elevate-local';
 
 type OpenAIChatChoice = {
@@ -66,7 +72,7 @@ export class ElevateProvider implements AIProvider {
         temperature: options.temperature ?? 0.5,
         max_tokens: options.maxTokens || 4096,
       }),
-      signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
+      signal: AbortSignal.timeout(requestTimeoutMs()),
     });
 
     const payload = (await response.json().catch(() => ({}))) as OpenAIChatResponse;

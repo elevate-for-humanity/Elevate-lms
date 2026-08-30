@@ -124,23 +124,32 @@ async function updateJob(
   db: AdminDb,
   patch: Record<string, unknown>,
 ) {
-  const { error } = await db
-    .from('course_factory_jobs')
-    .upsert(
-      {
-        job_id: JOB_ID,
-        credential_slug: PROGRAM_SLUG,
-        credential_name: 'Indiana Cosmetology License',
-        metadata: {
-          course_id: COURSE_ID,
-          source: 'production-workflow',
-          github_run_id: process.env.GITHUB_RUN_ID ?? null,
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const { error } = await db
+      .from('course_factory_jobs')
+      .upsert(
+        {
+          job_id: JOB_ID,
+          credential_slug: PROGRAM_SLUG,
+          credential_name: 'Indiana Cosmetology License',
+          metadata: {
+            course_id: COURSE_ID,
+            source: 'production-workflow',
+            github_run_id: process.env.GITHUB_RUN_ID ?? null,
+          },
+          ...patch,
         },
-        ...patch,
-      },
-      { onConflict: 'job_id' },
+        { onConflict: 'job_id' },
+      );
+    if (!error) return;
+    console.warn(
+      `[Cosmetology Course Builder] job ledger attempt ${attempt}/3 failed: ${error.message}`,
     );
-  if (error) fail(`Course job ledger update failed: ${error.message}`);
+    if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, attempt * 1500));
+  }
+  console.warn(
+    '[Cosmetology Course Builder] job ledger unavailable; continuing because telemetry cannot block canonical lesson generation.',
+  );
 }
 
 async function main() {

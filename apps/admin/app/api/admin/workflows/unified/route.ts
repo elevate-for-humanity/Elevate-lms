@@ -61,22 +61,27 @@ export async function GET(request: NextRequest) {
       console.error('[admin/workflows/unified] workflows query failed', generalResult.error);
       warnings.push('General workflow records are temporarily unavailable.');
     } else {
-      generalWorkflows = (generalResult.data ?? []).map((w): UnifiedWorkflow => ({
-        id: w.id,
-        title: w.name,
-        description: ((w.metadata as Record<string, unknown> | null)?.description as string) ?? null,
-        type: 'general',
-        category: w.category ?? 'system',
-        status: w.status ?? 'inactive',
-        created_at: w.created_at,
-        updated_at: w.last_run_at ?? w.updated_at ?? w.created_at,
-        last_run_at: w.last_run_at ?? null,
-        last_run_status: w.last_run_status ?? null,
-        run_count: w.run_count ?? 0,
-        workflow_key: w.workflow_key ?? null,
-        trigger_count: w.trigger_count ?? 0,
-        step_count: w.step_count ?? 0,
-      }));
+      generalWorkflows = (generalResult.data ?? []).map((w): UnifiedWorkflow => {
+        const triggerCount = Number(w.trigger_count ?? 0);
+        const stepCount = Number(w.step_count ?? 0);
+        const executable = triggerCount > 0 && stepCount > 0;
+        return {
+          id: w.id,
+          title: w.name,
+          description: ((w.metadata as Record<string, unknown> | null)?.description as string) ?? null,
+          type: 'general',
+          category: w.category ?? 'system',
+          status: executable ? (w.status ?? 'inactive') : 'incomplete',
+          created_at: w.created_at,
+          updated_at: w.last_run_at ?? w.updated_at ?? w.created_at,
+          last_run_at: w.last_run_at ?? null,
+          last_run_status: w.last_run_status ?? null,
+          run_count: w.run_count ?? 0,
+          workflow_key: w.workflow_key ?? null,
+          trigger_count: triggerCount,
+          step_count: stepCount,
+        };
+      });
     }
 
     if (aiResult.error) {

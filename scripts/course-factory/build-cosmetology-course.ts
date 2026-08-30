@@ -9,6 +9,7 @@ import { requireAdminClient } from '../../lib/supabase/admin';
 
 const PROGRAM_SLUG = 'cosmetology-apprenticeship';
 const COURSE_ID = '9ca9fb50-7119-46ea-ab81-9b0193c29c31';
+const CANONICAL_SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
 const EXPECTED_MODULES = 8;
 const EXPECTED_LESSONS = 40;
 const JOB_ID = process.env.GITHUB_RUN_ID
@@ -37,6 +38,12 @@ type DbResult<T> = { data: T | null; error: { message: string } | null };
 
 function fail(message: string): never {
   throw new Error(`[Cosmetology Course Builder] ${message}`);
+}
+
+function pinCanonicalDatabaseTarget(): void {
+  process.env.SUPABASE_URL = CANONICAL_SUPABASE_URL;
+  process.env.NEXT_PUBLIC_SUPABASE_URL = CANONICAL_SUPABASE_URL;
+  console.log('[Cosmetology Course Builder] database-project=cuxzzpsyufcewtmicszk');
 }
 
 function isTransientDatabaseError(error: unknown): boolean {
@@ -199,6 +206,7 @@ async function updateJob(db: AdminDb, patch: Record<string, unknown>) {
 }
 
 async function main() {
+  pinCanonicalDatabaseTarget();
   const db = await requireAdminClient();
   await hydrateProductionProvider(db);
 
@@ -380,26 +388,32 @@ async function main() {
 
 main().catch(async (error) => {
   const message = error instanceof Error ? error.message : String(error);
-  try {
-    const db = await requireAdminClient();
-    await Promise.all([
-      updateJob(db, {
-        status: 'failed',
-        stage: 'failed',
-        message: `Course generation stopped: ${message}`,
-        error: message,
-        completed_at: new Date().toISOString(),
-      }),
-      db
-        .from('courses')
-        .update({
-          generation_status: 'failed',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', COURSE_ID),
-    ]);
-  } catch (ledgerError) {
-    console.error('[Cosmetology Course Builder] failed to record terminal state', ledgerError);
+  if (isTransientDatabaseError(message)) {
+    console.error(
+      '[Cosmetology Course Builder] database unavailable; skipping unreachable terminal-state writes.',
+    );
+  } else {
+    try {
+      const db = await requireAdminClient();
+      await Promise.all([
+        updateJob(db, {
+          status: 'failed',
+          stage: 'failed',
+          message: `Course generation stopped: ${message}`,
+          error: message,
+          completed_at: new Date().toISOString(),
+        }),
+        db
+          .from('courses')
+          .update({
+            generation_status: 'failed',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', COURSE_ID),
+      ]);
+    } catch (ledgerError) {
+      console.error('[Cosmetology Course Builder] failed to record terminal state', ledgerError);
+    }
   }
   console.error('COSMETOLOGY_COURSE_BUILD_FAILED');
   console.error(error);

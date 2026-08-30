@@ -40,8 +40,11 @@ env:
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
-  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+  # Public project URL is repository-owned configuration, not a credential.
+  # Pin it here so a stale generic SUPABASE_URL secret cannot route this
+  # production-only workflow to another project or an unreachable endpoint.
+  SUPABASE_URL: https://cuxzzpsyufcewtmicszk.supabase.co
+  NEXT_PUBLIC_SUPABASE_URL: https://cuxzzpsyufcewtmicszk.supabase.co
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   NODE_OPTIONS: --conditions=react-server
 

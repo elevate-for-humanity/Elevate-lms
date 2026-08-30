@@ -6,7 +6,7 @@ import { getRoleDestination } from '@/lib/auth/role-destinations';
 const WWW_ORIGIN =
   process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
 const ADMIN_ORIGIN =
-  process.env.NEXT_PUBLIC_ADMIN_URL || '';
+  process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org';
 const ADMIN_PORTAL_ROLES = new Set(['admin', 'super_admin', 'staff', 'org_admin', 'platform_operator']);
 
 export default function UnauthorizedPage() {

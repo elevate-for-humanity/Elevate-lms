@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { Calendar, Clock } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
-import { createClient } from '@/lib/supabase/server';
+import { getHostShopBoard } from '@/lib/partner/board';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,14 +15,27 @@ export const metadata = {
 
 export default async function HostShopSchedulePage() {
   const { user } = await requireRole(HOST_SHOP_ROLES);
-  const supabase = await createClient();
+  const board = await getHostShopBoard(user.id);
+  const db = await requireAdminClient();
+  const shopIds = board.shops.map((shop) => shop.id).filter(Boolean);
+  const [{ data: partnerUsers }, { data: shopStaff }] = await Promise.all([
+    db.from('partner_users').select('user_id').eq('partner_id', board.partner.id).eq('status', 'active'),
+    shopIds.length
+      ? db.from('shop_staff').select('user_id').in('shop_id', shopIds).eq('active', true)
+      : Promise.resolve({ data: [] }),
+  ]);
+  const hostUserIds = Array.from(new Set([
+    ...(partnerUsers || []).map((row: any) => row.user_id),
+    ...(shopStaff || []).map((row: any) => row.user_id),
+  ].filter(Boolean)));
 
-  const { data: sessions, error } = await supabase
-    .from('attendance_sessions')
-    .select('id, title, scheduled_at, status')
-    .eq('host_id', user.id)
-    .order('scheduled_at', { ascending: true })
-    .limit(50);
+  const { data: sessions, error } = hostUserIds.length
+    ? await db.from('attendance_sessions')
+        .select('id, title, scheduled_at, status')
+        .in('host_id', hostUserIds)
+        .order('scheduled_at', { ascending: true })
+        .limit(50)
+    : { data: [], error: null };
 
   const rows = sessions ?? [];
   const now = Date.now();
@@ -41,9 +55,9 @@ export default async function HostShopSchedulePage() {
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Host Shop</p>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">{board.partner?.name || 'Host Shop'}</p>
           <h1 className="mt-2 text-3xl font-black text-slate-950">Training Schedule</h1>
-          <p className="mt-2 text-slate-600">Only attendance sessions hosted by this signed-in account are shown.</p>
+          <p className="mt-2 text-slate-600">Only attendance sessions hosted by active users assigned to this Host Shop are shown.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/host-shop/dashboard/attendance/record" className="rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-800">

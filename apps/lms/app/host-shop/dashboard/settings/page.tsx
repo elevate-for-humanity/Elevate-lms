@@ -20,10 +20,10 @@ export default async function PartnerSettingsPage() {
   const orgId = partner.id;
 
   const { data: org } = orgId
-    ? await db
+      ? await db
         .from('partners')
         .select(
-          'name, city, state, address, contact_name, contact_email, contact_phone, notification_preferences',
+          'name, city, state, address_line1, owner_name, supervisor_name, contact_name, contact_email, contact_phone, phone, notification_preferences',
         )
         .eq('id', orgId)
         .maybeSingle()
@@ -38,12 +38,12 @@ export default async function PartnerSettingsPage() {
   const initialData = {
     orgId,
     orgName: org?.name ?? '',
-    address: org?.address ?? '',
+    address: org?.address_line1 ?? '',
     city: org?.city ?? '',
     state: org?.state ?? '',
-    contactName: org?.contact_name ?? profile?.full_name ?? '',
+    contactName: org?.contact_name ?? org?.owner_name ?? org?.supervisor_name ?? profile?.full_name ?? '',
     contactEmail: org?.contact_email ?? profile?.email ?? user.email ?? '',
-    contactPhone: org?.contact_phone ?? '',
+    contactPhone: org?.contact_phone ?? org?.phone ?? '',
     emailNotifications: org?.notification_preferences?.email ?? true,
     weeklyDigest: org?.notification_preferences?.weekly_digest ?? true,
     outcomeAlerts: org?.notification_preferences?.outcome_alerts ?? true,

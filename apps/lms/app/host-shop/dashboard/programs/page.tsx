@@ -1,125 +1,54 @@
-import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { BookOpen, ChevronRight } from 'lucide-react';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { AlertTriangle, BookOpen, CheckCircle2, Users } from 'lucide-react';
+import { requireRole } from '@/lib/auth/require-role';
+import { getHostShopBoard } from '@/lib/partner/board';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 
-export const metadata: Metadata = {
-  title: 'Programs | Partner Portal',
+export const dynamic = 'force-dynamic';
+export const metadata = {
+  title: 'Programs & Standards | Host Shop Portal',
+  description: 'View the canonical occupation and registered-program status assigned to this Host Shop.',
   robots: { index: false, follow: false },
 };
 
-export const dynamic = 'force-dynamic';
-
-export default async function PartnerProgramsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
-  const db = await requireAdminClient();
-  if (!db) redirect('/login');
-
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (!profile || !['partner', 'admin', 'staff'].includes(profile.role)) {
-    redirect('/unauthorized');
-  }
-
-  // Resolve partner_id
-  const { data: partnerLink } = await db
-    .from('partner_users')
-    .select('partner_id')
-    .eq('user_id', user.id)
-    .eq('status', 'active')
-    .maybeSingle();
-
-  let programs: { id: string; title: string; slug: string; description: string | null }[] = [];
-
-  if (partnerLink?.partner_id) {
-    // Get programs this partner has access to
-    const { data: access } = await db
-      .from('partner_program_access')
-      .select('program_id, programs(id, title, slug, description)')
-      .eq('partner_id', partnerLink.partner_id)
-      .is('revoked_at', null);
-
-    if (access) {
-      programs = access.map((a: any) => a.programs).filter(Boolean);
-    }
-
-    // If no explicit access rows, fall back to all active programs
-    if (programs.length === 0) {
-      const { data: allPrograms } = await db
-        .from('programs')
-        .select('id, title, slug, description')
-        .eq('is_active', true)
-        .eq('published', true)
-        .order('title');
-      programs = allPrograms || [];
-    }
-  }
+export default async function HostShopProgramsPage() {
+  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const board = await getHostShopBoard(user.id);
+  const configured = board.unconfiguredPrograms.length === 0;
 
   return (
-    <div>
-      <div className="mb-6">
-        <Breadcrumbs
-          items={[{ label: 'Partner', href: '/partner/attendance' }, { label: 'Programs' }]}
-        />
-      </div>
-
-      <div className="max-w-4xl">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Programs</h1>
-          <p className="text-slate-700 mt-1">
-            View apprentice progress and manage attendance by program.
-          </p>
+    <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">{board.partner?.name || 'Host Shop'}</p>
+          <h1 className="mt-2 text-3xl font-black text-slate-950">Programs & Standards</h1>
+          <p className="mt-2 text-slate-600">Only programs assigned to this Host Shop are shown. The former all-program fallback has been removed.</p>
         </div>
-
-        {programs.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-            <BookOpen className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">No programs assigned</h3>
-            <p className="text-slate-700 text-sm">
-              Contact your Elevate coordinator to get programs linked to your account.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {programs.map((program) => (
-              <Link
-                key={program.id}
-                href={`/partner/programs/${program.slug}`}
-                className="flex items-center justify-between bg-white rounded-xl shadow-sm px-6 py-5 hover:shadow-md transition-shadow group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 text-brand-blue-600" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-slate-900 group-hover:text-brand-blue-600 transition-colors">
-                      {program.title}
-                    </p>
-                    {program.description && (
-                      <p className="text-sm text-slate-700 mt-0.5 line-clamp-1">
-                        {program.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <ChevronRight className="w-5 h-5 text-slate-700 group-hover:text-brand-blue-600 transition-colors" />
-              </Link>
-            ))}
-          </div>
-        )}
+        <Link href="/host-shop/dashboard" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800">Back to dashboard</Link>
       </div>
-    </div>
+
+      <section className={`mt-6 rounded-3xl border p-7 ${configured ? 'border-green-200 bg-green-50' : 'border-amber-300 bg-amber-50'}`}>
+        {configured ? <CheckCircle2 className="h-8 w-8 text-green-700" /> : <AlertTriangle className="h-8 w-8 text-amber-800" />}
+        <h2 className="mt-4 text-2xl font-black text-slate-950">{board.tradeInfo.label}</h2>
+        <p className="mt-2 leading-7 text-slate-700">
+          {configured
+            ? `${board.registeredPrograms.length} active registered occupation standard${board.registeredPrograms.length === 1 ? '' : 's'} available for regulated progress.`
+            : 'No active approved registered-program standard is configured for the assigned occupation. Competency, RTI, wage-milestone, and regulated completion credit remain blocked.'}
+        </p>
+      </section>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5">
+          <BookOpen className="h-5 w-5 text-brand-blue-700" />
+          <p className="mt-3 text-sm font-bold uppercase tracking-wide text-slate-500">Canonical program</p>
+          <p className="mt-1 text-xl font-black text-slate-950">{board.programType || 'Not assigned'}</p>
+        </section>
+        <section className="rounded-2xl border border-slate-200 bg-white p-5">
+          <Users className="h-5 w-5 text-brand-green-700" />
+          <p className="mt-3 text-sm font-bold uppercase tracking-wide text-slate-500">Active placements</p>
+          <p className="mt-1 text-xl font-black text-slate-950">{board.apprentices.length}</p>
+        </section>
+      </div>
+    </main>
   );
 }

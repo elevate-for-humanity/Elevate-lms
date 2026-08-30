@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
-import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { HOST_SHOP_ROLES, normalizeRole } from '@/lib/rbac/role-matrix';
 import { getHostShopAdminPartnerOptions, getHostShopBoard, HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -67,14 +66,13 @@ export default async function HostShopDashboardView() {
     effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
   if (!isPlatformAdmin) await ensureCanonicalPartner(user);
 
-  const previewSubject = isPlatformAdmin
-    ? await resolvePortalPreviewSubject(db, user.id)
-    : { userId: user.id, previewing: false };
-  const boardUserId = previewSubject.previewing ? previewSubject.userId : user.id;
-
   let board: Awaited<ReturnType<typeof getHostShopBoard>> | null = null;
   try {
-    board = await getHostShopBoard(boardUserId);
+    // Host Shop tenancy is selected with HOST_SHOP_ADMIN_COOKIE. Do not reuse
+    // an apprentice/student preview subject here: a learner preview cookie can
+    // otherwise replace the administrator identity and make the selected Host
+    // Shop appear inaccessible immediately after it is opened.
+    board = await getHostShopBoard(user.id);
   } catch (error) {
     if (
       isPlatformAdmin &&
@@ -123,6 +121,9 @@ export default async function HostShopDashboardView() {
     { href: '/host-shop/dashboard/wages', title: 'Wage compliance', detail: 'Verify actual wages against the registered occupation and employer-specific RAPIDS schedule.', image: '/images/pages/admin-wioa-hero.webp' },
     { href: '/host-shop/dashboard/reports', title: 'Reporting center', detail: 'Review documented work, competencies, attendance, RTI, and compliance records.', image: '/images/heroes/lms-analytics.webp' },
     { href: '/host-shop/dashboard/profile', title: 'Shop profile', detail: 'Maintain the approved shop profile, logo, flyer, and operating information.', image: '/images/pages/about-employer-partners.webp' },
+    { href: '/host-shop/dashboard/programs', title: 'Programs & standards', detail: 'Review the occupation assigned to this Host Shop and whether its registered standard is configured.', image: '/images/pages/programs-hero-vibrant.webp' },
+    { href: '/host-shop/dashboard/schedule', title: 'Training schedule', detail: 'View attendance sessions hosted by active users assigned to this Host Shop.', image: '/images/pages/calendar-page-1.webp' },
+    { href: '/host-shop/dashboard/store', title: 'Host Shop store', detail: 'Open verified purchasing options and approved service requests.', image: '/images/pages/store-page-1.webp' },
   ];
   const partnerName = board.partner?.name || board.shops[0]?.name || '';
   const { data: publicProfile } = partnerName

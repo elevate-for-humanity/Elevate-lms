@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest) {
       .from('partners')
       .update({
         name,
-        address,
+        address_line1: address,
         city,
         state,
         contact_name,

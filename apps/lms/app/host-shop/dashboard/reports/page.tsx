@@ -11,6 +11,7 @@ export default async function HostShopReportsPage() {
   const { user } = await requireRole(HOST_SHOP_ROLES);
   const board = await getHostShopBoard(user.id);
   const competencyBased = board.tradeInfo.progressModel === 'competency_based';
+  const progressConfigured = board.unconfiguredPrograms.length === 0;
   const approvedHours = board.apprentices.reduce((sum, apprentice) => sum + (apprentice.ojt.completed || 0), 0);
   const requiredHours = board.apprentices.reduce((sum, apprentice) => sum + Number(apprentice.ojt.required ?? 0), 0);
   const hourCompletionRate = requiredHours > 0 ? Math.round((approvedHours / requiredHours) * 100) : 0;
@@ -28,7 +29,7 @@ export default async function HostShopReportsPage() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-5"><Users className="h-5 w-5 text-brand-blue-700"/><p className="mt-3 text-3xl font-black text-slate-950">{board.apprentices.length}</p><p className="text-sm text-slate-600">Active apprentices</p></div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5"><Clock className="h-5 w-5 text-amber-700"/><p className="mt-3 text-3xl font-black text-slate-950">{approvedHours.toLocaleString()}h</p><p className="text-sm text-slate-600">Approved supervised work evidence</p></div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-5"><ShieldCheck className="h-5 w-5 text-brand-green-700"/><p className="mt-3 text-3xl font-black text-slate-950">{competencyBased ? `${competencyCompletionRate}%` : `${hourCompletionRate}%`}</p><p className="text-sm text-slate-600">{competencyBased ? `Aggregate Appendix A competency progress (${totalCompetenciesComplete}/${totalCompetenciesRequired || board.apprentices.length * (board.tradeInfo.competencyCount ?? 14)})` : 'Aggregate time-based OJT completion'}</p></div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5"><ShieldCheck className="h-5 w-5 text-brand-green-700"/><p className="mt-3 text-3xl font-black text-slate-950">{!progressConfigured ? 'Blocked' : competencyBased ? `${competencyCompletionRate}%` : `${hourCompletionRate}%`}</p><p className="text-sm text-slate-600">{!progressConfigured ? 'Registered-program standard not configured' : competencyBased ? `Aggregate Appendix A competency progress (${totalCompetenciesComplete}/${totalCompetenciesRequired || board.apprentices.length * (board.tradeInfo.competencyCount ?? 14)})` : 'Aggregate time-based OJT completion'}</p></div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5"><FileText className="h-5 w-5 text-purple-700"/><p className="mt-3 text-3xl font-black text-slate-950">{board.requiredDocumentCount ? `${board.acceptedDocumentCount}/${board.requiredDocumentCount}` : '—'}</p><p className="text-sm text-slate-600">Required docs accepted</p></div>
       </div>
 

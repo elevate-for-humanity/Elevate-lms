@@ -18,11 +18,29 @@ export async function POST(req: Request) {
 
   const db = await getAdminClient();
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+  const requestOrigin = new URL(req.url).origin;
+  const configuredAppUrl = process.env.NEXT_PUBLIC_APP_URL || requestOrigin;
+  let appOrigin = 'https://app.elevateforhumanity.org';
+
+  try {
+    const candidate = new URL(configuredAppUrl);
+    const isSafeProductionOrigin =
+      candidate.protocol === 'https:' &&
+      candidate.hostname === 'app.elevateforhumanity.org' &&
+      !candidate.port;
+
+    if (process.env.NODE_ENV !== 'production' || isSafeProductionOrigin) {
+      appOrigin = candidate.origin;
+    }
+  } catch {
+    // Fall back to the canonical app origin. Never email an internal or
+    // restricted-port callback URL to a portal user.
+  }
+
   // Always route through /auth/callback so the session is established correctly
   // and role-based destination routing runs. Never redirect directly to a page.
   const destination = redirectTo || getRoleDestination('student');
-  const finalRedirect = `${siteUrl}/auth/callback?redirect=${encodeURIComponent(destination)}`;
+  const finalRedirect = `${appOrigin}/auth/callback?redirect=${encodeURIComponent(destination)}`;
 
   // generateLink fails with "User not found" for unknown emails — use that as
   // the existence check instead of O(n) listUsers() scan.

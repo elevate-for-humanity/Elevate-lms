@@ -19,14 +19,16 @@ export default function DeploymentsClient() {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [warnings, setWarnings] = useState<string[]>([]);
 
   async function fetchDeployments() {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/dev-studio/builds');
+      const res = await fetch('/api/admin/dev-studio/deployments', { cache: 'no-store' });
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
-      setDeployments(json.builds ?? []);
+      setDeployments(json.deployments ?? []);
+      setWarnings(json.warnings ?? []);
       setError(null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to load');
@@ -96,6 +98,12 @@ export default function DeploymentsClient() {
           </button>
         </div>
 
+        {warnings.length > 0 && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800 mb-6">
+            {warnings.join(' ')}
+          </div>
+        )}
+
         {error && (
           <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700 mb-6">
             {error}
@@ -149,7 +157,7 @@ export default function DeploymentsClient() {
             <Rocket className="mx-auto h-12 w-12 text-slate-300" />
             <p className="mt-3 text-sm font-medium text-slate-500">No deployments yet</p>
             <p className="text-xs text-slate-400 mt-1">
-              Integration pending: ai_deployments table migration not yet applied
+              Supabase is connected. Deployment records will appear after the next tracked release.
             </p>
           </div>
         )}

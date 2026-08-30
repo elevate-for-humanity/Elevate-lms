@@ -136,7 +136,14 @@ function validateLesson(
   return [...errors, ...warnings];
 }
 
-export function validateBlueprint(blueprint: CredentialBlueprint): ValidationResult {
+export interface BlueprintValidationOptions {
+  requireGeneratedContent?: boolean;
+}
+
+export function validateBlueprint(
+  blueprint: CredentialBlueprint,
+  options: BlueprintValidationOptions = {},
+): ValidationResult {
   const allErrors: ValidationError[] = [];
   const allWarnings: ValidationError[] = [];
 
@@ -147,11 +154,14 @@ export function validateBlueprint(blueprint: CredentialBlueprint): ValidationRes
   }
 
   const lessons = (blueprint.modules ?? []).flatMap((courseModule) => courseModule.lessons ?? []);
-  const generatedPackage = lessons.some((lesson) =>
-    Boolean(lesson.content?.trim()) ||
-    Boolean(lesson.objective?.trim()) ||
-    Boolean(lesson.quizQuestions?.length),
-  );
+  const generatedPackage =
+    options.requireGeneratedContent ??
+    lessons.some(
+      (lesson) =>
+        Boolean(lesson.content?.trim()) ||
+        Boolean(lesson.objective?.trim()) ||
+        Boolean(lesson.quizQuestions?.length),
+    );
 
   if (generatedPackage) {
     for (const courseModule of blueprint.modules ?? []) {

@@ -126,20 +126,32 @@ export async function refreshSecrets(): Promise<void> {
 
 
 /**
+ * Decrypt one canonical platform secret by exact key.
+ *
+ * Control-plane callers must use this instead of hydrating the whole secret
+ * table into process.env. The restricted database function is the only place
+ * that can decrypt value_enc.
+ */
+export async function getDecryptedPlatformSecret(key: string): Promise<string | undefined> {
+  const client = getBootstrapClient();
+  if (!client) return process.env[key];
+
+  const { data, error } = await client.rpc('get_platform_secret', { p_key: key });
+  if (error || typeof data !== 'string' || !data.trim()) return process.env[key];
+  return data.trim();
+}
+
+/**
  * Hydrate only Northflank control-plane credentials.
- * Values are decrypted by the restricted database function and never returned
- * to a browser response.
+ * Values are decrypted by exact key and never returned to a browser response.
  */
 export async function hydrateNorthflankEnv(): Promise<void> {
-  const client = getBootstrapClient();
-  if (!client) return;
-
   const keys = ['NORTHFLANK_API_TOKEN', 'NORTHFLANK_PROJECT_ID'] as const;
   const values = await Promise.all(
-    keys.map(async (key) => {
-      const { data, error } = await client.rpc('get_platform_secret', { p_key: key });
-      return { key, value: error || typeof data !== 'string' ? null : data.trim() };
-    }),
+    keys.map(async (key) => ({
+      key,
+      value: await getDecryptedPlatformSecret(key),
+    })),
   );
 
   for (const { key, value } of values) {

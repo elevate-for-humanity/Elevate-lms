@@ -3,7 +3,7 @@
  * Canonical platform_secrets values are hydrated before process.env fallback.
  */
 
-import { getSecret, hydrateProcessEnv } from '@/lib/secrets';
+import { getDecryptedPlatformSecret } from '@/lib/secrets';
 
 function normalizeToken(value: string | undefined | null): string | null {
   if (!value) return null;
@@ -18,9 +18,12 @@ function normalizeToken(value: string | undefined | null): string | null {
   return token;
 }
 
-/** Load current runtime secrets into process.env before GitHub calls. */
+/**
+ * Retained for route compatibility. GitHub credentials are now resolved by
+ * exact key in getGitHubToken instead of hydrating every platform secret.
+ */
 export async function ensureDevStudioSecrets(): Promise<void> {
-  await hydrateProcessEnv();
+  await getGitHubToken();
 }
 
 /**
@@ -35,9 +38,9 @@ export async function getGitHubToken(): Promise<string | null> {
   const deployedToken = normalizeToken(process.env.GITHUB_TOKEN);
   if (deployedToken) return deployedToken;
 
-  await ensureDevStudioSecrets();
-
-  const fromCanonicalStore = normalizeToken(await getSecret('GITHUB_TOKEN'));
+  const fromCanonicalStore = normalizeToken(
+    await getDecryptedPlatformSecret('GITHUB_TOKEN'),
+  );
   if (fromCanonicalStore) {
     process.env.GITHUB_TOKEN = fromCanonicalStore;
     return fromCanonicalStore;

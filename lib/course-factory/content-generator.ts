@@ -336,7 +336,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
       });
 
       const parsed = parseStrictAIJson(
-        normalizeLessonContract(response.content),
+        normalizeLessonContract(normalizeFourOptionQuestions(response.content)),
         generatedLessonContentSchema,
         'Lesson generation',
       );
@@ -398,15 +398,52 @@ interface GeneratedAssessment {
  * the contract is zero-based. Normalize only that unambiguous boundary case;
  * every other invalid value still fails strict validation.
  */
-function normalizeAssessmentAnswerIndexes(raw: string): string {
-  const parsed = JSON.parse(raw) as { questions?: Array<{ options?: unknown[]; correct?: unknown }> };
-  for (const question of parsed.questions ?? []) {
-    if (
-      Array.isArray(question.options) &&
-      question.options.length === 4 &&
-      question.correct === question.options.length
-    ) {
-      question.correct = question.options.length - 1;
+type ProviderQuestion = { options?: unknown[]; correct?: unknown };
+
+/**
+ * Repair provider formatting without changing the correct answer.
+ *
+ * Some OpenAI-compatible providers return extra distractors even when JSON
+ * mode is enabled. Throwing away the whole assessment wastes the completed
+ * course checkpoints. Keep the selected answer plus three distractors and
+ * remap its zero-based index. Responses with fewer than four choices remain
+ * invalid and are retried by the bounded generator loop.
+ */
+export function normalizeFourOptionQuestions(raw: string): string {
+  const parsed = JSON.parse(raw) as {
+    questions?: ProviderQuestion[];
+    quiz_questions?: ProviderQuestion[];
+    experience?: { knowledgeChecks?: ProviderQuestion[] };
+  };
+  const groups = [
+    parsed.questions,
+    parsed.quiz_questions,
+    parsed.experience?.knowledgeChecks,
+  ];
+
+  for (const questions of groups) {
+    for (const question of questions ?? []) {
+      if (!Array.isArray(question.options)) continue;
+
+      let correct = Number(question.correct);
+      if (Number.isInteger(correct) && correct === question.options.length) {
+        correct = question.options.length - 1;
+      }
+
+      if (question.options.length > 4 && Number.isInteger(correct)) {
+        const correctOption = question.options[correct];
+        if (correctOption !== undefined) {
+          const selected = question.options
+            .filter((_, index) => index !== correct)
+            .slice(0, 3);
+          selected.push(correctOption);
+          question.options = selected;
+          question.correct = 3;
+          continue;
+        }
+      }
+
+      question.correct = correct;
     }
   }
   return JSON.stringify(parsed);
@@ -469,7 +506,7 @@ Return ONLY valid JSON.
     });
 
     const parsed = parseStrictAIJson(
-      normalizeAssessmentAnswerIndexes(response.content),
+      normalizeFourOptionQuestions(response.content),
       generatedAssessmentSchema,
       'Assessment generation',
     );
@@ -534,7 +571,7 @@ Return ONLY valid JSON.
     });
 
     const parsed = parseStrictAIJson(
-      normalizeAssessmentAnswerIndexes(response.content),
+      normalizeFourOptionQuestions(response.content),
       generatedAssessmentSchema,
       'Final exam generation',
     );

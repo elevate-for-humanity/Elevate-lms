@@ -322,6 +322,28 @@ async function main() {
 }
 
 main().catch(async (error) => {
+  const message = error instanceof Error ? error.message : String(error);
+  try {
+    const db = await requireAdminClient();
+    await Promise.all([
+      updateJob(db, {
+        status: 'failed',
+        stage: 'failed',
+        message: `Course generation stopped: ${message}`,
+        error: message,
+        completed_at: new Date().toISOString(),
+      }),
+      db
+        .from('courses')
+        .update({
+          generation_status: 'failed',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', COURSE_ID),
+    ]);
+  } catch (ledgerError) {
+    console.error('[Cosmetology Course Builder] failed to record terminal state', ledgerError);
+  }
   console.error('COSMETOLOGY_COURSE_BUILD_FAILED');
   console.error(error);
   process.exit(1);

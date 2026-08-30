@@ -77,13 +77,16 @@ jobs:
 
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Resolve and accept canonical Elevate LLM
-        run: node scripts/northflank/export-course-llm-env.mjs
-
       - name: Require production database credentials
         run: |
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
+
+      - name: Wait for authenticated production database readiness
+        run: node scripts/course-factory/wait-for-cosmetology-database.mjs
+
+      - name: Resolve and accept canonical Elevate LLM
+        run: node scripts/northflank/export-course-llm-env.mjs
 
       - name: Build canonical cosmetology course and queue media
         run: pnpm tsx scripts/course-factory/build-cosmetology-course.ts

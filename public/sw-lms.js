@@ -8,8 +8,16 @@ const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const PRECACHE_ASSETS = [
   '/offline.html',
   '/manifest-lms.json',
+  '/manifest-student.json',
+  '/manifest-apprentice.json',
+  '/manifest-employer.json',
+  '/manifest-program-holder.json',
+  '/manifest-shop-owner.json',
   `${CDN}/icons/student-192.png`,
   `${CDN}/icons/student-512.png`,
+  `${CDN}/icons/employer-192.png`,
+  `${CDN}/icons/program-holder-192.png`,
+  `${CDN}/icon-192.png`,
 ];
 
 function isCacheableResponse(response) {

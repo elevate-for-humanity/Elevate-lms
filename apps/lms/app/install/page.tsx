@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, Clock3, Download, GraduationCap, MonitorSmartphone } from 'lucide-react';
+import { BookOpen, Building2, Clock3, Download, GraduationCap, MonitorSmartphone, Store } from 'lucide-react';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export default function LmsInstallPage() {
             className="mt-7 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 py-3 font-extrabold text-white hover:bg-blue-800"
           />
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <Link href="/lms/dashboard" className="rounded-2xl border border-slate-200 bg-slate-50 p-5 hover:border-blue-300 hover:bg-blue-50">
               <GraduationCap className="h-5 w-5 text-blue-800" aria-hidden />
               <h2 className="mt-3 text-lg font-extrabold">Student Dashboard</h2>
@@ -43,6 +43,16 @@ export default function LmsInstallPage() {
               <BookOpen className="h-5 w-5 text-blue-800" aria-hidden />
               <h2 className="mt-3 text-lg font-extrabold">Employer Dashboard</h2>
               <p className="mt-2 text-sm font-medium leading-6 text-slate-700">Candidates, apprenticeship operations, verification, and employer workflows.</p>
+            </Link>
+            <Link href="/program-holder/dashboard" className="rounded-2xl border border-slate-200 bg-slate-50 p-5 hover:border-blue-300 hover:bg-blue-50">
+              <Building2 className="h-5 w-5 text-blue-800" aria-hidden />
+              <h2 className="mt-3 text-lg font-extrabold">Program Holder</h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-slate-700">Programs, students, agreements, compliance, documents, and reporting.</p>
+            </Link>
+            <Link href="/host-shop/dashboard" className="rounded-2xl border border-slate-200 bg-slate-50 p-5 hover:border-blue-300 hover:bg-blue-50">
+              <Store className="h-5 w-5 text-blue-800" aria-hidden />
+              <h2 className="mt-3 text-lg font-extrabold">Host Shop</h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-slate-700">Apprentices, attendance, OJL, competencies, documents, and shop reports.</p>
             </Link>
           </div>
 

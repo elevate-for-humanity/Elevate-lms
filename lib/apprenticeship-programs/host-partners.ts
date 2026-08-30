@@ -199,7 +199,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     zip: '46637',
     address: '1740 S Bend Ave, Suite A',
     phone: '(269) 240-7923',
-    programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
+    programs: ['cosmetology-apprenticeship'],
     note: 'South Bend host salon partner at its current South Bend Avenue location.',
     marketingBlurb:
       'A South Bend salon offering appointment-based hair services while participating in Elevate’s growing apprenticeship host-shop network.',

@@ -171,6 +171,41 @@ export async function processCourseAgenticTask(input: {
 
   if (task.worker === 'instructional-designer') {
     if (!target.programId && !target.programSlug) throw new Error('Instructional build is missing its canonical program identity.');
+    if (target.courseId) {
+      const loaded = await loadBlueprintWithProgram(db, {
+        programId: target.programId ?? undefined,
+        programSlug: target.programSlug ?? undefined,
+      });
+      const expectedModules = loaded?.blueprint.modules?.length ?? 0;
+      const expectedLessons = (loaded?.blueprint.modules ?? []).reduce(
+        (sum, module) => sum + (module.lessons?.length ?? 0),
+        0,
+      );
+      const [{ count: moduleCount, error: moduleError }, { data: lessons, error: lessonError }] = await Promise.all([
+        db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', target.courseId),
+        db.from('course_lessons').select('id,script').eq('course_id', target.courseId),
+      ]);
+      if (moduleError) throw moduleError;
+      if (lessonError) throw lessonError;
+      const scriptedLessons = (lessons ?? []).filter((lesson) => stringValue(lesson.script)).length;
+      if (
+        expectedModules > 0
+        && expectedLessons > 0
+        && moduleCount === expectedModules
+        && (lessons ?? []).length === expectedLessons
+        && scriptedLessons === expectedLessons
+      ) {
+        await updateTask(task, project, 'completed', {
+          course_id: target.courseId,
+          module_count: moduleCount,
+          lesson_count: expectedLessons,
+          scripted_lessons: scriptedLessons,
+          resumed_from_persisted_checkpoint: true,
+          summary: 'Accepted complete persisted instructional checkpoint; no course recreation required.',
+        }, `Persisted instructional checkpoint verified: ${moduleCount} modules and ${expectedLessons} scripted lessons.`);
+        return;
+      }
+    }
     const result = await courseBuilderController({
       programId: target.programId ?? undefined,
       programSlug: target.programSlug ?? undefined,

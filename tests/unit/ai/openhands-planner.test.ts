@@ -18,6 +18,21 @@ describe('OpenHands engineering delegation', () => {
   it('keeps Course Builder generation on the canonical course tool', () => {
     const planned = planAIToolFromCommand('Build the Business Administration course');
     expect(planned?.name).toBe('courses.generate');
+    expect(planned?.input).toMatchObject({
+      action: 'start',
+      goal: 'Build the Business Administration course',
+    });
+  });
+
+  it('resumes a complete existing course through the same agentic Course Builder', () => {
+    const courseId = '9ca9fb50-7119-46ea-ab81-9b0193c29c31';
+    const command = `Finish the cosmetology course ${courseId}`;
+    const planned = planAIToolFromCommand(command);
+
+    expect(planned).toEqual({
+      name: 'courses.generate',
+      input: { action: 'start', goal: command, courseId },
+    });
   });
 
   it('keeps generic platform test execution on the existing workflow tool', () => {

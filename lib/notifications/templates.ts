@@ -13,6 +13,7 @@ export interface EmailTemplate {
 }
 
 export type TemplateKey =
+  | 'enrollment_welcome'
   | 'inquiry_received'
   | 'apprentice_submission_received'
   | 'hostshop_submission_received'
@@ -67,6 +68,46 @@ function button(text: string, url: string): string {
 
 export function getTemplate(key: TemplateKey, data: Record<string, any>): EmailTemplate {
   switch (key) {
+    case 'enrollment_welcome': {
+      const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/lms/dashboard`;
+      const loginUrl = data.login_url || `${PLATFORM_DEFAULTS.siteUrl}/login`;
+      return {
+        subject: `Welcome to ${data.program_name || 'your Elevate program'} — start here`,
+        html: baseTemplate(`
+          <h2 style="color: ${BRAND_COLOR};">Welcome to your program</h2>
+          <p>Hi ${data.name || 'there'},</p>
+          <p>Your enrollment in <strong>${data.program_name || 'your program'}</strong> is active. Use the same email address that received this message when you sign in.</p>
+          <h3>Your first steps</h3>
+          <ol style="padding-left: 20px; line-height: 1.9;">
+            <li>Sign in to your learner account.</li>
+            <li>Open your dashboard and confirm your contact information.</li>
+            <li>Complete orientation and required acknowledgments.</li>
+            <li>Open My Courses and begin the first assigned lesson.</li>
+            <li>If you are an apprentice, confirm your Host Shop placement before clocking hours.</li>
+          </ol>
+          ${button('Sign In →', loginUrl)}
+          <p>After signing in, your dashboard is available at <a href="${dashboardUrl}">${dashboardUrl}</a>.</p>
+          <p style="font-size: 13px; color: #666;">Do not create a second account. If sign-in does not recognize your email, reply to this message or call ${SUPPORT_PHONE}.</p>
+        `),
+        text: `Welcome to ${data.program_name || 'your Elevate program'}
+
+Hi ${data.name || 'there'},
+
+Your enrollment is active. Sign in with the same email address that received this message.
+
+First steps:
+1. Sign in: ${loginUrl}
+2. Confirm your contact information.
+3. Complete orientation and required acknowledgments.
+4. Open My Courses and begin the first assigned lesson.
+5. Apprentices: confirm your Host Shop placement before clocking hours.
+
+Dashboard: ${dashboardUrl}
+
+Do not create a second account. If your email is not recognized, reply to this message or call ${SUPPORT_PHONE}.`,
+      };
+    }
+
     case 'inquiry_received':
       return {
         subject: 'We received your inquiry',

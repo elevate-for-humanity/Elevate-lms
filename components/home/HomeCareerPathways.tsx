@@ -34,8 +34,8 @@ const PATHWAYS = [
     title: 'CDL Training',
     description:
       'Prepare for commercial driving with permit preparation, safety instruction, and coordinated behind-the-wheel training.',
-    image: '/images/pages/cdl-cab-interior.webp',
-    imageAlt: 'Commercial driver training inside a truck cab',
+    image: '/images/pages/cdl-loading-dock.webp',
+    imageAlt: 'Commercial truck positioned at a loading dock for driver training',
     ctaHref: '/programs/cdl-training',
     badge: 'Transportation',
     cta: 'Explore CDL Training',

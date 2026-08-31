@@ -70,9 +70,33 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       },
       {
         type: 'image',
-        src: '/images/hero/hero-community.webp',
-        alt: 'A diverse community of learners preparing for new careers',
-        label: 'Join a community moving toward stronger careers',
+        src: '/images/partners/generations-hair/salon-service.webp',
+        alt: 'A cosmetology apprentice providing a supervised service in a host salon',
+        label: 'Learn inside an active apprenticeship host salon',
+      },
+      {
+        type: 'image',
+        src: '/images/pages/cdl-truck-highway.webp',
+        alt: 'A commercial truck traveling on the highway during CDL training',
+        label: 'Prepare for transportation and CDL careers',
+      },
+      {
+        type: 'image',
+        src: '/images/partners/generations-hair/stylist-at-work.webp',
+        alt: 'A host salon professional demonstrating hands-on cosmetology work',
+        label: 'Build skills alongside experienced professionals',
+      },
+      {
+        type: 'image',
+        src: '/images/pages/cdl-cab-interior.webp',
+        alt: 'The driver controls inside a commercial vehicle training cab',
+        label: 'Practice career skills in real working environments',
+      },
+      {
+        type: 'image',
+        src: '/images/partners/kountry-kutz-interior.webp',
+        alt: 'The interior of an approved apprenticeship host shop',
+        label: 'Train with local host-shop partners',
       },
       {
         type: 'image',

@@ -32,7 +32,10 @@ async function login(page: Page, loginBase: string, email: string, password: str
   await emailInput.fill(email);
   await passwordInput.fill(password);
   await Promise.all([
-    page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 30_000 }),
+    page.waitForURL((url) => !url.pathname.includes('/login'), {
+      timeout: 30_000,
+      waitUntil: 'domcontentloaded',
+    }),
     submit.click(),
   ]);
 }

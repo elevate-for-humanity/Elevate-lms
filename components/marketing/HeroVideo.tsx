@@ -361,13 +361,13 @@ export default function HeroVideo({
             type="button"
             onClick={() => void toggleSound()}
             aria-label={muted ? 'Play hero audio' : 'Pause hero audio'}
-            className={`absolute right-4 z-40 inline-flex min-h-11 items-center justify-center gap-2 border px-4 py-2 text-xs font-black text-white shadow-lg transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
+            className={`absolute right-4 z-40 inline-flex min-h-14 min-w-[10.5rem] touch-manipulation items-center justify-center gap-3 border-2 px-5 py-3 text-sm font-black text-white shadow-2xl transition active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
               soundButtonVariant === 'prominent'
                 ? 'top-4 rounded-lg border-red-300 bg-brand-red-700 hover:bg-brand-red-800'
                 : 'bottom-4 rounded-full border-white/70 bg-slate-950/45 backdrop-blur-sm hover:bg-slate-950/70'
             }`}
           >
-            {muted ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            {muted ? <Volume2 className="h-6 w-6" /> : <VolumeX className="h-6 w-6" />}
             <span>{muted ? 'Turn sound on' : 'Turn sound off'}</span>
           </button>
         ) : null}

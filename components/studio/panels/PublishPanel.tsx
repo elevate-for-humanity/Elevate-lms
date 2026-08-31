@@ -108,7 +108,7 @@ export function PublishPanel() {
       <PanelHeader
         icon={<Rocket className="w-5 h-5" />}
         title="Review & Publish"
-        subtitle={publishState.isPublished ? 'Published learner version' : 'Authorized human review and canonical publication'}
+        subtitle={publishState.isPublished ? 'Published learner version · human editing remains available' : 'AI-first acceptance with optional human review'}
         actions={
           <button type="button" onClick={() => void loadAudit()} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className="h-3.5 w-3.5" /> Re-run gate
@@ -131,7 +131,7 @@ export function PublishPanel() {
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
           <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600"><div>Review state</div><div className="mt-1 font-bold text-slate-950">{reviewStatus}</div></div>
           <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600"><div>Required lesson approvals</div><div className="mt-1 font-bold text-slate-950">{approvedLessons}/{totalLessons}</div></div>
-          <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600"><div>Review mode</div><div className="mt-1 font-bold text-slate-950">authorized human review</div></div>
+          <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600"><div>Review mode</div><div className="mt-1 font-bold text-slate-950">AI first pass · human override</div></div>
         </div>
 
         {!auditPass && audit?.blocking_issues?.length ? (
@@ -143,8 +143,8 @@ export function PublishPanel() {
 
       {!publishState.isPublished ? (
         <div className="mb-5 rounded-xl border border-violet-200 bg-violet-50 p-4">
-          <div className="flex items-center gap-2 font-bold text-violet-950"><ShieldCheck className="h-5 w-5" /> Human review workspace</div>
-          <p className="mt-1 text-xs leading-5 text-violet-800">These controls write the authenticated reviewer identity and audit trail through the canonical Course Builder review service. Nothing here auto-approves AI output.</p>
+          <div className="flex items-center gap-2 font-bold text-violet-950"><ShieldCheck className="h-5 w-5" /> Human review and override workspace</div>
+          <p className="mt-1 text-xs leading-5 text-violet-800">Course Builder AI performs the first checklist review. These controls let an authenticated human inspect, edit, approve, reject, or request revisions with a durable audit trail.</p>
           <textarea
             value={notes}
             onChange={(event) => setNotes(event.target.value)}

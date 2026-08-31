@@ -93,7 +93,7 @@ export async function repairPersistedLessonObjectives(courseId: string): Promise
   const db = await requireAdminClient();
   const { data: lessons, error } = await db
     .from('course_lessons')
-    .select('id,objective,content,learning_objectives,generation_status')
+    .select('id,content,learning_objectives,generation_status')
     .eq('course_id', courseId)
     .eq('generation_status', 'generated');
   if (error) throw new Error(`Persisted checkpoint repair lookup failed: ${error.message}`);
@@ -103,7 +103,6 @@ export async function repairPersistedLessonObjectives(courseId: string): Promise
     const existing = textArray(lesson.learning_objectives);
     if (existing.length >= 3) continue;
     const objectives = normalizePersistedLessonObjectives({
-      objective: lesson.objective,
       learningObjectives: lesson.learning_objectives,
       content: lesson.content,
     });

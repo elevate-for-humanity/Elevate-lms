@@ -458,3 +458,4 @@ export async function persistAssessmentCheckpoint(input: {
   } catch {
     // Best-effort checkpoint only. The canonical build remains authoritative.
   }
+}

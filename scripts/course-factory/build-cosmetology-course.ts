@@ -12,6 +12,7 @@ const COURSE_ID = '9ca9fb50-7119-46ea-ab81-9b0193c29c31';
 const CANONICAL_SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
 const EXPECTED_MODULES = 8;
 const EXPECTED_LESSONS = 40;
+const ABANDONED_JOB_AGE_MS = 6 * 60 * 60 * 1000;
 const JOB_ID = process.env.GITHUB_RUN_ID
   ? `cosmetology-production-${process.env.GITHUB_RUN_ID}`
   : `cosmetology-production-${randomUUID()}`;
@@ -193,6 +194,8 @@ async function updateJob(db: AdminDb, patch: Record<string, unknown>) {
         course_id: COURSE_ID,
         source: 'production-workflow',
         github_run_id: process.env.GITHUB_RUN_ID ?? null,
+        github_run_attempt: process.env.GITHUB_RUN_ATTEMPT ?? null,
+        last_heartbeat_at: new Date().toISOString(),
       },
       ...patch,
     },
@@ -201,6 +204,68 @@ async function updateJob(db: AdminDb, patch: Record<string, unknown>) {
   if (error) {
     console.warn(
       `[Cosmetology Course Builder] job ledger unavailable; continuing because telemetry cannot block canonical lesson generation: ${error.message}`,
+    );
+  }
+}
+
+async function reconcileAbandonedJobs(db: AdminDb) {
+  const { data: runningJobs, error } = await requiredDbOperation(
+    'abandoned Course Factory job lookup',
+    () =>
+      db
+        .from('course_factory_jobs')
+        .select('id,job_id,status,stage,started_at,completed_at,metadata')
+        .eq('credential_slug', PROGRAM_SLUG)
+        .eq('status', 'running')
+        .neq('job_id', JOB_ID),
+  );
+  if (error) fail(`Abandoned job lookup failed: ${error.message}`);
+
+  const now = Date.now();
+  for (const job of runningJobs ?? []) {
+    const startedAt =
+      typeof job.started_at === 'string' ? Date.parse(job.started_at) : Number.NaN;
+    const heartbeat =
+      job.metadata &&
+      typeof job.metadata === 'object' &&
+      typeof (job.metadata as Record<string, unknown>).last_heartbeat_at === 'string'
+        ? Date.parse(
+            (job.metadata as Record<string, string>).last_heartbeat_at,
+          )
+        : Number.NaN;
+    const lastActivity = Number.isFinite(heartbeat) ? heartbeat : startedAt;
+    const abandoned =
+      Boolean(job.completed_at) ||
+      !Number.isFinite(lastActivity) ||
+      now - lastActivity >= ABANDONED_JOB_AGE_MS;
+    if (!abandoned) {
+      fail(
+        `Another Cosmetology production job is active: ${job.job_id}. Refusing a duplicate run.`,
+      );
+    }
+
+    const completedAt =
+      typeof job.completed_at === 'string'
+        ? job.completed_at
+        : new Date().toISOString();
+    const { error: reconcileError } = await db
+      .from('course_factory_jobs')
+      .update({
+        status: 'failed',
+        stage: 'failed',
+        message:
+          'Abandoned production attempt reconciled before a new canonical run.',
+        error:
+          'The previous workflow stopped without a terminal ledger update; valid checkpoints remain resumable.',
+        completed_at: completedAt,
+      })
+      .eq('id', job.id)
+      .eq('status', 'running');
+    if (reconcileError) {
+      fail(`Could not reconcile abandoned job ${job.job_id}: ${reconcileError.message}`);
+    }
+    console.warn(
+      `[Cosmetology Course Builder] reconciled abandoned job ${job.job_id}`,
     );
   }
 }
@@ -236,6 +301,8 @@ async function main() {
   if (course.slug !== PROGRAM_SLUG || course.program_id !== program.id) {
     fail('Canonical course identity does not match the cosmetology program');
   }
+
+  await reconcileAbandonedJobs(db);
 
   // Telemetry starts only after the zero-cost database and identity preflight.
   await updateJob(db, {

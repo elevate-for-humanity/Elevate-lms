@@ -22,6 +22,40 @@ function text(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
+function searchableWords(value: string): string[] {
+  const ignored = new Set([
+    'build', 'course', 'complete', 'create', 'finish', 'full', 'generate', 'make', 'please',
+    'resume', 'the', 'this', 'with', 'videos',
+  ]);
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .split(' ')
+    .filter((word) => word.length >= 3 && !ignored.has(word));
+}
+
+async function resolveCanonicalCourseFromGoal(goal: string) {
+  const words = searchableWords(goal);
+  if (!words.length) return null;
+
+  const db = await requireAdminClient();
+  const { data, error } = await db
+    .from('courses')
+    .select('id,title,slug,program_id')
+    .limit(500);
+  if (error) throw error;
+
+  const ranked = (data ?? [])
+    .map((course) => {
+      const haystack = `${course.title ?? ''} ${course.slug ?? ''}`.toLowerCase();
+      return { course, score: words.filter((word) => haystack.includes(word)).length };
+    })
+    .filter((entry) => entry.score > 0)
+    .sort((left, right) => right.score - left.score);
+  if (!ranked.length || (ranked[1] && ranked[1].score === ranked[0].score)) return null;
+  return ranked[0].course;
+}
+
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
@@ -35,6 +69,15 @@ export async function POST(req: NextRequest) {
   if (action === 'resume-after-review') {
     const projectId = text(body.projectId);
     if (!projectId) return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
+    if (text(body.confirmationText) !== 'CONFIRM COURSE PUBLICATION') {
+      return NextResponse.json(
+        {
+          error: 'Explicit human publication approval is required.',
+          requiredConfirmation: 'CONFIRM COURSE PUBLICATION',
+        },
+        { status: 409 },
+      );
+    }
 
     // Status polling also wakes queued work, preventing a cold background timer from stranding runs.
   await runAgenticExecutorOnce();
@@ -135,15 +178,80 @@ export async function POST(req: NextRequest) {
   }
 
   const goal = text(body.goal);
-  const programId = text(body.programId);
-  const programSlug = text(body.programSlug);
-  const courseId = text(body.courseId);
+  let programId = text(body.programId);
+  let programSlug = text(body.programSlug);
+  let courseId = text(body.courseId);
   if (!goal) return NextResponse.json({ error: 'A course build goal is required.' }, { status: 400 });
+
+  const db = await requireAdminClient();
+  if (courseId && !programId && !programSlug) {
+    const { data: selectedCourse, error } = await db
+      .from('courses')
+      .select('id,program_id,slug')
+      .eq('id', courseId)
+      .maybeSingle();
+    if (error) throw error;
+    if (!selectedCourse) return NextResponse.json({ error: 'Course not found.' }, { status: 404 });
+    programId = text(selectedCourse.program_id);
+    programSlug = text(selectedCourse.slug);
+  }
+
+  if (!programId && !programSlug && !courseId) {
+    const selectedCourse = await resolveCanonicalCourseFromGoal(goal);
+    if (selectedCourse) {
+      courseId = text(selectedCourse.id);
+      programId = text(selectedCourse.program_id);
+      programSlug = text(selectedCourse.slug);
+    }
+  }
   if (!programId && !programSlug && !/#\d{6,}/.test(goal) && !courseId) {
     return NextResponse.json(
       { error: 'Select a canonical program/course or include its approved #INTraining identifier in the goal.' },
       { status: 400 },
     );
+  }
+
+  if (courseId) {
+    const { data: existingProject, error: projectError } = await db
+      .from('agentic_build_projects')
+      .select('*')
+      .eq('user_id', auth.id)
+      .eq('target_type', 'course')
+      .eq('target_id', courseId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (projectError) throw projectError;
+
+    if (existingProject) {
+      const { data: existingRun, error: runError } = await db
+        .from('agentic_build_runs')
+        .select('id,status,plan')
+        .eq('project_id', existingProject.id)
+        .in('status', ['queued', 'running', 'waiting_for_approval'])
+        .order('started_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (runError) throw runError;
+      if (existingRun) {
+        await appendAgenticMessage({
+          projectId: existingProject.id,
+          runId: existingRun.id,
+          role: 'user',
+          content: goal,
+          inputMode: 'text',
+        });
+        await runAgenticExecutorOnce();
+        return NextResponse.json({
+          ok: true,
+          reused: true,
+          projectId: existingProject.id,
+          runId: existingRun.id,
+          courseId,
+          plan: existingRun.plan,
+        });
+      }
+    }
   }
 
   const created = await createAgenticProject({

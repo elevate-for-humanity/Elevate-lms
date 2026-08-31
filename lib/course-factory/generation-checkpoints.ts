@@ -65,6 +65,62 @@ function textArray(value: unknown): string[] {
     : [];
 }
 
+export function normalizePersistedLessonObjectives(input: {
+  objective?: unknown;
+  learningObjectives?: unknown;
+  content?: unknown;
+}): string[] {
+  const content = record(input.content);
+  return Array.from(
+    new Set(
+      [
+        ...textArray(input.learningObjectives),
+        typeof input.objective === 'string' ? input.objective : '',
+        ...textArray(content?.learning_points),
+      ]
+        .map((value) => value.trim())
+        .filter(Boolean),
+    ),
+  ).slice(0, 5);
+}
+
+/**
+ * Repairs objective arrays lost by older publishers so completed database
+ * lessons remain valid generation checkpoints. This never invents content:
+ * it only normalizes the persisted objective and generated learning points.
+ */
+export async function repairPersistedLessonObjectives(courseId: string): Promise<number> {
+  const db = await requireAdminClient();
+  const { data: lessons, error } = await db
+    .from('course_lessons')
+    .select('id,objective,content,learning_objectives,generation_status')
+    .eq('course_id', courseId)
+    .eq('generation_status', 'generated');
+  if (error) throw new Error(`Persisted checkpoint repair lookup failed: ${error.message}`);
+
+  let repaired = 0;
+  for (const lesson of lessons ?? []) {
+    const existing = textArray(lesson.learning_objectives);
+    if (existing.length >= 3) continue;
+    const objectives = normalizePersistedLessonObjectives({
+      objective: lesson.objective,
+      learningObjectives: lesson.learning_objectives,
+      content: lesson.content,
+    });
+    if (objectives.length < 3) continue;
+    const { error: updateError } = await db
+      .from('course_lessons')
+      .update({ learning_objectives: objectives, updated_at: new Date().toISOString() })
+      .eq('id', lesson.id)
+      .eq('generation_status', 'generated');
+    if (updateError) {
+      throw new Error(`Persisted checkpoint repair failed for ${lesson.id}: ${updateError.message}`);
+    }
+    repaired += 1;
+  }
+  return repaired;
+}
+
 export async function loadLessonGenerationCheckpoint(
   courseTitle: string,
   lessonSlug: string,
@@ -402,4 +458,3 @@ export async function persistAssessmentCheckpoint(input: {
   } catch {
     // Best-effort checkpoint only. The canonical build remains authoritative.
   }
-}

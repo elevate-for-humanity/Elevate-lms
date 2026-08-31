@@ -88,6 +88,7 @@ async function onetGet<T>(path: string): Promise<T> {
       ...authHeaders(),
       Accept: 'application/json',
     },
+    signal: AbortSignal.timeout(15_000),
     next: { revalidate: 0 }, // always fresh — we cache in Supabase
   });
   if (!res.ok) throw new Error(`O*NET ${path} → ${res.status} ${res.statusText}`);

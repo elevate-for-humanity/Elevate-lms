@@ -114,12 +114,25 @@ export function ScrollNarrator() {
         type="button"
         onClick={toggle}
         aria-pressed={enabled}
-        className={`inline-flex min-h-14 min-w-[12.5rem] touch-manipulation items-center justify-center gap-3 rounded-full border-2 border-white px-6 py-4 text-base font-black text-white shadow-2xl transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 ${
+        aria-label={
+          enabled
+            ? isLoading
+              ? 'Natural narration is preparing. Tap to stop.'
+              : isPlaying
+                ? 'Stop page narration'
+                : 'Page narration is active on scroll. Tap to turn it off.'
+            : 'Turn on page narration'
+        }
+        title={enabled ? 'Narration on' : 'Narration off'}
+        className={`inline-flex h-12 w-12 min-h-0 min-w-0 touch-manipulation items-center justify-center rounded-full border-2 border-white p-0 text-white shadow-xl transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 ${
           enabled ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-blue-700 hover:bg-blue-800'
         }`}
+        style={{ minHeight: '3rem', minWidth: '3rem', padding: 0 }}
       >
-        {enabled ? <VolumeX className="h-6 w-6" aria-hidden="true" /> : <Volume2 className="h-6 w-6" aria-hidden="true" />}
-        {enabled ? (isLoading ? 'Preparing audio…' : isPlaying ? 'Stop reading' : 'Reading on scroll') : 'Read page aloud'}
+        {enabled ? <VolumeX className="h-5 w-5" aria-hidden="true" /> : <Volume2 className="h-5 w-5" aria-hidden="true" />}
+        <span className="sr-only">
+          {enabled ? (isLoading ? 'Preparing narration' : isPlaying ? 'Stop narration' : 'Narration on') : 'Narration off'}
+        </span>
       </button>
       {notice ? <p role="status" className="mt-2 max-w-64 rounded-lg bg-white p-2 text-xs font-bold text-red-800 shadow-lg">{notice}</p> : null}
     </div>

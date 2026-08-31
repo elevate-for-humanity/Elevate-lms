@@ -42,6 +42,8 @@ async function requestNaturalVoiceBlob(text: string, options: PlayOptions): Prom
   const cached = naturalVoiceCache.get(key);
   if (cached) return cached;
 
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 15_000);
   const request = fetch('/api/voice/natural', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
@@ -52,6 +54,7 @@ async function requestNaturalVoiceBlob(text: string, options: PlayOptions): Prom
         style: options.style || 'default',
         rate: options.rate || 1,
       }),
+      signal: controller.signal,
     })
     .then(async (response) => {
       if (!response.ok) throw new Error(`Natural voice request failed (${response.status})`);
@@ -62,7 +65,8 @@ async function requestNaturalVoiceBlob(text: string, options: PlayOptions): Prom
     .catch((error) => {
       naturalVoiceCache.delete(key);
       throw error;
-    });
+    })
+    .finally(() => window.clearTimeout(timeout));
 
   naturalVoiceCache.set(key, request);
   return request;

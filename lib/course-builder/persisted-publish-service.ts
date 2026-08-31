@@ -19,7 +19,7 @@ function hasContent(value: unknown): boolean {
  * Canonical persisted-course procurement gate.
  * Static repository catalogs are intentionally unsupported; persisted records
  * and their machine-verifiable evidence are the only publication authority.
- * Publication is automatic only after the complete deterministic gate passes.
+ * Publication requires both the complete deterministic gate and recorded human approval.
  */
 export async function runPersistedCourseProcurementHealthCheckWithClient(supabase: SupabaseClient, courseId: string) {
   const blocking: string[] = [];
@@ -38,6 +38,9 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
   if (externalProfile && !course.governing_body?.trim()) blocking.push('governing body is missing');
   if (externalProfile && !course.governing_standard_version?.trim()) blocking.push('governing standard/test-plan version is missing');
   if (course.generation_status && !['completed', 'published'].includes(course.generation_status)) blocking.push(`course generation is not complete (${course.generation_status}, ${course.generation_progress ?? 0}%)`);
+  if (course.review_status !== 'approved' || !course.reviewed_by || !course.reviewed_at) {
+    blocking.push('human approval is required before publication');
+  }
 
   const { data: modules, error: moduleError } = await supabase.from('course_modules').select(`
     id,title,slug,domain_key,target_hours,order_index,
@@ -177,18 +180,9 @@ export async function publishPersistedCourseWithClient(input: { db: SupabaseClie
     if (input.actorId) await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { repair_exhausted: true, label: input.label, blocking_issues: health.blocking_issues, metrics: health.metrics, repairs: health.repairs }, req: input.request });
     return { ok: false as const, error: 'AUTOMATED_REPAIR_EXHAUSTED', blocking_issues: health.blocking_issues, metrics: health.metrics, repairs: health.repairs };
   }
-  const { data: approvalId, error: approvalError } = await input.db.rpc('record_course_automated_approval', {
-    p_course_id: input.courseId,
-    p_gate_version: 'course-builder-acceptance-v1',
-    p_evidence: health.metrics,
-    p_initiated_by: input.actorId,
-  });
-  if (approvalError || !approvalId) {
-    throw new Error(`Automated approval audit failed: ${approvalError?.message ?? 'approval record was not created'}`);
-  }
   const result = await publishCourse(input.db, input.courseId, input.actorId, input.label);
-  if (input.actorId) await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { label: input.label, lesson_count: (result as any)?.lessonCount, procurement_gate: health.metrics, review_mode: 'automated_acceptance_contract', automated_approval_id: approvalId, repairs: health.repairs }, req: input.request });
-  return { ok: true as const, procurement_gate: health.metrics, automated_approval_id: approvalId, repairs: health.repairs, ...result };
+  if (input.actorId) await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { label: input.label, lesson_count: (result as any)?.lessonCount, procurement_gate: health.metrics, review_mode: 'human_approval', reviewed_by: health.metrics.reviewed_by, repairs: health.repairs }, req: input.request });
+  return { ok: true as const, procurement_gate: health.metrics, reviewed_by: health.metrics.reviewed_by, repairs: health.repairs, ...result };
 }
 
 export async function publishPersistedCourse(input: { courseId: string; actorId: string; label?: string; request?: NextRequest; }) { return publishPersistedCourseWithClient({ ...input, db: await createClient() }); }
@@ -204,7 +198,7 @@ export async function finalizeCourseAutomaticallyIfReadyWithClient(input: {
 }) {
   const { data: course, error } = await input.db
     .from('courses')
-    .select('id,status,created_by,generation_status')
+    .select('id,status,created_by,generation_status,review_status,reviewed_by,reviewed_at')
     .eq('id', input.courseId)
     .maybeSingle();
   if (error) throw error;
@@ -214,6 +208,10 @@ export async function finalizeCourseAutomaticallyIfReadyWithClient(input: {
   }
   if (!['completed', 'review'].includes(String(course.generation_status ?? ''))) {
     return { ok: false as const, state: 'generation_pending' as const };
+  }
+
+  if (course.review_status !== 'approved' || !course.reviewed_by || !course.reviewed_at) {
+    return { ok: false as const, state: 'approval_pending' as const };
   }
 
   const media = await getCourseMediaState(input.courseId, { verifyUrls: true });

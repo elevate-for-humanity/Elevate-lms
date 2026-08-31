@@ -71,12 +71,18 @@ export function getTemplate(key: TemplateKey, data: Record<string, any>): EmailT
     case 'enrollment_welcome': {
       const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/lms/dashboard`;
       const loginUrl = data.login_url || `${PLATFORM_DEFAULTS.siteUrl}/login`;
+      const passwordSetupUrl = data.password_setup_url || `${PLATFORM_DEFAULTS.siteUrl}/forgot-password`;
+      const securityUrl = data.security_url || `${PLATFORM_DEFAULTS.siteUrl}/account/settings/security`;
       return {
         subject: `Welcome to ${data.program_name || 'your Elevate program'} — start here`,
         html: baseTemplate(`
           <h2 style="color: ${BRAND_COLOR};">Welcome to your program</h2>
           <p>Hi ${data.name || 'there'},</p>
-          <p>Your enrollment in <strong>${data.program_name || 'your program'}</strong> is active. Use the same email address that received this message when you sign in.</p>
+          <p>Your enrollment in <strong>${data.program_name || 'your program'}</strong> is active.</p>
+          <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:16px;margin:18px 0;">
+            <p style="margin:0 0 8px;"><strong>Username:</strong> ${data.username || data.email || 'the email address that received this message'}</p>
+            <p style="margin:0;">For security, passwords are never sent by email. Use the one-time setup/reset page below to choose your password.</p>
+          </div>
           <h3>Your first steps</h3>
           <ol style="padding-left: 20px; line-height: 1.9;">
             <li>Sign in to your learner account.</li>
@@ -85,15 +91,20 @@ export function getTemplate(key: TemplateKey, data: Record<string, any>): EmailT
             <li>Open My Courses and begin the first assigned lesson.</li>
             <li>If you are an apprentice, confirm your Host Shop placement before clocking hours.</li>
           </ol>
+          ${button('Set or Reset Your Password →', passwordSetupUrl)}
           ${button('Sign In →', loginUrl)}
-          <p>After signing in, your dashboard is available at <a href="${dashboardUrl}">${dashboardUrl}</a>.</p>
+          <p>After signing in, your dashboard is available at <a href="${dashboardUrl}">${dashboardUrl}</a>. You can change your password later under <a href="${securityUrl}">Account Security</a>.</p>
           <p style="font-size: 13px; color: #666;">Do not create a second account. If sign-in does not recognize your email, reply to this message or call ${SUPPORT_PHONE}.</p>
         `),
         text: `Welcome to ${data.program_name || 'your Elevate program'}
 
 Hi ${data.name || 'there'},
 
-Your enrollment is active. Sign in with the same email address that received this message.
+Your enrollment is active.
+
+Username: ${data.username || data.email || 'the email address that received this message'}
+Password: For security, passwords are never sent by email.
+Set or reset your password: ${passwordSetupUrl}
 
 First steps:
 1. Sign in: ${loginUrl}
@@ -103,6 +114,7 @@ First steps:
 5. Apprentices: confirm your Host Shop placement before clocking hours.
 
 Dashboard: ${dashboardUrl}
+Change your password later: ${securityUrl}
 
 Do not create a second account. If your email is not recognized, reply to this message or call ${SUPPORT_PHONE}.`,
       };

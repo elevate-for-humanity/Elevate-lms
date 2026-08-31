@@ -282,12 +282,12 @@ async function processMarketingTask(task: any, run: any, project: any) {
   throw new Error(`Unsupported marketing campaign worker: ${task.worker}`);
 }
 
-export async function runAgenticExecutorOnce(): Promise<boolean> {
+export async function runAgenticExecutorOnce(input: { runId?: string } = {}): Promise<boolean> {
   if (polling) return true;
   polling = true;
   try {
     const db = await requireAdminClient();
-    const { data: tasks, error } = await db
+    let taskQuery = db
       .from('agentic_build_tasks')
       .select(
         'id, run_id, worker, action, dependencies, input, status, requires_approval, created_at',
@@ -295,6 +295,8 @@ export async function runAgenticExecutorOnce(): Promise<boolean> {
       .eq('status', 'queued')
       .order('created_at', { ascending: true })
       .limit(10);
+    if (input.runId) taskQuery = taskQuery.eq('run_id', input.runId);
+    const { data: tasks, error } = await taskQuery;
     if (error) throw error;
 
     for (const task of tasks ?? []) {

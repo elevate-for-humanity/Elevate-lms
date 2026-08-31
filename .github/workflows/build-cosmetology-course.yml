@@ -17,6 +17,8 @@ on:
       - 'lib/course-factory/durable-generation-journal.ts'
       - 'lib/course-factory/learning-intelligence.ts'
       - 'lib/course-factory/post-generation-governance.ts'
+      - 'lib/industry/onet.ts'
+      - 'lib/industry/careeronestop.ts'
       - 'lib/course-builder/persisted-publish-service.ts'
       - 'lib/curriculum/blueprints/cosmetology.ts'
 

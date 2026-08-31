@@ -26,17 +26,32 @@ async function _GET(request: NextRequest) {
     .maybeSingle();
   const apprenticeSiteScopeId = apprentice?.shop_id || apprentice?.employer_id || null;
 
+  // The action endpoint validates apprentice_sites.id, so the context must
+  // return that same canonical site identity. Returning shops.id here makes the
+  // UI look configured but every clock action fail with "Site not found".
   const { data: sites } = apprenticeSiteScopeId
-    ? await db.from('shops').select('id,name,latitude,longitude,active').eq('id', apprenticeSiteScopeId).eq('active', true)
+    ? await db
+        .from('apprentice_sites')
+        .select('id,name,latitude,longitude,radius_meters,shop_id,partner_id,is_active')
+        .eq('shop_id', apprenticeSiteScopeId)
+        .eq('is_active', true)
     : { data: [] };
-  const allowedSites = (sites || []).filter((site: any) => Number.isFinite(Number(site.latitude)) && Number.isFinite(Number(site.longitude))).map((site: any) => ({
-    id: site.id,
-    name: site.name || 'Approved Host Shop',
-    lat: site.latitude,
-    lng: site.longitude,
-    radius_m: 100,
-    shopId: site.id,
-  }));
+  const allowedSites = (sites || [])
+    .filter(
+      (site: any) =>
+        Number.isFinite(Number(site.latitude)) &&
+        Number.isFinite(Number(site.longitude)) &&
+        Number.isFinite(Number(site.radius_meters)) &&
+        Number(site.radius_meters) > 0,
+    )
+    .map((site: any) => ({
+      id: site.id,
+      name: site.name || 'Approved Host Shop',
+      lat: Number(site.latitude),
+      lng: Number(site.longitude),
+      radius_m: Number(site.radius_meters),
+      shopId: site.shop_id,
+    }));
 
   const { data: enrollment } = await db.from('program_enrollments')
     .select('program_slug,program_id').eq('user_id', subject.userId)

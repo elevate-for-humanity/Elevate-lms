@@ -176,7 +176,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           videoSrcMobile={slide.type === 'video' ? slide.mobileSrc : undefined}
           mountedFrameImage={slide.type === 'video' ? HOME_FIRST_FRAME : slide.src}
           transcript={dynamicAsset?.transcript || banner.transcript || HOME_NARRATION}
-          narrateTranscript
+          showSoundControl={false}
           analyticsName={banner.analyticsName}
           overlayMode="none"
           soundButtonVariant="prominent"

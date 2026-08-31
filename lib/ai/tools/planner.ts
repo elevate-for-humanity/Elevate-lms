@@ -126,8 +126,16 @@ export function planAIToolFromCommand(
     return { name: 'communications.remind', input: asAIRecord(context.toolInput) };
   }
   // Domain generation stays inside Elevate's canonical Course Builder, never OpenHands.
-  if (/\b(generate|build|create)\b.*\bcourse\b/.test(lower)) {
-    return { name: 'courses.generate', input: { ...asAIRecord(context.toolInput), prompt: command } };
+  if (/\b(generate|build|create|finish|complete|resume)\b.*\bcourse\b/.test(lower)) {
+    return {
+      name: 'courses.generate',
+      input: {
+        ...asAIRecord(context.toolInput),
+        action: 'start',
+        goal: command,
+        ...(id ? { courseId: id } : {}),
+      },
+    };
   }
   if (/\b(build|generate)\b.*\b(all )?courses?\b/.test(lower)) {
     return { name: 'workflows.buildCourses', input: asAIRecord(context.toolInput) };

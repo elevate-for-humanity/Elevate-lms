@@ -61,7 +61,12 @@ function heuristicPlan(command: string): PlannedCommand | null {
   if (/\banalytics|metrics\b/.test(lower)) return { tool: 'analytics.read', input: {} };
   if (/\bpayout\b.*\b(queue|pending|list|show)\b|\b(queue|pending|list|show)\b.*\bpayout/.test(lower)) return { tool: 'payouts.list', input: {} };
   if (/\bmark\b.*\bpayout\b.*\bpaid\b/.test(lower)) return { tool: 'payouts.markPaid', input: id ? { enrollmentId: id } : {} };
-  if (/\b(generate|build|create)\b.*\bcourse\b/.test(lower)) return { tool: 'courses.generate', input: { prompt: command } };
+  if (/\b(generate|build|create|finish|complete|resume)\b.*\bcourse\b/.test(lower)) {
+    return {
+      tool: 'courses.generate',
+      input: { action: 'start', goal: command, ...(id ? { courseId: id } : {}) },
+    };
+  }
   if (/\brun\b.*\btests?\b/.test(lower)) return { tool: 'workflows.runTests', input: {} };
   if (/\bdeploy\b/.test(lower)) return { tool: 'deployments.autopilot', input: {} };
   if (/\bapply\b.*\ball\b.*\bmigrations?\b/.test(lower)) return { tool: 'migrations.applyAll', input: {} };

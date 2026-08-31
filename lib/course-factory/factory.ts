@@ -76,7 +76,7 @@ function normalizeGeneratedSlug(slug: string, stepType: string, fallback: string
   return base;
 }
 
-function synchronizeLessonExperience(
+export function synchronizeLessonExperience(
   lesson: Record<string, any>,
   courseModule: CredentialBlueprint['modules'][number],
 ): void {
@@ -97,12 +97,20 @@ function synchronizeLessonExperience(
     explanation: question.explanation,
   }));
 
-  const objectives = Array.isArray(lesson.learningObjectives)
-    ? lesson.learningObjectives.filter(
-        (objective: unknown): objective is string =>
-          typeof objective === 'string' && objective.trim().length > 0,
-      )
-    : [];
+  const objectives = Array.from(
+    new Set(
+      [
+        ...(Array.isArray(lesson.learningObjectives) ? lesson.learningObjectives : []),
+        lesson.objective,
+        ...(Array.isArray(lesson.learningPoints) ? lesson.learningPoints : []),
+      ]
+        .filter(
+          (objective: unknown): objective is string =>
+            typeof objective === 'string' && objective.trim().length > 0,
+        )
+        .map((objective) => objective.trim()),
+    ),
+  );
   content.experience.remediation = {
     ...(content.experience.remediation ?? {}),
     passingScore: lesson.passingScore ?? content.experience.remediation?.passingScore ?? 80,
@@ -110,7 +118,9 @@ function synchronizeLessonExperience(
       content.experience.remediation?.reviewMessage ??
       'Review missed objectives, replay the relevant lesson section, and retry before continuing.',
     objectiveMap: questions.map(
-      (_: unknown, index: number) => objectives[index % Math.max(objectives.length, 1)] ?? '',
+      (_: unknown, index: number) =>
+        objectives[index % objectives.length] ??
+        `Demonstrate mastery of ${lesson.title || courseModule.title}.`,
     ),
   };
   const stepType = inferStepType(String(lesson.slug ?? ''));
@@ -870,7 +880,10 @@ export async function courseFactory(
     if (!audit.valid) {
       return {
         ok: false,
-        errors: audit.errors.map((error) => error.message),
+        errors: audit.errors.map(
+          (error) =>
+            `${error.module ?? 'course'}/${error.lesson ?? 'package'} [${error.field}]: ${error.message}`,
+        ),
         moduleCount: blueprint.modules.length,
         lessonCount: blueprint.modules.reduce(
           (sum, courseModule) => sum + (courseModule.lessons?.length ?? 0),
@@ -896,7 +909,10 @@ export async function courseFactory(
     if (!packageAudit.valid) {
       return {
         ok: false,
-        errors: packageAudit.errors.map((error) => error.message),
+        errors: packageAudit.errors.map(
+          (error) =>
+            `${error.module ?? 'course'}/${error.lesson ?? 'package'} [${error.field}]: ${error.message}`,
+        ),
         moduleCount: enriched.blueprint.modules.length,
         lessonCount: enriched.blueprint.modules.reduce(
           (sum, courseModule) => sum + (courseModule.lessons?.length ?? 0),

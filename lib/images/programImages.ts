@@ -389,7 +389,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Job Ready Indy learner preparing to launch a career',
   },
   'jri-introduction': {
-    card: '/images/funding/funding-jri-program-v2.jpg',
+    card: `${P}/career-services-page-10.webp`,
     hero: '/hero-images/jri-hero.webp',
     alt: 'Introduction to the Job Ready Indy career-readiness pathway',
   },

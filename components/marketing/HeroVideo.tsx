@@ -45,6 +45,8 @@ export interface HeroVideoProps {
   soundButtonVariant?: 'pill' | 'prominent';
   /** Allows a parent-level narration controller to remain the single audio authority. */
   showSoundControl?: boolean;
+  /** Hides the transcript disclosure when the parent supplies its own accessible narration UI. */
+  showTranscriptControl?: boolean;
   /** Delay mounting remote video sources so the first visual frame can paint without competing network work. */
   deferVideoMs?: number;
 }
@@ -70,6 +72,7 @@ export default function HeroVideo({
   overlayMode = 'default',
   soundButtonVariant = 'pill',
   showSoundControl = true,
+  showTranscriptControl = true,
   deferVideoMs = 0,
 }: HeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -376,7 +379,7 @@ export default function HeroVideo({
         ) : null}
       </section>
 
-      {transcript ? (
+      {transcript && showTranscriptControl ? (
         <div className="border-b border-slate-100 bg-slate-50">
           <div className="mx-auto max-w-4xl px-6 py-3">
             <button

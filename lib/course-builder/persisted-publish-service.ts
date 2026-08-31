@@ -204,7 +204,7 @@ export async function finalizeCourseAutomaticallyIfReadyWithClient(input: {
 }) {
   const { data: course, error } = await input.db
     .from('courses')
-    .select('id,status,created_by,generation_status')
+    .select('id,status,generation_status')
     .eq('id', input.courseId)
     .maybeSingle();
   if (error) throw error;
@@ -224,7 +224,7 @@ export async function finalizeCourseAutomaticallyIfReadyWithClient(input: {
   const publication = await publishPersistedCourseWithClient({
     db: input.db,
     courseId: input.courseId,
-    actorId: typeof course.created_by === 'string' ? course.created_by : null,
+    actorId: null,
     label: 'AI Course Builder automated acceptance',
   });
   return publication.ok

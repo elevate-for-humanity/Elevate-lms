@@ -8,6 +8,8 @@ import {
   CheckCircle2,
   ChevronDown,
   Loader2,
+  Mic,
+  MicOff,
   PanelRightOpen,
   Rocket,
   Send,
@@ -190,6 +192,9 @@ export default function UnifiedEllieChat({
   const [lastRoute, setLastRoute] = useState<EllieMessageRoute | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const [listening, setListening] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAiHealth().then(({ ok, label }) => {
@@ -251,6 +256,48 @@ export default function UnifiedEllieChat({
         ),
       );
     }
+  }
+
+  function toggleSpeechRecognition() {
+    if (listening) {
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setSpeechError('Voice input is not supported by this browser.');
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.onresult = (event: any) => {
+      let transcript = '';
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        transcript += event.results[index][0]?.transcript ?? '';
+      }
+      if (transcript.trim()) {
+        setInput((current) => `${current}${current.trim() ? ' ' : ''}${transcript.trim()}`);
+      }
+    };
+    recognition.onerror = (event: any) => {
+      setSpeechError(
+        event.error === 'not-allowed'
+          ? 'Microphone permission was denied. Allow microphone access and try again.'
+          : `Voice input stopped: ${event.error ?? 'unknown error'}`,
+      );
+      setListening(false);
+    };
+    recognition.onend = () => setListening(false);
+    recognitionRef.current = recognition;
+    setSpeechError(null);
+    setListening(true);
+    recognition.start();
   }
 
   async function send() {
@@ -542,6 +589,23 @@ export default function UnifiedEllieChat({
             />
             <button
               type="button"
+              aria-label={listening ? 'Stop voice input' : 'Start voice input'}
+              aria-pressed={listening}
+              onClick={toggleSpeechRecognition}
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 ${
+                listening
+                  ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100'
+                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              {listening ? (
+                <MicOff className="h-5 w-5" aria-hidden="true" />
+              ) : (
+                <Mic className="h-5 w-5" aria-hidden="true" />
+              )}
+            </button>
+            <button
+              type="button"
               aria-label="Send request"
               disabled={!input.trim() || loading}
               onClick={() => void send()}
@@ -554,6 +618,15 @@ export default function UnifiedEllieChat({
               )}
             </button>
           </div>
+          {speechError ? (
+            <p role="alert" className="mt-2 text-center text-xs font-medium text-red-700">
+              {speechError}
+            </p>
+          ) : listening ? (
+            <p role="status" className="mt-2 text-center text-xs font-medium text-red-700">
+              Listening… tap the microphone again to stop.
+            </p>
+          ) : null}
           <p className="mt-2 text-center text-[11px] text-gray-500">
             High-impact actions require confirmation and are written to the audit trail.
           </p>

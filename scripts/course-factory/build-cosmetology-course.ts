@@ -5,6 +5,7 @@ import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { queueCourseLessonVideos } from '../../lib/course-factory/media-service';
 import { publishCourse } from '../../lib/course-factory/publisher';
 import { registerProgramCourse } from '../../lib/course-builder/program-resolver';
+import { repairPersistedLessonObjectives } from '../../lib/course-factory/generation-checkpoints';
 import { requireAdminClient } from '../../lib/supabase/admin';
 
 const PROGRAM_SLUG = 'cosmetology-apprenticeship';
@@ -359,6 +360,13 @@ async function main() {
   console.log(
     `[Cosmetology Course Builder] checkpoint ready ${COURSE_ID}: ${EXPECTED_MODULES} modules/${EXPECTED_LESSONS} lessons`,
   );
+
+  const repairedObjectives = await repairPersistedLessonObjectives(COURSE_ID);
+  if (repairedObjectives > 0) {
+    console.log(
+      `[Cosmetology Course Builder] repaired ${repairedObjectives} persisted lesson objective checkpoints`,
+    );
+  }
 
   const result = await courseFactory(
     {

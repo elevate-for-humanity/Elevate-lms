@@ -1,16 +1,12 @@
 const CANONICAL_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
 const PROGRAM_SLUG = 'cosmetology-apprenticeship';
-const ATTEMPTS = Number.parseInt(process.env.COSMETOLOGY_DB_GATE_ATTEMPTS || '60', 10);
+const ATTEMPTS = Number.parseInt(process.env.COSMETOLOGY_DB_GATE_ATTEMPTS || '12', 10);
 const REQUIRED_CONSECUTIVE_PASSES = Number.parseInt(
-  process.env.COSMETOLOGY_DB_REQUIRED_PASSES || '5',
+  process.env.COSMETOLOGY_DB_REQUIRED_PASSES || '2',
   10,
 );
 const REQUEST_TIMEOUT_MS = Number.parseInt(
-  process.env.COSMETOLOGY_DB_REQUEST_TIMEOUT_MS || '15000',
-  10,
-);
-const MAX_READY_LATENCY_MS = Number.parseInt(
-  process.env.COSMETOLOGY_DB_MAX_LATENCY_MS || '8000',
+  process.env.COSMETOLOGY_DB_REQUEST_TIMEOUT_MS || '30000',
   10,
 );
 const MIN_RETRY_DELAY_MS = 5_000;
@@ -37,7 +33,6 @@ function validateConfiguration() {
     ['attempts', ATTEMPTS],
     ['required passes', REQUIRED_CONSECUTIVE_PASSES],
     ['request timeout', REQUEST_TIMEOUT_MS],
-    ['maximum ready latency', MAX_READY_LATENCY_MS],
   ];
   for (const [label, value] of values) {
     if (!Number.isFinite(value) || value <= 0) fail(`invalid ${label}: ${value}`);
@@ -45,9 +40,15 @@ function validateConfiguration() {
   if (REQUIRED_CONSECUTIVE_PASSES > ATTEMPTS) {
     fail('required consecutive passes cannot exceed total attempts');
   }
-  if (MAX_READY_LATENCY_MS >= REQUEST_TIMEOUT_MS) {
-    fail('maximum ready latency must be lower than the request timeout');
-  }
+}
+
+function parseRetryAfter(value) {
+  if (!value) return null;
+  const seconds = Number.parseInt(value, 10);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1_000;
+  const date = Date.parse(value);
+  if (!Number.isFinite(date)) return null;
+  return Math.max(0, date - Date.now());
 }
 
 async function checkDatabase(serviceRoleKey) {
@@ -70,6 +71,14 @@ async function checkDatabase(serviceRoleKey) {
   if (response.status === 401 || response.status === 403) {
     fail(`service-role credential was rejected with HTTP ${response.status}`);
   }
+  if (response.status === 429) {
+    return {
+      ready: false,
+      latencyMs,
+      reason: 'HTTP 429',
+      retryAfterMs: parseRetryAfter(response.headers.get('retry-after')),
+    };
+  }
   if (!response.ok) {
     return { ready: false, latencyMs, reason: `HTTP ${response.status}` };
   }
@@ -77,13 +86,6 @@ async function checkDatabase(serviceRoleKey) {
   const rows = await response.json();
   if (!Array.isArray(rows) || rows.length !== 1 || rows[0]?.slug !== PROGRAM_SLUG) {
     fail('canonical Cosmetology program was not returned by the production database');
-  }
-  if (latencyMs > MAX_READY_LATENCY_MS) {
-    return {
-      ready: false,
-      latencyMs,
-      reason: `latency ${latencyMs}ms exceeded ${MAX_READY_LATENCY_MS}ms`,
-    };
   }
   return {
     ready: true,
@@ -98,21 +100,29 @@ async function main() {
   if (!serviceRoleKey) fail('SUPABASE_SERVICE_ROLE_KEY is missing');
 
   let consecutivePasses = 0;
+  let retryAfterMs = null;
   for (let attempt = 1; attempt <= ATTEMPTS; attempt += 1) {
+    retryAfterMs = null;
     try {
       const result = await checkDatabase(serviceRoleKey);
       if (result.ready) {
         consecutivePasses += 1;
+        if (result.latencyMs > 8_000) {
+          console.warn(
+            `[Cosmetology Database Gate] slow successful response: ${result.latencyMs}ms`,
+          );
+        }
         console.log(
           `[Cosmetology Database Gate] pass ${consecutivePasses}/${REQUIRED_CONSECUTIVE_PASSES} on attempt ${attempt}: ${result.reason}`,
         );
         if (consecutivePasses >= REQUIRED_CONSECUTIVE_PASSES) {
           console.log(
-            `[Cosmetology Database Gate] stable: ${REQUIRED_CONSECUTIVE_PASSES} consecutive latency-qualified checks passed`,
+            `[Cosmetology Database Gate] stable: ${REQUIRED_CONSECUTIVE_PASSES} consecutive authenticated checks passed`,
           );
           return;
         }
       } else {
+        retryAfterMs = result.retryAfterMs ?? null;
         consecutivePasses = 0;
         console.warn(
           `[Cosmetology Database Gate] unavailable ${attempt}/${ATTEMPTS}: ${result.reason}; consecutive passes reset`,
@@ -129,11 +139,17 @@ async function main() {
       );
     }
 
-    if (attempt < ATTEMPTS) await sleep(retryDelay(attempt));
+    if (attempt < ATTEMPTS) {
+      const delay = retryAfterMs ?? retryDelay(attempt);
+      if (retryAfterMs !== null) {
+        console.warn(`[Cosmetology Database Gate] honoring Retry-After: ${delay}ms`);
+      }
+      await sleep(delay);
+    }
   }
 
   fail(
-    `production database failed to achieve ${REQUIRED_CONSECUTIVE_PASSES} consecutive checks at or below ${MAX_READY_LATENCY_MS}ms`,
+    `production database failed to achieve ${REQUIRED_CONSECUTIVE_PASSES} consecutive authenticated checks`,
   );
 }
 

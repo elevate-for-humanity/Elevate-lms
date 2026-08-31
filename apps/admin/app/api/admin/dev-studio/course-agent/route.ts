@@ -234,7 +234,7 @@ export async function POST(req: NextRequest) {
           content: goal,
           inputMode: 'text',
         });
-        await runAgenticExecutorOnce();
+        await runAgenticExecutorOnce({ runId: existingRun.id });
         return NextResponse.json({
           ok: true,
           reused: true,
@@ -285,7 +285,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Wake the durable executor immediately; its claim is atomic and safe alongside the background poller.
-  await runAgenticExecutorOnce();
+  await runAgenticExecutorOnce({ runId: started.run.id });
 
   return NextResponse.json({
     ok: true,
@@ -305,9 +305,6 @@ export async function GET(req: NextRequest) {
   const projectId = text(req.nextUrl.searchParams.get('projectId'));
   if (!projectId) return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
 
-  // Await one atomic executor pass so status polling durably advances queued work.
-  await runAgenticExecutorOnce();
-
   const project = await loadAgenticProject({ projectId, userId: auth.id });
   if (!project || project.target_type !== 'course') {
     return NextResponse.json({ error: 'Course agent project not found.' }, { status: 404 });
@@ -322,6 +319,9 @@ export async function GET(req: NextRequest) {
     .limit(1)
     .maybeSingle();
   if (runError) throw runError;
+
+  // Advance only this project's run so unrelated stale tasks cannot starve it.
+  if (run?.id) await runAgenticExecutorOnce({ runId: run.id });
 
   let tasks: any[] = [];
   if (run?.id) {

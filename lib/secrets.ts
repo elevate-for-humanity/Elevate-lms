@@ -16,7 +16,37 @@ let cache: Record<string, string> | null = null;
 let cacheTimestamp = 0;
 let hydrated = false;
 const CACHE_TTL_MS = 5 * 60 * 1000;
-const SECRETS_FETCH_TIMEOUT_MS = 3000;
+const SECRETS_FETCH_TIMEOUT_MS = Math.max(
+  1000,
+  Number.parseInt(process.env.SUPABASE_FETCH_TIMEOUT_MS || '30000', 10) || 30000,
+);
+const SECRETS_READ_ATTEMPTS = Math.max(
+  1,
+  Number.parseInt(process.env.SUPABASE_READ_MAX_ATTEMPTS || '3', 10) || 3,
+);
+
+function retryableSecretRead(error: { code?: string; message?: string } | null | undefined): boolean {
+  if (!error) return false;
+  return ['PGRST002', 'PGRST000', '57014'].includes(error.code || '') ||
+    /schema cache|retry|timeout|timed out|fetch failed|network/i.test(error.message || '');
+}
+
+async function readRuntimeSecrets(
+  client: SupabaseClient,
+  table: 'app_secrets' | 'platform_secrets',
+  columns: 'key,value' | 'key,value_enc,scope',
+) {
+  let lastResult: any = null;
+  for (let attempt = 1; attempt <= SECRETS_READ_ATTEMPTS; attempt += 1) {
+    const result = await client.from(table).select(columns).eq('scope', 'runtime');
+    lastResult = result;
+    if (!result.error || !retryableSecretRead(result.error)) return result;
+    if (attempt < SECRETS_READ_ATTEMPTS) {
+      await new Promise((resolve) => setTimeout(resolve, Math.min(250 * 2 ** (attempt - 1), 1000)));
+    }
+  }
+  return lastResult;
+}
 
 function getBootstrapClient(): SupabaseClient | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -48,13 +78,11 @@ async function loadSecrets(): Promise<Record<string, string>> {
   if (!client) return {};
 
   const secrets: Record<string, string> = {};
+  let canonicalReadSucceeded = false;
 
   // Legacy fallback first. Canonical platform_secrets values below overwrite it.
   try {
-    const result = await client
-      .from('app_secrets')
-      .select('key,value')
-      .eq('scope', 'runtime');
+    const result = await readRuntimeSecrets(client, 'app_secrets', 'key,value');
     if (!result.error) {
       for (const row of result.data ?? []) acceptSecret(secrets, row.key, row.value);
     } else if (result.error.code !== '42P01') {
@@ -66,11 +94,9 @@ async function loadSecrets(): Promise<Record<string, string>> {
 
   // Canonical source. Scope is enforced in the database and here at hydration.
   try {
-    const result = await client
-      .from('platform_secrets')
-      .select('key,value_enc,scope')
-      .eq('scope', 'runtime');
+    const result = await readRuntimeSecrets(client, 'platform_secrets', 'key,value_enc,scope');
     if (!result.error) {
+      canonicalReadSucceeded = true;
       for (const row of result.data ?? []) acceptSecret(secrets, row.key, row.value_enc);
     } else {
       logger.error('Failed to load platform_secrets', result.error);
@@ -79,8 +105,11 @@ async function loadSecrets(): Promise<Record<string, string>> {
     logger.error('Failed to load platform_secrets', error instanceof Error ? error : undefined);
   }
 
-  cache = secrets;
-  cacheTimestamp = Date.now();
+  // Do not cache an empty result caused by a transient canonical-store failure.
+  if (canonicalReadSucceeded) {
+    cache = secrets;
+    cacheTimestamp = Date.now();
+  }
   return secrets;
 }
 

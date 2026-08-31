@@ -26,7 +26,8 @@ const requiredContracts = [
   ['lib/course-builder/persisted-publish-service.ts', /\.from\(['"]courses['"]\)/, 'publish gate reads persisted courses'],
   ['lib/course-builder/persisted-publish-service.ts', /\.from\(['"]course_modules['"]\)/, 'publish gate validates persisted modules'],
   ['lib/course-builder/persisted-publish-service.ts', /course_lessons\(/, 'publish gate validates persisted lessons'],
-  ['lib/course-builder/persisted-publish-service.ts', /review_status[^\n]*approved/, 'publish gate requires human approval'],
+  ['lib/course-builder/persisted-publish-service.ts', /record_course_automated_approval/, 'publish gate records deterministic automated approval'],
+  ['lib/course-builder/persisted-publish-service.ts', /repairPersistedCourseAcceptanceWithClient/, 'publish gate runs the governed acceptance checklist'],
   ['lib/db/courses.ts', /\.from\(['"]course_lessons['"]\)/, 'course service uses canonical lessons table'],
 ];
 

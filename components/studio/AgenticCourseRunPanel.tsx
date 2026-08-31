@@ -47,7 +47,7 @@ export function AgenticCourseRunPanel({
   courseTitle: string;
 }) {
   const storageKey = `elevate:course-agent:${courseId}`;
-  const [goal, setGoal] = useState(`Finish ${courseTitle} as a complete learner-ready governed course, repair missing instructional content and assessments, generate required media, validate compliance, stop for authorized human review, then publish through the canonical Course Builder.`);
+  const [goal, setGoal] = useState(`Finish ${courseTitle} as a complete learner-ready governed course, repair missing instructional content and assessments, generate required media, validate every required checklist, approve with Course Builder AI when all gates pass, then publish through the canonical Course Builder while preserving human review and editing controls.`);
   const [projectId, setProjectId] = useState('');
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [starting, setStarting] = useState(false);
@@ -123,7 +123,7 @@ export function AgenticCourseRunPanel({
           </div>
           <h3 className="mt-1 text-base font-bold text-slate-950">Visible build plan · persistent task graph</h3>
           <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-600">
-            Course mutations still go through the canonical Course Builder. Media remains incomplete until persisted playable URLs exist; human review is never auto-created.
+            Course Builder AI performs the first governed review and approves only after every persisted checklist passes. Human operators can inspect, edit, reject, unpublish, or republish afterward.
           </p>
         </div>
         {projectId ? (

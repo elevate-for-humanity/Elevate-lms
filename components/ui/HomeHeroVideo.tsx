@@ -76,7 +76,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       },
       {
         type: 'image',
-        src: '/images/pages/cdl-truck-highway.webp',
+        src: '/images/pages/programs-cdl-hero.webp',
         alt: 'A commercial truck traveling on the highway during CDL training',
         label: 'Prepare for transportation and CDL careers',
       },
@@ -91,12 +91,6 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         src: '/images/pages/cdl-cab-interior.webp',
         alt: 'The driver controls inside a commercial vehicle training cab',
         label: 'Practice career skills in real working environments',
-      },
-      {
-        type: 'image',
-        src: '/images/partners/kountry-kutz-interior.webp',
-        alt: 'The interior of an approved apprenticeship host shop',
-        label: 'Train with local host-shop partners',
       },
       {
         type: 'image',
@@ -170,7 +164,10 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       aria-roledescription="carousel"
       aria-label="Elevate for Humanity homepage highlights"
     >
-      <div className="home-hero-slide-enter">
+      <div
+        key={`${slide.type}-${slide.src || slide.mobileSrc || activeSlide}`}
+        className="home-hero-slide-enter"
+      >
         <HeroVideo
           videoSrcDesktop={slide.type === 'video' ? slide.src : undefined}
           videoSrcMobile={slide.type === 'video' ? slide.mobileSrc : undefined}
@@ -240,16 +237,21 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       ) : null}
       <style jsx>{`
         .home-hero-slide-enter {
-          animation: home-hero-fade 700ms ease-out both;
+          animation: home-hero-fade 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
           transform-origin: center;
         }
         @keyframes home-hero-fade {
-          from {
+          0% {
             opacity: 0;
-            transform: scale(1.018);
+            filter: saturate(0.92) brightness(0.9);
+            transform: scale(1.025);
           }
-          to {
+          45% {
+            opacity: 0.72;
+          }
+          100% {
             opacity: 1;
+            filter: saturate(1) brightness(1);
             transform: scale(1);
           }
         }

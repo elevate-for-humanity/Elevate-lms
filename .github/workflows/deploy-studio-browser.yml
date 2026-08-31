@@ -1,0 +1,83 @@
+name: Deploy Studio Browser
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'Dockerfile.studio-browser'
+      - 'services/studio-browser/**'
+      - 'scripts/northflank/create-studio-browser-service.ts'
+      - 'scripts/northflank/connect-studio-browser-to-admin.ts'
+      - 'scripts/northflank/resolve-service-url.ts'
+      - '.github/workflows/deploy-studio-browser.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: northflank-studio-browser-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Provision, connect, and verify Studio Browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: production
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+      NORTHFLANK_STUDIO_BROWSER_SERVICE_ID: elevate-studio-browser
+      NORTHFLANK_GIT_BRANCH: main
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Generate shared browser credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          secret="$(openssl rand -base64 48 | tr -d '\n')"
+          echo "::add-mask::$secret"
+          echo "STUDIO_BROWSER_SECRET=$secret" >> "$GITHUB_ENV"
+
+      - name: Provision browser service
+        run: pnpm tsx scripts/northflank/create-studio-browser-service.ts --execute
+
+      - name: Trigger browser build
+        run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_STUDIO_BROWSER_SERVICE_ID"
+
+      - name: Wait for browser deployment
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_STUDIO_BROWSER_SERVICE_ID" --timeout-ms 1800000
+
+      - name: Connect browser to Admin
+        run: pnpm tsx scripts/northflank/connect-studio-browser-to-admin.ts
+
+      - name: Verify browser health
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            url="$(pnpm --silent tsx scripts/northflank/resolve-service-url.ts "$NORTHFLANK_STUDIO_BROWSER_SERVICE_ID" 2>/dev/null || true)"
+            if [ -n "$url" ] && curl -fsS --max-time 10 "${url%/}/health" | grep -q '"ok":true'; then
+              echo "Studio Browser is healthy at $url"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::Studio Browser did not become healthy'
+          exit 1

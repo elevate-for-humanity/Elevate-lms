@@ -97,16 +97,13 @@ function requirePublicBuildArgs(): Record<string, string> {
   return {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    NEXT_PUBLIC_SITE_URL:
-      process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
     NEXT_PUBLIC_PUBLIC_SITE_URL:
       process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
-    NEXT_PUBLIC_APP_URL:
-      process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org',
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org',
     NEXT_PUBLIC_ADMIN_URL:
       process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org',
-    NEXT_PUBLIC_LMS_URL:
-      process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org',
+    NEXT_PUBLIC_LMS_URL: process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org',
   };
 }
 
@@ -185,7 +182,12 @@ const billing = {
   buildPlan: process.env.NORTHFLANK_BUILD_PLAN || 'nf-compute-800-32',
 };
 
-function buildPatch(service: ServiceConfig, storageMb: number, rolloutMode: RolloutMode) {
+function buildPatch(
+  service: ServiceConfig,
+  storageMb: number,
+  rolloutMode: RolloutMode,
+  existingRuntimeEnvironment: Record<string, string>,
+) {
   return {
     billing,
     disabledCI: true,
@@ -198,7 +200,12 @@ function buildPatch(service: ServiceConfig, storageMb: number, rolloutMode: Roll
         public: true,
       },
     ],
-    runtimeEnvironment: runtimeEnvironmentFor(service),
+    // Infrastructure deploys must not erase feature-specific runtime settings
+    // (for example Studio Browser, OAuth, mail, or worker endpoints).
+    runtimeEnvironment: {
+      ...existingRuntimeEnvironment,
+      ...runtimeEnvironmentFor(service),
+    },
     buildArguments: requirePublicBuildArgs(),
     healthChecks,
     buildSettings: {
@@ -222,6 +229,10 @@ async function patchWithCapacitySafeStrategy(
   storageMb: number,
 ): Promise<{ response: Record<string, any>; rolloutMode: RolloutMode }> {
   const path = combinedServicePatchPath(projectId, service.id);
+  const current = await nfFetch<{ runtimeEnvironment?: Record<string, string> }>(
+    projectApiPath(projectId, `/services/${service.id}`),
+  );
+  const existingRuntimeEnvironment = current.runtimeEnvironment ?? {};
 
   // Production must remain available during deployments. Keep desired capacity
   // unchanged, allow one temporary surge instance, and never make an existing
@@ -231,7 +242,7 @@ async function patchWithCapacitySafeStrategy(
   const rolloutMode: RolloutMode = 'custom';
   const response = await nfFetch<Record<string, any>>(path, {
     method: 'PATCH',
-    body: JSON.stringify(buildPatch(service, storageMb, rolloutMode)),
+    body: JSON.stringify(buildPatch(service, storageMb, rolloutMode, existingRuntimeEnvironment)),
   });
   return { response, rolloutMode };
 }
@@ -275,9 +286,7 @@ async function configureService(
   }
 
   const availabilitySummary =
-    appliedRolloutMode === 'custom'
-      ? 'maxUnavailable=0 maxSurge=1'
-      : appliedRolloutMode;
+    appliedRolloutMode === 'custom' ? 'maxUnavailable=0 maxSurge=1' : appliedRolloutMode;
 
   console.info(
     `[patch-ok] ${service.role}:${service.id} dockerfile=${service.dockerfile} ` +
@@ -324,7 +333,9 @@ async function main() {
     await configureService(projectId, service, requestedEphemeralMb);
   }
 
-  console.info('Northflank zero-downtime configuration applied to all requested production services.');
+  console.info(
+    'Northflank zero-downtime configuration applied to all requested production services.',
+  );
 }
 
 main().catch((error) => {

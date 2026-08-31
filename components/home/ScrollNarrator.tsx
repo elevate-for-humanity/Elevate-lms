@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
-const SCROLL_SETTLE_MS = 500;
+const SCROLL_SETTLE_MS = 250;
 
 function narrationFor(section: HTMLElement) {
   const supplied = section.dataset.narration?.trim();
@@ -37,11 +37,16 @@ function mostVisibleHomepageSection() {
 }
 
 export function ScrollNarrator() {
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
   const lastSectionRef = useRef<HTMLElement | null>(null);
   const timerRef = useRef<number | null>(null);
-  const voice = useNaturalVoice();
+  const {
+    play,
+    stop,
+    isLoading,
+    isPlaying,
+  } = useNaturalVoice();
 
   const narrateVisibleSection = useCallback(async () => {
     const section = mostVisibleHomepageSection();
@@ -51,20 +56,20 @@ export function ScrollNarrator() {
     if (!text) return;
 
     lastSectionRef.current = section;
-    voice.stop();
-    const started = await voice.play(text, {
+    stop();
+    const started = await play(text, {
       voice: 'coral',
       style: 'instructor',
       rate: 1,
     });
     if (!started) setNotice('Read aloud is unavailable in this browser.');
-  }, [voice]);
+  }, [play, stop]);
 
   useEffect(() => {
     if (!enabled) {
       lastSectionRef.current = null;
       if (timerRef.current) window.clearTimeout(timerRef.current);
-      voice.stop();
+      stop();
       return;
     }
 
@@ -75,16 +80,26 @@ export function ScrollNarrator() {
       }, SCROLL_SETTLE_MS);
     };
 
+    const activateFromUserGesture = () => scheduleNarration();
+
     scheduleNarration();
     window.addEventListener('scroll', scheduleNarration, { passive: true });
+    window.addEventListener('wheel', activateFromUserGesture, { passive: true });
+    window.addEventListener('touchstart', activateFromUserGesture, { passive: true });
+    window.addEventListener('pointerdown', activateFromUserGesture, { passive: true });
+    window.addEventListener('keydown', activateFromUserGesture);
     window.addEventListener('resize', scheduleNarration);
 
     return () => {
       window.removeEventListener('scroll', scheduleNarration);
+      window.removeEventListener('wheel', activateFromUserGesture);
+      window.removeEventListener('touchstart', activateFromUserGesture);
+      window.removeEventListener('pointerdown', activateFromUserGesture);
+      window.removeEventListener('keydown', activateFromUserGesture);
       window.removeEventListener('resize', scheduleNarration);
       if (timerRef.current) window.clearTimeout(timerRef.current);
     };
-  }, [enabled, narrateVisibleSection, voice]);
+  }, [enabled, narrateVisibleSection, stop]);
 
   const toggle = () => {
     setNotice(null);
@@ -97,12 +112,12 @@ export function ScrollNarrator() {
         type="button"
         onClick={toggle}
         aria-pressed={enabled}
-        className={`inline-flex min-h-12 items-center gap-2 rounded-full px-4 py-3 text-sm font-black text-white shadow-xl transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 ${
+        className={`inline-flex min-h-14 min-w-[12.5rem] touch-manipulation items-center justify-center gap-3 rounded-full border-2 border-white px-6 py-4 text-base font-black text-white shadow-2xl transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 ${
           enabled ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-blue-700 hover:bg-blue-800'
         }`}
       >
-        {enabled ? <VolumeX className="h-5 w-5" aria-hidden="true" /> : <Volume2 className="h-5 w-5" aria-hidden="true" />}
-        {enabled ? 'Stop reading' : 'Read page aloud'}
+        {enabled ? <VolumeX className="h-6 w-6" aria-hidden="true" /> : <Volume2 className="h-6 w-6" aria-hidden="true" />}
+        {enabled ? (isLoading ? 'Preparing audio…' : isPlaying ? 'Stop reading' : 'Reading on scroll') : 'Read page aloud'}
       </button>
       {notice ? <p role="status" className="mt-2 max-w-64 rounded-lg bg-white p-2 text-xs font-bold text-red-800 shadow-lg">{notice}</p> : null}
     </div>

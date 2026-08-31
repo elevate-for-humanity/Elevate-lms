@@ -48,6 +48,10 @@ env:
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  ONET_API_KEY: ${{ secrets.ONET_API_KEY }}
+  CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
+  # Older deployments named this secret TOKEN; accept it while API_KEY is canonicalized.
+  CAREERONESTOP_API_KEY: ${{ secrets.CAREERONESTOP_API_KEY || secrets.CAREERONESTOP_TOKEN }}
   # Public project URL is repository-owned configuration, not a credential.
   # Pin it here so a stale generic SUPABASE_URL secret cannot route this
   # production-only workflow to another project or an unreachable endpoint.

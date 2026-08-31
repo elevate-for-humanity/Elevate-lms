@@ -43,6 +43,8 @@ export interface HeroVideoProps {
   heightClassName?: string;
   overlayMode?: 'default' | 'soft' | 'none';
   soundButtonVariant?: 'pill' | 'prominent';
+  /** Allows a parent-level narration controller to remain the single audio authority. */
+  showSoundControl?: boolean;
   /** Delay mounting remote video sources so the first visual frame can paint without competing network work. */
   deferVideoMs?: number;
 }
@@ -67,6 +69,7 @@ export default function HeroVideo({
   heightClassName = 'h-[clamp(380px,58vh,620px)]',
   overlayMode = 'default',
   soundButtonVariant = 'pill',
+  showSoundControl = true,
   deferVideoMs = 0,
 }: HeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -356,7 +359,7 @@ export default function HeroVideo({
           </div>
         ) : null}
 
-        {(voiceoverSrc && !audioFailed) || (narrateTranscript && transcript) || showVideo ? (
+        {showSoundControl && ((voiceoverSrc && !audioFailed) || (narrateTranscript && transcript) || showVideo) ? (
           <button
             type="button"
             onClick={() => void toggleSound()}

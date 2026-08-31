@@ -23,12 +23,12 @@ const payload = {
   name: serviceId,
   description: 'Isolated Playwright Chromium runtime for canonical Admin Dev Studio',
   billing: { deploymentPlan: 'nf-compute-200' },
-  // Chromium runs with --disable-dev-shm-usage, so a large /dev/shm reservation
-  // is unnecessary and exceeds the production project's resource allowance.
+  // Chromium runs with --disable-dev-shm-usage, so no /dev/shm reservation is
+  // needed. Omitting it also keeps this service within the project allowance.
   deployment: {
     instances: 1,
     docker: { configType: 'default' },
-    storage: { shmSize: 256, ephemeralStorage: { storageSize: 2048 } },
+    storage: { ephemeralStorage: { storageSize: 2048 } },
   },
   ports: [{ name: 'browser', internalPort: 3100, public: true, protocol: 'HTTP' }],
   buildSource: 'git',

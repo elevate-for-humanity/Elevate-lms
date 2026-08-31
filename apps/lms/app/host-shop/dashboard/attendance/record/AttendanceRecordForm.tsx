@@ -90,7 +90,7 @@ export default function AttendanceRecordForm({ students }: { students: Student[]
       <div className="space-y-4">
         {rows.map((row, index) => (
           <fieldset key={row.placementId} className="rounded-2xl border border-slate-200 p-5">
-            <legend className="sr-only">Attendance for {row.name}</legend>
+            <legend className="absolute left-0 top-0 h-8 w-8 opacity-0">Attendance for {row.name}</legend>
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0">
                 <p className="font-black text-slate-950">{row.name}</p>
@@ -106,7 +106,7 @@ export default function AttendanceRecordForm({ students }: { students: Student[]
                 {(['present', 'absent', 'excused', 'late'] as AttendanceStatus[]).map((status) => (
                   <label
                     key={status}
-                    className={`cursor-pointer rounded-xl border px-3 py-2 text-center text-sm font-bold capitalize ${
+                    className={`relative cursor-pointer rounded-xl border px-3 py-2 text-center text-sm font-bold capitalize ${
                       row.status === status
                         ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-900'
                         : 'border-slate-300 bg-white text-slate-700'

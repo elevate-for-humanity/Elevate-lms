@@ -8,8 +8,31 @@ describe('Supabase timed fetch circuit isolation', () => {
     CircuitBreaker.resetAll();
     vi.restoreAllMocks();
     delete process.env.SUPABASE_FETCH_TIMEOUT_MS;
+    delete process.env.SUPABASE_AUTH_FETCH_TIMEOUT_MS;
     delete process.env.SUPABASE_READ_MAX_ATTEMPTS;
     delete process.env.SUPABASE_CIRCUIT_BREAKER_ENABLED;
+  });
+
+  it('gives interactive Supabase Auth requests a dedicated timeout budget', async () => {
+    const timeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ access_token: 'test-token' }), { status: 200 }),
+    );
+
+    await timedFetch('https://example.supabase.co/auth/v1/token?grant_type=password', {
+      method: 'POST',
+    });
+
+    expect(timeoutSpy).toHaveBeenCalledWith(expect.any(Function), 15_000);
+  });
+
+  it('keeps public Data API reads on the fail-fast timeout', async () => {
+    const timeoutSpy = vi.spyOn(globalThis, 'setTimeout');
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('[]', { status: 200 }));
+
+    await timedFetch('https://example.supabase.co/rest/v1/programs');
+
+    expect(timeoutSpy).toHaveBeenCalledWith(expect.any(Function), 2_500);
   });
 
   it('allows batch workers to bypass the interactive read circuit', async () => {

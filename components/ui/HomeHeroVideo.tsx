@@ -64,21 +64,21 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       },
       {
         type: 'image',
-        src: '/images/hero/hero-healthcare.jpg',
-        alt: 'Healthcare professional welcoming students to a hands-on career pathway',
-        label: 'Prepare for an in-demand healthcare career',
+        src: '/images/hero/hero-hands-on-training.webp',
+        alt: 'A learner building technical skills through hands-on training',
+        label: 'Build practical skills through hands-on training',
       },
       {
         type: 'image',
-        src: '/images/partners/salon-saloon/team-interior.webp',
-        alt: 'Salon Saloon team inside their professional salon',
-        label: 'Learn with experienced professionals',
+        src: '/images/hero/hero-community.webp',
+        alt: 'A diverse community of learners preparing for new careers',
+        label: 'Join a community moving toward stronger careers',
       },
       {
         type: 'image',
-        src: '/images/pages/apprenticeships-page-2.webp',
-        alt: 'Apprentices developing practical skills with experienced professionals',
-        label: 'Build skills through hands-on apprenticeship training',
+        src: '/images/hero/hero-beauty-wellness.webp',
+        alt: 'A beauty and wellness professional delivering hands-on service',
+        label: 'Train for careers in beauty and wellness',
       },
     ] satisfies HomeHeroSlide[]
   ).filter((slide) => slide.type === 'image' || Boolean(slide.src || slide.mobileSrc));
@@ -140,6 +140,8 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   return (
     <div
       className="relative"
+      data-scroll-narration
+      data-narration={dynamicAsset?.transcript || banner.transcript || HOME_NARRATION}
       role="region"
       aria-roledescription="carousel"
       aria-label="Elevate for Humanity homepage highlights"
@@ -165,7 +167,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             type="button"
             onClick={() => selectSlide(activeSlide - 1)}
             aria-label="Show previous hero slide"
-            className="absolute left-0 top-1/2 z-50 inline-flex h-16 w-11 -translate-y-1/2 items-center justify-center rounded-r-lg border-y border-r border-white/80 bg-slate-950/65 text-white shadow-lg transition hover:bg-slate-950/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="absolute left-1 top-1/2 z-50 inline-flex h-16 w-11 -translate-y-1/2 items-center justify-center text-white drop-shadow-[0_2px_5px_rgba(0,0,0,0.9)] transition hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <span aria-hidden="true" className="text-4xl font-light leading-none">
               ‹
@@ -175,14 +177,14 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             type="button"
             onClick={() => selectSlide(activeSlide + 1)}
             aria-label="Show next hero slide"
-            className="absolute right-0 top-1/2 z-50 inline-flex h-16 w-11 -translate-y-1/2 items-center justify-center rounded-l-lg border-y border-l border-white/80 bg-slate-950/65 text-white shadow-lg transition hover:bg-slate-950/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="absolute right-1 top-1/2 z-50 inline-flex h-16 w-11 -translate-y-1/2 items-center justify-center text-white drop-shadow-[0_2px_5px_rgba(0,0,0,0.9)] transition hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <span aria-hidden="true" className="text-4xl font-light leading-none">
               ›
             </span>
           </button>
 
-          <div className="absolute bottom-5 left-1/2 z-50 flex w-[min(88vw,32rem)] -translate-x-1/2 items-center gap-2 rounded-lg border border-white/40 bg-slate-950/55 px-3 py-2 shadow-lg backdrop-blur-sm">
+          <div className="absolute bottom-5 left-1/2 z-50 flex w-[min(76vw,28rem)] -translate-x-1/2 items-center gap-2 px-2 py-1 drop-shadow-[0_2px_5px_rgba(0,0,0,0.9)]">
             {slides.map((item, index) => (
               <button
                 key={`${item.type}-${item.src}-${index}`}
@@ -199,7 +201,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
               type="button"
               onClick={() => setPaused((value) => !value)}
               aria-label={paused ? 'Resume hero slideshow' : 'Pause hero slideshow'}
-              className="ml-1 inline-flex h-8 min-w-10 items-center justify-center rounded-md border border-white/50 px-2 text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="ml-1 inline-flex h-8 min-w-8 items-center justify-center text-white transition hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <span aria-hidden="true" className="text-sm font-black leading-none">
                 {paused ? '▶' : 'Ⅱ'}

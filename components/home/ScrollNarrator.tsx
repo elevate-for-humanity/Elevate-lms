@@ -21,7 +21,9 @@ function narrationFor(section: HTMLElement) {
 }
 
 function mostVisibleHomepageSection() {
-  const sections = Array.from(document.querySelectorAll<HTMLElement>('main > section'));
+  const sections = Array.from(
+    document.querySelectorAll<HTMLElement>('main > section, main > [data-scroll-narration]'),
+  );
   let best: { section: HTMLElement; visibleRatio: number } | null = null;
 
   for (const section of sections) {
@@ -49,6 +51,7 @@ export function ScrollNarrator() {
     if (!text) return;
 
     lastSectionRef.current = section;
+    voice.stop();
     const started = await voice.play(text, {
       voice: 'coral',
       style: 'instructor',

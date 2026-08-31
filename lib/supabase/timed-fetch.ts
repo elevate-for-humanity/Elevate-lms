@@ -14,6 +14,7 @@ import { breakers } from '@/lib/resilience';
 // hold every page open for roughly 24.5 seconds. Batch workflows can still opt
 // into longer waits through the documented environment overrides.
 const DEFAULT_SUPABASE_FETCH_TIMEOUT_MS = 2_500;
+const DEFAULT_SUPABASE_AUTH_FETCH_TIMEOUT_MS = 15_000;
 const DEFAULT_SAFE_READ_MAX_ATTEMPTS = 1;
 const TRANSIENT_STATUSES = new Set([502, 503, 504]);
 
@@ -42,7 +43,25 @@ function positiveInteger(value: string | undefined, fallback: number, maximum: n
   return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, maximum) : fallback;
 }
 
-function fetchTimeoutMs(): number {
+function isSupabaseAuthRequest(input: RequestInfo | URL): boolean {
+  const rawUrl = input instanceof Request ? input.url : String(input);
+
+  try {
+    return new URL(rawUrl).pathname.startsWith('/auth/v1/');
+  } catch {
+    return rawUrl.includes('/auth/v1/');
+  }
+}
+
+function fetchTimeoutMs(input: RequestInfo | URL): number {
+  if (isSupabaseAuthRequest(input)) {
+    return positiveInteger(
+      process.env.SUPABASE_AUTH_FETCH_TIMEOUT_MS,
+      DEFAULT_SUPABASE_AUTH_FETCH_TIMEOUT_MS,
+      60_000,
+    );
+  }
+
   return positiveInteger(
     process.env.SUPABASE_FETCH_TIMEOUT_MS,
     DEFAULT_SUPABASE_FETCH_TIMEOUT_MS,
@@ -73,7 +92,7 @@ async function fetchAttempt(
   headers: Record<string, string>,
 ): Promise<Response> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), fetchTimeoutMs());
+  const timer = setTimeout(() => controller.abort(), fetchTimeoutMs(input));
 
   try {
     return await fetch(input, {

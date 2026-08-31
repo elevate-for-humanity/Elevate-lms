@@ -19,6 +19,7 @@ function jsonError(error: unknown): NextResponse {
     /NEXT_PUBLIC_SUPABASE_URL|NEXT_PUBLIC_SUPABASE_ANON_KEY|SUPABASE_URL|SUPABASE_ANON_KEY|MISSING_ENV/i.test(
       message,
     );
+  const transientFailure = /abort|timed?\s*out|fetch failed|network/i.test(message);
 
   console.error('[admin-login] unexpected authentication failure', {
     configurationFailure,
@@ -29,10 +30,12 @@ function jsonError(error: unknown): NextResponse {
     {
       error: configurationFailure
         ? 'Admin authentication is temporarily unavailable because the server authentication configuration is incomplete.'
-        : 'Admin authentication failed unexpectedly. Please retry.',
+        : transientFailure
+          ? 'The sign-in service took too long to respond. Please try again.'
+          : 'Admin authentication failed unexpectedly. Please retry.',
     },
     {
-      status: configurationFailure ? 503 : 500,
+      status: configurationFailure || transientFailure ? 503 : 500,
       headers: { 'Cache-Control': 'no-store, private' },
     },
   );
@@ -63,17 +66,22 @@ export async function POST(req: NextRequest) {
       return json({ error: 'Email and password required.' }, 400);
     }
 
-    try {
-      const { hydrateProcessEnv } = await import('@/lib/secrets');
-      await hydrateProcessEnv();
-    } catch {
-      // Secret hydration is optional for this route. Admin login only needs the
-      // public Supabase URL/anon key; authorization is evaluated through the
-      // newly authenticated user's own session and RLS policies.
-    }
+    // Production already injects the public Supabase configuration. Avoid
+    // blocking every interactive login on remote secret hydration; only use
+    // hydration as a recovery path when the deployed public values are absent.
     applyNormalizedSupabaseUrlToEnv();
+    let misconfigured = getServerSupabaseEnvMisconfigurationReason();
 
-    const misconfigured = getServerSupabaseEnvMisconfigurationReason();
+    if (misconfigured) {
+      try {
+        const { hydrateProcessEnv } = await import('@/lib/secrets');
+        await hydrateProcessEnv();
+        applyNormalizedSupabaseUrlToEnv();
+        misconfigured = getServerSupabaseEnvMisconfigurationReason();
+      } catch {
+        // The configuration error below provides the actionable response.
+      }
+    }
     if (misconfigured) {
       console.error('[admin-login] Supabase public auth configuration invalid', { misconfigured });
       return json(
@@ -94,13 +102,16 @@ export async function POST(req: NextRequest) {
     if (authError || !authData?.user) {
       const raw = authError?.message || 'Invalid email or password.';
       const invalidApiKey = /invalid api key/i.test(raw);
+      const transientFailure = /abort|timed?\s*out|fetch failed|network/i.test(raw);
       return json(
         {
           error: invalidApiKey
             ? 'Admin authentication is misconfigured (invalid Supabase anon key on this deployment). Contact engineering.'
-            : raw,
+            : transientFailure
+              ? 'The sign-in service took too long to respond. Please try again.'
+              : raw,
         },
-        invalidApiKey ? 503 : 401,
+        invalidApiKey || transientFailure ? 503 : 401,
       );
     }
 

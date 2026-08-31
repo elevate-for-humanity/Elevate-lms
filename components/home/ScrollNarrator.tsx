@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
-const SCROLL_SETTLE_MS = 250;
+const SCROLL_SETTLE_MS = 900;
 
 function narrationFor(section: HTMLElement) {
   const supplied = section.dataset.narration?.trim();
@@ -50,20 +50,22 @@ export function ScrollNarrator() {
 
   const narrateVisibleSection = useCallback(async () => {
     const section = mostVisibleHomepageSection();
-    if (!section || section === lastSectionRef.current) return;
+    if (!section || section === lastSectionRef.current || isPlaying || isLoading) return;
 
     const text = narrationFor(section);
     if (!text) return;
 
     lastSectionRef.current = section;
-    stop();
     const started = await play(text, {
       voice: 'coral',
       style: 'instructor',
       rate: 1,
     });
-    if (!started) setNotice('Read aloud is unavailable in this browser.');
-  }, [play, stop]);
+    if (!started) {
+      lastSectionRef.current = null;
+      setNotice('Read aloud is unavailable in this browser.');
+    }
+  }, [isLoading, isPlaying, play]);
 
   useEffect(() => {
     if (!enabled) {

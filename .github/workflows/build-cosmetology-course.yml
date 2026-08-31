@@ -70,7 +70,9 @@ jobs:
     timeout-minutes: 180
     concurrency:
       group: cosmetology-course-production-build
-      cancel-in-progress: true
+      # A canceled runner cannot reliably write its terminal database ledger.
+      # Queue production builds so a config push never strands an active lock.
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v7
         with:

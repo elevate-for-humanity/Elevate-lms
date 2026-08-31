@@ -122,7 +122,7 @@ export default async function HostShopDashboardView() {
     { href: '/host-shop/dashboard/reports', title: 'Reporting center', detail: 'Review documented work, competencies, attendance, RTI, and compliance records.', image: '/images/heroes/lms-analytics.webp' },
     { href: '/host-shop/dashboard/profile', title: 'Shop profile', detail: 'Maintain the approved shop profile, logo, flyer, and operating information.', image: '/images/pages/about-employer-partners.webp' },
     { href: '/host-shop/dashboard/programs', title: 'Programs & standards', detail: 'Review the occupation assigned to this Host Shop and whether its registered standard is configured.', image: '/images/pages/programs-hero-vibrant.webp' },
-    { href: '/host-shop/dashboard/schedule', title: 'Training schedule', detail: 'View attendance sessions hosted by active users assigned to this Host Shop.', image: '/images/pages/academic-calendar-hero.webp' },
+    { href: '/host-shop/dashboard/schedule', title: 'Training schedule', detail: 'View attendance sessions hosted by active users assigned to this Host Shop.', image: '/images/pages/admin-apprenticeships-classroom.webp' },
     { href: '/host-shop/dashboard/store', title: 'Host Shop store', detail: 'Open verified purchasing options and approved service requests.', image: '/images/pages/store-page-1.webp' },
   ];
   const operatingSteps = [

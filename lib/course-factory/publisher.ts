@@ -92,7 +92,7 @@ function normalizeLessonType(lesson: Record<string, any>, slug: string): string 
   return inferStepType(slug);
 }
 
-function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
+export function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
   const instructor = getInstructorForCourse(courseTitle);
   return [...modules]
     .sort((a, b) => a.orderIndex - b.orderIndex)
@@ -124,12 +124,21 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
                   (point): point is string => typeof point === 'string' && point.trim().length > 0,
                 )
               : [];
-            if (experience && !LearningIntelligenceSchema.safeParse(experience.intelligence).success) {
-              const lessonObjectives = Array.isArray(lesson.learningObjectives)
-                ? lesson.learningObjectives.filter(
-                    (objective): objective is string => typeof objective === 'string' && objective.trim().length > 0,
+            const learningObjectives = Array.from(
+              new Set(
+                [
+                  ...(Array.isArray(lesson.learningObjectives) ? lesson.learningObjectives : []),
+                  lesson.objective,
+                  ...learningPoints,
+                ]
+                  .filter(
+                    (objective): objective is string =>
+                      typeof objective === 'string' && objective.trim().length > 0,
                   )
-                : [];
+                  .map((objective) => objective.trim()),
+              ),
+            );
+            if (experience && !LearningIntelligenceSchema.safeParse(experience.intelligence).success) {
               const competencyKeys = Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
                 ? lesson.competencyKeys
                 : (courseModule.competencies ?? []).map((competency) => competency.competencyKey);
@@ -138,11 +147,7 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
                 lessonTitle: lesson.title,
                 domainKey: lesson.domainKey ?? courseModule.domainKey ?? courseModule.slug,
                 competencyKeys,
-                objectives: lessonObjectives.length
-                  ? lessonObjectives
-                  : [lesson.objective, ...learningPoints].filter(
-                      (objective): objective is string => typeof objective === 'string' && objective.trim().length > 0,
-                    ),
+                objectives: learningObjectives,
                 masteryThreshold: lesson.passingScore,
                 assessment: ['checkpoint', 'quiz', 'exam'].includes(stepType),
                 practical: governedPractical,
@@ -222,7 +227,7 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
                       transcript: experience.narrationScript ?? null,
                     }
                   : null),
-              learning_objectives: lesson.learningObjectives ?? null,
+              learning_objectives: learningObjectives.length ? learningObjectives : null,
               competency_checks: lesson.competencyChecks ?? experience?.knowledgeChecks ?? null,
               instructor_notes: instructorNotes,
               practical_required: governedPractical,

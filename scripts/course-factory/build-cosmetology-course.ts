@@ -375,9 +375,12 @@ async function main() {
     (stage, message, progress) =>
       console.log(`[Cosmetology Course Builder] ${stage} ${progress ?? ''} ${message}`),
   );
-  if (!result.ok || result.courseId !== COURSE_ID) {
+  if (result.courseId && result.courseId !== COURSE_ID) {
+    fail(`Course Factory changed canonical identity to ${result.courseId}`);
+  }
+  if (!result.ok) {
     fail(
-      `Course Factory failed or changed canonical identity: ${JSON.stringify(result.errors ?? result)}`,
+      `Course Factory could not automatically repair the generated package: ${JSON.stringify(result.errors ?? result)}`,
     );
   }
   if (result.moduleCount !== EXPECTED_MODULES || result.lessonCount !== EXPECTED_LESSONS) {
@@ -473,7 +476,7 @@ main().catch(async (error) => {
         db
           .from('courses')
           .update({
-            generation_status: 'failed',
+            generation_status: 'draft',
             updated_at: new Date().toISOString(),
           })
           .eq('id', COURSE_ID),

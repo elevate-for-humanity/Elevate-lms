@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import HeroVideo from '@/components/marketing/HeroVideo';
 
 export interface HeroBanner {
@@ -102,8 +102,28 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   ).filter((slide) => slide.type === 'image' || Boolean(slide.src || slide.mobileSrc));
 
   const [activeSlide, setActiveSlide] = useState(0);
+  const [previousSlide, setPreviousSlide] = useState<HomeHeroSlide | null>(null);
   const [paused, setPaused] = useState(false);
+  const transitionTimerRef = useRef<number | null>(null);
   const slide = slides[activeSlide] ?? slides[0];
+
+  const transitionToSlide = useCallback(
+    (index: number) => {
+      setActiveSlide((current) => {
+        const next = (index + slides.length) % slides.length;
+        if (next === current) return current;
+
+        setPreviousSlide(slides[current] ?? null);
+        if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);
+        transitionTimerRef.current = window.setTimeout(() => {
+          setPreviousSlide(null);
+          transitionTimerRef.current = null;
+        }, 1_050);
+        return next;
+      });
+    },
+    [slides],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -133,20 +153,25 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   }, []);
 
   const selectSlide = useCallback(
-    (index: number) => {
-      setActiveSlide((index + slides.length) % slides.length);
-    },
-    [slides.length],
+    (index: number) => transitionToSlide(index),
+    [transitionToSlide],
   );
 
   useEffect(() => {
     if (paused || slides.length < 2) return;
     const timer = window.setInterval(
-      () => setActiveSlide((current) => (current + 1) % slides.length),
+      () => transitionToSlide(activeSlide + 1),
       HOME_SLIDE_SECONDS * 1000,
     );
     return () => window.clearInterval(timer);
-  }, [paused, slides.length]);
+  }, [activeSlide, paused, slides.length, transitionToSlide]);
+
+  useEffect(
+    () => () => {
+      if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -164,22 +189,39 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       aria-roledescription="carousel"
       aria-label="Elevate for Humanity homepage highlights"
     >
-      <div
-        key={`${slide.type}-${slide.src || slide.mobileSrc || activeSlide}`}
-        className="home-hero-slide-enter"
-      >
-        <HeroVideo
+      <div className="relative overflow-hidden bg-slate-950">
+        {previousSlide ? (
+          <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+            <HeroVideo
+              mountedFrameImage={
+                previousSlide.type === 'video' ? HOME_FIRST_FRAME : previousSlide.src
+              }
+              analyticsName={banner.analyticsName}
+              overlayMode="none"
+              showSoundControl={false}
+              showTranscriptControl={false}
+              heightClassName="h-[clamp(400px,62vh,680px)]"
+            />
+          </div>
+        ) : null}
+        <div
+          key={`${slide.type}-${slide.src || slide.mobileSrc || activeSlide}`}
+          className="home-hero-slide-enter relative z-10"
+        >
+          <HeroVideo
           videoSrcDesktop={slide.type === 'video' ? slide.src : undefined}
           videoSrcMobile={slide.type === 'video' ? slide.mobileSrc : undefined}
           mountedFrameImage={slide.type === 'video' ? HOME_FIRST_FRAME : slide.src}
           transcript={dynamicAsset?.transcript || banner.transcript || HOME_NARRATION}
           showSoundControl={false}
+          showTranscriptControl={false}
           analyticsName={banner.analyticsName}
           overlayMode="none"
           soundButtonVariant="prominent"
           heightClassName="h-[clamp(400px,62vh,680px)]"
           deferVideoMs={slide.type === 'video' ? 100 : 0}
-        />
+          />
+        </div>
       </div>
 
       {slides.length > 1 ? (
@@ -205,24 +247,16 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             </span>
           </button>
 
-          <div className="absolute bottom-5 left-1/2 z-50 flex w-[min(76vw,28rem)] -translate-x-1/2 items-center gap-2 px-2 py-1 drop-shadow-[0_2px_5px_rgba(0,0,0,0.9)]">
-            {slides.map((item, index) => (
-              <button
-                key={`${item.type}-${item.src}-${index}`}
-                type="button"
-                onClick={() => selectSlide(index)}
-                aria-label={`Show slide ${index + 1}: ${item.label}`}
-                aria-current={index === activeSlide ? 'true' : undefined}
-                className={`h-1.5 flex-1 rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                  index === activeSlide ? 'bg-white' : 'bg-white/35 hover:bg-white/70'
-                }`}
-              />
-            ))}
+          <div className="absolute bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-full border border-white/40 bg-slate-950/55 px-4 py-2 text-white shadow-lg backdrop-blur-md">
+            <span className="min-w-10 text-center text-xs font-black tracking-[0.12em]" aria-hidden="true">
+              {activeSlide + 1} / {slides.length}
+            </span>
             <button
               type="button"
               onClick={() => setPaused((value) => !value)}
               aria-label={paused ? 'Resume hero slideshow' : 'Pause hero slideshow'}
-              className="ml-1 inline-flex h-8 min-w-8 items-center justify-center text-white transition hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="inline-flex h-10 w-10 min-h-0 min-w-0 touch-manipulation items-center justify-center rounded-full border border-white/60 bg-white/15 p-0 text-white transition hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              style={{ minHeight: '2.5rem', minWidth: '2.5rem', padding: 0 }}
             >
               <span aria-hidden="true" className="text-sm font-black leading-none">
                 {paused ? '▶' : 'Ⅱ'}

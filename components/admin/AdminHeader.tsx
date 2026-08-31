@@ -224,7 +224,7 @@ export default function AdminHeader() {
           </div>
         </div>
 
-        <div className={`overflow-hidden border-t border-slate-800 transition-[max-height] duration-200 xl:hidden ${navExpanded ? 'max-h-96' : 'max-h-0'}`}>
+        <div className={`overflow-hidden border-t border-slate-800 transition-[max-height] duration-200 xl:hidden ${navExpanded ? 'visible max-h-96 pointer-events-auto' : 'invisible max-h-0 pointer-events-none'}`}>
           <div className="px-3 py-3 sm:px-4">
             <p className="mb-2 text-xs font-semibold text-slate-400">Choose a workspace:</p>
             <div className="flex gap-2 overflow-x-auto overscroll-x-contain pb-2 scrollbar-hide">

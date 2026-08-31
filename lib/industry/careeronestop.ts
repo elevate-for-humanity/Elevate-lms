@@ -49,6 +49,7 @@ function userId(): string {
 async function cosGet<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}/${userId()}${path}`, {
     headers: authHeaders(),
+    signal: AbortSignal.timeout(15_000),
     next: { revalidate: 0 },
   });
   if (!res.ok) throw new Error(`CareerOneStop ${path} → ${res.status}`);

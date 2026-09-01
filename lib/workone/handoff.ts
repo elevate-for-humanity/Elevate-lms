@@ -6,8 +6,9 @@ import { sendEmail } from '@/lib/email/sendgrid';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { organization } from '@/lib/config/organization';
 import { logger } from '@/lib/logger';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
-const WORKONE_INTAKE_URL = 'https://WorkOneIndy.as.me/IntakeApptwithCN';
+const WORKONE_INTAKE_URL = WORKONE_INDY_BOOKING_URL;
 const ICC_URL = 'https://www.indianacareerconnect.com';
 const STAFF_EMAIL = 'elevate4humanityedu@gmail.com';
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;

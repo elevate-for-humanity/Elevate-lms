@@ -7,8 +7,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const PRODUCT = {
-  name: 'Meri-Gold-Round Multi-Zone Oil',
-  description: '10 mL botanical oil roller for hair, scalp, skin, body, massage, and daily wellness.',
+  name: 'Meri-Gold-Round Multi-Zone Essential Oil',
+  description: '10 mL essential-oil roller for hair, scalp, skin, body, massage, and daily wellness.',
   unitAmount: 2499,
 };
 

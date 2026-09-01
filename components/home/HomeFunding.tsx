@@ -1,9 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, CalendarDays, ClipboardList } from 'lucide-react';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
-const WORKONE_ORIENTATION_URL =
-  'https://workoneindy.as.me/schedule/e8f310c0/appointment/91381838/calendar/9483996?calendarIds=9483996';
 
 export function HomeFunding() {
   return (
@@ -47,7 +46,7 @@ export function HomeFunding() {
               Schedule the official Indianapolis WorkOne orientation, then complete Elevate&apos;s funding intake so we know where you are in the process.
             </p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a href={WORKONE_ORIENTATION_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-600 px-5 py-3 text-sm font-black text-white hover:bg-orange-700">
+              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-600 px-5 py-3 text-sm font-black text-white hover:bg-orange-700">
                 <CalendarDays className="h-5 w-5" /> Schedule WorkOne Orientation
               </a>
               <Link href="/funding/workone-intake" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-slate-900 bg-white px-5 py-3 text-sm font-black text-slate-950 hover:bg-slate-50">

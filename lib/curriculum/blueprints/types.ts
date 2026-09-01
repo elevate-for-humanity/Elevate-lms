@@ -162,8 +162,13 @@ export type BlueprintCertificateRequirements = {
 };
 
 export type BlueprintVideoConfig = {
-  videoGenerator: 'runway' | 'canvas-slides' | 'manual';
-  template: 'elevate-slide' | 'talking-head' | 'screencast' | 'custom';
+  videoGenerator: 'runway' | 'remotion' | 'canvas-slides' | 'manual';
+  template:
+    | 'elevate-slide'
+    | 'trade-demonstration'
+    | 'talking-head'
+    | 'screencast'
+    | 'custom';
   instructorName: string;
   instructorTitle: string;
   instructorImagePath: string;

@@ -160,9 +160,9 @@ const PROGRAM_ONBOARDING_TASKS: Record<string, { title: string; description: str
  */
 async function getApplicationByRef(supabase: SupabaseClient, applicationRef: string) {
   const { data, error } = await supabase
-    .from('paris_applications')
+    .from('applications')
     .select('*')
-    .eq('application_ref', applicationRef)
+    .eq('reference_number', applicationRef)
     .single();
   
   if (error && error.code !== 'PGRST116') {
@@ -227,7 +227,7 @@ async function createEnrollment(
   score: InterviewScore
 ): Promise<string> {
   const { data, error } = await supabase
-    .from('enrollments')
+    .from('program_enrollments')
     .insert({
       student_id: studentId,
       program_slug: programSlug,
@@ -388,7 +388,7 @@ async function updateApplicationStatus(
   eligibility: EligibilityResult
 ): Promise<void> {
   await supabase
-    .from('paris_applications')
+    .from('applications')
     .update({
       status: status,
       interview_completed_at: new Date().toISOString(),
@@ -397,7 +397,7 @@ async function updateApplicationStatus(
       risk_level: eligibility.riskLevel,
       updated_at: new Date().toISOString()
     })
-    .eq('application_ref', applicationRef);
+    .eq('reference_number', applicationRef);
 }
 
 /**
@@ -510,7 +510,7 @@ export async function checkProvisioningStatus(
     }
     
     const { data: enrollment } = await supabase
-      .from('enrollments')
+      .from('program_enrollments')
       .select('id')
       .eq('student_id', application.student_id)
       .single();

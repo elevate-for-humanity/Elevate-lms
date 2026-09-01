@@ -124,12 +124,14 @@ export async function speakNaturalVoice(text: string, options: PlayOptions = {})
 export function useNaturalVoice() {
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playbackTokenRef = useRef(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const stop = useCallback(() => {
+    playbackTokenRef.current += 1;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -149,11 +151,16 @@ export function useNaturalVoice() {
     if (!clean) return false;
 
     stop();
+    const playbackToken = playbackTokenRef.current;
     setError(null);
     setIsLoading(true);
 
     try {
       const audio = await requestNaturalVoice(clean, options);
+      if (playbackToken !== playbackTokenRef.current) {
+        audio.pause();
+        return false;
+      }
       audioRef.current = audio;
       audio.onplay = () => {
         setIsLoading(false);
@@ -178,6 +185,7 @@ export function useNaturalVoice() {
       await audio.play();
       return true;
     } catch {
+      if (playbackToken !== playbackTokenRef.current) return false;
       const utterance = browserFallback(clean, options);
       if (!utterance) {
         setIsLoading(false);

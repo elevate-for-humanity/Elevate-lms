@@ -109,7 +109,7 @@ async function _POST(request: NextRequest) {
     // No additional action needed - BNPL provider pays full amount to Stripe
 
     // Log to audit trail
-    await supabase.from('ai_audit_log').insert({
+    await supabase.from('audit_logs').insert({
       user_id: enrollment.user_id,
       action: 'PAYMENT_SPLIT',
       details: {

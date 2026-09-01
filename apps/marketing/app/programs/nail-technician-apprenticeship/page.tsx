@@ -2,6 +2,7 @@ import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
+import JozannaIndustryInstructor from '@/components/programs/beauty/JozannaIndustryInstructor';
 import heroBanners from '@/content/heroBanners';
 import { notFound } from 'next/navigation';
 import { getStaticProgram } from '@/data/programs';
@@ -37,7 +38,10 @@ export default async function NailTechnicianApprenticeshipPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
       <ProgramDetailPage program={program} banner={banner} heroOverride={heroOverride}>
-        <BeautyApprenticeshipAuthority program={program} />
+        <div className="space-y-10">
+          <JozannaIndustryInstructor industry="nail-technician" />
+          <BeautyApprenticeshipAuthority program={program} />
+        </div>
       </ProgramDetailPage>
     </>
   );

@@ -24,7 +24,7 @@ export function ParisFloatingButton({
           role="dialog"
           aria-modal="true"
           aria-label={learnerSurface ? 'PARIS Learning Assistant' : 'PARIS Career Assistant'}
-          className="fixed inset-0 z-[9999] flex items-stretch sm:pointer-events-none sm:items-end sm:justify-end sm:p-6 sm:pb-24"
+          className="fixed inset-0 z-[9999] flex h-[100dvh] items-stretch overscroll-contain sm:pointer-events-none sm:items-end sm:justify-end sm:p-6 sm:pb-24"
         >
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm sm:hidden"
@@ -32,7 +32,7 @@ export function ParisFloatingButton({
             aria-hidden="true"
           />
 
-          <div className="pointer-events-auto relative z-10 ml-auto flex h-full w-full flex-col bg-white shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200 sm:h-[min(680px,calc(100vh-8rem))] sm:w-[min(480px,calc(100vw-3rem))] sm:rounded-2xl sm:border sm:border-slate-200">
+          <div className="pointer-events-auto relative z-10 ml-auto flex h-[100dvh] min-h-0 w-full max-w-full flex-col overflow-hidden bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200 sm:h-[min(680px,calc(100dvh-8rem))] sm:w-[min(480px,calc(100vw-3rem))] sm:rounded-2xl sm:border sm:border-slate-200 sm:pb-0">
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 shrink-0 bg-white">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-red-600 flex items-center justify-center text-white text-sm sm:text-base font-bold shrink-0">
@@ -63,6 +63,7 @@ export function ParisFloatingButton({
                 courseTitle={courseTitle}
                 nextLessonTitle={nextLessonTitle}
                 courseProgress={courseProgress}
+                voiceEnabled
               />
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, CreditCard, Store } from 'lucide-react';
 import HeroVideo from '@/components/marketing/HeroVideo';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 export interface HeroBanner {
   pageKey: string;
@@ -43,10 +44,20 @@ interface DynamicHomeHeroAsset {
 
 const HOME_MEDIA_REVISION = process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 12) || 'home-hero';
 const HOME_FIRST_FRAME = '/images/heroes/hero-home-first-frame.webp';
-const HOME_SLIDE_SECONDS = 7;
+const HOME_SLIDE_SECONDS = 14;
 
 const HOME_NARRATION =
   'Welcome to Elevate for Humanity, where career training, registered apprenticeships, workforce support, and technology come together in one connected platform. Whether you want to begin a new career, earn while you learn, grow your business, host an apprentice, or build and manage training online, Elevate can help you take the next step. Explore hands-on pathways in healthcare, skilled trades, transportation, barbering, beauty, business, and technology. Eligible participants can also learn about available workforce funding pathways and payment options before enrolling. Shop and salon owners can join at no cost as apprenticeship host sites, train new talent inside their businesses, receive program support from Elevate, and may qualify for eligible workforce incentives. Apprentices gain supervised experience, documented skills, and the opportunity to earn wages while completing their pathway. Elevate also provides online applications, learner and employer portals, course-building tools, website and app development, testing support, and workforce-management technology. Explore a program, apply for training, become a host site, or request a demonstration. Your next opportunity can start right here with Elevate for Humanity.';
+
+function isApprovedHomeHeroAsset(publicUrl: string) {
+  try {
+    const url = new URL(publicUrl);
+    const path = url.pathname.toLowerCase();
+    return url.protocol === 'https:' && !path.includes('/partners/') && !/razors[-_ ]?image/.test(path);
+  } catch {
+    return false;
+  }
+}
 
 function withMediaRevision(src?: string) {
   if (!src) return undefined;
@@ -54,6 +65,9 @@ function withMediaRevision(src?: string) {
 }
 
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
+  const heroRef = useRef<HTMLElement | null>(null);
+  const [heroVisible, setHeroVisible] = useState(false);
+  const { play, prepare, stop } = useNaturalVoice();
   const [dynamicAsset, setDynamicAsset] = useState<DynamicHomeHeroAsset | null>(null);
   const resolvedVideoDesktop = dynamicAsset?.publicUrl || banner.videoSrcDesktop;
   const resolvedVideoMobile = dynamicAsset?.publicUrl || banner.videoSrcMobile;
@@ -200,7 +214,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         return response.json() as Promise<{ asset?: DynamicHomeHeroAsset | null }>;
       })
       .then((payload) => {
-        if (payload?.asset?.publicUrl?.startsWith('https://')) {
+        if (payload?.asset?.publicUrl && isApprovedHomeHeroAsset(payload.asset.publicUrl)) {
           setDynamicAsset(payload.asset);
         }
       })
@@ -212,6 +226,43 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       controller.abort();
     };
   }, []);
+
+  useEffect(() => {
+    const element = heroRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setHeroVisible(entry.isIntersecting && entry.intersectionRatio >= 0.35),
+      { threshold: [0, 0.35, 0.7] },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const nextSlide = slides[(activeSlide + 1) % slides.length];
+    if (nextSlide) void prepare(`${nextSlide.label}. ${nextSlide.description}`, {
+      voice: 'coral',
+      style: 'commercial',
+      rate: 0.98,
+    });
+  }, [activeSlide, prepare, slides]);
+
+  useEffect(() => {
+    if (!heroVisible || paused || !slide) {
+      if (!heroVisible) stop();
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      void play(`${slide.label}. ${slide.description}`, {
+        voice: 'coral',
+        style: 'commercial',
+        rate: 0.98,
+      });
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [activeSlide, heroVisible, paused, play, slide, stop]);
 
   const selectSlide = useCallback((index: number) => transitionToSlide(index), [transitionToSlide]);
 
@@ -240,9 +291,8 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
 
   return (
     <section
+      ref={heroRef}
       className="relative overflow-hidden border-b border-slate-200 bg-white"
-      data-scroll-narration
-      data-narration="Welcome. Elevate brings career training, paid apprenticeship pathways, employer support, and practical business tools together so you can find the next step that fits your goals."
       role="region"
       aria-roledescription="carousel"
       aria-label="Elevate for Humanity homepage highlights"
@@ -325,7 +375,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
               deferVideoMs={slide.type === 'video' ? 100 : 0}
             />
           </div>
-          <div className="absolute inset-x-0 bottom-0 z-40 bg-gradient-to-t from-slate-950/90 via-slate-950/45 to-transparent px-6 pb-20 pt-20 text-white sm:px-8">
+          <div className="absolute inset-x-0 bottom-0 z-40 bg-gradient-to-t from-slate-950/65 via-slate-950/20 to-transparent px-6 pb-20 pt-20 text-white sm:px-8">
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-blue-200">
               Featured pathway
             </p>

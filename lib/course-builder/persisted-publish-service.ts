@@ -14,6 +14,11 @@ function hasContent(value: unknown): boolean {
   if (typeof value === 'string') return value.trim().length > 0;
   return !!value && typeof value === 'object' && Object.keys(value as Record<string, unknown>).length > 0;
 }
+function onlyHumanReviewBlockers(issues: string[]) {
+  return issues.length > 0 && issues.every((issue) =>
+    issue.includes('human sign-off') || issue.includes('human-approved'),
+  );
+}
 
 /**
  * Canonical persisted-course procurement gate.
@@ -38,6 +43,9 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
   if (externalProfile && !course.governing_body?.trim()) blocking.push('governing body is missing');
   if (externalProfile && !course.governing_standard_version?.trim()) blocking.push('governing standard/test-plan version is missing');
   if (course.generation_status && !['completed', 'published'].includes(course.generation_status)) blocking.push(`course generation is not complete (${course.generation_status}, ${course.generation_progress ?? 0}%)`);
+  if (course.review_status !== 'approved' || !course.reviewed_by || !course.reviewed_at) {
+    blocking.push('authorized human sign-off missing');
+  }
 
   const { data: modules, error: moduleError } = await supabase.from('course_modules').select(`
     id,title,slug,domain_key,target_hours,order_index,
@@ -79,6 +87,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
       if (!lesson.hour_category) issues.push('hour category missing');
       if (!lesson.delivery_method) issues.push('delivery method missing');
       if (lesson.ai_generated === true && lesson.generation_status && !['verification_ready','certificate_ready','published','completed','generated'].includes(lesson.generation_status)) issues.push(`generation not ready (${lesson.generation_status})`);
+      if (lesson.ai_generated === true && lesson.approved !== true) issues.push('AI lesson not human-approved');
       if (isAssessment) {
         if (questions.length === 0) issues.push('assessment has no questions');
         if (lesson.passing_score == null) issues.push('assessment passing score missing');
@@ -106,6 +115,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
       if (isPractical) {
         if (competencies.length === 0) issues.push('practical competency checks missing');
         if (!lesson.evidence_type) issues.push('practical evidence type missing');
+        if (lesson.requires_instructor_signoff !== true) issues.push('authorized human sign-off missing for practical competency');
       }
       if (issues.length) blocking.push(`"${lesson.title}" (${module.title}): ${issues.join(', ')}`);
     }
@@ -151,6 +161,9 @@ export async function repairPersistedCourseAcceptanceWithClient(input: {
   let health = await runPersistedCourseProcurementHealthCheckWithClient(input.db, input.courseId);
 
   for (let attempt = 1; !health.pass && attempt <= maxAttempts; attempt += 1) {
+    // Automated repair may improve generated content, but it must never create,
+    // replace, or invalidate an authorized person's review decision.
+    if (onlyHumanReviewBlockers(health.blocking_issues)) break;
     const blockingBefore = [...health.blocking_issues];
     const normalization = await normalizeGeneratedCourseForGovernance(input.courseId);
     repairs.push({ attempt, blockingBefore, normalization });
@@ -168,7 +181,7 @@ export async function repairPersistedCourseAcceptanceWithClient(input: {
   return { ...health, repairs, repaired: repairs.length > 0 };
 }
 
-export async function publishPersistedCourseWithClient(input: { db: SupabaseClient; courseId: string; actorId: string | null; label?: string; request?: NextRequest; }) {
+export async function publishPersistedCourseWithClient(input: { db: SupabaseClient; courseId: string; actorId: string; label?: string; request?: NextRequest; }) {
   const health = await repairPersistedCourseAcceptanceWithClient({
     db: input.db,
     courseId: input.courseId,
@@ -177,18 +190,9 @@ export async function publishPersistedCourseWithClient(input: { db: SupabaseClie
     if (input.actorId) await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { repair_exhausted: true, label: input.label, blocking_issues: health.blocking_issues, metrics: health.metrics, repairs: health.repairs }, req: input.request });
     return { ok: false as const, error: 'AUTOMATED_REPAIR_EXHAUSTED', blocking_issues: health.blocking_issues, metrics: health.metrics, repairs: health.repairs };
   }
-  const { data: approvalId, error: approvalError } = await input.db.rpc('record_course_automated_approval', {
-    p_course_id: input.courseId,
-    p_gate_version: 'course-builder-acceptance-v1',
-    p_evidence: health.metrics,
-    p_initiated_by: input.actorId,
-  });
-  if (approvalError || !approvalId) {
-    throw new Error(`Automated approval audit failed: ${approvalError?.message ?? 'approval record was not created'}`);
-  }
   const result = await publishCourse(input.db, input.courseId, input.actorId, input.label);
-  if (input.actorId) await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { label: input.label, lesson_count: (result as any)?.lessonCount, procurement_gate: health.metrics, review_mode: 'automated_acceptance_contract', automated_approval_id: approvalId, repairs: health.repairs }, req: input.request });
-  return { ok: true as const, procurement_gate: health.metrics, automated_approval_id: approvalId, repairs: health.repairs, ...result };
+  await logAdminAudit({ action: AdminAction.COURSE_PUBLISHED, actorId: input.actorId, entityType: 'courses', entityId: input.courseId, metadata: { label: input.label, lesson_count: (result as any)?.lessonCount, procurement_gate: health.metrics, review_mode: 'authorized_human_signoff', repairs: health.repairs }, req: input.request });
+  return { ok: true as const, procurement_gate: health.metrics, repairs: health.repairs, ...result };
 }
 
 export async function publishPersistedCourse(input: { courseId: string; actorId: string; label?: string; request?: NextRequest; }) { return publishPersistedCourseWithClient({ ...input, db: await createClient() }); }
@@ -221,13 +225,11 @@ export async function finalizeCourseAutomaticallyIfReadyWithClient(input: {
     return { ok: false as const, state: 'media_pending' as const, media };
   }
 
-  const publication = await publishPersistedCourseWithClient({
-    db: input.db,
-    courseId: input.courseId,
-    actorId: null,
-    label: 'AI Course Builder automated acceptance',
-  });
-  return publication.ok
-    ? { ok: true as const, state: 'published' as const, media, publication }
-    : { ok: false as const, state: 'repair_pending' as const, media, publication };
+  const health = await repairPersistedCourseAcceptanceWithClient({ db: input.db, courseId: input.courseId });
+  return {
+    ok: false as const,
+    state: 'awaiting_human_review' as const,
+    media,
+    publication: health,
+  };
 }

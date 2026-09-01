@@ -295,6 +295,19 @@ export async function processCourseAgenticTask(input: {
       }, 'Course passed canonical procurement, governance, accessibility, instructional, and media readiness checks.');
       return;
     }
+    const humanReviewOnly = health.blocking_issues.every((issue) =>
+      issue.includes('human sign-off') || issue.includes('human-approved'),
+    );
+    if (humanReviewOnly) {
+      await updateTask(task, project, 'queued', {
+        course_id: target.courseId,
+        procurement: health.metrics,
+        media,
+        blocking_issues: health.blocking_issues,
+        repairs: health.repairs,
+      }, 'Automated QA passed; publication is waiting for authorized human course and lesson review.');
+      return;
+    }
     throw new Error(`Automated course repair exhausted: ${health.blocking_issues.join(' | ')}`);
   }
 
@@ -318,7 +331,7 @@ export async function processCourseAgenticTask(input: {
       procurement_gate: result.procurement_gate,
       media,
       published: true,
-    }, 'Canonical course publication completed after every automated acceptance gate passed.');
+    }, 'Canonical course publication completed after deterministic checks and authorized human approval.');
     await db
       .from('agentic_build_runs')
       .update({ status: 'completed', completed_at: new Date().toISOString(), error: null })

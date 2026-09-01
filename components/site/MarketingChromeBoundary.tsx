@@ -30,7 +30,7 @@ export async function MarketingChromeBoundary({ children }: { children: React.Re
       <Header />
       <div id="main-content" tabIndex={-1} className="site-main focus:outline-none"><RouteTransition>{children}</RouteTransition></div>
       <SiteFooter />
-      <ParisFloatingWrapper surface="public" />
+      {!pathname.startsWith('/store') && <ParisFloatingWrapper surface="public" />}
     </>
   );
 }

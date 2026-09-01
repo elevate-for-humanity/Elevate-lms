@@ -1,14 +1,56 @@
-import { safeInternalError } from '@/lib/api/safe-error';
-export const runtime = 'nodejs';
-export const maxDuration = 60;
-
 import { NextRequest, NextResponse } from 'next/server';
-import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
+import { safeInternalError } from '@/lib/api/safe-error';
+import { runAITask, type AITask } from '@/lib/ai/orchestrator';
+import { isAIAvailable } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
-import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+const MODE_CONFIG: Record<string, { task: AITask; instruction: string }> = {
+  course: {
+    task: 'course_generation',
+    instruction:
+      'Generate a course blueprint with title, summary, description, measurable objectives, ordered modules, and ordered lessons. Return JSON only.',
+  },
+  module: {
+    task: 'course_generation',
+    instruction:
+      'Generate one course module with a title, description, measurable learning outcomes, and ordered lesson names. Return JSON only.',
+  },
+  lesson: {
+    task: 'lesson_generation',
+    instruction:
+      'Generate one complete workforce lesson with objectives, safe HTML teaching content, activities, practical application, and summary. Return JSON only with an html field.',
+  },
+  quiz: {
+    task: 'quiz_generation',
+    instruction:
+      'Generate ten multiple-choice questions. Each must include question, four options, correctAnswer from 0 through 3, and an explanation. Return a JSON array only.',
+  },
+  objectives: {
+    task: 'course_generation',
+    instruction:
+      'Generate five to eight measurable learning objectives using observable action verbs. Return a JSON array only.',
+  },
+  images: {
+    task: 'course_generation',
+    instruction:
+      'Generate ten detailed, accessible visual prompts for original educational images. Include setting, people, action, evidence, composition, and alt-text intent. Return a JSON array only.',
+  },
+};
+
+function parseStructuredOutput(content: string): unknown {
+  const cleaned = content
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/, '')
+    .trim();
+  if (!cleaned) throw new Error('AI returned an empty response');
+  return JSON.parse(cleaned);
+}
 
 async function _POST(req: NextRequest) {
   try {
@@ -16,47 +58,61 @@ async function _POST(req: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const auth = await requireAuth(req);
-    if (auth instanceof NextResponse) return auth;
+    if (auth.error) return auth.error;
 
-    const { mode, prompt } = await req.json();
-    if (!mode || !prompt) return NextResponse.json({ error: 'Missing mode or prompt' }, { status: 400 });
+    const body = await req.json().catch(() => null);
+    const mode = typeof body?.mode === 'string' ? body.mode : '';
+    const prompt = typeof body?.prompt === 'string' ? body.prompt.trim() : '';
+    const config = MODE_CONFIG[mode];
 
-    if (!isAIAvailable()) return NextResponse.json({ error: 'AI service not configured' }, { status: 503 });
-
-    const basePrompts: Record<string, string> = {
-      course: 'Generate a full course including title, summary, description, objectives (as array), modules (as array with titles and descriptions), and lessons (as array with titles) in JSON format. Make it comprehensive and educational.',
-      module: 'Generate a module with title, description, learning outcomes (as array), and lesson names (as array) in JSON format. Make it detailed and structured.',
-      lesson: "Generate a full lesson with title, content (in HTML format), objectives (as array), step-by-step teaching text (in HTML), activities, and summary. Return as JSON with an 'html' field containing the formatted content.",
-      quiz: 'Generate a 10-question quiz in JSON format. Each question should have: question text, options (array of 4 choices), correctAnswer (index 0-3), and explanation. Make questions relevant and educational.',
-      objectives: 'Generate 5-8 strong, measurable learning objectives in JSON format as an array. Use action verbs (analyze, create, evaluate, etc.) and be specific about what learners will achieve.',
-      images: 'Generate 10 detailed AI image prompts in JSON format as an array. Each prompt should describe a relevant educational image for course materials, hero banners, or section illustrations. Be specific about style, composition, and educational context.',
-    };
-
-    const finalPrompt = `${basePrompts[mode]}\n\nUser request: ${prompt}\n\nIMPORTANT: Return ONLY valid JSON, no markdown formatting or code blocks.`;
-
-    const response = await aiChat({
-      model: 'gpt-4.1',
-      messages: [
-        { role: 'system', content: 'You are an expert instructional designer and curriculum developer. Create high-quality, engaging educational content that follows best practices in pedagogy and learning design. Always return valid JSON.' },
-        { role: 'user', content: finalPrompt },
-      ],
-      temperature: 0.7,
-      maxTokens: 4000,
-    });
-
-    const output = response.content;
-    let parsedOutput;
-    try {
-      const cleanOutput = output?.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsedOutput = JSON.parse(cleanOutput || '{}');
-    } catch {
-      parsedOutput = { content: output, raw: true };
+    if (!config || !prompt) {
+      return NextResponse.json(
+        { error: 'A supported mode and non-empty prompt are required' },
+        { status: 400 },
+      );
+    }
+    if (!isAIAvailable()) {
+      return NextResponse.json({ error: 'AI service not configured' }, { status: 503 });
     }
 
-    return NextResponse.json({ mode, output: parsedOutput, raw: output, success: true });
+    const response = await runAITask({
+      task: config.task,
+      prompt: `${config.instruction}\n\nUser request: ${prompt}\n\nReturn valid JSON only. Do not use markdown fences or placeholders.`,
+      context: {
+        userId: auth.userId ?? undefined,
+        topic: prompt.slice(0, 200),
+      },
+      maxTokens: 4000,
+      temperature: 0.4,
+    });
+
+    let output: unknown;
+    try {
+      output = parseStructuredOutput(response.content);
+    } catch (error) {
+      logger.warn('[generate-course] Structured output validation failed', {
+        mode,
+        provider: response.provider,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return NextResponse.json(
+        { error: 'AI returned invalid structured course content', retryable: true },
+        { status: 502 },
+      );
+    }
+
+    return NextResponse.json({
+      mode,
+      output,
+      success: true,
+      provider: response.provider,
+      canonicalOrchestrator: true,
+      reviewStatus: 'draft_for_human_review',
+    });
   } catch (error) {
     logger.error('AI generation error:', error instanceof Error ? error : new Error(String(error)));
     return safeInternalError(error as Error, 'Failed to generate content');
   }
 }
+
 export const POST = withApiAudit('/api/ai/generate-course', _POST);

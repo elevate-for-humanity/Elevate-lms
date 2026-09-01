@@ -1,18 +1,12 @@
 import { logger } from '@/lib/logger';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { NextRequest, NextResponse } from 'next/server';
-import { aiChat } from '@/lib/ai/ai-service';
+import { runAITask } from '@/lib/ai/orchestrator';
 import { getRecommendedTemplate } from '@/lib/templates/designs';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { apiAuthGuard } from '@/lib/admin/guards';
 
-/**
- * POST /api/ai/generate-site
- *
- * AI generates a complete site configuration based on user input.
- * Returns preview config that can be used to render a preview site.
- */
 async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -21,78 +15,64 @@ async function _POST(request: NextRequest) {
     const auth = await apiAuthGuard(request);
     if (auth.error) return auth.error;
 
-    const body = await request.json();
-    const {
-      organizationName,
-      organizationType,
-      industry,
-      targetAudience,
-      trainingTypes,
-      brandColors,
-      description,
-    } = body;
+    const body = await request.json().catch(() => null);
+    const organizationName = typeof body?.organizationName === 'string' ? body.organizationName.trim() : '';
+    const organizationType = typeof body?.organizationType === 'string' ? body.organizationType.trim() : '';
+    const industry = typeof body?.industry === 'string' ? body.industry.trim() : 'General';
+    const targetAudience = typeof body?.targetAudience === 'string' ? body.targetAudience.trim() : '';
+    const trainingTypes = typeof body?.trainingTypes === 'string' ? body.trainingTypes.trim() : '';
+    const brandColors = typeof body?.brandColors === 'string' ? body.brandColors.trim() : '';
+    const description = typeof body?.description === 'string' ? body.description.trim() : '';
 
     if (!organizationName || !organizationType) {
       return NextResponse.json({ error: 'Organization name and type required' }, { status: 400 });
     }
 
-    const template = getRecommendedTemplate(
-      industry || 'General',
-      organizationType || 'Training Provider',
-    );
+    const template = getRecommendedTemplate(industry || 'General', organizationType);
+    const result = await runAITask({
+      task: 'general_chat',
+      context: { userId: auth.id, skipRAG: true },
+      temperature: 0.6,
+      maxTokens: 2200,
+      prompt: `Generate an original website draft from the verified owner-supplied facts below.
 
-    const prompt = `You are a learning management system configuration expert. Generate compelling content for a training organization website.
+Organization: ${organizationName}
+Type: ${organizationType}
+Industry: ${industry || 'General'}
+Target audience: ${targetAudience || 'Not supplied'}
+Training types: ${trainingTypes || 'Not supplied'}
+Description: ${description || 'Not supplied'}
 
-Organization Details:
-- Name: ${organizationName}
-- Type: ${organizationType}
-- Industry: ${industry || 'General'}
-- Target Audience: ${targetAudience || 'Adult learners'}
-- Training Types: ${trainingTypes || 'Professional development'}
-- Description: ${description || 'Not provided'}
-
-Generate a JSON configuration with COMPELLING, SPECIFIC content:
-1. homepage: { 
-   heroTitle: (powerful headline, 6-10 words, specific to their industry),
-   heroSubtitle: (benefit-focused, 15-25 words),
-   heroCtaText: (action verb + benefit, 2-4 words),
-   features: [3 objects with { title, description } - specific to their training type]
-}
-2. programs: [3 training programs with { name, description (2 sentences), duration, level }]
-3. stats: { students: number, completionRate: "XX%", employers: number, rating: "X.X" }
-4. testimonial: { quote: (realistic student success story, 2 sentences), author: "Name, Title" }
-5. seo: { title, description, keywords: [5 relevant keywords] }
-
-Be specific to ${industry || 'their'} industry. Use real-sounding program names.
-Return ONLY valid JSON, no markdown.`;
-
-    const completion = await aiChat({
-      model: 'gpt-4.1',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a site configuration generator. Return only valid JSON.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.7,
-      maxTokens: 2000,
+Return JSON only with homepage, programs, and seo. Homepage must include heroTitle, heroSubtitle, heroCtaText, and three features. Programs may only use programs explicitly supported by the supplied facts; otherwise return an empty array. Do not generate statistics, ratings, reviews, testimonials, accreditation, approvals, prices, contact details, outcome claims, or other facts the owner did not supply.`,
     });
 
-    const responseText = completion.content || '';
-
-    let siteConfig;
+    let siteConfig: any;
     try {
-      const jsonStr = responseText.replace(/```json\n?|\n?```/g, '').trim();
-      siteConfig = JSON.parse(jsonStr);
-    } catch (parseError) {
-      logger.error('Failed to parse AI response', new Error(String(parseError)));
-      siteConfig = getDefaultConfig(organizationName, organizationType);
+      siteConfig = JSON.parse(result.content.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim());
+    } catch (error) {
+      logger.warn('[generate-site] invalid structured AI response', {
+        provider: result.provider,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return NextResponse.json(
+        { error: 'AI returned invalid structured website content', retryable: true },
+        { status: 502 },
+      );
     }
 
     const previewId = `preview_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    const requiredClaims = [
+      'student_count',
+      'completion_rate',
+      'employer_count',
+      'rating',
+      'testimonial',
+      'accreditation',
+      'pricing',
+      'contact_email',
+    ].map((key) => ({ key, status: 'owner_verification_required', value: null, source: null }));
 
-    const finalConfig = {
+    const config = {
       template: {
         id: template.id,
         name: template.name,
@@ -107,49 +87,17 @@ Return ONLY valid JSON, no markdown.`;
         backgroundColor: template.colors.background,
         textColor: template.colors.text,
         logoText: organizationName,
-        tagline: siteConfig.homepage?.heroSubtitle?.slice(0, 60) || 'Empowering learners',
+        tagline: siteConfig.homepage?.heroSubtitle?.slice(0, 60) || '',
       },
       homepage: {
-        heroTitle: siteConfig.homepage?.heroTitle || `Welcome to ${organizationName}`,
-        heroSubtitle: siteConfig.homepage?.heroSubtitle || 'Start your learning journey today.',
-        heroCtaText: siteConfig.homepage?.heroCtaText || 'Explore Programs',
-        features: siteConfig.homepage?.features || [
-          { title: 'Expert Training', description: 'Learn from industry professionals' },
-          { title: 'Flexible Learning', description: 'Study at your own pace' },
-          { title: 'Career Support', description: 'Job placement assistance' },
-        ],
+        heroTitle: siteConfig.homepage?.heroTitle || organizationName,
+        heroSubtitle: siteConfig.homepage?.heroSubtitle || description,
+        heroCtaText: siteConfig.homepage?.heroCtaText || 'Learn More',
+        features: Array.isArray(siteConfig.homepage?.features) ? siteConfig.homepage.features.slice(0, 3) : [],
       },
-      programs: siteConfig.programs || [
-        {
-          name: 'Fundamentals',
-          description: 'Build your foundation',
-          duration: '4 weeks',
-          level: 'Beginner',
-        },
-        {
-          name: 'Advanced',
-          description: 'Take skills further',
-          duration: '8 weeks',
-          level: 'Intermediate',
-        },
-        {
-          name: 'Professional',
-          description: 'Industry certification',
-          duration: '12 weeks',
-          level: 'Advanced',
-        },
-      ],
-      stats: siteConfig.stats || {
-        students: 500,
-        completionRate: '94%',
-        employers: 50,
-        rating: '4.9',
-      },
-      testimonial: siteConfig.testimonial || {
-        quote:
-          'This program changed my career trajectory completely. The instructors were amazing.',
-        author: 'Recent Graduate',
-      },
+      programs: Array.isArray(siteConfig.programs) ? siteConfig.programs : [],
+      stats: null,
+      testimonial: null,
       navigation: [
         { label: 'Home', href: '/' },
         { label: 'Programs', href: '/programs' },
@@ -157,13 +105,18 @@ Return ONLY valid JSON, no markdown.`;
         { label: 'Contact', href: '/contact' },
       ],
       footer: {
-        description: `${organizationName} provides quality training and education for career advancement.`,
-        contactEmail: `info@${organizationName.toLowerCase().replace(/\s+/g, '')}.org`,
+        description: description || `${organizationName} website draft.`,
+        contactEmail: null,
       },
       seo: siteConfig.seo || {
-        title: `${organizationName} - Professional Training`,
-        description: `${organizationName} offers industry-recognized training programs.`,
-        keywords: ['training', 'education', 'career'],
+        title: organizationName,
+        description: description || `${organizationName} website`,
+        keywords: [],
+      },
+      claims: requiredClaims,
+      publishing: {
+        blockedClaims: requiredClaims.map((claim) => claim.key),
+        requiresOwnerVerification: true,
       },
       meta: {
         organizationName,
@@ -171,89 +124,21 @@ Return ONLY valid JSON, no markdown.`;
         industry: industry || 'General',
         generatedAt: new Date().toISOString(),
         previewId,
+        provider: result.provider,
+        generatedClaimsPolicy: 'verified-input-only',
       },
     };
 
     return NextResponse.json({
       success: true,
       previewId,
-      config: finalConfig,
+      config,
       previewUrl: `/preview/${previewId}`,
     });
   } catch (error) {
-    logger.error(
-      'AI generation error',
-      normalizeError(error, 'AI generation failed'),
-      getErrorContext(error),
-    );
+    logger.error('AI generation error', normalizeError(error, 'AI generation failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to generate site configuration' }, { status: 500 });
   }
-}
-
-function getDefaultConfig(name: string, type: string) {
-  const colors = {
-    workforce_board: { primary: '#1e40af', secondary: '#3b82f6', accent: '#f59e0b' },
-    training_provider: { primary: '#059669', secondary: '#10b981', accent: '#f97316' },
-    nonprofit: { primary: '#7c3aed', secondary: '#8b5cf6', accent: '#ec4899' },
-    employer: { primary: '#0f172a', secondary: '#334155', accent: '#3b82f6' },
-  };
-
-  const colorSet = colors[type as keyof typeof colors] || colors.training_provider;
-
-  return {
-    branding: {
-      primaryColor: colorSet.primary,
-      secondaryColor: colorSet.secondary,
-      accentColor: colorSet.accent,
-      logoText: name,
-      tagline: 'Empowering learners through quality training',
-    },
-    homepage: {
-      heroTitle: `Welcome to ${name}`,
-      heroSubtitle: 'Start your learning journey today with industry-recognized training programs.',
-      heroCtaText: 'Explore Programs',
-      features: [
-        { title: 'Expert Instructors', description: 'Learn from industry professionals' },
-        { title: 'Flexible Learning', description: 'Study at your own pace, anywhere' },
-        { title: 'Career Support', description: 'Job placement assistance included' },
-      ],
-    },
-    programs: [
-      {
-        name: 'Fundamentals Course',
-        description: 'Build your foundation',
-        duration: '4 weeks',
-        level: 'Beginner',
-      },
-      {
-        name: 'Advanced Training',
-        description: 'Take your skills further',
-        duration: '8 weeks',
-        level: 'Intermediate',
-      },
-      {
-        name: 'Professional Certification',
-        description: 'Industry-recognized credential',
-        duration: '12 weeks',
-        level: 'Advanced',
-      },
-    ],
-    navigation: [
-      { label: 'Home', href: '/' },
-      { label: 'Programs', href: '/programs' },
-      { label: 'About', href: '/about' },
-      { label: 'Contact', href: '/contact' },
-    ],
-    footer: {
-      description: `${name} is dedicated to providing quality training and education.`,
-      contactEmail: `info@${name.toLowerCase().replace(/\s+/g, '')}.org`,
-    },
-    seo: {
-      title: `${name} - Professional Training Programs`,
-      description: `${name} offers training programs for career advancement.`,
-      keywords: ['training', 'education', 'professional development', 'certification'],
-    },
-  };
 }
 
 export const POST = withApiAudit('/api/ai/generate-site', _POST);

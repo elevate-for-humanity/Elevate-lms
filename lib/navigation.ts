@@ -6,6 +6,7 @@ import { ROUTES } from '@/lib/navigation/routes';
 
 export type { NavItem, NavSubItem } from '@/types/navigation';
 
+// Keep public programs discoverable by name in both desktop and mobile navigation.
 export const NAV_ITEMS: NavItem[] = [
   {
     id: 'programs',

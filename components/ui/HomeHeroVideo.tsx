@@ -181,6 +181,9 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   const [paused, setPaused] = useState(false);
   const transitionTimerRef = useRef<number | null>(null);
   const slide = slides[activeSlide] ?? slides[0];
+  const slideNarration = slide ? `${slide.label}. ${slide.description}` : '';
+  const nextSlide = slides[(activeSlide + 1) % slides.length];
+  const nextSlideNarration = nextSlide ? `${nextSlide.label}. ${nextSlide.description}` : '';
 
   const transitionToSlide = useCallback(
     (index: number) => {
@@ -240,29 +243,28 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   }, []);
 
   useEffect(() => {
-    const nextSlide = slides[(activeSlide + 1) % slides.length];
-    if (nextSlide) void prepare(`${nextSlide.label}. ${nextSlide.description}`, {
+    if (nextSlideNarration) void prepare(nextSlideNarration, {
       voice: 'coral',
       style: 'commercial',
       rate: 0.98,
     });
-  }, [activeSlide, prepare, slides]);
+  }, [activeSlide, nextSlideNarration, prepare]);
 
   useEffect(() => {
-    if (!heroVisible || paused || !slide) {
+    if (!heroVisible || paused || !slideNarration) {
       if (!heroVisible) stop();
       return;
     }
 
     const timer = window.setTimeout(() => {
-      void play(`${slide.label}. ${slide.description}`, {
+      void play(slideNarration, {
         voice: 'coral',
         style: 'commercial',
         rate: 0.98,
       });
     }, 250);
     return () => window.clearTimeout(timer);
-  }, [activeSlide, heroVisible, paused, play, slide, stop]);
+  }, [activeSlide, heroVisible, paused, play, slideNarration, stop]);
 
   const selectSlide = useCallback((index: number) => transitionToSlide(index), [transitionToSlide]);
 

@@ -55,6 +55,12 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
               const image = shop.slug === 'razors-image-barbershop'
                 ? { src: '/images/partners/razors-image-video-poster.webp', alt: "Razor's Image host barbershop representative", kind: 'photo' as const }
                 : stillMedia[1] ?? stillMedia[0];
+              const secondaryImage = shop.slug === 'razors-image-barbershop'
+                ? {
+                    src: '/images/partners/razors-image-apprenticeship-flyer.webp',
+                    alt: "Razor's Image Barber Apprenticeship Program artwork",
+                  }
+                : undefined;
               const video = shop.slug === 'razors-image-barbershop'
                 ? { src: '/videos/partners/razors-image-host-barbershop.mp4', alt: "Razor's Image owner describing the barber apprenticeship opportunity", kind: 'video' as const }
                 : shop.media?.find((media) => media.kind === 'video');
@@ -66,18 +72,44 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
                 >
                   {video ? (
                     <div className="bg-slate-950 px-4 py-5 sm:px-6">
-                      <div className="mx-auto max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-black shadow-xl">
-                        <video
-                          controls
-                          playsInline
-                          preload="metadata"
-                          poster={image?.src}
-                          aria-label={video.alt}
-                          className="aspect-[9/16] max-h-[680px] w-full bg-black object-contain"
-                        >
-                          <source src={video.src} type="video/mp4" />
-                          Your browser does not support embedded video.
-                        </video>
+                      <div className={secondaryImage ? 'grid items-stretch gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(150px,0.72fr)]' : ''}>
+                        <div className="mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
+                          <video
+                            controls
+                            playsInline
+                            preload="metadata"
+                            poster={image?.src}
+                            aria-label={video.alt}
+                            className="aspect-[9/16] max-h-[680px] w-full bg-black object-contain"
+                          >
+                            <source src={video.src} type="video/mp4" />
+                            Your browser does not support embedded video.
+                          </video>
+                        </div>
+                        {secondaryImage ? (
+                          <div className="grid gap-4">
+                            {image ? (
+                              <div className="relative min-h-52 overflow-hidden rounded-2xl border border-white/15 bg-white shadow-xl">
+                                <Image
+                                  src={image.src}
+                                  alt={image.alt}
+                                  fill
+                                  sizes="(max-width: 640px) 100vw, 24vw"
+                                  className="object-cover"
+                                />
+                              </div>
+                            ) : null}
+                            <div className="relative min-h-52 overflow-hidden rounded-2xl border border-white/15 bg-white shadow-xl">
+                              <Image
+                                src={secondaryImage.src}
+                                alt={secondaryImage.alt}
+                                fill
+                                sizes="(max-width: 640px) 100vw, 24vw"
+                                className="object-contain"
+                              />
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
                       <div className="mx-auto mt-4 max-w-xl text-center text-white">
                         <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-red-300">

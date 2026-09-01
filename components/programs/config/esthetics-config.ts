@@ -10,8 +10,8 @@ export const estheticsConfig: ProgramConfig = {
   primaryCta: { label: 'Apply Now', href: '/programs/esthetician-apprenticeship/apply' },
   secondaryCta: { label: 'Schedule a Tour', href: '/contact' },
   stats: [
-    { value: '700+', label: 'Training Hours' },
-    { value: '12-18', label: 'Months' },
+    { value: '20', label: 'Appendix A Competencies' },
+    { value: '300', label: 'RTI Hours' },
     { value: '$0', label: 'with Funding' },
   ],
 

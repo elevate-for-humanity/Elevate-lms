@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import type { VideoJob } from '@/lib/video/job-queue';
 import { processClaimedVideoJob } from '@/lib/video/process-video-job';
 import { finalizeCourseAutomaticallyIfReadyWithClient } from '@/lib/course-builder/persisted-publish-service';
+import { COURSE_MEDIA_STALE_RENDER_MS } from '@/lib/course-factory/media-manager';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -57,10 +58,19 @@ export async function POST(request: NextRequest) {
   // Capacity is global even when candidate selection is course-scoped. This
   // prevents an acceptance/repair run from overbooking Chromium while another
   // course already owns render slots.
+  const now = new Date();
+  const staleBefore = new Date(now.getTime() - COURSE_MEDIA_STALE_RENDER_MS).toISOString();
   const { count: activeCount, error: activeError } = await db
     .from('video_jobs')
     .select('id', { count: 'exact', head: true })
-    .eq('status', 'rendering');
+    .eq('status', 'rendering')
+    // A crashed worker may leave status=rendering behind after its lease has
+    // expired. It must remain available for audited recovery, but it no longer
+    // owns scarce renderer capacity. Legacy rows without a lease count as
+    // active only inside the same stale-render safety window.
+    .or(
+      `lease_expires_at.gt.${now.toISOString()},and(lease_expires_at.is.null,started_at.gt.${staleBefore})`,
+    );
   if (activeError) {
     return NextResponse.json({ error: 'Unable to inspect the video queue' }, { status: 500 });
   }

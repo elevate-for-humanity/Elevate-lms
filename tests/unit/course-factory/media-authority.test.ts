@@ -50,12 +50,14 @@ describe('canonical Course Factory media architecture', () => {
     expect(manager).toContain('Retry backoff has not elapsed');
   });
 
-  it('recovers stale rendering through Course Factory rather than the renderer route', () => {
+  it('keeps stale-state recovery in Course Factory while expired leases release capacity', () => {
     const manager = read('lib/course-factory/media-manager.ts');
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
     expect(manager).toContain('COURSE_MEDIA_STALE_RENDER_MS');
     expect(manager).toContain('Recovered stale rendering job through Course Factory policy');
-    expect(worker).not.toContain('staleBefore');
+    expect(worker).toContain('lease_expires_at.gt.');
+    expect(worker).toContain('started_at.gt.');
+    expect(worker).not.toContain('resetCanonicalMediaJob');
     expect(worker).not.toContain('retried403');
     expect(worker).not.toContain('Unexpected server response: 403');
   });

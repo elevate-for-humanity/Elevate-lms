@@ -83,12 +83,14 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
 
   useEffect(() => {
     if (!slides.length) return;
-    const nextSlides = [1, 2].map((offset) => slides[(activeIndex + offset) % slides.length]);
-    nextSlides.forEach((slide) => {
-      if (!slide?.media?.src) return;
-      const preload = new window.Image();
-      preload.src = slide.media.src;
-    });
+    const nextSlide = slides[(activeIndex + 1) % slides.length];
+    if (!nextSlide?.media?.src || nextSlide.media.kind === 'video') return;
+
+    // Warm only the next still image. Treating MP4 tours as images caused the
+    // browser to download media users had not reached yet and competed with the
+    // visible page for bandwidth.
+    const preload = new window.Image();
+    preload.src = nextSlide.media.src;
   }, [activeIndex, slides]);
 
   if (!slides.length) return null;

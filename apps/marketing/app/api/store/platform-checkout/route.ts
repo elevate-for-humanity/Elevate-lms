@@ -99,7 +99,10 @@ export async function POST(request: NextRequest) {
   const tenantId = await resolveTenantIdForUser(user.id);
   if (!tenantId) {
     return NextResponse.json(
-      { error: 'Start your organization trial first so the subscription can be attached to the correct workspace.', trialUrl: '/store/trial' },
+      {
+        error: 'Set up the organization workspace first so the subscription can be attached to the correct buyer and entitlements.',
+        trialUrl: `/store/trial?purchase=1&plan=${encodeURIComponent(plan.id)}&interval=${interval}&recommended=${encodeURIComponent(addonSlugs.join(','))}`,
+      },
       { status: 409 },
     );
   }
@@ -107,7 +110,10 @@ export async function POST(request: NextRequest) {
   const billingOrganizationId = await resolveBillingOrganizationId(tenantId, admin);
   if (!billingOrganizationId) {
     return NextResponse.json(
-      { error: 'Your workspace is not linked to a billing organization yet.', trialUrl: '/store/trial' },
+      {
+        error: 'Complete organization billing setup before secure payment.',
+        trialUrl: `/store/trial?purchase=1&plan=${encodeURIComponent(plan.id)}&interval=${interval}&recommended=${encodeURIComponent(addonSlugs.join(','))}`,
+      },
       { status: 409 },
     );
   }

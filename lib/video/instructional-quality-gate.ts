@@ -54,7 +54,11 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
   const courseDomain = domain(input.courseTitle);
   const minimumWordCount = minimumWords(input);
   const combinedInstructor = `${input.instructor.id} ${input.instructor.title} ${input.instructor.specialty}`.toLowerCase();
-  const demonstrationClaimed = /\b(watch|observe|you (?:can|will) see|here (?:is|you see)|demonstrat(?:e|es|ed|ion)|shown? (?:here|on screen))\b/i.test(input.script);
+  // A competency phrase such as "demonstrate mastery" is not a promise that
+  // the learner will see a visual procedure. Require an explicit viewing cue
+  // or a first-person demonstration promise before enforcing sourced/close-up
+  // visual evidence.
+  const demonstrationClaimed = /\b(watch|observe|you (?:can|will) see|here (?:is|you see)|(?:i|we) (?:will|'ll) demonstrate|this demonstration|shown? (?:here|on screen))\b/i.test(input.script);
   const demonstrationScenes = input.storyboard.scenes.filter((scene) =>
     Boolean(scene.requiredVisualEvidence) &&
     (/close-up|extreme-close-up/.test(scene.shotSize) || Boolean(scene.referenceImageUrl || scene.sourceVideoUrl)),

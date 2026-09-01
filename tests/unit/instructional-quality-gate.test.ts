@@ -48,4 +48,14 @@ describe('instructional quality gate', () => {
     expect(result.failures.some((failure) => failure.includes('too short'))).toBe(true);
     expect(result.failures.some((failure) => failure.includes('claims a visual demonstration'))).toBe(true);
   });
+
+  it('does not treat competency mastery language as a visual demonstration claim', () => {
+    const result = instructionalQualityFailures({
+      courseTitle: 'Cosmetology Apprenticeship', lessonTitle: 'Sanitation and Disinfection',
+      script: `${longInstruction} Demonstrate mastery of sanitation and disinfection before progressing.`,
+      instructor, storyboard: storyboard(false),
+    });
+    expect(result.evidence.demonstrationClaimed).toBe(false);
+    expect(result.failures).toEqual([]);
+  });
 });

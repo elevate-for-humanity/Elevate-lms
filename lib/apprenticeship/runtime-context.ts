@@ -28,7 +28,7 @@ export async function resolveApprenticeshipRuntimeContext(
   let enrollmentQuery = db
     .from('program_enrollments')
     .select(
-      'id,user_id,student_id,program_id,program_slug,status,enrollment_state,host_shop_id,supervisor_id,rapids_status,rapids_id,course_id,orientation_completed_at,documents_submitted_at,access_granted_at,payment_status,funding_status,created_at',
+      'id,user_id,student_id,program_id,program_slug,status,enrollment_state,host_shop_id,supervisor_id,rapids_status,rapids_id,course_id,orientation_completed_at,documents_submitted_at,access_granted_at,payment_status,funding_status,transfer_hours,transfer_hours_verified,transfer_hours_verified_at,transfer_hours_source,created_at',
     );
 
   if (input.enrollmentId) enrollmentQuery = enrollmentQuery.eq('id', input.enrollmentId);

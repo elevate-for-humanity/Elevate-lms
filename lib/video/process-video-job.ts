@@ -212,7 +212,6 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         .maybeSingle();
       tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
     }
-    const baseScript = job.script?.trim() || job.lesson_title;
     const bulletPoints = Array.isArray(job.bullet_points) ? job.bullet_points : [];
     const persistedSceneData =
       job.scene_data && typeof job.scene_data === 'object'
@@ -221,7 +220,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     const { data: lesson } = await db
       .from('course_lessons')
       .select(
-        'content,content_json,domain_key,compliance_profile_key,lesson_type,evidence_type,video_config',
+        'content,content_json,domain_key,compliance_profile_key,lesson_type,evidence_type,video_config,script,script_text',
       )
       .eq('id', job.lesson_id)
       .maybeSingle();
@@ -229,6 +228,20 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       lesson?.video_config && typeof lesson.video_config === 'object'
         ? (lesson.video_config as Record<string, unknown>)
         : {};
+    // The lesson is the canonical source of truth. Jobs can survive course
+    // repairs and deployments, so their persisted script may contain stale
+    // trade or instructor identity. Prefer the current governed narration and
+    // keep the job copy only as a compatibility fallback.
+    const baseScript = [
+      lesson?.script_text,
+      lesson?.script,
+      videoConfig.narration,
+      videoConfig.transcript,
+      job.script,
+      job.lesson_title,
+    ]
+      .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
+      ?.trim() ?? job.lesson_title;
     const configuredInstructorId = [videoConfig.instructorId, videoConfig.instructor_id]
       .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
       ?.trim() ?? '';

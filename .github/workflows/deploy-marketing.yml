@@ -221,9 +221,10 @@ jobs:
               && grep -q 'Earn while you learn—or become a Host Shop for free.' /tmp/www-home.html \
               && grep -q 'Barber Apprenticeship' /tmp/www-barber.html \
               && grep -q 'Esthetician Apprenticeship Pathway' /tmp/www-esthetics.html \
-              && grep -q '700-hour' /tmp/www-esthetics.html \
+              && grep -q '300 related-instruction hours' /tmp/www-esthetics.html \
+              && grep -q 'RAPIDS occupation 2089CB' /tmp/www-esthetics.html \
+              && ! grep -q '700-hour' /tmp/www-esthetics.html \
               && ! grep -q 'Professional Esthetician & Client Services' /tmp/www-esthetics.html \
-              && ! grep -q 'DOL Registered Apprenticeship' /tmp/www-esthetics.html \
               && grep -q '/programs/esthetician-apprenticeship' /tmp/www-sitemap.xml; then
               html_ok=true
             fi

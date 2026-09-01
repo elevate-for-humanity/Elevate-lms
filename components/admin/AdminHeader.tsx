@@ -124,7 +124,7 @@ export default function AdminHeader() {
 
   return (
     <>
-      <div className="sticky top-0 z-50 border-b border-slate-200 bg-white text-slate-900 shadow-sm">
+      <div className="admin-header-shell sticky top-0 z-50 border-b border-slate-200 bg-white text-slate-900 shadow-sm">
         <div className="mx-auto max-w-7xl px-3 sm:px-6">
           <div className="flex min-h-16 items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-3">
@@ -152,7 +152,7 @@ export default function AdminHeader() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex min-h-11 items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-bold transition-all ${
+                    className={`admin-nav-link flex min-h-11 items-center gap-1.5 rounded-md px-2.5 py-2 text-xs font-bold transition-all ${
                       isActive ? 'bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-200' : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950'
                     }`}
                   >
@@ -237,7 +237,7 @@ export default function AdminHeader() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setNavExpanded(false)}
-                    className={`flex min-h-11 flex-shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all ${
+                    className={`admin-nav-link flex min-h-11 flex-shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all ${
                       isActive ? 'bg-orange-500 text-white' : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-100'
                     }`}
                   >
@@ -251,6 +251,16 @@ export default function AdminHeader() {
       </div>
 
       <style jsx>{`
+        @keyframes admin-shell-enter { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .admin-header-shell { animation: admin-shell-enter 320ms ease-out both; }
+        .admin-nav-link { transition: color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
+        .admin-nav-link:hover { transform: translateY(-1px); }
+        .admin-nav-link:active { transform: translateY(0) scale(0.98); }
+        @media (prefers-reduced-motion: reduce) {
+          .admin-header-shell { animation: none; }
+          .admin-nav-link { transition: none; }
+          .admin-nav-link:hover, .admin-nav-link:active { transform: none; }
+        }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>

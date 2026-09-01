@@ -5,35 +5,15 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
-const SCROLL_SETTLE_MS = 140;
+const SCROLL_SETTLE_MS = 900;
 
 function narrationFor(section: HTMLElement) {
-  const supplied = section.dataset.narration?.trim();
-  if (supplied) return supplied;
-
-  const heading = section.querySelector<HTMLElement>('h1, h2, h3');
-  const paragraphs = Array.from(section.querySelectorAll<HTMLElement>('p')).slice(0, 2);
-  const benefits = Array.from(section.querySelectorAll<HTMLElement>('li')).slice(0, 4);
-  const actions = Array.from(section.querySelectorAll<HTMLElement>('a, button'))
-    .map((item) => item.innerText.trim())
-    .filter(Boolean)
-    .slice(0, 2);
-  return [
-    heading?.innerText,
-    ...paragraphs.map((item) => item.innerText),
-    benefits.length ? `Key benefits: ${benefits.map((item) => item.innerText).join('. ')}` : '',
-    actions.length ? `Next steps: ${actions.join(' or ')}.` : '',
-  ]
-    .filter(Boolean)
-    .join('. ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 1800);
+  return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';
 }
 
 function mostVisiblePageSection() {
   const sections = Array.from(
-    document.querySelectorAll<HTMLElement>('main section, main > [data-scroll-narration]'),
+    document.querySelectorAll<HTMLElement>('main [data-scroll-narration]'),
   ).filter((section) => section.dataset.narrationDisabled !== 'true');
   let best: { section: HTMLElement; visibleRatio: number } | null = null;
 
@@ -71,8 +51,8 @@ export function ScrollNarrator() {
     lastNarrationRef.current = { section, text };
     const started = await play(text, {
       voice: 'coral',
-      style: 'instructor',
-      rate: 1,
+      style: 'assistant',
+      rate: 0.92,
     });
     if (!started) {
       lastNarrationRef.current = null;
@@ -90,7 +70,7 @@ export function ScrollNarrator() {
     const section = mostVisiblePageSection();
     if (!section) return;
     const text = narrationFor(section);
-    if (text) void prepare(text, { voice: 'coral', style: 'instructor', rate: 1 });
+    if (text) void prepare(text, { voice: 'coral', style: 'assistant', rate: 0.92 });
   }, [enabled, pathname, prepare]);
 
   useEffect(() => {
@@ -108,24 +88,19 @@ export function ScrollNarrator() {
       }, SCROLL_SETTLE_MS);
     };
 
-    const activateFromUserGesture = () => {
-      if (timerRef.current) window.clearTimeout(timerRef.current);
-      void narrateVisibleSection();
-    };
-
     window.addEventListener('scroll', scheduleNarration, { passive: true });
-    window.addEventListener('wheel', activateFromUserGesture, { passive: true });
-    window.addEventListener('touchstart', activateFromUserGesture, { passive: true });
-    window.addEventListener('pointerdown', activateFromUserGesture, { passive: true });
-    window.addEventListener('keydown', activateFromUserGesture);
+    window.addEventListener('wheel', scheduleNarration, { passive: true });
+    window.addEventListener('touchstart', scheduleNarration, { passive: true });
+    window.addEventListener('pointerdown', scheduleNarration, { passive: true });
+    window.addEventListener('keydown', scheduleNarration);
     window.addEventListener('resize', scheduleNarration);
 
     return () => {
       window.removeEventListener('scroll', scheduleNarration);
-      window.removeEventListener('wheel', activateFromUserGesture);
-      window.removeEventListener('touchstart', activateFromUserGesture);
-      window.removeEventListener('pointerdown', activateFromUserGesture);
-      window.removeEventListener('keydown', activateFromUserGesture);
+      window.removeEventListener('wheel', scheduleNarration);
+      window.removeEventListener('touchstart', scheduleNarration);
+      window.removeEventListener('pointerdown', scheduleNarration);
+      window.removeEventListener('keydown', scheduleNarration);
       window.removeEventListener('resize', scheduleNarration);
       if (timerRef.current) window.clearTimeout(timerRef.current);
     };

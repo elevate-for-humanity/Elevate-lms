@@ -48,7 +48,7 @@ export default function EstheticianOrientationPage() {
       content: (
         <div className="space-y-4">
           <p>
-            The {config.programTitle} is aligned to <strong>{config.hoursLabel}</strong> of Indiana esthetics education and supervised practice.
+            The {config.programTitle} follows a competency-based Appendix A standard requiring <strong>{config.hoursLabel}</strong> with supervised practice documented as auditable evidence.
           </p>
           <div className="grid gap-4 mt-4">
             <div className="bg-blue-50 p-4 rounded-lg">
@@ -75,7 +75,7 @@ export default function EstheticianOrientationPage() {
           <ul className="space-y-3">
             <li className="flex items-start gap-2">
               <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
-              <span><strong>Attend consistently.</strong> Required education and supervised-practice hours must be completed and documented.</span>
+              <span><strong>Attend consistently.</strong> Required RTI hours and all Appendix A competencies must be completed and documented; supervised work hours remain auditable evidence.</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>

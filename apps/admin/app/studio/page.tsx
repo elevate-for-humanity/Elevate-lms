@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, Bot, ShieldCheck, Wrench } from 'lucide-react';
 
 import StudioWorkspaceGrid from './StudioWorkspaceGrid.client';
-import UnifiedEllieChat from '@/components/studio/UnifiedEllieChat';
+import StudioCommandWorkspace from '@/components/studio/StudioCommandWorkspace';
 import { requireRole } from '@/lib/auth/require-role';
 import { getAvailableWorkspaces } from '@/lib/devstudio/workspace-registry';
 
@@ -65,7 +65,7 @@ export default async function StudioPage() {
           </div>
 
           <div className="h-[calc(100dvh-10rem)] min-h-[500px] min-w-0 max-h-[760px] sm:h-[68vh] sm:min-h-[620px] sm:max-h-[900px]">
-            <UnifiedEllieChat embedded />
+            <StudioCommandWorkspace />
           </div>
         </section>
 

@@ -115,6 +115,17 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(registry).toContain("featureFlag: 'LIVE_CANVAS_ENABLED'");
   });
 
+  it('keeps live preview and isolated browser inspection beside Admin AI', () => {
+    const page = source('apps/admin/app/studio/page.tsx');
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+
+    expect(page).toContain('StudioCommandWorkspace');
+    expect(workspace).toContain('<UnifiedEllieChat');
+    expect(workspace).toContain('<RepositoryLivePreview');
+    expect(workspace).toContain('<CloudBrowserWorkspace');
+    expect(workspace).toContain('Live inspection');
+  });
+
   it('validates GitHub credentials before declaring Studio execution ready', () => {
     const health = source('lib/devstudio/health-handler.ts');
     expect(health).toContain("fetch('https://api.github.com/user'");

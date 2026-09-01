@@ -91,10 +91,6 @@ export const STATIC_PROGRAM_MAP: ReadonlyMap<string, ProgramSchema> = new Map(
   STATIC_PROGRAMS.map((program) => [program.slug, program]),
 );
 
-const VERIFIED_RAPIDS_SLUGS = new Set<string>(
-  Object.values(RAPIDS_CONFIG.programs).map((program) => program.slug),
-);
-
 function hasNumericSelfPayPrice(program: ProgramSchema): boolean {
   const amount = Number(String(program.selfPayCost || '').replace(/[^0-9.]/g, ''));
   return Number.isFinite(amount) && amount > 0;

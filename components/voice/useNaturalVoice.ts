@@ -10,6 +10,7 @@ type PlayOptions = {
   rate?: number;
   onEnded?: () => void;
   onError?: () => void;
+  allowBrowserFallback?: boolean;
 };
 
 const naturalVoiceCache = new Map<string, Promise<Blob>>();
@@ -116,6 +117,7 @@ export async function speakNaturalVoice(text: string, options: PlayOptions = {})
     await audio.play();
     return true;
   } catch {
+    if (options.allowBrowserFallback === false) return false;
     const utterance = browserFallback(clean, options);
     return Boolean(utterance);
   }
@@ -186,6 +188,12 @@ export function useNaturalVoice() {
       return true;
     } catch {
       if (playbackToken !== playbackTokenRef.current) return false;
+      if (options.allowBrowserFallback === false) {
+        setIsLoading(false);
+        setError('Natural voice is temporarily unavailable.');
+        options.onError?.();
+        return false;
+      }
       const utterance = browserFallback(clean, options);
       if (!utterance) {
         setIsLoading(false);

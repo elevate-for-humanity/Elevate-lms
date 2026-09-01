@@ -1,4 +1,7 @@
-import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
+import {
+  createMiddlewareSupabaseClient,
+  hasSupabaseAuthCookie,
+} from '@/lib/supabase/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
@@ -61,6 +64,15 @@ function authCookieOptions(
   };
 }
 
+function redirectToLogin(req: NextRequest, pathname: string) {
+  const loginUrl = new URL(loginPathFor(pathname), req.url);
+  loginUrl.searchParams.set('redirect', `${pathname}${req.nextUrl.search}`);
+  const response = NextResponse.redirect(loginUrl);
+  response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+  response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  return response;
+}
+
 /**
  * Refresh Supabase sessions once at the LMS request boundary and persist any
  * rotated cookies. Protected portal routes fail closed for anonymous/expired
@@ -87,6 +99,11 @@ export async function middleware(req: NextRequest) {
   // without a network session refresh. A stale cross-subdomain cookie used to
   // make the public login shell wait on Supabase during an outage.
   if (protectedPath) {
+    // Do not spend the bounded Supabase network timeout proving that a request
+    // with no session cookie is anonymous. This keeps every role-specific PWA
+    // entry point responsive during a Supabase slowdown or cold start.
+    if (!hasSupabaseAuthCookie(req)) return redirectToLogin(req, pathname);
+
     const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
       cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
       response = NextResponse.next({ request: { headers: requestHeaders } });
@@ -104,14 +121,7 @@ export async function middleware(req: NextRequest) {
       error,
     } = await supabase.auth.getUser();
 
-    if (protectedPath && (error || !user)) {
-      const loginUrl = new URL(loginPathFor(pathname), req.url);
-      loginUrl.searchParams.set('redirect', `${pathname}${req.nextUrl.search}`);
-      const redirectResponse = NextResponse.redirect(loginUrl);
-      redirectResponse.headers.set('Cache-Control', 'private, no-store, max-age=0');
-      redirectResponse.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
-      return redirectResponse;
-    }
+    if (error || !user) return redirectToLogin(req, pathname);
   }
 
   response.cookies.set('__efh_pathname', pathname, {

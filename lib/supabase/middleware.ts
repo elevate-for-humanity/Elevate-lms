@@ -28,6 +28,26 @@ type CookieMutation = {
   options?: Record<string, unknown>;
 };
 
+/**
+ * Supabase SSR stores the session in one or more sb-<project>-auth-token
+ * cookies. Chunked sessions append a numeric suffix, so match the stable part
+ * of the name instead of requiring an exact suffix.
+ *
+ * This is only an anonymous-request fast path. A present cookie is never
+ * trusted here; getUser() still verifies it with Supabase before access is
+ * granted.
+ */
+export function hasSupabaseAuthCookie(request: Pick<NextRequest, 'cookies'>): boolean {
+  return request.cookies
+    .getAll()
+    .some(
+      ({ name, value }) =>
+        name.startsWith('sb-') &&
+        (name.endsWith('-auth-token') || /-auth-token\.\d+$/.test(name)) &&
+        value.trim().length > 0,
+    );
+}
+
 export function createMiddlewareSupabaseClient(
   request: NextRequest,
   setAll: (cookies: CookieMutation[]) => void,

@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
-import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
+import {
+  createMiddlewareSupabaseClient,
+  hasSupabaseAuthCookie,
+} from '@/lib/supabase/middleware';
 import { PRIVILEGED_MFA_ROLES, privilegedMfaEnforcementEnabled } from '@/lib/auth/privileged-mfa';
 import {
   ADMIN_ROLES,
@@ -85,6 +88,15 @@ function platformCookieOptions(options: Record<string, unknown> | undefined) {
   };
 }
 
+function unauthenticatedRedirect(req: NextRequest, pathname: string, search: string) {
+  const loginUrl = new URL('/login', req.url);
+  loginUrl.searchParams.set('redirect', `${pathname}${search}`);
+  const response = NextResponse.redirect(loginUrl);
+  response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+  response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  return response;
+}
+
 type PendingCookie = {
   name: string;
   value: string;
@@ -129,6 +141,11 @@ export async function middleware(req: NextRequest) {
   const ipBlocked = checkAdminIP(req);
   if (ipBlocked) return ipBlocked;
 
+  // Missing cookies are definitive: redirect locally instead of waiting up to
+  // eight seconds for a remote getUser() call that cannot authenticate anyone.
+  // Requests with cookies still receive full identity, role, and MFA checks.
+  if (!hasSupabaseAuthCookie(req)) return unauthenticatedRedirect(req, pathname, search);
+
   const pendingCookies: PendingCookie[] = [];
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', `${pathname}${search}`);
@@ -160,9 +177,7 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (error || !user) {
-    const loginUrl = new URL('/login', req.url);
-    loginUrl.searchParams.set('redirect', `${pathname}${search}`);
-    return withCookies(NextResponse.redirect(loginUrl));
+    return withCookies(unauthenticatedRedirect(req, pathname, search));
   }
 
   const [{ data: profile }, { data: roleRows }] = await Promise.all([

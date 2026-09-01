@@ -6,23 +6,24 @@ import { ArrowRight, BookOpen, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { TEAM } from '@/data/team';
 
 const PROGRAM = {
   slug: 'financial-literacy',
-  title: 'Financial Literacy Training',
+  title: 'Elevate Financial Empowerment Program',
   description:
-    'Practical training in budgeting, banking, credit, debt management, savings, taxes, pay statements, benefits, and financial recordkeeping.',
+    'A practical financial literacy course that helps participants take control of their finances and build a stronger financial future.',
   category: 'business',
 } as const;
 
 const canonical = `${PLATFORM_DEFAULTS.siteUrl}/programs/financial-literacy`;
 
 export const metadata: Metadata = {
-  title: 'Financial Literacy Training | Elevate for Humanity',
+  title: 'Elevate Financial Empowerment Program | Elevate for Humanity',
   description: PROGRAM.description,
   alternates: { canonical },
   openGraph: {
-    title: 'Financial Literacy Training | Elevate for Humanity',
+    title: 'Elevate Financial Empowerment Program | Elevate for Humanity',
     description: PROGRAM.description,
     url: canonical,
     siteName: PLATFORM_DEFAULTS.orgName,
@@ -31,13 +32,19 @@ export const metadata: Metadata = {
 };
 
 const topics = [
-  'Building a practical budget and spending plan',
-  'Banking accounts, fees, and consumer protections',
+  'Budgeting and personalized spending plans',
+  'Banking, account selection, fees, and financial services',
+  'Saving, emergency funds, and financial goal setting',
   'Credit reports, credit scores, and responsible borrowing',
-  'Debt-management and repayment strategies',
-  'Emergency savings and longer-term financial goals',
+  'Debt management and practical repayment strategies',
+  'Consumer rights, fraud prevention, and financial protection',
   'Taxes, pay statements, benefits, and financial records',
+  'Insurance fundamentals and managing financial risk',
+  'Basic investing and understanding how money can grow',
+  'Long-term wealth building and financial wellness planning',
 ];
+
+const instructor = TEAM.find((member) => member.name === 'Dr. Carlina Wilkes');
 
 export default function FinancialLiteracyPage() {
   return (
@@ -73,7 +80,7 @@ export default function FinancialLiteracyPage() {
             Business & Financial Skills
           </p>
           <h1 className="mt-3 max-w-4xl text-4xl font-black leading-tight sm:text-6xl">
-            Financial Literacy Training
+            Elevate Financial Empowerment Program
           </h1>
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-200">{PROGRAM.description}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -89,6 +96,36 @@ export default function FinancialLiteracyPage() {
             >
               Ask About Tuition
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-slate-200 bg-slate-50 px-4 py-14 sm:py-16">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-sm font-extrabold uppercase tracking-widest text-brand-red-700">
+            Learn it. Plan it. Apply it. Build your future.
+          </p>
+          <h2 className="mt-3 text-3xl font-black text-slate-950 sm:text-4xl">
+            Practical knowledge for lasting financial wellness
+          </h2>
+          <div className="mt-6 max-w-4xl space-y-5 text-lg leading-8 text-slate-700">
+            <p>
+              The Elevate Financial Empowerment Program is a practical financial literacy course
+              designed to help participants take control of their finances and build a stronger
+              financial future. Participants learn essential skills in budgeting, banking, saving,
+              credit and credit scores, debt management, consumer protection, taxes, insurance,
+              basic investing, and long-term wealth building.
+            </p>
+            <p>
+              Through hands-on activities, participants develop personalized financial goals and
+              practical strategies they can apply immediately. The course emphasizes not only
+              understanding money, but learning how to manage it, protect it, save it, and grow it.
+            </p>
+            <p>
+              Participants leave with a clearer understanding of their financial position and a
+              personalized plan for moving toward financial stability, independence, and long-term
+              financial wellness.
+            </p>
           </div>
         </div>
       </section>
@@ -124,6 +161,41 @@ export default function FinancialLiteracyPage() {
           </aside>
         </div>
       </section>
+
+      {instructor && (
+        <section className="border-t border-slate-200 bg-slate-950 px-4 py-14 text-white sm:py-16">
+          <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[0.55fr_1fr] lg:items-center">
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-3xl border border-white/15 shadow-2xl">
+              <Image
+                src={instructor.headshotSrc || '/images/carlina-wilkes.jpg'}
+                alt="Dr. Carlina Wilkes, Financial Empowerment Program Instructor"
+                fill
+                className="object-cover object-top"
+                sizes="(max-width: 1024px) 100vw, 36vw"
+              />
+            </div>
+            <div>
+              <p className="text-sm font-extrabold uppercase tracking-widest text-orange-300">
+                Meet Your Instructor
+              </p>
+              <h2 className="mt-3 text-3xl font-black sm:text-4xl">Dr. Carlina Wilkes</h2>
+              <p className="mt-2 text-xl font-bold text-white">
+                Financial Empowerment Program Instructor
+              </p>
+              <p className="mt-1 text-base font-semibold text-slate-300">
+                Executive Director of Financial Operations &amp; Organizational Compliance
+              </p>
+              <p className="mt-6 text-lg leading-8 text-slate-200">{instructor.bio}</p>
+              <Link
+                href="/about/team/carlina-wilkes"
+                className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 font-extrabold text-slate-950 hover:bg-slate-100"
+              >
+                Read Dr. Wilkes&apos;s Bio <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
     </main>
   );
 }

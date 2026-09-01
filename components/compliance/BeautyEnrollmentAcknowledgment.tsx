@@ -84,8 +84,10 @@ export function BeautyEnrollmentAcknowledgment({
           {schoolName} for state licensure eligibility.
         </p>
         <p className="text-sm text-slate-700 leading-relaxed mt-3">
-          <strong>Indiana Requirements:</strong> Indiana requires {hours.toLocaleString('en-US')}{' '}
-          hours of training for licensure.
+          <strong>{programType === 'esthetician' ? 'Registered-program requirements' : 'Indiana requirements'}:</strong>{' '}
+          {programType === 'esthetician'
+            ? 'The approved Appendix A standard is competency-based: 20 verified occupational competencies plus 300 related-instruction hours. Work hours are retained as auditable evidence, not used as a fixed apprenticeship completion denominator.'
+            : `Indiana requires ${hours.toLocaleString('en-US')} hours of training for licensure.`}
         </p>
         <p className="text-sm text-slate-700 leading-relaxed mt-3">
           <strong>Program Fee:</strong> The program fee of ${fee.toLocaleString('en-US')} is a flat

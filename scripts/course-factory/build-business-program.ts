@@ -142,16 +142,26 @@ async function hydrateAISecrets(db: AdminDb) {
   if (!usable) console.warn('[Business Course Builder] No AI provider credential is available; deterministic baseline mode remains valid.');
 }
 
-async function kickMediaWorker() {
+async function kickMediaWorker(courseId: string) {
   const secret = process.env.CRON_SECRET?.trim();
-  if (!secret) return;
+  if (!secret) {
+    console.warn('[Business Course Builder] CRON_SECRET is unavailable; media worker kick skipped.');
+    return;
+  }
   try {
-    await fetch(`${ADMIN_URL}/api/internal/videos/process-queue`, {
+    const response = await fetch(`${ADMIN_URL}/api/internal/videos/process-queue`, {
       method: 'POST',
       headers: { authorization: `Bearer ${secret}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ courseId, maxJobs: 4 }),
       signal: AbortSignal.timeout(45_000),
     });
-  } catch {
+    if (!response.ok) {
+      console.warn(`[Business Course Builder] Media worker kick returned HTTP ${response.status}.`);
+    }
+  } catch (error) {
+    console.warn(
+      `[Business Course Builder] Media worker kick failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     // Persisted job state remains authoritative; the worker may also be running independently.
   }
 }
@@ -174,7 +184,7 @@ async function waitForMedia(courseId: string) {
 
   while (Date.now() < deadline) {
     await repairMissingMedia(courseId);
-    await kickMediaWorker();
+    await kickMediaWorker(courseId);
     const rows = await loadCurrentMediaRows(db, courseId);
     const state = summarizeMedia(rows);
 

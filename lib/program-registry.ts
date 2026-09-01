@@ -30,6 +30,7 @@ export const PROGRAMS: ProgramEntry[] = [
   { slug: 'emergency-health-safety', name: 'Emergency Health & Safety', category: 'healthcare', formType: 'apply', active: true },
   { slug: 'emt-apprenticeship', name: 'Emergency Medical Technician Apprenticeship', category: 'apprenticeship', formType: 'apply', active: true },
   { slug: 'esthetician-apprenticeship', name: 'Esthetician Apprenticeship', category: 'beauty', formType: 'apply', active: true },
+  { slug: 'financial-literacy', name: 'Financial Literacy', category: 'business', formType: 'apply', active: true },
   { slug: 'forklift', name: 'Forklift Operator Certification', category: 'trades', formType: 'apply', active: true },
   { slug: 'graphic-design', name: 'Graphic Design', category: 'technology', formType: 'apply', active: true },
   { slug: 'guest-service-gold', name: 'Guest Service Gold', category: 'hospitality', formType: 'apply', active: true },

@@ -16,7 +16,10 @@ const EXPECTED_MAIN_VIDEOS = 35;
 const EXPECTED_MICROCLIPS = 70;
 const MEDIA_POLL_MS = 15_000;
 const MEDIA_TIMEOUT_MS = 75 * 60_000;
-const ADMIN_URL = (process.env.ADMIN_URL || 'https://admin.elevateforhumanity.org').replace(/\/$/, '');
+const ADMIN_URL = (process.env.ADMIN_URL || 'https://admin.elevateforhumanity.org').replace(
+  /\/$/,
+  '',
+);
 const AI_SECRET_KEYS = [
   'GEMINI_API_KEY',
   'GOOGLE_CLOUD_API_KEY',
@@ -47,7 +50,9 @@ function instructionalText(value: unknown): string {
   if (typeof value === 'string') return value.replace(/<[^>]*>/g, ' ');
   if (Array.isArray(value)) return value.map(instructionalText).join(' ');
   if (value && typeof value === 'object') {
-    return Object.values(value as Record<string, unknown>).map(instructionalText).join(' ');
+    return Object.values(value as Record<string, unknown>)
+      .map(instructionalText)
+      .join(' ');
   }
   return '';
 }
@@ -99,7 +104,9 @@ async function loadCurrentMediaRows(db: AdminDb, courseId: string): Promise<Medi
   if (lessonError) fail(`Lesson media identity query failed: ${lessonError.message}`);
   const lessonIds = (lessons ?? []).map((lesson) => lesson.id).filter(Boolean);
   if (lessonIds.length !== EXPECTED_LESSONS) {
-    fail(`Media verification expected ${EXPECTED_LESSONS} current lesson identities; found ${lessonIds.length}`);
+    fail(
+      `Media verification expected ${EXPECTED_LESSONS} current lesson identities; found ${lessonIds.length}`,
+    );
   }
 
   const { data, error } = await db
@@ -137,15 +144,21 @@ async function hydrateAISecrets(db: AdminDb) {
       ].includes(key),
     ) ||
     (available.includes('CLOUDFLARE_ACCOUNT_ID') &&
-      (available.includes('CLOUDFLARE_AI_API_TOKEN') || available.includes('CLOUDFLARE_API_TOKEN')));
+      (available.includes('CLOUDFLARE_AI_API_TOKEN') ||
+        available.includes('CLOUDFLARE_API_TOKEN')));
 
-  if (!usable) console.warn('[Business Course Builder] No AI provider credential is available; deterministic baseline mode remains valid.');
+  if (!usable)
+    console.warn(
+      '[Business Course Builder] No AI provider credential is available; deterministic baseline mode remains valid.',
+    );
 }
 
 async function kickMediaWorker(courseId: string) {
   const secret = process.env.CRON_SECRET?.trim();
   if (!secret) {
-    console.warn('[Business Course Builder] CRON_SECRET is unavailable; media worker kick skipped.');
+    console.warn(
+      '[Business Course Builder] CRON_SECRET is unavailable; media worker kick skipped.',
+    );
     return;
   }
   try {
@@ -153,7 +166,7 @@ async function kickMediaWorker(courseId: string) {
       method: 'POST',
       headers: { authorization: `Bearer ${secret}`, 'content-type': 'application/json' },
       body: JSON.stringify({ courseId, maxJobs: 4 }),
-      signal: AbortSignal.timeout(600_000),
+      signal: AbortSignal.timeout(1_800_000),
     });
     const responseBody = await response.text();
     if (!response.ok) {
@@ -161,7 +174,9 @@ async function kickMediaWorker(courseId: string) {
         `Media worker kick returned HTTP ${response.status}: ${responseBody.slice(0, 500)}`,
       );
     }
-    console.log(`[Business Course Builder] media worker ${response.status}: ${responseBody.slice(0, 500)}`);
+    console.log(
+      `[Business Course Builder] media worker ${response.status}: ${responseBody.slice(0, 500)}`,
+    );
   } catch (error) {
     throw new Error(
       `[Business Course Builder] Media worker kick failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -177,7 +192,9 @@ async function repairMissingMedia(courseId: string) {
     limit: null,
   });
   if (repair.failed > 0) {
-    console.warn(`[Business Course Builder] ${repair.failed} media enqueue attempt(s) failed; persisted job state will determine whether retry is still possible.`);
+    console.warn(
+      `[Business Course Builder] ${repair.failed} media enqueue attempt(s) failed; persisted job state will determine whether retry is still possible.`,
+    );
   }
 }
 
@@ -219,7 +236,9 @@ async function waitForMedia(courseId: string) {
       const messages = state.failedOnly
         .flatMap((group) => group.map((row) => row.error_message).filter(Boolean))
         .slice(0, 3);
-      fail(`Media generation has unrecoverable failed assets: ${messages.join(' | ') || 'unknown renderer failure'}`);
+      fail(
+        `Media generation has unrecoverable failed assets: ${messages.join(' | ') || 'unknown renderer failure'}`,
+      );
     }
 
     await new Promise((resolve) => setTimeout(resolve, MEDIA_POLL_MS));
@@ -232,7 +251,10 @@ async function auditCourse(courseId: string) {
   const db = await requireAdminClient();
   const [{ data: modules, error: moduleError }, { data: lessons, error: lessonError }] =
     await Promise.all([
-      db.from('course_modules').select('id,title,domain_key,target_hours').eq('course_id', courseId),
+      db
+        .from('course_modules')
+        .select('id,title,domain_key,target_hours')
+        .eq('course_id', courseId),
       db
         .from('course_lessons')
         .select(
@@ -292,7 +314,11 @@ async function auditCourse(courseId: string) {
   }
 }
 
-async function checkpointStructure(db: AdminDb, programId: string, blueprint: Awaited<ReturnType<typeof getBlueprintBySlug>>) {
+async function checkpointStructure(
+  db: AdminDb,
+  programId: string,
+  blueprint: Awaited<ReturnType<typeof getBlueprintBySlug>>,
+) {
   if (!blueprint) fail('Business blueprint not found');
   const { data: existing, error: existingError } = await db
     .from('courses')
@@ -303,12 +329,23 @@ async function checkpointStructure(db: AdminDb, programId: string, blueprint: Aw
 
   const [{ count: moduleCount }, { count: lessonCount }] = existing?.id
     ? await Promise.all([
-        db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', existing.id),
-        db.from('course_lessons').select('id', { count: 'exact', head: true }).eq('course_id', existing.id),
+        db
+          .from('course_modules')
+          .select('id', { count: 'exact', head: true })
+          .eq('course_id', existing.id),
+        db
+          .from('course_lessons')
+          .select('id', { count: 'exact', head: true })
+          .eq('course_id', existing.id),
       ])
     : [{ count: 0 }, { count: 0 }];
 
-  if (existing?.id && existing.program_id === programId && moduleCount === EXPECTED_MODULES && lessonCount === EXPECTED_LESSONS) {
+  if (
+    existing?.id &&
+    existing.program_id === programId &&
+    moduleCount === EXPECTED_MODULES &&
+    lessonCount === EXPECTED_LESSONS
+  ) {
     return existing.id as string;
   }
 
@@ -324,7 +361,9 @@ async function checkpointStructure(db: AdminDb, programId: string, blueprint: Aw
     fail(`Deterministic structure checkpoint failed: ${checkpoint.errors.join(' | ')}`);
   }
   if (checkpoint.moduleCount !== EXPECTED_MODULES || checkpoint.lessonCount !== EXPECTED_LESSONS) {
-    fail(`Deterministic checkpoint returned ${checkpoint.moduleCount} modules/${checkpoint.lessonCount} lessons`);
+    fail(
+      `Deterministic checkpoint returned ${checkpoint.moduleCount} modules/${checkpoint.lessonCount} lessons`,
+    );
   }
 
   const { error: stateError } = await db
@@ -341,7 +380,9 @@ async function checkpointStructure(db: AdminDb, programId: string, blueprint: Aw
     .eq('id', checkpoint.courseId);
   if (stateError) fail(`Deterministic checkpoint state update failed: ${stateError.message}`);
 
-  console.log(`[Business Course Builder] deterministic checkpoint ready ${checkpoint.courseId}: ${EXPECTED_MODULES} modules/${EXPECTED_LESSONS} lessons`);
+  console.log(
+    `[Business Course Builder] deterministic checkpoint ready ${checkpoint.courseId}: ${EXPECTED_MODULES} modules/${EXPECTED_LESSONS} lessons`,
+  );
   return checkpoint.courseId;
 }
 
@@ -374,10 +415,14 @@ async function getReusableCourse(db: AdminDb, programId: string): Promise<string
     const payloadLength = instructionalText(lesson.content).replace(/\s+/g, ' ').trim().length;
     return (
       payloadLength >= 1000 &&
-      Array.isArray(lesson.learning_objectives) && lesson.learning_objectives.length >= 3 &&
-      typeof lesson.script === 'string' && lesson.script.trim().length >= 200 &&
+      Array.isArray(lesson.learning_objectives) &&
+      lesson.learning_objectives.length >= 3 &&
+      typeof lesson.script === 'string' &&
+      lesson.script.trim().length >= 200 &&
       Boolean(lesson.content_json && typeof lesson.content_json === 'object') &&
-      ['generated', 'completed', 'verification_ready', 'certificate_ready', 'published'].includes(lesson.generation_status ?? '')
+      ['generated', 'completed', 'verification_ready', 'certificate_ready', 'published'].includes(
+        lesson.generation_status ?? '',
+      )
     );
   });
 
@@ -428,10 +473,17 @@ async function main() {
       if (checkpoint?.id) {
         await db
           .from('courses')
-          .update({ generation_status: 'failed_retryable', generation_progress: 15, status: 'draft', is_active: false })
+          .update({
+            generation_status: 'failed_retryable',
+            generation_progress: 15,
+            status: 'draft',
+            is_active: false,
+          })
           .eq('id', checkpoint.id);
       }
-      fail(`Course Factory failed after deterministic checkpoint: ${JSON.stringify(build.errors ?? [])}`);
+      fail(
+        `Course Factory failed after deterministic checkpoint: ${JSON.stringify(build.errors ?? [])}`,
+      );
     }
     if (build.moduleCount !== EXPECTED_MODULES || build.lessonCount !== EXPECTED_LESSONS) {
       fail(`Factory returned ${build.moduleCount} modules/${build.lessonCount} lessons`);
@@ -453,7 +505,9 @@ async function main() {
   const recovery = await recoverCourseMediaJobs({ courseId });
   console.log('[Business Course Builder] authorized course-scoped media recovery', recovery);
   if (recovery.blocked.length) {
-    fail(`Authorized media recovery left blocked jobs: ${recovery.blocked.map((item) => `${item.jobId}: ${item.reason}`).join(' | ')}`);
+    fail(
+      `Authorized media recovery left blocked jobs: ${recovery.blocked.map((item) => `${item.jobId}: ${item.reason}`).join(' | ')}`,
+    );
   }
 
   await repairMissingMedia(courseId);
@@ -482,7 +536,9 @@ async function main() {
     );
   }
 
-  const reviewerId = String((procurement.metrics as Record<string, unknown>).reviewed_by ?? '').trim();
+  const reviewerId = String(
+    (procurement.metrics as Record<string, unknown>).reviewed_by ?? '',
+  ).trim();
   if (!reviewerId) {
     fail('Procurement passed without an authorized human reviewer identity');
   }
@@ -506,7 +562,11 @@ async function main() {
   if (finalError || !finalCourse) {
     fail(`Final verification failed: ${finalError?.message ?? 'missing course'}`);
   }
-  if (finalCourse.status !== 'published' || !finalCourse.is_active || finalCourse.program_id !== program.id) {
+  if (
+    finalCourse.status !== 'published' ||
+    !finalCourse.is_active ||
+    finalCourse.program_id !== program.id
+  ) {
     fail(`Final state invalid: ${JSON.stringify(finalCourse)}`);
   }
 

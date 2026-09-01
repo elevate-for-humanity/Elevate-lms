@@ -24,9 +24,13 @@ const REMOTION_PROVIDER = 'remotion';
 const REMOTION_MODEL = 'ElevateLesson';
 
 async function hydrateMediaRuntimeSecrets(): Promise<void> {
-  const missing = ['ELEVENLABS_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY', 'PEXELS_API_KEY', 'DID_API_KEY'].filter(
-    (key) => !process.env[key]?.trim(),
-  );
+  const missing = [
+    'ELEVENLABS_API_KEY',
+    'GEMINI_API_KEY',
+    'OPENAI_API_KEY',
+    'PEXELS_API_KEY',
+    'DID_API_KEY',
+  ].filter((key) => !process.env[key]?.trim());
   if (!missing.length) return;
   const db = createAdminClient();
   const { data: runtimeSettings } = await db
@@ -35,7 +39,11 @@ async function hydrateMediaRuntimeSecrets(): Promise<void> {
     .in('key', ['AI_PROVIDER', 'AI_TRANSCRIPTION_MODEL'])
     .eq('is_active', true);
   for (const setting of runtimeSettings ?? []) {
-    if (!process.env[setting.key]?.trim() && typeof setting.value === 'string' && setting.value.trim()) {
+    if (
+      !process.env[setting.key]?.trim() &&
+      typeof setting.value === 'string' &&
+      setting.value.trim()
+    ) {
       process.env[setting.key] = setting.value.trim();
     }
   }
@@ -53,20 +61,33 @@ async function hydrateMediaRuntimeSecrets(): Promise<void> {
 }
 
 function safeAssetKey(value: string): string {
-  return value.replace(/[^a-zA-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'clip';
+  return (
+    value
+      .replace(/[^a-zA-Z0-9_-]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 80) || 'clip'
+  );
 }
 
 function mediaCharacters(sceneData: Record<string, unknown>): MediaCharacterReference[] {
   if (!Array.isArray(sceneData.characters)) return [];
   return sceneData.characters
-    .filter((value): value is Record<string, unknown> => Boolean(value && typeof value === 'object'))
+    .filter((value): value is Record<string, unknown> =>
+      Boolean(value && typeof value === 'object'),
+    )
     .map((value, index) => ({
       id: typeof value.id === 'string' && value.id ? value.id : `character-${index + 1}`,
       ...(typeof value.name === 'string' ? { name: value.name } : {}),
-      ...(typeof value.reference_image_url === 'string' ? { referenceImageUrl: value.reference_image_url } : {}),
-      ...(typeof value.appearance_prompt === 'string' ? { appearancePrompt: value.appearance_prompt } : {}),
+      ...(typeof value.reference_image_url === 'string'
+        ? { referenceImageUrl: value.reference_image_url }
+        : {}),
+      ...(typeof value.appearance_prompt === 'string'
+        ? { appearancePrompt: value.appearance_prompt }
+        : {}),
       ...(typeof value.voice_id === 'string' ? { voiceId: value.voice_id } : {}),
-      ...(typeof value.consent_record_id === 'string' ? { consentRecordId: value.consent_record_id } : {}),
+      ...(typeof value.consent_record_id === 'string'
+        ? { consentRecordId: value.consent_record_id }
+        : {}),
     }));
 }
 
@@ -87,7 +108,9 @@ function generatedSceneData(plan: LessonRenderPlanDraft): Record<string, unknown
       dialogue: scene.narration,
       procedure_phase: scene.instructionalObjective,
       required_visual_evidence: scene.evidenceExpectation,
-      shot_size: /close|detail|inspect/i.test(scene.visualFocus ?? '') ? 'close-up' : 'medium-close',
+      shot_size: /close|detail|inspect/i.test(scene.visualFocus ?? '')
+        ? 'close-up'
+        : 'medium-close',
       camera_move: 'dolly-in',
       transition: scene.transitionOut === 'crossfade' ? 'crossfade' : 'cut',
       source_authority: {
@@ -103,94 +126,9 @@ function generatedSceneData(plan: LessonRenderPlanDraft): Record<string, unknown
  * rendering mechanic for microclips; Remotion is the common fallback. Both
  * report terminal state through the same video_jobs identity. */
 export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
-  await hydrateMediaRuntimeSecrets();
-  const db = createAdminClient();
-  const { data: course } = await db
-    .from('courses')
-    .select('title,org_id,program_id,compliance_profile_key,governing_body,governing_region,governing_standard_version')
-    .eq('id', job.course_id)
-    .maybeSingle();
-  const courseTitle = course?.title ?? 'Elevate LMS';
-  let tenantId: string | null = null;
-  if (course?.org_id) {
-    const { data: organization } = await db
-      .from('organizations')
-      .select('tenant_id')
-      .eq('id', course.org_id)
-      .maybeSingle();
-    tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
-  }
-  const script = job.script?.trim() || job.lesson_title;
-  const bulletPoints = Array.isArray(job.bullet_points) ? job.bullet_points : [];
-  const persistedSceneData = job.scene_data && typeof job.scene_data === 'object' ? (job.scene_data as Record<string, unknown>) : {};
-  const { data: lesson } = await db
-    .from('course_lessons')
-    .select('content,content_json,domain_key,compliance_profile_key,lesson_type,evidence_type,video_config')
-    .eq('id', job.lesson_id)
-    .maybeSingle();
-  const videoConfig = lesson?.video_config && typeof lesson.video_config === 'object'
-    ? lesson.video_config as Record<string, unknown>
-    : {};
-  const configuredInstructorId = typeof videoConfig.instructorId === 'string'
-    ? videoConfig.instructorId.trim()
-    : '';
-  const instructor = configuredInstructorId
-    ? getInstructorById(configuredInstructorId)
-    : getInstructorForCourse(courseTitle);
-  const { data: program } = course?.program_id
-    ? await db
-        .from('programs')
-        .select('occupation_code,category,track,type')
-        .eq('id', course.program_id)
-        .maybeSingle()
-    : { data: null };
-  const domainProfileKey = [
-    persistedSceneData.domain_profile_key,
-    lesson?.compliance_profile_key,
-    course?.compliance_profile_key,
-    program?.occupation_code,
-    program?.track,
-    program?.category,
-    program?.type,
-  ].find((value): value is string => typeof value === 'string' && value.trim().length > 0) ?? null;
-  const suppliedScenes = Array.isArray(persistedSceneData.scenes) && persistedSceneData.scenes.length > 0;
-  const generatedPlan = suppliedScenes
-    ? null
-    : await generateLessonScenes({
-        lessonId: job.lesson_id,
-        title: job.lesson_title,
-        content: script,
-        domainKey: domainProfileKey,
-        occupationTitle: typeof program?.track === 'string' ? program.track : undefined,
-        stateAuthority: course?.governing_body ?? undefined,
-        stateStandardVersion: course?.governing_standard_version ?? undefined,
-        stateRequirement: typeof lesson?.compliance_profile_key === 'string' ? lesson.compliance_profile_key : undefined,
-        requiresPracticalEvidence: lesson?.evidence_type === 'practical' || lesson?.lesson_type === 'lab',
-      });
-  const sceneData = generatedPlan ? generatedSceneData(generatedPlan) : persistedSceneData;
-  const isMicroclip = job.asset_kind === 'microclip';
-  // Every render is an immutable candidate. Approval, not rendering, changes
-  // the learner-facing lesson URL.
-  const renderId = `${job.lesson_id}-${safeAssetKey(job.asset_key ?? job.id)}-${job.id}`;
-  const characters = mediaCharacters(sceneData);
-  const storyboard = directMedia({
-    title: job.lesson_title,
-    objective: bulletPoints[0] ?? job.lesson_title,
-    script,
-    sceneData,
-    characters,
-    defaultDurationSeconds: 5,
-  });
-  enforceInstructionalQuality({
-    courseTitle,
-    lessonTitle: job.lesson_title,
-    lessonType: lesson?.lesson_type,
-    evidenceType: lesson?.evidence_type,
-    script,
-    instructor,
-    storyboard,
-  });
-
+  // Start lease renewal before secret hydration, scene generation, and quality
+  // planning. Those pre-render stages can call external providers and must not
+  // leave an actively-owned job looking stale.
   let heartbeatRunning = false;
   const heartbeatTimer = job.lease_token
     ? setInterval(() => {
@@ -198,16 +136,121 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         heartbeatRunning = true;
         void heartbeatJob(job)
           .then((renewed) => {
-            if (!renewed) logger.warn('[video-worker] Rendering lease was not renewed', { jobId: job.id });
+            if (!renewed)
+              logger.warn('[video-worker] Rendering lease was not renewed', { jobId: job.id });
           })
           .catch((error) => {
             logger.error('[video-worker] Rendering heartbeat failed', error, { jobId: job.id });
           })
-          .finally(() => { heartbeatRunning = false; });
+          .finally(() => {
+            heartbeatRunning = false;
+          });
       }, 60_000)
     : null;
 
   try {
+    await hydrateMediaRuntimeSecrets();
+    const db = createAdminClient();
+    const { data: course } = await db
+      .from('courses')
+      .select(
+        'title,org_id,program_id,compliance_profile_key,governing_body,governing_region,governing_standard_version',
+      )
+      .eq('id', job.course_id)
+      .maybeSingle();
+    const courseTitle = course?.title ?? 'Elevate LMS';
+    let tenantId: string | null = null;
+    if (course?.org_id) {
+      const { data: organization } = await db
+        .from('organizations')
+        .select('tenant_id')
+        .eq('id', course.org_id)
+        .maybeSingle();
+      tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
+    }
+    const script = job.script?.trim() || job.lesson_title;
+    const bulletPoints = Array.isArray(job.bullet_points) ? job.bullet_points : [];
+    const persistedSceneData =
+      job.scene_data && typeof job.scene_data === 'object'
+        ? (job.scene_data as Record<string, unknown>)
+        : {};
+    const { data: lesson } = await db
+      .from('course_lessons')
+      .select(
+        'content,content_json,domain_key,compliance_profile_key,lesson_type,evidence_type,video_config',
+      )
+      .eq('id', job.lesson_id)
+      .maybeSingle();
+    const videoConfig =
+      lesson?.video_config && typeof lesson.video_config === 'object'
+        ? (lesson.video_config as Record<string, unknown>)
+        : {};
+    const configuredInstructorId =
+      typeof videoConfig.instructorId === 'string' ? videoConfig.instructorId.trim() : '';
+    const instructor = configuredInstructorId
+      ? getInstructorById(configuredInstructorId)
+      : getInstructorForCourse(courseTitle);
+    const { data: program } = course?.program_id
+      ? await db
+          .from('programs')
+          .select('occupation_code,category,track,type')
+          .eq('id', course.program_id)
+          .maybeSingle()
+      : { data: null };
+    const domainProfileKey =
+      [
+        persistedSceneData.domain_profile_key,
+        lesson?.compliance_profile_key,
+        course?.compliance_profile_key,
+        program?.occupation_code,
+        program?.track,
+        program?.category,
+        program?.type,
+      ].find((value): value is string => typeof value === 'string' && value.trim().length > 0) ??
+      null;
+    const suppliedScenes =
+      Array.isArray(persistedSceneData.scenes) && persistedSceneData.scenes.length > 0;
+    const generatedPlan = suppliedScenes
+      ? null
+      : await generateLessonScenes({
+          lessonId: job.lesson_id,
+          title: job.lesson_title,
+          content: script,
+          domainKey: domainProfileKey,
+          occupationTitle: typeof program?.track === 'string' ? program.track : undefined,
+          stateAuthority: course?.governing_body ?? undefined,
+          stateStandardVersion: course?.governing_standard_version ?? undefined,
+          stateRequirement:
+            typeof lesson?.compliance_profile_key === 'string'
+              ? lesson.compliance_profile_key
+              : undefined,
+          requiresPracticalEvidence:
+            lesson?.evidence_type === 'practical' || lesson?.lesson_type === 'lab',
+        });
+    const sceneData = generatedPlan ? generatedSceneData(generatedPlan) : persistedSceneData;
+    const isMicroclip = job.asset_kind === 'microclip';
+    // Every render is an immutable candidate. Approval, not rendering, changes
+    // the learner-facing lesson URL.
+    const renderId = `${job.lesson_id}-${safeAssetKey(job.asset_key ?? job.id)}-${job.id}`;
+    const characters = mediaCharacters(sceneData);
+    const storyboard = directMedia({
+      title: job.lesson_title,
+      objective: bulletPoints[0] ?? job.lesson_title,
+      script,
+      sceneData,
+      characters,
+      defaultDurationSeconds: 5,
+    });
+    enforceInstructionalQuality({
+      courseTitle,
+      lessonTitle: job.lesson_title,
+      lessonType: lesson?.lesson_type,
+      evidenceType: lesson?.evidence_type,
+      script,
+      instructor,
+      storyboard,
+    });
+
     const primaryScene = storyboard.scenes[0];
     if (!primaryScene) throw new Error('MEDIA_STORYBOARD_EMPTY');
 
@@ -217,11 +260,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     // Direct GPU microclips do not currently produce the captions, transcript,
     // or multi-scene evidence required by the canonical quality gate. Keep this
     // expensive path opt-in until it can satisfy that same completion contract.
-    if (
-      isMicroclip &&
-      storyboard.scenes.length === 1 &&
-      (await gpuVideoAvailable())
-    ) {
+    if (isMicroclip && storyboard.scenes.length === 1 && (await gpuVideoAvailable())) {
       const scene = primaryScene;
       const requestedDuration = Math.min(15, Math.max(1, scene.durationSeconds));
       const gpuStartedAt = Date.now();
@@ -272,7 +311,12 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
                 unit: 'second',
                 externalRef: job.id,
                 idempotencyKey: `gpu-video-seconds:${job.id}`,
-                metadata: { provider: generated.provider, operation: scene.operation, course_id: job.course_id, lesson_id: job.lesson_id },
+                metadata: {
+                  provider: generated.provider,
+                  operation: scene.operation,
+                  course_id: job.course_id,
+                  lesson_id: job.lesson_id,
+                },
               }),
               recordPlatformUsage(db, {
                 tenantId,
@@ -282,7 +326,12 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
                 unit: 'second',
                 externalRef: job.id,
                 idempotencyKey: `gpu-render-seconds:${job.id}`,
-                metadata: { provider: generated.provider, operation: scene.operation, course_id: job.course_id, lesson_id: job.lesson_id },
+                metadata: {
+                  provider: generated.provider,
+                  operation: scene.operation,
+                  course_id: job.course_id,
+                  lesson_id: job.lesson_id,
+                },
               }),
               recordPlatformUsage(db, {
                 tenantId,
@@ -292,7 +341,12 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
                 unit: 'byte',
                 externalRef: job.id,
                 idempotencyKey: `gpu-output-bytes:${job.id}`,
-                metadata: { provider: generated.provider, operation: scene.operation, course_id: job.course_id, lesson_id: job.lesson_id },
+                metadata: {
+                  provider: generated.provider,
+                  operation: scene.operation,
+                  course_id: job.course_id,
+                  lesson_id: job.lesson_id,
+                },
               }),
               recordMediaProvenance(db, {
                 tenantId,
@@ -304,18 +358,26 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
                 provider: generated.provider,
                 model,
                 operation: scene.operation,
-                referenceUrls: [scene.referenceImageUrl, scene.sourceVideoUrl].filter((value): value is string => Boolean(value)),
-                likenessConsentRecordIds: storyboard.characters.map((character) => character.consentRecordId).filter((value): value is string => Boolean(value)),
+                referenceUrls: [scene.referenceImageUrl, scene.sourceVideoUrl].filter(
+                  (value): value is string => Boolean(value),
+                ),
+                likenessConsentRecordIds: storyboard.characters
+                  .map((character) => character.consentRecordId)
+                  .filter((value): value is string => Boolean(value)),
                 moderationDecision: 'approved',
                 generatedAssetUrl: videoUrl,
                 generatedBytes: buffer.length,
               }),
             ]);
           } catch (meterError) {
-            logger.error('[video-worker] GPU output succeeded but usage/provenance recording failed', meterError, {
-              jobId: job.id,
-              tenantId,
-            });
+            logger.error(
+              '[video-worker] GPU output succeeded but usage/provenance recording failed',
+              meterError,
+              {
+                jobId: job.id,
+                tenantId,
+              },
+            );
           }
 
           // The GPU clip is a scene candidate, not a terminal lesson asset.
@@ -329,12 +391,15 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         }
       } catch (gpuError) {
         const gpuMessage = gpuError instanceof Error ? gpuError.message : String(gpuError);
-        await db.from('video_jobs').update({
-          last_provider: 'gpu',
-          last_provider_model: null,
-          last_failure_at: new Date().toISOString(),
-          error_message: `GPU fallback: ${gpuMessage}`.slice(0, 2000),
-        }).eq('id', job.id);
+        await db
+          .from('video_jobs')
+          .update({
+            last_provider: 'gpu',
+            last_provider_model: null,
+            last_failure_at: new Date().toISOString(),
+            error_message: `GPU fallback: ${gpuMessage}`.slice(0, 2000),
+          })
+          .eq('id', job.id);
         try {
           await recordPlatformUsage(db, {
             tenantId,

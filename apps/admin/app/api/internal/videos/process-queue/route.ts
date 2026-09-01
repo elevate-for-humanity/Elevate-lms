@@ -8,7 +8,7 @@ import { COURSE_MEDIA_STALE_RENDER_MS } from '@/lib/course-factory/media-manager
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 600;
+export const maxDuration = 1800;
 
 function renderConcurrency(): number {
   const parsed = Number(process.env.VIDEO_RENDER_CONCURRENCY ?? '2');
@@ -76,10 +76,7 @@ export async function POST(request: NextRequest) {
   }
 
   const active = activeCount ?? 0;
-  const availableSlots = Math.min(
-    Math.max(0, maxConcurrent - active),
-    maxJobs ?? maxConcurrent,
-  );
+  const availableSlots = Math.min(Math.max(0, maxConcurrent - active), maxJobs ?? maxConcurrent);
   if (availableSlots === 0) {
     return NextResponse.json({
       ok: true,
@@ -102,7 +99,10 @@ export async function POST(request: NextRequest) {
       .eq('course_id', courseId)
       .eq('status', 'queued');
     if (queuedCountError) {
-      return NextResponse.json({ error: 'Unable to inspect the course video queue' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Unable to inspect the course video queue' },
+        { status: 500 },
+      );
     }
 
     if ((queuedCount ?? 0) === 0) {
@@ -117,10 +117,18 @@ export async function POST(request: NextRequest) {
         .limit(1)
         .maybeSingle();
       if (draftError) {
-        return NextResponse.json({ error: 'Unable to read a draft course video job' }, { status: 500 });
+        return NextResponse.json(
+          { error: 'Unable to read a draft course video job' },
+          { status: 500 },
+        );
       }
       if (!draft) {
-        return NextResponse.json({ ok: true, started: 0, reason: 'no-draft-or-queued-job', courseId });
+        return NextResponse.json({
+          ok: true,
+          started: 0,
+          reason: 'no-draft-or-queued-job',
+          courseId,
+        });
       }
 
       const now = new Date().toISOString();
@@ -133,7 +141,10 @@ export async function POST(request: NextRequest) {
         .select('id')
         .maybeSingle();
       if (queueDraftError) {
-        return NextResponse.json({ error: 'Unable to queue the bounded draft video job' }, { status: 500 });
+        return NextResponse.json(
+          { error: 'Unable to queue the bounded draft video job' },
+          { status: 500 },
+        );
       }
       queuedDraftJobId = queuedDraft?.id ?? null;
     }

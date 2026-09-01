@@ -69,6 +69,7 @@ function redirectToLogin(req: NextRequest, pathname: string) {
   loginUrl.searchParams.set('redirect', `${pathname}${req.nextUrl.search}`);
   const response = NextResponse.redirect(loginUrl);
   response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+  response.headers.set('Vary', 'Cookie');
   response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
   return response;
 }

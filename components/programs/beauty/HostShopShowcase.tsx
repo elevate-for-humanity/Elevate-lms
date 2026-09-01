@@ -9,8 +9,8 @@ import type {
   FeaturedHostPartnerMedia,
 } from '@/lib/apprenticeship-programs/host-partners';
 
-const ROTATION_MS = 4500;
-const VIDEO_ROTATION_MS = 27_000;
+const ROTATION_MS = 9000;
+const VIDEO_ROTATION_MS = 40_000;
 type ShowcaseMedia = FeaturedHostPartnerMedia & { backdropSrc?: string };
 
 const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
@@ -173,22 +173,32 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
                   />
                 </div>
               ) : image && !failedImages.has(image.src) ? (
-                <Image
-                  key={image.src}
-                  src={image.src}
-                  alt={image.alt}
-                  fill
-                  priority={activeIndex === 0}
-                  sizes="(max-width: 1024px) 100vw, 58vw"
-                  className="host-showcase-media-enter object-cover object-center"
-                  onError={() =>
+                <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
+                  <Image
+                    src={image.src}
+                    alt=""
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 58vw"
+                    className="-z-10 scale-110 object-cover opacity-40 blur-xl"
+                    aria-hidden="true"
+                  />
+                  <Image
+                    key={image.src}
+                    src={image.src}
+                    alt={image.alt}
+                    fill
+                    priority={activeIndex === 0}
+                    sizes="(max-width: 1024px) 100vw, 58vw"
+                    className="host-showcase-media-enter object-contain"
+                    onError={() =>
                     setFailedImages((current) => {
                       const next = new Set(current);
                       next.add(image.src);
                       return next;
                     })
                   }
-                />
+                  />
+                </div>
               ) : (
                 <div className="absolute inset-0 flex flex-col justify-end bg-[radial-gradient(circle_at_top_left,rgba(185,28,28,0.32),transparent_42%),linear-gradient(145deg,#1e293b,#020617)] px-8 py-10 sm:px-12 sm:py-12">
                   <p className="max-w-xl text-4xl font-black tracking-tight sm:text-5xl">

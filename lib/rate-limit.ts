@@ -69,7 +69,10 @@ export function getRedisClient(): RedisClientCompat | null {
 }
 
 export const RATE_LIMITS = {
-  auth: { requests: 5, window: '1 m' },
+  // Shared school, shop, and workforce-office networks can legitimately sign in
+  // several users at once. Keep the IP throttle protective without blocking the
+  // sixth valid user behind the same NAT. Supabase also enforces account-level auth limits.
+  auth: { requests: 20, window: '1 m' },
   payment: { requests: 10, window: '1 m' },
   contact: { requests: 3, window: '1 m' },
   api: { requests: 180, window: '1 m' },

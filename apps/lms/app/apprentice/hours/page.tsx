@@ -52,9 +52,14 @@ export default async function ApprenticeHoursPage() {
   }
 
   const allLogs = hoursData || [];
-  const logs = allLogs.slice(0, 20);
-  const totalHours = allLogs.reduce((sum, log: any) => sum + (Number(log.hours_claimed) || 0), 0);
-  const approvedHours = allLogs
+  // Transfer credit is displayed from the verified enrollment fields below.
+  // Historical transfer rows remain auditable but are excluded from weekly OJL.
+  const workLogs = allLogs.filter(
+    (log: any) => log.category !== 'transfer' && log.source_type !== 'transfer',
+  );
+  const logs = workLogs.slice(0, 20);
+  const totalHours = workLogs.reduce((sum, log: any) => sum + (Number(log.hours_claimed) || 0), 0);
+  const approvedHours = workLogs
     .filter((log: any) => log.status === 'approved' || log.approval_status === 'approved')
     .reduce((sum, log: any) => sum + (Number(log.accepted_hours) || Number(log.hours_claimed) || 0), 0);
 

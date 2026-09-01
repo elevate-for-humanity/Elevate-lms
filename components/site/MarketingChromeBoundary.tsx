@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 import Header from '@/components/site/Header';
 import { SiteFooter } from '@/components/site-footer';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
+import { RouteTransition } from '@/components/site/RouteTransition';
 
 const OPERATIONAL_PREFIXES = ['/case-manager', '/workforce-board', '/provider'] as const;
 
@@ -27,7 +28,7 @@ export async function MarketingChromeBoundary({ children }: { children: React.Re
   return (
     <>
       <Header />
-      <div id="main-content" tabIndex={-1} className="site-main focus:outline-none">{children}</div>
+      <div id="main-content" tabIndex={-1} className="site-main focus:outline-none"><RouteTransition>{children}</RouteTransition></div>
       <SiteFooter />
       <ParisFloatingWrapper surface="public" />
     </>

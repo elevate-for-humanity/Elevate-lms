@@ -12,7 +12,7 @@ import {
   isStrictWorkforceFundedProgram,
 } from '@/lib/programs/funding-registry';
 import { sanitizePublicFundingText } from '@/lib/programs/public-funding-copy';
-import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
 import { BOOKKEEPING } from './bookkeeping';
 import { BUSINESS_ADMIN } from './business-administration';
 import { CAD_DRAFTING } from './cad-drafting';
@@ -105,7 +105,7 @@ function looksLikeApprenticeship(program: ProgramSchema): boolean {
 }
 
 function replaceUnverifiedRegisteredLanguage(text: string | undefined, slug: string): string {
-  if (!text || VERIFIED_RAPIDS_SLUGS.has(slug)) return text || '';
+  if (!text || isRAPIDSProgram(slug)) return text || '';
   return text
     .replace(/DOL[-\s]?registered/gi, 'work-based training')
     .replace(/U\.S\. Department of Labor Registered Apprenticeship/gi, 'work-based training pathway')
@@ -116,7 +116,7 @@ function replaceUnverifiedRegisteredLanguage(text: string | undefined, slug: str
 }
 
 function publicTitle(program: ProgramSchema): string {
-  if (!looksLikeApprenticeship(program) || VERIFIED_RAPIDS_SLUGS.has(program.slug)) return program.title;
+  if (!looksLikeApprenticeship(program) || isRAPIDSProgram(program.slug)) return program.title;
   return program.title.replace(/\s*Apprenticeship\b/gi, ' Training Pathway').replace(/\s+/g, ' ').trim();
 }
 
@@ -124,7 +124,7 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
   const verifiedFunding = getVerifiedProgramFunding(program.slug);
   const workforceFunded = isStrictWorkforceFundedProgram(program.slug);
   const canonicalSlug = verifiedFunding?.slug ?? program.slug;
-  const registered = VERIFIED_RAPIDS_SLUGS.has(canonicalSlug);
+  const registered = isRAPIDSProgram(canonicalSlug);
   const apprenticeshipLike = looksLikeApprenticeship(program);
   const copyFallback = verifiedFunding?.description ?? `${publicTitle(program)} career training.`;
   const fundingOptions: FundingType[] = ['self_pay'];

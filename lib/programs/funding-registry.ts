@@ -1,4 +1,4 @@
-export const WORKONE_INDY_INTAKE_URL = 'https://WorkOneIndy.as.me/IntakeApptwithCN';
+export { WORKONE_INDY_BOOKING_URL as WORKONE_INDY_INTAKE_URL } from '@/lib/workone/booking';
 
 export type ProgramFundingTier = 'workforce-funded' | 'self-pay';
 

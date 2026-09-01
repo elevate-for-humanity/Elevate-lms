@@ -52,12 +52,12 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
     licenseTitle: 'Indiana Esthetician License',
     licensingBody: 'Indiana Professional Licensing Agency (IPLA)',
     salaryRange: 'Varies by employer, experience, and service model',
-    totalHours: 700,
-    hoursLabel: '700 hours',
+    totalHours: 300,
+    hoursLabel: '20 competencies plus 300 RTI hours',
     ojtDescription:
       'Complete supervised esthetics practice at an approved spa or salon site with documented client-care, sanitation, skin-analysis, treatment, and professional-practice activities.',
     rtiDescription:
-      'Complete related esthetics instruction covering skin science, sanitation, safety, client consultation, documentation, and licensing preparation.',
+      'Complete 300 hours of related esthetics instruction covering skin science, sanitation, safety, client consultation, documentation, and licensing preparation while demonstrating all 20 Appendix A competencies.',
     tuition: {
       total: 4980,
       setupFeePercent: 0,

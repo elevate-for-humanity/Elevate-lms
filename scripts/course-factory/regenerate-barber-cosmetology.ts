@@ -1,5 +1,6 @@
 // Production regeneration runner for canonical Barber and Cosmetology courses.
 import { courseFactory } from '../../lib/course-factory';
+import { normalizeGeneratedCourseForGovernance } from '../../lib/course-factory/post-generation-governance';
 import { requireAdminClient } from '../../lib/supabase/admin';
 
 const AI_SECRET_KEYS = [
@@ -89,8 +90,21 @@ async function main() {
       );
     }
 
+    failureStage = `${programSlug}-governance-normalization`;
+    const governance = await normalizeGeneratedCourseForGovernance(result.courseId);
+    if (governance.lessonsNormalized !== result.lessonCount) {
+      throw new Error(
+        `${programSlug} governance normalized ${governance.lessonsNormalized} of ${result.lessonCount} lessons`,
+      );
+    }
+    if (governance.warnings.length) {
+      throw new Error(
+        `${programSlug} governance normalization warnings: ${JSON.stringify(governance.warnings)}`,
+      );
+    }
+
     console.log(
-      `COURSE_REGENERATION_SUCCESS ${programSlug} ${result.courseId} ${result.moduleCount} ${result.lessonCount}`,
+      `COURSE_REGENERATION_SUCCESS ${programSlug} ${result.courseId} ${result.moduleCount} ${result.lessonCount} ${governance.totalDurationHours}h`,
     );
   }
 }

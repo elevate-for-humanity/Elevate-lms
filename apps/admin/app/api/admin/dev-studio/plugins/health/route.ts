@@ -32,7 +32,11 @@ export async function GET(request: NextRequest) {
       (process.env.STRIPE_RESTRICTED_KEY || process.env.STRIPE_SECRET_KEY) &&
       process.env.STRIPE_WEBHOOK_SECRET,
     );
-    const cloudflareConfigured = Boolean(
+    const cloudflareAiConfigured = Boolean(
+      (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN) &&
+      process.env.CLOUDFLARE_ACCOUNT_ID,
+    );
+    const cloudflareControlPlaneConfigured = Boolean(
       process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ACCOUNT_ID,
     );
     return buildCapabilityHealth('plugins', [
@@ -85,10 +89,18 @@ export async function GET(request: NextRequest) {
           : 'Stripe server or webhook configuration is incomplete.',
       },
       {
-        name: 'cloudflare',
-        passed: cloudflareConfigured,
+        name: 'cloudflare-workers-ai',
+        passed: cloudflareAiConfigured,
         required: false,
-        message: cloudflareConfigured
+        message: cloudflareAiConfigured
+          ? 'Cloudflare Workers AI is configured.'
+          : 'Cloudflare Workers AI configuration is incomplete.',
+      },
+      {
+        name: 'cloudflare-control-plane',
+        passed: cloudflareControlPlaneConfigured,
+        required: false,
+        message: cloudflareControlPlaneConfigured
           ? 'Cloudflare control-plane access is configured.'
           : 'Cloudflare control-plane access is not configured.',
       },

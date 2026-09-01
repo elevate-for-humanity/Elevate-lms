@@ -11,7 +11,7 @@ const AI_SECRET_KEYS = [
   'AZURE_OPENAI_API_KEY',
 ] as const;
 
-const TARGETS = ['barber-apprenticeship', 'cosmetology-apprenticeship'] as const;
+// This supervised recovery is scoped to Cosmetology. Barbering remains a separate\n// canonical course and must never block or consume this course's recovery run.\nconst TARGETS = ['cosmetology-apprenticeship'] as const;
 let failureStage = 'startup';
 
 async function hydrateProductionAISecrets() {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import StoreGuideChat from '@/components/store/StoreGuideChat';
 import GuidedTour from '@/components/store/GuidedTour';
 
@@ -9,6 +10,8 @@ interface StoreClientWrapperProps {
 }
 
 export default function StoreClientWrapper({ children }: StoreClientWrapperProps) {
+  const pathname = usePathname();
+  const demoRoute = pathname.startsWith('/store/demo');
   const [activeTourId, setActiveTourId] = useState<string | null>(null);
   const [showGuide, setShowGuide] = useState(false);
 
@@ -42,7 +45,7 @@ export default function StoreClientWrapper({ children }: StoreClientWrapperProps
   return (
     <>
       {children}
-      {showGuide && <StoreGuideChat onStartTour={handleStartTour} />}
+      {showGuide && !demoRoute && <StoreGuideChat onStartTour={handleStartTour} />}
       {activeTourId && (
         <GuidedTour
           tourId={activeTourId}

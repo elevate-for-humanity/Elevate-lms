@@ -41,7 +41,7 @@ export default function Page() {
             <div className="lg:col-span-3">
               <h1 className="text-3xl font-extrabold text-slate-900 mb-1">Dr. Carlina Wilkes</h1>
               <p className="text-brand-red-600 font-bold text-lg mb-1">Executive Director of Financial Operations &amp; Organizational Compliance</p>
-              <p className="text-slate-600 font-bold text-base mb-6">Financial Empowerment Program Instructor</p>
+              <p className="text-slate-600 font-bold text-base mb-6">Chair, Financial Literacy</p>
               <div className="text-slate-800 space-y-4 text-[16px] leading-relaxed">
                 <p>Dr. Wilkes brings over 24 years of federal experience with the Defense Finance and Accounting Service (DFAS) and holds DoD Financial Management Certification Level II. She oversees financial operations and organizational compliance at {PLATFORM_DEFAULTS.orgName}.</p>
                 <p>Her extensive background includes federal financial management, cost accounting, budget development and monitoring, audit readiness, regulatory compliance, financial reporting, and long-term financial planning. Her leadership helps Elevate maintain strong fiscal accountability across its programs and operations.</p>
@@ -55,7 +55,7 @@ export default function Page() {
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                   <a
-                    href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:9e274365-f578-4d7e-a21e-29f0e3647862"
+                    href="/images/programs/financial-literacy-flyer.jpg"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-6 py-3.5 font-extrabold text-slate-800 hover:border-slate-500"
@@ -82,7 +82,7 @@ export default function Page() {
               </h2>
             </div>
             <a
-              href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:9e274365-f578-4d7e-a21e-29f0e3647862"
+              href="/images/programs/financial-literacy-flyer.jpg"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3.5 font-extrabold text-white hover:bg-slate-800"
@@ -90,13 +90,14 @@ export default function Page() {
               Open Full Flyer <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>
-          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
-            <iframe
-              src="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:9e274365-f578-4d7e-a21e-29f0e3647862"
-              title="Financial Literacy Program flyer"
-              className="h-[720px] w-full sm:h-[900px]"
-              loading="lazy"
-              allowFullScreen
+          <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
+            <Image
+              src="/images/programs/financial-literacy-flyer.jpg"
+              alt="Elevate Financial Empowerment Program — 8-week practical financial literacy course led by Dr. Carlina A. Wilkes"
+              width={1189}
+              height={1536}
+              className="h-auto w-full"
+              sizes="(max-width: 768px) 100vw, 768px"
             />
           </div>
         </div>

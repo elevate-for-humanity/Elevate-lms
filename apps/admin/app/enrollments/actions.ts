@@ -58,11 +58,21 @@ export async function createEnrollment(data: {
   user_id: string;
   course_id: string;
   program_id?: string | null;
+  cohort_id?: string | null;
   status?: string;
   progress?: number;
 }) {
   const { user, supabase } = await requireAdminAction();
   const db = await requireAdminClient();
+  const { data: course, error: courseError } = await db
+    .from('courses')
+    .select('id,program_id,slug')
+    .eq('id', data.course_id)
+    .maybeSingle();
+  if (courseError || !course) throw new Error('Course configuration could not be resolved');
+  const programId = data.program_id ?? course.program_id;
+  if (!programId) throw new Error('Course is not connected to a program');
+
   const { data: existing } = await db
     .from('program_enrollments')
     .select('id')
@@ -75,11 +85,17 @@ export async function createEnrollment(data: {
     .from('program_enrollments')
     .insert({
       user_id: data.user_id,
+      student_id: data.user_id,
       course_id: data.course_id,
-      program_id: data.program_id ?? null,
+      program_id: programId,
+      program_slug: course.slug ?? null,
+      cohort_id: data.cohort_id ?? null,
       status: data.status ?? 'active',
       enrollment_state: data.status ?? 'active',
       progress: data.progress ?? 0,
+      progress_percent: data.progress ?? 0,
+      lms_enrolled: true,
+      access_granted_at: (data.status ?? 'active') === 'active' ? now : null,
       enrolled_at: now,
       created_at: now,
       updated_at: now,

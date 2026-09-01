@@ -1,9 +1,10 @@
 {
+  "id": "org.elevateforhumanity.launcher",
   "name": "Elevate for Humanity",
   "short_name": "Elevate",
   "description": "Workforce education and career development programs",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "/pwa/",
+  "scope": "/pwa/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",

@@ -1,4 +1,4 @@
-import { after, NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { VideoJob } from '@/lib/video/job-queue';
@@ -155,34 +155,37 @@ export async function POST(request: NextRequest) {
   }
   const claimedJobs = claimedRows as VideoJob[];
 
-  after(async () => {
-    const results = await Promise.allSettled(claimedJobs.map((job) => processClaimedVideoJob(job)));
-    results.forEach((result, index) => {
-      if (result.status === 'rejected') {
-        logger.error('[video-worker] Background processor failed', result.reason, {
-          jobId: claimedJobs[index]?.id,
-          courseId: claimedJobs[index]?.course_id,
-        });
-      }
-    });
-    const courseIds = [...new Set(claimedJobs.map((job) => job.course_id).filter(Boolean))];
-    for (const completedCourseId of courseIds) {
-      try {
-        const finalization = await finalizeCourseAutomaticallyIfReadyWithClient({
-          db,
-          courseId: completedCourseId,
-        });
-        logger.info('[video-worker] Automated course finalization checked', {
-          courseId: completedCourseId,
-          state: finalization.state,
-        });
-      } catch (finalizationError) {
-        logger.error('[video-worker] Automated course finalization failed', finalizationError, {
-          courseId: completedCourseId,
-        });
-      }
+  // The Admin service is self-hosted. Next's deferred after() callback did not
+  // execute reliably there, leaving claimed rows in rendering until their
+  // leases expired. Keep execution attached to the durable internal worker
+  // request; the instrumentation loop awaits this request and retries after a
+  // process restart, while database leases preserve duplicate safety.
+  const results = await Promise.allSettled(claimedJobs.map((job) => processClaimedVideoJob(job)));
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      logger.error('[video-worker] Processor failed', result.reason, {
+        jobId: claimedJobs[index]?.id,
+        courseId: claimedJobs[index]?.course_id,
+      });
     }
   });
+  const courseIds = [...new Set(claimedJobs.map((job) => job.course_id).filter(Boolean))];
+  for (const completedCourseId of courseIds) {
+    try {
+      const finalization = await finalizeCourseAutomaticallyIfReadyWithClient({
+        db,
+        courseId: completedCourseId,
+      });
+      logger.info('[video-worker] Automated course finalization checked', {
+        courseId: completedCourseId,
+        state: finalization.state,
+      });
+    } catch (finalizationError) {
+      logger.error('[video-worker] Automated course finalization failed', finalizationError, {
+        courseId: completedCourseId,
+      });
+    }
+  }
 
   return NextResponse.json(
     {
@@ -200,7 +203,9 @@ export async function POST(request: NextRequest) {
       activeBeforeClaim: active,
       maxConcurrent,
       queuedDraftJobId,
+      completed: results.filter((result) => result.status === 'fulfilled').length,
+      failed: results.filter((result) => result.status === 'rejected').length,
     },
-    { status: 202 },
+    { status: 200 },
   );
 }

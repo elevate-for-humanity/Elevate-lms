@@ -153,7 +153,7 @@ async function kickMediaWorker(courseId: string) {
       method: 'POST',
       headers: { authorization: `Bearer ${secret}`, 'content-type': 'application/json' },
       body: JSON.stringify({ courseId, maxJobs: 4 }),
-      signal: AbortSignal.timeout(45_000),
+      signal: AbortSignal.timeout(600_000),
     });
     const responseBody = await response.text();
     if (!response.ok) {
@@ -186,6 +186,10 @@ async function waitForMedia(courseId: string) {
   const deadline = Date.now() + MEDIA_TIMEOUT_MS;
 
   while (Date.now() < deadline) {
+    const recovery = await recoverCourseMediaJobs({ courseId });
+    if (recovery.recovered.length || recovery.blocked.length) {
+      console.log('[Business Course Builder] course-scoped media recovery', recovery);
+    }
     await repairMissingMedia(courseId);
     await kickMediaWorker(courseId);
     const rows = await loadCurrentMediaRows(db, courseId);

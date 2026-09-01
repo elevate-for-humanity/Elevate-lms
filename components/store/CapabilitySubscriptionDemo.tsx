@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { ArrowRight, CheckCircle2, CreditCard, PlayCircle, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, CreditCard, PlayCircle, Sparkles, TrendingUp, ShieldCheck, Layers3 } from 'lucide-react';
 
 type DemoStep = {
   eyebrow: string;
@@ -54,6 +54,14 @@ export default function CapabilitySubscriptionDemo({
 
   const [step, setStep] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const recommendedAddOns =
+    /workforce|compliance|government/i.test(categoryLabel)
+      ? ['ZORA compliance assistant', 'Reporting and audit workflows', 'Role-based access']
+      : /education|learning|course/i.test(categoryLabel)
+        ? ['ELLIE learner support', 'Credential management', 'Student progress reporting']
+        : /ai/i.test(categoryLabel)
+          ? ['Natural voice', 'CRM and workflow automation', 'AI Team Orchestrator']
+          : ['PARIS sales and intake', 'CRM and follow-up automation', 'Reporting dashboard'];
 
   useEffect(() => {
     if (!playing) return undefined;
@@ -131,6 +139,40 @@ export default function CapabilitySubscriptionDemo({
                 View / start {name} <ArrowRight className="h-4 w-4" />
               </Link>
             </aside>
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-4 lg:grid-cols-3">
+          <article className="rounded-2xl border border-emerald-400/30 bg-emerald-950/40 p-6">
+            <TrendingUp className="h-6 w-6 text-emerald-300" aria-hidden="true" />
+            <p className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-emerald-300">Operational upside</p>
+            <h2 className="mt-2 text-xl font-black">Turn a disconnected task into a tracked workflow</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-200">Reduce manual handoffs, preserve one accountable record, and give staff a repeatable process they can measure instead of rebuilding work in email and spreadsheets.</p>
+          </article>
+          <article className="rounded-2xl border border-cyan-400/30 bg-cyan-950/40 p-6">
+            <ShieldCheck className="h-6 w-6 text-cyan-300" aria-hidden="true" />
+            <p className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-cyan-300">Why it is a must-have</p>
+            <h2 className="mt-2 text-xl font-black">The proof stays connected to the action</h2>
+            <p className="mt-2 text-sm font-semibold leading-6 text-slate-200">A serious buyer should be able to verify ownership, status, history, outcomes, and exceptions. Elevate keeps those controls in the operating workflow instead of treating compliance as an after-the-fact report.</p>
+          </article>
+          <article className="rounded-2xl border border-orange-400/30 bg-orange-950/40 p-6">
+            <Layers3 className="h-6 w-6 text-orange-300" aria-hidden="true" />
+            <p className="mt-4 text-xs font-black uppercase tracking-[0.18em] text-orange-300">Recommended with this</p>
+            <ul className="mt-3 space-y-2">
+              {recommendedAddOns.map((item) => <li key={item} className="flex gap-2 text-sm font-bold text-slate-100"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-orange-300" />{item}</li>)}
+            </ul>
+          </article>
+        </div>
+
+        <div className="mt-8 rounded-2xl border border-white/15 bg-white/5 p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">Purchase path</p>
+            <h2 className="mt-2 text-2xl font-black">Test it, select the right capacity, then pay securely.</h2>
+            <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-200">Start a no-card trial or choose a base plan and add-ons. Workspace setup happens before payment so the subscription and entitlements attach to the correct organization.</p>
+          </div>
+          <div className="mt-5 grid shrink-0 gap-2 sm:mt-0">
+            <Link href="/store/plans" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 font-black text-white hover:bg-brand-red-700">Choose plan & payment <CreditCard className="h-4 w-4" /></Link>
+            <Link href="/store/trial" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 px-6 font-bold text-white hover:bg-white/10">Start 14-day trial</Link>
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ const PUBLIC_ROUTES = [
   '/',
   '/programs',
   '/apprenticeships',
-  '/programs/business',
+  '/programs/business-administration',
   '/programs/hvac-technician',
   '/programs/cdl-training',
   '/programs/barber-apprenticeship',

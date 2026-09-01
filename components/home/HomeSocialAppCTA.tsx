@@ -45,7 +45,7 @@ export function HomeSocialAppCTA() {
             </a>
           ))}
 
-          <Link href="/mobile-app" className="rounded-2xl bg-emerald-600 p-5 text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-emerald-700">
+          <Link href="/mobile-app" className="rounded-2xl bg-emerald-700 p-5 text-white shadow-lg transition hover:-translate-y-0.5 hover:bg-emerald-800">
             <Download className="h-7 w-7" aria-hidden="true" />
             <h3 className="mt-4 text-lg font-black">Download / Install the App</h3>
             <p className="mt-2 text-sm leading-6 text-white/90">Get iPhone, iPad, and Android installation steps and open Elevate from your home screen.</p>

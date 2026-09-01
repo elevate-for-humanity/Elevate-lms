@@ -13,6 +13,7 @@ on:
       - 'apps/lms/app/api/learner/**'
       - 'apps/lms/app/lms/courses/**'
       - 'lib/course-factory/**'
+      - 'lib/course-builder/**'
       - 'supabase/migrations/**'
       - 'scripts/audit-course-builder-procurement.mjs'
       - '.github/workflows/course-builder-procurement-gate.yml'
@@ -27,6 +28,7 @@ on:
       - 'apps/lms/app/api/learner/**'
       - 'apps/lms/app/lms/courses/**'
       - 'lib/course-factory/**'
+      - 'lib/course-builder/**'
       - 'supabase/migrations/**'
       - 'scripts/audit-course-builder-procurement.mjs'
 

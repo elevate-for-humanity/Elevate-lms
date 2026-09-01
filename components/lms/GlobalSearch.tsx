@@ -80,12 +80,12 @@ function GlobalSearchContent() {
   }, [initial]);
 
   return (
-    <form onSubmit={onSubmit} className="relative mx-auto flex max-w-2xl items-center">
-      <div className="relative w-full">
-        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+    <form onSubmit={onSubmit} className="relative flex min-w-0 w-full max-w-2xl items-center">
+      <div className="relative min-w-0 w-full">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 sm:left-4" />
         <input
           type="search"
-          className="w-full rounded-full border border-slate-200 bg-white pl-12 pr-32 py-4 text-sm md:text-base shadow-card focus:border-accent-500 focus:outline-none focus:ring-4 focus:ring-accent-100 transition-all"
+          className="min-h-11 min-w-0 w-full rounded-full border border-slate-200 bg-white py-2.5 pl-10 pr-11 text-sm shadow-card transition-all focus:border-accent-500 focus:outline-none focus:ring-4 focus:ring-accent-100 sm:py-4 sm:pl-12 sm:pr-32 md:text-base"
           placeholder="Search programs, courses, or topics…"
           value={query}
           onChange={(
@@ -94,9 +94,11 @@ function GlobalSearchContent() {
         />
         <button
           type="submit"
-          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-accent-500 px-6 py-2 text-sm font-semibold text-white shadow-md hover:bg-accent-600 active:scale-95 transition-all duration-200"
+          aria-label="Search"
+          className="absolute right-1 top-1/2 inline-flex min-h-9 min-w-9 -translate-y-1/2 items-center justify-center rounded-full bg-accent-500 px-2 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-accent-600 active:scale-95 sm:right-2 sm:px-6 sm:py-2"
         >
-          Search
+          <Search className="h-4 w-4 sm:hidden" aria-hidden="true" />
+          <span className="hidden sm:inline">Search</span>
         </button>
       </div>
     </form>

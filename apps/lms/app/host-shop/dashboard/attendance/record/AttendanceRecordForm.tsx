@@ -89,9 +89,9 @@ export default function AttendanceRecordForm({ students }: { students: Student[]
 
       <div className="space-y-4">
         {rows.map((row, index) => (
-          <fieldset key={row.placementId} className="rounded-2xl border border-slate-200 p-5">
+          <fieldset key={row.placementId} className="min-w-0 max-w-full overflow-hidden rounded-2xl border border-slate-200 p-4 sm:p-5">
             <legend className="absolute left-0 top-0 h-8 w-8 opacity-0">Attendance for {row.name}</legend>
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex min-w-0 max-w-full flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0">
                 <p className="font-black text-slate-950">{row.name}</p>
                 {row.email ? <p className="truncate text-sm text-slate-500">{row.email}</p> : null}
@@ -102,7 +102,7 @@ export default function AttendanceRecordForm({ students }: { students: Student[]
                 ) : null}
               </div>
 
-              <div className="grid gap-2 sm:grid-cols-4">
+              <div className="grid min-w-0 max-w-full gap-2 sm:grid-cols-4">
                 {(['present', 'absent', 'excused', 'late'] as AttendanceStatus[]).map((status) => (
                   <label
                     key={status}
@@ -126,14 +126,14 @@ export default function AttendanceRecordForm({ students }: { students: Student[]
               </div>
             </div>
 
-            <label className="mt-4 block">
+            <label className="mt-4 block min-w-0 max-w-full">
               <span className="mb-2 block text-xs font-bold uppercase tracking-wide text-slate-500">Notes (optional)</span>
               <textarea
                 value={row.notes}
                 maxLength={2000}
                 onChange={(event) => updateRow(index, { notes: event.target.value })}
                 rows={2}
-                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-950"
+                className="box-border min-w-0 max-w-full w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-950"
                 placeholder="Add an attendance note if needed"
               />
             </label>

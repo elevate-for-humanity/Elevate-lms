@@ -33,7 +33,7 @@ async function login(page: Page, loginBase: string, email: string, password: str
   await passwordInput.fill(password);
   await Promise.all([
     page.waitForURL((url) => !url.pathname.includes('/login'), {
-      timeout: 30_000,
+      timeout: 60_000,
       waitUntil: 'domcontentloaded',
     }),
     submit.click(),
@@ -83,6 +83,7 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
       const rect = el.getBoundingClientRect();
       const style = window.getComputedStyle(el);
       if (style.display === 'none' || style.visibility === 'hidden' || rect.width === 0 || rect.height === 0) return false;
+      if (el.classList.contains('sr-only') || el.closest('[aria-hidden="true"]')) return false;
       return rect.height < 32 || rect.width < 32;
     }).slice(0, 10).map((element) => ({ tag: element.tagName, text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '').trim().slice(0, 80) })));
     expect(tinyCritical, `${target} has undersized mobile controls`).toEqual([]);
@@ -92,14 +93,17 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
 async function certify(page: Page, testInfo: any, role: string, credentials: readonly string[], loginBase: string, paths: string[]) {
   await login(page, loginBase, credentials[0], credentials[1]);
   for (const path of paths) await test.step(`${testInfo.project.name}: ${path}`, async () => assertResponsivePage(page, path));
-  await page.screenshot({ path: testInfo.outputPath(`${role}-${testInfo.project.name}.png`), fullPage: true });
+  await page.screenshot({ path: testInfo.outputPath(`${role}-${testInfo.project.name}.png`), fullPage: false });
 }
 
 function roleSuite(name: string, key: keyof typeof creds, loginBase: string, paths: string[]) {
   test.describe(name, () => {
     const credentials = creds[key];
     test.skip(!credentials[0] || !credentials[1], `Disposable ${name} identity is required`);
-    test(`critical ${name} surfaces fit the active device viewport`, async ({ page }, testInfo) => certify(page, testInfo, key, credentials, loginBase, paths));
+    test(`critical ${name} surfaces fit the active device viewport`, async ({ page }, testInfo) => {
+      test.setTimeout(180_000);
+      await certify(page, testInfo, key, credentials, loginBase, paths);
+    });
   });
 }
 

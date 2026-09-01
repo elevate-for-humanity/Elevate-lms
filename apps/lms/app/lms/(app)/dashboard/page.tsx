@@ -245,14 +245,14 @@ export default async function StudentDashboard() {
   return (
     <div className="min-h-screen bg-white">
       <div className="border-b border-slate-200 bg-white px-4 py-3 sm:px-6">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm">
+        <div className="mx-auto flex min-w-0 max-w-6xl items-center justify-between gap-2 sm:gap-4">
+          <div className="flex shrink-0 items-center gap-2 text-sm">
             <GraduationCap className="h-4 w-4 text-brand-blue-700" aria-hidden="true" />
             <span className="font-bold text-slate-950">My Dashboard</span>
           </div>
-          <div className="flex items-center gap-3">
-            <GlobalSearch />
-            <NotificationBell />
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-2 sm:gap-3">
+            <div className="min-w-0 max-w-sm flex-1"><GlobalSearch /></div>
+            <div className="shrink-0"><NotificationBell /></div>
           </div>
         </div>
       </div>

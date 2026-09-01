@@ -47,8 +47,16 @@ export async function GET(request: NextRequest) {
   try {
     const services = await Promise.all(
       getNorthflankServices().map(async (cfg) => {
-        const service = await getNorthflankService(projectId, cfg.id);
+        const [service, healthResponse] = await Promise.all([
+          getNorthflankService(projectId, cfg.id),
+          fetch(`${cfg.url}${cfg.healthPath}`, {
+            cache: 'no-store',
+            signal: AbortSignal.timeout(5000),
+            headers: { 'User-Agent': 'ElevateDevStudio/1.0' },
+          }).catch(() => null),
+        ]);
         const status = statusOf(service);
+        const runtimeHealthy = isHealthy(status) || healthResponse?.ok === true;
         const deploymentStatus = service.deploymentStatus as
           | { lastTransitionTime?: string; updatedAt?: string }
           | undefined;
@@ -56,14 +64,16 @@ export async function GET(request: NextRequest) {
         return {
           name: cfg.id,
           status,
-          runningCount: isHealthy(status) ? 1 : 0,
+          runningCount: runtimeHealthy ? 1 : 0,
           desiredCount: 1,
           pendingCount: ['BUILDING', 'DEPLOYING', 'PENDING'].includes(status.toUpperCase()) ? 1 : 0,
           deployBranch: String(
             (service.vcsData as { projectBranch?: string } | undefined)?.projectBranch ?? 'main',
           ),
           lastDeployedAt: deploymentStatus?.lastTransitionTime ?? deploymentStatus?.updatedAt ?? null,
-          healthy: isHealthy(status),
+          healthy: runtimeHealthy,
+          providerStatus: status,
+          healthStatus: healthResponse?.status ?? null,
         };
       }),
     );

@@ -10,7 +10,7 @@ interface Agent {
   role: string;
   status: string;
   capabilities: string[];
-  created_at: string;
+  updated_at: string;
 }
 
 export default function AgentsClient() {
@@ -69,8 +69,7 @@ export default function AgentsClient() {
               AI Agents
             </h1>
             <p className="text-blue-100 text-lg mt-2 max-w-2xl">
-              10 autonomous agents powering the Elevate Dev Studio — from code generation to
-              compliance.
+              Registered autonomous agents and their persisted capabilities, status, and model assignment.
             </p>
           </div>
         </div>
@@ -137,7 +136,7 @@ export default function AgentsClient() {
                 </div>
               )}
               <p className="text-[10px] text-slate-400 mt-4">
-                Added {new Date(agent.created_at).toLocaleDateString()}
+                Updated {new Date(agent.updated_at).toLocaleDateString()}
               </p>
             </div>
           ))}
@@ -148,7 +147,7 @@ export default function AgentsClient() {
             <Bot className="mx-auto h-12 w-12 text-slate-300" />
             <p className="mt-3 text-sm font-medium text-slate-500">No agents found</p>
             <p className="text-xs text-slate-400 mt-1">
-              Integration pending: ai_agents table migration not yet applied
+              The agent registry is connected and currently contains no agents. Admin AI tools remain separate registered tools.
             </p>
           </div>
         )}

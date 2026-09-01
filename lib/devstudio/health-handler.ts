@@ -49,12 +49,24 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const hasGemini = isGeminiConfigured() || Boolean(selectedSecrets.GEMINI_API_KEY);
   const hasOpenAI = isOpenAIConfigured() || Boolean(selectedSecrets.OPENAI_API_KEY);
   const hasAnthropic = isAnthropicConfigured() || Boolean(selectedSecrets.ANTHROPIC_API_KEY);
-  const hasGitHub = Boolean(
-    process.env.GITHUB_TOKEN ||
+  const githubToken = process.env.GITHUB_TOKEN ||
       process.env.GH_TOKEN ||
       process.env.GITHUB_PAT ||
-      selectedSecrets.GITHUB_TOKEN,
-  );
+      selectedSecrets.GITHUB_TOKEN;
+  const hasGitHub = Boolean(githubToken);
+  let githubTokenValid = false;
+  if (githubToken) {
+    try {
+      const response = await fetch('https://api.github.com/user', {
+        headers: { Authorization: `Bearer ${githubToken}`, Accept: 'application/vnd.github+json' },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(5000),
+      });
+      githubTokenValid = response.ok;
+    } catch {
+      githubTokenValid = false;
+    }
+  }
   const aiConfigured = hasGroq || hasGemini || hasOpenAI || hasAnthropic;
   const northflankServices = getNorthflankServices().map((service) => ({
     key: service.key,
@@ -81,6 +93,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
     hasOpenAI,
     hasAnthropic,
     hasGitHub,
+    githubTokenValid,
     aiConfigured,
     supabaseUrlPresent: Boolean(
       process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
@@ -100,11 +113,12 @@ export async function handleDevStudioHealth(req: NextRequest) {
         process.env.GITHUB_REMOTE_URL || process.env.GITHUB_REPO,
       ),
       tokenPresent: hasGitHub,
+      tokenValid: githubTokenValid,
       pushScript: 'pnpm run git:push-main',
     },
     execution: {
       mode: 'admin-native',
-      ready: hasGitHub,
+      ready: githubTokenValid,
       legacyShellRemoved: true,
     },
     northflank: {

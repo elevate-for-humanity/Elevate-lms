@@ -218,10 +218,11 @@ export default function DevContainerPanel() {
   }
 
   async function deleteEnvironmentKey(key: string) {
-    if (!window.confirm(`Delete ${key} from canonical platform secrets?`)) return;
+    const confirmation = window.prompt(`Type CONFIRM DELETE SECRET to permanently delete ${key} from canonical platform secrets.`);
+    if (confirmation !== 'CONFIRM DELETE SECRET') return;
     setStatus(null);
     try {
-      const res = await fetch(`${ENV_API}?key=${encodeURIComponent(key)}`, { method: 'DELETE' });
+      const res = await fetch(`${ENV_API}?key=${encodeURIComponent(key)}`, { method: 'DELETE', headers: { 'x-confirmation': confirmation } });
       const payload = await readJson(res);
       if (!res.ok) throw new Error(errorMessage(payload, `Could not delete ${key}`));
       await loadEnvironment();

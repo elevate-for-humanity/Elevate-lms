@@ -90,8 +90,34 @@ describe('Admin Dashboard and Studio surface contract', () => {
   it('enforces production confirmation at server execution boundaries', () => {
     const shell = source('apps/admin/app/api/admin/dev-studio/shell/route.ts');
     const files = source('apps/admin/app/api/admin/dev-studio/files/route.ts');
+    const builds = source('apps/admin/app/api/admin/dev-studio/builds/route.ts');
+    const services = source('apps/admin/app/api/admin/dev-studio/services/route.ts');
+    const environment = source('apps/admin/app/api/admin/dev-studio/env/route.ts');
 
     expect(shell).toContain("requireTypedConfirmation(body?.confirmation, 'deploy_autopilot')");
     expect(files).toContain("requireTypedConfirmation(body.confirmation, 'git_push')");
+    expect(builds).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
+    expect(builds).toContain("return safeError('Northflank is not configured.");
+    expect(services).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
+    expect(environment).toContain("requireTypedConfirmation(req.headers.get('x-confirmation'), 'delete_secret')");
+  });
+
+  it('preflights the isolated browser runtime before enabling Chromium', () => {
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    expect(workspace).toContain("fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store' })");
+    expect(workspace).toContain('disabled={runtimeReady !== true}');
+    expect(workspace).toContain('STUDIO_BROWSER_PUBLIC_URL');
+  });
+
+  it('does not advertise the unconnected Live Canvas without its feature flag', () => {
+    const registry = source('lib/devstudio/workspace-registry.ts');
+    expect(registry).toContain("route: '/studio/canvas'");
+    expect(registry).toContain("featureFlag: 'LIVE_CANVAS_ENABLED'");
+  });
+
+  it('validates GitHub credentials before declaring Studio execution ready', () => {
+    const health = source('lib/devstudio/health-handler.ts');
+    expect(health).toContain("fetch('https://api.github.com/user'");
+    expect(health).toContain('ready: githubTokenValid');
   });
 });

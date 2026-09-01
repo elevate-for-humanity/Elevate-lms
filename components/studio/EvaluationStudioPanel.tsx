@@ -29,6 +29,9 @@ interface EvaluationRun {
     evidence?: string;
   }>;
   created_at: string;
+  total_cases?: number | null;
+  passed_cases?: number | null;
+  failed_cases?: number | null;
 }
 
 
@@ -204,7 +207,13 @@ export default function EvaluationStudioPanel() {
                       <p className="mt-3 font-medium">
                         Score: {run.score}
                       </p>
-                    )}
+                  )}
+
+                  {run.total_cases !== null && run.total_cases !== undefined && (
+                    <p className="mt-2 text-sm text-slate-600">
+                      Cases: {run.passed_cases ?? 0} passed · {run.failed_cases ?? 0} failed · {run.total_cases} total
+                    </p>
+                  )}
 
 
                   {Array.isArray(run.findings) &&

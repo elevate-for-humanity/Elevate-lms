@@ -124,13 +124,14 @@ export default function ServicesPanel() {
   useEffect(() => { load(); }, [load]);
 
   async function doAction(serviceKey: string, action: string) {
+    if (!window.confirm(`${action === 'restart' ? 'Restart the build for' : 'Deploy'} ${serviceKey} in production?`)) return;
     setActions((prev) => ({ ...prev, [serviceKey + action]: 'loading' }));
     setActionMsg((prev) => ({ ...prev, [serviceKey]: '' }));
     try {
       const res = await fetch('/api/admin/dev-studio/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, service: serviceKey }),
+        body: JSON.stringify({ action, service: serviceKey, confirmation: 'CONFIRM DEPLOY' }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? `HTTP ${res.status}`);

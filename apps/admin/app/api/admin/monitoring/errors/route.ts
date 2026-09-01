@@ -8,9 +8,7 @@ import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/**
- * Admin error surface for Lizzy — Sentry config, audit pipeline failures, shell wiring.
- */
+/** Admin error surface for Lizzy — Sentry config and audit pipeline failures. */
 export async function GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
@@ -54,11 +52,31 @@ export async function GET(request: Request) {
 
   const rows = auditFailures ?? [];
 
+  const readable = (value: unknown, fallback: string) => {
+    if (typeof value === 'string' && value.trim() && value !== '[object Object]') return value.trim();
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      const record = value as Record<string, unknown>;
+      for (const key of ['endpoint', 'action', 'operation', 'table', 'message', 'error', 'code']) {
+        const candidate = record[key];
+        if (typeof candidate === 'string' && candidate.trim()) return candidate.trim();
+      }
+    }
+    return fallback;
+  };
+
+  const normalizedFailures = rows.map((row) => ({
+    id: row.id,
+    endpoint: readable(row.context, 'audit_pipeline'),
+    error_message: readable(row.error_message, 'Audit operation failed'),
+    created_at: row.created_at,
+    resolved: row.resolved,
+  }));
+
   // MonitoringClient (/admin/monitoring) expects `errors` with API-error row shape
-  const errors = rows.map((row) => ({
+  const errors = normalizedFailures.map((row) => ({
     id: row.id,
     timestamp: row.created_at,
-    endpoint: row.context ?? 'audit_pipeline',
+    endpoint: row.endpoint,
     error: row.error_message ?? 'Audit write failed',
     statusCode: 500,
     ip: '—',
@@ -76,7 +94,7 @@ export async function GET(request: Request) {
     intake: {
       idempotencyTtlSeconds: Number(process.env.APPLICATION_INTAKE_IDEMPOTENCY_TTL_SECONDS || '86400'),
     },
-    auditFailures: rows,
+    auditFailures: normalizedFailures,
     errors,
     auditFailuresDegraded: Boolean(auditError),
     generatedAt: new Date().toISOString(),

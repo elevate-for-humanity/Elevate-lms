@@ -37,14 +37,20 @@ export default function MemoryClient() {
 
   async function addMemory() {
     if (!newKey || !newValue) return;
-    await fetch('/api/admin/dev-studio/memory', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key: newKey, value: newValue, category: 'manual' }),
-    });
-    setNewKey('');
-    setNewValue('');
-    fetchMemories();
+    try {
+      const response = await fetch('/api/admin/dev-studio/memory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: newKey, value: newValue, category: 'manual' }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || 'Failed to store memory');
+      setNewKey('');
+      setNewValue('');
+      await fetchMemories();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Failed to store memory');
+    }
   }
 
   useEffect(() => {
@@ -102,6 +108,7 @@ export default function MemoryClient() {
             />
             <button
               onClick={addMemory}
+              disabled={!newKey.trim() || !newValue.trim()}
               className="inline-flex items-center gap-2 rounded-full bg-teal-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-teal-700 transition shadow-sm"
             >
               <Plus className="h-4 w-4" /> Store
@@ -150,7 +157,7 @@ export default function MemoryClient() {
             <Brain className="mx-auto h-12 w-12 text-slate-300" />
             <p className="mt-3 text-sm font-medium text-slate-500">No memories stored yet</p>
             <p className="text-xs text-slate-400 mt-1">
-              Integration pending: ai_memory table migration not yet applied
+              The governed memory store is connected and currently has no records.
             </p>
           </div>
         )}

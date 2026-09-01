@@ -14,6 +14,8 @@ export interface EmailTemplate {
 
 export type TemplateKey =
   | 'enrollment_welcome'
+  | 'theory_schedule_start'
+  | 'theory_schedule_stop'
   | 'inquiry_received'
   | 'apprentice_submission_received'
   | 'hostshop_submission_received'
@@ -68,6 +70,36 @@ function button(text: string, url: string): string {
 
 export function getTemplate(key: TemplateKey, data: Record<string, any>): EmailTemplate {
   switch (key) {
+    case 'theory_schedule_start': {
+      const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/apprentice`;
+      return {
+        subject: 'It is time to start your scheduled theory session',
+        html: baseTemplate(`
+          <h2 style="color: ${BRAND_COLOR};">Start your theory session</h2>
+          <p>Hi ${data.name || 'there'},</p>
+          <p>Your scheduled theory block is starting now. Open your assigned course and continue the next required lesson.</p>
+          <p><strong>Weekly target:</strong> ${data.weekly_target_hours} hours<br><strong>Weekly maximum:</strong> ${data.weekly_max_hours} hours</p>
+          ${button('Open Apprentice Dashboard →', dashboardUrl)}
+        `),
+        text: `It is time to start your scheduled theory session.\n\nWeekly target: ${data.weekly_target_hours} hours\nWeekly maximum: ${data.weekly_max_hours} hours\n\nOpen your dashboard: ${dashboardUrl}`,
+      };
+    }
+
+    case 'theory_schedule_stop': {
+      const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/apprentice`;
+      return {
+        subject: 'Your scheduled theory block is complete',
+        html: baseTemplate(`
+          <h2 style="color: ${BRAND_COLOR};">Stop and save your theory work</h2>
+          <p>Hi ${data.name || 'there'},</p>
+          <p>Your scheduled theory block is complete. Save your work and return at your next scheduled session.</p>
+          <p>Keep working toward the <strong>${data.weekly_target_hours}-hour weekly target</strong> without exceeding the <strong>${data.weekly_max_hours}-hour weekly maximum</strong>.</p>
+          ${button('Review Apprentice Dashboard →', dashboardUrl)}
+        `),
+        text: `Your scheduled theory block is complete. Save your work and return at the next scheduled session.\n\nWeekly target: ${data.weekly_target_hours} hours\nWeekly maximum: ${data.weekly_max_hours} hours\n\nReview your dashboard: ${dashboardUrl}`,
+      };
+    }
+
     case 'enrollment_welcome': {
       const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/lms/dashboard`;
       const loginUrl = data.login_url || `${PLATFORM_DEFAULTS.siteUrl}/login`;

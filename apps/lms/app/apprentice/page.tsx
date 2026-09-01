@@ -50,7 +50,7 @@ export default async function ApprenticePortalPage() {
   });
   if (!runtime) redirect('/lms/dashboard?notice=apprentice-enrollment-required');
 
-  const [{ data: profile }, { data: docs }, certsRes, { data: documentRequirements }, { data: handbookAcceptance }, { data: cosmetologyBilling }] = await Promise.all([
+  const [{ data: profile }, { data: docs }, certsRes, { data: documentRequirements }, { data: handbookAcceptance }, { data: cosmetologyBilling }, { data: theorySchedule }] = await Promise.all([
     db.from('profiles').select('full_name,first_name,last_name').eq('id', subject.userId).maybeSingle(),
     db.from('documents').select('id,document_type,status,verification_status').eq('user_id', subject.userId),
     db.from('program_completion_certificates').select('id', { count: 'exact', head: true }).eq('user_id', subject.userId),
@@ -59,6 +59,9 @@ export default async function ApprenticePortalPage() {
     programSlug === 'cosmetology-apprenticeship'
       ? db.from('cosmetology_subscriptions').select('stripe_subscription_id,payment_status,setup_fee_paid,fully_paid').eq('user_id', subject.userId).order('created_at', { ascending: false }).limit(1).maybeSingle()
       : Promise.resolve({ data: null }),
+    (db as any).from('apprenticeship_theory_schedules')
+      .select('id,course_id,timezone,days_of_week,start_time,end_time,weekly_target_minutes,weekly_max_minutes,active')
+      .eq('user_id', subject.userId).eq('program_slug', programSlug).eq('active', true).limit(1).maybeSingle(),
   ]);
 
   const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Apprentice';
@@ -113,6 +116,7 @@ export default async function ApprenticePortalPage() {
       </section>
       <section className="rounded-3xl border-2 border-red-300 bg-red-50 p-6 shadow-sm"><div className="flex gap-3"><AlertCircle className="mt-1 h-6 w-6 shrink-0 text-red-700"/><div className="w-full"><h2 className="text-xl font-black text-red-950">Required to-do — {incompleteCount} incomplete</h2><p className="mt-1 text-sm font-semibold text-red-900">PARIS will walk you through these items in order. Red items must be completed before the corresponding activity is unlocked.</p><div className="mt-5 grid gap-3">{todoItems.map(({ label, done, href, icon: Icon }, index) => <Link key={label} href={href} className={`flex items-center justify-between gap-4 rounded-xl border p-4 ${done ? 'border-green-300 bg-green-50 text-green-950' : 'border-red-300 bg-white text-red-950'}`}><span className="flex items-center gap-3"><span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-black ${done ? 'bg-green-700 text-white' : 'bg-red-700 text-white'}`}>{done ? '✓' : index + 1}</span><Icon className="h-5 w-5 shrink-0"/><span className="font-black">{label}</span></span><span className="text-xs font-black uppercase">{done ? 'Complete' : 'Open'}</span></Link>)}</div></div></div></section>
       <section className="grid gap-4 sm:grid-cols-3"><Metric label="Host Salon" value={shopName} detail={runtime.placement?.supervisor_user_id ? 'Supervisor connected' : 'Supervisor verification still required'} icon={MapPin}/><Metric label="Required documents" value={`${Math.max(0, (documentRequirements?.length || 0) - missingDocumentCount)} / ${documentRequirements?.length || 0}`} detail={`${missingDocumentCount} incomplete`} icon={FileText}/><Metric label="Payment setup" value={billingConfigured ? 'Configured' : 'Required'} detail={billingConfigured ? 'Automatic billing is connected' : 'Authorize and add a card in Billing'} icon={CreditCard}/></section>
+      <TheorySchedulePanel schedule={theorySchedule} courseHref={courseHref} completedLessons={completedLessons} totalLessons={totalLessons}/>
     </main>;
   }
 
@@ -139,6 +143,8 @@ export default async function ApprenticePortalPage() {
 
     <section className="grid gap-5 lg:grid-cols-3"><ProgressPanel title="Registered competency mastery" value={progress.competencies.percent} detail={`${progress.competencies.completed} of ${progress.competencies.required} competencies verified`} /><ProgressPanel title="Verified Related Technical Instruction" value={progress.rti.percent} detail={`${progress.rti.verifiedHours.toFixed(2)} verified of ${progress.rti.requiredHours} required RTI hours`} /><ProgressPanel title="Digital course completion" value={digitalCoursePercent} detail={`${completedLessons} of ${totalLessons} published lessons complete; this does not itself award RTI credit`} /></section>
 
+    <TheorySchedulePanel schedule={theorySchedule} courseHref={courseHref} completedLessons={completedLessons} totalLessons={totalLessons}/>
+
     <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><h2 className="text-xl font-black text-slate-950">Progressive wage checkpoint</h2><p className="mt-2 text-sm font-medium leading-6 text-slate-700">The applicable wage floor resolves the immutable occupation baseline and any employer-specific RAPIDS wage schedule without flattening one employer&apos;s schedule into the occupation standard.</p><div className="mt-4 flex flex-wrap gap-3 text-sm font-bold"><span className="rounded-full bg-slate-100 px-3 py-2">Current registered floor: ${wage.requiredRegisteredRate.toFixed(2)}/hr</span>{nextWageMilestone ? <span className="rounded-full bg-amber-100 px-3 py-2 text-amber-950">Next baseline milestone: {nextWageMilestone.completedCompetencies} competencies → ${nextWageMilestone.hourlyRate.toFixed(2)}/hr</span> : <span className="rounded-full bg-green-100 px-3 py-2 text-green-950">Final baseline competency milestone reached</span>}</div></section>
 
     <section><div className="mb-4"><h2 className="text-2xl font-black text-slate-950">Apprentice tools</h2><p className="mt-1 text-sm font-medium text-slate-700">All tools use the same enrollment, placement, Host Shop, registered standard, and audit records.</p></div><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{actions.map((action) => <Link key={action.title} href={action.href} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-red-300 hover:shadow-md"><div className="relative aspect-[16/9] overflow-hidden bg-slate-100"><Image src={action.image} alt="" fill sizes="(max-width:640px) 100vw,25vw" className="object-cover transition-transform group-hover:scale-[1.03]" /></div><div className="p-5"><h3 className="font-black text-slate-950">{action.title}</h3><p className="mt-1 text-sm font-medium leading-6 text-slate-700">{action.text}</p></div></Link>)}</div></section>
@@ -151,4 +157,16 @@ function Metric({ label, value, detail, icon: Icon }: { label: string; value: st
 
 function ProgressPanel({ title, value, detail }: { title: string; value: number; detail: string }) {
   return <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between gap-4"><h3 className="font-black text-slate-950">{title}</h3><span className="text-sm font-black text-slate-800">{value}%</span></div><div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-brand-red-600" style={{ width: `${Math.min(100, Math.max(0, value))}%` }} /></div><p className="mt-3 text-sm font-medium leading-6 text-slate-700">{detail}</p></article>;
+}
+
+const THEORY_DAY_LABELS: Record<number, string> = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday' };
+
+function TheorySchedulePanel({ schedule, courseHref, completedLessons, totalLessons }: { schedule: any; courseHref: string; completedLessons: number; totalLessons: number }) {
+  if (!schedule) return <section className="rounded-3xl border border-amber-300 bg-amber-50 p-6 shadow-sm"><h2 className="text-xl font-black text-amber-950">Theory schedule is being assigned</h2><p className="mt-2 text-sm font-semibold leading-6 text-amber-900">Your recurring theory schedule is created automatically from your active Host Shop placement. Return here after the placement record finishes syncing.</p></section>;
+  const days = (schedule.days_of_week || []).map((day: number) => THEORY_DAY_LABELS[day]).filter(Boolean).join(', ');
+  const time = (value: string) => {
+    const [hour, minute] = String(value).split(':').map(Number);
+    return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(new Date(2020, 0, 1, hour, minute));
+  };
+  return <section className="rounded-3xl border border-fuchsia-200 bg-fuchsia-50 p-6 shadow-sm sm:p-8"><div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.15em] text-fuchsia-800">Your weekly theory plan</p><h2 className="mt-2 text-2xl font-black text-slate-950">{days}</h2><p className="mt-2 font-bold text-slate-800">{time(schedule.start_time)}–{time(schedule.end_time)} · {schedule.timezone}</p><p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">Complete <strong>{schedule.weekly_target_minutes / 60} theory hours each week</strong>. Do not exceed <strong>{schedule.weekly_max_minutes / 60} theory hours in a full week</strong>. You will receive automatic alerts when each scheduled block starts and stops.</p><p className="mt-2 text-sm font-semibold text-slate-700">Course progress: {completedLessons} of {totalLessons} published lessons complete.</p></div><div className="flex flex-wrap gap-3"><Link href={courseHref} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-fuchsia-800 px-5 py-3 font-black text-white">Start theory course</Link><a href="/docs/syllabi/cosmetology-apprenticeship.md" target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-fuchsia-300 bg-white px-5 py-3 font-black text-fuchsia-950">Open syllabus</a></div></div></section>;
 }

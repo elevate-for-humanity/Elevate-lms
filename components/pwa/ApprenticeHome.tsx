@@ -57,13 +57,15 @@ const DISCIPLINE_CONFIG = {
     icon: <Flower2 className="w-10 h-10 text-white" />,
     color: 'bg-rose-700',
     lightColor: 'bg-rose-500',
-    targetHours: 700,
+    targetHours: 0,
+    targetCompetencies: 20,
+    requiredRtiHours: 300,
     applyHref: '/programs/esthetician/apply',
     logHref: '/pwa/esthetician/log-hours',
     historyHref: '/pwa/esthetician/history',
     progressHref: '/pwa/esthetician/progress',
     lmsHref: '/lms/dashboard',
-    subtitle: 'Track your hours, access training, and progress toward your esthetician license.',
+    subtitle: 'Complete 20 Appendix A competencies and 300 RTI hours while documenting supervised work.',
   },
 };
 
@@ -131,8 +133,9 @@ function Dashboard({
   discipline: Props['discipline'];
 }) {
   const config = DISCIPLINE_CONFIG[discipline];
-  const pct = Math.min(100, Math.round((data.totalHours / config.targetHours) * 100));
-  const remaining = Math.max(0, config.targetHours - data.totalHours);
+  const isCompetencyBased = discipline === 'esthetician';
+  const pct = isCompetencyBased ? 0 : Math.min(100, Math.round((data.totalHours / config.targetHours) * 100));
+  const remaining = isCompetencyBased ? 0 : Math.max(0, config.targetHours - data.totalHours);
 
   return (
     <div className="min-h-screen bg-slate-900 pb-8">
@@ -143,7 +146,30 @@ function Dashboard({
       </div>
 
       <div className="px-4 -mt-4 space-y-4 max-w-lg mx-auto">
-        {/* Hours progress card */}
+        {/* Registered-program progress card */}
+        {isCompetencyBased ? (
+          <div className="bg-slate-800 rounded-2xl p-5">
+            <div className="flex items-center gap-2 text-slate-300 text-sm font-medium">
+              <Award className="w-4 h-4" /> Appendix A completion
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="rounded-xl bg-slate-900 p-4">
+                <p className="text-3xl font-black text-white">20</p>
+                <p className="mt-1 text-xs font-semibold text-slate-400">verified competencies</p>
+              </div>
+              <div className="rounded-xl bg-slate-900 p-4">
+                <p className="text-3xl font-black text-white">300</p>
+                <p className="mt-1 text-xs font-semibold text-slate-400">required RTI hours</p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm leading-6 text-slate-300">
+              Esthetician completion is competency-based. Supervised work hours remain auditable evidence and are not a fixed completion denominator.
+            </p>
+            <Link href={config.progressHref} className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700">
+              View competency progress <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+        ) : (
         <div className="bg-slate-800 rounded-2xl p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 text-slate-300 text-sm font-medium">
@@ -171,6 +197,7 @@ function Dashboard({
             </p>
           )}
         </div>
+        )}
 
         {/* This week */}
         <div className="bg-slate-800 rounded-2xl p-5 flex items-center justify-between">

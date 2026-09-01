@@ -126,6 +126,25 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('Live inspection');
   });
 
+  it('consolidates the legacy testing screen into the governed Testing Center', () => {
+    const legacy = source('apps/admin/app/testing/page.tsx');
+    const canonical = source('apps/admin/app/testing-center/page.tsx');
+
+    expect(legacy).toContain("redirect('/testing-center')");
+    expect(legacy).not.toContain("from('testing_sessions')");
+    expect(canonical).toContain("from('exam_bookings')");
+    expect(canonical).toContain("from('exam_sessions')");
+    expect(canonical).toContain("from('testing_slots')");
+  });
+
+  it('does not duplicate the Course Builder under multiple program labels', () => {
+    const programs = source('apps/admin/app/programs/page.tsx');
+
+    expect(programs.match(/href="\/course-builder"/g)).toHaveLength(1);
+    expect(programs).not.toContain('>Program Builder<');
+    expect(programs).toContain('>Course Library<');
+  });
+
   it('validates GitHub credentials before declaring Studio execution ready', () => {
     const health = source('lib/devstudio/health-handler.ts');
     expect(health).toContain("fetch('https://api.github.com/user'");

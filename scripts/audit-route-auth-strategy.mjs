@@ -32,6 +32,7 @@ const PATTERNS = {
   ADMIN: [
     /requireAdmin\b/,
     /apiRequireAdmin\b/,
+    /apiRequireDevStudio\b/,
     /requireRole\b/,
     /requireInstructor\b/,
     /apiRequireInstructor\b/,

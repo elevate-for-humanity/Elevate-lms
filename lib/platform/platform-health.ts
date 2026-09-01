@@ -159,14 +159,15 @@ async function checkRedis(): Promise<ServiceCheck> {
 }
 
 async function checkStripe(): Promise<ServiceCheck> {
-  const key = process.env.STRIPE_SECRET_KEY?.trim();
-  const configured = Boolean(key && key.startsWith('sk_'));
+  const { getStripeRuntimeKey } = await import('@/lib/stripe/runtime-key');
+  const key = getStripeRuntimeKey();
+  const configured = Boolean(key);
   if (!configured) {
     return {
       name: 'Stripe',
       status: 'unknown',
       configured: false,
-      message: 'STRIPE_SECRET_KEY not set',
+      message: 'Stripe server credential not set',
     };
   }
 

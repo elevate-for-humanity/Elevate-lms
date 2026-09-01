@@ -140,23 +140,53 @@ function scanProductDestinations(config: TenantSiteConfig, issues: SiteValidatio
 
 function scanPublishedClaims(config: TenantSiteConfig, issues: SiteValidationIssue[]) {
   const claims = new Map((config.claims || []).map((claim) => [claim.key, claim]));
-  const requireEvidence = (key: string, present: boolean) => {
+  const normalizedValue = (value: unknown) => typeof value === 'string'
+    ? value.trim().replace(/\s+/g, ' ').toLowerCase()
+    : JSON.stringify(value);
+  const requireEvidence = (key: string, present: boolean, displayedValue?: unknown, page?: TenantSitePage, section?: TenantSiteSection) => {
     if (!present) return;
     const claim = claims.get(key);
-    if (!claim || !['verified', 'owner_attested'].includes(claim.status) || !text(claim.source) || !text(claim.verifiedAt)) {
+    if (!claim || claim.status !== 'verified' || !text(claim.source) || !text(claim.verifiedAt)) {
       issues.push({
         severity: 'error',
         code: 'unverified_public_claim',
         message: `Public claim “${key}” requires a source and verification timestamp before publishing.`,
+        page: page?.slug,
+        sectionId: section?.id,
+      });
+    } else if (displayedValue !== undefined && normalizedValue(displayedValue) !== normalizedValue(claim.value)) {
+      issues.push({
+        severity: 'error',
+        code: 'public_claim_value_mismatch',
+        message: `Displayed value for “${key}” does not match the verified evidence record.`,
+        page: page?.slug,
+        sectionId: section?.id,
       });
     }
   };
 
-  requireEvidence('student_count', config.stats?.students !== undefined);
-  requireEvidence('completion_rate', Boolean(text(config.stats?.completionRate)));
-  requireEvidence('employer_count', config.stats?.employers !== undefined);
-  requireEvidence('rating', Boolean(text(config.stats?.rating)));
-  requireEvidence('testimonial', Boolean(config.testimonial?.quote || config.testimonial?.author));
+  requireEvidence('student_count', config.stats?.students !== undefined, config.stats?.students);
+  requireEvidence('completion_rate', Boolean(text(config.stats?.completionRate)), config.stats?.completionRate);
+  requireEvidence('employer_count', config.stats?.employers !== undefined, config.stats?.employers);
+  requireEvidence('rating', Boolean(text(config.stats?.rating)), config.stats?.rating);
+  requireEvidence('testimonial', Boolean(config.testimonial?.quote || config.testimonial?.author), config.testimonial?.quote);
+
+  for (const page of config.pages || []) {
+    for (const section of page.sections) {
+      if (section.type !== 'stats' && section.type !== 'testimonial' && section.type !== 'pricing') continue;
+      const sectionKey = text(section.content.claimKey);
+      const items = Array.isArray(section.content.items) ? section.content.items : [];
+      const sectionValue = section.type === 'testimonial' ? section.content.quote : section.content.value;
+      if (sectionKey) requireEvidence(sectionKey, true, sectionValue, page, section);
+      else if (items.length === 0) requireEvidence(`${section.type}:${section.id}`, true, sectionValue, page, section);
+      for (const [index, item] of items.entries()) {
+        const record = item && typeof item === 'object' ? item as Record<string, unknown> : {};
+        const itemKey = text(record.claimKey);
+        const displayed = section.type === 'pricing' ? record.price : section.type === 'testimonial' ? record.quote : record.value;
+        requireEvidence(itemKey || `${section.type}:${section.id}:${index}`, true, displayed, page, section);
+      }
+    }
+  }
 }
 
 export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResult {

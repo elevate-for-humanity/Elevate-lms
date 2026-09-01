@@ -62,7 +62,7 @@ describe('Website Builder publish contract', () => {
     const result = validateSiteConfig(config);
     expect(result.warnings.some((issue) => issue.code === 'contact_page_without_form')).toBe(true);
   });
-  it('blocks public proof without claim evidence and accepts sourced owner-attested proof', () => {
+  it('blocks public proof until an authorized verification is recorded', () => {
     const config = ensureComposableSiteConfig(buildDefaultSiteConfig({ organizationName: 'Verified Proof Test' }));
     config.stats = { students: 25 };
 
@@ -76,8 +76,43 @@ describe('Website Builder publish contract', () => {
       verifiedAt: '2026-09-01T00:00:00.000Z',
       status: 'owner_attested',
     }];
+    const attested = validateSiteConfig(config);
+    expect(attested.errors.some((issue) => issue.code === 'unverified_public_claim')).toBe(true);
+
+    config.claims[0].status = 'verified';
     const accepted = validateSiteConfig(config);
     expect(accepted.errors.some((issue) => issue.code === 'unverified_public_claim')).toBe(false);
+  });
+
+  it('blocks claim sections that try to bypass the canonical claim registry', () => {
+    const config = ensureComposableSiteConfig(buildDefaultSiteConfig({ organizationName: 'Section Proof Test' }));
+    const home = config.pages?.find((page) => page.slug === '/');
+    if (!home) throw new Error('Expected home page');
+    home.sections.push({
+      id: 'proof',
+      type: 'stats',
+      visible: true,
+      content: { items: [{ label: 'Customers', value: 5000 }] },
+      settings: {},
+    });
+
+    const blocked = validateSiteConfig(config);
+    expect(blocked.errors.some((issue) => issue.code === 'unverified_public_claim' && issue.sectionId === 'proof')).toBe(true);
+
+    config.claims = [{
+      key: 'customer_count',
+      value: 5000,
+      source: 'Signed customer ledger review',
+      verifiedAt: '2026-09-01T00:00:00.000Z',
+      status: 'verified',
+    }];
+    (home.sections.at(-1)?.content.items as Array<Record<string, unknown>>)[0].claimKey = 'customer_count';
+    const accepted = validateSiteConfig(config);
+    expect(accepted.errors.some((issue) => issue.code === 'unverified_public_claim')).toBe(false);
+
+    (home.sections.at(-1)?.content.items as Array<Record<string, unknown>>)[0].value = 50000;
+    const tampered = validateSiteConfig(config);
+    expect(tampered.errors.some((issue) => issue.code === 'public_claim_value_mismatch')).toBe(true);
   });
 
 });

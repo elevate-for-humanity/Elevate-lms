@@ -3,22 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Loader2, Mic, MicOff, Sparkles, Volume2 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
-
-type FieldKey = 'businessName' | 'industry' | 'services' | 'audience' | 'style' | 'goal' | 'extra';
-type InterviewField = { key: FieldKey; label: string; question: string; placeholder: string };
-
-const fields: InterviewField[] = [
-  { key: 'businessName', label: 'Identity', question: "What's the business or organization called?", placeholder: 'Bright Path Home Care' },
-  { key: 'industry', label: 'Business', question: 'What kind of business is it?', placeholder: 'Home care, salon, training school, construction...' },
-  { key: 'services', label: 'Offer', question: 'What should people be able to buy, book, apply for, or learn about?', placeholder: 'Your main services, programs, products, or offers' },
-  { key: 'audience', label: 'Audience', question: 'Who do you most want this website to reach?', placeholder: 'Families, students, employers, local customers...' },
-  { key: 'style', label: 'Direction', question: 'How should the site feel when someone lands on it?', placeholder: 'Luxury, editorial, bold, calm, modern, clinical...' },
-  { key: 'goal', label: 'Conversion', question: 'What is the one action that matters most?', placeholder: 'Book, call, apply, buy, request a quote...' },
-  { key: 'extra', label: 'Details', question: 'Anything specific you do or do not want on the site?', placeholder: 'Pages, colors, offers, references, things to avoid...' },
-];
+import {
+  getWebsiteInterviewQuestions,
+  missingRequiredWebsiteAnswers,
+  type WebsiteInterviewAnswers,
+} from '@/lib/website-builder/interview';
 
 export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any) => void }) {
-  const [values, setValues] = useState<Record<FieldKey, string>>({ businessName: '', industry: '', services: '', audience: '', style: '', goal: '', extra: '' });
+  const [values, setValues] = useState<WebsiteInterviewAnswers>({});
   const [step, setStep] = useState(0);
   const [listening, setListening] = useState(false);
   const [building, setBuilding] = useState(false);
@@ -26,10 +18,11 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
   const [autoVoice, setAutoVoice] = useState(false);
   const recognitionRef = useRef<any>(null);
   const naturalVoice = useNaturalVoice();
-  const current = fields[step];
+  const fields = useMemo(() => getWebsiteInterviewQuestions(values), [values]);
+  const current = fields[Math.min(step, fields.length - 1)];
 
-  const canBuild = useMemo(() => values.businessName.trim() && values.industry.trim() && values.services.trim(), [values]);
-  const answered = useMemo(() => fields.filter((field) => values[field.key].trim()).length, [values]);
+  const canBuild = useMemo(() => missingRequiredWebsiteAnswers(values).length === 0, [values]);
+  const answered = useMemo(() => fields.filter((field) => values[field.key]?.trim()).length, [fields, values]);
   const progress = Math.round(((step + 1) / fields.length) * 100);
 
   const speakQuestion = async () => {
@@ -84,7 +77,7 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
       const response = await fetch('/api/apps/website-builder/ai-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ answers: values }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'PARIS could not build the website');
@@ -115,7 +108,7 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
           <div className="mt-8 space-y-2">
             {fields.map((field, index) => {
               const active = index === step;
-              const complete = Boolean(values[field.key].trim());
+              const complete = Boolean(values[field.key]?.trim());
               return (
                 <button
                   key={field.key}
@@ -166,7 +159,7 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
             <h3 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{current.question}</h3>
             <div className="mt-6 flex gap-3">
               <textarea
-                value={values[current.key]}
+                value={values[current.key] || ''}
                 onChange={(event) => setValues((prev) => ({ ...prev, [current.key]: event.target.value }))}
                 placeholder={current.placeholder}
                 rows={5}

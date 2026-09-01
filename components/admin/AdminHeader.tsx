@@ -37,6 +37,7 @@ const NAV_ITEMS = [
   { label: 'Partners', href: '/partners', icon: Handshake },
   { label: 'Marketing', href: '/crm', icon: Megaphone },
   { label: 'Compliance', href: '/compliance', icon: ShieldCheck },
+  { label: 'Website Claims', href: '/website-claims', icon: ShieldCheck },
   { label: 'Dev Studio', href: '/studio', icon: Bot },
 ] as const;
 

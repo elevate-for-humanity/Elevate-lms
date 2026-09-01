@@ -134,8 +134,11 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
   }
 
   if (section.type === 'stats') {
-    const source = c.items && typeof c.items === 'object' && !Array.isArray(c.items) ? c.items as Record<string, unknown> : c;
-    return <section className="mx-auto grid max-w-6xl gap-4 px-5 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">{Object.entries(source).slice(0, 8).map(([key, value]) => <div key={key} className="rounded-2xl border border-black/10 bg-white p-6 text-center"><p className="text-3xl font-black" style={{ color: primary }}>{String(value ?? '')}</p><p className="mt-2 text-sm font-bold capitalize text-slate-500">{key.replace(/([A-Z])/g, ' $1')}</p></div>)}</section>;
+    const items = list(c.items);
+    const stats = items.length
+      ? items.map((item, index) => ({ key: text(item.label) || `stat-${index}`, label: text(item.label), value: item.value }))
+      : Object.entries(c).filter(([key]) => !['claimKey', 'title', 'text', 'items'].includes(key)).map(([key, value]) => ({ key, label: key.replace(/([A-Z])/g, ' $1'), value }));
+    return <section className="mx-auto grid max-w-6xl gap-4 px-5 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">{stats.slice(0, 8).map((stat) => <div key={stat.key} className="rounded-2xl border border-black/10 bg-white p-6 text-center"><p className="text-3xl font-black" style={{ color: primary }}>{String(stat.value ?? '')}</p><p className="mt-2 text-sm font-bold capitalize text-slate-500">{stat.label}</p></div>)}</section>;
   }
 
   if (section.type === 'gallery') {

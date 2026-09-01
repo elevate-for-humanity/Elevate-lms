@@ -63,6 +63,7 @@ export type TenantSitePage = {
 export type TenantSiteClaim = {
   key: string;
   value: unknown;
+  text?: string;
   source: string | null;
   verifiedAt: string | null;
   status: 'verified' | 'owner_attested' | 'owner_verification_required';

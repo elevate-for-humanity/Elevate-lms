@@ -5,6 +5,7 @@ import { bridgeLegacyPatchIntoComposition } from '@/lib/tenant/legacy-compositio
 import { validateSiteConfig } from '@/lib/tenant/site-validation';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { loadVerifiedWebsiteClaims } from '@/lib/tenant/website-claims';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -68,6 +69,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const existing = site.site_config && typeof site.site_config === 'object' ? mergeSiteConfig(base, site.site_config as Partial<TenantSiteConfig>) : base;
   const configPatch = body.siteConfig && typeof body.siteConfig === 'object' ? body.siteConfig as Partial<TenantSiteConfig> : {};
   const merged = bridgeLegacyPatchIntoComposition(mergeSiteConfig(existing, configPatch), configPatch);
+
+  // Verification state is server authority. Never trust claims embedded in a
+  // browser-supplied site_config, even when the rest of the draft is editable.
+  try {
+    merged.claims = await loadVerifiedWebsiteClaims(supabase, websiteId);
+  } catch {
+    return NextResponse.json({ error: 'Claim verification service is unavailable; the website was not saved or published.' }, { status: 503 });
+  }
 
   const update: Record<string, unknown> = { site_name: siteName, site_config: merged, updated_at: new Date().toISOString() };
 

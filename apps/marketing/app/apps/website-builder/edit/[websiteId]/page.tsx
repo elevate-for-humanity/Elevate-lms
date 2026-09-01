@@ -10,6 +10,7 @@ import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-si
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { WebsiteClaimsPanel } from '@/components/website-builder/WebsiteClaimsPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,6 +53,7 @@ export default async function WebsiteEditorPage({ params }: Props) {
         initialConfig={config}
       />
       <BusinessCardsPanel websiteId={site.id} />
+      <WebsiteClaimsPanel websiteId={site.id} />
       <DomainPanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
       <WebsiteAdvancedSettings websiteId={site.id} initialConfig={config} />
     </>

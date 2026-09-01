@@ -61,7 +61,7 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
       name: 'AI Website Builder',
       reason: 'Create, edit, preview and publish a business website without code.',
       href: '/store/apps/website-builder',
-      demoHref: '/store/demo/capability/website_builder',
+      demoHref: '/store/demo/website',
       badge: 'Start here',
     });
     common.push({
@@ -69,14 +69,14 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
       name: 'CRM',
       reason: 'Capture leads and keep customer follow-up connected to your website.',
       href: '/store#marketplace',
-      demoHref: '/store/demo/capability/crm',
+      demoHref: '/store/demo/crm',
     });
     common.push({
       key: 'ai_paris',
       name: 'AI Assistant',
       reason: 'Automate routine questions, follow-up and business support.',
       href: '/store#marketplace',
-      demoHref: '/store/demo/capability/ai_paris',
+      demoHref: '/store/demo/ai-studio',
     });
   }
   if (goal === 'course') {
@@ -86,7 +86,7 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
       reason:
         'Describe the course and let AI create the starting structure, lessons and assessments.',
       href: '/store#marketplace',
-      demoHref: '/store/demo/capability/course_builder',
+      demoHref: '/store/demo/ai-studio',
       badge: 'Best match',
     });
     common.push({
@@ -94,7 +94,7 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
       name: 'LMS',
       reason: 'Deliver training, track progress and manage learners.',
       href: '/store#marketplace',
-      demoHref: '/store/demo/capability/lms',
+      demoHref: '/store/demo/lms',
     });
   }
   if (goal === 'community') {
@@ -111,7 +111,7 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
       name: 'AI Team',
       reason: 'Add guided onboarding, support and engagement assistance.',
       href: '/store#marketplace',
-      demoHref: '/store/demo/capability/ai_orchestrator',
+      demoHref: '/store/demo/ai-studio',
     });
   }
   if (goal === 'customers') {
@@ -120,7 +120,7 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
       name: 'CRM',
       reason: 'Create a customer pipeline, follow-up process and shared record of activity.',
       href: '/store#marketplace',
-      demoHref: '/store/demo/capability/crm',
+      demoHref: '/store/demo/crm',
       badge: 'Best match',
     });
     common.push({
@@ -128,7 +128,7 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
       name: 'AI Assistant',
       reason: 'Reduce manual follow-up and repetitive customer questions.',
       href: '/store#marketplace',
-      demoHref: '/store/demo/capability/ai_paris',
+      demoHref: '/store/demo/ai-studio',
     });
   }
   if (goal === 'grants') {
@@ -137,7 +137,7 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
       name: 'Grants Discovery',
       reason: 'Search, match and track funding opportunities from one workspace.',
       href: '/store/apps/grants',
-      demoHref: '/store/demo/capability/grants_discovery',
+      demoHref: '/store/demo/admin',
       badge: 'Best match',
     });
   }
@@ -147,7 +147,7 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
       name: 'SAM.gov Manager',
       reason: 'Use a guided workflow for registration, renewals and compliance tracking.',
       href: '/store/apps/sam-gov',
-      demoHref: '/store/demo/capability/sam_gov_manager',
+      demoHref: '/store/demo/admin',
       badge: 'Best match',
     });
   }
@@ -181,7 +181,7 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
       reason:
         'Add learner delivery, progress and training records when your organization needs them.',
       href: '/store#marketplace',
-      demoHref: '/store/demo/capability/lms',
+      demoHref: '/store/demo/lms',
     });
   }
   return common.slice(0, 4);

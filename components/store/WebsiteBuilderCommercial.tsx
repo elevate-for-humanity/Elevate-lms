@@ -86,7 +86,7 @@ const INITIAL_SITE: BuilderState = {
 };
 
 const EXAMPLE_PROMPT =
-  'Build me a luxury dental website in Indianapolis with online booking, financing, implants, Invisalign, testimonials, white and gold branding, and a strong mobile version.';
+  'Build a premium black-and-gold commerce website for MERI-GOLD-ROUND Multi-Zone Oil by Curvature Body Sculpting. Use the real product images and customer-care email curvaturebodysculpting@gmail.com. Include benefits, ingredients, quantity selection, cart, secure Stripe checkout, shipping, policies, SEO, mobile preview, and persuasive reasons to buy.';
 
 const INTERVIEW_QUESTIONS = [
   'Are you building a new website or importing an existing one? If importing, include the current website URL.',
@@ -456,13 +456,19 @@ export default function WebsiteBuilderCommercial() {
               }}
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-5 font-black text-white shadow-sm hover:bg-brand-red-800"
             >
-              <Play className="h-5 w-5" /> Preview completed example
+              <Play className="h-5 w-5" /> Preview Meri-Gold-Round store
             </button>
             <Link
               href="/apps/website-builder/start-trial"
               className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-5 font-black text-slate-950 hover:bg-slate-50"
             >
               Open the real builder
+            </Link>
+            <Link
+              href="/apps/website-builder/import"
+              className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 font-black text-slate-800 hover:bg-slate-50"
+            >
+              Import an existing website
             </Link>
           </div>
         </div>

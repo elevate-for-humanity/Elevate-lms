@@ -78,7 +78,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          pnpm tsx scripts/audit-apprenticeship-architecture.ts >> /tmp/beauty-build.log 2>&1
+          node scripts/check-registered-apprenticeship-architecture.mjs >> /tmp/beauty-build.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           tail -n 240 /tmp/beauty-build.log > /tmp/beauty-build-tail.log

@@ -116,4 +116,4 @@ jobs:
         run: pnpm tsx scripts/course-factory/build-cosmetology-course.ts
 
       - name: Verify apprenticeship architecture
-        run: pnpm tsx scripts/audit-apprenticeship-architecture.ts
+        run: node scripts/check-registered-apprenticeship-architecture.mjs

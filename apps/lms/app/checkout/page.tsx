@@ -57,7 +57,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
       phone_number_collection: { enabled: true },
     }));
 
-    if (user) await supabase.from('license_leads').insert({ email: user.email, plan, source: 'website' });
+    if (user) await supabase.from('leads').insert({ email: user.email, plan, source: 'website' });
     if (!session.url) redirect('/pricing/sponsor-licensing?error=checkout');
     redirect(session.url);
   } catch {

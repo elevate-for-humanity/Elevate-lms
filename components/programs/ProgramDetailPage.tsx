@@ -113,6 +113,11 @@ export default function ProgramDetailPage({
     bnplDepositStart && selfPayNumeric > bnplDepositStart && p.durationWeeks > 0
       ? Math.ceil((selfPayNumeric - bnplDepositStart) / p.durationWeeks)
       : null;
+  const durationLabel = p.durationWeeks > 0
+    ? `${p.durationWeeks} ${p.durationWeeks === 1 ? 'week' : 'weeks'}`
+    : p.programType === 'apprenticeship'
+      ? 'Competency-based'
+      : 'Schedule varies';
   const hasIndianaFunding = isWorkforceFunded;
   const heroPosterSrc = getProgramHeroImage(p.slug);
   const heroAlt = getProgramImageAlt(p.slug, p.heroImageAlt || p.title);
@@ -285,7 +290,7 @@ export default function ProgramDetailPage({
                   {[
                     {
                       icon: <Clock className="w-3.5 h-3.5" />,
-                      val: `${p.durationWeeks} ${p.durationWeeks === 1 ? 'week' : 'weeks'}`,
+                      val: durationLabel,
                     },
                     {
                       icon: <BookOpen className="w-3.5 h-3.5" />,
@@ -404,7 +409,7 @@ export default function ProgramDetailPage({
               ))}
             </div>
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <DecisionFact label="Length" value={`${p.durationWeeks} weeks`} />
+              <DecisionFact label="Length" value={durationLabel} />
               <DecisionFact label="Schedule" value={`${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`} />
               <DecisionFact label="Training" value={totalHours > 0 ? `${totalHours} hours` : hoursRange} />
               <DecisionFact label="Credential" value={`${p.credentials.length} included`} />

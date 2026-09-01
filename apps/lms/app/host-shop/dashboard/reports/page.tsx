@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Clock, FileText, ShieldCheck, Users } from 'lucide-react';
+import { Clock, Download, FileText, ShieldCheck, Users } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 import { getHostShopBoard } from '@/lib/partner/board';
@@ -40,6 +40,14 @@ export default async function HostShopReportsPage() {
           <Link href="/host-shop/dashboard/attendance" className="rounded-xl border border-slate-200 p-5 hover:border-brand-blue-300 hover:bg-brand-blue-50/40"><h3 className="font-black text-slate-950">Attendance</h3><p className="mt-1 text-sm text-slate-600">Recorded training sessions and attendance metrics.</p></Link>
           <Link href="/host-shop/dashboard/competencies" className="rounded-xl border border-slate-200 p-5 hover:border-brand-blue-300 hover:bg-brand-blue-50/40"><h3 className="font-black text-slate-950">Competency sign-offs</h3><p className="mt-1 text-sm text-slate-600">Appendix A verification records and competency-based progress.</p></Link>
           <Link href="/host-shop/dashboard/documents" className="rounded-xl border border-slate-200 p-5 hover:border-brand-blue-300 hover:bg-brand-blue-50/40"><h3 className="font-black text-slate-950">Compliance documents</h3><p className="mt-1 text-sm text-slate-600">Required Host Shop documents, signatures, and review status.</p></Link>
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+        <h2 className="text-xl font-black text-slate-950">Secure exports</h2>
+        <p className="mt-1 text-sm text-slate-600">Exports contain only records assigned to this Host Shop. Incomplete compliance remains labeled as outstanding.</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {[['overview','Summary'],['apprentices','Apprentices'],['hours','Work hours'],['attendance','Attendance'],['compliance','Compliance']].map(([type,label]) => <a key={type} href={`/api/host-shop/reports/export?type=${type}`} download className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white hover:bg-slate-800"><Download className="h-4 w-4"/>{label} CSV</a>)}
         </div>
       </section>
     </main>

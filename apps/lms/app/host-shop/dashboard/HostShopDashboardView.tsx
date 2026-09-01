@@ -92,13 +92,10 @@ export default async function HostShopDashboardView() {
   const partnerMouSigned = board.partner?.mou_signed === true;
   const partnerOnboardingComplete = board.partner?.onboarding_completed === true;
 
-  // Owners remain gated by compliance milestones. Platform administrators can
-  // inspect incomplete records without changing or bypassing those milestones.
+  // Approved owners retain operational portal access while every incomplete
+  // compliance milestone remains prominently visible across the portal.
   if (!isPlatformAdmin) {
-    if (!partnerApproved || !partnerVerified) redirect('/host-shop/onboarding');
-    if (!partnerMouSigned) redirect(board.onboardingPaths.signMou);
-    if (!board.documentsComplete) redirect(board.onboardingPaths.documents);
-    if (!partnerOnboardingComplete) redirect('/host-shop/orientation');
+    if (!partnerApproved) redirect('/host-shop/onboarding');
   }
 
   const registeredCount = board.registeredPrograms.length;

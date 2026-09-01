@@ -3,17 +3,20 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getMyPartnerContext, getSessionUser } from '@/lib/partner/access';
 import { PlatformShell } from '@/components/platform/PlatformShell';
-import { getHostShopOnboardingPaths, resolveHostShopProgram } from '@/lib/partners/host-shop-onboarding';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES, normalizeRole } from '@/lib/rbac/role-matrix';
+import { getHostShopBoard } from '@/lib/partner/board';
+import { getHostShopReadinessItems } from '@/lib/partners/host-shop-readiness';
+import HostShopReadinessBanner from '@/components/partners/HostShopReadinessBanner';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * Single authorization + readiness boundary for every /host-shop/dashboard/* route.
  * A canonical Host Shop role and a valid Host Shop relationship are required.
- * Operational access remains locked until MOU, onboarding, and required document
- * verification are complete.
+ * Compliance gaps are highlighted on every operational page. The portal remains
+ * usable so an approved shop can upload evidence, configure operations, and export
+ * its own records while incomplete items remain visibly non-compliant.
  */
 export default async function HostShopDashboardLayout({ children }: { children: React.ReactNode }) {
   // Relationship data alone is not permission to enter the Host Shop portal.
@@ -73,18 +76,8 @@ export default async function HostShopDashboardLayout({ children }: { children: 
     redirect('/host-shop/login?error=no_partner');
   }
 
-  const programType = resolveHostShopProgram(partner as unknown as Record<string, unknown>);
-  const onboardingPaths = getHostShopOnboardingPaths(programType);
-
-  if (!partner.mou_signed) {
-    redirect(onboardingPaths.signMou);
-  }
-  if (!partner.onboarding_completed) {
-    redirect(onboardingPaths.forms);
-  }
-  if (!partner.documents_verified) {
-    redirect(onboardingPaths.documents);
-  }
+  const board = await getHostShopBoard(auth.user.id);
+  const readinessItems = getHostShopReadinessItems(board);
 
   const supabase = await createClient();
   const { data: profile } = await supabase
@@ -105,6 +98,7 @@ export default async function HostShopDashboardLayout({ children }: { children: 
       }}
       role="host_shop"
     >
+      <HostShopReadinessBanner items={readinessItems} />
       {children}
     </PlatformShell>
   );

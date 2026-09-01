@@ -10,7 +10,6 @@ import type {
 } from '@/lib/apprenticeship-programs/host-partners';
 
 const ROTATION_MS = 9000;
-const VIDEO_ROTATION_MS = 40_000;
 type ShowcaseMedia = FeaturedHostPartnerMedia & { backdropSrc?: string };
 
 const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
@@ -25,9 +24,10 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
     kind: 'photo',
   },
   'razors-image-barbershop': {
-    src: '/images/partners/razors-image-video-poster.webp',
-    alt: "Razor's Image host barbershop representative",
-    kind: 'photo',
+    src: '/videos/partners/razors-image-host-barbershop.mp4',
+    alt: "Razor's Image owner describing the barber apprenticeship opportunity",
+    kind: 'video',
+    backdropSrc: '/images/partners/razors-image-video-poster.webp',
   },
   'b-52s-barber-shop': {
     src: '/images/partners/b52s-official.webp',
@@ -73,12 +73,11 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
   useEffect(() => {
     if (paused || interacting || reduceMotion || slides.length < 2) return;
     const activeMedia = slides[activeIndex]?.media;
-    const timer = window.setTimeout(
-      () => {
-        setActiveIndex((current) => (current + 1) % slides.length);
-      },
-      activeMedia?.kind === 'video' ? VIDEO_ROTATION_MS : ROTATION_MS,
-    );
+    // Video tours control their own advancement so they always play to completion.
+    if (activeMedia?.kind === 'video') return;
+    const timer = window.setTimeout(() => {
+      setActiveIndex((current) => (current + 1) % slides.length);
+    }, ROTATION_MS);
     return () => window.clearTimeout(timer);
   }, [activeIndex, interacting, paused, reduceMotion, slides]);
 
@@ -106,6 +105,8 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
   return (
     <section
       aria-labelledby="host-shop-showcase-heading"
+      data-scroll-narration
+      data-narration="Becoming a Host Shop is free. Your business can train future staff in a real workplace, build a dependable talent pipeline, organize apprentice progress with Elevate, and earn revenue from supervised services. Apprentices can earn wages while learning, receive structured hands-on training, document their hours and skills, and work toward completing their apprenticeship requirements."
       className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-12 text-slate-950 sm:px-6 sm:py-16"
       onMouseEnter={() => setInteracting(true)}
       onMouseLeave={() => setInteracting(false)}
@@ -165,8 +166,12 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
                     controls
                     autoPlay
                     muted
-                    loop
                     playsInline
+                    onLoadedMetadata={(event) => {
+                      event.currentTarget.defaultPlaybackRate = 1;
+                      event.currentTarget.playbackRate = 1;
+                    }}
+                    onEnded={() => go(1)}
                     preload="metadata"
                     className="host-showcase-media-enter h-full max-w-full object-contain shadow-2xl"
                     aria-label={image.alt}

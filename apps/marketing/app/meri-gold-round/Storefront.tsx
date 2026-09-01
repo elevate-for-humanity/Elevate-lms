@@ -61,11 +61,11 @@ export default function Storefront() {
           <p className={styles.eyebrow}>ONE OIL. WHOLE BODY. TOTAL CARE.</p>
           <h1>Your daily ritual, from head to toe.</h1>
           <p className={styles.lede}>
-            A portable botanical oil roller made for hair, scalp, skin, body, massage,
+            A portable essential-oil roller made for hair, scalp, skin, body, massage,
             and everyday moments of care.
           </p>
           <div className={styles.heroActions}>
-            <a className={styles.primary} href="#shop">Shop Multi-Zone Oil</a>
+            <a className={styles.primary} href="#shop">Shop Essential Oil</a>
             <a className={styles.secondary} href="#ingredients">See what is inside</a>
           </div>
           <div className={styles.trustRow} aria-label="Product qualities">
@@ -100,7 +100,7 @@ export default function Storefront() {
         </div>
         <div className={styles.buyBox}>
           <p className={styles.eyebrow}>10 ML / 0.34 FL OZ</p>
-          <h2>Meri-Gold-Round Multi-Zone Oil</h2>
+          <h2>Meri-Gold-Round Multi-Zone Essential Oil</h2>
           <p className={styles.rating}>★★★★★ <span>Everyday head-to-toe care</span></p>
           <p className={styles.price}>${PRICE.toFixed(2)}</p>
           <p>
@@ -141,7 +141,7 @@ export default function Storefront() {
           <p className={styles.eyebrow}>THE MERI-GOLD-ROUND DIFFERENCE</p>
           <h2>Made for real life, not another crowded shelf.</h2>
           <p>
-            A thoughtful blend of jojoba, argan, coconut, castor, sunflower, lavender,
+            A thoughtful essential-oil blend with jojoba, argan, coconut, castor, sunflower, lavender,
             and tea tree oils in a travel-ready roller. Use only as directed on the label.
           </p>
         </div>

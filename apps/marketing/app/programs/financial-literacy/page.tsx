@@ -10,7 +10,7 @@ import { TEAM } from '@/data/team';
 
 const PROGRAM = {
   slug: 'financial-literacy',
-  title: 'Elevate Financial Empowerment Program',
+  title: 'Financial Literacy Program',
   description:
     'A practical financial literacy course that helps participants take control of their finances and build a stronger financial future.',
   category: 'business',
@@ -19,11 +19,11 @@ const PROGRAM = {
 const canonical = `${PLATFORM_DEFAULTS.siteUrl}/programs/financial-literacy`;
 
 export const metadata: Metadata = {
-  title: 'Elevate Financial Empowerment Program | Elevate for Humanity',
+  title: 'Financial Literacy Program | Elevate for Humanity',
   description: PROGRAM.description,
   alternates: { canonical },
   openGraph: {
-    title: 'Elevate Financial Empowerment Program | Elevate for Humanity',
+    title: 'Financial Literacy Program | Elevate for Humanity',
     description: PROGRAM.description,
     url: canonical,
     siteName: PLATFORM_DEFAULTS.orgName,
@@ -80,8 +80,11 @@ export default function FinancialLiteracyPage() {
             Business & Financial Skills
           </p>
           <h1 className="mt-3 max-w-4xl text-4xl font-black leading-tight sm:text-6xl">
-            Elevate Financial Empowerment Program
+            Financial Literacy Program
           </h1>
+          <p className="mt-3 text-xl font-extrabold text-orange-300 sm:text-2xl">
+            Featuring the Elevate Financial Empowerment Program
+          </p>
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-200">{PROGRAM.description}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
@@ -110,7 +113,7 @@ export default function FinancialLiteracyPage() {
           </h2>
           <div className="mt-6 max-w-4xl space-y-5 text-lg leading-8 text-slate-700">
             <p>
-              The Elevate Financial Empowerment Program is a practical financial literacy course
+              The Elevate Financial Empowerment Program, taught within Elevate&apos;s Financial Literacy Program, is a practical course
               designed to help participants take control of their finances and build a stronger
               financial future. Participants learn essential skills in budgeting, banking, saving,
               credit and credit scores, debt management, consumer protection, taxes, insurance,

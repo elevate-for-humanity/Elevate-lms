@@ -261,6 +261,12 @@ export default function AdminHeader() {
           .admin-nav-link { transition: none; }
           .admin-nav-link:hover, .admin-nav-link:active { transform: none; }
         }
+        @keyframes admin-shell-enter { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .admin-header-shell { animation: admin-shell-enter 320ms ease-out both; }
+        .admin-nav-link { transition: color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
+        .admin-nav-link:hover { transform: translateY(-1px); }
+        .admin-nav-link:active { transform: translateY(0) scale(0.98); }
+        @media (prefers-reduced-motion: reduce) { .admin-header-shell { animation: none; } .admin-nav-link { transition: none; } .admin-nav-link:hover, .admin-nav-link:active { transform: none; } }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>

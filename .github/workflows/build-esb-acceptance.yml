@@ -46,6 +46,11 @@ env:
   NODE_ENV: production
   AI_CIRCUIT_RECOVERY_WAIT: '1'
   AI_PROVIDER: cloudflare
+  # This is a three-hour production batch, not a request-time route. Give safe
+  # Supabase reads a bounded recovery budget while timed-fetch still refuses
+  # to replay writes after an unknown network outcome.
+  SUPABASE_FETCH_TIMEOUT_MS: '15000'
+  SUPABASE_READ_MAX_ATTEMPTS: '3'
   SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
   NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

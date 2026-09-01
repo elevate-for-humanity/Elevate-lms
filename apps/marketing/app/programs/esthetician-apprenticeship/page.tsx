@@ -134,7 +134,7 @@ export async function generateMetadata() {
     openGraph: {
       title: 'Esthetician Apprenticeship Pathway | Indiana',
       description:
-        'Supervised esthetics education and practice aligned to Indiana’s 700-hour education requirement, with documented progress and licensing preparation.',
+        'Registered competency-based esthetician apprenticeship requiring 20 verified competencies and 300 related-instruction hours.',
       url: 'https://www.elevateforhumanity.org/programs/esthetician-apprenticeship',
       type: 'website',
       images: [

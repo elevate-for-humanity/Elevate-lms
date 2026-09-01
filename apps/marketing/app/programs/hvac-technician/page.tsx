@@ -10,7 +10,11 @@ export default async function HvacTechnicianPage() {
   if (!loaded) return notFound();
   const p = loaded.program;
   const banner = heroBanners["hvac-technician"] ?? null;
-  return <ProgramDetailPage program={p} banner={banner} />;
+  const heroBanner =
+    banner?.primaryCta?.href?.includes('/apply')
+      ? { ...banner, primaryCta: undefined }
+      : banner;
+  return <ProgramDetailPage program={p} banner={heroBanner} />;
 }
 
 export async function generateMetadata() {

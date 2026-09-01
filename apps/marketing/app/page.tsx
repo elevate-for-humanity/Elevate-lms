@@ -62,14 +62,30 @@ export default function HomePage() {
       <StructuredData />
       <main>
         <HomeHeroVideo banner={heroBanners.home} />
-        <HostShopShowcase shops={FEATURED_BEAUTY_HOST_PARTNERS} />
-        <HomeCareerPathways />
-        <HomeApprenticeshipSales />
-        <HomeWebsiteBuilderSales />
-        <HomeSocialAppCTA />
-        <HomeFunding />
-        <HomeFinalCTA />
-        <HomeTrustBar />
+        <div data-scroll-narration data-narration="Take a look inside our host-shop network. These are working businesses where apprentices can build skills with approved supervision and real customers.">
+          <HostShopShowcase shops={FEATURED_BEAUTY_HOST_PARTNERS} />
+        </div>
+        <div data-scroll-narration data-narration="You do not have to have your whole career figured out today. Start by exploring the field that fits your interests, schedule, and goals.">
+          <HomeCareerPathways />
+        </div>
+        <div data-scroll-narration data-narration="An apprenticeship lets you learn with structure while gaining supervised experience on the job. We help connect the classroom, the employer, and your progress records.">
+          <HomeApprenticeshipSales />
+        </div>
+        <div data-scroll-narration data-narration="If you run a business or training program, Elevate can also help you build your website and manage the tools behind it from one connected place.">
+          <HomeWebsiteBuilderSales />
+        </div>
+        <div data-scroll-narration data-narration="Stay connected with opportunities, updates, and your Elevate community wherever you are.">
+          <HomeSocialAppCTA />
+        </div>
+        <div data-scroll-narration data-narration="Cost should be clear before you enroll. We help you review possible funding and payment paths, then verify what you qualify for.">
+          <HomeFunding />
+        </div>
+        <div data-scroll-narration data-narration="When you are ready, choose the next step that fits you: explore a program, apply for training, or connect with our team.">
+          <HomeFinalCTA />
+        </div>
+        <div data-narration-disabled="true">
+          <HomeTrustBar />
+        </div>
         <HomeMobileActions />
       </main>
     </>

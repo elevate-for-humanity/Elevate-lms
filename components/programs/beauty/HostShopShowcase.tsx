@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Play } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
 import type {
   FeaturedHostPartner,
   FeaturedHostPartnerMedia,
@@ -176,9 +177,13 @@ export default function HostShopShowcase({
                     key={image.src}
                     src={image.src}
                     controls
-                    autoPlay
-                    muted
                     playsInline
+                    poster={image.backdropSrc}
+                    onPlay={(event) => {
+                      stopAllNaturalVoicePlayback();
+                      event.currentTarget.muted = false;
+                      event.currentTarget.volume = 1;
+                    }}
                     onLoadedMetadata={(event) => {
                       event.currentTarget.defaultPlaybackRate = 1;
                       event.currentTarget.playbackRate = 1;

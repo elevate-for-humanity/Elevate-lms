@@ -29,6 +29,37 @@ export const maxDuration = 60;
 const MAX_BYTES = 50 * 1024 * 1024;
 const SUPABASE_BUCKET = 'documents';
 
+async function extractAttachmentPreview(bytes: Uint8Array, contentType: string): Promise<string> {
+  const buffer = Buffer.from(bytes);
+  const mime = contentType.toLowerCase();
+  try {
+    if (
+      mime.startsWith('text/') ||
+      mime.includes('csv') ||
+      mime.includes('json') ||
+      mime.includes('markdown')
+    ) {
+      return buffer.toString('utf8').slice(0, 100_000);
+    }
+    if (mime.includes('pdf')) {
+      const { PDFParse } = await import('pdf-parse');
+      const parser = new PDFParse({ data: buffer });
+      try {
+        return (await parser.getText()).text.slice(0, 100_000);
+      } finally {
+        await parser.destroy();
+      }
+    }
+    if (mime.includes('wordprocessingml') || mime.includes('msword')) {
+      const mammoth = await import('mammoth');
+      return (await mammoth.extractRawText({ buffer })).value.slice(0, 100_000);
+    }
+  } catch {
+    return '';
+  }
+  return '';
+}
+
 function hasR2Config(): boolean {
   return Boolean(process.env.R2_ENDPOINT && process.env.R2_ACCESS_KEY && process.env.R2_BUCKET);
 }
@@ -55,7 +86,9 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return safeError('Unauthorized', 401);
 
   try {
@@ -69,29 +102,35 @@ export async function POST(request: NextRequest) {
     }
 
     const contentType = file.type || 'application/octet-stream';
-    const ext = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+    const ext =
+      file.name
+        .split('.')
+        .pop()
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]/g, '') || 'bin';
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 120);
     const timestamp = Date.now();
     let key = `devstudio-docs/${user.id}/${timestamp}-${safeName}`;
 
     const bytes = new Uint8Array(await file.arrayBuffer());
+    const contentPreview = await extractAttachmentPreview(bytes, contentType);
     let signedUrl = '';
     let storageBucket = SUPABASE_BUCKET;
 
     if (hasR2Config()) {
       const s3 = getS3();
-      await s3.send(new PutObjectCommand({
-        Bucket: R2_BUCKET,
-        Key: key,
-        Body: bytes,
-        ContentType: contentType,
-        Metadata: { 'uploaded-by': user.id, 'original-name': file.name, label },
-      }));
-      signedUrl = await getSignedUrl(
-        s3,
-        new GetObjectCommand({ Bucket: R2_BUCKET, Key: key }),
-        { expiresIn: 7 * 24 * 3600 },
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: R2_BUCKET,
+          Key: key,
+          Body: bytes,
+          ContentType: contentType,
+          Metadata: { 'uploaded-by': user.id, 'original-name': file.name, label },
+        }),
       );
+      signedUrl = await getSignedUrl(s3, new GetObjectCommand({ Bucket: R2_BUCKET, Key: key }), {
+        expiresIn: 7 * 24 * 3600,
+      });
       storageBucket = R2_BUCKET;
     } else {
       const db = await requireAdminClient();
@@ -102,9 +141,7 @@ export async function POST(request: NextRequest) {
 
       if (uploadErr) return safeError('Storage upload failed', 500);
 
-      const { data: urlData } = db.storage
-        .from(SUPABASE_BUCKET)
-        .getPublicUrl(storagePath);
+      const { data: urlData } = db.storage.from(SUPABASE_BUCKET).getPublicUrl(storagePath);
 
       const { data: signed } = await db.storage
         .from(SUPABASE_BUCKET)
@@ -135,15 +172,25 @@ export async function POST(request: NextRequest) {
     if (dbErr) {
       if (dbErr.code === '42P01') {
         return NextResponse.json({
-          id: `temp-${timestamp}`, key, url: signedUrl,
-          name: label || file.name, size: file.size, type: contentType,
-          created_at: new Date().toISOString(), storage: storageBucket,
+          id: `temp-${timestamp}`,
+          key,
+          url: signedUrl,
+          name: label || file.name,
+          size: file.size,
+          type: contentType,
+          created_at: new Date().toISOString(),
+          storage: storageBucket,
         });
       }
       return safeError('File uploaded but failed to record metadata', 500);
     }
 
-    return NextResponse.json({ ...doc, url: signedUrl, storage: storageBucket });
+    return NextResponse.json({
+      ...doc,
+      url: signedUrl,
+      storage: storageBucket,
+      content_preview: contentPreview,
+    });
   } catch (err) {
     return safeInternalError(err, 'Upload failed');
   }
@@ -157,14 +204,18 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return safeError('Unauthorized', 401);
 
   try {
     const db = await requireAdminClient();
     const { data, error } = await db
       .from('devstudio_documents')
-      .select('id, name, original_name, s3_key, size_bytes, content_type, ext, signed_url, signed_url_expires_at, created_at')
+      .select(
+        'id, name, original_name, s3_key, size_bytes, content_type, ext, signed_url, signed_url_expires_at, created_at',
+      )
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(50);

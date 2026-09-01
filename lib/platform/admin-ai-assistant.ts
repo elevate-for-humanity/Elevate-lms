@@ -2,6 +2,7 @@ import { getKnowledgeGraphContext } from '@/lib/platform/knowledge-graph';
 import { getSystemRegistryContext } from '@/lib/platform/system-registry';
 
 export interface AdminAiPromptContext {
+  agent?: 'PARIS' | 'ELLIE' | 'LIZZY' | 'ZORA';
   ragContext?: string;
   fileContext?: string;
   documentsContext?: string;
@@ -34,6 +35,7 @@ export function isOperationalDiagnosticRequest(message: string): boolean {
 }
 
 export function buildAdminAiSystemPrompt({
+  agent = 'LIZZY',
   ragContext,
   fileContext,
   documentsContext,
@@ -43,8 +45,15 @@ export function buildAdminAiSystemPrompt({
 }: AdminAiPromptContext): string {
   const diagnosticMode = isOperationalDiagnosticRequest(lastUserMessage);
 
-  return `You are the internal Dev Studio AI platform controller for Elevate LMS.
-You are a devops copilot, internal architect, schema-aware debugger, and operational analyst.
+  const role = {
+    PARIS: 'public guide, business interviewer, website and career-pathway strategist',
+    ELLIE: 'curriculum architect, adaptive-learning specialist, and course-production lead',
+    LIZZY: 'platform operator, devops copilot, schema-aware debugger, and administrative assistant',
+    ZORA: 'compliance, evidence, claim-safety, accessibility, and audit specialist',
+  }[agent];
+
+  return `You are ${agent}, the ${role} inside Elevate LMS Dev Studio.
+You share the same governed platform context and tools as the other canonical agents. Stay within your specialist role, cite actual evidence, and hand off conceptually when another role is better suited; never pretend a tool ran.
 
 Platform stack: Next.js App Router, Supabase, TypeScript, Tailwind, Northflank.
 

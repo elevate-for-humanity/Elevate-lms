@@ -26,11 +26,23 @@ if (!domain) throw new Error(`No public browser domain is available for ${browse
 const publicUrl = domain.startsWith('http') ? domain : `https://${domain}`;
 
 const admin = await nfFetch<Service>(projectApiPath(projectId, `/services/${adminServiceId}`));
+const current = admin.runtimeEnvironment ?? {};
+if (
+  current.STUDIO_BROWSER_URL === publicUrl &&
+  current.STUDIO_BROWSER_PUBLIC_URL === publicUrl &&
+  current.NEXT_PUBLIC_STUDIO_BROWSER_URL === publicUrl &&
+  current.STUDIO_BROWSER_SECRET === secret
+) {
+  console.log(
+    `Studio Browser is already connected to ${adminServiceId}; no service patch required.`,
+  );
+  process.exit(0);
+}
 await nfFetch(combinedServicePatchPath(projectId, adminServiceId), {
   method: 'PATCH',
   body: JSON.stringify({
     runtimeEnvironment: {
-      ...(admin.runtimeEnvironment ?? {}),
+      ...current,
       STUDIO_BROWSER_URL: publicUrl,
       STUDIO_BROWSER_PUBLIC_URL: publicUrl,
       NEXT_PUBLIC_STUDIO_BROWSER_URL: publicUrl,

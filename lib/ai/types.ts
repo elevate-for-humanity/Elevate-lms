@@ -1,11 +1,13 @@
 /**
  * AI Gateway Module - Type Definitions
- * 
+ *
  * Unified type system for all AI agents (PARS, ELLIE, LIZZY, ZORA)
  * and the AI routing/orchestration infrastructure.
  */
 
 export enum AIAgent {
+  PARIS = 'PARIS',
+  /** @deprecated Compatibility alias for historical callers. */
   PARS = 'PARS',
   ELLIE = 'ELLIE',
   LIZZY = 'LIZZY',
@@ -256,7 +258,16 @@ export interface ExecutionContext {
   intent?: AgentIntent;
 }
 
-export type AIProviderName = 'openai' | 'anthropic' | 'gemini' | 'google' | 'cloudflare' | 'azure' | 'groq' | 'elevate' | 'none';
+export type AIProviderName =
+  | 'openai'
+  | 'anthropic'
+  | 'gemini'
+  | 'google'
+  | 'cloudflare'
+  | 'azure'
+  | 'groq'
+  | 'elevate'
+  | 'none';
 export type AIImageProviderName = 'dalle' | 'stability' | 'azure' | 'none';
 
 export interface ChatMessage {

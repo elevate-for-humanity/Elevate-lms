@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { routeEllieMessage } from '@/lib/devstudio/ellie-message-router';
+import { routeEllieMessage, selectStudioAgent } from '@/lib/devstudio/ellie-message-router';
 
 describe('routeEllieMessage', () => {
   it('routes explicit deploy commands to command execution', () => {
@@ -23,5 +23,16 @@ describe('routeEllieMessage', () => {
   it('routes website creation and publishing to the tool orchestrator', () => {
     expect(routeEllieMessage('Build a website for a training provider')).toBe('platform');
     expect(routeEllieMessage('Publish the website after checking it')).toBe('platform');
+  });
+});
+
+describe('selectStudioAgent', () => {
+  it.each([
+    ['Build an adaptive CNA course', 'ELLIE'],
+    ['Audit RLS policies and verified claims', 'ZORA'],
+    ['Interview a business owner and build their website', 'PARIS'],
+    ['Inspect the failed deployment workflow', 'LIZZY'],
+  ])('routes %s to %s', (message, agent) => {
+    expect(selectStudioAgent(message)).toBe(agent);
   });
 });

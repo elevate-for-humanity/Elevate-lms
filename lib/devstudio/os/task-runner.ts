@@ -33,6 +33,9 @@ function normalizePriority(value?: number): string {
 
 function runtimeAgentForDevAgent(slug?: string | null, role?: string | null): AIAgentId {
   const haystack = `${slug ?? ''} ${role ?? ''}`.toLowerCase();
+  if (haystack.includes('paris') || haystack.includes('public_guide')) return 'PARIS';
+  if (haystack.includes('ellie') || haystack.includes('curriculum')) return 'ELLIE';
+  if (haystack.includes('lizzy') || haystack.includes('platform_operations')) return 'LIZZY';
   if (haystack.includes('compliance') || haystack.includes('qa')) return 'ZORA';
   return 'LIZZY';
 }
@@ -111,14 +114,18 @@ export async function createAiTask(
   const command = `${input.title} ${input.description ?? ''} ${input.command ?? ''}`.trim();
   const plannedTool = planAIToolFromCommand(command);
   const tool = plannedTool ? getAITool(plannedTool.name) : null;
-  const riskTags = Array.from(new Set([
-    ...detectRiskTags(command),
-    ...(tool?.approvalRequired ? [`tool:${tool.name}`] : []),
-  ]));
+  const riskTags = Array.from(
+    new Set([...detectRiskTags(command), ...(tool?.approvalRequired ? [`tool:${tool.name}`] : [])]),
+  );
   const needsApproval = requiresApproval(command) || Boolean(tool?.approvalRequired);
   const traceId = input.traceId ?? newTraceId();
 
-  let agent: { id: string; slug?: string | null; name?: string | null; role?: string | null } | null = null;
+  let agent: {
+    id: string;
+    slug?: string | null;
+    name?: string | null;
+    role?: string | null;
+  } | null = null;
   if (input.agentSlug) {
     const { data } = await db
       .from('ai_agents')
@@ -187,7 +194,10 @@ export async function createAiTask(
 
   const { error: stepError } = await db.from('ai_task_steps').insert(stepRows);
   if (stepError) {
-    await db.from('ai_tasks').update({ status: 'failed', error_message: stepError.message }).eq('id', task.id);
+    await db
+      .from('ai_tasks')
+      .update({ status: 'failed', error_message: stepError.message })
+      .eq('id', task.id);
     throw new Error(stepError.message);
   }
 
@@ -244,17 +254,30 @@ export async function runTaskExecution(
   }
 
   const { data: agentRecord } = task.agent_id
-    ? await db.from('ai_agents').select('id, slug, name, role').eq('id', task.agent_id).maybeSingle()
+    ? await db
+        .from('ai_agents')
+        .select('id, slug, name, role')
+        .eq('id', task.agent_id)
+        .maybeSingle()
     : { data: null };
-  const runtimeAgent = (task.agent_type as AIAgentId | null) ?? runtimeAgentForDevAgent(agentRecord?.slug, agentRecord?.role);
+  const runtimeAgent =
+    (task.agent_type as AIAgentId | null) ??
+    runtimeAgentForDevAgent(agentRecord?.slug, agentRecord?.role);
   const command = commandFromTask(task as Record<string, any>);
-  const adminOrigin = runtime.adminOrigin ?? process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.elevateforhumanity.org';
+  const adminOrigin =
+    runtime.adminOrigin ??
+    process.env.NEXT_PUBLIC_ADMIN_URL ??
+    'https://admin.elevateforhumanity.org';
   const appOrigin = runtime.appOrigin ?? process.env.NEXT_PUBLIC_APP_URL ?? adminOrigin;
 
   await setAgentStatus(db, task.agent_id, 'busy');
   await db
     .from('ai_tasks')
-    .update({ status: 'running', updated_at: new Date().toISOString(), attempts: Number(task.attempts ?? 0) + 1 })
+    .update({
+      status: 'running',
+      updated_at: new Date().toISOString(),
+      attempts: Number(task.attempts ?? 0) + 1,
+    })
     .eq('id', taskId);
 
   const { data: steps } = await db
@@ -263,9 +286,15 @@ export async function runTaskExecution(
     .eq('task_id', taskId)
     .order('step_order', { ascending: true });
 
-  const resolveStep = (steps ?? []).find((step: any) => step.action_type === 'resolve' || step.action === 'resolve');
-  const executeStep = (steps ?? []).find((step: any) => step.action_type === 'execute' || step.action === 'execute');
-  const recordStep = (steps ?? []).find((step: any) => step.action_type === 'record' || step.action === 'record');
+  const resolveStep = (steps ?? []).find(
+    (step: any) => step.action_type === 'resolve' || step.action === 'resolve',
+  );
+  const executeStep = (steps ?? []).find(
+    (step: any) => step.action_type === 'execute' || step.action === 'execute',
+  );
+  const recordStep = (steps ?? []).find(
+    (step: any) => step.action_type === 'record' || step.action === 'record',
+  );
 
   const plannedTool = planAIToolFromCommand(command, {
     toolName: task.tool_name ?? undefined,
@@ -273,17 +302,26 @@ export async function runTaskExecution(
   });
 
   if (resolveStep) {
-    await db.from('ai_task_steps').update({
-      status: 'completed',
-      started_at: new Date().toISOString(),
-      completed_at: new Date().toISOString(),
-      output: plannedTool ? `Resolved registered tool ${plannedTool.name}` : 'Resolved advisory AI task',
-      output_json: plannedTool ? { tool: plannedTool.name, input: plannedTool.input } : { mode: 'advisory' },
-    }).eq('id', resolveStep.id);
+    await db
+      .from('ai_task_steps')
+      .update({
+        status: 'completed',
+        started_at: new Date().toISOString(),
+        completed_at: new Date().toISOString(),
+        output: plannedTool
+          ? `Resolved registered tool ${plannedTool.name}`
+          : 'Resolved advisory AI task',
+        output_json: plannedTool
+          ? { tool: plannedTool.name, input: plannedTool.input }
+          : { mode: 'advisory' },
+      })
+      .eq('id', resolveStep.id);
     await appendTaskLog(
       db,
       taskId,
-      plannedTool ? `Resolved registered tool: ${plannedTool.name}` : 'No registered operational tool matched; using advisory AI runtime.',
+      plannedTool
+        ? `Resolved registered tool: ${plannedTool.name}`
+        : 'No registered operational tool matched; using advisory AI runtime.',
       'info',
       resolveStep.id,
       runtime.tenantId ?? task.tenant_id,
@@ -292,8 +330,19 @@ export async function runTaskExecution(
   }
 
   if (executeStep) {
-    await db.from('ai_task_steps').update({ status: 'running', started_at: new Date().toISOString() }).eq('id', executeStep.id);
-    await appendTaskLog(db, taskId, 'Executing through canonical AI runtime', 'info', executeStep.id, runtime.tenantId ?? task.tenant_id, actorId);
+    await db
+      .from('ai_task_steps')
+      .update({ status: 'running', started_at: new Date().toISOString() })
+      .eq('id', executeStep.id);
+    await appendTaskLog(
+      db,
+      taskId,
+      'Executing through canonical AI runtime',
+      'info',
+      executeStep.id,
+      runtime.tenantId ?? task.tenant_id,
+      actorId,
+    );
   }
 
   try {
@@ -317,30 +366,38 @@ export async function runTaskExecution(
     });
 
     if (result.status === 'approval_required') {
-      const riskTags = Array.from(new Set([...(task.risk_tags ?? []), `tool:${result.tool ?? 'protected'}`]));
+      const riskTags = Array.from(
+        new Set([...(task.risk_tags ?? []), `tool:${result.tool ?? 'protected'}`]),
+      );
       if (executeStep) {
-        await db.from('ai_task_steps').update({
-          status: 'awaiting_approval',
-          output: result.message,
-          output_json: {
-            ok: false,
-            status: result.status,
-            tool: result.tool,
-            required_confirmation: result.requiredConfirmation,
-          },
-        }).eq('id', executeStep.id);
+        await db
+          .from('ai_task_steps')
+          .update({
+            status: 'awaiting_approval',
+            output: result.message,
+            output_json: {
+              ok: false,
+              status: result.status,
+              tool: result.tool,
+              required_confirmation: result.requiredConfirmation,
+            },
+          })
+          .eq('id', executeStep.id);
       }
-      await db.from('ai_tasks').update({
-        status: 'awaiting_approval',
-        requires_approval: true,
-        approval_status: 'pending',
-        approval_reason: result.requiredConfirmation
-          ? `Human approval required. Protected confirmation: ${result.requiredConfirmation}`
-          : result.message,
-        risk_tags: riskTags,
-        tool_name: result.tool ?? task.tool_name,
-        updated_at: new Date().toISOString(),
-      }).eq('id', taskId);
+      await db
+        .from('ai_tasks')
+        .update({
+          status: 'awaiting_approval',
+          requires_approval: true,
+          approval_status: 'pending',
+          approval_reason: result.requiredConfirmation
+            ? `Human approval required. Protected confirmation: ${result.requiredConfirmation}`
+            : result.message,
+          risk_tags: riskTags,
+          tool_name: result.tool ?? task.tool_name,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', taskId);
       await createPendingApproval(
         db,
         taskId,
@@ -352,106 +409,153 @@ export async function runTaskExecution(
         runtime.tenantId ?? task.tenant_id,
       );
       await setAgentStatus(db, task.agent_id, 'idle');
-      await appendTaskLog(db, taskId, `Execution paused for human approval: ${result.tool ?? 'protected action'}`, 'warn', executeStep?.id, runtime.tenantId ?? task.tenant_id, actorId);
+      await appendTaskLog(
+        db,
+        taskId,
+        `Execution paused for human approval: ${result.tool ?? 'protected action'}`,
+        'warn',
+        executeStep?.id,
+        runtime.tenantId ?? task.tenant_id,
+        actorId,
+      );
       return;
     }
 
     if (!result.ok) {
       if (executeStep) {
-        await db.from('ai_task_steps').update({
+        await db
+          .from('ai_task_steps')
+          .update({
+            status: 'failed',
+            completed_at: new Date().toISOString(),
+            error_message: result.message,
+            output: result.message,
+            output_json: {
+              ok: false,
+              status: result.status,
+              tool: result.tool ?? null,
+              payload: result.payload ?? null,
+            },
+          })
+          .eq('id', executeStep.id);
+      }
+      if (recordStep)
+        await db.from('ai_task_steps').update({ status: 'skipped' }).eq('id', recordStep.id);
+      await db
+        .from('ai_tasks')
+        .update({
           status: 'failed',
-          completed_at: new Date().toISOString(),
           error_message: result.message,
-          output: result.message,
-          output_json: {
+          result_json: {
             ok: false,
+            executed: result.executed,
             status: result.status,
             tool: result.tool ?? null,
-            payload: result.payload ?? null,
+            trace_id: result.traceId ?? null,
           },
-        }).eq('id', executeStep.id);
-      }
-      if (recordStep) await db.from('ai_task_steps').update({ status: 'skipped' }).eq('id', recordStep.id);
-      await db.from('ai_tasks').update({
-        status: 'failed',
-        error_message: result.message,
-        result_json: {
-          ok: false,
-          executed: result.executed,
-          status: result.status,
-          tool: result.tool ?? null,
-          trace_id: result.traceId ?? null,
-        },
-        completed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }).eq('id', taskId);
+          completed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', taskId);
       await setAgentStatus(db, task.agent_id, 'error');
-      await appendTaskLog(db, taskId, `Task failed: ${result.message}`, 'error', executeStep?.id, runtime.tenantId ?? task.tenant_id, actorId);
+      await appendTaskLog(
+        db,
+        taskId,
+        `Task failed: ${result.message}`,
+        'error',
+        executeStep?.id,
+        runtime.tenantId ?? task.tenant_id,
+        actorId,
+      );
       return;
     }
 
     if (result.status === 'running') {
       if (executeStep) {
-        await db.from('ai_task_steps').update({
+        await db
+          .from('ai_task_steps')
+          .update({
+            status: 'running',
+            output: result.message,
+            output_json: {
+              ok: true,
+              executed: result.executed,
+              status: result.status,
+              tool: result.tool ?? null,
+              payload: result.payload ?? null,
+              trace_id: result.traceId ?? null,
+            },
+          })
+          .eq('id', executeStep.id);
+      }
+      await db
+        .from('ai_tasks')
+        .update({
           status: 'running',
+          result_json: {
+            ok: true,
+            executed: result.executed,
+            status: 'running',
+            message: result.message,
+            tool: result.tool ?? null,
+            payload: result.payload ?? null,
+            trace_id: result.traceId ?? null,
+          },
+          tool_output: result.payload ?? null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', taskId);
+      await setAgentStatus(db, task.agent_id, 'idle');
+      await appendTaskLog(
+        db,
+        taskId,
+        'External tool accepted the task; canonical task remains running until status verification completes.',
+        'info',
+        executeStep?.id,
+        runtime.tenantId ?? task.tenant_id,
+        actorId,
+      );
+      return;
+    }
+
+    if (executeStep) {
+      await db
+        .from('ai_task_steps')
+        .update({
+          status: 'completed',
+          completed_at: new Date().toISOString(),
           output: result.message,
           output_json: {
             ok: true,
             executed: result.executed,
             status: result.status,
             tool: result.tool ?? null,
+            provider: result.provider ?? null,
             payload: result.payload ?? null,
             trace_id: result.traceId ?? null,
           },
-        }).eq('id', executeStep.id);
-      }
-      await db.from('ai_tasks').update({
-        status: 'running',
-        result_json: {
-          ok: true,
-          executed: result.executed,
-          status: 'running',
-          message: result.message,
-          tool: result.tool ?? null,
-          payload: result.payload ?? null,
-          trace_id: result.traceId ?? null,
-        },
-        tool_output: result.payload ?? null,
-        updated_at: new Date().toISOString(),
-      }).eq('id', taskId);
-      await setAgentStatus(db, task.agent_id, 'idle');
-      await appendTaskLog(db, taskId, 'External tool accepted the task; canonical task remains running until status verification completes.', 'info', executeStep?.id, runtime.tenantId ?? task.tenant_id, actorId);
-      return;
-    }
-
-    if (executeStep) {
-      await db.from('ai_task_steps').update({
-        status: 'completed',
-        completed_at: new Date().toISOString(),
-        output: result.message,
-        output_json: {
-          ok: true,
-          executed: result.executed,
-          status: result.status,
-          tool: result.tool ?? null,
-          provider: result.provider ?? null,
-          payload: result.payload ?? null,
-          trace_id: result.traceId ?? null,
-        },
-      }).eq('id', executeStep.id);
+        })
+        .eq('id', executeStep.id);
     }
 
     if (recordStep) {
-      await db.from('ai_task_steps').update({
-        status: 'completed',
-        started_at: new Date().toISOString(),
-        completed_at: new Date().toISOString(),
-        output: 'Verified task outcome persisted',
-        output_json: { persisted: true, executed: result.executed, tool: result.tool ?? null },
-      }).eq('id', recordStep.id);
+      await db
+        .from('ai_task_steps')
+        .update({
+          status: 'completed',
+          started_at: new Date().toISOString(),
+          completed_at: new Date().toISOString(),
+          output: 'Verified task outcome persisted',
+          output_json: { persisted: true, executed: result.executed, tool: result.tool ?? null },
+        })
+        .eq('id', recordStep.id);
     }
 
-    const summary = `${result.executed ? 'Executed' : 'Completed advisory task'} "${task.title}" at ${new Date().toISOString()}. ${result.message}`.slice(0, 12_000);
+    const summary =
+      `${result.executed ? 'Executed' : 'Completed advisory task'} "${task.title}" at ${new Date().toISOString()}. ${result.message}`.slice(
+        0,
+        12_000,
+      );
     await db.from('ai_memory').insert({
       scope: 'task',
       task_id: taskId,
@@ -470,31 +574,42 @@ export async function runTaskExecution(
       updated_at: new Date().toISOString(),
     });
 
-    await db.from('ai_tasks').update({
-      status: 'completed',
-      completed_at: new Date().toISOString(),
-      result: {
-        ok: true,
-        executed: result.executed,
-        message: result.message,
-        tool: result.tool ?? null,
-      },
-      result_json: {
-        ok: true,
-        executed: result.executed,
-        status: result.status,
-        message: result.message,
-        tool: result.tool ?? null,
-        provider: result.provider ?? null,
-        trace_id: result.traceId ?? null,
-      },
-      tool_output: result.payload ?? null,
-      approval_status: runtime.approvalGranted ? 'approved' : task.approval_status,
-      updated_at: new Date().toISOString(),
-    }).eq('id', taskId);
+    await db
+      .from('ai_tasks')
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+        result: {
+          ok: true,
+          executed: result.executed,
+          message: result.message,
+          tool: result.tool ?? null,
+        },
+        result_json: {
+          ok: true,
+          executed: result.executed,
+          status: result.status,
+          message: result.message,
+          tool: result.tool ?? null,
+          provider: result.provider ?? null,
+          trace_id: result.traceId ?? null,
+        },
+        tool_output: result.payload ?? null,
+        approval_status: runtime.approvalGranted ? 'approved' : task.approval_status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', taskId);
 
     await setAgentStatus(db, task.agent_id, 'idle');
-    await appendTaskLog(db, taskId, 'Task completed through canonical AI runtime', 'info', undefined, runtime.tenantId ?? task.tenant_id, actorId);
+    await appendTaskLog(
+      db,
+      taskId,
+      'Task completed through canonical AI runtime',
+      'info',
+      undefined,
+      runtime.tenantId ?? task.tenant_id,
+      actorId,
+    );
 
     await writeDevAuditLog(db, {
       actorId,
@@ -511,21 +626,35 @@ export async function runTaskExecution(
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (executeStep) {
-      await db.from('ai_task_steps').update({
-        status: 'failed',
-        completed_at: new Date().toISOString(),
-        error_message: message,
-        output: message,
-      }).eq('id', executeStep.id);
+      await db
+        .from('ai_task_steps')
+        .update({
+          status: 'failed',
+          completed_at: new Date().toISOString(),
+          error_message: message,
+          output: message,
+        })
+        .eq('id', executeStep.id);
     }
-    await db.from('ai_tasks').update({
-      status: 'failed',
-      error_message: message,
-      completed_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }).eq('id', taskId);
+    await db
+      .from('ai_tasks')
+      .update({
+        status: 'failed',
+        error_message: message,
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', taskId);
     await setAgentStatus(db, task.agent_id, 'error');
-    await appendTaskLog(db, taskId, `Task execution error: ${message}`, 'error', executeStep?.id, runtime.tenantId ?? task.tenant_id, actorId);
+    await appendTaskLog(
+      db,
+      taskId,
+      `Task execution error: ${message}`,
+      'error',
+      executeStep?.id,
+      runtime.tenantId ?? task.tenant_id,
+      actorId,
+    );
     throw error;
   }
 }
@@ -539,22 +668,33 @@ export async function approveTask(
   const { data: task } = await db.from('ai_tasks').select('*').eq('id', taskId).single();
   if (!task) throw new Error('Task not found');
 
-  await db.from('ai_approvals').update({
-    status: 'approved',
-    approved_by: reviewerId,
-    decided_at: new Date().toISOString(),
-    reviewed_by: reviewerId,
-    reviewed_at: new Date().toISOString(),
-  }).eq('task_id', taskId).eq('status', 'pending');
+  await db
+    .from('ai_approvals')
+    .update({
+      status: 'approved',
+      approved_by: reviewerId,
+      decided_at: new Date().toISOString(),
+      reviewed_by: reviewerId,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq('task_id', taskId)
+    .eq('status', 'pending');
 
-  await db.from('ai_task_steps').update({ status: 'pending' }).eq('task_id', taskId).eq('status', 'awaiting_approval');
+  await db
+    .from('ai_task_steps')
+    .update({ status: 'pending' })
+    .eq('task_id', taskId)
+    .eq('status', 'awaiting_approval');
 
-  await db.from('ai_tasks').update({
-    status: 'planning',
-    requires_approval: false,
-    approval_status: 'approved',
-    updated_at: new Date().toISOString(),
-  }).eq('id', taskId);
+  await db
+    .from('ai_tasks')
+    .update({
+      status: 'planning',
+      requires_approval: false,
+      approval_status: 'approved',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', taskId);
 
   await writeDevAuditLog(db, {
     actorId: reviewerId,
@@ -581,15 +721,26 @@ export async function rollbackTask(
     .eq('task_id', taskId)
     .eq('snapshot_type', 'before');
 
-  await db.from('ai_tasks').update({
-    status: 'rolled_back',
-    completed_at: new Date().toISOString(),
-    result_json: { rolled_back: true, snapshots: snapshots?.length ?? 0 },
-    updated_at: new Date().toISOString(),
-  }).eq('id', taskId);
+  await db
+    .from('ai_tasks')
+    .update({
+      status: 'rolled_back',
+      completed_at: new Date().toISOString(),
+      result_json: { rolled_back: true, snapshots: snapshots?.length ?? 0 },
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', taskId);
 
   await setAgentStatus(db, task.agent_id, 'idle');
-  await appendTaskLog(db, taskId, `Task marked rolled back (${snapshots?.length ?? 0} snapshots referenced)`, 'warn', undefined, task.tenant_id, actorId);
+  await appendTaskLog(
+    db,
+    taskId,
+    `Task marked rolled back (${snapshots?.length ?? 0} snapshots referenced)`,
+    'warn',
+    undefined,
+    task.tenant_id,
+    actorId,
+  );
 
   await writeDevAuditLog(db, {
     actorId,

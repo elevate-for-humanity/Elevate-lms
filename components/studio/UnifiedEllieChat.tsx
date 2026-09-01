@@ -10,6 +10,7 @@ import {
   Loader2,
   Mic,
   MicOff,
+  Paperclip,
   PanelRightOpen,
   Rocket,
   Send,
@@ -23,10 +24,11 @@ import {
   ELLIE_ROUTE_LABEL,
   fetchAiHealth,
   routeEllieMessage,
-  sendOpsMessage,
+  selectStudioAgent,
   streamExecuteCommand,
   streamPlatformChat,
   type EllieMessageRoute,
+  type StudioSpecialist,
 } from '@/lib/devstudio/ellie-unified-handlers';
 
 type ToolCall = { tool: string; args: Record<string, unknown>; result: string };
@@ -46,6 +48,7 @@ interface ChatMessage {
   content: string;
   provider?: string;
   route?: EllieMessageRoute;
+  agent?: StudioSpecialist;
   toolCalls?: ToolCall[];
   action?: EllieAction | null;
   actionOutcome?: { status: 'executed' | 'rejected' | 'failed'; message: string };
@@ -56,6 +59,7 @@ interface UnifiedEllieChatProps {
   onOpenPreview?: () => void;
   embedded?: boolean;
   fileContext?: string;
+  agentOverride?: StudioSpecialist;
 }
 
 const QUICK = [
@@ -183,6 +187,7 @@ export default function UnifiedEllieChat({
   onOpenPreview,
   embedded = false,
   fileContext,
+  agentOverride,
 }: UnifiedEllieChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -195,6 +200,42 @@ export default function UnifiedEllieChat({
   const recognitionRef = useRef<any>(null);
   const [listening, setListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
+  const [attachment, setAttachment] = useState<{ name: string; context: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
+
+  async function uploadAttachment(file: File) {
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('label', file.name);
+      const response = await fetch('/api/admin/dev-studio/upload', { method: 'POST', body: form });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error ?? `Upload failed (HTTP ${response.status})`);
+      const preview =
+        typeof result.content_preview === 'string' ? result.content_preview.trim() : '';
+      const context = [
+        `Attached file: ${file.name}`,
+        `Content type: ${file.type || 'application/octet-stream'}`,
+        `Size: ${file.size} bytes`,
+        result.url ? `Authorized source URL: ${result.url}` : '',
+        preview
+          ? `Extracted content:\n${preview}`
+          : 'No text could be extracted; use the authorized source URL when visual inspection is required.',
+      ]
+        .filter(Boolean)
+        .join('\n');
+      setAttachment({ name: file.name, context });
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : 'Upload failed');
+    } finally {
+      setUploading(false);
+      if (attachmentInputRef.current) attachmentInputRef.current.value = '';
+    }
+  }
 
   useEffect(() => {
     fetchAiHealth().then(({ ok, label }) => {
@@ -306,9 +347,10 @@ export default function UnifiedEllieChat({
 
     setInput('');
     setLoading(true);
-    const route = routeEllieMessage(text);
+    const route = attachment ? 'platform' : routeEllieMessage(text);
+    const agent = agentOverride ?? selectStudioAgent(text);
     setLastRoute(route);
-    const userMsg: ChatMessage = { role: 'user', content: text, route };
+    const userMsg: ChatMessage = { role: 'user', content: text, route, agent };
     setMessages((prev) => [...prev, userMsg]);
     const assistantIdx = messages.length + 1;
 
@@ -321,6 +363,7 @@ export default function UnifiedEllieChat({
             content: `▶ ${ELLIE_ROUTE_LABEL.command}\n`,
             provider: 'execute',
             route,
+            agent,
           },
         ]);
         await streamExecuteCommand(text, (line) => {
@@ -332,32 +375,18 @@ export default function UnifiedEllieChat({
             return next;
           });
         });
-      } else if (route === 'ops') {
-        const { reply, action } = await sendOpsMessage(
-          text,
-          messages.map((message) => ({ role: message.role, content: message.content })),
-        );
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: reply,
-            provider: 'admin-ai',
-            route,
-            action: (action as EllieAction) ?? null,
-          },
-        ]);
       } else {
         setMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: '', provider: 'admin-ai', route },
+          { role: 'assistant', content: '', provider: 'admin-ai', route, agent },
         ]);
         const history = [...messages, userMsg].map((message) => ({
           role: message.role,
           content: message.content,
         }));
         await streamPlatformChat(history, {
-          fileContext,
+          agent,
+          fileContext: [fileContext, attachment?.context].filter(Boolean).join('\n\n') || undefined,
           onToken: (token) => {
             setMessages((prev) => {
               const next = [...prev];
@@ -514,6 +543,7 @@ export default function UnifiedEllieChat({
                     {message.provider && message.role === 'assistant' && (
                       <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
                         {message.provider}
+                        {message.agent ? ` · ${message.agent}` : ''}
                         {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
                       </p>
                     )}
@@ -572,7 +602,47 @@ export default function UnifiedEllieChat({
 
       <div className={`min-w-0 shrink-0 border-t p-3 sm:p-4 ${inputAreaClass}`}>
         <div className="mx-auto w-full min-w-0 max-w-3xl">
+          {attachment ? (
+            <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
+              <span className="min-w-0 truncate font-semibold">Attached: {attachment.name}</span>
+              <button
+                type="button"
+                onClick={() => setAttachment(null)}
+                className="shrink-0 font-bold hover:underline"
+              >
+                Remove
+              </button>
+            </div>
+          ) : null}
+          {uploadError ? (
+            <p role="alert" className="mb-2 text-xs font-medium text-red-700">
+              {uploadError}
+            </p>
+          ) : null}
           <div className="flex w-full min-w-0 items-end gap-2 rounded-2xl border border-gray-300 bg-white p-2 shadow-sm focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100">
+            <input
+              ref={attachmentInputRef}
+              type="file"
+              className="sr-only"
+              accept=".pdf,.doc,.docx,.txt,.md,.csv,.json,image/*"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) void uploadAttachment(file);
+              }}
+            />
+            <button
+              type="button"
+              aria-label="Attach a file"
+              disabled={uploading}
+              onClick={() => attachmentInputRef.current?.click()}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+            >
+              {uploading ? (
+                <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+              ) : (
+                <Paperclip className="h-5 w-5" aria-hidden="true" />
+              )}
+            </button>
             <textarea
               ref={inputRef}
               value={input}

@@ -26,7 +26,7 @@ const requiredContracts = [
   ['lib/course-builder/persisted-publish-service.ts', /\.from\(['"]courses['"]\)/, 'publish gate reads persisted courses'],
   ['lib/course-builder/persisted-publish-service.ts', /\.from\(['"]course_modules['"]\)/, 'publish gate validates persisted modules'],
   ['lib/course-builder/persisted-publish-service.ts', /course_lessons\(/, 'publish gate validates persisted lessons'],
-  ['lib/course-builder/persisted-publish-service.ts', /deterministic_automated_gate/, 'publish gate uses deterministic automated approval'],
+  ['lib/course-builder/persisted-publish-service.ts', /authorized human sign-off missing/, 'publish gate requires authorized human approval'],
   ['lib/course-builder/persisted-publish-service.ts', /repairPersistedCourseAcceptanceWithClient/, 'publish gate runs the governed acceptance checklist'],
   ['lib/db/courses.ts', /\.from\(['"]course_lessons['"]\)/, 'course service uses canonical lessons table'],
 ];
@@ -60,8 +60,8 @@ const persistedPublisher = fs.readFileSync(
   'utf8',
 );
 checks.push({
-  name: 'terminal course build records automated approval evidence',
-  pass: persistedPublisher.includes('record_course_automated_approval'),
+  name: 'publish gate cannot manufacture automated approval',
+  pass: !persistedPublisher.includes('record_course_automated_approval'),
   detail: 'lib/course-builder/persisted-publish-service.ts',
 });
 

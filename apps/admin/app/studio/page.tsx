@@ -13,13 +13,15 @@ export const runtime = 'nodejs';
 export default async function StudioPage() {
   await requireRole(['super_admin', 'admin']);
 
-  const workspaces = getAvailableWorkspaces().map(({ id, label, description, route, healthEndpoint }) => ({
-    id,
-    label,
-    description,
-    route,
-    healthEndpoint,
-  }));
+  const workspaces = getAvailableWorkspaces().map(
+    ({ id, label, description, route, healthEndpoint }) => ({
+      id,
+      label,
+      description,
+      route,
+      healthEndpoint,
+    }),
+  );
 
   return (
     <main className="min-h-screen bg-gray-50 text-gray-950">
@@ -53,19 +55,25 @@ export default async function StudioPage() {
                 <Bot className="h-6 w-6 text-gray-900" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Admin AI</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Admin AI
+                </p>
                 <h1 className="mt-1 text-2xl font-semibold tracking-tight text-gray-950 sm:text-3xl">
                   Tell the platform what you need done
                 </h1>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600">
-                  Course Builder, website publishing, deployments, documents, workflows, reporting, code inspection, and operational actions run as internal tools. You should not have to choose a builder before you ask for the outcome.
+                  Course Builder, website publishing, deployments, documents, workflows, reporting,
+                  code inspection, and operational actions run as internal tools. You should not
+                  have to choose a builder before you ask for the outcome.
                 </p>
               </div>
             </div>
           </div>
 
           <div className="h-[calc(100dvh-10rem)] min-h-[500px] min-w-0 max-h-[760px] sm:h-[68vh] sm:min-h-[620px] sm:max-h-[900px]">
-            <StudioCommandWorkspace />
+            <StudioCommandWorkspace
+              workspaces={workspaces.map(({ id, label, route }) => ({ id, label, route }))}
+            />
           </div>
         </section>
 
@@ -73,11 +81,14 @@ export default async function StudioPage() {
           <summary className="flex min-w-0 cursor-pointer list-none flex-wrap items-center gap-2 px-4 py-4 text-sm font-semibold text-gray-800 marker:hidden sm:px-5">
             <Wrench className="h-4 w-4" aria-hidden="true" />
             Advanced capability surfaces
-            <span className="min-w-0 text-xs font-normal text-gray-500 sm:ml-1">for direct inspection and troubleshooting</span>
+            <span className="min-w-0 text-xs font-normal text-gray-500 sm:ml-1">
+              for direct inspection and troubleshooting
+            </span>
           </summary>
           <div className="border-t border-gray-100 p-5">
             <p className="mb-5 max-w-3xl text-sm leading-6 text-gray-600">
-              These routes remain available as underlying tools and audit surfaces. They are not the primary operating model; normal work should start in Admin AI above.
+              These routes remain available as underlying tools and audit surfaces. They are not the
+              primary operating model; normal work should start in Admin AI above.
             </p>
             <StudioWorkspaceGrid workspaces={workspaces} />
           </div>

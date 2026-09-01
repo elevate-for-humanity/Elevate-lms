@@ -6,6 +6,7 @@ import { Eye, Globe2, MessageSquare, X } from 'lucide-react';
 
 import UnifiedEllieChat from './UnifiedEllieChat';
 import RepositoryLivePreview from './RepositoryLivePreview';
+import StudioCapabilityRail, { type StudioSpecialist } from './StudioCapabilityRail';
 
 const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
   ssr: false,
@@ -18,12 +19,22 @@ const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
 
 type InspectionMode = 'preview' | 'browser';
 
-export default function StudioCommandWorkspace() {
+export default function StudioCommandWorkspace({
+  workspaces,
+}: {
+  workspaces: Array<{ id: string; label: string; route: string }>;
+}) {
   const [inspectionOpen, setInspectionOpen] = useState(true);
   const [mode, setMode] = useState<InspectionMode>('preview');
+  const [specialist, setSpecialist] = useState<StudioSpecialist | null>(null);
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col bg-white lg:flex-row">
+      <StudioCapabilityRail
+        workspaces={workspaces}
+        specialist={specialist}
+        onSpecialistChange={setSpecialist}
+      />
       <section className="flex min-h-0 min-w-0 flex-1 flex-col">
         <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-gray-50 px-3 py-2 lg:hidden">
           <MessageSquare className="h-4 w-4 text-gray-500" aria-hidden="true" />
@@ -37,7 +48,11 @@ export default function StudioCommandWorkspace() {
             {inspectionOpen ? 'Hide preview' : 'Show preview'}
           </button>
         </div>
-        <UnifiedEllieChat embedded onOpenPreview={() => setInspectionOpen(true)} />
+        <UnifiedEllieChat
+          embedded
+          onOpenPreview={() => setInspectionOpen(true)}
+          agentOverride={specialist ?? undefined}
+        />
       </section>
 
       {inspectionOpen ? (

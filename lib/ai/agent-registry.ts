@@ -1,27 +1,19 @@
 /**
  * AI Gateway Module - Agent Registry
  *
- * Manages all AI agents (PARS, ELLIE, LIZZY, ZORA) with their
+ * Manages all AI agents (PARIS, ELLIE, LIZZY, ZORA) with their
  * configurations, capabilities, and health monitoring.
  */
 
-import {
-  AIAgent,
-  AgentIntent,
-  AgentStatus,
-} from './types';
+import { AIAgent, AgentIntent, AgentStatus } from './types';
 
-import type {
-  AgentConfig,
-  AgentCapabilities,
-  AgentHealthStatus,
-} from './types';
+import type { AgentConfig, AgentCapabilities, AgentHealthStatus } from './types';
 
 // ============================================================
 // Pre-defined Agent Configurations
 // ============================================================
 
-const PARS_CAPABILITIES: AgentCapabilities = {
+const PARIS_CAPABILITIES: AgentCapabilities = {
   intents: [AgentIntent.ADMISSION],
   maxConcurrentTasks: 5,
   timeout: 300000, // 5 minutes
@@ -64,16 +56,17 @@ const ROUTER_CAPABILITIES: AgentCapabilities = {
 // Default agent configurations
 const DEFAULT_AGENTS: AgentConfig[] = [
   {
-    id: 'agent-pars',
-    name: 'PARS (Pre-Admission Review System)',
-    type: AIAgent.PARS,
-    capabilities: PARS_CAPABILITIES,
+    id: 'agent-paris',
+    name: 'PARIS (Public Assistance, Recruitment & Intake System)',
+    type: AIAgent.PARIS,
+    capabilities: PARIS_CAPABILITIES,
     endpoint: '/api/ai/agents/paris',
     priority: 10,
-    maxConcurrentTasks: PARS_CAPABILITIES.maxConcurrentTasks,
+    maxConcurrentTasks: PARIS_CAPABILITIES.maxConcurrentTasks,
     status: AgentStatus.ACTIVE,
     metadata: {
-      description: 'Handles admission interviews, eligibility assessments, and program applications',
+      description:
+        'Handles admission interviews, eligibility assessments, and program applications',
       keywords: ['interview', 'apply', 'program', 'eligibility', 'admission', 'paris'],
     },
   },
@@ -88,7 +81,16 @@ const DEFAULT_AGENTS: AgentConfig[] = [
     status: AgentStatus.ACTIVE,
     metadata: {
       description: 'Student success coach, notifications, enrollment support, and course guidance',
-      keywords: ['progress', 'course', 'lesson', 'enroll', 'payment', 'funding', 'student', 'support'],
+      keywords: [
+        'progress',
+        'course',
+        'lesson',
+        'enroll',
+        'payment',
+        'funding',
+        'student',
+        'support',
+      ],
     },
   },
   {
@@ -115,7 +117,8 @@ const DEFAULT_AGENTS: AgentConfig[] = [
     maxConcurrentTasks: ZORA_CAPABILITIES.maxConcurrentTasks,
     status: AgentStatus.ACTIVE,
     metadata: {
-      description: 'Compliance monitoring, WIOA reporting, credential tracking, and regulatory audits',
+      description:
+        'Compliance monitoring, WIOA reporting, credential tracking, and regulatory audits',
       keywords: ['WIOA', 'DOL', 'compliance', 'credential', 'audit', 'certification', 'regulation'],
     },
   },
@@ -167,7 +170,8 @@ export class AgentRegistry {
    * Get an agent by its type
    */
   getAgent(type: AIAgent): AgentConfig | null {
-    return this.agents.get(type) || null;
+    const canonicalType = type === AIAgent.PARS ? AIAgent.PARIS : type;
+    return this.agents.get(canonicalType) || null;
   }
 
   /**
@@ -182,7 +186,9 @@ export class AgentRegistry {
    */
   getAvailableAgents(): AgentConfig[] {
     return this.getAllAgents().filter(
-      (agent) => agent.status === AgentStatus.ACTIVE && this.getAgentLoad(agent.type) < agent.maxConcurrentTasks
+      (agent) =>
+        agent.status === AgentStatus.ACTIVE &&
+        this.getAgentLoad(agent.type) < agent.maxConcurrentTasks,
     );
   }
 
@@ -191,10 +197,10 @@ export class AgentRegistry {
    */
   selectAgent(intent: AgentIntent): AgentConfig {
     const availableAgents = this.getAvailableAgents();
-    
+
     // Filter agents that can handle this intent
-    const capableAgents = availableAgents.filter(
-      (agent) => agent.capabilities.intents.includes(intent)
+    const capableAgents = availableAgents.filter((agent) =>
+      agent.capabilities.intents.includes(intent),
     );
 
     if (capableAgents.length === 0) {
@@ -211,7 +217,7 @@ export class AgentRegistry {
       const loadA = this.getAgentLoad(a.type);
       const loadB = this.getAgentLoad(b.type);
       const priorityDiff = b.priority - a.priority;
-      
+
       // If priorities are equal, prefer the less loaded agent
       if (priorityDiff === 0) {
         return loadA - loadB;
@@ -281,12 +287,12 @@ export class AgentRegistry {
    */
   getHealth(): Record<string, AgentHealthStatus> {
     const health: Record<string, AgentHealthStatus> = {};
-    
+
     this.getAllAgents().forEach((agent) => {
       const tasks = this.agentTasks.get(agent.type);
       const activeTasks = tasks ? tasks.size : 0;
       const loadPercentage = (activeTasks / agent.maxConcurrentTasks) * 100;
-      
+
       health[agent.type] = {
         status: agent.status,
         load: Math.round(loadPercentage * 100) / 100,
@@ -309,7 +315,7 @@ export class AgentRegistry {
   } {
     const agents = this.getAllAgents();
     const health = this.getHealth();
-    
+
     let totalTasks = 0;
     let totalLoad = 0;
     let healthyAgents = 0;
@@ -342,9 +348,7 @@ export class AgentRegistry {
    * Get agents by intent capability
    */
   getAgentsByIntent(intent: AgentIntent): AgentConfig[] {
-    return this.getAllAgents().filter(
-      (agent) => agent.capabilities.intents.includes(intent)
-    );
+    return this.getAllAgents().filter((agent) => agent.capabilities.intents.includes(intent));
   }
 
   /**

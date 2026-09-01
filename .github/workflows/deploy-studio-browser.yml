@@ -9,6 +9,8 @@ on:
       - 'services/studio-browser/**'
       - 'scripts/northflank/create-studio-browser-service.ts'
       - 'scripts/northflank/connect-studio-browser-to-admin.ts'
+      - 'scripts/northflank/resolve-studio-browser-secret.ts'
+      - 'scripts/northflank/verify-studio-browser-link.ts'
       - 'scripts/northflank/resolve-service-url.ts'
       - '.github/workflows/deploy-studio-browser.yml'
 
@@ -47,11 +49,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Generate shared browser credential
+      - name: Resolve shared browser credential
         shell: bash
         run: |
           set -euo pipefail
-          secret="$(openssl rand -base64 48 | tr -d '\n')"
+          secret="$(pnpm --silent tsx scripts/northflank/resolve-studio-browser-secret.ts)"
           echo "::add-mask::$secret"
           echo "STUDIO_BROWSER_SECRET=$secret" >> "$GITHUB_ENV"
 
@@ -66,6 +68,9 @@ jobs:
 
       - name: Connect browser to Admin
         run: pnpm tsx scripts/northflank/connect-studio-browser-to-admin.ts
+
+      - name: Verify Browser and Admin linkage
+        run: pnpm tsx scripts/northflank/verify-studio-browser-link.ts
 
       - name: Verify browser health
         shell: bash

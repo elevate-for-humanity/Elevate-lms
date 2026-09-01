@@ -1,4 +1,10 @@
-import { ELLIE_ROUTE_LABEL, routeEllieMessage, type EllieMessageRoute } from '@/lib/devstudio/ellie-message-router';
+import {
+  ELLIE_ROUTE_LABEL,
+  routeEllieMessage,
+  selectStudioAgent,
+  type StudioSpecialist,
+  type EllieMessageRoute,
+} from '@/lib/devstudio/ellie-message-router';
 
 export type UnifiedChatMessage = {
   role: 'user' | 'assistant';
@@ -9,7 +15,13 @@ export type UnifiedChatMessage = {
   action?: unknown;
 };
 
-export { routeEllieMessage, ELLIE_ROUTE_LABEL, type EllieMessageRoute };
+export {
+  routeEllieMessage,
+  selectStudioAgent,
+  ELLIE_ROUTE_LABEL,
+  type EllieMessageRoute,
+  type StudioSpecialist,
+};
 
 export async function fetchAiHealth(): Promise<{
   ok: boolean;
@@ -25,7 +37,8 @@ export async function fetchAiHealth(): Promise<{
       anthropic: Boolean(data.hasAnthropic),
       gemini: Boolean(data.hasGemini),
     };
-    const ok = res.ok && (providers.groq || providers.openai || providers.anthropic || providers.gemini);
+    const ok =
+      res.ok && (providers.groq || providers.openai || providers.anthropic || providers.gemini);
     const label = [
       providers.groq && 'Groq',
       providers.openai && 'OpenAI',
@@ -65,6 +78,7 @@ export async function sendOpsMessage(
 export async function streamPlatformChat(
   messages: { role: string; content: string }[],
   opts: {
+    agent?: 'PARIS' | 'ELLIE' | 'LIZZY' | 'ZORA';
     fileContext?: string;
     documentsContext?: string;
     provider?: string;
@@ -82,6 +96,7 @@ export async function streamPlatformChat(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       messages,
+      agent: opts.agent,
       fileContext: opts.fileContext,
       documentsContext: opts.documentsContext,
       provider: opts.provider,

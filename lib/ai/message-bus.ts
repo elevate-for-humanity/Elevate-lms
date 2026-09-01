@@ -5,16 +5,9 @@
  * Supports request/response patterns with correlation IDs.
  */
 
-import {
-  AIAgent,
-  MessageType,
-  MessageBusChannel,
-} from './types';
+import { AIAgent, MessageType, MessageBusChannel } from './types';
 
-import type {
-  AgentMessage,
-  MessageBusSubscription,
-} from './types';
+import type { AgentMessage, MessageBusSubscription } from './types';
 
 // ============================================================
 // Message Types
@@ -171,7 +164,7 @@ export class MessageBus {
   request<T = AgentMessage>(
     channel: string,
     message: Omit<AgentMessage, 'correlationId'>,
-    timeout?: number
+    timeout?: number,
   ): Promise<T> {
     const correlationId = this.generateCorrelationId();
     const timeoutMs = timeout || this.defaultRequestTimeout;
@@ -225,6 +218,7 @@ export class MessageBus {
   private getChannelForAgent(agent: AIAgent): MessageBusChannel {
     switch (agent) {
       case AIAgent.PARS:
+      case AIAgent.PARIS:
         return MessageBusChannel.ADMISSIONS;
       case AIAgent.ELLIE:
         return MessageBusChannel.STUDENT_LIFECYCLE;
@@ -312,7 +306,7 @@ export function createAgentMessage(
     channel?: MessageBusChannel;
     correlationId?: string;
     metadata?: Record<string, unknown>;
-  }
+  },
 ): AgentMessage {
   return {
     id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -334,12 +328,17 @@ export function createTaskAssignedMessage(
   taskId: string,
   agent: AIAgent,
   source: AIAgent,
-  correlationId?: string
+  correlationId?: string,
 ): AgentMessage {
-  return createAgentMessage(MessageType.TASK_ASSIGNED, source, { taskId, agent }, {
-    target: agent,
-    correlationId,
-  });
+  return createAgentMessage(
+    MessageType.TASK_ASSIGNED,
+    source,
+    { taskId, agent },
+    {
+      target: agent,
+      correlationId,
+    },
+  );
 }
 
 /**
@@ -349,11 +348,16 @@ export function createTaskCompletedMessage(
   taskId: string,
   result: unknown,
   source: AIAgent,
-  correlationId?: string
+  correlationId?: string,
 ): AgentMessage {
-  return createAgentMessage(MessageType.TASK_COMPLETED, source, { taskId, result }, {
-    correlationId,
-  });
+  return createAgentMessage(
+    MessageType.TASK_COMPLETED,
+    source,
+    { taskId, result },
+    {
+      correlationId,
+    },
+  );
 }
 
 /**
@@ -363,11 +367,16 @@ export function createTaskFailedMessage(
   taskId: string,
   error: string,
   source: AIAgent,
-  correlationId?: string
+  correlationId?: string,
 ): AgentMessage {
-  return createAgentMessage(MessageType.TASK_FAILED, source, { taskId, error }, {
-    correlationId,
-  });
+  return createAgentMessage(
+    MessageType.TASK_FAILED,
+    source,
+    { taskId, error },
+    {
+      correlationId,
+    },
+  );
 }
 
 /**
@@ -377,11 +386,16 @@ export function createEventMessage(
   eventType: string,
   data: Record<string, unknown>,
   source: AIAgent,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): AgentMessage {
-  return createAgentMessage(MessageType.EVENT, source, { eventType, ...data }, {
-    metadata,
-  });
+  return createAgentMessage(
+    MessageType.EVENT,
+    source,
+    { eventType, ...data },
+    {
+      metadata,
+    },
+  );
 }
 
 /**
@@ -392,7 +406,7 @@ export function createNotificationMessage(
   body: string,
   source: AIAgent,
   recipient?: AIAgent,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): AgentMessage {
   return createAgentMessage(
     MessageType.NOTIFICATION,
@@ -401,7 +415,7 @@ export function createNotificationMessage(
     {
       target: recipient,
       metadata,
-    }
+    },
   );
 }
 
@@ -413,7 +427,7 @@ export function createApprovalRequiredMessage(
   requester: AIAgent,
   approver: AIAgent,
   details: Record<string, unknown>,
-  correlationId?: string
+  correlationId?: string,
 ): AgentMessage {
   return createAgentMessage(
     MessageType.APPROVAL_REQUIRED,
@@ -422,7 +436,7 @@ export function createApprovalRequiredMessage(
     {
       target: approver,
       correlationId,
-    }
+    },
   );
 }
 

@@ -24,15 +24,8 @@ import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-cl
 import { aiChat } from '@/lib/ai/ai-service';
 import { getRAGContext } from '@/lib/platform/rag';
 import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
-import {
-  ROUTE_DEPENDENCIES,
-  lookupRoute,
-  lookupTable,
-} from '@/lib/platform/knowledge-graph';
-import {
-  PROGRAM_REGISTRY,
-  getProgramBySlug,
-} from '@/lib/platform/system-registry';
+import { ROUTE_DEPENDENCIES, lookupRoute, lookupTable } from '@/lib/platform/knowledge-graph';
+import { PROGRAM_REGISTRY, getProgramBySlug } from '@/lib/platform/system-registry';
 import {
   buildAdminAiSystemPrompt,
   isOperationalDiagnosticRequest,
@@ -44,6 +37,13 @@ import path from 'path';
 type ToolCallRecord = { tool: string; args: Record<string, unknown>; result: string };
 type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
 type ChatProvider = 'auto' | 'groq' | 'openai' | 'gemini' | 'anthropic';
+type StudioAgent = 'PARIS' | 'ELLIE' | 'LIZZY' | 'ZORA';
+
+function normalizeAgent(value: unknown): StudioAgent {
+  return ['PARIS', 'ELLIE', 'LIZZY', 'ZORA'].includes(String(value).toUpperCase())
+    ? (String(value).toUpperCase() as StudioAgent)
+    : 'LIZZY';
+}
 
 const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, ...string[]]> = {
   groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
@@ -107,7 +107,8 @@ const TOOLS: any[] = [
     type: 'function',
     function: {
       name: 'get_dashboard_stats',
-      description: 'Get headline metrics from the same canonical tables used by the Admin dashboard.',
+      description:
+        'Get headline metrics from the same canonical tables used by the Admin dashboard.',
       parameters: { type: 'object', properties: {}, required: [] },
     },
   },
@@ -135,7 +136,10 @@ const TOOLS: any[] = [
       parameters: {
         type: 'object',
         properties: {
-          query: { type: 'string', description: 'Route, program slug, table, component, or problem terms to inspect' },
+          query: {
+            type: 'string',
+            description: 'Route, program slug, table, component, or problem terms to inspect',
+          },
         },
         required: ['query'],
       },
@@ -150,8 +154,14 @@ const TOOLS: any[] = [
       parameters: {
         type: 'object',
         properties: {
-          slug: { type: 'string', description: 'Program slug, for example barber, cna, or hvac-technician' },
-          include_live: { type: 'boolean', description: 'Also query live Supabase program/course metadata' },
+          slug: {
+            type: 'string',
+            description: 'Program slug, for example barber, cna, or hvac-technician',
+          },
+          include_live: {
+            type: 'boolean',
+            description: 'Also query live Supabase program/course metadata',
+          },
         },
         required: ['slug'],
       },
@@ -166,7 +176,10 @@ const TOOLS: any[] = [
       parameters: {
         type: 'object',
         properties: {
-          route_path: { type: 'string', description: 'Route path such as /programs/barber or /dashboard' },
+          route_path: {
+            type: 'string',
+            description: 'Route path such as /programs/barber or /dashboard',
+          },
         },
         required: ['route_path'],
       },
@@ -213,7 +226,11 @@ const TOOLS: any[] = [
         type: 'object',
         properties: {
           query: { type: 'string', description: 'Literal or regex search term' },
-          path_hint: { type: 'string', description: 'Optional safe path prefix such as app, apps/admin/app, components, lib, content, data' },
+          path_hint: {
+            type: 'string',
+            description:
+              'Optional safe path prefix such as app, apps/admin/app, components, lib, content, data',
+          },
           limit: { type: 'number', description: 'Maximum matching lines, capped at 80' },
         },
         required: ['query'],
@@ -308,14 +325,17 @@ const TOOLS: any[] = [
       parameters: {
         type: 'object',
         properties: {
-          title:              { type: 'string',  description: 'Course title' },
-          description:        { type: 'string',  description: 'What the course covers' },
-          audience:           { type: 'string',  description: 'Target learner (e.g. "adult workforce learners")' },
-          modules:            { type: 'number',  description: 'Number of modules (default 5)' },
-          lessons_per_module: { type: 'number',  description: 'Lessons per module (default 3)' },
-          hours:              { type: 'number',  description: 'Target training hours when known' },
-          state:              { type: 'string',  description: 'State/jurisdiction when relevant' },
-          credential:         { type: 'string',  description: 'Credential or license target when relevant' },
+          title: { type: 'string', description: 'Course title' },
+          description: { type: 'string', description: 'What the course covers' },
+          audience: {
+            type: 'string',
+            description: 'Target learner (e.g. "adult workforce learners")',
+          },
+          modules: { type: 'number', description: 'Number of modules (default 5)' },
+          lessons_per_module: { type: 'number', description: 'Lessons per module (default 3)' },
+          hours: { type: 'number', description: 'Target training hours when known' },
+          state: { type: 'string', description: 'State/jurisdiction when relevant' },
+          credential: { type: 'string', description: 'Credential or license target when relevant' },
         },
         required: ['title'],
       },
@@ -349,8 +369,14 @@ const TOOLS: any[] = [
       parameters: {
         type: 'object',
         properties: {
-          course_id:  { type: 'string',  description: 'Canonical course ID from build_course/save_course' },
-          voice:      { type: 'string',  description: 'TTS voice: alloy | echo | fable | onyx | nova | shimmer (default alloy)' },
+          course_id: {
+            type: 'string',
+            description: 'Canonical course ID from build_course/save_course',
+          },
+          voice: {
+            type: 'string',
+            description: 'TTS voice: alloy | echo | fable | onyx | nova | shimmer (default alloy)',
+          },
           use_pexels: { type: 'boolean', description: 'Use Pexels b-roll footage (default true)' },
         },
         required: ['course_id'],
@@ -386,8 +412,8 @@ const TOOLS: any[] = [
       parameters: {
         type: 'object',
         properties: {
-          document_id:     { type: 'string', description: 'Document ID' },
-          application_id:  { type: 'string', description: 'Application ID to update' },
+          document_id: { type: 'string', description: 'Document ID' },
+          application_id: { type: 'string', description: 'Application ID to update' },
         },
         required: ['document_id', 'application_id'],
       },
@@ -425,7 +451,10 @@ const SAFE_SOURCE_PREFIXES = [
 ];
 
 function toSafeRelativePath(filePath: string): string | null {
-  const normalized = filePath.replace(/\\/g, '/').replace(/^\/workspace\//, '').replace(/^\.\//, '');
+  const normalized = filePath
+    .replace(/\\/g, '/')
+    .replace(/^\/workspace\//, '')
+    .replace(/^\.\//, '');
   if (normalized.includes('..') || normalized.startsWith('/')) return null;
   if (!SAFE_SOURCE_PREFIXES.some((prefix) => normalized.startsWith(prefix))) return null;
   return normalized;
@@ -472,10 +501,12 @@ function routeFromSourceFile(file: string): string | null {
 
   const suffix = routeFile.slice(appPrefix.length).replace(/\/(page|route)\.tsx?$/, '');
   if (suffix === '') return '/';
-  return suffix
-    .replace(/\/\([^)]*\)/g, '')
-    .replace(/\/page$/, '')
-    .replace(/\/route$/, '') || '/';
+  return (
+    suffix
+      .replace(/\/\([^)]*\)/g, '')
+      .replace(/\/page$/, '')
+      .replace(/\/route$/, '') || '/'
+  );
 }
 
 function routePatternMatches(patternRoute: string, requestedRoute: string): boolean {
@@ -501,15 +532,24 @@ function findRouteFiles(routePath: string): string[] {
 }
 
 function inspectPlatformRegistry(query: string): string {
-  const terms = query.toLowerCase().split(/[^a-z0-9/_-]+/).filter(Boolean);
+  const terms = query
+    .toLowerCase()
+    .split(/[^a-z0-9/_-]+/)
+    .filter(Boolean);
   const matchesTerm = (value: string) => terms.some((term) => value.toLowerCase().includes(term));
-  const programMatches = PROGRAM_REGISTRY
-    .filter((program) => matchesTerm(`${program.slug} ${program.title} ${program.category} ${program.canonical_route}`))
-    .slice(0, 12);
+  const programMatches = PROGRAM_REGISTRY.filter((program) =>
+    matchesTerm(`${program.slug} ${program.title} ${program.category} ${program.canonical_route}`),
+  ).slice(0, 12);
   const routeMatches = Object.entries(ROUTE_DEPENDENCIES)
-    .filter(([route, deps]) => matchesTerm(`${route} ${deps.tables.join(' ')} ${deps.apis.join(' ')} ${deps.components.join(' ')}`))
+    .filter(([route, deps]) =>
+      matchesTerm(
+        `${route} ${deps.tables.join(' ')} ${deps.apis.join(' ')} ${deps.components.join(' ')}`,
+      ),
+    )
     .slice(0, 12);
-  const tableMatches = Array.from(new Set(Object.values(ROUTE_DEPENDENCIES).flatMap((deps) => deps.tables)))
+  const tableMatches = Array.from(
+    new Set(Object.values(ROUTE_DEPENDENCIES).flatMap((deps) => deps.tables)),
+  )
     .filter((table) => matchesTerm(table))
     .map((table) => ({ table, owners: lookupTable(table).map((system) => system.id) }))
     .slice(0, 12);
@@ -518,7 +558,11 @@ function inspectPlatformRegistry(query: string): string {
     {
       query,
       program_matches: programMatches,
-      route_dependency_matches: routeMatches.map(([route, deps]) => ({ route, ...deps, owner: lookupRoute(route)?.id ?? null })),
+      route_dependency_matches: routeMatches.map(([route, deps]) => ({
+        route,
+        ...deps,
+        owner: lookupRoute(route)?.id ?? null,
+      })),
       table_matches: tableMatches,
     },
     null,
@@ -529,16 +573,20 @@ function inspectPlatformRegistry(query: string): string {
 function inspectRoute(routePath: string): string {
   const normalized = routePath.startsWith('/') ? routePath : `/${routePath}`;
   const sourceFiles = findRouteFiles(normalized);
-  const dependencyEntry = Object.entries(ROUTE_DEPENDENCIES).find(([route]) =>
-    route === normalized || routePatternMatches(route, normalized)
+  const dependencyEntry = Object.entries(ROUTE_DEPENDENCIES).find(
+    ([route]) => route === normalized || routePatternMatches(route, normalized),
   );
-  const owningSystem = lookupRoute(normalized)?.id ?? (dependencyEntry ? lookupRoute(dependencyEntry[0])?.id ?? null : null);
+  const owningSystem =
+    lookupRoute(normalized)?.id ??
+    (dependencyEntry ? (lookupRoute(dependencyEntry[0])?.id ?? null) : null);
 
   return JSON.stringify(
     {
       route: normalized,
       owning_system: owningSystem,
-      known_dependencies: dependencyEntry ? { route_pattern: dependencyEntry[0], ...dependencyEntry[1] } : null,
+      known_dependencies: dependencyEntry
+        ? { route_pattern: dependencyEntry[0], ...dependencyEntry[1] }
+        : null,
       source_files: sourceFiles,
       source_excerpts: sourceFiles.slice(0, 3).map((file) => sourceExcerpt(file, 90)),
     },
@@ -548,28 +596,20 @@ function inspectRoute(routePath: string): string {
 }
 
 function searchCode(query: string, pathHint?: string, limit = 40): string {
-  const safeHint = pathHint ? toSafeRelativePath(pathHint.endsWith('/') ? pathHint : `${pathHint}/`) : null;
-  const paths = safeHint ? [safeHint] : ['app', 'apps/admin/app', 'components', 'content', 'data', 'lib'];
-  return runRipgrep([
-    '-n',
-    '-F',
-    query.slice(0, 160),
-    ...paths,
-    '-g',
-    '*.{ts,tsx,js,jsx,json,md}',
-  ])
+  const safeHint = pathHint
+    ? toSafeRelativePath(pathHint.endsWith('/') ? pathHint : `${pathHint}/`)
+    : null;
+  const paths = safeHint
+    ? [safeHint]
+    : ['app', 'apps/admin/app', 'components', 'content', 'data', 'lib'];
+  return runRipgrep(['-n', '-F', query.slice(0, 160), ...paths, '-g', '*.{ts,tsx,js,jsx,json,md}'])
     .split('\n')
     .slice(0, Math.min(Math.max(limit, 5), 80))
     .join('\n');
 }
 
 function inspectBuildErrors(kind: string): string {
-  const candidates = [
-    `.next/${kind}.log`,
-    `logs/${kind}.log`,
-    `tmp/${kind}.log`,
-    `${kind}.log`,
-  ];
+  const candidates = [`.next/${kind}.log`, `logs/${kind}.log`, `tmp/${kind}.log`, `${kind}.log`];
   const found = candidates.find((candidate) => existsSync(path.join(REPO_ROOT, candidate)));
   if (!found) {
     const command =
@@ -591,8 +631,9 @@ async function collectAutomaticEvidence(query: string): Promise<ToolCallRecord[]
   records.push({ tool: 'inspect_platform_registry', args: { query }, result: registryResult });
 
   const normalized = query.toLowerCase();
-  const mentionedProgram = PROGRAM_REGISTRY.find((program) =>
-    normalized.includes(program.slug) || normalized.includes(program.title.toLowerCase())
+  const mentionedProgram = PROGRAM_REGISTRY.find(
+    (program) =>
+      normalized.includes(program.slug) || normalized.includes(program.title.toLowerCase()),
   );
   if (mentionedProgram) {
     const result = await execTool('query_program_by_slug', {
@@ -632,10 +673,15 @@ function formatAutomaticEvidence(records: ToolCallRecord[]): string {
     .join('\n\n');
 }
 
-function enforceEvidenceBoundary(message: string, query: string, records: ToolCallRecord[]): string {
+function enforceEvidenceBoundary(
+  message: string,
+  query: string,
+  records: ToolCallRecord[],
+): string {
   if (!isOperationalDiagnosticRequest(query)) return message;
 
-  const hasEvidenceStatus = /Evidence used:/i.test(message) || /No live tool was executed/i.test(message);
+  const hasEvidenceStatus =
+    /Evidence used:/i.test(message) || /No live tool was executed/i.test(message);
   if (hasEvidenceStatus) return message;
 
   const evidenceLine = records.length
@@ -743,19 +789,24 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
     case 'get_dashboard_stats': {
       const db = await requireAdminClient();
-      const pendingStatuses = ['pending', 'submitted', 'in_review', 'under_review', 'pending_admin_review'];
+      const pendingStatuses = [
+        'pending',
+        'submitted',
+        'in_review',
+        'under_review',
+        'pending_admin_review',
+      ];
       const [enrollRes, appRes, certRes, progRes] = await Promise.all([
         db.from('program_enrollments').select('id', { count: 'exact', head: true }),
-        db.from('applications')
+        db
+          .from('applications')
           .select('id', { count: 'exact', head: true })
           .in('status', pendingStatuses),
         db.from('program_completion_certificates').select('id', {
           count: 'exact',
           head: true,
         }),
-        db.from('programs')
-          .select('id', { count: 'exact', head: true })
-          .eq('is_active', true),
+        db.from('programs').select('id', { count: 'exact', head: true }).eq('is_active', true),
       ]);
       return JSON.stringify(
         {
@@ -774,11 +825,19 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       const limit = typeof args.limit === 'number' ? args.limit : 10;
       let q = db
         .from('applications')
-        .select('id, status, created_at, submitted_at, program_interest, program_slug, first_name, last_name, full_name, email')
+        .select(
+          'id, status, created_at, submitted_at, program_interest, program_slug, first_name, last_name, full_name, email',
+        )
         .order('created_at', { ascending: false })
         .limit(limit);
       if (args.status === 'pending') {
-        q = q.in('status', ['pending', 'submitted', 'in_review', 'under_review', 'pending_admin_review']);
+        q = q.in('status', [
+          'pending',
+          'submitted',
+          'in_review',
+          'under_review',
+          'pending_admin_review',
+        ]);
       } else if (args.status) {
         q = q.eq('status', String(args.status));
       }
@@ -792,7 +851,9 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
     }
 
     case 'query_program_by_slug': {
-      const slug = String(args.slug || '').trim().toLowerCase();
+      const slug = String(args.slug || '')
+        .trim()
+        .toLowerCase();
       const registry = getProgramBySlug(slug) ?? null;
       let live: Record<string, unknown> | null = null;
 
@@ -840,7 +901,10 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
     }
 
     case 'get_component_source': {
-      return sourceExcerpt(String(args.file_path || ''), typeof args.max_lines === 'number' ? args.max_lines : 160);
+      return sourceExcerpt(
+        String(args.file_path || ''),
+        typeof args.max_lines === 'number' ? args.max_lines : 160,
+      );
     }
 
     case 'search_schema': {
@@ -934,10 +998,12 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       const lessonsPerModule = Math.max(1, Math.min(20, Number(args.lessons_per_module || 3)));
       const hours = Number(args.hours || 0) || undefined;
       const state = typeof args.state === 'string' ? args.state.trim() || undefined : undefined;
-      const credential = typeof args.credential === 'string' ? args.credential.trim() || undefined : undefined;
+      const credential =
+        typeof args.credential === 'string' ? args.credential.trim() || undefined : undefined;
 
       const { courseFactory } = await import('@/lib/course-factory');
-      const { normalizeGeneratedCourseForGovernance } = await import('@/lib/course-factory/post-generation-governance');
+      const { normalizeGeneratedCourseForGovernance } =
+        await import('@/lib/course-factory/post-generation-governance');
       const result = await courseFactory({
         title,
         topic: description,
@@ -958,25 +1024,29 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         governance = await normalizeGeneratedCourseForGovernance(result.courseId);
       }
 
-      return JSON.stringify({
-        __type: 'course_saved',
-        success: result.ok,
-        courseId: result.courseId ?? null,
-        courseSlug: result.courseSlug ?? null,
-        title: result.title ?? title,
-        modulesGenerated: result.moduleCount ?? 0,
-        lessonsGenerated: result.lessonCount ?? 0,
-        assessmentsGenerated: result.assessmentsGenerated ?? 0,
-        videosQueued: result.videosQueued ?? 0,
-        governance,
-        warnings: result.warnings ?? [],
-        errors: result.errors ?? [],
-        status: result.status ?? null,
-        url: result.courseId ? `/studio/courses/${result.courseId}` : null,
-        message: result.ok
-          ? `Course "${result.title ?? title}" was generated and saved through the canonical Course Factory as a governed draft.`
-          : 'Course generation did not persist because the canonical Course Factory did not pass its evidence, completeness, or validation gates.',
-      }, null, 2);
+      return JSON.stringify(
+        {
+          __type: 'course_saved',
+          success: result.ok,
+          courseId: result.courseId ?? null,
+          courseSlug: result.courseSlug ?? null,
+          title: result.title ?? title,
+          modulesGenerated: result.moduleCount ?? 0,
+          lessonsGenerated: result.lessonCount ?? 0,
+          assessmentsGenerated: result.assessmentsGenerated ?? 0,
+          videosQueued: result.videosQueued ?? 0,
+          governance,
+          warnings: result.warnings ?? [],
+          errors: result.errors ?? [],
+          status: result.status ?? null,
+          url: result.courseId ? `/studio/courses/${result.courseId}` : null,
+          message: result.ok
+            ? `Course "${result.title ?? title}" was generated and saved through the canonical Course Factory as a governed draft.`
+            : 'Course generation did not persist because the canonical Course Factory did not pass its evidence, completeness, or validation gates.',
+        },
+        null,
+        2,
+      );
     }
 
     case 'save_course': {
@@ -985,36 +1055,47 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
       const existingId = String(course.courseId || course.course_id || '').trim();
       if (existingId) {
-        return JSON.stringify({
-          __type: 'course_saved',
-          success: true,
-          courseId: existingId,
-          title: String(course.title),
-          url: `/studio/courses/${existingId}`,
-          message: 'This course is already persisted through the canonical Course Factory. No duplicate save was performed.',
-        }, null, 2);
+        return JSON.stringify(
+          {
+            __type: 'course_saved',
+            success: true,
+            courseId: existingId,
+            title: String(course.title),
+            url: `/studio/courses/${existingId}`,
+            message:
+              'This course is already persisted through the canonical Course Factory. No duplicate save was performed.',
+          },
+          null,
+          2,
+        );
       }
 
-      const courseModules = Array.isArray(course.modules) ? course.modules as Array<Record<string, unknown>> : [];
+      const courseModules = Array.isArray(course.modules)
+        ? (course.modules as Array<Record<string, unknown>>)
+        : [];
       const moduleCount = Math.max(1, Math.min(40, courseModules.length || 5));
       const lessonsPerModule = Math.max(
         1,
         Math.min(
           20,
           courseModules.length
-            ? Math.max(...courseModules.map((module) => Array.isArray(module.lessons) ? module.lessons.length : 0), 1)
+            ? Math.max(
+                ...courseModules.map((module) =>
+                  Array.isArray(module.lessons) ? module.lessons.length : 0,
+                ),
+                1,
+              )
             : 3,
         ),
       );
       const { courseFactory } = await import('@/lib/course-factory');
-      const { normalizeGeneratedCourseForGovernance } = await import('@/lib/course-factory/post-generation-governance');
+      const { normalizeGeneratedCourseForGovernance } =
+        await import('@/lib/course-factory/post-generation-governance');
       const result = await courseFactory({
         title: String(course.title),
         topic: String(course.description || course.subtitle || course.title),
         audience: String(course.audience || 'adult workforce learners'),
-        ...(Number(course.duration_hours || 0) > 0
-          ? { hours: Number(course.duration_hours) }
-          : {}),
+        ...(Number(course.duration_hours || 0) > 0 ? { hours: Number(course.duration_hours) } : {}),
         moduleCount,
         lessonsPerModule,
         contentSource: 'ai',
@@ -1028,25 +1109,29 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         governance = await normalizeGeneratedCourseForGovernance(result.courseId);
       }
 
-      return JSON.stringify({
-        __type: 'course_saved',
-        success: result.ok,
-        courseId: result.courseId ?? null,
-        courseSlug: result.courseSlug ?? null,
-        title: result.title ?? String(course.title),
-        modulesGenerated: result.moduleCount ?? 0,
-        lessonsGenerated: result.lessonCount ?? 0,
-        assessmentsGenerated: result.assessmentsGenerated ?? 0,
-        videosQueued: result.videosQueued ?? 0,
-        governance,
-        warnings: result.warnings ?? [],
-        errors: result.errors ?? [],
-        status: result.status ?? null,
-        url: result.courseId ? `/studio/courses/${result.courseId}` : null,
-        message: result.ok
-          ? `Course "${result.title ?? String(course.title)}" was persisted through the canonical Course Factory and normalized for governance.`
-          : 'Course persistence was blocked because the canonical Course Factory did not pass its completeness or validation gates.',
-      }, null, 2);
+      return JSON.stringify(
+        {
+          __type: 'course_saved',
+          success: result.ok,
+          courseId: result.courseId ?? null,
+          courseSlug: result.courseSlug ?? null,
+          title: result.title ?? String(course.title),
+          modulesGenerated: result.moduleCount ?? 0,
+          lessonsGenerated: result.lessonCount ?? 0,
+          assessmentsGenerated: result.assessmentsGenerated ?? 0,
+          videosQueued: result.videosQueued ?? 0,
+          governance,
+          warnings: result.warnings ?? [],
+          errors: result.errors ?? [],
+          status: result.status ?? null,
+          url: result.courseId ? `/studio/courses/${result.courseId}` : null,
+          message: result.ok
+            ? `Course "${result.title ?? String(course.title)}" was persisted through the canonical Course Factory and normalized for governance.`
+            : 'Course persistence was blocked because the canonical Course Factory did not pass its completeness or validation gates.',
+        },
+        null,
+        2,
+      );
     }
 
     case 'generate_videos': {
@@ -1055,21 +1140,18 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
       try {
         const baseUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001';
-        const res = await fetch(
-          `${baseUrl}/api/admin/courses/${courseId}/generate-videos`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-internal-key': process.env.INTERNAL_API_KEY || '',
-            },
-            body: JSON.stringify({
-              provider: args.provider || 'auto',
-              voice: args.voice || 'alloy',
-              usePexels: args.use_pexels !== false,
-            }),
+        const res = await fetch(`${baseUrl}/api/admin/courses/${courseId}/generate-videos`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-internal-key': process.env.INTERNAL_API_KEY || '',
           },
-        ).catch(() => null);
+          body: JSON.stringify({
+            provider: args.provider || 'auto',
+            voice: args.voice || 'alloy',
+            usePexels: args.use_pexels !== false,
+          }),
+        }).catch(() => null);
 
         if (res?.ok) {
           const data = await res.json();
@@ -1097,33 +1179,40 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       const db = await requireAdminClient();
       const { data: doc } = await db
         .from('documents')
-        .select('id, file_name, document_type, extracted_data, ocr_text, status, user_id, application_id')
+        .select(
+          'id, file_name, document_type, extracted_data, ocr_text, status, user_id, application_id',
+        )
         .eq('id', documentId)
         .single();
 
       if (!doc) return `Document ${documentId} not found`;
 
-      const fields = doc.extracted_data as Record<string, unknown> || {};
+      const fields = (doc.extracted_data as Record<string, unknown>) || {};
       const fieldCount = Object.keys(fields).length;
-      const ocrPreview = (doc.ocr_text as string || '').slice(0, 500);
+      const ocrPreview = ((doc.ocr_text as string) || '').slice(0, 500);
       const anomalies: string[] = [];
       if (!fields.full_name && !fields.name) anomalies.push('No name detected');
       if (!fields.date_of_birth && !fields.dob) anomalies.push('No date of birth detected');
       if (doc.document_type === 'id' && !fields.id_number) anomalies.push('No ID number detected');
-      if (doc.document_type === 'pay_stub' && !fields.employer) anomalies.push('No employer detected');
+      if (doc.document_type === 'pay_stub' && !fields.employer)
+        anomalies.push('No employer detected');
 
-      return JSON.stringify({
-        __type: 'document_analysis',
-        documentId,
-        fileName: doc.file_name,
-        documentType: doc.document_type,
-        fieldCount,
-        fields,
-        anomalies,
-        ocrPreview,
-        applicationId: doc.application_id,
-        status: doc.status,
-      }, null, 2);
+      return JSON.stringify(
+        {
+          __type: 'document_analysis',
+          documentId,
+          fileName: doc.file_name,
+          documentType: doc.document_type,
+          fieldCount,
+          fields,
+          anomalies,
+          ocrPreview,
+          applicationId: doc.application_id,
+          status: doc.status,
+        },
+        null,
+        2,
+      );
     }
 
     case 'apply_document_to_application': {
@@ -1140,15 +1229,18 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
       if (!doc) return `Document ${documentId} not found`;
 
-      const fields = doc.extracted_data as Record<string, unknown> || {};
+      const fields = (doc.extracted_data as Record<string, unknown>) || {};
       const applicationUpdate: Record<string, unknown> = {};
-      if (fields.full_name || fields.name) applicationUpdate.full_name = fields.full_name || fields.name;
-      if (fields.date_of_birth || fields.dob) applicationUpdate.date_of_birth = fields.date_of_birth || fields.dob;
+      if (fields.full_name || fields.name)
+        applicationUpdate.full_name = fields.full_name || fields.name;
+      if (fields.date_of_birth || fields.dob)
+        applicationUpdate.date_of_birth = fields.date_of_birth || fields.dob;
       if (fields.address) applicationUpdate.address = fields.address;
       if (fields.phone) applicationUpdate.phone = fields.phone;
       if (fields.email) applicationUpdate.email = fields.email;
       if (fields.employer) applicationUpdate.employer_name = fields.employer;
-      if (fields.income || fields.gross_pay) applicationUpdate.income = fields.income || fields.gross_pay;
+      if (fields.income || fields.gross_pay)
+        applicationUpdate.income = fields.income || fields.gross_pay;
       if (fields.ssn_last4) applicationUpdate.ssn_last4 = fields.ssn_last4;
 
       if (Object.keys(applicationUpdate).length === 0) {
@@ -1162,11 +1254,14 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
       if (error) return 'Failed to update application';
 
-      await db.from('documents').update({
-        application_id: applicationId,
-        status: 'applied',
-        applied_at: new Date().toISOString(),
-      }).eq('id', documentId);
+      await db
+        .from('documents')
+        .update({
+          application_id: applicationId,
+          status: 'applied',
+          applied_at: new Date().toISOString(),
+        })
+        .eq('id', documentId);
 
       return JSON.stringify({
         __type: 'document_applied',
@@ -1194,6 +1289,7 @@ async function _POST(req: NextRequest) {
 
     const body = await req.json();
     const { fileContext, documentsContext, provider: rawProvider, model: rawModel } = body;
+    const agent = normalizeAgent(body.agent);
 
     let messages: ChatMessage[] = [];
     if (Array.isArray(body.messages)) {
@@ -1221,7 +1317,8 @@ async function _POST(req: NextRequest) {
     }
 
     const providerPreference = normalizeProvider(rawProvider);
-    const lastUserMessage = messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
+    const lastUserMessage =
+      messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
 
     const [ragContext, automaticEvidence] = await Promise.all([
       getRAGContext(lastUserMessage),
@@ -1230,6 +1327,7 @@ async function _POST(req: NextRequest) {
     const toolCalls: ToolCallRecord[] = [...automaticEvidence];
 
     const systemPrompt = buildAdminAiSystemPrompt({
+      agent,
       ragContext: `## AI Studio Charter\n${getAiCharterContext()}\n\n${ragContext || ''}`,
       fileContext,
       documentsContext,
@@ -1340,7 +1438,11 @@ async function _POST(req: NextRequest) {
               messages: [
                 { role: 'system', content: systemPrompt },
                 ...toChatMessages(messages),
-                { role: 'assistant', content: choice.message.content ?? '', tool_calls: toolCallRequests },
+                {
+                  role: 'assistant',
+                  content: choice.message.content ?? '',
+                  tool_calls: toolCallRequests,
+                },
                 ...execResults,
               ],
               temperature: 0.4,
@@ -1393,11 +1495,9 @@ async function _POST(req: NextRequest) {
                 { role: 'user', content: toolResults.filter(Boolean) as never[] },
               ],
             });
-            assistantMessage =
-              second.content.find((block) => block.type === 'text')?.text ?? null;
+            assistantMessage = second.content.find((block) => block.type === 'text')?.text ?? null;
           } else {
-            assistantMessage =
-              initial.content.find((block) => block.type === 'text')?.text ?? null;
+            assistantMessage = initial.content.find((block) => block.type === 'text')?.text ?? null;
           }
           provider = 'anthropic';
           model = selectedModel;
@@ -1412,10 +1512,7 @@ async function _POST(req: NextRequest) {
           const result = await aiChat({
             provider: 'gemini',
             model: selectedModel,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              ...toChatMessages(messages),
-            ],
+            messages: [{ role: 'system', content: systemPrompt }, ...toChatMessages(messages)],
             temperature: 0.4,
             maxTokens: 4096,
           });
@@ -1473,7 +1570,9 @@ async function _POST(req: NextRequest) {
       try {
         const supabase = await createClient();
         const db = await requireAdminClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         const { error: logError } = await db.from('devstudio_chat_log').insert({
           user_id: user?.id || null,
           user_message: messages[messages.length - 1]?.content || '',
@@ -1482,7 +1581,8 @@ async function _POST(req: NextRequest) {
           provider,
           model,
         });
-        if (logError) logger.warn('[devstudio/chat] DB log insert failed', { reason: logError.message });
+        if (logError)
+          logger.warn('[devstudio/chat] DB log insert failed', { reason: logError.message });
       } catch (err: unknown) {
         logger.warn('[devstudio/chat] DB log failed', normalizeError(err));
       }
@@ -1495,19 +1595,23 @@ async function _POST(req: NextRequest) {
         for (const word of words) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: word })}\n\n`));
         }
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-          done: true,
-          provider,
-          model,
-          providerPreference,
-          availableProviders: {
-            groq: isGroqConfigured(),
-            openai: isOpenAIConfigured(),
-            anthropic: isAnthropicConfigured(),
-            gemini: isGeminiConfigured(),
-          },
-          toolCalls,
-        })}\n\n`));
+        controller.enqueue(
+          encoder.encode(
+            `data: ${JSON.stringify({
+              done: true,
+              provider,
+              model,
+              providerPreference,
+              availableProviders: {
+                groq: isGroqConfigured(),
+                openai: isOpenAIConfigured(),
+                anthropic: isAnthropicConfigured(),
+                gemini: isGeminiConfigured(),
+              },
+              toolCalls,
+            })}\n\n`,
+          ),
+        );
         controller.close();
       },
     });

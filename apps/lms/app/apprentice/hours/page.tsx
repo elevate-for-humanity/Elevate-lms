@@ -38,37 +38,43 @@ export default async function ApprenticeHoursPage() {
       accepted_hours,
       notes,
       status,
+      approval_status,
       source_type,
       category,
       created_at
     `,
     )
     .eq('user_id', subject.userId)
-    .order('work_date', { ascending: false })
-    .limit(20);
+    .order('work_date', { ascending: false });
 
   if (error) {
     logger.error('Error fetching hours', normalizeError(error, 'Failed to fetch hours'), getErrorContext(error));
   }
 
-  const logs = hoursData || [];
-  const totalHours = logs.reduce((sum, log: any) => sum + (log.hours_claimed || 0), 0);
-  const approvedHours = logs
-    .filter((log: any) => log.status === 'approved')
-    .reduce((sum, log: any) => sum + (log.accepted_hours || log.hours_claimed || 0), 0);
+  const allLogs = hoursData || [];
+  const logs = allLogs.slice(0, 20);
+  const totalHours = allLogs.reduce((sum, log: any) => sum + (Number(log.hours_claimed) || 0), 0);
+  const approvedHours = allLogs
+    .filter((log: any) => log.status === 'approved' || log.approval_status === 'approved' || log.approval_status === 'approved')
+    .reduce((sum, log: any) => sum + (Number(log.accepted_hours) || Number(log.hours_claimed) || 0), 0);
 
   // Resolve required hours from the learner's active enrollment
   const { data: activeEnrollment } = await db
     .from('program_enrollments')
-    .select('program_slug')
+    .select('program_slug, transfer_hours, transfer_hours_verified')
     .eq('user_id', subject.userId)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
   const requiredHours = getApprenticeshipRequiredHours(activeEnrollment?.program_slug ?? null);
+  const transferHoursVerified = activeEnrollment?.transfer_hours_verified === true;
+  const transferHours = transferHoursVerified
+    ? Math.max(0, Number(activeEnrollment?.transfer_hours) || 0)
+    : 0;
+  const creditedHours = approvedHours + transferHours;
   const progressPercent = requiredHours
-    ? Math.min(Math.round((approvedHours / requiredHours) * 100), 100)
+    ? Math.min(Math.round((creditedHours / requiredHours) * 100), 100)
     : 0;
 
   return (
@@ -122,8 +128,8 @@ export default async function ApprenticeHoursPage() {
             <h2 className="font-semibold text-slate-900">Apprenticeship Progress</h2>
             <span className="text-sm text-slate-700">
               {requiredHours
-                ? `${approvedHours} / ${requiredHours} hours`
-                : `${approvedHours} approved hours`}
+                ? `${creditedHours} / ${requiredHours} credited hours`
+                : `${creditedHours} credited hours`}
             </span>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-4 mb-2">
@@ -167,8 +173,8 @@ export default async function ApprenticeHoursPage() {
                 <Calendar className="w-5 h-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{logs.length}</p>
-                <p className="text-sm text-slate-700">Entries</p>
+                <p className="text-2xl font-bold text-slate-900">{transferHoursVerified ? transferHours : 'Pending'}</p>
+                <p className="text-sm text-slate-700">Transfer Hours</p>
               </div>
             </div>
           </div>
@@ -179,7 +185,7 @@ export default async function ApprenticeHoursPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-900">
-                  {requiredHours ? Math.max(requiredHours - approvedHours, 0) : 'N/A'}
+                  {requiredHours ? Math.max(requiredHours - creditedHours, 0) : 'N/A'}
                 </p>
                 <p className="text-sm text-slate-700">Remaining</p>
               </div>
@@ -219,7 +225,7 @@ export default async function ApprenticeHoursPage() {
                             : 'bg-yellow-100 text-yellow-700'
                       }`}
                     >
-                      {log.status || 'Pending'}
+                      {log.approval_status || log.status || 'Pending'}
                     </span>
                   </div>
                 </div>

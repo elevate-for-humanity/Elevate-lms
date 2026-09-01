@@ -41,7 +41,11 @@ export function ScrollNarrator() {
 
   const narrateVisibleSection = useCallback(async () => {
     const section = mostVisiblePageSection();
-    if (!section) return;
+    if (!section) {
+      lastNarrationRef.current = null;
+      stop();
+      return;
+    }
 
     const text = narrationFor(section);
     if (!text) return;
@@ -59,7 +63,7 @@ export function ScrollNarrator() {
       lastNarrationRef.current = null;
       setNotice('Natural narration is temporarily unavailable.');
     }
-  }, [play]);
+  }, [play, stop]);
 
   useEffect(() => {
     lastNarrationRef.current = null;

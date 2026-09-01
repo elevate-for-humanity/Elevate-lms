@@ -2,11 +2,11 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createPublicClient } from '@/lib/supabase/public';
+import { normalizePublicProgram, STATIC_PROGRAM_MAP } from '@/data/programs';
 
 export const revalidate = 3600;
 export const metadata: Metadata = {
-  title: 'Compliance & Credentials | Elevate for Humanity',
+  title: 'Compliance & Credentials',
   description:
     'Compliance posture, credential disclosure, and program-to-credential mapping for Elevate for Humanity workforce programs.',
   alternates: {
@@ -15,10 +15,18 @@ export const metadata: Metadata = {
 };
 
 export default async function CompliancePage() {
-  const supabase = createPublicClient();
-  const { data: dbRows } = await supabase.from('compliance_audits').select('*').limit(50);
-
-  const programCredentials = (dbRows as any[]) || [];
+  const programCredentials = Array.from(STATIC_PROGRAM_MAP.values())
+    .map(normalizePublicProgram)
+    .flatMap((program) =>
+      program.credentials.map((credential) => ({
+        key: `${program.slug}:${credential.name}`,
+        program: program.title,
+        credential: credential.name,
+        issuer: credential.issuer || credential.issuingBody || 'Credentialing authority',
+        delivery: `${program.deliveryMode} training; credential requirements are determined by the issuer`,
+      })),
+    )
+    .slice(0, 50);
 
   return (
     <div className="min-h-screen bg-white">
@@ -61,7 +69,12 @@ export default async function CompliancePage() {
 
         <section>
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Program-to-Credential Mapping</h2>
-          <div className="max-w-full overflow-x-auto overscroll-x-contain rounded-xl bg-white shadow-sm" role="region" aria-label="Program-to-credential mapping" tabIndex={0}>
+          <div
+            className="max-w-full overflow-x-auto overscroll-x-contain rounded-xl bg-white shadow-sm"
+            role="region"
+            aria-label="Program-to-credential mapping"
+            tabIndex={0}
+          >
             <table className="w-full min-w-[720px] text-sm">
               <thead className="bg-white">
                 <tr>
@@ -72,8 +85,8 @@ export default async function CompliancePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {programCredentials.map((row, i) => (
-                  <tr key={i} className="hover:bg-white">
+                {programCredentials.map((row) => (
+                  <tr key={row.key} className="hover:bg-white">
                     <td className="px-4 py-3 font-medium text-slate-900">{row.program}</td>
                     <td className="px-4 py-3 text-slate-900">{row.credential}</td>
                     <td className="px-4 py-3 text-slate-700">{row.issuer}</td>

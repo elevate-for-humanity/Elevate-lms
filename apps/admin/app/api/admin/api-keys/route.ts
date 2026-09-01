@@ -58,8 +58,14 @@ export async function DELETE(request: NextRequest) {
   const db = await requireAdminClient();
   if (!db) return safeError('Database unavailable', 503);
 
-  const { error } = await db.from('api_keys').delete().eq('id', id);
+  const { data, error } = await db
+    .from('api_keys')
+    .update({ is_active: false, status: 'revoked' })
+    .eq('id', id)
+    .select('id, is_active, status')
+    .maybeSingle();
   if (error) return safeInternalError(error, 'Failed to revoke API key');
+  if (!data) return safeError('API key not found', 404);
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, apiKey: data });
 }

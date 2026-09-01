@@ -1,19 +1,18 @@
 {
   "$schema": "./seo-index-whitelist.schema.json",
   "_comment": "Pages explicitly approved for indexing. All other pages default to noindex.",
-  "_lastReviewed": "2025-01-20",
+  "_lastReviewed": "2026-09-01",
   "_reviewedBy": "Platform Governance",
   "indexed_pages": [
     "/",
     "/about",
+    "/about/elizabeth-greene",
     "/how-it-works",
     "/contact",
     "/support",
     "/programs",
     "/programs/healthcare",
     "/programs/skilled-trades",
-    "/programs/technology",
-    "/programs/business",
     "/apprenticeships",
     "/apply",
     "/employers",
@@ -41,11 +40,11 @@
     "/governance/operational-controls",
     "/governance/contact",
     "/privacy",
-    "/privacy-policy",
     "/terms",
     "/terms-of-service",
     "/accessibility",
     "/store",
+    "/store/practice-tests",
     "/store/licenses",
     "/white-label",
     "/social",
@@ -77,6 +76,9 @@
     "/dashboard",
     "/admin",
     "/checkout",
-    "/booking"
+    "/booking",
+    "/privacy-policy",
+    "/programs/business",
+    "/programs/technology"
   ]
 }

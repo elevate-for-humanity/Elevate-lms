@@ -26,6 +26,10 @@ const EXPECTED_HOLDERS: { email: string; minPrograms: number; org?: string }[] =
 const EXPECTED_HOST_SHOPS: { email: string; label: string }[] = [
   { email: 'calvincutz1985@gmail.com', label: 'Cals Kutz Studio / Calvin Pena' },
   { email: 'christopherd.newkirk@gmail.com', label: "B-52's Barber Shop / Chris Newkirk" },
+  { email: 'adamkriech1@gmail.com', label: 'Kountry Kutz Barbershop / Adam Kriech' },
+  { email: 'razorsimage11@gmail.com', label: "Razor's Image Barbershop / Aaron Brown" },
+  { email: 'toryntreat7@icloud.com', label: 'Salon Saloon LLC / Tory Treat' },
+  { email: 'styleandscissorsalon@gmail.com', label: 'Style and Scissor Salon / Corienne Meid' },
 ];
 
 function gateHolderDashboard(holder: {

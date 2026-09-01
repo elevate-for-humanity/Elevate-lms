@@ -11,17 +11,17 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 const SAFE_HERO_COPY = {
-  microLabel: 'Indiana Esthetics Pathway',
+  microLabel: 'DOL Registered • Competency Based',
   belowHeroHeadline: 'Esthetician Apprenticeship Pathway — Indiana',
   belowHeroSubheadline:
-    'Supervised esthetics education and practice aligned to Indiana’s 700-hour education requirement, with documented progress and licensing preparation.',
+    'Complete 20 verified Appendix A occupational competencies and 300 hours of related instruction through supervised host-site training.',
   trustIndicators: [
-    'Indiana 700-hour esthetics education requirement',
-    'Supervised practice',
-    'Licensing preparation',
+    '20 Appendix A competencies',
+    '300 related-instruction hours',
+    'RAPIDS occupation 2089CB',
   ],
   transcript:
-    'Explore Elevate’s Indiana esthetician apprenticeship pathway with supervised esthetics education and practice, related instruction, documented progress, and preparation for state licensing requirements.',
+    'Explore Elevate’s registered, competency-based Esthetician Apprenticeship. Complete 20 verified Appendix A occupational competencies and 300 hours of related instruction through supervised host-site practice.',
 } as const;
 
 export default async function EstheticianApprenticeshipPage() {
@@ -36,25 +36,25 @@ export default async function EstheticianApprenticeshipPage() {
     ...ESTHETICIAN_APPRENTICESHIP,
     title: 'Esthetician Apprenticeship',
     subtitle:
-      'Indiana esthetician pathway with supervised spa or salon training, related instruction, documented progress, and preparation for the state licensing pathway. Indiana requires 700 hours of esthetics education.',
-    durationWeeks: 28,
+      'DOL-registered, competency-based esthetician apprenticeship requiring 20 verified occupational competencies and 300 related-instruction hours, with supervised host-site training and licensing preparation.',
+    durationWeeks: 0,
     hoursPerWeekMin: 25,
     hoursPerWeekMax: 25,
     hoursBreakdown: {
-      onlineInstruction: 230,
-      handsOnLab: 400,
-      examPrep: 70,
+      onlineInstruction: 300,
+      handsOnLab: 0,
+      examPrep: 0,
       careerPlacement: 0,
     },
-    schedule: 'Approximately 25 hours per week across supervised esthetics education and practice.',
+    schedule: 'Competency-based progression through 20 Appendix A competencies, with 300 required related-instruction hours and supervised host-site practice.',
     fundingStatement:
       'Self-pay enrollment is available. Any employer or workforce funding must be confirmed in writing for the individual participant before enrollment.',
     fundingOptions: ['self_pay'],
     complianceAlignment: [
       {
-        standard: 'Indiana State Board of Cosmetology and Barber Examiners — Esthetics Education',
+        standard: 'U.S. Department of Labor Appendix A — Esthetician (RAPIDS 2089CB)',
         description:
-          'Indiana publishes a 700-hour minimum education requirement for esthetician applicants. Program completion and licensure remain subject to current state requirements and board review.',
+          'Registered-program completion is competency-based: 20 verified competencies plus 300 related-instruction hours. State licensing requirements are tracked separately.',
       },
     ],
   });
@@ -68,7 +68,7 @@ export default async function EstheticianApprenticeshipPage() {
     badgeColor: 'blue' as const,
     metaTitle: 'Esthetician Apprenticeship Pathway | Indiana | Elevate for Humanity',
     metaDescription:
-      'Indiana esthetician apprenticeship pathway with supervised training, related instruction, documented progress and preparation for Indiana’s 700-hour esthetics education and licensing requirements.',
+      'Registered competency-based esthetician apprenticeship with 20 occupational competencies, 300 related-instruction hours, supervised host-site practice, and licensing preparation.',
   };
 
   const rawBanner = heroBanners['esthetician-apprenticeship'] ?? null;
@@ -120,7 +120,7 @@ export async function generateMetadata() {
   return {
     title: 'Esthetician Apprenticeship Pathway | Indiana | Elevate for Humanity',
     description:
-      'Indiana esthetician apprenticeship pathway with supervised training, related instruction, documented progress and preparation for Indiana’s 700-hour esthetics education and licensing requirements.',
+      'Registered competency-based esthetician apprenticeship with 20 occupational competencies, 300 related-instruction hours, supervised host-site practice, and licensing preparation.',
     keywords: [
       'esthetician apprenticeship Indiana',
       'esthetics apprenticeship Indiana',
@@ -128,7 +128,7 @@ export async function generateMetadata() {
       'esthetician apprenticeship Indianapolis',
       'spa apprenticeship Indiana',
       'Indiana esthetician license pathway',
-      '700 hour esthetician training Indiana',
+      'competency based esthetician apprenticeship Indiana',
     ],
     alternates: { canonical: 'https://www.elevateforhumanity.org/programs/esthetician-apprenticeship' },
     openGraph: {

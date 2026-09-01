@@ -51,7 +51,7 @@ export async function loadRegisteredApprenticeshipProgress(
       .eq('standard_key', context.contract.standardVersionKey),
     db
       .from('hour_entries')
-      .select('id,status,approval_status,accepted_hours,hours,hours_claimed,source_type,host_shop_id,program_slug')
+      .select('id,status,approval_status,accepted_hours,hours,hours_claimed,source_type,category,host_shop_id,program_slug')
       .eq('user_id', context.studentId)
       .eq('program_slug', context.programSlug),
   ]);
@@ -87,6 +87,9 @@ export async function loadRegisteredApprenticeshipProgress(
   let approvedOjlHours = 0;
   let pendingOjl = 0;
   for (const row of hourResult.data || []) {
+    // Transfer credit is canonical on program_enrollments. Exclude legacy
+    // transfer-shaped hour entries so the same evidence is never counted twice.
+    if (row.category === 'transfer' || row.source_type === 'transfer') continue;
     if (context.placement?.shop_id && row.host_shop_id && row.host_shop_id !== context.placement.shop_id) continue;
     const isApproved = row.approval_status === 'approved' || row.status === 'approved';
     const isPending = row.approval_status === 'pending' || row.status === 'pending';

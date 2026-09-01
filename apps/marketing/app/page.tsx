@@ -63,7 +63,10 @@ export default function HomePage() {
       <main>
         <HomeHeroVideo banner={heroBanners.home} />
         <div data-scroll-narration data-narration="Take a look inside our host-shop network. These are working businesses where apprentices can build skills with approved supervision and real customers.">
-          <HostShopShowcase shops={FEATURED_BEAUTY_HOST_PARTNERS} />
+          <HostShopShowcase
+            shops={FEATURED_BEAUTY_HOST_PARTNERS}
+            videoTourShopSlug="salon-saloon"
+          />
         </div>
         <div data-scroll-narration data-narration="You do not have to have your whole career figured out today. Start by exploring the field that fits your interests, schedule, and goals.">
           <HomeCareerPathways />

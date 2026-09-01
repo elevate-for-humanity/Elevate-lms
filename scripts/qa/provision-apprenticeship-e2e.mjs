@@ -24,10 +24,26 @@ function password() {
   return `Qa!${randomBytes(18).toString('base64url')}7z`;
 }
 
+const TRANSIENT_DATABASE_ERROR = /statement timeout|canceling statement|schema cache|fetch failed|connection reset|gateway timeout|temporarily unavailable/i;
+
 async function must(resultPromise, label) {
-  const result = await resultPromise;
-  if (result.error) throw new Error(`${label}: ${result.error.message}`);
-  return result.data;
+  const maxAttempts = 4;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const result = await resultPromise;
+    if (!result.error) return result.data;
+
+    const message = String(result.error.message || result.error);
+    const retryable = TRANSIENT_DATABASE_ERROR.test(message);
+    if (!retryable || attempt === maxAttempts) {
+      throw new Error(`${label}: ${message}`);
+    }
+
+    const delayMs = 1_500 * attempt;
+    console.warn(`[QA fixture] ${label} hit a transient database error; retrying ${attempt}/${maxAttempts} in ${delayMs}ms`);
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+
+  throw new Error(`${label}: exhausted retry policy`);
 }
 
 async function createQaUser(kind, role, fullName) {

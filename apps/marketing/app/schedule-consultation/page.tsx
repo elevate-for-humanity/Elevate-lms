@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -24,6 +24,12 @@ const TIME_SLOTS = [
 ];
 
 const MEETING_TYPES = [
+  {
+    value: 'host-shop-tour',
+    label: 'Host Shop Tour',
+    duration: '30 min',
+    desc: 'See a participating shop, ask questions, and learn how free Host Shop enrollment works',
+  },
   {
     value: 'website-app-build',
     label: 'Website, App & Subscription Build Consultation',
@@ -86,8 +92,54 @@ export default function ScheduleConsultationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState('');
+  const [googleCalendarUrl, setGoogleCalendarUrl] = useState('');
+  const [bookedTimes, setBookedTimes] = useState<string[]>([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
   const dates = getNextWeekdays(10);
+
+  useEffect(() => {
+    const requestedType = new URLSearchParams(window.location.search).get('type');
+    if (requestedType && MEETING_TYPES.some((type) => type.value === requestedType)) {
+      setMeetingType(requestedType);
+      setStep(2);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!selectedDate) {
+      setBookedTimes([]);
+      return;
+    }
+    const controller = new AbortController();
+    setAvailabilityLoading(true);
+    void fetch(`/api/schedule-consultation?date=${encodeURIComponent(selectedDate)}`, {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Availability unavailable');
+        return response.json() as Promise<{ bookedTimes?: string[] }>;
+      })
+      .then((payload) => setBookedTimes(payload.bookedTimes || []))
+      .catch(() => {
+        if (!controller.signal.aborted) setError('Availability could not be loaded. Please try again.');
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setAvailabilityLoading(false);
+      });
+    return () => controller.abort();
+  }, [selectedDate]);
+
+  function meetsNoticeWindow(date: string, time: string) {
+    const match = time.match(/^(\d{1,2}):(\d{2}) (AM|PM)$/);
+    if (!match) return false;
+    let hour = Number(match[1]);
+    if (match[3] === 'PM' && hour !== 12) hour += 12;
+    if (match[3] === 'AM' && hour === 12) hour = 0;
+    const requested = new Date(`${date}T${String(hour).padStart(2, '0')}:${match[2]}:00-04:00`);
+    return requested.getTime() >= Date.now() + 24 * 60 * 60 * 1000;
+  }
 
   const handleSubmit = async () => {
     if (!name || !email || !meetingType || !selectedDate || !selectedTime) {
@@ -110,7 +162,9 @@ export default function ScheduleConsultationPage() {
           appointment_time: selectedTime,
         }),
       });
-      if (!res.ok) throw new Error('Failed to book');
+      const payload = (await res.json()) as { googleCalendarUrl?: string; error?: string };
+      if (!res.ok) throw new Error(payload.error || 'Failed to book');
+      setGoogleCalendarUrl(payload.googleCalendarUrl || '');
       setConfirmed(true);
     } catch {
       setError('Something went wrong. Please try again or call us at (317) 314-3757.');
@@ -132,16 +186,27 @@ export default function ScheduleConsultationPage() {
             <strong>{formatDate(selectedDate)}</strong> at <strong>{selectedTime}</strong>.
           </p>
           <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-4 text-left">
-            <div className="font-semibold text-brand-blue-900 mb-1">Join via Zoom</div>
+            <div className="font-semibold text-brand-blue-900 mb-1">Google Calendar ready</div>
             <p className="text-brand-blue-700 text-sm">
-              Your unique Zoom meeting link has been sent to your email.
+              Use the button below to add this appointment to Google Calendar. A confirmation has
+              also been sent to your email.
             </p>
           </div>
           <p className="text-slate-500 text-sm mb-6">
-            Check your inbox at <strong>{email}</strong> for the confirmation with your Zoom link.
-            Our enrollment team will reach out before your appointment.
+            Check your inbox at <strong>{email}</strong> for the appointment details. Our team will
+            reach out before your appointment.
           </p>
           <div className="flex flex-col gap-3">
+            {googleCalendarUrl ? (
+              <a
+                href={googleCalendarUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-brand-blue-700 text-center text-white font-semibold px-6 py-3 rounded-lg hover:bg-brand-blue-800 transition-colors"
+              >
+                Add to Google Calendar
+              </a>
+            ) : null}
             <Link
               href="/programs"
               className="bg-brand-red-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors"
@@ -257,19 +322,24 @@ export default function ScheduleConsultationPage() {
             {selectedDate && (
               <>
                 <h2 className="text-lg font-bold text-slate-900 mb-4">Pick a time</h2>
+                <p className="mb-4 text-sm text-slate-600">Appointments require at least 24 hours&apos; notice. Booked times are disabled.</p>
                 <div className="grid grid-cols-4 gap-2 mb-6">
-                  {TIME_SLOTS.map((time) => (
-                    <button
-                      key={time}
-                      onClick={() => {
-                        setSelectedTime(time);
-                        setStep(3);
-                      }}
-                      className={`p-3 rounded-xl text-center text-sm font-medium transition-colors ${selectedTime === time ? 'bg-brand-red-600 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:border-brand-red-300'}`}
-                    >
-                      {time}
-                    </button>
-                  ))}
+                  {TIME_SLOTS.map((time) => {
+                    const unavailable = bookedTimes.includes(time) || !meetsNoticeWindow(selectedDate, time);
+                    return (
+                      <button
+                        key={time}
+                        disabled={availabilityLoading || unavailable}
+                        onClick={() => {
+                          setSelectedTime(time);
+                          setStep(3);
+                        }}
+                        className={`p-3 rounded-xl text-center text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 ${selectedTime === time ? 'bg-brand-red-600 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:border-brand-red-300'}`}
+                      >
+                        {bookedTimes.includes(time) ? `${time} · Booked` : time}
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             )}

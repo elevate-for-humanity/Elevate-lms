@@ -33,8 +33,8 @@ const PROVIDER_IMAGES: Record<string, string> = {
   certiport: '/images/pages/testing-page-1.jpg',
   nha: '/images/pages/medical-assistant.webp',
   workkeys: '/images/pages/career-services-page-1.webp',
-  careersafe: '/images/pages/programs-emergency-health-safety-hero.jpg',
-  midland: '/images/pages/competency-test-hero.jpg',
+  careersafe: '/images/pages/programs-emergency-health-safety-hero.webp',
+  midland: '/images/pages/competency-test-hero.webp',
 };
 
 const CAPABILITY_LABELS: Record<string, string> = {
@@ -109,17 +109,23 @@ export default function TestingPage() {
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <ShieldCheck className="h-5 w-5 text-emerald-600" />
               <p className="mt-2 font-bold text-slate-900">Server-authoritative pricing</p>
-              <p className="mt-1 text-sm text-slate-600">Checkout never accepts a price supplied by the browser.</p>
+              <p className="mt-1 text-sm text-slate-600">
+                Checkout never accepts a price supplied by the browser.
+              </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <MapPin className="h-5 w-5 text-brand-blue-600" />
               <p className="mt-2 font-bold text-slate-900">Appointment required</p>
-              <p className="mt-1 text-sm text-slate-600">Testing modes and check-in requirements vary by provider.</p>
+              <p className="mt-1 text-sm text-slate-600">
+                Testing modes and check-in requirements vary by provider.
+              </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <CalendarDays className="h-5 w-5 text-brand-red-600" />
               <p className="mt-2 font-bold text-slate-900">Exact exam selection</p>
-              <p className="mt-1 text-sm text-slate-600">Payment is tied to the specific exam selected.</p>
+              <p className="mt-1 text-sm text-slate-600">
+                Payment is tied to the specific exam selected.
+              </p>
             </div>
           </div>
         </div>
@@ -152,7 +158,10 @@ export default function TestingPage() {
                   key={provider.key}
                   className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
                 >
-                  <Link href={`/testing/${provider.key}`} className="relative block h-56 overflow-hidden">
+                  <Link
+                    href={`/testing/${provider.key}`}
+                    className="relative block h-56 overflow-hidden"
+                  >
                     <Image
                       src={PROVIDER_IMAGES[provider.key] || '/images/pages/tech-classroom.webp'}
                       alt={provider.name}
@@ -190,7 +199,9 @@ export default function TestingPage() {
                         <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
                           Available retail pricing
                         </p>
-                        {providerPriceLabel && <p className="text-2xl font-black text-slate-950">{providerPriceLabel}</p>}
+                        {providerPriceLabel && (
+                          <p className="text-2xl font-black text-slate-950">{providerPriceLabel}</p>
+                        )}
                       </div>
                       <p className="mt-2 text-sm leading-relaxed text-slate-600">
                         {canCheckout
@@ -226,7 +237,9 @@ export default function TestingPage() {
                                 />
                               </div>
                             ) : (
-                              <span className="text-xs font-semibold text-slate-500">Not configured</span>
+                              <span className="text-xs font-semibold text-slate-500">
+                                Not configured
+                              </span>
                             )}
                           </div>
                         );
@@ -269,15 +282,15 @@ export default function TestingPage() {
             <div className="rounded-xl border border-slate-200 bg-white p-5">
               <p className="font-bold text-slate-900">Scheduling</p>
               <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                Appointment required. Arrive {TESTING_CENTER.policy.arriveMinutesBefore} minutes early
-                for in-person exams. Testing modes vary by provider.
+                Appointment required. Arrive {TESTING_CENTER.policy.arriveMinutesBefore} minutes
+                early for in-person exams. Testing modes vary by provider.
               </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-white p-5">
               <p className="font-bold text-slate-900">Funding and payment</p>
               <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                {TESTING_CENTER.policy.workforceFunding} Self-pay checkout is available for exams with
-                a configured retail amount in the canonical testing registry.
+                {TESTING_CENTER.policy.workforceFunding} Self-pay checkout is available for exams
+                with a configured retail amount in the canonical testing registry.
               </p>
             </div>
           </div>

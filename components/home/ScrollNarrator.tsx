@@ -5,7 +5,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
-const SCROLL_SETTLE_MS = 900;
+const SCROLL_SETTLE_MS = 140;
 
 function narrationFor(section: HTMLElement) {
   const supplied = section.dataset.narration?.trim();
@@ -55,37 +55,47 @@ export function ScrollNarrator() {
   const pathname = usePathname();
   const [enabled, setEnabled] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
-  const lastSectionRef = useRef<HTMLElement | null>(null);
+  const lastNarrationRef = useRef<{ section: HTMLElement; text: string } | null>(null);
   const timerRef = useRef<number | null>(null);
-  const { play, stop, isLoading, isPlaying } = useNaturalVoice();
+  const { play, prepare, stop, isLoading, isPlaying } = useNaturalVoice();
 
   const narrateVisibleSection = useCallback(async () => {
     const section = mostVisiblePageSection();
-    if (!section || section === lastSectionRef.current || isPlaying || isLoading) return;
+    if (!section || isPlaying || isLoading) return;
 
     const text = narrationFor(section);
     if (!text) return;
+    if (lastNarrationRef.current?.section === section && lastNarrationRef.current.text === text)
+      return;
 
-    lastSectionRef.current = section;
+    lastNarrationRef.current = { section, text };
     const started = await play(text, {
       voice: 'coral',
       style: 'instructor',
       rate: 1,
     });
     if (!started) {
-      lastSectionRef.current = null;
+      lastNarrationRef.current = null;
       setNotice('Read aloud is unavailable in this browser.');
     }
   }, [isLoading, isPlaying, play]);
 
   useEffect(() => {
-    lastSectionRef.current = null;
+    lastNarrationRef.current = null;
     stop();
   }, [pathname, stop]);
 
   useEffect(() => {
+    if (!enabled) return;
+    const section = mostVisiblePageSection();
+    if (!section) return;
+    const text = narrationFor(section);
+    if (text) void prepare(text, { voice: 'coral', style: 'instructor', rate: 1 });
+  }, [enabled, pathname, prepare]);
+
+  useEffect(() => {
     if (!enabled) {
-      lastSectionRef.current = null;
+      lastNarrationRef.current = null;
       if (timerRef.current) window.clearTimeout(timerRef.current);
       stop();
       return;
@@ -98,9 +108,11 @@ export function ScrollNarrator() {
       }, SCROLL_SETTLE_MS);
     };
 
-    const activateFromUserGesture = () => scheduleNarration();
+    const activateFromUserGesture = () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+      void narrateVisibleSection();
+    };
 
-    scheduleNarration();
     window.addEventListener('scroll', scheduleNarration, { passive: true });
     window.addEventListener('wheel', activateFromUserGesture, { passive: true });
     window.addEventListener('touchstart', activateFromUserGesture, { passive: true });
@@ -121,7 +133,14 @@ export function ScrollNarrator() {
 
   const toggle = () => {
     setNotice(null);
-    setEnabled((current) => !current);
+    if (isPlaying || isLoading) {
+      setEnabled(false);
+      stop();
+      return;
+    }
+    setEnabled(true);
+    lastNarrationRef.current = null;
+    void narrateVisibleSection();
   };
 
   return (
@@ -145,7 +164,7 @@ export function ScrollNarrator() {
         }`}
         style={{ minHeight: '3rem', minWidth: '3rem', padding: 0 }}
       >
-        {enabled ? (
+        {isPlaying || isLoading ? (
           <VolumeX className="h-5 w-5" aria-hidden="true" />
         ) : (
           <Volume2 className="h-5 w-5" aria-hidden="true" />

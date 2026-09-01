@@ -11,6 +11,8 @@ import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeMobileActions } from '@/components/home/HomeMobileActions';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
+import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
+import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 
 export const revalidate = 300;
 
@@ -59,10 +61,8 @@ export default function HomePage() {
     <>
       <StructuredData />
       <main>
-        <h1 className="sr-only">
-          Career training, registered apprenticeships, testing, and workforce pathways
-        </h1>
         <HomeHeroVideo banner={heroBanners.home} />
+        <HostShopShowcase shops={FEATURED_BEAUTY_HOST_PARTNERS} />
         <HomeCareerPathways />
         <HomeApprenticeshipSales />
         <HomeWebsiteBuilderSales />

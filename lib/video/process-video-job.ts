@@ -260,9 +260,10 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     });
     const suppliedScenes =
       Array.isArray(persistedSceneData.scenes) && persistedSceneData.scenes.length > 0;
-    const generatedPlan = suppliedScenes
-      ? null
-      : await generateLessonScenes({
+    let generatedPlan: LessonRenderPlanDraft | null = null;
+    if (!suppliedScenes) {
+      try {
+        generatedPlan = await generateLessonScenes({
           lessonId: job.lesson_id,
           title: job.lesson_title,
           content: script,
@@ -277,6 +278,18 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
           requiresPracticalEvidence:
             lesson?.evidence_type === 'practical' || lesson?.lesson_type === 'lab',
         });
+      } catch (scenePlanError) {
+        // Scene enrichment must never strand an otherwise complete persisted
+        // course. directMedia() deterministically derives an evidence-bearing
+        // storyboard from the governed narration when the optional AI provider
+        // is unavailable, rate-limited, or misconfigured.
+        logger.warn('[video-worker] AI scene enrichment unavailable; using deterministic storyboard', {
+          jobId: job.id,
+          courseId: job.course_id,
+          error: scenePlanError instanceof Error ? scenePlanError.message : String(scenePlanError),
+        });
+      }
+    }
     const sceneData = generatedPlan ? generatedSceneData(generatedPlan) : persistedSceneData;
     const isMicroclip = job.asset_kind === 'microclip';
     // Every render is an immutable candidate. Approval, not rendering, changes

@@ -145,7 +145,11 @@ async function transcribeRenderedAudio(videoPath: string, workDir: string): Prom
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
     {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/octet-stream' },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'cf-aig-gateway-id': process.env.AI_GATEWAY_ID?.trim() || 'default',
+        'Content-Type': 'application/octet-stream',
+      },
       body: audio,
       signal: AbortSignal.timeout(180_000),
     },

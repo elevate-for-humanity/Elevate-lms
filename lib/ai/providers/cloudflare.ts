@@ -20,6 +20,10 @@ function contentText(value: unknown): string {
   return value == null ? '' : String(value);
 }
 
+function gatewayId(): string {
+  return process.env.AI_GATEWAY_ID?.trim() || 'default';
+}
+
 /** Cloudflare Workers AI provider used as a free/low-cost failover path. */
 export class CloudflareProvider implements AIProvider {
   readonly name = 'cloudflare' as const;
@@ -42,6 +46,7 @@ export class CloudflareProvider implements AIProvider {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
+          'cf-aig-gateway-id': gatewayId(),
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -49,6 +54,7 @@ export class CloudflareProvider implements AIProvider {
           temperature: options.temperature ?? 0.5,
           max_tokens: options.maxTokens || 4096,
         }),
+        signal: AbortSignal.timeout(120_000),
       },
     );
     if (!response.ok) {

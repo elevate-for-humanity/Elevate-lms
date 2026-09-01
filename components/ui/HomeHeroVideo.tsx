@@ -247,6 +247,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       voice: 'coral',
       style: 'commercial',
       rate: 0.98,
+      allowBrowserFallback: false,
     });
   }, [activeSlide, nextSlideNarration, prepare]);
 

@@ -3,7 +3,7 @@ import { courseFactory } from '../../lib/course-factory';
 import { normalizeGeneratedCourseForGovernance } from '../../lib/course-factory/post-generation-governance';
 import { requireAdminClient } from '../../lib/supabase/admin';
 
-// Governance reads canonical learning_objectives/content; recovery is scoped to Cosmetology. Barbering remains a separate
+// Governance uses production's generated lifecycle state; recovery is scoped to Cosmetology. Barbering remains a separate
 // canonical course and must never block or consume this course's recovery run.
 const TARGETS = [
   {

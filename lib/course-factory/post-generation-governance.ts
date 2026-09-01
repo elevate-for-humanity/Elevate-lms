@@ -145,7 +145,7 @@ export async function normalizeGeneratedCourseForGovernance(
         hour_category: lesson.hour_category || (isPractical ? 'practical' : isAssessment ? 'exam' : 'didactic'),
         delivery_method: lesson.delivery_method || 'online_async',
         // Generation has completed successfully, but human approval remains separate.
-        generation_status: 'verification_ready',
+        generation_status: 'generated',
       };
       if (governedExperience) {
         update.content_json = { ...contentJson, experience: governedExperience };

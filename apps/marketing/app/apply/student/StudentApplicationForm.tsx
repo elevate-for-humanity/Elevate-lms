@@ -8,8 +8,9 @@ import {
   uploadTransferHoursEvidence,
 } from '@/lib/applications/upload-transfer-hours-evidence';
 import ApprenticeshipFundingNotice from '@/components/apply/ApprenticeshipFundingNotice';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
-const WORKONE_INTAKE_URL = 'https://WorkOneIndy.as.me/IntakeApptwithCN';
+const WORKONE_INTAKE_URL = WORKONE_INDY_BOOKING_URL;
 
 interface StudentApplicationFormProps {
   initialProgram?: string;
@@ -78,6 +79,7 @@ const PROGRAMS = [
   { value: 'barber-apprenticeship', label: 'Barber Apprenticeship' },
   { value: 'cosmetology-apprenticeship', label: 'Cosmetology Apprenticeship' },
   { value: 'esthetician-apprenticeship', label: 'Esthetician Apprenticeship' },
+  { value: 'financial-literacy', label: 'Financial Literacy' },
   { value: 'nail-technician-apprenticeship', label: 'Nail Technician Apprenticeship' },
   { value: 'phlebotomy', label: 'Phlebotomy Technician' },
   { value: 'qma', label: 'Qualified Medication Aide (QMA)' },

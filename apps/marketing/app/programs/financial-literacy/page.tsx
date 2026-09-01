@@ -115,7 +115,7 @@ export default function FinancialLiteracyPage() {
               </h2>
             </div>
             <a
-              href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:9e274365-f578-4d7e-a21e-29f0e3647862"
+              href="/images/programs/financial-literacy-flyer.jpg"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3.5 font-extrabold text-white hover:bg-slate-800"
@@ -123,13 +123,14 @@ export default function FinancialLiteracyPage() {
               Open Full Flyer <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>
-          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-100 shadow-xl">
-            <iframe
-              src="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:9e274365-f578-4d7e-a21e-29f0e3647862"
-              title="Financial Literacy Program flyer"
-              className="h-[720px] w-full sm:h-[900px]"
-              loading="lazy"
-              allowFullScreen
+          <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
+            <Image
+              src="/images/programs/financial-literacy-flyer.jpg"
+              alt="Elevate Financial Empowerment Program — 8-week practical financial literacy course led by Dr. Carlina A. Wilkes"
+              width={1189}
+              height={1536}
+              className="h-auto w-full"
+              sizes="(max-width: 768px) 100vw, 768px"
             />
           </div>
         </div>
@@ -203,7 +204,7 @@ export default function FinancialLiteracyPage() {
             <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-3xl border border-white/15 shadow-2xl">
               <Image
                 src={instructor.headshotSrc || '/images/carlina-wilkes.jpg'}
-                alt="Dr. Carlina Wilkes, Financial Empowerment Program Instructor"
+                alt="Dr. Carlina Wilkes, Chair, Financial Literacy"
                 fill
                 className="object-cover object-top"
                 sizes="(max-width: 1024px) 100vw, 36vw"

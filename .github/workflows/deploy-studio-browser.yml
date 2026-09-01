@@ -61,10 +61,41 @@ jobs:
         run: pnpm tsx scripts/northflank/create-studio-browser-service.ts --execute
 
       - name: Trigger browser build
+        id: trigger_browser_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_STUDIO_BROWSER_SERVICE_ID"
 
-      - name: Wait for browser deployment
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_STUDIO_BROWSER_SERVICE_ID" --timeout-ms 1800000
+      - name: Require concrete browser build id
+        run: test -n "${{ steps.trigger_browser_build.outputs.build_id }}"
+
+      - name: Wait for browser build
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_STUDIO_BROWSER_SERVICE_ID" --build-id "${{ steps.trigger_browser_build.outputs.build_id }}" --timeout-ms 1800000
+
+      - name: Verify exact browser build
+        run: pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_STUDIO_BROWSER_SERVICE_ID" --build-id "${{ steps.trigger_browser_build.outputs.build_id }}" --sha "${{ github.sha }}"
+
+      - name: Deploy exact browser build
+        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_STUDIO_BROWSER_SERVICE_ID" --build-id "${{ steps.trigger_browser_build.outputs.build_id }}" --sha "${{ github.sha }}"
+
+      - name: Wait for exact browser runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="${{ github.sha }}"
+          for attempt in $(seq 1 120); do
+            url="$(pnpm --silent tsx scripts/northflank/resolve-service-url.ts "$NORTHFLANK_STUDIO_BROWSER_SERVICE_ID" 2>/dev/null || true)"
+            if [ -n "$url" ]; then
+              status="$(curl -sS --max-time 10 -o /tmp/studio-browser-health.json -w "%{http_code}" "${url%/}/health?deploy=$expected" || true)"
+              live_sha="$(node -e "try{const d=require('/tmp/studio-browser-health.json');process.stdout.write(d.commit||'')}catch(e){}")"
+              echo "Attempt $attempt/120: status=$status live_sha=${live_sha:-missing}"
+              if [ "$status" = 200 ] && [ "$live_sha" = "$expected" ]; then
+                echo "Studio Browser exact runtime is live at $url"
+                exit 0
+              fi
+            fi
+            sleep 10
+          done
+          echo '::error::Studio Browser never served the exact requested SHA'
+          exit 1
 
       - name: Connect browser to Admin
         run: pnpm tsx scripts/northflank/connect-studio-browser-to-admin.ts
@@ -78,7 +109,7 @@ jobs:
           set -euo pipefail
           for attempt in $(seq 1 30); do
             url="$(pnpm --silent tsx scripts/northflank/resolve-service-url.ts "$NORTHFLANK_STUDIO_BROWSER_SERVICE_ID" 2>/dev/null || true)"
-            if [ -n "$url" ] && curl -fsS --max-time 10 "${url%/}/health" | grep -q '"ok":true'; then
+            if [ -n "$url" ] && curl -fsS --max-time 10 "${url%/}/health" | grep -q '"commit":"${{ github.sha }}"'; then
               echo "Studio Browser is healthy at $url"
               exit 0
             fi

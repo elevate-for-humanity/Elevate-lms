@@ -313,6 +313,7 @@ const server = http.createServer(async (req, res) => {
         ok: true,
         service: 'studio-browser',
         engine: 'playwright-chromium',
+        commit: process.env.GIT_SHA || 'MISSING',
         sessions: sessions.size,
       });
     if (req.method === 'POST' && url.pathname === '/sessions') {

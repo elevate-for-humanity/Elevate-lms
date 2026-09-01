@@ -46,14 +46,23 @@ export default function Page() {
                 <p>Dr. Wilkes brings over 24 years of federal experience with the Defense Finance and Accounting Service (DFAS) and holds DoD Financial Management Certification Level II. She oversees financial operations and organizational compliance at {PLATFORM_DEFAULTS.orgName}.</p>
                 <p>Her extensive background includes federal financial management, cost accounting, budget development and monitoring, audit readiness, regulatory compliance, financial reporting, and long-term financial planning. Her leadership helps Elevate maintain strong fiscal accountability across its programs and operations.</p>
                 <p>Dr. Wilkes also leads the Elevate Financial Empowerment Program. As the program instructor, she helps participants understand their financial position, establish meaningful goals, and apply practical strategies for budgeting, banking, saving, credit, debt management, consumer protection, taxes, insurance, investing, and long-term wealth building.</p>
-                <div className="pt-4">
+                <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:flex-wrap">
                   <Link
                     href="/programs/financial-literacy"
-                    className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3.5 font-extrabold text-white hover:bg-brand-red-700"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3.5 font-extrabold text-white hover:bg-brand-red-700"
                   >
                     Explore the Financial Empowerment Program
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
+                  <a
+                    href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:9e274365-f578-4d7e-a21e-29f0e3647862"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-slate-300 px-6 py-3.5 font-extrabold text-slate-800 hover:border-slate-500"
+                  >
+                    View Financial Empowerment Program Document
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </a>
                 </div>
               </div>
             </div>

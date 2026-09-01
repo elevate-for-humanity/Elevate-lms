@@ -240,25 +240,14 @@ export async function normalizeGeneratedCourseForGovernance(
   }
 
   const totalDurationHours = Math.round((totalDurationMinutes / 60) * 100) / 100;
-  const { data: course } = await db.from('courses').select('program_id').eq('id', courseId).maybeSingle();
-  let declaredProgramHours = 0;
-  if (course?.program_id) {
-    const { data: program } = await db
-      .from('programs')
-      .select('total_hours,is_apprenticeship')
-      .eq('id', course.program_id)
-      .maybeSingle();
-    if (program?.is_apprenticeship) declaredProgramHours = Math.max(0, Number(program.total_hours ?? 0));
-  }
-
   const { error: courseUpdateError } = await db
     .from('courses')
     .update({
       generation_status: 'completed',
       generation_progress: 100,
-      // Apprenticeship program hours include OJL and must not be replaced by
-      // the much smaller self-paced lesson seat-time rollup.
-      duration_hours: declaredProgramHours || (totalDurationHours > 0 ? totalDurationHours : null),
+      // Course duration is self-paced instructional seat time. Regulatory RTI
+      // and OJL totals remain in the registered-apprenticeship standards layer.
+      duration_hours: totalDurationHours > 0 ? totalDurationHours : null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', courseId);

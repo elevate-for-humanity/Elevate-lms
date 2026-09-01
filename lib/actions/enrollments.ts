@@ -169,26 +169,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
         /* Module progress created successfully */
       }
     }
-    // 8. If this is an apprenticeship program, create apprenticeship_enrollments record
-    if (program.is_apprenticeship) {
-      const { error: apprenticeError } = await (db).from('apprenticeship_enrollments').insert({
-        student_id: input.student_id,
-        program_id: input.program_id,
-        enrollment_id: enrollment.id,
-        status: 'pending',
-        related_instruction_hours: 0,
-        on_the_job_hours: 0,
-        transferred_related_instruction_hours: 0,
-        transferred_ojt_hours: 0,
-      });
-      if (apprenticeError) {
-        logger.error('Apprenticeship enrollment error:', apprenticeError);
-        // Don't fail the whole enrollment
-      } else {
-        /* Apprenticeship enrollment created successfully */
-      }
-    }
-    // 9. Revalidate relevant paths
+    // Apprenticeships use the canonical program_enrollments record created above.\n    // Program-specific hours and transfer evidence are maintained on that record\n    // and in transfer_hours; no parallel enrollment authority is created.\n    // 9. Revalidate relevant paths
     revalidatePath('/enrollments');
     revalidatePath(`/admin/students/${input.student_id}`);
     revalidatePath(`/admin/programs/${program.slug}`);
@@ -334,14 +315,13 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
         );
         const totalOther = allTransfers.reduce((sum, t) => sum + (t.hours_other_accepted || 0), 0);
         // Update apprenticeship record
-        db
-          .from('apprenticeship_enrollments')
+        await db
+          .from('program_enrollments')
           .update({
-            transferred_related_instruction_hours: totalTheory,
-            transferred_ojt_hours: totalPractical + totalOther,
+            transfer_hours: totalTheory + totalPractical + totalOther,
             updated_at: new Date().toISOString(),
           })
-          .eq('enrollment_id', transferHours.enrollment_id);
+          .eq('id', transferHours.enrollment_id);
       }
     }
     // 5. Revalidate paths

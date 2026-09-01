@@ -15,6 +15,7 @@ import {
   Sparkles,
   Replace,
 } from 'lucide-react';
+import ParisChat from '@/components/paris/ParisChat';
 
 const DEMOS = [
   {
@@ -203,6 +204,15 @@ export default function DemoTabs() {
           </div>
         </div>
       </div>
+
+      <section className="mt-8 overflow-hidden rounded-3xl border border-cyan-200 bg-white shadow-lg">
+        <div className="border-b border-cyan-100 bg-gradient-to-r from-cyan-50 via-white to-orange-50 px-5 py-4">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-700">Embedded demo advisor</p>
+          <h2 className="mt-1 text-xl font-black text-slate-950">Explore {active.label} with PARIS</h2>
+          <p className="mt-1 text-sm font-semibold text-slate-700">PARIS will explain the demo, ask what your organization needs, answer questions, and recommend the next demo or plan.</p>
+        </div>
+        <ParisChat surface="store" showHeader={false} voiceEnabled className="h-[min(620px,72dvh)] min-h-[440px]" />
+      </section>
     </div>
   );
 }

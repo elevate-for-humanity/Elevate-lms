@@ -5,6 +5,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Canonical Admin typography token.
+ *
+ * The Admin shell and Tailwind font-sans stack both consume --font-inter. When
+ * the token is undefined the entire font-family declaration becomes invalid,
+ * causing Chromium to fall back to Times New Roman. Keep the token defined at
+ * the application root so every dashboard and Studio workspace shares the
+ * same modern system-sans stack even when the optional Inter face is absent.
+ */
+:root {
+  --font-inter: 'Inter';
+}
+
 /* ============================================================================
    ADMIN PORTAL - INSTITUTIONAL TYPOGRAPHY
    Enterprise-grade visual standards for audit-safe presentation

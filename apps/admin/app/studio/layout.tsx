@@ -9,9 +9,9 @@ export default function StudioLayout({ children }: { children: ReactNode }) {
   const workspaces = getAvailableWorkspaces().map(({ id, label, route }) => ({ id, label, route }));
 
   return (
-    <section className="min-w-0 bg-slate-50" aria-label="Dev Studio">
+    <section className="min-w-0 bg-slate-50 md:flex" aria-label="Dev Studio">
       <StudioNavigation workspaces={workspaces} />
-      <div className="min-w-0 overflow-x-hidden">{children}</div>
+      <div className="min-w-0 flex-1 overflow-x-hidden">{children}</div>
     </section>
   );
 }

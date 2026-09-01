@@ -281,10 +281,12 @@ for (const specialist of ['PARIS', 'ELLIE', 'LIZZY', 'ZORA']) {
 }
 
 const capabilityRail = read('components/studio/StudioCapabilityRail.tsx');
-for (const capability of ['Plugins & connections', "'repository'", "'browser'", "'memory'"]) {
+for (const capability of ['Plugins & connections', 'repository:', 'browser:', 'memory:']) {
   if (!capabilityRail.includes(capability))
     fail(`Studio capability rail does not expose canonical capability: ${capability}`);
 }
+if (!capabilityRail.includes('const visible = workspaces;'))
+  fail('Studio capability rail hides registered workspaces instead of exposing the canonical registry');
 const unifiedChat = read('components/studio/UnifiedEllieChat.tsx');
 for (const interaction of ['Attach a file', 'selectStudioAgent', 'agentOverride']) {
   if (!unifiedChat.includes(interaction))

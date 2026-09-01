@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import { Eye, Globe2, MessageSquare, X } from 'lucide-react';
+import { Eye, Globe2, Menu, MessageSquare, X } from 'lucide-react';
 
 import UnifiedEllieChat from './UnifiedEllieChat';
 import RepositoryLivePreview from './RepositoryLivePreview';
@@ -27,6 +27,7 @@ export default function StudioCommandWorkspace({
   const [inspectionOpen, setInspectionOpen] = useState(true);
   const [mode, setMode] = useState<InspectionMode>('preview');
   const [specialist, setSpecialist] = useState<StudioSpecialist | null>(null);
+  const [capabilitiesOpen, setCapabilitiesOpen] = useState(false);
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col bg-white lg:flex-row">
@@ -35,8 +36,33 @@ export default function StudioCommandWorkspace({
         specialist={specialist}
         onSpecialistChange={setSpecialist}
       />
+      {capabilitiesOpen ? (
+        <div className="fixed inset-0 z-50 flex md:hidden" role="dialog" aria-modal="true" aria-label="Studio capabilities">
+          <StudioCapabilityRail
+            mobile
+            workspaces={workspaces}
+            specialist={specialist}
+            onSpecialistChange={setSpecialist}
+            onNavigate={() => setCapabilitiesOpen(false)}
+          />
+          <button
+            type="button"
+            className="min-w-0 flex-1 bg-slate-950/70"
+            onClick={() => setCapabilitiesOpen(false)}
+            aria-label="Close Studio capabilities"
+          />
+        </div>
+      ) : null}
       <section className="flex min-h-0 min-w-0 flex-1 flex-col">
         <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-gray-50 px-3 py-2 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setCapabilitiesOpen(true)}
+            className="rounded-lg border border-gray-300 bg-white p-1.5 text-gray-700"
+            aria-label="Open agents, tools, library, and connections"
+          >
+            <Menu className="h-4 w-4" aria-hidden="true" />
+          </button>
           <MessageSquare className="h-4 w-4 text-gray-500" aria-hidden="true" />
           <span className="text-xs font-semibold text-gray-700">Admin AI</span>
           <button

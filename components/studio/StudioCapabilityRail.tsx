@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
   Bot,
@@ -12,10 +13,15 @@ import {
   CircleDot,
   FileCode2,
   Globe2,
+  HeartPulse,
+  History,
+  LibraryBig,
   ListChecks,
   MemoryStick,
   PlugZap,
+  Rocket,
   ShieldCheck,
+  Users,
   Workflow,
 } from 'lucide-react';
 
@@ -31,42 +37,48 @@ const AGENTS: Array<{ id: StudioSpecialist; label: string; detail: string }> = [
 
 const ICONS: Record<string, typeof Bot> = {
   courses: Brain,
+  content: FileCode2,
+  media: LibraryBig,
   repository: FileCode2,
   browser: Globe2,
   workflows: Workflow,
   tasks: ListChecks,
   containers: Boxes,
+  agents: Bot,
+  builds: History,
+  logs: ListChecks,
+  deployments: Rocket,
+  evaluations: ShieldCheck,
+  collaboration: Users,
   memory: MemoryStick,
   claims: ShieldCheck,
+  health: HeartPulse,
   settings: Cable,
 };
 
-const PRIMARY = new Set([
-  'courses',
-  'repository',
-  'browser',
-  'workflows',
-  'tasks',
-  'containers',
-  'memory',
-  'claims',
-  'settings',
-]);
+type PluginCheck = { name: string; passed: boolean; required: boolean; message: string };
 
 export default function StudioCapabilityRail({
   workspaces,
   specialist,
   onSpecialistChange,
+  mobile = false,
+  onNavigate,
 }: {
   workspaces: Workspace[];
   specialist: StudioSpecialist | null;
   onSpecialistChange: (agent: StudioSpecialist | null) => void;
+  mobile?: boolean;
+  onNavigate?: () => void;
 }) {
   const [expanded, setExpanded] = useState(true);
+  const pathname = usePathname();
   const [plugins, setPlugins] = useState<'checking' | 'healthy' | 'degraded' | 'blocked'>(
     'checking',
   );
   const [agentCount, setAgentCount] = useState<number | null>(null);
+  const [pluginChecks, setPluginChecks] = useState<PluginCheck[]>([]);
+  const [connectionsOpen, setConnectionsOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -88,6 +100,9 @@ export default function StudioCapabilityRail({
               ? 'degraded'
               : 'healthy',
         );
+        setPluginChecks(
+          Array.isArray(pluginResult.body.checks) ? pluginResult.body.checks : [],
+        );
         const rows = Array.isArray(agentResult.body.agents)
           ? agentResult.body.agents
           : Array.isArray(agentResult.body)
@@ -103,11 +118,11 @@ export default function StudioCapabilityRail({
     };
   }, []);
 
-  const visible = workspaces.filter((workspace) => PRIMARY.has(workspace.id));
+  const visible = workspaces;
 
   return (
     <aside
-      className={`${expanded ? 'w-64' : 'w-16'} hidden shrink-0 flex-col border-r border-slate-200 bg-slate-950 text-white transition-[width] duration-200 md:flex`}
+      className={`${expanded ? 'w-64' : 'w-16'} ${mobile ? 'flex h-full' : 'hidden md:flex'} shrink-0 flex-col border-r border-slate-200 bg-slate-950 text-white transition-[width] duration-200`}
       aria-label="Studio capabilities"
     >
       <div className="flex h-12 items-center border-b border-slate-800 px-3">
@@ -168,16 +183,19 @@ export default function StudioCapabilityRail({
         <nav className="space-y-1">
           {visible.map((workspace) => {
             const Icon = ICONS[workspace.id] ?? CircleDot;
+            const href = workspace.id === 'media' ? '/studio/media?tab=library' : workspace.route;
+            const label = workspace.id === 'media' ? 'Library & Media' : workspace.label;
             return (
               <Link
                 key={workspace.id}
-                href={workspace.route}
-                title={workspace.label}
-                className="flex items-center gap-3 rounded-xl px-2 py-2 text-slate-300 transition hover:bg-slate-800 hover:text-white"
+                href={href}
+                onClick={onNavigate}
+                title={label}
+                className={`flex items-center gap-3 rounded-xl px-2 py-2 transition ${pathname === workspace.route || pathname.startsWith(`${workspace.route}/`) ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
               >
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                 {expanded ? (
-                  <span className="truncate text-xs font-semibold">{workspace.label}</span>
+                  <span className="truncate text-xs font-semibold">{label}</span>
                 ) : null}
               </Link>
             );
@@ -185,9 +203,11 @@ export default function StudioCapabilityRail({
         </nav>
       </div>
 
-      <Link
-        href="/studio/settings"
-        className="flex items-center gap-3 border-t border-slate-800 px-4 py-3 text-slate-300 hover:bg-slate-900 hover:text-white"
+      <div className="border-t border-slate-800">
+      <button
+        type="button"
+        onClick={() => setConnectionsOpen((value) => !value)}
+        className="flex w-full items-center gap-3 px-4 py-3 text-left text-slate-300 hover:bg-slate-900 hover:text-white"
         title="Connected capabilities"
       >
         {plugins === 'healthy' ? (
@@ -209,7 +229,26 @@ export default function StudioCapabilityRail({
             </span>
           </span>
         ) : null}
-      </Link>
+      </button>
+      {expanded && connectionsOpen ? (
+        <div className="max-h-52 space-y-1 overflow-y-auto border-t border-slate-800 bg-slate-900 px-3 py-2">
+          {pluginChecks.map((check) => (
+            <div key={check.name} className="rounded-lg bg-slate-950 px-2.5 py-2">
+              <div className="flex items-center gap-2">
+                <span className={`h-2 w-2 rounded-full ${check.passed ? 'bg-emerald-400' : check.required ? 'bg-red-400' : 'bg-amber-400'}`} />
+                <span className="truncate text-[11px] font-bold capitalize text-slate-200">
+                  {check.name.replace(/-/g, ' ')}
+                </span>
+              </div>
+              <p className="mt-1 text-[10px] leading-4 text-slate-500">{check.message}</p>
+            </div>
+          ))}
+          <Link href="/studio/settings" onClick={onNavigate} className="block rounded-lg px-2 py-2 text-[11px] font-bold text-cyan-300 hover:bg-slate-800">
+            Connection settings
+          </Link>
+        </div>
+      ) : null}
+      </div>
     </aside>
   );
 }

@@ -20,6 +20,12 @@ describe('routeEllieMessage', () => {
     expect(routeEllieMessage('Use the course builder to make a CNA course')).toBe('platform');
   });
 
+  it('routes read-only course lookup to ELLIE platform tools', () => {
+    expect(routeEllieMessage('Show me the cosmetology course')).toBe('platform');
+    expect(routeEllieMessage('Open the Indiana Cosmetology License course')).toBe('platform');
+    expect(selectStudioAgent('Show me the cosmetology course')).toBe('ELLIE');
+  });
+
   it('routes website creation and publishing to the tool orchestrator', () => {
     expect(routeEllieMessage('Build a website for a training provider')).toBe('platform');
     expect(routeEllieMessage('Publish the website after checking it')).toBe('platform');

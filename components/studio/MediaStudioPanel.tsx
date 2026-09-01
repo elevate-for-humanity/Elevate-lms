@@ -135,6 +135,13 @@ export default function MediaStudioPanel() {
 
   useEffect(() => { void loadAssets(); }, [loadAssets]);
 
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get('tab');
+    if (requested === 'create' || requested === 'projects' || requested === 'library') {
+      setTab(requested);
+    }
+  }, []);
+
   const projects = useMemo(() => {
     const grouped = new Map<string, MediaAsset[]>();
     for (const asset of assets) {

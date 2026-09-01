@@ -123,7 +123,7 @@ export function AgenticCourseRunPanel({
           </div>
           <h3 className="mt-1 text-base font-bold text-slate-950">Visible build plan · persistent task graph</h3>
           <p className="mt-1 max-w-2xl text-xs leading-5 text-slate-600">
-            Course Builder AI performs the first governed review and approves only after every persisted checklist passes. Human operators can inspect, edit, reject, unpublish, or republish afterward.
+            Course Builder AI performs the first governed checklist review. An authorized human must inspect the evidence and approve publication after every required gate passes.
           </p>
         </div>
         {projectId ? (

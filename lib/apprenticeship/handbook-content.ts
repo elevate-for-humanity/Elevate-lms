@@ -549,8 +549,8 @@ export const ESTHETICIAN_HANDBOOK: ProgramHandbook = {
       .replace(/barbershop/gi, 'spa/salon')
       .replace(/Barber/g, 'Esthetician')
       .replace(/Barbershop/g, 'Spa/Salon')
-      .replace(/1,500 hours/g, '700 hours')
-      .replace(/1500/g, '700'),
+      .replace(/1,500 hours/g, '20 verified competencies plus 300 RTI hours')
+      .replace(/1500/g, '300'),
   })),
 };
 

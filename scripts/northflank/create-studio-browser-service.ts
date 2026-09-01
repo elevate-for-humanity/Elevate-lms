@@ -1,7 +1,13 @@
 #!/usr/bin/env tsx
 /** Create/update the isolated open-source Studio browser service. */
 import crypto from 'node:crypto';
-import { combinedServiceCreatePath, nfFetch, projectApiPath, resolveProjectId } from './lib.ts';
+import {
+  combinedServiceCreatePath,
+  combinedServicePatchPath,
+  nfFetch,
+  projectApiPath,
+  resolveProjectId,
+} from './lib.ts';
 
 const serviceId = process.env.NORTHFLANK_STUDIO_BROWSER_SERVICE_ID || 'elevate-studio-browser';
 const branch = process.env.NORTHFLANK_GIT_BRANCH || 'main';
@@ -74,7 +80,7 @@ console.log(
 );
 if (!execute) process.exit(0);
 if (await exists())
-  await nfFetch(projectApiPath(projectId, `/services/${serviceId}`), {
+  await nfFetch(combinedServicePatchPath(projectId, serviceId), {
     method: 'PATCH',
     body: JSON.stringify(payload),
   });

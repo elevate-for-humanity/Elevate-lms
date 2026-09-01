@@ -7,6 +7,22 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { apiAuthGuard } from '@/lib/admin/guards';
 
+type SubmittedClaim = {
+  value?: unknown;
+  source?: unknown;
+  verifiedAt?: unknown;
+};
+
+function readSubmittedClaim(input: unknown, key: string) {
+  if (!input || typeof input !== 'object') return null;
+  const claim = (input as Record<string, SubmittedClaim>)[key];
+  if (!claim || typeof claim !== 'object') return null;
+  const source = typeof claim.source === 'string' ? claim.source.trim() : '';
+  const verifiedAt = typeof claim.verifiedAt === 'string' ? claim.verifiedAt.trim() : '';
+  if (!source || !verifiedAt || Number.isNaN(Date.parse(verifiedAt))) return null;
+  return { key, value: claim.value, source, verifiedAt, status: 'owner_attested' as const };
+}
+
 async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -23,6 +39,7 @@ async function _POST(request: NextRequest) {
     const trainingTypes = typeof body?.trainingTypes === 'string' ? body.trainingTypes.trim() : '';
     const brandColors = typeof body?.brandColors === 'string' ? body.brandColors.trim() : '';
     const description = typeof body?.description === 'string' ? body.description.trim() : '';
+    const submittedClaims = body?.verifiedClaims;
 
     if (!organizationName || !organizationType) {
       return NextResponse.json({ error: 'Organization name and type required' }, { status: 400 });
@@ -61,7 +78,7 @@ Return JSON only with homepage, programs, and seo. Homepage must include heroTit
     }
 
     const previewId = `preview_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-    const requiredClaims = [
+    const claimKeys = [
       'student_count',
       'completion_rate',
       'employer_count',
@@ -70,7 +87,41 @@ Return JSON only with homepage, programs, and seo. Homepage must include heroTit
       'accreditation',
       'pricing',
       'contact_email',
-    ].map((key) => ({ key, status: 'owner_verification_required', value: null, source: null }));
+    ];
+    const claims = claimKeys.map((key) =>
+      readSubmittedClaim(submittedClaims, key) || {
+        key,
+        status: 'owner_verification_required' as const,
+        value: null,
+        source: null,
+        verifiedAt: null,
+      },
+    );
+    const claimMap = new Map(claims.map((claim) => [claim.key, claim]));
+    const numericClaim = (key: string) => {
+      const claim = claimMap.get(key);
+      const value = claim?.status === 'owner_attested' ? Number(claim.value) : Number.NaN;
+      return Number.isFinite(value) && value >= 0 ? value : undefined;
+    };
+    const textClaim = (key: string) => {
+      const claim = claimMap.get(key);
+      return claim?.status === 'owner_attested' && typeof claim.value === 'string' && claim.value.trim()
+        ? claim.value.trim()
+        : undefined;
+    };
+    const testimonialClaim = claimMap.get('testimonial');
+    const testimonialValue = testimonialClaim?.status === 'owner_attested'
+      && testimonialClaim.value
+      && typeof testimonialClaim.value === 'object'
+      ? testimonialClaim.value as Record<string, unknown>
+      : null;
+    const testimonial = testimonialValue
+      && typeof testimonialValue.quote === 'string'
+      && testimonialValue.quote.trim()
+      && typeof testimonialValue.author === 'string'
+      && testimonialValue.author.trim()
+      ? { quote: testimonialValue.quote.trim(), author: testimonialValue.author.trim() }
+      : undefined;
 
     const config = {
       template: {
@@ -96,8 +147,13 @@ Return JSON only with homepage, programs, and seo. Homepage must include heroTit
         features: Array.isArray(siteConfig.homepage?.features) ? siteConfig.homepage.features.slice(0, 3) : [],
       },
       programs: Array.isArray(siteConfig.programs) ? siteConfig.programs : [],
-      stats: null,
-      testimonial: null,
+      stats: {
+        students: numericClaim('student_count'),
+        completionRate: textClaim('completion_rate'),
+        employers: numericClaim('employer_count'),
+        rating: textClaim('rating'),
+      },
+      testimonial,
       navigation: [
         { label: 'Home', href: '/' },
         { label: 'Programs', href: '/programs' },
@@ -113,10 +169,12 @@ Return JSON only with homepage, programs, and seo. Homepage must include heroTit
         description: description || `${organizationName} website`,
         keywords: [],
       },
-      claims: requiredClaims,
+      claims,
       publishing: {
-        blockedClaims: requiredClaims.map((claim) => claim.key),
-        requiresOwnerVerification: true,
+        blockedClaims: claims
+          .filter((claim) => claim.status !== 'owner_attested')
+          .map((claim) => claim.key),
+        requiresOwnerVerification: claims.some((claim) => claim.status !== 'owner_attested'),
       },
       meta: {
         organizationName,

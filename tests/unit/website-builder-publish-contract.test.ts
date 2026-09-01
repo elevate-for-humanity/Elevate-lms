@@ -62,4 +62,22 @@ describe('Website Builder publish contract', () => {
     const result = validateSiteConfig(config);
     expect(result.warnings.some((issue) => issue.code === 'contact_page_without_form')).toBe(true);
   });
+  it('blocks public proof without claim evidence and accepts sourced owner-attested proof', () => {
+    const config = ensureComposableSiteConfig(buildDefaultSiteConfig({ organizationName: 'Verified Proof Test' }));
+    config.stats = { students: 25 };
+
+    const blocked = validateSiteConfig(config);
+    expect(blocked.errors.some((issue) => issue.code === 'unverified_public_claim')).toBe(true);
+
+    config.claims = [{
+      key: 'student_count',
+      value: 25,
+      source: 'Enrollment export 2026-09-01',
+      verifiedAt: '2026-09-01T00:00:00.000Z',
+      status: 'owner_attested',
+    }];
+    const accepted = validateSiteConfig(config);
+    expect(accepted.errors.some((issue) => issue.code === 'unverified_public_claim')).toBe(false);
+  });
+
 });

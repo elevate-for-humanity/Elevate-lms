@@ -138,6 +138,27 @@ function scanProductDestinations(config: TenantSiteConfig, issues: SiteValidatio
   }
 }
 
+function scanPublishedClaims(config: TenantSiteConfig, issues: SiteValidationIssue[]) {
+  const claims = new Map((config.claims || []).map((claim) => [claim.key, claim]));
+  const requireEvidence = (key: string, present: boolean) => {
+    if (!present) return;
+    const claim = claims.get(key);
+    if (!claim || !['verified', 'owner_attested'].includes(claim.status) || !text(claim.source) || !text(claim.verifiedAt)) {
+      issues.push({
+        severity: 'error',
+        code: 'unverified_public_claim',
+        message: `Public claim “${key}” requires a source and verification timestamp before publishing.`,
+      });
+    }
+  };
+
+  requireEvidence('student_count', config.stats?.students !== undefined);
+  requireEvidence('completion_rate', Boolean(text(config.stats?.completionRate)));
+  requireEvidence('employer_count', config.stats?.employers !== undefined);
+  requireEvidence('rating', Boolean(text(config.stats?.rating)));
+  requireEvidence('testimonial', Boolean(config.testimonial?.quote || config.testimonial?.author));
+}
+
 export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResult {
   const config = ensureComposableSiteConfig(input);
   const issues: SiteValidationIssue[] = [];
@@ -179,6 +200,7 @@ export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResul
 
   scanWellnessClaims(config, issues);
   scanProductDestinations(config, issues);
+  scanPublishedClaims(config, issues);
 
   const errors = issues.filter((issue) => issue.severity === 'error');
   const warnings = issues.filter((issue) => issue.severity === 'warning');

@@ -60,6 +60,14 @@ export type TenantSitePage = {
   sections: TenantSiteSection[];
 };
 
+export type TenantSiteClaim = {
+  key: string;
+  value: unknown;
+  source: string | null;
+  verifiedAt: string | null;
+  status: 'verified' | 'owner_attested' | 'owner_verification_required';
+};
+
 export type TenantSiteConfig = {
   schemaVersion?: 1 | 2;
   pages?: TenantSitePage[];
@@ -109,6 +117,7 @@ export type TenantSiteConfig = {
   navigation: Array<{ label: string; href: string }>;
   footer: { description: string; contactEmail?: string };
   seo?: { title: string; description: string; keywords?: string[] };
+  claims?: TenantSiteClaim[];
   meta?: Record<string, unknown>;
 };
 

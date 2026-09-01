@@ -21,7 +21,6 @@ import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLab
 import CookieConsent from '@/components/CookieConsent';
 import FacebookPixel from '@/components/FacebookPixel';
 import { ScrollNarrator } from '@/components/home/ScrollNarrator';
-import { WebsiteGuide } from '@/components/marketing/WebsiteGuide';
 
 const siteUrl = 'https://www.elevateforhumanity.org';
 const logoUrl = `${siteUrl}/images/logo.png`;
@@ -136,7 +135,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MarketingChromeBoundary>{children}</MarketingChromeBoundary>
         </I18nProvider>
         <ScrollNarrator />
-        <WebsiteGuide />
         <CookieConsent />
       </body>
     </html>

@@ -122,6 +122,50 @@ function generatedSceneData(plan: LessonRenderPlanDraft): Record<string, unknown
   };
 }
 
+function persistedInstructionalScript(input: {
+  lessonTitle: string;
+  jobScript: string;
+  contentJson: unknown;
+}): string {
+  const content = input.contentJson && typeof input.contentJson === 'object'
+    ? input.contentJson as Record<string, unknown>
+    : {};
+  const experience = content.experience && typeof content.experience === 'object'
+    ? content.experience as Record<string, unknown>
+    : {};
+  const readingGuide = experience.readingGuide && typeof experience.readingGuide === 'object'
+    ? experience.readingGuide as Record<string, unknown>
+    : {};
+  const sections = Array.isArray(readingGuide.sections) ? readingGuide.sections : [];
+  const sectionNarration = sections.flatMap((section) => {
+    if (!section || typeof section !== 'object') return [];
+    const row = section as Record<string, unknown>;
+    return [row.heading, row.body].filter((value): value is string =>
+      typeof value === 'string' && value.trim().length > 0,
+    );
+  });
+  const takeaways = Array.isArray(readingGuide.keyTakeaways)
+    ? readingGuide.keyTakeaways.filter((value): value is string => typeof value === 'string')
+    : [];
+  const practicalTask = experience.practicalTask && typeof experience.practicalTask === 'object'
+    ? experience.practicalTask as Record<string, unknown>
+    : {};
+  const practicalInstructions = Array.isArray(practicalTask.instructions)
+    ? practicalTask.instructions.filter((value): value is string => typeof value === 'string')
+    : [];
+
+  return [
+    `Today's lesson is ${input.lessonTitle}.`,
+    input.jobScript,
+    typeof readingGuide.summary === 'string' ? readingGuide.summary : '',
+    ...sectionNarration,
+    takeaways.length ? `Key takeaways: ${takeaways.join('. ')}.` : '',
+    practicalInstructions.length
+      ? `Apply the lesson in this order: ${practicalInstructions.join('. ')}.`
+      : '',
+  ].filter(Boolean).join(' ');
+}
+
 /** Render one already-claimed canonical video job. GPU generation is an optional
  * rendering mechanic for microclips; Remotion is the common fallback. Both
  * report terminal state through the same video_jobs identity. */
@@ -168,7 +212,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         .maybeSingle();
       tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
     }
-    const script = job.script?.trim() || job.lesson_title;
+    const baseScript = job.script?.trim() || job.lesson_title;
     const bulletPoints = Array.isArray(job.bullet_points) ? job.bullet_points : [];
     const persistedSceneData =
       job.scene_data && typeof job.scene_data === 'object'
@@ -185,8 +229,9 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       lesson?.video_config && typeof lesson.video_config === 'object'
         ? (lesson.video_config as Record<string, unknown>)
         : {};
-    const configuredInstructorId =
-      typeof videoConfig.instructorId === 'string' ? videoConfig.instructorId.trim() : '';
+    const configuredInstructorId = [videoConfig.instructorId, videoConfig.instructor_id]
+      .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
+      ?.trim() ?? '';
     const instructor = configuredInstructorId
       ? getInstructorById(configuredInstructorId)
       : getInstructorForCourse(courseTitle);
@@ -208,6 +253,11 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         program?.type,
       ].find((value): value is string => typeof value === 'string' && value.trim().length > 0) ??
       null;
+    const script = persistedInstructionalScript({
+      lessonTitle: job.lesson_title,
+      jobScript: baseScript,
+      contentJson: lesson?.content_json,
+    });
     const suppliedScenes =
       Array.isArray(persistedSceneData.scenes) && persistedSceneData.scenes.length > 0;
     const generatedPlan = suppliedScenes

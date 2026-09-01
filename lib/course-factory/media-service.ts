@@ -123,9 +123,9 @@ export async function queueCourseLessonVideos(
       const videoConfig = lesson.video_config && typeof lesson.video_config === 'object'
         ? lesson.video_config as Record<string, unknown>
         : {};
-      const instructorId = typeof videoConfig.instructorId === 'string'
-        ? videoConfig.instructorId.trim()
-        : '';
+      const instructorId = [videoConfig.instructorId, videoConfig.instructor_id]
+        .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
+        ?.trim() ?? '';
       const instructor = instructorId
         ? getInstructorById(instructorId)
         : getInstructorForCourse(course.title);

@@ -20,6 +20,8 @@ import { SkipToContent } from '@/components/accessibility/SkipToContent';
 import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLabels';
 import CookieConsent from '@/components/CookieConsent';
 import FacebookPixel from '@/components/FacebookPixel';
+import { ScrollNarrator } from '@/components/home/ScrollNarrator';
+import { WebsiteGuide } from '@/components/marketing/WebsiteGuide';
 
 const siteUrl = 'https://www.elevateforhumanity.org';
 const logoUrl = `${siteUrl}/images/logo.png`;
@@ -133,6 +135,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <I18nProvider>
           <MarketingChromeBoundary>{children}</MarketingChromeBoundary>
         </I18nProvider>
+        <ScrollNarrator />
+        <WebsiteGuide />
         <CookieConsent />
       </body>
     </html>

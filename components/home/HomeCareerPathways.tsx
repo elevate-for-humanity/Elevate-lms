@@ -83,18 +83,26 @@ export function HomeCareerPathways() {
           <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
             Start With a Career Path
           </p>
-          <h2 id="featured-pathways-heading" className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+          <h2
+            id="featured-pathways-heading"
+            className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
+          >
             Choose where you want to go next.
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-700">
-            Elevate connects career training, apprenticeships, funding guidance, and employer-based learning. Pick a pathway below to see what the experience looks like and how to get started.
+            Elevate connects career training, apprenticeships, funding guidance, and employer-based
+            learning. Pick a pathway below to see what the experience looks like and how to get
+            started.
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {PATHWAYS.map((p) => (
-            <article key={p.slug} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md ring-1 ring-black/[0.02] transition hover:-translate-y-1 hover:shadow-2xl">
-              <Link href={p.ctaHref} className="block h-full">
+            <article
+              key={p.slug}
+              className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md ring-1 ring-black/[0.02] transition hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <Link href={p.ctaHref} className="block">
                 <div className="relative aspect-[4/3] overflow-hidden bg-white">
                   <Image
                     src={p.image}
@@ -122,7 +130,8 @@ export function HomeCareerPathways() {
                     </ul>
                   )}
                   <span className="mt-5 inline-flex items-center gap-2 text-base font-extrabold text-brand-red-700">
-                    {p.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    {p.cta}{' '}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </div>
               </Link>
@@ -131,7 +140,10 @@ export function HomeCareerPathways() {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <Link href="/programs" className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-8 py-4 text-base font-extrabold text-white transition hover:bg-brand-red-700">
+          <Link
+            href="/programs"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-8 py-4 text-base font-extrabold text-white transition hover:bg-brand-red-700"
+          >
             View Every Program <ArrowRight className="h-5 w-5" />
           </Link>
         </div>

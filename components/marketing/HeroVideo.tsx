@@ -37,6 +37,8 @@ export interface HeroVideoProps {
   className?: string;
   children?: React.ReactNode;
   mediaFit?: 'cover' | 'contain';
+  /** Optional shared color treatment for a coordinated media set. */
+  mediaClassName?: string;
   demoSlides?: HeroDemoSlide[];
   demoStartSeconds?: number;
   demoSlideSeconds?: number;
@@ -68,6 +70,7 @@ export default function HeroVideo({
   className = '',
   children,
   mediaFit = 'cover',
+  mediaClassName = '',
   heightClassName = 'h-[clamp(380px,58vh,620px)]',
   overlayMode = 'default',
   soundButtonVariant = 'pill',
@@ -137,21 +140,32 @@ export default function HeroVideo({
     const section = sectionRef.current;
     if (!section) return;
 
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry?.isIntersecting || entry.intersectionRatio < 0.55 || scrollNarrationAttemptedRef.current) return;
-      scrollNarrationAttemptedRef.current = true;
-      const audio = audioRef.current;
-      if (!audio) return;
-      audio.currentTime = 0;
-      audio.play().then(() => {
-        soundRequestedRef.current = true;
-        setMuted(false);
-      }).catch(() => {
-        // Browsers may require a tap before audible playback. The visible
-        // Play audio control remains available when that policy applies.
-        scrollNarrationAttemptedRef.current = false;
-      });
-    }, { threshold: [0.55] });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (
+          !entry?.isIntersecting ||
+          entry.intersectionRatio < 0.55 ||
+          scrollNarrationAttemptedRef.current
+        )
+          return;
+        scrollNarrationAttemptedRef.current = true;
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.currentTime = 0;
+        audio
+          .play()
+          .then(() => {
+            soundRequestedRef.current = true;
+            setMuted(false);
+          })
+          .catch(() => {
+            // Browsers may require a tap before audible playback. The visible
+            // Play audio control remains available when that policy applies.
+            scrollNarrationAttemptedRef.current = false;
+          });
+      },
+      { threshold: [0.55] },
+    );
 
     observer.observe(section);
     return () => observer.disconnect();
@@ -218,7 +232,12 @@ export default function HeroVideo({
   }
 
   const hasHeroContent = Boolean(
-    microLabel || belowHeroHeadline || belowHeroSubheadline || ctas?.length || trustIndicators?.length || children,
+    microLabel ||
+    belowHeroHeadline ||
+    belowHeroSubheadline ||
+    ctas?.length ||
+    trustIndicators?.length ||
+    children,
   );
 
   return (
@@ -236,7 +255,7 @@ export default function HeroVideo({
             priority
             unoptimized
             sizes="100vw"
-            className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center`}
+            className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center ${mediaClassName}`}
             aria-hidden="true"
           />
         ) : null}
@@ -264,7 +283,7 @@ export default function HeroVideo({
               setVideoReady(false);
               setMuted(true);
             }}
-            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-500 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-500 ${mediaClassName} ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           >
             {mobileSource && mobileSource !== desktopSource ? (
@@ -276,13 +295,25 @@ export default function HeroVideo({
 
         {overlayMode === 'default' ? (
           <>
-            <div className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/90 via-slate-950/62 to-slate-950/20" aria-hidden="true" />
-            <div className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/65 via-transparent to-slate-950/10" aria-hidden="true" />
+            <div
+              className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/90 via-slate-950/62 to-slate-950/20"
+              aria-hidden="true"
+            />
+            <div
+              className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/65 via-transparent to-slate-950/10"
+              aria-hidden="true"
+            />
           </>
         ) : overlayMode === 'soft' ? (
           <>
-            <div className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/58 via-slate-950/24 to-transparent" aria-hidden="true" />
-            <div className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/38 via-transparent to-transparent" aria-hidden="true" />
+            <div
+              className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/58 via-slate-950/24 to-transparent"
+              aria-hidden="true"
+            />
+            <div
+              className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/38 via-transparent to-transparent"
+              aria-hidden="true"
+            />
           </>
         ) : null}
 
@@ -349,8 +380,14 @@ export default function HeroVideo({
                   {trustIndicators?.length ? (
                     <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
                       {Array.from(new Set(trustIndicators)).map((item) => (
-                        <li key={item} className="flex items-center gap-2 text-sm font-bold text-white/90">
-                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red-500" aria-hidden="true" />
+                        <li
+                          key={item}
+                          className="flex items-center gap-2 text-sm font-bold text-white/90"
+                        >
+                          <span
+                            className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red-500"
+                            aria-hidden="true"
+                          />
                           {item}
                         </li>
                       ))}
@@ -362,7 +399,8 @@ export default function HeroVideo({
           </div>
         ) : null}
 
-        {showSoundControl && ((voiceoverSrc && !audioFailed) || (narrateTranscript && transcript) || showVideo) ? (
+        {showSoundControl &&
+        ((voiceoverSrc && !audioFailed) || (narrateTranscript && transcript) || showVideo) ? (
           <button
             type="button"
             onClick={() => void toggleSound()}
@@ -393,7 +431,10 @@ export default function HeroVideo({
               Video transcript
             </button>
             {transcriptOpen ? (
-              <p id={transcriptId} className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-800">
+              <p
+                id={transcriptId}
+                className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-800"
+              >
                 {transcript}
               </p>
             ) : null}

@@ -14,6 +14,14 @@ type PlayOptions = {
 };
 
 const naturalVoiceCache = new Map<string, Promise<Blob>>();
+const NATURAL_VOICE_STOP_EVENT = 'elevate:natural-voice-stop';
+
+/** Stops every natural-voice hook instance, including audio created on another page section. */
+export function stopAllNaturalVoicePlayback() {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new Event(NATURAL_VOICE_STOP_EVENT));
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
 
 function naturalVoiceCacheKey(text: string, options: PlayOptions) {
   return JSON.stringify([
@@ -152,7 +160,7 @@ export function useNaturalVoice() {
     const clean = text.trim().slice(0, 2400);
     if (!clean) return false;
 
-    stop();
+    stopAllNaturalVoicePlayback();
     const playbackToken = playbackTokenRef.current;
     setError(null);
     setIsLoading(true);
@@ -270,10 +278,13 @@ export function useNaturalVoice() {
   }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.getVoices();
-    }
-    return () => stop();
+    const handleGlobalStop = () => stop();
+    window.addEventListener(NATURAL_VOICE_STOP_EVENT, handleGlobalStop);
+    if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
+    return () => {
+      window.removeEventListener(NATURAL_VOICE_STOP_EVENT, handleGlobalStop);
+      stop();
+    };
   }, [stop]);
 
   return {

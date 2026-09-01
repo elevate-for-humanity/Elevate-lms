@@ -224,9 +224,9 @@ export default function AboutPage() {
               Personal credentials and professional authorizations
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-200">
-              These items are presented as Elizabeth Greene&apos;s personal credentials or professional
-              authorizations where the repository identifies them that way. Organizational approvals
-              are listed separately below so they are not confused with personal licensure.
+              These are Elizabeth Greene&apos;s personal licenses, credentials, certifications, and
+              professional authorizations. Elevate&apos;s organizational approvals and relationships
+              are listed separately below.
             </p>
           </div>
 

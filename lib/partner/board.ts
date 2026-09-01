@@ -108,6 +108,12 @@ function isPending(row: HourRow) {
   return row.approval_status === 'pending' || row.status === 'pending';
 }
 
+const ACCEPTED_DOCUMENT_STATUSES = new Set(['accepted', 'approved', 'verified', 'complete', 'completed']);
+
+function isAcceptedDocumentStatus(value: unknown) {
+  return ACCEPTED_DOCUMENT_STATUSES.has(String(value || '').trim().toLowerCase());
+}
+
 async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerRecord> {
   // Platform administrators audit a specifically selected Host Shop. Resolve
   // that selection before ordinary memberships so an admin's unrelated partner
@@ -280,12 +286,15 @@ export async function getHostShopBoard(userId: string) {
   for (const doc of uploadedDocs || []) if (!latestDocs.has(doc.document_type)) latestDocs.set(doc.document_type, doc);
   const documentStatuses = requirements.map((requirement: any) => {
     const document = latestDocs.get(requirement.document_type);
-    return { ...requirement, uploaded: Boolean(document), document: document || null, status: document?.status || 'missing' };
+    const rawStatus = String(document?.status || 'missing').trim().toLowerCase();
+    const status = isAcceptedDocumentStatus(rawStatus) ? 'accepted' : rawStatus;
+    return { ...requirement, uploaded: Boolean(document), document: document || null, status };
   });
   const missingDocuments = documentStatuses.filter((d: any) => d.is_required && (!d.uploaded || ['missing', 'rejected', 'expired'].includes(d.status)));
   const pendingDocuments = documentStatuses.filter((d: any) => d.is_required && d.status === 'pending');
   const acceptedDocumentCount = documentStatuses.filter((d: any) => d.is_required && d.status === 'accepted').length;
   const requiredDocumentCount = documentStatuses.filter((d: any) => d.is_required).length;
+  const documentsComplete = requiredDocumentCount > 0 && acceptedDocumentCount === requiredDocumentCount;
 
   const registeredPrograms = Array.from(
     new Map(
@@ -316,6 +325,7 @@ export async function getHostShopBoard(userId: string) {
     pendingDocuments,
     acceptedDocumentCount,
     requiredDocumentCount,
+    documentsComplete,
     apprentices: apprentices.map((apprentice) => ({
       ...apprentice,
       ojt: workProgress[apprentice.student_id] || { completed: 0, required: null, progressModel: apprentice.tradeInfo.progressModel },

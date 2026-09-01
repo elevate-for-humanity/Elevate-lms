@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { ensureCanonicalHostShopInfrastructure } from '@/lib/partners/ensure-canonical-host-shop';
 
 export type BarberPartnerApplicationRow = {
   id: string;
@@ -132,6 +133,23 @@ export async function provisionPartnerFromBarberApplication(
     .update({ partner_id: partnerId })
     .eq('id', app.id)
     .then(undefined, () => undefined);
+
+  await ensureCanonicalHostShopInfrastructure({
+    db,
+    partnerId,
+    ownerId: options?.linkUserId || null,
+    businessName: displayName,
+    businessType: 'barbershop',
+    contactName: app.contact_name,
+    contactEmail: email,
+    contactPhone: app.contact_phone,
+    address1: app.shop_address_line1,
+    address2: app.shop_address_line2,
+    city: app.shop_city,
+    state: app.shop_state,
+    zip: app.shop_zip,
+    licenseNumber: app.indiana_shop_license_number,
+  });
 
   return partnerId ? { partnerId } : null;
 }

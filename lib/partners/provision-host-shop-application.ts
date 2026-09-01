@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { normalizeHostShopProgram } from '@/lib/partners/host-shop-onboarding';
+import { ensureCanonicalHostShopInfrastructure } from '@/lib/partners/ensure-canonical-host-shop';
 
 export type HostShopUploadedDocuments = { shopLicense: string; insurance: string; workersComp: string; supervisorLicense: string; ein: string; localBusiness?: string | null };
 export type ProvisionHostShopApplicationInput = { db: SupabaseClient; applicationId: string; businessName: string; legalBusinessName: string; ownerName: string; contactName: string; email: string; phone: string; address1: string; address2?: string | null; city: string; state: string; zip: string; businessType: string; licenseNumber: string; supervisorName: string; supervisorLicenseNumber: string; supervisorYearsLicensed?: string | number | null; workersCompStatus: string; compensationModel: string; numberOfEmployees?: string | number | null; programs: string[]; documents: HostShopUploadedDocuments };
@@ -49,7 +50,7 @@ export async function provisionHostShopApplication(input: ProvisionHostShopAppli
   const existingPrograms = Array.isArray(existingPartner?.programs) ? existingPartner.programs.map(String) : [];
   const mergedPrograms = [...new Set([...existingPrograms, ...programs])];
   const alreadyApproved = existingPartner?.approval_status === 'approved';
-  const partnerPayload = { name: input.businessName, legal_name: input.legalBusinessName, shop_name: input.businessName, owner_name: input.ownerName, contact_name: input.contactName, contact_email: email, phone: input.phone, contact_phone: input.phone, address_line1: input.address1, address_line2: input.address2 || null, city: input.city, state: input.state || 'Indiana', zip: input.zip, license_number: input.licenseNumber, supervisor_name: input.supervisorName, supervisor_license_number: input.supervisorLicenseNumber, supervisor_years_licensed: numericOrNull(input.supervisorYearsLicensed), compensation_model: input.compensationModel, number_of_employees: numericOrNull(input.numberOfEmployees), workers_comp_status: input.workersCompStatus, has_general_liability: true, can_supervise_and_verify: true, partner_type: input.businessType || 'host_shop', program_type: primaryProgram, programs: mergedPrograms, status: 'active', approval_status: alreadyApproved ? 'approved' : 'pending', account_status: alreadyApproved || existingPartner?.account_status === 'active' ? 'active' : 'conditional_access', documents_verified: alreadyApproved, onboarding_completed: alreadyApproved ? undefined : false, mou_acknowledged: true, updated_at: now };
+  const partnerPayload = { name: input.businessName, legal_name: input.legalBusinessName, shop_name: input.businessName, owner_name: input.ownerName, contact_name: input.contactName, contact_email: email, phone: input.phone, contact_phone: input.phone, address_line1: input.address1, address_line2: input.address2 || null, city: input.city, state: input.state || 'Indiana', zip: input.zip, license_number: input.licenseNumber, supervisor_name: input.supervisorName, supervisor_license_number: input.supervisorLicenseNumber, supervisor_years_licensed: numericOrNull(input.supervisorYearsLicensed), compensation_model: input.compensationModel, number_of_employees: numericOrNull(input.numberOfEmployees), workers_comp_status: input.workersCompStatus, has_general_liability: true, can_supervise_and_verify: true, partner_type: input.businessType || 'host_shop', program_type: primaryProgram, programs: mergedPrograms, status: 'active', approval_status: alreadyApproved ? 'approved' : 'pending', account_status: alreadyApproved || existingPartner?.account_status === 'active' ? 'active' : 'conditional_access', documents_verified: false, onboarding_completed: alreadyApproved ? undefined : false, mou_acknowledged: true, updated_at: now };
 
   let partnerId = existingPartner?.id as string | undefined;
   if (partnerId) { const { error } = await db.from('partners').update(partnerPayload).eq('id', partnerId); if (error) throw error; }
@@ -66,6 +67,8 @@ export async function provisionHostShopApplication(input: ProvisionHostShopAppli
 
   for (const programId of programs) { const { error } = await db.from('partner_program_access').upsert({ partner_id: partnerId, program_id: programId, can_view_apprentices: true, can_enter_progress: true, can_view_reports: true, revoked_at: null }, { onConflict: 'partner_id,program_id' }); if (error) throw error; }
 
+  const canonical = await ensureCanonicalHostShopInfrastructure({ db, partnerId, ownerId: identity.userId, businessName: input.businessName, businessType: input.businessType, contactName: input.contactName, contactEmail: email, contactPhone: input.phone, address1: input.address1, address2: input.address2, city: input.city, state: input.state, zip: input.zip, licenseNumber: input.licenseNumber });
+
   const programSpecificLicense = primaryProgram === 'barber' ? 'barbershop_license' : 'salon_license';
   const docs = [[programSpecificLicense,input.documents.shopLicense],['liability_insurance',input.documents.insurance],['workers_comp',input.documents.workersComp],['supervisor_license',input.documents.supervisorLicense],['ein_letter',input.documents.ein],...(input.documents.localBusiness ? [['business_license',input.documents.localBusiness]] : [])] as Array<[string,string]>;
   for (const [documentType,path] of docs) {
@@ -73,10 +76,8 @@ export async function provisionHostShopApplication(input: ProvisionHostShopAppli
     const { error } = await db.from('partner_documents').insert({ partner_id: partnerId, document_type: documentType, program_id: primaryProgram, state: input.state || 'Indiana', display_name: fileName(path), file_name: fileName(path), file_url: path, status: alreadyApproved ? 'accepted' : 'pending', storage_bucket: 'documents' }); if (error) throw error;
   }
 
-  const partnershipPayload = { application_id: input.applicationId, partner_id: partnerId, business_name: input.businessName, business_type: input.businessType || 'other', license_number: input.licenseNumber, address: [input.address1,input.address2,input.city,input.state,input.zip].filter(Boolean).join(', '), contact_name: input.contactName, contact_email: email, contact_phone: input.phone, status: alreadyApproved ? 'active' : 'pending', partner_tier: 'free', portal_access_enabled: true, portal_access_at: now, onboarding_completed: false, metadata: { programs, source: 'host_shop_application', application_id: input.applicationId, conditional_access: !alreadyApproved }, updated_at: now };
-  const { data: existingPartnership, error: lookupError } = await db.from('host_shop_partnerships').select('id').or(`application_id.eq.${input.applicationId},partner_id.eq.${partnerId}`).limit(1).maybeSingle(); if (lookupError) throw lookupError;
-  if (existingPartnership?.id) { const { error } = await db.from('host_shop_partnerships').update(partnershipPayload).eq('id', existingPartnership.id); if (error) throw error; }
-  else { const { error } = await db.from('host_shop_partnerships').insert(partnershipPayload); if (error) throw error; }
+  const { error: partnershipError } = await db.from('host_shop_partnerships').update({ application_id: input.applicationId, shop_id: canonical.shopId, status: alreadyApproved ? 'active' : 'pending', metadata: { programs, source: 'host_shop_application', application_id: input.applicationId, conditional_access: !alreadyApproved }, updated_at: now }).eq('partner_id', partnerId);
+  if (partnershipError) throw partnershipError;
 
   // Finalize the canonical verification state only after partner, documents, and partnership all exist.
   // The RPC is service-role only and is idempotent.

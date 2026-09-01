@@ -12,6 +12,8 @@ import {
   Stethoscope,
   User,
   Wrench,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
@@ -83,6 +85,7 @@ export default function ParisChat({
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(voiceEnabled);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -144,8 +147,8 @@ export default function ParisChat({
       }
 
       setMessages((previous) => [...previous, { role: 'assistant', content: data.reply }]);
-      if (storeSurface && voiceEnabled) {
-        void voice.play(data.reply, { voice: 'coral', style: 'commercial', rate: 0.96 });
+      if (autoSpeak) {
+        void voice.play(data.reply, { voice: 'coral', style: storeSurface ? 'commercial' : 'assistant', rate: 0.96 });
       }
       onComplete?.([]);
     } catch {
@@ -164,7 +167,7 @@ export default function ParisChat({
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  }, [courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, storeSurface, surface, voice, voiceEnabled]);
+  }, [autoSpeak, courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, storeSurface, surface, voice]);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -293,7 +296,19 @@ export default function ParisChat({
 
       <form onSubmit={handleSubmit} className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
         <label htmlFor="paris-chat-input" className="sr-only">Ask PARIS a question</label>
-        <div className="flex items-end gap-3">
+        <div className="flex items-end gap-2 sm:gap-3">
+          <button
+            type="button"
+            aria-label={autoSpeak ? 'Mute PARIS voice' : 'Turn on PARIS voice'}
+            aria-pressed={autoSpeak}
+            onClick={() => {
+              if (autoSpeak) voice.stop();
+              setAutoSpeak((enabled) => !enabled);
+            }}
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100"
+          >
+            {autoSpeak ? <Volume2 className="h-5 w-5" aria-hidden="true" /> : <VolumeX className="h-5 w-5" aria-hidden="true" />}
+          </button>
           <textarea
             id="paris-chat-input"
             ref={inputRef}
@@ -301,8 +316,8 @@ export default function ParisChat({
             onChange={(event) => setInput(event.target.value.slice(0, 2000))}
             onKeyDown={handleKeyDown}
             placeholder={learnerSurface ? 'Ask about your course or next lesson…' : storeSurface ? 'Tell PARIS about your business or ask a platform question…' : 'Ask about a program, funding, testing, or apprenticeship…'}
-            className="min-h-[52px] max-h-40 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-4 py-3 text-sm text-slate-950 focus:border-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-200"
-            rows={2}
+            className="min-h-11 max-h-28 min-w-0 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-3 py-2.5 text-base text-slate-950 focus:border-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-200 sm:min-h-[52px] sm:max-h-40 sm:px-4 sm:py-3 sm:text-sm"
+            rows={1}
             disabled={isLoading}
             maxLength={2000}
           />
@@ -310,7 +325,7 @@ export default function ParisChat({
             type="submit"
             aria-label="Send message"
             disabled={!input.trim() || isLoading}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-brand-blue-700 px-5 py-3 font-semibold text-white transition hover:bg-brand-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-brand-blue-700 p-0 font-semibold text-white transition hover:bg-brand-blue-800 disabled:cursor-not-allowed disabled:opacity-50 sm:h-auto sm:min-h-12 sm:w-auto sm:rounded-2xl sm:px-5 sm:py-3"
           >
             <Send className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">Send</span>

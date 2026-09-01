@@ -122,7 +122,7 @@ export default async function EnrollmentSuccessPage() {
             </div>
             <div className="flex justify-between items-center py-3 border-b border-slate-100">
               <span className="text-slate-600">Indiana Education Requirement</span>
-              <span className="font-bold text-slate-900">700 hours</span>
+              <span className="font-bold text-slate-900">20 competencies + 300 RTI hours</span>
             </div>
             <div className="py-3 text-sm text-slate-600">
               Federal Registered Apprenticeship status is not currently published for this occupation in Elevate&apos;s canonical RAPIDS registry. Licensing is controlled by the applicable Indiana authority.
@@ -142,7 +142,7 @@ export default async function EnrollmentSuccessPage() {
               {
                 n: 2,
                 title: 'Complete required education and supervised practice',
-                desc: 'Indiana currently publishes a 700-hour minimum education requirement for esthetician applicants.',
+                desc: 'The registered Appendix A standard requires 20 verified occupational competencies and 300 related-instruction hours.',
               },
               {
                 n: 3,

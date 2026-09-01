@@ -142,12 +142,18 @@ export default function HeroVideo({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (
-          !entry?.isIntersecting ||
-          entry.intersectionRatio < 0.55 ||
-          scrollNarrationAttemptedRef.current
-        )
+        if (!entry?.isIntersecting || entry.intersectionRatio < 0.2) {
+          const audio = audioRef.current;
+          if (audio && !audio.paused) {
+            audio.pause();
+            audio.currentTime = 0;
+          }
+          transcriptVoice.stop();
+          soundRequestedRef.current = false;
+          setMuted(true);
           return;
+        }
+        if (entry.intersectionRatio < 0.55 || scrollNarrationAttemptedRef.current) return;
         scrollNarrationAttemptedRef.current = true;
         const audio = audioRef.current;
         if (!audio) return;
@@ -164,7 +170,7 @@ export default function HeroVideo({
             scrollNarrationAttemptedRef.current = false;
           });
       },
-      { threshold: [0.55] },
+      { threshold: [0, 0.2, 0.55] },
     );
 
     observer.observe(section);

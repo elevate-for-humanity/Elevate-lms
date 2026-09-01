@@ -55,14 +55,14 @@ export default async function ApprenticeHoursPage() {
   const logs = allLogs.slice(0, 20);
   const totalHours = allLogs.reduce((sum, log: any) => sum + (Number(log.hours_claimed) || 0), 0);
   const approvedHours = allLogs
-    .filter((log: any) => log.status === 'approved' || log.approval_status === 'approved' || log.approval_status === 'approved')
+    .filter((log: any) => log.status === 'approved' || log.approval_status === 'approved')
     .reduce((sum, log: any) => sum + (Number(log.accepted_hours) || Number(log.hours_claimed) || 0), 0);
 
   // Resolve required hours from the learner's active enrollment
   const { data: activeEnrollment } = await db
     .from('program_enrollments')
     .select('program_slug, transfer_hours, transfer_hours_verified')
-    .eq('user_id', subject.userId)
+    .or(`user_id.eq.${subject.userId},student_id.eq.${subject.userId}`)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -218,9 +218,9 @@ export default async function ApprenticeHoursPage() {
                     <span className="font-semibold text-slate-900">{log.hours_claimed} hrs</span>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        log.status === 'approved'
+                        (log.status === 'approved' || log.approval_status === 'approved')
                           ? 'bg-brand-green-100 text-brand-green-700'
-                          : log.status === 'rejected'
+                          : (log.status === 'rejected' || log.approval_status === 'rejected')
                             ? 'bg-brand-red-100 text-brand-red-700'
                             : 'bg-yellow-100 text-yellow-700'
                       }`}

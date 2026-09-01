@@ -26,7 +26,7 @@ const requiredContracts = [
   ['lib/course-builder/persisted-publish-service.ts', /\.from\(['"]courses['"]\)/, 'publish gate reads persisted courses'],
   ['lib/course-builder/persisted-publish-service.ts', /\.from\(['"]course_modules['"]\)/, 'publish gate validates persisted modules'],
   ['lib/course-builder/persisted-publish-service.ts', /course_lessons\(/, 'publish gate validates persisted lessons'],
-  ['lib/course-builder/persisted-publish-service.ts', /record_course_automated_approval/, 'publish gate records deterministic automated approval'],
+  ['lib/course-builder/persisted-publish-service.ts', /authorized human sign-off missing/, 'publish gate requires authorized human approval'],
   ['lib/course-builder/persisted-publish-service.ts', /repairPersistedCourseAcceptanceWithClient/, 'publish gate runs the governed acceptance checklist'],
   ['lib/db/courses.ts', /\.from\(['"]course_lessons['"]\)/, 'course service uses canonical lessons table'],
 ];
@@ -54,6 +54,16 @@ for (const [file, pattern, name] of requiredContracts) {
   const content = fs.existsSync(absolute) ? fs.readFileSync(absolute, 'utf8') : '';
   checks.push({ name, pass: pattern.test(content), detail: file });
 }
+
+const persistedPublisher = fs.readFileSync(
+  path.join(rootDir, 'lib/course-builder/persisted-publish-service.ts'),
+  'utf8',
+);
+checks.push({
+  name: 'publish gate cannot manufacture automated approval',
+  pass: !persistedPublisher.includes('record_course_automated_approval'),
+  detail: 'lib/course-builder/persisted-publish-service.ts',
+});
 
 const retiredCatalog = path.join(rootDir, 'lms-data', 'courses');
 const retiredCatalogFiles = fs.existsSync(retiredCatalog) ? walk(retiredCatalog) : [];

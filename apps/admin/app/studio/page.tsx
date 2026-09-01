@@ -102,7 +102,7 @@ export default async function StudioPage() {
                       </a>
                       <Link
                         href="/studio/courses"
-                        className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 bg-[rgba(255,255,255,0.1)] px-4 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-[rgba(255,255,255,0.2)]"
                       >
                         <BookOpen className="h-4 w-4" aria-hidden="true" />
                         Open Course Builder

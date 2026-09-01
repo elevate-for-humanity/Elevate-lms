@@ -9,11 +9,11 @@ test.describe('Homepage PLATFORM_DEFAULTS leaks', () => {
     expect(html).not.toContain('${PLATFORM_DEFAULTS.orgName}');
   });
 
-  test('employer strip image alt is human-readable', async ({ page }) => {
+  test('homepage pathway image alt is human-readable', async ({ page }) => {
     await page.goto('/');
-    const employerSection = page.locator('#employer-strip-heading');
-    await expect(employerSection).toBeVisible();
-    const img = page.locator('section[aria-labelledby="employer-strip-heading"] img').first();
+    const pathwaySection = page.getByRole('region', { name: 'Choose where you want to go next.' });
+    await expect(pathwaySection).toBeVisible();
+    const img = pathwaySection.getByRole('img').first();
     const alt = await img.getAttribute('alt');
     expect(alt).toBeTruthy();
     expect(alt).not.toMatch(/PLATFORM_DEFAULTS/);

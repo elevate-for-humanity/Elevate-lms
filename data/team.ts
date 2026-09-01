@@ -80,24 +80,6 @@ export const TEAM: TeamMember[] = [
     bio: 'Ameco Martin holds an Associate\'s Degree in Business and a Bachelor\'s Degree in Computer Programming. She is the owner of Ameco\'s Enterprise LLC, located at 6110 West 25th Street, Unit 241022, Indianapolis, IN 46224. She serves as Director of Information Technology at Elevate for Humanity, overseeing all IT and technology credential programs including IT Help Desk / CompTIA A+, Cybersecurity Analyst, Network Administration, Network Support Technician, Web Development, Software Development, Graphic Design, CAD/Drafting, and related business technology programs. She also serves as the dedicated Career Coach embedded full-time at Warren Central High School under Elevate\'s WIOA In-School Youth contract with EmployIndy.',
     email: 'amecosenterprise@gmail.com',
   },
-  {
-    id: '10',
-    name: 'Naomi Jordan',
-    title: 'Director of Healthcare Administration',
-    orgRole: 'Healthcare Programs & Administration',
-    bio: 'Naomi Jordan is the owner of Rebuilds Mind and Body Studio LLC, located at 6331 N Keystone Ave, Indianapolis, IN 46220. She holds active Indiana credentials as a Certified Nursing Assistant (CNA), Home Health Aide (HHA), Phlebotomy Technician, and Qualified Medication Aide (QMA). She serves as Director of Healthcare Administration at Elevate for Humanity, overseeing all healthcare program administration, clinical coordination, healthcare partner relationships, and curriculum compliance for CNA, HHA, Phlebotomy, QMA, Medical Assistant, Pharmacy Technician, and Peer Recovery Specialist programs.',
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/naomi-jordan.jpg',
-    email: 'naomi@elevateforhumanity.org',
-  },
-  {
-    id: '9',
-    name: 'Alberta Davis',
-    title: 'Testing Center Coordinator & Exam Proctor',
-    orgRole: 'Credential Testing',
-    bio: "Alberta Davis serves as a Testing Center Coordinator and Exam Proctor at Elevate for Humanity's Workforce Credential Testing Center in Indianapolis. She supports the administration of industry-recognized certification exams and workforce assessments for individuals, employers, schools, and workforce development partners.\n\nIn her role, Alberta coordinates testing appointments, prepares testing stations, and assists candidates through the check-in and identity verification process to ensure each testing session begins smoothly. As an exam proctor, she monitors in-person and live testing sessions to maintain compliance with certification provider policies and exam security standards.\n\nAlberta also assists with onsite testing events for partner organizations and workforce programs, helping expand access to credential testing opportunities across the community. Through her work, she helps maintain a secure, organized, and professional testing environment where candidates can focus on earning the certifications needed to advance in the workforce.",
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/alberta-davis.webp',
-    email: 'alberta@elevateforhumanity.org',
-  },
 ];
 
 export const FOUNDER = TEAM[0];

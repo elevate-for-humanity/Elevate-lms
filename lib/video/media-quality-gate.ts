@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 
+import { createAdminClient } from '@/lib/supabase/admin';
 import type { MediaStoryboard } from './media-director';
 
 const execFileAsync = promisify(execFile);
@@ -107,6 +108,29 @@ export function resolveCloudflareTranscriptionModel(env: NodeJS.ProcessEnv = pro
   return configured?.startsWith('@cf/') ? configured : '@cf/openai/whisper';
 }
 
+async function requireCloudflareTranscriptionCredentials(): Promise<{
+  accountId: string;
+  token: string;
+}> {
+  let accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim() ?? '';
+  let token = (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim() ?? '';
+  if (accountId && token) return { accountId, token };
+
+  const db = createAdminClient();
+  if (!accountId) {
+    const { data, error } = await db.rpc('get_platform_secret', { p_key: 'CLOUDFLARE_ACCOUNT_ID' });
+    if (!error && typeof data === 'string') accountId = data.trim();
+  }
+  if (!token) {
+    const { data, error } = await db.rpc('get_platform_secret', { p_key: 'CLOUDFLARE_AI_API_TOKEN' });
+    if (!error && typeof data === 'string') token = data.trim();
+  }
+  if (!accountId || !token) {
+    throw new Error('Cloudflare rendered-audio transcription credentials are not configured');
+  }
+  return { accountId, token };
+}
+
 async function transcribeRenderedAudio(videoPath: string, workDir: string): Promise<string> {
   const model = resolveCloudflareTranscriptionModel();
 
@@ -116,9 +140,7 @@ async function transcribeRenderedAudio(videoPath: string, workDir: string): Prom
     '-vn', '-ac', '1', '-ar', '16000', audioPath,
   ], { timeout: 120_000, maxBuffer: 2_000_000 });
   const audio = await readFile(audioPath);
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
-  const token = (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim();
-  if (!accountId || !token) throw new Error('Cloudflare rendered-audio transcription credentials are not configured');
+  const { accountId, token } = await requireCloudflareTranscriptionCredentials();
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
     {

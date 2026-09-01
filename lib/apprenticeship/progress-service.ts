@@ -21,6 +21,9 @@ export type RegisteredApprenticeshipProgress = {
   ojl: {
     approvedHours: number;
     pendingEntries: number;
+    transferHours: number;
+    transferHoursVerified: boolean;
+    totalCreditedHours: number;
   };
   completionReady: boolean;
 };
@@ -93,6 +96,12 @@ export async function loadRegisteredApprenticeshipProgress(
       positiveNumber(row.accepted_hours) || positiveNumber(row.hours) || positiveNumber(row.hours_claimed);
   }
 
+  const transferHoursVerified = context.enrollment.transfer_hours_verified === true;
+  const transferHours = transferHoursVerified
+    ? positiveNumber(context.enrollment.transfer_hours)
+    : 0;
+  const totalCreditedHours = approvedOjlHours + transferHours;
+
   const competencyPercent = requiredCompetencies
     ? Math.min(100, Math.round((completedCompetencies / requiredCompetencies) * 100))
     : 0;
@@ -123,6 +132,9 @@ export async function loadRegisteredApprenticeshipProgress(
     ojl: {
       approvedHours: Math.round(approvedOjlHours * 100) / 100,
       pendingEntries: pendingOjl,
+      transferHours: Math.round(transferHours * 100) / 100,
+      transferHoursVerified,
+      totalCreditedHours: Math.round(totalCreditedHours * 100) / 100,
     },
     completionReady,
   };

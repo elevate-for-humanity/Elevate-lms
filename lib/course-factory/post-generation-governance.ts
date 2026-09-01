@@ -44,7 +44,7 @@ export async function normalizeGeneratedCourseForGovernance(
 
   const { data: modules, error: moduleError } = await db
     .from('course_modules')
-    .select('id,title,slug,domain_key,target_hours,order_index,course_lessons(id,title,slug,objective,domain_key,learning_objectives,competency_checks,quiz_questions,content,content_json,script,script_text,lesson_type,ai_generated,approved,generation_status,hour_category,delivery_method,practical_required,evidence_type,requires_instructor_signoff,duration_minutes,passing_score,order_index)')
+    .select('id,title,slug,domain_key,target_hours,order_index,course_lessons(id,title,slug,domain_key,learning_objectives,competency_checks,quiz_questions,content,content_json,script,script_text,lesson_type,ai_generated,approved,generation_status,hour_category,delivery_method,practical_required,evidence_type,requires_instructor_signoff,duration_minutes,passing_score,order_index)')
     .eq('course_id', courseId)
     .order('order_index', { ascending: true });
   if (moduleError) throw moduleError;
@@ -78,7 +78,6 @@ export async function normalizeGeneratedCourseForGovernance(
       const experience = asRecord(contentJson.experience ?? content.experience);
       const objectives = normalizeLearningObjectives({
         learningObjectives: lesson.learning_objectives,
-        objective: lesson.objective,
         content,
         contentJson,
       });

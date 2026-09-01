@@ -7,13 +7,14 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { organization } from '@/lib/config/organization';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 const STAFF_EMAIL = 'elevate4humanityedu@gmail.com';
-const WORKONE_INTAKE_URL = 'https://WorkOneIndy.as.me/IntakeApptwithCN';
+const WORKONE_INTAKE_URL = WORKONE_INDY_BOOKING_URL;
 
 const ALLOWED_PROGRESS = new Set([
   'not_started',

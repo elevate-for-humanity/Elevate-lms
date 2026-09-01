@@ -88,6 +88,15 @@ const INITIAL_SITE: BuilderState = {
 const EXAMPLE_PROMPT =
   'Build me a luxury dental website in Indianapolis with online booking, financing, implants, Invisalign, testimonials, white and gold branding, and a strong mobile version.';
 
+const INTERVIEW_QUESTIONS = [
+  'Are you building a new website or importing an existing one? If importing, include the current website URL.',
+  'What is the business name, and what products or services do you sell?',
+  'Who is the primary customer, and what is the most important action they should take?',
+  'What visual style, colors, logo, and product images should the website use?',
+  'Do you need products, pricing, inventory, shipping, booking, subscriptions, cart, or secure checkout?',
+  'Which pages, policies, domain, SEO, analytics, and outside integrations must be included?',
+];
+
 const QUICK_COMMANDS = [
   'Make the hero brighter',
   'Add online booking',
@@ -260,10 +269,11 @@ export default function WebsiteBuilderCommercial() {
   const recognitionRef = useRef<RecognitionLike | null>(null);
   const naturalVoice = useNaturalVoice();
   const [site, setSite] = useState<BuilderState>(INITIAL_SITE);
-  const [command, setCommand] = useState(EXAMPLE_PROMPT);
-  const [reply, setReply] = useState(
-    'Tell me what you want to build. I will update the preview from your instruction.',
-  );
+  const [command, setCommand] = useState('');
+  const [reply, setReply] = useState(INTERVIEW_QUESTIONS[0]);
+  const [interviewAnswers, setInterviewAnswers] = useState<string[]>([]);
+  const [awaitingBuildApproval, setAwaitingBuildApproval] = useState(false);
+  const [approvedBrief, setApprovedBrief] = useState('');
   const [history, setHistory] = useState<string[]>([]);
   const [working, setWorking] = useState(false);
   const [stage, setStage] = useState(0);
@@ -296,10 +306,11 @@ export default function WebsiteBuilderCommercial() {
     if (working) return BUILD_STAGES[stage];
     if (site.published) return 'Published';
     if (site.generated) return 'Draft saved automatically';
-    return 'Ready for your instruction';
-  }, [site.generated, site.published, stage, working]);
+    if (awaitingBuildApproval) return 'Build plan ready for approval';
+    return `Interview ${Math.min(interviewAnswers.length + 1, INTERVIEW_QUESTIONS.length)} of ${INTERVIEW_QUESTIONS.length}`;
+  }, [awaitingBuildApproval, interviewAnswers.length, site.generated, site.published, stage, working]);
 
-  async function runCommand(value: string) {
+  async function executeBuilderCommand(value: string) {
     const message = value.trim();
     if (!message || working) return;
 
@@ -336,6 +347,46 @@ export default function WebsiteBuilderCommercial() {
     } finally {
       setWorking(false);
     }
+  }
+
+  async function runCommand(value: string) {
+    const message = value.trim();
+    if (!message || working) return;
+
+    if (!site.generated) {
+      if (awaitingBuildApproval) {
+        if (!/^(build|build it|yes|approve|approved|go ahead|create it)/i.test(message)) {
+          setReply('I have not generated anything yet. Type “Build it” to approve this plan, or tell me what to change in the plan.');
+          return;
+        }
+        setAwaitingBuildApproval(false);
+        setCommand('');
+        await executeBuilderCommand(approvedBrief);
+        return;
+      }
+
+      const nextAnswers = [...interviewAnswers, message];
+      setInterviewAnswers(nextAnswers);
+      setHistory((current) => [...current.slice(-3), message]);
+      setCommand('');
+
+      if (nextAnswers.length < INTERVIEW_QUESTIONS.length) {
+        const nextQuestion = INTERVIEW_QUESTIONS[nextAnswers.length];
+        setReply(nextQuestion);
+        if (voiceEnabled) void naturalVoice.play(nextQuestion, { voice: 'coral', style: 'assistant', rate: 1.03 });
+        return;
+      }
+
+      const brief = INTERVIEW_QUESTIONS.map((question, index) => `${question} Answer: ${nextAnswers[index]}`).join('\n');
+      setApprovedBrief(brief);
+      setAwaitingBuildApproval(true);
+      const summary = 'I have the business, audience, design direction, commerce requirements, pages, policies, domain, SEO, and integrations. Review those answers above. Type “Build it” when you want me to generate the draft beside you.';
+      setReply(summary);
+      if (voiceEnabled) void naturalVoice.play(summary, { voice: 'coral', style: 'assistant', rate: 1.03 });
+      return;
+    }
+
+    await executeBuilderCommand(message);
   }
 
   function startListening() {
@@ -392,8 +443,8 @@ export default function WebsiteBuilderCommercial() {
               Tell PARIS what you want. Watch the website respond.
             </h2>
             <p className="mt-3 max-w-3xl text-sm font-semibold leading-7 text-slate-700 sm:text-base">
-              This demo uses your actual instruction. Type or speak a request, then watch PARIS change the business,
-              hero, brand, services, booking, financing, testimonials, mobile preview, and publish state.
+              PARIS interviews you first, summarizes the build plan, and waits for approval. Then watch the draft appear
+              beside the conversation and keep talking or typing to change it.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -401,11 +452,11 @@ export default function WebsiteBuilderCommercial() {
               type="button"
               onClick={() => {
                 setCommand(EXAMPLE_PROMPT);
-                void runCommand(EXAMPLE_PROMPT);
+                void executeBuilderCommand(EXAMPLE_PROMPT);
               }}
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-5 font-black text-white shadow-sm hover:bg-brand-red-800"
             >
-              <Play className="h-5 w-5" /> Run dental example
+              <Play className="h-5 w-5" /> Preview completed example
             </button>
             <Link
               href="/apps/website-builder/start-trial"
@@ -496,7 +547,7 @@ export default function WebsiteBuilderCommercial() {
                 onChange={(event) => setCommand(event.target.value)}
                 rows={5}
                 className="mt-2 w-full resize-none rounded-xl border border-slate-300 bg-white p-3 text-sm font-semibold leading-6 text-slate-800 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
-                placeholder="Example: Build a luxury dental website with booking, financing, implants, testimonials, and a brighter hero."
+                placeholder={awaitingBuildApproval ? 'Type “Build it” to approve, or describe a change.' : 'Answer PARIS in your own words.'}
               />
 
               <div className="mt-3 grid grid-cols-[auto_1fr] gap-2">

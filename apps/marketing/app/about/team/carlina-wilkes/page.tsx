@@ -3,12 +3,12 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Dr. Carlina Wilkes | Our Team',
-  description: `Dr. Carlina Wilkes — Executive Director of Financial Operations & Organizational Compliance at ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute.`,
+  description: `Dr. Carlina Wilkes leads financial operations, organizational compliance, and the Financial Empowerment Program at ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute.`,
 };
 
 export default function Page() {
@@ -40,10 +40,21 @@ export default function Page() {
 
             <div className="lg:col-span-3">
               <h1 className="text-3xl font-extrabold text-slate-900 mb-1">Dr. Carlina Wilkes</h1>
-              <p className="text-brand-red-600 font-bold text-lg mb-6">Executive Director of Financial Operations & Organizational Compliance</p>
+              <p className="text-brand-red-600 font-bold text-lg mb-1">Executive Director of Financial Operations &amp; Organizational Compliance</p>
+              <p className="text-slate-600 font-bold text-base mb-6">Financial Empowerment Program Instructor</p>
               <div className="text-slate-800 space-y-4 text-[16px] leading-relaxed">
-                <p>Dr. Wilkes brings over 24 years of federal experience with the Defense Finance and Accounting Service (DFAS), holding DoD Financial Management Certification Level II. She oversees financial operations and compliance at {PLATFORM_DEFAULTS.orgName}.</p>
-                <p>Her extensive background in federal financial management, audit readiness, and regulatory compliance ensures that Elevate maintains the highest standards of fiscal accountability across all funded programs including WIOA, WRG, and JRI.</p>
+                <p>Dr. Wilkes brings over 24 years of federal experience with the Defense Finance and Accounting Service (DFAS) and holds DoD Financial Management Certification Level II. She oversees financial operations and organizational compliance at {PLATFORM_DEFAULTS.orgName}.</p>
+                <p>Her extensive background includes federal financial management, cost accounting, budget development and monitoring, audit readiness, regulatory compliance, financial reporting, and long-term financial planning. Her leadership helps Elevate maintain strong fiscal accountability across its programs and operations.</p>
+                <p>Dr. Wilkes also leads the Elevate Financial Empowerment Program. As the program instructor, she helps participants understand their financial position, establish meaningful goals, and apply practical strategies for budgeting, banking, saving, credit, debt management, consumer protection, taxes, insurance, investing, and long-term wealth building.</p>
+                <div className="pt-4">
+                  <Link
+                    href="/programs/financial-literacy"
+                    className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3.5 font-extrabold text-white hover:bg-brand-red-700"
+                  >
+                    Explore the Financial Empowerment Program
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

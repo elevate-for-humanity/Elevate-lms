@@ -116,7 +116,7 @@ export const PROGRAMS: Record<string, ProgramData> = {
     slug: 'esthetician-apprenticeship',
     name: 'Esthetician Apprenticeship',
     shortName: 'Esthetician',
-    totalHours: ESTHETICIAN?.relatedInstructionHours ?? 0,
+    totalHours: ESTHETICIAN?.completion.requiredRtiHours ?? 0,
     ojtHours: 0,
     durationRange: 'Varies by competency progression, RTI completion, approved work schedule, and applicable licensing requirements',
     durationMonths: { min: 6, max: 18 },

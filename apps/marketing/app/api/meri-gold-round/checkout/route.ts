@@ -14,7 +14,11 @@ const PRODUCT = {
 
 export async function POST(request: NextRequest) {
   const originHeader = request.headers.get('origin');
-  if (originHeader && originHeader !== request.nextUrl.origin) {
+  const allowedOrigins = new Set([
+    'https://www.elevateforhumanity.org',
+    'https://elevateforhumanity.org',
+  ]);
+  if (originHeader && !allowedOrigins.has(originHeader)) {
     return NextResponse.json({ error: 'Invalid checkout origin.' }, { status: 403 });
   }
 
@@ -40,7 +44,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Payment is temporarily unavailable.' }, { status: 503 });
   }
 
-  const origin = request.nextUrl.origin;
+  const origin = originHeader && allowedOrigins.has(originHeader)
+    ? originHeader
+    : 'https://www.elevateforhumanity.org';
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',

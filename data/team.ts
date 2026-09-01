@@ -78,6 +78,7 @@ export const TEAM: TeamMember[] = [
     title: 'Director of Information Technology',
     orgRole: 'Information Technology Programs',
     bio: 'Ameco Martin holds an Associate\'s Degree in Business and a Bachelor\'s Degree in Computer Programming. She is the owner of Ameco\'s Enterprise LLC, located at 6110 West 25th Street, Unit 241022, Indianapolis, IN 46224. She serves as Director of Information Technology at Elevate for Humanity, overseeing all IT and technology credential programs including IT Help Desk / CompTIA A+, Cybersecurity Analyst, Network Administration, Network Support Technician, Web Development, Software Development, Graphic Design, CAD/Drafting, and related business technology programs. She also serves as the dedicated Career Coach embedded full-time at Warren Central High School under Elevate\'s WIOA In-School Youth contract with EmployIndy.',
+    headshotSrc: '/images/ameco-martin.jpg',
     email: 'amecosenterprise@gmail.com',
   },
 ];

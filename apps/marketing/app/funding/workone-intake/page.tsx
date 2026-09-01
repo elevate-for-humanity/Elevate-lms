@@ -3,9 +3,8 @@ import Link from 'next/link';
 import { CalendarDays, CheckCircle2, ClipboardList } from 'lucide-react';
 
 import StudentApplicationForm from '@/apps/marketing/app/apply/student/StudentApplicationForm';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
-const WORKONE_ORIENTATION_URL =
-  'https://workoneindy.as.me/schedule/e8f310c0/appointment/91381838/calendar/9483996?calendarIds=9483996';
 
 export const metadata: Metadata = {
   title: 'WorkOne Funding Intake | Elevate for Humanity',
@@ -33,7 +32,7 @@ export default function WorkOneFundingIntakePage() {
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <a
-              href={WORKONE_ORIENTATION_URL}
+              href={WORKONE_INDY_BOOKING_URL}
               target="_blank"
               rel="noreferrer"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-black text-white hover:bg-orange-600"

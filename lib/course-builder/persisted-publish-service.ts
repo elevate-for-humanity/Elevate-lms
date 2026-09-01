@@ -144,7 +144,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(supabas
       validatedLessons,
       review_status: course.review_status ?? null,
       reviewed_by: course.reviewed_by ?? null,
-      reviewMode: 'automated_acceptance_contract',
+      reviewMode: 'authorized_human_signoff',
     },
   };
 }

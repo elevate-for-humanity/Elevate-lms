@@ -54,14 +54,26 @@ const previewStyles: Record<CapabilityCategory, string> = {
   enterprise: 'from-slate-600 via-slate-800 to-slate-950',
 };
 
-function interactiveDemoHref(capability: PlatformCapability): string | null {
-  if (capability.key === 'website_builder') return '/store/demo/website';
-  return null;
+function interactiveDemoHref(capability: PlatformCapability): string {
+  if (capability.demoHref) return capability.demoHref;
+
+  if (capability.key === 'crm' || capability.category === 'business') {
+    return '/store/demo/crm';
+  }
+  if (capability.category === 'ai') return '/store/demo/ai-studio';
+  if (capability.key === 'employer_portal' || capability.key === 'apprenticeship') {
+    return '/store/demo/employer';
+  }
+  if (capability.category === 'workforce') return '/store/demo/institutional';
+  if (capability.category === 'education') return '/store/demo/lms';
+  if (capability.category === 'compliance') return '/store/demo/institutional';
+  if (capability.category === 'apps') return '/store/demo/admin';
+  return '/store/demo/enterprise';
 }
 
 function ProductPreview({ capability, name }: { capability: PlatformCapability; name: string }) {
   const cues = capability.keywords.filter((word) => word.length > 2).slice(0, 3);
-  const isInteractive = Boolean(interactiveDemoHref(capability));
+  const isInteractive = true;
   return (
     <div
       className={`group relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br ${previewStyles[capability.category]} p-5 text-white`}
@@ -286,13 +298,10 @@ export function UnifiedSalesMarketplace() {
                       {action.label}
                     </Link>
                     <Link
-                      href={
-                        interactiveDemoHref(capability) ||
-                        `/store/demo/capability/${String(capability.key)}`
-                      }
+                      href={interactiveDemoHref(capability)}
                       className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-black text-slate-950 hover:border-brand-red-400 hover:bg-slate-50"
                     >
-                      {interactiveDemoHref(capability) ? 'Open Live Demo' : 'View Guided Tour'}
+                      Open Actual Demo
                     </Link>
                   </div>
                 </div>

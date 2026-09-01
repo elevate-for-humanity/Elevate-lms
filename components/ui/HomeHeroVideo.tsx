@@ -264,7 +264,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
                 mediaClassName={previousSlide.toneClass}
                 showSoundControl={false}
                 showTranscriptControl={false}
-                heightClassName="h-[clamp(330px,48vw,570px)]"
+                heightClassName="h-[clamp(400px,62vh,680px)]"
               />
             </div>
           ) : null}
@@ -284,7 +284,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
               mediaFit="contain"
               mediaClassName={slide.toneClass}
               soundButtonVariant="prominent"
-              heightClassName="h-[clamp(330px,48vw,570px)]"
+              heightClassName="h-[clamp(400px,62vh,680px)]"
               deferVideoMs={slide.type === 'video' ? 100 : 0}
             />
           </div>

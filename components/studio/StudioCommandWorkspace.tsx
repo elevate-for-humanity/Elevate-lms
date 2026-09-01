@@ -23,7 +23,7 @@ export default function StudioCommandWorkspace({
 }: {
   workspaces: Array<{ id: string; label: string; route: string }>;
 }) {
-  const [inspectionOpen, setInspectionOpen] = useState(false);
+  const [inspectionOpen, setInspectionOpen] = useState(true);
   const [mode, setMode] = useState<InspectionMode>('preview');
 
   return (
@@ -45,7 +45,7 @@ export default function StudioCommandWorkspace({
       </section>
 
       {inspectionOpen ? (
-        <aside className="absolute inset-0 z-20 flex min-h-0 min-w-0 flex-col bg-slate-950 lg:relative lg:inset-auto lg:z-auto lg:w-[46%] lg:border-l lg:border-gray-200 xl:w-1/2">
+        <aside className="relative flex h-[45%] min-h-0 min-w-0 shrink-0 flex-col border-t border-gray-200 bg-slate-950 lg:h-auto lg:w-[46%] lg:border-l lg:border-t-0 xl:w-1/2">
           <header className="flex shrink-0 items-center gap-2 border-b border-slate-800 bg-slate-900 px-3 py-2 text-white">
             <span className="mr-auto text-xs font-black">Live inspection</span>
             <button

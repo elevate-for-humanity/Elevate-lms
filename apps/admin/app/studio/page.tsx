@@ -1,6 +1,16 @@
 // Admin-owned AI operating surface. Studio capabilities are tools behind one conversation-first interface.
 import Link from 'next/link';
-import { ArrowLeft, Bot, ShieldCheck, Wrench } from 'lucide-react';
+import Image from 'next/image';
+import {
+  ArrowDown,
+  ArrowLeft,
+  Bot,
+  CheckCircle2,
+  Mic,
+  ShieldCheck,
+  Sparkles,
+  Wrench,
+} from 'lucide-react';
 
 import StudioWorkspaceGrid from './StudioWorkspaceGrid.client';
 import StudioCommandWorkspace from '@/components/studio/StudioCommandWorkspace';
@@ -49,28 +59,66 @@ export default async function StudioPage() {
         </div>
 
         <section className="min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm sm:rounded-3xl">
-          <div className="border-b border-gray-100 px-5 py-5 sm:px-7">
-            <div className="flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-gray-50">
-                <Bot className="h-6 w-6 text-gray-900" aria-hidden="true" />
+          <div className="relative isolate overflow-hidden border-b border-indigo-900/10 bg-gradient-to-br from-slate-950 via-indigo-950 to-blue-800 text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(56,189,248,0.24),transparent_34%),radial-gradient(circle_at_65%_120%,rgba(168,85,247,0.3),transparent_46%)]" />
+            <div className="relative grid min-h-[250px] items-center gap-5 px-5 py-7 sm:px-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(300px,.75fr)] lg:px-10 lg:py-9">
+              <div className="max-w-3xl">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100 backdrop-blur">
+                  <Sparkles className="h-4 w-4" aria-hidden="true" />
+                  One unified Admin AI
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 shadow-lg backdrop-blur sm:flex">
+                    <Bot className="h-7 w-7 text-cyan-200" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                      Tell the platform what you need done
+                    </h1>
+                    <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-100 sm:text-base">
+                      Build courses, inspect code, publish websites, run workflows, review
+                      operations, and manage deployments from one intelligent conversation.
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-blue-50 sm:text-sm">
+                      {[
+                        '14 connected capabilities',
+                        'Automatic tool routing',
+                        'Audited execution',
+                      ].map((label) => (
+                        <span key={label} className="inline-flex items-center gap-1.5">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-300" aria-hidden="true" />
+                          {label}
+                        </span>
+                      ))}
+                    </div>
+                    <a
+                      href="#admin-ai-workspace"
+                      className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-indigo-950 shadow-lg shadow-indigo-950/20 transition hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-950"
+                    >
+                      <Mic className="h-4 w-4" aria-hidden="true" />
+                      Talk to Admin AI
+                      <ArrowDown className="h-4 w-4" aria-hidden="true" />
+                    </a>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Admin AI
-                </p>
-                <h1 className="mt-1 text-2xl font-semibold tracking-tight text-gray-950 sm:text-3xl">
-                  Tell the platform what you need done
-                </h1>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600">
-                  Course Builder, website publishing, deployments, documents, workflows, reporting,
-                  code inspection, and operational actions run as internal tools. You should not
-                  have to choose a builder before you ask for the outcome.
-                </p>
+              <div className="relative hidden min-h-[210px] lg:block">
+                <Image
+                  src="/studio-hero.svg"
+                  alt="Unified AI command center connecting courses, websites, data, and deployments"
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 34vw, 0px"
+                  className="object-contain object-right"
+                />
               </div>
             </div>
           </div>
 
-          <div className="h-[calc(100dvh-7rem)] min-h-[540px] min-w-0 sm:h-[calc(100dvh-8rem)] sm:min-h-[620px]">
+          <div
+            id="admin-ai-workspace"
+            className="h-[calc(100dvh-7rem)] min-h-[540px] min-w-0 scroll-mt-3 sm:h-[calc(100dvh-8rem)] sm:min-h-[620px]"
+          >
             <StudioCommandWorkspace
               workspaces={workspaces.map(({ id, label, route }) => ({ id, label, route }))}
             />

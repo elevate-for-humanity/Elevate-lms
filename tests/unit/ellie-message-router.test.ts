@@ -30,6 +30,11 @@ describe('routeEllieMessage', () => {
     expect(routeEllieMessage('Build a website for a training provider')).toBe('platform');
     expect(routeEllieMessage('Publish the website after checking it')).toBe('platform');
   });
+
+  it('keeps conversational repair follow-ups in the stateful tool orchestrator', () => {
+    expect(routeEllieMessage('Can u fix this')).toBe('platform');
+    expect(routeEllieMessage('Please continue and correct it')).toBe('platform');
+  });
 });
 
 describe('selectStudioAgent', () => {

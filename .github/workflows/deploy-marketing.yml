@@ -218,7 +218,7 @@ jobs:
 
             html_ok=false
             if grep -qi '<html' /tmp/www-home.html \
-              && grep -q 'Career training, registered apprenticeships, testing, and workforce pathways' /tmp/www-home.html \
+              && grep -q 'Earn while you learn—or become a Host Shop for free.' /tmp/www-home.html \
               && grep -q 'Barber Apprenticeship' /tmp/www-barber.html \
               && grep -q 'Esthetician Apprenticeship Pathway' /tmp/www-esthetics.html \
               && grep -q '700-hour' /tmp/www-esthetics.html \

@@ -17,8 +17,11 @@ export default function StoreDemoVideo() {
   const [ready, setReady] = useState(false);
 
   const start = () => {
+    const v = videoRef.current;
+    if (!v) return;
     setStarted(true);
-    // play() is called in the onCanPlay handler once the video element mounts
+    v.muted = false;
+    v.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
   };
 
   const toggle = () => {
@@ -60,21 +63,22 @@ export default function StoreDemoVideo() {
         </>
       )}
 
-      {/* Video — single file, no loop */}
-      {started && (
-        <>
-          <video
+      {/* Video stays mounted so Play remains inside the user's tap gesture. */}
+      <video
             ref={videoRef}
             className={`absolute inset-0 w-full h-full object-contain bg-black transition-opacity duration-300 ${ready ? 'opacity-100' : 'opacity-0'}`}
             playsInline
-            muted
+            muted={false}
             controls={false}
-            onCanPlay={() => { setReady(true); videoRef.current?.play().then(() => setPlaying(true)).catch(() => {}); }}
+            preload="metadata"
+            onCanPlay={() => setReady(true)}
             onError={() => { setReady(false); setPlaying(false); }}
             onEnded={() => setPlaying(false)}
           >
             <source src={getBrowserPublicStorageUrl('course-videos', 'hvac/hvac-module1-lesson1.mp4')} type="video/mp4" />
           </video>
+      {started && (
+        <>
           <div className="absolute bottom-0 inset-x-0 p-3 flex items-center justify-between bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
             <button onClick={(e) => { e.stopPropagation(); toggle(); }} className="text-white hover:text-white/80">
               {playing ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}

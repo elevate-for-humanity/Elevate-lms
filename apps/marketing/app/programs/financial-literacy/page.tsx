@@ -103,6 +103,38 @@ export default function FinancialLiteracyPage() {
         </div>
       </section>
 
+      <section className="border-b border-slate-200 bg-white px-4 py-14 sm:py-16">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-sm font-extrabold uppercase tracking-widest text-brand-red-700">
+                Official Program Flyer
+              </p>
+              <h2 className="mt-2 text-3xl font-black text-slate-950">
+                Financial Literacy Program
+              </h2>
+            </div>
+            <a
+              href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:9e274365-f578-4d7e-a21e-29f0e3647862"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3.5 font-extrabold text-white hover:bg-slate-800"
+            >
+              Open Full Flyer <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </div>
+          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-100 shadow-xl">
+            <iframe
+              src="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:9e274365-f578-4d7e-a21e-29f0e3647862"
+              title="Financial Literacy Program flyer"
+              className="h-[720px] w-full sm:h-[900px]"
+              loading="lazy"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      </section>
+
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-14 sm:py-16">
         <div className="mx-auto max-w-5xl">
           <p className="text-sm font-extrabold uppercase tracking-widest text-brand-red-700">

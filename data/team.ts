@@ -40,9 +40,9 @@ export const TEAM: TeamMember[] = [
     id: '3',
     name: 'Dr. Carlina Wilkes',
     title: 'Executive Director of Financial Operations & Organizational Compliance',
-    orgRole: 'Grants & Compliance',
-    bio: 'Dr. Wilkes brings 24+ years of federal experience with DFAS, holding DoD Financial Management Certification Level II. She oversees financial operations and compliance at Elevate for Humanity.',
-    headshotSrc: 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/carlina-wilkes.jpg',
+    orgRole: 'Financial Empowerment Program Instructor',
+    bio: 'Dr. Carlina Wilkes brings more than 24 years of federal financial management experience with the Defense Finance and Accounting Service (DFAS) and holds DoD Financial Management Certification Level II. Her expertise includes federal cost accounting, budget development and monitoring, audit readiness, regulatory compliance, financial reporting, and long-term financial planning. At Elevate for Humanity, she oversees financial operations and organizational compliance and leads the Elevate Financial Empowerment Program, helping participants turn financial knowledge into practical plans for stability, independence, and long-term wellness.',
+    headshotSrc: '/images/carlina-wilkes.jpg',
     email: 'carlina@elevateforhumanity.org',
   },
   {

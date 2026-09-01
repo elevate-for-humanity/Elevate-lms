@@ -19,6 +19,10 @@ const OPS_REQUEST_RE =
   /\b(?:applications?|enrollments?|students?|payouts?|analytics|metrics|cohorts?|wioa|reminders?|certificates?|platform health|system health)\b/i;
 const PLATFORM_REQUEST_RE =
   /\b(?:code|repository|repo|route|component|schema|migration|typescript|workflow|deployment|browser|live site|production page|course|curriculum|lesson|assessment|website|claim|compliance|policy|audit|security)\b/i;
+const NATURAL_ACTION_RE =
+  /\b(?:fix|repair|correct|change|update|edit|improve|finish|complete|continue|check|inspect|test|verify|open|show|find|explain|help)\b/i;
+const DETERMINISTIC_COMMAND_RE =
+  /\b(?:deploy|run (?:the )?tests?|apply (?:all )?migrations?|rollback (?:the )?migration|git push)\b/i;
 export const OUTCOME_REQUEST_PATTERNS = [
   'build (a )?course',
   'create (a )?course',
@@ -31,7 +35,15 @@ export function routeEllieMessage(message: string): EllieMessageRoute {
   if (OUTCOME_REQUEST_RE.test(message)) return 'platform';
   if (OPS_REQUEST_RE.test(message)) return 'ops';
   if (PLATFORM_REQUEST_RE.test(message)) return 'platform';
-  return 'command';
+  if (DETERMINISTIC_COMMAND_RE.test(message)) return 'command';
+  // Natural follow-ups (for example, "Can you fix this?") require the
+  // conversation history, attachments, retrieved context, and the complete
+  // tool-capable orchestrator. The legacy command endpoint is intentionally
+  // stateless and must only receive explicit deterministic operations such as
+  // deploy. Sending ordinary language there discards the referent of "this"
+  // and produces a misleading analysis-only response.
+  if (NATURAL_ACTION_RE.test(message)) return 'platform';
+  return 'platform';
 }
 
 /** All requests enter one orchestrator. Internal capabilities are selected by

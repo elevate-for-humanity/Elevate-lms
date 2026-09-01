@@ -42,7 +42,14 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
   },
 };
 
-export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner[] }) {
+export default function HostShopShowcase({
+  shops,
+  videoTourShopSlug,
+}: {
+  shops: FeaturedHostPartner[];
+  /** Limit video playback to the designated tour while retaining other shops as still slides. */
+  videoTourShopSlug?: string;
+}) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
   // Keep the rotation representative and brisk: one real photo per shop,
@@ -50,11 +57,14 @@ export default function HostShopShowcase({ shops }: { shops: FeaturedHostPartner
   const slides = useMemo(
     () =>
       shops.flatMap((shop) => {
+        const featured = FEATURED_MEDIA_BY_SHOP[shop.slug];
         const media: ShowcaseMedia | undefined =
-          FEATURED_MEDIA_BY_SHOP[shop.slug] ?? shop.media?.find((item) => item.kind !== 'video');
+          featured?.kind !== 'video' || !videoTourShopSlug || shop.slug === videoTourShopSlug
+            ? featured ?? shop.media?.find((item) => item.kind !== 'video')
+            : shop.media?.find((item) => item.kind !== 'video');
         return media ? [{ shop, media }] : [];
       }),
-    [shops],
+    [shops, videoTourShopSlug],
   );
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);

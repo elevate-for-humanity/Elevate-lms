@@ -5,7 +5,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
-const SCROLL_SETTLE_MS = 900;
+const SCROLL_SETTLE_MS = 220;
 
 function narrationFor(section: HTMLElement) {
   return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';
@@ -41,7 +41,7 @@ export function ScrollNarrator() {
 
   const narrateVisibleSection = useCallback(async () => {
     const section = mostVisiblePageSection();
-    if (!section || isPlaying || isLoading) return;
+    if (!section) return;
 
     const text = narrationFor(section);
     if (!text) return;
@@ -58,7 +58,7 @@ export function ScrollNarrator() {
       lastNarrationRef.current = null;
       setNotice('Read aloud is unavailable in this browser.');
     }
-  }, [isLoading, isPlaying, play]);
+  }, [play]);
 
   useEffect(() => {
     lastNarrationRef.current = null;
@@ -67,10 +67,34 @@ export function ScrollNarrator() {
 
   useEffect(() => {
     if (!enabled) return;
-    const section = mostVisiblePageSection();
-    if (!section) return;
-    const text = narrationFor(section);
-    if (text) void prepare(text, { voice: 'coral', style: 'assistant', rate: 0.92 });
+
+    const sections = Array.from(
+      document.querySelectorAll<HTMLElement>('main [data-scroll-narration]'),
+    ).filter((section) => section.dataset.narrationDisabled !== 'true');
+
+    const preload = (section: HTMLElement) => {
+      const text = narrationFor(section);
+      if (text) void prepare(text, { voice: 'coral', style: 'assistant', rate: 0.98 });
+    };
+
+    if (!('IntersectionObserver' in window)) {
+      sections.slice(0, 2).forEach(preload);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          preload(entry.target as HTMLElement);
+          observer.unobserve(entry.target);
+        }
+      },
+      { rootMargin: '85% 0px', threshold: 0.01 },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
   }, [enabled, pathname, prepare]);
 
   useEffect(() => {
@@ -83,6 +107,7 @@ export function ScrollNarrator() {
 
     const scheduleNarration = () => {
       if (timerRef.current) window.clearTimeout(timerRef.current);
+      if (isPlaying || isLoading) stop();
       timerRef.current = window.setTimeout(() => {
         void narrateVisibleSection();
       }, SCROLL_SETTLE_MS);
@@ -104,7 +129,7 @@ export function ScrollNarrator() {
       window.removeEventListener('resize', scheduleNarration);
       if (timerRef.current) window.clearTimeout(timerRef.current);
     };
-  }, [enabled, narrateVisibleSection, stop]);
+  }, [enabled, isLoading, isPlaying, narrateVisibleSection, stop]);
 
   const toggle = () => {
     setNotice(null);

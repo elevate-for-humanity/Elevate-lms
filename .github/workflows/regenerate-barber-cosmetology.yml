@@ -1,4 +1,4 @@
-name: Regenerate Barber and Cosmetology Courses
+name: Regenerate Cosmetology Course
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:
-      group: barber-cosmetology-course-regeneration
+      group: cosmetology-course-regeneration
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
 
-      - name: Regenerate both courses through canonical Course Factory
+      - name: Reconcile Cosmetology through canonical Course Factory
         id: regenerate
         shell: bash
         run: |

@@ -6,6 +6,13 @@ const root = process.cwd();
 const source = (relativePath: string) => readFileSync(path.join(root, relativePath), 'utf8');
 
 describe('Admin Dashboard and Studio surface contract', () => {
+  it('registers implemented top-level Studio operations pages in navigation', () => {
+    const registry = source('lib/devstudio/workspace-registry.ts');
+    for (const route of ['/studio/agents', '/studio/builds', '/studio/logs']) {
+      expect(registry).toContain(`route: '${route}'`);
+    }
+  });
+
   it('keeps one canonical Admin Dashboard and Studio route', () => {
     const contracts = JSON.parse(source('lib/routes/platform-surface-contracts.json'));
 

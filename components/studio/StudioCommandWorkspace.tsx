@@ -2,11 +2,10 @@
 
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import { Eye, Globe2, Menu, MessageSquare, X } from 'lucide-react';
+import { Eye, Globe2, MessageSquare, X } from 'lucide-react';
 
 import UnifiedEllieChat from './UnifiedEllieChat';
 import RepositoryLivePreview from './RepositoryLivePreview';
-import StudioCapabilityRail, { type StudioSpecialist } from './StudioCapabilityRail';
 
 const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
   ssr: false,
@@ -20,49 +19,17 @@ const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
 type InspectionMode = 'preview' | 'browser';
 
 export default function StudioCommandWorkspace({
-  workspaces,
+  workspaces: _workspaces,
 }: {
   workspaces: Array<{ id: string; label: string; route: string }>;
 }) {
-  const [inspectionOpen, setInspectionOpen] = useState(true);
+  const [inspectionOpen, setInspectionOpen] = useState(false);
   const [mode, setMode] = useState<InspectionMode>('preview');
-  const [specialist, setSpecialist] = useState<StudioSpecialist | null>(null);
-  const [capabilitiesOpen, setCapabilitiesOpen] = useState(false);
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col bg-white lg:flex-row">
-      <StudioCapabilityRail
-        workspaces={workspaces}
-        specialist={specialist}
-        onSpecialistChange={setSpecialist}
-      />
-      {capabilitiesOpen ? (
-        <div className="fixed inset-0 z-50 flex md:hidden" role="dialog" aria-modal="true" aria-label="Studio capabilities">
-          <StudioCapabilityRail
-            mobile
-            workspaces={workspaces}
-            specialist={specialist}
-            onSpecialistChange={setSpecialist}
-            onNavigate={() => setCapabilitiesOpen(false)}
-          />
-          <button
-            type="button"
-            className="min-w-0 flex-1 bg-slate-950/70"
-            onClick={() => setCapabilitiesOpen(false)}
-            aria-label="Close Studio capabilities"
-          />
-        </div>
-      ) : null}
+    <div className="relative flex h-full min-h-0 min-w-0 flex-col bg-white lg:flex-row">
       <section className="flex min-h-0 min-w-0 flex-1 flex-col">
         <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-gray-50 px-3 py-2 lg:hidden">
-          <button
-            type="button"
-            onClick={() => setCapabilitiesOpen(true)}
-            className="rounded-lg border border-gray-300 bg-white p-1.5 text-gray-700"
-            aria-label="Open agents, tools, library, and connections"
-          >
-            <Menu className="h-4 w-4" aria-hidden="true" />
-          </button>
           <MessageSquare className="h-4 w-4 text-gray-500" aria-hidden="true" />
           <span className="text-xs font-semibold text-gray-700">Admin AI</span>
           <button
@@ -74,15 +41,11 @@ export default function StudioCommandWorkspace({
             {inspectionOpen ? 'Hide preview' : 'Show preview'}
           </button>
         </div>
-        <UnifiedEllieChat
-          embedded
-          onOpenPreview={() => setInspectionOpen(true)}
-          agentOverride={specialist ?? undefined}
-        />
+        <UnifiedEllieChat embedded onOpenPreview={() => setInspectionOpen(true)} />
       </section>
 
       {inspectionOpen ? (
-        <aside className="flex min-h-[560px] min-w-0 flex-col border-t border-gray-200 bg-slate-950 lg:min-h-0 lg:w-[46%] lg:border-l lg:border-t-0 xl:w-1/2">
+        <aside className="absolute inset-0 z-20 flex min-h-0 min-w-0 flex-col bg-slate-950 lg:relative lg:inset-auto lg:z-auto lg:w-[46%] lg:border-l lg:border-gray-200 xl:w-1/2">
           <header className="flex shrink-0 items-center gap-2 border-b border-slate-800 bg-slate-900 px-3 py-2 text-white">
             <span className="mr-auto text-xs font-black">Live inspection</span>
             <button

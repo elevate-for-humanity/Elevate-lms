@@ -8,7 +8,7 @@
  */
 
 export type EllieMessageRoute = 'command' | 'ops' | 'platform';
-export type StudioSpecialist = 'PARIS' | 'ELLIE' | 'LIZZY' | 'ZORA';
+export type StudioSpecialist = 'ADMIN_AI';
 
 // Outcome-oriented requests enter the governed command runtime. Keeping these
 // phrases explicit makes the natural-language contract auditable while the
@@ -34,28 +34,10 @@ export function routeEllieMessage(message: string): EllieMessageRoute {
   return 'command';
 }
 
-/** Selects a specialist role; execution remains governed by the shared tool registry. */
-export function selectStudioAgent(message: string): StudioSpecialist {
-  const normalized = message.toLowerCase();
-  if (
-    /\b(compliance|policy|audit|evidence|claim|security|rls|ferpa|accessibility|credential verification)\b/.test(
-      normalized,
-    )
-  )
-    return 'ZORA';
-  if (
-    /\b(course|curriculum|lesson|assessment|learning objective|learner|remediation|instruction|teaching)\b/.test(
-      normalized,
-    )
-  )
-    return 'ELLIE';
-  if (
-    /\b(website|business interview|public guide|admissions|career pathway|job match|customer|lead|conversion|seo)\b/.test(
-      normalized,
-    )
-  )
-    return 'PARIS';
-  return 'LIZZY';
+/** All requests enter one orchestrator. Internal capabilities are selected by
+ * the server from intent and actual tool calls, never by a UI persona switch. */
+export function selectStudioAgent(_message: string): StudioSpecialist {
+  return 'ADMIN_AI';
 }
 
 export const ELLIE_ROUTE_LABEL: Record<EllieMessageRoute, string> = {

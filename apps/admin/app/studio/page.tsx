@@ -25,7 +25,7 @@ export default async function StudioPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 text-gray-950">
-      <div className="mx-auto min-w-0 max-w-7xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
+      <div className="mx-auto min-w-0 max-w-screen-2xl px-2 py-3 sm:px-4 sm:py-5 lg:px-6">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <Link
             href="/dashboard"
@@ -70,7 +70,7 @@ export default async function StudioPage() {
             </div>
           </div>
 
-          <div className="h-[calc(100dvh-10rem)] min-h-[500px] min-w-0 max-h-[760px] sm:h-[68vh] sm:min-h-[620px] sm:max-h-[900px]">
+          <div className="h-[calc(100dvh-7rem)] min-h-[540px] min-w-0 sm:h-[calc(100dvh-8rem)] sm:min-h-[620px]">
             <StudioCommandWorkspace
               workspaces={workspaces.map(({ id, label, route }) => ({ id, label, route }))}
             />

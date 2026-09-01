@@ -37,12 +37,75 @@ import path from 'path';
 type ToolCallRecord = { tool: string; args: Record<string, unknown>; result: string };
 type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
 type ChatProvider = 'auto' | 'groq' | 'openai' | 'gemini' | 'anthropic';
-type StudioAgent = 'PARIS' | 'ELLIE' | 'LIZZY' | 'ZORA';
+type StudioAgent = 'ADMIN_AI';
 
-function normalizeAgent(value: unknown): StudioAgent {
-  return ['PARIS', 'ELLIE', 'LIZZY', 'ZORA'].includes(String(value).toUpperCase())
-    ? (String(value).toUpperCase() as StudioAgent)
-    : 'LIZZY';
+function normalizeAgent(_value: unknown): StudioAgent {
+  return 'ADMIN_AI';
+}
+
+const UNIFIED_CAPABILITY_RULES = [
+  { pattern: /\b(course|curriculum|lesson|assessment|lms)\b/i, slugs: ['ellie', 'ai-lms-builder'] },
+  { pattern: /\b(website|page|design|seo|content)\b/i, slugs: ['paris', 'ai-website-manager'] },
+  {
+    pattern: /\b(compliance|policy|audit|security|rls|claim)\b/i,
+    slugs: ['zora', 'ai-compliance-assistant'],
+  },
+  { pattern: /\b(workflow|automation|pipeline)\b/i, slugs: ['ai-workflow-builder'] },
+  {
+    pattern: /\b(deploy|test|container|build|ci|workflow run)\b/i,
+    slugs: ['ai-devops-engineer', 'ai-qa-tester'],
+  },
+  {
+    pattern: /\b(code|schema|repository|repo|debug|route|component|typescript)\b/i,
+    slugs: ['ai-architect', 'ai-developer', 'ai-debugger'],
+  },
+  {
+    pattern: /\b(operation|report|application|enrollment|business|analytics)\b/i,
+    slugs: ['ai-business-operations-manager'],
+  },
+] as const;
+
+function unifiedCapabilities(message: string, toolCalls: ToolCallRecord[]): string[] {
+  const evidence = `${message} ${toolCalls.map((call) => call.tool).join(' ')}`;
+  const selected = new Set<string>(['lizzy']);
+  for (const rule of UNIFIED_CAPABILITY_RULES) {
+    if (rule.pattern.test(evidence)) rule.slugs.forEach((slug) => selected.add(slug));
+  }
+  return [...selected];
+}
+
+async function recordUnifiedCapabilityUse(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  slugs: string[],
+  provider: string,
+  model: string,
+  toolCalls: ToolCallRecord[],
+) {
+  const { data, error } = await db.from('ai_agents').select('slug, metadata').in('slug', slugs);
+  if (error) throw error;
+  const usedAt = new Date().toISOString();
+  await Promise.all(
+    (data ?? []).map((row) =>
+      db
+        .from('ai_agents')
+        .update({
+          metadata: {
+            ...((row.metadata as Record<string, unknown> | null) ?? {}),
+            connected: true,
+            orchestrator: 'admin-ai',
+            execution_route: '/api/admin/dev-studio/chat',
+            last_used_at: usedAt,
+            last_provider: provider,
+            last_model: model,
+            last_tools: toolCalls.map((call) => call.tool),
+          },
+          model_hint: `${provider}:${model}`,
+          status: 'idle',
+          updated_at: usedAt,
+        })
+        .eq('slug', row.slug),
+    ),
+  );
 }
 
 const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, ...string[]]> = {
@@ -1565,6 +1628,7 @@ async function _POST(req: NextRequest) {
     }
 
     assistantMessage = enforceEvidenceBoundary(assistantMessage, lastUserMessage, toolCalls);
+    const capabilitiesUsed = unifiedCapabilities(lastUserMessage, toolCalls);
 
     (async () => {
       try {
@@ -1583,6 +1647,7 @@ async function _POST(req: NextRequest) {
         });
         if (logError)
           logger.warn('[devstudio/chat] DB log insert failed', { reason: logError.message });
+        await recordUnifiedCapabilityUse(db, capabilitiesUsed, provider, model, toolCalls);
       } catch (err: unknown) {
         logger.warn('[devstudio/chat] DB log failed', normalizeError(err));
       }
@@ -1609,6 +1674,7 @@ async function _POST(req: NextRequest) {
                 gemini: isGeminiConfigured(),
               },
               toolCalls,
+              capabilitiesUsed,
             })}\n\n`,
           ),
         );

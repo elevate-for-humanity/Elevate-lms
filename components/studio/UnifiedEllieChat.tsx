@@ -51,6 +51,7 @@ interface ChatMessage {
   agent?: StudioSpecialist;
   toolCalls?: ToolCall[];
   action?: EllieAction | null;
+  capabilitiesUsed?: string[];
   actionOutcome?: { status: 'executed' | 'rejected' | 'failed'; message: string };
 }
 
@@ -59,7 +60,6 @@ interface UnifiedEllieChatProps {
   onOpenPreview?: () => void;
   embedded?: boolean;
   fileContext?: string;
-  agentOverride?: StudioSpecialist;
 }
 
 const QUICK = [
@@ -187,7 +187,6 @@ export default function UnifiedEllieChat({
   onOpenPreview,
   embedded = false,
   fileContext,
-  agentOverride,
 }: UnifiedEllieChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -348,7 +347,7 @@ export default function UnifiedEllieChat({
     setInput('');
     setLoading(true);
     const route = attachment ? 'platform' : routeEllieMessage(text);
-    const agent = agentOverride ?? selectStudioAgent(text);
+    const agent = selectStudioAgent(text);
     setLastRoute(route);
     const userMsg: ChatMessage = { role: 'user', content: text, route, agent };
     setMessages((prev) => [...prev, userMsg]);
@@ -405,6 +404,7 @@ export default function UnifiedEllieChat({
                   ...row,
                   provider: meta.provider ?? row.provider,
                   toolCalls: meta.toolCalls ?? row.toolCalls,
+                  capabilitiesUsed: meta.capabilitiesUsed ?? row.capabilitiesUsed,
                 };
               }
               return next;
@@ -493,7 +493,7 @@ export default function UnifiedEllieChat({
 
       <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 sm:px-6 sm:py-5">
         {messages.length === 0 ? (
-          <div className="mx-auto flex w-full min-w-0 max-w-3xl flex-col items-center py-5 text-center sm:py-12">
+          <div className="mx-auto flex w-full min-w-0 max-w-4xl flex-col items-center py-5 text-center sm:py-12">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 shadow-sm">
               <Bot className="h-7 w-7 text-gray-800" aria-hidden="true" />
             </div>
@@ -523,7 +523,7 @@ export default function UnifiedEllieChat({
             </div>
           </div>
         ) : (
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
+          <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -543,11 +543,16 @@ export default function UnifiedEllieChat({
                     {message.provider && message.role === 'assistant' && (
                       <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
                         {message.provider}
-                        {message.agent ? ` · ${message.agent}` : ''}
+                        {message.agent ? ' · Admin AI' : ''}
                         {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
                       </p>
                     )}
                     <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                    {message.role === 'assistant' && message.capabilitiesUsed?.length ? (
+                      <p className="mt-2 text-[11px] text-gray-500">
+                        Capabilities used: {message.capabilitiesUsed.join(', ')}
+                      </p>
+                    ) : null}
                     {message.role === 'assistant' && message.toolCalls?.length ? (
                       <ToolActivity toolCalls={message.toolCalls} />
                     ) : null}
@@ -601,7 +606,7 @@ export default function UnifiedEllieChat({
       </div>
 
       <div className={`min-w-0 shrink-0 border-t p-3 sm:p-4 ${inputAreaClass}`}>
-        <div className="mx-auto w-full min-w-0 max-w-3xl">
+        <div className="mx-auto w-full min-w-0 max-w-4xl">
           {attachment ? (
             <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
               <span className="min-w-0 truncate font-semibold">Attached: {attachment.name}</span>
@@ -619,7 +624,7 @@ export default function UnifiedEllieChat({
               {uploadError}
             </p>
           ) : null}
-          <div className="flex w-full min-w-0 items-end gap-2 rounded-2xl border border-gray-300 bg-white p-2 shadow-sm focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100">
+          <div className="flex w-full min-w-0 flex-wrap items-end gap-2 rounded-2xl border border-gray-300 bg-white p-2 shadow-sm focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100 sm:flex-nowrap">
             <input
               ref={attachmentInputRef}
               type="file"
@@ -655,7 +660,7 @@ export default function UnifiedEllieChat({
               }}
               rows={2}
               placeholder="Tell Admin AI what you need done…"
-              className={`min-h-[52px] min-w-0 flex-1 resize-none rounded-xl border px-3 py-2 text-sm outline-none ${inputClass}`}
+              className={`order-first min-h-[88px] min-w-0 basis-full resize-none rounded-xl border px-3 py-2 text-base outline-none sm:order-none sm:min-h-[52px] sm:flex-1 sm:basis-auto sm:text-sm ${inputClass}`}
             />
             <button
               type="button"
@@ -698,7 +703,7 @@ export default function UnifiedEllieChat({
             </p>
           ) : null}
           <p className="mt-2 text-center text-[11px] text-gray-500">
-            High-impact actions require confirmation and are written to the audit trail.
+            Governed actions use configured rules and are written to the audit trail.
           </p>
         </div>
       </div>

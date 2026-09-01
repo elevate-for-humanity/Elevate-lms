@@ -275,9 +275,8 @@ if (adminAiChat.includes('intake_submissions'))
   fail(
     'Admin AI references retired/nonexistent intake_submissions instead of canonical applications',
   );
-for (const specialist of ['PARIS', 'ELLIE', 'LIZZY', 'ZORA']) {
-  if (!adminAiChat.includes(specialist))
-    fail(`Admin AI chat does not recognize canonical specialist: ${specialist}`);
+for (const invariant of ['ADMIN_AI', 'UNIFIED_CAPABILITY_RULES', 'recordUnifiedCapabilityUse']) {
+  if (!adminAiChat.includes(invariant)) fail(`Admin AI is missing unified execution: ${invariant}`);
 }
 
 const capabilityRail = read('components/studio/StudioCapabilityRail.tsx');
@@ -286,12 +285,19 @@ for (const capability of ['Plugins & connections', 'repository:', 'browser:', 'm
     fail(`Studio capability rail does not expose canonical capability: ${capability}`);
 }
 if (!capabilityRail.includes('const visible = workspaces;'))
-  fail('Studio capability rail hides registered workspaces instead of exposing the canonical registry');
+  fail(
+    'Studio capability rail hides registered workspaces instead of exposing the canonical registry',
+  );
 const unifiedChat = read('components/studio/UnifiedEllieChat.tsx');
-for (const interaction of ['Attach a file', 'selectStudioAgent', 'agentOverride']) {
+for (const interaction of ['Attach a file', 'selectStudioAgent', 'capabilitiesUsed']) {
   if (!unifiedChat.includes(interaction))
     fail(`canonical Studio chat is missing intelligence interaction: ${interaction}`);
 }
+const studioWorkspace = read('components/studio/StudioCommandWorkspace.tsx');
+if (studioWorkspace.includes('StudioCapabilityRail'))
+  fail('Root Studio still exposes separate agent/capability navigation');
+if (unifiedChat.includes('agentOverride'))
+  fail('Canonical Studio chat still allows a user-selected agent override');
 for (const forbiddenWrite of [
   ".from('lms_courses').insert",
   ".from('modules').insert",

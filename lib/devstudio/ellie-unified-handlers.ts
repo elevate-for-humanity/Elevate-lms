@@ -78,7 +78,7 @@ export async function sendOpsMessage(
 export async function streamPlatformChat(
   messages: { role: string; content: string }[],
   opts: {
-    agent?: 'PARIS' | 'ELLIE' | 'LIZZY' | 'ZORA';
+    agent?: 'ADMIN_AI';
     fileContext?: string;
     documentsContext?: string;
     provider?: string;
@@ -88,6 +88,7 @@ export async function streamPlatformChat(
       toolCalls?: UnifiedChatMessage['toolCalls'];
       provider?: string;
       model?: string;
+      capabilitiesUsed?: string[];
     }) => void;
   },
 ): Promise<void> {
@@ -132,6 +133,7 @@ export async function streamPlatformChat(
             toolCalls: chunk.toolCalls,
             provider: chunk.provider,
             model: chunk.model,
+            capabilitiesUsed: chunk.capabilitiesUsed,
           });
         }
       } catch {

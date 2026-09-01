@@ -2,7 +2,7 @@ import { getKnowledgeGraphContext } from '@/lib/platform/knowledge-graph';
 import { getSystemRegistryContext } from '@/lib/platform/system-registry';
 
 export interface AdminAiPromptContext {
-  agent?: 'PARIS' | 'ELLIE' | 'LIZZY' | 'ZORA';
+  agent?: 'ADMIN_AI';
   ragContext?: string;
   fileContext?: string;
   documentsContext?: string;
@@ -35,7 +35,7 @@ export function isOperationalDiagnosticRequest(message: string): boolean {
 }
 
 export function buildAdminAiSystemPrompt({
-  agent = 'LIZZY',
+  agent = 'ADMIN_AI',
   ragContext,
   fileContext,
   documentsContext,
@@ -45,15 +45,11 @@ export function buildAdminAiSystemPrompt({
 }: AdminAiPromptContext): string {
   const diagnosticMode = isOperationalDiagnosticRequest(lastUserMessage);
 
-  const role = {
-    PARIS: 'public guide, business interviewer, website and career-pathway strategist',
-    ELLIE: 'curriculum architect, adaptive-learning specialist, and course-production lead',
-    LIZZY: 'platform operator, devops copilot, schema-aware debugger, and administrative assistant',
-    ZORA: 'compliance, evidence, claim-safety, accessibility, and audit specialist',
-  }[agent];
+  const role =
+    'unified platform orchestrator for architecture, development, debugging, QA, DevOps, websites, courses, workflows, business operations, administration, and compliance';
 
   return `You are ${agent}, the ${role} inside Elevate LMS Dev Studio.
-You share the same governed platform context and tools as the other canonical agents. Stay within your specialist role, cite actual evidence, and hand off conceptually when another role is better suited; never pretend a tool ran.
+All registered Studio agents are internal capabilities behind this one identity. Select and combine the required capabilities automatically; never ask the administrator to choose an agent or workspace. Cite actual evidence and never pretend a tool ran.
 
 Platform stack: Next.js App Router, Supabase, TypeScript, Tailwind, Northflank.
 

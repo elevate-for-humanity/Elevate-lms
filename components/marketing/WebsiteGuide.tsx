@@ -55,11 +55,13 @@ export function WebsiteGuide() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-24 right-4 z-[79] inline-flex min-h-12 items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-extrabold text-white shadow-2xl transition hover:-translate-y-0.5 hover:bg-blue-800 sm:bottom-6 sm:right-6"
+        className="fixed bottom-6 right-4 z-[79] inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-950 text-sm font-extrabold text-white shadow-2xl transition hover:-translate-y-0.5 hover:bg-blue-800 sm:right-6 sm:w-auto sm:gap-2 sm:px-5 sm:py-3"
+        aria-label="Find my next step"
         aria-expanded={open}
         aria-controls="website-guide-panel"
       >
-        <HelpCircle className="h-5 w-5" aria-hidden="true" /> Find my next step
+        <HelpCircle className="h-5 w-5" aria-hidden="true" />
+        <span className="hidden sm:inline">Find my next step</span>
       </button>
 
       {open ? (

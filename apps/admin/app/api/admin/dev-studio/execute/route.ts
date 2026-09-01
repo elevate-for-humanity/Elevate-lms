@@ -30,7 +30,7 @@ function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
 function extractUuid(text: string): string | null {
-  return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i)?.[0] ?? null;
+  return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i)?.[0] ?? null;
 }
 function extractJsonObject(text: string): Record<string, unknown> | null {
   const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
@@ -106,11 +106,52 @@ async function classifyCommand(command: string): Promise<PlannedCommand> {
   };
 }
 
-function summarizePayload(payload: unknown): string {
+function redactSecrets(value: string): string {
+  return value
+    .replace(/\bsk_(?:live|test)_[A-Za-z0-9_*.-]+/gi, '[REDACTED STRIPE KEY]')
+    .replace(/\bSG\.[A-Za-z0-9_.-]+/g, '[REDACTED SENDGRID KEY]')
+    .replace(/\bBearer\s+[A-Za-z0-9_.-]+/gi, 'Bearer [REDACTED]');
+}
+
+function summarizePayload(toolName: string, payload: unknown): string {
   if (payload == null) return 'Completed with no response body.';
-  if (typeof payload === 'string') return payload.slice(0, 2200);
+  if (typeof payload === 'string') return redactSecrets(payload.slice(0, 2200));
+
+  const record = asRecord(payload);
+  if (toolName === 'system.health') {
+    const services = asRecord(record.services);
+    const lines = Object.values(services).map((value) => {
+      const service = asRecord(value);
+      const name = String(service.name ?? 'Service');
+      const status = String(service.status ?? 'unknown');
+      const message = typeof service.message === 'string' ? ` — ${redactSecrets(service.message)}` : '';
+      return `• ${name}: ${status}${message}`;
+    });
+    return [`Overall platform status: ${String(record.overall ?? 'unknown')}`, ...lines].join('\n');
+  }
+
+  if (toolName === 'organization.directory') {
+    const members = Array.isArray(record.members) ? record.members : [];
+    if (!members.length) return 'No matching active team member was found in the approved organization directory.';
+    return members.map((value) => {
+      const member = asRecord(value);
+      const summary = [member.name, member.title].filter(Boolean).join(' — ');
+      return member.bio ? `${summary}\n${String(member.bio)}` : summary;
+    }).join('\n\n');
+  }
+
+  const protectedTools: Record<string, string> = {
+    'students.search': 'Student records were found. Open the protected Students workspace to review authorized details.',
+    'enrollments.search': 'Enrollment records were found. Open the protected Enrollments workspace to review authorized details.',
+    'applications.search': 'Application records were found. Open the protected Applications workspace to review authorized details.',
+    'payouts.list': 'Payout records were found. Open the protected payout queue to review authorized details.',
+    'wioa.list': 'WIOA records were found. Open the protected WIOA workspace to review authorized details.',
+    'workflows.inspect': 'Workflow state was inspected. Open AI Task Queue or Workflow Designer for the complete protected audit record.',
+  };
+  if (protectedTools[toolName]) return protectedTools[toolName];
+
   try {
-    const json = JSON.stringify(payload, null, 2);
+    const json = redactSecrets(JSON.stringify(payload, null, 2));
     return json.length > 2200 ? `${json.slice(0, 2200)}\n…` : json;
   } catch {
     return 'Completed.';
@@ -195,7 +236,7 @@ export async function POST(request: NextRequest) {
             write(`Failed · HTTP ${result.httpStatus} · Tool execution failed.`);
           } else {
             write(`Completed · ${result.tool} · HTTP ${result.httpStatus}`);
-            write(summarizePayload(result.payload));
+            write(summarizePayload(result.tool, result.payload));
           }
         }
       } catch (error) {

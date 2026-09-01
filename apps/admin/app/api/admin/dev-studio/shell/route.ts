@@ -23,6 +23,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -157,6 +158,17 @@ export async function POST(request: NextRequest) {
   const inputs: Record<string, string> = body?.inputs ?? {};
 
   if (!workflowRaw) return safeError('workflow is required', 400);
+
+  const isProductionDeploy = /^deploy(?:-|$)/i.test(workflowRaw);
+  if (isProductionDeploy) {
+    const confirmation = requireTypedConfirmation(body?.confirmation, 'deploy_autopilot');
+    if (!confirmation.ok) {
+      return NextResponse.json(
+        { error: 'Production deployment requires typed confirmation.', requiredConfirmation: confirmation.required },
+        { status: 409 },
+      );
+    }
+  }
 
   const workflowAliases: Record<string, string> = {
     'deploy-all': 'deploy-production-dispatch.yml',

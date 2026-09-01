@@ -39,6 +39,8 @@ export default function DevStudioEditorWorkspace({
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
+  const [branch, setBranch] = useState('');
+  const [confirmMainCommit, setConfirmMainCommit] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const refreshFiles = useCallback(async () => {
@@ -47,6 +49,7 @@ export default function DevStudioEditorWorkspace({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setFiles(walkFiles(data.tree ?? []));
+      setBranch(String(data.branch ?? ''));
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'File tree unavailable');
     }
@@ -62,6 +65,7 @@ export default function DevStudioEditorWorkspace({
 
   async function loadFile(path: string) {
     setSelected(path);
+    setConfirmMainCommit(false);
     setLoading(true);
     setStatus('');
     try {
@@ -82,6 +86,11 @@ export default function DevStudioEditorWorkspace({
 
   async function saveFile() {
     if (!selected) return;
+    if (branch === 'main' && !confirmMainCommit) {
+      setConfirmMainCommit(true);
+      setStatus('Direct main commit: press Confirm Main Commit to continue.');
+      return;
+    }
     const updating = Boolean(sha);
     setLoading(true);
     setStatus(updating ? 'Committing update…' : 'Creating file…');
@@ -93,6 +102,7 @@ export default function DevStudioEditorWorkspace({
           path: selected,
           content,
           message,
+          ...(branch === 'main' ? { confirmation: 'CONFIRM PUSH' } : {}),
           ...(updating ? { sha } : {}),
         }),
       });
@@ -100,6 +110,7 @@ export default function DevStudioEditorWorkspace({
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setSha(data.sha ?? sha);
       setStatus(data.commit ? 'Committed to GitHub' : 'Committed');
+      setConfirmMainCommit(false);
       await refreshFiles();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Save failed');
@@ -133,7 +144,7 @@ export default function DevStudioEditorWorkspace({
           className="inline-flex items-center gap-1 rounded bg-[#0078d4] px-2 py-1 text-[11px] text-white disabled:opacity-40"
         >
           {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
-          Commit
+          {branch === 'main' && confirmMainCommit ? 'Confirm Main Commit' : 'Commit'}
         </button>
         <input
           ref={fileInputRef}
@@ -188,7 +199,7 @@ export default function DevStudioEditorWorkspace({
         </div>
         <div className="min-w-0 flex-1">
           {selected ? (
-            <CodeEditor value={content} onChange={(value) => setContent(value ?? '')} filePath={selected} />
+            <CodeEditor value={content} onChange={(value) => { setContent(value ?? ''); setConfirmMainCommit(false); }} filePath={selected} />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-[#858585]">
               Select a file or switch to Git

@@ -183,12 +183,16 @@ async function checkStripe(): Promise<ServiceCheck> {
       configured: true,
     };
   } catch (err) {
+    const raw = err instanceof Error ? err.message : '';
+    const message = /expired api key|invalid api key|api key provided/i.test(raw)
+      ? 'The configured Stripe API key is expired or invalid.'
+      : 'Stripe API probe failed.';
     return {
       name: 'Stripe',
       status: 'down',
       latencyMs: Date.now() - start,
       configured: true,
-      message: err instanceof Error ? err.message : 'Stripe API probe failed',
+      message,
     };
   }
 }

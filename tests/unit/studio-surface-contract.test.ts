@@ -57,4 +57,34 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(panel).toContain("fetch('/api/admin/dev-studio/chat'");
     expect(panel).not.toContain('/api/admin/studio/');
   });
+
+  it('routes commercial generation through the live Media Studio endpoint', () => {
+    const registry = source('lib/ai/tools/registry.ts');
+    const commercialRoute = source('apps/admin/app/api/admin/media-studio/commercial/route.ts');
+
+    expect(registry).toContain("name: 'video.generate'");
+    expect(registry).toContain("path: '/api/admin/media-studio/commercial'");
+    expect(registry).not.toContain("path: '/api/video/generate'");
+    expect(commercialRoute).toContain("z.enum(['plan', 'revise', 'render'])");
+    expect(commercialRoute).toContain('renderCommercialVideo(plan, brief)');
+  });
+
+  it('keeps organization lookup separate from protected student search', () => {
+    const registry = source('lib/ai/tools/registry.ts');
+    const planner = source('lib/ai/tools/planner.ts');
+    const execute = source('apps/admin/app/api/admin/dev-studio/execute/route.ts');
+
+    expect(registry).toContain("name: 'organization.directory'");
+    expect(planner).toContain("name: 'organization.directory'");
+    expect(execute).toContain("toolName === 'organization.directory'");
+    expect(execute).toContain("'students.search': 'Student records were found.");
+  });
+
+  it('enforces production confirmation at server execution boundaries', () => {
+    const shell = source('apps/admin/app/api/admin/dev-studio/shell/route.ts');
+    const files = source('apps/admin/app/api/admin/dev-studio/files/route.ts');
+
+    expect(shell).toContain("requireTypedConfirmation(body?.confirmation, 'deploy_autopilot')");
+    expect(files).toContain("requireTypedConfirmation(body.confirmation, 'git_push')");
+  });
 });

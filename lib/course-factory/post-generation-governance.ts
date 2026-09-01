@@ -2,6 +2,7 @@ import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { compileLearningIntelligence, LearningIntelligenceSchema } from './learning-intelligence';
+import { deriveLessonDurationMinutes, normalizeLearningObjectives } from './governance-normalization';
 
 function asRecord(value: unknown): Record<string, any> {
   if (value && typeof value === 'object' && !Array.isArray(value)) return value as Record<string, any>;
@@ -43,7 +44,7 @@ export async function normalizeGeneratedCourseForGovernance(
 
   const { data: modules, error: moduleError } = await db
     .from('course_modules')
-    .select('id,title,slug,domain_key,target_hours,order_index,course_lessons(id,title,slug,domain_key,learning_objectives,competency_checks,quiz_questions,content,content_json,lesson_type,ai_generated,approved,generation_status,hour_category,delivery_method,practical_required,evidence_type,requires_instructor_signoff,duration_minutes,passing_score,order_index)')
+    .select('id,title,slug,domain_key,target_hours,order_index,course_lessons(id,title,slug,objective,domain_key,learning_objectives,competency_checks,quiz_questions,content,content_json,script,script_text,lesson_type,ai_generated,approved,generation_status,hour_category,delivery_method,practical_required,evidence_type,requires_instructor_signoff,duration_minutes,passing_score,order_index)')
     .eq('course_id', courseId)
     .order('order_index', { ascending: true });
   if (moduleError) throw moduleError;
@@ -75,7 +76,12 @@ export async function normalizeGeneratedCourseForGovernance(
       const contentJson = asRecord(lesson.content_json);
       const content = asRecord(lesson.content);
       const experience = asRecord(contentJson.experience ?? content.experience);
-      const objectives = asArray(lesson.learning_objectives).map((v) => String(v).trim()).filter(Boolean);
+      const objectives = normalizeLearningObjectives({
+        learningObjectives: lesson.learning_objectives,
+        objective: lesson.objective,
+        content,
+        contentJson,
+      });
       const domainKey = String(lesson.domain_key || moduleDomain).trim();
       const competencyChecks = asArray(lesson.competency_checks);
       const derivedCompetencies = competencyChecks.length
@@ -116,7 +122,13 @@ export async function normalizeGeneratedCourseForGovernance(
           practical: isPractical,
         });
       }
-      const duration = Math.max(0, Number(lesson.duration_minutes ?? 0));
+      const duration = deriveLessonDurationMinutes({
+        durationMinutes: lesson.duration_minutes,
+        lessonType,
+        script: lesson.script,
+        scriptText: lesson.script_text,
+        experienceNarration: experience.narrationScript,
+      });
       moduleDurationMinutes += duration;
       totalDurationMinutes += duration;
 
@@ -129,6 +141,8 @@ export async function normalizeGeneratedCourseForGovernance(
         domain_key: domainKey || null,
         competency_checks: derivedCompetencies,
         quiz_questions: questions,
+        learning_objectives: objectives,
+        duration_minutes: duration,
         hour_category: lesson.hour_category || (isPractical ? 'practical' : isAssessment ? 'exam' : 'didactic'),
         delivery_method: lesson.delivery_method || 'online_async',
         // Generation has completed successfully, but human approval remains separate.
@@ -227,12 +241,25 @@ export async function normalizeGeneratedCourseForGovernance(
   }
 
   const totalDurationHours = Math.round((totalDurationMinutes / 60) * 100) / 100;
+  const { data: course } = await db.from('courses').select('program_id').eq('id', courseId).maybeSingle();
+  let declaredProgramHours = 0;
+  if (course?.program_id) {
+    const { data: program } = await db
+      .from('programs')
+      .select('total_hours,is_apprenticeship')
+      .eq('id', course.program_id)
+      .maybeSingle();
+    if (program?.is_apprenticeship) declaredProgramHours = Math.max(0, Number(program.total_hours ?? 0));
+  }
+
   const { error: courseUpdateError } = await db
     .from('courses')
     .update({
       generation_status: 'completed',
       generation_progress: 100,
-      duration_hours: totalDurationHours > 0 ? totalDurationHours : null,
+      // Apprenticeship program hours include OJL and must not be replaced by
+      // the much smaller self-paced lesson seat-time rollup.
+      duration_hours: declaredProgramHours || (totalDurationHours > 0 ? totalDurationHours : null),
       updated_at: new Date().toISOString(),
     })
     .eq('id', courseId);

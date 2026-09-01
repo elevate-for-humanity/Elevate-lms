@@ -14,6 +14,10 @@ interface Task {
   approval_reason: string | null;
   ai_agents: { name: string; role: string } | null;
   created_at: string;
+  source?: 'ai_task' | 'agentic_build';
+  project_id?: string;
+  error_message?: string | null;
+  credits_used?: number;
 }
 
 export default function TasksClient() {
@@ -37,7 +41,16 @@ export default function TasksClient() {
   }
 
   async function approveTask(id: string) {
-    await fetch(`/api/admin/dev-studio/tasks/${id}/approve`, { method: 'POST' });
+    const task = tasks.find((candidate) => candidate.id === id);
+    if (task?.source === 'agentic_build' && task.project_id) {
+      await fetch('/api/admin/dev-studio/course-agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'resume-after-review', projectId: task.project_id }),
+      });
+    } else {
+      await fetch(`/api/admin/dev-studio/tasks/${id}/approve`, { method: 'POST' });
+    }
     fetchTasks();
   }
 
@@ -137,6 +150,8 @@ export default function TasksClient() {
                           Requires approval: {task.approval_reason}
                         </p>
                       )}
+                      {task.description && <p className="mt-2 line-clamp-3 text-sm text-slate-600">{task.description}</p>}
+                      {task.error_message && <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{task.error_message}</p>}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {task.status === 'awaiting_approval' && (
@@ -147,12 +162,12 @@ export default function TasksClient() {
                           >
                             Approve
                           </button>
-                          <button
+                          {task.source !== 'agentic_build' && <button
                             onClick={() => rollbackTask(task.id)}
                             className="rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-200 transition"
                           >
                             Reject
-                          </button>
+                          </button>}
                         </>
                       )}
                     </div>
@@ -164,6 +179,7 @@ export default function TasksClient() {
                       {task.status.replace(/_/g, ' ')}
                     </span>
                     <span>{new Date(task.created_at).toLocaleString()}</span>
+                    {task.source === 'agentic_build' && <span>Course Builder{typeof task.credits_used === 'number' ? ` · ${task.credits_used} credits` : ''}</span>}
                   </div>
                 </div>
               </div>

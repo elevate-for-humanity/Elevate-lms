@@ -210,10 +210,6 @@ export async function loadCourseSession(courseId: string): Promise<CourseSession
   const [
     modulesRes,
     lessonsRes,
-    videosRes,
-    automationRes,
-    workflowsRes,
-    quizzesRes,
   ] = await Promise.all([
     queryDb
       .from('course_modules')
@@ -239,33 +235,6 @@ export async function loadCourseSession(courseId: string): Promise<CourseSession
       .eq('course_id', courseId)
       .order('order_index', { ascending: true }),
 
-    // Videos — global pool, not course-scoped (linked via course_lessons.video_url)
-    queryDb
-      .from('videos')
-      .select('id, title, description, url, video_url, thumbnail_url, duration_seconds, published, category, created_at')
-      .eq('published', true)
-      .order('created_at', { ascending: false })
-      .limit(100),
-
-    // Automation rules — course-scoped where possible, else recent global
-    queryDb
-      .from('automation_rules')
-      .select('id, name, description, status, trigger_type, action_type, enabled, run_count, last_triggered_at, created_at')
-      .order('created_at', { ascending: false })
-      .limit(50),
-
-    queryDb
-      .from('workflows')
-      .select('id, name, workflow_key, category, status, last_run_at, last_run_status, run_count, created_at')
-      .order('created_at', { ascending: false })
-      .limit(50),
-
-    // Quizzes scoped to this course
-    queryDb
-      .from('quizzes')
-      .select('id, course_id, title, description, time_limit_minutes, passing_score, question_count, created_at, updated_at')
-      .eq('course_id', courseId)
-      .order('created_at', { ascending: false }),
   ]);
 
   // ── Resolve optional results with graceful degradation ───────────────────
@@ -277,29 +246,42 @@ export async function loadCourseSession(courseId: string): Promise<CourseSession
     warnings.push('lessons query failed');
     logger.warn('[studio] lessons query failed', { message: lessonsRes.error.message, courseId });
   }
-  if (videosRes.error) {
-    warnings.push('videos query failed');
-    logger.warn('[studio] videos query failed', { message: videosRes.error.message });
-  }
-  if (automationRes.error) {
-    warnings.push('automation rules query failed');
-    logger.warn('[studio] automation query failed', { message: automationRes.error.message });
-  }
-  if (workflowsRes.error) {
-    warnings.push('workflows query failed');
-    logger.warn('[studio] workflows query failed', { message: workflowsRes.error.message });
-  }
-  if (quizzesRes.error) {
-    warnings.push('quizzes query failed');
-    logger.warn('[studio] quizzes query failed', { message: quizzesRes.error.message, courseId });
-  }
-
   const modules = (modulesRes.data ?? []) as StudioModule[];
   const lessons = (lessonsRes.data ?? []) as StudioLesson[];
-  const videos = (videosRes.data ?? []) as StudioVideo[];
-  const automationRules = (automationRes.data ?? []) as StudioAutomationRule[];
-  const workflows = (workflowsRes.data ?? []) as StudioWorkflow[];
-  const quizzes = (quizzesRes.data ?? []) as StudioQuiz[];
+  const linkedVideos: StudioVideo[] = lessons
+    .filter((lesson) => Boolean(lesson.video_url))
+    .map((lesson) => ({
+      id: `lesson:${lesson.id}`,
+      title: lesson.title,
+      description: 'Attached course lesson video',
+      url: lesson.video_url,
+      video_url: lesson.video_url,
+      thumbnail_url: null,
+      duration_seconds: lesson.duration_minutes ? Number(lesson.duration_minutes) * 60 : null,
+      published: lesson.is_published,
+      category: 'course-lesson',
+      created_at: lesson.created_at,
+    }));
+  const videos = linkedVideos;
+  // Legacy automation_rules/workflows records are platform-global and have no
+  // course foreign key. Do not misrepresent them as course automation.
+  const automationRules: StudioAutomationRule[] = [];
+  const workflows: StudioWorkflow[] = [];
+  // Canonical assessments live on course_lessons.quiz_questions. The legacy
+  // integer-keyed quizzes table cannot represent UUID Course Builder courses.
+  const quizzes: StudioQuiz[] = lessons
+    .filter((lesson) => Array.isArray(lesson.quiz_questions) && lesson.quiz_questions.length > 0)
+    .map((lesson) => ({
+      id: lesson.id,
+      course_id: lesson.course_id,
+      title: lesson.title,
+      description: 'Canonical lesson assessment',
+      time_limit_minutes: null,
+      passing_score: lesson.passing_score,
+      question_count: lesson.quiz_questions?.length ?? 0,
+      created_at: lesson.created_at,
+      updated_at: lesson.updated_at,
+    }));
 
   // ── Derive publish state ──────────────────────────────────────────────────
   const publishedLessons = lessons.filter(l => l.is_published).length;

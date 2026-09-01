@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 
+import { createAdminClient } from '@/lib/supabase/admin';
 import type { MediaStoryboard } from './media-director';
 
 const execFileAsync = promisify(execFile);
@@ -102,33 +103,56 @@ async function requireTextAsset(url: string, label: string): Promise<string> {
   return content;
 }
 
+export function resolveCloudflareTranscriptionModel(env: NodeJS.ProcessEnv = process.env): string {
+  const configured = env.AI_TRANSCRIPTION_MODEL?.trim();
+  return configured?.startsWith('@cf/') ? configured : '@cf/openai/whisper';
+}
+
+async function requireCloudflareTranscriptionCredentials(): Promise<{
+  accountId: string;
+  token: string;
+}> {
+  let accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim() ?? '';
+  let token = (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim() ?? '';
+  if (accountId && token) return { accountId, token };
+
+  const db = createAdminClient();
+  if (!accountId) {
+    const { data, error } = await db.rpc('get_platform_secret', { p_key: 'CLOUDFLARE_ACCOUNT_ID' });
+    if (!error && typeof data === 'string') accountId = data.trim();
+  }
+  if (!token) {
+    const { data, error } = await db.rpc('get_platform_secret', { p_key: 'CLOUDFLARE_AI_API_TOKEN' });
+    if (!error && typeof data === 'string') token = data.trim();
+  }
+  if (!accountId || !token) {
+    throw new Error('Cloudflare rendered-audio transcription credentials are not configured');
+  }
+  return { accountId, token };
+}
+
 async function transcribeRenderedAudio(videoPath: string, workDir: string): Promise<string> {
-  // Transcription is a media-verification capability, not the platform's
-  // canonical text-generation provider. A Cloudflare-backed AI runtime can
-  // therefore validate rendered audio with the separately configured OpenAI
-  // transcription model instead of failing every otherwise valid video.
-  const model = process.env.AI_TRANSCRIPTION_MODEL?.trim();
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
-  if (!model) throw new Error('AI_TRANSCRIPTION_MODEL is not configured');
-  if (!apiKey) throw new Error('OPENAI_API_KEY is not configured for rendered-audio validation (AI_PROVIDER may remain Cloudflare)');
+  const model = resolveCloudflareTranscriptionModel();
 
   const audioPath = join(workDir, 'rendered-audio.wav');
   await execFileAsync('ffmpeg', [
     '-hide_banner', '-loglevel', 'error', '-y', '-i', videoPath,
     '-vn', '-ac', '1', '-ar', '16000', audioPath,
   ], { timeout: 120_000, maxBuffer: 2_000_000 });
-  const form = new FormData();
-  form.append('file', new Blob([await readFile(audioPath)], { type: 'audio/wav' }), 'rendered-audio.wav');
-  form.append('model', model);
-  form.append('response_format', 'text');
-  const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}` },
-    body: form,
-    signal: AbortSignal.timeout(180_000),
-  });
-  if (!response.ok) throw new Error(`Rendered-audio transcription returned HTTP ${response.status}`);
-  const transcript = (await response.text()).trim();
+  const audio = await readFile(audioPath);
+  const { accountId, token } = await requireCloudflareTranscriptionCredentials();
+  const response = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/octet-stream' },
+      body: audio,
+      signal: AbortSignal.timeout(180_000),
+    },
+  );
+  if (!response.ok) throw new Error(`Cloudflare rendered-audio transcription returned HTTP ${response.status}`);
+  const payload = await response.json() as { result?: { text?: string } };
+  const transcript = payload.result?.text?.trim() ?? '';
   if (!transcript) throw new Error('Rendered-audio transcription is empty');
   return transcript;
 }

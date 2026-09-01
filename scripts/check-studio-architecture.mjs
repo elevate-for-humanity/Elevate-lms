@@ -21,10 +21,12 @@ for (const file of [
   'apps/admin/app/studio/ai/page.tsx',
   'apps/admin/app/studio/StudioNavigation.client.tsx',
   'components/studio/UnifiedEllieChat.tsx',
+  'components/studio/StudioCommandWorkspace.tsx',
   'lib/devstudio/workspace-registry.ts',
   'lib/devstudio/ellie-message-router.ts',
   'lib/devstudio/course-builder-controller.ts',
   'lib/course-builder/orchestrator.ts',
+  'Dockerfile.studio-browser',
   'services/studio-browser/server.mjs',
   'apps/admin/app/api/admin/dev-studio/browser/session/route.ts',
   'apps/admin/app/api/admin/dev-studio/browser/agent/route.ts',
@@ -36,6 +38,27 @@ for (const file of [
   'apps/admin/app/studio/canvas/page.tsx',
   'apps/admin/app/studio/courses/[courseId]/page.tsx',
 ]) if (!exists(file)) fail(`canonical Studio file is missing: ${file}`);
+
+const studioBrowserImage = read('Dockerfile.studio-browser');
+for (const invariant of [
+  'FROM node:22-bookworm-slim',
+  'playwright install --with-deps chromium',
+  'PLAYWRIGHT_BROWSERS_PATH=/ms-playwright',
+  'USER studio',
+]) {
+  if (!studioBrowserImage.includes(invariant)) {
+    fail(`Studio browser image is missing resource/security invariant: ${invariant}`);
+  }
+}
+for (const oversizedImage of [
+  'mcr.microsoft.com/playwright',
+  'playwright install firefox',
+  'playwright install webkit',
+]) {
+  if (studioBrowserImage.includes(oversizedImage)) {
+    fail(`Studio browser image installs an unused browser payload: ${oversizedImage}`);
+  }
+}
 
 const adminLayout = read('apps/admin/app/layout.tsx');
 for (const sharedSurface of ['AdminHeader','BuildVersionSync','AdminPwaRegister','AdminUpdateNotice','SupabaseConfigBootstrap']) {
@@ -60,8 +83,12 @@ for (const standaloneNavigation of ['<aside', 'fixed inset-y-0', 'lg:sticky']) {
 }
 
 const studioRoot = read('apps/admin/app/studio/page.tsx');
-for (const invariant of ['UnifiedEllieChat', "requireRole(['super_admin', 'admin'])", 'Advanced capability surfaces']) {
+for (const invariant of ['StudioCommandWorkspace', "requireRole(['super_admin', 'admin'])", 'Advanced capability surfaces']) {
   if (!studioRoot.includes(invariant)) fail(`conversation-first Studio root missing invariant: ${invariant}`);
+}
+const studioCommandWorkspace = read('components/studio/StudioCommandWorkspace.tsx');
+if (!studioCommandWorkspace.includes('<UnifiedEllieChat')) {
+  fail('Studio command workspace does not include the canonical Admin AI conversation');
 }
 for (const forbiddenRootPattern of ['bg-slate-950 text-white', '<StudioWorkspaceGrid workspaces={workspaces} />\n      </div>\n    </main>']) {
   if (studioRoot.includes(forbiddenRootPattern)) fail(`Studio root regressed to capability-grid-first UI: ${forbiddenRootPattern}`);

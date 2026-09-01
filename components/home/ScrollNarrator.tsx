@@ -52,11 +52,12 @@ export function ScrollNarrator() {
     const started = await play(text, {
       voice: 'coral',
       style: 'assistant',
-      rate: 0.92,
+      rate: 0.98,
+      allowBrowserFallback: false,
     });
     if (!started) {
       lastNarrationRef.current = null;
-      setNotice('Read aloud is unavailable in this browser.');
+      setNotice('Natural narration is temporarily unavailable.');
     }
   }, [play]);
 
@@ -74,7 +75,7 @@ export function ScrollNarrator() {
 
     const preload = (section: HTMLElement) => {
       const text = narrationFor(section);
-      if (text) void prepare(text, { voice: 'coral', style: 'assistant', rate: 0.98 });
+      if (text) void prepare(text, { voice: 'coral', style: 'assistant', rate: 0.98, allowBrowserFallback: false });
     };
 
     if (!('IntersectionObserver' in window)) {

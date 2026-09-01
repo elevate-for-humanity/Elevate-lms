@@ -1,4 +1,4 @@
-// Admin-owned AI operating surface. Studio capabilities are tools behind one conversation-first interface.
+// Admin-owned AI operating surface. Studio capabilities run through one stateful, conversation-first tool orchestrator.
 import Link from 'next/link';
 import Image from 'next/image';
 import {

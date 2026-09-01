@@ -38,7 +38,7 @@ export function routeEllieMessage(message: string): EllieMessageRoute {
   if (DETERMINISTIC_COMMAND_RE.test(message)) return 'command';
   // Natural follow-ups (for example, "Can you fix this?") require the
   // conversation history, attachments, retrieved context, and the complete
-  // tool-capable orchestrator. The legacy command endpoint is intentionally
+  // unified tool-capable orchestrator. The legacy command endpoint is intentionally
   // stateless and must only receive explicit deterministic operations such as
   // deploy. Sending ordinary language there discards the referent of "this"
   // and produces a misleading analysis-only response.

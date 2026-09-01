@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { getInstructorForCourse } from '@/lib/ai-instructors';
+import { getInstructorById, getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
 import { recordPlatformUsage } from '@/lib/platform/usage-metering';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -12,6 +12,7 @@ import {
 } from './gpu-video-client';
 import { heartbeatJob, markComplete, markFailed, type VideoJob } from './job-queue';
 import { enforceMediaQuality } from './media-quality-gate';
+import { enforceInstructionalQuality } from './instructional-quality-gate';
 import { directMedia, scenePrompt, type MediaCharacterReference } from './media-director';
 import { recordMediaProvenance } from './media-provenance';
 import { renderStoryboardVideo } from './remotion-render';
@@ -119,15 +120,23 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       .maybeSingle();
     tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
   }
-  const instructor = getInstructorForCourse(courseTitle);
   const script = job.script?.trim() || job.lesson_title;
   const bulletPoints = Array.isArray(job.bullet_points) ? job.bullet_points : [];
   const persistedSceneData = job.scene_data && typeof job.scene_data === 'object' ? (job.scene_data as Record<string, unknown>) : {};
   const { data: lesson } = await db
     .from('course_lessons')
-    .select('content,content_json,domain_key,compliance_profile_key,lesson_type,evidence_type')
+    .select('content,content_json,domain_key,compliance_profile_key,lesson_type,evidence_type,video_config')
     .eq('id', job.lesson_id)
     .maybeSingle();
+  const videoConfig = lesson?.video_config && typeof lesson.video_config === 'object'
+    ? lesson.video_config as Record<string, unknown>
+    : {};
+  const configuredInstructorId = typeof videoConfig.instructorId === 'string'
+    ? videoConfig.instructorId.trim()
+    : '';
+  const instructor = configuredInstructorId
+    ? getInstructorById(configuredInstructorId)
+    : getInstructorForCourse(courseTitle);
   const { data: program } = course?.program_id
     ? await db
         .from('programs')
@@ -171,6 +180,15 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     sceneData,
     characters,
     defaultDurationSeconds: 5,
+  });
+  enforceInstructionalQuality({
+    courseTitle,
+    lessonTitle: job.lesson_title,
+    lessonType: lesson?.lesson_type,
+    evidenceType: lesson?.evidence_type,
+    script,
+    instructor,
+    storyboard,
   });
 
   let heartbeatRunning = false;

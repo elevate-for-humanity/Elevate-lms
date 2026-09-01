@@ -61,14 +61,24 @@ export const AI_INSTRUCTORS: AIInstructor[] = [
     ],
   },
   {
+    id: 'avery-brooks',
+    name: 'Avery Brooks',
+    title: 'Cosmetology Education Specialist',
+    specialty: 'Cosmetology, Skin, Nail & Salon Education',
+    voice: 'nova',
+    avatar: '/images/team/instructors/instructor-beauty.jpg',
+    bio: 'Avery teaches cosmetology theory, infection control, client consultation, hair, skin, nail, and salon-service fundamentals with a practical, safety-first approach.',
+    categories: ['cosmetology', 'beauty', 'esthetician', 'nail'],
+  },
+  {
     id: 'james-williams',
     name: 'James Williams',
     title: 'Master Barber & Educator',
-    specialty: 'Barbering & Cosmetology',
+    specialty: 'Barbering',
     voice: 'echo',
     avatar: '/images/team/instructors/instructor-barber.jpg',
     bio: 'James is a licensed master barber with his own successful shop. He trains the next generation of barbers in cutting techniques, business management, and client relations.',
-    categories: ['barber', 'cosmetology', 'beauty', 'esthetician', 'nail'],
+    categories: ['barber'],
   },
   {
     id: 'lisa-martinez',
@@ -126,8 +136,18 @@ export function getInstructorForCourse(courseName: string): AIInstructor {
     }
   }
 
-  // Default to Angela for general courses
-  return AI_INSTRUCTORS[5];
+  // The fallback is explicit so adding a domain instructor cannot silently
+  // change the identity used by unrelated courses.
+  const fallback = AI_INSTRUCTORS.find((instructor) => instructor.id === 'angela-thompson');
+  if (!fallback) throw new Error('AI_INSTRUCTOR_FALLBACK_MISSING:angela-thompson');
+  return fallback;
+}
+
+/** Resolve an instructor selected by a governed course blueprint. */
+export function getInstructorById(instructorId: string): AIInstructor {
+  const instructor = AI_INSTRUCTORS.find((candidate) => candidate.id === instructorId);
+  if (!instructor) throw new Error(`AI_INSTRUCTOR_MISSING:${instructorId}`);
+  return instructor;
 }
 
 /**

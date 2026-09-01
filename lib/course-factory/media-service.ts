@@ -2,7 +2,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { createJob, type VideoJob } from '@/lib/video/job-queue';
 import { resetCanonicalMediaJob } from '@/lib/course-factory/media-manager';
 import { logger } from '@/lib/logger';
-import { generateInstructorIntro, getInstructorForCourse } from '@/lib/ai-instructors';
+import { generateInstructorIntro, getInstructorById, getInstructorForCourse } from '@/lib/ai-instructors';
 
 export interface QueueCourseLessonVideosInput {
   courseId: string;
@@ -55,11 +55,10 @@ export async function queueCourseLessonVideos(
     );
   }
 
-  const instructor = getInstructorForCourse(course.title);
   let lessonQuery = db
     .from('course_lessons')
     .select(
-      'id, module_id, title, script, bullet_points, scene_data, content_json, video_url, video_status, order_index',
+      'id, module_id, title, script, bullet_points, scene_data, content_json, video_config, video_url, video_status, order_index',
     )
     .eq('course_id', input.courseId);
   if (input.lessonId) lessonQuery = lessonQuery.eq('id', input.lessonId);
@@ -121,6 +120,15 @@ export async function queueCourseLessonVideos(
 
   for (const [candidateIndex, lesson] of candidates.entries()) {
     try {
+      const videoConfig = lesson.video_config && typeof lesson.video_config === 'object'
+        ? lesson.video_config as Record<string, unknown>
+        : {};
+      const instructorId = typeof videoConfig.instructorId === 'string'
+        ? videoConfig.instructorId.trim()
+        : '';
+      const instructor = instructorId
+        ? getInstructorById(instructorId)
+        : getInstructorForCourse(course.title);
       const lessonKey = assetIdentity(lesson.id, 'lesson', null);
       const existingLessonJob = existingByAsset.get(lessonKey);
       const hasVideo = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;

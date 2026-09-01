@@ -3,8 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   ArrowDown,
-  ArrowLeft,
   Bot,
+  BookOpen,
   CheckCircle2,
   Mic,
   ShieldCheck,
@@ -34,17 +34,17 @@ export default async function StudioPage() {
   );
 
   return (
-    <main className="min-h-screen bg-gray-50 text-gray-950">
-      <div className="mx-auto min-w-0 max-w-screen-2xl px-2 py-3 sm:px-4 sm:py-5 lg:px-6">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 transition hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2"
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Admin Dashboard
-          </Link>
-          <div className="flex flex-wrap items-center gap-2">
+    <main className="min-h-screen w-full min-w-0 overflow-x-clip bg-gray-50 text-gray-950">
+      <div className="mx-auto w-full min-w-0 max-w-screen-2xl px-3 py-3 sm:px-4 sm:py-5 lg:px-6">
+        <div className="mb-3 flex min-w-0 flex-wrap items-center justify-end gap-2 sm:mb-5">
+          <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
+            <Link
+              href="/studio/courses"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-indigo-700 px-3 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-indigo-800 sm:px-4 sm:text-sm"
+            >
+              <BookOpen className="h-4 w-4" aria-hidden="true" />
+              Courses
+            </Link>
             <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 shadow-sm">
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
               Protected admin tools
@@ -61,8 +61,8 @@ export default async function StudioPage() {
         <section className="min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm sm:rounded-3xl">
           <div className="relative isolate overflow-hidden border-b border-indigo-900/10 bg-gradient-to-br from-slate-950 via-indigo-950 to-blue-800 text-white">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(56,189,248,0.24),transparent_34%),radial-gradient(circle_at_65%_120%,rgba(168,85,247,0.3),transparent_46%)]" />
-            <div className="relative grid min-h-[250px] items-center gap-5 px-5 py-7 sm:px-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(300px,.75fr)] lg:px-10 lg:py-9">
-              <div className="max-w-3xl">
+            <div className="relative grid min-h-[250px] min-w-0 items-center gap-5 px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(300px,.75fr)] lg:px-10 lg:py-9">
+              <div className="min-w-0 max-w-3xl">
                 <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-cyan-100 backdrop-blur">
                   <Sparkles className="h-4 w-4" aria-hidden="true" />
                   One unified Admin AI
@@ -72,10 +72,10 @@ export default async function StudioPage() {
                     <Bot className="h-7 w-7 text-cyan-200" aria-hidden="true" />
                   </div>
                   <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                    <h1 className="max-w-full text-[2rem] font-bold leading-[1.08] tracking-tight !text-white sm:text-4xl lg:text-5xl">
                       Tell the platform what you need done
                     </h1>
-                    <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-100 sm:text-base">
+                    <p className="mt-3 max-w-2xl text-sm leading-6 !text-blue-100 sm:text-base">
                       Build courses, inspect code, publish websites, run workflows, review
                       operations, and manage deployments from one intelligent conversation.
                     </p>
@@ -91,14 +91,23 @@ export default async function StudioPage() {
                         </span>
                       ))}
                     </div>
-                    <a
-                      href="#admin-ai-workspace"
-                      className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-indigo-950 shadow-lg shadow-indigo-950/20 transition hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-950"
-                    >
-                      <Mic className="h-4 w-4" aria-hidden="true" />
-                      Talk to Admin AI
-                      <ArrowDown className="h-4 w-4" aria-hidden="true" />
-                    </a>
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      <a
+                        href="#admin-ai-workspace"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-indigo-950 shadow-lg shadow-indigo-950/20 transition hover:bg-cyan-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200 focus-visible:ring-offset-2 focus-visible:ring-offset-indigo-950"
+                      >
+                        <Mic className="h-4 w-4" aria-hidden="true" />
+                        Talk to Admin AI
+                        <ArrowDown className="h-4 w-4" aria-hidden="true" />
+                      </a>
+                      <Link
+                        href="/studio/courses"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+                      >
+                        <BookOpen className="h-4 w-4" aria-hidden="true" />
+                        Open Course Builder
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -117,7 +126,7 @@ export default async function StudioPage() {
 
           <div
             id="admin-ai-workspace"
-            className="h-[calc(100dvh-7rem)] min-h-[540px] min-w-0 scroll-mt-3 sm:h-[calc(100dvh-8rem)] sm:min-h-[620px]"
+            className="h-[calc(100dvh-5rem)] min-h-[640px] min-w-0 scroll-mt-3 sm:h-[calc(100dvh-8rem)] sm:min-h-[620px]"
           >
             <StudioCommandWorkspace
               workspaces={workspaces.map(({ id, label, route }) => ({ id, label, route }))}

@@ -30,6 +30,8 @@ export type RevalidateLmsResult = {
   status?: number;
 };
 
+type RevalidateResponse = { ok?: boolean; revalidated?: string[]; error?: string };
+
 export type PublishWebsiteResult = {
   ok: boolean;
   timestamp: string;
@@ -67,21 +69,32 @@ export async function revalidatePublicLmsSite(): Promise<RevalidateLmsResult> {
       signal: AbortSignal.timeout(45_000),
     });
 
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
+    const contentType = res.headers.get('content-type') || '';
+    const text = await res.text().catch(() => '');
+    if (!res.ok || !contentType.toLowerCase().includes('application/json')) {
       return {
         ok: false,
         status: res.status,
-        error: text.slice(0, 200) || `LMS revalidate HTTP ${res.status}`,
+        error: !contentType.toLowerCase().includes('application/json')
+          ? `Cache endpoint returned ${contentType || 'an unknown content type'} instead of JSON`
+          : text.slice(0, 200) || `Public-site revalidate HTTP ${res.status}`,
         paths: PUBLIC_REVALIDATE_PATHS,
       };
     }
 
-    const json = (await res.json().catch(() => ({}))) as { revalidated?: string[] };
+    let json: RevalidateResponse;
+    try {
+      json = JSON.parse(text) as RevalidateResponse;
+    } catch {
+      return { ok: false, status: res.status, error: 'Cache endpoint returned invalid JSON', paths: PUBLIC_REVALIDATE_PATHS };
+    }
+    if (json.ok !== true || !Array.isArray(json.revalidated)) {
+      return { ok: false, status: res.status, error: json.error || 'Cache endpoint rejected the refresh contract', paths: PUBLIC_REVALIDATE_PATHS };
+    }
     return {
       ok: true,
       status: res.status,
-      paths: json.revalidated ?? PUBLIC_REVALIDATE_PATHS,
+      paths: json.revalidated,
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -188,6 +201,27 @@ export async function getPublishWebsiteStatus(): Promise<PublishWebsiteStatus> {
             deploymentStatus?.lastTransitionTime ?? deploymentStatus?.updatedAt ?? null;
         } catch {
           status = 'unavailable';
+        }
+      }
+
+      if (!status || status === 'unknown' || status === 'unavailable') {
+        try {
+          const health = await fetch(`${cfg.url.replace(/\/$/, '')}${cfg.healthPath}`, {
+            cache: 'no-store',
+            signal: AbortSignal.timeout(8_000),
+          });
+          const contentType = health.headers.get('content-type') || '';
+          const payload = contentType.includes('application/json')
+            ? (await health.json().catch(() => null)) as { ok?: boolean; timestamp?: string } | null
+            : null;
+          if (health.ok && payload?.ok === true) {
+            status = 'healthy';
+            lastDeployedAt ??= payload.timestamp ?? null;
+          } else {
+            status = `unhealthy (HTTP ${health.status})`;
+          }
+        } catch {
+          status = 'unreachable';
         }
       }
 

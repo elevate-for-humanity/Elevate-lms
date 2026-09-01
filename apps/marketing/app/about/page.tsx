@@ -59,6 +59,8 @@ const founderCredentials = [
   'Information Technology Specialist Exam Proctor',
   'Entrepreneurship and Small Business Exam Proctor',
   'Intuit QuickBooks Certification Exam Proctor',
+  'VITA Free Tax Preparation Site Coordinator',
+  'VITA Free Tax Preparation Center Owner and Operator',
 ];
 
 const organizationApprovals = [
@@ -74,6 +76,7 @@ const organizationApprovals = [
   'CareerSafe OSHA training provider relationship',
   'HSI affiliate relationship',
   'NRF RISE Up provider relationship',
+  'VITA Free Tax Preparation Center operated through Selfish Inc.',
 ];
 
 const capabilities = [
@@ -221,8 +224,9 @@ export default function AboutPage() {
               sponsor compliance.
             </p>
             <p>
-              She also leads Selfish Inc., a 501(c)(3) nonprofit connected to community support and
-              VITA free tax preparation services, and oversees Elevate tax operations.
+              She also leads Selfish Inc., a 501(c)(3) nonprofit, operates its VITA free tax
+              preparation center and community-support programs, serves as a VITA site coordinator,
+              and oversees Elevate tax operations.
             </p>
           </div>
         </div>

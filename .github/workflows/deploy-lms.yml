@@ -63,7 +63,9 @@ permissions:
 # deployment remains in service under the maxUnavailable=0 rollout contract.
 concurrency:
   group: northflank-lms-deploy
-  cancel-in-progress: true
+  # Do not discard a production image after Northflank has already started
+  # building it. GitHub still coalesces queued runs to the newest pending SHA.
+  cancel-in-progress: false
 
 jobs:
   deploy-lms:

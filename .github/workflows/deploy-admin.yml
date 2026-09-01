@@ -38,7 +38,11 @@ permissions:
 
 concurrency:
   group: northflank-admin-deploy
-  cancel-in-progress: true
+  # Northflank images take several minutes to build. Cancelling an active run
+  # on every shared-library commit can leave production pinned to an old image
+  # indefinitely when commits arrive faster than builds complete. Finish the
+  # active deployment; GitHub will retain only the newest pending run.
+  cancel-in-progress: false
 
 jobs:
   deploy-admin:

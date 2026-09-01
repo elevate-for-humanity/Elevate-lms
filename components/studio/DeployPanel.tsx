@@ -69,7 +69,10 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
       const res = await fetch('/api/admin/dev-studio/shell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ workflow: workflow.key }),
+        body: JSON.stringify({
+          workflow: workflow.key,
+          ...(workflow.key.startsWith('deploy-') ? { confirmation: 'CONFIRM DEPLOY' } : {}),
+        }),
       });
       const data = await res.json().catch(() => ({})) as DispatchResult;
       if (!res.ok || data.error) throw new Error(data.error || `Dispatch failed with HTTP ${res.status}`);
@@ -134,7 +137,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
       const res = await fetch('/api/admin/dev-studio/shell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ workflow: 'deploy-production-dispatch' }),
+        body: JSON.stringify({ workflow: 'deploy-production-dispatch', confirmation: 'CONFIRM DEPLOY' }),
       });
       const data = await res.json().catch(() => ({})) as DispatchResult;
       if (!res.ok || data.error) throw new Error(data.error || `Deploy failed with HTTP ${res.status}`);

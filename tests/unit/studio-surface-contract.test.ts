@@ -6,6 +6,13 @@ const root = process.cwd();
 const source = (relativePath: string) => readFileSync(path.join(root, relativePath), 'utf8');
 
 describe('Admin Dashboard and Studio surface contract', () => {
+  it('registers implemented top-level Studio operations pages in navigation', () => {
+    const registry = source('lib/devstudio/workspace-registry.ts');
+    for (const route of ['/studio/agents', '/studio/builds', '/studio/logs']) {
+      expect(registry).toContain(`route: '${route}'`);
+    }
+  });
+
   it('keeps one canonical Admin Dashboard and Studio route', () => {
     const contracts = JSON.parse(source('lib/routes/platform-surface-contracts.json'));
 
@@ -56,5 +63,72 @@ describe('Admin Dashboard and Studio surface contract', () => {
 
     expect(panel).toContain("fetch('/api/admin/dev-studio/chat'");
     expect(panel).not.toContain('/api/admin/studio/');
+  });
+
+  it('routes commercial generation through the live Media Studio endpoint', () => {
+    const registry = source('lib/ai/tools/registry.ts');
+    const commercialRoute = source('apps/admin/app/api/admin/media-studio/commercial/route.ts');
+
+    expect(registry).toContain("name: 'video.generate'");
+    expect(registry).toContain("path: '/api/admin/media-studio/commercial'");
+    expect(registry).not.toContain("path: '/api/video/generate'");
+    expect(commercialRoute).toContain("z.enum(['plan', 'revise', 'render'])");
+    expect(commercialRoute).toContain('renderCommercialVideo(plan, brief)');
+  });
+
+  it('keeps organization lookup separate from protected student search', () => {
+    const registry = source('lib/ai/tools/registry.ts');
+    const planner = source('lib/ai/tools/planner.ts');
+    const execute = source('apps/admin/app/api/admin/dev-studio/execute/route.ts');
+
+    expect(registry).toContain("name: 'organization.directory'");
+    expect(planner).toContain("name: 'organization.directory'");
+    expect(execute).toContain("toolName === 'organization.directory'");
+    expect(execute).toContain("'students.search': 'Student records were found.");
+  });
+
+  it('enforces production confirmation at server execution boundaries', () => {
+    const shell = source('apps/admin/app/api/admin/dev-studio/shell/route.ts');
+    const files = source('apps/admin/app/api/admin/dev-studio/files/route.ts');
+    const builds = source('apps/admin/app/api/admin/dev-studio/builds/route.ts');
+    const services = source('apps/admin/app/api/admin/dev-studio/services/route.ts');
+    const environment = source('apps/admin/app/api/admin/dev-studio/env/route.ts');
+
+    expect(shell).toContain("requireTypedConfirmation(body?.confirmation, 'deploy_autopilot')");
+    expect(files).toContain("requireTypedConfirmation(body.confirmation, 'git_push')");
+    expect(builds).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
+    expect(builds).toContain("return safeError('Northflank is not configured.");
+    expect(services).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
+    expect(environment).toContain("requireTypedConfirmation(req.headers.get('x-confirmation'), 'delete_secret')");
+  });
+
+  it('preflights the isolated browser runtime before enabling Chromium', () => {
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    expect(workspace).toContain("fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store' })");
+    expect(workspace).toContain('disabled={runtimeReady !== true}');
+    expect(workspace).toContain('STUDIO_BROWSER_PUBLIC_URL');
+  });
+
+  it('does not advertise the unconnected Live Canvas without its feature flag', () => {
+    const registry = source('lib/devstudio/workspace-registry.ts');
+    expect(registry).toContain("route: '/studio/canvas'");
+    expect(registry).toContain("featureFlag: 'LIVE_CANVAS_ENABLED'");
+  });
+
+  it('keeps live preview and isolated browser inspection beside Admin AI', () => {
+    const page = source('apps/admin/app/studio/page.tsx');
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+
+    expect(page).toContain('StudioCommandWorkspace');
+    expect(workspace).toContain('<UnifiedEllieChat');
+    expect(workspace).toContain('<RepositoryLivePreview');
+    expect(workspace).toContain('<CloudBrowserWorkspace');
+    expect(workspace).toContain('Live inspection');
+  });
+
+  it('validates GitHub credentials before declaring Studio execution ready', () => {
+    const health = source('lib/devstudio/health-handler.ts');
+    expect(health).toContain("fetch('https://api.github.com/user'");
+    expect(health).toContain('ready: githubTokenValid');
   });
 });

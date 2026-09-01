@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@/lib/supabase';
 
 export type CourseSnapshot = {
   course: Record<string, any>;
+  program: Record<string, any> | null;
   modules: Array<Record<string, any>>;
   lessons: Array<Record<string, any>>;
 };
@@ -27,12 +28,18 @@ async function loadSnapshot(db: SupabaseClient, courseId: string): Promise<Cours
   if (moduleError) throw moduleError;
   if (lessonError) throw lessonError;
   if (!course) throw new Error('Course not found');
-  return { course, modules: modules ?? [], lessons: lessons ?? [] };
+  let program: Record<string, any> | null = null;
+  if (course.program_id) {
+    const { data, error } = await db.from('programs').select('id,is_apprenticeship,total_hours').eq('id', course.program_id).maybeSingle();
+    if (error) throw error;
+    program = data;
+  }
+  return { course, program, modules: modules ?? [], lessons: lessons ?? [] };
 }
 
 function readinessBlockers(snapshot: CourseSnapshot): string[] {
   const blockers: string[] = [];
-  const { course, modules, lessons } = snapshot;
+  const { course, program, modules, lessons } = snapshot;
   if (!modules.length) blockers.push('Course has no modules.');
   if (!lessons.length) blockers.push('Course has no lessons.');
   if (!course.compliance_profile_key) blockers.push('Course has no explicit compliance profile.');
@@ -48,7 +55,9 @@ function readinessBlockers(snapshot: CourseSnapshot): string[] {
   }
   const declaredHours = Number(course.duration_hours ?? 0);
   const seatHours = lessons.reduce((sum, lesson) => sum + Number(lesson.minimum_seat_time_minutes ?? lesson.duration_minutes ?? 0), 0) / 60;
-  if (declaredHours > 0 && Math.abs(declaredHours - seatHours) > Math.max(1, declaredHours * 0.05)) {
+  if (program?.is_apprenticeship && declaredHours !== Number(program.total_hours ?? 0)) {
+    blockers.push(`Declared hours (${declaredHours}) do not match the linked apprenticeship program (${Number(program.total_hours ?? 0)}).`);
+  } else if (!program?.is_apprenticeship && declaredHours > 0 && Math.abs(declaredHours - seatHours) > Math.max(1, declaredHours * 0.05)) {
     blockers.push(`Declared hours (${declaredHours}) do not reconcile with configured lesson seat hours (${seatHours.toFixed(2)}).`);
   }
   if (course.compliance_profile_key === 'dol_apprenticeship') {

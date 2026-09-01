@@ -14,7 +14,9 @@ export function asAIRecord(value: unknown): Record<string, unknown> {
 }
 
 function extractUuid(text: string): string | null {
-  return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i)?.[0] ?? null;
+  // Database identities include newer UUID versions; routing must not discard
+  // a valid persisted UUID merely because its version nibble is above v5.
+  return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i)?.[0] ?? null;
 }
 
 function extractNamedFilter(command: string, label: string): string | null {
@@ -71,6 +73,11 @@ export function planAIToolFromCommand(
   const contextId = typeof context.id === 'string' ? context.id : null;
   const id = contextId ?? extractUuid(command);
 
+  const personAtElevate = command.match(/\bwho is\s+(.+?)\s+(?:at|with)\s+elevate(?:\s+for\s+humanity)?\b/i);
+  if (personAtElevate?.[1]) {
+    return { name: 'organization.directory', input: { query: personAtElevate[1].trim() } };
+  }
+
   if (/\bwioa\b/.test(lower) && /\b(follow[- ]?ups?|30\s*[- ]?day|overdue|past due|missing|missed)\b/.test(lower)) {
     return { name: 'wioa.followups', input: wioaFollowupInput(command, context) };
   }
@@ -107,7 +114,45 @@ export function planAIToolFromCommand(
   if (/\b(system|platform)\b.*\b(health|status)\b|\bhealth check\b/.test(lower)) {
     return { name: 'system.health', input: {} };
   }
-  if (/\b(workflows?|course build|course generation)\b/.test(lower) && /\b(inspect|status|progress|state|check|report|current|running|failures?|completion)\b/.test(lower)) {
+  if (/\b(create|make|generate|render)\b.*\b(commercial|promo|promotional)\b.*\bvideo\b|\bcommercial video\b/.test(lower)) {
+    const duration = Number(lower.match(/\b(15|30|45|60|90)\s*[- ]?second/)?.[1] ?? 30);
+    const aspectRatio = lower.includes('9:16') ? '9:16' : lower.includes('1:1') ? '1:1' : '16:9';
+    return {
+      name: 'video.generate',
+      input: {
+        action: 'render',
+        projectName: 'Admin AI Commercial',
+        title: 'Elevate for Humanity Commercial',
+        prompt: command,
+        audience: 'prospective learners, employers, training providers, and community partners',
+        objective: 'demonstrate verified Elevate platform workflows',
+        cta: 'Explore the Elevate demos',
+        durationSeconds: duration,
+        aspectRatio,
+        sourceMode: 'hybrid',
+        tone: 'professional',
+        voice: 'coral',
+        includeCaptions: true,
+      },
+    };
+  }
+  if (/\b(store demos?|demo routes?)\b/.test(lower) && /\b(scan|audit|inspect|test|verify|fix|repair)\b/.test(lower)) {
+    return {
+      name: 'openhands.execute',
+      input: {
+        ...asAIRecord(context.toolInput),
+        task: `Audit and repair the public Store demos using repository and live-browser evidence. Do not publish or deploy. User request: ${command}`,
+      },
+    };
+  }
+  // Workflow inspection is only for requests whose subject is workflow/build
+  // execution state. Do not let an incidental phrase such as "claims that do
+  // not match the real workflow" hijack a browser or engineering audit.
+  if (
+    /\b(workflows?|course build|course generation)\b/.test(lower) &&
+    /\b(status|progress|state|current|running|failed|failure|completion|queue|task)\b/.test(lower) &&
+    !/\b(store demos?|demo routes?|live browser|public store|broken links?|mobile layout|console errors?|api errors?)\b/.test(lower)
+  ) {
     return { name: 'workflows.inspect', input: asAIRecord(context.toolInput) };
   }
   if (/\b(analytics|metrics|dashboard numbers)\b/.test(lower)) {
@@ -121,6 +166,24 @@ export function planAIToolFromCommand(
   }
   if (/\b(issue|generate)\b.*\bcertificate/.test(lower)) {
     return { name: 'certificates.issue', input: asAIRecord(context.toolInput) };
+  }
+  // Existing course media repair is Course Builder work. Route it before the
+  // generic engineering/browser rules so words such as "repair", "endpoint",
+  // or "dashboard" cannot accidentally dispatch an unauthorized OpenHands job.
+  if (
+    /\b(course|lesson)\b/.test(lower) &&
+    /\b(videos?|media|mp4s?|captions?|transcripts?|assets?)\b/.test(lower) &&
+    /\b(repair|fix|replace|restore|recover|rerender|re-render|audit|publish|finish|resume)\b/.test(lower)
+  ) {
+    return {
+      name: 'courses.generate',
+      input: {
+        ...asAIRecord(context.toolInput),
+        action: 'start',
+        goal: command,
+        ...(id ? { courseId: id } : {}),
+      },
+    };
   }
   if (/\b(send|email)\b.*\breminder/.test(lower)) {
     return { name: 'communications.remind', input: asAIRecord(context.toolInput) };

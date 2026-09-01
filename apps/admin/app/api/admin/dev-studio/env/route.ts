@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeDbError, safeError, safeInternalError } from '@/lib/api/safe-error';
 import { refreshSecrets } from '@/lib/secrets';
+import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -136,6 +137,10 @@ export async function DELETE(req: NextRequest) {
 
   const key = req.nextUrl.searchParams.get('key')?.trim().toUpperCase() ?? '';
   if (!isValidKey(key)) return safeError('Valid key query param is required', 400);
+  const confirmation = requireTypedConfirmation(req.headers.get('x-confirmation'), 'delete_secret');
+  if (!confirmation.ok) {
+    return NextResponse.json({ error: 'Deleting a canonical secret requires typed confirmation.', requiredConfirmation: confirmation.required }, { status: 409 });
+  }
 
   try {
     const db = await requireAdminClient();

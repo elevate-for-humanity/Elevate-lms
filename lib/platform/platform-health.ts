@@ -159,14 +159,15 @@ async function checkRedis(): Promise<ServiceCheck> {
 }
 
 async function checkStripe(): Promise<ServiceCheck> {
-  const key = process.env.STRIPE_SECRET_KEY?.trim();
-  const configured = Boolean(key && key.startsWith('sk_'));
+  const { getStripeRuntimeKey } = await import('@/lib/stripe/runtime-key');
+  const key = getStripeRuntimeKey();
+  const configured = Boolean(key);
   if (!configured) {
     return {
       name: 'Stripe',
       status: 'unknown',
       configured: false,
-      message: 'STRIPE_SECRET_KEY not set',
+      message: 'Stripe server credential not set',
     };
   }
 
@@ -183,12 +184,16 @@ async function checkStripe(): Promise<ServiceCheck> {
       configured: true,
     };
   } catch (err) {
+    const raw = err instanceof Error ? err.message : '';
+    const message = /expired api key|invalid api key|api key provided/i.test(raw)
+      ? 'The configured Stripe API key is expired or invalid.'
+      : 'Stripe API probe failed.';
     return {
       name: 'Stripe',
       status: 'down',
       latencyMs: Date.now() - start,
       configured: true,
-      message: err instanceof Error ? err.message : 'Stripe API probe failed',
+      message,
     };
   }
 }

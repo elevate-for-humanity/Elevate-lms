@@ -75,9 +75,11 @@ function htmlPreview(filePath: string, content: string, baseOrigin: string) {
 export default function RepositoryLivePreview({
   filePath,
   content,
+  initialUrl = '',
 }: {
   filePath: string | null;
   content: string;
+  initialUrl?: string;
 }) {
   const target = useMemo(() => inferTarget(filePath ?? ''), [filePath]);
   const defaultOrigin = target?.origin ?? 'https://www.elevateforhumanity.org';
@@ -90,8 +92,8 @@ export default function RepositoryLivePreview({
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    setManualUrl(target?.url ?? target?.origin ?? '');
-  }, [target?.url, target?.origin]);
+    setManualUrl(target?.url ?? target?.origin ?? initialUrl);
+  }, [target?.url, target?.origin, initialUrl]);
 
   const previewUrl = manualUrl.trim();
   const canOpen = /^https?:\/\//i.test(previewUrl);

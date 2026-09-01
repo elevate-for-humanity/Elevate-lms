@@ -10,6 +10,7 @@ export default function CloudBrowserWorkspace() {
   const [target, setTarget] = useState('https://www.elevateforhumanity.org');
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
+  const [runtimeReady, setRuntimeReady] = useState<boolean | null>(null);
   const [error, setError] = useState('');
   const [events, setEvents] = useState<BrowserEvent[]>([]);
   const [typedText, setTypedText] = useState('');
@@ -20,6 +21,29 @@ export default function CloudBrowserWorkspace() {
 
   const endpoint = session ? `${session.publicUrl}/sessions/${session.id}` : '';
   const authHeaders = session ? { Authorization: `Bearer ${session.token}` } : {};
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store' })
+      .then(async (response) => ({ response, payload: await response.json() }))
+      .then(({ response, payload }) => {
+        if (cancelled) return;
+        const ready = response.ok && payload.configured === true && payload.ready === true;
+        setRuntimeReady(ready);
+        setStatus(ready ? 'Ready to start' : payload.configured ? 'Runtime is offline' : 'Runtime is not configured');
+        if (!ready) setError(payload.configured
+          ? 'The isolated browser service is configured but is not responding.'
+          : 'Configure STUDIO_BROWSER_URL, STUDIO_BROWSER_PUBLIC_URL, and STUDIO_BROWSER_SECRET in Containers before starting Chromium.');
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setRuntimeReady(false);
+          setStatus('Runtime check failed');
+          setError('Could not verify the isolated browser runtime.');
+        }
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   async function start() {
     setError(''); setStatus('Starting isolated Chromium…');
@@ -79,7 +103,7 @@ export default function CloudBrowserWorkspace() {
       <header className="flex flex-wrap items-center gap-2 border-b border-slate-800 bg-slate-900 p-3">
         <Globe2 className="h-5 w-5 text-cyan-300" /><strong className="mr-2">Cloud Browser</strong>
         <input value={target} onChange={(event) => setTarget(event.target.value)} className="min-w-[260px] flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs" aria-label="Browser URL" />
-        {!session ? <button onClick={start} className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-black text-slate-950">Start Chromium</button> : <>
+        {!session ? <button onClick={start} disabled={runtimeReady !== true} className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-black text-slate-950 disabled:cursor-not-allowed disabled:opacity-50">Start Chromium</button> : <>
           <button onClick={() => action({ type: 'navigate', url: target })} className="rounded-lg bg-cyan-500 px-3 py-2 text-xs font-black text-slate-950">Go</button>
           <button onClick={() => action({ type: 'reload' })} className="rounded-lg border border-slate-700 p-2" title="Reload"><RefreshCw className="h-4 w-4" /></button>
           <button onClick={stop} className="rounded-lg border border-rose-800 p-2 text-rose-300" title="Stop"><Square className="h-4 w-4" /></button>

@@ -26,7 +26,7 @@ const TRANSITIONS: Record<ReviewAction, { from: string[]; to: string }> = {
 
 async function collectReadinessBlockers(db: Awaited<ReturnType<typeof requireAdminClient>>, courseId: string) {
   const [{ data: course, error: courseError }, { data: modules, error: moduleError }, { data: lessons, error: lessonError }] = await Promise.all([
-    db.from('courses').select('duration_hours,compliance_profile_key,governing_body,governing_region').eq('id', courseId).maybeSingle(),
+    db.from('courses').select('duration_hours,program_id,compliance_profile_key,governing_body,governing_region').eq('id', courseId).maybeSingle(),
     db.from('course_modules').select('id,target_hours').eq('course_id', courseId),
     db.from('course_lessons').select('id,lesson_type,duration_minutes,minimum_seat_time_minutes,passing_score,learning_objectives,content,content_json').eq('course_id', courseId),
   ]);
@@ -51,7 +51,20 @@ async function collectReadinessBlockers(db: Awaited<ReturnType<typeof requireAdm
   }
   const declaredHours = Number(course.duration_hours ?? 0);
   const seatHours = rows.reduce((sum, lesson) => sum + Number(lesson.minimum_seat_time_minutes ?? lesson.duration_minutes ?? 0), 0) / 60;
-  if (declaredHours > 0 && Math.abs(declaredHours - seatHours) > Math.max(1, declaredHours * 0.05)) {
+  let apprenticeshipProgram = false;
+  if (course.program_id) {
+    const { data: program, error: programError } = await db
+      .from('programs')
+      .select('is_apprenticeship,total_hours')
+      .eq('id', course.program_id)
+      .maybeSingle();
+    if (programError) throw programError;
+    apprenticeshipProgram = Boolean(program?.is_apprenticeship);
+    if (apprenticeshipProgram && Number(program?.total_hours ?? 0) !== declaredHours) {
+      blockers.push(`Course hours (${declaredHours}) do not match the linked apprenticeship program (${Number(program?.total_hours ?? 0)}).`);
+    }
+  }
+  if (!apprenticeshipProgram && declaredHours > 0 && Math.abs(declaredHours - seatHours) > Math.max(1, declaredHours * 0.05)) {
     blockers.push(`Declared hours (${declaredHours}) do not reconcile with configured lesson seat hours (${seatHours.toFixed(2)}).`);
   }
   if (course.compliance_profile_key === 'dol_apprenticeship' && !(course.governing_body && course.governing_region)) {

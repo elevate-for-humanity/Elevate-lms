@@ -4,9 +4,9 @@
  * Scene-based lesson video composition.
  *
  * Structure per lesson:
- *   BrandedIntro  — course title + lesson title (fixed 3s)
+ *   BrandedIntro  — course title + lesson title (fixed 1s)
  *   Scene[]       — title card + bullet points over stock clip or image
- *   BrandedOutro  — recap + quiz reminder (fixed 3s)
+ *   BrandedOutro  — recap + quiz reminder (fixed 2s)
  *
  * Each scene has:
  *   - Background: Pexels video clip (looped) or fallback image
@@ -64,8 +64,8 @@ export interface SlideLessonProps {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const INTRO_FRAMES = 90; // 3s at 30fps
-const OUTRO_FRAMES = 90;
+const INTRO_FRAMES = 30; // One readable second; never open on a blank/blurred card.
+const OUTRO_FRAMES = 60;
 
 // ── Animation helpers ─────────────────────────────────────────────────────────
 
@@ -168,7 +168,7 @@ function BrandedIntro({ props, frame }: { props: SlideLessonProps; frame: number
       <div style={{ textAlign: 'center', padding: '0 120px', maxWidth: 1200 }}>
         <div
           style={{
-            opacity: fadeIn(frame, 8, 18),
+            opacity: fadeIn(frame, 0, 1),
             fontSize: 18,
             color: props.accentColor,
             fontFamily: 'sans-serif',
@@ -182,8 +182,8 @@ function BrandedIntro({ props, frame }: { props: SlideLessonProps; frame: number
         </div>
         <div
           style={{
-            opacity: fadeIn(frame, 20, 25),
-            transform: `translateY(${slideUp(frame, fps, 20)}px)`,
+            opacity: fadeIn(frame, 0, 1),
+            transform: `translateY(${slideUp(frame, fps, 0)}px)`,
             fontSize: 60,
             fontWeight: 900,
             color: '#fff',

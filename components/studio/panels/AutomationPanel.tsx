@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AutomationPanel — displays automation rules and workflows for this course.
+ * AutomationPanel — displays only automation explicitly scoped to this course.
  * Reads automationRules + workflows from CourseProvider (loaded at session start).
  * Full automation management is available at /studio/workflows.
  */
@@ -18,7 +18,7 @@ export function AutomationPanel() {
     <div className="p-6 max-w-2xl">
       <PanelHeader
         icon={<Zap className="w-5 h-5" />}
-        title="Automation"
+        title="Course Automation"
         subtitle={`${automationRules.length} rule${automationRules.length !== 1 ? 's' : ''} · ${workflows.length} workflow${workflows.length !== 1 ? 's' : ''}`}
         actions={
           <a
@@ -64,8 +64,8 @@ export function AutomationPanel() {
       ) : (
         <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-6 py-8 text-center mb-6">
           <Zap className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-          <p className="text-sm font-medium text-slate-600">No automation rules yet</p>
-          <p className="text-xs text-slate-400 mt-1">Create rules to automate notifications, enrollments, and completions.</p>
+          <p className="text-sm font-medium text-slate-600">No course-scoped automation rules</p>
+          <p className="text-xs text-slate-400 mt-1">Platform-wide rules are managed in the unified Workflow Designer and are not counted as course rules.</p>
           <a href="/studio/workflows" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-brand-blue-600 hover:text-brand-blue-800">
             Create automation rule <ExternalLink className="w-3.5 h-3.5" />
           </a>

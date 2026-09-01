@@ -11,7 +11,7 @@ import type { MediaStoryboard } from './media-director';
 const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
 const MAX_FREEZE_SECONDS = 4;
-const MAX_BLACK_SECONDS = 2;
+const MAX_BLACK_SECONDS = 0.75;
 
 export interface MediaQualityEvidence {
   bytes: number;
@@ -103,14 +103,14 @@ async function requireTextAsset(url: string, label: string): Promise<string> {
 }
 
 async function transcribeRenderedAudio(videoPath: string, workDir: string): Promise<string> {
-  const provider = process.env.AI_PROVIDER?.trim().toLowerCase();
-  if (provider !== 'openai') {
-    throw new Error(`Rendered-audio transcription is not configured for canonical provider "${provider || 'unset'}"`);
-  }
+  // Transcription is a media-verification capability, not the platform's
+  // canonical text-generation provider. A Cloudflare-backed AI runtime can
+  // therefore validate rendered audio with the separately configured OpenAI
+  // transcription model instead of failing every otherwise valid video.
   const model = process.env.AI_TRANSCRIPTION_MODEL?.trim();
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!model) throw new Error('AI_TRANSCRIPTION_MODEL is not configured');
-  if (!apiKey) throw new Error('OPENAI_API_KEY is not configured for rendered-audio validation');
+  if (!apiKey) throw new Error('OPENAI_API_KEY is not configured for rendered-audio validation (AI_PROVIDER may remain Cloudflare)');
 
   const audioPath = join(workDir, 'rendered-audio.wav');
   await execFileAsync('ffmpeg', [

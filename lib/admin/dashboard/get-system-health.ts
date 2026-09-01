@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@/lib/supabase';
+import { getStripeRuntimeKey } from '@/lib/stripe/runtime-key';
 
 export interface SystemHealthAlert {
   code: string;
@@ -21,7 +22,6 @@ export interface DashboardSystemHealth {
 const REQUIRED_ENV = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'SUPABASE_SERVICE_ROLE_KEY',
-  'STRIPE_SECRET_KEY',
   'STRIPE_WEBHOOK_SECRET',
   'RESEND_API_KEY',
 ];
@@ -35,7 +35,7 @@ async function getCachedStripeIssuingStatus(): Promise<{ enabled: boolean; reaso
   if (_stripeIssuingCache && now < _stripeIssuingCache.expiresAt) {
     return _stripeIssuingCache.result;
   }
-  const key = process.env.STRIPE_SECRET_KEY;
+  const key = getStripeRuntimeKey();
   if (!key) {
     const result = { enabled: false, reason: 'no_key' };
     _stripeIssuingCache = { result, expiresAt: now + 5 * 60 * 1000 };
@@ -64,6 +64,7 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
 
   // Check required env vars
   const missingEnv = REQUIRED_ENV.filter((k) => !process.env[k]);
+  if (!getStripeRuntimeKey()) missingEnv.push('STRIPE_RESTRICTED_KEY or STRIPE_SECRET_KEY');
   const buildEnvOk = missingEnv.length === 0;
   if (!buildEnvOk) {
     alerts.push({
@@ -116,7 +117,7 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
       stripeIssuing.reason === 'not_approved'
         ? 'Stripe Issuing not yet approved for this account. Apply at dashboard.stripe.com/issuing.'
         : stripeIssuing.reason === 'no_key'
-        ? 'STRIPE_SECRET_KEY missing — Stripe Issuing status unknown.'
+        ? 'Stripe server credential missing — Stripe Issuing status unknown.'
         : `Stripe Issuing unavailable (${stripeIssuing.reason}).`;
     alerts.push({
       code: 'stripe_issuing_not_enabled',

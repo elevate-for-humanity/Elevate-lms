@@ -10,6 +10,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { hydrateNorthflankEnv } from '@/lib/secrets';
+import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
 import {
   getNorthflankProjectId,
   getNorthflankService,
@@ -65,8 +66,11 @@ export async function GET(request: NextRequest) {
 
       const nf = nfResult.status === 'fulfilled' ? nfResult.value : null;
       const status = nf ? statusOf(nf) : nfReady ? 'unavailable' : 'not_configured';
-      const running = nf ? isRunning(status) : null;
       const healthy = health.status === 'fulfilled' ? health.value.ok : null;
+      // Northflank's deployment status shape varies by service type. A passing
+      // canonical health probe is stronger runtime evidence than an unknown
+      // provider status and must not be rendered as "Stopped".
+      const running = nf ? (isRunning(status) || healthy === true) : healthy === true ? true : null;
       const lastDeployedAt =
         ((nf?.deploymentStatus as { lastTransitionTime?: string; updatedAt?: string } | undefined)?.lastTransitionTime ??
           (nf?.deploymentStatus as { updatedAt?: string } | undefined)?.updatedAt ??
@@ -113,7 +117,7 @@ export async function POST(request: NextRequest) {
 
   await hydrateNorthflankEnv().catch(() => {});
 
-  let body: { action: string; service: string };
+  let body: { action: string; service: string; confirmation?: string };
   try {
     body = await request.json();
   } catch {
@@ -135,6 +139,10 @@ export async function POST(request: NextRequest) {
 
   if (action !== 'deploy' && action !== 'restart') {
     return safeError(`Unknown action: ${action}`, 400);
+  }
+  const confirmation = requireTypedConfirmation(body.confirmation, 'deploy_autopilot');
+  if (!confirmation.ok) {
+    return NextResponse.json({ error: 'Service deployment requires typed confirmation.', requiredConfirmation: confirmation.required }, { status: 409 });
   }
 
   try {

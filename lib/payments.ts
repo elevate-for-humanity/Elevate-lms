@@ -3,10 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe/client';
 import { logAuditEvent } from '@/lib/audit';
 
-// Resolved at request time — null when STRIPE_SECRET_KEY is absent (build/test)
-const stripe = getStripe();
-
 function requireStripe(): Stripe {
+  const stripe = getStripe();
   if (!stripe) {
     throw new Error('Stripe is not configured');
   }
@@ -68,7 +66,6 @@ export async function getOrCreateStripeCustomer(
     return profile.stripe_customer_id;
   }
   // Create new Stripe customer
-  if (!stripe) throw new Error('Stripe not configured');
   const customer = await requireStripe().customers.create({
     email,
     ...(name ? { name } : {}),

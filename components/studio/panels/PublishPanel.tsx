@@ -108,7 +108,7 @@ export function PublishPanel() {
       <PanelHeader
         icon={<Rocket className="w-5 h-5" />}
         title="Review & Publish"
-        subtitle={publishState.isPublished ? 'Published learner version · human editing remains available' : 'AI-first acceptance with optional human review'}
+        subtitle={publishState.isPublished ? (auditPass ? 'Published learner version · readiness verified' : 'Published database record · readiness blockers require correction') : 'AI-first acceptance with optional human review'}
         actions={
           <button type="button" onClick={() => void loadAudit()} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className="h-3.5 w-3.5" /> Re-run gate
@@ -169,7 +169,7 @@ export function PublishPanel() {
         </div>
       ) : null}
 
-      {publishState.isPublished ? (
+      {publishState.isPublished && auditPass ? (
         <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4">
           <CheckCircle className="h-6 w-6 shrink-0 text-emerald-600" />
           <div className="flex-1">
@@ -177,6 +177,14 @@ export function PublishPanel() {
             <p className="text-xs text-emerald-600">The learner version was published through the canonical Course Builder authority.</p>
           </div>
           <a href={`/lms/courses/${course.id}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-medium text-emerald-700 hover:text-emerald-900">View <ExternalLink className="h-3.5 w-3.5" /></a>
+        </div>
+      ) : publishState.isPublished ? (
+        <div className="flex items-start gap-3 rounded-xl border border-red-300 bg-red-50 px-4 py-4">
+          <XCircle className="mt-0.5 h-6 w-6 shrink-0 text-red-600" />
+          <div>
+            <p className="text-sm font-bold text-red-900">Published record has readiness blockers</p>
+            <p className="mt-1 text-xs leading-5 text-red-800">The database status is published, but the canonical procurement gate does not pass. This page will not represent the course as verified-live until the persisted blockers are resolved and the gate passes.</p>
+          </div>
         </div>
       ) : (
         <button onClick={() => void handlePublish()} disabled={!auditPass || Boolean(busy)} className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-blue-600 px-6 py-3.5 font-semibold text-white transition hover:bg-brand-blue-700 disabled:cursor-not-allowed disabled:opacity-40">

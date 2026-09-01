@@ -1,5 +1,6 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { getStripeRuntimeKey } from '@/lib/stripe/runtime-key';
 
 export type HealthStatus = 'healthy' | 'degraded' | 'down';
 
@@ -113,19 +114,20 @@ export async function getSiteHealthSnapshot(): Promise<SiteHealthSnapshot> {
 
     // Stripe
     (async () => {
-      const configured = Boolean(process.env.STRIPE_SECRET_KEY);
+      const stripeKey = getStripeRuntimeKey();
+      const configured = Boolean(stripeKey);
       if (!configured) {
         return {
           name: 'Stripe',
           status: 'down' as HealthStatus,
           latencyMs: null,
-          detail: 'STRIPE_SECRET_KEY not set',
+          detail: 'Stripe server credential not set',
         };
       }
       const { latencyMs, error } = await timeCheck(async () => {
         const res = await fetch('https://api.stripe.com/v1/balance', {
           headers: {
-            Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+            Authorization: `Bearer ${stripeKey}`,
           },
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

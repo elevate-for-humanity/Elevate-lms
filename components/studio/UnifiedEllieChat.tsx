@@ -288,7 +288,7 @@ export default function UnifiedEllieChat({
     recognition.onerror = (event: any) => {
       setSpeechError(
         event.error === 'not-allowed'
-          ? 'Microphone permission was denied. Allow microphone access and try again.'
+          ? 'Microphone access is blocked. Allow microphone access for admin.elevateforhumanity.org in your browser site settings, reload this page, then press the microphone again. You can continue typing while voice input is unavailable.'
           : `Voice input stopped: ${event.error ?? 'unknown error'}`,
       );
       setListening(false);

@@ -86,7 +86,7 @@ function vttTimestamp(seconds: number): string {
 }
 
 export function buildStoryboardWebVtt(scenes: SceneData[]): string {
-  let cursor = 3;
+  let cursor = 1;
   const cues = scenes.map((scene, index) => {
     const start = cursor;
     cursor += scene.durationFrames / 30;
@@ -107,6 +107,13 @@ interface InstructorConfig {
 }
 
 const INSTRUCTOR_CONFIGS: Record<string, InstructorConfig> = {
+  'avery-brooks': {
+    name: 'Avery Brooks',
+    title: 'Cosmetology Education Specialist',
+    voice: EDGE_TTS_VOICES.female,
+    topBarColor: '#a855f7',
+    accentColor: '#ec4899',
+  },
   'marcus-johnson': {
     name: 'Marcus Johnson',
     title: 'Workforce Development Specialist',
@@ -172,8 +179,8 @@ function requiredInstructor(id: string): InstructorConfig {
 const DEFAULT_INSTRUCTOR = requiredInstructor('marcus-johnson');
 
 function getInstructor(instructorId?: string): InstructorConfig {
-  const instructor = instructorId ? INSTRUCTOR_CONFIGS[instructorId] : undefined;
-  return instructor ?? DEFAULT_INSTRUCTOR;
+  if (!instructorId) return DEFAULT_INSTRUCTOR;
+  return requiredInstructor(instructorId);
 }
 
 // ── Segment frame calculator ──────────────────────────────────────────────────
@@ -556,7 +563,7 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
       backgroundColor: '#0f172a',
       logoText: 'Elevate LMS',
     };
-    const totalFrames = 180 + scenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
+    const totalFrames = 90 + scenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
     const bundleUrl = await getBundleUrl();
     const { renderMedia, selectComposition } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;

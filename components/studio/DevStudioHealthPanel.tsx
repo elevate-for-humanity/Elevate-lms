@@ -16,6 +16,7 @@ type HealthPayload = Record<string, unknown> & {
   hasOpenAI?: boolean;
   hasAnthropic?: boolean;
   hasGitHub?: boolean;
+  githubTokenValid?: boolean;
   supabaseUrlPresent?: boolean;
   supabaseServiceKeyPresent?: boolean;
   execution?: {
@@ -61,7 +62,7 @@ export default function DevStudioHealthPanel() {
 
   const rows = health
     ? [
-        ['GitHub token', flag(health.hasGitHub)],
+        ['GitHub token', !health.hasGitHub ? 'missing' : health.githubTokenValid ? 'valid' : 'invalid'],
         ['Groq', flag(health.hasGroq)],
         ['OpenAI', flag(health.hasOpenAI)],
         ['Anthropic', flag(health.hasAnthropic)],
@@ -69,7 +70,7 @@ export default function DevStudioHealthPanel() {
         ['Supabase URL', flag(health.supabaseUrlPresent)],
         ['Supabase service key', flag(health.supabaseServiceKeyPresent)],
         ['Execution mode', health.execution?.mode ?? 'admin-native'],
-        ['Dev Studio execution', health.execution?.ready ? 'ready' : 'needs GitHub token'],
+        ['Dev Studio execution', health.execution?.ready ? 'ready' : health.hasGitHub ? 'blocked by invalid GitHub token' : 'needs GitHub token'],
         ['Northflank API', flag(health.northflank?.tokenPresent)],
         ['Northflank project', flag(health.northflank?.projectIdPresent)],
       ]

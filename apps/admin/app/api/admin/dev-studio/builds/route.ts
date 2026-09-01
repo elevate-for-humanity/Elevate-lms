@@ -4,6 +4,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { hydrateNorthflankEnv } from '@/lib/secrets';
+import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
 import {
   getNorthflankProjectId,
   getNorthflankServices,
@@ -25,7 +26,8 @@ export async function GET(req: NextRequest) {
     .limit(20);
 
   if (error) return safeError('Failed to fetch Dev Studio builds', 500);
-  return NextResponse.json({ builds: data });
+  await hydrateNorthflankEnv().catch(() => {});
+  return NextResponse.json({ builds: data, northflankConfigured: isNorthflankReady() && Boolean(getNorthflankProjectId()) });
 }
 
 export async function POST(req: NextRequest) {
@@ -35,8 +37,17 @@ export async function POST(req: NextRequest) {
   await hydrateNorthflankEnv().catch(() => {});
 
   const body = await req.json().catch(() => ({}));
+  const confirmation = requireTypedConfirmation(body.confirmation, 'deploy_autopilot');
+  if (!confirmation.ok) {
+    return NextResponse.json({ error: 'Production deployment requires typed confirmation.', requiredConfirmation: confirmation.required }, { status: 409 });
+  }
   const db = await requireAdminClient();
   const service = body.service ?? 'admin';
+
+  const projectId = getNorthflankProjectId();
+  if (!projectId || !isNorthflankReady()) {
+    return safeError('Northflank is not configured. Add NORTHFLANK_API_TOKEN and NORTHFLANK_PROJECT_ID before deploying.', 503);
+  }
 
   const { data, error } = await db
     .from('ai_deployments')
@@ -60,7 +71,6 @@ export async function POST(req: NextRequest) {
     metadata: { service },
   });
 
-  const projectId = getNorthflankProjectId();
   const services = service === 'all'
     ? getNorthflankServices()
     : getNorthflankServices().filter((item) => item.key === service || item.id === service);
@@ -68,17 +78,6 @@ export async function POST(req: NextRequest) {
   if (!services.length) {
     await db.from('ai_deployments').update({ status: 'failed' }).eq('id', data.id);
     return safeError(`Unknown Northflank service: ${service}`, 400);
-  }
-
-  if (!projectId || !isNorthflankReady()) {
-    return NextResponse.json(
-      {
-        build: data,
-        triggered: false,
-        message: 'Build record created, but Northflank API credentials are not configured.',
-      },
-      { status: 202 },
-    );
   }
 
   try {

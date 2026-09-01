@@ -17,6 +17,9 @@ export type StudioWorkspaceId =
   | 'browser'
   | 'canvas'
   | 'tasks'
+  | 'agents'
+  | 'builds'
+  | 'logs'
   | 'deployments'
   | 'containers'
   | 'evaluations'
@@ -39,13 +42,16 @@ export interface StudioWorkspaceDefinition {
 
 export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
   { id: 'courses', label: 'Course Builder', description: 'Canonical Course Factory inspection and authoring surface.', permission: 'studio.courses.manage', route: '/studio/courses', healthEndpoint: '/api/admin/dev-studio/courses/health' },
-  { id: 'content', label: 'Content Studio', description: 'Generate and manage reviewed content.', permission: 'studio.content.manage', route: '/studio/content', healthEndpoint: '/api/admin/dev-studio/content/health' },
+  { id: 'content', label: 'Website Content', description: 'Manage the public team directory, training partners and website page copy.', permission: 'studio.content.manage', route: '/studio/content', healthEndpoint: '/api/admin/dev-studio/content/health' },
   { id: 'media', label: 'Media Studio', description: 'Organization-scoped media and documents.', permission: 'studio.media.manage', route: '/studio/media', healthEndpoint: '/api/admin/dev-studio/media/health' },
   { id: 'workflows', label: 'Workflow Designer', description: 'Build versioned visual automations.', permission: 'studio.workflows.manage', route: '/studio/workflows', healthEndpoint: '/api/admin/dev-studio/workflows/health' },
   { id: 'repository', label: 'Repository Workspace', description: 'Edit and preview source, commit to GitHub, and run code in an isolated browser runtime.', permission: 'studio.repository.view', route: '/studio/repository', healthEndpoint: '/api/admin/dev-studio/repository/health' },
   { id: 'browser', label: 'Cloud Browser', description: 'Operate isolated Playwright Chromium sessions and capture live runtime evidence.', permission: 'studio.repository.view', route: '/studio/browser', healthEndpoint: '/api/admin/dev-studio/browser/session' },
-  { id: 'canvas', label: 'Live Canvas', description: 'Build, preview, review and publish visual projects with approval controls.', permission: 'studio.content.manage', route: '/studio/canvas', healthEndpoint: '/api/admin/dev-studio/health' },
+  { id: 'canvas', label: 'Live Canvas', description: 'Experimental project canvas; available only when a real project executor is configured.', permission: 'studio.content.manage', route: '/studio/canvas', healthEndpoint: '/api/admin/dev-studio/health', featureFlag: 'LIVE_CANVAS_ENABLED' },
   { id: 'tasks', label: 'AI Task Queue', description: 'Plan, approve, execute and verify AI work.', permission: 'studio.tasks.manage', route: '/studio/tasks', healthEndpoint: '/api/admin/dev-studio/tasks/health' },
+  { id: 'agents', label: 'AI Agents', description: 'Inspect registered autonomous agents, capabilities and execution state.', permission: 'studio.tasks.manage', route: '/studio/agents', healthEndpoint: '/api/admin/dev-studio/agents' },
+  { id: 'builds', label: 'Builds', description: 'Inspect durable build records and verification evidence.', permission: 'studio.deployments.manage', route: '/studio/builds', healthEndpoint: '/api/admin/dev-studio/builds' },
+  { id: 'logs', label: 'Logs', description: 'Inspect governed runtime and AI error records.', permission: 'studio.health.view', route: '/studio/logs', healthEndpoint: '/api/admin/dev-studio/health' },
   { id: 'deployments', label: 'Deployments', description: 'Build, deploy, verify and roll back services.', permission: 'studio.deployments.manage', route: '/studio/deployments', healthEndpoint: '/api/admin/dev-studio/deployments/health' },
   { id: 'containers', label: 'Containers', description: 'Manage isolated execution environments and canonical runtime configuration.', permission: 'studio.containers.manage', route: '/studio/containers', healthEndpoint: '/api/admin/dev-studio/containers/health' },
   { id: 'evaluations', label: 'Evaluation Center', description: 'Evidence-based platform and AI evaluation.', permission: 'studio.evaluations.manage', route: '/studio/evaluations', healthEndpoint: '/api/admin/dev-studio/evaluations/health' },

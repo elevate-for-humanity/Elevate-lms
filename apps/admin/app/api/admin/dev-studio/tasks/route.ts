@@ -30,13 +30,62 @@ export async function GET(request: NextRequest) {
 
     if (status) query = query.eq('status', status);
 
-    const { data, error } = await query;
+    const [{ data, error }, { data: agenticRuns, error: agenticError }] = await Promise.all([
+      query,
+      db
+        .from('agentic_build_runs')
+        .select('id,project_id,prompt,status,credits_used,error,created_at,started_at,completed_at')
+        .order('created_at', { ascending: false })
+        .limit(limit),
+    ]);
     if (error) {
       if (isMissingTable(error)) return tableNotReadyResponse();
       throw error;
     }
 
-    return jsonOk({ tasks: data ?? [] });
+    if (agenticError && !isMissingTable(agenticError)) throw agenticError;
+
+    const projectIds = [...new Set((agenticRuns ?? []).map((run) => run.project_id).filter(Boolean))];
+    const { data: projects, error: projectsError } = projectIds.length
+      ? await db
+          .from('agentic_build_projects')
+          .select('id,title,target_type,target_id,user_id')
+          .in('id', projectIds)
+      : { data: [], error: null };
+    if (projectsError && !isMissingTable(projectsError)) throw projectsError;
+    const projectById = new Map((projects ?? []).map((project) => [project.id, project]));
+    const visibleRuns = (agenticRuns ?? []).filter((run) => {
+      const project = projectById.get(run.project_id);
+      return project && (project.user_id === auth.id || auth.effectiveRoles.includes('super_admin'));
+    });
+    const normalizedAgenticTasks = visibleRuns.map((run) => {
+      const project = projectById.get(run.project_id)!;
+      return {
+        id: run.id,
+        project_id: run.project_id,
+        source: 'agentic_build',
+        title: project.title || `${project.target_type} build`,
+        description: run.prompt,
+        status: run.status === 'waiting_for_approval' ? 'awaiting_approval' : run.status,
+        priority: 'medium',
+        requires_approval: run.status === 'waiting_for_approval',
+        approval_reason: run.status === 'waiting_for_approval' ? 'Course acceptance review is required.' : null,
+        ai_agents: { name: 'Course Builder AI', role: project.target_type },
+        error_message: run.error,
+        credits_used: run.credits_used,
+        target_type: project.target_type,
+        target_id: project.target_id,
+        created_at: run.created_at,
+        updated_at: run.completed_at ?? run.started_at ?? run.created_at,
+        completed_at: run.completed_at,
+      };
+    });
+    const normalizedTasks = (data ?? []).map((task) => ({ ...task, source: 'ai_task' }));
+    const tasks = [...normalizedTasks, ...normalizedAgenticTasks]
+      .sort((left, right) => String(right.created_at).localeCompare(String(left.created_at)))
+      .slice(0, limit);
+
+    return jsonOk({ tasks });
   } catch (err) {
     return safeInternalError(err, 'Failed to load tasks');
   }

@@ -1,6 +1,11 @@
 'use client';
 
-import { ParisFloatingButton } from './ParisFloatingButton';
+import dynamic from 'next/dynamic';
+
+const ParisFloatingButton = dynamic(
+  () => import('./ParisFloatingButton').then((module) => module.ParisFloatingButton),
+  { ssr: false },
+);
 
 export type ParisLearnerContext = {
   surface?: 'public' | 'learner';

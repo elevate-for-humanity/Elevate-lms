@@ -73,7 +73,7 @@ jobs:
 
       - name: Verify apprenticeship architecture
         id: audit
-        run: pnpm tsx scripts/audit-apprenticeship-architecture.ts
+        run: node scripts/check-registered-apprenticeship-architecture.mjs
 
       - name: Report sanitized stage outcomes
         if: always() && github.event_name == 'issues'

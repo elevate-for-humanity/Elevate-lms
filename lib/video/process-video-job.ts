@@ -13,6 +13,7 @@ import {
 import { heartbeatJob, markComplete, markFailed, type VideoJob } from './job-queue';
 import { enforceMediaQuality } from './media-quality-gate';
 import { enforceInstructionalQuality } from './instructional-quality-gate';
+import { repairInstructionalScript } from './instructional-script-repair';
 import { directMedia, scenePrompt, type MediaCharacterReference } from './media-director';
 import { recordMediaProvenance } from './media-provenance';
 import { renderStoryboardVideo } from './remotion-render';
@@ -266,12 +267,51 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         program?.type,
       ].find((value): value is string => typeof value === 'string' && value.trim().length > 0) ??
       null;
-    const script = persistedInstructionalScript({
+    const persistedScript = persistedInstructionalScript({
       lessonTitle: job.lesson_title,
       jobScript: baseScript,
       contentJson: lesson?.content_json,
     });
+    const repairedScript = repairInstructionalScript({
+      lessonTitle: job.lesson_title,
+      lessonType: lesson?.lesson_type,
+      evidenceType: lesson?.evidence_type,
+      baseScript: persistedScript,
+      content: lesson?.content,
+      contentJson: lesson?.content_json,
+    });
+    const script = repairedScript.script;
+    if (repairedScript.repaired) {
+      const now = new Date().toISOString();
+      const [{ error: lessonRepairError }, { error: jobRepairError }] = await Promise.all([
+        db.from('course_lessons').update({
+          script,
+          script_text: script,
+          video_status: 'rendering',
+          video_error: null,
+          updated_at: now,
+        }).eq('id', job.lesson_id),
+        db.from('video_jobs').update({
+          script,
+          scene_data: null,
+          error_message: null,
+          updated_at: now,
+        }).eq('id', job.id),
+      ]);
+      if (lessonRepairError || jobRepairError) {
+        throw new Error(
+          `Canonical narration repair could not be persisted: ${lessonRepairError?.message ?? jobRepairError?.message}`,
+        );
+      }
+      logger.info('[video-worker] Automatically repaired undersized canonical narration', {
+        jobId: job.id,
+        lessonId: job.lesson_id,
+        wordCount: repairedScript.wordCount,
+        minimumWordCount: repairedScript.minimumWordCount,
+      });
+    }
     const suppliedScenes =
+      !repairedScript.repaired &&
       Array.isArray(persistedSceneData.scenes) && persistedSceneData.scenes.length > 0;
     let generatedPlan: LessonRenderPlanDraft | null = null;
     if (!suppliedScenes) {

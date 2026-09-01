@@ -629,9 +629,9 @@ export const footerNavigation = {
   demo: {
     title: 'Live Demo',
     links: [
-      { label: 'Admin Demo', href: '/demo/admin' },
-      { label: 'Employer Demo', href: '/demo/employer' },
-      { label: 'Learner Demo', href: '/demo/learner' },
+      { label: 'Admin Demo', href: '/store/demo/admin' },
+      { label: 'Employer Demo', href: '/store/demo/employer' },
+      { label: 'Learner Demo', href: '/store/demo/student' },
     ],
   },
   internal: {

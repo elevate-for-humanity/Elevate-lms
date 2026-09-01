@@ -155,14 +155,17 @@ async function kickMediaWorker(courseId: string) {
       body: JSON.stringify({ courseId, maxJobs: 4 }),
       signal: AbortSignal.timeout(45_000),
     });
+    const responseBody = await response.text();
     if (!response.ok) {
-      console.warn(`[Business Course Builder] Media worker kick returned HTTP ${response.status}.`);
+      throw new Error(
+        `Media worker kick returned HTTP ${response.status}: ${responseBody.slice(0, 500)}`,
+      );
     }
+    console.log(`[Business Course Builder] media worker ${response.status}: ${responseBody.slice(0, 500)}`);
   } catch (error) {
-    console.warn(
+    throw new Error(
       `[Business Course Builder] Media worker kick failed: ${error instanceof Error ? error.message : String(error)}`,
     );
-    // Persisted job state remains authoritative; the worker may also be running independently.
   }
 }
 

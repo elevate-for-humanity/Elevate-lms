@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isPrivateAddress } from './server.mjs';
+import { auditPage, isPrivateAddress } from './server.mjs';
 
 test('blocks private IPv4 networks', () => {
   for (const address of ['127.0.0.1', '10.0.0.4', '172.16.1.2', '192.168.1.2', '169.254.1.1']) {
@@ -17,4 +17,38 @@ test('blocks loopback and private IPv6 networks', () => {
   assert.equal(isPrivateAddress('::1'), true);
   assert.equal(isPrivateAddress('fd00::1'), true);
   assert.equal(isPrivateAddress('fe80::1'), true);
+});
+
+test('returns measured browser events with document audit evidence', async () => {
+  const expectedDocumentAudit = {
+    title: 'Elevate',
+    url: 'https://www.elevateforhumanity.org/',
+    viewport: { width: 390, height: 844 },
+    document: { width: 390, height: 2200 },
+    horizontalOverflow: false,
+    counts: { headings: 5, links: 12, controls: 14, images: 3, forms: 1 },
+    accessibilityHeuristics: {
+      missingAlt: [],
+      unlabeledControls: [],
+      emptyLinks: [],
+      headingSkips: [],
+    },
+  };
+  const session = {
+    lastSeen: 0,
+    events: [
+      { type: 'console', level: 'log', text: 'loaded' },
+      { type: 'console', level: 'error', text: 'boom' },
+      { type: 'requestfailed', url: 'https://www.elevateforhumanity.org/missing.js' },
+    ],
+    page: {
+      waitForLoadState: async () => undefined,
+      evaluate: async () => expectedDocumentAudit,
+    },
+  };
+  const result = await auditPage(session);
+  assert.equal(result.horizontalOverflow, false);
+  assert.equal(result.browserEvents.length, 2);
+  assert.equal(result.browserEvents[0].level, 'error');
+  assert.match(result.evidenceCapturedAt, /^\d{4}-\d{2}-\d{2}T/);
 });

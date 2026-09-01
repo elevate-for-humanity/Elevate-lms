@@ -3,6 +3,7 @@ import { TOOL_META } from '@/components/studio/AIChat';
 
 describe('Dev Studio AIChat tool metadata', () => {
   it('labels operational diagnostic tools explicitly', () => {
+    expect(TOOL_META.scan_live_page.label).toBe('Live Browser');
     expect(TOOL_META.inspect_platform_registry.label).toBe('Platform Registry');
     expect(TOOL_META.query_program_by_slug.label).toBe('Program');
     expect(TOOL_META.inspect_route.label).toBe('Route');
@@ -13,4 +14,3 @@ describe('Dev Studio AIChat tool metadata', () => {
     expect(TOOL_META.inspect_build_errors.label).toBe('Build Logs');
   });
 });
-

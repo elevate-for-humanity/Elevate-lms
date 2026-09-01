@@ -24,6 +24,7 @@ import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-cl
 import { aiChat } from '@/lib/ai/ai-service';
 import { getRAGContext } from '@/lib/platform/rag';
 import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
+import { runStudioBrowserAudit } from '@/lib/devstudio/browser-audit';
 import { ROUTE_DEPENDENCIES, lookupRoute, lookupTable } from '@/lib/platform/knowledge-graph';
 import { PROGRAM_REGISTRY, getProgramBySlug } from '@/lib/platform/system-registry';
 import {
@@ -185,6 +186,28 @@ const TOOLS: any[] = [
         properties: {
           limit: { type: 'number', description: 'Max rows (default 10)' },
           status: { type: 'string', description: 'pending | approved | rejected' },
+        },
+        required: [],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'scan_live_page',
+      description:
+        'Run the isolated Playwright browser against an Elevate production page and return measured desktop/mobile layout, console, request, response, and accessibility evidence. This is the only tool that proves live browser behavior.',
+      parameters: {
+        type: 'object',
+        properties: {
+          url: {
+            type: 'string',
+            description: 'Elevate production URL. Defaults to https://www.elevateforhumanity.org',
+          },
+          include_mobile: {
+            type: 'boolean',
+            description: 'Also inspect a 390x844 mobile viewport. Defaults to true.',
+          },
         },
         required: [],
       },
@@ -723,6 +746,21 @@ async function collectAutomaticEvidence(query: string): Promise<ToolCallRecord[]
     });
   }
 
+  if (
+    /\b(?:scan|inspect|check|test|audit)\b/i.test(query) &&
+    /\b(?:live|homepage|home page|browser|console|network|mobile|accessibility|layout|broken control)\b/i.test(
+      query,
+    )
+  ) {
+    const urlMatch = query.match(/https?:\/\/[^\s)]+/i);
+    const args = {
+      url: urlMatch?.[0] || 'https://www.elevateforhumanity.org',
+      include_mobile: true,
+    };
+    const result = await execTool('scan_live_page', args);
+    records.push({ tool: 'scan_live_page', args, result });
+  }
+
   return records;
 }
 
@@ -742,6 +780,35 @@ function enforceEvidenceBoundary(
   records: ToolCallRecord[],
 ): string {
   if (!isOperationalDiagnosticRequest(query)) return message;
+
+  const requestsBrowserEvidence =
+    /\b(?:live|homepage|home page|browser|console|network|mobile|accessibility|layout|broken control)\b/i.test(
+      query,
+    );
+  const browserRecord = records.find((record) => record.tool === 'scan_live_page');
+  if (requestsBrowserEvidence) {
+    let browserFailure = '';
+    if (browserRecord) {
+      try {
+        const result = JSON.parse(browserRecord.result) as {
+          status?: string;
+          verified?: boolean;
+          error?: string;
+        };
+        if (result.status === 'failed' || result.verified === false) {
+          browserFailure = result.error || 'The live browser audit failed without an error detail.';
+        }
+      } catch {
+        browserFailure = 'The live browser audit returned invalid evidence.';
+      }
+    } else {
+      browserFailure = 'No live browser tool was executed for this answer.';
+    }
+
+    if (browserFailure) {
+      return `Problem:\nThe requested live browser verification did not complete.\n\nEvidence used:\n- scan_live_page: failed — ${browserFailure}\n- Any registry or source inspection is architecture evidence only; it does not prove live browser behavior.\n\nLikely causes:\n- The isolated Studio Browser runtime is unavailable, unconfigured, or unreachable from Admin.\n\nAffected files/routes/tables:\n- /api/admin/dev-studio/browser/session\n- /api/admin/dev-studio/chat\n- services/studio-browser/server.mjs\n- STUDIO_BROWSER_URL and STUDIO_BROWSER_SECRET runtime configuration\n\nConfidence:\nHigh confidence that live verification failed; no conclusion is made about homepage quality.\n\nNext debug step:\nRestore Studio Browser health, then rerun this exact request. Do not mark the page clean until scan_live_page returns measured desktop and mobile evidence.`;
+    }
+  }
 
   const hasEvidenceStatus =
     /Evidence used:/i.test(message) || /No live tool was executed/i.test(message);
@@ -911,6 +978,30 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
     case 'inspect_platform_registry': {
       return inspectPlatformRegistry(String(args.query || ''));
+    }
+
+    case 'scan_live_page': {
+      try {
+        return JSON.stringify(
+          await runStudioBrowserAudit({
+            url: typeof args.url === 'string' ? args.url : undefined,
+            includeMobile: args.include_mobile !== false,
+          }),
+          null,
+          2,
+        );
+      } catch (error) {
+        return JSON.stringify(
+          {
+            evidenceType: 'live-playwright-browser-audit',
+            status: 'failed',
+            error: error instanceof Error ? error.message : 'Live browser audit failed',
+            verified: false,
+          },
+          null,
+          2,
+        );
+      }
     }
 
     case 'query_program_by_slug': {

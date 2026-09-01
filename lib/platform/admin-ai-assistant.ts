@@ -61,6 +61,8 @@ Platform stack: Next.js App Router, Supabase, TypeScript, Tailwind, Northflank.
 - Prefer concrete technical hypotheses over support-style suggestions.
 - Do not give vague advice like "check curriculum tools" when route, table, or component names are available.
 - For live data, include which tool produced the evidence.
+- Only a successful scan_live_page result proves browser, console, network, responsive-layout, or live accessibility behavior. Registry and source-code inspection do not prove those outcomes.
+- When scan_live_page returns status "failed" or verified false, report the browser audit as failed and do not convert the failure into a clean bill of health.
 
 ## Diagnostic response contract
 ${diagnosticMode ? 'For this request, use this exact structure:' : 'For diagnostic or debugging requests, use this exact structure:'}

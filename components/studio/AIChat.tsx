@@ -82,6 +82,7 @@ export const TOOL_META: Record<
   list_enrollments: { label: 'Enrollments', color: 'text-brand-green-700', icon: Database },
   get_dashboard_stats: { label: 'Stats', color: 'text-amber-700', icon: Zap },
   get_recent_applications: { label: 'Applications', color: 'text-orange-700', icon: Database },
+  scan_live_page: { label: 'Live Browser', color: 'text-cyan-700', icon: ExternalLink },
   inspect_platform_registry: {
     label: 'Platform Registry',
     color: 'text-brand-blue-700',

@@ -6,7 +6,11 @@ export const dynamic = 'force-dynamic';
 
 function configuration() {
   const internalUrl = (process.env.STUDIO_BROWSER_URL || '').replace(/\/$/, '');
-  const publicUrl = (process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL || process.env.STUDIO_BROWSER_PUBLIC_URL || '').replace(/\/$/, '');
+  const publicUrl = (
+    process.env.NEXT_PUBLIC_STUDIO_BROWSER_URL ||
+    process.env.STUDIO_BROWSER_PUBLIC_URL ||
+    ''
+  ).replace(/\/$/, '');
   const secret = process.env.STUDIO_BROWSER_SECRET || '';
   return { internalUrl, publicUrl, secret, configured: !!(internalUrl && publicUrl && secret) };
 }
@@ -17,11 +21,21 @@ export async function GET(req: NextRequest) {
   const config = configuration();
   if (!config.configured) return NextResponse.json({ configured: false, ready: false });
   try {
-    const response = await fetch(`${config.internalUrl}/health`, { cache: 'no-store', signal: AbortSignal.timeout(5000) });
+    const response = await fetch(`${config.internalUrl}/health`, {
+      cache: 'no-store',
+      signal: AbortSignal.timeout(5000),
+    });
     const health = await response.json();
     return NextResponse.json({ configured: true, ready: response.ok, health });
-  } catch {
-    return NextResponse.json({ configured: true, ready: false });
+  } catch (error) {
+    return NextResponse.json({
+      configured: true,
+      ready: false,
+      error:
+        error instanceof Error
+          ? `Studio browser health check failed: ${error.message}`
+          : 'Studio browser health check failed',
+    });
   }
 }
 
@@ -30,7 +44,10 @@ export async function POST(req: NextRequest) {
   if (auth.error) return auth.error;
   const config = configuration();
   if (!config.configured) {
-    return NextResponse.json({ error: 'Studio browser runtime is not configured' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Studio browser runtime is not configured' },
+      { status: 503 },
+    );
   }
   const body = await req.json().catch(() => ({}));
   const response = await fetch(`${config.internalUrl}/sessions`, {
@@ -40,7 +57,9 @@ export async function POST(req: NextRequest) {
     cache: 'no-store',
     signal: AbortSignal.timeout(35_000),
   });
-  const payload = await response.json().catch(() => ({ error: 'Studio browser returned an invalid response' }));
+  const payload = await response
+    .json()
+    .catch(() => ({ error: 'Studio browser returned an invalid response' }));
   if (!response.ok) return NextResponse.json(payload, { status: response.status });
   return NextResponse.json({ ...payload, publicUrl: config.publicUrl });
 }

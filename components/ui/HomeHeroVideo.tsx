@@ -242,7 +242,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     <section
       className="relative overflow-hidden border-b border-slate-200 bg-white"
       data-scroll-narration
-      data-narration={`${slide.label}. ${slide.description}`}
+      data-narration="Welcome. Elevate brings career training, paid apprenticeship pathways, employer support, and practical business tools together so you can find the next step that fits your goals."
       role="region"
       aria-roledescription="carousel"
       aria-label="Elevate for Humanity homepage highlights"

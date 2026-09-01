@@ -262,6 +262,22 @@ function isAssessmentStep(stepType: string): boolean {
   return stepType === 'checkpoint' || stepType === 'quiz' || stepType === 'exam';
 }
 
+export function hasGovernedBlueprintLessonFallback(lesson: {
+  content?: unknown;
+  quizQuestions?: unknown;
+}): boolean {
+  const raw = typeof lesson.content === 'string'
+    ? lesson.content
+    : lesson.content && typeof lesson.content === 'object'
+      ? JSON.stringify(lesson.content)
+      : '';
+  const instructionalWords = raw
+    .replace(/<[^>]+>/g, ' ')
+    .match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g)?.length ?? 0;
+  return instructionalWords >= 180 &&
+    Array.isArray(lesson.quizQuestions) && lesson.quizQuestions.length >= 3;
+}
+
 async function enrichBlueprint(
   blueprint: CredentialBlueprint,
   courseTitle: string,
@@ -773,17 +789,33 @@ async function enrichBlueprint(
         continue;
       }
 
-      const generated = await generateLessonContent({
-        lesson,
-        moduleTitle: courseModule.title,
-        courseTitle,
-        state: input.state ?? enriched.state,
-        standardsBlock: [
-          `Required domain: ${lesson.domainKey || courseModule.domainKey || courseModule.slug}`,
-          `Required module competencies: ${(courseModule.competencies ?? []).map((competency) => competency.competencyKey).join(', ') || 'Apply the module objective'}`,
-          `Blueprint lesson identity: ${lesson.slug} — ${lesson.title}`,
-        ].join('\n'),
-      });
+      let generated: Awaited<ReturnType<typeof generateLessonContent>>;
+      try {
+        generated = await generateLessonContent({
+          lesson,
+          moduleTitle: courseModule.title,
+          courseTitle,
+          state: input.state ?? enriched.state,
+          standardsBlock: [
+            `Required domain: ${lesson.domainKey || courseModule.domainKey || courseModule.slug}`,
+            `Required module competencies: ${(courseModule.competencies ?? []).map((competency) => competency.competencyKey).join(', ') || 'Apply the module objective'}`,
+            `Blueprint lesson identity: ${lesson.slug} — ${lesson.title}`,
+          ].join('\n'),
+        });
+      } catch (generationError) {
+        // Registered blueprints already contain governed, reviewed instruction.
+        // A malformed optional AI enrichment must not erase or block that
+        // canonical content during a production refresh.
+        if (!hasGovernedBlueprintLessonFallback(lesson)) throw generationError;
+        logger.warn('[course-factory] AI enrichment failed; preserving governed blueprint lesson', {
+          lessonSlug: lesson.slug,
+          error: generationError instanceof Error
+            ? generationError.message
+            : String(generationError),
+        });
+        synchronizeLessonExperience(lesson as unknown as Record<string, any>, courseModule);
+        continue;
+      }
       lesson.objective = generated.objective;
       lesson.content = generated.content;
       lesson.learningPoints = generated.learning_points;

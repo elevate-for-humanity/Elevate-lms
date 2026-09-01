@@ -61,7 +61,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     [
       {
         type: 'image',
-        src: '/images/pages/cosmetology-apprenticeship-hero.webp',
+        src: '/images/partners/generations-hair/salon-service.webp',
         alt: 'A cosmetology apprentice training with professional supervision in a salon',
         label: 'Earn while you learn in a real host shop',
         description:
@@ -97,7 +97,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       },
       {
         type: 'image',
-        src: '/images/pages/barber-hands-on-bright.webp',
+        src: '/images/partners/generations-hair/stylist-at-work.webp',
         alt: 'A host salon professional demonstrating hands-on cosmetology work',
         label: 'Build skills alongside experienced professionals',
         description:
@@ -142,7 +142,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       },
       {
         type: 'image',
-        src: '/images/pages/business-meeting.webp',
+        src: '/images/pages/entrepreneurship.webp',
         alt: 'Business professionals collaborating around a table',
         label: 'Turn an idea into a stronger business',
         description:

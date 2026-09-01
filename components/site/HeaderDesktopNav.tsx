@@ -10,7 +10,7 @@ function isExternal(href: string) {
 
 function DropdownContent({ subItems, embedded = false }: { subItems: NavSubItem[]; embedded?: boolean }) {
   return (
-    <div className={embedded ? 'min-w-0 p-1' : 'min-w-[260px] max-w-[360px] rounded-xl border border-slate-200 bg-white p-3 shadow-2xl'}>
+    <div className={embedded ? 'min-w-0 p-1' : 'max-h-[min(78vh,44rem)] min-w-[280px] max-w-[380px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 shadow-2xl'}>
       {subItems.map((sub) => {
         if (sub.isHeader) {
           return (

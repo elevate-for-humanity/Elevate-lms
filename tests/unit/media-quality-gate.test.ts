@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
-import { mediaQualityFailures, type MediaQualityEvidence } from '@/lib/video/media-quality-gate';
+import {
+  mediaQualityFailures,
+  resolveTranscriptionRuntime,
+  type MediaQualityEvidence,
+} from '@/lib/video/media-quality-gate';
 
 const validEvidence: MediaQualityEvidence = {
   bytes: 2_000_000,
@@ -27,6 +31,28 @@ const validEvidence: MediaQualityEvidence = {
 };
 
 describe('canonical media completion quality gate', () => {
+  it('uses Cloudflare Whisper when Cloudflare is the canonical provider', () => {
+    expect(resolveTranscriptionRuntime({
+      AI_PROVIDER: 'cloudflare',
+      CLOUDFLARE_ACCOUNT_ID: 'account-id',
+      CLOUDFLARE_AI_API_TOKEN: 'token',
+    })).toEqual({ provider: 'cloudflare', model: '@cf/openai/whisper' });
+  });
+
+  it('preserves an explicitly configured Cloudflare transcription model', () => {
+    expect(resolveTranscriptionRuntime({
+      AI_TRANSCRIPTION_PROVIDER: 'cloudflare',
+      AI_TRANSCRIPTION_MODEL: '@cf/openai/whisper-large-v3-turbo',
+    })).toEqual({ provider: 'cloudflare', model: '@cf/openai/whisper-large-v3-turbo' });
+  });
+
+  it('keeps OpenAI transcription independent from the text-generation provider', () => {
+    expect(resolveTranscriptionRuntime({
+      AI_TRANSCRIPTION_PROVIDER: 'openai',
+      AI_TRANSCRIPTION_MODEL: 'gpt-4o-mini-transcribe',
+    })).toEqual({ provider: 'openai', model: 'gpt-4o-mini-transcribe' });
+  });
+
   it('accepts complete evidence', () => {
     expect(mediaQualityFailures(validEvidence)).toEqual([]);
   });

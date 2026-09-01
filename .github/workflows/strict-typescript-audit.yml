@@ -1,15 +1,6 @@
 name: Strict TypeScript Audit
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-    paths:
-      - '**/*.ts'
-      - '**/*.tsx'
-      - '**/tsconfig*.json'
-      - '.github/workflows/strict-typescript-audit.yml'
   workflow_dispatch:
 
 permissions:

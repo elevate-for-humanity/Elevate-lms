@@ -667,7 +667,7 @@ export default function UnifiedEllieChat({
               aria-label={listening ? 'Stop voice input' : 'Start voice input'}
               aria-pressed={listening}
               onClick={toggleSpeechRecognition}
-              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 ${
+              className={`flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 ${
                 listening
                   ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100'
                   : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
@@ -678,19 +678,21 @@ export default function UnifiedEllieChat({
               ) : (
                 <Mic className="h-5 w-5" aria-hidden="true" />
               )}
+              <span>{listening ? 'Stop' : 'Speak'}</span>
             </button>
             <button
               type="button"
               aria-label="Send request"
               disabled={!input.trim() || loading}
               onClick={() => void send()}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-900 text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-gray-900 px-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
               ) : (
                 <Send className="h-5 w-5" aria-hidden="true" />
               )}
+              <span>Send</span>
             </button>
           </div>
           {speechError ? (

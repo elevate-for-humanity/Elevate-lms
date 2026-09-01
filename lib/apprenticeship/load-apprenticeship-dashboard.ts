@@ -9,8 +9,7 @@ import {
   getProgramDashboardExtras,
   type ProgramDashboardExtras,
 } from '@/lib/apprenticeship/program-dashboard-extras';
-import { ensureBarberLmsEnrollment } from '@/lib/barber/ensure-lms-enrollment';
-import { BARBER_PROGRAM_SLUG } from '@/lib/barber/constants';
+import { ensureApprenticeshipLmsEnrollment } from '@/lib/apprenticeship/ensure-lms-enrollment';
 import { resolveCourseEntryLinks } from '@/lib/lms/resolve-course-entry-links';
 
 export interface RtiTrainingSummary {
@@ -52,9 +51,12 @@ export async function loadApprenticeshipDashboard(
     return { ...base, extras, complianceLinks, rti: null };
   }
 
-  if (programSlug === BARBER_PROGRAM_SLUG && base.enrollment) {
+  if (base.enrollment) {
     const adminDb = await getAdminClient();
-    await ensureBarberLmsEnrollment(adminDb ?? supabase, user.id, {
+    await ensureApprenticeshipLmsEnrollment(adminDb ?? supabase, {
+      userId: user.id,
+      programSlug,
+      courseId,
       grantAccess: Boolean(base.enrollment.orientation_completed_at),
     });
   }

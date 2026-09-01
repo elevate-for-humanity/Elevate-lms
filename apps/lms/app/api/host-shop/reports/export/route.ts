@@ -5,7 +5,7 @@ import { getHostShopBoard } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getHostShopReadinessItems } from '@/lib/partners/host-shop-readiness';
 
-const EXPORT_TYPES = new Set(['overview', 'apprentices', 'hours', 'attendance', 'compliance']);
+const EXPORT_TYPES = new Set(['overview', 'apprentices', 'progress', 'hours', 'attendance', 'compliance']);
 const csvCell = (value: unknown) => `"${String(value ?? '').replaceAll('"', '""')}"`;
 const csv = (headers: string[], rows: unknown[][]) => [headers, ...rows].map((row) => row.map(csvCell).join(',')).join('\r\n');
 
@@ -23,6 +23,20 @@ export async function GET(request: NextRequest) {
     output = csv(['shop','active_apprentices','pending_hours','documents_accepted','documents_required','onboarding_complete'], [[board.partner.name,board.apprentices.length,board.pendingHoursCount,board.acceptedDocumentCount,board.requiredDocumentCount,board.partner.onboarding_completed === true]]);
   } else if (type === 'apprentices') {
     output = csv(['apprentice','email','program','start_date','approved_hours','competencies_complete','competencies_required'], board.apprentices.map((item) => [item.name,item.email,item.program_slug,item.start_date,item.ojt.completed,item.competency?.completed ?? 0,item.competency?.required ?? 0]));
+  } else if (type === 'progress') {
+    const { data: enrollments, error: enrollmentError } = studentIds.length
+      ? await db.from('program_enrollments').select('id,user_id,student_id,program_slug,status,enrollment_state,transfer_hours,transfer_hours_verified').or(`user_id.in.(${studentIds.join(',')}),student_id.in.(${studentIds.join(',')})`)
+      : { data: [], error: null };
+    if (enrollmentError) return NextResponse.json({ error: 'Progress export unavailable' }, { status: 500 });
+    const enrollmentIds = (enrollments || []).map((row) => row.id).filter(Boolean);
+    const { data: rtiEntries, error: rtiError } = enrollmentIds.length
+      ? await db.from('apprenticeship_rti_entries').select('enrollment_id,status,minutes_verified').in('enrollment_id', enrollmentIds)
+      : { data: [], error: null };
+    if (rtiError) return NextResponse.json({ error: 'RTI progress export unavailable' }, { status: 500 });
+    const rtiHours = new Map<string, number>();
+    for (const row of rtiEntries || []) if (['verified','approved'].includes(String(row.status))) rtiHours.set(row.enrollment_id, (rtiHours.get(row.enrollment_id) || 0) + Number(row.minutes_verified || 0) / 60);
+    const apprenticeByStudent = new Map(board.apprentices.map((item) => [item.student_id,item]));
+    output = csv(['apprentice','program','enrollment_status','approved_ojl_hours','verified_transfer_hours','verified_rti_hours','competencies_complete','competencies_required'], (enrollments || []).map((row) => { const apprentice = apprenticeByStudent.get(row.user_id || row.student_id); return [apprentice?.name || 'Assigned apprentice',row.program_slug,row.enrollment_state || row.status,apprentice?.ojt.completed || 0,row.transfer_hours_verified ? Number(row.transfer_hours || 0) : 0,Math.round((rtiHours.get(row.id) || 0) * 100) / 100,apprentice?.competency?.completed || 0,apprentice?.competency?.required || 0]; }));
   } else if (type === 'hours') {
     const { data, error } = studentIds.length ? await db.from('hour_entries').select('user_id,host_shop_id,program_slug,work_date,entered_at,hours,hours_claimed,accepted_hours,status,approval_status,notes').in('user_id', studentIds).in('host_shop_id', shopIds).order('work_date', { ascending: false }) : { data: [], error: null };
     if (error) return NextResponse.json({ error: 'Hours export unavailable' }, { status: 500 });

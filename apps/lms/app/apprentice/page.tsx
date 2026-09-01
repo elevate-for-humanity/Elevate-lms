@@ -12,6 +12,8 @@ import { resolveApprenticeshipRuntimeContext } from '@/lib/apprenticeship/runtim
 import { loadRegisteredApprenticeshipProgress } from '@/lib/apprenticeship/progress-service';
 import { resolveApplicableWage } from '@/lib/apprenticeship/registered-program-contract';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 
 export const metadata: Metadata = { title: 'Apprentice Dashboard', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
@@ -49,6 +51,8 @@ export default async function ApprenticePortalPage() {
     requireRegisteredStandard: false,
   });
   if (!runtime) redirect('/lms/dashboard?notice=apprentice-enrollment-required');
+  const beautyProgram = getBeautyApprenticeshipConfig(programSlug);
+  const registeredStandard = getRegisteredProgramStandard(programSlug);
 
   const [{ data: profile }, { data: docs }, certsRes, { data: documentRequirements }, { data: handbookAcceptance }, { data: cosmetologyBilling }, { data: theorySchedule }] = await Promise.all([
     db.from('profiles').select('full_name,first_name,last_name').eq('id', subject.userId).maybeSingle(),
@@ -100,23 +104,23 @@ export default async function ApprenticePortalPage() {
       { label: 'RTI course content assigned and published', done: Boolean(runtime.enrollment.course_id && totalLessons > 0), href: courseHref, icon: BookOpen },
     ];
     const incompleteCount = todoItems.filter((item) => !item.done).length;
-    const shopName = runtime.shop?.name || (runtime.placement?.id ? 'Salon Saloon' : 'Not connected');
+    const shopName = runtime.shop?.name || (runtime.placement?.id ? beautyProgram?.hostLabel || 'Assigned Host Shop' : 'Not connected');
     return <main className="space-y-7 pb-10">
       <section className="relative min-h-[390px] overflow-hidden rounded-3xl bg-fuchsia-950 shadow-xl ring-1 ring-fuchsia-900/20">
         <Image src={heroImage} alt={`${displayProgram} apprentice training`} fill priority className="object-cover object-center" sizes="100vw" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-fuchsia-950/90 to-fuchsia-900/20" />
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/70 to-transparent" />
         <div className="relative z-10 flex min-h-[390px] max-w-3xl flex-col justify-center p-7 text-white sm:p-10 lg:p-12">
-          <span className="w-fit rounded-full border border-pink-300/50 bg-pink-500/20 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-pink-100 backdrop-blur">Cosmetology Apprentice Portal</span>
+          <span className="w-fit rounded-full border border-pink-300/50 bg-pink-500/20 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-pink-100 backdrop-blur">{beautyProgram?.portalLabel || 'Apprentice Portal'}</span>
           <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">Welcome, {firstName}</h1>
           <p className="mt-3 text-xl font-bold text-pink-100">{displayProgram}</p>
-          <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-slate-100 sm:text-base">Track your Salon Saloon training, 144 RTI hours, tuition progress, documents, competencies, and State Board readiness in one place.</p>
+          <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-slate-100 sm:text-base">Track training with your {beautyProgram?.hostLabel || 'Host Shop'}, {registeredStandard?.completion.requiredRtiHours || 'required'} RTI hours, tuition progress, documents, competencies, and State Board readiness in one place.</p>
           <div className="mt-6 flex flex-wrap gap-3"><Link href="/apprentice/billing" className="rounded-xl bg-pink-600 px-5 py-3 font-black text-white shadow-lg hover:bg-pink-500">Complete payment setup</Link><Link href="/apprentice/documents" className="rounded-xl border border-white/50 bg-white/10 px-5 py-3 font-black text-white backdrop-blur hover:bg-white/20">Required documents</Link></div>
         </div>
       </section>
       <section className="rounded-3xl border-2 border-red-300 bg-red-50 p-6 shadow-sm"><div className="flex gap-3"><AlertCircle className="mt-1 h-6 w-6 shrink-0 text-red-700"/><div className="w-full"><h2 className="text-xl font-black text-red-950">Required to-do — {incompleteCount} incomplete</h2><p className="mt-1 text-sm font-semibold text-red-900">PARIS will walk you through these items in order. Red items must be completed before the corresponding activity is unlocked.</p><div className="mt-5 grid gap-3">{todoItems.map(({ label, done, href, icon: Icon }, index) => <Link key={label} href={href} className={`flex items-center justify-between gap-4 rounded-xl border p-4 ${done ? 'border-green-300 bg-green-50 text-green-950' : 'border-red-300 bg-white text-red-950'}`}><span className="flex items-center gap-3"><span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-black ${done ? 'bg-green-700 text-white' : 'bg-red-700 text-white'}`}>{done ? '✓' : index + 1}</span><Icon className="h-5 w-5 shrink-0"/><span className="font-black">{label}</span></span><span className="text-xs font-black uppercase">{done ? 'Complete' : 'Open'}</span></Link>)}</div></div></div></section>
-      <section className="grid gap-4 sm:grid-cols-3"><Metric label="Host Salon" value={shopName} detail={runtime.placement?.supervisor_user_id ? 'Supervisor connected' : 'Supervisor verification still required'} icon={MapPin}/><Metric label="Required documents" value={`${Math.max(0, (documentRequirements?.length || 0) - missingDocumentCount)} / ${documentRequirements?.length || 0}`} detail={`${missingDocumentCount} incomplete`} icon={FileText}/><Metric label="Payment setup" value={billingConfigured ? 'Configured' : 'Required'} detail={billingConfigured ? 'Automatic billing is connected' : 'Authorize and add a card in Billing'} icon={CreditCard}/></section>
-      <TheorySchedulePanel schedule={theorySchedule} courseHref={courseHref} completedLessons={completedLessons} totalLessons={totalLessons}/>
+      <section className="grid gap-4 sm:grid-cols-3"><Metric label={beautyProgram?.hostLabel || 'Host Shop'} value={shopName} detail={runtime.placement?.supervisor_user_id ? 'Supervisor connected' : 'Supervisor verification still required'} icon={MapPin}/><Metric label="Required documents" value={`${Math.max(0, (documentRequirements?.length || 0) - missingDocumentCount)} / ${documentRequirements?.length || 0}`} detail={`${missingDocumentCount} incomplete`} icon={FileText}/><Metric label="Payment setup" value={billingConfigured ? 'Configured' : 'Required'} detail={billingConfigured ? 'Tuition billing is connected' : 'Review payment requirements in Billing'} icon={CreditCard}/></section>
+      <TheorySchedulePanel schedule={theorySchedule} courseHref={courseHref} syllabusHref={beautyProgram?.syllabusHref || '/apprentice/rti'} completedLessons={completedLessons} totalLessons={totalLessons}/>
     </main>;
   }
 
@@ -143,7 +147,7 @@ export default async function ApprenticePortalPage() {
 
     <section className="grid gap-5 lg:grid-cols-3"><ProgressPanel title="Registered competency mastery" value={progress.competencies.percent} detail={`${progress.competencies.completed} of ${progress.competencies.required} competencies verified`} /><ProgressPanel title="Verified Related Technical Instruction" value={progress.rti.percent} detail={`${progress.rti.verifiedHours.toFixed(2)} verified of ${progress.rti.requiredHours} required RTI hours`} /><ProgressPanel title="Digital course completion" value={digitalCoursePercent} detail={`${completedLessons} of ${totalLessons} published lessons complete; this does not itself award RTI credit`} /></section>
 
-    <TheorySchedulePanel schedule={theorySchedule} courseHref={courseHref} completedLessons={completedLessons} totalLessons={totalLessons}/>
+    <TheorySchedulePanel schedule={theorySchedule} courseHref={courseHref} syllabusHref={beautyProgram?.syllabusHref || '/apprentice/rti'} completedLessons={completedLessons} totalLessons={totalLessons}/>
 
     <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><h2 className="text-xl font-black text-slate-950">Progressive wage checkpoint</h2><p className="mt-2 text-sm font-medium leading-6 text-slate-700">The applicable wage floor resolves the immutable occupation baseline and any employer-specific RAPIDS wage schedule without flattening one employer&apos;s schedule into the occupation standard.</p><div className="mt-4 flex flex-wrap gap-3 text-sm font-bold"><span className="rounded-full bg-slate-100 px-3 py-2">Current registered floor: ${wage.requiredRegisteredRate.toFixed(2)}/hr</span>{nextWageMilestone ? <span className="rounded-full bg-amber-100 px-3 py-2 text-amber-950">Next baseline milestone: {nextWageMilestone.completedCompetencies} competencies → ${nextWageMilestone.hourlyRate.toFixed(2)}/hr</span> : <span className="rounded-full bg-green-100 px-3 py-2 text-green-950">Final baseline competency milestone reached</span>}</div></section>
 
@@ -161,12 +165,12 @@ function ProgressPanel({ title, value, detail }: { title: string; value: number;
 
 const THEORY_DAY_LABELS: Record<number, string> = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday' };
 
-function TheorySchedulePanel({ schedule, courseHref, completedLessons, totalLessons }: { schedule: any; courseHref: string; completedLessons: number; totalLessons: number }) {
+function TheorySchedulePanel({ schedule, courseHref, syllabusHref, completedLessons, totalLessons }: { schedule: any; courseHref: string; syllabusHref: string; completedLessons: number; totalLessons: number }) {
   if (!schedule) return <section className="rounded-3xl border border-amber-300 bg-amber-50 p-6 shadow-sm"><h2 className="text-xl font-black text-amber-950">Theory schedule is being assigned</h2><p className="mt-2 text-sm font-semibold leading-6 text-amber-900">Your recurring theory schedule is created automatically from your active Host Shop placement. Return here after the placement record finishes syncing.</p></section>;
   const days = (schedule.days_of_week || []).map((day: number) => THEORY_DAY_LABELS[day]).filter(Boolean).join(', ');
   const time = (value: string) => {
     const [hour, minute] = String(value).split(':').map(Number);
     return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(new Date(2020, 0, 1, hour, minute));
   };
-  return <section className="rounded-3xl border border-fuchsia-200 bg-fuchsia-50 p-6 shadow-sm sm:p-8"><div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.15em] text-fuchsia-800">Your weekly theory plan</p><h2 className="mt-2 text-2xl font-black text-slate-950">{days}</h2><p className="mt-2 font-bold text-slate-800">{time(schedule.start_time)}–{time(schedule.end_time)} · {schedule.timezone}</p><p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">Complete <strong>{schedule.weekly_target_minutes / 60} theory hours each week</strong>. Do not exceed <strong>{schedule.weekly_max_minutes / 60} theory hours in a full week</strong>. You will receive automatic alerts when each scheduled block starts and stops.</p><p className="mt-2 text-sm font-semibold text-slate-700">Course progress: {completedLessons} of {totalLessons} published lessons complete.</p></div><div className="flex flex-wrap gap-3"><Link href={courseHref} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-fuchsia-800 px-5 py-3 font-black text-white">Start theory course</Link><a href="/docs/syllabi/cosmetology-apprenticeship.md" target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-fuchsia-300 bg-white px-5 py-3 font-black text-fuchsia-950">Open syllabus</a></div></div></section>;
+  return <section className="rounded-3xl border border-fuchsia-200 bg-fuchsia-50 p-6 shadow-sm sm:p-8"><div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.15em] text-fuchsia-800">Your weekly theory plan</p><h2 className="mt-2 text-2xl font-black text-slate-950">{days}</h2><p className="mt-2 font-bold text-slate-800">{time(schedule.start_time)}–{time(schedule.end_time)} · {schedule.timezone}</p><p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">Complete <strong>{schedule.weekly_target_minutes / 60} theory hours each week</strong>. Do not exceed <strong>{schedule.weekly_max_minutes / 60} theory hours in a full week</strong>. You will receive automatic alerts when each scheduled block starts and stops.</p><p className="mt-2 text-sm font-semibold text-slate-700">Course progress: {completedLessons} of {totalLessons} published lessons complete.</p></div><div className="flex flex-wrap gap-3"><Link href={courseHref} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-fuchsia-800 px-5 py-3 font-black text-white">Start theory course</Link><a href={syllabusHref} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-fuchsia-300 bg-white px-5 py-3 font-black text-fuchsia-950">Open syllabus</a></div></div></section>;
 }

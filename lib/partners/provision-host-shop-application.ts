@@ -27,6 +27,64 @@ async function resolveOrCreateUser(db: SupabaseClient, email: string, contactNam
   return { userId: data.user.id, isNewUser: true };
 }
 
+/**
+ * Canonical owner-access contract used by every Host Shop intake path.
+ * Creating a partner row without this identity/profile/membership chain leaves
+ * a shop approved in Admin but unable to sign in to its portal.
+ */
+export async function ensureHostShopOwnerAccess(input: {
+  db: SupabaseClient;
+  partnerId: string;
+  email: string;
+  contactName: string;
+  phone?: string | null;
+}) {
+  const email = input.email.toLowerCase().trim();
+  const identity = await resolveOrCreateUser(input.db, email, input.contactName);
+  if (!identity.userId) throw new Error('HOST_SHOP_OWNER_IDENTITY_NOT_CREATED');
+
+  const parts = input.contactName.trim().split(/\s+/);
+  const firstName = parts.shift() || input.contactName;
+  const lastName = parts.join(' ') || null;
+  const { data: existingProfile } = await input.db
+    .from('profiles')
+    .select('id, role')
+    .eq('id', identity.userId)
+    .maybeSingle();
+
+  if (!existingProfile) {
+    const { error } = await input.db.from('profiles').insert({
+      id: identity.userId,
+      email,
+      full_name: input.contactName,
+      first_name: firstName,
+      last_name: lastName,
+      phone: input.phone || null,
+      role: 'partner',
+    });
+    if (error) throw error;
+  } else if (!['admin', 'super_admin', 'org_admin', 'staff'].includes(String(existingProfile.role || ''))) {
+    const { error } = await input.db
+      .from('profiles')
+      .update({ role: 'partner', full_name: input.contactName, phone: input.phone || null })
+      .eq('id', identity.userId);
+    if (error) throw error;
+  }
+
+  const { error: membershipError } = await input.db.from('partner_users').upsert(
+    {
+      user_id: identity.userId,
+      partner_id: input.partnerId,
+      role: 'partner_admin',
+      status: 'active',
+    },
+    { onConflict: 'user_id,partner_id' },
+  );
+  if (membershipError) throw membershipError;
+
+  return identity;
+}
+
 async function createSecureAccessLink(db: SupabaseClient, email: string, isNewUser: boolean, onboardingUrl: string): Promise<string | null> {
   try {
     const { data, error } = await db.auth.admin.generateLink({ type: isNewUser ? 'recovery' : 'magiclink', email: email.toLowerCase().trim(), options: { redirectTo: onboardingUrl } });
@@ -56,14 +114,13 @@ export async function provisionHostShopApplication(input: ProvisionHostShopAppli
   if (partnerId) { const { error } = await db.from('partners').update(partnerPayload).eq('id', partnerId); if (error) throw error; }
   else { const { data, error } = await db.from('partners').insert({ ...partnerPayload, onboarding_completed: false, applied_at: now }).select('id').single(); if (error || !data?.id) throw error || new Error('Host Shop partner insert returned no id.'); partnerId = data.id; }
 
-  const identity = await resolveOrCreateUser(db, email, input.contactName);
-  if (identity.userId) {
-    const parts = input.contactName.trim().split(/\s+/); const firstName = parts.shift() || input.contactName; const lastName = parts.join(' ') || null;
-    const { data: existingProfile } = await db.from('profiles').select('id, role').eq('id', identity.userId).maybeSingle();
-    if (!existingProfile) { const { error } = await db.from('profiles').insert({ id: identity.userId, email, full_name: input.contactName, first_name: firstName, last_name: lastName, phone: input.phone, role: 'partner' }); if (error) throw error; }
-    else if (!['admin','super_admin','org_admin','staff'].includes(String(existingProfile.role || ''))) { const { error } = await db.from('profiles').update({ role: 'partner' }).eq('id', identity.userId); if (error) throw error; }
-    const { error } = await db.from('partner_users').upsert({ user_id: identity.userId, partner_id: partnerId, role: 'partner_admin', status: 'active' }, { onConflict: 'user_id,partner_id' }); if (error) throw error;
-  }
+  const identity = await ensureHostShopOwnerAccess({
+    db,
+    partnerId,
+    email,
+    contactName: input.contactName,
+    phone: input.phone,
+  });
 
   for (const programId of programs) { const { error } = await db.from('partner_program_access').upsert({ partner_id: partnerId, program_id: programId, can_view_apprentices: true, can_enter_progress: true, can_view_reports: true, revoked_at: null }, { onConflict: 'partner_id,program_id' }); if (error) throw error; }
 

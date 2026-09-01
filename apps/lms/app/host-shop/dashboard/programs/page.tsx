@@ -3,6 +3,7 @@ import { AlertTriangle, BookOpen, CheckCircle2, Users } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { getHostShopBoard } from '@/lib/partner/board';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
@@ -49,6 +50,17 @@ export default async function HostShopProgramsPage() {
           <p className="mt-1 text-xl font-black text-slate-950">{board.apprentices.length}</p>
         </section>
       </div>
+
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+        <h2 className="text-xl font-black text-slate-950">Assigned occupation syllabi and Appendix A</h2>
+        <div className="mt-4 grid gap-3">
+          {board.apprentices.map((apprentice) => {
+            const config = getBeautyApprenticeshipConfig(apprentice.program_slug || '');
+            return <article key={apprentice.id} className="flex flex-col gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between"><div><h3 className="font-black text-slate-950">{apprentice.name}</h3><p className="text-sm font-medium text-slate-600">{config?.label || apprentice.program_slug || 'Apprenticeship'} · {apprentice.tradeInfo.registered ? `Appendix A ${apprentice.tradeInfo.rapidsCode}` : 'approved standard pending configuration'}</p></div><div className="flex flex-wrap gap-2">{config ? <a href={config.syllabusHref} target="_blank" rel="noreferrer" className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold">Open syllabus</a> : null}<Link href="/host-shop/dashboard/apprentices" className="rounded-lg bg-slate-950 px-3 py-2 text-sm font-bold text-white">View progress</Link></div></article>;
+          })}
+          {!board.apprentices.length ? <p className="rounded-xl bg-slate-50 p-4 text-sm font-medium text-slate-600">Syllabi and occupation standards appear automatically when an active apprentice placement is connected.</p> : null}
+        </div>
+      </section>
     </main>
   );
 }

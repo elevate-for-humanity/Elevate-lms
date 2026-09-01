@@ -8,6 +8,7 @@ import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
+import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -39,6 +40,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
     .maybeSingle();
 
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
+  const beautyProgram = programSlug ? getBeautyApprenticeshipConfig(programSlug) : null;
   const privileged = ['admin', 'super_admin', 'staff'].includes(String(profile?.role || ''));
 
   if (!privileged && !programSlug) {
@@ -76,7 +78,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <div className="mt-4">{children}</div>
       <ParisFloatingWrapper
         surface="learner"
-        courseTitle={programSlug === 'cosmetology-apprenticeship' ? 'Cosmetology Apprenticeship' : programSlug?.replace(/[-_]/g, ' ') || 'Apprenticeship'}
+        courseTitle={beautyProgram ? `${beautyProgram.label} Apprenticeship` : programSlug?.replace(/[-_]/g, ' ') || 'Apprenticeship'}
         nextLessonTitle="Complete the required items highlighted in red on your apprentice dashboard"
       />
     </PlatformShell>

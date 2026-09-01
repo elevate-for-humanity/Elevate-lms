@@ -2,7 +2,11 @@ import { createServerClient } from '@supabase/ssr';
 import type { NextRequest } from 'next/server';
 import { getServerPublicSupabaseConfig } from '@/lib/supabase/public-config';
 
-const MIDDLEWARE_SUPABASE_TIMEOUT_MS = 2_500;
+// A 2.5 second abort turned a transient Supabase slowdown into an anonymous
+// session and sent authenticated portal users back to login while navigating.
+// Keep the request bounded, but allow enough time for a rotated refresh token
+// to be verified on a cold regional connection.
+const MIDDLEWARE_SUPABASE_TIMEOUT_MS = 8_000;
 
 async function middlewareFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   const controller = new AbortController();

@@ -38,6 +38,21 @@ export default async function HostShopDashboardLayout({ children }: { children: 
   // force platform administrators through an owner's membership or onboarding
   // gates before that selection can be made.
   if (isPlatformAdmin) {
+    // Admins may enter this layout before choosing a shop. Once the audited
+    // shop cookie is present, use the exact same readiness contract shown to
+    // the owner so reports and every sub-page cannot hide compliance gaps.
+    let readinessItems = null;
+    try {
+      readinessItems = getHostShopReadinessItems(await getHostShopBoard(auth.user.id));
+    } catch (error) {
+      if (
+        !(error instanceof Error) ||
+        !['HOST_SHOP_ADMIN_PARTNER_REQUIRED', 'HOST_SHOP_ACCESS_DENIED'].includes(error.message)
+      ) {
+        throw error;
+      }
+    }
+
     return (
       <PlatformShell
         user={{
@@ -50,6 +65,7 @@ export default async function HostShopDashboardLayout({ children }: { children: 
         }}
         role="host_shop"
       >
+        {readinessItems ? <HostShopReadinessBanner items={readinessItems} /> : null}
         {children}
       </PlatformShell>
     );

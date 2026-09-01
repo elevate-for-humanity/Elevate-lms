@@ -49,8 +49,10 @@ test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
 
     if (touchOnlyProfile) {
       // Touch-device emulation does not expose a hardware Tab sequence. Verify
-      // the control's activation contract and explicit target focus instead.
-      await skipLink.click();
+      // the keyboard activation contract and explicit target focus instead.
+      await skipLink.focus();
+      await expect(skipLink).toBeFocused();
+      await page.keyboard.press('Enter');
       await expect(page.locator('#main-content')).toBeFocused();
       return;
     }

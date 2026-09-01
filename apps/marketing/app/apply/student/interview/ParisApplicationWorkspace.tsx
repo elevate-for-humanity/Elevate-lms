@@ -466,7 +466,13 @@ export default function ParisApplicationWorkspace({
 
       <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
         <section className="flex h-[min(72vh,720px)] min-h-[520px] min-w-0 flex-col border-b border-slate-200 lg:border-b-0 lg:border-r">
-          <div ref={scrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6" aria-live="polite">
+          <div
+            ref={scrollRef}
+            className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6"
+            aria-label="Application interview conversation"
+            aria-live="polite"
+            tabIndex={0}
+          >
             {session.messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-6 ${message.role === 'user' ? 'bg-brand-red-600 text-white' : 'border border-slate-200 bg-white text-slate-800 shadow-sm'}`}>

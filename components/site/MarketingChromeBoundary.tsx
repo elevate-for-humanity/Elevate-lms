@@ -5,10 +5,11 @@ import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { RouteTransition } from '@/components/site/RouteTransition';
 
 const OPERATIONAL_PREFIXES = ['/case-manager', '/workforce-board', '/provider'] as const;
+const STANDALONE_BRAND_PREFIXES = ['/meri-gold-round', '/merigoldround'] as const;
 
-function isOperationalPath(pathname: string) {
+function matchesPrefix(pathname: string, prefixes: readonly string[]) {
   const clean = pathname.split('?')[0] || '/';
-  return OPERATIONAL_PREFIXES.some((prefix) => clean === prefix || clean.startsWith(`${prefix}/`));
+  return prefixes.some((prefix) => clean === prefix || clean.startsWith(`${prefix}/`));
 }
 
 /**
@@ -19,9 +20,10 @@ function isOperationalPath(pathname: string) {
 export async function MarketingChromeBoundary({ children }: { children: React.ReactNode }) {
   const requestHeaders = await headers();
   const pathname = requestHeaders.get('x-pathname') || '/';
-  const operational = isOperationalPath(pathname);
+  const operational = matchesPrefix(pathname, OPERATIONAL_PREFIXES);
+  const standaloneBrand = matchesPrefix(pathname, STANDALONE_BRAND_PREFIXES);
 
-  if (operational) {
+  if (operational || standaloneBrand) {
     return <div id="main-content" tabIndex={-1} className="min-h-dvh focus:outline-none">{children}</div>;
   }
 

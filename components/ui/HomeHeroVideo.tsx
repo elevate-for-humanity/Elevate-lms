@@ -36,14 +36,6 @@ interface HomeHeroSlide {
 }
 
 const HOME_SLIDE_SECONDS = 12;
-const DEPLOYED_COMMIT_SHA = process.env.NEXT_PUBLIC_GIT_SHA?.trim();
-
-function revisionedHeroAsset(src: string): string {
-  if (!DEPLOYED_COMMIT_SHA) return src;
-  const separator = src.includes('?') ? '&' : '?';
-  return `${src}${separator}v=${encodeURIComponent(DEPLOYED_COMMIT_SHA)}`;
-}
-
 const HOME_NARRATION =
   'Welcome to Elevate for Humanity. Explore real career training and apprenticeship pathways built around hands-on learning, local Host Shops, and clear next steps. Choose the path that fits you, and we will help you understand how to begin.';
 
@@ -214,7 +206,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           {previousSlide ? (
             <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
               <HeroVideo
-                mountedFrameImage={revisionedHeroAsset(previousSlide.src)}
+                mountedFrameImage={previousSlide.src}
                 analyticsName={banner.analyticsName}
                 overlayMode="none"
                 mediaFit="cover"
@@ -230,7 +222,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             className="home-hero-slide-enter relative z-10"
           >
             <HeroVideo
-              mountedFrameImage={revisionedHeroAsset(slide.src)}
+              mountedFrameImage={slide.src}
               transcript={banner.transcript || HOME_NARRATION}
               showSoundControl={false}
               showTranscriptControl={false}
@@ -305,13 +297,13 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       </div>
       <style jsx>{`
         .home-hero-slide-enter {
-          animation: home-hero-fade 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
+          animation: home-hero-fade 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
           transform-origin: center;
         }
         @keyframes home-hero-fade {
           0% {
-            opacity: 0;
-            filter: saturate(0.92) brightness(0.9);
+            opacity: 0.55;
+            filter: saturate(0.96) brightness(0.96);
             transform: scale(1.025);
           }
           45% {

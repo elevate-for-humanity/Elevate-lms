@@ -113,17 +113,19 @@ export default function ProgramDetailPage({
     bnplDepositStart && selfPayNumeric > bnplDepositStart && p.durationWeeks > 0
       ? Math.ceil((selfPayNumeric - bnplDepositStart) / p.durationWeeks)
       : null;
-  const durationLabel = p.durationWeeks > 0
-    ? `${p.durationWeeks} ${p.durationWeeks === 1 ? 'week' : 'weeks'}`
-    : p.programType === 'apprenticeship'
-      ? 'Competency-based'
-      : 'Schedule varies';
+  const durationLabel =
+    p.durationWeeks > 0
+      ? `${p.durationWeeks} ${p.durationWeeks === 1 ? 'week' : 'weeks'}`
+      : p.programType === 'apprenticeship'
+        ? 'Competency-based'
+        : 'Schedule varies';
   const hasIndianaFunding = isWorkforceFunded;
   const heroPosterSrc = getProgramHeroImage(p.slug);
   const heroAlt = getProgramImageAlt(p.slug, p.heroImageAlt || p.title);
   const requestInfoHref =
     p.cta?.requestInfoHref || `/contact?program=${encodeURIComponent(p.slug)}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
+  const isTaxPreparationProgram = p.slug === 'tax-preparation';
   const pathwaySteps = [
     {
       step: 'Step 1',
@@ -398,34 +400,77 @@ export default function ProgramDetailPage({
       <section className="border-b border-slate-200 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-4 py-12 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.05fr_.95fr]">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">Know Before You Apply</p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Is this program right for you?</h2>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+              Know Before You Apply
+            </p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">
+              Is this program right for you?
+            </h2>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {(p.admissionRequirements ?? []).slice(0, 6).map((requirement) => (
-                <div key={requirement} className="flex gap-3 rounded-2xl bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-800">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />
+                <div
+                  key={requirement}
+                  className="flex gap-3 rounded-2xl bg-slate-50 p-4 text-sm font-semibold leading-6 text-slate-800"
+                >
+                  <CheckCircle2
+                    className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700"
+                    aria-hidden="true"
+                  />
                   <span>{requirement}</span>
                 </div>
               ))}
             </div>
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <DecisionFact label="Length" value={durationLabel} />
-              <DecisionFact label="Schedule" value={`${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`} />
-              <DecisionFact label="Training" value={totalHours > 0 ? `${totalHours} hours` : hoursRange} />
+              <DecisionFact
+                label="Schedule"
+                value={`${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hrs/week`}
+              />
+              <DecisionFact
+                label="Training"
+                value={totalHours > 0 ? `${totalHours} hours` : hoursRange}
+              />
               <DecisionFact label="Credential" value={`${p.credentials.length} included`} />
             </div>
           </div>
 
           <aside className="rounded-3xl bg-slate-950 p-6 text-white shadow-xl sm:p-8">
             <WalletCards className="h-8 w-8 text-orange-300" aria-hidden="true" />
-            <p className="mt-5 text-xs font-black uppercase tracking-[0.16em] text-orange-300">Price & Enrollment</p>
+            <p className="mt-5 text-xs font-black uppercase tracking-[0.16em] text-orange-300">
+              Price & Enrollment
+            </p>
             <div className="mt-2 text-4xl font-black">{p.selfPayCost}</div>
-            {bnplDepositStart && <p className="mt-2 text-sm font-semibold text-slate-200">Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.</p>}
-            {estimatedWeeklyAfterDeposit && <p className="mt-1 text-sm text-slate-300">Estimated from ${estimatedWeeklyAfterDeposit.toLocaleString()} per week across the published program length. Final terms depend on checkout selections and provider approval.</p>}
+            {bnplDepositStart && (
+              <p className="mt-2 text-sm font-semibold text-slate-200">
+                Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.
+              </p>
+            )}
+            {estimatedWeeklyAfterDeposit && (
+              <p className="mt-1 text-sm text-slate-300">
+                Estimated from ${estimatedWeeklyAfterDeposit.toLocaleString()} per week across the
+                published program length. Final terms depend on checkout selections and provider
+                approval.
+              </p>
+            )}
             <div className="mt-6 grid gap-3">
-              <Link href={p.cta.applyHref || `/apply?program=${p.slug}`} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Apply to This Program</Link>
-              <Link href={`/programs/${p.slug}/payment/bnpl`} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100">See BNPL & Payment Options</Link>
-              <Link href={requestInfoHref} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-6 py-3 font-black text-white hover:bg-slate-800">Get Program Information</Link>
+              <Link
+                href={p.cta.applyHref || `/apply?program=${p.slug}`}
+                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
+              >
+                Apply to This Program
+              </Link>
+              <Link
+                href={`/programs/${p.slug}/payment/bnpl`}
+                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100"
+              >
+                See BNPL & Payment Options
+              </Link>
+              <Link
+                href={requestInfoHref}
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-6 py-3 font-black text-white hover:bg-slate-800"
+              >
+                Get Program Information
+              </Link>
             </div>
           </aside>
         </div>
@@ -483,6 +528,72 @@ export default function ProgramDetailPage({
         </div>
       </section>
 
+      {isTaxPreparationProgram && (
+        <section aria-labelledby="enrolled-agent-pathway" className="bg-slate-950 py-14 sm:py-20">
+          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+            <div className="mx-auto w-full max-w-lg">
+              <a
+                href="https://uat-app.badgecert.com/public/badges/x3o93ye8"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View Elizabeth Greene's Enrolled Agent badge record on BadgeCert (opens in a new tab)"
+                className="block rounded-full outline-none ring-amber-300 transition hover:scale-[1.01] focus-visible:ring-4"
+              >
+                <Image
+                  src="/images/programs/irs-enrolled-agent-ea.webp"
+                  alt="Elevate for Humanity IRS Enrolled Agent career pathway graphic"
+                  width={1536}
+                  height={1536}
+                  sizes="(min-width: 1024px) 42vw, (min-width: 640px) 70vw, 92vw"
+                  className="h-auto w-full"
+                />
+              </a>
+            </div>
+            <div className="text-white">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">
+                Verified tax expertise
+              </p>
+              <h2
+                id="enrolled-agent-pathway"
+                className="mt-3 text-3xl font-black tracking-tight sm:text-4xl"
+              >
+                Learn from experienced tax leadership
+              </h2>
+              <p className="mt-5 max-w-2xl text-base leading-7 text-slate-200 sm:text-lg">
+                Elizabeth Greene&apos;s verified badge shows advanced preparation in federal taxes,
+                tax rules, taxpayer representation, and professional ethics. It was issued August
+                31, 2026 and can be verified online. Students learn these same professional subject
+                areas in Elevate&apos;s tax preparation pathway, but completing the course does not
+                automatically make a student an IRS Enrolled Agent.
+              </p>
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href={p.cta.applyHref || '/apply?program=tax-preparation'}
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white transition-colors hover:bg-brand-red-700"
+                >
+                  Apply for Tax Preparation
+                </Link>
+                <Link
+                  href={requestInfoHref}
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-6 py-3 font-black text-white transition-colors hover:bg-slate-800"
+                >
+                  Request Program Information
+                </Link>
+                <a
+                  href="https://uat-app.badgecert.com/public/badges/x3o93ye8"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-amber-300/70 px-6 py-3 font-black text-amber-200 transition-colors hover:bg-amber-300/10"
+                >
+                  Verify Elizabeth&apos;s Badge
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* 5-STEP WORKFORCE PATHWAY */}
       <section className="py-12 bg-slate-50 border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-4">
@@ -512,16 +623,23 @@ export default function ProgramDetailPage({
       <section className="py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-extrabold text-slate-900 mb-2">What You&apos;ll Learn</h2>
-          <p className="text-slate-500 text-sm mb-8">Select a module to see its topics. Details stay available without crowding the page.</p>
+          <p className="text-slate-500 text-sm mb-8">
+            Select a module to see its topics. Details stay available without crowding the page.
+          </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {(p.curriculum ?? []).map((mod, i) => (
-              <details key={i} className="group rounded-xl border border-slate-200 bg-white p-5 open:shadow-md">
+              <details
+                key={i}
+                className="group rounded-xl border border-slate-200 bg-white p-5 open:shadow-md"
+              >
                 <summary className="flex cursor-pointer list-none items-center gap-2">
                   <span className="w-6 h-6 rounded-full text-[11px] font-extrabold flex items-center justify-center flex-shrink-0 bg-slate-900 text-white">
                     {i + 1}
                   </span>
                   <h3 className="flex-1 font-bold text-sm text-slate-900">{mod.title}</h3>
-                  <span className="text-lg font-black text-brand-red-700 group-open:rotate-45">+</span>
+                  <span className="text-lg font-black text-brand-red-700 group-open:rotate-45">
+                    +
+                  </span>
                 </summary>
                 <ul className="mt-4 space-y-1.5 border-t border-slate-100 pt-4">
                   {(mod.topics ?? []).map((t, j) => (

@@ -192,7 +192,7 @@ export const CPR_FIRST_AID: ProgramSchema = {
       credentialIssued: 'AHA BLS / Heartsaver CPR/AED',
       duration: '4 hours',
       required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/cpr-aed',
+      enrollmentUrl: '/contact',
     },
     {
       courseId: 'hsi-first-aid',
@@ -201,7 +201,7 @@ export const CPR_FIRST_AID: ProgramSchema = {
       credentialIssued: 'AHA Heartsaver First Aid',
       duration: '4 hours',
       required: true,
-      enrollmentUrl: 'https://www.hsi.com/courses/first-aid',
+      enrollmentUrl: '/contact',
     },
   ],
 
@@ -228,7 +228,7 @@ export const CPR_FIRST_AID: ProgramSchema = {
     {
       question: 'Is this the healthcare-level CPR?',
       answer:
-        'Yes. This course meets the CPR standard required by hospitals, clinics, nursing facilities, and most healthcare employers. HSI certifications are nationally recognized and accepted by employers across healthcare, construction, and childcare.',
+        'Yes. This course meets the CPR standard required by hospitals, clinics, nursing facilities, and most healthcare employers.',
     },
     {
       question: 'What if I already have a mannequin?',

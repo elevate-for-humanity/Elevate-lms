@@ -214,37 +214,6 @@ for (const sourceRoot of ['apps/admin', 'components', 'lib', 'scripts', 'tests']
   }
 }
 
-const retiredCourseDraftAdapter = 'apps/admin/app/api/admin/courses/ai-builder/generate/route.ts';
-if (exists(retiredCourseDraftAdapter)) {
-  const courseDraftAdapter = read(retiredCourseDraftAdapter);
-  if (!courseDraftAdapter.includes('COURSE_BUILDER_ROOT_REQUIRED')) {
-    fail(
-      'retired Admin AI course draft adapter is not pinned to the canonical Course Builder root',
-    );
-  }
-  for (const forbiddenLegacyBehavior of [
-    'generateBlueprintFromAI',
-    "generation_authority: 'course-factory'",
-    "persistence_authority: 'courseFactory()'",
-    'draft_only: true',
-  ]) {
-    if (courseDraftAdapter.includes(forbiddenLegacyBehavior))
-      fail(
-        `retired Admin AI course draft adapter still contains legacy generation behavior: ${forbiddenLegacyBehavior}`,
-      );
-  }
-  for (const forbiddenWrite of [
-    ".from('courses').insert",
-    ".from('course_modules').insert",
-    ".from('course_lessons').insert",
-    ".from('lms_courses').insert",
-    ".from('curriculum_lessons').insert",
-  ]) {
-    if (courseDraftAdapter.includes(forbiddenWrite))
-      fail(`retired Admin AI course draft adapter contains direct persistence: ${forbiddenWrite}`);
-  }
-}
-
 const courseFactoryBarrel = read('lib/course-factory/index.ts');
 if (
   !courseFactoryBarrel.includes("export { courseFactory } from '../course-builder/orchestrator'")

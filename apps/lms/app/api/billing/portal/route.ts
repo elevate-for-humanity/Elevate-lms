@@ -4,7 +4,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 async function _POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'payment');
@@ -21,19 +21,23 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
+    const admin = await requireAdminClient();
     const [{ data: profile }, { data: enrollment }] = await Promise.all([
-      supabase.from('profiles').select('stripe_customer_id').eq('id', user.id).maybeSingle(),
-      supabase
+      admin.from('profiles').select('stripe_customer_id').eq('id', user.id).maybeSingle(),
+      admin
         .from('program_enrollments')
         .select('stripe_customer_id')
-        .eq('user_id', user.id)
+        .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
         .not('stripe_customer_id', 'is', null)
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle(),
     ]);
 
-    const stripeCustomerId = profile?.stripe_customer_id || enrollment?.stripe_customer_id;
+    const customerCandidates = [enrollment?.stripe_customer_id, profile?.stripe_customer_id];
+    const stripeCustomerId = customerCandidates.find(
+      (value) => typeof value === 'string' && value.startsWith('cus_'),
+    );
 
     if (!stripeCustomerId) {
       return NextResponse.json({ error: 'No billing account found' }, { status: 404 });

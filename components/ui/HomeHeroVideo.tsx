@@ -36,6 +36,13 @@ interface HomeHeroSlide {
 }
 
 const HOME_SLIDE_SECONDS = 12;
+const DEPLOYED_COMMIT_SHA = process.env.NEXT_PUBLIC_GIT_SHA?.trim();
+
+function revisionedHeroAsset(src: string): string {
+  if (!DEPLOYED_COMMIT_SHA) return src;
+  const separator = src.includes('?') ? '&' : '?';
+  return `${src}${separator}v=${encodeURIComponent(DEPLOYED_COMMIT_SHA)}`;
+}
 
 const HOME_NARRATION =
   'Welcome to Elevate for Humanity. Explore real career training and apprenticeship pathways built around hands-on learning, local Host Shops, and clear next steps. Choose the path that fits you, and we will help you understand how to begin.';
@@ -207,7 +214,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           {previousSlide ? (
             <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
               <HeroVideo
-                mountedFrameImage={previousSlide.src}
+                mountedFrameImage={revisionedHeroAsset(previousSlide.src)}
                 analyticsName={banner.analyticsName}
                 overlayMode="none"
                 mediaFit="cover"
@@ -223,7 +230,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             className="home-hero-slide-enter relative z-10"
           >
             <HeroVideo
-              mountedFrameImage={slide.src}
+              mountedFrameImage={revisionedHeroAsset(slide.src)}
               transcript={banner.transcript || HOME_NARRATION}
               showSoundControl={false}
               showTranscriptControl={false}

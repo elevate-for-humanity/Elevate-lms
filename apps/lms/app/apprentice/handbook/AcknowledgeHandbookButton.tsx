@@ -15,10 +15,13 @@ export function AcknowledgeHandbookButton() {
       const res = await fetch('/api/apprentice/handbook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ handbook_type: 'apprentice', acknowledged: true }),
+        body: JSON.stringify({ action: 'acknowledge', handbookVersion: '2025.1' }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) { setError(data.error ?? 'Failed to record acknowledgment'); return; }
+      if (!res.ok) {
+        setError(data.error ?? 'Failed to record acknowledgment');
+        return;
+      }
       setDone(true);
     } catch {
       setError('Network error — try again');
@@ -42,7 +45,11 @@ export function AcknowledgeHandbookButton() {
         disabled={loading}
         className="flex items-center gap-2 px-4 py-2.5 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-semibold rounded-lg transition-colors disabled:opacity-50"
       >
-        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+        {loading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <CheckCircle className="w-4 h-4" />
+        )}
         {loading ? 'Recording…' : 'Acknowledge Receipt'}
       </button>
       {error && <p className="text-xs text-red-600">{error}</p>}

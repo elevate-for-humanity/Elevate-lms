@@ -13,9 +13,9 @@ import type { SupabaseClient } from '@/lib/supabase';
 import { provisionAccount } from '@/lib/enrollment/provision-account';
 import { ensureDigitalBinder } from '@/lib/enrollment/ensure-digital-binder';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { COSMETOLOGY_COURSE_ID } from '@/lib/cosmetology/pricing';
 
 const COSMETOLOGY_PROGRAM_SLUG = 'cosmetology-apprenticeship';
-const COSMETOLOGY_COURSE_ID = 'b427be5e-c85b-4b41-91d6-4288aec8c975';
 
 export interface CosmetologyPostPaymentInput {
   db: SupabaseClient;
@@ -92,7 +92,9 @@ export async function runCosmetologyPostPayment(
         postLoginUrl: `${siteUrl}/apprentice`,
       });
       if (provision.error || !provision.userId) {
-        logger.error('[cosmetology-post-payment] Account provisioning failed', undefined, { error: provision.error });
+        logger.error('[cosmetology-post-payment] Account provisioning failed', undefined, {
+          error: provision.error,
+        });
         steps['provision_account'] = 'failed';
       } else {
         profileId = provision.userId;
@@ -202,10 +204,13 @@ export async function runCosmetologyPostPayment(
 
     if (enrolled?.user_id) {
       await Promise.all([
-        db.from('profiles').update({
-          enrollment_status: 'active',
-          portal_type: 'apprentice',
-        }).eq('id', enrolled.user_id),
+        db
+          .from('profiles')
+          .update({
+            enrollment_status: 'active',
+            portal_type: 'apprentice',
+          })
+          .eq('id', enrolled.user_id),
         ensureDigitalBinder({ db, userId: enrolled.user_id, enrollmentId }),
       ]);
       steps['dashboard_and_binder'] = 'ok';
@@ -266,7 +271,10 @@ export async function runCosmetologyPostPayment(
       });
       steps['student_email'] = 'ok';
     } catch (err) {
-      logger.warn('[cosmetology-post-payment] Enrollment confirmation email failed (non-fatal)', err);
+      logger.warn(
+        '[cosmetology-post-payment] Enrollment confirmation email failed (non-fatal)',
+        err,
+      );
       steps['student_email'] = 'failed';
     }
   } else {
@@ -276,9 +284,14 @@ export async function runCosmetologyPostPayment(
   try {
     await db
       .from('applications')
-      .update({ onboarding_sent_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .update({
+        onboarding_sent_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', applicationId);
-  } catch { /* non-fatal */ }
+  } catch {
+    /* non-fatal */
+  }
 
   // ── Step 6: Send internal admin notification ───────────────────────────────
   try {
@@ -345,7 +358,11 @@ export async function runCosmetologyPostPayment(
     steps['admin_email'] = 'failed';
   }
 
-  logger.info('[cosmetology-post-payment] Pipeline complete', { applicationId, enrollmentId, steps });
+  logger.info('[cosmetology-post-payment] Pipeline complete', {
+    applicationId,
+    enrollmentId,
+    steps,
+  });
 
   return { success: true, enrollmentId, steps };
 }

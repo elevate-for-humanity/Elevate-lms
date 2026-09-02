@@ -22,13 +22,41 @@ const requiredFiles = {
 };
 
 const requiredContracts = [
-  ['lib/course-builder/orchestrator.ts', /\.from\(['"]courses['"]\)/, 'Course Builder persists course configuration'],
-  ['lib/course-builder/persisted-publish-service.ts', /\.from\(['"]courses['"]\)/, 'publish gate reads persisted courses'],
-  ['lib/course-builder/persisted-publish-service.ts', /\.from\(['"]course_modules['"]\)/, 'publish gate validates persisted modules'],
-  ['lib/course-builder/persisted-publish-service.ts', /course_lessons\(/, 'publish gate validates persisted lessons'],
-  ['lib/course-builder/persisted-publish-service.ts', /authorized human sign-off missing/, 'publish gate requires authorized human approval'],
-  ['lib/course-builder/persisted-publish-service.ts', /repairPersistedCourseAcceptanceWithClient/, 'publish gate runs the governed acceptance checklist'],
-  ['lib/db/courses.ts', /\.from\(['"]course_lessons['"]\)/, 'course service uses canonical lessons table'],
+  [
+    'lib/course-builder/orchestrator.ts',
+    /\.from\(['"]courses['"]\)/,
+    'Course Builder persists course configuration',
+  ],
+  [
+    'lib/course-builder/persisted-publish-service.ts',
+    /\.from\(['"]courses['"]\)/,
+    'publish gate reads persisted courses',
+  ],
+  [
+    'lib/course-builder/persisted-publish-service.ts',
+    /\.from\(['"]course_modules['"]\)/,
+    'publish gate validates persisted modules',
+  ],
+  [
+    'lib/course-builder/persisted-publish-service.ts',
+    /course_lessons\(/,
+    'publish gate validates persisted lessons',
+  ],
+  [
+    'lib/course-builder/persisted-publish-service.ts',
+    /authorized human sign-off missing/,
+    'publish gate requires authorized human approval',
+  ],
+  [
+    'lib/course-builder/persisted-publish-service.ts',
+    /repairPersistedCourseAcceptanceWithClient/,
+    'publish gate runs the governed acceptance checklist',
+  ],
+  [
+    'lib/db/courses.ts',
+    /\.from\(['"]course_lessons['"]\)/,
+    'course service uses canonical lessons table',
+  ],
 ];
 
 function walk(directory) {
@@ -60,8 +88,11 @@ const persistedPublisher = fs.readFileSync(
   'utf8',
 );
 checks.push({
-  name: 'publish gate cannot manufacture automated approval',
-  pass: !persistedPublisher.includes('record_course_automated_approval'),
+  name: 'publish gate records deterministic automated approval evidence',
+  pass:
+    persistedPublisher.includes('record_course_automated_approval') &&
+    persistedPublisher.includes('AUTOMATED_COURSE_GATE_VERSION') &&
+    persistedPublisher.includes('automated_approval_id'),
   detail: 'lib/course-builder/persisted-publish-service.ts',
 });
 
@@ -70,7 +101,9 @@ const retiredCatalogFiles = fs.existsSync(retiredCatalog) ? walk(retiredCatalog)
 checks.push({
   name: 'retired static course catalog is absent',
   pass: retiredCatalogFiles.length === 0,
-  detail: retiredCatalogFiles.length ? retiredCatalogFiles.map(relative).join(', ') : 'lms-data/courses (absent or empty)',
+  detail: retiredCatalogFiles.length
+    ? retiredCatalogFiles.map(relative).join(', ')
+    : 'lms-data/courses (absent or empty)',
 });
 
 const applicationFiles = ['apps', 'components', 'lib'].flatMap((directory) =>
@@ -90,16 +123,25 @@ const failed = checks.filter((check) => !check.pass);
 const report = {
   timestamp: new Date().toISOString(),
   authority: 'Supabase courses -> course_modules -> course_lessons',
-  summary: { totalChecks: checks.length, passed: checks.length - failed.length, failed: failed.length },
+  summary: {
+    totalChecks: checks.length,
+    passed: checks.length - failed.length,
+    failed: failed.length,
+  },
   checks,
 };
-fs.writeFileSync(path.join(reportsDir, 'lms_integrity_report.json'), JSON.stringify(report, null, 2));
+fs.writeFileSync(
+  path.join(reportsDir, 'lms_integrity_report.json'),
+  JSON.stringify(report, null, 2),
+);
 
 for (const check of checks) {
   console.log(`${check.pass ? 'PASS' : 'FAIL'}: ${check.name} (${check.detail})`);
 }
 if (failed.length) {
-  console.error(`FAIL: LMS persisted-course authority could not be proven (${failed.length} failed check(s)).`);
+  console.error(
+    `FAIL: LMS persisted-course authority could not be proven (${failed.length} failed check(s)).`,
+  );
   process.exit(1);
 }
 console.log('PASS: LMS course integrity proven from the canonical persisted-course architecture.');

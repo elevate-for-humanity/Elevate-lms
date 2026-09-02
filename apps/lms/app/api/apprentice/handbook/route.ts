@@ -59,7 +59,11 @@ async function _GET(request: NextRequest) {
       signedAt: agreement?.accepted_at || null,
     });
   } catch (error) {
-    logger.error('[Handbook API] Error', normalizeError(error, 'Handbook API error'), getErrorContext(error));
+    logger.error(
+      '[Handbook API] Error',
+      normalizeError(error, 'Handbook API error'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -89,17 +93,33 @@ async function _POST(request: NextRequest) {
     const { action, signature, handbookVersion } = body;
 
     if (action === 'acknowledge') {
+      const handbookIp =
+        request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+        request.headers.get('x-real-ip') ||
+        '0.0.0.0';
+      const version = String(handbookVersion || '2025.1');
+      const { data: existing } = await db
+        .from('handbook_acknowledgments')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('handbook_version', version)
+        .maybeSingle();
+      if (existing) return NextResponse.json({ success: true, alreadyAcknowledged: true });
+
       const { error } = await db.from('handbook_acknowledgments').insert({
         user_id: user.id,
-        handbook_version: handbookVersion || '2025.1',
+        handbook_version: version,
         acknowledged_at: new Date().toISOString(),
-        ip_address:
-          request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '0.0.0.0',
+        ip_address: handbookIp,
         user_agent: request.headers.get('user-agent') || 'unknown',
       });
 
       if (error) {
-        logger.error('[Handbook API] Acknowledge error', normalizeError(error, 'Acknowledge failed'), getErrorContext(error));
+        logger.error(
+          '[Handbook API] Acknowledge error',
+          normalizeError(error, 'Acknowledge failed'),
+          getErrorContext(error),
+        );
         return NextResponse.json({ error: 'Failed to acknowledge handbook' }, { status: 500 });
       }
 
@@ -120,7 +140,11 @@ async function _POST(request: NextRequest) {
       });
 
       if (error) {
-        logger.error('[Handbook API] Sign error', normalizeError(error, 'Sign failed'), getErrorContext(error));
+        logger.error(
+          '[Handbook API] Sign error',
+          normalizeError(error, 'Sign failed'),
+          getErrorContext(error),
+        );
         return NextResponse.json({ error: 'Failed to sign agreement' }, { status: 500 });
       }
 
@@ -129,7 +153,11 @@ async function _POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error) {
-    logger.error('[Handbook API] Error', normalizeError(error, 'Handbook API error'), getErrorContext(error));
+    logger.error(
+      '[Handbook API] Error',
+      normalizeError(error, 'Handbook API error'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

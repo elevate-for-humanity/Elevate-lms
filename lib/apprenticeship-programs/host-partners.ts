@@ -149,13 +149,34 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A community salon and barber shop in downtown Sullivan offering hair services and traditional barbering in a local, client-focused setting.',
     media: [
-      { src: '/images/partners/style-and-scissor-salon/contact-card.webp', alt: 'Style and Scissor Salon contact card for owner Cori Meid', kind: 'photo' },
-      { src: '/images/partners/style-and-scissor-salon/logo.webp', alt: 'Style and Scissor Salon scissors and comb logo', kind: 'photo' },
-      { src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp', alt: 'Pink nail designs completed at Style and Scissor Salon', kind: 'photo' },
-      { src: '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp', alt: 'Nail art portfolio from Style and Scissor Salon', kind: 'photo' },
-      { src: '/images/partners/style-and-scissor-salon/melissas-nails.webp', alt: 'Melissa nail designs from Style and Scissor Salon', kind: 'photo' },
+      {
+        src: '/images/partners/style-and-scissor-salon/contact-card.webp',
+        alt: 'Style and Scissor Salon contact card for owner Cori Meid',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/style-and-scissor-salon/logo.webp',
+        alt: 'Style and Scissor Salon scissors and comb logo',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp',
+        alt: 'Pink nail designs completed at Style and Scissor Salon',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/style-and-scissor-salon/portfolio-nail-work.webp',
+        alt: 'Nail art portfolio from Style and Scissor Salon',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/style-and-scissor-salon/melissas-nails.webp',
+        alt: 'Melissa nail designs from Style and Scissor Salon',
+        kind: 'photo',
+      },
     ],
-    onlineListingUrl: 'https://www.fresha.com/pl/lvp/style-and-scissor-salon-west-hopewell-street-farmersburg-l1E0B7',
+    onlineListingUrl:
+      'https://www.fresha.com/pl/lvp/style-and-scissor-salon-west-hopewell-street-farmersburg-l1E0B7',
     onlineListingLabel: 'View Style and Scissor details',
   },
   {
@@ -171,20 +192,81 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'An independent Martinsville hair business located inside Cat Eye Collective and participating in the Elevate apprenticeship host-shop network.',
     media: [
-      { src: '/images/partners/generations-hair/color-transformation.webp', alt: 'Generations Hair LLC dimensional color transformation', kind: 'photo' },
-      { src: '/images/partners/generations-hair/dimensional-color.webp', alt: 'Generations Hair LLC dimensional brunette and blonde color work', kind: 'photo' },
-      { src: '/images/partners/generations-hair/salon-service.webp', alt: 'Generations Hair LLC stylist providing a supervised salon service', kind: 'photo' },
-      { src: '/images/partners/generations-hair/stylist-at-work.webp', alt: 'Generations Hair LLC stylist working with a salon guest', kind: 'photo' },
-      { src: '/images/partners/generations-hair/cutting.webp', alt: 'Generations Hair Co cutting portfolio', kind: 'flyer' },
-      { src: '/images/partners/generations-hair/brunettes.webp', alt: 'Generations Hair Co brunette color portfolio', kind: 'flyer' },
-      { src: '/images/partners/generations-hair/extensions.webp', alt: 'Generations Hair Co extensions portfolio', kind: 'flyer' },
-      { src: '/images/partners/generations-hair/blondes.webp', alt: 'Generations Hair Co blonde color portfolio', kind: 'flyer' },
-      { src: '/images/partners/generations-hair/vivids.webp', alt: 'Generations Hair Co vivid color portfolio', kind: 'flyer' },
-      { src: '/images/partners/generations-hair/reds-coppers.webp', alt: 'Generations Hair Co reds and coppers portfolio', kind: 'flyer' },
-      { src: '/images/partners/generations-hair/special-event-styling.webp', alt: 'Generations Hair Co special event and bridal styling portfolio', kind: 'flyer' },
-      { src: '/images/partners/generations-hair/look-book.webp', alt: 'Generations Hair Co salon look book', kind: 'flyer' },
-      { src: '/images/partners/generations-hair/curls.webp', alt: 'Generations Hair Co curls portfolio', kind: 'flyer' },
-      { src: '/images/partners/generations-hair/brand-mark.webp', alt: 'Generations Hair LLC brand mark', kind: 'flyer' },
+      {
+        src: '/images/partners/generations-hair/color-transformation.webp',
+        alt: 'Generations Hair LLC dimensional color transformation',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/generations-hair/dimensional-color.webp',
+        alt: 'Generations Hair LLC dimensional brunette and blonde color work',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/generations-hair/salon-service.webp',
+        alt: 'Generations Hair LLC stylist providing a supervised salon service',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/generations-hair/stylist-at-work.webp',
+        alt: 'Generations Hair LLC stylist working with a salon guest',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/generations-hair/cutting.webp',
+        alt: 'Generations Hair Co cutting portfolio',
+        kind: 'flyer',
+      },
+      {
+        src: '/images/partners/generations-hair/brunettes.webp',
+        alt: 'Generations Hair Co brunette color portfolio',
+        kind: 'flyer',
+      },
+      {
+        src: '/images/partners/generations-hair/extensions.webp',
+        alt: 'Generations Hair Co extensions portfolio',
+        kind: 'flyer',
+      },
+      {
+        src: '/images/partners/generations-hair/blondes.webp',
+        alt: 'Generations Hair Co blonde color portfolio',
+        kind: 'flyer',
+      },
+      {
+        src: '/images/partners/generations-hair/vivids.webp',
+        alt: 'Generations Hair Co vivid color portfolio',
+        kind: 'flyer',
+      },
+      {
+        src: '/images/partners/generations-hair/reds-coppers.webp',
+        alt: 'Generations Hair Co reds and coppers portfolio',
+        kind: 'flyer',
+      },
+      {
+        src: '/images/partners/generations-hair/special-event-styling.webp',
+        alt: 'Generations Hair Co special event and bridal styling portfolio',
+        kind: 'flyer',
+      },
+      {
+        src: '/images/partners/generations-hair/look-book.webp',
+        alt: 'Generations Hair Co salon look book',
+        kind: 'flyer',
+      },
+      {
+        src: '/images/partners/generations-hair/curls.webp',
+        alt: 'Generations Hair Co curls portfolio',
+        kind: 'flyer',
+      },
+      {
+        src: '/images/partners/generations-hair/brand-mark.webp',
+        alt: 'Generations Hair LLC brand mark',
+        kind: 'flyer',
+      },
+      {
+        src: '/images/partners/generations-hair/highlighted-curls-card.webp',
+        alt: 'Highlighted dimensional curls created by Generations Hair LLC in Martinsville, Indiana',
+        kind: 'photo',
+      },
     ],
     socialUrl: 'https://www.instagram.com/midwesternmanes/',
     socialLabel: 'Contact / view shop photos',
@@ -204,10 +286,26 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A South Bend salon offering appointment-based hair services while participating in Elevate’s growing apprenticeship host-shop network.',
     media: [
-      { src: '/images/partners/salon-saloon/team-sign.webp', alt: 'Salon Saloon team in front of the salon sign', kind: 'photo' },
-      { src: '/images/partners/salon-saloon/team-interior.webp', alt: 'Salon Saloon team inside the South Bend salon', kind: 'photo' },
-      { src: '/images/partners/salon-saloon/team-studio.webp', alt: 'Salon Saloon team in the studio service area', kind: 'photo' },
-      { src: '/videos/partners/salon-saloon-tour.mp4', alt: 'Salon Saloon team and salon tour', kind: 'video' },
+      {
+        src: '/images/partners/salon-saloon/team-sign.webp',
+        alt: 'Salon Saloon team in front of the salon sign',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/salon-saloon/team-interior.webp',
+        alt: 'Salon Saloon team inside the South Bend salon',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/salon-saloon/team-studio.webp',
+        alt: 'Salon Saloon team in the studio service area',
+        kind: 'photo',
+      },
+      {
+        src: '/videos/partners/salon-saloon-tour.mp4',
+        alt: 'Salon Saloon team and salon tour',
+        kind: 'video',
+      },
     ],
     websiteUrl: 'https://tory-103460.square.site/',
     websiteLabel: 'Book / view Salon Saloon online',

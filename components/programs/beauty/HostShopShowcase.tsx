@@ -48,6 +48,7 @@ export default function HostShopShowcase({
   videoTourShopSlug,
   autoPlayVideoOnVisible = false,
   narration,
+  mediaOverrides,
 }: {
   shops: FeaturedHostPartner[];
   /** Limit video playback to the designated tour while retaining other shops as still slides. */
@@ -56,6 +57,8 @@ export default function HostShopShowcase({
   autoPlayVideoOnVisible?: boolean;
   /** Page-specific natural narration used while this section is dominant. */
   narration?: string;
+  /** Page-specific media without changing another surface such as the homepage. */
+  mediaOverrides?: Record<string, ShowcaseMedia>;
 }) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
@@ -64,14 +67,14 @@ export default function HostShopShowcase({
   const slides = useMemo(
     () =>
       shops.flatMap((shop) => {
-        const featured = FEATURED_MEDIA_BY_SHOP[shop.slug];
+        const featured = mediaOverrides?.[shop.slug] ?? FEATURED_MEDIA_BY_SHOP[shop.slug];
         const media: ShowcaseMedia | undefined =
           featured?.kind !== 'video' || !videoTourShopSlug || shop.slug === videoTourShopSlug
             ? (featured ?? shop.media?.find((item) => item.kind !== 'video'))
             : shop.media?.find((item) => item.kind !== 'video');
         return media ? [{ shop, media }] : [];
       }),
-    [shops, videoTourShopSlug],
+    [mediaOverrides, shops, videoTourShopSlug],
   );
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -168,7 +171,10 @@ export default function HostShopShowcase({
       ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
       data-scroll-narration
-      data-narration={narration ?? 'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.'}
+      data-narration={
+        narration ??
+        'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.'
+      }
       className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-12 text-slate-950 sm:px-6 sm:py-16"
       onMouseEnter={() => setInteracting(true)}
       onMouseLeave={() => setInteracting(false)}

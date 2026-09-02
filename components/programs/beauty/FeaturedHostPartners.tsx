@@ -20,24 +20,39 @@ function phoneHref(phone: string) {
 }
 
 export default function FeaturedHostPartners({ programSlug }: { programSlug?: string }) {
-  const requiredBusinessType = programSlug === 'barber-apprenticeship'
-    ? 'BarberShop'
-    : programSlug === 'cosmetology-apprenticeship'
-      ? 'HairSalon'
-      : undefined;
+  const requiredBusinessType =
+    programSlug === 'barber-apprenticeship'
+      ? 'BarberShop'
+      : programSlug === 'cosmetology-apprenticeship'
+        ? 'HairSalon'
+        : undefined;
   const shops = programSlug
-    ? FEATURED_BEAUTY_HOST_PARTNERS.filter((shop) =>
-        shop.programs.includes(programSlug) &&
-        (!requiredBusinessType || shop.businessType === requiredBusinessType))
+    ? FEATURED_BEAUTY_HOST_PARTNERS.filter(
+        (shop) =>
+          shop.programs.includes(programSlug) &&
+          (!requiredBusinessType || shop.businessType === requiredBusinessType),
+      )
     : FEATURED_BEAUTY_HOST_PARTNERS;
 
   if (!shops.length) return null;
 
   return (
     <>
-      <HostShopShowcase shops={shops} />
+      <HostShopShowcase
+        shops={shops}
+        mediaOverrides={{
+          'generations-hair-llc': {
+            src: '/images/partners/generations-hair/highlighted-curls-home.webp',
+            alt: 'Highlighted dimensional curls created by Generations Hair LLC in Martinsville, Indiana',
+            kind: 'photo',
+          },
+        }}
+      />
 
-      <section className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 sm:py-16" id="host-shops">
+      <section
+        className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 sm:py-16"
+        id="host-shops"
+      >
         <div className="mx-auto max-w-6xl">
           <p className="text-center text-xs font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
             Training network & local businesses
@@ -46,24 +61,43 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
             Visit, book, and train with our host-shop network
           </h2>
           <p className="mx-auto mt-3 max-w-3xl text-center text-base font-medium leading-7 text-slate-700">
-            Each participating shop is a real local business. Use the contact, website, and map links below to support the shops, explore services, or learn about future apprenticeship opportunities.
+            Each participating shop is a real local business. Use the contact, website, and map
+            links below to support the shops, explore services, or learn about future apprenticeship
+            opportunities.
           </p>
 
           <div className="mt-10 grid gap-6 lg:grid-cols-2">
             {shops.map((shop) => {
               const stillMedia = shop.media?.filter((media) => media.kind !== 'video') ?? [];
-              const image = shop.slug === 'razors-image-barbershop'
-                ? { src: '/images/partners/razors-image-video-poster.webp', alt: "Razor's Image host barbershop representative", kind: 'photo' as const }
-                : stillMedia[1] ?? stillMedia[0];
-              const secondaryImage = shop.slug === 'razors-image-barbershop'
-                ? {
-                    src: '/images/partners/razors-image-apprenticeship-flyer.webp',
-                    alt: "Razor's Image Barber Apprenticeship Program artwork",
-                  }
-                : undefined;
-              const video = shop.slug === 'razors-image-barbershop'
-                ? { src: '/videos/partners/razors-image-host-barbershop.mp4', alt: "Razor's Image owner describing the barber apprenticeship opportunity", kind: 'video' as const }
-                : shop.media?.find((media) => media.kind === 'video');
+              const image =
+                shop.slug === 'razors-image-barbershop'
+                  ? {
+                      src: '/images/partners/razors-image-video-poster.webp',
+                      alt: "Razor's Image host barbershop representative",
+                      kind: 'photo' as const,
+                    }
+                  : shop.slug === 'generations-hair-llc'
+                    ? {
+                        src: '/images/partners/generations-hair/highlighted-curls-card.webp',
+                        alt: 'Highlighted dimensional curls created by Generations Hair LLC',
+                        kind: 'photo' as const,
+                      }
+                    : (stillMedia[1] ?? stillMedia[0]);
+              const secondaryImage =
+                shop.slug === 'razors-image-barbershop'
+                  ? {
+                      src: '/images/partners/razors-image-apprenticeship-flyer.webp',
+                      alt: "Razor's Image Barber Apprenticeship Program artwork",
+                    }
+                  : undefined;
+              const video =
+                shop.slug === 'razors-image-barbershop'
+                  ? {
+                      src: '/videos/partners/razors-image-host-barbershop.mp4',
+                      alt: "Razor's Image owner describing the barber apprenticeship opportunity",
+                      kind: 'video' as const,
+                    }
+                  : shop.media?.find((media) => media.kind === 'video');
               const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
               return (
                 <article
@@ -72,7 +106,13 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
                 >
                   {video ? (
                     <div className="bg-slate-950 px-4 py-5 sm:px-6">
-                      <div className={secondaryImage ? 'grid items-stretch gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(150px,0.72fr)]' : ''}>
+                      <div
+                        className={
+                          secondaryImage
+                            ? 'grid items-stretch gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(150px,0.72fr)]'
+                            : ''
+                        }
+                      >
                         <div className="mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
                           <video
                             controls
@@ -116,7 +156,10 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
                           Participating host barbershop
                         </p>
                         <p className="mt-2 text-sm font-semibold leading-6 text-slate-200">
-                          Razor&apos;s Image provides an approved workplace training environment. Elevate for Humanity administers the DOL-registered Barber Apprenticeship; enrollment, eligibility, placement, wages, and licensing remain subject to the applicable program and employer requirements.
+                          Razor&apos;s Image provides an approved workplace training environment.
+                          Elevate for Humanity administers the DOL-registered Barber Apprenticeship;
+                          enrollment, eligibility, placement, wages, and licensing remain subject to
+                          the applicable program and employer requirements.
                         </p>
                       </div>
                     </div>
@@ -139,7 +182,9 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
                           {shop.dba ?? shop.name}
                         </h3>
                         {shop.dba ? (
-                          <p className="mt-1 text-sm font-semibold text-slate-600">Legal name: {shop.name}</p>
+                          <p className="mt-1 text-sm font-semibold text-slate-600">
+                            Legal name: {shop.name}
+                          </p>
                         ) : null}
                       </div>
                       <span className="rounded-full bg-brand-blue-50 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-brand-blue-800">
@@ -153,7 +198,10 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
 
                     <div className="mt-5 space-y-3 border-y border-slate-100 py-5">
                       <p className="flex items-start gap-2 text-sm font-bold text-slate-800">
-                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-red-700" aria-hidden="true" />
+                        <MapPin
+                          className="mt-0.5 h-4 w-4 shrink-0 text-brand-red-700"
+                          aria-hidden="true"
+                        />
                         <span>{fullAddress}</span>
                       </p>
                       {shop.phone ? (
@@ -204,7 +252,8 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
                           rel="noopener noreferrer"
                           className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-extrabold text-slate-900 transition hover:bg-slate-50"
                         >
-                          {shop.websiteLabel ?? 'Visit shop website'} <ExternalLink className="h-4 w-4" />
+                          {shop.websiteLabel ?? 'Visit shop website'}{' '}
+                          <ExternalLink className="h-4 w-4" />
                         </a>
                       ) : null}
                       {shop.bookingUrl ? (

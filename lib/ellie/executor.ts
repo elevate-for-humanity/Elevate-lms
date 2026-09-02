@@ -109,7 +109,7 @@ async function approveProgramHolder(params: Params, db: SupabaseClient): Promise
   if (!programHolderId) return { success: false, message: 'No program holder ID provided.' };
 
   const { error } = await db
-    .from('program_holder_profiles')
+    .from('program_holders')
     .update({ status: 'active', approved_at: new Date().toISOString() })
     .eq('id', programHolderId);
 
@@ -122,7 +122,7 @@ async function rejectProgramHolder(params: Params, db: SupabaseClient): Promise<
   if (!programHolderId) return { success: false, message: 'No program holder ID provided.' };
 
   const { error } = await db
-    .from('program_holder_profiles')
+    .from('program_holders')
     .update({ status: 'rejected', rejection_reason: reason ?? 'Rejected via Ellie', reviewed_at: new Date().toISOString() })
     .eq('id', programHolderId);
 

@@ -87,7 +87,31 @@ grant execute on function directory_private.list_public_host_shops()
 create or replace view public.public_host_shops
 with (security_invoker = true)
 as
-select * from directory_private.list_public_host_shops();
+select
+  d.id,
+  d.public_slug,
+  d.display_name,
+  d.description,
+  d.logo_url,
+  d.flyer_url,
+  d.website_url,
+  d.website::varchar(255) as website,
+  d.phone::varchar(20) as phone,
+  d.address_line1::varchar(255) as address_line1,
+  d.address_line2::varchar(255) as address_line2,
+  d.city::varchar(100) as city,
+  d.state::varchar(50) as state,
+  d.zip::varchar(20) as zip,
+  d.programs,
+  d.featured,
+  d.display_order,
+  d.public_profile_published_at,
+  d.media_gallery,
+  d.video_url,
+  d.source_url,
+  d.google_maps_url,
+  d.media_verified_at
+from directory_private.list_public_host_shops() d;
 
 grant select on public.public_host_shops to anon, authenticated;
 

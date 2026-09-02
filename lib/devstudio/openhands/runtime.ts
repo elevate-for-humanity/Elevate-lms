@@ -146,7 +146,7 @@ export async function dispatchOpenHandsTask(
         tool_name: 'openhands.execute',
         tool_input: { task: input.task, repository: input.repository ?? null },
         attempts: 1,
-        max_attempts: 1,
+        max_attempts: 3,
         timeout_ms: 3_600_000,
         started_at: now,
         updated_at: now,
@@ -236,12 +236,12 @@ function evaluateOpenHandsCompletion(
   }
 
   if (lifecycle.status === 'failed') {
-    return evaluateExecution({
-      tool: 'openhands.execute',
-      error: lifecycle.error || 'OpenHands execution failed',
-      attempts,
-      maxAttempts,
-    });
+    const reason = lifecycle.error || 'OpenHands execution failed';
+    return {
+      status: attempts < maxAttempts ? 'FAIL_RETRYABLE' : 'FAIL_BLOCKING',
+      reasons: [reason],
+      evidence: { provider: 'openhands', attempts, max_attempts: maxAttempts, error: reason },
+    };
   }
 
   if (lifecycle.status !== 'completed') {
@@ -266,9 +266,9 @@ function evaluateOpenHandsCompletion(
   const failed = failingChecks(github);
   if (failed.length) {
     return {
-      status: 'FAIL_BLOCKING',
+      status: attempts < maxAttempts ? 'FAIL_RETRYABLE' : 'FAIL_BLOCKING',
       reasons: failed,
-      evidence: { provider: 'openhands', github },
+      evidence: { provider: 'openhands', attempts, max_attempts: maxAttempts, github },
     };
   }
 
@@ -289,6 +289,149 @@ function evaluateOpenHandsCompletion(
     expectedOutput: 'A completed OpenHands engineering run with independently verifiable repository evidence.',
     verificationRule: 'At least one reported branch or pull request must exist in GitHub and reported CI must not be failing.',
   });
+}
+
+async function retryOpenHandsTask(input: {
+  task: Record<string, any>;
+  reasons: string[];
+  attempt: number;
+}): Promise<void> {
+  const db = await requireAdminClient();
+  const taskInput = input.task.tool_input && typeof input.task.tool_input === 'object'
+    ? input.task.tool_input as Record<string, unknown>
+    : {};
+  const previous = input.task.tool_output && typeof input.task.tool_output === 'object'
+    ? input.task.tool_output as Record<string, unknown>
+    : {};
+  const originalTask = typeof taskInput.task === 'string'
+    ? taskInput.task
+    : String(input.task.command ?? input.task.description ?? input.task.title ?? 'Repair the verified engineering failure.');
+  const repository = typeof taskInput.repository === 'string'
+    ? taskInput.repository
+    : typeof previous.repository === 'string'
+      ? previous.repository
+      : null;
+  const attempt = input.attempt;
+  const retryMessage = `${originalTask}\n\nPrevious verification failed. Repair the implementation and rerun the relevant checks. Do not merely explain the failure. Verified evidence:\n- ${input.reasons.join('\n- ')}`;
+  const start = await startOpenHandsTask({
+    message: retryMessage,
+    repository,
+    traceId: input.task.correlation_id ?? input.task.trace_id ?? null,
+    taskId: input.task.id,
+    tags: ['engineering', 'verification-repair', `attempt-${attempt}`],
+  });
+
+  await db
+    .from('ai_tasks')
+    .update({
+      attempts: attempt,
+      status: 'running',
+      requires_approval: false,
+      approval_status: 'approved',
+      approval_reason: null,
+      error_message: null,
+      completed_at: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', input.task.id);
+  await attachStartTask(
+    input.task.id,
+    start,
+    input.task.tenant_id,
+    input.task.user_id,
+  );
+  await appendLog(
+    input.task.id,
+    `Verification repair attempt ${attempt}/${Number(input.task.max_attempts ?? 3)} dispatched.`,
+    'warn',
+    input.task.tenant_id,
+    input.task.user_id,
+  );
+}
+
+export async function reconcileOpenHandsTasks(limit = 10): Promise<{
+  checked: number;
+  completed: number;
+  running: number;
+  retried: number;
+  failed: number;
+  errors: string[];
+}> {
+  const db = await requireAdminClient();
+  const { data, error } = await db
+    .from('ai_tasks')
+    .select('*')
+    .eq('tool_name', 'openhands.execute')
+    .in('status', ['running', 'failed'])
+    .order('updated_at', { ascending: true })
+    .limit(Math.max(1, Math.min(limit, 50)));
+  if (error) throw new Error(`Unable to load OpenHands reconciliation queue: ${error.message}`);
+
+  const result = { checked: 0, completed: 0, running: 0, retried: 0, failed: 0, errors: [] as string[] };
+  for (const candidate of data ?? []) {
+    result.checked += 1;
+    try {
+      if (candidate.status === 'running') {
+        await refreshOpenHandsTask({ taskId: candidate.id, actorId: candidate.user_id });
+      }
+      const { data: refreshed } = await db.from('ai_tasks').select('*').eq('id', candidate.id).single();
+      if (!refreshed) continue;
+      if (refreshed.status === 'completed') {
+        result.completed += 1;
+        continue;
+      }
+      if (refreshed.status === 'running') {
+        result.running += 1;
+        continue;
+      }
+      const evaluation = refreshed.result_json?.evaluation as EvaluationResult | undefined;
+      const attempts = Number(refreshed.attempts ?? 1);
+      const maxAttempts = Number(refreshed.max_attempts ?? 3);
+      if (
+        refreshed.status === 'failed' &&
+        evaluation?.status === 'FAIL_RETRYABLE' &&
+        attempts < maxAttempts
+      ) {
+        const nextAttempt = attempts + 1;
+        const { data: claimed, error: claimError } = await db
+          .from('ai_tasks')
+          .update({
+            status: 'planning',
+            attempts: nextAttempt,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', refreshed.id)
+          .eq('status', 'failed')
+          .eq('attempts', attempts)
+          .select('id')
+          .maybeSingle();
+        if (claimError) throw claimError;
+        if (claimed?.id) {
+          await retryOpenHandsTask({
+            task: { ...refreshed, attempts: nextAttempt },
+            reasons: evaluation.reasons,
+            attempt: nextAttempt,
+          });
+          result.retried += 1;
+        }
+      } else if (refreshed.status === 'failed') {
+        result.failed += 1;
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      await db
+        .from('ai_tasks')
+        .update({
+          status: 'failed',
+          error_message: message,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', candidate.id)
+        .eq('status', 'planning');
+      result.errors.push(`${candidate.id}:${message}`);
+    }
+  }
+  return result;
 }
 
 export async function refreshOpenHandsTask(input: {
@@ -336,14 +479,24 @@ export async function refreshOpenHandsTask(input: {
     Number(task.max_attempts ?? 1),
   );
   const now = new Date().toISOString();
+  const verificationStillRunning =
+    lifecycle.status === 'completed' &&
+    githubEvidence !== null &&
+    pendingChecks(githubEvidence).length > 0;
+  const needsHumanApproval =
+    evaluation.status === 'REQUIRES_HUMAN_REVIEW' && !verificationStillRunning;
   const taskStatus =
     evaluation.status === 'PASS'
       ? 'completed'
       : evaluation.status === 'FAIL_BLOCKING'
         ? 'failed'
-        : evaluation.status === 'REQUIRES_HUMAN_REVIEW'
-          ? 'awaiting_approval'
-          : lifecycleTaskStatus(lifecycle);
+        : evaluation.status === 'FAIL_RETRYABLE'
+          ? 'failed'
+          : needsHumanApproval
+            ? 'awaiting_approval'
+            : verificationStillRunning
+              ? 'running'
+              : lifecycleTaskStatus(lifecycle);
 
   const mergedExternal = {
     ...external,
@@ -371,9 +524,9 @@ export async function refreshOpenHandsTask(input: {
       },
       result: evaluation.status === 'PASS' ? { provider: 'openhands', lifecycle, githubEvidence, evaluation } : task.result,
       error_message: evaluation.status === 'FAIL_BLOCKING' ? evaluation.reasons.join(' ') : null,
-      requires_approval: evaluation.status === 'REQUIRES_HUMAN_REVIEW',
-      approval_status: evaluation.status === 'REQUIRES_HUMAN_REVIEW' ? 'pending' : task.approval_status,
-      approval_reason: evaluation.status === 'REQUIRES_HUMAN_REVIEW' ? evaluation.reasons.join(' ') : task.approval_reason,
+      requires_approval: needsHumanApproval,
+      approval_status: needsHumanApproval ? 'pending' : task.approval_status,
+      approval_reason: needsHumanApproval ? evaluation.reasons.join(' ') : task.approval_reason,
       completed_at: ['completed', 'failed'].includes(taskStatus) ? now : null,
       updated_at: now,
     })
@@ -404,7 +557,7 @@ export async function refreshOpenHandsTask(input: {
     await db
       .from('ai_task_steps')
       .update({
-        status: evaluation.status === 'PASS' ? 'completed' : evaluation.status === 'REQUIRES_HUMAN_REVIEW' ? 'awaiting_approval' : evaluation.status === 'FAIL_BLOCKING' ? 'failed' : 'pending',
+        status: evaluation.status === 'PASS' ? 'completed' : needsHumanApproval ? 'awaiting_approval' : evaluation.status === 'FAIL_BLOCKING' || evaluation.status === 'FAIL_RETRYABLE' ? 'failed' : 'pending',
         output: evaluation.reasons.join(' '),
         output_json: { evaluation, github: githubEvidence },
         completed_at: evaluation.status === 'PASS' ? now : null,
@@ -412,7 +565,7 @@ export async function refreshOpenHandsTask(input: {
       .eq('id', verifyStep.id);
   }
 
-  if (evaluation.status === 'REQUIRES_HUMAN_REVIEW') {
+  if (needsHumanApproval) {
     await createPendingApprovalForVerification(task.id, input.actorId ?? task.user_id, evaluation.reasons, task.tenant_id);
   }
 

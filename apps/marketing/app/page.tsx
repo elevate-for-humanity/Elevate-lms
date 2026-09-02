@@ -98,7 +98,7 @@ export default function HomePage() {
           shops={HOME_HOST_SHOPS}
           videoTourShopSlug="salon-saloon"
           autoPlayVideoOnVisible
-          narration="Welcome inside Salon Saloon, a participating Elevate Host Shop in South Bend. This full tour shows the professional salon environment where apprentices can build supervised, hands-on experience while the Host Shop develops future talent. Use the gallery controls to explore additional participating shops."
+          narration="Meet Salon Saloon, a new participating Elevate Host Shop serving South Bend. Visit the salon at 1740 South Bend Avenue, Suite A, South Bend, Indiana 46637, or call 269-240-7923. This tour introduces the professional salon environment where cosmetology apprentices can build supervised, hands-on experience while the Host Shop develops future talent. Use the booking link or schedule a Host Shop tour to learn more."
         />
         <div
           data-scroll-narration

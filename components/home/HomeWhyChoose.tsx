@@ -12,7 +12,6 @@ const PROOF_ITEMS = [
   { label: 'Indiana ETPL Provider', href: '/federal-compliance' },
   { label: 'Certiport Authorized Testing Center', href: '/programs/technology' },
   { label: 'ACT WorkKeys Assessment Partner', href: '/testing' },
-  { label: 'HSI Authorized Training', href: '/programs/healthcare' },
 ];
 
 const PARTNER_LOGOS = [
@@ -24,7 +23,6 @@ const PARTNER_LOGOS = [
   { src: '/images/partners/microsoft-logo.png', alt: 'Microsoft training partner', href: '/programs/technology' },
   { src: '/images/partners/certiport.svg', alt: 'Certiport authorized testing', href: '/programs/technology' },
   { src: '/images/partners/act-workkeys.svg', alt: 'ACT WorkKeys assessment partner', href: '/testing' },
-  { src: '/images/partners/hsi.svg', alt: 'HSI authorized training', href: '/programs/healthcare' },
 ];
 
 export function HomeWhyChoose() {

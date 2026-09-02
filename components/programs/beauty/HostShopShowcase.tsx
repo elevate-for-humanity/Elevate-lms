@@ -241,12 +241,9 @@ export default function HostShopShowcase({
                       event.currentTarget.playbackRate = 1;
                     }}
                     onEnded={(event) => {
-                      if (autoPlayVideoOnVisible) {
-                        event.currentTarget.currentTime = 0;
-                        event.currentTarget.pause();
-                      } else {
-                        go(1);
-                      }
+                      // Hold the final frame. The tour is never cut short, sped up,
+                      // reset, or advanced automatically.
+                      event.currentTarget.pause();
                     }}
                     preload="metadata"
                     className="host-showcase-media-enter h-full max-w-full object-contain shadow-2xl"

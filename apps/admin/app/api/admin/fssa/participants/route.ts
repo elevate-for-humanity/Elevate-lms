@@ -1,21 +1,14 @@
-import { NextResponse } from 'next/server';
 import { requireAdminRole } from '@/lib/api/requireAdminRole';
+import { retiredFssaResponse } from '@/lib/api/retired-fssa-route';
 
 export const dynamic = 'force-dynamic';
 
-const retired = async () => {
+const retiredParticipants = async () => {
   const authError = await requireAdminRole();
   if (authError) return authError;
-
-  return NextResponse.json(
-    {
-      error: 'FSSA SNAP E&T routes have been retired',
-      message: 'Use the canonical workforce case-management APIs.',
-    },
-    { status: 410 },
-  );
+  return retiredFssaResponse();
 };
 
-export const GET = retired;
-export const POST = retired;
-export const PATCH = retired;
+export const GET = retiredParticipants;
+export const POST = retiredParticipants;
+export const PATCH = retiredParticipants;

@@ -21,7 +21,12 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
   active: {
     label: 'Active',
     color: 'bg-brand-green-100 text-brand-green-800',
-    icon: <span className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" />,
+    icon: (
+      <span
+        className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0"
+        aria-hidden="true"
+      />
+    ),
   },
   past_due: {
     label: 'Payment Due',
@@ -41,7 +46,12 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
   paid_in_full: {
     label: 'Paid in Full',
     color: 'bg-brand-green-100 text-brand-green-800',
-    icon: <span className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" />,
+    icon: (
+      <span
+        className="w-3.5 h-3.5 rounded-full bg-brand-blue-600 inline-block flex-shrink-0"
+        aria-hidden="true"
+      />
+    ),
   },
   pending_payment_method: {
     label: 'Setup Pending',
@@ -69,7 +79,13 @@ function fmtDate(iso: string | null): string {
   });
 }
 
-export default function BillingCard({ billing, readOnly = false }: { billing: BillingSummary; readOnly?: boolean }) {
+export default function BillingCard({
+  billing,
+  readOnly = false,
+}: {
+  billing: BillingSummary;
+  readOnly?: boolean;
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [authorized, setAuthorized] = useState(false);
@@ -101,9 +117,22 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
         headers: { 'Content-Type': 'application/json' },
         body: needsSetup ? JSON.stringify({ authorized: true }) : undefined,
       });
-      const json = await res.json();
+      const responseText = await res.text();
+      let json: { error?: string; url?: string } = {};
+      try {
+        json = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        json = {};
+      }
       if (!res.ok) {
-        setError(json.error ?? 'Unable to open secure Stripe billing. Please contact support.');
+        setError(
+          json.error ??
+            `Unable to open secure Stripe billing (${res.status}). Please contact support.`,
+        );
+        return;
+      }
+      if (!json.url) {
+        setError('The secure billing link was not returned. Please try again or contact support.');
         return;
       }
       window.location.href = json.url;
@@ -163,7 +192,9 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
 
         <div className="flex items-center justify-between text-sm">
           <span className="text-slate-600">Automatic Drafts</span>
-          <span className={`font-semibold ${billing.hasSubscription ? 'text-brand-green-700' : 'text-red-700'}`}>
+          <span
+            className={`font-semibold ${billing.hasSubscription ? 'text-brand-green-700' : 'text-red-700'}`}
+          >
             {billing.hasSubscription ? 'Authorized and active' : 'Card and authorization required'}
           </span>
         </div>
@@ -185,10 +216,7 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
             <div className="flex justify-between text-xs text-slate-500 mb-1">
               <span>Tuition progress</span>
               <span>
-                {Math.round(
-                  ((totalPaid ?? 0) / Number(billing.fullTuitionAmount)) * 100,
-                )}
-                %
+                {Math.round(((totalPaid ?? 0) / Number(billing.fullTuitionAmount)) * 100)}%
               </span>
             </div>
             <div className="w-full bg-slate-100 rounded-full h-2">
@@ -197,9 +225,7 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
                 style={{
                   width: `${Math.min(
                     100,
-                    Math.round(
-                      ((totalPaid ?? 0) / Number(billing.fullTuitionAmount)) * 100,
-                    ),
+                    Math.round(((totalPaid ?? 0) / Number(billing.fullTuitionAmount)) * 100),
                   )}%`,
                 }}
               />
@@ -214,9 +240,7 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
               <CalendarDays className="w-4 h-4 text-slate-400" />
               Next Payment
             </span>
-            <span className="font-semibold text-slate-900">
-              {fmtDate(billing.nextPaymentDate)}
-            </span>
+            <span className="font-semibold text-slate-900">{fmtDate(billing.nextPaymentDate)}</span>
           </div>
         )}
 
@@ -235,7 +259,10 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>
               Your account is suspended due to non-payment. Call{' '}
-              <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="font-semibold underline">
+              <a
+                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
+                className="font-semibold underline"
+              >
                 {PLATFORM_DEFAULTS.supportPhone}
               </a>{' '}
               to restore access.
@@ -244,16 +271,15 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
         )}
 
         {/* Error */}
-        {error && (
-          <p className="text-xs text-red-600 bg-red-50 rounded p-2">{error}</p>
-        )}
+        {error && <p className="text-xs text-red-600 bg-red-50 rounded p-2">{error}</p>}
 
         {/* Update payment method — only if not paid in full and has Stripe */}
         {!billing.fullyPaid && billing.paymentStatus !== 'cancelled' && !readOnly && (
           <div className="space-y-3 pt-2">
             {!billing.hasSubscription && !billing.setupFeePaid && (
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
-                Pay the enrollment deposit first. Weekly automatic-payment authorization becomes available after the deposit is recorded.
+                Pay the enrollment deposit first. Weekly automatic-payment authorization becomes
+                available after the deposit is recorded.
               </div>
             )}
             {!billing.hasSubscription && billing.setupFeePaid && (
@@ -265,16 +291,18 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
                   className="mt-1 h-4 w-4 rounded border-slate-400"
                 />
                 <span>
-                  I authorize Elevate for Humanity to securely save my payment method with
-                  Stripe and automatically charge the weekly tuition amount shown above until
-                  the remaining balance is paid or the finite payment schedule ends. I understand
-                  I will receive receipts and can update my payment method from this dashboard.
+                  I authorize Elevate for Humanity to securely save my payment method with Stripe
+                  and automatically charge the weekly tuition amount shown above until the remaining
+                  balance is paid or the finite payment schedule ends. I understand I will receive
+                  receipts and can update my payment method from this dashboard.
                 </span>
               </label>
             )}
             <button
               onClick={handleUpdatePayment}
-              disabled={loading || (!billing.hasSubscription && (!billing.setupFeePaid || !authorized))}
+              disabled={
+                loading || (!billing.hasSubscription && (!billing.setupFeePaid || !authorized))
+              }
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition"
             >
               <CreditCard className="w-4 h-4" />
@@ -288,7 +316,8 @@ export default function BillingCard({ billing, readOnly = false }: { billing: Bi
         )}
         {readOnly && !billing.fullyPaid && !billing.hasSubscription && billing.setupFeePaid && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">
-            Admin preview is read-only. The learner will see the authorization checkbox and “Authorize &amp; Add Card” button after the enrollment deposit is paid.
+            Admin preview is read-only. The learner will see the authorization checkbox and
+            “Authorize &amp; Add Card” button after the enrollment deposit is paid.
           </div>
         )}
       </div>

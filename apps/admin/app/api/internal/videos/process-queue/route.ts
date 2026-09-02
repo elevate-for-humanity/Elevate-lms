@@ -186,6 +186,10 @@ export async function POST(request: NextRequest) {
       const finalization = await finalizeCourseAutomaticallyIfReadyWithClient({
         db,
         courseId: completedCourseId,
+        // This is a secret-authenticated internal worker, not an interactive
+        // user session. An empty actor is recorded as system automation by the
+        // canonical publication service.
+        actorId: '',
       });
       logger.info('[video-worker] Automated course finalization checked', {
         courseId: completedCourseId,

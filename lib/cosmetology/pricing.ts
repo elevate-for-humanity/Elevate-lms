@@ -7,7 +7,7 @@
  */
 
 export const COSMETOLOGY_PROGRAM_ID = '0661bc6d-c748-4655-b11b-6d418a4ace4a';
-export const COSMETOLOGY_COURSE_ID = 'b427be5e-c85b-4b41-91d6-4288aec8c975';
+export const COSMETOLOGY_COURSE_ID = '9ca9fb50-7119-46ea-ab81-9b0193c29c31';
 
 export const TUITION_CENTS = 498000;
 export const TUITION_DOLLARS = 4980;

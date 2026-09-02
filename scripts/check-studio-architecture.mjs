@@ -307,7 +307,7 @@ for (const forbiddenWrite of [
     fail(`Admin AI reintroduced parallel course persistence: ${forbiddenWrite}`);
 }
 const buildCourseBlock =
-  adminAiChat.match(/case 'build_course': \{([\s\S]*?)case 'save_course':/i)?.[1] ?? '';
+  adminAiChat.match(/case 'build_course': \{([\s\S]*?)case 'generate_videos':/i)?.[1] ?? '';
 for (const invariant of [
   'dryRun: false',
   "__type: 'course_saved'",

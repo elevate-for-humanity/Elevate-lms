@@ -28,8 +28,6 @@ export default function Header() {
             alt="Elevate"
             width={32}
             height={40}
-            priority
-            fetchPriority="high"
             sizes="32px"
             className="h-10 w-8 shrink-0 object-contain"
             style={{ width: 32, height: 40 }}

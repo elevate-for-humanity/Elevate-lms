@@ -411,6 +411,9 @@ const TOOLS: any[] = [
       parameters: {
         type: 'object',
         properties: {
+          course_id: { type: 'string', description: 'Existing canonical course UUID to refresh in place' },
+          program_id: { type: 'string', description: 'Canonical program UUID that owns the course' },
+          program_slug: { type: 'string', description: 'Registered program slug used to resolve its credential blueprint' },
           title: { type: 'string', description: 'Course title' },
           description: { type: 'string', description: 'What the course covers' },
           audience: {
@@ -430,24 +433,6 @@ const TOOLS: any[] = [
   {
     type: 'function',
     function: {
-      name: 'save_course',
-      description:
-        'Compatibility tool for an older reviewed course draft. It persists only through the canonical Course Factory; it never writes legacy course/module/lesson tables directly.',
-      parameters: {
-        type: 'object',
-        properties: {
-          course: {
-            type: 'object',
-            description: 'A legacy course draft object that has not already been persisted',
-          },
-        },
-        required: ['course'],
-      },
-    },
-  },
-  {
-    type: 'function',
-    function: {
       name: 'generate_videos',
       description:
         'Start video generation for a saved course. Uses TTS narration (OpenAI) + Pexels b-roll + ffmpeg pipeline. ' +
@@ -457,7 +442,7 @@ const TOOLS: any[] = [
         properties: {
           course_id: {
             type: 'string',
-            description: 'Canonical course ID from build_course/save_course',
+            description: 'Canonical course ID from build_course',
           },
           voice: {
             type: 'string',
@@ -1143,8 +1128,28 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
     // ── Course generation ──────────────────────────────────────────────────
     case 'build_course': {
-      const title = String(args.title || '').trim();
-      if (!title) return 'title is required to build a course';
+      const requestedCourseId = String(args.course_id || '').trim();
+      let programId = String(args.program_id || '').trim() || undefined;
+      let programSlug = String(args.program_slug || '').trim() || undefined;
+      let canonicalTitle = '';
+
+      if (requestedCourseId) {
+        const db = await requireAdminClient();
+        const { data: existingCourse, error: courseLookupError } = await db
+          .from('courses')
+          .select('id, title, program_id')
+          .eq('id', requestedCourseId)
+          .maybeSingle();
+        if (courseLookupError) {
+          throw new Error(`Unable to resolve canonical course ${requestedCourseId}: ${courseLookupError.message}`);
+        }
+        if (!existingCourse) return `Canonical course not found: ${requestedCourseId}`;
+        canonicalTitle = String(existingCourse.title || '').trim();
+        programId = String(existingCourse.program_id || '').trim() || programId;
+      }
+
+      const title = String(args.title || canonicalTitle).trim();
+      if (!title) return 'title or course_id is required to build a course';
 
       const description = String(args.description || title).trim();
       const audience = String(args.audience || 'adult workforce learners').trim();
@@ -1161,6 +1166,9 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       const result = await courseFactory({
         title,
         topic: description,
+        ...(requestedCourseId ? { courseId: requestedCourseId } : {}),
+        ...(programId ? { programId } : {}),
+        ...(programSlug ? { programSlug } : {}),
         audience,
         ...(hours !== undefined ? { hours } : {}),
         ...(state !== undefined ? { state } : {}),
@@ -1197,91 +1205,6 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
           message: result.ok
             ? `Course "${result.title ?? title}" was generated and saved through the canonical Course Factory as a governed draft.`
             : 'Course generation did not persist because the canonical Course Factory did not pass its evidence, completeness, or validation gates.',
-        },
-        null,
-        2,
-      );
-    }
-
-    case 'save_course': {
-      const course = args.course as Record<string, unknown>;
-      if (!course?.title) return 'course object with title is required';
-
-      const existingId = String(course.courseId || course.course_id || '').trim();
-      if (existingId) {
-        return JSON.stringify(
-          {
-            __type: 'course_saved',
-            success: true,
-            courseId: existingId,
-            title: String(course.title),
-            url: `/studio/courses/${existingId}`,
-            message:
-              'This course is already persisted through the canonical Course Factory. No duplicate save was performed.',
-          },
-          null,
-          2,
-        );
-      }
-
-      const courseModules = Array.isArray(course.modules)
-        ? (course.modules as Array<Record<string, unknown>>)
-        : [];
-      const moduleCount = Math.max(1, Math.min(40, courseModules.length || 5));
-      const lessonsPerModule = Math.max(
-        1,
-        Math.min(
-          20,
-          courseModules.length
-            ? Math.max(
-                ...courseModules.map((module) =>
-                  Array.isArray(module.lessons) ? module.lessons.length : 0,
-                ),
-                1,
-              )
-            : 3,
-        ),
-      );
-      const { courseFactory } = await import('@/lib/course-factory');
-      const { normalizeGeneratedCourseForGovernance } =
-        await import('@/lib/course-factory/post-generation-governance');
-      const result = await courseFactory({
-        title: String(course.title),
-        topic: String(course.description || course.subtitle || course.title),
-        audience: String(course.audience || 'adult workforce learners'),
-        ...(Number(course.duration_hours || 0) > 0 ? { hours: Number(course.duration_hours) } : {}),
-        moduleCount,
-        lessonsPerModule,
-        contentSource: 'ai',
-        mode: 'refresh',
-        videoMode: 'queue',
-        dryRun: false,
-      });
-
-      let governance = null;
-      if (result.ok && result.courseId) {
-        governance = await normalizeGeneratedCourseForGovernance(result.courseId);
-      }
-
-      return JSON.stringify(
-        {
-          __type: 'course_saved',
-          success: result.ok,
-          courseId: result.courseId ?? null,
-          courseSlug: result.courseSlug ?? null,
-          title: result.title ?? String(course.title),
-          modulesGenerated: result.moduleCount ?? 0,
-          lessonsGenerated: result.lessonCount ?? 0,
-          assessmentsGenerated: result.assessmentsGenerated ?? 0,
-          videosQueued: result.videosQueued ?? 0,
-          governance,
-          warnings: result.warnings ?? [],
-          errors: result.errors ?? [],
-          status: result.status ?? null,
-          url: result.courseId ? `/studio/courses/${result.courseId}` : null,
-          message: result.ok
-            ? `Course "${result.title ?? String(course.title)}" was persisted through the canonical Course Factory and normalized for governance.`
-            : 'Course persistence was blocked because the canonical Course Factory did not pass its completeness or validation gates.',
         },
         null,
         2,

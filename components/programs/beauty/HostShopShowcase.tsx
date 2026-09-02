@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Phone, Play } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
 import type {
@@ -311,6 +311,15 @@ export default function HostShopShowcase({
                   {shop.address}, {shop.city}, {shop.state} {shop.zip}
                 </span>
               </p>
+              {shop.phone ? (
+                <a
+                  href={`tel:${shop.phone.replace(/[^+\d]/g, '')}`}
+                  className="mt-3 flex items-center gap-2 text-sm font-bold text-brand-blue-800 hover:underline"
+                >
+                  <Phone className="h-4 w-4 shrink-0 text-brand-red-700" aria-hidden="true" />
+                  {shop.phone}
+                </a>
+              ) : null}
 
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link

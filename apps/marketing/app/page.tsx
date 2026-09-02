@@ -14,6 +14,19 @@ import StructuredData from '@/components/StructuredData';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
 import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 
+const HOME_HOST_SHOP_ORDER = [
+  'salon-saloon',
+  'kountry-kutz-barbershop',
+  'cals-kutz-studio',
+  'b-52s-barber-shop',
+  'generations-hair-llc',
+] as const;
+
+const HOME_HOST_SHOPS = HOME_HOST_SHOP_ORDER.flatMap((slug) => {
+  const shop = FEATURED_BEAUTY_HOST_PARTNERS.find((candidate) => candidate.slug === slug);
+  return shop ? [shop] : [];
+});
+
 export const revalidate = 300;
 
 export const metadata: Metadata = {
@@ -81,7 +94,12 @@ export default function HomePage() {
       <StructuredData />
       <main>
         <HomeHeroVideo banner={heroBanners.home} />
-        <HostShopShowcase shops={FEATURED_BEAUTY_HOST_PARTNERS} videoTourShopSlug="salon-saloon" />
+        <HostShopShowcase
+          shops={HOME_HOST_SHOPS}
+          videoTourShopSlug="salon-saloon"
+          autoPlayVideoOnVisible
+          narration="Welcome inside Salon Saloon, a participating Elevate Host Shop in South Bend. This full tour shows the professional salon environment where apprentices can build supervised, hands-on experience while the Host Shop develops future talent. Use the gallery controls to explore additional participating shops."
+        />
         <div
           data-scroll-narration
           data-narration="You do not have to have your whole career figured out today. Start by exploring the field that fits your interests, schedule, and goals."

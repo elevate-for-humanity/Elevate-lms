@@ -61,3 +61,6 @@ begin
     'curriculum_lessons_inserted',0,'curriculum_lessons_skipped',0,'automated_quality_gate','passed');
 end;
 $function$;
+
+revoke all on function public.publish_course_from_staging(uuid, uuid) from public, anon, authenticated;
+grant execute on function public.publish_course_from_staging(uuid, uuid) to service_role;

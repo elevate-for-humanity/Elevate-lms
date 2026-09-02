@@ -1,9 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
-import {
-  createMiddlewareSupabaseClient,
-  hasSupabaseAuthCookie,
-} from '@/lib/supabase/middleware';
+import { createMiddlewareSupabaseClient, hasSupabaseAuthCookie } from '@/lib/supabase/middleware';
 import { PRIVILEGED_MFA_ROLES, privilegedMfaEnforcementEnabled } from '@/lib/auth/privileged-mfa';
 import {
   ADMIN_ROLES,
@@ -33,6 +30,7 @@ const PUBLIC_PATHS = [
   // It must bypass session middleware or cron/local worker calls are redirected
   // to /login before bearer authentication can run.
   '/api/internal/videos/process-queue',
+  '/api/cron/process-course-builder-jobs',
   '/auth/confirm',
   '/auth/reset-password',
   '/install',

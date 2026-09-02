@@ -12,12 +12,32 @@ export type SceneLayout =
   | 'split_right_text'
   | 'top_label';
 export type SceneTransition = 'cut' | 'fade' | 'crossfade';
+export type InstructionalSceneType =
+  | 'problem_hook'
+  | 'mental_model'
+  | 'system_diagram'
+  | 'equipment_closeup'
+  | 'worked_example'
+  | 'field_scenario'
+  | 'common_mistake'
+  | 'safety_warning'
+  | 'memory_recap'
+  | 'knowledge_check';
+
+export interface TeachingModel {
+  name: string;
+  memoryAnchor: string;
+  plainLanguageMap: string;
+  misconception: string;
+  transferQuestion: string;
+}
 
 // ── GPT output (draft) ────────────────────────────────────────────────────────
 
 export interface LessonSceneDraft {
   id: string;
   order: number;
+  sceneType: InstructionalSceneType;
   /** What the learner will know or be able to do after this scene */
   instructionalObjective: string;
   dolCompetencyId: string;
@@ -44,6 +64,7 @@ export interface LessonRenderPlanDraft {
   voice: VoiceName;
   videoStyle: VideoStyle;
   targetResolution: '1920x1080' | '1280x720';
+  teachingModel: TeachingModel;
   scenes: LessonSceneDraft[];
 }
 

@@ -58,7 +58,7 @@ export async function queueCourseLessonVideos(
   let lessonQuery = db
     .from('course_lessons')
     .select(
-      'id, module_id, title, script, bullet_points, scene_data, content_json, video_config, video_url, video_status, order_index',
+      'id, module_id, title, script, bullet_points, scene_data, content_json, video_config, video_url, video_status, media_origin, media_quality_status, order_index',
     )
     .eq('course_id', input.courseId);
   if (input.lessonId) lessonQuery = lessonQuery.eq('id', input.lessonId);
@@ -132,7 +132,8 @@ export async function queueCourseLessonVideos(
       const lessonKey = assetIdentity(lesson.id, 'lesson', null);
       const existingLessonJob = existingByAsset.get(lessonKey);
       const hasVideo = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
-      const mainComplete = hasVideo && lesson.video_status === 'complete';
+      const mainComplete = hasVideo && lesson.video_status === 'complete'
+        && lesson.media_origin === 'generated' && lesson.media_quality_status === 'approved';
       const mainInFlight = lesson.video_status === 'queued' || lesson.video_status === 'rendering';
       const shouldQueueMain = force || (!mainInFlight && (!onlyMissing || !mainComplete));
 

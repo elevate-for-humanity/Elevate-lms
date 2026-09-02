@@ -12,7 +12,11 @@ HARD RULES:
 - Narration must be natural, specific, concise, and free of motivational filler.
 - visualFocus and videoQuery must describe the exact physical action or diagram required by the narration.
 - Do not repeat visualFocus or videoQuery within one lesson.
-- Do not reproduce proprietary textbook language, images, diagrams, videos, or test questions.`;
+- Do not reproduce proprietary textbook language, images, diagrams, videos, or test questions.
+- Build one memorable teaching model for the lesson. Give it a short name, a plain-language map, a memory anchor, one misconception to correct, and a transfer question.
+- For an eight-scene lesson use this instructional sequence: problem_hook, mental_model, system_diagram, equipment_closeup or field_scenario, worked_example, common_mistake or safety_warning, memory_recap, knowledge_check.
+- A knowledge_check must ask the learner to apply the model to a new situation; it must not merely repeat a definition.
+- Use deterministic diagrams for invisible systems, pressure/temperature relationships, refrigerant flow, electrical paths, or regulatory decision rules.`;
 
 export function buildSceneGenerationUserPrompt(opts: {
   lessonId: string;
@@ -38,7 +42,7 @@ export function buildSceneGenerationUserPrompt(opts: {
   const isIntro = opts.lessonType === 'intro';
   const arc = isIntro
     ? opts.profile.introductionArc.map((item, index) => `Scene ${index + 1}: ${item}`).join('\n')
-    : `Create ${sceneCount} scenes in this arc: establish context; teach the concept; demonstrate or visualize it; show correct application; check understanding; recap.`;
+    : `Create ${sceneCount} scenes in this arc: problem hook; memorable mental model; exact system diagram; equipment close-up or field scenario; worked example; common mistake or safety warning; memory recap; application-based knowledge check.`;
 
   return `Create an original ${opts.profile.label} instructional video plan.
 
@@ -70,5 +74,5 @@ SCENE ARC:
 ${arc}
 
 Return exactly ${sceneCount} scenes using this JSON shape:
-{"lessonId":"${opts.lessonId}","title":"${opts.title}","voice":"onyx","videoStyle":"${opts.profile.videoStyle}","targetResolution":"1920x1080","scenes":[{"id":"scene-1","order":1,"instructionalObjective":"Observable learner outcome","dolCompetencyId":"${opts.dolCompetencyId ?? 'not-applicable'}","stateRequirement":"${opts.stateRequirement ?? 'not-supplied'}","examDomain":"${opts.examDomain ?? 'not-supplied'}","demonstrationStep":"Exact action or diagram","evidenceExpectation":"Required learner or verifier evidence","narration":"Two to four original instructional sentences.","caption":"Concrete on-screen instruction","subcaption":"One supporting line","videoQuery":"Specific obtainable footage or diagram","visualFocus":"Exact visible action","layout":"lower_third","minClipSeconds":6,"maxClipSeconds":12,"transitionIn":"fade","transitionOut":"cut"}]}`;
+{"lessonId":"${opts.lessonId}","title":"${opts.title}","voice":"onyx","videoStyle":"${opts.profile.videoStyle}","targetResolution":"1920x1080","teachingModel":{"name":"Short memorable model name","memoryAnchor":"A concise memory anchor","plainLanguageMap":"How the parts and relationships work in plain language","misconception":"A likely misconception and its correction","transferQuestion":"A new situation where the learner applies the model"},"scenes":[{"id":"scene-1","order":1,"sceneType":"problem_hook","instructionalObjective":"Observable learner outcome","dolCompetencyId":"${opts.dolCompetencyId ?? 'not-applicable'}","stateRequirement":"${opts.stateRequirement ?? 'not-supplied'}","examDomain":"${opts.examDomain ?? 'not-supplied'}","demonstrationStep":"Exact action or diagram","evidenceExpectation":"Required learner or verifier evidence","narration":"Two to four original instructional sentences.","caption":"Concrete on-screen instruction","subcaption":"One supporting line","videoQuery":"Specific obtainable footage or diagram","visualFocus":"Exact visible action","layout":"lower_third","minClipSeconds":6,"maxClipSeconds":12,"transitionIn":"fade","transitionOut":"cut"}]}`;
 }

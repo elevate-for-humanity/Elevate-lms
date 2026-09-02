@@ -94,12 +94,20 @@ function mediaCharacters(sceneData: Record<string, unknown>): MediaCharacterRefe
 
 function generatedSceneData(plan: LessonRenderPlanDraft): Record<string, unknown> {
   return {
-    instructional_plan_version: '1.0',
+    instructional_plan_version: '2.0',
+    teaching_model: {
+      name: plan.teachingModel.name,
+      memory_anchor: plan.teachingModel.memoryAnchor,
+      plain_language_map: plan.teachingModel.plainLanguageMap,
+      misconception: plan.teachingModel.misconception,
+      transfer_question: plan.teachingModel.transferQuestion,
+    },
     voice: plan.voice,
     video_style: plan.videoStyle,
     target_resolution: plan.targetResolution,
     scenes: plan.scenes.map((scene) => ({
       id: scene.id,
+      scene_type: scene.sceneType,
       duration_seconds: scene.maxClipSeconds ?? scene.minClipSeconds ?? 8,
       subject: plan.title,
       environment: scene.videoQuery,

@@ -34,7 +34,8 @@ import {
   gpuVideoAvailable,
 } from './gpu-video-client';
 import type { SceneData, SlideLessonProps } from '@/remotion-src/compositions/SlideLesson';
-import { instructionalLayoutForTitle } from '@/remotion-src/instructional-layout';
+import { instructionalLayoutForScene } from '@/remotion-src/instructional-layout';
+import { deriveInstructionalVisualIntent } from '@/server/video-generator/visual-intelligence';
 
 // Remotion's inputProps requires Record<string, unknown> — this cast is safe
 // because ElevateLessonProps is a plain serialisable object.
@@ -425,8 +426,17 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
       const narration = scene.dialogue?.trim() || scene.action.trim();
       const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
       const audioSrc = await uploadLessonMediaBuffer(audio, `${input.lessonId}-scene-${index + 1}`, 'mp3');
-      const query = [scene.subject, scene.environment, scene.action].join(' ').slice(0, 180);
-      const instructionalLayout = instructionalLayoutForTitle(scene.subject);
+      const visualIntent = deriveInstructionalVisualIntent({
+        domainKey: /hvac|epa 608|refriger/i.test(input.courseTitle) ? 'hvac_epa608' : null,
+        title: scene.subject,
+        action: scene.action,
+        visualFocus: scene.requiredVisualEvidence,
+        sceneType: scene.sceneType,
+      });
+      const query = visualIntent.query;
+      const instructionalLayout = visualIntent.deterministicDiagram
+        ? instructionalLayoutForScene({ title: scene.subject, action: scene.action, sceneType: scene.sceneType })
+        : null;
       let clipUrl = instructionalLayout ? null : scene.sourceVideoUrl || null;
       let lipSyncedInstructor = false;
 
@@ -551,6 +561,8 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
         imageUrl,
         audioSrc,
         durationFrames: Math.ceil(durationSeconds * 30),
+        sceneType: scene.sceneType,
+        memoryAnchor: scene.memoryAnchor,
       });
     }
 

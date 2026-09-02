@@ -29,7 +29,7 @@ import {
   Sequence,
   staticFile,
 } from 'remotion';
-import { instructionalLayoutForTitle, type InstructionalLayout } from '../instructional-layout';
+import { instructionalLayoutForScene, type InstructionalLayout } from '../instructional-layout';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -47,6 +47,8 @@ export interface SceneData {
   audioSrc: string | null;
   /** Duration in frames at 30fps */
   durationFrames: number;
+  sceneType?: string;
+  memoryAnchor?: string;
 }
 
 export interface SlideLessonProps {
@@ -270,9 +272,9 @@ function InstructionalGraphic({
     boxShadow: '0 14px 35px rgba(15,23,42,0.16)',
   } as const;
 
-  if (layout.kind === 'comparison') {
+  if (layout.kind === 'comparison' || layout.kind === 'refrigeration-cycle') {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${layout.kind === 'refrigeration-cycle' ? 4 : 3}, 1fr)`, gap: 20 }}>
         {layout.columns.map((column, index) => (
           <div key={column.title} style={{ ...card, padding: 28, opacity: fadeIn(frame, 16 + index * 10, 16) }}>
             <div style={{ color: props.primaryColor, fontSize: 28, marginBottom: 12 }}>{column.title}</div>
@@ -336,7 +338,7 @@ function SceneSlide({
   props: SlideLessonProps;
 }) {
   const { fps } = useVideoConfig();
-  const instructionalLayout = instructionalLayoutForTitle(scene.title);
+  const instructionalLayout = instructionalLayoutForScene({ title: scene.title, action: scene.narration, sceneType: scene.sceneType });
   const instructionalBackgroundPosition =
     `${50 + Math.sin(frame / (fps * 2)) * 30}% ${50 + Math.cos(frame / (fps * 2.5)) * 20}%`;
 

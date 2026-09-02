@@ -13,10 +13,16 @@ export interface InstructionalQualityInput {
 export interface InstructionalQualityEvidence {
   wordCount: number;
   minimumWordCount: number;
-  courseDomain: 'cosmetology' | 'barbering' | 'general';
+  courseDomain: 'cosmetology' | 'barbering' | 'hvac_epa608' | 'general';
   demonstrationClaimed: boolean;
   demonstrationScenes: number;
   titleKeywordCoverage: number;
+  sceneTypeCoverage: number;
+  hasMentalModel: boolean;
+  hasWorkedExample: boolean;
+  hasMemoryRecap: boolean;
+  hasKnowledgeCheck: boolean;
+  hasSafetyScene: boolean;
 }
 
 function words(value: string): string[] {
@@ -27,6 +33,7 @@ function domain(courseTitle: string): InstructionalQualityEvidence['courseDomain
   const title = courseTitle.toLowerCase();
   if (/cosmetolog|beauty/.test(title)) return 'cosmetology';
   if (/barber/.test(title)) return 'barbering';
+  if (/hvac|epa 608|refriger/.test(title)) return 'hvac_epa608';
   return 'general';
 }
 
@@ -64,6 +71,14 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
     (/close-up|extreme-close-up/.test(scene.shotSize) || Boolean(scene.referenceImageUrl || scene.sourceVideoUrl)),
   ).length;
   const titleKeywordCoverage = keywordCoverage(input.lessonTitle, input.script);
+  const sceneTypes = new Set<string>(input.storyboard.scenes.flatMap((scene) => scene.sceneType ? [scene.sceneType] : []));
+  const requiredTypes = ['mental_model', 'system_diagram', 'worked_example', 'memory_recap', 'knowledge_check'];
+  const sceneTypeCoverage = requiredTypes.filter((type) => sceneTypes.has(type)).length / requiredTypes.length;
+  const hasMentalModel = sceneTypes.has('mental_model');
+  const hasWorkedExample = sceneTypes.has('worked_example') || sceneTypes.has('field_scenario');
+  const hasMemoryRecap = sceneTypes.has('memory_recap');
+  const hasKnowledgeCheck = sceneTypes.has('knowledge_check');
+  const hasSafetyScene = sceneTypes.has('safety_warning') || input.storyboard.scenes.some((scene) => scene.procedurePhase === 'safety');
 
   if (scriptWords.length < minimumWordCount) {
     failures.push(`instruction is too short (${scriptWords.length} words; minimum ${minimumWordCount})`);
@@ -83,6 +98,15 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
   if (/remember, practice makes perfect[\s\S]*take notes[\s\S]*let'?s get started/i.test(input.script)) {
     failures.push('generic lesson-template narration must be replaced with topic-specific instruction');
   }
+  if (courseDomain === 'hvac_epa608') {
+    if (!hasMentalModel) failures.push('HVAC instruction must include a memorable mental-model scene');
+    if (!sceneTypes.has('system_diagram')) failures.push('HVAC instruction must include an exact system-diagram scene');
+    if (!hasWorkedExample) failures.push('HVAC instruction must include a worked example or field scenario');
+    if (!hasMemoryRecap) failures.push('HVAC instruction must include a memory recap');
+    if (!hasKnowledgeCheck) failures.push('HVAC instruction must include an application-based knowledge check');
+    const safetyRelevant = /recover|refrigerant|electrical|voltage|pressure|cylinder|service|procedure/i.test(`${input.lessonTitle} ${input.script}`);
+    if (safetyRelevant && !hasSafetyScene) failures.push('safety-sensitive HVAC instruction must include an explicit safety-warning scene');
+  }
 
   return {
     evidence: {
@@ -92,6 +116,12 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
       demonstrationClaimed,
       demonstrationScenes,
       titleKeywordCoverage,
+      sceneTypeCoverage,
+      hasMentalModel,
+      hasWorkedExample,
+      hasMemoryRecap,
+      hasKnowledgeCheck,
+      hasSafetyScene,
     },
     failures,
   };

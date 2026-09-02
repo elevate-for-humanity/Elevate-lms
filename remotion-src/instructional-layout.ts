@@ -3,7 +3,29 @@ export type InstructionalLayout =
   | { kind: 'pitch-deck'; items: string[] }
   | { kind: 'lean-canvas'; items: string[] }
   | { kind: 'comparison'; columns: Array<{ title: string; purpose: string }> }
-  | { kind: 'activity'; items: string[] };
+  | { kind: 'activity'; items: string[] }
+  | { kind: 'refrigeration-cycle'; columns: Array<{ title: string; purpose: string }> }
+  | { kind: 'epa-decision'; items: string[] }
+  | { kind: 'knowledge-check'; items: string[] };
+
+export function instructionalLayoutForScene(input: { title: string; action?: string; sceneType?: string }): InstructionalLayout | null {
+  const text = `${input.title} ${input.action ?? ''}`.toLowerCase();
+  if (input.sceneType === 'knowledge_check') {
+    return { kind: 'knowledge-check', items: ['Read the field condition', 'Choose the governing rule', 'Explain the safe next step'] };
+  }
+  if (/refrigeration cycle|refrigerant flow|compressor.*condenser|evaporator.*compressor/.test(text)) {
+    return { kind: 'refrigeration-cycle', columns: [
+      { title: 'Compressor', purpose: 'Raises vapor pressure and temperature' },
+      { title: 'Condenser', purpose: 'Rejects heat and forms high-pressure liquid' },
+      { title: 'Metering Device', purpose: 'Drops pressure and controls flow' },
+      { title: 'Evaporator', purpose: 'Absorbs heat and forms low-pressure vapor' },
+    ] };
+  }
+  if (/epa 608|recovery level|appliance type|type i|type ii|type iii|universal/.test(text) && (input.sceneType === 'system_diagram' || input.sceneType === 'mental_model')) {
+    return { kind: 'epa-decision', items: ['Identify equipment and refrigerant', 'Determine appliance category', 'Apply the current recovery rule', 'Recover, document, and verify'] };
+  }
+  return instructionalLayoutForTitle(input.title);
+}
 
 export function instructionalLayoutForTitle(title: string): InstructionalLayout | null {
   const normalized = title.trim().toLowerCase();

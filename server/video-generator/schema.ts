@@ -25,10 +25,16 @@ export const SceneLayoutSchema = z.enum([
   'top_label',
 ]);
 export const SceneTransitionSchema = z.enum(['cut', 'fade', 'crossfade']);
+export const InstructionalSceneTypeSchema = z.enum([
+  'problem_hook', 'mental_model', 'system_diagram', 'equipment_closeup',
+  'worked_example', 'field_scenario', 'common_mistake', 'safety_warning',
+  'memory_recap', 'knowledge_check',
+]);
 
 export const LessonSceneDraftSchema = z.object({
   id: z.string().min(1),
   order: z.number().int().positive(),
+  sceneType: InstructionalSceneTypeSchema,
   instructionalObjective: z.string().min(5).max(200),
   dolCompetencyId: z.string().min(1).max(120),
   stateRequirement: z.string().min(1).max(500),
@@ -54,6 +60,13 @@ export const LessonRenderPlanDraftSchema = z
     voice: VoiceNameSchema,
     videoStyle: VideoStyleSchema,
     targetResolution: z.enum(['1920x1080', '1280x720']),
+    teachingModel: z.object({
+      name: z.string().min(3).max(100),
+      memoryAnchor: z.string().min(8).max(240),
+      plainLanguageMap: z.string().min(12).max(400),
+      misconception: z.string().min(8).max(300),
+      transferQuestion: z.string().min(8).max(300),
+    }),
     scenes: z.array(LessonSceneDraftSchema).min(4).max(12),
   })
   .superRefine((data, ctx) => {

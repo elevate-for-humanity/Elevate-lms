@@ -27,6 +27,10 @@ export type CameraMove =
 
 export type ShotSize = 'extreme-wide' | 'wide' | 'medium' | 'medium-close' | 'close-up' | 'extreme-close-up';
 export type Transition = 'cut' | 'crossfade' | 'dip-black' | 'match-cut' | 'whip' | 'none';
+export type InstructionalSceneType =
+  | 'problem_hook' | 'mental_model' | 'system_diagram' | 'equipment_closeup'
+  | 'worked_example' | 'field_scenario' | 'common_mistake' | 'safety_warning'
+  | 'memory_recap' | 'knowledge_check';
 
 export interface MediaCharacterReference {
   id: string;
@@ -63,6 +67,8 @@ export interface MediaScene {
   /** Instructional phase and the exact action the picture must prove. */
   procedurePhase?: string;
   requiredVisualEvidence?: string;
+  sceneType?: InstructionalSceneType;
+  memoryAnchor?: string;
 }
 
 export interface MediaStoryboard {
@@ -122,6 +128,13 @@ function transitionValue(value: unknown): Transition {
   return typeof value === 'string' && allowed.includes(value as Transition) ? (value as Transition) : 'cut';
 }
 
+function sceneTypeValue(value: unknown, index: number, total: number): InstructionalSceneType {
+  const allowed: InstructionalSceneType[] = ['problem_hook','mental_model','system_diagram','equipment_closeup','worked_example','field_scenario','common_mistake','safety_warning','memory_recap','knowledge_check'];
+  if (typeof value === 'string' && allowed.includes(value as InstructionalSceneType)) return value as InstructionalSceneType;
+  const arc: InstructionalSceneType[] = ['problem_hook','mental_model','system_diagram','equipment_closeup','worked_example','common_mistake','memory_recap','knowledge_check'];
+  return arc[Math.min(arc.length - 1, Math.floor(index * arc.length / Math.max(1, total)))] ?? 'worked_example';
+}
+
 function promptHash(input: unknown): string {
   return crypto.createHash('sha256').update(JSON.stringify(input)).digest('hex');
 }
@@ -148,6 +161,7 @@ function scriptScenes(script: string, title: string): Record<string, unknown>[] 
     const detail = /angle|position|blade|guard|hand|finger|line|section|tool/i.test(action);
     return {
       action,
+      scene_type: sceneTypeValue(undefined, index, sentences.length),
       subject: title,
       dialogue: action,
       procedure_phase: phase,
@@ -228,6 +242,8 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
       seed: Number.isFinite(Number(scene.seed)) ? Number(scene.seed) : undefined,
       procedurePhase: stringValue(scene.procedure_phase) || undefined,
       requiredVisualEvidence: stringValue(scene.required_visual_evidence, action) || undefined,
+      sceneType: sceneTypeValue(scene.scene_type, index, sourceScenes.length),
+      memoryAnchor: stringValue(scene.memory_anchor, stringValue((raw.teaching_model as Record<string, unknown> | undefined)?.memory_anchor)) || undefined,
     };
   });
 

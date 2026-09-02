@@ -58,4 +58,25 @@ describe('instructional quality gate', () => {
     expect(result.evidence.demonstrationClaimed).toBe(false);
     expect(result.failures).toEqual([]);
   });
+
+  it('requires a complete intelligence arc for HVAC lessons', () => {
+    const dry = storyboard();
+    dry.title = 'EPA 608 Refrigeration Cycle';
+    const script = `${longInstruction} EPA 608 refrigeration cycle compressor condenser evaporator.`;
+    const rejected = instructionalQualityFailures({
+      courseTitle: 'HVAC EPA 608 Preparation', lessonTitle: 'EPA 608 Refrigeration Cycle',
+      script, instructor: { id: 'marcus-johnson', title: 'HVAC Instructor', specialty: 'HVAC' }, storyboard: dry,
+    });
+    expect(rejected.failures.some((failure) => failure.includes('mental-model'))).toBe(true);
+
+    const complete = storyboard();
+    complete.scenes = [
+      'problem_hook', 'mental_model', 'system_diagram', 'equipment_closeup',
+      'worked_example', 'safety_warning', 'memory_recap', 'knowledge_check',
+    ].map((sceneType, index) => ({ ...complete.scenes[0]!, id: `scene-${index + 1}`, order: index + 1, sceneType: sceneType as NonNullable<typeof complete.scenes[0]['sceneType']> }));
+    expect(instructionalQualityFailures({
+      courseTitle: 'HVAC EPA 608 Preparation', lessonTitle: 'EPA 608 Refrigeration Cycle',
+      script, instructor: { id: 'marcus-johnson', title: 'HVAC Instructor', specialty: 'HVAC' }, storyboard: complete,
+    }).failures).toEqual([]);
+  });
 });

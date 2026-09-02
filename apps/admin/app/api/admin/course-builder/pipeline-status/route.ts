@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', courseId),
       db
         .from('course_lessons')
-        .select('id, content, learning_objectives, video_status, video_url')
+        .select('id, content, learning_objectives, video_status, video_url, media_origin, media_quality_status')
         .eq('course_id', courseId),
       db.from('video_jobs').select('id, status, review_status, retry_count, failure_class, error_message, lease_expires_at, dead_lettered_at').eq('course_id', courseId),
     ]);
@@ -99,13 +99,14 @@ export async function GET(request: NextRequest) {
       const state = String(lesson.video_status ?? '').toLowerCase();
       const hasVideoUrl = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
 
-      if (VIDEO_COMPLETE_STATES.has(state) && hasVideoUrl) {
+      const generatedAndApproved = lesson.media_origin === 'generated' && lesson.media_quality_status === 'approved';
+      if (VIDEO_COMPLETE_STATES.has(state) && hasVideoUrl && generatedAndApproved) {
         videosComplete += 1;
       } else if (VIDEO_PENDING_STATES.has(state)) {
         videosPending += 1;
       } else if (VIDEO_FAILED_STATES.has(state)) {
         videosFailed += 1;
-      } else if (!hasVideoUrl) {
+      } else {
         videosMissing += 1;
       }
     }

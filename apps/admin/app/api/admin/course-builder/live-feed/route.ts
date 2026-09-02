@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         ? db.from('course_modules').select('id, course_id').in('course_id', ids)
         : Promise.resolve({ data: [], error: null }),
       ids.length
-        ? db.from('course_lessons').select('id, course_id, video_status').in('course_id', ids)
+        ? db.from('course_lessons').select('id, course_id, video_status, media_origin, media_quality_status').in('course_id', ids)
         : Promise.resolve({ data: [], error: null }),
       ids.length
         ? db.from('video_jobs').select('id, course_id, status').in('course_id', ids)
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
       const key = row.course_id as string;
       lessonCount.set(key, (lessonCount.get(key) ?? 0) + 1);
 
-      if (row.video_status === 'complete') {
+      if (row.video_status === 'complete' && row.media_origin === 'generated' && row.media_quality_status === 'approved') {
         videoComplete.set(key, (videoComplete.get(key) ?? 0) + 1);
       }
 

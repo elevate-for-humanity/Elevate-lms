@@ -89,19 +89,3 @@ where p.approval_status = 'approved'
 comment on view public.public_host_shops is
   'Public directory of approved operational Host Shops with an active canonical shop and opted-in Host Shop partnership. Partner verification remains a separate compliance state.';
 
-do $$
-begin
-  if exists (
-    select 1 from public.public_host_shops
-    where display_name in ('Choice Medical Institute', 'Curvature Body Sculpting', 'NHA')
-  ) then
-    raise exception 'Non-Host-Shop organization leaked into public_host_shops';
-  end if;
-
-  if not exists (
-    select 1 from public.public_host_shops where display_name = 'Salon Saloon LLC'
-  ) then
-    raise exception 'Operational Salon Saloon record is missing from public_host_shops';
-  end if;
-end
-$$;

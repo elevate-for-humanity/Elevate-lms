@@ -60,6 +60,7 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
@@ -179,3 +180,9 @@ jobs:
           echo "$manifest" | grep -q '"start_url"[[:space:]]*:[[:space:]]*"/dashboard"' || { echo '::error::Admin manifest does not use canonical /dashboard start_url'; exit 1; }
           worker=$(curl -fsSL --max-time 20 https://admin.elevateforhumanity.org/sw-admin.js)
           echo "$worker" | grep -q 'Service Worker — Admin Domain' || { echo '::error::Admin service worker is not the canonical worker'; exit 1; }
+
+      - name: Wake durable Course Builder queue
+        run: |
+          curl -fsS --max-time 300 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "https://admin.elevateforhumanity.org/api/cron/process-course-builder-jobs"

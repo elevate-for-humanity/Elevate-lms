@@ -195,6 +195,15 @@ jobs:
             echo "exit_code=1" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          # A source push validates the builder but must never mutate production
+          # course state or spend provider credits. Paid course generation is
+          # issue-triggered and explicitly course-scoped.
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "Push validation passed; production course generation requires an approved issue trigger." > /tmp/course-acceptance.log
+            echo "exit_code=0" >> "$GITHUB_OUTPUT"
+            cat /tmp/course-acceptance.log
+            exit 0
+          fi
           if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN ESB COURSE BUILDER ACCEPTANCE" ]; then
             pnpm tsx scripts/course-factory/build-esb-acceptance.ts > /tmp/course-acceptance.log 2>&1
           else

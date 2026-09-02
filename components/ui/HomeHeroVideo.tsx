@@ -48,12 +48,12 @@ const HOME_NARRATION =
 const HOME_SLIDES: HomeHeroSlide[] = [
   {
     type: 'image',
-    src: '/images/partners/razors-image-storefront.webp',
-    alt: "Razor's Image participating apprenticeship barbershop storefront",
-    label: 'Train with real businesses in your community',
+    src: '/images/partners/salon-saloon/team-interior.webp',
+    alt: 'Salon Saloon team inside their participating apprenticeship salon',
+    label: 'Train with working professionals in a real salon',
     description:
-      'Explore structured apprenticeships connected to participating local shops and experienced professionals.',
-    toneClass: 'brightness-[1.04] contrast-[1.04] saturate-[1.03] object-center',
+      'Explore structured apprenticeships connected to participating local shops, experienced professionals, and supervised workplace learning.',
+    toneClass: 'brightness-[1.05] contrast-[1.03] saturate-[1.03] object-center',
   },
   {
     type: 'image',

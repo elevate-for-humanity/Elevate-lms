@@ -57,12 +57,14 @@ if (failures.length === 0) {
   for (const invariant of [
     'review_status',
     'governing_standard_version',
-    'AI lesson not human-approved',
+    'AUTOMATED_COURSE_GATE_VERSION',
     'rationale missing',
     'standards/competency mapping missing',
     'canonical interactive lesson experience missing',
     'mastery remediation plan missing',
-    'authorized human sign-off missing',
+    'record_course_automated_approval',
+    'automated_quality_gate',
+    'automated_approval_id',
     'module_completion_rules',
     'publishCourse',
   ]) if (!persistedPublish.includes(invariant)) fail(`persisted Course Builder publish gate missing: ${invariant}`);
@@ -112,4 +114,4 @@ if (failures.length) {
 }
 
 console.log('Course Builder procurement architecture gate: PASS');
-console.log('Verified: Studio-controlled root authority, governed template and persisted publication, human AI review, standards traceability, mastery/remediation services, spaced review, readiness reporting, grounded AI tutoring, practical sign-off controls, and hardened RLS.');
+console.log('Verified: Studio-controlled root authority, governed template and persisted publication, deterministic automated approval evidence, standards traceability, mastery/remediation services, spaced review, readiness reporting, grounded AI tutoring, practical sign-off controls, and hardened RLS.');

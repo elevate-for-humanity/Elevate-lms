@@ -109,6 +109,8 @@ jobs:
         run: node scripts/verify-admin-instrumentation-boundary.mjs
       - name: Enforce portal production contracts
         run: node scripts/verify-portal-production-contracts.mjs
+      - name: Reconcile canonical Admin database binding
+        run: pnpm tsx scripts/northflank/sync-admin-database-env.ts
       - name: Enforce canonical Northflank Admin runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
       - name: Enforce canonical Admin domain assignment

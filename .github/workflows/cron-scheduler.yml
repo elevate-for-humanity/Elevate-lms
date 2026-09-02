@@ -107,6 +107,13 @@ jobs:
             -H "Content-Type: application/json" \
             --max-time 30 || echo "::warning::process-provisioning-jobs failed"
 
+      - name: Process durable Course Builder job
+        run: |
+          curl -sf -X GET "$ADMIN_URL/api/cron/process-course-builder-jobs" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 300 || echo "::warning::process-course-builder-jobs failed"
+
       - name: Dispatch platform events to workflow engine
         run: |
           curl -sf -X POST "$ADMIN_URL/api/internal/workflow-event-processor" \

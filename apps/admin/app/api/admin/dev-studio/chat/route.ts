@@ -405,15 +405,24 @@ const TOOLS: any[] = [
     function: {
       name: 'build_course',
       description:
-        'Generate, validate, persist, and governance-normalize a complete course as a governed draft through the canonical Course Factory. ' +
+        'Queue durable generation, validation, persistence, governance normalization, and automated quality-gated publishing through the canonical Course Factory. ' +
         'Use when the user says "build a course", "create a course", "make a course about", or "generate a course". ' +
-        'The course is saved in one tool call; publishing remains a separate governed action.',
+        'Returns a resumable job ID immediately; duplicate active builds for the same canonical target are suppressed.',
       parameters: {
         type: 'object',
         properties: {
-          course_id: { type: 'string', description: 'Existing canonical course UUID to refresh in place' },
-          program_id: { type: 'string', description: 'Canonical program UUID that owns the course' },
-          program_slug: { type: 'string', description: 'Registered program slug used to resolve its credential blueprint' },
+          course_id: {
+            type: 'string',
+            description: 'Existing canonical course UUID to refresh in place',
+          },
+          program_id: {
+            type: 'string',
+            description: 'Canonical program UUID that owns the course',
+          },
+          program_slug: {
+            type: 'string',
+            description: 'Registered program slug used to resolve its credential blueprint',
+          },
           title: { type: 'string', description: 'Course title' },
           description: { type: 'string', description: 'What the course covers' },
           audience: {
@@ -874,7 +883,11 @@ export default function ${pageTitle.replace(/[^a-zA-Z0-9]/g, '') || 'Template'}P
   );
 }
 
-async function execTool(name: string, args: Record<string, unknown>): Promise<string> {
+async function execTool(
+  name: string,
+  args: Record<string, unknown>,
+  actorUserId?: string,
+): Promise<string> {
   switch (name) {
     case 'list_programs': {
       const db = await requireAdminClient();
@@ -1128,9 +1141,10 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
     // ── Course generation ──────────────────────────────────────────────────
     case 'build_course': {
+      if (!actorUserId) throw new Error('Authenticated operator identity is required');
       const requestedCourseId = String(args.course_id || '').trim();
       let programId = String(args.program_id || '').trim() || undefined;
-      let programSlug = String(args.program_slug || '').trim() || undefined;
+      const programSlug = String(args.program_slug || '').trim() || undefined;
       let canonicalTitle = '';
 
       if (requestedCourseId) {
@@ -1141,7 +1155,9 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
           .eq('id', requestedCourseId)
           .maybeSingle();
         if (courseLookupError) {
-          throw new Error(`Unable to resolve canonical course ${requestedCourseId}: ${courseLookupError.message}`);
+          throw new Error(
+            `Unable to resolve canonical course ${requestedCourseId}: ${courseLookupError.message}`,
+          );
         }
         if (!existingCourse) return `Canonical course not found: ${requestedCourseId}`;
         canonicalTitle = String(existingCourse.title || '').trim();
@@ -1160,10 +1176,7 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       const credential =
         typeof args.credential === 'string' ? args.credential.trim() || undefined : undefined;
 
-      const { courseFactory } = await import('@/lib/course-factory');
-      const { normalizeGeneratedCourseForGovernance } =
-        await import('@/lib/course-factory/post-generation-governance');
-      const result = await courseFactory({
+      const factoryInput = {
         title,
         topic: description,
         ...(requestedCourseId ? { courseId: requestedCourseId } : {}),
@@ -1179,32 +1192,61 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         mode: 'refresh',
         videoMode: 'queue',
         dryRun: false,
-      });
+      };
 
-      let governance = null;
-      if (result.ok && result.courseId) {
-        governance = await normalizeGeneratedCourseForGovernance(result.courseId);
+      const db = await requireAdminClient();
+      const target = requestedCourseId || programId || programSlug || title.toLowerCase();
+      const idempotencyKey = `course_build:${target}`;
+      const { data: existing } = await db
+        .from('devstudio_jobs')
+        .select('id, status, stage, progress')
+        .eq('idempotency_key', idempotencyKey)
+        .in('status', ['queued', 'running'])
+        .maybeSingle();
+      if (existing) {
+        return JSON.stringify({
+          __type: 'course_build_queued',
+          success: true,
+          jobId: existing.id,
+          status: existing.status,
+          stage: existing.stage,
+          progress: existing.progress,
+          message: `This canonical course already has an active build. Resuming job ${existing.id}.`,
+        });
       }
+
+      const { data: job, error: enqueueError } = await db
+        .from('devstudio_jobs')
+        .insert({
+          user_id: actorUserId,
+          command: `Build canonical course: ${title}`,
+          status: 'queued',
+          stage: 'queued',
+          progress: 0,
+          tool_name: 'build_course',
+          tool_args: factoryInput,
+          idempotency_key: idempotencyKey,
+          log_lines: ['Course build accepted and queued.'],
+        })
+        .select('id')
+        .single();
+      if (enqueueError || !job)
+        throw new Error(
+          `Unable to queue Course Builder: ${enqueueError?.message ?? 'no job returned'}`,
+        );
 
       return JSON.stringify(
         {
-          __type: 'course_saved',
-          success: result.ok,
-          courseId: result.courseId ?? null,
-          courseSlug: result.courseSlug ?? null,
-          title: result.title ?? title,
-          modulesGenerated: result.moduleCount ?? 0,
-          lessonsGenerated: result.lessonCount ?? 0,
-          assessmentsGenerated: result.assessmentsGenerated ?? 0,
-          videosQueued: result.videosQueued ?? 0,
-          governance,
-          warnings: result.warnings ?? [],
-          errors: result.errors ?? [],
-          status: result.status ?? null,
-          url: result.courseId ? `/studio/courses/${result.courseId}` : null,
-          message: result.ok
-            ? `Course "${result.title ?? title}" was generated and saved through the canonical Course Factory as a governed draft.`
-            : 'Course generation did not persist because the canonical Course Factory did not pass its evidence, completeness, or validation gates.',
+          __type: 'course_build_queued',
+          success: true,
+          jobId: job.id,
+          courseId: requestedCourseId || null,
+          title,
+          status: 'queued',
+          stage: 'queued',
+          progress: 0,
+          url: requestedCourseId ? `/studio/courses/${requestedCourseId}` : null,
+          message: `Course "${title}" is queued for durable generation, validation, governance normalization, and automated publishing. You can leave or reload Studio without losing the run.`,
         },
         null,
         2,
@@ -1447,7 +1489,7 @@ async function _POST(req: NextRequest) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
-                const result = await execTool(tc.function.name, args);
+                const result = await execTool(tc.function.name, args, auth.userId);
                 toolCalls.push({ tool: tc.function.name, args, result });
                 return {
                   role: 'tool' as const,
@@ -1505,7 +1547,7 @@ async function _POST(req: NextRequest) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {
                 const args = JSON.parse(tc.function.arguments || '{}') as Record<string, unknown>;
-                const result = await execTool(tc.function.name, args);
+                const result = await execTool(tc.function.name, args, auth.userId);
                 toolCalls.push({ tool: tc.function.name, args, result });
                 return { role: 'tool' as const, tool_call_id: tc.id, content: result };
               }),
@@ -1557,7 +1599,11 @@ async function _POST(req: NextRequest) {
             const toolResults = await Promise.all(
               toolUseBlocks.map(async (b) => {
                 if (b.type !== 'tool_use') return null;
-                const result = await execTool(b.name, b.input as Record<string, unknown>);
+                const result = await execTool(
+                  b.name,
+                  b.input as Record<string, unknown>,
+                  auth.userId,
+                );
                 toolCalls.push({ tool: b.name, args: b.input as Record<string, unknown>, result });
                 return { type: 'tool_result' as const, tool_use_id: b.id, content: result };
               }),

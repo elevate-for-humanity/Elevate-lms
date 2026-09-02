@@ -228,17 +228,15 @@ if (!courseOrchestrator.includes("from '../course-factory/factory'"))
   fail('Course Builder orchestrator is not the owner of private Course Factory execution');
 
 const adminAiChat = read('apps/admin/app/api/admin/dev-studio/chat/route.ts');
-if (
-  !adminAiChat.includes("await import('@/lib/course-factory')") &&
-  !adminAiChat.includes("await import('@/lib/devstudio/course-builder-controller')")
-) {
+const durableCourseWorker = read('lib/jobs/handlers/course-build.ts');
+if (!durableCourseWorker.includes("from '@/lib/course-factory'")) {
   fail(
     'Admin AI does not delegate course creation through the canonical Course Builder facade/controller',
   );
 }
 if (adminAiChat.includes('@/lib/course-factory/factory'))
   fail('Admin AI imports the private Course Factory engine directly');
-if (!adminAiChat.includes('normalizeGeneratedCourseForGovernance'))
+if (!durableCourseWorker.includes('normalizeGeneratedCourseForGovernance'))
   fail('Admin AI course creation does not run post-generation governance');
 if (adminAiChat.includes('intake_submissions'))
   fail(
@@ -279,8 +277,9 @@ const buildCourseBlock =
   adminAiChat.match(/case 'build_course': \{([\s\S]*?)case 'generate_videos':/i)?.[1] ?? '';
 for (const invariant of [
   'dryRun: false',
-  "__type: 'course_saved'",
-  'normalizeGeneratedCourseForGovernance',
+  "__type: 'course_build_queued'",
+  "status: 'queued'",
+  'idempotency_key',
   'requestedCourseId',
   'programId',
   'programSlug',
@@ -288,12 +287,21 @@ for (const invariant of [
   if (!buildCourseBlock.includes(invariant))
     fail(`build_course is not a one-step governed Course Builder operation: ${invariant}`);
 }
-if (
-  !buildCourseBlock.includes("await import('@/lib/course-factory')") &&
-  !buildCourseBlock.includes("await import('@/lib/devstudio/course-builder-controller')")
-) {
-  fail('build_course does not enter the Course Builder facade/controller');
-}
+for (const durableFile of [
+  'lib/jobs/handlers/course-build.ts',
+  'apps/admin/app/api/cron/process-course-builder-jobs/route.ts',
+  'supabase/migrations/20260902090000_durable_course_builder_jobs.sql',
+])
+  if (!exists(durableFile))
+    fail(`durable Course Builder execution file is missing: ${durableFile}`);
+const courseBuildWorker = read('lib/jobs/handlers/course-build.ts');
+for (const invariant of [
+  'courseFactory(',
+  'normalizeGeneratedCourseForGovernance',
+  "status: 'completed'",
+])
+  if (!courseBuildWorker.includes(invariant))
+    fail(`durable Course Builder worker is missing invariant: ${invariant}`);
 if (buildCourseBlock.includes('/api/admin/courses/ai-builder/generate'))
   fail(
     'build_course regressed to draft-only compatibility endpoint instead of canonical persistence',

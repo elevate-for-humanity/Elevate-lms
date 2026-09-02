@@ -34,13 +34,17 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return safeError('Unauthorized', 401);
 
     const db = await requireAdminClient();
     let query = db
       .from('devstudio_jobs')
-      .select('id, command, status, log_lines, tool_name, started_at, finished_at')
+      .select(
+        'id, command, status, stage, progress, result, error, attempts, max_attempts, log_lines, tool_name, tool_args, started_at, finished_at, updated_at',
+      )
       .eq('user_id', user.id)
       .order('started_at', { ascending: false })
       .limit(limit);
@@ -73,7 +77,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return safeError('Unauthorized', 401);
 
     const body = await request.json().catch(() => ({}));
@@ -133,10 +139,12 @@ export async function PATCH(request: NextRequest) {
 
     if (lines && lines.length > 0) {
       // Use raw SQL to append to the jsonb array atomically
-      const { error } = await db.rpc('devstudio_append_log', {
-        p_job_id: jobId,
-        p_lines: lines,
-      }).single();
+      const { error } = await db
+        .rpc('devstudio_append_log', {
+          p_job_id: jobId,
+          p_lines: lines,
+        })
+        .single();
 
       // If RPC doesn't exist yet, fall back to a full replace via select+update
       if (error && error.code === 'PGRST202') {

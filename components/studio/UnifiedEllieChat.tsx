@@ -62,6 +62,84 @@ interface UnifiedEllieChatProps {
   fileContext?: string;
 }
 
+interface StudioJob {
+  id: string;
+  command: string;
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
+  stage?: string | null;
+  progress?: number | null;
+  error?: string | null;
+  attempts?: number;
+  max_attempts?: number;
+  tool_name?: string | null;
+}
+
+function CourseBuildRuns() {
+  const [jobs, setJobs] = useState<StudioJob[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    const refresh = async () => {
+      const response = await fetch('/api/admin/dev-studio/jobs?limit=8&status=all', {
+        cache: 'no-store',
+      });
+      if (!response.ok || !active) return;
+      const body = await response.json().catch(() => ({ jobs: [] }));
+      if (active)
+        setJobs((body.jobs ?? []).filter((job: StudioJob) => job.tool_name === 'build_course'));
+    };
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 5000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, []);
+
+  if (!jobs.length) return null;
+  return (
+    <div className="shrink-0 border-b border-gray-200 bg-gray-50 px-4 py-3" aria-live="polite">
+      <div className="mx-auto max-w-4xl space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">
+          Course Builder runs
+        </p>
+        {jobs.slice(0, 3).map((job) => {
+          const progress = Math.max(0, Math.min(100, job.progress ?? 0));
+          return (
+            <div
+              key={job.id}
+              className="rounded-xl border border-gray-200 bg-white px-3 py-2 shadow-sm"
+            >
+              <div className="flex items-center gap-2 text-xs">
+                {job.status === 'completed' ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                ) : job.status === 'failed' ? (
+                  <XCircle className="h-4 w-4 text-red-600" />
+                ) : (
+                  <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                )}
+                <span className="min-w-0 flex-1 truncate font-semibold text-gray-900">
+                  {job.command}
+                </span>
+                <span className="text-gray-500">
+                  {job.stage ?? job.status} · {progress}%
+                </span>
+              </div>
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-100">
+                <div
+                  className={`h-full rounded-full ${job.status === 'failed' ? 'bg-red-500' : 'bg-blue-600'}`}
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              {job.error ? <p className="mt-2 text-xs text-red-700">{job.error}</p> : null}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 const QUICK = [
   {
     label: 'Build a course',
@@ -490,6 +568,8 @@ export default function UnifiedEllieChat({
           </p>
         </div>
       )}
+
+      <CourseBuildRuns />
 
       <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 sm:px-6 sm:py-5">
         {messages.length === 0 ? (

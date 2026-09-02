@@ -1,5 +1,6 @@
 import { courseFactory } from '@/lib/course-factory';
 import { normalizeGeneratedCourseForGovernance } from '@/lib/course-factory/post-generation-governance';
+import { finalizeCourseAutomaticallyIfReadyWithClient } from '@/lib/course-builder/persisted-publish-service';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { FactoryInput, FactoryStage } from '@/lib/course-factory/types';
@@ -46,6 +47,14 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
   }
 
   const governance = await normalizeGeneratedCourseForGovernance(result.courseId);
+  const finalization = await finalizeCourseAutomaticallyIfReadyWithClient({
+    db,
+    courseId: result.courseId,
+  });
+  if (finalization.state === 'quality_gate_failed') {
+    const blockers = finalization.publication.blocking_issues.join('; ');
+    throw new Error(`Automated course repair exhausted: ${blockers}`);
+  }
   const finishedAt = new Date().toISOString();
   const { error } = await db
     .from('devstudio_jobs')
@@ -53,7 +62,7 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
       status: 'completed',
       stage: 'complete',
       progress: 100,
-      result: { ...result, governance },
+      result: { ...result, governance, finalization },
       error: null,
       finished_at: finishedAt,
       locked_at: null,

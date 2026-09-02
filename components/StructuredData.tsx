@@ -1,6 +1,7 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { PROGRAMS } from '@/lib/programs/canonical-data';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
+import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 
 export default function StructuredData() {
   const barber = PROGRAMS['barber-apprenticeship'];
@@ -47,7 +48,7 @@ export default function StructuredData() {
       availableLanguage: ['English'],
     },
     sameAs: [
-      'https://www.facebook.com/profile.php?id=61571046346179',
+      'https://www.facebook.com/61578240192934/',
       'https://linkedin.com/company/elevateforhumanity',
       'https://instagram.com/elevateforhumanity',
       'https://www.youtube.com/@elevateforhumanity',
@@ -126,6 +127,51 @@ export default function StructuredData() {
     },
   };
 
+  const hostShopSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    '@id': `${canonicalSiteUrl}/#featured-host-shops`,
+    name: 'Featured Indiana apprenticeship Host Shops',
+    numberOfItems: FEATURED_BEAUTY_HOST_PARTNERS.length,
+    itemListElement: FEATURED_BEAUTY_HOST_PARTNERS.map((shop, index) => {
+      const publicUrls = [
+        shop.websiteUrl,
+        shop.bookingUrl,
+        shop.socialUrl,
+        shop.onlineListingUrl,
+      ].filter((url): url is string => Boolean(url));
+      const images = (shop.media ?? [])
+        .filter((media) => media.kind !== 'video')
+        .map((media) => `${canonicalSiteUrl}${media.src}`);
+
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        url: `${canonicalSiteUrl}/host-shops/${shop.slug}`,
+        item: {
+          '@type': shop.businessType ?? 'LocalBusiness',
+          '@id': `${canonicalSiteUrl}/host-shops/${shop.slug}#business`,
+          name: shop.dba ?? shop.name,
+          legalName: shop.dba ? shop.name : undefined,
+          description: shop.marketingBlurb ?? shop.note,
+          url: `${canonicalSiteUrl}/host-shops/${shop.slug}`,
+          telephone: shop.phone,
+          image: images.length ? images : undefined,
+          sameAs: publicUrls.length ? publicUrls : undefined,
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: shop.address,
+            addressLocality: shop.city,
+            addressRegion: shop.state,
+            postalCode: shop.zip,
+            addressCountry: 'US',
+          },
+          parentOrganization: { '@id': `${canonicalSiteUrl}/#organization` },
+        },
+      };
+    }),
+  };
+
   return (
     <>
       <script
@@ -135,6 +181,10 @@ export default function StructuredData() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(hostShopSchema) }}
       />
     </>
   );

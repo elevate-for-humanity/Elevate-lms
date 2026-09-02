@@ -61,7 +61,7 @@ export default function HostShopShowcase({
         const featured = FEATURED_MEDIA_BY_SHOP[shop.slug];
         const media: ShowcaseMedia | undefined =
           featured?.kind !== 'video' || !videoTourShopSlug || shop.slug === videoTourShopSlug
-            ? featured ?? shop.media?.find((item) => item.kind !== 'video')
+            ? (featured ?? shop.media?.find((item) => item.kind !== 'video'))
             : shop.media?.find((item) => item.kind !== 'video');
         return media ? [{ shop, media }] : [];
       }),
@@ -107,9 +107,24 @@ export default function HostShopShowcase({
   if (!slides.length) return null;
 
   const { shop, media: image } = slides[activeIndex];
-  const externalUrl = shop.websiteUrl ?? shop.onlineListingUrl ?? shop.socialUrl;
-  const externalLabel =
-    shop.websiteLabel ?? shop.onlineListingLabel ?? shop.socialLabel ?? 'Visit shop online';
+  const externalLinks = [
+    shop.websiteUrl
+      ? { href: shop.websiteUrl, label: shop.websiteLabel ?? `Visit ${shop.dba ?? shop.name}` }
+      : null,
+    shop.bookingUrl ? { href: shop.bookingUrl, label: 'Book an appointment' } : null,
+    shop.socialUrl
+      ? { href: shop.socialUrl, label: shop.socialLabel ?? `Follow ${shop.dba ?? shop.name}` }
+      : null,
+    shop.onlineListingUrl
+      ? {
+          href: shop.onlineListingUrl,
+          label: shop.onlineListingLabel ?? `View ${shop.dba ?? shop.name} online`,
+        }
+      : null,
+  ].filter(
+    (link, index, links): link is { href: string; label: string } =>
+      Boolean(link) && links.findIndex((candidate) => candidate?.href === link.href) === index,
+  );
 
   function go(delta: number) {
     setActiveIndex((current) => (current + delta + slides.length) % slides.length);
@@ -213,12 +228,12 @@ export default function HostShopShowcase({
                     sizes="(max-width: 1024px) 100vw, 58vw"
                     className="host-showcase-media-enter object-contain"
                     onError={() =>
-                    setFailedImages((current) => {
-                      const next = new Set(current);
-                      next.add(image.src);
-                      return next;
-                    })
-                  }
+                      setFailedImages((current) => {
+                        const next = new Set(current);
+                        next.add(image.src);
+                        return next;
+                      })
+                    }
                   />
                 </div>
               ) : (
@@ -269,16 +284,17 @@ export default function HostShopShowcase({
                 >
                   Explore this host shop
                 </Link>
-                {externalUrl ? (
+                {externalLinks.map((link) => (
                   <a
-                    href={externalUrl}
+                    key={link.href}
+                    href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border-2 border-brand-blue-700 bg-white px-5 py-2.5 text-sm font-black text-brand-blue-900 hover:bg-sky-50"
                   >
-                    {externalLabel} <ExternalLink className="h-4 w-4" />
+                    {link.label} <ExternalLink className="h-4 w-4" aria-hidden="true" />
                   </a>
-                ) : null}
+                ))}
               </div>
             </div>
           </div>

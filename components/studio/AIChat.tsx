@@ -99,7 +99,6 @@ export const TOOL_META: Record<
   design_page_template: { label: 'Page Template', color: 'text-indigo-700', icon: Sparkles },
   run_safe_command: { label: 'Shell', color: 'text-slate-700', icon: Terminal },
   build_course: { label: 'Build Course', color: 'text-purple-700', icon: BookOpen },
-  save_course: { label: 'Save Course', color: 'text-brand-green-700', icon: BookOpen },
   generate_videos: { label: 'Generate Videos', color: 'text-rose-700', icon: Video },
   analyze_document: { label: 'Analyze Document', color: 'text-amber-700', icon: FileText },
   apply_document_to_application: {
@@ -425,7 +424,7 @@ function EllieApprovalCard({
 
 // Picks the right rich card for a tool result, falls back to null (use default collapsible)
 function RichToolResult({ tool, result }: { tool: string; result: string }) {
-  if (tool === 'build_course' || tool === 'save_course') return <CourseCard result={result} />;
+  if (tool === 'build_course') return <CourseCard result={result} />;
   if (tool === 'generate_videos') return <VideoProgressCard result={result} />;
   if (tool === 'analyze_document' || tool === 'apply_document_to_application')
     return <DocumentAnalysisCard result={result} />;

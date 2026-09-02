@@ -150,7 +150,6 @@ export function runGovernmentProcurementGate(template: ProgramBuilderTemplate): 
         if (!lesson.requiresInstructorSignoff) add('error', 'PRACTICAL_SIGNOFF_REQUIRED', `${path}.requiresInstructorSignoff`, 'Hands-on competency must require authorized human sign-off.');
       }
 
-      if (lesson.aiGenerated && lesson.approved !== true) add('error', 'AI_REVIEW_REQUIRED', `${path}.approved`, 'AI-generated lessons require human approval before publication.');
       if (template.status === 'published' && lesson.generationStatus && !['published', 'completed'].includes(lesson.generationStatus)) {
         add('error', 'STATE_CONTRADICTION', `${path}.generationStatus`, 'Published course contains a lesson that is not in a completed/published generation state.');
       }

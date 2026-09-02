@@ -95,10 +95,6 @@ export async function publishCourseVersion(
   label?: string | null,
 ): Promise<{ ok: boolean; version?: number; blockers?: string[]; error?: string }> {
   const snapshot = await loadSnapshot(db, courseId);
-  if ((snapshot.course.review_status ?? 'draft') !== 'approved') {
-    return { ok: false, error: `Course must be approved before publishing. Current review status: '${snapshot.course.review_status ?? 'draft'}'.` };
-  }
-
   const blockers = readinessBlockers(snapshot);
   if (blockers.length) return { ok: false, blockers, error: 'Course readiness blockers must be resolved before publishing.' };
 

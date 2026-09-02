@@ -186,8 +186,9 @@ export default function RepositoryLivePreview({
               key={`${previewUrl}-${refreshKey}`}
               title="Deployed route preview"
               src={previewUrl}
-              sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts"
-              referrerPolicy="strict-origin-when-cross-origin"
+              sandbox=""
+              referrerPolicy="no-referrer"
+              allow="autoplay 'none'; camera 'none'; geolocation 'none'; microphone 'none'"
               className="h-full min-h-[480px] w-full border-0 bg-white"
             />
           ) : (

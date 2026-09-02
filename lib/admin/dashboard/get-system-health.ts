@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@/lib/supabase';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { getStripeRuntimeKey } from '@/lib/stripe/runtime-key';
 
 export interface SystemHealthAlert {
@@ -60,6 +61,11 @@ async function getCachedStripeIssuingStatus(): Promise<{ enabled: boolean; reaso
 }
 
 export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSystemHealth> {
+  // Runtime credentials may be stored in the canonical platform secret store
+  // instead of being duplicated in the container environment. Hydrate before
+  // computing health so the dashboard reports the effective runtime contract.
+  await hydrateProcessEnv();
+
   const alerts: SystemHealthAlert[] = [];
 
   // Check required env vars

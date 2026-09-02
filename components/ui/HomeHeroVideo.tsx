@@ -221,7 +221,9 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
 
         <div
           className="relative order-1 w-full overflow-hidden bg-[#f4f1ec] bg-cover bg-center lg:order-2"
-          style={{ backgroundImage: `url(${slides[0]?.src})` }}
+          style={{
+            backgroundImage: `url(${revisionedHeroAsset(slides[0]?.src ?? '')})`,
+          }}
         >
           {previousSlide ? (
             <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">

@@ -207,9 +207,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           {previousSlide ? (
             <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
               <HeroVideo
-                mountedFrameImage={
-                  previousSlide.src
-                }
+                mountedFrameImage={previousSlide.src}
                 analyticsName={banner.analyticsName}
                 overlayMode="none"
                 mediaFit="cover"
@@ -221,7 +219,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             </div>
           ) : null}
           <div
-            key={`${slide.type}-${slide.src || slide.mobileSrc || activeSlide}`}
+            key={`${slide.type}-${slide.src || activeSlide}`}
             className="home-hero-slide-enter relative z-10"
           >
             <HeroVideo

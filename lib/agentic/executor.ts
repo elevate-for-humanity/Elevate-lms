@@ -12,10 +12,12 @@ import { adaptiveBackoffMs } from '@/lib/resilience/adaptive-backoff';
 const DEFAULT_POLL_MS = 60_000;
 const MAX_OUTAGE_BACKOFF_MS = 15 * 60_000;
 const HOME_HERO_KIND = 'homepage-hero-commercial';
+const TASK_LEASE_SECONDS = 10 * 60;
 let started = false;
 let timer: NodeJS.Timeout | null = null;
 let polling = false;
 let consecutivePollFailures = 0;
+const executorId = `${process.env.HOSTNAME ?? 'admin'}:${process.pid}:${crypto.randomUUID()}`;
 
 function pollIntervalMs(): number {
   const configured = Number.parseInt(process.env.AGENTIC_EXECUTOR_POLL_MS ?? '', 10);
@@ -51,17 +53,49 @@ async function completeTask(taskId: string, output: Record<string, unknown>) {
       output,
       completed_at: new Date().toISOString(),
       error: null,
+      lease_owner: null,
+      lease_expires_at: null,
+      heartbeat_at: null,
     })
-    .eq('id', taskId);
+    .eq('id', taskId)
+    .eq('lease_owner', executorId);
 }
 
-async function failTask(taskId: string, runId: string, projectId: string, error: unknown) {
+async function failTask(task: any, runId: string, projectId: string, error: unknown) {
   const db = await requireAdminClient();
   const message = error instanceof Error ? error.message : String(error);
+  const retryable = Number(task.attempt_count ?? 1) < Number(task.max_attempts ?? 3);
+  const retryAt = new Date(
+    Date.now() +
+      adaptiveBackoffMs(Number(task.attempt_count ?? 1), {
+        baseDelayMs: 15_000,
+        maxDelayMs: 5 * 60_000,
+      }),
+  ).toISOString();
   await db
     .from('agentic_build_tasks')
-    .update({ status: 'failed', error: message, completed_at: new Date().toISOString() })
-    .eq('id', taskId);
+    .update({
+      status: retryable ? 'queued' : 'failed',
+      error: message,
+      next_attempt_at: retryable ? retryAt : task.next_attempt_at,
+      completed_at: retryable ? null : new Date().toISOString(),
+      lease_owner: null,
+      lease_expires_at: null,
+      heartbeat_at: null,
+    })
+    .eq('id', task.id)
+    .eq('lease_owner', executorId);
+  if (retryable) {
+    await db.from('agentic_build_events').insert({
+      project_id: projectId,
+      run_id: runId,
+      task_id: task.id,
+      event_type: 'agentic.task.retry_scheduled',
+      summary: `Attempt ${task.attempt_count} failed; retry scheduled.`,
+      payload: { error: message, next_attempt_at: retryAt },
+    });
+    return;
+  }
   await db
     .from('agentic_build_runs')
     .update({ status: 'failed', error: message, failed_at: new Date().toISOString() })
@@ -70,7 +104,7 @@ async function failTask(taskId: string, runId: string, projectId: string, error:
   await db.from('agentic_build_events').insert({
     project_id: projectId,
     run_id: runId,
-    task_id: taskId,
+    task_id: task.id,
     event_type: 'agentic.task.failed',
     summary: message,
     payload: {},
@@ -88,22 +122,37 @@ async function dependencyOutputs(runId: string, dependencyIds: string[]) {
   return data ?? [];
 }
 
-async function dependenciesCompleted(runId: string, dependencyIds: string[]) {
-  if (!dependencyIds.length) return true;
-  const rows = await dependencyOutputs(runId, dependencyIds);
-  return rows.length === dependencyIds.length && rows.every((row) => row.status === 'completed');
+async function claimTask(runId?: string) {
+  const db = await requireAdminClient();
+  const { data, error } = await db.rpc('claim_agentic_build_task', {
+    p_worker_id: executorId,
+    p_run_id: runId ?? null,
+    p_lease_seconds: TASK_LEASE_SECONDS,
+  });
+  if (error) throw error;
+  return Array.isArray(data) ? (data[0] ?? null) : (data ?? null);
 }
 
-async function claimTask(taskId: string) {
-  const db = await requireAdminClient();
-  const { data } = await db
-    .from('agentic_build_tasks')
-    .update({ status: 'running', started_at: new Date().toISOString() })
-    .eq('id', taskId)
-    .eq('status', 'queued')
-    .select('id')
-    .maybeSingle();
-  return Boolean(data?.id);
+function startTaskHeartbeat(taskId: string): () => void {
+  const interval = setInterval(
+    async () => {
+      try {
+        const db = await requireAdminClient();
+        const { data, error } = await db.rpc('heartbeat_agentic_build_task', {
+          p_task_id: taskId,
+          p_worker_id: executorId,
+          p_lease_seconds: TASK_LEASE_SECONDS,
+        });
+        if (error || data !== true)
+          console.warn('[agentic-executor] task lease heartbeat rejected', { taskId });
+      } catch (error) {
+        console.warn('[agentic-executor] task lease heartbeat failed', { taskId, error });
+      }
+    },
+    Math.floor((TASK_LEASE_SECONDS * 1000) / 3),
+  );
+  interval.unref?.();
+  return () => clearInterval(interval);
 }
 
 async function resolveOrganizationId(tenantId: string | null) {
@@ -287,36 +336,22 @@ export async function runAgenticExecutorOnce(input: { runId?: string } = {}): Pr
   polling = true;
   try {
     const db = await requireAdminClient();
-    let taskQuery = db
-      .from('agentic_build_tasks')
-      .select(
-        'id, run_id, worker, action, dependencies, input, status, requires_approval, created_at',
-      )
-      .eq('status', 'queued')
-      .order('created_at', { ascending: true })
-      .limit(10);
-    if (input.runId) taskQuery = taskQuery.eq('run_id', input.runId);
-    const { data: tasks, error } = await taskQuery;
-    if (error) throw error;
-
-    for (const task of tasks ?? []) {
-      if (!(await dependenciesCompleted(task.run_id, task.dependencies ?? []))) continue;
+    const task = await claimTask(input.runId);
+    if (task) {
       const { data: run } = await db
         .from('agentic_build_runs')
         .select('id, project_id, prompt, status')
         .eq('id', task.run_id)
         .eq('status', 'running')
         .maybeSingle();
-      if (!run) continue;
+      if (!run) throw new Error(`Claimed task ${task.id} has no active run`);
       const { data: project } = await db
         .from('agentic_build_projects')
         .select('id, tenant_id, user_id, target_id, target_type, metadata, status')
         .eq('id', run.project_id)
         .eq('status', 'active')
         .maybeSingle();
-      if (!project || !['marketing_campaign', 'course'].includes(project.target_type)) continue;
-      if (task.requires_approval && project.metadata?.execution_approved !== true) continue;
-      if (!(await claimTask(task.id))) continue;
+      if (!project) throw new Error(`Claimed task ${task.id} has no active project`);
 
       await db.from('agentic_build_events').insert({
         project_id: project.id,
@@ -327,16 +362,20 @@ export async function runAgenticExecutorOnce(input: { runId?: string } = {}): Pr
         payload: {},
       });
 
+      const stopHeartbeat = startTaskHeartbeat(task.id);
       try {
         if (project.target_type === 'course') {
           await processCourseAgenticTask({ task: { ...task, status: 'running' }, run, project });
-        } else {
+        } else if (project.target_type === 'marketing_campaign') {
           await processMarketingTask({ ...task, status: 'running' }, run, project);
+        } else {
+          throw new Error(`No executor is registered for target type ${project.target_type}`);
         }
       } catch (err) {
-        await failTask(task.id, run.id, project.id, err);
+        await failTask(task, run.id, project.id, err);
+      } finally {
+        stopHeartbeat();
       }
-      break;
     }
     return true;
   } catch (err) {

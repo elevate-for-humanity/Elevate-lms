@@ -100,6 +100,7 @@ export interface AgenticPlanTask {
   input: Record<string, unknown>;
   costClass: AgenticCostClass;
   approvalRequired: boolean;
+  idempotencyKey?: string;
 }
 
 export interface AgenticPlan {

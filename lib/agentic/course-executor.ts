@@ -18,6 +18,8 @@ interface AgenticTaskRow {
   dependencies?: string[] | null;
   input?: Record<string, unknown> | null;
   status?: string;
+  attempt_count?: number;
+  lease_owner?: string | null;
 }
 
 interface AgenticRunRow {
@@ -53,7 +55,10 @@ function metadataValue(metadata: Record<string, unknown> | null, ...keys: string
   return null;
 }
 
-async function resolveCourseTarget(project: AgenticProjectRow, run: AgenticRunRow): Promise<CourseTarget> {
+async function resolveCourseTarget(
+  project: AgenticProjectRow,
+  run: AgenticRunRow,
+): Promise<CourseTarget> {
   const db = await requireAdminClient();
   const courseId = project.target_id ?? metadataValue(project.metadata, 'courseId', 'course_id');
   let programId = metadataValue(project.metadata, 'programId', 'program_id');
@@ -68,7 +73,10 @@ async function resolveCourseTarget(project: AgenticProjectRow, run: AgenticRunRo
     if (error) throw error;
     if (course) {
       programId = programId ?? stringValue(course.program_id);
-      const relation = course.programs as unknown as { slug?: string | null } | Array<{ slug?: string | null }> | null;
+      const relation = course.programs as unknown as
+        | { slug?: string | null }
+        | Array<{ slug?: string | null }>
+        | null;
       const linkedSlug = Array.isArray(relation) ? relation[0]?.slug : relation?.slug;
       programSlug = programSlug ?? stringValue(linkedSlug);
     }
@@ -110,9 +118,17 @@ async function updateTask(
       error: null,
       completed_at: terminal ? new Date().toISOString() : null,
       started_at: terminal ? undefined : null,
+      attempt_count:
+        status === 'queued' ? Math.max(0, Number(task.attempt_count ?? 1) - 1) : undefined,
+      next_attempt_at:
+        status === 'queued' ? new Date(Date.now() + 15_000).toISOString() : undefined,
+      lease_owner: null,
+      lease_expires_at: null,
+      heartbeat_at: null,
     })
     .eq('id', task.id)
-    .eq('run_id', task.run_id);
+    .eq('run_id', task.run_id)
+    .eq('lease_owner', task.lease_owner);
   if (error) throw error;
 
   await db.from('agentic_build_events').insert({
@@ -136,41 +152,57 @@ export async function processCourseAgenticTask(input: {
 
   if (task.worker === 'course-architect') {
     if (!target.programId && !target.programSlug) {
-      throw new Error('Course plan requires a canonical programId/programSlug or an approved #INTraining identifier in the goal.');
+      throw new Error(
+        'Course plan requires a canonical programId/programSlug or an approved #INTraining identifier in the goal.',
+      );
     }
     const loaded = await loadBlueprintWithProgram(db, {
       programId: target.programId ?? undefined,
       programSlug: target.programSlug ?? undefined,
     });
-    if (!loaded) throw new Error('No registered Course Builder blueprint is linked to the selected program.');
+    if (!loaded)
+      throw new Error('No registered Course Builder blueprint is linked to the selected program.');
     const modules = loaded.blueprint.modules ?? [];
     const lessonCount = modules.reduce((sum, module) => sum + (module.lessons?.length ?? 0), 0);
-    await updateTask(task, project, 'completed', {
-      program_id: loaded.program.id,
-      program_slug: loaded.program.slug,
-      blueprint_id: loaded.blueprint.id,
-      module_count: modules.length,
-      lesson_count: lessonCount,
-      modules: modules.map((module) => ({
-        title: module.title,
-        lesson_count: module.lessons?.length ?? 0,
-      })),
-    }, `Course blueprint resolved: ${modules.length} modules and ${lessonCount} lessons.`);
+    await updateTask(
+      task,
+      project,
+      'completed',
+      {
+        program_id: loaded.program.id,
+        program_slug: loaded.program.slug,
+        blueprint_id: loaded.blueprint.id,
+        module_count: modules.length,
+        lesson_count: lessonCount,
+        modules: modules.map((module) => ({
+          title: module.title,
+          lesson_count: module.lessons?.length ?? 0,
+        })),
+      },
+      `Course blueprint resolved: ${modules.length} modules and ${lessonCount} lessons.`,
+    );
     return;
   }
 
   if (task.worker === 'visual-designer') {
-    await updateTask(task, project, 'completed', {
-      design_system: 'canonical-lms-course-experience',
-      responsive_preview: ['desktop', 'tablet', 'mobile'],
-      learner_renderer: 'shared LMS course/lesson renderer',
-      independent_publication_authority: false,
-    }, 'Course visual system mapped to the canonical LMS learner experience.');
+    await updateTask(
+      task,
+      project,
+      'completed',
+      {
+        design_system: 'canonical-lms-course-experience',
+        responsive_preview: ['desktop', 'tablet', 'mobile'],
+        learner_renderer: 'shared LMS course/lesson renderer',
+        independent_publication_authority: false,
+      },
+      'Course visual system mapped to the canonical LMS learner experience.',
+    );
     return;
   }
 
   if (task.worker === 'instructional-designer') {
-    if (!target.programId && !target.programSlug) throw new Error('Instructional build is missing its canonical program identity.');
+    if (!target.programId && !target.programSlug)
+      throw new Error('Instructional build is missing its canonical program identity.');
     if (target.courseId) {
       const loaded = await loadBlueprintWithProgram(db, {
         programId: target.programId ?? undefined,
@@ -181,28 +213,39 @@ export async function processCourseAgenticTask(input: {
         (sum, module) => sum + (module.lessons?.length ?? 0),
         0,
       );
-      const [{ count: moduleCount, error: moduleError }, { data: lessons, error: lessonError }] = await Promise.all([
-        db.from('course_modules').select('id', { count: 'exact', head: true }).eq('course_id', target.courseId),
-        db.from('course_lessons').select('id,script').eq('course_id', target.courseId),
-      ]);
+      const [{ count: moduleCount, error: moduleError }, { data: lessons, error: lessonError }] =
+        await Promise.all([
+          db
+            .from('course_modules')
+            .select('id', { count: 'exact', head: true })
+            .eq('course_id', target.courseId),
+          db.from('course_lessons').select('id,script').eq('course_id', target.courseId),
+        ]);
       if (moduleError) throw moduleError;
       if (lessonError) throw lessonError;
       const scriptedLessons = (lessons ?? []).filter((lesson) => stringValue(lesson.script)).length;
       if (
-        expectedModules > 0
-        && expectedLessons > 0
-        && moduleCount === expectedModules
-        && (lessons ?? []).length === expectedLessons
-        && scriptedLessons === expectedLessons
+        expectedModules > 0 &&
+        expectedLessons > 0 &&
+        moduleCount === expectedModules &&
+        (lessons ?? []).length === expectedLessons &&
+        scriptedLessons === expectedLessons
       ) {
-        await updateTask(task, project, 'completed', {
-          course_id: target.courseId,
-          module_count: moduleCount,
-          lesson_count: expectedLessons,
-          scripted_lessons: scriptedLessons,
-          resumed_from_persisted_checkpoint: true,
-          summary: 'Accepted complete persisted instructional checkpoint; no course recreation required.',
-        }, `Persisted instructional checkpoint verified: ${moduleCount} modules and ${expectedLessons} scripted lessons.`);
+        await updateTask(
+          task,
+          project,
+          'completed',
+          {
+            course_id: target.courseId,
+            module_count: moduleCount,
+            lesson_count: expectedLessons,
+            scripted_lessons: scriptedLessons,
+            resumed_from_persisted_checkpoint: true,
+            summary:
+              'Accepted complete persisted instructional checkpoint; no course recreation required.',
+          },
+          `Persisted instructional checkpoint verified: ${moduleCount} modules and ${expectedLessons} scripted lessons.`,
+        );
         return;
       }
     }
@@ -214,7 +257,9 @@ export async function processCourseAgenticTask(input: {
       videoMode: 'off',
     });
     if (!result.ok || !result.courseId) {
-      throw new Error(`Course Builder failed: ${(result.errors ?? result.warnings ?? []).join('; ') || result.status || 'unknown error'}`);
+      throw new Error(
+        `Course Builder failed: ${(result.errors ?? result.warnings ?? []).join('; ') || result.status || 'unknown error'}`,
+      );
     }
     await db
       .from('agentic_build_projects')
@@ -231,15 +276,21 @@ export async function processCourseAgenticTask(input: {
         updated_at: new Date().toISOString(),
       })
       .eq('id', project.id);
-    await updateTask(task, project, 'completed', {
-      course_id: result.courseId,
-      course_slug: result.courseSlug,
-      module_count: result.moduleCount,
-      lesson_count: result.lessonCount,
-      assessments_generated: result.assessmentsGenerated,
-      completion_ratio: result.completionRatio,
-      warnings: result.warnings ?? [],
-    }, `Canonical Course Builder persisted ${result.moduleCount ?? 0} modules and ${result.lessonCount ?? 0} lessons.`);
+    await updateTask(
+      task,
+      project,
+      'completed',
+      {
+        course_id: result.courseId,
+        course_slug: result.courseSlug,
+        module_count: result.moduleCount,
+        lesson_count: result.lessonCount,
+        assessments_generated: result.assessmentsGenerated,
+        completion_ratio: result.completionRatio,
+        warnings: result.warnings ?? [],
+      },
+      `Canonical Course Builder persisted ${result.moduleCount ?? 0} modules and ${result.lessonCount ?? 0} lessons.`,
+    );
     return;
   }
 
@@ -250,12 +301,13 @@ export async function processCourseAgenticTask(input: {
       .select('target_id,metadata')
       .eq('id', project.id)
       .maybeSingle();
-    const refreshedCourseId = stringValue(refreshed?.target_id) ?? metadataValue(
-      refreshed?.metadata as Record<string, unknown> | null,
-      'courseId',
-      'course_id',
-    );
-    if (!refreshedCourseId) throw new Error(`${task.worker} cannot continue until Course Builder persists the canonical course.`);
+    const refreshedCourseId =
+      stringValue(refreshed?.target_id) ??
+      metadataValue(refreshed?.metadata as Record<string, unknown> | null, 'courseId', 'course_id');
+    if (!refreshedCourseId)
+      throw new Error(
+        `${task.worker} cannot continue until Course Builder persists the canonical course.`,
+      );
     target.courseId = refreshedCourseId;
   }
 
@@ -263,22 +315,40 @@ export async function processCourseAgenticTask(input: {
     const queued = await queueCourseMedia({ courseId: target.courseId, onlyMissing: true });
     const media = await getCourseMediaState(target.courseId, { verifyUrls: true });
     if (!media.completePackage) {
-      await updateTask(task, project, 'queued', {
-        course_id: target.courseId,
-        ...queued,
-        ...media,
-        note: 'Queued is not complete. This task remains queued until every required canonical media asset is complete and playable.',
-      }, `Media pending: ${media.complete}/${media.expectedTotal} canonical assets complete; ${media.failed} failed; ${media.queued} queued; ${media.rendering} rendering.`);
+      await updateTask(
+        task,
+        project,
+        'queued',
+        {
+          course_id: target.courseId,
+          ...queued,
+          ...media,
+          note: 'Queued is not complete. This task remains queued until every required canonical media asset is complete and playable.',
+        },
+        `Media pending: ${media.complete}/${media.expectedTotal} canonical assets complete; ${media.failed} failed; ${media.queued} queued; ${media.rendering} rendering.`,
+      );
       return;
     }
-    await updateTask(task, project, 'completed', { course_id: target.courseId, ...queued, ...media }, 'All required canonical course media is persisted and playable.');
+    await updateTask(
+      task,
+      project,
+      'completed',
+      { course_id: target.courseId, ...queued, ...media },
+      'All required canonical course media is persisted and playable.',
+    );
     return;
   }
 
   if (task.worker === 'compliance-qa') {
     const media = await getCourseMediaState(target.courseId, { verifyUrls: true });
     if (!media.completePackage) {
-      await updateTask(task, project, 'queued', { course_id: target.courseId, ...media }, 'QA is waiting for canonical Course Factory media readiness.');
+      await updateTask(
+        task,
+        project,
+        'queued',
+        { course_id: target.courseId, ...media },
+        'QA is waiting for canonical Course Factory media readiness.',
+      );
       return;
     }
     const health = await repairPersistedCourseAcceptanceWithClient({
@@ -286,36 +356,53 @@ export async function processCourseAgenticTask(input: {
       courseId: target.courseId,
     });
     if (health.pass) {
-      await updateTask(task, project, 'completed', {
-        course_id: target.courseId,
-        procurement: health.metrics,
-        media,
-        blocking_issues: [],
-        repairs: health.repairs,
-      }, 'Course passed canonical procurement, governance, accessibility, instructional, and media readiness checks.');
+      await updateTask(
+        task,
+        project,
+        'completed',
+        {
+          course_id: target.courseId,
+          procurement: health.metrics,
+          media,
+          blocking_issues: [],
+          repairs: health.repairs,
+        },
+        'Course passed canonical procurement, governance, accessibility, instructional, and media readiness checks.',
+      );
       return;
     }
-    const humanReviewOnly = health.blocking_issues.every((issue) =>
-      issue.includes('human sign-off') || issue.includes('human-approved'),
+    const humanReviewOnly = health.blocking_issues.every(
+      (issue) => issue.includes('human sign-off') || issue.includes('human-approved'),
     );
     if (humanReviewOnly) {
-      await updateTask(task, project, 'queued', {
-        course_id: target.courseId,
-        procurement: health.metrics,
-        media,
-        blocking_issues: health.blocking_issues,
-        repairs: health.repairs,
-      }, 'Automated QA passed; publication is waiting for authorized human course and lesson review.');
+      await updateTask(
+        task,
+        project,
+        'queued',
+        {
+          course_id: target.courseId,
+          procurement: health.metrics,
+          media,
+          blocking_issues: health.blocking_issues,
+          repairs: health.repairs,
+        },
+        'Automated QA passed; publication is waiting for authorized human course and lesson review.',
+      );
       return;
     }
     throw new Error(`Automated course repair exhausted: ${health.blocking_issues.join(' | ')}`);
   }
 
   if (task.worker === 'publisher') {
-    if (!project.user_id) throw new Error('Canonical publication requires an authenticated initiating identity for the audit trail.');
+    if (!project.user_id)
+      throw new Error(
+        'Canonical publication requires an authenticated initiating identity for the audit trail.',
+      );
     const media = await getCourseMediaState(target.courseId, { verifyUrls: true });
     if (!media.completePackage) {
-      throw new Error(`Publication blocked: canonical media package incomplete (${media.complete}/${media.expectedTotal} complete, ${media.failed} failed, ${media.queued} queued, ${media.rendering} rendering).`);
+      throw new Error(
+        `Publication blocked: canonical media package incomplete (${media.complete}/${media.expectedTotal} complete, ${media.failed} failed, ${media.queued} queued, ${media.rendering} rendering).`,
+      );
     }
     const result = await publishPersistedCourseWithClient({
       db,
@@ -324,14 +411,22 @@ export async function processCourseAgenticTask(input: {
       label: 'Agentic Course Builder publication',
     });
     if (!result.ok) {
-      throw new Error(`Publication blocked: ${(result.blocking_issues ?? []).join(' | ') || result.error}`);
+      throw new Error(
+        `Publication blocked: ${(result.blocking_issues ?? []).join(' | ') || result.error}`,
+      );
     }
-    await updateTask(task, project, 'completed', {
-      course_id: target.courseId,
-      procurement_gate: result.procurement_gate,
-      media,
-      published: true,
-    }, 'Canonical course publication completed after deterministic checks and authorized human approval.');
+    await updateTask(
+      task,
+      project,
+      'completed',
+      {
+        course_id: target.courseId,
+        procurement_gate: result.procurement_gate,
+        media,
+        published: true,
+      },
+      'Canonical course publication completed after deterministic checks and authorized human approval.',
+    );
     await db
       .from('agentic_build_runs')
       .update({ status: 'completed', completed_at: new Date().toISOString(), error: null })

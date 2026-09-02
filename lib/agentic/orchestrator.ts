@@ -16,7 +16,10 @@ function taskId(prefix: string, index: number) {
  * Deterministic baseline planner. Domain workers may replace/refine this plan,
  * but PARIS always persists an inspectable task graph before mutations begin.
  */
-export function createBaselineAgenticPlan(targetType: AgenticTargetType, prompt: string): AgenticPlan {
+export function createBaselineAgenticPlan(
+  targetType: AgenticTargetType,
+  prompt: string,
+): AgenticPlan {
   const trimmed = prompt.trim().slice(0, 4000);
   const tasks: AgenticPlanTask[] = [];
   const push = (
@@ -38,21 +41,25 @@ export function createBaselineAgenticPlan(targetType: AgenticTargetType, prompt:
       input,
       costClass: definition.costClass,
       approvalRequired: Boolean(definition.approvalRequired),
+      idempotencyKey: `${worker}:${action}`,
     });
     return id;
   };
 
   if (targetType === 'application') {
-    const interview = push('application-interview', 'collect_next_required_answer', { prompt: trimmed });
+    const interview = push('application-interview', 'collect_next_required_answer', {
+      prompt: trimmed,
+    });
     const qa = push('admissions-qa', 'evaluate_completeness', {}, [interview]);
     push('application-documents', 'evaluate_document_requirements', {}, [interview]);
     push('funding-guidance', 'evaluate_funding_pathway', {}, [interview]);
     push('enrollment', 'wait_for_authorized_approval', {}, [qa]);
   } else if (targetType === 'course' || targetType === 'program') {
     const architecture = push('course-architect', 'plan_learning_structure', { prompt: trimmed });
-    const instruction = targetType === 'course'
-      ? push('instructional-designer', 'design_learning_experience', {}, [architecture])
-      : architecture;
+    const instruction =
+      targetType === 'course'
+        ? push('instructional-designer', 'design_learning_experience', {}, [architecture])
+        : architecture;
     const design = push('visual-designer', 'compose_visual_system', {}, [architecture]);
     const media = push('media-director', 'plan_media', {}, [instruction, design]);
     const qa = push('compliance-qa', 'validate_build', {}, [instruction, design, media]);
@@ -79,7 +86,9 @@ export function createBaselineAgenticPlan(targetType: AgenticTargetType, prompt:
   }
 
   return {
-    summary: trimmed ? `Plan for ${targetType}: ${trimmed.slice(0, 180)}` : `Plan for ${targetType}`,
+    summary: trimmed
+      ? `Plan for ${targetType}: ${trimmed.slice(0, 180)}`
+      : `Plan for ${targetType}`,
     tasks,
   };
 }
@@ -103,11 +112,14 @@ export async function startAgenticRun(input: {
     })
     .select('id, project_id, status, plan, started_at')
     .single();
-  if (runError || !run) throw new Error(`Unable to start agentic run: ${runError?.message || 'unknown error'}`);
+  if (runError || !run)
+    throw new Error(`Unable to start agentic run: ${runError?.message || 'unknown error'}`);
 
   const idMap = new Map<string, string>();
   for (const task of plan.tasks) {
-    const dependencyIds = task.dependencies.map((dependency) => idMap.get(dependency)).filter(Boolean) as string[];
+    const dependencyIds = task.dependencies
+      .map((dependency) => idMap.get(dependency))
+      .filter(Boolean) as string[];
     const { data: row, error } = await db
       .from('agentic_build_tasks')
       .insert({
@@ -120,11 +132,15 @@ export async function startAgenticRun(input: {
         output: {},
         cost_class: task.costClass,
         requires_approval: task.approvalRequired,
+        idempotency_key: task.idempotencyKey ?? `${task.worker}:${task.action}`,
         started_at: null,
       })
       .select('id')
       .single();
-    if (error || !row) throw new Error(`Unable to create agentic task ${task.worker}: ${error?.message || 'unknown error'}`);
+    if (error || !row)
+      throw new Error(
+        `Unable to create agentic task ${task.worker}: ${error?.message || 'unknown error'}`,
+      );
     idMap.set(task.id, row.id);
   }
 
@@ -154,19 +170,22 @@ export async function recordAgenticTaskResult(input: {
       status,
       output: input.result,
       error: input.result.errors?.join('\n') || null,
-      completed_at: status === 'completed' || status === 'failed' || status === 'canceled' ? now : null,
+      completed_at:
+        status === 'completed' || status === 'failed' || status === 'canceled' ? now : null,
     })
     .eq('id', input.taskId)
     .eq('run_id', input.runId);
   if (error) throw new Error(`Unable to record agentic task result: ${error.message}`);
 
   if (input.result.creditsUsed > 0) {
-    await db.rpc('increment_agentic_run_credits', {
-      p_run_id: input.runId,
-      p_credits: input.result.creditsUsed,
-    }).then(({ error: rpcError }) => {
-      if (rpcError) throw new Error(`Unable to record run credits: ${rpcError.message}`);
-    });
+    await db
+      .rpc('increment_agentic_run_credits', {
+        p_run_id: input.runId,
+        p_credits: input.result.creditsUsed,
+      })
+      .then(({ error: rpcError }) => {
+        if (rpcError) throw new Error(`Unable to record run credits: ${rpcError.message}`);
+      });
   }
 
   await db.from('agentic_build_events').insert({
@@ -199,7 +218,11 @@ export async function finishAgenticRun(input: {
     completed_at: input.status === 'completed' ? now : null,
     failed_at: input.status === 'failed' ? now : null,
   };
-  const { error } = await db.from('agentic_build_runs').update(patch).eq('id', input.runId).eq('project_id', input.projectId);
+  const { error } = await db
+    .from('agentic_build_runs')
+    .update(patch)
+    .eq('id', input.runId)
+    .eq('project_id', input.projectId);
   if (error) throw new Error(`Unable to finish agentic run: ${error.message}`);
   await db.from('agentic_build_events').insert({
     project_id: input.projectId,
@@ -233,6 +256,7 @@ export async function createAgenticCheckpoint(input: {
     })
     .select('id, label, created_at')
     .single();
-  if (error || !data) throw new Error(`Unable to create checkpoint: ${error?.message || 'unknown error'}`);
+  if (error || !data)
+    throw new Error(`Unable to create checkpoint: ${error?.message || 'unknown error'}`);
   return data;
 }

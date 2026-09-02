@@ -185,6 +185,7 @@ jobs:
 
       - name: Wake durable Course Builder queue
         run: |
-          curl -fsS --max-time 300 \
+          curl --fail-with-body --silent --show-error --max-time 300 \
+            --max-redirs 0 \
             -H "Authorization: Bearer $CRON_SECRET" \
             "https://admin.elevateforhumanity.org/api/cron/process-course-builder-jobs"

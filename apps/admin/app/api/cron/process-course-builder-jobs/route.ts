@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
@@ -32,11 +32,26 @@ async function _GET(request: Request) {
   const job = data?.[0] as CourseBuildJob | undefined;
   if (!job) return NextResponse.json({ processed: 0 });
 
+  const wakeNext = () =>
+    after(async () => {
+      const url = new URL('/api/cron/process-course-builder-jobs', request.url);
+      await fetch(url, {
+        headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+        cache: 'no-store',
+      }).catch((cause) =>
+        logger.warn('[course-builder-worker] next-job wake-up failed', {
+          error: cause instanceof Error ? cause.message : String(cause),
+        }),
+      );
+    });
+
   try {
     await processCourseBuild(job);
+    wakeNext();
     return NextResponse.json({ processed: 1, jobId: job.id, status: 'completed' });
   } catch (cause) {
     await failCourseBuild(job, cause);
+    wakeNext();
     logger.error(
       '[course-builder-worker] build failed',
       cause instanceof Error ? cause : new Error(String(cause)),

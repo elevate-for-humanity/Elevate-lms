@@ -10,7 +10,7 @@
 
 import { logger } from '@/lib/logger';
 import { normalizeError } from '@/lib/errors/normalize-error';
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -1234,6 +1234,21 @@ async function execTool(
         throw new Error(
           `Unable to queue Course Builder: ${enqueueError?.message ?? 'no job returned'}`,
         );
+
+      after(async () => {
+        const secret = process.env.CRON_SECRET;
+        if (!secret) return;
+        const baseUrl =
+          process.env.ADMIN_URL ||
+          process.env.NEXT_PUBLIC_ADMIN_URL ||
+          'https://admin.elevateforhumanity.org';
+        await fetch(`${baseUrl}/api/cron/process-course-builder-jobs`, {
+          headers: { authorization: `Bearer ${secret}` },
+          cache: 'no-store',
+        }).catch((error) =>
+          logger.warn('[devstudio/chat] Course Builder wake-up failed', normalizeError(error)),
+        );
+      });
 
       return JSON.stringify(
         {

@@ -281,6 +281,9 @@ for (const invariant of [
   'dryRun: false',
   "__type: 'course_saved'",
   'normalizeGeneratedCourseForGovernance',
+  'requestedCourseId',
+  'programId',
+  'programSlug',
 ]) {
   if (!buildCourseBlock.includes(invariant))
     fail(`build_course is not a one-step governed Course Builder operation: ${invariant}`);
@@ -295,6 +298,8 @@ if (buildCourseBlock.includes('/api/admin/courses/ai-builder/generate'))
   fail(
     'build_course regressed to draft-only compatibility endpoint instead of canonical persistence',
   );
+if (adminAiChat.includes("name: 'save_course'") || adminAiChat.includes("case 'save_course'"))
+  fail('obsolete save_course compatibility path was reintroduced');
 
 const preAuthRegistry = read('lib/pre-auth-tables.ts');
 if (

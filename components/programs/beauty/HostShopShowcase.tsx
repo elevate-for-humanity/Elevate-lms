@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Play } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
 import type {
   FeaturedHostPartner,
@@ -46,10 +46,16 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
 export default function HostShopShowcase({
   shops,
   videoTourShopSlug,
+  autoPlayVideoOnVisible = false,
+  narration,
 }: {
   shops: FeaturedHostPartner[];
   /** Limit video playback to the designated tour while retaining other shops as still slides. */
   videoTourShopSlug?: string;
+  /** Start the designated tour, muted, when its section enters the viewport. */
+  autoPlayVideoOnVisible?: boolean;
+  /** Page-specific natural narration used while this section is dominant. */
+  narration?: string;
 }) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
@@ -72,6 +78,7 @@ export default function HostShopShowcase({
   const [interacting, setInteracting] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
+  const sectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -91,6 +98,32 @@ export default function HostShopShowcase({
     }, ROTATION_MS);
     return () => window.clearTimeout(timer);
   }, [activeIndex, interacting, paused, reduceMotion, slides]);
+
+  useEffect(() => {
+    if (!autoPlayVideoOnVisible) return;
+    const section = sectionRef.current;
+    if (!section || !('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const video = section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]');
+        if (!video) return;
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.45) {
+          video.muted = true;
+          void video.play().catch(() => undefined);
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: [0, 0.45, 0.75] },
+    );
+
+    observer.observe(section);
+    return () => {
+      observer.disconnect();
+      section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]')?.pause();
+    };
+  }, [activeIndex, autoPlayVideoOnVisible]);
 
   useEffect(() => {
     if (!slides.length) return;
@@ -132,9 +165,10 @@ export default function HostShopShowcase({
 
   return (
     <section
+      ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
       data-scroll-narration
-      data-narration="Becoming a Host Shop is free. Your business can train future staff in a real workplace, build a dependable talent pipeline, organize apprentice progress with Elevate, and earn revenue from supervised services. Apprentices can earn wages while learning, receive structured hands-on training, document their hours and skills, and work toward completing their apprenticeship requirements."
+      data-narration={narration ?? 'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.'}
       className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-12 text-slate-950 sm:px-6 sm:py-16"
       onMouseEnter={() => setInteracting(true)}
       onMouseLeave={() => setInteracting(false)}
@@ -193,17 +227,27 @@ export default function HostShopShowcase({
                     src={image.src}
                     controls
                     playsInline
+                    muted={autoPlayVideoOnVisible}
+                    data-host-shop-tour
                     poster={image.backdropSrc}
                     onPlay={(event) => {
-                      stopAllNaturalVoicePlayback();
-                      event.currentTarget.muted = false;
-                      event.currentTarget.volume = 1;
+                      if (!event.currentTarget.muted) {
+                        stopAllNaturalVoicePlayback();
+                        event.currentTarget.volume = 1;
+                      }
                     }}
                     onLoadedMetadata={(event) => {
                       event.currentTarget.defaultPlaybackRate = 1;
                       event.currentTarget.playbackRate = 1;
                     }}
-                    onEnded={() => go(1)}
+                    onEnded={(event) => {
+                      if (autoPlayVideoOnVisible) {
+                        event.currentTarget.currentTime = 0;
+                        event.currentTarget.pause();
+                      } else {
+                        go(1);
+                      }
+                    }}
                     preload="metadata"
                     className="host-showcase-media-enter h-full max-w-full object-contain shadow-2xl"
                     aria-label={image.alt}

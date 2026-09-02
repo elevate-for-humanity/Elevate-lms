@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { getPlatformHealth } from '@/lib/platform/platform-health';
 import { emitEvent } from '@/lib/platform/events';
 import { reconcileApplicationRemediations } from '@/lib/automation/reconcile-application-remediations';
+import { reconcileOpenHandsTasks } from '@/lib/devstudio/openhands/runtime';
 
 export type AutopilotTickResult = {
   ok: boolean;
@@ -99,6 +100,20 @@ export async function runPlatformAutopilotTick(): Promise<AutopilotTickResult> {
       const message = error instanceof Error ? error.message : 'application_remediation_failed';
       errors.push(`application_remediation_failed:${message}`);
       logger.warn('[autopilot] application remediation reconciliation failed', { error: message });
+    }
+
+    try {
+      const engineering = await reconcileOpenHandsTasks(10);
+      checks.push(`engineering_tasks_checked:${engineering.checked}`);
+      if (engineering.running) actions.push(`engineering_tasks_running:${engineering.running}`);
+      if (engineering.completed) actions.push(`engineering_tasks_verified:${engineering.completed}`);
+      if (engineering.retried) actions.push(`engineering_repairs_retried:${engineering.retried}`);
+      if (engineering.failed) errors.push(`engineering_tasks_failed:${engineering.failed}`);
+      errors.push(...engineering.errors.map((message) => `engineering_reconcile_failed:${message}`));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'engineering_reconcile_failed';
+      errors.push(`engineering_reconcile_failed:${message}`);
+      logger.warn('[autopilot] engineering reconciliation failed', { error: message });
     }
 
     await emitEvent('autopilot.tick_complete', 'system', {

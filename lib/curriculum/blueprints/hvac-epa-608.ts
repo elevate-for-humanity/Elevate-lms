@@ -613,7 +613,7 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         'Rupture Disc & Pressure Relief',
         'EPA 608 Type III Practice Exam',
         'Core Section Review',
-        'Type I, II, III Comparison Chart',
+        'EPA 608 Study Guide & Type I, II, III Comparison',
         'Full-Length Practice Exam Core',
         'Full-Length Practice Exam Type I',
         'Full-Length Practice Exam Type II',
@@ -642,7 +642,7 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
         },
         {
           slug: 'hvac-lesson-54',
-          title: 'Type I, II, III Comparison Chart',
+          title: 'EPA 608 Study Guide & Type I, II, III Comparison',
           order: 4,
           domainKey: 'epa608_universal',
         },

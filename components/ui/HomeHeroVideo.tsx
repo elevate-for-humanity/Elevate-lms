@@ -38,66 +38,67 @@ interface HomeHeroSlide {
 const HOME_SLIDE_SECONDS = 12;
 const HOME_NARRATION =
   'Welcome to Elevate for Humanity. Explore real career training and apprenticeship pathways built around hands-on learning, local Host Shops, and clear next steps. Choose the path that fits you, and we will help you understand how to begin.';
+const HOME_SLIDES: HomeHeroSlide[] = [
+  {
+    type: 'image',
+    src: '/images/partners/razors-image-storefront.webp',
+    alt: "Razor's Image participating apprenticeship barbershop storefront",
+    label: 'Train with real businesses in your community',
+    description:
+      'Explore structured apprenticeships connected to participating local shops and experienced professionals.',
+    toneClass: 'brightness-[1.04] contrast-[1.04] saturate-[1.03] object-center',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp',
+    alt: 'Professional nail work created inside a participating beauty salon',
+    label: 'Turn talent into a professional pathway',
+    description:
+      'Build technique, confidence, and documented experience through supervised, hands-on training.',
+    toneClass: 'brightness-[1.03] contrast-[1.04] saturate-[1.05] object-center',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/generations-hair/premium-curls.jpg',
+    alt: 'Dimensional curls created by Generations Hair Co',
+    label: 'See the professional standard apprentices work toward',
+    description:
+      'Develop technique, consistency, and confidence through structured training in a real salon environment.',
+    toneClass: 'brightness-[1.04] contrast-[1.03] saturate-[1.04] object-[center_42%]',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/generations-hair/premium-stylist-at-work.jpg',
+    alt: 'Generations Hair Co stylist working with a client',
+    label: 'Learn beside working beauty professionals',
+    description:
+      'Connect theory with supervised client service, workplace routines, and professional expectations.',
+    toneClass: 'brightness-[1.03] contrast-[1.04] saturate-[1.03] object-center',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/kountry-kutz-official.webp',
+    alt: 'Kountry Kutz participating apprenticeship host barbershop',
+    label: 'Earn while you learn inside a Host Shop',
+    description:
+      'Apprentices gain supervised experience while participating businesses develop future talent.',
+    toneClass: 'brightness-[1.04] contrast-[1.04] saturate-[1.03] object-center',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/cals-kutz-confidence-restored.webp',
+    alt: 'Professional barber service at Cals Kutz Studio',
+    label: 'Build confidence through real experience',
+    description:
+      'Move from learning to working with a clear pathway, practical support, and measurable progress.',
+    toneClass: 'brightness-[1.04] contrast-[1.04] saturate-[1.03] object-center',
+  },
+];
 
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   const heroRef = useRef<HTMLElement | null>(null);
   const [heroVisible, setHeroVisible] = useState(false);
-  const slides: HomeHeroSlide[] = [
-    {
-      type: 'image',
-      src: '/images/partners/razors-image-storefront.webp',
-      alt: "Razor's Image participating apprenticeship barbershop storefront",
-      label: 'Train with real businesses in your community',
-      description:
-        'Explore structured apprenticeships connected to participating local shops and experienced professionals.',
-      toneClass: 'brightness-[1.04] contrast-[1.04] saturate-[1.03] object-center',
-    },
-    {
-      type: 'image',
-      src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp',
-      alt: 'Professional nail work created inside a participating beauty salon',
-      label: 'Turn talent into a professional pathway',
-      description:
-        'Build technique, confidence, and documented experience through supervised, hands-on training.',
-      toneClass: 'brightness-[1.03] contrast-[1.04] saturate-[1.05] object-center',
-    },
-    {
-      type: 'image',
-      src: '/images/partners/generations-hair/premium-curls.jpg',
-      alt: 'Dimensional curls created by Generations Hair Co',
-      label: 'See the professional standard apprentices work toward',
-      description:
-        'Develop technique, consistency, and confidence through structured training in a real salon environment.',
-      toneClass: 'brightness-[1.04] contrast-[1.03] saturate-[1.04] object-[center_42%]',
-    },
-    {
-      type: 'image',
-      src: '/images/partners/generations-hair/premium-stylist-at-work.jpg',
-      alt: 'Generations Hair Co stylist working with a client',
-      label: 'Learn beside working beauty professionals',
-      description:
-        'Connect theory with supervised client service, workplace routines, and professional expectations.',
-      toneClass: 'brightness-[1.03] contrast-[1.04] saturate-[1.03] object-center',
-    },
-    {
-      type: 'image',
-      src: '/images/partners/kountry-kutz-official.webp',
-      alt: 'Kountry Kutz participating apprenticeship host barbershop',
-      label: 'Earn while you learn inside a Host Shop',
-      description:
-        'Apprentices gain supervised experience while participating businesses develop future talent.',
-      toneClass: 'brightness-[1.04] contrast-[1.04] saturate-[1.03] object-center',
-    },
-    {
-      type: 'image',
-      src: '/images/partners/cals-kutz-confidence-restored.webp',
-      alt: 'Professional barber service at Cals Kutz Studio',
-      label: 'Build confidence through real experience',
-      description:
-        'Move from learning to working with a clear pathway, practical support, and measurable progress.',
-      toneClass: 'brightness-[1.04] contrast-[1.04] saturate-[1.03] object-center',
-    },
-  ];
+  const slides = HOME_SLIDES;
 
   const [activeSlide, setActiveSlide] = useState(0);
   const [previousSlide, setPreviousSlide] = useState<HomeHeroSlide | null>(null);
@@ -211,7 +212,10 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           </div>
         </div>
 
-        <div className="relative order-1 w-full overflow-hidden bg-slate-950 lg:order-2">
+        <div
+          className="relative order-1 w-full overflow-hidden bg-[#f4f1ec] bg-cover bg-center lg:order-2"
+          style={{ backgroundImage: `url(${slides[0]?.src})` }}
+        >
           {previousSlide ? (
             <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
               <HeroVideo

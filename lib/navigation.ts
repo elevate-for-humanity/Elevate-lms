@@ -15,8 +15,16 @@ export const NAV_ITEMS: NavItem[] = [
     subItems: [
       { name: 'All Programs', href: ROUTES.programs, isSectionLink: true },
       { name: 'Business & Financial', isHeader: true, href: '/programs/business' },
-      { name: 'Business Administration', href: '/programs/business-administration', isSectionLink: true },
-      { name: 'Administrative Assistant', href: '/programs/administrative-assistant', isSectionLink: true },
+      {
+        name: 'Business Administration',
+        href: '/programs/business-administration',
+        isSectionLink: true,
+      },
+      {
+        name: 'Administrative Assistant',
+        href: '/programs/administrative-assistant',
+        isSectionLink: true,
+      },
       { name: 'Bookkeeping & QuickBooks', href: '/programs/bookkeeping', isSectionLink: true },
       { name: 'Financial Literacy', href: '/programs/financial-literacy', isSectionLink: true },
       { name: 'Tax Preparation', href: '/programs/tax-preparation', isSectionLink: true },
@@ -33,8 +41,16 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'HVAC', href: ROUTES.programsHVAC, isSectionLink: true },
       { name: 'CDL Training', href: ROUTES.programsCDL, isSectionLink: true },
       { name: 'Welding', href: '/programs/welding', isSectionLink: true },
-      { name: 'Automotive Technician', href: '/programs/automotive-technician', isSectionLink: true },
-      { name: 'Construction Trades', href: '/programs/construction-trades-certification', isSectionLink: true },
+      {
+        name: 'Automotive Technician',
+        href: '/programs/automotive-technician',
+        isSectionLink: true,
+      },
+      {
+        name: 'Construction Trades',
+        href: '/programs/construction-trades-certification',
+        isSectionLink: true,
+      },
       { name: 'Beauty Apprenticeships', isHeader: true, href: ROUTES.programsBeauty },
       { name: 'Barber', href: ROUTES.programsBarber, isSectionLink: true },
       { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },
@@ -42,7 +58,11 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Nail Technician', href: ROUTES.programsNailTech, isSectionLink: true },
       { name: 'Technology', isHeader: true, href: ROUTES.programsTechnology },
       { name: 'IT Help Desk', href: '/programs/it-help-desk', isSectionLink: true },
-      { name: 'Cybersecurity Analyst', href: '/programs/cybersecurity-analyst', isSectionLink: true },
+      {
+        name: 'Cybersecurity Analyst',
+        href: '/programs/cybersecurity-analyst',
+        isSectionLink: true,
+      },
       { name: 'Web Development', href: '/programs/web-development', isSectionLink: true },
       { name: 'Data Analytics', href: '/programs/data-analytics', isSectionLink: true },
     ],
@@ -54,6 +74,8 @@ export const NAV_ITEMS: NavItem[] = [
     subItems: [
       { name: 'How It Works', href: ROUTES.apprenticeshipsHowItWorks, isSectionLink: true },
       { name: 'All Apprenticeships', href: ROUTES.apprenticeships, isSectionLink: true },
+      { name: 'All Host Sites', href: ROUTES.apprenticeshipsHostShop, isSectionLink: true },
+      { name: 'Become a Host Site', href: ROUTES.apprenticeshipsHostShop, isSectionLink: true },
       { name: 'Programs', isHeader: true },
       { name: 'Barber', href: ROUTES.programsBarber, isSectionLink: true },
       { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },
@@ -93,7 +115,6 @@ export const NAV_ITEMS: NavItem[] = [
     href: ROUTES.employers,
     subItems: [
       { name: 'Hire Graduates', href: ROUTES.employersHireGraduates, isSectionLink: true },
-      { name: 'Become a Host Site', href: ROUTES.apprenticeshipsHostShop, isSectionLink: true },
       { name: 'Post a Job', href: ROUTES.employersPostJob, isSectionLink: true },
       { name: 'Workforce Agency Tools', href: ROUTES.forAgencies, isSectionLink: true },
       { name: 'Request Demo', href: ROUTES.storeDemo, isSectionLink: true },
@@ -118,22 +139,57 @@ export const NAV_ITEMS: NavItem[] = [
     subItems: [
       { name: 'All Apps & Portals', href: '/online-apps', isSectionLink: true },
       { name: 'Learners', isHeader: true },
-      { name: 'Student / LMS Portal', href: ROUTES.studentPortal, isSectionLink: true, isAuth: true },
-      { name: 'Apprentice Portal', href: ROUTES.apprenticePortal, isSectionLink: true, isAuth: true },
+      {
+        name: 'Student / LMS Portal',
+        href: ROUTES.studentPortal,
+        isSectionLink: true,
+        isAuth: true,
+      },
+      {
+        name: 'Apprentice Portal',
+        href: ROUTES.apprenticePortal,
+        isSectionLink: true,
+        isAuth: true,
+      },
       { name: 'Parent Portal', href: ROUTES.parentPortal, isSectionLink: true, isAuth: true },
       { name: 'Employers & Host Sites', isHeader: true },
       { name: 'Employer Portal', href: ROUTES.employerPortal, isSectionLink: true, isAuth: true },
       { name: 'Host Site Portal', href: ROUTES.hostShopPortal, isSectionLink: true, isAuth: true },
       { name: 'Workforce & Providers', isHeader: true },
       { name: 'Workforce Portal', href: ROUTES.workforcePortal, isSectionLink: true, isAuth: true },
-      { name: 'Workforce Board Portal', href: ROUTES.workforceBoardPortal, isSectionLink: true, isAuth: true },
-      { name: 'Case Manager Portal', href: ROUTES.caseManagerPortal, isSectionLink: true, isAuth: true },
+      {
+        name: 'Workforce Board Portal',
+        href: ROUTES.workforceBoardPortal,
+        isSectionLink: true,
+        isAuth: true,
+      },
+      {
+        name: 'Case Manager Portal',
+        href: ROUTES.caseManagerPortal,
+        isSectionLink: true,
+        isAuth: true,
+      },
       { name: 'Provider Portal', href: ROUTES.providerPortal, isSectionLink: true, isAuth: true },
-      { name: 'Program Holder Portal', href: ROUTES.programHolderPortal, isSectionLink: true, isAuth: true },
+      {
+        name: 'Program Holder Portal',
+        href: ROUTES.programHolderPortal,
+        isSectionLink: true,
+        isAuth: true,
+      },
       { name: 'Staff & Platform', isHeader: true },
-      { name: 'Instructor Portal', href: ROUTES.instructorPortal, isSectionLink: true, isAuth: true },
+      {
+        name: 'Instructor Portal',
+        href: ROUTES.instructorPortal,
+        isSectionLink: true,
+        isAuth: true,
+      },
       { name: 'Staff Portal', href: ROUTES.staffPortal, isSectionLink: true, isAuth: true },
-      { name: 'Testing Center Operations', href: ROUTES.testingPortal, isSectionLink: true, isAuth: true },
+      {
+        name: 'Testing Center Operations',
+        href: ROUTES.testingPortal,
+        isSectionLink: true,
+        isAuth: true,
+      },
       { name: 'Creator Studio', href: ROUTES.creatorPortal, isSectionLink: true, isAuth: true },
       { name: 'Admin Portal', href: ROUTES.adminPortal, isSectionLink: true, isAuth: true },
     ],
@@ -150,12 +206,18 @@ export const NAV_ITEMS: NavItem[] = [
     href: ROUTES.about,
     subItems: [
       { name: 'Mission', href: ROUTES.about, isSectionLink: true },
-      { name: 'Apprenticeship Sponsor of Record', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
+      {
+        name: 'Apprenticeship Sponsor of Record',
+        href: ROUTES.apprenticeshipSponsor,
+        isSectionLink: true,
+      },
     ],
   },
 ];
 
-export function findDuplicateNavHrefs(navItems: NavItem[]): Array<{ href: string; items: NavItem[] }> {
+export function findDuplicateNavHrefs(
+  navItems: NavItem[],
+): Array<{ href: string; items: NavItem[] }> {
   const hrefMap = new Map<string, NavItem[]>();
   for (const item of navItems) {
     if (!item.href) continue;

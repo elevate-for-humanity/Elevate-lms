@@ -38,16 +38,18 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
 
   return (
     <>
-      <HostShopShowcase
-        shops={shops}
-        mediaOverrides={{
-          'generations-hair-llc': {
-            src: '/images/partners/generations-hair/highlighted-curls-home.webp',
-            alt: 'Highlighted dimensional curls created by Generations Hair LLC in Martinsville, Indiana',
-            kind: 'photo',
-          },
-        }}
-      />
+      {programSlug !== 'cosmetology-apprenticeship' ? (
+        <HostShopShowcase
+          shops={shops}
+          mediaOverrides={{
+            'generations-hair-llc': {
+              src: '/images/partners/generations-hair/highlighted-curls-home.webp',
+              alt: 'Highlighted dimensional curls created by Generations Hair LLC in Martinsville, Indiana',
+              kind: 'photo',
+            },
+          }}
+        />
+      ) : null}
 
       <section
         className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 sm:py-16"

@@ -116,6 +116,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
+        <link rel="preload" as="image" href="/images/partners/razors-image-storefront.webp" />
+        <link rel="preload" as="image" href="/images/logo.png" />
         <SupabasePublicConfigScript />
         <script
           type="application/ld+json"

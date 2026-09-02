@@ -42,9 +42,11 @@ export function ScrollNarrator() {
   const narrateVisibleSection = useCallback(async () => {
     const section = mostVisiblePageSection();
     if (!section) {
-      // Keep the current sentence playing while the viewport crosses spacing
-      // between narrated sections. Route changes and the user's off control are
-      // the authorities that stop playback outside a replacement section.
+      // A section owns its narration only while it is visibly dominant. Stop
+      // at section boundaries so speech from one area can never overlap the
+      // next area or continue after the visitor has scrolled away.
+      lastNarrationRef.current = null;
+      stop();
       return;
     }
 

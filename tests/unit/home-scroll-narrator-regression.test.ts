@@ -13,13 +13,13 @@ describe('homepage scroll narration lifecycle', () => {
     expect(scheduler).not.toContain('stop()');
   });
 
-  it('does not stop narration while crossing a gap between sections', () => {
+  it('releases narration when no page section owns the viewport', () => {
     const noSection = source.slice(
       source.indexOf('if (!section)'),
       source.indexOf('const text = narrationFor(section)'),
     );
-    expect(noSection).not.toContain('stop()');
-    expect(noSection).not.toContain('lastNarrationRef.current = null');
+    expect(noSection).toContain('stop()');
+    expect(noSection).toContain('lastNarrationRef.current = null');
   });
 
   it('warms opening narration and evaluates the initial viewport', () => {

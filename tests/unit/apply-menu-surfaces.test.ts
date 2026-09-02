@@ -33,4 +33,13 @@ describe('Apply menu surfaces', () => {
   it('documents the two canonical extra host apply links', () => {
     expect(EXTRA_HOST_APPLY_LINKS).toHaveLength(2);
   });
+
+  it('owns Host Site discovery under Apprenticeships instead of Employers', () => {
+    const apprenticeships = NAV_ITEMS.find((item) => item.id === 'apprenticeships');
+    const employers = NAV_ITEMS.find((item) => item.id === 'employers');
+
+    expect(apprenticeships?.subItems?.some((item) => item.name === 'All Host Sites')).toBe(true);
+    expect(apprenticeships?.subItems?.some((item) => item.name === 'Become a Host Site')).toBe(true);
+    expect(employers?.subItems?.some((item) => /Host Site/.test(item.name))).toBe(false);
+  });
 });

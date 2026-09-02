@@ -96,7 +96,6 @@ const retiredMutationRoutes = [
   'apps/admin/app/api/admin/courses/[courseId]/generate-missing/route.ts',
   'apps/admin/app/api/admin/courses/[courseId]/publish/route.ts',
   'apps/admin/app/api/admin/courses/[courseId]/review/route.ts',
-  'apps/admin/app/api/admin/courses/ai-builder/generate/route.ts',
   'apps/lms/app/api/ai/generate-and-publish-course/route.ts',
   'apps/admin/app/api/admin/courses/generate/publish/route.ts',
   'supabase/functions/ai-course-create/index.ts',

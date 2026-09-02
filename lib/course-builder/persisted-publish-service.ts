@@ -20,6 +20,37 @@ function hasContent(value: unknown): boolean {
 }
 export const AUTOMATED_COURSE_GATE_VERSION = 'course-quality-v1';
 
+async function ensureCourseCompletionBadge(
+  db: SupabaseClient,
+  course: { id: string; title?: string | null; slug?: string | null },
+) {
+  const key = `course_${course.id.replaceAll('-', '_')}_complete`;
+  const { data, error } = await db
+    .from('badge_definitions')
+    .upsert(
+      {
+        key,
+        name: `${course.title || 'Course'} Completion`,
+        description: `Awarded after completing ${course.title || 'the course'} and satisfying its mastery requirements.`,
+        badge_type: 'completion',
+        criteria: {
+          type: 'course_complete',
+          course_id: course.id,
+          course_slug: course.slug ?? null,
+          gate_version: AUTOMATED_COURSE_GATE_VERSION,
+        },
+        points_reward: 250,
+        rarity: 'rare',
+        is_active: true,
+      },
+      { onConflict: 'key' },
+    )
+    .select('id,key,name')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 /**
  * Canonical persisted-course procurement gate.
  * Static repository catalogs are intentionally unsupported; persisted records
@@ -256,6 +287,22 @@ export async function publishPersistedCourseWithClient(input: {
   label?: string;
   request?: NextRequest;
 }) {
+  const { data: course, error: courseError } = await input.db
+    .from('courses')
+    .select('id,title,slug')
+    .eq('id', input.courseId)
+    .maybeSingle();
+  if (courseError) throw courseError;
+  if (!course) {
+    return {
+      ok: false as const,
+      error: 'COURSE_NOT_FOUND',
+      blocking_issues: ['course not found'],
+      metrics: {},
+      repairs: [],
+    };
+  }
+
   const health = await repairPersistedCourseAcceptanceWithClient({
     db: input.db,
     courseId: input.courseId,
@@ -309,6 +356,7 @@ export async function publishPersistedCourseWithClient(input: {
     };
   }
   const result = await publishCourse(input.db, input.courseId, input.actorId, input.label);
+  const badge = await ensureCourseCompletionBadge(input.db, course);
   await logAdminAudit({
     action: AdminAction.COURSE_PUBLISHED,
     actorId: input.actorId,
@@ -320,6 +368,7 @@ export async function publishPersistedCourseWithClient(input: {
       procurement_gate: health.metrics,
       review_mode: 'automated_quality_gate',
       automated_approval_id: automatedApprovalId,
+      badge_definition_id: badge.id,
       repairs: health.repairs,
     },
     req: input.request,
@@ -327,6 +376,7 @@ export async function publishPersistedCourseWithClient(input: {
   return {
     ok: true as const,
     automated_approval_id: automatedApprovalId,
+    badge,
     procurement_gate: health.metrics,
     repairs: health.repairs,
     ...result,

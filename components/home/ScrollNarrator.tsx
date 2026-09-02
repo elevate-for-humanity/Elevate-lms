@@ -5,7 +5,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
-const SCROLL_SETTLE_MS = 220;
+const SCROLL_SETTLE_MS = 90;
 
 function narrationFor(section: HTMLElement) {
   return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';
@@ -42,8 +42,9 @@ export function ScrollNarrator() {
   const narrateVisibleSection = useCallback(async () => {
     const section = mostVisiblePageSection();
     if (!section) {
-      lastNarrationRef.current = null;
-      stop();
+      // Keep the current sentence playing while the viewport crosses spacing
+      // between narrated sections. Route changes and the user's off control are
+      // the authorities that stop playback outside a replacement section.
       return;
     }
 
@@ -79,8 +80,18 @@ export function ScrollNarrator() {
 
     const preload = (section: HTMLElement) => {
       const text = narrationFor(section);
-      if (text) void prepare(text, { voice: 'coral', style: 'assistant', rate: 0.98, allowBrowserFallback: false });
+      if (text)
+        void prepare(text, {
+          voice: 'coral',
+          style: 'assistant',
+          rate: 0.98,
+          allowBrowserFallback: false,
+        });
     };
+
+    // Warm the opening experience immediately. A section may become dominant
+    // before an observer callback runs on fast mobile scrolls.
+    sections.slice(0, 3).forEach(preload);
 
     if (!('IntersectionObserver' in window)) {
       sections.slice(0, 2).forEach(preload);
@@ -112,11 +123,15 @@ export function ScrollNarrator() {
 
     const scheduleNarration = () => {
       if (timerRef.current) window.clearTimeout(timerRef.current);
-      if (isPlaying || isLoading) stop();
       timerRef.current = window.setTimeout(() => {
         void narrateVisibleSection();
       }, SCROLL_SETTLE_MS);
     };
+
+    // Resolve the initially visible section without requiring a throwaway
+    // scroll gesture. Browser media policy still keeps actual playback under
+    // the visitor's interaction/permission boundary.
+    scheduleNarration();
 
     window.addEventListener('scroll', scheduleNarration, { passive: true });
     window.addEventListener('wheel', scheduleNarration, { passive: true });
@@ -134,7 +149,7 @@ export function ScrollNarrator() {
       window.removeEventListener('resize', scheduleNarration);
       if (timerRef.current) window.clearTimeout(timerRef.current);
     };
-  }, [enabled, isLoading, isPlaying, narrateVisibleSection, stop]);
+  }, [enabled, narrateVisibleSection, stop]);
 
   const toggle = () => {
     setNotice(null);

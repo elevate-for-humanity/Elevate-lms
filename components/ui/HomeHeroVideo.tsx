@@ -63,12 +63,21 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     },
     {
       type: 'image',
-      src: '/images/partners/generations-hair/salon-service.webp',
-      alt: 'A professional salon service at Generations Hair',
-      label: 'Learn in polished, professional environments',
+      src: '/images/partners/generations-hair/premium-curls.jpg',
+      alt: 'Dimensional curls created by Generations Hair Co',
+      label: 'See the professional standard apprentices work toward',
       description:
-        'Connect theory with real workplace routines, client care, and the standards employers expect.',
-      toneClass: 'brightness-[1.04] contrast-[1.03] saturate-[1.03] object-[center_38%]',
+        'Develop technique, consistency, and confidence through structured training in a real salon environment.',
+      toneClass: 'brightness-[1.04] contrast-[1.03] saturate-[1.04] object-[center_42%]',
+    },
+    {
+      type: 'image',
+      src: '/images/partners/generations-hair/premium-stylist-at-work.jpg',
+      alt: 'Generations Hair Co stylist working with a client',
+      label: 'Learn beside working beauty professionals',
+      description:
+        'Connect theory with supervised client service, workplace routines, and professional expectations.',
+      toneClass: 'brightness-[1.03] contrast-[1.04] saturate-[1.03] object-center',
     },
     {
       type: 'image',

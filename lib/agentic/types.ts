@@ -10,6 +10,48 @@ export type AgenticTargetType =
   | 'dev_studio';
 
 export type AgenticProjectStatus = 'active' | 'paused' | 'completed' | 'failed' | 'archived';
+export type AgenticProjectLifecycleStatus =
+  | 'discovery'
+  | 'planned'
+  | 'approved'
+  | 'designing'
+  | 'building'
+  | 'validating'
+  | 'repairing'
+  | 'preview_ready'
+  | 'awaiting_approval'
+  | 'publishing'
+  | 'live'
+  | 'blocked'
+  | 'publish_failed'
+  | 'rolling_back'
+  | 'rolled_back'
+  | 'cancelled'
+  | 'archived';
+
+export type AgenticProjectSourceType =
+  | 'blank'
+  | 'prompt'
+  | 'template'
+  | 'remix'
+  | 'github'
+  | 'gitlab'
+  | 'public_site'
+  | 'existing_elevate_asset';
+
+export interface AgenticArtifactManifest {
+  schemaVersion: 1;
+  artifactType: string;
+  authority: string;
+  targetId?: string | null;
+  state: Record<string, unknown>;
+  validation: {
+    status: 'not_run' | 'running' | 'passed' | 'failed';
+    blockingFindings: string[];
+    warnings: string[];
+    evidence: Array<Record<string, unknown>>;
+  };
+}
 export type AgenticExecutionStatus =
   | 'queued'
   | 'running'
@@ -74,6 +116,15 @@ export interface AgenticProjectRecord {
   title: string;
   original_prompt: string | null;
   status: AgenticProjectStatus;
+  lifecycle_status?: AgenticProjectLifecycleStatus;
+  source_type?: AgenticProjectSourceType;
+  artifact_manifest?: AgenticArtifactManifest | Record<string, unknown>;
+  design_system?: Record<string, unknown>;
+  approved_plan?: AgenticPlan | Record<string, unknown>;
+  subscription_requirements?: Record<string, unknown>;
+  template_version_id?: string | null;
+  current_checkpoint_id?: string | null;
+  current_release_id?: string | null;
   locale: string;
   metadata: Record<string, unknown>;
   created_at: string;

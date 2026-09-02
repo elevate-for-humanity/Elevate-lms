@@ -2,9 +2,12 @@ import crypto from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type {
   AgenticInputMode,
+  AgenticProjectLifecycleStatus,
   AgenticProjectRecord,
+  AgenticProjectSourceType,
   AgenticTargetType,
 } from './types';
+import { assertAgenticProjectTransition } from './project-lifecycle';
 
 function hashResumeToken(token: string): string {
   return crypto.createHash('sha256').update(token).digest('hex');
@@ -24,30 +27,89 @@ export async function createAgenticProject(input: {
   targetId?: string | null;
   metadata?: Record<string, unknown>;
   resumeToken?: string;
+  sourceType?: AgenticProjectSourceType;
 }): Promise<{ project: AgenticProjectRecord; resumeToken: string | null }> {
   const db = await requireAdminClient();
   const resumeToken = input.resumeToken ?? (!input.userId ? createResumeToken() : null);
-  const { data, error } = await db
+  const baseRow = {
+    tenant_id: input.tenantId ?? null,
+    user_id: input.userId ?? null,
+    target_type: input.targetType,
+    target_id: input.targetId ?? null,
+    title: input.title,
+    original_prompt: input.originalPrompt ?? null,
+    locale: input.locale ?? 'en',
+    resume_token_hash: resumeToken ? hashResumeToken(resumeToken) : null,
+    metadata: input.metadata ?? {},
+  };
+  let { data, error } = await db
     .from('agentic_build_projects')
     .insert({
-      tenant_id: input.tenantId ?? null,
-      user_id: input.userId ?? null,
-      target_type: input.targetType,
-      target_id: input.targetId ?? null,
-      title: input.title,
-      original_prompt: input.originalPrompt ?? null,
-      locale: input.locale ?? 'en',
-      resume_token_hash: resumeToken ? hashResumeToken(resumeToken) : null,
-      metadata: input.metadata ?? {},
+      ...baseRow,
+      lifecycle_status: 'discovery',
+      source_type: input.sourceType ?? (input.originalPrompt ? 'prompt' : 'blank'),
     })
     .select('*')
     .single();
+
+  // Production migrations are applied independently of application rollout.
+  // Preserve creation during that compatibility window. Migration defaults
+  // populate the canonical lifecycle after the columns become available.
+  if (
+    error?.code === '42703' ||
+    error?.message?.includes('lifecycle_status') ||
+    error?.message?.includes('source_type')
+  ) {
+    const legacy = await db.from('agentic_build_projects').insert(baseRow).select('*').single();
+    data = legacy.data;
+    error = legacy.error;
+  }
 
   if (error || !data) {
     throw new Error(`Unable to create agentic project: ${error?.message || 'unknown error'}`);
   }
 
   return { project: data as AgenticProjectRecord, resumeToken };
+}
+
+export async function transitionAgenticProject(input: {
+  project: AgenticProjectRecord;
+  to: AgenticProjectLifecycleStatus;
+  actorId?: string | null;
+  reason?: string;
+  evidence?: Array<Record<string, unknown>>;
+}): Promise<AgenticProjectRecord> {
+  const db = await requireAdminClient();
+  const from = input.project.lifecycle_status ?? 'discovery';
+  assertAgenticProjectTransition(from, input.to);
+
+  const now = new Date().toISOString();
+  const { data, error } = await db
+    .from('agentic_build_projects')
+    .update({ lifecycle_status: input.to, updated_at: now })
+    .eq('id', input.project.id)
+    .eq('lifecycle_status', from)
+    .select('*')
+    .maybeSingle();
+  if (error) throw new Error(`Unable to transition agentic project: ${error.message}`);
+  if (!data)
+    throw new Error('Agentic project changed while its lifecycle transition was being applied');
+
+  const { error: eventError } = await db.from('agentic_build_events').insert({
+    project_id: input.project.id,
+    event_type: 'agentic.project.lifecycle_transitioned',
+    summary: `${from} -> ${input.to}`,
+    payload: {
+      from,
+      to: input.to,
+      actor_id: input.actorId ?? null,
+      reason: input.reason ?? null,
+      evidence: input.evidence ?? [],
+    },
+  });
+  if (eventError)
+    throw new Error(`Unable to audit agentic project transition: ${eventError.message}`);
+  return data as AgenticProjectRecord;
 }
 
 export async function loadAgenticProject(input: {
@@ -112,7 +174,8 @@ export async function updateAgenticProjectMetadata(input: {
     .select('*')
     .single();
 
-  if (error || !data) throw new Error(`Unable to update agentic project: ${error?.message || 'unknown error'}`);
+  if (error || !data)
+    throw new Error(`Unable to update agentic project: ${error?.message || 'unknown error'}`);
   return data as AgenticProjectRecord;
 }
 

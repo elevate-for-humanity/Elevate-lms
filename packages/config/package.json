@@ -1,9 +1,0 @@
-{
-  "name": "@elevate/config",
-  "version": "0.1.0",
-  "private": true,
-  "exports": {
-    "./env": "./src/env.ts",
-    ".": "./src/index.ts"
-  }
-}

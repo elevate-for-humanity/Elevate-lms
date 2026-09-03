@@ -1,8 +1,0 @@
-import Link from 'next/link';
-import { AlertTriangle, CheckCircle2 } from 'lucide-react';
-import type { HostShopReadinessItem } from '@/lib/partners/host-shop-readiness';
-
-export default function HostShopReadinessBanner({ items }: { items: HostShopReadinessItem[] }) {
-  if (!items.length) return <section className="mx-auto mt-5 max-w-7xl rounded-2xl border border-emerald-300 bg-emerald-50 px-5 py-4 text-emerald-950"><div className="flex items-center gap-3"><CheckCircle2 className="h-5 w-5 shrink-0"/><div><h2 className="font-black">Host Shop onboarding complete</h2><p className="text-sm font-semibold">All required readiness items are complete. Operational tools and exports are available.</p></div></div></section>;
-  return <section role="alert" className="mx-auto mt-5 max-w-7xl rounded-2xl border-2 border-red-400 bg-red-50 px-5 py-5 text-red-950"><div className="flex gap-3"><AlertTriangle className="mt-0.5 h-6 w-6 shrink-0"/><div className="min-w-0 flex-1"><h2 className="text-lg font-black">Outstanding Host Shop requirements ({items.length})</h2><p className="mt-1 text-sm font-semibold">Your operational portal remains available. Items below must be resolved before the shop is marked fully compliant.</p><ul className="mt-4 grid gap-3 md:grid-cols-2">{items.map((item) => <li key={item.key} className={`rounded-xl border bg-white p-4 ${item.severity === 'required' ? 'border-red-300' : 'border-amber-300'}`}><h3 className="font-black">{item.title}</h3><p className="mt-1 text-sm font-medium leading-5">{item.detail}</p><Link href={item.href} className="mt-3 inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-black text-white">Resolve item</Link></li>)}</ul></div></div></section>;
-}

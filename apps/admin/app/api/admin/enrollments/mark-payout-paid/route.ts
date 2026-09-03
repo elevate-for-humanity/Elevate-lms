@@ -5,7 +5,10 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { getProgramHolderPaymentReadiness } from '@/lib/program-holder/onboarding-readiness';
+import {
+  getProgramHolderPaymentReadiness,
+  getStudentPaymentReadiness,
+} from '@/lib/program-holder/onboarding-readiness';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,12 +43,16 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
   if (!paymentEnrollment?.program_holder_id)
     return safeError('Program Holder assignment required before payment', 409);
-  const readiness = await getProgramHolderPaymentReadiness(db, paymentEnrollment.program_holder_id);
-  if (!readiness.ready) {
+  const [holderReadiness, studentReadiness] = await Promise.all([
+    getProgramHolderPaymentReadiness(db, paymentEnrollment.program_holder_id),
+    getStudentPaymentReadiness(db, enrollment_id),
+  ]);
+  if (!holderReadiness.ready || !studentReadiness.ready) {
     return NextResponse.json(
       {
-        error: 'Payment is on hold until Program Holder onboarding is complete.',
-        missing_requirements: readiness.missing,
+        error:
+          'Payment is on hold until Program Holder onboarding and this student’s graduation closeout are complete.',
+        missing_requirements: [...holderReadiness.missing, ...studentReadiness.missing],
       },
       { status: 409 },
     );

@@ -10,6 +10,8 @@ import {
 } from 'lucide-react';
 import { getProgramHolderWorkspace, programTitle } from '@/lib/program-holder/workspace';
 import { ProgramHolderDocumentUpload } from './ProgramHolderDocumentUpload';
+import { ProgramHolderTrainingLogForm } from './ProgramHolderTrainingLogForm';
+import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseoutForm';
 
 type Section =
   | 'dashboard'
@@ -66,7 +68,8 @@ export async function ProgramHolderWorkspaceView({
     return <Students title="Enrolled Students" rows={data.enrollments} programs={data.programs} />;
   if (section === 'pending') return <Applicants rows={data.applicants} programs={data.programs} />;
   if (section === 'programs') return <Programs data={data} />;
-  if (section === 'hours') return <Hours rows={data.hours} programs={data.programs} />;
+  if (section === 'hours')
+    return <Hours rows={data.hours} programs={data.programs} enrollments={data.enrollments} />;
   if (section === 'compliance')
     return <Compliance score={complianceScore} items={complianceItems} atRisk={atRisk.length} />;
   if (section === 'documents') return <Documents rows={data.documents} />;
@@ -212,6 +215,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             <th className="px-3 py-3">Program</th>
             <th className="px-3 py-3">Enrollment</th>
             <th className="px-3 py-3">Progress</th>
+            <th className="px-3 py-3">Training dates</th>
             <th className="px-3 py-3">Next action</th>
           </tr>
         </thead>
@@ -230,12 +234,16 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   {String(row.enrollment_state || row.status || 'enrolled').replaceAll('_', ' ')}
                 </td>
                 <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
+                <td className="px-3 py-4 text-xs">
+                  <span className="block">Start: {row.training_start_date || 'Missing'}</span>
+                  <span className="block">End: {row.training_end_date || 'Missing'}</span>
+                </td>
                 <td className="px-3 py-4">{row.next_required_action || 'Continue training'}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={5} className="px-3 py-8 text-center text-slate-500">
+              <td colSpan={6} className="px-3 py-8 text-center text-slate-500">
                 No confirmed student enrollments are linked.
               </td>
             </tr>
@@ -247,6 +255,12 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
 }
 
 function Students({ title, rows, programs }: { title: string; rows: any[]; programs: any[] }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const sevenDays = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  const finalWeek = rows.filter(
+    (row) =>
+      row.training_end_date && row.training_end_date >= today && row.training_end_date <= sevenDays,
+  );
   return (
     <div className="space-y-6">
       <Hero
@@ -254,6 +268,16 @@ function Students({ title, rows, programs }: { title: string; rows: any[]; progr
         title={title}
         description="This roster uses canonical enrollments. Application leads are not counted as enrolled students."
       />
+      {finalWeek.length > 0 && (
+        <section role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-5">
+          <p className="font-black text-amber-950">Final-week completion alert</p>
+          <p className="mt-1 text-sm text-amber-900">
+            {finalWeek.map((row) => row.full_name || 'Student').join(', ')}{' '}
+            {finalWeek.length === 1 ? 'is' : 'are'} in the last week of training. Complete the
+            closeout before payment can be released.
+          </p>
+        </section>
+      )}
       <div className="flex flex-wrap gap-3">
         <input
           aria-label="Search students"
@@ -289,6 +313,7 @@ function Students({ title, rows, programs }: { title: string; rows: any[]; progr
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <EnrollmentTable rows={rows} programs={programs} />
       </section>
+      <ProgramHolderStudentCloseoutForm enrollments={rows} />
     </div>
   );
 }
@@ -390,22 +415,37 @@ function Programs({ data }: { data: any }) {
     </div>
   );
 }
-function Hours({ rows, programs }: { rows: any[]; programs: any[] }) {
+function Hours({
+  rows,
+  programs,
+  enrollments,
+}: {
+  rows: any[];
+  programs: any[];
+  enrollments: any[];
+}) {
   return (
     <div className="space-y-6">
       <Hero
         eyebrow="Training Operations"
         title="Training Hours"
-        description="Review training-hour submissions tied to your assigned programs."
+        description="Record what each student completed daily or weekly, enter training hours, and submit progress for Admin review."
       />
+      <ProgramHolderTrainingLogForm enrollments={enrollments} programs={programs} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-black">Submitted training logs</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Admin can review every submitted entry. Entries remain read-only after submission.
+        </p>
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead>
               <tr className="border-b">
                 <th className="p-3">Date</th>
+                <th className="p-3">Student</th>
                 <th className="p-3">Program</th>
                 <th className="p-3">Hours</th>
+                <th className="p-3">Work completed</th>
                 <th className="p-3">Approval</th>
               </tr>
             </thead>
@@ -414,8 +454,13 @@ function Hours({ rows, programs }: { rows: any[]; programs: any[] }) {
                 rows.map((row) => (
                   <tr key={row.id} className="border-b border-slate-100">
                     <td className="p-3">{row.work_date || '—'}</td>
+                    <td className="p-3 font-semibold">
+                      {enrollments.find((item) => item.user_id === row.user_id)?.full_name ||
+                        'Student'}
+                    </td>
                     <td className="p-3">{programTitle(programs, null, row.program_slug)}</td>
-                    <td className="p-3 font-bold">{row.hours ?? row.hours_claimed ?? 0}</td>
+                    <td className="p-3 font-bold">{row.hours_claimed ?? row.hours ?? 0}</td>
+                    <td className="max-w-md p-3 text-slate-700">{row.notes || '—'}</td>
                     <td className="p-3 capitalize">
                       {row.approval_status || row.status || 'pending'}
                     </td>
@@ -423,8 +468,8 @@ function Hours({ rows, programs }: { rows: any[]; programs: any[] }) {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-slate-500">
-                    No hour entries are awaiting review.
+                  <td colSpan={6} className="p-8 text-center text-slate-500">
+                    No training logs have been submitted yet.
                   </td>
                 </tr>
               )}

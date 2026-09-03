@@ -47,7 +47,7 @@ export default async function ProgramHolderDetailPage({
   const { data: roster, error: rosterError } = await db
     .from('program_enrollments')
     .select(
-      'id,user_id,full_name,email,status,enrollment_state,program_id,enrolled_at,progress_percent,at_risk',
+      'id,user_id,full_name,email,status,enrollment_state,program_id,enrolled_at,progress_percent,at_risk,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,certificate_issued_at',
     )
     .eq('program_holder_id', id)
     .order('enrolled_at', { ascending: false });
@@ -57,6 +57,13 @@ export default async function ProgramHolderDetailPage({
     .select('id,document_type,file_name,status,approved,created_at')
     .eq('user_id', holder.user_id)
     .order('created_at', { ascending: false });
+  const { data: trainingLogs } = await db
+    .from('hour_entries')
+    .select('id,user_id,work_date,hours_claimed,category,notes,approval_status,status,created_at')
+    .eq('program_holder_id', id)
+    .order('work_date', { ascending: false })
+    .limit(100);
+  const learnerByUserId = new Map(learners.map((learner: any) => [learner.user_id, learner]));
 
   const canDecide = ['admin', 'super_admin'].includes(String(profile.role ?? ''));
 
@@ -166,6 +173,56 @@ export default async function ProgramHolderDetailPage({
         </section>
 
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-100 px-6 py-4">
+            <h2 className="text-lg font-black text-slate-950">
+              Student progress and training hours
+            </h2>
+            <p className="mt-1 text-sm font-medium text-slate-600">
+              Daily and weekly logs submitted by this Program Holder for Admin review.
+            </p>
+          </div>
+          {trainingLogs?.length ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-600">
+                  <tr>
+                    <th className="px-5 py-3">Date</th>
+                    <th className="px-5 py-3">Student</th>
+                    <th className="px-5 py-3">Type</th>
+                    <th className="px-5 py-3">Hours</th>
+                    <th className="px-5 py-3">Work completed</th>
+                    <th className="px-5 py-3">Review</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {trainingLogs.map((log: any) => {
+                    const learner = learnerByUserId.get(log.user_id) as any;
+                    return (
+                      <tr key={log.id}>
+                        <td className="px-5 py-4">{log.work_date || '—'}</td>
+                        <td className="px-5 py-4 font-black">{learner?.full_name || 'Student'}</td>
+                        <td className="px-5 py-4 capitalize">
+                          {String(log.category || 'training').replaceAll('_', ' ')}
+                        </td>
+                        <td className="px-5 py-4 font-black">{log.hours_claimed ?? 0}</td>
+                        <td className="max-w-lg px-5 py-4 text-slate-700">{log.notes || '—'}</td>
+                        <td className="px-5 py-4 capitalize">
+                          {log.approval_status || log.status || 'submitted'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="p-8 text-center text-sm font-semibold text-slate-500">
+              No training logs have been submitted yet.
+            </p>
+          )}
+        </section>
+
+        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-6 py-4">
             <div>
               <h2 className="flex items-center gap-2 text-lg font-black text-slate-950">
@@ -193,6 +250,8 @@ export default async function ProgramHolderDetailPage({
                     <th className="px-5 py-3">Program</th>
                     <th className="px-5 py-3">State</th>
                     <th className="px-5 py-3">Progress</th>
+                    <th className="px-5 py-3">Training dates</th>
+                    <th className="px-5 py-3">Closeout</th>
                     <th className="px-5 py-3">Enrolled</th>
                   </tr>
                 </thead>
@@ -222,6 +281,26 @@ export default async function ProgramHolderDetailPage({
                         </td>
                         <td className="px-5 py-4 font-bold text-slate-800">
                           {Number(learner.progress_percent || 0)}%
+                        </td>
+                        <td className="px-5 py-4 text-xs text-slate-700">
+                          <span className="block">
+                            Start: {learner.training_start_date || 'Missing'}
+                          </span>
+                          <span className="block">
+                            End: {learner.training_end_date || 'Missing'}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 text-xs text-slate-700">
+                          {learner.training_start_date &&
+                          learner.training_end_date &&
+                          Number(learner.total_hours_completed || 0) > 0 &&
+                          learner.lms_completed &&
+                          learner.practical_skills_verified &&
+                          learner.certificate_issued_at ? (
+                            <span className="font-black text-emerald-700">Complete</span>
+                          ) : (
+                            <span className="font-black text-amber-700">Missing items</span>
+                          )}
                         </td>
                         <td className="px-5 py-4 text-slate-600">
                           {learner.enrolled_at

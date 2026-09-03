@@ -1,5 +1,0 @@
-Production deployment replay marker — 2026-08-12
-
-Purpose: deploy the merged Supabase migration reconciliation, auth/profile provisioning hardening, storage canonicalization, and SAM storage policy synchronization from main to Marketing, LMS, and Admin.
-
-This file is intentionally under scripts/northflank/ so the existing path-filtered deploy workflows each trigger once on merge.

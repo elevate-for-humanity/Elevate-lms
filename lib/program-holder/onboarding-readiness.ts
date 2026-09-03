@@ -15,6 +15,33 @@ export type ProgramHolderReadiness = {
   rightsAcknowledged: boolean;
 };
 
+export async function getStudentPaymentReadiness(db: any, enrollmentId: string) {
+  const { data: student } = await db
+    .from('program_enrollments')
+    .select(
+      'full_name,status,enrollment_state,training_start_date,training_end_date,progress_percent,total_hours_completed,lms_completed,practical_skills_verified,certificate_issued_at',
+    )
+    .eq('id', enrollmentId)
+    .maybeSingle();
+  if (!student) return { ready: false, missing: ['Student enrollment record'] };
+  const name = student.full_name || 'Student';
+  const missing = [
+    ...(!['completed', 'graduated'].includes(String(student.status))
+      ? [`${name}: graduation closeout`]
+      : []),
+    ...(!student.training_start_date ? [`${name}: training start date`] : []),
+    ...(!student.training_end_date ? [`${name}: training end date`] : []),
+    ...(Number(student.progress_percent || 0) < 100 ? [`${name}: final progress`] : []),
+    ...(Number(student.total_hours_completed || 0) <= 0
+      ? [`${name}: completed hands-on hours`]
+      : []),
+    ...(!student.lms_completed ? [`${name}: coursework completion verification`] : []),
+    ...(!student.practical_skills_verified ? [`${name}: practical skills verification`] : []),
+    ...(!student.certificate_issued_at ? [`${name}: certificate receipt date`] : []),
+  ];
+  return { ready: missing.length === 0, missing };
+}
+
 export async function getProgramHolderPaymentReadiness(
   db: any,
   holderId: string,

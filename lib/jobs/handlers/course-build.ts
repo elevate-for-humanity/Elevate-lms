@@ -56,6 +56,27 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
     const blockers = finalization.publication.blocking_issues.join('; ');
     throw new Error(`Automated course repair exhausted: ${blockers}`);
   }
+  if (!finalization.ok) {
+    const now = new Date();
+    const retryAt = new Date(now.getTime() + 5 * 60_000);
+    const { error: pendingError } = await db
+      .from('devstudio_jobs')
+      .update({
+        status: 'queued',
+        stage: finalization.state,
+        progress: 99,
+        result: { ...result, governance, finalization },
+        error: null,
+        run_at: retryAt.toISOString(),
+        finished_at: null,
+        locked_at: null,
+        locked_by: null,
+        updated_at: now.toISOString(),
+      })
+      .eq('id', job.id);
+    if (pendingError) throw pendingError;
+    return;
+  }
   const finishedAt = new Date().toISOString();
   const { error } = await db
     .from('devstudio_jobs')

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { syncIndividualAppSubscription } from '@/lib/apps/sync-subscription';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const WEBSITE_BUILDER_TRIAL = {
   days: 14,
@@ -54,39 +54,27 @@ export async function consumeWebsiteBuilderCredits(
   userId: string,
   operation: WebsiteBuilderCreditOperation,
 ): Promise<TrialCreditResult> {
-  // Paid access is synchronized with Stripe before every metered AI operation.
-  // This prevents a stale local `active` row from granting continued AI use
-  // after the upstream subscription has become past_due/canceled.
-  const subscription = await syncIndividualAppSubscription(
-    userId,
-    'website-builder',
-    supabase,
-  );
+  // Use the same canonical access decision as the builder pages and APIs.
+  // This preserves Stripe-synchronized customer enforcement while allowing
+  // platform administrators to operate and verify the product without a
+  // redundant personal subscription.
+  const access = await getWebsiteBuilderAccess(userId, supabase);
 
-  if (!subscription || !['trial', 'active'].includes(subscription.status || '')) {
+  if (!access.allowed) {
     return {
       allowed: false,
       charged: 0,
       balance: null,
       isTrial: false,
-      upgradeUrl: '/store/apps/website-builder',
-      error: 'Website Builder subscription required',
+      upgradeUrl: access.upgradeUrl || '/store/apps/website-builder',
+      error: access.reason === 'trial_expired'
+        ? 'Your 14-day Website Builder trial has expired'
+        : 'Website Builder subscription required',
     };
   }
 
-  if (subscription.status === 'active') {
+  if (access.isAdmin || access.status === 'active') {
     return { allowed: true, charged: 0, balance: null, isTrial: false };
-  }
-
-  if (subscription.trial_ends_at && new Date(subscription.trial_ends_at) < new Date()) {
-    return {
-      allowed: false,
-      charged: 0,
-      balance: 0,
-      isTrial: true,
-      upgradeUrl: '/store/apps/website-builder',
-      error: 'Your 14-day Website Builder trial has expired',
-    };
   }
 
   const { data: ensured, error: ensureError } = await supabase.rpc('ensure_app_trial_wallet', {

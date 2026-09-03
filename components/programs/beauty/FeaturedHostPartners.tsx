@@ -26,18 +26,11 @@ export default function FeaturedHostPartners({
   programSlug?: string;
   showDirectory?: boolean;
 }) {
-  const requiredBusinessType =
-    programSlug === 'barber-apprenticeship'
-      ? 'BarberShop'
-      : programSlug === 'cosmetology-apprenticeship'
-        ? 'HairSalon'
-        : undefined;
+  // Program enrollment is the source of truth. Some verified partners operate
+  // combined salon/barber businesses, so businessType must not hide a host that
+  // is explicitly approved for this pathway.
   const matchingShops = programSlug
-    ? FEATURED_BEAUTY_HOST_PARTNERS.filter(
-        (shop) =>
-          shop.programs.includes(programSlug) &&
-          (!requiredBusinessType || shop.businessType === requiredBusinessType),
-      )
+    ? FEATURED_BEAUTY_HOST_PARTNERS.filter((shop) => shop.programs.includes(programSlug))
     : FEATURED_BEAUTY_HOST_PARTNERS;
   const shops =
     programSlug === 'barber-apprenticeship'

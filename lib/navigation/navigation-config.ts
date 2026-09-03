@@ -5,7 +5,7 @@
 import type React from 'react';
 import {
   Activity, Award, BarChart3, BookOpen, Briefcase, Building2, Calendar,
-  ClipboardCheck, ClipboardList, Clock, FileText, GraduationCap,
+  ClipboardCheck, ClipboardList, Clock, DollarSign, FileText, GraduationCap,
   LayoutDashboard, Palette, Plus, Settings, Shield, Target, Users,
 } from 'lucide-react';
 import { PortalRouter } from '@/lib/routing/portal-router';
@@ -157,6 +157,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
     { id: 'compliance', label: 'Compliance', href: '/program-holder/compliance', icon: Shield },
     { id: 'documents', label: 'Documents', href: '/program-holder/documents', icon: FileText },
     { id: 'reports', label: 'Reports', href: '/program-holder/reports', icon: BarChart3 },
+    { id: 'payouts', label: 'Payouts', href: '/program-holder/payouts', icon: DollarSign },
     { id: 'settings', label: 'Settings', href: '/program-holder/settings', icon: Settings },
   ] }],
   provider: [{ id: 'provider', items: [

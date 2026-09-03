@@ -10,7 +10,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import '../../../styles/contrast-guardrails.css';
 import BuildVersionSync from '@/components/BuildVersionSync';
-import AdminHeader from '@/components/admin/AdminHeader';
+import { AdminNavShell } from '@/components/admin/AdminNavShell';
+import { DEFAULT_NAV } from '@/lib/admin/nav-config';
 import { I18nProvider } from '@/lib/i18n/context';
 import { AdminPwaRegister } from '@/components/pwa/AdminPwaRegister';
 import { AdminUpdateNotice } from '@/components/pwa/AdminUpdateNotice';
@@ -79,7 +80,7 @@ export default async function AdminGroupLayout({
         <I18nProvider>
           <div className="min-h-dvh min-w-0 overflow-x-clip bg-slate-50">
             <BuildVersionSync />
-            <AdminHeader />
+            <AdminNavShell navSections={DEFAULT_NAV} />
             <main className="min-w-0 overflow-x-clip">
               {children}
             </main>

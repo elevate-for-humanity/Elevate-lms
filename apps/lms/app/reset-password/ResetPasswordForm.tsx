@@ -25,7 +25,8 @@ export default function ResetPasswordForm() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
+      const recoveryMode = searchParams.get('mode') === 'recovery';
+      if (data.session && recoveryMode) {
         setSessionReady(true);
       } else {
         // A direct visit from the login page is a recovery-email request.
@@ -35,23 +36,25 @@ export default function ResetPasswordForm() {
         setSessionReady(true);
       }
     });
-  }, [router]);
+  }, [router, searchParams]);
 
   const handleRecoveryRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const supabase = createClient();
-      const resetTarget = programHolder
-        ? '/reset-password?portal=program-holder'
-        : '/reset-password';
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(resetTarget)}`;
-      const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(
-        email.trim().toLowerCase(),
-        { redirectTo },
-      );
-      if (recoveryError) throw recoveryError;
+      const response = await fetch('/api/auth/password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          portal: programHolder ? 'program-holder' : 'learner',
+        }),
+      });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.error || 'Unable to send recovery email. Try again.');
+      }
       setRecoverySent(true);
     } catch (err: any) {
       setError(err?.message || 'Unable to send recovery email. Try again.');

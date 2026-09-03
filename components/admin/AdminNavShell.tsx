@@ -21,6 +21,7 @@ interface AdminNavShellProps {
 export function AdminNavShell({ navSections }: AdminNavShellProps) {
   const [userName, setUserName] = useState('Admin');
   const [notifs, setNotifs] = useState<AdminNavNotif[]>([]);
+  const [resolvedNavSections, setResolvedNavSections] = useState(navSections);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,8 +33,16 @@ export function AdminNavShell({ navSections }: AdminNavShellProps) {
         setNotifs(data.notifs ?? []);
       })
       .catch(() => {/* non-critical — defaults are fine */});
+
+    fetch('/api/admin/nav-config', { credentials: 'same-origin' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (cancelled || !Array.isArray(data?.sections) || data.sections.length === 0) return;
+        setResolvedNavSections(data.sections);
+      })
+      .catch(() => {/* non-critical — server-provided defaults remain available */});
     return () => { cancelled = true; };
   }, []);
 
-  return <AdminNav userName={userName} notifs={notifs} navSections={navSections} />;
+  return <AdminNav userName={userName} notifs={notifs} navSections={resolvedNavSections} />;
 }

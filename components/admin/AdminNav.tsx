@@ -84,7 +84,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
         <div className="h-14 flex items-center gap-2 px-4 sm:px-6">
           <Link href="/dashboard" className="flex items-center gap-2 flex-shrink-0">
             <LogoImage alt="Elevate" width={28} height={42} className="w-auto h-8" />
@@ -209,24 +209,29 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
         </div>
 
         {/* Horizontal Mobile Nav - Scrollable */}
-        <div className={`xl:hidden border-t border-slate-200 overflow-hidden transition-all duration-300 ${navExpanded ? 'max-h-96' : 'max-h-0'}`}>
-          <div className="px-4 py-3">
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {NAV.map((section) => {
-                const active = isSectionActive(pathname, section);
-                return (
-                  <Link
-                    key={section.href}
-                    href={section.href}
-                    onClick={() => setNavExpanded(false)}
-                    className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium ${
-                      active ? 'bg-brand-red-500 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
+        <div className={`xl:hidden overflow-hidden border-t border-slate-200 transition-all duration-300 ${navExpanded ? 'max-h-[80vh]' : 'max-h-0'}`}>
+          <div className="max-h-[80vh] overflow-y-auto px-4 py-3">
+            <div className="grid gap-2 sm:grid-cols-2">
+              {NAV.map((section) => (
+                <details key={section.label} className="rounded-lg border border-slate-200 bg-white" open={isSectionActive(pathname, section)}>
+                  <summary className={`flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-bold ${isSectionActive(pathname, section) ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-800'}`}>
                     {section.label}
-                  </Link>
-                );
-              })}
+                    <ChevronDown className="h-4 w-4" />
+                  </summary>
+                  <div className="border-t border-slate-100 p-1.5">
+                    {section.items.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setNavExpanded(false)}
+                        className={`block min-h-11 rounded-md px-3 py-2.5 text-sm ${isActive(pathname, item.href) ? 'bg-brand-red-50 font-semibold text-brand-red-700' : 'text-slate-700 hover:bg-slate-50'}`}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </details>
+              ))}
             </div>
           </div>
         </div>

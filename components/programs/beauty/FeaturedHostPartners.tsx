@@ -101,13 +101,15 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
                     }
                   : undefined;
               const video =
-                shop.slug === 'razors-image-barbershop'
-                  ? {
-                      src: '/videos/partners/razors-image-host-barbershop.mp4',
-                      alt: "Razor's Image owner describing the barber apprenticeship opportunity",
-                      kind: 'video' as const,
-                    }
-                  : shop.media?.find((media) => media.kind === 'video');
+                programSlug === 'barber-apprenticeship'
+                  ? undefined
+                  : shop.slug === 'razors-image-barbershop'
+                    ? {
+                        src: '/videos/partners/razors-image-host-barbershop.mp4',
+                        alt: "Razor's Image owner describing the barber apprenticeship opportunity",
+                        kind: 'video' as const,
+                      }
+                    : shop.media?.find((media) => media.kind === 'video');
               const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
               return (
                 <article

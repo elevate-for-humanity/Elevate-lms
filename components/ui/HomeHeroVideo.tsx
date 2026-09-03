@@ -257,16 +257,6 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
               deferVideoMs={0}
             />
           </div>
-          <div className="absolute inset-x-0 bottom-0 z-40 bg-gradient-to-t from-slate-950/65 via-slate-950/20 to-transparent px-6 pb-20 pt-20 text-white sm:px-8">
-            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-blue-200">
-              Featured pathway
-            </p>
-            <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">{slide.label}</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-100 sm:text-base">
-              {slide.description}
-            </p>
-          </div>
-
           {slides.length > 1 ? (
             <>
               <button

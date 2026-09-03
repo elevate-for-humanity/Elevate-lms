@@ -32,7 +32,7 @@ export default function StoreCoursesPage() {
   ];
 
   return (
-    <div className="bg-white">            <div className="max-w-7xl mx-auto px-4 py-4">
+    <main className="bg-white">            <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Courses" }]} />
       </div>
 {/* Hero */}
@@ -46,7 +46,7 @@ export default function StoreCoursesPage() {
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Certification Courses <span className="block text-brand-blue-300">With Exam Vouchers</span></h1>
-            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Get certified in Microsoft Office, Adobe Creative Suite, OSHA Safety, and more. Each course includes the certification exam voucher.</p>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Review current certification-training options. Course access, provider authorization, exam-voucher inclusion, schedule, and final price are confirmed before enrollment or payment.</p>
           </div>
         </div>
       </section>
@@ -87,7 +87,7 @@ export default function StoreCoursesPage() {
                     </div>
                     <div className="flex items-center gap-1">
                       <BookOpen className="w-4 h-4" />
-                      {course.duration}
+                      Availability verified before payment
                     </div>
                   </div>
 
@@ -98,10 +98,10 @@ export default function StoreCoursesPage() {
                       </span>
                     </div>
                     <Link
-                      href={`/courses/${course.slug}`}
+                      href={`/contact?topic=certification-course&course=${encodeURIComponent(course.slug)}`}
                       className="inline-flex items-center gap-1 text-brand-blue-600 font-semibold hover:text-brand-blue-700"
                     >
-                      View Details
+                      Check Availability
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
@@ -127,14 +127,14 @@ export default function StoreCoursesPage() {
               <Award aria-label="award" className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-slate-900 mb-2">Exam Voucher Included</h3>
               <p className="text-slate-700">
-                Every course includes the certification exam voucher - no hidden costs.
+                Voucher inclusion is stated in the written enrollment scope before payment.
               </p>
             </div>
             <div>
               <BookOpen className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-slate-900 mb-2">Self-Paced Learning</h3>
               <p className="text-slate-700">
-                Learn at your own pace with lifetime access to course materials.
+                Delivery format and access period are confirmed for the selected course before enrollment.
               </p>
             </div>
           </div>
@@ -159,6 +159,6 @@ export default function StoreCoursesPage() {
           </Link>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

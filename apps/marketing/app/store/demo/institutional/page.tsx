@@ -51,7 +51,7 @@ const demoSteps = [
 
 export default function InstitutionalDemoPage() {
   return (
-    <div className="bg-white min-h-screen">
+    <main className="bg-white min-h-screen">
       {/* Header */}
       <section className="bg-slate-900 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -70,7 +70,7 @@ export default function InstitutionalDemoPage() {
           </h1>
           <p className="text-xl text-slate-300 mb-6">
             This demo shows how institutions manage multiple programs while maintaining clean, oversight-ready records. 
-            Reporting views are generated from live enrollment and attendance data — not manual entry.
+            The preview below uses clearly labeled sample data to show how enrollment, attendance, and reporting workflows fit together.
           </p>
           
           <div className="flex items-center gap-4 text-sm text-slate-400">
@@ -154,7 +154,7 @@ export default function InstitutionalDemoPage() {
           
           <div className="text-center mt-6">
             <p className="text-sm text-slate-500 mb-4">
-              This is a preview of the live admin dashboard
+              Sample dashboard preview — no production participant data
             </p>
             <Link
               href="/store/demo/admin"
@@ -204,7 +204,7 @@ export default function InstitutionalDemoPage() {
           <h2 className="text-xl font-bold mb-4">What This Replaces</h2>
           <p className="text-slate-700 max-w-2xl mx-auto">
             This replaces <strong>registrar coordination</strong>, <strong>compliance staff tracking</strong>, 
-            and <strong>internal reporting prep</strong>. Reports generate from live data, not manual assembly.
+            and <strong>internal reporting prep</strong>. In production, reports are designed to generate from authorized operational records rather than a separate manual assembly process.
           </p>
         </div>
       </section>
@@ -212,19 +212,19 @@ export default function InstitutionalDemoPage() {
       {/* CTA */}
       <section className="py-16 bg-blue-600 text-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Ready to Activate Institutional License?</h2>
+          <h2 className="text-2xl font-bold mb-4">Ready to Scope an Institutional License?</h2>
           <p className="text-blue-100 mb-8">
-            $2,500/month • Up to 1,000 learners • Up to 25 programs • Cancel anytime
+            Starting at $2,500/month • Final scope, service levels, implementation, and contract terms are confirmed before purchase
           </p>
           <Link
-            href="/store/checkout?license=institutional"
+            href="/contact?topic=platform-licensing&product=institutional"
             className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition-colors"
           >
-            Activate Institutional License
+            Request Institutional Scope
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

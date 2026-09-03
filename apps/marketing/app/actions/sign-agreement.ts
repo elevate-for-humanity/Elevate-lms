@@ -7,6 +7,7 @@ import {
   type AgreementType,
 } from '@/lib/legal/recordAgreementAcceptance';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { checkAndSendOnboardingCompleteEmail } from '@/lib/program-holder/onboarding-complete';
 
 export async function signAgreement(data: {
   agreementType: string;
@@ -70,8 +71,8 @@ export async function signAgreement(data: {
         mou_signed_at: signedAt,
         mou_holder_signed_at: signedAt,
         mou_holder_name: signerName,
-      mou_status: 'signed',
-      status: 'active',
+        mou_status: 'signed',
+        status: 'active',
         enrollments_restricted: false,
         restriction_reason: null,
         updated_at: signedAt,
@@ -83,6 +84,7 @@ export async function signAgreement(data: {
         error:
           'The signature was recorded, but the Program Holder record could not be activated. Please contact support.',
       };
+    await checkAndSendOnboardingCompleteEmail(db, user.id);
   }
 
   return {

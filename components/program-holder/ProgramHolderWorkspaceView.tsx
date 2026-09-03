@@ -12,6 +12,7 @@ import { getProgramHolderWorkspace, programTitle } from '@/lib/program-holder/wo
 import { ProgramHolderDocumentUpload } from './ProgramHolderDocumentUpload';
 import { ProgramHolderTrainingLogForm } from './ProgramHolderTrainingLogForm';
 import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseoutForm';
+import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
 
 type Section =
   | 'dashboard'
@@ -535,6 +536,7 @@ function Documents({ rows }: { rows: any[] }) {
         description="Upload and track protected Program Holder onboarding records for HVAC delivery and payment readiness."
       />
       <ProgramHolderDocumentUpload />
+      <ProgramHolderAcknowledgements />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Document register</h2>
         <div className="mt-4 space-y-3">

@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getProgramHolderPaymentReadiness } from './onboarding-readiness';
 
 /**
  * Checks whether all 4 program holder onboarding steps are complete and,
@@ -44,26 +45,8 @@ export async function checkAndSendOnboardingCompleteEmail(
 
   if (!holder) return { sent: false, reason: 'no_holder_row' };
   if (holder.welcome_email_sent) return { sent: false, reason: 'already_sent' };
-  if (!holder.mou_signed) return { sent: false, reason: 'mou_not_signed' };
-
-  // 2 & 3. Acknowledgements
-  const { data: acks } = await admin
-    .from('program_holder_acknowledgements')
-    .select('document_type')
-    .eq('user_id', userId);
-
-  const hasHandbook = acks?.some((a: any) => a.document_type === 'handbook');
-  const hasRights = acks?.some((a: any) => a.document_type === 'rights');
-  if (!hasHandbook) return { sent: false, reason: 'handbook_not_acknowledged' };
-  if (!hasRights) return { sent: false, reason: 'rights_not_acknowledged' };
-
-  // 4. At least one document
-  const { count: docCount } = await admin
-    .from('program_holder_documents')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId);
-
-  if (!docCount || docCount === 0) return { sent: false, reason: 'no_documents' };
+  const readiness = await getProgramHolderPaymentReadiness(admin, holderId);
+  if (!readiness.ready) return { sent: false, reason: readiness.missing.join('; ') };
 
   // Get profile for email
   const { data: profile } = await admin
@@ -78,6 +61,26 @@ export async function checkAndSendOnboardingCompleteEmail(
   const organizationName = holder.organization_name || 'your organization';
 
   await sendWelcomeEmail({ email: profile.email, firstName, organizationName });
+
+  const { data: existingNotice } = await admin
+    .from('staff_notifications')
+    .select('id')
+    .eq('type', 'program_holder_onboarding_complete')
+    .contains('metadata', { program_holder_id: holderId })
+    .maybeSingle();
+  if (!existingNotice) {
+    await admin.from('staff_notifications').insert({
+      type: 'program_holder_onboarding_complete',
+      title: 'Program Holder onboarding complete',
+      message: `${organizationName} completed the MOU, acknowledgements, and all required documents.`,
+      severity: 'success',
+      metadata: {
+        program_holder_id: holderId,
+        user_id: userId,
+        action_url: `/program-holders/${holderId}`,
+      },
+    });
+  }
 
   // Mark sent — welcome_email_sent column may not exist yet; ignore error
   await admin

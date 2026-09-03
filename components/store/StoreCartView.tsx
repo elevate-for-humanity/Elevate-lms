@@ -36,9 +36,18 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
     setMessage(null);
     try {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      let user = null;
+      try {
+        const { data } = await supabase.auth.getUser();
+        user = data.user;
+      } catch {
+        // A cross-origin auth lookup can fail before the buyer has established a
+        // platform session. Treat that as signed out and continue to the secure
+        // sign-in handoff instead of exposing a raw network error in the cart.
+      }
       if (!user) {
-        window.location.href = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent('https://www.elevateforhumanity.org/store/cart')}`;
+        const returnUrl = `${window.location.origin}/store/cart`;
+        window.location.href = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(returnUrl)}`;
         return;
       }
 

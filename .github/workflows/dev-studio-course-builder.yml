@@ -98,6 +98,7 @@ jobs:
           node scripts/audit-course-builder-procurement.mjs
           pnpm typecheck:studio
           pnpm exec eslint lib/devstudio/course-builder-controller.ts lib/course-builder lib/course-factory --quiet
+          pnpm exec vitest run tests/unit/course-factory/lesson-contract-normalization.test.ts
 
       - name: Require production persistence and canonical Cloudflare Workers AI
         shell: bash

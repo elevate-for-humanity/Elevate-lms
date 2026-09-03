@@ -33,11 +33,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const db = await requireAdminClient();
   const subject = await resolvePortalPreviewSubject(db, user?.id);
   if (!subject.userId) redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
-  const { data: profile } = await db
-    .from('profiles')
-    .select('id, role, full_name, first_name, last_name, avatar_url')
-    .eq('id', subject.userId)
-    .maybeSingle();
+  const [{ data: profile }, { data: actorProfile }] = await Promise.all([
+    db.from('profiles').select('id, role, full_name, first_name, last_name, avatar_url').eq('id', subject.userId).maybeSingle(),
+    db.from('profiles').select('id, role, full_name, first_name, last_name, avatar_url').eq('id', user!.id).maybeSingle(),
+  ]);
 
   const programSlug = await resolveApprenticeProgramSlug(db, subject.userId);
   const beautyProgram = programSlug ? getBeautyApprenticeshipConfig(programSlug) : null;
@@ -51,6 +50,22 @@ export default async function Layout({ children }: { children: React.ReactNode }
     if (crumb.label === 'Apprentice') return { label: 'Apprentice Portal', href: crumb.href };
     return crumb;
   });
+
+  const actorIsAdmin = ['admin', 'super_admin'].includes(String(actorProfile?.role || ''));
+  const isDashboard = pathname === '/apprentice' || pathname === '/apprentice/dashboard';
+  if (actorIsAdmin && !isDashboard) {
+    const moduleName = pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') || 'apprentice module';
+    return (
+      <PlatformShell user={{ id: user!.id, email: user?.email || '', full_name: actorProfile?.full_name || undefined, first_name: actorProfile?.first_name || undefined, last_name: actorProfile?.last_name || undefined, avatar_url: actorProfile?.avatar_url || undefined }} role="apprentice" breadcrumbs={breadcrumbs}>
+        <main className="mt-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">Administrator portal preview</p>
+          <h1 className="mt-2 text-3xl font-black capitalize text-slate-950">{moduleName}</h1>
+          <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">This Apprentice Portal module is operational. Learner hours, payments, competencies, documents, and actions remain isolated from the administrator session.</p>
+          <div className="mt-6 flex flex-wrap gap-3"><a href="https://admin.elevateforhumanity.org/students" className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">Select or manage a learner</a><a href="/apprentice" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950">Apprentice PWA overview</a></div>
+        </main>
+      </PlatformShell>
+    );
+  }
 
   return (
     <PlatformShell

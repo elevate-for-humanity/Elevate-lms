@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES, normalizeRole } from '@/lib/rbac/role-matrix';
 import {
-  getHostShopAdminPartnerOptions,
   getHostShopBoard,
   HOST_SHOP_ADMIN_COOKIE,
 } from '@/lib/partner/board';
@@ -13,45 +12,6 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
-
-async function selectAdminPartner(formData: FormData) {
-  'use server';
-  await requireRole(['super_admin', 'admin', 'org_admin']);
-  const partnerId = String(formData.get('partnerId') ?? '').trim();
-  if (!partnerId) redirect('/host-shop/dashboard');
-  const db = await requireAdminClient();
-  const { data: partner } = await db
-    .from('partners')
-    .select(
-      'id, status, approval_status, verification_status, is_active, partner_type, program_type, programs',
-    )
-    .eq('id', partnerId)
-    .maybeSingle();
-  const typeText = [
-    partner?.partner_type,
-    partner?.program_type,
-    ...(Array.isArray(partner?.programs) ? partner.programs : []),
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-  const eligible =
-    partner &&
-    partner.status === 'active' &&
-    partner.approval_status === 'approved' &&
-    partner.is_active !== false &&
-    /(barber|cosmet|nail|esthetic|salon|shop|training_site)/.test(typeText);
-  if (!eligible) redirect('/host-shop/dashboard?error=inactive_partner');
-  const cookieStore = await cookies();
-  cookieStore.set(HOST_SHOP_ADMIN_COOKIE, partnerId, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 3600,
-  });
-  redirect('/host-shop/dashboard');
-}
 
 async function clearAdminPartner() {
   'use server';
@@ -164,12 +124,6 @@ export default async function HostShopDashboardView() {
       error instanceof Error &&
       ['HOST_SHOP_ADMIN_PARTNER_REQUIRED', 'HOST_SHOP_ACCESS_DENIED'].includes(error.message)
     ) {
-      const partners = (await getHostShopAdminPartnerOptions()).filter(
-        (partner: any) =>
-          partner.status === 'active' &&
-          partner.approval_status === 'approved' &&
-          partner.is_active !== false,
-      );
       return (
         <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
           <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -187,28 +141,9 @@ export default async function HostShopDashboardView() {
               <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">
                 Admin portal access
               </p>
-              <h1 className="mt-2 text-3xl font-black text-slate-950">
-                Choose an active verified Host Shop
-              </h1>
-              <form action={selectAdminPartner} className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <select
-                  name="partnerId"
-                  required
-                  className="min-h-12 flex-1 rounded-xl border border-slate-400 bg-white px-4 py-3 font-semibold"
-                >
-                  <option value="">Select Host Shop</option>
-                  {partners.map((partner: any) => (
-                    <option key={partner.id} value={partner.id}>
-                      {partner.name}{' '}
-                      {partner.city ? `— ${partner.city}, ${partner.state || ''}` : ''}{' '}
-                      {partner.verification_status !== 'verified' ? '— verification pending' : ''}
-                    </option>
-                  ))}
-                </select>
-                <button className="min-h-12 rounded-xl bg-brand-blue-700 px-6 py-3 font-black text-white">
-                  Open Host Shop portal
-                </button>
-              </form>
+              <h1 className="mt-2 text-3xl font-black text-slate-950">Host Shop PWA</h1>
+              <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-700">This neutral preview confirms that the Host Shop PWA is operational without attaching Admin to a business record. Select a shop from the secured Admin dashboard to open its audited portal.</p>
+              <div className="mt-6 flex flex-wrap gap-3"><a href="https://admin.elevateforhumanity.org/dashboard" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-6 py-3 font-black text-white">Select a Host Shop in Admin</a><a href="https://admin.elevateforhumanity.org/partners" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3 font-black text-slate-950">Manage partners</a></div>
             </div>
           </section>
         </main>

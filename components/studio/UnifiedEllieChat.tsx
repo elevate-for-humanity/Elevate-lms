@@ -442,7 +442,6 @@ export default function UnifiedEllieChat({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             task: text,
-            repository: 'elevate-for-humanity/Elevate-lms',
             confirmationText: text.includes('CONFIRM OPENHANDS EXECUTION')
               ? 'CONFIRM OPENHANDS EXECUTION'
               : '',
@@ -467,7 +466,7 @@ export default function UnifiedEllieChat({
               capabilitiesUsed: ['lizzy', 'ai-devops-engineer', 'ai-developer'],
               toolCalls: [{
                 tool: 'openhands.execute',
-                args: { repository: 'elevate-for-humanity/Elevate-lms' },
+                args: { repository: 'configured production repository' },
                 result: JSON.stringify(result),
               }],
             };

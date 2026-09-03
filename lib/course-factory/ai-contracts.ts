@@ -54,14 +54,14 @@ function normalizeBlueprintLesson(value: unknown, fallbackIndex: number): Record
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const source = value as Record<string, unknown>;
   const title = String(source.title ?? source.name ?? source.label ?? `Lesson ${fallbackIndex}`).trim();
-  // Preserve explicitly supplied canonical fields so the strict schema can reject
-  // invalid AI output. Only normalize legacy aliases when canonical fields are absent.
-  const slug = source.slug == null
-    ? slugifyBlueprintValue(source.id ?? title, `lesson-${fallbackIndex}`)
-    : String(source.slug).trim();
-  const stepType = source.stepType == null
-    ? normalizeBlueprintStepType(source.type ?? source.kind, title, slug)
-    : source.stepType;
+  // Normalize provider vocabulary at the AI boundary. The downstream schema
+  // stays strict, but equivalent labels no longer strand an otherwise valid build.
+  const slug = slugifyBlueprintValue(source.slug ?? source.id ?? title, `lesson-${fallbackIndex}`);
+  const stepType = normalizeBlueprintStepType(
+    source.stepType ?? source.type ?? source.kind,
+    title,
+    slug,
+  );
   return { title, slug, stepType };
 }
 

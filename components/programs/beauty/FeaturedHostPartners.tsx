@@ -26,13 +26,21 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
       : programSlug === 'cosmetology-apprenticeship'
         ? 'HairSalon'
         : undefined;
-  const shops = programSlug
+  const matchingShops = programSlug
     ? FEATURED_BEAUTY_HOST_PARTNERS.filter(
         (shop) =>
           shop.programs.includes(programSlug) &&
           (!requiredBusinessType || shop.businessType === requiredBusinessType),
       )
     : FEATURED_BEAUTY_HOST_PARTNERS;
+  const shops =
+    programSlug === 'barber-apprenticeship'
+      ? [...matchingShops].sort((left, right) => {
+          if (left.slug === 'razors-image-barbershop') return -1;
+          if (right.slug === 'razors-image-barbershop') return 1;
+          return 0;
+        })
+      : matchingShops;
 
   if (!shops.length) return null;
 

@@ -92,6 +92,17 @@ describe('canonical Course Factory media architecture', () => {
     expect(scheduler).not.toContain('$APP_URL/api/internal/videos/process-queue');
   });
 
+  it('keeps long course builds alive and resumes completed builds at media finalization', () => {
+    const scheduler = read('.github/workflows/cron-scheduler.yml');
+    const route = read('apps/admin/app/api/cron/process-course-builder-jobs/route.ts');
+    const handler = read('lib/jobs/handlers/course-build.ts');
+    expect(scheduler).toContain('--max-time 3600');
+    expect(route).toContain('export const maxDuration = 3600');
+    expect(handler).toContain('resumableMediaCheckpoint');
+    expect(handler).toContain('Resuming completed build at media finalization');
+    expect(handler).toContain("generation_status: 'completed'");
+  });
+
   it('claims work atomically and renews an expiring database lease', () => {
     const migration = read('supabase/migrations/20260828190000_harden_video_worker_lifecycle.sql');
     const renderer = read('lib/video/process-video-job.ts');

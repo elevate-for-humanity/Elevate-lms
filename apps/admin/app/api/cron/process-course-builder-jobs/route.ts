@@ -12,7 +12,10 @@ import { withRuntime } from '@/lib/api/withRuntime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300;
+// AI enrichment for a full regulated course can exceed the serverless default.
+// Admin is self-hosted, so keep the request alive while the durable DB lease is
+// renewed by the worker heartbeat.
+export const maxDuration = 3600;
 
 async function _GET(request: Request) {
   if (

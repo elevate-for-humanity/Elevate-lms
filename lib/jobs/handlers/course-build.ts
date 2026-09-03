@@ -10,11 +10,23 @@ export interface CourseBuildJob {
   tool_args: FactoryInput;
   attempts: number;
   max_attempts: number;
+  result?: Record<string, unknown> | null;
+}
+
+function resumableMediaCheckpoint(job: CourseBuildJob): string | null {
+  const checkpoint = job.result;
+  if (!checkpoint || checkpoint.ok !== true || typeof checkpoint.courseId !== 'string') return null;
+  const finalization = checkpoint.finalization;
+  if (!finalization || typeof finalization !== 'object') return null;
+  if ((finalization as { state?: unknown }).state !== 'media_pending') return null;
+  const requestedCourseId = job.tool_args.courseId;
+  return !requestedCourseId || requestedCourseId === checkpoint.courseId ? checkpoint.courseId : null;
 }
 
 export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
   const db = await requireAdminClient();
   const progressWrites: PromiseLike<unknown>[] = [];
+  const checkpointCourseId = resumableMediaCheckpoint(job);
 
   const progress = (stage: FactoryStage, message: string, value = 0) => {
     progressWrites.push(
@@ -61,11 +73,29 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
   }, 60_000);
 
   let result;
-  try {
-    result = await courseFactory(job.tool_args, progress);
-  } finally {
+  if (checkpointCourseId) {
     clearInterval(heartbeat);
-    await Promise.allSettled(progressWrites);
+    result = job.result as Record<string, unknown> & { ok: true; courseId: string };
+    const { error: resumeError } = await db
+      .from('courses')
+      .update({
+        generation_status: 'completed',
+        generation_progress: 100,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', checkpointCourseId);
+    if (resumeError) throw resumeError;
+    logger.info('[course-build] Resuming completed build at media finalization', {
+      jobId: job.id,
+      courseId: checkpointCourseId,
+    });
+  } else {
+    try {
+      result = await courseFactory(job.tool_args, progress);
+    } finally {
+      clearInterval(heartbeat);
+      await Promise.allSettled(progressWrites);
+    }
   }
   if (!result.ok || !result.courseId) {
     throw new Error(
@@ -74,7 +104,9 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
     );
   }
 
-  const governance = await normalizeGeneratedCourseForGovernance(result.courseId);
+  const governance = checkpointCourseId
+    ? (result.governance ?? (await normalizeGeneratedCourseForGovernance(result.courseId)))
+    : await normalizeGeneratedCourseForGovernance(result.courseId);
   const finalization = await finalizeCourseAutomaticallyIfReadyWithClient({
     db,
     courseId: result.courseId,

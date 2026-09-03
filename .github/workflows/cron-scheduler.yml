@@ -74,7 +74,7 @@ on:
     - cron: '*/30 * * * *' # every-30-min (missed clock-out enforcement)
 
 env:
-  ADMIN_URL: ${{ secrets.ADMIN_URL }}
+  ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
   APP_URL: https://app.elevateforhumanity.org
   CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
@@ -112,7 +112,7 @@ jobs:
           curl -sf -X GET "$ADMIN_URL/api/cron/process-course-builder-jobs" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
-            --max-time 300 || echo "::warning::process-course-builder-jobs failed"
+            --max-time 300
 
       - name: Dispatch platform events to workflow engine
         run: |

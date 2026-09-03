@@ -24,6 +24,7 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
           stage,
           progress: Math.max(0, Math.min(99, Math.round(value))),
           log_lines: [message],
+          locked_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq('id', job.id)

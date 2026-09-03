@@ -17,6 +17,7 @@ export const fetchCache = 'force-no-store';
 
 const BARBER_HERO_IMAGE =
   'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-hero-new.webp';
+const BARBER_RTI_HOURS = 260;
 
 const FLOW = [
   { icon: BookOpen, title: 'Learn the theory', body: 'Complete verified Related Technical Instruction alongside your hands-on training.' },
@@ -88,8 +89,11 @@ export default async function BarberApprenticeshipPage() {
               <Link href={program.cta.applyHref} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 text-sm font-black text-white hover:bg-brand-red-700">
                 Apply for Barber Apprenticeship <ArrowRight className="h-4 w-4" />
               </Link>
+              <Link href="#host-shops" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-blue-800 px-7 py-3.5 text-sm font-black text-white hover:bg-brand-blue-900">
+                Explore Host Shops <Building2 className="h-4 w-4" />
+              </Link>
               <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-brand-blue-700 bg-white px-7 py-3.5 text-sm font-black text-brand-blue-900 hover:bg-sky-50">
-                Become a Host Shop <Building2 className="h-4 w-4" />
+                Become a Host Shop
               </Link>
             </div>
           </div>
@@ -99,7 +103,7 @@ export default async function BarberApprenticeshipPage() {
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-8">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 lg:grid-cols-4">
           <Fact icon={ShieldCheck} label="Registered model" value="Competency based" />
-          <Fact icon={BookOpen} label="Required RTI" value={`${program.relatedInstructionHours} verified hours`} />
+          <Fact icon={BookOpen} label="Required RTI" value={`${BARBER_RTI_HOURS} verified hours`} />
           <Fact icon={Scissors} label="Training setting" value="Approved host shop" />
           <Fact icon={BadgeCheck} label="Self-pay tuition" value={program.selfPayCost || 'See program details'} />
         </div>
@@ -112,7 +116,7 @@ export default async function BarberApprenticeshipPage() {
             <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Train where the work happens.</h2>
             <p className="mt-3 text-base leading-7 text-slate-700">Approved host shops provide the supervised work setting. Placement availability is verified during enrollment and is not implied by a public listing.</p>
           </div>
-          <FeaturedHostPartners programSlug="barber-apprenticeship" showDirectory={false} />
+          <FeaturedHostPartners programSlug="barber-apprenticeship" />
           <div className="mt-10"><BarberWorkforceNetworkMap /></div>
         </div>
       </section>

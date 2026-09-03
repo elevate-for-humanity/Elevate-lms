@@ -283,7 +283,7 @@ export async function repairPersistedCourseAcceptanceWithClient(input: {
 export async function publishPersistedCourseWithClient(input: {
   db: SupabaseClient;
   courseId: string;
-  actorId: string;
+  actorId?: string | null;
   label?: string;
   request?: NextRequest;
 }) {
@@ -343,7 +343,7 @@ export async function publishPersistedCourseWithClient(input: {
       p_course_id: input.courseId,
       p_gate_version: AUTOMATED_COURSE_GATE_VERSION,
       p_evidence: evidence,
-      p_initiated_by: input.actorId || null,
+      p_initiated_by: input.actorId ?? null,
     },
   );
   if (approvalError) {
@@ -359,7 +359,8 @@ export async function publishPersistedCourseWithClient(input: {
   const badge = await ensureCourseCompletionBadge(input.db, course);
   await logAdminAudit({
     action: AdminAction.COURSE_PUBLISHED,
-    actorId: input.actorId,
+    actorId: input.actorId ?? null,
+    actorRole: input.actorId ? undefined : 'course_builder_system',
     entityType: 'courses',
     entityId: input.courseId,
     metadata: {
@@ -416,10 +417,9 @@ export async function finalizeCourseAutomaticallyIfReadyWithClient(input: {
     return { ok: false as const, state: 'generation_pending' as const };
   }
 
-  const actorId = input.actorId || course.created_by;
-  if (!actorId) {
-    return { ok: false as const, state: 'missing_audit_actor' as const };
-  }
+  // Automated publication is a system action. Human attribution is optional;
+  // the approval evidence and immutable audit records remain authoritative.
+  const actorId = input.actorId ?? course.created_by ?? null;
 
   const media = await getCourseMediaState(input.courseId, { verifyUrls: true });
   if (!media.completePackage) {

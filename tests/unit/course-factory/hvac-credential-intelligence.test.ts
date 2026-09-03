@@ -34,4 +34,11 @@ describe('HVAC credential intelligence', () => {
     expect(source).not.toContain('80% if compressor works, 90% if it does not');
     expect(source).not.toContain('15% for comfort cooling');
   });
+
+  it('versions lesson checkpoints with the governing blueprint', () => {
+    const factory = readFileSync('lib/course-factory/factory.ts', 'utf8');
+    const generator = readFileSync('lib/course-factory/content-generator.ts', 'utf8');
+    expect(factory).toContain('checkpointNamespace: `${enriched.id}:${enriched.version}`');
+    expect(generator).toContain('`${input.lesson.slug}@${input.checkpointNamespace}`');
+  });
 });

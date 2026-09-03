@@ -807,6 +807,7 @@ async function enrichBlueprint(
           moduleTitle: courseModule.title,
           courseTitle,
           state: input.state ?? enriched.state,
+          checkpointNamespace: `${enriched.id}:${enriched.version}`,
           standardsBlock: [
             evidenceStandardsBlock,
             `Required domain: ${lesson.domainKey || courseModule.domainKey || courseModule.slug}`,

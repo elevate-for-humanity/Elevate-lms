@@ -39,6 +39,8 @@ interface LessonGenerationInput {
   courseTitle: string;
   state?: string;
   standardsBlock?: string;
+  /** Invalidates durable/database checkpoints when the governing blueprint changes. */
+  checkpointNamespace?: string;
 }
 
 const GOVERNED_COURSE_RULES = `
@@ -79,7 +81,10 @@ export function lessonGenerationMaxAttempts(): number {
 export async function generateLessonContent(
   input: LessonGenerationInput,
 ): Promise<GeneratedLessonContent> {
-  const cached = await loadLessonGenerationCheckpoint(input.courseTitle, input.lesson.slug);
+  const checkpointSlug = input.checkpointNamespace
+    ? `${input.lesson.slug}@${input.checkpointNamespace}`
+    : input.lesson.slug;
+  const cached = await loadLessonGenerationCheckpoint(input.courseTitle, checkpointSlug);
   if (cached) {
     logger.info('[course-factory/content-generator] Reusing generated lesson checkpoint', {
       lesson: input.lesson.slug,
@@ -242,7 +247,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
 
       await persistLessonGenerationCheckpoint({
         courseTitle: input.courseTitle,
-        lessonSlug: input.lesson.slug,
+        lessonSlug: checkpointSlug,
         objective: parsed.objective,
         html: parsed.content,
         learningPoints: parsed.learning_points,

@@ -26,6 +26,8 @@ import { loadLearnerWorkspace } from '@/lib/learner/workspace';
 import { getActiveJobs } from '@/lib/data/jobs';
 import JobCard from '@/components/jobs/JobCard';
 import { MARKETING_HOST } from '@/lib/routing/portal-map';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 export const metadata: Metadata = generateInternalMetadata({
   title: 'Student Dashboard',
@@ -69,9 +71,18 @@ function isBlockedExternalTraining(course: { partner_name?: string | null; exter
 }
 
 export default async function StudentDashboard() {
-  const { user, profile } = await requireRole(['student', 'learner', 'admin']);
+  const { user, profile } = await requireRole(['student', 'learner', 'admin', 'super_admin']);
   const supabase = await createClient();
-  const workspace = await loadLearnerWorkspace(user.id, profile?.role || 'student');
+  const db = await requireAdminClient();
+  const subject = await resolvePortalPreviewSubject(db, user.id);
+  const isAdminActor = ['admin', 'super_admin'].includes(String(profile?.role || ''));
+  if (isAdminActor && !subject.previewing) return <NeutralStudentPortalPreview />;
+
+  const subjectId = subject.userId;
+  const { data: subjectProfile } = subject.previewing
+    ? await db.from('profiles').select('role,full_name,email').eq('id', subjectId).maybeSingle()
+    : { data: profile };
+  const workspace = await loadLearnerWorkspace(subjectId, subjectProfile?.role || 'student');
   const careerJobs = await getActiveJobs({ limit: 4 });
 
   const [
@@ -85,12 +96,12 @@ export default async function StudentDashboard() {
     supabase
       .from('certificates')
       .select('id, course_title, issued_at, verification_code')
-      .eq('user_id', user.id)
+      .eq('user_id', subjectId)
       .order('issued_at', { ascending: false }),
     supabase
       .from('applications')
       .select('id, status, requested_funding_source')
-      .eq('user_id', user.id)
+      .eq('user_id', subjectId)
       .eq('status', 'pending_workone')
       .order('created_at', { ascending: false })
       .limit(1)
@@ -98,14 +109,14 @@ export default async function StudentDashboard() {
     supabase
       .from('quiz_attempts')
       .select('id, score, passed, completed_at, quiz_id, quizzes(title)')
-      .eq('user_uuid', user.id)
+      .eq('user_uuid', subjectId)
       .not('completed_at', 'is', null)
       .order('completed_at', { ascending: false })
       .limit(5),
     supabase
       .from('payment_logs')
       .select('id, amount, status, completed_at, created_at')
-      .eq('user_id', user.id)
+      .eq('user_id', subjectId)
       .order('created_at', { ascending: false })
       .limit(5),
     supabase
@@ -119,7 +130,7 @@ export default async function StudentDashboard() {
     supabase
       .from('external_course_completions')
       .select('id, external_course_id, completed_at, certificate_url, approved_at, elevate_sponsored, stripe_session_id')
-      .eq('user_id', user.id),
+      .eq('user_id', subjectId),
   ]);
 
   const programEnrollments = workspace.enrollments.filter((row) => row.program_id).map((row) => ({
@@ -178,7 +189,7 @@ export default async function StudentDashboard() {
       supabase
         .from('lesson_progress')
         .select('lesson_id, completed')
-        .eq('user_id', user.id)
+        .eq('user_id', subjectId)
         .eq('course_id', activeCourseId),
     ]);
 
@@ -229,8 +240,9 @@ export default async function StudentDashboard() {
     .reduce((sum: number, payment: any) => sum + Number(payment.amount ?? 0), 0);
 
   const firstName =
-    profile?.full_name?.split(' ')[0] ||
-    user.email?.split('@')[0] ||
+    subjectProfile?.full_name?.split(' ')[0] ||
+    subjectProfile?.email?.split('@')[0] ||
+    (!subject.previewing ? user.email?.split('@')[0] : '') ||
     'there';
 
   const learningTools = [
@@ -521,6 +533,11 @@ export default async function StudentDashboard() {
 
     </div>
   );
+}
+
+function NeutralStudentPortalPreview() {
+  const modules = ['Onboarding', 'Required Documents', 'Digital Binder', 'Agreements', 'My Courses', 'Progress', 'Assignments', 'Schedule', 'Certificates', 'Career Services'];
+  return <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6"><div className="mx-auto max-w-6xl space-y-6"><section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Administrator portal preview</p><h1 className="mt-2 text-3xl font-black text-slate-950">Student PWA</h1><p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">This neutral preview confirms that the Student PWA is operational. No learner identity, enrollment, payment, progress, or career record is attached. Select a learner from secured Admin student management to open an audited, read-only dashboard.</p><div className="mt-6 flex flex-wrap gap-3"><a href="https://admin.elevateforhumanity.org/students" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">Select a learner in Admin</a><a href="https://admin.elevateforhumanity.org/dashboard" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950">Return to Admin dashboard</a></div></section><section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{modules.map((label) => <article key={label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><GraduationCap className="h-5 w-5 text-blue-700"/><h2 className="mt-3 font-black text-slate-950">{label}</h2><p className="mt-1 text-sm text-slate-600">Available after an authorized learner is selected.</p></article>)}</section></div></main>;
 }
 
 function Stat({ label, value }: { label: string; value: string }) {

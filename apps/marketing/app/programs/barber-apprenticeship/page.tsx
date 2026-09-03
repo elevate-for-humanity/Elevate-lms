@@ -72,7 +72,6 @@ export default async function BarberApprenticeshipPage() {
         analyticsName="barber-apprenticeship"
         heightClassName="h-[clamp(360px,55vh,600px)]"
         overlayMode="none"
-        transcript={heroBanner?.transcript ?? 'Barber apprenticeship training in a professional shop environment.'}
       />
 
       <section className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12">

@@ -31,6 +31,7 @@ const TRUSTED_HOSTS = [
   'www.elevateforhumanity.org',
   'admin.elevateforhumanity.org',
   'app.elevateforhumanity.org',
+  'store.elevateforhumanity.org',
 ];
 
 /**

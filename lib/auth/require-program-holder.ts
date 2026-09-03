@@ -81,7 +81,9 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
   if (!['approved', 'active'].includes(holder.status) || !holder.approved_at) {
     redirect('/program-holder/onboarding?status=pending-approval');
   }
-  if (!holder.mou_signed) redirect('/program-holder/sign-mou?required=true');
+  // Program Holders may view their dashboard while completing onboarding.
+  // Money movement and other privileged actions enforce the full checklist
+  // independently; an unsigned MOU must never make student records invisible.
 
   const { data: associations } = await db
     .from('program_holder_programs')

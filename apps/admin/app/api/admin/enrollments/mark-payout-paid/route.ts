@@ -5,6 +5,7 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getProgramHolderPaymentReadiness } from '@/lib/program-holder/onboarding-readiness';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +32,24 @@ export async function POST(request: NextRequest) {
 
   const { enrollment_id, push_to_quickbooks } = await request.json();
   if (!enrollment_id) return safeError('enrollment_id required', 400);
+
+  const { data: paymentEnrollment } = await db
+    .from('program_enrollments')
+    .select('program_holder_id')
+    .eq('id', enrollment_id)
+    .maybeSingle();
+  if (!paymentEnrollment?.program_holder_id)
+    return safeError('Program Holder assignment required before payment', 409);
+  const readiness = await getProgramHolderPaymentReadiness(db, paymentEnrollment.program_holder_id);
+  if (!readiness.ready) {
+    return NextResponse.json(
+      {
+        error: 'Payment is on hold until Program Holder onboarding is complete.',
+        missing_requirements: readiness.missing,
+      },
+      { status: 409 },
+    );
+  }
 
   const now = new Date().toISOString();
 
@@ -60,23 +79,28 @@ export async function POST(request: NextRequest) {
         .eq('id', enrollment_id)
         .maybeSingle();
 
-      const profile = (enrollment?.profiles as any);
+      const profile = enrollment?.profiles as any;
       if (enrollment && profile?.email) {
         const lmsBase = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
         const qbRes = await fetch(`${lmsBase}/api/quickbooks/contractor-payment`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-internal-key': process.env.INTERNAL_API_KEY || '' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-internal-key': process.env.INTERNAL_API_KEY || '',
+          },
           body: JSON.stringify({
             enrollment_id,
-            amount:                enrollment.payout_amount ?? 0,
-            program_holder_name:   profile.full_name ?? profile.email,
-            program_holder_email:  profile.email,
+            amount: enrollment.payout_amount ?? 0,
+            program_holder_name: profile.full_name ?? profile.email,
+            program_holder_email: profile.email,
             memo: `Voucher payment — enrollment ${enrollment_id}`,
           }),
         });
         if (qbRes.ok) qbResult = await qbRes.json();
       }
-    } catch { /* non-fatal — payout still marked paid locally */ }
+    } catch {
+      /* non-fatal — payout still marked paid locally */
+    }
   }
 
   // Audit entry
@@ -98,5 +122,9 @@ export async function POST(request: NextRequest) {
     .order('changed_at', { ascending: false })
     .limit(50);
 
-  return NextResponse.json({ enrollment: updated, audit_log: auditLog ?? [], quickbooks: qbResult });
+  return NextResponse.json({
+    enrollment: updated,
+    audit_log: auditLog ?? [],
+    quickbooks: qbResult,
+  });
 }

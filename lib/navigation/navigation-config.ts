@@ -54,8 +54,7 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
   student: [{ id: 'learning', items: [
     { id: 'dashboard', label: 'Dashboard', href: p('lms'), icon: LayoutDashboard },
     { id: 'onboarding', label: 'Onboarding', href: p('lms', 'onboarding'), icon: ClipboardList },
-    { id: 'documents', label: 'Required Documents', href: p('lms', 'documents'), icon: FileText },
-    { id: 'binder', label: 'Digital Binder', href: p('lms', 'binder'), icon: ClipboardCheck },
+    { id: 'documents', label: 'Documents & Records', href: p('lms', 'documents'), icon: FileText },
     { id: 'agreements', label: 'Agreements', href: p('lms', 'agreements'), icon: Shield },
     { id: 'handbook', label: 'Student Handbook', href: p('lms', 'handbook'), icon: BookOpen },
     { id: 'courses', label: 'My Courses', href: p('lms', 'courses'), icon: BookOpen },

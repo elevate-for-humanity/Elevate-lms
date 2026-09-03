@@ -6,9 +6,13 @@ import { createPortalPreviewHandoff, verifyPortalPreviewHandoff } from '@/lib/ad
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin']);
 const HOST_SHOP_ROLES = new Set(['partner', 'host_shop', 'host_shop_admin', 'program_holder']);
+const APPRENTICE_ROLES = new Set(['apprentice', 'barber_apprentice', 'cosmetology_apprentice']);
 
 function previewDestination(role: unknown) {
-  return HOST_SHOP_ROLES.has(String(role || '')) ? '/host-shop/dashboard' : '/apprentice';
+  const value = String(role || '');
+  if (HOST_SHOP_ROLES.has(value)) return '/host-shop/dashboard';
+  if (APPRENTICE_ROLES.has(value)) return '/apprentice';
+  return '/lms/dashboard';
 }
 
 export async function GET(request: NextRequest) {

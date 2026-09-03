@@ -39,6 +39,7 @@ export function HomeSocialAppCTA() {
       className="border-y border-slate-200 bg-slate-950 px-4 py-12 text-white"
       aria-labelledby="follow-elevate-heading"
       data-scroll-narration
+      data-narration-src="/audio/narration/social.mp3"
       data-narration="Stay connected with Elevate. Like us on Facebook, follow us on Instagram, subscribe on YouTube, connect on LinkedIn, or open the latest video feed for new demonstrations, tours, and community updates."
     >
       <div className="mx-auto max-w-6xl">

@@ -11,6 +11,10 @@ function narrationFor(section: HTMLElement) {
   return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';
 }
 
+function narrationSourceFor(section: HTMLElement) {
+  return section.dataset.narrationSrc?.trim() || undefined;
+}
+
 function mostVisiblePageSection() {
   const sections = Array.from(
     document.querySelectorAll<HTMLElement>('main [data-scroll-narration]'),
@@ -35,7 +39,7 @@ export function ScrollNarrator() {
   const pathname = usePathname();
   const [enabled, setEnabled] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
-  const lastNarrationRef = useRef<{ section: HTMLElement; text: string } | null>(null);
+  const lastNarrationRef = useRef<{ section: HTMLElement; text: string; source?: string } | null>(null);
   const timerRef = useRef<number | null>(null);
   const { play, prepare, stop, isLoading, isPlaying } = useNaturalVoice();
 
@@ -52,11 +56,17 @@ export function ScrollNarrator() {
 
     const text = narrationFor(section);
     if (!text) return;
-    if (lastNarrationRef.current?.section === section && lastNarrationRef.current.text === text)
+    const source = narrationSourceFor(section);
+    if (
+      lastNarrationRef.current?.section === section &&
+      lastNarrationRef.current.text === text &&
+      lastNarrationRef.current.source === source
+    )
       return;
 
-    lastNarrationRef.current = { section, text };
+    lastNarrationRef.current = { section, text, source };
     const started = await play(text, {
+      src: source,
       voice: 'coral',
       style: 'assistant',
       rate: 0.98,
@@ -84,6 +94,7 @@ export function ScrollNarrator() {
       const text = narrationFor(section);
       if (text)
         void prepare(text, {
+          src: narrationSourceFor(section),
           voice: 'coral',
           style: 'assistant',
           rate: 0.98,

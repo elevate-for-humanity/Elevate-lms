@@ -48,6 +48,7 @@ export default function HostShopShowcase({
   videoTourShopSlug,
   autoPlayVideoOnVisible = false,
   narration,
+  narrationSrc,
   mediaOverrides,
 }: {
   shops: FeaturedHostPartner[];
@@ -57,6 +58,8 @@ export default function HostShopShowcase({
   autoPlayVideoOnVisible?: boolean;
   /** Page-specific natural narration used while this section is dominant. */
   narration?: string;
+  /** Pre-rendered narration removes runtime voice-generation delay. */
+  narrationSrc?: string;
   /** Page-specific media without changing another surface such as the homepage. */
   mediaOverrides?: Record<string, ShowcaseMedia>;
 }) {
@@ -111,14 +114,14 @@ export default function HostShopShowcase({
       ([entry]) => {
         const video = section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]');
         if (!video) return;
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.45) {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
           video.muted = true;
           void video.play().catch(() => undefined);
         } else {
           video.pause();
         }
       },
-      { threshold: [0, 0.45, 0.75] },
+      { threshold: [0, 0.35, 0.75] },
     );
 
     observer.observe(section);
@@ -171,6 +174,7 @@ export default function HostShopShowcase({
       ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
       data-scroll-narration
+      data-narration-src={narrationSrc}
       data-narration={
         narration ??
         'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.'
@@ -243,8 +247,8 @@ export default function HostShopShowcase({
                       }
                     }}
                     onLoadedMetadata={(event) => {
-                      event.currentTarget.defaultPlaybackRate = 1;
-                      event.currentTarget.playbackRate = 1;
+                      event.currentTarget.defaultPlaybackRate = 0.82;
+                      event.currentTarget.playbackRate = 0.82;
                     }}
                     onEnded={(event) => {
                       // Hold the final frame. The tour is never cut short, sped up,

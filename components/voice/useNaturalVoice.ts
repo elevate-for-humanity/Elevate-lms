@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 type NaturalVoiceStyle = 'default' | 'assistant' | 'instructor' | 'commercial';
 
 type PlayOptions = {
+  src?: string;
   voice?: string;
   style?: NaturalVoiceStyle;
   rate?: number;
@@ -29,6 +30,7 @@ function naturalVoiceCacheKey(text: string, options: PlayOptions) {
     options.voice || 'coral',
     options.style || 'default',
     options.rate || 1,
+    options.src || '',
   ]);
 }
 
@@ -51,18 +53,27 @@ async function requestNaturalVoiceBlob(text: string, options: PlayOptions): Prom
   const cached = naturalVoiceCache.get(key);
   if (cached) return cached;
 
+  const source = options.src?.trim();
+  if (source && !source.startsWith('/')) {
+    throw new Error('Natural voice media must use a same-origin path.');
+  }
+
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 15_000);
-  const request = fetch('/api/voice/natural', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
-      cache: 'no-store',
-      body: JSON.stringify({
-        text,
-        voice: options.voice || 'coral',
-        style: options.style || 'default',
-        rate: options.rate || 1,
-      }),
+  const request = fetch(source || '/api/voice/natural', {
+      ...(source
+        ? { method: 'GET' }
+        : {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
+            body: JSON.stringify({
+              text,
+              voice: options.voice || 'coral',
+              style: options.style || 'default',
+              rate: options.rate || 1,
+            }),
+          }),
+      cache: source ? 'force-cache' : 'no-store',
       signal: controller.signal,
     })
     .then(async (response) => {

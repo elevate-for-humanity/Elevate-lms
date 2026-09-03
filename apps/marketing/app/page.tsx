@@ -98,41 +98,42 @@ export default function HomePage() {
           shops={HOME_HOST_SHOPS}
           videoTourShopSlug="salon-saloon"
           autoPlayVideoOnVisible
+          narrationSrc="/audio/narration/host-shop.mp3"
           narration="Meet Salon Saloon, a new participating Elevate Host Shop serving South Bend. Visit the salon at 1740 South Bend Avenue, Suite A, South Bend, Indiana 46637, or call 269-240-7923. This tour introduces the professional salon environment where cosmetology apprentices can build supervised, hands-on experience while the Host Shop develops future talent. Use the booking link or schedule a Host Shop tour to learn more."
         />
         <div
           data-scroll-narration
           data-narration="You do not have to have your whole career figured out today. Start by exploring the field that fits your interests, schedule, and goals."
+          data-narration-src="/audio/narration/career-pathways.mp3"
         >
           <HomeCareerPathways />
         </div>
         <div
           data-scroll-narration
           data-narration="An apprenticeship lets you learn with structure while gaining supervised experience on the job. We help connect the classroom, the employer, and your progress records."
+          data-narration-src="/audio/narration/apprenticeship.mp3"
         >
           <HomeApprenticeshipSales />
         </div>
         <div
           data-scroll-narration
           data-narration="If you run a business or training program, Elevate can also help you build your website and manage the tools behind it from one connected place."
+          data-narration-src="/audio/narration/website-builder.mp3"
         >
           <HomeWebsiteBuilderSales />
         </div>
-        <div
-          data-scroll-narration
-          data-narration="Stay connected with opportunities, updates, and your Elevate community wherever you are."
-        >
-          <HomeSocialAppCTA />
-        </div>
+        <HomeSocialAppCTA />
         <div
           data-scroll-narration
           data-narration="Cost should be clear before you enroll. We help you review possible funding and payment paths, then verify what you qualify for."
+          data-narration-src="/audio/narration/funding.mp3"
         >
           <HomeFunding />
         </div>
         <div
           data-scroll-narration
           data-narration="When you are ready, choose the next step that fits you: explore a program, apply for training, or connect with our team."
+          data-narration-src="/audio/narration/final.mp3"
         >
           <HomeFinalCTA />
         </div>

@@ -55,6 +55,25 @@ export async function POST(request: NextRequest) {
   const db = await requireAdminClient();
   const maxConcurrent = renderConcurrency();
 
+  if (courseId) {
+    const { data: course, error: courseError } = await db
+      .from('courses')
+      .select('generation_paused')
+      .eq('id', courseId)
+      .maybeSingle();
+    if (courseError) {
+      return NextResponse.json({ error: 'Unable to inspect course generation state' }, { status: 500 });
+    }
+    if (!course || course.generation_paused === true) {
+      return NextResponse.json({
+        ok: true,
+        started: 0,
+        reason: 'course-generation-paused',
+        courseId,
+      });
+    }
+  }
+
   // Capacity is global even when candidate selection is course-scoped. This
   // prevents an acceptance/repair run from overbooking Chromium while another
   // course already owns render slots.
@@ -152,14 +171,46 @@ export async function POST(request: NextRequest) {
 
   // Postgres owns the concurrency boundary. FOR UPDATE SKIP LOCKED prevents
   // separate Admin instances from rendering the same canonical asset.
-  const { data: claimedRows, error: claimError } = await db.rpc('claim_video_jobs', {
-    p_limit: availableSlots,
-    p_course_id: courseId,
-    p_lease_seconds: 900,
-  });
-  if (claimError) {
-    logger.error('[video-worker] Atomic queue claim failed', claimError);
-    return NextResponse.json({ error: 'Unable to claim the video queue' }, { status: 500 });
+  let claimedRows: VideoJob[] = [];
+  if (courseId) {
+    const { data, error: claimError } = await db.rpc('claim_video_jobs', {
+      p_limit: availableSlots,
+      p_course_id: courseId,
+      p_lease_seconds: 900,
+    });
+    if (claimError) {
+      logger.error('[video-worker] Atomic queue claim failed', claimError);
+      return NextResponse.json({ error: 'Unable to claim the video queue' }, { status: 500 });
+    }
+    claimedRows = (data ?? []) as VideoJob[];
+  } else {
+    // The database lease remains the concurrency authority, while the course
+    // pause flag is the cost-control authority. Claim per unpaused course so a
+    // large paused backlog cannot consume renderer or GPU capacity.
+    const { data: eligibleCourses, error: eligibleCourseError } = await db
+      .from('courses')
+      .select('id')
+      .eq('generation_paused', false)
+      .order('updated_at', { ascending: true });
+    if (eligibleCourseError) {
+      return NextResponse.json({ error: 'Unable to inspect unpaused courses' }, { status: 500 });
+    }
+    for (const course of eligibleCourses ?? []) {
+      const remaining = availableSlots - claimedRows.length;
+      if (remaining <= 0) break;
+      const { data, error: claimError } = await db.rpc('claim_video_jobs', {
+        p_limit: remaining,
+        p_course_id: course.id,
+        p_lease_seconds: 900,
+      });
+      if (claimError) {
+        logger.error('[video-worker] Atomic course-scoped queue claim failed', claimError, {
+          courseId: course.id,
+        });
+        return NextResponse.json({ error: 'Unable to claim the video queue' }, { status: 500 });
+      }
+      claimedRows.push(...((data ?? []) as VideoJob[]));
+    }
   }
   if (!claimedRows?.length) {
     return NextResponse.json({ ok: true, started: 0, reason: 'queue-empty', courseId });

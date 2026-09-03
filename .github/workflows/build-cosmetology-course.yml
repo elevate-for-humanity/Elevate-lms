@@ -29,9 +29,10 @@ permissions:
 env:
   CI: true
   NODE_ENV: production
-  # Course generation uses Elevate's single self-hosted canonical provider.
-  AI_PROVIDER: elevate
-  AI_PROVIDER_ORDER: elevate
+  # Course generation uses serverless Workers AI. The always-on L4 LLM worker
+  # is intentionally excluded so idle course authoring cannot consume GPU credit.
+  AI_PROVIDER: cloudflare
+  AI_PROVIDER_ORDER: cloudflare
   AI_CIRCUIT_RECOVERY_WAIT: '1'
   COURSE_FACTORY_LESSON_MAX_TOKENS: '4000'
   COURSE_FACTORY_LESSON_MAX_ATTEMPTS: '2'
@@ -111,9 +112,6 @@ jobs:
 
       - name: Wait for authenticated production database readiness
         run: node scripts/course-factory/wait-for-cosmetology-database.mjs
-
-      - name: Resolve and accept canonical Elevate LLM
-        run: node scripts/northflank/export-course-llm-env.mjs
 
       - name: Build canonical cosmetology course and queue media
         run: pnpm tsx scripts/course-factory/build-cosmetology-course.ts

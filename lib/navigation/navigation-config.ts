@@ -151,6 +151,14 @@ export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
   ] }],
   program_holder: [{ id: 'program-holder', items: [
     { id: 'dashboard', label: 'Dashboard', href: p('programholder'), icon: LayoutDashboard },
+    { id: 'students', label: 'Enrolled Students', href: '/program-holder/students', icon: Users },
+    { id: 'pending', label: 'Applicants', href: '/program-holder/students/pending', icon: Clock },
+    { id: 'programs', label: 'HVAC Program', href: '/program-holder/programs', icon: BookOpen },
+    { id: 'hours', label: 'Training Hours', href: '/program-holder/hours', icon: Clock },
+    { id: 'compliance', label: 'Compliance', href: '/program-holder/compliance', icon: Shield },
+    { id: 'documents', label: 'Documents', href: '/program-holder/documents', icon: FileText },
+    { id: 'reports', label: 'Reports', href: '/program-holder/reports', icon: BarChart3 },
+    { id: 'settings', label: 'Settings', href: '/program-holder/settings', icon: Settings },
   ] }],
   provider: [{ id: 'provider', items: [
     { id: 'dashboard', label: 'Dashboard', href: p('provider'), icon: LayoutDashboard },

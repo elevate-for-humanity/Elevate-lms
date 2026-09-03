@@ -209,6 +209,44 @@ async function updateJob(db: AdminDb, patch: Record<string, unknown>) {
   }
 }
 
+async function githubRunHasStopped(runId: string): Promise<boolean | null> {
+  const repository = process.env.GITHUB_REPOSITORY;
+  if (!repository || !/^\d+$/.test(runId)) return null;
+
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/${repository}/actions/runs/${runId}`,
+      {
+        headers: {
+          Accept: 'application/vnd.github+json',
+          'User-Agent': 'elevate-cosmetology-course-builder',
+          ...(process.env.GITHUB_TOKEN
+            ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
+            : {}),
+        },
+        signal: AbortSignal.timeout(10_000),
+      },
+    );
+    if (!response.ok) {
+      console.warn(
+        `[Cosmetology Course Builder] could not verify workflow ${runId}: HTTP ${response.status}`,
+      );
+      return null;
+    }
+
+    const run = (await response.json()) as {
+      status?: string;
+      conclusion?: string | null;
+    };
+    return run.status === 'completed' || Boolean(run.conclusion);
+  } catch (error) {
+    console.warn(
+      `[Cosmetology Course Builder] could not verify workflow ${runId}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return null;
+  }
+}
+
 async function reconcileAbandonedJobs(db: AdminDb) {
   const { data: runningJobs, error } = await requiredDbOperation(
     'abandoned Course Factory job lookup',
@@ -235,8 +273,18 @@ async function reconcileAbandonedJobs(db: AdminDb) {
           )
         : Number.NaN;
     const lastActivity = Number.isFinite(heartbeat) ? heartbeat : startedAt;
+    const priorRunId =
+      job.metadata &&
+      typeof job.metadata === 'object' &&
+      typeof (job.metadata as Record<string, unknown>).github_run_id === 'string'
+        ? (job.metadata as Record<string, string>).github_run_id
+        : null;
+    const priorRunStopped = priorRunId
+      ? await githubRunHasStopped(priorRunId)
+      : null;
     const abandoned =
       Boolean(job.completed_at) ||
+      priorRunStopped === true ||
       !Number.isFinite(lastActivity) ||
       now - lastActivity >= ABANDONED_JOB_AGE_MS;
     if (!abandoned) {

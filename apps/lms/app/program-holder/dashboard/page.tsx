@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function ProgramHolderDashboard() {
   const ctx = await requireProgramHolder();
-  if (ctx.mode === 'admin') return <AdminOversight db={ctx.db} />;
+  if (ctx.mode === 'admin') return <AdminOversight />;
 
   const { db, holderId, programIds, profile } = ctx;
   const [holderRes, programsRes, studentsRes, hoursRes, docsRes] = await Promise.all([
@@ -70,15 +70,9 @@ export default async function ProgramHolderDashboard() {
   );
 }
 
-async function AdminOversight({ db }: { db: any }) {
-  const [holdersRes, studentsRes, hoursRes, programsRes] = await Promise.all([
-    db.from('program_holders').select('id, organization_name, name, status, mou_signed, approved_at, payout_status').order('created_at', { ascending: false }).limit(100),
-    db.from('program_holder_students').select('id', { count: 'exact', head: true }),
-    db.from('hour_entries').select('id', { count: 'exact', head: true }).not('program_holder_id', 'is', null).eq('status', 'pending'),
-    db.from('program_holder_programs').select('program_id', { count: 'exact', head: true }).eq('status', 'active'),
-  ]);
-  const holders = holdersRes.data ?? [];
-  return <main className="min-h-screen bg-slate-50 px-4 py-8"><div className="mx-auto max-w-7xl"><p className="text-sm font-bold uppercase tracking-[0.18em] text-blue-800">Program Holder Portal · Admin Oversight</p><h1 className="mt-2 text-4xl font-black">Program Holder operations</h1><p className="mt-2 max-w-3xl text-slate-600">Platform-wide oversight without assigning Admin to an individual holder record.</p><div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><Metric label="Program holders" value={holders.length} /><Metric label="Active associations" value={programsRes.count ?? 0} /><Metric label="Linked students" value={studentsRes.count ?? 0} /><Metric label="Pending hours" value={hoursRes.count ?? 0} /></div><section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-2xl font-black">Program Holder registry</h2><a href="https://admin.elevateforhumanity.org/program-holders" className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white">Open Admin management</a></div><div className="mt-5 divide-y divide-slate-100">{holders.length ? holders.map((holder: any) => <div key={holder.id} className="flex flex-wrap items-center justify-between gap-3 py-3"><div><p className="font-bold">{holder.organization_name || holder.name || holder.id}</p><p className="text-xs text-slate-600">{holder.status || 'unknown'} · MOU {holder.mou_signed ? 'signed' : 'required'}</p></div><span className="text-sm font-semibold">{holder.payout_status || 'Payout not configured'}</span></div>) : <p className="py-8 text-sm text-slate-600">No Program Holders found.</p>}</div></section></div></main>;
+function AdminOversight() {
+  const modules = ['Programs', 'Student Rosters', 'Training Hours', 'Documents', 'Compliance', 'Payouts'];
+  return <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6"><div className="mx-auto max-w-6xl space-y-6"><section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Administrator portal preview</p><h1 className="mt-2 text-3xl font-black text-slate-950">Program Holder PWA</h1><p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">This neutral preview confirms that the Program Holder PWA is operational. No provider, learner roster, hours, document, compliance, or payout record is attached to the administrator session.</p><div className="mt-6 flex flex-wrap gap-3"><a href="https://admin.elevateforhumanity.org/program-holders" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">Select a Program Holder in Admin</a><a href="https://admin.elevateforhumanity.org/dashboard" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950">Return to Admin dashboard</a></div></section><section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{modules.map((label) => <article key={label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 className="font-black text-slate-950">{label}</h2><p className="mt-1 text-sm text-slate-600">Available after an authorized Program Holder is selected.</p></article>)}</section></div></main>;
 }
 
 function Metric({ label, value }: { label: string; value: number }) { return <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-3xl font-black">{value}</p><p className="mt-1 text-sm font-semibold text-slate-600">{label}</p></div>; }

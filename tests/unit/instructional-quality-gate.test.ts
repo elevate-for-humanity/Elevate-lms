@@ -16,7 +16,8 @@ function storyboard(closeUp = true): MediaStoryboard {
       id: 'scene-1', order: 1, durationSeconds: 8, operation: 'textToVideo', subject: 'Sanitation',
       environment: 'salon', action: 'Disinfect tools', visualStyle: 'educational',
       shotSize: closeUp ? 'close-up' : 'wide', cameraMove: 'locked', lighting: 'bright', transition: 'cut',
-      characterIds: [], requiredVisualEvidence: 'Hands immerse cleaned tools in labeled disinfectant',
+      characterIds: [], dialogue: 'Use sanitation and disinfection to disinfect tools safely.',
+      requiredVisualEvidence: 'Hands disinfect tools using sanitation procedure',
     }],
   };
 }
@@ -47,6 +48,24 @@ describe('instructional quality gate', () => {
     });
     expect(result.failures.some((failure) => failure.includes('too short'))).toBe(true);
     expect(result.failures.some((failure) => failure.includes('claims a visual demonstration'))).toBe(true);
+  });
+
+  it('rejects internal prompt instructions leaked into learner narration', () => {
+    const result = instructionalQualityFailures({
+      courseTitle: 'Cosmetology Apprenticeship', lessonTitle: 'Sanitation and Disinfection',
+      script: `${longInstruction} The narration should model a concrete example and end with the action the learner must demonstrate.`,
+      instructor, storyboard: storyboard(),
+    });
+    expect(result.failures).toContain('narration contains internal generation instructions');
+  });
+
+  it('requires narration to cover every persisted learning objective', () => {
+    const result = instructionalQualityFailures({
+      courseTitle: 'Cosmetology Apprenticeship', lessonTitle: 'Sanitation and Disinfection',
+      script: longInstruction, learningObjectives: ['Disinfect implements', 'Perform a scalp analysis'],
+      instructor, storyboard: storyboard(),
+    });
+    expect(result.failures.some((failure) => failure.includes('learning objectives'))).toBe(true);
   });
 
   it('does not treat competency mastery language as a visual demonstration claim', () => {

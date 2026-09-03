@@ -2,6 +2,7 @@ import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { classifyVideoFailure, type VideoAssetKind, type VideoJob } from '@/lib/video/job-queue';
+import { MEDIA_QUALITY_GATE_VERSION, mediaQualityFailures, type MediaQualityEvidence } from '@/lib/video/media-quality-gate';
 
 export const COURSE_MEDIA_MAX_RETRIES = 3;
 export const COURSE_MEDIA_STALE_RENDER_MS = 45 * 60 * 1000;
@@ -31,7 +32,14 @@ export interface CourseMediaState {
   staleRendering: number;
   lessonStateMismatches: number;
   microclipStateMismatches: number;
+  invalidQualityEvidence: number;
   completePackage: boolean;
+}
+
+export function hasCanonicalMediaQualityEvidence(value: unknown): value is MediaQualityEvidence {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const evidence = value as MediaQualityEvidence;
+  return evidence.gateVersion === MEDIA_QUALITY_GATE_VERSION && mediaQualityFailures(evidence).length === 0;
 }
 
 export function canonicalMediaIdentityKey(
@@ -325,6 +333,9 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
     ),
   ).length;
   const completeRows = rows.filter((row) => row.status === 'complete' && Boolean(row.video_url));
+  const invalidQualityEvidence = completeRows.filter((row) =>
+    row.review_status !== 'approved' || !hasCanonicalMediaQualityEvidence(row.quality_evidence),
+  ).length;
   let playable = options.verifyUrls ? 0 : completeRows.length;
   let unreachable: Array<{ jobId: string; url: string; reason: string }> = [];
 
@@ -354,11 +365,13 @@ export async function getCourseMediaState(courseId: string, options: { verifyUrl
     staleRendering,
     lessonStateMismatches,
     microclipStateMismatches,
+    invalidQualityEvidence,
     completePackage:
       rows.length === expectedTotal &&
       duplicates === 0 &&
       queued === 0 && rendering === 0 && failed === 0 && staleRendering === 0 &&
       lessonStateMismatches === 0 && microclipStateMismatches === 0 &&
+      invalidQualityEvidence === 0 &&
       complete === expectedTotal && playable === expectedTotal && unreachable.length === 0,
   };
 }

@@ -3,12 +3,14 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('server-only', () => ({}));
 
 import {
+  MEDIA_QUALITY_GATE_VERSION,
   mediaQualityFailures,
   resolveCloudflareTranscriptionModel,
   type MediaQualityEvidence,
 } from '@/lib/video/media-quality-gate';
 
 const validEvidence: MediaQualityEvidence = {
+  gateVersion: MEDIA_QUALITY_GATE_VERSION,
   bytes: 2_000_000,
   actualDurationSeconds: 148,
   expectedDurationSeconds: 148,
@@ -28,6 +30,14 @@ const validEvidence: MediaQualityEvidence = {
   repeatedVisualMaximum: 1,
   requiredProcedurePhases: ['procedure'],
   deliveredProcedurePhases: ['procedure'],
+  sourceEvidenceCoverage: 1,
+  exactVisualSourceCoverage: 1,
+  instructionalQuality: {
+    wordCount: 190, minimumWordCount: 180, courseDomain: 'cosmetology', demonstrationClaimed: false,
+    demonstrationScenes: 1, titleKeywordCoverage: 1, sceneTypeCoverage: 0.2, hasMentalModel: false,
+    hasWorkedExample: true, hasMemoryRecap: false, hasKnowledgeCheck: false, hasSafetyScene: true,
+    objectiveCoverage: 1, sceneNarrationAlignment: 1, instructionLeakageDetected: false,
+  },
 };
 
 describe('canonical media completion quality gate', () => {

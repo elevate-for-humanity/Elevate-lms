@@ -229,7 +229,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     const { data: lesson } = await db
       .from('course_lessons')
       .select(
-        'content,content_json,domain_key,compliance_profile_key,lesson_type,evidence_type,video_config,script,script_text',
+        'content,content_json,domain_key,compliance_profile_key,lesson_type,evidence_type,video_config,script,script_text,learning_objectives',
       )
       .eq('id', job.lesson_id)
       .maybeSingle();
@@ -365,12 +365,15 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       characters,
       defaultDurationSeconds: 5,
     });
-    enforceInstructionalQuality({
+    const instructionalQuality = enforceInstructionalQuality({
       courseTitle,
       lessonTitle: job.lesson_title,
       lessonType: lesson?.lesson_type,
       evidenceType: lesson?.evidence_type,
       script,
+      learningObjectives: Array.isArray(lesson?.learning_objectives)
+        ? lesson.learning_objectives.filter((value): value is string => typeof value === 'string')
+        : bulletPoints,
       instructor,
       storyboard,
     });
@@ -581,6 +584,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       provider: REMOTION_PROVIDER,
       providerModel: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
       expectedScript: script,
+      instructionalQuality,
     });
     await markComplete(job.id, {
       video_url: result.videoUrl,

@@ -6,6 +6,7 @@ export interface InstructionalQualityInput {
   lessonType?: string | null;
   evidenceType?: string | null;
   script: string;
+  learningObjectives?: string[];
   instructor: { id: string; title: string; specialty: string };
   storyboard: MediaStoryboard;
 }
@@ -23,7 +24,12 @@ export interface InstructionalQualityEvidence {
   hasMemoryRecap: boolean;
   hasKnowledgeCheck: boolean;
   hasSafetyScene: boolean;
+  objectiveCoverage: number;
+  sceneNarrationAlignment: number;
+  instructionLeakageDetected: boolean;
 }
+
+const IGNORED_WORDS = new Set(['and', 'the', 'for', 'with', 'to', 'of', 'a', 'an', 'in', 'on', 'this', 'that', 'will', 'your', 'you']);
 
 function words(value: string): string[] {
   return value.toLowerCase().match(/[a-z0-9]+/g) ?? [];
@@ -45,11 +51,27 @@ function minimumWords(input: InstructionalQualityInput): number {
 }
 
 function keywordCoverage(title: string, script: string): number {
-  const ignored = new Set(['and', 'the', 'for', 'with', 'to', 'of', 'a', 'an', 'in', 'on']);
-  const expected = [...new Set(words(title).filter((word) => word.length > 2 && !ignored.has(word)))];
+  const expected = [...new Set(words(title).filter((word) => word.length > 2 && !IGNORED_WORDS.has(word)))];
   if (!expected.length) return 1;
   const delivered = new Set(words(script));
   return expected.filter((word) => delivered.has(word)).length / expected.length;
+}
+
+function objectivesCoverage(objectives: string[], script: string): number {
+  if (!objectives.length) return 1;
+  return objectives.filter((objective) => keywordCoverage(objective, script) >= 0.5).length / objectives.length;
+}
+
+function sceneAlignment(storyboard: MediaStoryboard): number {
+  if (!storyboard.scenes.length) return 0;
+  const aligned = storyboard.scenes.filter((scene) => {
+    const visualTerms = [...new Set(words(`${scene.action} ${scene.requiredVisualEvidence ?? ''}`)
+      .filter((word) => word.length > 3 && !IGNORED_WORDS.has(word)))];
+    if (!visualTerms.length) return false;
+    const narration = new Set(words(scene.dialogue ?? ''));
+    return visualTerms.filter((word) => narration.has(word)).length / visualTerms.length >= 0.3;
+  }).length;
+  return aligned / storyboard.scenes.length;
 }
 
 export function instructionalQualityFailures(input: InstructionalQualityInput): {
@@ -79,12 +101,23 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
   const hasMemoryRecap = sceneTypes.has('memory_recap');
   const hasKnowledgeCheck = sceneTypes.has('knowledge_check');
   const hasSafetyScene = sceneTypes.has('safety_warning') || input.storyboard.scenes.some((scene) => scene.procedurePhase === 'safety');
+  const learningObjectives = (input.learningObjectives ?? []).filter((value) => value.trim().length > 0);
+  const objectiveCoverage = objectivesCoverage(learningObjectives, input.script);
+  const sceneNarrationAlignment = sceneAlignment(input.storyboard);
+  const instructionLeakageDetected = /\b(the narration should|the script should|apply this to .{0,160} by identifying|end with the action the learner|as an ai|return (?:valid )?json|prompt engineering)\b/i.test(input.script);
 
   if (scriptWords.length < minimumWordCount) {
     failures.push(`instruction is too short (${scriptWords.length} words; minimum ${minimumWordCount})`);
   }
   if (titleKeywordCoverage < 0.5) {
     failures.push(`narration does not sufficiently cover the lesson title (${Math.round(titleKeywordCoverage * 100)}%)`);
+  }
+  if (instructionLeakageDetected) failures.push('narration contains internal generation instructions');
+  if (objectiveCoverage < 1) {
+    failures.push(`narration covers only ${Math.round(objectiveCoverage * 100)}% of stated learning objectives`);
+  }
+  if (sceneNarrationAlignment < 0.75) {
+    failures.push(`only ${Math.round(sceneNarrationAlignment * 100)}% of scenes visually align with their narration`);
   }
   if (courseDomain === 'cosmetology' && /\bbarber|barbering\b/.test(`${input.script} ${combinedInstructor}`.toLowerCase())) {
     failures.push('cosmetology lesson contains a barbering instructor or trade identity');
@@ -122,6 +155,9 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
       hasMemoryRecap,
       hasKnowledgeCheck,
       hasSafetyScene,
+      objectiveCoverage,
+      sceneNarrationAlignment,
+      instructionLeakageDetected,
     },
     failures,
   };

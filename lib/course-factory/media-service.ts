@@ -1,6 +1,6 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createJob, type VideoJob } from '@/lib/video/job-queue';
-import { resetCanonicalMediaJob } from '@/lib/course-factory/media-manager';
+import { hasCanonicalMediaQualityEvidence, resetCanonicalMediaJob } from '@/lib/course-factory/media-manager';
 import { logger } from '@/lib/logger';
 import { generateInstructorIntro, getInstructorById, getInstructorForCourse } from '@/lib/ai-instructors';
 
@@ -133,7 +133,9 @@ export async function queueCourseLessonVideos(
       const existingLessonJob = existingByAsset.get(lessonKey);
       const hasVideo = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
       const mainComplete = hasVideo && lesson.video_status === 'complete'
-        && lesson.media_origin === 'generated' && lesson.media_quality_status === 'approved';
+        && lesson.media_origin === 'generated' && lesson.media_quality_status === 'approved'
+        && existingLessonJob?.review_status === 'approved'
+        && hasCanonicalMediaQualityEvidence(existingLessonJob.quality_evidence);
       const mainInFlight = lesson.video_status === 'queued' || lesson.video_status === 'rendering';
       const shouldQueueMain = force || (!mainInFlight && (!onlyMissing || !mainComplete));
 

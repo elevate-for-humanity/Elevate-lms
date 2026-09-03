@@ -15,20 +15,20 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-// R2 Configuration
-const R2_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
-const R2_ACCESS_KEY_ID = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID;
-const R2_SECRET_ACCESS_KEY = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY;
-const R2_BUCKET_NAME = process.env.CLOUDFLARE_R2_BUCKET_NAME || 'elevate-media';
-const R2_PUBLIC_URL = process.env.CLOUDFLARE_R2_PUBLIC_URL; // e.g., https://media.elevateforhumanity.org
+function r2Config() {
+  return {
+    accountId: process.env.CLOUDFLARE_ACCOUNT_ID?.trim() ?? '',
+    accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID?.trim() ?? '',
+    secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY?.trim() ?? '',
+    bucketName: process.env.CLOUDFLARE_R2_BUCKET_NAME?.trim() || 'elevate-media',
+    publicUrl: process.env.CLOUDFLARE_R2_PUBLIC_URL?.trim().replace(/\/$/, '') || '',
+  };
+}
 
 // Check if R2 is configured
 export const isR2Configured = () => {
-  return !!(
-    process.env.CLOUDFLARE_ACCOUNT_ID &&
-    process.env.CLOUDFLARE_R2_ACCESS_KEY_ID &&
-    process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY
-  );
+  const config = r2Config();
+  return Boolean(config.accountId && config.accessKeyId && config.secretAccessKey);
 };
 
 // Create S3-compatible client for R2
@@ -39,12 +39,13 @@ const getR2Client = () => {
     );
   }
 
+  const config = r2Config();
   return new S3Client({
     region: 'auto',
-    endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    endpoint: `https://${config.accountId}.r2.cloudflarestorage.com`,
     credentials: {
-      accessKeyId: R2_ACCESS_KEY_ID!,
-      secretAccessKey: R2_SECRET_ACCESS_KEY!,
+      accessKeyId: config.accessKeyId,
+      secretAccessKey: config.secretAccessKey,
     },
   });
 };
@@ -65,11 +66,12 @@ export async function uploadToR2(
   contentType: string,
 ): Promise<UploadResult> {
   try {
+    const config = r2Config();
     const client = getR2Client();
 
     await client.send(
       new PutObjectCommand({
-        Bucket: R2_BUCKET_NAME,
+        Bucket: config.bucketName,
         Key: key,
         Body: file,
         ContentType: contentType,
@@ -77,9 +79,9 @@ export async function uploadToR2(
       }),
     );
 
-    const url = R2_PUBLIC_URL
-      ? `${R2_PUBLIC_URL}/${key}`
-      : `https://${R2_BUCKET_NAME}.${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${key}`;
+    const url = config.publicUrl
+      ? `${config.publicUrl}/${key}`
+      : `https://${config.bucketName}.${config.accountId}.r2.cloudflarestorage.com/${key}`;
 
     return { success: true, key, url };
   } catch (error) {
@@ -119,11 +121,12 @@ export async function uploadFromUrlToR2(sourceUrl: string, key: string): Promise
  */
 export async function deleteFromR2(key: string): Promise<boolean> {
   try {
+    const config = r2Config();
     const client = getR2Client();
 
     await client.send(
       new DeleteObjectCommand({
-        Bucket: R2_BUCKET_NAME,
+        Bucket: config.bucketName,
         Key: key,
       }),
     );
@@ -140,12 +143,13 @@ export async function deleteFromR2(key: string): Promise<boolean> {
  */
 export async function getSignedR2Url(key: string, expiresIn = 3600): Promise<string | null> {
   try {
+    const config = r2Config();
     const client = getR2Client();
 
     const url = await getSignedUrl(
       client,
       new GetObjectCommand({
-        Bucket: R2_BUCKET_NAME,
+        Bucket: config.bucketName,
         Key: key,
       }),
       { expiresIn },
@@ -163,11 +167,12 @@ export async function getSignedR2Url(key: string, expiresIn = 3600): Promise<str
  */
 export async function listR2Files(prefix?: string): Promise<string[]> {
   try {
+    const config = r2Config();
     const client = getR2Client();
 
     const response = await client.send(
       new ListObjectsV2Command({
-        Bucket: R2_BUCKET_NAME,
+        Bucket: config.bucketName,
         Prefix: prefix,
       }),
     );
@@ -183,10 +188,11 @@ export async function listR2Files(prefix?: string): Promise<string[]> {
  * Get public URL for a file
  */
 export function getR2PublicUrl(key: string): string {
-  if (R2_PUBLIC_URL) {
-    return `${R2_PUBLIC_URL}/${key}`;
+  const config = r2Config();
+  if (config.publicUrl) {
+    return `${config.publicUrl}/${key}`;
   }
-  return `https://pub-${R2_ACCOUNT_ID}.r2.dev/${key}`;
+  return `https://${config.bucketName}.${config.accountId}.r2.cloudflarestorage.com/${key}`;
 }
 
 /**

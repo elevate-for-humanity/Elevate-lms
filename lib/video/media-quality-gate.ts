@@ -8,6 +8,9 @@ import { promisify } from 'node:util';
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { MediaStoryboard } from './media-director';
+import type { InstructionalQualityEvidence } from './instructional-quality-gate';
+
+export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v2';
 
 const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
@@ -15,6 +18,7 @@ const MAX_FREEZE_SECONDS = 4;
 const MAX_BLACK_SECONDS = 0.75;
 
 export interface MediaQualityEvidence {
+  gateVersion: typeof MEDIA_QUALITY_GATE_VERSION;
   bytes: number;
   actualDurationSeconds: number;
   expectedDurationSeconds: number;
@@ -34,10 +38,14 @@ export interface MediaQualityEvidence {
   repeatedVisualMaximum: number;
   requiredProcedurePhases: string[];
   deliveredProcedurePhases: string[];
+  sourceEvidenceCoverage: number;
+  exactVisualSourceCoverage: number;
+  instructionalQuality: InstructionalQualityEvidence;
 }
 
 export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   const failures: string[] = [];
+  if (evidence.gateVersion !== MEDIA_QUALITY_GATE_VERSION) failures.push('media quality evidence uses an obsolete gate version');
   const durationTolerance = Math.max(2, evidence.expectedDurationSeconds * 0.1);
   if (evidence.bytes < MIN_BYTES) failures.push(`MP4 is too small (${evidence.bytes} bytes)`);
   if (!Number.isFinite(evidence.actualDurationSeconds) || evidence.actualDurationSeconds <= 0) {
@@ -72,6 +80,11 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   if (evidence.narrationCoverage < 0.97) failures.push(`narration coverage ${(evidence.narrationCoverage * 100).toFixed(1)}% is below 97%`);
   if (evidence.visualEvidenceCoverage < 0.75) failures.push(`visual evidence coverage ${(evidence.visualEvidenceCoverage * 100).toFixed(1)}% is below 75%`);
   if (evidence.repeatedVisualMaximum > 3) failures.push(`one visual is repeated across ${evidence.repeatedVisualMaximum} scenes`);
+  if (evidence.sourceEvidenceCoverage < 1) failures.push('one or more scenes have no persisted visual-source evidence');
+  if (evidence.exactVisualSourceCoverage < 1) failures.push('one or more demonstration scenes use unverified stock imagery');
+  if (evidence.instructionalQuality.instructionLeakageDetected) failures.push('narration contains internal generation instructions');
+  if (evidence.instructionalQuality.objectiveCoverage < 1) failures.push('narration does not cover every stated learning objective');
+  if (evidence.instructionalQuality.sceneNarrationAlignment < 0.75) failures.push('storyboard does not align with narration');
   const missingPhases = evidence.requiredProcedurePhases.filter((phase) => !evidence.deliveredProcedurePhases.includes(phase));
   if (missingPhases.length) failures.push(`missing procedure phases: ${missingPhases.join(', ')}`);
   return failures;
@@ -169,6 +182,7 @@ export async function enforceMediaQuality(input: {
   provider?: string;
   providerModel?: string;
   expectedScript: string;
+  instructionalQuality: InstructionalQualityEvidence;
 }): Promise<MediaQualityEvidence> {
   const response = await fetch(input.videoUrl, { signal: AbortSignal.timeout(60_000) });
   if (!response.ok) throw new Error(`MP4 returned HTTP ${response.status}`);
@@ -191,7 +205,16 @@ export async function enforceMediaQuality(input: {
     const counts = new Map<string, number>();
     visualKeys.forEach((key) => counts.set(key, (counts.get(key) ?? 0) + 1));
     const deliveredProcedurePhases = [...new Set(input.sceneData.scenes.map((scene) => scene.procedurePhase).filter((value): value is NonNullable<typeof value> => Boolean(value)))];
-    const requiredProcedurePhases = [...new Set(input.sceneData.scenes.map((scene) => scene.procedurePhase).filter((value): value is NonNullable<typeof value> => Boolean(value)))];
+    const requiredProcedurePhases = [...new Set(input.sceneData.scenes
+      .filter((scene) => Boolean(scene.requiredVisualEvidence))
+      .map((scene) => scene.procedurePhase)
+      .filter((value): value is NonNullable<typeof value> => Boolean(value)))];
+    const sourcedScenes = input.sceneData.scenes.filter((scene) => Boolean(scene.resolvedProvider && scene.resolvedModel));
+    const exactSceneTypes = new Set(['equipment_closeup', 'worked_example', 'common_mistake', 'safety_warning']);
+    const exactScenes = input.sceneData.scenes.filter((scene) => scene.sceneType && exactSceneTypes.has(scene.sceneType));
+    const verifiedExactScenes = exactScenes.filter((scene) =>
+      ['wan', 'ltx', 'remotion'].includes(scene.resolvedProvider ?? ''),
+    );
 
     const [{ stderr: sceneOutput }, { stderr: freezeOutput }, { stderr: blackOutput }] = await Promise.all([
       execFileAsync('ffmpeg', ['-hide_banner', '-i', videoPath, '-filter:v', "select='gt(scene,0.12)',showinfo", '-f', 'null', '-'], { timeout: 120_000, maxBuffer: 8_000_000 }),
@@ -200,6 +223,7 @@ export async function enforceMediaQuality(input: {
     ]);
 
     const evidence: MediaQualityEvidence = {
+      gateVersion: MEDIA_QUALITY_GATE_VERSION,
       bytes: buffer.length,
       actualDurationSeconds: Number(probe.format?.duration ?? 0),
       expectedDurationSeconds: input.expectedDurationSeconds,
@@ -219,6 +243,9 @@ export async function enforceMediaQuality(input: {
       repeatedVisualMaximum: Math.max(0, ...counts.values()),
       requiredProcedurePhases,
       deliveredProcedurePhases,
+      sourceEvidenceCoverage: input.sceneData.scenes.length ? sourcedScenes.length / input.sceneData.scenes.length : 0,
+      exactVisualSourceCoverage: exactScenes.length ? verifiedExactScenes.length / exactScenes.length : 1,
+      instructionalQuality: input.instructionalQuality,
     };
     const failures = mediaQualityFailures(evidence);
     if (failures.length) throw new Error(`Media quality gate failed: ${failures.join('; ')}`);

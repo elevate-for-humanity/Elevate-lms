@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { gpuVideoAvailable } from '@/lib/video/gpu-video-client';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -39,6 +40,8 @@ export async function GET(request: NextRequest) {
     const cloudflareControlPlaneConfigured = Boolean(
       process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ACCOUNT_ID,
     );
+    const gpuConfigured = Boolean(process.env.GPU_VIDEO_WORKER_URL && process.env.GPU_WORKER_SECRET);
+    const gpuReady = gpuConfigured ? await gpuVideoAvailable() : false;
     return buildCapabilityHealth('plugins', [
       {
         name: 'plugin-source-access',
@@ -95,6 +98,16 @@ export async function GET(request: NextRequest) {
         message: cloudflareAiConfigured
           ? 'Cloudflare Workers AI is configured.'
           : 'Cloudflare Workers AI configuration is incomplete.',
+      },
+      {
+        name: 'instructional-gpu-video',
+        passed: gpuReady,
+        required: false,
+        message: gpuReady
+          ? 'The instructional GPU renderer is configured and model-ready.'
+          : gpuConfigured
+            ? 'The instructional GPU renderer is configured but not ready.'
+            : 'The instructional GPU renderer is not connected to Admin.',
       },
       {
         name: 'cloudflare-control-plane',

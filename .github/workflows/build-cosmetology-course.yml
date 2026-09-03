@@ -69,7 +69,9 @@ jobs:
       (github.event.issue.number == 928 &&
        github.event.issue.title == 'RUN COSMETOLOGY COURSE PRODUCTION BUILD')
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    # Full regulated-course generation can exceed three hours when the provider
+    # repairs individual lesson or exam contracts. GitHub-hosted jobs allow six.
+    timeout-minutes: 360
     concurrency:
       group: cosmetology-course-production-build
       # A canceled runner cannot reliably write its terminal database ledger.

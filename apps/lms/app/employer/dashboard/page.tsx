@@ -34,6 +34,7 @@ export default async function EmployerDashboardOrchestrated() {
 
   const isEmployer = effectiveRoles.includes('employer') || effectiveRoles.includes('sponsor');
   const isAdmin = effectiveRoles.includes('admin') || effectiveRoles.includes('super_admin');
+  if (isAdmin) return <NeutralEmployerPortalPreview />;
   const employer = await getEmployerRecord(supabase, user.id);
 
   if (isEmployer && !isAdmin && !employer) {
@@ -172,6 +173,11 @@ export default async function EmployerDashboardOrchestrated() {
       </div>
     </StateAwareDashboard>
   );
+}
+
+function NeutralEmployerPortalPreview() {
+  const modules = ['Job Postings', 'Applications', 'Apprenticeships', 'Company Profile', 'Live Workforce', 'Reports'];
+  return <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6"><div className="mx-auto max-w-6xl space-y-6"><section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Administrator portal preview</p><h1 className="mt-2 text-3xl font-black text-slate-950">Employer PWA</h1><p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">This neutral preview confirms that the Employer PWA is operational. No employer, posting, applicant, workforce, or apprenticeship record is attached to the administrator session.</p><div className="mt-6 flex flex-wrap gap-3"><a href="https://admin.elevateforhumanity.org/employers" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">Select an employer in Admin</a><a href="https://admin.elevateforhumanity.org/dashboard" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950">Return to Admin dashboard</a></div></section><section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{modules.map((label) => <article key={label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><Building2 className="h-5 w-5 text-blue-700"/><h2 className="mt-3 font-black text-slate-950">{label}</h2><p className="mt-1 text-sm text-slate-600">Available after an authorized employer is selected.</p></article>)}</section></div></main>;
 }
 
 function MetricCard({ label, value, icon, note }: { label: string; value: number; icon: React.ReactNode; note?: string }) {

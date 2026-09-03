@@ -185,7 +185,32 @@ jobs:
 
       - name: Wake durable Course Builder queue
         run: |
-          curl --fail-with-body --silent --show-error --max-time 300 \
-            --max-redirs 0 \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            "https://admin.elevateforhumanity.org/api/cron/process-course-builder-jobs"
+          set -euo pipefail
+          wake_url="https://admin.elevateforhumanity.org/api/cron/process-course-builder-jobs"
+          for attempt in $(seq 1 5); do
+            status=$(curl --silent --show-error --max-time 300 \
+              --max-redirs 0 \
+              -o /tmp/course-builder-wake.json \
+              -w "%{http_code}" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              "$wake_url" || true)
+            case "$status" in
+              2*)
+                echo "Course Builder queue wake succeeded on attempt $attempt"
+                cat /tmp/course-builder-wake.json
+                exit 0
+                ;;
+              000|502|503|504)
+                echo "::warning::Transient queue wake failure HTTP $status on attempt $attempt/5"
+                if [ "$attempt" -lt 5 ]; then sleep $((attempt * 15)); fi
+                ;;
+              *)
+                echo "::error::Course Builder queue wake failed with non-retryable HTTP $status"
+                cat /tmp/course-builder-wake.json 2>/dev/null || true
+                exit 1
+                ;;
+            esac
+          done
+          echo "::error::Course Builder queue wake did not recover after 5 attempts"
+          cat /tmp/course-builder-wake.json 2>/dev/null || true
+          exit 1

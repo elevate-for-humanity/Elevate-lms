@@ -51,9 +51,16 @@ function EnrollmentBadge({ state, accessGranted }: { state: string | null; acces
   );
 }
 
-export default async function StudentsPage() {
+function isTestOrAuditProfile(student: { email?: string | null; full_name?: string | null }) {
+  const email = String(student.email || '').toLowerCase();
+  const name = String(student.full_name || '').toLowerCase();
+  return email.endsWith('@qa.invalid') || email.endsWith('@elevate-test.dev') || email.endsWith('@elevate.test') || email.endsWith('@elevate-demo.test') || email.endsWith('@test.elevateforhumanity.org') || email.endsWith('@example.com') || name.startsWith('[qa') || ['test admin', 'upload tester', 'final tester', 'v2 test', 'dev studio'].includes(name);
+}
+
+export default async function StudentsPage({ searchParams }: { searchParams: Promise<{ include_test?: string }> }) {
   await requireRole(['admin', 'staff']);
   const db = await requireAdminClient();
+  const includeTest = (await searchParams).include_test === '1';
 
   // Load students with their most recent enrollment
   const { data: operationalStudents } = await db
@@ -69,9 +76,11 @@ export default async function StudentsPage() {
   // The directory previously truncated to the 50 newest profiles, which hid
   // valid active students such as older HVAC enrollments. The operational set
   // is already bounded to 1,000 and filtered above, so render the full set.
-  const students = operationalStudents ?? [];
-  const totalStudents = operationalStudents?.length ?? 0;
-  const operationalStudentIds = (operationalStudents ?? []).map((student: any) => student.id);
+  const allStudents = operationalStudents ?? [];
+  const testRecordCount = allStudents.filter(isTestOrAuditProfile).length;
+  const students = includeTest ? allStudents : allStudents.filter((student) => !isTestOrAuditProfile(student));
+  const totalStudents = allStudents.length - testRecordCount;
+  const operationalStudentIds = allStudents.filter((student) => !isTestOrAuditProfile(student)).map((student: any) => student.id);
 
   // Load enrollments for displayed students to show real state.
   const studentIds = students.map((student: any) => student.id);
@@ -131,14 +140,7 @@ export default async function StudentsPage() {
         { label: 'Pending Approval', value: pendingApproval || 0, icon: Clock, color: 'amber' },
         { label: 'Completed', value: completedEnrollments || 0, icon: CheckCircle, color: 'blue' },
       ]}
-      actions={
-        <Link
-          href="/students/export"
-          className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg border border-white/20 transition-colors"
-        >
-          Export CSV
-        </Link>
-      }
+      actions={<div className="flex flex-wrap gap-2"><Link href={includeTest ? '/students' : '/students?include_test=1'} className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg border border-white/20 transition-colors">{includeTest ? 'Operational records' : `Test & audit records (${testRecordCount})`}</Link><Link href="/students/export" className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg border border-white/20 transition-colors">Export CSV</Link></div>}
     >
       <AdminCard>
         {students && students.length > 0 ? (

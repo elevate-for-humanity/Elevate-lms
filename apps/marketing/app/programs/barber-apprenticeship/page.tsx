@@ -69,7 +69,6 @@ export default async function BarberApprenticeshipPage() {
 
       <HeroVideo
         mountedFrameImage={BARBER_HERO_IMAGE}
-        voiceoverSrc={heroBanner?.voiceoverSrc}
         analyticsName="barber-apprenticeship"
         heightClassName="h-[clamp(360px,55vh,600px)]"
         overlayMode="none"
@@ -101,9 +100,21 @@ export default async function BarberApprenticeshipPage() {
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-8">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 lg:grid-cols-4">
           <Fact icon={ShieldCheck} label="Registered model" value="Competency based" />
-          <Fact icon={BookOpen} label="Required RTI" value="144 verified hours" />
+          <Fact icon={BookOpen} label="Required RTI" value={`${program.relatedInstructionHours} verified hours`} />
           <Fact icon={Scissors} label="Training setting" value="Approved host shop" />
           <Fact icon={BadgeCheck} label="Self-pay tuition" value={program.selfPayCost || 'See program details'} />
+        </div>
+      </section>
+
+      <section className="border-b border-slate-200 bg-gradient-to-b from-white to-sky-50 px-4 py-10 sm:py-14">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-8 max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">Host-shop network</p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Train where the work happens.</h2>
+            <p className="mt-3 text-base leading-7 text-slate-700">Approved host shops provide the supervised work setting. Placement availability is verified during enrollment and is not implied by a public listing.</p>
+          </div>
+          <FeaturedHostPartners programSlug="barber-apprenticeship" />
+          <div className="mt-10"><BarberWorkforceNetworkMap /></div>
         </div>
       </section>
 
@@ -207,18 +218,6 @@ export default async function BarberApprenticeshipPage() {
       <BeautyTheoryDailyPolicy programTitle="Barber Apprenticeship" />
       <BeautyApprenticeshipAuthority program={program} />
 
-      <section className="px-4 py-14 sm:py-18">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-8 max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">Host-shop network</p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Train where the work happens.</h2>
-            <p className="mt-3 text-base leading-7 text-slate-700">Approved host shops provide the supervised work setting. Placement availability is verified during enrollment and is not implied by a public listing.</p>
-          </div>
-          <FeaturedHostPartners programSlug="barber-apprenticeship" />
-          <div className="mt-10"><BarberWorkforceNetworkMap /></div>
-        </div>
-      </section>
-
       <section className="border-t border-sky-200 bg-gradient-to-r from-brand-blue-50 via-white to-orange-50 px-4 py-14 text-slate-950">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-black sm:text-4xl">Ready to start the barber apprenticeship?</h2>
@@ -247,7 +246,7 @@ export async function generateMetadata() {
   return {
     title: 'Registered Barber Apprenticeship Program | Indiana | Elevate for Humanity',
     description:
-      'Indiana competency-based registered barber apprenticeship with 144 verified hours of Related Technical Instruction, supervised host-shop training, digital progress records, and Indiana licensing preparation.',
+      'Indiana competency-based registered barber apprenticeship with 260 verified hours of Related Technical Instruction, supervised host-shop training, digital progress records, and Indiana licensing preparation.',
     keywords: [
       'barber apprenticeship Indiana',
       'registered barber apprenticeship',

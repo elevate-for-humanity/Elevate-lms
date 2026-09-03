@@ -241,6 +241,8 @@ export default function HostShopShowcase({
                     data-host-shop-tour
                     poster={image.backdropSrc}
                     onPlay={(event) => {
+                      event.currentTarget.defaultPlaybackRate = 0.82;
+                      event.currentTarget.playbackRate = 0.82;
                       if (!event.currentTarget.muted) {
                         stopAllNaturalVoicePlayback();
                         event.currentTarget.volume = 1;

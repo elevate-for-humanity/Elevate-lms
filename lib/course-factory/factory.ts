@@ -29,6 +29,7 @@ import {
 import { publishCourse } from './publisher';
 import { buildCourseEvidenceContext } from './evidence-context';
 import { compileLearningIntelligence } from './learning-intelligence';
+import { CourseExperienceSchema } from './experience-contract';
 import { inferStepType, validateBlueprint } from './validator';
 import type { FactoryInput, FactoryOutput, FactoryStage, ProgressCallback } from './types';
 
@@ -274,8 +275,17 @@ export function hasGovernedBlueprintLessonFallback(lesson: {
   const instructionalWords = raw
     .replace(/<[^>]+>/g, ' ')
     .match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g)?.length ?? 0;
+  let hasCompleteExperience = false;
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    hasCompleteExperience = CourseExperienceSchema.safeParse(parsed.experience).success;
+  } catch {
+    hasCompleteExperience = false;
+  }
   return instructionalWords >= 180 &&
-    Array.isArray(lesson.quizQuestions) && lesson.quizQuestions.length >= 3;
+    Array.isArray(lesson.quizQuestions) &&
+    lesson.quizQuestions.length >= 3 &&
+    hasCompleteExperience;
 }
 
 async function enrichBlueprint(

@@ -68,9 +68,7 @@ export default async function BarberApprenticeshipPage() {
       />
 
       <HeroVideo
-        videoSrcDesktop={heroBanner?.videoSrcDesktop}
-        videoSrcMobile={heroBanner?.videoSrcMobile ?? heroBanner?.videoSrcDesktop}
-        posterImage={BARBER_HERO_IMAGE}
+        mountedFrameImage={BARBER_HERO_IMAGE}
         voiceoverSrc={heroBanner?.voiceoverSrc}
         analyticsName="barber-apprenticeship"
         heightClassName="h-[clamp(360px,55vh,600px)]"

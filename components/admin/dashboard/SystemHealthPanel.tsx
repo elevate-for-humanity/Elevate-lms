@@ -72,7 +72,7 @@ export function SystemHealthPanel({ health }: Props) {
       </div>
 
       <div className="px-6 py-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+        <div className="mb-4 grid grid-cols-[repeat(2,minmax(0,1fr))] gap-3 sm:grid-cols-[repeat(3,minmax(0,1fr))]">
           {[
             {
               label: "Stripe Webhook",
@@ -118,7 +118,7 @@ export function SystemHealthPanel({ health }: Props) {
             <Link
               key={label}
               href={href}
-              className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-medium transition-colors hover:shadow-sm ${
+              className={`flex min-w-0 flex-wrap items-center gap-2 overflow-hidden rounded-xl border px-3 py-2.5 text-xs font-medium transition-colors hover:shadow-sm ${
                 ok
                   ? "bg-emerald-50 border-emerald-200 text-emerald-700"
                   : "bg-rose-50 border-rose-200 text-rose-700"
@@ -129,9 +129,9 @@ export function SystemHealthPanel({ health }: Props) {
               ) : (
                 <XCircle className="w-3.5 h-3.5 flex-shrink-0" />
               )}
-              <span className="truncate">{label}</span>
+              <span className="min-w-0 flex-1 truncate">{label}</span>
               {!ok && value && (
-                <span className="ml-auto font-bold flex-shrink-0">{value}</span>
+                <span className="w-full min-w-0 truncate pl-5 font-bold">{value}</span>
               )}
             </Link>
           ))}

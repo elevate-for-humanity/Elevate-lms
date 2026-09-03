@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
-import { Phone, Mail, MapPin, Clock, Users, Building2 } from 'lucide-react';
-import { ContactForm } from './ContactForm.client';
+import { Phone, Mail, MapPin, Clock, MessageSquare, Users, Building2 } from 'lucide-react';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -8,7 +7,25 @@ export const metadata: Metadata = {
   description: 'Get in touch with our workforce development team. We help job seekers, employers, and training partners connect to funded career programs in Indianapolis and across Indiana.',
 };
 
-export default function ContactPage() {
+type ContactPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function titleFromSlug(value: string) {
+  return value.replaceAll('-', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+export default async function ContactPage({ searchParams }: ContactPageProps) {
+  const params = (await searchParams) || {};
+  const product = typeof params.product === 'string' ? params.product : '';
+  const course = typeof params.course === 'string' ? params.course : '';
+  const submitted = params.submitted === '1';
+  const requestedItem = product || course;
+  const defaultSubject = course ? 'enrollment' : requestedItem ? 'other' : '';
+  const defaultMessage = requestedItem
+    ? `I would like current availability, delivery details, access terms, and final pricing for ${titleFromSlug(requestedItem)}.`
+    : '';
+
   return (
     <main id="main-content" className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Hero */}
@@ -36,8 +53,119 @@ export default function ContactPage() {
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-xl p-8">
                 <h2 className="text-2xl font-bold text-slate-900 mb-6">Send Us a Message</h2>
+                {submitted && (
+                  <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-900" role="status">
+                    Message received. Our team will follow up using the email you provided.
+                  </div>
+                )}
                 
-                <ContactForm />
+                <form className="space-y-6" action="/api/contact" method="post">
+                  {/* Name */}
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
+                      Your Name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      required
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 transition-colors"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 transition-colors"
+                      placeholder="you@example.com"
+                    />
+                  </div>
+
+                  {/* Role Selector */}
+                  <div>
+                    <label htmlFor="role" className="block text-sm font-semibold text-slate-700 mb-2">
+                      I am a...
+                    </label>
+                    <select
+                      id="role"
+                      name="role"
+                      required
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 transition-colors"
+                    >
+                      <option value="">Select your role</option>
+                      <option value="job-seeker">Job Seeker / Career Changer</option>
+                      <option value="student">Current Student</option>
+                      <option value="graduate">Program Graduate</option>
+                      <option value="employer">Employer / Business Owner</option>
+                      <option value="agency">Workforce Agency Staff</option>
+                      <option value="training-partner">Training Provider / School</option>
+                      <option value="government">Government / Policy</option>
+                      <option value="media">Media / Press</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  {/* Subject */}
+                  <div>
+                    <label htmlFor="subject" className="block text-sm font-semibold text-slate-700 mb-2">
+                      How Can We Help?
+                    </label>
+                    <select
+                      id="subject"
+                      name="subject"
+                      required
+                      defaultValue={defaultSubject}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 transition-colors"
+                    >
+                      <option value="">Select a topic</option>
+                      <option value="enrollment">Program Enrollment & Eligibility</option>
+                      <option value="funding">WIOA / Funding Questions</option>
+                      <option value="apprenticeship">Apprenticeship Opportunities</option>
+                      <option value="employer-partnership">Employer Partnership Inquiry</option>
+                      <option value="host-shop">Host Shop / Training Site</option>
+                      <option value="job-placement">Job Placement Services</option>
+                      <option value="technical">Technical Support</option>
+                      <option value="feedback">Program Feedback</option>
+                      <option value="media">Media / Press Inquiry</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  {/* Message */}
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
+                      Your Message
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows={5}
+                      required
+                      minLength={10}
+                      defaultValue={defaultMessage}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-brand-orange-500 transition-colors resize-none"
+                      placeholder="Tell us about your goals, questions, or how we can support you..."
+                    />
+                  </div>
+
+                  {/* Submit */}
+                  <button
+                    type="submit"
+                    className="w-full bg-brand-orange-600 text-white font-semibold py-4 px-6 rounded-lg hover:bg-brand-orange-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                    Send Message
+                  </button>
+                </form>
 
                 <p className="text-sm text-slate-500 mt-4 text-center">
                   We typically respond within 1-2 business days. For urgent matters, call us directly.

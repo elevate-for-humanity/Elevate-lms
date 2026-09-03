@@ -38,8 +38,35 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
     );
   };
 
-  const result = await courseFactory(job.tool_args, progress);
-  await Promise.allSettled(progressWrites);
+  // Long provider calls can be quiet for several minutes. Renew the lease on
+  // an independent cadence so healthy builds are not reclaimed mid-request.
+  const heartbeat = setInterval(() => {
+    progressWrites.push(
+      db
+        .from('devstudio_jobs')
+        .update({
+          locked_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', job.id)
+        .eq('status', 'running')
+        .then(({ error }) => {
+          if (error)
+            logger.warn('[course-build] heartbeat failed', {
+              jobId: job.id,
+              error: error.message,
+            });
+        }),
+    );
+  }, 60_000);
+
+  let result;
+  try {
+    result = await courseFactory(job.tool_args, progress);
+  } finally {
+    clearInterval(heartbeat);
+    await Promise.allSettled(progressWrites);
+  }
   if (!result.ok || !result.courseId) {
     throw new Error(
       result.errors?.join('; ') ||

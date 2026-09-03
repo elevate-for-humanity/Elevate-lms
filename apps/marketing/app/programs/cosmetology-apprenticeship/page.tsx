@@ -27,9 +27,13 @@ export default async function CosmetologyApprenticeshipPage() {
           __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
         }}
       />
-      <ProgramDetailPage program={program} banner={banner} heroOverride={heroOverride}>
+      <ProgramDetailPage
+        program={program}
+        banner={banner}
+        heroOverride={heroOverride}
+        featuredContent={<FeaturedHostPartners programSlug="cosmetology-apprenticeship" />}
+      >
         <BeautyApprenticeshipAuthority program={program} />
-        <FeaturedHostPartners programSlug="cosmetology-apprenticeship" />
       </ProgramDetailPage>
     </>
   );

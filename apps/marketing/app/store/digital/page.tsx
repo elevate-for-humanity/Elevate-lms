@@ -77,7 +77,7 @@ export default function StoreDigitalPage() {
               Digital Resources <span className="text-brand-blue-300">For Training Providers</span>
             </h1>
             <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">
-              Everything you need to start, grow, and scale your workforce training business. AI assistants, compliance tools, marketing templates, and business guides.
+              Explore working previews and request confirmed availability for AI assistants, compliance tools, templates, and business guides. Products are only offered for payment after access and delivery are verified.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="#ai-tools" className="inline-flex items-center gap-2 bg-white text-indigo-900 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-all">

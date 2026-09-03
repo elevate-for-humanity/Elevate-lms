@@ -54,7 +54,7 @@ function EnrollmentBadge({ state, accessGranted }: { state: string | null; acces
 function isTestOrAuditProfile(student: { email?: string | null; full_name?: string | null }) {
   const email = String(student.email || '').toLowerCase();
   const name = String(student.full_name || '').toLowerCase();
-  return email.endsWith('@qa.invalid') || email.endsWith('@elevate-test.dev') || email.endsWith('@elevate.test') || email.endsWith('@elevate-demo.test') || email.endsWith('@test.elevateforhumanity.org') || email.endsWith('@example.com') || name.startsWith('[qa') || ['test admin', 'upload tester', 'final tester', 'v2 test', 'dev studio'].includes(name);
+  return email.endsWith('.test') || email.endsWith('@qa.invalid') || email.endsWith('@elevate-test.dev') || email.endsWith('@test.elevateforhumanity.org') || email.endsWith('@example.com') || name.startsWith('[qa') || ['test admin', 'upload tester', 'final tester', 'v2 test', 'dev studio'].includes(name);
 }
 
 export default async function StudentsPage({ searchParams }: { searchParams: Promise<{ include_test?: string }> }) {

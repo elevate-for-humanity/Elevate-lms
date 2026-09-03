@@ -108,9 +108,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   const slides = HOME_SLIDES;
 
   const [activeSlide, setActiveSlide] = useState(0);
-  const [previousSlide, setPreviousSlide] = useState<HomeHeroSlide | null>(null);
   const [paused, setPaused] = useState(false);
-  const transitionTimerRef = useRef<number | null>(null);
   const slide = slides[activeSlide] ?? slides[0];
 
   const transitionToSlide = useCallback(
@@ -119,12 +117,6 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         const next = (index + slides.length) % slides.length;
         if (next === current) return current;
 
-        setPreviousSlide(slides[current] ?? null);
-        if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);
-        transitionTimerRef.current = window.setTimeout(() => {
-          setPreviousSlide(null);
-          transitionTimerRef.current = null;
-        }, 1_050);
         return next;
       });
     },
@@ -153,13 +145,6 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     );
     return () => window.clearInterval(timer);
   }, [activeSlide, heroVisible, paused, slides.length, transitionToSlide]);
-
-  useEffect(
-    () => () => {
-      if (transitionTimerRef.current) window.clearTimeout(transitionTimerRef.current);
-    },
-    [],
-  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -221,28 +206,11 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         </div>
 
         <div
-          className="relative order-1 w-full overflow-hidden bg-[#f4f1ec] bg-cover bg-center lg:order-2"
-          style={{
-            backgroundImage: `url(${revisionedHeroAsset(slides[0]?.src ?? '')})`,
-          }}
+          className="relative order-1 w-full overflow-hidden bg-[#f4f1ec] lg:order-2"
         >
-          {previousSlide ? (
-            <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-              <HeroVideo
-                mountedFrameImage={revisionedHeroAsset(previousSlide.src)}
-                analyticsName={banner.analyticsName}
-                overlayMode="none"
-                mediaFit="cover"
-                mediaClassName={previousSlide.toneClass}
-                showSoundControl={false}
-                showTranscriptControl={false}
-                heightClassName="h-[clamp(480px,72svh,760px)] lg:h-[clamp(400px,62vh,680px)]"
-              />
-            </div>
-          ) : null}
           <div
             key={`${slide.type}-${slide.src || activeSlide}`}
-            className="home-hero-slide-enter relative z-10"
+            className="relative z-10"
           >
             <HeroVideo
               mountedFrameImage={revisionedHeroAsset(slide.src)}
@@ -308,32 +276,6 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           ) : null}
         </div>
       </div>
-      <style jsx>{`
-        .home-hero-slide-enter {
-          animation: home-hero-fade 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
-          transform-origin: center;
-        }
-        @keyframes home-hero-fade {
-          0% {
-            opacity: 0.55;
-            filter: saturate(0.96) brightness(0.96);
-            transform: scale(1.025);
-          }
-          45% {
-            opacity: 0.72;
-          }
-          100% {
-            opacity: 1;
-            filter: saturate(1) brightness(1);
-            transform: scale(1);
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .home-hero-slide-enter {
-            animation: none;
-          }
-        }
-      `}</style>
     </section>
   );
 }

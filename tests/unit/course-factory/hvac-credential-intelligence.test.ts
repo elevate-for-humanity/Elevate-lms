@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { HVAC_EPA608_BLUEPRINT } from '@/lib/curriculum/blueprints/hvac-epa-608';
 
 describe('HVAC credential intelligence', () => {
@@ -22,5 +23,15 @@ describe('HVAC credential intelligence', () => {
         expect.objectContaining({ provider: 'EPA-approved certifying organization', required: true }),
       ]),
     );
+  });
+
+  it('keeps current refrigerant classifications and Type I recovery rules straight', () => {
+    const source = readFileSync('scripts/backfill-hvac-script-text.ts', 'utf8');
+    expect(source).toContain('90% if the compressor is operational, 80% if it is not');
+    expect(source).toContain('R-32</strong> is an HFC');
+    expect(source).toContain('R-454B</strong> is an HFC/HFO blend');
+    expect(source).not.toContain('HFOs (R-32, R-454B)');
+    expect(source).not.toContain('80% if compressor works, 90% if it does not');
+    expect(source).not.toContain('15% for comfort cooling');
   });
 });

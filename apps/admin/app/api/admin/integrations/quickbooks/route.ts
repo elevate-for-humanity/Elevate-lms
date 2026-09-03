@@ -39,20 +39,37 @@ async function getQuickBooksConfig() {
   const { data } = await db
     .from('app_settings')
     .select('key, value')
-    .in('key', ['QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID', 'QB_TOKEN_EXPIRES']);
+    .in('key', [
+      'QB_CLIENT_ID',
+      'QB_CLIENT_SECRET',
+      'QB_REDIRECT_URI',
+      'QB_ACCESS_TOKEN',
+      'QB_REFRESH_TOKEN',
+      'QB_REALM_ID',
+      'QB_TOKEN_EXPIRES',
+    ]);
   const stored = Object.fromEntries((data ?? []).map((row) => [row.key, row.value]));
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
   return {
-    accessToken: process.env.QB_ACCESS_TOKEN || stored.QB_ACCESS_TOKEN || '',
-    refreshToken: process.env.QB_REFRESH_TOKEN || stored.QB_REFRESH_TOKEN || '',
-    realmId: process.env.QB_REALM_ID || stored.QB_REALM_ID || '',
+    clientId: stored.QB_CLIENT_ID || process.env.QB_CLIENT_ID || '',
+    clientSecret: stored.QB_CLIENT_SECRET || process.env.QB_CLIENT_SECRET || '',
+    redirectUri:
+      stored.QB_REDIRECT_URI ||
+      process.env.QB_REDIRECT_URI ||
+      `${siteUrl}/api/auth/quickbooks/callback`,
+    accessToken: stored.QB_ACCESS_TOKEN || process.env.QB_ACCESS_TOKEN || '',
+    refreshToken: stored.QB_REFRESH_TOKEN || process.env.QB_REFRESH_TOKEN || '',
+    realmId: stored.QB_REALM_ID || process.env.QB_REALM_ID || '',
   };
 }
 
 // ── Token refresh ─────────────────────────────────────────────────────────────
 
-async function refreshAccessToken(refreshToken: string): Promise<string | null> {
-  const clientId     = process.env.QB_CLIENT_ID;
-  const clientSecret = process.env.QB_CLIENT_SECRET;
+async function refreshAccessToken(
+  refreshToken: string,
+  clientId: string,
+  clientSecret: string,
+): Promise<string | null> {
   if (!clientId || !clientSecret || !refreshToken) return null;
 
   try {
@@ -106,8 +123,8 @@ export async function GET(request: NextRequest) {
   const action = request.nextUrl.searchParams.get('action') ?? 'status';
 
   if (action === 'auth_url') {
-    const clientId    = process.env.QB_CLIENT_ID;
-    const redirectUri = process.env.QB_REDIRECT_URI ?? `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/api/auth/quickbooks/callback`;
+    const config = await getQuickBooksConfig();
+    const { clientId, redirectUri } = config;
     if (!clientId) return safeError('QB_CLIENT_ID not configured', 503);
 
     const state = randomBytes(32).toString('base64url');
@@ -149,7 +166,11 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     // Try token refresh
-    const newToken = await refreshAccessToken(config.refreshToken);
+    const newToken = await refreshAccessToken(
+      config.refreshToken,
+      config.clientId,
+      config.clientSecret,
+    );
     if (!newToken) {
       return NextResponse.json({ connected: false, error: 'Token expired — reconnect via auth_url' });
     }

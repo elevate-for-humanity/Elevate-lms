@@ -11,6 +11,8 @@ function firstPathSegment(path: string): string {
   return segment ? `/${segment}` : '/';
 }
 
+const STORE_ORIGIN = 'https://store.elevateforhumanity.org';
+
 const ROLE_OWNED_PREFIXES = new Set(
   Object.values(ROLE_ROUTE_CONFIG).map((config) => firstPathSegment(config.path)),
 );
@@ -40,6 +42,16 @@ export function resolveRoleCompatiblePostLoginUrl(
   try {
     const requestedUrl = new URL(absoluteRoleDestination(requestedPath));
     const canonical = new URL(canonicalUrl);
+
+    // The Store is a trusted shared buyer surface, not a role-owned portal.
+    // A validated sign-in may return any role to a Store route without granting
+    // access to a different role's dashboard.
+    if (
+      requestedUrl.origin === STORE_ORIGIN &&
+      (requestedUrl.pathname === '/store' || requestedUrl.pathname.startsWith('/store/'))
+    ) {
+      return requestedUrl.toString();
+    }
 
     if (requestedUrl.origin !== canonical.origin) return canonicalUrl;
 

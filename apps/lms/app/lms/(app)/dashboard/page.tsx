@@ -270,6 +270,16 @@ export default async function StudentDashboard() {
       </div>
 
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+        {subject.previewing ? (
+          <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+            <span className="font-semibold">
+              Admin preview: viewing {subjectProfile?.full_name || 'this learner'}&apos;s read-only Student dashboard.
+            </span>
+            <a className="font-black underline" href="/api/admin/preview?end=1">
+              Exit learner preview
+            </a>
+          </section>
+        ) : null}
         {workspace.nextRequiredAction ? (
           <section role="alert" className="rounded-3xl border-2 border-red-400 bg-red-50 p-6">
             <p className="text-xs font-black uppercase tracking-widest text-red-800">Onboarding incomplete · {workspace.onboardingPercent}% complete</p>

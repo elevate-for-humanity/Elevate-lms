@@ -5,6 +5,7 @@ import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import JozannaIndustryInstructor from '@/components/programs/beauty/JozannaIndustryInstructor';
+import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
 
 export const dynamic = 'force-dynamic';
@@ -106,7 +107,12 @@ export default async function EstheticianApprenticeshipPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
-      <ProgramDetailPage program={program} banner={safeBanner} heroOverride={heroOverride}>
+      <ProgramDetailPage
+        program={program}
+        banner={safeBanner}
+        heroOverride={heroOverride}
+        featuredContent={<FeaturedHostPartners programSlug="esthetician-apprenticeship" />}
+      >
         <div className="space-y-10">
           <JozannaIndustryInstructor industry="esthetician" />
           <BeautyApprenticeshipAuthority program={program} />

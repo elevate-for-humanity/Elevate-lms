@@ -173,7 +173,8 @@ export const BULK_ENTITY_ID = '00000000-0000-0000-0000-000000000000';
 
 export interface AdminAuditParams {
   action: AdminActionType;
-  actorId: string;
+  actorId: string | null;
+  actorRole?: string;
   entityType: string;
   entityId: string;
   metadata?: Record<string, unknown>;
@@ -215,6 +216,7 @@ export async function logAdminAudit(params: AdminAuditParams): Promise<void> {
     const { error } = await db.from('admin_audit_events').insert({
       action: params.action,
       actor_user_id: params.actorId,
+      actor_role: params.actorRole ?? (params.actorId ? 'user' : 'system'),
       target_type: params.entityType,
       target_id: params.entityId,
       metadata: meta,

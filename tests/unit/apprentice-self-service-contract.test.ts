@@ -17,6 +17,17 @@ describe('apprentice self-service portal contracts', () => {
     expect(route).toMatch(/db\s*\.from\('apprentice_document_types'\)/);
     expect(route).toContain('resolveEnrollment(db, user.id, programSlug)');
     expect(route).toMatch(/db\.storage\s*\.from\('documents'\)\s*\.upload/);
+    expect(route).toContain("document_type: documentType");
+    expect(route).toContain('file_size: file.size');
+  });
+
+  it('allows configured document type keys without a drifting database allowlist', () => {
+    const migration = source(
+      'supabase/migrations/20260903143657_allow_dynamic_document_type_keys.sql',
+    );
+    expect(migration).toContain('DROP CONSTRAINT IF EXISTS documents_document_type_check');
+    expect(migration).toContain("document_type ~ '^[a-z][a-z0-9_-]{0,127}$'");
+    expect(migration).not.toContain("document_type IN (");
   });
 
   it('resolves billing ownership through either canonical learner identity column', () => {

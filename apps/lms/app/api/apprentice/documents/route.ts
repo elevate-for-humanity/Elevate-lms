@@ -123,6 +123,22 @@ async function _POST(request: NextRequest) {
         { status: 400 },
       );
 
+    // Requirements are database-configured, so validate their machine key by
+    // shape instead of maintaining a second, inevitably drifting allowlist.
+    const documentType = String(docType.document_type || '').trim();
+    if (!/^[a-z][a-z0-9_-]{0,127}$/.test(documentType)) {
+      const configurationError = new Error('Invalid configured apprentice document type');
+      logger.error(
+        '[Documents API] Invalid configured document type',
+        configurationError,
+        { documentTypeId, programSlug },
+      );
+      return NextResponse.json(
+        { error: 'This document requirement is misconfigured. Please contact program staff.' },
+        { status: 500 },
+      );
+    }
+
     const maxBytes = Number(docType.max_file_size_mb || 10) * 1024 * 1024;
     if (file.size <= 0 || file.size > maxBytes) {
       return NextResponse.json(
@@ -147,7 +163,7 @@ async function _POST(request: NextRequest) {
       .from('documents')
       .select('id,status,verification_status,metadata,file_url')
       .eq('user_id', user.id)
-      .eq('document_type', docType.document_type)
+      .eq('document_type', documentType)
       .contains('metadata', { program_slug: programSlug, enrollment_id: enrollment.id });
     if (existingError) throw existingError;
 
@@ -168,7 +184,7 @@ async function _POST(request: NextRequest) {
 
     const timestamp = Date.now();
     const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const storagePath = `${user.id}/apprentice-documents/${programSlug}/${enrollment.id}/${docType.document_type}/${timestamp}_${safeFileName}`;
+    const storagePath = `${user.id}/apprentice-documents/${programSlug}/${enrollment.id}/${documentType}/${timestamp}_${safeFileName}`;
     const { error: uploadError } = await db.storage
       .from('documents')
       .upload(storagePath, file, {
@@ -181,8 +197,9 @@ async function _POST(request: NextRequest) {
       .from('documents')
       .insert({
         user_id: user.id,
-        document_type: docType.document_type,
+        document_type: documentType,
         file_name: file.name,
+        file_size: file.size,
         file_url: null,
         file_size_bytes: file.size,
         mime_type: file.type,
@@ -200,6 +217,22 @@ async function _POST(request: NextRequest) {
       .single();
 
     if (recordError || !docRecord) {
+      const persistenceError = normalizeError(
+        recordError || new Error('Document insert returned no record'),
+        'Failed to persist uploaded document',
+      );
+      logger.error(
+        '[Documents API] Failed to persist uploaded document',
+        persistenceError,
+        {
+          ...getErrorContext(recordError || persistenceError),
+          documentType,
+          documentTypeId,
+          programSlug,
+          enrollmentId: enrollment.id,
+          userId: user.id,
+        },
+      );
       await db.storage.from('documents').remove([storagePath]);
       return NextResponse.json({ error: 'Failed to save document record' }, { status: 500 });
     }
@@ -232,7 +265,7 @@ async function _POST(request: NextRequest) {
       metadata: {
         enrollment_id: enrollment.id,
         program_slug: programSlug,
-        document_type: docType.document_type,
+        document_type: documentType,
         storage_path: storagePath,
       },
     });
@@ -253,7 +286,7 @@ async function _POST(request: NextRequest) {
                 .sendDocumentUploadNotification(
                   admin.email!,
                   studentName,
-                  docType.name || docType.document_type,
+                  docType.name || documentType,
                   programSlug,
                 )
                 .catch(() => undefined),

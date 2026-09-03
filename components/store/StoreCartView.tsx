@@ -47,7 +47,7 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
         if (cart.items.length !== 1) throw new Error('App subscriptions must be checked out separately from store products.');
         const parsed = parseIndividualAppCartProduct(individual.product.id);
         if (!parsed) throw new Error('Invalid app subscription');
-        const response = await fetch('/api/apps/upgrade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ appSlug: parsed.appSlug, plan: parsed.planId }) });
+        const response = await fetch('/api/apps/upgrade', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ appSlug: parsed.appSlug, plan: parsed.planId }) });
         const data = await response.json();
         if (!response.ok || !data.checkoutUrl) throw new Error(data.error || 'Could not start app checkout');
         clearCart();

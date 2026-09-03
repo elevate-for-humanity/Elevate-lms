@@ -54,9 +54,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Checkout service is temporarily unavailable.' }, { status: 503 });
   }
 
-  // Server-side cart + product rows are the source of truth. Never trust client
-  // product IDs, prices, inventory, shipping requirements, or quantities.
-  const { data: rawCart, error: cartError } = await db
+  const requestBody = await request.json().catch(() => ({}));
+  const requestedItems = Array.isArray(requestBody?.items)
+    ? requestBody.items
+        .filter((item: unknown): item is { slug: string; quantity?: number } =>
+          Boolean(item && typeof item === 'object' && typeof (item as { slug?: unknown }).slug === 'string'),
+        )
+        .map((item: { slug: string; quantity?: number }) => ({
+          slug: item.slug.trim().toLowerCase(),
+          quantity: Number(item.quantity ?? 1),
+        }))
+    : [];
+
+  // Server-side product rows are always the source of truth. The browser cart
+  // sends only slugs and quantities; names, prices, availability, inventory,
+  // shipping and product IDs are reloaded here before Stripe Checkout.
+  const { data: storedCart, error: cartError } = await db
     .from('cart_items')
     .select(
       `id, quantity, product:products(
@@ -71,7 +84,52 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unable to load your cart.' }, { status: 500 });
   }
 
-  const cart = (rawCart ?? []) as unknown as CartRow[];
+  let cart = (storedCart ?? []) as unknown as CartRow[];
+
+  // Public product pages use the browser cart so buyers can shop before signing
+  // in. After authentication, resolve that cart against the canonical products
+  // table instead of silently showing or checking out a different empty cart.
+  if (cart.length === 0 && requestedItems.length > 0) {
+    if (
+      requestedItems.length > 25 ||
+      requestedItems.some(
+        (item: { slug: string; quantity: number }) =>
+          !item.slug || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 10,
+      )
+    ) {
+      return NextResponse.json({ error: 'Cart contains an invalid item or quantity.' }, { status: 400 });
+    }
+
+    const requestedSlugs = [...new Set(requestedItems.map((item: { slug: string }) => item.slug))];
+    const { data: resolvedProducts, error: productError } = await db
+      .from('products')
+      .select(
+        'id, slug, name, description, price, price_cents, currency, type, is_active, requires_shipping, track_inventory, inventory_quantity',
+      )
+      .in('slug', requestedSlugs);
+
+    if (productError) {
+      return NextResponse.json({ error: 'Unable to validate the selected products.' }, { status: 500 });
+    }
+
+    const bySlug = new Map(
+      ((resolvedProducts ?? []) as CartProduct[]).map((product) => [product.slug.toLowerCase(), product]),
+    );
+    const unresolved = requestedSlugs.filter((slug: string) => !bySlug.has(slug));
+    if (unresolved.length) {
+      return NextResponse.json(
+        { error: 'One or more selected products are not available for secure checkout.' },
+        { status: 409 },
+      );
+    }
+
+    cart = requestedItems.map((item: { slug: string; quantity: number }, index: number) => ({
+      id: `browser-cart-${index}`,
+      quantity: item.quantity,
+      product: bySlug.get(item.slug) ?? null,
+    }));
+  }
+
   if (cart.length < 1 || cart.length > 25) {
     return NextResponse.json({ error: 'Cart must contain 1-25 items' }, { status: 400 });
   }

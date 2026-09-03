@@ -1,5 +1,5 @@
 # Trigger Northflank VCS build
-# Production deploy requested for responsive Store and barber media correction
-merge_sha=729d1c573a73cb6f55d444a6fdcd59fedb5c342b
-requested_at=2026-09-03T00:15:00Z
+# Production deploy requested for barber-page DOL and media corrections
+merge_sha=e51075636850253125f12099e2b9f32b0b0bc843
+requested_at=2026-09-03T00:30:00Z
 services=marketing

@@ -1970,3 +1970,96 @@ body[data-custom-header-route='true'] [data-marketing-main] {
     transform: translateX(-50%);
   }
 }
+
+
+/* ============================================================================
+   RESPONSIVE LAYOUT CONTRACT
+   Shared guardrails for the public website and Store on narrow viewports.
+   ============================================================================ */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+main,
+header,
+footer,
+nav,
+section,
+article,
+aside,
+form,
+fieldset,
+div {
+  min-width: 0;
+}
+
+img,
+video,
+canvas,
+iframe,
+embed,
+object {
+  max-width: 100%;
+}
+
+iframe,
+video {
+  width: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+pre,
+code {
+  overflow-wrap: normal;
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 639px) {
+  body {
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  a,
+  button,
+  label,
+  dd,
+  dt {
+    overflow-wrap: anywhere;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  [class*='w-['],
+  [class*='min-w-['] {
+    max-width: 100%;
+  }
+}

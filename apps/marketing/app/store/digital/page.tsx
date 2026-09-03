@@ -19,6 +19,34 @@ export const metadata: Metadata = {
   },
 };
 
+const VERIFIED_PRODUCT_DESTINATIONS: Record<string, { href: string; label: string; available: boolean }> = {
+  'sam-gov-assistant': {
+    href: '/store/sam-gov-assistant',
+    label: 'Open Free Assistant',
+    available: true,
+  },
+  'ai-studio-starter': {
+    href: '/store/demo/ai-studio',
+    label: 'View Working Demo',
+    available: false,
+  },
+  'ai-studio-pro': {
+    href: '/store/demo/ai-studio',
+    label: 'View Working Demo',
+    available: false,
+  },
+};
+
+function getProductDestination(product: { id: string; slug: string }) {
+  return (
+    VERIFIED_PRODUCT_DESTINATIONS[product.id] || {
+      href: `/contact?topic=digital-resource&product=${encodeURIComponent(product.slug)}`,
+      label: 'Request Availability',
+      available: false,
+    }
+  );
+}
+
 export default function StoreDigitalPage() {
 
   const aiTools = DIGITAL_PRODUCTS.filter((p) => 
@@ -30,7 +58,7 @@ export default function StoreDigitalPage() {
   );
 
   return (
-    <div className="bg-white">
+    <main className="bg-white">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Digital" }]} />
       </div>
@@ -114,7 +142,7 @@ export default function StoreDigitalPage() {
             {aiTools.map((product) => (
               <Link
                 key={product.id}
-                href={`/store/digital/${product.slug}`}
+                href={getProductDestination(product).href}
                 className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group border border-slate-100"
               >
                 <div className="relative h-48 overflow-hidden">
@@ -128,7 +156,7 @@ export default function StoreDigitalPage() {
                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   <div className="absolute bottom-4 left-4 right-4">
                     <span className="inline-block px-3 py-1 bg-indigo-600 text-slate-900 text-xs font-bold rounded-full">
-                      {product.priceDisplay}
+                      {getProductDestination(product).available ? product.priceDisplay : 'Availability required'}
                     </span>
                   </div>
                 </div>
@@ -145,7 +173,7 @@ export default function StoreDigitalPage() {
                       </li>
                     ))}
                   </ul>
-                  <div className="flex items-center gap-2 text-indigo-600 font-semibold">See Details<ArrowRight className="w-4 h-4" />
+                  <div className="flex items-center gap-2 text-indigo-600 font-semibold">{getProductDestination(product).label}<ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
               </Link>
@@ -165,7 +193,7 @@ export default function StoreDigitalPage() {
             {downloadProducts.map((product) => (
               <Link
                 key={product.id}
-                href={`/store/digital/${product.slug}`}
+                href={getProductDestination(product).href}
                 className="bg-white rounded-xl p-6 hover:shadow-lg transition-all group border border-slate-100"
               >
                 <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
@@ -181,8 +209,8 @@ export default function StoreDigitalPage() {
                 </h3>
                 <p className="text-slate-600 text-sm mb-4 line-clamp-2">{product.description}</p>
                 <div className="flex items-center justify-between pt-4 border-t border-slate-200">
-                  <span className="text-2xl font-black text-slate-900">{product.priceDisplay}</span>
-                  <span className="text-amber-600 font-semibold">Get Now →</span>
+                  <span className="text-2xl font-black text-slate-900">{getProductDestination(product).available ? product.priceDisplay : 'Availability required'}</span>
+                  <span className="text-amber-600 font-semibold">{getProductDestination(product).label} →</span>
                 </div>
               </Link>
             ))}
@@ -201,7 +229,7 @@ export default function StoreDigitalPage() {
             {platformTools.map((product) => (
               <Link
                 key={product.id}
-                href={`/store/digital/${product.slug}`}
+                href={getProductDestination(product).href}
                 className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all group"
               >
                 <div className="relative h-40 overflow-hidden">
@@ -213,7 +241,7 @@ export default function StoreDigitalPage() {
                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" placeholder="empty" />
                   <div className="absolute bottom-4 left-4">
                     <span className="px-3 py-1 bg-brand-blue-600 text-white text-xs font-bold rounded-full">
-                      {product.priceDisplay}
+                      {getProductDestination(product).available ? product.priceDisplay : 'Availability required'}
                     </span>
                   </div>
                 </div>
@@ -222,7 +250,7 @@ export default function StoreDigitalPage() {
                     {product.name}
                   </h3>
                   <p className="text-slate-600 text-sm mb-4">{product.description}</p>
-                  <div className="flex items-center gap-2 text-brand-blue-600 font-semibold">See Details<ArrowRight className="w-4 h-4" />
+                  <div className="flex items-center gap-2 text-brand-blue-600 font-semibold">{getProductDestination(product).label}<ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
               </Link>
@@ -245,6 +273,6 @@ export default function StoreDigitalPage() {
           </Link>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

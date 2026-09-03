@@ -5,6 +5,7 @@ import { WebsiteBuilderApp } from './WebsiteBuilderApp';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { syncIndividualAppSubscription } from '@/lib/apps/sync-subscription';
 import { startAppTrial } from '@/lib/trial/start-app-trial';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,17 +27,20 @@ export default async function WebsiteBuilderPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/apps/website-builder&message=login-required');
 
-  let subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
-  if (!subscription) {
+  let access = await getWebsiteBuilderAccess(user.id, supabase);
+  if (!access.allowed && access.reason === 'subscription_required') {
     const trial = await startAppTrial(user.id, 'website-builder', supabase);
     if (trial.status === 'error') redirect('/store/apps/website-builder?reason=trial-start-failed');
-    subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
+    access = await getWebsiteBuilderAccess(user.id, supabase);
   }
-  if (!subscription) redirect('/store/apps/website-builder?reason=subscription-unavailable');
+  if (!access.allowed) {
+    redirect(access.upgradeUrl || `/store/apps/website-builder?reason=${encodeURIComponent(access.reason || 'subscription-required')}`);
+  }
 
-  if (subscription.status !== 'trial' && subscription.status !== 'active') {
-    redirect(subscription.upgrade_url || `/store/apps/website-builder?reason=${encodeURIComponent(subscription.access_reason || subscription.status || 'subscription-required')}`);
-  }
+  const subscription = access.isAdmin
+    ? { status: access.status, plan: access.plan, trial_ends_at: null }
+    : await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
+  if (!subscription) redirect('/store/apps/website-builder?reason=subscription-unavailable');
 
   let trialDaysRemaining = 0;
   if (subscription.status === 'trial' && subscription.trial_ends_at) {

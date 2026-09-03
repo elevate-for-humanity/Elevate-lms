@@ -8,7 +8,6 @@ import { ArrowLeft, CreditCard, Loader2, Minus, Plus, ShieldCheck, ShoppingCart,
 import { useStoreCart } from '@/hooks/useStoreCart';
 import { addToCart, clearCart } from '@/lib/store/cart';
 import { isIndividualAppCartProduct, parseIndividualAppCartProduct, resolveCartAddParam } from '@/lib/store/resolve-cart-add';
-import { createClient } from '@/lib/supabase/client';
 
 interface Props { checkoutError?: string | null; addParam?: string | null }
 
@@ -35,21 +34,10 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
     setCheckingOut(true);
     setMessage(null);
     try {
-      const supabase = createClient();
-      let user = null;
-      try {
-        const { data } = await supabase.auth.getUser();
-        user = data.user;
-      } catch {
-        // A cross-origin auth lookup can fail before the buyer has established a
-        // platform session. Treat that as signed out and continue to the secure
-        // sign-in handoff instead of exposing a raw network error in the cart.
-      }
-      if (!user) {
+      const redirectToLogin = () => {
         const returnUrl = `${window.location.origin}/store/cart`;
         window.location.href = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(returnUrl)}`;
-        return;
-      }
+      };
 
       const individual = cart.items.find((item) => isIndividualAppCartProduct(item.product.id));
       if (individual) {
@@ -57,6 +45,7 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
         const parsed = parseIndividualAppCartProduct(individual.product.id);
         if (!parsed) throw new Error('Invalid app subscription');
         const response = await fetch('/api/apps/upgrade', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ appSlug: parsed.appSlug, plan: parsed.planId }) });
+        if (response.status === 401) { redirectToLogin(); return; }
         const data = await response.json();
         if (!response.ok || !data.checkoutUrl) throw new Error(data.error || 'Could not start app checkout');
         clearCart();
@@ -69,6 +58,7 @@ export default function StoreCartView({ checkoutError, addParam }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items: cart.items.map((item) => ({ slug: item.product.slug, quantity: item.quantity })) }),
       });
+      if (response.status === 401) { redirectToLogin(); return; }
       const data = await response.json();
       if (!response.ok || !data.checkoutUrl) throw new Error(data.error || 'Could not start secure checkout');
       window.location.href = data.checkoutUrl;

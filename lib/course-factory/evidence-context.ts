@@ -43,8 +43,13 @@ export async function buildCourseEvidenceContext(args: {
     `Credential code: ${blueprint.credentialCode}`,
     `Jurisdiction: ${blueprint.state ?? args.state ?? 'federal'}`,
     `Blueprint version: ${blueprint.version}`,
+    `Source authority: ${blueprint.sourceAuthority ?? 'registered course blueprint'}`,
+    `Source reference: ${blueprint.sourceReference ?? 'registered course blueprint'}`,
+    `Source effective date: ${blueprint.effectiveDate ?? 'not specified'}`,
     ...blueprint.modules.flatMap(moduleEvidence),
   ];
+
+  if (blueprint.sourceAuthority) sources.push(blueprint.sourceAuthority);
 
   const socCode = args.programSlug ? getSocCode(args.programSlug) : null;
 

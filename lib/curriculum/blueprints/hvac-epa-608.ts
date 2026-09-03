@@ -17,11 +17,13 @@
 
 import type { CredentialBlueprint, BlueprintVideoConfig } from './types';
 
-// Locked video format — matches the 6 produced HVAC lesson videos exactly.
-// Do not change without regenerating all lesson videos.
+// Canonical instructional-video contract. HVAC media must teach the narrated
+// procedure with equipment close-ups, deterministic diagrams, worked examples,
+// safety evidence, and knowledge checks. It must not fall back to decorative
+// AI backgrounds that merely play underneath narration.
 const HVAC_VIDEO_CONFIG: BlueprintVideoConfig = {
-  videoGenerator: 'canvas-slides', // legacy — do not copy for new programs
-  template: 'elevate-slide',
+  videoGenerator: 'remotion',
+  template: 'trade-demonstration',
   instructorName: 'Marcus Johnson',
   instructorTitle: 'Master HVAC Technician',
   instructorImagePath: '/images/team/instructors/instructor-trades.jpg',
@@ -32,15 +34,18 @@ const HVAC_VIDEO_CONFIG: BlueprintVideoConfig = {
   ttsSpeed: 0.85,
   slideCount: 5,
   segments: ['intro', 'concept', 'visual', 'application', 'wrapup'],
-  generateDalleImage: true,
-  dalleImageStyle: 'natural',
-  width: 1920,
-  height: 1080,
+  generateDalleImage: false,
+  requireInstructionalEvidence: true,
+  requireNarrationVisualAlignment: true,
+  requireSafetySceneWhenApplicable: true,
+  requireWorkedExample: true,
+  width: 1280,
+  height: 720,
 };
 
 export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
-  id: 'hvac-epa608-v1',
-  version: '1.0.0',
+  id: 'hvac-epa608-v2',
+  version: '2.0.0',
   credentialSlug: 'epa-608',
   credentialTitle: 'EPA Section 608 Technician Certification',
   state: 'federal',
@@ -48,18 +53,23 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
   credentialCode: 'EPA-608',
   trackVariants: ['type_i', 'type_ii', 'type_iii', 'universal'],
   status: 'active',
+  sourceAuthority: 'U.S. Environmental Protection Agency',
+  sourceReference:
+    '40 CFR Part 82, Subpart F; EPA Section 608 Technician Certification; EPA Section 608 Regulatory Updates; EPA HFC Technology Transitions Program. Elevate lessons and practice questions are independently authored and are not official EPA or ESCO exam questions.',
+  effectiveDate: '2026-03-23',
+  contentLicense: 'Original Elevate for Humanity instructional content',
+  examVersionPolicy: {
+    current: 'EPA Section 608 current test domains',
+    transition: 'Revalidate against the EPA-approved certifying organization before assigning an exam during the announced 2026-2027 test-bank transition.',
+    protectedQuestionBank: true,
+    prohibitOfficialQuestionClaims: true,
+  },
   externalCourses: [
     {
-      title: 'ESCO Institute: EPA 608 Certification Prep',
-      provider: 'ESCO Institute',
-      url: 'https://www.escogroup.org/esco/certifications/608.aspx',
+      title: 'EPA-approved Section 608 certification examination',
+      provider: 'EPA-approved certifying organization',
+      url: 'https://www.epa.gov/section608/section-608-technician-certification-programs',
       required: true,
-    },
-    {
-      title: 'ESCO Institute: HVAC Excellence Certification Prep',
-      provider: 'ESCO Institute',
-      url: 'https://www.escogroup.org/esco/certifications/',
-      required: false,
     },
     {
       title: 'OSHA 10-Hour General Industry (CareerSafe)',
@@ -86,6 +96,10 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
     requiresFinalExam: true,
     requiresUniversalReview: true,
     generatorMode: 'fixed',
+    originalContentRequired: true,
+    authoritativeSourceRequired: true,
+    prohibitProtectedExamQuestions: true,
+    requireCredentialVersionLabel: true,
   },
 
   modules: [

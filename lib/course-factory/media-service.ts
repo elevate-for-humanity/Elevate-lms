@@ -147,7 +147,7 @@ export async function queueCourseLessonVideos(
           script:
             candidateIndex === 0
               ? `${generateInstructorIntro(instructor, course.title)} ${lesson.script ?? ''}`.trim()
-              : `Welcome back. I'm ${instructor.name}, your ${instructor.title}. ${lesson.script ?? ''}`.trim(),
+              : String(lesson.script ?? '').trim(),
           bullet_points: Array.isArray(lesson.bullet_points) ? (lesson.bullet_points as string[]) : [],
           scene_data: lesson.scene_data ?? null,
           asset_kind: 'lesson',

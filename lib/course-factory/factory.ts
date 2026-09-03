@@ -293,6 +293,7 @@ async function enrichBlueprint(
   courseTitle: string,
   input: FactoryInput,
   progress: ProgressTracker,
+  evidenceStandardsBlock: string,
 ): Promise<{ blueprint: CredentialBlueprint; assessmentsGenerated: number }> {
   const enriched = cloneBlueprint(blueprint);
   const totalLessons = enriched.modules.reduce(
@@ -807,6 +808,7 @@ async function enrichBlueprint(
           courseTitle,
           state: input.state ?? enriched.state,
           standardsBlock: [
+            evidenceStandardsBlock,
             `Required domain: ${lesson.domainKey || courseModule.domainKey || courseModule.slug}`,
             `Required module competencies: ${(courseModule.competencies ?? []).map((competency) => competency.competencyKey).join(', ') || 'Apply the module objective'}`,
             `Blueprint lesson identity: ${lesson.slug} — ${lesson.title}`,
@@ -944,7 +946,7 @@ export async function courseFactory(
     const enriched =
       input.contentSource === 'blueprint'
         ? { blueprint, assessmentsGenerated: 0 }
-        : await enrichBlueprint(blueprint, courseTitle, input, tracker);
+        : await enrichBlueprint(blueprint, courseTitle, input, tracker, evidence.standardsBlock);
 
     tracker.emit('validate', 'Validating the complete generated course package.', 80);
     const packageAudit = validateBlueprint(enriched.blueprint, { requireGeneratedContent: true });

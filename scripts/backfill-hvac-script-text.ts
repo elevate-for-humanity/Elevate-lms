@@ -157,8 +157,9 @@ const CHECKPOINT_REVIEW: Record<number, string> = {
 <li>CFCs (R-11, R-12) — highest ozone depletion potential, fully phased out</li>
 <li>HCFCs (R-22) — lower ODP, being phased out. R-22 production ended 2020.</li>
 <li>HFCs (R-410A, R-134a) — zero ODP but high GWP. Current standard.</li>
-<li>HFOs (R-32, R-454B) — low GWP, next generation</li>
-<li>Venting refrigerant intentionally = federal violation, up to $44,539/day fine</li>
+<li><strong>R-32</strong> is an HFC. <strong>R-454B</strong> is an HFC/HFO blend. Both are A2L refrigerants and require mildly-flammable-refrigerant safety procedures.</li>
+<li>HFOs such as R-1234yf have very low GWP. Never identify R-32 as an HFO.</li>
+<li>Intentional venting is prohibited for regulated refrigerants. Penalty amounts change over time, so verify the current EPA enforcement figure instead of memorizing a static dollar amount.</li>
 </ul>
 <h3>Recovery, Recycling, Reclamation</h3>
 <ul>
@@ -198,9 +199,9 @@ const CHECKPOINT_REVIEW: Record<number, string> = {
 </ul>
 <h3>Leak Repair Requirements</h3>
 <ul>
-<li>Commercial/industrial systems with 50+ lbs: repair leaks within 30 days if annual leak rate exceeds 20%</li>
-<li>Comfort cooling systems with 50+ lbs: repair within 30 days if annual leak rate exceeds 15%</li>
-<li>Must keep records of refrigerant added to systems with 50+ lbs</li>
+<li>For appliances containing ozone-depleting refrigerants, current trigger rates are 20% for commercial refrigeration, 30% for industrial process refrigeration, and 10% for comfort cooling.</li>
+<li>The 2020 EPA revision removed Section 608 leak-repair provisions for appliances containing substitute refrigerants such as HFCs, while leaving certification, evacuation, recovery-equipment, sales, safe-disposal, and reclamation requirements in place.</li>
+<li>Before applying a leak rule, identify the refrigerant class and verify the current EPA rule.</li>
 </ul>
 <h3>Leak Detection</h3>
 <ul>

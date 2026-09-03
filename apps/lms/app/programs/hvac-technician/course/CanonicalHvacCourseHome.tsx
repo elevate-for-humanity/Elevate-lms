@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { BookOpen, CheckCircle2, ChevronRight, Clock, Play, Search } from 'lucide-react';
+import { BookOpen, CheckCircle2, ChevronRight, ClipboardCheck, Clock, Play, Search } from 'lucide-react';
 
 type Lesson = {
   id: string;
@@ -99,15 +99,24 @@ export default function CanonicalHvacCourseHome({
             </div>
           </div>
 
-          {nextLesson ? (
+          <div className="mt-7 flex flex-wrap gap-3">
+            {nextLesson ? (
+              <Link
+                href={lessonHref(courseId, nextLesson.id)}
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-slate-950 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-950"
+              >
+                <Play className="h-4 w-4" aria-hidden="true" />
+                {completed.size ? 'Continue course' : 'Start course'}
+              </Link>
+            ) : null}
             <Link
-              href={lessonHref(courseId, nextLesson.id)}
-              className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-slate-950 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-950"
+              href="/programs/hvac-technician/practice"
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-white/40 bg-white/10 px-5 py-3 font-bold text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
             >
-              <Play className="h-4 w-4" aria-hidden="true" />
-              {completed.size ? 'Continue course' : 'Start course'}
+              <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
+              EPA 608 practice tests
             </Link>
-          ) : null}
+          </div>
         </div>
       </section>
 

@@ -75,7 +75,7 @@ export function lessonGenerationMaxAttempts(): number {
   return Math.min(3, Math.max(1, configured));
 }
 
-function normalizeLessonContract(raw: string): string {
+export function normalizeLessonContract(raw: string): string {
   try {
     const parsed = JSON.parse(raw) as Record<string, any>;
     const experience =
@@ -182,6 +182,43 @@ function normalizeLessonContract(raw: string): string {
           ),
         }),
       );
+    }
+
+    if (Array.isArray(experience.exercises)) {
+      experience.exercises = experience.exercises.map((exercise: Record<string, any>) => {
+        const instructions = Array.isArray(exercise?.instructions)
+          ? exercise.instructions.filter(
+              (value: unknown): value is string =>
+                typeof value === 'string' && value.trim().length > 0,
+            )
+          : [];
+
+        // Preserve the provider-authored action. When it omitted only the
+        // required verification step, derive that step from the same exercise's
+        // artifact and grading criteria instead of regenerating the whole lesson
+        // or inserting unrelated generic content. Empty exercises remain invalid
+        // and are retried by the strict generation contract.
+        if (instructions.length === 1) {
+          const expectedArtifact =
+            typeof exercise?.expectedArtifact === 'string' && exercise.expectedArtifact.trim()
+              ? exercise.expectedArtifact.trim()
+              : 'the completed work';
+          const criteria = Array.isArray(exercise?.autoGrade?.criteria)
+            ? exercise.autoGrade.criteria.filter(
+                (value: unknown): value is string =>
+                  typeof value === 'string' && value.trim().length > 0,
+              )
+            : [];
+          const verificationTarget = criteria.length
+            ? criteria.join('; ')
+            : lessonFocus;
+          instructions.push(
+            `Document ${expectedArtifact}, then verify it against these success criteria before submission: ${verificationTarget}.`,
+          );
+        }
+
+        return { ...exercise, instructions };
+      });
     }
 
     if (experience.practicalTask && typeof experience.practicalTask === 'object') {

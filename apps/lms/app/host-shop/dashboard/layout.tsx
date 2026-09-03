@@ -8,6 +8,7 @@ import { HOST_SHOP_ROLES, normalizeRole } from '@/lib/rbac/role-matrix';
 import { getHostShopBoard } from '@/lib/partner/board';
 import { getHostShopReadinessItems } from '@/lib/partners/host-shop-readiness';
 import HostShopReadinessBanner from '@/components/partners/HostShopReadinessBanner';
+import { headers } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,6 +34,7 @@ export default async function HostShopDashboardLayout({ children }: { children: 
   const isPlatformAdmin =
     (actorRole !== null && ['super_admin', 'admin', 'org_admin'].includes(actorRole)) ||
     auth.effectiveRoles.some((role) => ['super_admin', 'admin', 'org_admin'].includes(role));
+  const pathname = (await headers()).get('x-pathname') || '/host-shop/dashboard';
 
   // The dashboard page owns the administrator's audited-shop selection. Do not
   // force platform administrators through an owner's membership or onboarding
@@ -51,6 +53,23 @@ export default async function HostShopDashboardLayout({ children }: { children: 
       ) {
         throw error;
       }
+    }
+
+    if (!readinessItems && pathname !== '/host-shop/dashboard') {
+      const moduleName = pathname.split('/').filter(Boolean).pop()?.replace(/-/g, ' ') || 'host shop module';
+      return (
+        <PlatformShell
+          user={{ id: auth.user.id, email: auth.user.email || '', full_name: actorProfile?.full_name || undefined, first_name: actorProfile?.first_name || undefined, last_name: actorProfile?.last_name || undefined, avatar_url: actorProfile?.avatar_url || undefined }}
+          role="host_shop"
+        >
+          <main className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Administrator portal preview</p>
+            <h1 className="mt-2 text-3xl font-black capitalize text-slate-950">{moduleName}</h1>
+            <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-slate-700">This Host Shop module is operational. Shop apprentices, hours, wages, documents, messages, and actions remain isolated until an administrator selects a specific shop through the audited Admin workspace.</p>
+            <div className="mt-6 flex flex-wrap gap-3"><a href="https://admin.elevateforhumanity.org/dashboard" className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">Select a Host Shop in Admin</a><a href="/host-shop/dashboard" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-950">Host Shop PWA overview</a></div>
+          </main>
+        </PlatformShell>
+      );
     }
 
     return (

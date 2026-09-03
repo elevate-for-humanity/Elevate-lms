@@ -172,13 +172,13 @@ export default function FeaturedHostPartners({
                       </div>
                       <div className="mx-auto mt-4 max-w-xl text-center text-white">
                         <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-red-300">
-                          Participating host barbershop
+                          Participating host {shop.businessType === 'BarberShop' ? 'barbershop' : 'salon'}
                         </p>
                         <p className="mt-2 text-sm font-semibold leading-6 text-slate-200">
-                          Razor&apos;s Image provides an approved workplace training environment.
-                          Elevate for Humanity administers the DOL-registered Barber Apprenticeship;
-                          enrollment, eligibility, placement, wages, and licensing remain subject to
-                          the applicable program and employer requirements.
+                          {shop.name} provides a supervised workplace training environment for the{' '}
+                          {programSlug ? programLabel(programSlug) : 'selected'} pathway. Enrollment,
+                          placement, wages, and licensing remain subject to the applicable program,
+                          employer, and state requirements.
                         </p>
                       </div>
                     </div>

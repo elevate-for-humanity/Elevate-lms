@@ -24,11 +24,16 @@ export function ContactForm() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const product = params.get('product');
+    const course = params.get('course');
     const topic = params.get('topic');
     if (product) {
       const productName = PRODUCT_NAMES[product] || product.replaceAll('-', ' ');
       setSubject('other');
       setMessage(`I would like availability, delivery, and pricing information for ${productName}.`);
+    } else if (course) {
+      const courseName = course.replaceAll('-', ' ');
+      setSubject('enrollment');
+      setMessage(`I would like current availability, credential details, access period, and final pricing for ${courseName}.`);
     } else if (topic) {
       setSubject(topic === 'platform-licensing' ? 'employer-partnership' : 'other');
     }

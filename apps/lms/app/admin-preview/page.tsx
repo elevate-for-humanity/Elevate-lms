@@ -8,9 +8,13 @@ export const dynamic = 'force-dynamic';
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin']);
 const HOST_SHOP_ROLES = new Set(['partner', 'host_shop', 'host_shop_admin', 'program_holder']);
+const APPRENTICE_ROLES = new Set(['apprentice', 'barber_apprentice', 'cosmetology_apprentice']);
 
 function previewDestination(role: unknown) {
-  return HOST_SHOP_ROLES.has(String(role || '')) ? '/host-shop/dashboard' : '/apprentice';
+  const value = String(role || '');
+  if (HOST_SHOP_ROLES.has(value)) return '/host-shop/dashboard';
+  if (APPRENTICE_ROLES.has(value)) return '/apprentice';
+  return '/lms/dashboard';
 }
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
 
@@ -85,7 +89,7 @@ export default async function AdminPreviewPage({
         <form action={startPreview} className="mt-6">
           <input type="hidden" name="user_id" value={target.id} />
           <button className="w-full rounded-xl bg-blue-700 px-5 py-3 font-bold text-white hover:bg-blue-800" type="submit">
-            Open apprentice dashboard
+            Open read-only portal
           </button>
         </form>
         <a className="mt-4 block text-center text-sm font-semibold text-slate-600 underline" href="https://admin.elevateforhumanity.org/impersonate">

@@ -64,7 +64,10 @@ const footerLinks = {
   ],
 
   legal: [
-    { name: 'Terms of Service', href: '/legal' },
+    { name: 'Trust Center', href: '/trust' },
+    { name: 'Procurement Center', href: '/procurement' },
+    { name: 'Support', href: '/support' },
+    { name: 'Terms of Service', href: '/terms-of-service' },
     { name: 'Privacy Policy', href: '/legal/privacy' },
     { name: 'Security & Data', href: '/security-and-data-protection' },
     { name: 'Accessibility', href: '/accessibility' },

@@ -90,7 +90,7 @@ const faqs = [
 
 export default function SupportPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white">
       {/* Hero */}
       <section className="bg-gradient-to-br from-brand-blue-700 via-brand-blue-800 to-brand-blue-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4">
@@ -100,14 +100,9 @@ export default function SupportPage() {
               Browse our help center, search documentation, or contact our support team.
             </p>
             
-            {/* Search */}
-            <div className="relative max-w-xl">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search for help articles..."
-                className="w-full pl-12 pr-4 py-4 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-orange-500"
-              />
+            <div className="flex flex-wrap gap-3">
+              <Link href="/help" className="rounded-xl bg-white px-5 py-3 font-bold text-brand-blue-800 hover:bg-blue-50">Browse help topics</Link>
+              <Link href="/support/ticket" className="rounded-xl border border-blue-300 px-5 py-3 font-bold text-white hover:bg-white/10">Submit a support ticket</Link>
             </div>
           </div>
         </div>
@@ -151,7 +146,7 @@ export default function SupportPage() {
             <div className="bg-white rounded-xl p-6 text-center">
               <Mail className="w-10 h-10 text-brand-blue-600 mx-auto mb-4" />
               <h3 className="font-bold text-slate-900 mb-2">Email Support</h3>
-              <p className="text-slate-600 text-sm mb-4">Response within 24 hours on business days</p>
+              <p className="text-slate-600 text-sm mb-4">Goal: response within one business day</p>
               <Link href="/contact" className="text-brand-blue-600 font-semibold hover:underline">
                 Send Email →
               </Link>
@@ -197,6 +192,6 @@ export default function SupportPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

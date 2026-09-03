@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Accessibility, BadgeCheck, Database, FileCheck2, LockKeyhole, Scale, ShieldCheck } from 'lucide-react';
+import { Accessibility, BadgeCheck, Database, FileCheck2, LifeBuoy, LockKeyhole, Scale, ShieldCheck } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Trust Center | Elevate for Humanity',
+  title: 'Trust Center',
   description: 'Institutional evidence, approvals, security, accessibility, governance, privacy, and procurement resources for Elevate for Humanity.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/trust' },
 };
@@ -38,6 +38,12 @@ const areas = [
     description: 'Review the registered-apprenticeship structure, OJT documentation, competency verification, and related compliance resources.',
     href: '/compliance/apprenticeship-structure',
     icon: FileCheck2,
+  },
+  {
+    title: 'Support & escalation',
+    description: 'Review support channels, business hours, help resources, and ticket intake. Contract-specific escalation and service levels are documented during procurement.',
+    href: '/support',
+    icon: LifeBuoy,
   },
   {
     title: 'Procurement center',

@@ -58,6 +58,9 @@ interface Props {
   banner?: HeroBannerConfig | null;
   /** Replaces the default video/image hero entirely. */
   heroOverride?: React.ReactNode;
+  /** Route-specific proof shown immediately after the decision panel. */
+  featuredContent?: React.ReactNode;
+  /** Supplemental compliance, instructor, or authority content shown after the core template. */
   children?: React.ReactNode;
 }
 
@@ -65,6 +68,7 @@ export default function ProgramDetailPage({
   program: p,
   banner: bannerProp,
   heroOverride,
+  featuredContent,
   children,
 }: Props) {
   // Dev-time validation
@@ -475,6 +479,8 @@ export default function ProgramDetailPage({
           </aside>
         </div>
       </section>
+
+      {featuredContent ? <div>{featuredContent}</div> : null}
 
       {/* CREDIBILITY STRIP */}
       <section className="py-8 border-y border-slate-100">

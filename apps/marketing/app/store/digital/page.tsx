@@ -77,7 +77,7 @@ export default function StoreDigitalPage() {
               Digital Resources <span className="text-brand-blue-300">For Training Providers</span>
             </h1>
             <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">
-              Explore working previews and request confirmed availability for AI assistants, compliance tools, templates, and business guides. Products are only offered for payment after access and delivery are verified. Every card now opens either working access or a staffed inquiry path.
+              Explore working previews and request confirmed availability for AI assistants, compliance tools, templates, and business guides. Products are only offered for payment after access and delivery are verified. Every card now opens either working access or a staffed inquiry form.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link href="#ai-tools" className="inline-flex items-center gap-2 bg-white text-indigo-900 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-all">

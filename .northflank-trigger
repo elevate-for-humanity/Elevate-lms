@@ -1,5 +1,5 @@
 # Trigger Northflank VCS build
-# Production deploy requested for concise DOL-facing barber experience
-merge_sha=d6e0fabb1ca63e834606991dc7fdbfb3519b724d
-requested_at=2026-09-03T00:45:00Z
+# Production deploy requested for final barber hero polish
+merge_sha=c67bcbd8c0c91bc7545c1864e82648200389ba03
+requested_at=2026-09-03T13:05:00Z
 services=marketing

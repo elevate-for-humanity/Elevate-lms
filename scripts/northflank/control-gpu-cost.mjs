@@ -10,7 +10,7 @@ if (!['auto', 'sleep', 'wake-video'].includes(action)) throw new Error(`Unsuppor
 
 const base = `https://api.northflank.com/v1/teams/${team}/projects/${project}`;
 
-async function request(path: string, init: RequestInit = {}) {
+async function request(path, init = {}) {
   const response = await fetch(`${base}${path}`, {
     ...init,
     headers: {
@@ -25,7 +25,7 @@ async function request(path: string, init: RequestInit = {}) {
   return body ? JSON.parse(body) : {};
 }
 
-async function scale(serviceId: string, instances: 0 | 1) {
+async function scale(serviceId, instances) {
   const currentRaw = await request(`/services/${serviceId}`);
   const current = currentRaw.data ?? currentRaw;
   const existing = Number(current.deployment?.instances ?? current.deployment?.spec?.instances ?? 0);
@@ -40,7 +40,7 @@ async function scale(serviceId: string, instances: 0 | 1) {
   console.log(JSON.stringify({ serviceId, before: existing, instances, changed: true }));
 }
 
-async function eligibleVideoWork(): Promise<number> {
+async function eligibleVideoWork() {
   if (!supabaseUrl || !serviceKey) throw new Error('Supabase credentials are required for auto mode');
   const headers = { apikey: serviceKey, authorization: `Bearer ${serviceKey}` };
   const courseResponse = await fetch(
@@ -48,7 +48,7 @@ async function eligibleVideoWork(): Promise<number> {
     { headers },
   );
   if (!courseResponse.ok) throw new Error(`Unable to inspect active courses: ${courseResponse.status}`);
-  const courses = (await courseResponse.json()) as Array<{ id: string }>;
+  const courses = await courseResponse.json();
   let total = 0;
   for (const course of courses) {
     const response = await fetch(

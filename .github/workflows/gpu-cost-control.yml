@@ -38,4 +38,4 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - name: Enforce demand-based GPU capacity
-        run: pnpm tsx scripts/northflank/control-gpu-cost.ts "${{ github.event_name == 'workflow_dispatch' && inputs.action || 'auto' }}"
+        run: node scripts/northflank/control-gpu-cost.mjs "${{ github.event_name == 'workflow_dispatch' && inputs.action || 'auto' }}"

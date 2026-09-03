@@ -1,5 +1,5 @@
 # Trigger Northflank VCS build
-# Production deploy requested for final barber hero polish
-merge_sha=c67bcbd8c0c91bc7545c1864e82648200389ba03
-requested_at=2026-09-03T13:05:00Z
+# Production deploy requested for apprenticeship page audit
+merge_sha=5df5ea2556eb24d9fca51dc0cd2fd3ea99d2241d
+requested_at=2026-09-03T14:00:00Z
 services=marketing

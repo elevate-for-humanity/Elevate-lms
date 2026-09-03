@@ -19,7 +19,13 @@ function phoneHref(phone: string) {
   return `tel:${phone.replace(/[^0-9+]/g, '')}`;
 }
 
-export default function FeaturedHostPartners({ programSlug }: { programSlug?: string }) {
+export default function FeaturedHostPartners({
+  programSlug,
+  showDirectory = true,
+}: {
+  programSlug?: string;
+  showDirectory?: boolean;
+}) {
   const requiredBusinessType =
     programSlug === 'barber-apprenticeship'
       ? 'BarberShop'
@@ -59,10 +65,11 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
         />
       ) : null}
 
-      <section
-        className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 sm:py-16"
-        id="host-shops"
-      >
+      {showDirectory ? (
+        <section
+          className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 sm:py-16"
+          id="host-shops"
+        >
         <div className="mx-auto max-w-6xl">
           <p className="text-center text-xs font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
             Training network & local businesses
@@ -314,8 +321,9 @@ export default function FeaturedHostPartners({ programSlug }: { programSlug?: st
               );
             })}
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }

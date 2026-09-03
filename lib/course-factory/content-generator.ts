@@ -72,7 +72,7 @@ export function lessonGenerationMaxTokens(): number {
  */
 export function lessonGenerationMaxAttempts(): number {
   const configured = Number.parseInt(process.env.COURSE_FACTORY_LESSON_MAX_ATTEMPTS ?? '', 10);
-  if (!Number.isFinite(configured)) return 2;
+  if (!Number.isFinite(configured)) return 3;
   return Math.min(3, Math.max(1, configured));
 }
 
@@ -213,7 +213,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
             content:
               attempt === 1
                 ? prompt
-                : `${prompt}\n\nYour previous response failed the strict contract. Return the complete JSON object with every required field, at least 6 flashcards, 2 quickClips, 3 knowledgeChecks, 1 exercise, 2 resources, 4 glossary terms, readiness and targeted remediation. No markdown.`,
+                : `${prompt}\n\nYour previous response failed the strict contract with this exact validation error:\n${lastError instanceof Error ? lastError.message : String(lastError)}\n\nCorrect every named defect. Return the complete JSON object with every required field, exactly 4 substantive options for every quiz question and knowledge check, at least 6 flashcards, 2 quickClips, 3 knowledgeChecks, 1 exercise, 2 resources, 4 glossary terms, readiness and targeted remediation. No markdown.`,
           },
         ],
         temperature: attempt === 1 ? 0.65 : 0.35,

@@ -151,6 +151,39 @@ export function normalizeLessonContract(raw: string): string {
       });
     }
 
+    // Providers occasionally return a complete scenario or case study with only
+    // one decision option. Preserve the authored option and derive its grounded
+    // counterpart from the same question, evidence, and lesson objective.
+    for (const key of ['scenario', 'caseStudy'] as const) {
+      const decision = experience[key];
+      if (!decision || typeof decision !== 'object' || !Array.isArray(decision.options)) continue;
+      const options = decision.options.filter(
+        (option: unknown): option is Record<string, any> =>
+          !!option && typeof option === 'object' && !Array.isArray(option),
+      );
+      if (options.length === 1) {
+        const existingIsCorrect = options[0].isCorrect === true;
+        const question =
+          typeof decision.question === 'string' && decision.question.trim()
+            ? decision.question.trim()
+            : lessonFocus;
+        options.push(
+          existingIsCorrect
+            ? {
+                text: `Choose a conclusion that ignores the documented evidence and decision criteria for ${question}`,
+                isCorrect: false,
+                feedback: `This choice is not supported because it bypasses the evidence and observable criteria required to demonstrate ${lessonFocus}.`,
+              }
+            : {
+                text: `Choose the conclusion supported by the documented evidence and apply it to ${lessonFocus}.`,
+                isCorrect: true,
+                feedback: `This choice uses the case evidence and the lesson's decision criteria to demonstrate ${lessonFocus}.`,
+              },
+        );
+        decision.options = options;
+      }
+    }
+
     if (experience.practicalTask && typeof experience.practicalTask === 'object') {
       const instructions = Array.isArray(experience.practicalTask.instructions)
         ? experience.practicalTask.instructions.filter(

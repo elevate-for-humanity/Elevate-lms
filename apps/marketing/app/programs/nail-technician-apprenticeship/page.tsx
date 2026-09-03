@@ -3,6 +3,7 @@ import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import JozannaIndustryInstructor from '@/components/programs/beauty/JozannaIndustryInstructor';
+import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import heroBanners from '@/content/heroBanners';
 import { notFound } from 'next/navigation';
 import { getStaticProgram } from '@/data/programs';
@@ -13,14 +14,14 @@ export default async function NailTechnicianApprenticeshipPage() {
   const loaded = await loadProgramForPage('nail-technician-apprenticeship');
   const program = loaded?.program ?? getStaticProgram('nail-technician-apprenticeship');
   if (!program) return notFound();
-  const banner = heroBanners['nail-technician-apprenticeship'] ?? null;
+  const rawBanner = heroBanners['nail-technician-apprenticeship'] ?? null;
+  const banner = rawBanner ? { ...rawBanner, voiceoverSrc: undefined } : null;
   const structuredData = buildBeautyProgramStructuredData(program);
   const heroOverride = banner?.videoSrcDesktop ? (
     <HeroVideo
       videoSrcDesktop={banner.videoSrcDesktop}
       videoSrcMobile={banner.videoSrcMobile ?? banner.videoSrcDesktop}
       posterImage={banner.posterImage || program.heroImage}
-      voiceoverSrc={banner.voiceoverSrc}
       microLabel={banner.microLabel}
       analyticsName={banner.analyticsName}
       belowHeroHeadline={banner.belowHeroHeadline}
@@ -37,7 +38,12 @@ export default async function NailTechnicianApprenticeshipPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
-      <ProgramDetailPage program={program} banner={banner} heroOverride={heroOverride}>
+      <ProgramDetailPage
+        program={program}
+        banner={banner}
+        heroOverride={heroOverride}
+        featuredContent={<FeaturedHostPartners programSlug="nail-technician-apprenticeship" />}
+      >
         <div className="space-y-10">
           <JozannaIndustryInstructor industry="nail-technician" />
           <BeautyApprenticeshipAuthority program={program} />

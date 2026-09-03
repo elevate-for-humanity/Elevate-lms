@@ -141,6 +141,9 @@ jobs:
           if [ "${{ steps.target.outputs.program }}" = "esb" ]; then
             pnpm tsx scripts/course-factory/build-esb-acceptance.ts
           elif [ "${{ steps.target.outputs.program }}" = "hvac-technician" ]; then
+            # Rebuild the canonical authored source first so Course Builder never
+            # republishes stale refrigerant classifications or static penalty data.
+            pnpm tsx scripts/backfill-hvac-script-text.ts --force
             pnpm tsx scripts/course-builder/run.ts --course hvac-technician --mode refresh
             pnpm tsx scripts/check-hvac-content.ts
           else

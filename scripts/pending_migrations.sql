@@ -1,0 +1,2967 @@
+-- 35 pending migrations — paste into Supabase Dashboard > SQL Editor
+
+
+-- ── 20260322000006_seed_credential_registry.sql ──────────────────────────────────────────
+
+-- =============================================================================
+-- Seed credential_registry — workforce credentials for Elevate programs
+--
+-- Targets credential_registry (the real workforce table), NOT credentials
+-- (the API keys table). These are two different tables.
+--
+-- Two credentials already exist in the live DB with correct data:
+--   EPA Section 608  → d37ae8a2-9297-44d1-83db-fa7ef375b796
+--   NCRC             → 3e4683f2-a977-4193-99d7-7b8d15270116
+-- These rows are included in the ON CONFLICT DO UPDATE to keep them current.
+--
+-- The remaining 12 credentials are new inserts.
+-- All IDs are deterministic so downstream FKs (program_credentials,
+-- credential_exam_domains) can reference them by stable UUID.
+--
+-- Idempotent: ON CONFLICT (id) DO UPDATE on all rows.
+-- =============================================================================
+
+INSERT INTO public.credential_registry (
+  id,
+  name,
+  abbreviation,
+  description,
+  issuer_type,
+  issuing_authority,
+  proctor_authority,
+  delivery,
+  requires_exam,
+  exam_type,
+  passing_score,
+  verification_source,
+  renewal_period_months,
+  wioa_eligible,
+  dol_registered,
+  is_active,
+  is_published
+)
+VALUES
+
+-- EPA Section 608 Universal (already in live DB — update to ensure fields are current)
+('d37ae8a2-9297-44d1-83db-fa7ef375b796',
+ 'EPA Section 608 Universal', 'EPA-608',
+ 'Federal certification required to purchase and handle refrigerants. Universal covers all system types.',
+ 'elevate_proctored', 'U.S. Environmental Protection Agency', 
+ 'elevate', 'internal',
+ true, 'proctored', 70,
+ 'external_link', 36, true, false, true, true),
+
+-- OSHA 10-Hour Construction
+('00000000-0000-0000-0000-000000000102',
+ 'OSHA 10-Hour Construction', 'OSHA-10',
+ 'OSHA Outreach Training Program card for construction industry workers.',
+ 'partner_delivered', 'Occupational Safety and Health Administration', 
+'none', 'internal',
+ false, 'none', NULL,
+ 'external_link', NULL, true, false, true, true),
+
+-- ACT WorkKeys NCRC (already in live DB — update)
+('3e4683f2-a977-4193-99d7-7b8d15270116',
+ 'WorkKeys National Career Readiness Certificate', 'NCRC',
+ 'ACT WorkKeys credential validating applied math, workplace documents, and business writing skills.',
+ 'elevate_proctored', 'ACT', 
+ 'elevate', 'external',
+ true, 'vendor', 3,
+ 'issuer_api', NULL, true, false, true, true),
+
+-- Indiana Barber License
+('00000000-0000-0000-0000-000000000104',
+ 'Indiana Barber License', 'IN-BARBER',
+ 'Indiana Professional Licensing Agency barber license. Required to practice barbering in Indiana.',
+ 'partner_delivered', 'Indiana Professional Licensing Agency', 
+'none', 'internal',
+ true, 'state_board', 70,
+ 'issuer_api', NULL, true, false, true, true),
+
+-- Indiana Cosmetology License
+('00000000-0000-0000-0000-000000000105',
+ 'Indiana Cosmetology License', 'IN-COSMO',
+ 'Indiana PLA cosmetology license. Required to practice cosmetology in Indiana.',
+ 'partner_delivered', 'Indiana Professional Licensing Agency', 
+'none', 'internal',
+ true, 'state_board', 70,
+ 'issuer_api', NULL, true, false, true, true),
+
+-- Indiana Nail Technician License
+('00000000-0000-0000-0000-000000000106',
+ 'Indiana Nail Technician License', 'IN-NAIL',
+ 'Indiana PLA nail technician license. Required to practice nail technology in Indiana.',
+ 'partner_delivered', 'Indiana Professional Licensing Agency', 
+'none', 'internal',
+ true, 'state_board', 70,
+ 'issuer_api', NULL, true, false, true, true),
+
+-- Indiana CNA
+('00000000-0000-0000-0000-000000000107',
+ 'Indiana Certified Nursing Assistant', 'IN-CNA',
+ 'Indiana State Department of Health CNA certification. Required for nursing assistant practice in Indiana.',
+ 'partner_delivered', 'Indiana State Department of Health', 
+ 'external_vendor', 'internal',
+ true, 'proctored_written_and_skills', 70,
+ 'issuer_api', NULL, true, false, true, true),
+
+-- CDL Class A
+('00000000-0000-0000-0000-000000000108',
+ 'CDL Class A Commercial Driver License', 'CDL-A',
+ 'Indiana BMV Class A CDL. Required to operate combination vehicles over 26,001 lbs.',
+ 'partner_delivered', 'Indiana Bureau of Motor Vehicles', 
+ 'external_vendor', 'internal',
+ true, 'knowledge_and_skills', 80,
+ 'issuer_api', NULL, true, true, true, true),
+
+-- Indiana Peer Recovery Specialist
+('00000000-0000-0000-0000-000000000109',
+ 'Indiana Peer Recovery Specialist', 'IN-PRS',
+ 'ICAADA-certified Peer Recovery Specialist. Supports individuals in substance use recovery.',
+ 'partner_delivered', 'Indiana Counseling Association on Alcohol and Drug Abuse', 
+'none', 'internal',
+ true, 'proctored', 70,
+ 'issuer_api', NULL, true, false, true, true),
+
+-- DOT Specimen Collector
+('00000000-0000-0000-0000-000000000110',
+ 'DOT Specimen Collector Certification', 'DOT-COLLECTOR',
+ 'Federal certification to collect urine specimens for DOT-regulated drug testing under 49 CFR Part 40.',
+ 'elevate_proctored', 'U.S. Department of Transportation', 
+ 'elevate', 'internal',
+ true, 'practical_and_written', 70,
+ 'issuer_api', NULL, true, false, true, true),
+
+-- NCCT Medical Assistant
+('00000000-0000-0000-0000-000000000111',
+ 'NCCT Medical Assistant (NCMA)', 'NCMA',
+ 'National Center for Competency Testing Medical Assistant certification.',
+ 'partner_delivered', 'National Center for Competency Testing', 
+ 'none', 'external',
+ true, 'proctored', 70,
+ 'issuer_api', NULL, true, false, true, true),
+
+-- NCCT Phlebotomy
+('00000000-0000-0000-0000-000000000112',
+ 'NCCT Phlebotomy Technician (NPT)', 'NPT',
+ 'National Center for Competency Testing Phlebotomy Technician certification.',
+ 'partner_delivered', 'National Center for Competency Testing', 
+ 'none', 'external',
+ true, 'proctored', 70,
+ 'issuer_api', NULL, true, false, true, true),
+
+-- CompTIA Security+
+('00000000-0000-0000-0000-000000000113',
+ 'CompTIA Security+ SY0-701', 'SEC+',
+ 'CompTIA Security+ certification validating baseline cybersecurity skills. DoD 8570 approved.',
+ 'partner_delivered', 'CompTIA', 
+ 'external_vendor', 'external',
+ true, 'proctored', 75,
+ 'issuer_api', 36, true, false, true, true),
+
+-- IRS AFSP
+('00000000-0000-0000-0000-000000000114',
+ 'IRS Annual Filing Season Program', 'AFSP',
+ 'IRS voluntary program for non-credentialed tax preparers. Requires 18 CE hours annually.',
+ 'partner_delivered', 'Internal Revenue Service', 
+'none', 'external',
+ false, 'none', 70,
+ 'issuer_api', 12, true, false, true, true)
+
+ON CONFLICT (id) DO UPDATE SET
+  name                  = EXCLUDED.name,
+  abbreviation          = EXCLUDED.abbreviation,
+  description           = EXCLUDED.description,
+  issuer_type           = EXCLUDED.issuer_type,
+  issuing_authority     = EXCLUDED.issuing_authority,
+  proctor_authority     = EXCLUDED.proctor_authority,
+  delivery              = EXCLUDED.delivery,
+  requires_exam         = EXCLUDED.requires_exam,
+  exam_type             = EXCLUDED.exam_type,
+  passing_score         = EXCLUDED.passing_score,
+  verification_source   = EXCLUDED.verification_source,
+  renewal_period_months = EXCLUDED.renewal_period_months,
+  wioa_eligible         = EXCLUDED.wioa_eligible,
+  dol_registered        = EXCLUDED.dol_registered,
+  is_active             = EXCLUDED.is_active,
+  is_published          = EXCLUDED.is_published,
+  updated_at            = now();
+
+
+
+-- ── 20260402000010_fix_limbo_approved_applications.sql ──────────────────────────────────────────
+
+-- Fix 53 applications auto-approved without funding/payment verification.
+--
+-- Root cause: insertApplication() called approveApplication() on every submission.
+-- approveApplication() returned PAYMENT_NOT_VERIFIED but the caller treated it as
+-- non-fatal and returned success:true. Result: status='approved' with no enrollment,
+-- no funding_verified, no has_workone_approval.
+--
+-- Strategy: patch enforce_application_flow to allow approved→in_review as a valid
+-- admin correction transition, then reset the 53 records.
+
+-- Step 1: Add approved→in_review to the trigger function
+CREATE OR REPLACE FUNCTION enforce_application_flow()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF OLD.status IS NULL OR OLD.status = '' THEN RETURN NEW; END IF;
+  IF OLD.status = NEW.status THEN RETURN NEW; END IF;
+
+  -- Forward path
+  IF (OLD.status = 'submitted'       AND NEW.status = 'in_review')       THEN RETURN NEW; END IF;
+  IF (OLD.status = 'in_review'       AND NEW.status = 'approved')        THEN RETURN NEW; END IF;
+  IF (OLD.status = 'approved'        AND NEW.status = 'ready_to_enroll') THEN RETURN NEW; END IF;
+  IF (OLD.status = 'ready_to_enroll' AND NEW.status = 'enrolled')        THEN RETURN NEW; END IF;
+
+  -- Rejection from any active state
+  IF OLD.status IN ('submitted','in_review','approved','ready_to_enroll')
+     AND NEW.status = 'rejected' THEN RETURN NEW; END IF;
+
+  -- Admin correction: re-queue approved record for review
+  IF OLD.status = 'approved' AND NEW.status = 'in_review' THEN RETURN NEW; END IF;
+
+  -- Supplemental statuses
+  IF OLD.status = 'submitted' AND NEW.status IN ('pending_workone','waitlisted') THEN RETURN NEW; END IF;
+  IF OLD.status IN ('pending_workone','waitlisted') AND NEW.status IN ('in_review','rejected') THEN RETURN NEW; END IF;
+
+  RAISE EXCEPTION 'Invalid transition: % -> %. Must be ready_to_enroll or rejected.', OLD.status, NEW.status;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Step 2: Reset limbo records
+UPDATE public.applications
+SET
+  status             = 'in_review',
+  eligibility_status = 'pending',
+  updated_at         = NOW()
+WHERE
+  status                = 'approved'
+  AND funding_verified  = false
+  AND has_workone_approval = false
+  AND user_id NOT IN (
+    SELECT DISTINCT user_id
+    FROM public.program_enrollments
+    WHERE user_id IS NOT NULL
+  );
+
+-- Verify
+SELECT
+  COUNT(*) FILTER (WHERE status = 'in_review' AND funding_verified = false)                                  AS reset_to_in_review,
+  COUNT(*) FILTER (WHERE status = 'approved'  AND funding_verified = false AND has_workone_approval = false) AS still_limbo
+FROM public.applications;
+
+-- Addendum: fix 8 records where user_id IS NULL.
+-- NULL NOT IN (subquery) evaluates to NULL (not TRUE) in SQL,
+-- so the original UPDATE above skipped them.
+UPDATE public.applications
+SET
+  status             = 'in_review',
+  eligibility_status = 'pending',
+  updated_at         = NOW()
+WHERE
+  status                = 'approved'
+  AND funding_verified  = false
+  AND has_workone_approval = false
+  AND user_id IS NULL;
+
+
+
+-- ── 20260402000011_admin_real_data.sql ──────────────────────────────────────────
+
+-- Admin real data tables: replaces all hardcoded fake data in admin pages.
+-- Covers: financial assurance, email automations, social campaigns, workflows, MOU documents.
+
+-- 1) Financial assurance records
+create table if not exists public.financial_assurance_records (
+  id                        uuid primary key default gen_random_uuid(),
+  record_type               text not null check (record_type in ('surety_bond','letter_of_credit','insurance','other')),
+  provider_name             text not null,
+  policy_or_reference_number text,
+  coverage_amount           numeric(12,2),
+  effective_date            date,
+  expiration_date           date,
+  status                    text not null default 'active' check (status in ('active','expired','pending','cancelled')),
+  state                     text,
+  notes                     text,
+  document_url              text,
+  created_at                timestamptz not null default now(),
+  updated_at                timestamptz not null default now()
+);
+
+create index if not exists financial_assurance_records_status_idx
+  on public.financial_assurance_records(status);
+create index if not exists financial_assurance_records_expiration_idx
+  on public.financial_assurance_records(expiration_date);
+
+-- 2) Email automations
+create table if not exists public.email_automations (
+  id                    uuid primary key default gen_random_uuid(),
+  name                  text not null,
+  slug                  text unique,
+  trigger_type          text not null check (trigger_type in (
+                          'application_submitted','application_approved',
+                          'payment_failed','payment_received','manual','other')),
+  audience_type         text not null default 'mixed' check (audience_type in ('students','applicants','partners','mixed')),
+  is_active             boolean not null default false,
+  last_run_at           timestamptz,
+  last_run_status       text check (last_run_status in ('success','failed','partial')),
+  last_recipient_count  integer not null default 0,
+  total_runs            integer not null default 0,
+  total_recipients      integer not null default 0,
+  provider              text default 'sendgrid',
+  metadata              jsonb not null default '{}'::jsonb,
+  created_at            timestamptz not null default now(),
+  updated_at            timestamptz not null default now()
+);
+
+-- 3) Social campaigns
+create table if not exists public.social_campaigns (
+  id                uuid primary key default gen_random_uuid(),
+  name              text not null,
+  platform          text not null check (platform in ('facebook','instagram','linkedin','youtube','x','tiktok','multi')),
+  status            text not null default 'draft' check (status in ('draft','scheduled','active','paused','completed','failed')),
+  scheduled_posts   integer not null default 0,
+  published_posts   integer not null default 0,
+  failed_posts      integer not null default 0,
+  last_published_at timestamptz,
+  start_date        timestamptz,
+  end_date          timestamptz,
+  metadata          jsonb not null default '{}'::jsonb,
+  created_at        timestamptz not null default now(),
+  updated_at        timestamptz not null default now()
+);
+
+-- 4) Workflows
+create table if not exists public.workflows (
+  id               uuid primary key default gen_random_uuid(),
+  name             text not null,
+  workflow_key     text unique,
+  category         text not null default 'operations',
+  status           text not null default 'inactive' check (status in ('active','inactive','paused','error')),
+  last_run_at      timestamptz,
+  last_run_status  text check (last_run_status in ('success','failed','partial')),
+  run_count        integer not null default 0,
+  metadata         jsonb not null default '{}'::jsonb,
+  created_at       timestamptz not null default now(),
+  updated_at       timestamptz not null default now()
+);
+
+-- 5) MOU documents
+create table if not exists public.mou_documents (
+  id                    uuid primary key default gen_random_uuid(),
+  title                 text not null,
+  organization_name     text,
+  document_status       text not null default 'draft' check (document_status in ('draft','sent','signed','expired','archived')),
+  effective_date        date,
+  expiration_date       date,
+  file_url              text,
+  external_document_id  text,
+  notes                 text,
+  created_at            timestamptz not null default now(),
+  updated_at            timestamptz not null default now()
+);
+
+-- updated_at trigger (idempotent)
+create or replace function public.set_updated_at()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+do $$ begin
+  if not exists (select 1 from pg_trigger where tgname = 'trg_financial_assurance_records_updated_at') then
+    create trigger trg_financial_assurance_records_updated_at
+    before update on public.financial_assurance_records
+    for each row execute function public.set_updated_at();
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (select 1 from pg_trigger where tgname = 'trg_email_automations_updated_at') then
+    create trigger trg_email_automations_updated_at
+    before update on public.email_automations
+    for each row execute function public.set_updated_at();
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (select 1 from pg_trigger where tgname = 'trg_social_campaigns_updated_at') then
+    create trigger trg_social_campaigns_updated_at
+    before update on public.social_campaigns
+    for each row execute function public.set_updated_at();
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (select 1 from pg_trigger where tgname = 'trg_workflows_updated_at') then
+    create trigger trg_workflows_updated_at
+    before update on public.workflows
+    for each row execute function public.set_updated_at();
+  end if;
+end $$;
+
+do $$ begin
+  if not exists (select 1 from pg_trigger where tgname = 'trg_mou_documents_updated_at') then
+    create trigger trg_mou_documents_updated_at
+    before update on public.mou_documents
+    for each row execute function public.set_updated_at();
+  end if;
+end $$;
+
+-- RLS
+alter table public.financial_assurance_records enable row level security;
+alter table public.email_automations           enable row level security;
+alter table public.social_campaigns            enable row level security;
+alter table public.workflows                   enable row level security;
+alter table public.mou_documents               enable row level security;
+
+-- Policies — uses profiles.role (matches existing project pattern)
+drop policy if exists "admins_manage_financial_assurance" on public.financial_assurance_records;
+create policy "admins_manage_financial_assurance"
+  on public.financial_assurance_records for all
+  using (exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin','super_admin','staff')
+  ))
+  with check (exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin','super_admin','staff')
+  ));
+
+drop policy if exists "admins_manage_email_automations" on public.email_automations;
+create policy "admins_manage_email_automations"
+  on public.email_automations for all
+  using (exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin','super_admin','staff')
+  ))
+  with check (exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin','super_admin','staff')
+  ));
+
+drop policy if exists "admins_manage_social_campaigns" on public.social_campaigns;
+create policy "admins_manage_social_campaigns"
+  on public.social_campaigns for all
+  using (exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin','super_admin','staff')
+  ))
+  with check (exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin','super_admin','staff')
+  ));
+
+drop policy if exists "admins_manage_workflows" on public.workflows;
+create policy "admins_manage_workflows"
+  on public.workflows for all
+  using (exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin','super_admin','staff')
+  ))
+  with check (exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin','super_admin','staff')
+  ));
+
+drop policy if exists "admins_manage_mou_documents" on public.mou_documents;
+create policy "admins_manage_mou_documents"
+  on public.mou_documents for all
+  using (exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin','super_admin','staff')
+  ))
+  with check (exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role in ('admin','super_admin','staff')
+  ));
+
+-- Summary view for financial assurance dashboard
+create or replace view public.v_admin_financial_assurance_summary as
+select
+  count(*)::int                                                                          as total_records,
+  count(*) filter (where status = 'active')::int                                        as active_records,
+  count(*) filter (where expiration_date is not null
+                     and expiration_date < current_date)::int                           as expired_records,
+  count(*) filter (where expiration_date is not null
+                     and expiration_date >= current_date
+                     and expiration_date <= current_date + interval '30 days')::int     as expiring_soon_records,
+  coalesce(sum(coverage_amount) filter (where status = 'active'), 0)::numeric(12,2)    as active_coverage_total
+from public.financial_assurance_records;
+
+
+
+-- ── 20260404000001_checkout_contexts_price_columns.sql ──────────────────────────────────────────
+
+-- Add server-authoritative price resolution columns to checkout_contexts.
+-- These are written by the checkout API and read by the capture/webhook handlers
+-- to verify the amount Affirm/Sezzle authorized matches what was required.
+
+ALTER TABLE public.checkout_contexts
+  ADD COLUMN IF NOT EXISTS required_amount_cents INTEGER,
+  ADD COLUMN IF NOT EXISTS overpay_amount_cents   INTEGER DEFAULT 0;
+
+-- Fix expires_at: was re-added as TEXT by the original migration's ALTER TABLE,
+-- overriding the TIMESTAMPTZ from CREATE TABLE. Cast existing values and retype.
+-- Safe: all existing values are ISO strings or NULL.
+ALTER TABLE public.checkout_contexts
+  ALTER COLUMN expires_at TYPE TIMESTAMPTZ
+  USING expires_at::TIMESTAMPTZ;
+
+
+
+-- ── 20260404000001_rls_assignment_submissions_support_tickets.sql ──────────────────────────────────────────
+
+-- RLS for assignment_submissions and support_tickets.
+-- These tables had no policies. Both are learner-write surfaces.
+-- Apply in Supabase Dashboard → SQL Editor.
+
+-- ── assignment_submissions ────────────────────────────────────────────────────
+ALTER TABLE public.assignment_submissions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "assignment_submissions_own_read"   ON public.assignment_submissions;
+DROP POLICY IF EXISTS "assignment_submissions_own_insert" ON public.assignment_submissions;
+DROP POLICY IF EXISTS "assignment_submissions_own_update" ON public.assignment_submissions;
+DROP POLICY IF EXISTS "assignment_submissions_admin"      ON public.assignment_submissions;
+
+-- Learners can read and write only their own submissions
+CREATE POLICY "assignment_submissions_own_read" ON public.assignment_submissions
+  FOR SELECT TO authenticated
+  USING (user_id = auth.uid());
+
+CREATE POLICY "assignment_submissions_own_insert" ON public.assignment_submissions
+  FOR INSERT TO authenticated
+  WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "assignment_submissions_own_update" ON public.assignment_submissions
+  FOR UPDATE TO authenticated
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+-- Admins and instructors can read all submissions
+CREATE POLICY "assignment_submissions_admin" ON public.assignment_submissions
+  FOR SELECT TO authenticated
+  USING (
+    auth.uid() IN (
+      SELECT id FROM public.profiles
+      WHERE role IN ('admin', 'super_admin', 'instructor', 'staff')
+    )
+  );
+
+-- ── support_tickets ───────────────────────────────────────────────────────────
+ALTER TABLE public.support_tickets ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "support_tickets_own_read"   ON public.support_tickets;
+DROP POLICY IF EXISTS "support_tickets_own_insert" ON public.support_tickets;
+DROP POLICY IF EXISTS "support_tickets_admin"      ON public.support_tickets;
+
+-- Learners can read their own tickets and create new ones
+CREATE POLICY "support_tickets_own_read" ON public.support_tickets
+  FOR SELECT TO authenticated
+  USING (user_id = auth.uid());
+
+CREATE POLICY "support_tickets_own_insert" ON public.support_tickets
+  FOR INSERT TO authenticated
+  WITH CHECK (user_id = auth.uid());
+
+-- Admins and staff can read and update all tickets
+CREATE POLICY "support_tickets_admin" ON public.support_tickets
+  FOR ALL TO authenticated
+  USING (
+    auth.uid() IN (
+      SELECT id FROM public.profiles
+      WHERE role IN ('admin', 'super_admin', 'staff')
+    )
+  );
+
+
+
+-- ── 20260404000002_bnpl_missing_columns.sql ──────────────────────────────────────────
+
+-- Add missing columns required by Affirm and Sezzle webhook handlers.
+-- All columns use IF NOT EXISTS — safe to re-run.
+
+-- ── payments ─────────────────────────────────────────────────────────────────
+-- Sezzle webhook writes these on order.authorized / order.captured / order.refunded
+ALTER TABLE public.payments
+  ADD COLUMN IF NOT EXISTS provider              TEXT,
+  ADD COLUMN IF NOT EXISTS amount_cents          INTEGER,
+  ADD COLUMN IF NOT EXISTS customer_name         TEXT,
+  ADD COLUMN IF NOT EXISTS program_slug          TEXT,
+  ADD COLUMN IF NOT EXISTS program_name          TEXT,
+  ADD COLUMN IF NOT EXISTS application_id        UUID,
+  ADD COLUMN IF NOT EXISTS internal_order_id     TEXT,
+  ADD COLUMN IF NOT EXISTS card_token            TEXT,
+  ADD COLUMN IF NOT EXISTS authorized_at         TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS authorized_amount_cents INTEGER,
+  ADD COLUMN IF NOT EXISTS captured_at           TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS captured_amount_cents INTEGER,
+  ADD COLUMN IF NOT EXISTS refunded_at           TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS refunded_amount_cents INTEGER,
+  ADD COLUMN IF NOT EXISTS released_at           TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS checkout_completed_at TIMESTAMPTZ;
+
+-- ── barber_subscriptions ──────────────────────────────────────────────────────
+-- Affirm webhook writes affirm_charge_id; deactivation writes deactivated_at / deactivation_reason
+ALTER TABLE public.barber_subscriptions
+  ADD COLUMN IF NOT EXISTS affirm_charge_id      TEXT,
+  ADD COLUMN IF NOT EXISTS deactivated_at        TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS deactivation_reason   TEXT;
+
+-- ── applications ─────────────────────────────────────────────────────────────
+-- Affirm webhook writes affirm_charge_id, payment_amount, payment_completed_at, refund_amount, refunded_at
+ALTER TABLE public.applications
+  ADD COLUMN IF NOT EXISTS affirm_charge_id      TEXT,
+  ADD COLUMN IF NOT EXISTS payment_amount        NUMERIC,
+  ADD COLUMN IF NOT EXISTS payment_amount_cents  INTEGER,
+  ADD COLUMN IF NOT EXISTS payment_completed_at  TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS refund_amount         NUMERIC,
+  ADD COLUMN IF NOT EXISTS refunded_at           TIMESTAMPTZ;
+
+
+
+-- ── 20260406000001_profiles_onboarding_columns.sql ──────────────────────────────────────────
+
+-- Add missing onboarding tracking columns to profiles
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS agreements_signed_at timestamptz,
+  ADD COLUMN IF NOT EXISTS documents_submitted_at timestamptz,
+  ADD COLUMN IF NOT EXISTS handbook_acknowledged_at timestamptz,
+  ADD COLUMN IF NOT EXISTS orientation_completed_at timestamptz,
+  ADD COLUMN IF NOT EXISTS funding_confirmed boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS funding_source text,
+  ADD COLUMN IF NOT EXISTS schedule_selected boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS selected_cohort text,
+  ADD COLUMN IF NOT EXISTS cohort_start_date date,
+  ADD COLUMN IF NOT EXISTS schedule_preference text;
+
+
+
+-- ── 20260602000001_forward_schema_reconciliation.sql ──────────────────────────────────────────
+
+-- Forward schema reconciliation for 3 tables where live DB is missing columns
+-- that app code actively references.
+--
+-- Determined by: live DB introspection + grep of .ts/.tsx column references.
+-- See docs/schema-drift-decisions.md for full decision rationale.
+--
+-- All statements use ADD COLUMN IF NOT EXISTS — safe to run against live DB
+-- where columns may already exist from manual dashboard edits.
+
+-- ============================================================
+-- page_sections
+-- Live has: id, page_id, component, position, props, created_at, updated_at
+-- lib/data/pages.ts reads: section_type, content, is_visible (newer shape)
+-- lib/data/pages.ts writes: component, position, props (older shape)
+-- Adding new columns additively — both shapes coexist until a cleanup migration
+-- ============================================================
+
+ALTER TABLE public.page_sections
+  ADD COLUMN IF NOT EXISTS section_type TEXT NOT NULL DEFAULT 'content',
+  ADD COLUMN IF NOT EXISTS content      JSONB NOT NULL DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS is_visible   BOOLEAN NOT NULL DEFAULT true;
+
+-- ============================================================
+-- direct_messages
+-- Live has: id, user_id, title, content, is_read, created_at, updated_at
+-- MessagesClient.tsx expects: conversation_id, sender_id
+-- ============================================================
+
+ALTER TABLE public.direct_messages
+  ADD COLUMN IF NOT EXISTS conversation_id UUID,
+  ADD COLUMN IF NOT EXISTS sender_id       UUID;
+
+-- ============================================================
+-- credentials
+-- Live has: id, partner_id, name, type, description, created_at, expires_at,
+--           issued_at, revoked_at
+-- App references: abbreviation, issuing_authority (via program_credentials join)
+-- ============================================================
+
+ALTER TABLE public.credentials
+  ADD COLUMN IF NOT EXISTS abbreviation      TEXT,
+  ADD COLUMN IF NOT EXISTS issuing_authority TEXT;
+
+-- ============================================================
+-- pages
+-- Live has: id, path, title, description, section, is_published,
+--           requires_auth, roles_allowed, created_at, updated_at
+-- App references: slug (6 refs), status (4 refs)
+-- Missing: slug, status, meta_title, meta_desc
+-- ============================================================
+
+ALTER TABLE public.pages
+  ADD COLUMN IF NOT EXISTS slug        TEXT,
+  ADD COLUMN IF NOT EXISTS status      TEXT NOT NULL DEFAULT 'published',
+  ADD COLUMN IF NOT EXISTS meta_title  TEXT,
+  ADD COLUMN IF NOT EXISTS meta_desc   TEXT;
+
+-- Backfill slug from path for existing rows (path is the durable identifier)
+UPDATE public.pages
+SET slug = regexp_replace(
+  regexp_replace(lower(trim(path)), '[^a-z0-9]+', '-', 'g'),
+  '^-|-$', '', 'g'
+)
+WHERE slug IS NULL AND path IS NOT NULL;
+
+-- Backfill status from is_published for existing rows
+UPDATE public.pages
+SET status = CASE WHEN is_published THEN 'published' ELSE 'draft' END
+WHERE status = 'published' AND is_published IS NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS pages_slug_unique ON public.pages (slug)
+  WHERE slug IS NOT NULL;
+
+-- ============================================================
+-- placement_records
+-- Live has: id, learner_id, program_id, case_manager_id, employer_name,
+--           job_title, employment_type, hourly_wage, start_date, status,
+--           verified_at, verified_by, verification_method, notes,
+--           created_at, updated_at
+-- App references: hire_date (5), employer_id (5), enrollment_id (2),
+--                 annual_salary (1), verification_source (2)
+-- Missing: hire_date, employer_id, enrollment_id, annual_salary,
+--          verification_source
+-- ============================================================
+
+ALTER TABLE public.placement_records
+  ADD COLUMN IF NOT EXISTS hire_date            DATE,
+  ADD COLUMN IF NOT EXISTS employer_id          UUID,
+  ADD COLUMN IF NOT EXISTS enrollment_id        UUID,
+  ADD COLUMN IF NOT EXISTS annual_salary        NUMERIC,
+  ADD COLUMN IF NOT EXISTS verification_source  TEXT,
+  ADD COLUMN IF NOT EXISTS employed_q2          BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS employed_q4          BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS median_earnings_q2   NUMERIC,
+  ADD COLUMN IF NOT EXISTS tenant_id            UUID;
+
+-- Backfill hire_date from start_date where not set (same semantic for most records)
+UPDATE public.placement_records
+SET hire_date = start_date
+WHERE hire_date IS NULL AND start_date IS NOT NULL;
+
+-- Backfill verification_source from verification_method where not set
+UPDATE public.placement_records
+SET verification_source = verification_method
+WHERE verification_source IS NULL AND verification_method IS NOT NULL;
+
+-- ============================================================
+-- program_modules
+-- Live has: id, program_id, module_number, title, description,
+--           lesson_count, duration_hours, sort_order, created_at, phase_id
+-- App references: order_index (3 refs), is_published (2 refs)
+-- Missing: order_index, is_published
+-- ============================================================
+
+ALTER TABLE public.program_modules
+  ADD COLUMN IF NOT EXISTS order_index  INTEGER,
+  ADD COLUMN IF NOT EXISTS is_published BOOLEAN NOT NULL DEFAULT true;
+
+-- Backfill order_index from sort_order (same semantic)
+UPDATE public.program_modules
+SET order_index = sort_order
+WHERE order_index IS NULL AND sort_order IS NOT NULL;
+
+
+
+-- ── 20260602000002_messages_additive_columns.sql ──────────────────────────────────────────
+
+-- messages: add columns from later definition without dropping existing ones.
+--
+-- Live has: id, sender_id, recipient_id, subject, body, read, read_at,
+--           created_at, conversation_id, deleted_by, read_by
+-- App references: read (12), conversation_id (6), read_by (5), deleted_by (4),
+--                 is_read (3) — mixed usage of both old and new column names.
+--
+-- Strategy: add new columns additively. Do NOT drop read/conversation_id/
+-- deleted_by/read_by — 12+ app references depend on them.
+-- App code using is_read (3 refs) will work once the column exists.
+
+ALTER TABLE public.messages
+  ADD COLUMN IF NOT EXISTS is_read    BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS thread_id  UUID,
+  ADD COLUMN IF NOT EXISTS parent_id  UUID,
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+
+-- Backfill is_read from read for existing rows
+UPDATE public.messages
+SET is_read = COALESCE(read, false)
+WHERE is_read = false AND read IS NOT NULL;
+
+
+
+-- ── 20260602000003_tax_clients_column_aliases.sql ──────────────────────────────────────────
+
+-- tax_clients: add missing columns referenced by app code.
+--
+-- Live has: id, first_name, last_name, email, phone, ssn_last4, preparer_id,
+--           tenant_id, created_at, ssn_hash, user_id, office_id, ssn_last_four,
+--           preparation_fee, refund_amount, firm_id, dob
+--
+-- App code (app/api/tax/file-return/route.ts) writes:
+--   date_of_birth, address_street, address_city, address_state, address_zip
+-- None of these exist in live. Adding them so writes do not silently fail.
+--
+-- date_of_birth: live has `dob`. Adding date_of_birth as a separate column
+-- (not a generated alias — Postgres doesn't support generated columns as aliases).
+-- Both will be populated; a future cleanup migration can consolidate.
+
+ALTER TABLE public.tax_clients
+  ADD COLUMN IF NOT EXISTS date_of_birth  DATE,
+  ADD COLUMN IF NOT EXISTS address_street TEXT,
+  ADD COLUMN IF NOT EXISTS address_city   TEXT,
+  ADD COLUMN IF NOT EXISTS address_state  TEXT,
+  ADD COLUMN IF NOT EXISTS address_zip    TEXT,
+  ADD COLUMN IF NOT EXISTS updated_at     TIMESTAMPTZ DEFAULT now();
+
+-- Backfill date_of_birth from dob for existing rows
+UPDATE public.tax_clients
+SET date_of_birth = dob
+WHERE date_of_birth IS NULL AND dob IS NOT NULL;
+
+
+
+-- ── 20260602000004_page_sections_canonical.sql ──────────────────────────────────────────
+
+-- page_sections: establish canonical schema.
+--
+-- The table was temporarily given three extra columns (section_type, content,
+-- is_visible) during schema reconciliation. No code path ever wrote those
+-- columns — all reads and writes use component/position/props exclusively.
+-- This migration drops the three wrong columns and documents the canonical shape.
+--
+-- Canonical shape:
+--   id          uuid PRIMARY KEY DEFAULT gen_random_uuid()
+--   page_id     uuid (FK to pages.id)
+--   component   text NOT NULL
+--   position    integer NOT NULL DEFAULT 0
+--   props       jsonb NOT NULL DEFAULT '{}'
+--   created_at  timestamptz DEFAULT now()
+--   updated_at  timestamptz DEFAULT now()
+
+ALTER TABLE public.page_sections
+  DROP COLUMN IF EXISTS section_type,
+  DROP COLUMN IF EXISTS content,
+  DROP COLUMN IF EXISTS is_visible;
+
+
+
+-- ── 20260602000005_direct_messages_canonical.sql ──────────────────────────────────────────
+
+-- direct_messages: canonicalize sender identity column.
+--
+-- The table had both user_id (original) and sender_id (added during
+-- schema reconciliation). All app code (MessagesClient.tsx) exclusively
+-- uses sender_id for reads, writes, and mark-as-read operations.
+-- user_id is never referenced in any app code path.
+--
+-- Action: backfill sender_id from user_id, then drop user_id.
+
+UPDATE public.direct_messages
+SET sender_id = user_id
+WHERE sender_id IS NULL AND user_id IS NOT NULL;
+
+ALTER TABLE public.direct_messages
+  DROP COLUMN IF EXISTS user_id;
+
+
+
+-- ── 20260602000006_rls_forms_webinars_provider.sql ──────────────────────────────────────────
+
+-- RLS policies for forms, form_submissions, webinars, webinar_registrations,
+-- and provider_* tables. These tables existed without policies, causing
+-- authenticated non-service-role reads to return empty results.
+--
+-- Access model:
+--   forms                      — public read; admin write
+--   form_submissions           — anon insert (unauthenticated form posts); admin read
+--   webinars                   — public read (is_public rows); admin write
+--   webinar_registrations      — user owns their row; admin read all
+--   provider_applications      — anon insert (public apply form); owner read own; admin manage
+--   provider_compliance_artifacts — provider_admin reads/writes own tenant; admin read all
+--   provider_onboarding_steps  — provider_admin reads own tenant; admin read all
+--   provider_program_approvals — provider_admin reads own tenant; admin read all
+
+-- ─── helpers ────────────────────────────────────────────────────────────────
+
+-- Returns true when the caller's profile role is one of the admin tiers.
+-- Used in USING / WITH CHECK clauses below.
+CREATE OR REPLACE FUNCTION public.is_admin_role()
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid()
+      AND role IN ('admin', 'super_admin', 'staff')
+  )
+$$;
+
+-- Returns the tenant_id from the caller's profile.
+CREATE OR REPLACE FUNCTION public.my_tenant_id()
+RETURNS uuid
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+AS $$
+  SELECT tenant_id FROM public.profiles WHERE id = auth.uid()
+$$;
+
+-- ─── forms ──────────────────────────────────────────────────────────────────
+
+ALTER TABLE public.forms ENABLE ROW LEVEL SECURITY;
+
+-- Anyone (including anon) can look up a form by id — needed for the submit route
+-- which verifies the form exists before inserting a submission.
+CREATE POLICY "forms_public_read"
+  ON public.forms
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "forms_admin_insert"
+  ON public.forms
+  FOR INSERT
+  WITH CHECK (public.is_admin_role());
+
+CREATE POLICY "forms_admin_update"
+  ON public.forms
+  FOR UPDATE
+  USING (public.is_admin_role());
+
+CREATE POLICY "forms_admin_delete"
+  ON public.forms
+  FOR DELETE
+  USING (public.is_admin_role());
+
+-- ─── form_submissions ───────────────────────────────────────────────────────
+
+ALTER TABLE public.form_submissions ENABLE ROW LEVEL SECURITY;
+
+-- The /api/forms/submit route uses createClient() without requiring auth,
+-- so submissions must be insertable by anon callers.
+CREATE POLICY "form_submissions_anon_insert"
+  ON public.form_submissions
+  FOR INSERT
+  WITH CHECK (true);
+
+-- Authenticated users can read their own submissions (user_id may be null for anon).
+CREATE POLICY "form_submissions_owner_read"
+  ON public.form_submissions
+  FOR SELECT
+  USING (
+    user_id = auth.uid()
+    OR public.is_admin_role()
+  );
+
+CREATE POLICY "form_submissions_admin_delete"
+  ON public.form_submissions
+  FOR DELETE
+  USING (public.is_admin_role());
+
+-- ─── webinars ───────────────────────────────────────────────────────────────
+
+ALTER TABLE public.webinars ENABLE ROW LEVEL SECURITY;
+
+-- Public page reads only is_public=true rows; the policy mirrors that filter
+-- so even a direct query without the filter returns only public rows for anon.
+CREATE POLICY "webinars_public_read"
+  ON public.webinars
+  FOR SELECT
+  USING (is_public = true OR public.is_admin_role());
+
+CREATE POLICY "webinars_admin_insert"
+  ON public.webinars
+  FOR INSERT
+  WITH CHECK (public.is_admin_role());
+
+CREATE POLICY "webinars_admin_update"
+  ON public.webinars
+  FOR UPDATE
+  USING (public.is_admin_role());
+
+CREATE POLICY "webinars_admin_delete"
+  ON public.webinars
+  FOR DELETE
+  USING (public.is_admin_role());
+
+-- ─── webinar_registrations ──────────────────────────────────────────────────
+
+ALTER TABLE public.webinar_registrations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "webinar_registrations_owner_read"
+  ON public.webinar_registrations
+  FOR SELECT
+  USING (user_id = auth.uid() OR public.is_admin_role());
+
+CREATE POLICY "webinar_registrations_owner_insert"
+  ON public.webinar_registrations
+  FOR INSERT
+  WITH CHECK (user_id = auth.uid() OR public.is_admin_role());
+
+CREATE POLICY "webinar_registrations_owner_update"
+  ON public.webinar_registrations
+  FOR UPDATE
+  USING (user_id = auth.uid() OR public.is_admin_role());
+
+CREATE POLICY "webinar_registrations_admin_delete"
+  ON public.webinar_registrations
+  FOR DELETE
+  USING (public.is_admin_role());
+
+-- ─── provider_applications ──────────────────────────────────────────────────
+
+ALTER TABLE public.provider_applications ENABLE ROW LEVEL SECURITY;
+
+-- Public apply form: anon insert allowed (no auth required to submit an application).
+CREATE POLICY "provider_applications_anon_insert"
+  ON public.provider_applications
+  FOR INSERT
+  WITH CHECK (true);
+
+-- Applicant can read their own application by matching contact_email.
+-- Admin can read all.
+CREATE POLICY "provider_applications_read"
+  ON public.provider_applications
+  FOR SELECT
+  USING (
+    public.is_admin_role()
+    OR (
+      auth.uid() IS NOT NULL
+      AND contact_email = (
+        SELECT email FROM auth.users WHERE id = auth.uid()
+      )
+    )
+  );
+
+CREATE POLICY "provider_applications_admin_update"
+  ON public.provider_applications
+  FOR UPDATE
+  USING (public.is_admin_role());
+
+CREATE POLICY "provider_applications_admin_delete"
+  ON public.provider_applications
+  FOR DELETE
+  USING (public.is_admin_role());
+
+-- ─── provider_compliance_artifacts ──────────────────────────────────────────
+
+ALTER TABLE public.provider_compliance_artifacts ENABLE ROW LEVEL SECURITY;
+
+-- provider_admin reads/writes rows belonging to their own tenant.
+-- Admin reads all.
+CREATE POLICY "provider_compliance_artifacts_tenant_read"
+  ON public.provider_compliance_artifacts
+  FOR SELECT
+  USING (
+    tenant_id = public.my_tenant_id()
+    OR public.is_admin_role()
+  );
+
+CREATE POLICY "provider_compliance_artifacts_tenant_insert"
+  ON public.provider_compliance_artifacts
+  FOR INSERT
+  WITH CHECK (
+    tenant_id = public.my_tenant_id()
+    OR public.is_admin_role()
+  );
+
+CREATE POLICY "provider_compliance_artifacts_tenant_update"
+  ON public.provider_compliance_artifacts
+  FOR UPDATE
+  USING (
+    tenant_id = public.my_tenant_id()
+    OR public.is_admin_role()
+  );
+
+CREATE POLICY "provider_compliance_artifacts_admin_delete"
+  ON public.provider_compliance_artifacts
+  FOR DELETE
+  USING (public.is_admin_role());
+
+-- ─── provider_onboarding_steps ──────────────────────────────────────────────
+
+ALTER TABLE public.provider_onboarding_steps ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "provider_onboarding_steps_tenant_read"
+  ON public.provider_onboarding_steps
+  FOR SELECT
+  USING (
+    tenant_id = public.my_tenant_id()
+    OR public.is_admin_role()
+  );
+
+-- Steps are written by admin/staff only (system-managed).
+CREATE POLICY "provider_onboarding_steps_admin_write"
+  ON public.provider_onboarding_steps
+  FOR INSERT
+  WITH CHECK (public.is_admin_role());
+
+CREATE POLICY "provider_onboarding_steps_admin_update"
+  ON public.provider_onboarding_steps
+  FOR UPDATE
+  USING (public.is_admin_role());
+
+CREATE POLICY "provider_onboarding_steps_admin_delete"
+  ON public.provider_onboarding_steps
+  FOR DELETE
+  USING (public.is_admin_role());
+
+-- ─── provider_program_approvals ─────────────────────────────────────────────
+
+ALTER TABLE public.provider_program_approvals ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "provider_program_approvals_tenant_read"
+  ON public.provider_program_approvals
+  FOR SELECT
+  USING (
+    tenant_id = public.my_tenant_id()
+    OR public.is_admin_role()
+  );
+
+CREATE POLICY "provider_program_approvals_admin_write"
+  ON public.provider_program_approvals
+  FOR INSERT
+  WITH CHECK (public.is_admin_role());
+
+CREATE POLICY "provider_program_approvals_admin_update"
+  ON public.provider_program_approvals
+  FOR UPDATE
+  USING (public.is_admin_role());
+
+CREATE POLICY "provider_program_approvals_admin_delete"
+  ON public.provider_program_approvals
+  FOR DELETE
+  USING (public.is_admin_role());
+
+
+
+-- ── 20260602000007_fix_rls_and_conversations.sql ──────────────────────────────────────────
+
+-- Three fixes identified during RLS policy alignment audit:
+--
+-- 1. direct_message_conversations: live table has columns 'add' and
+--    'elevateforhumanity' from a malformed migration. App expects
+--    participant_1_id, participant_2_id, last_message_at, last_message_preview.
+--    Drop the garbage columns, add the real ones.
+--
+-- 2. provider_onboarding_steps: policy only allowed admin writes, but
+--    provider/settings and provider/programs/create routes use createClient()
+--    (user-scoped) to UPDATE steps for their own tenant. Add tenant-scoped
+--    UPDATE policy for provider_admin role.
+--
+-- 3. provider_program_approvals: policy only allowed admin writes, but
+--    provider/programs/create and provider/programs/submit routes use
+--    createClient() to INSERT approval records for their own tenant. Add
+--    tenant-scoped INSERT policy for provider_admin role.
+--
+-- 4. direct_messages: RLS was never enabled. Any authenticated user could
+--    read all messages. Enable RLS and add sender/conversation-participant
+--    scoped policies.
+
+-- ─── 1. direct_message_conversations schema fix ──────────────────────────────
+
+ALTER TABLE public.direct_message_conversations
+  DROP COLUMN IF EXISTS add,
+  DROP COLUMN IF EXISTS elevateforhumanity,
+  ADD COLUMN IF NOT EXISTS participant_1_id uuid,
+  ADD COLUMN IF NOT EXISTS participant_2_id uuid,
+  ADD COLUMN IF NOT EXISTS last_message_at timestamptz,
+  ADD COLUMN IF NOT EXISTS last_message_preview text;
+
+-- ─── 2. provider_onboarding_steps: add tenant-scoped UPDATE ──────────────────
+--
+-- provider/settings and provider/programs/create call:
+--   supabase.from('provider_onboarding_steps')
+--     .update({ completed: true, ... })
+--     .eq('tenant_id', tenantId)
+--     .eq('step', '...')
+-- using createClient() (user JWT, not service role).
+-- The existing policy only allows admin INSERT/UPDATE/DELETE, so these
+-- writes were silently failing (RLS blocks, no error surfaced to UI).
+
+CREATE POLICY "provider_onboarding_steps_tenant_update"
+  ON public.provider_onboarding_steps
+  FOR UPDATE
+  USING (tenant_id = public.my_tenant_id());
+
+-- ─── 3. provider_program_approvals: add tenant-scoped INSERT ─────────────────
+--
+-- provider/programs/create inserts an approval record via createClient():
+--   supabase.from('provider_program_approvals').insert({ tenant_id, ... })
+-- provider/programs/submit also inserts via createClient() after auth check.
+-- Both were blocked by the admin-only INSERT policy.
+
+CREATE POLICY "provider_program_approvals_tenant_insert"
+  ON public.provider_program_approvals
+  FOR INSERT
+  WITH CHECK (tenant_id = public.my_tenant_id());
+
+-- ─── 4. direct_messages: enable RLS + add policies ───────────────────────────
+--
+-- Access model:
+--   - A user can read messages in conversations they participate in.
+--     Scoped via direct_message_conversations.participant_1_id / participant_2_id.
+--   - A user can insert messages into conversations they participate in,
+--     and only as themselves (sender_id = auth.uid()).
+--   - A user can update their own messages (e.g. mark-as-read updates
+--     issued by the recipient are scoped to neq sender_id, so the UPDATE
+--     policy must allow the conversation participant, not just the sender).
+--   - Admin can read/write all.
+
+ALTER TABLE public.direct_messages ENABLE ROW LEVEL SECURITY;
+
+-- Helper: returns true if the caller is a participant in the given conversation.
+CREATE OR REPLACE FUNCTION public.is_conversation_participant(p_conversation_id uuid)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.direct_message_conversations
+    WHERE id = p_conversation_id
+      AND (participant_1_id = auth.uid() OR participant_2_id = auth.uid())
+  )
+$$;
+
+CREATE POLICY "direct_messages_participant_read"
+  ON public.direct_messages
+  FOR SELECT
+  USING (
+    public.is_conversation_participant(conversation_id)
+    OR public.is_admin_role()
+  );
+
+-- Sender inserts their own messages into conversations they belong to.
+CREATE POLICY "direct_messages_sender_insert"
+  ON public.direct_messages
+  FOR INSERT
+  WITH CHECK (
+    sender_id = auth.uid()
+    AND public.is_conversation_participant(conversation_id)
+  );
+
+-- Mark-as-read: MessagesClient updates is_read=true for messages in a
+-- conversation where sender_id != current user (i.e. the recipient marks
+-- the other person's messages as read). Policy must allow any participant
+-- to update, not just the sender.
+CREATE POLICY "direct_messages_participant_update"
+  ON public.direct_messages
+  FOR UPDATE
+  USING (
+    public.is_conversation_participant(conversation_id)
+    OR public.is_admin_role()
+  );
+
+CREATE POLICY "direct_messages_admin_delete"
+  ON public.direct_messages
+  FOR DELETE
+  USING (public.is_admin_role());
+
+-- ─── direct_message_conversations: enable RLS ────────────────────────────────
+
+ALTER TABLE public.direct_message_conversations ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "direct_message_conversations_participant_read"
+  ON public.direct_message_conversations
+  FOR SELECT
+  USING (
+    participant_1_id = auth.uid()
+    OR participant_2_id = auth.uid()
+    OR public.is_admin_role()
+  );
+
+-- Either participant can update (last_message_at / last_message_preview
+-- is written by the sender after inserting a message).
+CREATE POLICY "direct_message_conversations_participant_update"
+  ON public.direct_message_conversations
+  FOR UPDATE
+  USING (
+    participant_1_id = auth.uid()
+    OR participant_2_id = auth.uid()
+    OR public.is_admin_role()
+  );
+
+-- Only admin creates conversations (or a future "start conversation" API).
+CREATE POLICY "direct_message_conversations_admin_insert"
+  ON public.direct_message_conversations
+  FOR INSERT
+  WITH CHECK (public.is_admin_role());
+
+CREATE POLICY "direct_message_conversations_admin_delete"
+  ON public.direct_message_conversations
+  FOR DELETE
+  USING (public.is_admin_role());
+
+
+
+-- ── 20260603000001_normalize_funding_source.sql ──────────────────────────────────────────
+
+-- Normalise program_enrollments.funding_source values.
+--
+-- Fixes the drift introduced by 10 separate routes writing different
+-- string representations of the same concept.
+--
+-- Canonical values after this migration:
+--   self_pay   — student paying out of pocket (Stripe / BNPL)
+--   funded     — employer, grant, or program-funded
+--   wioa       — Workforce Innovation and Opportunity Act
+--   jri        — Job Ready Indy
+--   unknown    — no funding source recorded
+--
+-- Apply in Supabase Dashboard → SQL Editor.
+-- Safe to run multiple times (idempotent UPDATE with WHERE).
+
+begin;
+
+-- self-pay variants → self_pay
+update public.program_enrollments
+set funding_source = 'self_pay'
+where lower(trim(coalesce(funding_source, ''))) in (
+  'self-pay', 'self_pay', 'self pay', 'selfpay', 'self-payment'
+)
+and funding_source <> 'self_pay';
+
+-- funded variants → funded
+update public.program_enrollments
+set funding_source = 'funded'
+where lower(trim(coalesce(funding_source, ''))) in (
+  'funded', 'funded_program', 'funded program', 'employer funded',
+  'employer-funded', 'grant', 'grant funded', 'grant-funded'
+)
+and funding_source <> 'funded';
+
+-- null / empty → unknown
+update public.program_enrollments
+set funding_source = 'unknown'
+where funding_source is null
+   or trim(funding_source) = '';
+
+commit;
+
+-- Verify: run this after applying to confirm no unexpected values remain.
+-- select funding_source, count(*) from public.program_enrollments
+-- group by funding_source order by count desc;
+
+
+
+-- ── 20260603000002_stripe_event_log.sql ──────────────────────────────────────────
+
+-- Stripe event idempotency log.
+--
+-- Prevents duplicate processing when Stripe retries a webhook or when
+-- multiple webhook endpoints are accidentally registered for the same account.
+--
+-- The canonical webhook (app/api/webhooks/stripe/route.ts) already uses
+-- stripe_webhook_events for idempotency. This table is a lightweight
+-- secondary guard for any handler that does NOT use stripe_webhook_events.
+--
+-- Apply in Supabase Dashboard → SQL Editor.
+
+create table if not exists public.stripe_event_log (
+  id               bigserial primary key,
+  stripe_event_id  text        not null,
+  stripe_event_type text       not null,
+  processed_at     timestamptz not null default now()
+  , constraint stripe_event_log_event_id_unique unique (stripe_event_id)
+);
+
+-- Index for fast duplicate lookups
+create index if not exists idx_stripe_event_log_event_id
+  on public.stripe_event_log (stripe_event_id);
+
+-- Service role only — no user-facing RLS needed
+alter table public.stripe_event_log enable row level security;
+
+-- No SELECT/INSERT policies for anon or authenticated roles.
+-- Only the service role (webhook handler) writes to this table.
+
+comment on table public.stripe_event_log is
+  'Secondary idempotency guard for Stripe webhook handlers. '
+  'Primary guard is stripe_webhook_events. '
+  'Insert stripe_event_id before processing; unique constraint rejects duplicates.';
+
+
+
+-- ── 20260603000003_publish_hvac_program.sql ──────────────────────────────────────────
+
+-- Ensure the HVAC Technician program row exists and is published.
+--
+-- The program page at /programs/hvac-technician calls getPublishedProgramBySlug
+-- which requires published = true and is_active = true. Without this the page
+-- returns 404 even though the course content (curriculum_lessons, modules) is live.
+--
+-- Safe to re-run: uses INSERT ... ON CONFLICT DO UPDATE.
+
+INSERT INTO public.programs (
+  id,
+  slug,
+  title,
+  short_description,
+  description,
+  published,
+  is_active,
+  status,
+  delivery_model,
+  display_order,
+  created_at,
+  updated_at
+)
+VALUES (
+  '4226f7f6-fbc1-44b5-83e8-b12ea149e4c7',
+  'hvac-technician',
+  'HVAC Technician',
+  'Earn your EPA 608 certification and enter the HVAC trade in weeks.',
+  'Hands-on HVAC training covering refrigerant handling, system diagnostics, and EPA 608 certification. WIOA and Workforce Ready Grant eligible.',
+  true,
+  true,
+  'published',
+  'hybrid',
+  1,
+  now(),
+  now()
+)
+ON CONFLICT (id) DO UPDATE SET
+  published     = true,
+  is_active     = true,
+  status        = 'published',
+  short_description = COALESCE(NULLIF(programs.short_description, ''), EXCLUDED.short_description),
+  updated_at    = now();
+
+-- Also ensure the slug index can find it
+UPDATE public.programs
+SET
+  published  = true,
+  is_active  = true,
+  status     = 'published',
+  updated_at = now()
+WHERE slug = 'hvac-technician'
+  AND (published = false OR is_active = false OR status != 'published');
+
+
+
+-- ── 20260604000001_course_generation_control.sql ──────────────────────────────────────────
+
+-- Course generation control fields
+-- Adds draft/generating/review/published lifecycle to courses
+-- and queued/generating/generated/approved lifecycle to course_lessons.
+-- Enables incremental generation with per-lesson lock and approve controls.
+
+-- courses: generation lifecycle
+ALTER TABLE public.courses
+  ADD COLUMN IF NOT EXISTS generation_status   text    NOT NULL DEFAULT 'draft'
+    CHECK (generation_status IN ('draft', 'generating', 'review', 'published')),
+  ADD COLUMN IF NOT EXISTS generation_progress integer NOT NULL DEFAULT 0
+    CHECK (generation_progress BETWEEN 0 AND 100),
+  ADD COLUMN IF NOT EXISTS generation_paused   boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS generator_prompt    text,
+  ADD COLUMN IF NOT EXISTS last_generated_at   timestamptz;
+
+-- course_lessons: per-lesson edit control
+ALTER TABLE public.course_lessons
+  ADD COLUMN IF NOT EXISTS generation_status  text    NOT NULL DEFAULT 'queued'
+    CHECK (generation_status IN ('queued', 'generating', 'generated', 'approved')),
+  ADD COLUMN IF NOT EXISTS locked             boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS ai_generated       boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS approved           boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS generator_prompt   text,
+  ADD COLUMN IF NOT EXISTS last_generated_at  timestamptz;
+
+-- Index for fast lookup of unlocked/unapproved lessons during generation
+CREATE INDEX IF NOT EXISTS idx_course_lessons_generation
+  ON public.course_lessons (course_id, generation_status, locked, approved);
+
+
+
+-- ── 20260604000002_barber_billing_schema.sql ──────────────────────────────────────────
+
+-- Barber billing schema additions
+--
+-- Adds columns the webhook already writes but that don't exist in the DB:
+--   barber_subscriptions: payment_status, failed_payment_at, suspension_deadline
+--   applications: submit_token guard + backfill for nulls
+--
+-- Creates billing_events table for the weekly billing cron audit log.
+-- All statements are idempotent (IF NOT EXISTS / IF NOT EXISTS guards).
+
+-- ─── barber_subscriptions: payment lifecycle columns ────────────────────────
+
+ALTER TABLE public.barber_subscriptions
+  ADD COLUMN IF NOT EXISTS payment_status       TEXT    NOT NULL DEFAULT 'active'
+    CHECK (payment_status IN ('active', 'past_due', 'suspended', 'cancelled', 'paid_in_full')),
+  ADD COLUMN IF NOT EXISTS failed_payment_at    TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS suspension_deadline  TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS suspended_at         TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS suspension_reason    TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_barber_subscriptions_payment_status
+  ON public.barber_subscriptions (payment_status)
+  WHERE payment_status IN ('past_due', 'suspended');
+
+-- ─── applications: submit_token guard ───────────────────────────────────────
+-- submit_token is defined in the CREATE TABLE baseline but may be null on
+-- rows inserted before the column existed. Backfill those rows.
+
+ALTER TABLE public.applications
+  ADD COLUMN IF NOT EXISTS submit_token UUID DEFAULT gen_random_uuid();
+
+UPDATE public.applications
+  SET submit_token = gen_random_uuid()
+  WHERE submit_token IS NULL;
+
+-- Unique index (safe to re-run)
+CREATE UNIQUE INDEX IF NOT EXISTS applications_submit_token_uq
+  ON public.applications (submit_token)
+  WHERE submit_token IS NOT NULL;
+
+-- ─── billing_events: weekly billing cron audit log ──────────────────────────
+-- One row per billing attempt (success or failure) from the weekly cron.
+-- Separate from barber_payments (which is the Stripe-confirmed ledger).
+
+CREATE TABLE IF NOT EXISTS public.billing_events (
+  id                      UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  barber_subscription_id  UUID        REFERENCES public.barber_subscriptions(id) ON DELETE CASCADE,
+  user_id                 UUID        REFERENCES auth.users(id),
+  event_type              TEXT        NOT NULL,
+    CHECK (event_type IN ('charge_attempted', 'charge_succeeded', 'charge_failed',
+                          'suspended', 'reinstated', 'cancelled', 'paid_in_full')),
+  amount_cents            INTEGER,
+  stripe_invoice_id       TEXT,
+  stripe_payment_intent   TEXT,
+  weeks_remaining_before  INTEGER,
+  weeks_remaining_after   INTEGER,
+  failure_reason          TEXT,
+  metadata                JSONB,
+  created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.billing_events ENABLE ROW LEVEL SECURITY;
+
+-- Admins and service role can read all; users can read their own
+CREATE POLICY "billing_events_service_role" ON public.billing_events
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+
+CREATE POLICY "billing_events_user_read" ON public.billing_events
+  FOR SELECT USING (user_id = auth.uid());
+
+CREATE INDEX IF NOT EXISTS idx_billing_events_subscription
+  ON public.billing_events (barber_subscription_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_billing_events_user
+  ON public.billing_events (user_id, created_at DESC);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_billing_events_invoice_unique
+  ON public.billing_events (stripe_invoice_id)
+  WHERE stripe_invoice_id IS NOT NULL;
+
+
+
+-- ── 20260604000003_schema_drift_waiver_columns.sql ──────────────────────────────────────────
+
+-- Resolves expired column-mismatch waivers W005–W015.
+-- Each statement adds the column the admin UI already queries for.
+-- All columns are nullable so existing rows are unaffected.
+
+-- W005: transfer_hours.status
+ALTER TABLE public.transfer_hours
+  ADD COLUMN IF NOT EXISTS status text DEFAULT 'pending';
+
+-- W006: signatures.status
+ALTER TABLE public.signatures
+  ADD COLUMN IF NOT EXISTS status text DEFAULT 'pending';
+
+-- W007: external_modules.status + approval_status
+ALTER TABLE public.external_modules
+  ADD COLUMN IF NOT EXISTS status text DEFAULT 'active',
+  ADD COLUMN IF NOT EXISTS approval_status text DEFAULT 'pending';
+
+-- W010: jri_participants.status
+ALTER TABLE public.jri_participants
+  ADD COLUMN IF NOT EXISTS status text DEFAULT 'active';
+
+-- W011: assignment_submissions.course_id
+ALTER TABLE public.assignment_submissions
+  ADD COLUMN IF NOT EXISTS course_id uuid REFERENCES public.courses(id) ON DELETE SET NULL;
+
+-- W012: quiz_attempts.course_id
+ALTER TABLE public.quiz_attempts
+  ADD COLUMN IF NOT EXISTS course_id uuid REFERENCES public.courses(id) ON DELETE SET NULL;
+
+-- W014: grades.enrollment_id
+ALTER TABLE public.grades
+  ADD COLUMN IF NOT EXISTS enrollment_id uuid REFERENCES public.program_enrollments(id) ON DELETE SET NULL;
+
+-- W015: attendance_records.enrollment_id
+ALTER TABLE public.attendance_records
+  ADD COLUMN IF NOT EXISTS enrollment_id uuid REFERENCES public.program_enrollments(id) ON DELETE SET NULL;
+
+
+
+-- ── 20260604000004_applications_payment_columns.sql ──────────────────────────────────────────
+
+-- Add payment tracking columns to applications table.
+-- These allow the approval pipeline to gate on payment_status
+-- without querying stripe_sessions_staging as a side-channel.
+
+ALTER TABLE public.applications
+  ADD COLUMN IF NOT EXISTS payment_status    text NOT NULL DEFAULT 'unpaid',
+  ADD COLUMN IF NOT EXISTS payment_intent_id text;
+
+-- Index for payment-gated approval queries
+CREATE INDEX IF NOT EXISTS idx_applications_payment_status
+  ON public.applications(payment_status);
+
+-- Backfill: mark any application that already has a linked paid Stripe session as paid.
+-- Safe to run multiple times (IF NOT EXISTS + WHERE clause).
+UPDATE public.applications a
+SET    payment_status = 'paid'
+FROM   public.stripe_sessions_staging s
+WHERE  s.application_id = a.id
+  AND  s.payment_status = 'paid'
+  AND  a.payment_status = 'unpaid';
+
+
+
+-- ── 20260604000005_crm_leads.sql ──────────────────────────────────────────
+
+-- CRM leads table — student/applicant pipeline.
+-- Separate from the existing `leads` table which is enterprise/licensing-oriented.
+-- Every eligibility submission, application, and payment creates or advances a row here.
+
+CREATE TABLE IF NOT EXISTS public.crm_leads (
+  id                 uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at         timestamptz NOT NULL DEFAULT now(),
+  updated_at         timestamptz NOT NULL DEFAULT now(),
+
+  full_name          text        NOT NULL,
+  email              text        NOT NULL,
+  phone              text,
+
+  source             text        NOT NULL DEFAULT 'website',
+  source_detail      text,
+  role               text        NOT NULL DEFAULT 'student',
+  program_slug       text,
+
+  -- Pipeline stage (ordered funnel)
+  stage              text        NOT NULL DEFAULT 'new',
+  -- new | qualified | nurture | applied | checkout_started |
+  -- paid_awaiting_approval | approved | converted | lost
+
+  status             text        NOT NULL DEFAULT 'open',
+  -- open | won | lost
+
+  priority           text        NOT NULL DEFAULT 'normal',
+  -- normal | high | urgent
+
+  qualified          boolean,
+  funding_interest   boolean,
+  self_pay_interest  boolean,
+
+  -- Links to other system objects (nullable — populated as funnel progresses)
+  application_id     uuid        REFERENCES public.applications(id)        ON DELETE SET NULL,
+  profile_id         uuid        REFERENCES public.profiles(id)            ON DELETE SET NULL,
+  enrollment_id      uuid        REFERENCES public.program_enrollments(id) ON DELETE SET NULL,
+  owner_user_id      uuid        REFERENCES public.profiles(id)            ON DELETE SET NULL,
+
+  notes              text
+  , UNIQUE (email)
+);
+
+CREATE INDEX IF NOT EXISTS idx_crm_leads_stage    ON public.crm_leads(stage);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_status   ON public.crm_leads(status);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_priority ON public.crm_leads(priority);
+CREATE INDEX IF NOT EXISTS idx_crm_leads_app_id   ON public.crm_leads(application_id);
+
+-- Follow-up reminders — task queue for the CRM.
+-- Separate from follow_ups (JRI case management) and followup_schedule (program scheduling).
+
+CREATE TABLE IF NOT EXISTS public.follow_up_reminders (
+  id                 uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at         timestamptz NOT NULL DEFAULT now(),
+  due_at             timestamptz NOT NULL,
+  status             text        NOT NULL DEFAULT 'pending',
+  -- pending | completed | dismissed
+
+  type               text        NOT NULL,
+  -- qualified-lead-follow-up | application-unpaid-24h | paid-applicant-approval
+
+  lead_id            uuid        REFERENCES public.crm_leads(id)    ON DELETE CASCADE,
+  application_id     uuid        REFERENCES public.applications(id) ON DELETE CASCADE,
+  assigned_user_id   uuid        REFERENCES public.profiles(id)     ON DELETE SET NULL,
+  note               text
+);
+
+CREATE INDEX IF NOT EXISTS idx_fur_status     ON public.follow_up_reminders(status);
+CREATE INDEX IF NOT EXISTS idx_fur_due_at     ON public.follow_up_reminders(due_at);
+CREATE INDEX IF NOT EXISTS idx_fur_lead_id    ON public.follow_up_reminders(lead_id);
+CREATE INDEX IF NOT EXISTS idx_fur_app_id     ON public.follow_up_reminders(application_id);
+
+
+
+-- ── 20260604000006_barber_post_payment_schema.sql ──────────────────────────────────────────
+
+-- Post-payment barber enrollment schema.
+-- Adds columns to applications and creates external_course_access for
+-- provider credential tracking (Milady and future integrations).
+
+ALTER TABLE public.applications
+  ADD COLUMN IF NOT EXISTS enrollment_id      uuid        REFERENCES public.program_enrollments(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS milady_status      text        NOT NULL DEFAULT 'not_applicable',
+  ADD COLUMN IF NOT EXISTS onboarding_sent_at timestamptz;
+
+-- milady_status values:
+--   not_applicable | pending | queued | issued | failed
+
+CREATE TABLE IF NOT EXISTS public.external_course_access (
+  id                 uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at         timestamptz NOT NULL DEFAULT now(),
+  updated_at         timestamptz NOT NULL DEFAULT now(),
+  student_id         uuid        REFERENCES public.profiles(id)      ON DELETE SET NULL,
+  application_id     uuid        REFERENCES public.applications(id)  ON DELETE SET NULL,
+  provider           text        NOT NULL,       -- 'milady' | 'nha' | etc.
+  provider_user_id   text,
+  provider_course_id text,
+  access_status      text        NOT NULL DEFAULT 'pending',
+  -- pending | issued | failed | revoked
+  login_email        text,
+  temp_password      text,
+  activation_url     text,
+  issued_at          timestamptz,
+  notes              text
+);
+
+CREATE INDEX IF NOT EXISTS idx_eca_student     ON public.external_course_access(student_id);
+CREATE INDEX IF NOT EXISTS idx_eca_application ON public.external_course_access(application_id);
+CREATE INDEX IF NOT EXISTS idx_eca_provider    ON public.external_course_access(provider);
+
+
+
+-- ── 20260604000007_course_discussions_schema.sql ──────────────────────────────────────────
+
+-- Add course_id and user_id to course_discussions if missing.
+-- The discussions page already uses these columns in insert/select;
+-- this migration ensures they exist in the live schema.
+
+alter table public.course_discussions
+  add column if not exists course_id uuid references public.training_courses(id) on delete cascade,
+  add column if not exists user_id   uuid references auth.users(id) on delete cascade;
+
+-- Index for fast per-course lookups
+create index if not exists idx_course_discussions_course_id
+  on public.course_discussions(course_id);
+
+create index if not exists idx_course_discussions_user_id
+  on public.course_discussions(user_id);
+
+
+
+-- ── 20260604000008_exam_bookings_payment_gate.sql ──────────────────────────────────────────
+
+-- Add payment gate, no-show enforcement, and retake tracking to exam_bookings.
+--
+-- Apply in Supabase Dashboard → SQL Editor before deploying the booking API changes.
+
+ALTER TABLE public.exam_bookings
+  ADD COLUMN IF NOT EXISTS user_id            uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS payment_status     text NOT NULL DEFAULT 'unpaid'
+                             CHECK (payment_status IN ('unpaid','paid','waived','no_show_fee_required')),
+  ADD COLUMN IF NOT EXISTS payment_intent_id  text,
+  ADD COLUMN IF NOT EXISTS fee_cents          integer,
+  ADD COLUMN IF NOT EXISTS no_show_fee_paid   boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS no_show_locked_at  timestamptz,
+  ADD COLUMN IF NOT EXISTS attempts_used      integer NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS retake_fee_paid    boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS exam_result        text CHECK (exam_result IN ('passed','failed','no_show','pending',NULL)),
+  ADD COLUMN IF NOT EXISTS result_recorded_at timestamptz;
+
+-- Index for payment lookups (webhook matching)
+CREATE INDEX IF NOT EXISTS idx_exam_bookings_payment_intent
+  ON public.exam_bookings (payment_intent_id)
+  WHERE payment_intent_id IS NOT NULL;
+
+-- Index for user booking history
+CREATE INDEX IF NOT EXISTS idx_exam_bookings_user_id
+  ON public.exam_bookings (user_id)
+  WHERE user_id IS NOT NULL;
+
+-- Index for no-show enforcement cron
+CREATE INDEX IF NOT EXISTS idx_exam_bookings_no_show_check
+  ON public.exam_bookings (preferred_date, status, exam_result)
+  WHERE status = 'confirmed' AND exam_result IS NULL;
+
+
+
+-- ── 20260604000009_testing_slots_and_enforcement.sql ──────────────────────────────────────────
+
+-- Testing center slot system and enforcement tables.
+-- Apply in Supabase Dashboard → SQL Editor.
+
+-- ── Availability slots (admin-created) ──────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.testing_slots (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  exam_type       text NOT NULL,           -- provider key: 'workkeys', 'nha', 'certiport', etc.
+  start_time      timestamptz NOT NULL,
+  end_time        timestamptz NOT NULL,
+  capacity        integer NOT NULL DEFAULT 10,
+  booked_count    integer NOT NULL DEFAULT 0,
+  location        text NOT NULL DEFAULT 'In-person — 8888 Keystone Crossing Suite 1300, Indianapolis IN 46240',
+  proctor_id      uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  notes           text,
+  is_cancelled    boolean NOT NULL DEFAULT false,
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  updated_at      timestamptz NOT NULL DEFAULT now()
+  CONSTRAINT slots_capacity_positive CHECK (capacity > 0),
+  CONSTRAINT slots_booked_lte_capacity CHECK (booked_count <= capacity),
+  CONSTRAINT slots_end_after_start CHECK (end_time > start_time)
+);
+
+CREATE INDEX IF NOT EXISTS idx_testing_slots_exam_type_time
+  ON public.testing_slots (exam_type, start_time)
+  WHERE is_cancelled = false;
+
+-- ── No-show fee tracking ─────────────────────────────────────────────────────
+-- Links an exam_booking to a required no-show fee before rebooking is allowed.
+CREATE TABLE IF NOT EXISTS public.testing_enforcement (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  booking_id          uuid NOT NULL REFERENCES public.exam_bookings(id) ON DELETE CASCADE,
+  user_id             uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  email               text NOT NULL,
+  enforcement_type    text NOT NULL CHECK (enforcement_type IN ('no_show', 'retake', 'reschedule')),
+  fee_cents           integer NOT NULL,
+  fee_paid            boolean NOT NULL DEFAULT false,
+  payment_intent_id   text,
+  paid_at             timestamptz,
+  locked_at           timestamptz NOT NULL DEFAULT now(),
+  unlocked_at         timestamptz,
+  created_at          timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_testing_enforcement_email
+  ON public.testing_enforcement (email, fee_paid);
+
+CREATE INDEX IF NOT EXISTS idx_testing_enforcement_user
+  ON public.testing_enforcement (user_id, fee_paid)
+  WHERE user_id IS NOT NULL;
+
+-- ── Link exam_bookings to slots ──────────────────────────────────────────────
+ALTER TABLE public.exam_bookings
+  ADD COLUMN IF NOT EXISTS slot_id uuid REFERENCES public.testing_slots(id) ON DELETE SET NULL;
+
+-- ── Helper: decrement slot on booking cancellation ───────────────────────────
+CREATE OR REPLACE FUNCTION public.decrement_slot_on_cancel()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  IF NEW.status IN ('cancelled') AND OLD.status NOT IN ('cancelled') AND OLD.slot_id IS NOT NULL THEN
+    UPDATE public.testing_slots
+    SET booked_count = GREATEST(0, booked_count - 1),
+        updated_at   = now()
+    WHERE id = OLD.slot_id;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_decrement_slot_on_cancel ON public.exam_bookings;
+CREATE TRIGGER trg_decrement_slot_on_cancel
+  AFTER UPDATE ON public.exam_bookings
+  FOR EACH ROW EXECUTE FUNCTION public.decrement_slot_on_cancel();
+
+
+
+-- ── 20260605000001_sync_hvac_course_lessons_from_curriculum.sql ──────────────────────────────────────────
+
+-- Migration: 20260605000001
+--
+-- Syncs HVAC course_lessons from curriculum_lessons.
+-- Copies quiz_questions, passing_score, video_url, and lesson_type
+-- for all 95 hvac-lesson-* rows.
+--
+-- Applied via REST API on 2026-06-05. Run this in Supabase Dashboard
+-- SQL Editor if course_lessons ever needs to be rebuilt from scratch.
+
+UPDATE course_lessons cl
+SET
+  video_url      = cur.video_file,
+  quiz_questions = COALESCE(cl.quiz_questions, cur.quiz_questions),
+  passing_score  = CASE
+                     WHEN (cl.passing_score IS NULL OR cl.passing_score = 0)
+                          AND cur.passing_score > 0
+                     THEN cur.passing_score
+                     ELSE cl.passing_score
+                   END,
+  lesson_type    = COALESCE(cur.step_type, cl.lesson_type),
+  updated_at     = now()
+FROM curriculum_lessons cur
+WHERE cl.slug = cur.lesson_slug
+  AND cl.slug LIKE 'hvac-lesson-%';
+
+
+
+-- ── 20260605000002_fix_lms_lessons_step_type.sql ──────────────────────────────────────────
+
+-- Migration: 20260605000002
+--
+-- Fixes lms_lessons view:
+--   1. step_type: course_lessons uses lesson_type (enum), not step_type.
+--      COALESCE(cl.lesson_type::text, cur.step_type::text, 'lesson')
+--   2. content: course_lessons.content is jsonb; cast to text for UNION.
+--   3. lesson_source: updated to 'course_lessons' (was hardcoded 'curriculum').
+--   4. Non-existent columns on course_lessons replaced with NULL casts.
+
+DROP VIEW IF EXISTS public.lms_lessons CASCADE;
+
+CREATE OR REPLACE VIEW public.lms_lessons AS
+SELECT
+  cl.id,
+  cl.course_id,
+  cl.order_index,
+  NULL::integer                                                  AS lesson_number,
+  cl.title,
+  cl.content::text                                               AS content,
+  cl.rendered_html,
+  COALESCE(NULLIF(cl.video_url, ''), cur.video_file)            AS video_url,
+  COALESCE(cl.lesson_type::text, cur.step_type::text, 'lesson') AS step_type,
+  cl.lesson_type::text                                           AS content_type,
+  cl.slug,
+  cur.lesson_slug,
+  COALESCE(cl.passing_score, cur.passing_score)                 AS passing_score,
+  COALESCE(cl.quiz_questions, cur.quiz_questions)               AS quiz_questions,
+  cl.activities,
+  cl.video_config,
+  cl.module_id,
+  cm.title                                                       AS module_title,
+  cm.order_index                                                 AS module_order,
+  cl.order_index                                                 AS lesson_order,
+  cl.duration_minutes,
+  cl.is_published,
+  cl.status,
+  'course_lessons'::text                                         AS lesson_source,
+  cl.created_at,
+  cl.updated_at,
+  cl.partner_exam_code,
+  NULL::uuid                                                     AS quiz_id,
+  NULL::text                                                     AS description,
+  NULL::jsonb                                                    AS resources,
+  NULL::text                                                     AS scorm_package_id,
+  NULL::text                                                     AS scorm_launch_path
+FROM public.course_lessons cl
+LEFT JOIN public.curriculum_lessons cur
+  ON  cur.lesson_slug = cl.slug
+  AND cur.course_id   = cl.course_id
+LEFT JOIN public.course_modules cm
+  ON  cm.id = cl.module_id
+
+UNION ALL
+
+SELECT
+  tl.id,
+  tl.course_id,
+  tl.order_index,
+  tl.lesson_number,
+  tl.title,
+  tl.content,
+  NULL::text                                                     AS rendered_html,
+  tl.video_url,
+  COALESCE(tl.lesson_type::text, 'lesson')                      AS step_type,
+  tl.content_type::text                                          AS content_type,
+  NULL::text                                                     AS slug,
+  NULL::text                                                     AS lesson_slug,
+  tl.passing_score,
+  tl.quiz_questions,
+  NULL::jsonb                                                    AS activities,
+  NULL::jsonb                                                    AS video_config,
+  tl.module_id,
+  NULL::text                                                     AS module_title,
+  NULL::integer                                                  AS module_order,
+  tl.order_index                                                 AS lesson_order,
+  tl.duration_minutes,
+  tl.is_published,
+  NULL::text                                                     AS status,
+  'training'::text                                               AS lesson_source,
+  tl.created_at,
+  tl.updated_at,
+  NULL::text                                                     AS partner_exam_code,
+  tl.quiz_id,
+  tl.description,
+  NULL::jsonb                                                    AS resources,
+  NULL::text                                                     AS scorm_package_id,
+  NULL::text                                                     AS scorm_launch_path
+FROM public.training_lessons tl
+WHERE NOT EXISTS (
+  SELECT 1 FROM public.course_lessons cl2
+  WHERE cl2.course_id = tl.course_id
+);
+
+GRANT SELECT ON public.lms_lessons TO authenticated, anon, service_role;
+
+
+
+-- ── 20260606000001_backfill_hvac_quiz_questions.sql ──────────────────────────────────────────
+
+-- Migration: 20260606000001_backfill_hvac_quiz_questions
+-- Backfills quiz_questions for 37 HVAC course_lessons rows that were seeded
+-- without questions. Questions sourced from HVAC_QUIZ_MAP (hvac-quizzes.ts).
+-- Only updates rows where quiz_questions IS NULL — safe to re-run.
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-07-03-1","question":"When servicing a small appliance with R-600a, you must:","options":["Use standard tools","Ensure no ignition sources are present and use non-sparking tools","Wear only gloves","Ventilate only if the leak is large"],"correctAnswer":1,"explanation":"R-600a is highly flammable. Eliminate all ignition sources, use non-sparking tools, and ensure adequate ventilation."},{"id":"q-07-03-2","question":"Capillary tubes in small appliances serve as:","options":["Suction lines","Fixed metering devices that control refrigerant flow","Discharge lines","Oil return lines"],"correctAnswer":1,"explanation":"Capillary tubes are fixed metering devices — their length and diameter determine refrigerant flow rate."},{"id":"q-07-03-3","question":"A restricted capillary tube in a refrigerator causes:","options":["Higher evaporator temperature","Low suction pressure and warm cabinet temperature","Overcharge symptoms","No effect on performance"],"correctAnswer":1,"explanation":"A restricted cap tube starves the evaporator — suction pressure drops, the coil cannot absorb enough heat, and the cabinet warms."},{"id":"q-07-03-4","question":"Frost pattern on a refrigerator evaporator coil can indicate:","options":["Normal operation only","Airflow restriction, defrost failure, or refrigerant issues depending on pattern","Always a refrigerant leak","Always a defrost heater failure"],"correctAnswer":1,"explanation":"Frost pattern diagnosis: uniform frost = normal; partial frost = airflow or defrost issue; no frost = no refrigerant or compressor failure."},{"id":"q-07-03-5","question":"Before opening a small appliance refrigerant circuit for repair, you must:","options":["Do nothing special","Recover all refrigerant first","Only turn off the power","Add nitrogen first"],"correctAnswer":1,"explanation":"All refrigerant must be recovered before opening any refrigerant circuit — even on small appliances."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-41'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"epa-t1-01","question":"Type I certification covers systems containing:","options":["More than 50 lbs of refrigerant","5 lbs or less of refrigerant","Any amount of high-pressure refrigerant","Only automotive AC systems"],"correctAnswer":1,"explanation":"Type I covers small appliances — systems manufactured, charged, and hermetically sealed with 5 lbs or less of refrigerant."},{"id":"epa-t1-02","question":"Which of the following is a small appliance?","options":["A 5-ton rooftop unit","A household refrigerator","A centrifugal chiller","A split-system heat pump"],"correctAnswer":1,"explanation":"Small appliances include household refrigerators, freezers, window AC units, PTACs, dehumidifiers, vending machines, and water coolers."},{"id":"epa-t1-03","question":"When recovering from a small appliance with an operating compressor, you must recover:","options":["80% of the charge","90% of the charge","100% of the charge","0% — recovery is not required"],"correctAnswer":1,"explanation":"For small appliances with operating compressors, 90% of the refrigerant must be recovered."},{"id":"epa-t1-04","question":"When recovering from a small appliance with a non-operating compressor, you must recover:","options":["90% of the charge","80% of the charge","0 psig","4 inches Hg vacuum"],"correctAnswer":1,"explanation":"For small appliances with non-operating compressors, 80% of the refrigerant must be recovered."},{"id":"epa-t1-05","question":"When is 0% recovery allowed from a small appliance?","options":["When the system has a leak","When the system has leaked to atmospheric pressure","When the technician is in a hurry","0% recovery is never allowed"],"correctAnswer":1,"explanation":"If a small appliance has already leaked to atmospheric pressure (0 psig), no additional recovery is required."},{"id":"epa-t1-06","question":"System-dependent recovery equipment relies on:","options":["Its own compressor","The appliance''s compressor or system pressure","Gravity only","External air pressure"],"correctAnswer":1,"explanation":"System-dependent equipment uses the appliance''s own compressor or internal pressure to push refrigerant into the recovery vessel."},{"id":"epa-t1-07","question":"Self-contained recovery equipment has:","options":["No compressor","Its own compressor to draw refrigerant out","Only a vacuum pump","A heating element only"],"correctAnswer":1,"explanation":"Self-contained equipment has its own compressor and can recover refrigerant regardless of whether the appliance''s compressor works."},{"id":"epa-t1-08","question":"A PTAC unit is classified as:","options":["A high-pressure system","A low-pressure system","A small appliance","A commercial refrigeration system"],"correctAnswer":2,"explanation":"Packaged Terminal Air Conditioners (PTACs) are small appliances containing 5 lbs or less of refrigerant."},{"id":"epa-t1-09","question":"Before disposing of a small appliance, a technician must:","options":["Vent the refrigerant","Recover the refrigerant","Only remove the compressor","No action is required"],"correctAnswer":1,"explanation":"Refrigerant must be recovered from small appliances before disposal."},{"id":"epa-t1-10","question":"Small appliances are exempt from which requirement?","options":["Recovery requirements","Leak repair requirements","Certification requirements","Venting prohibition"],"correctAnswer":1,"explanation":"Small appliances are exempt from leak repair requirements. Recovery and venting prohibition still apply."},{"id":"epa-t1-11","question":"What refrigerant is typically in household refrigerators made after 1995?","options":["R-12","R-22","R-134a","R-410A"],"correctAnswer":2,"explanation":"R-134a (an HFC) replaced R-12 (a CFC) in household refrigerators after the CFC phase-out."},{"id":"epa-t1-12","question":"Recovery cylinders must not be filled beyond:","options":["100% capacity","90% capacity","80% capacity","70% capacity"],"correctAnswer":2,"explanation":"Recovery cylinders must not be filled beyond 80% capacity to allow for thermal expansion."},{"id":"epa-t1-13","question":"The access point on a sealed system is often a:","options":["Schrader valve","Process stub or tube","King valve","Sight glass"],"correctAnswer":1,"explanation":"Small appliances often have a process stub that must be pierced or accessed with a piercing valve for recovery."},{"id":"epa-t1-14","question":"R-12 is classified as a:","options":["HFC","HCFC","CFC","HFO"],"correctAnswer":2,"explanation":"R-12 is a CFC with high ozone depletion potential. Production was phased out in 1996."},{"id":"epa-t1-15","question":"A window air conditioning unit typically contains:","options":["More than 10 lbs","Between 5 and 15 lbs","Less than 5 lbs","No refrigerant"],"correctAnswer":2,"explanation":"Window AC units are small appliances containing less than 5 lbs of refrigerant."},{"id":"epa-t1-16","question":"If a small appliance compressor will not run, use:","options":["System-dependent active recovery","Self-contained recovery","Passive recovery only","No recovery needed"],"correctAnswer":1,"explanation":"When the compressor won''t run, self-contained recovery equipment must be used."},{"id":"epa-t1-17","question":"Recovered refrigerant can be returned to:","options":["Any system","The same owner''s equipment without recycling","Only new systems","Only after reclamation"],"correctAnswer":1,"explanation":"Recovered refrigerant can be returned to the same owner''s equipment. Changing ownership requires reclamation."},{"id":"epa-t1-18","question":"Dehumidifiers are classified as:","options":["High-pressure systems","Low-pressure systems","Small appliances","Commercial equipment"],"correctAnswer":2,"explanation":"Residential dehumidifiers contain less than 5 lbs of refrigerant and are small appliances."},{"id":"epa-t1-19","question":"A vending machine with built-in refrigeration is:","options":["Not regulated by EPA","A small appliance","A commercial system requiring Type II","Exempt from recovery"],"correctAnswer":1,"explanation":"Vending machines with built-in refrigeration are small appliances."},{"id":"epa-t1-20","question":"The purpose of a filter-drier in recovery is to:","options":["Increase speed","Remove moisture and contaminants","Measure refrigerant amount","Prevent backflow"],"correctAnswer":1,"explanation":"Filter-driers remove moisture, acid, and particulate contaminants from refrigerant."},{"id":"epa-t1-21","question":"When recovering from a system with a known leak:","options":["Skip recovery","Recover as much as possible","Only recover if more than 50% remains","Vent the remaining charge"],"correctAnswer":1,"explanation":"Even with a leak, the technician must recover as much refrigerant as possible."},{"id":"epa-t1-22","question":"EPA 608 certifications:","options":["Expire after 1 year","Expire after 3 years","Expire after 5 years","Do not expire"],"correctAnswer":3,"explanation":"EPA Section 608 certifications do not expire once earned."},{"id":"epa-t1-23","question":"A piercing valve should be checked for:","options":["Proper color coding","Leaks before and after use","Electrical continuity","Thread compatibility only"],"correctAnswer":1,"explanation":"Piercing valves must be checked for leaks. A leaking valve would release refrigerant."},{"id":"epa-t1-24","question":"What should be done if a warm appliance needs recovery?","options":["Begin immediately","Allow it to cool first","Add more refrigerant","Vent excess pressure"],"correctAnswer":1,"explanation":"Allowing the system to cool reduces internal pressure, making recovery safer and more efficient."},{"id":"epa-t1-25","question":"Type I certification allows work on:","options":["All HVAC systems","Only small appliances with 5 lbs or less","High-pressure systems","Low-pressure chillers"],"correctAnswer":1,"explanation":"Type I certification covers only small appliances with 5 lbs or less of refrigerant."},{"id":"epa-t1-26","question":"A household refrigerator manufactured after 1995 most likely contains:","options":["R-12","R-22","R-134a","R-410A"],"correctAnswer":2,"explanation":"R-134a replaced R-12 in household refrigerators after the CFC phase-out in 1996."},{"id":"epa-t1-27","question":"What is the maximum charge size for a small appliance?","options":["2 lbs","5 lbs","10 lbs","50 lbs"],"correctAnswer":1,"explanation":"Small appliances are defined as systems manufactured, charged, and hermetically sealed with 5 lbs or less of refrigerant."},{"id":"epa-t1-28","question":"A hermetically sealed system means:","options":["The system has no service valves","The refrigerant circuit is factory-sealed with no service ports","The system uses only HFCs","The compressor is externally driven"],"correctAnswer":1,"explanation":"Hermetically sealed systems are factory-sealed with no service ports. Access requires piercing valves or process stubs."},{"id":"epa-t1-29","question":"When using a system-dependent recovery device, the appliance compressor must:","options":["Be non-operational","Be operational to push refrigerant into the recovery vessel","Be bypassed","Be replaced first"],"correctAnswer":1,"explanation":"System-dependent (passive) recovery relies on the appliance''s own compressor or internal pressure to move refrigerant."},{"id":"epa-t1-30","question":"Recovery efficiency of 90% for small appliances with operating compressors was established:","options":["Before November 15, 1993","After November 15, 1993","After January 1, 2020","After January 1, 2010"],"correctAnswer":1,"explanation":"The 90% recovery requirement applies to small appliances manufactured after November 15, 1993."},{"id":"epa-t1-31","question":"A portable room air conditioner (window unit) is classified as:","options":["Type II high-pressure equipment","A small appliance","Type III low-pressure equipment","Commercial refrigeration"],"correctAnswer":1,"explanation":"Window and portable room AC units contain less than 5 lbs of refrigerant and are small appliances."},{"id":"epa-t1-32","question":"What refrigerant is commonly found in older household refrigerators (pre-1996)?","options":["R-134a","R-22","R-12","R-410A"],"correctAnswer":2,"explanation":"R-12 (a CFC) was used in household refrigerators before the phase-out. It was replaced by R-134a."},{"id":"epa-t1-33","question":"A water cooler with built-in refrigeration is classified as:","options":["Type II equipment","A small appliance","Type III equipment","Not regulated"],"correctAnswer":1,"explanation":"Water coolers with built-in refrigeration contain less than 5 lbs of refrigerant and are small appliances."},{"id":"epa-t1-34","question":"When a small appliance has already leaked to atmospheric pressure, recovery required is:","options":["90%","80%","0% — no recovery required","50%"],"correctAnswer":2,"explanation":"If a small appliance has already leaked to atmospheric pressure (0 psig), no additional recovery is required."},{"id":"epa-t1-35","question":"A piercing valve is used to:","options":["Measure system pressure only","Access a sealed system by piercing the process tube","Recover refrigerant from large systems","Test for leaks"],"correctAnswer":1,"explanation":"Piercing valves clamp onto the process stub of a sealed small appliance to provide access for recovery."},{"id":"epa-t1-36","question":"After using a piercing valve, the technician should:","options":["Leave it in place permanently","Check for leaks and cap the valve","Remove it and seal the tube","Leave it open for future access"],"correctAnswer":1,"explanation":"After recovery, check the piercing valve for leaks and cap it to prevent refrigerant release."},{"id":"epa-t1-37","question":"Self-contained recovery equipment certified after November 15, 1993 must be certified by:","options":["The manufacturer","EPA or an EPA-approved testing organization","OSHA","The state licensing board"],"correctAnswer":1,"explanation":"Recovery equipment must be certified by EPA or an EPA-approved testing organization (such as UL or ETL)."},{"id":"epa-t1-38","question":"A chest freezer is classified as:","options":["Type II equipment","A small appliance","Type III equipment","Commercial refrigeration"],"correctAnswer":1,"explanation":"Household chest freezers contain less than 5 lbs of refrigerant and are small appliances."},{"id":"epa-t1-39","question":"The recovery cylinder used for small appliance refrigerant must be:","options":["Any available cylinder","A DOT-approved recovery cylinder","A new cylinder only","A cylinder rated for the specific refrigerant only"],"correctAnswer":1,"explanation":"Recovery cylinders must meet DOT standards and be appropriate for the refrigerant being recovered."},{"id":"epa-t1-40","question":"What is the purpose of the process stub on a small appliance?","options":["Electrical connection point","Access point for refrigerant recovery and charging","Mounting bracket","Oil drain port"],"correctAnswer":1,"explanation":"The process stub is a small copper tube used as the access point for recovery and charging on sealed small appliances."},{"id":"epa-t1-41","question":"A technician recovering from a small appliance with a non-operating compressor must achieve:","options":["90% recovery","80% recovery","0 psig","500 microns"],"correctAnswer":1,"explanation":"For small appliances with non-operating compressors, 80% of the refrigerant must be recovered."},{"id":"epa-t1-42","question":"Which of the following is NOT a small appliance?","options":["Household refrigerator","Window air conditioner","5-ton split system","Dehumidifier"],"correctAnswer":2,"explanation":"A 5-ton split system contains far more than 5 lbs of refrigerant and is Type II high-pressure equipment."},{"id":"epa-t1-43","question":"Recovered refrigerant from a small appliance can be:","options":["Vented if less than 1 lb","Stored in a recovery cylinder for recycling or reclamation","Mixed with other refrigerants","Disposed of in a drain"],"correctAnswer":1,"explanation":"Recovered refrigerant must be stored in approved recovery cylinders and sent for recycling or reclamation."},{"id":"epa-t1-44","question":"A PTAC (Packaged Terminal Air Conditioner) is commonly found in:","options":["Residential homes","Hotels and motels","Industrial facilities","Centrifugal chiller plants"],"correctAnswer":1,"explanation":"PTACs are the through-the-wall units common in hotel and motel rooms. They are small appliances."},{"id":"epa-t1-45","question":"The refrigerant charge in a typical window AC unit is approximately:","options":["0.5–2 lbs","5–10 lbs","10–20 lbs","20–50 lbs"],"correctAnswer":0,"explanation":"Window AC units typically contain 0.5–2 lbs of refrigerant, well within the 5 lb small appliance threshold."},{"id":"epa-t1-46","question":"Before disposing of a household refrigerator, the refrigerant must be:","options":["Vented — it is a small amount","Recovered by a certified technician or under the safe disposal exemption","Left in the unit","Drained into a container"],"correctAnswer":1,"explanation":"Refrigerant must be recovered before disposal. The safe disposal exemption allows non-certified persons to use approved equipment for this purpose."},{"id":"epa-t1-47","question":"What does ''passive recovery'' mean for small appliances?","options":["Using a vacuum pump","Allowing refrigerant to flow into the recovery vessel using system pressure only","Using the appliance compressor to push refrigerant out","No recovery is performed"],"correctAnswer":1,"explanation":"Passive recovery uses the system''s own pressure differential to move refrigerant into the recovery vessel without an external compressor."},{"id":"epa-t1-48","question":"A recovery cylinder must be labeled with:","options":["Only the technician''s name","The refrigerant type and that it contains used refrigerant","Only the date of recovery","No labeling is required"],"correctAnswer":1,"explanation":"Recovery cylinders must be labeled with the refrigerant type and marked as containing used (recovered) refrigerant."},{"id":"epa-t1-49","question":"R-600a (isobutane) is used in some modern household refrigerators because:","options":["It has high ODP","It has very low GWP and good thermodynamic properties","It is non-flammable","It is cheaper than R-134a only"],"correctAnswer":1,"explanation":"R-600a has near-zero GWP and excellent efficiency. It is A3 (flammable) but used in small charges in sealed household appliances."},{"id":"epa-t1-50","question":"A technician must have Type I certification to service:","options":["Any HVAC system","Only small appliances with 5 lbs or less","High-pressure systems only","Low-pressure chillers only"],"correctAnswer":1,"explanation":"Type I certification is specifically for small appliances with 5 lbs or less of refrigerant."},{"id":"epa-t1-51","question":"What is the primary advantage of self-contained recovery equipment over system-dependent equipment?","options":["It is cheaper","It works even when the appliance compressor is non-functional","It recovers refrigerant faster always","It requires no power"],"correctAnswer":1,"explanation":"Self-contained equipment has its own compressor, so it can recover refrigerant regardless of the appliance''s condition."},{"id":"epa-t1-52","question":"A technician who recovers refrigerant from a small appliance must:","options":["Dispose of it immediately","Store it in an approved recovery cylinder","Return it to the manufacturer","Mix it with new refrigerant"],"correctAnswer":1,"explanation":"Recovered refrigerant must be stored in DOT-approved recovery cylinders for proper handling."},{"id":"epa-t1-53","question":"The safe disposal exemption applies to:","options":["All HVAC equipment","Small appliances being disposed of (not serviced)","Commercial refrigeration only","Any system under 50 lbs"],"correctAnswer":1,"explanation":"The safe disposal exemption applies only to small appliances being disposed of, not to equipment being serviced."},{"id":"epa-t1-54","question":"Which of the following small appliances uses R-290 (propane) as a refrigerant?","options":["All modern refrigerators","Some commercial display cases and household refrigerators in certain markets","Window AC units","Dehumidifiers"],"correctAnswer":1,"explanation":"R-290 is used in some commercial display cases and household refrigerators, particularly in European markets and increasingly in the US."},{"id":"epa-t1-55","question":"When recovering from a small appliance, the recovery vessel should be:","options":["Warm to increase pressure","Cool to increase recovery efficiency","At room temperature only","Temperature does not matter"],"correctAnswer":1,"explanation":"Cooling the recovery vessel increases the pressure differential, improving recovery efficiency and speed."},{"id":"epa-t1-56","question":"A technician finds a small appliance with a broken compressor. The correct recovery method is:","options":["System-dependent active recovery","Self-contained recovery equipment","No recovery needed — compressor is broken","Vent the refrigerant"],"correctAnswer":1,"explanation":"When the compressor is broken, self-contained recovery equipment must be used since system-dependent methods require a working compressor."},{"id":"epa-t1-57","question":"What is the purpose of an oil separator in recovery equipment?","options":["Remove moisture","Separate compressor oil from recovered refrigerant","Measure refrigerant purity","Control recovery speed"],"correctAnswer":1,"explanation":"Oil separators remove compressor oil from recovered refrigerant to prevent oil contamination of the recovery cylinder."},{"id":"epa-t1-58","question":"Small appliances are exempt from which EPA requirement?","options":["Recovery before disposal","Venting prohibition","Mandatory leak repair requirements","Certification requirements"],"correctAnswer":2,"explanation":"Small appliances are exempt from mandatory leak repair requirements. Recovery and venting prohibition still apply."},{"id":"epa-t1-59","question":"A technician recovering from a small appliance should connect the recovery equipment to:","options":["The electrical terminals","The process stub or piercing valve","The condenser coil","The evaporator drain"],"correctAnswer":1,"explanation":"Recovery equipment connects to the process stub (or a piercing valve installed on the process stub) to access the refrigerant circuit."},{"id":"epa-t1-60","question":"After recovery from a small appliance, the technician should verify:","options":["The refrigerant color","That the required recovery percentage was achieved","The refrigerant smell","That the compressor runs"],"correctAnswer":1,"explanation":"The technician must verify that the required recovery percentage (80% or 90% depending on compressor status) was achieved."},{"id":"epa-t1-61","question":"R-134a in a household refrigerator has what ODP?","options":["1.0","0.05","0","0.5"],"correctAnswer":2,"explanation":"R-134a is an HFC with zero ODP. It contains no chlorine or bromine."},{"id":"epa-t1-62","question":"A technician who services small appliances without EPA 608 certification:","options":["Is only subject to a warning","Faces civil penalties up to $44,539 per day","Is exempt if the system is under 2 lbs","Only needs state certification"],"correctAnswer":1,"explanation":"Servicing refrigerant-containing equipment without EPA 608 certification is a federal violation with penalties up to $44,539 per day."},{"id":"epa-t1-63","question":"What is the typical refrigerant charge in a household chest freezer?","options":["0.25–0.75 lbs","5–10 lbs","10–20 lbs","20–50 lbs"],"correctAnswer":0,"explanation":"Household chest freezers typically contain 0.25–0.75 lbs of refrigerant — well within the 5 lb small appliance threshold."},{"id":"epa-t1-64","question":"A vending machine refrigeration system is classified as a small appliance because:","options":["It uses R-134a","It is manufactured, charged, and hermetically sealed with 5 lbs or less of refrigerant","It is portable","It is used commercially"],"correctAnswer":1,"explanation":"Vending machine refrigeration systems meet the small appliance definition — hermetically sealed with 5 lbs or less."},{"id":"epa-t1-65","question":"When is it acceptable to vent refrigerant from a small appliance?","options":["When the charge is less than 1 lb","When the system has already leaked to atmospheric pressure","When the technician is in a hurry","Never — venting is always prohibited"],"correctAnswer":1,"explanation":"If a small appliance has already leaked to atmospheric pressure, no recovery is required. Otherwise, venting is prohibited."},{"id":"epa-t1-66","question":"The process stub on a small appliance is typically made of:","options":["Steel","Copper","Aluminum","Plastic"],"correctAnswer":1,"explanation":"Process stubs are typically small copper tubes that are pinched off after factory charging."},{"id":"epa-t1-67","question":"A technician must keep records of refrigerant recovered from small appliances for:","options":["No records required","1 year","3 years","5 years"],"correctAnswer":2,"explanation":"Records of refrigerant recovery must be kept for at least 3 years."},{"id":"epa-t1-68","question":"Which of the following is a correct statement about Type I recovery requirements?","options":["90% recovery is always required","80% recovery is always required","Recovery requirements depend on whether the compressor is operational","No recovery is required for small appliances"],"correctAnswer":2,"explanation":"Type I recovery: 90% if compressor works, 80% if compressor doesn''t work, 0% if already at atmospheric pressure."},{"id":"epa-t1-69","question":"A dehumidifier with a 2 lb refrigerant charge is classified as:","options":["Type II high-pressure equipment","A small appliance","Type III low-pressure equipment","Not regulated"],"correctAnswer":1,"explanation":"A dehumidifier with 2 lbs of refrigerant is a small appliance — under the 5 lb threshold."},{"id":"epa-t1-70","question":"What should a technician do if a recovery cylinder is nearly full?","options":["Continue filling until it is completely full","Stop recovery and use a new cylinder — never exceed 80% capacity","Vent the remaining refrigerant","Heat the cylinder to compress the refrigerant"],"correctAnswer":1,"explanation":"Recovery cylinders must not exceed 80% capacity. Stop and use a new cylinder when approaching the limit."},{"id":"epa-t1-71","question":"A small appliance that uses R-600a (isobutane) requires:","options":["No special precautions","Elimination of ignition sources due to flammability","Type III certification","Commercial refrigeration certification"],"correctAnswer":1,"explanation":"R-600a is A3 (highly flammable). Eliminate all ignition sources when working on systems containing flammable refrigerants."},{"id":"epa-t1-72","question":"The ''safe disposal'' exemption allows:","options":["Venting refrigerant during disposal","Non-certified persons to recover refrigerant from small appliances being disposed of using approved equipment","Disposal without any refrigerant handling","Certified technicians to skip recovery"],"correctAnswer":1,"explanation":"The safe disposal exemption allows non-certified persons (scrap dealers, appliance retailers) to recover refrigerant from small appliances being disposed of."},{"id":"epa-t1-73","question":"After recovering refrigerant from a small appliance, the technician should:","options":["Immediately recharge the system","Label the recovery cylinder with the refrigerant type","Mix the recovered refrigerant with new refrigerant","Dispose of the recovery cylinder"],"correctAnswer":1,"explanation":"Recovery cylinders must be labeled with the refrigerant type and marked as containing used refrigerant."},{"id":"epa-t1-74","question":"A technician using system-dependent recovery on a small appliance should monitor:","options":["The electrical current","The pressure in the recovery vessel to ensure it does not exceed safe limits","The ambient temperature only","The refrigerant color"],"correctAnswer":1,"explanation":"Monitor recovery vessel pressure to ensure it stays within safe limits during system-dependent recovery."},{"id":"epa-t1-75","question":"Which statement about EPA 608 Type I certification is correct?","options":["It allows work on all refrigerant-containing equipment","It is limited to small appliances with 5 lbs or less of refrigerant","It expires after 5 years","It requires annual renewal"],"correctAnswer":1,"explanation":"Type I certification covers only small appliances (5 lbs or less). It does not expire once earned."},{"id":"epa-t1-76","question":"When using a passive (system-dependent) recovery device on a small appliance with an inoperative compressor, the technician should:","options":["Give up and vent the refrigerant","Install access valves on both the high and low side to maximize recovery","Use only the high side access valve","Use only the low side access valve"],"correctAnswer":1,"explanation":"For inoperative compressors, install access valves on both high and low sides to maximize refrigerant recovery using system pressure."},{"id":"epa-t1-77","question":"To recover from a small appliance with an inoperative compressor using a passive device, the technician can:","options":["Only wait for pressure to equalize","Heat the appliance and/or strike the compressor to try to free it, then use system pressure","Add nitrogen to push refrigerant out","Vent the refrigerant — no other option exists"],"correctAnswer":1,"explanation":"Heating the appliance raises pressure. Striking the compressor may free a stuck compressor. Both help maximize passive recovery."},{"id":"epa-t1-78","question":"Solderless (Schrader-type) access fittings installed during service on a small appliance should be:","options":["Left in place permanently for future service","Removed at the conclusion of service to prevent leaks","Capped but left in place","Replaced with solder fittings"],"correctAnswer":1,"explanation":"Solderless access fittings must be removed at the conclusion of service. They are not designed for permanent installation and can leak."},{"id":"epa-t1-79","question":"R-134a is the likely substitute for R-12 in small appliances because:","options":["It has the same pressure as R-12","It is an HFC with zero ODP and similar thermodynamic properties","It uses the same oil as R-12","It is cheaper than R-12"],"correctAnswer":1,"explanation":"R-134a replaced R-12 in household refrigerators and small appliances. It has zero ODP and similar cooling performance, though it requires POE oil."},{"id":"epa-t1-80","question":"Refrigerants can decompose at high temperatures (such as near open flames or hot surfaces) to produce:","options":["Harmless water vapor","Toxic gases including phosgene and hydrofluoric acid","Oxygen","Carbon dioxide only"],"correctAnswer":1,"explanation":"At high temperatures, refrigerants decompose into toxic products including phosgene (from CFCs) and hydrofluoric acid. Never expose refrigerants to open flames."},{"id":"epa-t1-81","question":"Using pressure and temperature readings together on a small appliance helps a technician:","options":["Measure the refrigerant charge weight","Identify the refrigerant type and detect non-condensable gases","Determine the compressor efficiency","Measure airflow"],"correctAnswer":1,"explanation":"Comparing measured pressure to the PT chart for the expected refrigerant confirms the refrigerant type and reveals non-condensables if pressure is higher than expected."},{"id":"epa-t1-82","question":"Non-condensable gases in a small appliance are indicated by:","options":["Lower than expected pressure for the measured temperature","Higher than expected pressure for the measured temperature","Normal pressure readings","Zero pressure"],"correctAnswer":1,"explanation":"Non-condensables (air) add to system pressure. If measured pressure is higher than the PT chart predicts for the measured temperature, non-condensables are present."},{"id":"epa-t1-83","question":"The recovery efficiency requirement for small appliances manufactured BEFORE November 15, 1993 with an operating compressor is:","options":["90%","80%","70%","60%"],"correctAnswer":1,"explanation":"For small appliances made before November 15, 1993 with an operating compressor, 80% recovery is required."},{"id":"epa-t1-84","question":"The recovery efficiency requirement for small appliances manufactured AFTER November 15, 1993 with an operating compressor is:","options":["80%","90%","95%","100%"],"correctAnswer":1,"explanation":"For small appliances made after November 15, 1993 with an operating compressor, 90% recovery is required."},{"id":"epa-t1-85","question":"A mail-in (open-book) Type I exam has a passing score of:","options":["70%","75%","80%","84%"],"correctAnswer":3,"explanation":"Mail-in open-book Type I exams require 84% to pass. Closed-book proctored exams require 70%."},{"id":"epa-t1-86","question":"A mail-in Type I certification can be used toward Universal certification:","options":["Yes, it counts for the Type I portion","No — Universal requires all sections to be taken as closed-book proctored exams","Yes, if the score was above 90%","Only if taken within the last 2 years"],"correctAnswer":1,"explanation":"Universal certification requires all sections (Core + Type I + II + III) to be taken as closed-book proctored exams. Mail-in Type I does not qualify."},{"id":"epa-t1-87","question":"When operating a compressor to assist passive recovery, the technician should:","options":["Run the compressor until the system reaches 0 psig","Run the compressor to push refrigerant into the recovery vessel, monitoring vessel pressure","Run the compressor at maximum speed only","Never run the compressor during recovery"],"correctAnswer":1,"explanation":"Running the appliance compressor pushes refrigerant into the recovery vessel. Monitor vessel pressure to stay within safe limits."},{"id":"epa-t1-88","question":"A small appliance that uses R-600a (isobutane) presents what additional hazard compared to R-134a?","options":["Higher toxicity","Flammability — R-600a is A3 (highly flammable)","Higher ODP","Higher pressure"],"correctAnswer":1,"explanation":"R-600a is classified A3 — highly flammable. Eliminate all ignition sources before working on appliances containing R-600a."},{"id":"epa-t1-89","question":"What is the correct recovery procedure when a small appliance has both liquid and vapor refrigerant?","options":["Recover vapor only","Recover liquid first, then vapor, to speed up the process","Recover vapor first, then liquid","Order does not matter"],"correctAnswer":1,"explanation":"Recovering liquid first is faster because liquid contains more refrigerant mass per volume than vapor."},{"id":"epa-t1-90","question":"After recovery from a small appliance, the technician should verify the recovery was complete by:","options":["Checking the refrigerant color","Confirming the system pressure is at or below the required recovery level","Smelling the refrigerant","Checking the compressor amperage"],"correctAnswer":1,"explanation":"Verify recovery by confirming system pressure is at or below the required level (0 psig if leaked to atmosphere, or 80%/90% by weight)."},{"id":"epa-t1-91","question":"A technician who cannot achieve the required recovery level due to equipment limitations must:","options":["Vent the remaining refrigerant","Document the problem and use the best available equipment","Stop work entirely","Call the EPA for a waiver"],"correctAnswer":1,"explanation":"If required recovery levels cannot be achieved, the technician must document the problem and recover as much as possible with available equipment."},{"id":"epa-t1-92","question":"The EPA 608 Type I exam consists of:","options":["25 questions (Type I topics only)","50 questions (25 Core + 25 Type I)","75 questions","100 questions"],"correctAnswer":1,"explanation":"The Type I exam has 50 questions: 25 from the Core group (environmental/regulatory) and 25 from the Type I technical group."},{"id":"epa-t1-93","question":"Which of the following is a correct statement about recovery from small appliances?","options":["Recovery is only required for systems over 2 lbs","Recovery is required before any service that involves opening the refrigerant circuit","Recovery is only required before disposal","Recovery is optional for certified technicians"],"correctAnswer":1,"explanation":"Recovery is required before any service that involves opening the refrigerant circuit, not just before disposal."},{"id":"epa-t1-94","question":"A technician finds a small appliance with a charge that has partially leaked. The technician should:","options":["Add refrigerant to top off the charge without recovery","Recover the remaining refrigerant before opening the system","Vent the remaining charge since it is small","Leave the system as-is"],"correctAnswer":1,"explanation":"Even a partial charge must be recovered before opening the system. Venting is prohibited regardless of the amount remaining."},{"id":"epa-t1-95","question":"What is the purpose of installing a high-side access valve on a small appliance with an inoperative compressor?","options":["To add refrigerant","To allow recovery of high-side liquid refrigerant that cannot be moved by the compressor","To measure discharge pressure","To connect the manifold gauge set"],"correctAnswer":1,"explanation":"With an inoperative compressor, high-side liquid refrigerant cannot be moved. A high-side access valve allows direct recovery of that liquid."},{"id":"epa-t1-96","question":"The term ''hermetically sealed'' in the context of small appliances means:","options":["The system has service valves","The compressor and motor are sealed in the same housing with no external shaft seal","The system uses only HFC refrigerants","The system has no moving parts"],"correctAnswer":1,"explanation":"A hermetic compressor has the motor and compressor sealed in the same welded housing, eliminating shaft seals and reducing leak points."},{"id":"epa-t1-97","question":"A technician recovering from a small appliance should connect recovery equipment to:","options":["Only the high side","Only the low side","Both high and low sides when possible for maximum recovery","The electrical terminals"],"correctAnswer":2,"explanation":"Connecting to both high and low sides maximizes recovery efficiency, especially when the compressor is inoperative."},{"id":"epa-t1-98","question":"What happens to refrigerant composition in a zeotropic blend small appliance during a vapor leak?","options":["Composition stays the same","Lighter components leak preferentially, changing the blend composition (fractionation)","Heavier components leak first","Only oil leaks out"],"correctAnswer":1,"explanation":"Fractionation: lighter (lower-boiling) components escape faster during a vapor leak, leaving a charge with altered composition."},{"id":"epa-t1-99","question":"A small appliance technician must be certified under which EPA 608 type?","options":["Type II","Type III","Type I","Universal only"],"correctAnswer":2,"explanation":"Type I certification is required to service small appliances. Universal certification also covers Type I work."},{"id":"epa-t1-100","question":"The safe disposal exemption does NOT apply to:","options":["Household refrigerators being scrapped","Small appliances being serviced and returned to service","Window AC units being disposed of","Vending machines being scrapped"],"correctAnswer":1,"explanation":"The safe disposal exemption applies only to appliances being disposed of — not to equipment being serviced and returned to service."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-43'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-08-01-1","question":"Type II certification covers systems using:","options":["Low-pressure refrigerants (below atmospheric)","High-pressure refrigerants (above atmospheric at room temperature) except small appliances","Only R-22 systems","Small appliances only"],"correctAnswer":1,"explanation":"Type II covers high-pressure systems — R-22, R-410A, R-404A, R-134a in large systems, and similar refrigerants above atmospheric pressure."},{"id":"q-08-01-2","question":"R-410A operates at approximately what high-side pressure on a 95°F day?","options":["150 psig","250 psig","400 psig","600 psig"],"correctAnswer":2,"explanation":"R-410A operates at approximately 400 psig on the high side at 95°F ambient — significantly higher than R-22 (~250 psig)."},{"id":"q-08-01-3","question":"High-pressure systems require recovery equipment rated for:","options":["Standard residential pressures","The maximum operating pressure of the refrigerant being recovered","Only 150 psig","Any pressure — all equipment is the same"],"correctAnswer":1,"explanation":"Recovery equipment must be rated for the refrigerant''s maximum operating pressure. R-410A requires equipment rated for 800+ psig."},{"id":"q-08-01-4","question":"R-404A is commonly used in:","options":["Residential air conditioning","Commercial refrigeration (walk-in coolers, display cases)","Low-pressure chillers","Small appliances"],"correctAnswer":1,"explanation":"R-404A is a commercial refrigeration refrigerant used in medium and low-temperature applications like walk-in coolers and display cases."},{"id":"q-08-01-5","question":"The high-pressure cutout on a system protects against:","options":["Low refrigerant charge","Dangerously high discharge pressure that could rupture components","Low ambient temperature","Electrical overload"],"correctAnswer":1,"explanation":"The high-pressure cutout (HPC) opens the compressor circuit if discharge pressure exceeds a safe limit, preventing system damage."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-44'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-08-02-1","question":"Required evacuation level for systems with 200+ lbs of refrigerant (high-pressure) is:","options":["500 microns","4 in. Hg","10 in. Hg","29 in. Hg"],"correctAnswer":1,"explanation":"Systems with 200+ lbs require evacuation to 4 in. Hg (approximately 10,000 microns). Smaller systems require deeper vacuum."},{"id":"q-08-02-2","question":"Required evacuation level for systems with less than 200 lbs of high-pressure refrigerant is:","options":["4 in. Hg","10 in. Hg","15 in. Hg","23 in. Hg"],"correctAnswer":1,"explanation":"Systems with less than 200 lbs of high-pressure refrigerant require evacuation to 10 in. Hg before opening."},{"id":"q-08-02-3","question":"Moisture in a refrigerant system causes:","options":["Better lubrication","Acid formation, copper plating, and ice blockage at the metering device","Higher efficiency","No measurable effect"],"correctAnswer":1,"explanation":"Moisture reacts with refrigerant and oil to form acids that corrode system components. It also freezes at the metering device."},{"id":"q-08-02-4","question":"A filter drier should be replaced when:","options":["Every 10 years","After any system opening, burnout, or when moisture indicator shows wet","Only when it is visibly dirty","Never — they last forever"],"correctAnswer":1,"explanation":"Replace the filter drier after any system opening (contamination risk), after a burnout, or when the sight glass moisture indicator shows wet."},{"id":"q-08-02-5","question":"Triple evacuation is more effective than single evacuation because:","options":["It is faster","Breaking vacuum with dry nitrogen between stages carries moisture out more effectively","It uses less electricity","It requires less equipment"],"correctAnswer":1,"explanation":"Nitrogen breaks the vacuum and carries moisture out of the system. Three cycles remove more moisture than a single deep pull."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-45'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-08-04-1","question":"The annual leak rate threshold requiring repair for comfort cooling systems with 50+ lbs is:","options":["5%","10%","20%","30%"],"correctAnswer":2,"explanation":"Comfort cooling systems with 50+ lbs must be repaired if the annual leak rate exceeds 20% of the system charge."},{"id":"q-08-04-2","question":"After repairing a leak on a system with 50+ lbs, the technician must verify the repair within:","options":["24 hours","30 days","90 days","1 year"],"correctAnswer":1,"explanation":"Leak repairs on systems with 50+ lbs must be verified within 30 days of the repair."},{"id":"q-08-04-3","question":"Service records for systems with 50+ lbs must be kept for:","options":["1 year","3 years","5 years","10 years"],"correctAnswer":1,"explanation":"Service records for large systems must be maintained for 3 years and made available to EPA inspectors on request."},{"id":"q-08-04-4","question":"A system owner who cannot repair a leak within 30 days must:","options":["Vent the refrigerant","Notify the EPA and develop a retrofit or retirement plan","Continue operating normally","Replace the entire system immediately"],"correctAnswer":1,"explanation":"If repair cannot be completed within 30 days, the owner must notify the EPA and develop a plan to retrofit or retire the equipment."},{"id":"q-08-04-5","question":"The most common location for refrigerant leaks in a split system is:","options":["Inside the compressor","Flare fittings, brazed joints, and Schrader valve cores","The condenser coil fins","The filter drier"],"correctAnswer":1,"explanation":"Flare fittings (vibration loosening), brazed joints (poor workmanship), and Schrader valve cores are the most common leak points."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-47'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-08-06-1","question":"Push-pull recovery method uses:","options":["One recovery machine","Two connections — vapor from the high side and liquid from the low side simultaneously","The system compressor only","A vacuum pump"],"correctAnswer":1,"explanation":"Push-pull recovery connects vapor to the recovery machine inlet and liquid to the outlet, dramatically speeding recovery."},{"id":"q-08-06-2","question":"Recovery rate slows as the system pressure drops because:","options":["The recovery machine gets tired","Lower pressure means lower refrigerant density — less mass per volume recovered","The refrigerant changes composition","The hoses get cold"],"correctAnswer":1,"explanation":"As pressure drops, refrigerant density decreases. The recovery machine moves the same volume but less mass — recovery slows."},{"id":"q-08-06-3","question":"After recovery, the system should be verified at or below the required vacuum level using:","options":["The manifold gauge only","A calibrated micron gauge","A compound gauge","Visual inspection"],"correctAnswer":1,"explanation":"A micron gauge accurately measures deep vacuum. Manifold gauges are not accurate enough below 30 in. Hg."},{"id":"q-08-06-4","question":"Recovered refrigerant that is contaminated with oil should be:","options":["Recharged into the system","Sent to a certified reclaimer","Vented","Mixed with clean refrigerant"],"correctAnswer":1,"explanation":"Contaminated refrigerant must go to a certified reclaimer. It cannot be recharged without reprocessing to ARI 700 standards."},{"id":"q-08-06-5","question":"The recovery cylinder valve should be opened before connecting to the system to:","options":["Increase pressure","Verify the cylinder is not full and check for pressure","Cool the cylinder","Purge the hoses with refrigerant"],"correctAnswer":1,"explanation":"Always check the recovery cylinder before connecting — verify it is not full (80% max) and check for unexpected pressure."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-49'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"epa-t2-01","question":"Type II certification covers:","options":["Small appliances","High-pressure systems","Low-pressure systems","Motor vehicle AC"],"correctAnswer":1,"explanation":"Type II covers high-pressure equipment such as residential AC, commercial refrigeration, and heat pumps using R-22, R-410A, R-134a, etc."},{"id":"epa-t2-02","question":"For high-pressure systems containing less than 200 lbs of refrigerant, the required recovery level is:","options":["0 psig","4 inches Hg vacuum","10 inches Hg vacuum","15 inches Hg vacuum"],"correctAnswer":0,"explanation":"Systems with less than 200 lbs must be recovered to 0 psig (atmospheric pressure)."},{"id":"epa-t2-03","question":"For high-pressure systems containing 200 lbs or more, the required recovery level is:","options":["0 psig","4 inches Hg vacuum","10 inches Hg vacuum","15 inches Hg vacuum"],"correctAnswer":2,"explanation":"Systems with 200 lbs or more must be recovered to 10 inches Hg vacuum."},{"id":"epa-t2-04","question":"The most accurate instrument for measuring deep vacuum is a:","options":["Compound gauge","Micron gauge (electronic vacuum gauge)","Manometer","Bourdon tube gauge"],"correctAnswer":1,"explanation":"A micron gauge (electronic vacuum gauge) measures vacuum in microns and is the most accurate for deep vacuum measurement."},{"id":"epa-t2-05","question":"A standing pressure test is used to:","options":["Measure superheat","Check for leaks in a pressurized system","Determine subcooling","Measure airflow"],"correctAnswer":1,"explanation":"A standing pressure test pressurizes the system with dry nitrogen and monitors for pressure drop, indicating a leak."},{"id":"epa-t2-06","question":"The leak rate that triggers mandatory repair for comfort cooling equipment is:","options":["5% per year","10% per year","20% per year","35% per year"],"correctAnswer":1,"explanation":"Comfort cooling systems (residential/commercial AC) must be repaired if the annual leak rate exceeds 10%."},{"id":"epa-t2-07","question":"The leak rate that triggers mandatory repair for commercial refrigeration is:","options":["5% per year","10% per year","20% per year","35% per year"],"correctAnswer":2,"explanation":"Commercial refrigeration and industrial process refrigeration must be repaired if the annual leak rate exceeds 20%."},{"id":"epa-t2-08","question":"After a major repair, a system should be leak-tested with:","options":["Refrigerant","Dry nitrogen","Compressed air","Oxygen"],"correctAnswer":1,"explanation":"Dry nitrogen is used for pressure testing. Never use oxygen or compressed air (moisture and contaminants)."},{"id":"epa-t2-09","question":"Triple evacuation involves:","options":["Three recovery attempts","Pulling vacuum, breaking with nitrogen, repeating three times","Using three vacuum pumps simultaneously","Evacuating three separate circuits"],"correctAnswer":1,"explanation":"Triple evacuation: pull vacuum, break with dry nitrogen, pull vacuum, break with nitrogen, pull final vacuum. Removes moisture effectively."},{"id":"epa-t2-10","question":"The purpose of evacuation is to:","options":["Remove refrigerant","Remove air and moisture from the system","Test for leaks","Charge the system"],"correctAnswer":1,"explanation":"Evacuation removes air (non-condensables) and moisture from the system before charging with refrigerant."},{"id":"epa-t2-11","question":"A system should be evacuated to at least:","options":["1000 microns","500 microns","250 microns","It depends on the manufacturer"],"correctAnswer":1,"explanation":"Most manufacturers require evacuation to 500 microns or below. Some require 250 microns."},{"id":"epa-t2-12","question":"Non-condensable gases in a system cause:","options":["Lower head pressure","Higher head pressure","Lower suction pressure","No effect"],"correctAnswer":1,"explanation":"Non-condensables (air) raise head pressure because they cannot condense and take up space in the condenser."},{"id":"epa-t2-13","question":"An electronic leak detector should be checked for sensitivity using:","options":["Soap bubbles","A reference leak (calibrated leak)","Nitrogen","UV dye"],"correctAnswer":1,"explanation":"Electronic leak detectors should be calibrated using a reference leak to verify they can detect the minimum leak rate."},{"id":"epa-t2-14","question":"R-410A operates at approximately what pressure compared to R-22?","options":["Same pressure","50% higher pressure","60% higher pressure","Lower pressure"],"correctAnswer":2,"explanation":"R-410A operates at approximately 60% higher pressure than R-22, requiring different gauges and equipment rated for higher pressures."},{"id":"epa-t2-15","question":"Superheat is the temperature of refrigerant vapor above its:","options":["Condensing temperature","Saturation (boiling) temperature","Ambient temperature","Subcooling temperature"],"correctAnswer":1,"explanation":"Superheat = actual suction line temperature minus the saturation temperature at suction pressure."},{"id":"epa-t2-16","question":"Subcooling is the temperature of liquid refrigerant below its:","options":["Evaporating temperature","Saturation (condensing) temperature","Ambient temperature","Superheat temperature"],"correctAnswer":1,"explanation":"Subcooling = saturation temperature at discharge pressure minus the actual liquid line temperature."},{"id":"epa-t2-17","question":"What causes frost on a suction line?","options":["Overcharge","Undercharge or restricted airflow","High ambient temperature","Dirty condenser"],"correctAnswer":1,"explanation":"Frost on the suction line indicates low superheat, often caused by undercharge, restricted airflow, or a stuck-open TXV."},{"id":"epa-t2-18","question":"Before using recovery equipment on a different refrigerant, you should:","options":["Just connect and start","Change the oil and clean or replace filter-driers to prevent cross-contamination","Only change the hoses","No action needed if using the same equipment"],"correctAnswer":1,"explanation":"Cross-contamination of refrigerants makes them unusable. Equipment must be cleaned between different refrigerant types."},{"id":"epa-t2-19","question":"A TXV (thermostatic expansion valve) controls:","options":["Compressor speed","Refrigerant flow into the evaporator","Condenser fan speed","System pressure"],"correctAnswer":1,"explanation":"The TXV meters refrigerant flow into the evaporator based on superheat, maintaining optimal evaporator performance."},{"id":"epa-t2-20","question":"What is the purpose of a sight glass in a refrigeration system?","options":["Measure temperature","Indicate liquid refrigerant condition and moisture content","Control refrigerant flow","Filter contaminants"],"correctAnswer":1,"explanation":"A sight glass shows whether liquid refrigerant is present (bubbles indicate low charge) and may have a moisture indicator."},{"id":"epa-t2-21","question":"When charging R-410A, it must be charged as a:","options":["Vapor only","Liquid only","Either vapor or liquid","Gas at high pressure"],"correctAnswer":1,"explanation":"R-410A is a near-azeotropic blend and must be charged as a liquid to maintain proper composition."},{"id":"epa-t2-22","question":"Moisture in a refrigeration system can cause:","options":["Higher efficiency","Acid formation and copper plating","Lower head pressure","Faster cooling"],"correctAnswer":1,"explanation":"Moisture reacts with refrigerant and oil to form acids, which cause copper plating, sludge, and compressor failure."},{"id":"epa-t2-23","question":"The king valve is located on the:","options":["Suction line","Liquid line at the receiver outlet","Compressor discharge","Evaporator inlet"],"correctAnswer":1,"explanation":"The king valve is at the liquid receiver outlet. Closing it allows pump-down of the low side for service."},{"id":"epa-t2-24","question":"What does a high head pressure and high suction pressure indicate?","options":["Undercharge","Overcharge or non-condensables","Restriction in the liquid line","Low airflow over evaporator"],"correctAnswer":1,"explanation":"Both pressures being high typically indicates overcharge, non-condensable gases, or a dirty/blocked condenser."},{"id":"epa-t2-25","question":"Leak repair must be completed within how many days for comfort cooling systems?","options":["15 days","30 days","45 days","120 days"],"correctAnswer":1,"explanation":"Comfort cooling systems must have leaks repaired within 30 days of discovery. Extensions may be available with a retrofit/retirement plan."},{"id":"epa-t2-26","question":"What is the recovery requirement for high-pressure systems with less than 200 lbs of refrigerant when using equipment manufactured after November 15, 1993?","options":["0 psig","4 in. Hg vacuum","10 in. Hg vacuum","500 microns"],"correctAnswer":0,"explanation":"Systems under 200 lbs must be recovered to 0 psig using equipment manufactured after November 15, 1993."},{"id":"epa-t2-27","question":"What is the recovery requirement for high-pressure systems with 200 lbs or more using equipment manufactured after November 15, 1993?","options":["0 psig","4 in. Hg vacuum","10 in. Hg vacuum","500 microns"],"correctAnswer":2,"explanation":"Systems with 200 lbs or more must be recovered to 10 in. Hg vacuum using post-1993 equipment."},{"id":"epa-t2-28","question":"What is the recovery requirement for high-pressure systems under 200 lbs using equipment manufactured BEFORE November 15, 1993?","options":["0 psig","4 in. Hg vacuum","10 in. Hg vacuum","500 microns"],"correctAnswer":1,"explanation":"Using pre-1993 equipment on systems under 200 lbs requires recovery to 4 in. Hg vacuum."},{"id":"epa-t2-29","question":"What is the recovery requirement for high-pressure systems 200 lbs or more using equipment manufactured BEFORE November 15, 1993?","options":["0 psig","4 in. Hg vacuum","10 in. Hg vacuum","15 in. Hg vacuum"],"correctAnswer":3,"explanation":"Using pre-1993 equipment on systems with 200 lbs or more requires recovery to 15 in. Hg vacuum."},{"id":"epa-t2-30","question":"R-410A requires manifold gauges rated for at least:","options":["250 psig","400 psig","800 psig","1,000 psig"],"correctAnswer":2,"explanation":"R-410A operates at much higher pressures than R-22. Gauges must be rated for at least 800 psig on the high side."},{"id":"epa-t2-31","question":"What is the normal operating suction pressure range for R-410A in a residential AC system at 75°F indoor conditions?","options":["50–70 psig","100–130 psig","200–250 psig","300–350 psig"],"correctAnswer":1,"explanation":"R-410A suction pressure typically runs 100–130 psig at normal residential cooling conditions."},{"id":"epa-t2-32","question":"What is the normal operating discharge pressure range for R-410A in a residential AC system?","options":["100–150 psig","200–250 psig","300–400 psig","400–500 psig"],"correctAnswer":2,"explanation":"R-410A discharge pressure typically runs 300–400 psig at normal residential cooling conditions."},{"id":"epa-t2-33","question":"A fixed orifice metering device (piston) is charged using:","options":["Subcooling method","Superheat method","Weight method only","Sight glass only"],"correctAnswer":1,"explanation":"Fixed orifice (piston) systems are charged using the superheat method. TXV systems use subcooling."},{"id":"epa-t2-34","question":"Target superheat for a fixed orifice system is typically:","options":["0–5°F","10–20°F","25–35°F","40–50°F"],"correctAnswer":1,"explanation":"Target superheat for fixed orifice systems is typically 10–20°F at the suction line near the evaporator."},{"id":"epa-t2-35","question":"Target subcooling for a TXV system is typically:","options":["0–5°F","10–15°F","25–35°F","40–50°F"],"correctAnswer":1,"explanation":"Target subcooling for TXV systems is typically 10–15°F at the liquid line, per manufacturer specifications."},{"id":"epa-t2-36","question":"What does a low suction pressure and low discharge pressure together indicate?","options":["Overcharge","Undercharge or refrigerant leak","Non-condensables","Dirty condenser"],"correctAnswer":1,"explanation":"Both pressures low = undercharge. The system does not have enough refrigerant to build normal operating pressures."},{"id":"epa-t2-37","question":"What does a high suction pressure and high discharge pressure together indicate?","options":["Undercharge","Overcharge or non-condensables in the system","Restriction in the liquid line","Low airflow over evaporator"],"correctAnswer":1,"explanation":"Both pressures high = overcharge or non-condensables. Too much refrigerant or air in the system raises both pressures."},{"id":"epa-t2-38","question":"What does a low suction pressure and high discharge pressure together indicate?","options":["Undercharge","Overcharge","Restriction in the metering device or liquid line","Normal operation at high load"],"correctAnswer":2,"explanation":"Low suction + high discharge = restriction. Refrigerant is backed up on the high side and starved on the low side."},{"id":"epa-t2-39","question":"The purpose of a liquid line filter-drier is to:","options":["Increase system pressure","Remove moisture and contaminants from the liquid refrigerant","Measure refrigerant flow","Control superheat"],"correctAnswer":1,"explanation":"Liquid line filter-driers protect the metering device and compressor from moisture, acid, and particulate contamination."},{"id":"epa-t2-40","question":"A clogged filter-drier will cause:","options":["High suction pressure","A pressure drop across the drier and starved evaporator","High discharge pressure only","No effect on system operation"],"correctAnswer":1,"explanation":"A clogged filter-drier restricts refrigerant flow, causing a pressure drop and starving the evaporator of refrigerant."},{"id":"epa-t2-41","question":"What is the purpose of an accumulator on the suction line?","options":["Increase suction pressure","Prevent liquid refrigerant from reaching the compressor","Store excess refrigerant","Measure superheat"],"correctAnswer":1,"explanation":"The accumulator traps liquid refrigerant and oil, allowing only vapor to enter the compressor, preventing liquid slugging."},{"id":"epa-t2-42","question":"Liquid slugging in a compressor is caused by:","options":["High superheat","Liquid refrigerant entering the compressor","Low discharge pressure","High ambient temperature"],"correctAnswer":1,"explanation":"Liquid slugging occurs when liquid refrigerant enters the compressor. Liquids are incompressible and can destroy the compressor."},{"id":"epa-t2-43","question":"What is the purpose of a crankcase heater on a compressor?","options":["Heat the refrigerant before compression","Prevent refrigerant migration into the oil during off cycles","Increase compressor efficiency","Reduce starting current"],"correctAnswer":1,"explanation":"Crankcase heaters keep the oil warm during off cycles, preventing refrigerant from migrating into and diluting the oil."},{"id":"epa-t2-44","question":"A scroll compressor differs from a reciprocating compressor in that it:","options":["Uses pistons","Uses two spiral scrolls to compress refrigerant","Operates at lower pressures","Requires more oil"],"correctAnswer":1,"explanation":"Scroll compressors use two interlocking spiral scrolls — one fixed, one orbiting — to compress refrigerant continuously."},{"id":"epa-t2-45","question":"What is the purpose of a hard start kit?","options":["Increase compressor speed","Provide extra starting torque to a compressor that struggles to start","Reduce starting current","Protect against overload"],"correctAnswer":1,"explanation":"Hard start kits add a start capacitor and potential relay to provide extra starting torque for compressors with high starting loads."},{"id":"epa-t2-46","question":"A dual-run capacitor has how many terminals?","options":["2","3","4","5"],"correctAnswer":1,"explanation":"A dual-run capacitor has three terminals: HERM (compressor), FAN (fan motor), and C (common)."},{"id":"epa-t2-47","question":"What is the purpose of a high-pressure switch?","options":["Measure discharge pressure","Shut down the compressor if discharge pressure exceeds safe limits","Control refrigerant flow","Measure superheat"],"correctAnswer":1,"explanation":"The high-pressure switch is a safety device that shuts down the compressor if discharge pressure exceeds the setpoint."},{"id":"epa-t2-48","question":"What is the purpose of a low-pressure switch?","options":["Measure suction pressure","Shut down the compressor if suction pressure drops below safe limits","Control refrigerant flow","Measure subcooling"],"correctAnswer":1,"explanation":"The low-pressure switch shuts down the compressor if suction pressure drops too low, protecting against loss of charge."},{"id":"epa-t2-49","question":"A heat pump in heating mode has the outdoor coil acting as the:","options":["Condenser","Evaporator","Metering device","Accumulator"],"correctAnswer":1,"explanation":"In heating mode, the reversing valve redirects refrigerant so the outdoor coil absorbs heat from outdoor air (evaporator)."},{"id":"epa-t2-50","question":"The balance point of a heat pump is:","options":["The outdoor temperature at which the heat pump operates most efficiently","The outdoor temperature at which heat pump output equals building heat loss","The indoor setpoint temperature","The temperature at which defrost activates"],"correctAnswer":1,"explanation":"The balance point is the outdoor temperature where heat pump capacity equals building heat loss. Below this, supplemental heat is needed."},{"id":"epa-t2-51","question":"What is the purpose of a defrost cycle on a heat pump?","options":["Cool the indoor coil","Melt frost that accumulates on the outdoor coil in heating mode","Increase heating capacity","Test the reversing valve"],"correctAnswer":1,"explanation":"In heating mode, the outdoor coil can frost over. Defrost temporarily reverses the cycle to melt the frost."},{"id":"epa-t2-52","question":"During defrost, the heat pump temporarily switches to:","options":["Heating mode at higher capacity","Cooling mode to send hot refrigerant to the outdoor coil","Fan-only mode","Emergency heat only"],"correctAnswer":1,"explanation":"During defrost, the cycle reverses to cooling mode, sending hot discharge gas to the outdoor coil to melt frost."},{"id":"epa-t2-53","question":"What is the purpose of a bi-flow filter-drier in a heat pump?","options":["Filter refrigerant in one direction only","Filter refrigerant flowing in either direction (heating and cooling modes)","Measure refrigerant flow","Control superheat"],"correctAnswer":1,"explanation":"Heat pumps reverse refrigerant flow, so bi-flow filter-driers are used to filter in both directions."},{"id":"epa-t2-54","question":"A variable-speed (inverter-driven) compressor adjusts capacity by:","options":["Cycling on and off","Varying the compressor motor speed","Bypassing refrigerant","Changing the refrigerant type"],"correctAnswer":1,"explanation":"Inverter-driven compressors vary motor speed to precisely match the load, improving efficiency and comfort."},{"id":"epa-t2-55","question":"What is the purpose of a check valve in a heat pump refrigerant circuit?","options":["Prevent refrigerant from flowing backward through a metering device","Measure refrigerant flow","Control superheat","Filter contaminants"],"correctAnswer":0,"explanation":"Check valves allow refrigerant to bypass a metering device in one flow direction, allowing the same metering device to work in both heating and cooling modes."},{"id":"epa-t2-56","question":"Refrigerant R-407C is a replacement for R-22 with what characteristic?","options":["Zero temperature glide","Temperature glide of approximately 7°F","Higher ODP than R-22","Same pressure as R-410A"],"correctAnswer":1,"explanation":"R-407C has a temperature glide of approximately 7°F. It must be charged as a liquid to maintain proper composition."},{"id":"epa-t2-57","question":"What is the purpose of a suction line accumulator in a heat pump?","options":["Increase suction pressure","Protect the compressor from liquid refrigerant during mode switching","Store excess refrigerant","Measure superheat"],"correctAnswer":1,"explanation":"During mode switching (heating to cooling or vice versa), liquid refrigerant can flood back. The accumulator protects the compressor."},{"id":"epa-t2-58","question":"A comfort cooling system with more than 50 lbs of refrigerant must be repaired if the annual leak rate exceeds:","options":["5%","10%","20%","35%"],"correctAnswer":1,"explanation":"Comfort cooling systems (residential and commercial AC) must be repaired if the annual leak rate exceeds 10%."},{"id":"epa-t2-59","question":"Commercial refrigeration systems must be repaired if the annual leak rate exceeds:","options":["10%","20%","30%","35%"],"correctAnswer":1,"explanation":"Commercial refrigeration systems must be repaired if the annual leak rate exceeds 20%."},{"id":"epa-t2-60","question":"Industrial process refrigeration systems must be repaired if the annual leak rate exceeds:","options":["10%","20%","30%","35%"],"correctAnswer":2,"explanation":"Industrial process refrigeration systems must be repaired if the annual leak rate exceeds 30%."},{"id":"epa-t2-61","question":"After a major repair, a system must be leak-tested before recharging using:","options":["Refrigerant at operating pressure","Dry nitrogen at 150 psig or manufacturer''s specified test pressure","Compressed air","Oxygen"],"correctAnswer":1,"explanation":"Dry nitrogen is used for pressure testing after major repairs. Never use oxygen (explosion risk) or compressed air (moisture)."},{"id":"epa-t2-62","question":"What is the purpose of a standing vacuum test?","options":["Measure system charge","Verify system integrity — a rising vacuum indicates a leak","Measure superheat","Test the compressor"],"correctAnswer":1,"explanation":"After evacuation, a standing vacuum test monitors for rising pressure (vacuum loss), which indicates a leak or moisture in the system."},{"id":"epa-t2-63","question":"A micron gauge reads 500 microns after evacuation. The technician then isolates the vacuum pump and the reading rises to 1,500 microns. This indicates:","options":["Normal — vacuum always rises slightly","A leak or moisture in the system","The vacuum pump is too powerful","The system is properly evacuated"],"correctAnswer":1,"explanation":"A rising vacuum after isolation indicates either a leak (air entering) or moisture boiling off. The system is not ready to charge."},{"id":"epa-t2-64","question":"What is the purpose of a refrigerant recovery machine''s oil separator?","options":["Remove moisture from refrigerant","Separate compressor oil from recovered refrigerant to prevent contamination of the recovery cylinder","Measure refrigerant purity","Control recovery speed"],"correctAnswer":1,"explanation":"The oil separator prevents recovery machine oil from contaminating the recovered refrigerant in the recovery cylinder."},{"id":"epa-t2-65","question":"When charging R-410A into a system, the refrigerant must be added as:","options":["Vapor from the top of the cylinder","Liquid from the bottom of the cylinder (cylinder inverted)","Either vapor or liquid","Gas at low pressure only"],"correctAnswer":1,"explanation":"R-410A is a near-azeotropic blend that must be charged as liquid to maintain proper composition. Invert the cylinder to charge liquid."},{"id":"epa-t2-66","question":"What is the purpose of a liquid line solenoid valve?","options":["Control compressor speed","Stop refrigerant flow to the evaporator when the system shuts down (pump-down)","Measure liquid refrigerant temperature","Filter contaminants"],"correctAnswer":1,"explanation":"Liquid line solenoid valves close when the system shuts down, preventing refrigerant migration to the evaporator (pump-down control)."},{"id":"epa-t2-67","question":"A pump-down cycle:","options":["Removes refrigerant from the system","Moves refrigerant from the low side to the high side before shutdown","Adds refrigerant to the system","Tests the compressor"],"correctAnswer":1,"explanation":"Pump-down moves refrigerant from the low side to the receiver/high side before shutdown, preventing liquid migration during the off cycle."},{"id":"epa-t2-68","question":"What is the purpose of a receiver in a refrigeration system?","options":["Store excess refrigerant and ensure a solid liquid supply to the metering device","Measure refrigerant charge","Filter contaminants","Control superheat"],"correctAnswer":0,"explanation":"The receiver stores excess refrigerant and ensures a continuous supply of liquid refrigerant to the metering device under varying load conditions."},{"id":"epa-t2-69","question":"A sight glass with a green moisture indicator means:","options":["The system is overcharged","Moisture content is acceptable","The system needs evacuation","The refrigerant is contaminated"],"correctAnswer":1,"explanation":"A green moisture indicator in the sight glass means moisture is within acceptable limits. Yellow indicates moisture is present."},{"id":"epa-t2-70","question":"What is the purpose of a hot gas bypass valve?","options":["Recover refrigerant","Prevent evaporator freeze-up at low loads by bypassing hot discharge gas to the suction side","Increase system capacity","Control condenser fan speed"],"correctAnswer":1,"explanation":"Hot gas bypass prevents evaporator freeze-up at low loads by introducing hot discharge gas to maintain minimum evaporator pressure."},{"id":"epa-t2-71","question":"A compressor with high amperage draw and low suction pressure most likely has:","options":["A refrigerant overcharge","A worn or failed compressor (internal leak)","A dirty condenser","A bad capacitor"],"correctAnswer":1,"explanation":"High amperage with low suction pressure suggests the compressor is working hard but not pumping effectively — internal wear or failure."},{"id":"epa-t2-72","question":"What is the purpose of a crankcase pressure regulator (CPR)?","options":["Regulate discharge pressure","Limit suction pressure to the compressor during pulldown to prevent motor overload","Control refrigerant flow","Measure crankcase oil level"],"correctAnswer":1,"explanation":"CPR valves limit suction pressure during pulldown (when a warm system starts up), preventing compressor motor overload."},{"id":"epa-t2-73","question":"An evaporator pressure regulator (EPR) is used to:","options":["Increase evaporator pressure","Maintain minimum evaporator pressure to prevent freezing in multi-temperature systems","Control superheat","Measure evaporator temperature"],"correctAnswer":1,"explanation":"EPR valves maintain minimum evaporator pressure in multi-temperature systems, preventing the warmest evaporator from freezing."},{"id":"epa-t2-74","question":"What is the purpose of a head pressure control valve?","options":["Limit discharge pressure","Maintain minimum head pressure in cold weather to ensure proper refrigerant flow","Control compressor speed","Measure discharge temperature"],"correctAnswer":1,"explanation":"Head pressure control valves maintain minimum condensing pressure in cold weather, ensuring adequate pressure differential for refrigerant flow."},{"id":"epa-t2-75","question":"A technician must verify that a high-pressure system is properly evacuated before charging. The correct sequence is:","options":["Charge first, then evacuate","Pressure test with nitrogen, then evacuate to 500 microns or below, then charge","Evacuate, then pressure test, then charge","Charge, then pressure test"],"correctAnswer":1,"explanation":"Correct sequence: pressure test with nitrogen to verify no leaks, then evacuate to 500 microns or below, then charge with refrigerant."},{"id":"epa-t2-76","question":"System-dependent recovery equipment is prohibited on high-pressure systems containing more than:","options":["5 lbs","10 lbs","15 lbs","50 lbs"],"correctAnswer":2,"explanation":"System-dependent recovery equipment cannot be used on high-pressure systems with more than 15 lbs of refrigerant. Self-contained equipment is required."},{"id":"epa-t2-77","question":"A ''major repair'' on a high-pressure system is defined as:","options":["Any repair costing over $500","Any repair that involves opening the refrigerant circuit (breaking a refrigerant-containing joint)","Replacing the compressor only","Any repair requiring more than 1 hour"],"correctAnswer":1,"explanation":"A major repair is any repair that involves opening the refrigerant circuit — breaking a joint, replacing a component, etc."},{"id":"epa-t2-78","question":"After a major repair on a high-pressure system, before recharging, the technician must:","options":["Charge immediately","Leak test with nitrogen, then evacuate to required level","Only evacuate — no leak test needed","Only leak test — no evacuation needed"],"correctAnswer":1,"explanation":"After a major repair: pressure test with nitrogen to verify the repair, then evacuate to the required level before recharging."},{"id":"epa-t2-79","question":"For a non-major repair on a high-pressure system with a leak, the recovery requirement is:","options":["Same as major repair","0 psig (atmospheric pressure)","10 in. Hg vacuum","No recovery required"],"correctAnswer":1,"explanation":"For non-major repairs on leaky systems, recovery to 0 psig is required. Major repairs require deeper evacuation."},{"id":"epa-t2-80","question":"The preferred gas for leak testing a high-pressure system is:","options":["Pure refrigerant at operating pressure","Nitrogen alone, or nitrogen with a trace of HCFC-22 as a tracer","Compressed air","Oxygen"],"correctAnswer":1,"explanation":"Nitrogen alone is best. Nitrogen with a trace of HCFC-22 as a tracer gas is also acceptable. Never use compressed air (moisture) or oxygen (explosion risk)."},{"id":"epa-t2-81","question":"After reaching the required vacuum level, a technician should wait before charging because:","options":["The vacuum pump needs to cool down","A pressure rise indicates residual liquid refrigerant or moisture that needs more time to evacuate","The refrigerant needs to warm up","Waiting is not necessary"],"correctAnswer":1,"explanation":"After isolation, monitor for pressure rise. Rising pressure means liquid refrigerant is still boiling off or moisture is present — continue evacuation."},{"id":"epa-t2-82","question":"Signs of a refrigerant leak in a hermetically sealed high-pressure system include:","options":["Low head pressure only","Excessive superheat and oil traces around fittings and joints","High suction pressure","Normal operating pressures"],"correctAnswer":1,"explanation":"Excessive superheat (starved evaporator) and oil traces (oil migrates with refrigerant through leak points) are key signs of a leak."},{"id":"epa-t2-83","question":"A comfort cooling system with more than 50 lbs of refrigerant that exceeds the 10% annual leak rate must be repaired within:","options":["15 days","30 days","60 days","120 days"],"correctAnswer":1,"explanation":"Comfort cooling systems must be repaired within 30 days of discovering the leak rate exceeds 10% annually."},{"id":"epa-t2-84","question":"An extension to the 30-day leak repair deadline may be granted if:","options":["The technician is busy","The owner submits a retrofit or retirement plan within 30 days","The system is over 10 years old","The refrigerant is R-410A"],"correctAnswer":1,"explanation":"A one-time extension is available if the owner submits a written plan to retrofit or retire the equipment within the 30-day window."},{"id":"epa-t2-85","question":"Leak repair records for systems with more than 50 lbs of refrigerant must be kept for:","options":["1 year","3 years","5 years","10 years"],"correctAnswer":1,"explanation":"Leak repair records must be maintained for at least 3 years and made available to EPA inspectors upon request."},{"id":"epa-t2-86","question":"To speed up recovery from a high-pressure system, a technician should:","options":["Add more refrigerant first","Recover liquid refrigerant first, then vapor","Recover vapor first, then liquid","Only recover vapor"],"correctAnswer":1,"explanation":"Recovering liquid first is faster — liquid contains far more refrigerant mass per volume than vapor."},{"id":"epa-t2-87","question":"To speed up recovery, the recovery vessel should be:","options":["Heated","Chilled (placed in ice or cold water)","At room temperature","Pressurized with nitrogen"],"correctAnswer":1,"explanation":"Chilling the recovery vessel lowers its internal pressure, increasing the pressure differential that drives refrigerant in faster."},{"id":"epa-t2-88","question":"Hydrocarbons (propane, isobutane) are NOT approved for retrofitting high-pressure HVAC systems because:","options":["They are too expensive","They are highly flammable and not approved by EPA SNAP for this use","They have high ODP","They are not available in the US"],"correctAnswer":1,"explanation":"EPA SNAP has not approved hydrocarbon refrigerants for retrofit of residential or commercial AC systems due to flammability risk."},{"id":"epa-t2-89","question":"ASHRAE Standard 15 requires an oxygen deprivation sensor in machinery rooms because:","options":["Refrigerants are toxic","All refrigerants can displace oxygen and cause suffocation, regardless of toxicity","Only toxic refrigerants require sensors","Only flammable refrigerants require sensors"],"correctAnswer":1,"explanation":"ASHRAE 15 requires oxygen deprivation sensors for all refrigerant machinery rooms — all refrigerants can displace oxygen."},{"id":"epa-t2-90","question":"A hermetic compressor should never be energized while under vacuum because:","options":["It wastes electricity","The motor windings can overheat and burn out without refrigerant vapor for cooling","It will draw in air","The oil will foam"],"correctAnswer":1,"explanation":"Hermetic compressor motors are cooled by refrigerant vapor. Running under vacuum removes this cooling, causing motor winding failure."},{"id":"epa-t2-91","question":"The psig to psia conversion is:","options":["psia = psig − 14.7","psia = psig + 14.7","psia = psig × 14.7","psia = psig ÷ 14.7"],"correctAnswer":1,"explanation":"Absolute pressure (psia) = gauge pressure (psig) + atmospheric pressure (14.7 psi). PT charts use psia; gauges read psig."},{"id":"epa-t2-92","question":"On a PT chart, the listed pressure for R-410A at 40°F is approximately 118 psig. This means the absolute pressure is:","options":["118 psia","103.3 psia","132.7 psia","14.7 psia"],"correctAnswer":2,"explanation":"psia = psig + 14.7 = 118 + 14.7 = 132.7 psia. PT charts may list either psig or psia — always check the chart header."},{"id":"epa-t2-93","question":"In a high-pressure system, the refrigerant in the liquid line is in what state?","options":["Superheated vapor","Saturated vapor","Subcooled liquid","Two-phase mixture"],"correctAnswer":2,"explanation":"The liquid line carries subcooled liquid refrigerant from the condenser to the metering device. Subcooling ensures no flash gas at the metering device."},{"id":"epa-t2-94","question":"In a high-pressure system, the refrigerant in the suction line is in what state?","options":["Subcooled liquid","Saturated liquid","Superheated vapor","Two-phase mixture"],"correctAnswer":2,"explanation":"The suction line carries superheated vapor from the evaporator to the compressor. Superheat ensures no liquid reaches the compressor."},{"id":"epa-t2-95","question":"The receiver in a refrigeration system stores refrigerant in what state?","options":["Superheated vapor","Subcooled liquid","Saturated liquid (liquid and vapor)","Frozen solid"],"correctAnswer":2,"explanation":"The receiver stores refrigerant as saturated liquid (with some vapor space above). It acts as a reservoir to accommodate charge variations."},{"id":"epa-t2-96","question":"The accumulator in a refrigeration system stores refrigerant in what state?","options":["Subcooled liquid","Superheated vapor","Saturated mixture — traps liquid, allows only vapor to pass to compressor","Frozen solid"],"correctAnswer":2,"explanation":"The accumulator traps liquid refrigerant and oil, allowing only vapor to pass to the compressor, preventing liquid slugging."},{"id":"epa-t2-97","question":"To reduce cross-contamination when switching between refrigerant types on recovery equipment:","options":["Just connect and start — contamination is minor","Change the compressor oil and replace filter-driers in the recovery machine","Only change the hoses","No action needed if both refrigerants are HFCs"],"correctAnswer":1,"explanation":"Change the recovery machine''s compressor oil and replace its filter-driers between different refrigerant types to prevent cross-contamination."},{"id":"epa-t2-98","question":"The EPA 608 Type II exam consists of:","options":["25 questions (Type II topics only)","50 questions (25 Core + 25 Type II)","75 questions","100 questions"],"correctAnswer":1,"explanation":"The Type II exam has 50 questions: 25 from the Core group and 25 from the Type II technical group."},{"id":"epa-t2-99","question":"A high-pressure system with 150 lbs of R-410A requires recovery to what level before a major repair, using post-1993 equipment?","options":["4 in. Hg vacuum","0 psig","10 in. Hg vacuum","500 microns"],"correctAnswer":1,"explanation":"High-pressure systems under 200 lbs require recovery to 0 psig using post-November 15, 1993 equipment before major repairs."},{"id":"epa-t2-100","question":"A high-pressure system with 250 lbs of R-410A requires recovery to what level before a major repair, using post-1993 equipment?","options":["0 psig","4 in. Hg vacuum","10 in. Hg vacuum","500 microns"],"correctAnswer":2,"explanation":"High-pressure systems with 200 lbs or more require recovery to 10 in. Hg vacuum using post-November 15, 1993 equipment."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-50'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-09-01-1","question":"Type III certification covers systems using:","options":["High-pressure refrigerants","Low-pressure refrigerants that operate below atmospheric pressure at room temperature","Small appliances","All refrigerant types"],"correctAnswer":1,"explanation":"Type III covers low-pressure chillers using R-11, R-113, or R-123 — these refrigerants operate below atmospheric pressure (in vacuum) at room temperature."},{"id":"q-09-01-2","question":"R-123 is the low-pressure replacement for:","options":["R-22","R-11 (CFC-11)","R-410A","R-134a"],"correctAnswer":1,"explanation":"R-123 (HCFC-123) replaced R-11 (CFC-11) in centrifugal chillers. R-123 has lower ODP than R-11 but is still being phased out."},{"id":"q-09-01-3","question":"Low-pressure systems operate at suction pressures:","options":["Above atmospheric (positive psig)","Below atmospheric (in vacuum — negative gauge pressure)","At exactly atmospheric","At 400+ psig"],"correctAnswer":1,"explanation":"Low-pressure refrigerants have boiling points above room temperature, so the evaporator operates in vacuum (below atmospheric pressure)."},{"id":"q-09-01-4","question":"Air leaking into a low-pressure chiller is dangerous because:","options":["It improves efficiency","Air raises system pressure, reduces capacity, and can cause moisture contamination","It has no effect","It lowers head pressure"],"correctAnswer":1,"explanation":"Air (non-condensable) leaks into low-pressure systems because they operate in vacuum. Air raises pressure and reduces chiller capacity."},{"id":"q-09-01-5","question":"Low-pressure chillers are typically used in:","options":["Residential homes","Large commercial buildings for central cooling","Small retail stores","Automotive applications"],"correctAnswer":1,"explanation":"Centrifugal chillers with low-pressure refrigerants are used in large commercial buildings — hospitals, office towers, universities."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-51'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-09-03-1","question":"Before opening a low-pressure chiller for service, the system must be:","options":["Pressurized with nitrogen","Recovered to the required vacuum level","Pressurized to atmospheric","Cooled to below freezing"],"correctAnswer":1,"explanation":"Low-pressure systems must be recovered before opening. The required level is 25 mm Hg absolute (approximately 29 in. Hg vacuum)."},{"id":"q-09-03-2","question":"Required recovery level for low-pressure systems is:","options":["500 microns","4 in. Hg","25 mm Hg absolute (29 in. Hg vacuum)","0 psig"],"correctAnswer":2,"explanation":"Low-pressure systems require recovery to 25 mm Hg absolute — a very deep vacuum due to the refrigerant''s low operating pressure."},{"id":"q-09-03-3","question":"Low-pressure refrigerant recovery is challenging because:","options":["The refrigerant is too heavy","The system already operates near vacuum — recovery must pull even deeper vacuum","The refrigerant is flammable","Recovery equipment cannot handle it"],"correctAnswer":1,"explanation":"Since the system operates near vacuum, recovery must achieve an even deeper vacuum — specialized low-pressure recovery equipment is required."},{"id":"q-09-03-4","question":"After recovering a low-pressure chiller, the system should be pressurized with nitrogen to:","options":["Atmospheric pressure","0.5 psig to prevent air infiltration during service","15 psig","50 psig"],"correctAnswer":1,"explanation":"After recovery, pressurize to 0.5 psig with dry nitrogen to prevent air and moisture from entering during service."},{"id":"q-09-03-5","question":"Low-pressure recovery equipment differs from high-pressure equipment because:","options":["It is the same equipment","It must handle below-atmospheric pressures and is designed for low-pressure refrigerants","It is smaller","It uses a different power source"],"correctAnswer":1,"explanation":"Low-pressure recovery equipment is specifically designed for below-atmospheric operation and the properties of low-pressure refrigerants."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-53'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-10-04-1","question":"Duct leakage testing uses:","options":["A refrigerant gauge set","A duct blaster (blower door) to pressurize the duct system and measure leakage CFM","A manometer only","Visual inspection only"],"correctAnswer":1,"explanation":"A duct blaster pressurizes the duct system to 25 Pa and measures the CFM required to maintain that pressure — that CFM equals leakage."},{"id":"q-10-04-2","question":"Duct leakage to the outside (leakage to outdoors) causes:","options":["Better efficiency","Energy loss — conditioned air escapes to unconditioned spaces","Improved comfort","No measurable effect"],"correctAnswer":1,"explanation":"Leakage to outdoors wastes conditioned air directly. Studies show typical homes lose 20–30% of conditioned air through duct leaks."},{"id":"q-10-04-3","question":"Mastic sealant is preferred over duct tape for sealing because:","options":["It is cheaper","It remains flexible and adheres permanently — duct tape fails within a few years","It is easier to apply","It is required by code only"],"correctAnswer":1,"explanation":"Mastic (water-based sealant) bonds permanently and stays flexible. Standard duct tape dries out and fails within 1–5 years."},{"id":"q-10-04-4","question":"Aeroseal is a duct sealing technology that:","options":["Requires opening all ducts","Injects aerosolized sealant particles that adhere to leak edges from inside the duct","Only works on metal ducts","Requires a special license"],"correctAnswer":1,"explanation":"Aeroseal pressurizes the duct system and injects sealant particles that are carried to leaks and bond to the edges — sealing from inside."},{"id":"q-10-04-5","question":"Energy codes typically require duct leakage to be below:","options":["50 CFM25 per 100 sq ft","4 CFM25 per 100 sq ft of conditioned floor area","100 CFM25 total","No limit"],"correctAnswer":1,"explanation":"IECC and Title 24 typically require total duct leakage below 4 CFM25 per 100 sq ft of conditioned floor area for new construction."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-60'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-10-05-1","question":"MERV rating on air filters measures:","options":["Filter thickness","Minimum Efficiency Reporting Value — the filter''s ability to capture particles","Airflow resistance only","Filter lifespan"],"correctAnswer":1,"explanation":"MERV (Minimum Efficiency Reporting Value) rates filter efficiency from 1–16. Higher MERV = smaller particles captured."},{"id":"q-10-05-2","question":"A MERV 13 filter captures:","options":["Only large dust particles","Particles 0.3–1.0 microns including bacteria and smoke","Only pollen","Nothing smaller than 10 microns"],"correctAnswer":1,"explanation":"MERV 13 captures 50%+ of particles 0.3–1.0 microns — including bacteria, smoke, and fine dust. Recommended for good IAQ."},{"id":"q-10-05-3","question":"High-MERV filters (13+) in undersized filter slots cause:","options":["Better air quality with no downside","High static pressure that reduces airflow and stresses the system","Lower static pressure","No effect on the system"],"correctAnswer":1,"explanation":"High-MERV filters have more resistance. In undersized slots, they restrict airflow, raising static pressure and reducing system performance."},{"id":"q-10-05-4","question":"How often should standard 1-inch filters be replaced?","options":["Every 5 years","Every 6–12 months","Every 1–3 months depending on conditions","Never — they are permanent"],"correctAnswer":2,"explanation":"Standard 1-inch filters should be replaced every 1–3 months. Homes with pets, allergies, or high dust need more frequent changes."},{"id":"q-10-05-5","question":"A UV germicidal lamp in the air handler is used to:","options":["Improve filter efficiency","Kill mold, bacteria, and viruses on the evaporator coil and in the airstream","Measure airflow","Reduce static pressure"],"correctAnswer":1,"explanation":"UV-C lamps kill biological contaminants on the evaporator coil (preventing mold growth) and can treat the airstream for IAQ improvement."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-61'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-05-01","question":"Superheat is measured at the:","options":["Condenser outlet","Evaporator outlet (suction line)","Compressor discharge","Liquid line"],"correctAnswer":1,"explanation":"Superheat is measured at the evaporator outlet (suction line) — it''s the temperature above saturation at suction pressure."},{"id":"q-05-02","question":"Subcooling is measured at the:","options":["Evaporator inlet","Condenser outlet (liquid line)","Compressor suction","Metering device"],"correctAnswer":1,"explanation":"Subcooling is measured at the condenser outlet (liquid line) — it''s the temperature below saturation at discharge pressure."},{"id":"q-05-03","question":"High superheat typically indicates:","options":["Overcharge","Undercharge or low airflow over evaporator","Dirty condenser","Overfeeding TXV"],"correctAnswer":1,"explanation":"High superheat means the refrigerant is fully evaporating too early — usually from undercharge or insufficient heat load."},{"id":"q-05-04","question":"Low superheat typically indicates:","options":["Undercharge","Overcharge or restricted airflow","Normal operation","Compressor failure"],"correctAnswer":1,"explanation":"Low superheat means liquid refrigerant may reach the compressor (flood-back), risking compressor damage."},{"id":"q-05-05","question":"A TXV controls refrigerant flow based on:","options":["Discharge pressure","Suction line superheat","Ambient temperature","Compressor amperage"],"correctAnswer":1,"explanation":"The TXV sensing bulb monitors suction line temperature and adjusts flow to maintain target superheat."},{"id":"q-m05-06","question":"TXV systems are charged by:","options":["Superheat method","Subcooling method","Weight method only","Sight glass only"],"correctAnswer":1,"explanation":"TXV systems are charged by subcooling — target typically 10–15°F at the liquid line."},{"id":"q-m05-07","question":"Fixed orifice systems are charged by:","options":["Subcooling method","Superheat method","Weight method only","Pressure method only"],"correctAnswer":1,"explanation":"Fixed orifice systems are charged by superheat — target varies by outdoor temperature and indoor wet bulb."},{"id":"q-m05-08","question":"A frozen evaporator coil is most commonly caused by:","options":["Overcharge","Low airflow or low refrigerant charge","High ambient temperature","Dirty condenser"],"correctAnswer":1,"explanation":"Low airflow (dirty filter, closed registers) or low charge causes coil temperature to drop below 32°F."},{"id":"q-m05-09","question":"Scroll compressors dominate residential HVAC because:","options":["They are cheapest","They are quieter, more efficient, and more reliable than reciprocating types","They handle liquid better","They are easier to repair"],"correctAnswer":1,"explanation":"Scroll compressors have fewer moving parts, run quieter, and are more efficient than reciprocating piston compressors."},{"id":"q-m05-10","question":"A dirty condenser coil causes:","options":["Lower head pressure","Higher head pressure and reduced efficiency","Lower suction pressure","No measurable effect"],"correctAnswer":1,"explanation":"Dirt insulates the condenser coil, reducing heat transfer. Head pressure rises and compressor amperage increases."},{"id":"q-m05-11","question":"Subcooling is measured at the:","options":["Compressor discharge","Condenser outlet / liquid line","Evaporator outlet","Metering device inlet only"],"correctAnswer":1,"explanation":"Subcooling = saturation temperature at condenser pressure minus actual liquid temperature, measured at the liquid line."},{"id":"q-m05-12","question":"High superheat (above 15°F) typically indicates:","options":["Overcharge","Undercharge or restricted metering device","Dirty condenser","Non-condensables"],"correctAnswer":1,"explanation":"High superheat means the refrigerant fully evaporates too early — usually from undercharge or a restricted metering device."},{"id":"q-m05-13","question":"Low superheat (near 0°F) indicates:","options":["Undercharge","Overcharge or flooding — liquid may reach the compressor","Normal operation","Dirty condenser"],"correctAnswer":1,"explanation":"Near-zero superheat means liquid refrigerant is not fully evaporating — flood-back risk to the compressor."},{"id":"q-m05-14","question":"A clogged condensate drain causes:","options":["Higher efficiency","Water overflow and safety switch shutdown","Lower humidity only","No operational effect"],"correctAnswer":1,"explanation":"A blocked drain causes the condensate pan to overflow. Most systems have a float switch that shuts down the system."},{"id":"q-m05-15","question":"Non-condensable gases in a system cause:","options":["Lower head pressure","Higher head pressure than the PT chart predicts","Lower suction pressure","No measurable effect"],"correctAnswer":1,"explanation":"Non-condensables (air, nitrogen) raise head pressure because they cannot condense and occupy space in the condenser."},{"id":"q-m05-16","question":"Bubbles in the liquid line sight glass indicate:","options":["Normal operation","Low refrigerant charge","Overcharge","Air in the system only"],"correctAnswer":1,"explanation":"Bubbles mean flash gas is forming — the charge is low or there is a restriction causing pressure drop before the metering device."},{"id":"q-m05-17","question":"A compressor that hums but does not start most likely has:","options":["A refrigerant leak","A failed run/start capacitor or seized compressor","A thermostat problem","A dirty filter"],"correctAnswer":1,"explanation":"Humming without starting indicates the motor is trying but cannot turn. Check the capacitor first."},{"id":"q-m05-18","question":"Condenser fan airflow on a standard residential unit is:","options":["Down through the coil","Up through the coil and out the top","Horizontal through the coil","Recirculated internally"],"correctAnswer":1,"explanation":"Residential condensers draw air in through the sides of the coil and discharge it upward out the top."},{"id":"q-m05-19","question":"The accumulator on a heat pump protects the compressor from:","options":["High pressure","Liquid refrigerant flood-back","Electrical overload","Overheating"],"correctAnswer":1,"explanation":"The accumulator catches liquid refrigerant before it reaches the compressor — critical during defrost."},{"id":"q-m05-20","question":"R-410A must be charged as:","options":["Vapor only","Liquid from the cylinder","Either liquid or vapor","Gas from the top of the cylinder"],"correctAnswer":1,"explanation":"R-410A is a near-azeotropic blend and must be charged as liquid to prevent fractionation."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-63'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-11-02-1","question":"A contactor is used to:","options":["Control 24V circuits","Switch high-voltage power (208/230V) to the compressor and condenser fan","Measure amperage","Protect against short circuits"],"correctAnswer":1,"explanation":"The contactor is a heavy-duty relay that switches line voltage to the compressor and condenser fan motor when energized by 24V."},{"id":"q-11-02-2","question":"Pitted or burned contactor contacts cause:","options":["Higher efficiency","Voltage drop, overheating, and eventual failure to close or open","Lower amperage draw","No operational effect"],"correctAnswer":1,"explanation":"Pitted contacts increase resistance, causing voltage drop and heat. Severely pitted contacts may weld closed or fail to close."},{"id":"q-11-02-3","question":"A relay differs from a contactor in that relays:","options":["Handle higher current","Switch lower-current circuits (control circuits) rather than line voltage loads","Are always 24V","Cannot be replaced"],"correctAnswer":1,"explanation":"Relays switch control-level currents (fan relay, heat relay). Contactors handle high-current line voltage loads."},{"id":"q-11-02-4","question":"To test a contactor coil, measure:","options":["Voltage across the contacts","Resistance of the coil (typically 8–20Ω for a 24V coil)","Current through the contacts","Capacitance"],"correctAnswer":1,"explanation":"A good 24V contactor coil reads 8–20Ω. Open coil = infinite resistance; shorted coil = near zero resistance."},{"id":"q-11-02-5","question":"If a contactor is energized (coil has 24V) but contacts are not closing, the cause is:","options":["Low refrigerant","Welded-open contacts, mechanical failure, or insufficient coil voltage","Thermostat failure","Capacitor failure"],"correctAnswer":1,"explanation":"If the coil is energized but contacts do not close, the contactor has a mechanical failure — replace it."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-65'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-11-03-1","question":"A run capacitor improves motor efficiency by:","options":["Increasing voltage","Providing a phase-shifted current to create a rotating magnetic field in single-phase motors","Reducing amperage draw","Storing energy for starting"],"correctAnswer":1,"explanation":"Run capacitors shift current phase in the start winding, creating a rotating magnetic field that keeps single-phase motors running efficiently."},{"id":"q-11-03-2","question":"A weak run capacitor causes:","options":["Lower amperage draw","Higher amperage draw, reduced motor efficiency, and overheating","Better starting torque","No measurable effect"],"correctAnswer":1,"explanation":"A weak capacitor reduces the phase shift, causing the motor to draw more current, run hotter, and eventually fail."},{"id":"q-11-03-3","question":"Capacitor capacitance is measured in:","options":["Ohms","Microfarads (µF)","Volts","Amperes"],"correctAnswer":1,"explanation":"Capacitance is measured in microfarads (µF). A typical compressor run capacitor is 35–80 µF; fan motor capacitors are 5–15 µF."},{"id":"q-11-03-4","question":"Before testing or replacing a capacitor, you must:","options":["Turn off the thermostat only","Discharge the capacitor — it can hold a lethal charge even after power is removed","Wait 5 minutes only","No special precaution needed"],"correctAnswer":1,"explanation":"Capacitors store charge and can deliver a lethal shock. Always discharge with a resistor (10kΩ, 5W) before handling."},{"id":"q-11-03-5","question":"A dual-run capacitor contains:","options":["Two separate capacitors in one can — one for the compressor, one for the fan motor","A start and run capacitor combined","Two identical capacitors in parallel","A capacitor and a relay"],"correctAnswer":0,"explanation":"A dual-run capacitor has two capacitor sections in one can — typically labeled HERM (compressor) and FAN, sharing a common terminal."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-66'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-11-04-1","question":"A control board fault code is retrieved by:","options":["Calling the manufacturer only","Counting LED flash sequences or reading a digital display on the board","Measuring voltage at the board","Replacing the board and seeing if it works"],"correctAnswer":1,"explanation":"Most control boards flash LED codes to indicate fault history. Count the flashes and compare to the legend on the board or service manual."},{"id":"q-11-04-2","question":"Before replacing a control board, the technician should:","options":["Replace it immediately — boards always fail","Verify all inputs (24V, sensors, switches) are correct and the board is actually at fault","Check refrigerant charge","Replace all sensors first"],"correctAnswer":1,"explanation":"Control boards are expensive. Always verify all inputs are correct before condemning the board — a bad sensor or switch is often the real cause."},{"id":"q-11-04-3","question":"A pressure switch on a furnace opens when:","options":["The thermostat calls for heat","Inducer draft pressure is insufficient — indicating a blocked flue or failed inducer","The heat exchanger is hot","The gas valve opens"],"correctAnswer":1,"explanation":"The pressure switch verifies the inducer is creating adequate draft. If draft is insufficient (blocked flue, failed inducer), it opens and locks out the furnace."},{"id":"q-11-04-4","question":"A rollout switch trips when:","options":["The filter is dirty","Flames roll out of the burner box — indicating a cracked heat exchanger or blocked flue","The thermostat is set too high","The capacitor fails"],"correctAnswer":1,"explanation":"Rollout switches are manual-reset safety devices. Flame rollout indicates a serious combustion problem — never reset without finding the cause."},{"id":"q-11-04-5","question":"The limit switch on a furnace opens when:","options":["The thermostat calls for heat","Heat exchanger temperature exceeds a safe limit — typically due to low airflow","The gas valve closes","The inducer starts"],"correctAnswer":1,"explanation":"The high-limit switch opens the gas valve circuit if the heat exchanger overheats. It auto-resets when temperature drops. Repeated tripping = airflow problem."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-67'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-11-01","question":"High head pressure and low suction pressure typically indicate:","options":["Overcharge","Undercharge","Restriction in the liquid line or dirty condenser","Normal operation"],"correctAnswer":2,"explanation":"A restriction traps refrigerant on the high side (high head) and starves the low side (low suction). A dirty condenser also raises head pressure."},{"id":"q-11-02","question":"The subcooling method of charging is used on systems with:","options":["Fixed orifice metering","TXV metering devices","Capillary tubes","No metering device"],"correctAnswer":1,"explanation":"Systems with TXVs are charged by subcooling. Fixed orifice systems are charged by superheat."},{"id":"q-11-03","question":"Bubbles in the sight glass indicate:","options":["Normal operation","Low refrigerant charge","Overcharge","Air in the system"],"correctAnswer":1,"explanation":"Bubbles in the liquid line sight glass typically indicate insufficient liquid refrigerant (low charge)."},{"id":"q-11-04","question":"A vacuum of 500 microns indicates:","options":["A major leak","The system is properly dehydrated","Too much moisture remains","The vacuum pump is broken"],"correctAnswer":1,"explanation":"500 microns is the standard target for evacuation, indicating adequate moisture removal."},{"id":"q-11-05","question":"Non-condensable gases in a system cause:","options":["Lower head pressure","Higher head pressure than normal","Lower suction pressure","No measurable effect"],"correctAnswer":1,"explanation":"Non-condensables (air, nitrogen) raise head pressure because they cannot condense and occupy space in the condenser."},{"id":"q-m11-06","question":"High head pressure and normal suction most likely indicates:","options":["Undercharge","Dirty condenser, high ambient, or non-condensables","Low evaporator airflow","Failed compressor"],"correctAnswer":1,"explanation":"High head with normal suction = condenser problem. Dirty coil, restricted airflow, high ambient, or non-condensables."},{"id":"q-m11-07","question":"Low suction and high superheat most likely indicates:","options":["Overcharge","Undercharge or restricted metering device","Dirty condenser","Non-condensables"],"correctAnswer":1,"explanation":"Low suction + high superheat = evaporator starved. Check refrigerant charge, metering device, and evaporator airflow."},{"id":"q-m11-08","question":"Both high suction and high head pressure indicates:","options":["Undercharge","Overcharge or non-condensables","Restriction","Normal at high load"],"correctAnswer":1,"explanation":"Both pressures high = overcharge or non-condensables. Too much refrigerant or air in the system."},{"id":"q-m11-09","question":"Both low suction and low head pressure indicates:","options":["Overcharge","Undercharge or very low load","Restriction","Non-condensables"],"correctAnswer":1,"explanation":"Both pressures low = undercharge or very low load. Not enough refrigerant circulating."},{"id":"q-m11-10","question":"A TXV stuck closed causes:","options":["High suction pressure","Very low suction pressure and high superheat","Overcharge symptoms","No pressure change"],"correctAnswer":1,"explanation":"A stuck-closed TXV starves the evaporator — suction pressure drops dramatically and superheat rises."},{"id":"q-m11-11","question":"Ice on the suction line at the outdoor unit indicates:","options":["Normal operation in cold weather","Low charge or severely restricted evaporator airflow","Overcharge","High ambient temperature"],"correctAnswer":1,"explanation":"Ice on the suction line means refrigerant is not absorbing enough heat — low charge or low airflow."},{"id":"q-m11-12","question":"The subcooling charging method targets:","options":["0–2°F subcooling","10–15°F subcooling at the liquid line","30°F subcooling","Maximum subcooling possible"],"correctAnswer":1,"explanation":"TXV systems target 10–15°F subcooling at the liquid line service valve."},{"id":"q-m11-13","question":"Non-condensables are removed by:","options":["Adding refrigerant","Full recovery, deep evacuation, and recharge with virgin refrigerant","Purging through the Schrader valve","Running the system at high load"],"correctAnswer":1,"explanation":"Non-condensables cannot be selectively purged. Full recovery, evacuation, and recharge is required."},{"id":"q-m11-14","question":"A weak run capacitor causes the motor to:","options":["Draw less amperage","Draw more amperage and run hotter","Run at higher speed","Have no measurable effect"],"correctAnswer":1,"explanation":"A weak capacitor reduces phase shift, causing the motor to draw excess current, run hotter, and eventually fail."},{"id":"q-m11-15","question":"Pitted contactor contacts cause:","options":["Higher efficiency","Voltage drop, overheating, and eventual failure","Lower amperage draw","No operational effect"],"correctAnswer":1,"explanation":"Pitted contacts increase resistance, causing voltage drop and heat. Severely pitted contacts may weld closed."},{"id":"q-m11-16","question":"A control board fault code is retrieved by:","options":["Calling the manufacturer","Counting LED flash sequences or reading a digital display","Measuring voltage at the board","Replacing the board"],"correctAnswer":1,"explanation":"Most control boards flash LED codes to indicate fault history. Count flashes and compare to the legend on the board."},{"id":"q-m11-17","question":"Before replacing a control board, the technician should:","options":["Replace it immediately","Verify all inputs are correct and the board is actually at fault","Check refrigerant charge","Replace all sensors first"],"correctAnswer":1,"explanation":"Control boards are expensive. Always verify all inputs before condemning the board — a bad sensor is often the real cause."},{"id":"q-m11-18","question":"A rollout switch trips when:","options":["The filter is dirty","Flames roll out of the burner box — indicating a cracked heat exchanger or blocked flue","The thermostat is set too high","The capacitor fails"],"correctAnswer":1,"explanation":"Rollout switches are manual-reset safety devices. Flame rollout indicates a serious combustion problem."},{"id":"q-m11-19","question":"The limit switch on a furnace opens when:","options":["The thermostat calls for heat","Heat exchanger temperature exceeds a safe limit due to low airflow","The gas valve closes","The inducer starts"],"correctAnswer":1,"explanation":"The high-limit switch opens the gas valve circuit if the heat exchanger overheats. Repeated tripping = airflow problem."},{"id":"q-m11-20","question":"A pressure switch on a furnace opens when:","options":["The thermostat calls for heat","Inducer draft pressure is insufficient — blocked flue or failed inducer","The heat exchanger is hot","The gas valve opens"],"correctAnswer":1,"explanation":"The pressure switch verifies adequate draft. If insufficient (blocked flue, failed inducer), it opens and locks out the furnace."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-68'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-12-01-1","question":"In heating mode, a heat pump''s outdoor coil acts as the:","options":["Condenser","Evaporator — absorbing heat from outdoor air","Metering device","Compressor"],"correctAnswer":1,"explanation":"In heating mode, the outdoor coil evaporates refrigerant, absorbing heat from outdoor air. The indoor coil condenses, releasing heat indoors."},{"id":"q-12-01-2","question":"Heat pump refrigerant circuit differs from a standard AC by having:","options":["Two compressors","A reversing valve that switches refrigerant flow direction","Two metering devices only","No condenser"],"correctAnswer":1,"explanation":"The reversing valve (4-way valve) is the key difference — it redirects refrigerant flow to switch between heating and cooling modes."},{"id":"q-12-01-3","question":"Heat pumps typically have metering devices on:","options":["The indoor coil only","Both the indoor and outdoor coils — one active per mode","The outdoor coil only","Neither coil — no metering needed"],"correctAnswer":1,"explanation":"Heat pumps have metering devices (TXV or check valve/piston) on both coils. In cooling, the indoor metering device is active; in heating, the outdoor one."},{"id":"q-12-01-4","question":"The accumulator on a heat pump suction line protects the compressor from:","options":["High pressure","Liquid refrigerant flood-back during mode switching or defrost","Electrical overload","Overheating"],"correctAnswer":1,"explanation":"The accumulator catches liquid refrigerant before it reaches the compressor — critical during defrost when liquid can flood back."},{"id":"q-12-01-5","question":"Charging a heat pump in heating mode uses:","options":["Superheat at the indoor coil","Subcooling at the outdoor coil (now the condenser)","Weight method only","The same method as cooling mode"],"correctAnswer":1,"explanation":"In heating mode, the outdoor coil is the condenser. Charge by subcooling at the outdoor coil liquid line."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-69'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-12-03-1","question":"Frost forms on the outdoor coil in heating mode because:","options":["The refrigerant is too cold","The outdoor coil temperature drops below 32°F as it absorbs heat from cold outdoor air","The system is overcharged","The reversing valve is stuck"],"correctAnswer":1,"explanation":"In heating mode, the outdoor coil evaporates refrigerant at temperatures below outdoor air temperature — often below 32°F, causing frost."},{"id":"q-12-03-2","question":"During defrost, the heat pump temporarily switches to:","options":["Heating mode with higher capacity","Cooling mode — reversing refrigerant flow to melt frost from the outdoor coil","Fan-only mode","Emergency heat only"],"correctAnswer":1,"explanation":"Defrost reverses the cycle (cooling mode) so the outdoor coil becomes the condenser, melting frost with hot refrigerant."},{"id":"q-12-03-3","question":"Auxiliary heat strips energize during defrost to:","options":["Help melt the frost","Prevent cold air from blowing into the conditioned space while the outdoor coil defrosts","Increase compressor efficiency","Reduce defrost time"],"correctAnswer":1,"explanation":"During defrost, the indoor coil is cold (evaporating). Aux heat strips prevent cold air from blowing into the house."},{"id":"q-12-03-4","question":"Defrost is typically initiated by:","options":["A timer only","A combination of time and outdoor coil temperature (demand defrost)","Outdoor temperature only","The thermostat"],"correctAnswer":1,"explanation":"Modern demand defrost uses a time-temperature algorithm — defrost initiates only when the coil is actually frosted, saving energy."},{"id":"q-12-03-5","question":"A heat pump that defrosts too frequently indicates:","options":["Normal operation in cold weather","Low refrigerant charge, low airflow over the outdoor coil, or a defrost control problem","Overcharge","High efficiency operation"],"correctAnswer":1,"explanation":"Excessive defrost cycles indicate the outdoor coil is running colder than normal — check refrigerant charge and outdoor coil airflow."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-71'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-12-04-1","question":"Heat pump charging in cooling mode uses:","options":["Heating mode subcooling","Cooling mode superheat (fixed orifice) or subcooling (TXV)","Weight method only","Outdoor temperature chart only"],"correctAnswer":1,"explanation":"Charge heat pumps in cooling mode using the same method as a standard AC: superheat for fixed orifice, subcooling for TXV."},{"id":"q-12-04-2","question":"Low charge on a heat pump in heating mode causes:","options":["Higher COP","Low suction pressure, high superheat, and reduced heating capacity","Higher head pressure","Normal operation"],"correctAnswer":1,"explanation":"Low charge in heating mode starves the outdoor evaporator — suction pressure drops, superheat rises, and heating capacity falls."},{"id":"q-12-04-3","question":"The balance point of a heat pump is:","options":["The outdoor temperature where the heat pump is most efficient","The outdoor temperature where heat pump capacity equals building heat loss","The temperature at which defrost starts","The minimum operating temperature"],"correctAnswer":1,"explanation":"The balance point is where heat pump output exactly meets building heat loss. Below this, auxiliary heat supplements the heat pump."},{"id":"q-12-04-4","question":"A dual-fuel heat pump system uses:","options":["Two compressors","A heat pump for mild weather and a gas furnace for very cold weather","Two refrigerant circuits","Electric strips only for backup"],"correctAnswer":1,"explanation":"Dual-fuel systems use the heat pump when it is efficient (above ~35°F) and switch to gas heat when outdoor temperatures drop below the balance point."},{"id":"q-12-04-5","question":"Cold climate heat pumps (hyper-heat) can operate efficiently down to:","options":["35°F","20°F","-13°F or lower","0°F only"],"correctAnswer":2,"explanation":"Modern cold-climate heat pumps (Mitsubishi Hyper-Heat, Bosch IDS) maintain rated capacity down to -13°F or lower using variable-speed compressors."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-72'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-12-05-1","question":"During a heat pump diagnosis lab, the first step is:","options":["Check refrigerant charge","Verify the complaint and gather operating data (pressures, temperatures, mode)","Replace the reversing valve","Check the capacitor"],"correctAnswer":1,"explanation":"Always start with the complaint and gather data. Operating pressures and temperatures in both modes tell the full story."},{"id":"q-12-05-2","question":"If a heat pump heats but does not cool, the most likely cause is:","options":["Low refrigerant charge","Reversing valve stuck in heating position or O-terminal wiring issue","Failed compressor","Dirty filter"],"correctAnswer":1,"explanation":"Heats but no cooling = reversing valve stuck in heating position, or the O-terminal is not energizing the solenoid in cooling mode."},{"id":"q-12-05-3","question":"If a heat pump runs but provides no heating or cooling, the most likely cause is:","options":["Thermostat failure","Failed compressor or reversing valve stuck in mid-position","Dirty filter only","Low refrigerant only"],"correctAnswer":1,"explanation":"No heating or cooling with the system running suggests the compressor is not pumping or the reversing valve is stuck mid-stroke."},{"id":"q-12-05-4","question":"Auxiliary heat running continuously in mild weather (above 40°F) indicates:","options":["Normal operation","Heat pump is not operating — check compressor, reversing valve, or refrigerant charge","High efficiency mode","Thermostat is set correctly"],"correctAnswer":1,"explanation":"Aux heat should only run when the heat pump cannot keep up. Continuous aux in mild weather means the heat pump is not contributing."},{"id":"q-12-05-5","question":"The \"Emergency Heat\" setting on a thermostat:","options":["Increases heat pump efficiency","Bypasses the heat pump and runs auxiliary heat only — use only if the heat pump has failed","Activates defrost mode","Increases compressor speed"],"correctAnswer":1,"explanation":"Emergency heat locks out the heat pump and runs aux heat only. Use only when the heat pump has failed — it is much less efficient."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-73'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-12-01","question":"Manual J is used to calculate:","options":["Duct sizing","Heat load (equipment sizing)","Refrigerant charge","Electrical load"],"correctAnswer":1,"explanation":"Manual J calculates the heating and cooling load of a building to determine proper equipment size."},{"id":"q-12-02","question":"When brazing copper tubing, nitrogen should flow through the tubing to:","options":["Cool the joint","Prevent oxidation inside the tubing","Test for leaks","Increase pressure"],"correctAnswer":1,"explanation":"Flowing dry nitrogen prevents copper oxide scale from forming inside the tubing during brazing."},{"id":"q-12-03","question":"A flare fitting requires:","options":["Brazing","A properly flared tube end","Soldering","Press-fit connection"],"correctAnswer":1,"explanation":"Flare fittings use a flared tube end compressed against a fitting with a flare nut. No heat required."},{"id":"q-12-04","question":"Static pressure in ductwork is measured in:","options":["PSI","Inches of water column (in. w.c.)","Microns","CFM"],"correctAnswer":1,"explanation":"Duct static pressure is measured in inches of water column using a manometer."},{"id":"q-12-05","question":"Before starting a newly installed system, the technician should:","options":["Immediately turn it on","Verify charge, check electrical connections, verify airflow, and leak test","Only check the thermostat","Run it for 5 minutes and walk away"],"correctAnswer":1,"explanation":"A complete pre-startup checklist includes verifying charge, electrical, airflow, leak testing, and performance verification."},{"id":"q-m12-06","question":"Manual J calculates:","options":["Duct sizing","Building heat load for equipment sizing","Refrigerant charge","Electrical load"],"correctAnswer":1,"explanation":"Manual J calculates the heating and cooling load of a building to determine proper equipment size."},{"id":"q-m12-07","question":"Nitrogen flows through copper tubing during brazing to:","options":["Cool the joint","Prevent copper oxide scale inside the tubing","Test for leaks","Increase pressure"],"correctAnswer":1,"explanation":"Flowing dry nitrogen prevents oxidation scale that would contaminate the refrigerant system."},{"id":"q-m12-08","question":"Duct static pressure is measured in:","options":["PSI","Inches of water column (in. w.c.)","Microns","CFM"],"correctAnswer":1,"explanation":"Duct static pressure is measured in inches of water column using a manometer."},{"id":"q-m12-09","question":"Total external static pressure (TESP) is measured:","options":["At the supply plenum only","Across the air handler — supply plenum minus return plenum","At each register","At the outdoor unit"],"correctAnswer":1,"explanation":"TESP = supply plenum pressure minus return plenum pressure — the total resistance the blower must overcome."},{"id":"q-m12-10","question":"Typical maximum TESP for residential equipment is:","options":["0.1 in. w.c.","0.5 in. w.c.","2.0 in. w.c.","5.0 in. w.c."],"correctAnswer":1,"explanation":"Most residential equipment is rated for 0.5 in. w.c. TESP. Exceeding this reduces airflow and causes comfort problems."},{"id":"q-m12-11","question":"Mastic sealant is preferred over duct tape because:","options":["It is cheaper","It remains flexible and adheres permanently — duct tape fails within years","It is easier to apply","It is required by code only"],"correctAnswer":1,"explanation":"Mastic bonds permanently and stays flexible. Standard duct tape dries out and fails within 1–5 years."},{"id":"q-m12-12","question":"A flow hood (balometer) measures:","options":["Static pressure","CFM at a supply or return register","Duct leakage","Temperature differential"],"correctAnswer":1,"explanation":"A flow hood captures all air from a register and measures CFM directly — the most accurate field method."},{"id":"q-m12-13","question":"Duct leakage testing uses:","options":["A refrigerant gauge set","A duct blaster to pressurize the duct system and measure leakage CFM","A manometer only","Visual inspection only"],"correctAnswer":1,"explanation":"A duct blaster pressurizes the duct system to 25 Pa and measures the CFM required to maintain that pressure."},{"id":"q-m12-14","question":"Before starting a newly installed system, the technician should:","options":["Immediately turn it on","Verify charge, check electrical connections, verify airflow, and leak test","Only check the thermostat","Run it for 5 minutes and walk away"],"correctAnswer":1,"explanation":"A complete pre-startup checklist includes verifying charge, electrical, airflow, leak testing, and performance verification."},{"id":"q-m12-15","question":"Temperature rise across a gas furnace heat exchanger should match:","options":["Outdoor temperature","The manufacturer''s specified range (typically 35–65°F)","Exactly 70°F always","The thermostat setpoint"],"correctAnswer":1,"explanation":"Temperature rise is a key furnace performance indicator. Too high = low airflow; too low = high airflow or low gas pressure."},{"id":"q-m12-16","question":"Cooling temperature split across the evaporator should be approximately:","options":["5–8°F","14–22°F","30–40°F","50°F+"],"correctAnswer":1,"explanation":"A 14–22°F temperature split indicates proper heat transfer. Lower = low airflow or low charge; higher = very low airflow."},{"id":"q-m12-17","question":"Duct insulation in unconditioned spaces is required to:","options":["Reduce noise","Prevent heat gain/loss and condensation","Increase airflow","Meet fire codes only"],"correctAnswer":1,"explanation":"Uninsulated ducts in attics or crawlspaces gain or lose significant heat. R-6 to R-8 minimum is required by energy codes."},{"id":"q-m12-18","question":"A flare fitting requires:","options":["Brazing","A properly flared tube end compressed against a fitting","Soldering","Press-fit connection"],"correctAnswer":1,"explanation":"Flare fittings use a flared tube end compressed against a fitting with a flare nut. No heat required."},{"id":"q-m12-19","question":"Heat pump charging in cooling mode uses:","options":["Heating mode subcooling","Cooling mode superheat (fixed orifice) or subcooling (TXV)","Weight method only","Outdoor temperature chart only"],"correctAnswer":1,"explanation":"Charge heat pumps in cooling mode using the same method as a standard AC: superheat for fixed orifice, subcooling for TXV."},{"id":"q-m12-20","question":"The balance point of a heat pump is:","options":["The most efficient outdoor temperature","The outdoor temperature where heat pump capacity equals building heat loss","The defrost initiation temperature","The minimum operating temperature"],"correctAnswer":1,"explanation":"The balance point is where heat pump output exactly meets building heat loss. Below this, auxiliary heat supplements."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-74'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-13-01-1","question":"The systematic troubleshooting process begins with:","options":["Replacing the most common failed part","Verifying the customer complaint and gathering operating data","Checking refrigerant charge first","Calling technical support"],"correctAnswer":1,"explanation":"Always verify the complaint first. Then gather data, form a hypothesis, test, repair, and verify the fix — never guess and replace."},{"id":"q-13-01-2","question":"Operating data gathered before diagnosis should include:","options":["Only the thermostat setting","Supply/return temperatures, pressures, superheat, subcooling, and amperage","Refrigerant type only","Customer name and address"],"correctAnswer":1,"explanation":"Complete operating data — temperatures, pressures, superheat, subcooling, amperage — gives a full picture of system performance."},{"id":"q-13-01-3","question":"After completing a repair, the technician must:","options":["Leave immediately","Verify the repair solved the complaint and the system is operating within spec","Only check the thermostat","File paperwork only"],"correctAnswer":1,"explanation":"Always verify the repair: confirm the complaint is resolved, check operating parameters, and ensure no new problems were introduced."},{"id":"q-13-01-4","question":"A \"shotgun\" approach to troubleshooting (replacing parts without diagnosis) is problematic because:","options":["It is too slow","It wastes parts and money, may not fix the real problem, and damages customer trust","It is too accurate","It is required by some manufacturers"],"correctAnswer":1,"explanation":"Replacing parts without diagnosis wastes money, may not fix the root cause, and erodes customer confidence in the technician."},{"id":"q-13-01-5","question":"When a system has multiple faults, the technician should:","options":["Fix all faults simultaneously","Prioritize safety issues first, then address faults in logical order","Fix the cheapest fault first","Fix the most expensive fault first"],"correctAnswer":1,"explanation":"Safety issues (CO, electrical hazards) always come first. Then address faults in logical order — often the root cause fixes downstream symptoms."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-75'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-13-03-1","question":"A gas furnace that ignites but shuts off after a few seconds most likely has:","options":["A gas pressure problem","A dirty or failed flame sensor","A cracked heat exchanger","A bad thermostat"],"correctAnswer":1,"explanation":"Ignites then shuts off = flame sensor is not proving the flame. Clean the flame sensor with fine steel wool — it is the most common cause."},{"id":"q-13-03-2","question":"A furnace that runs but does not heat adequately should be checked for:","options":["Refrigerant charge","Dirty filter, low gas pressure, or cracked heat exchanger","Capacitor failure","Thermostat calibration only"],"correctAnswer":1,"explanation":"Inadequate heating: check airflow (filter), gas pressure at manifold, heat exchanger integrity, and temperature rise."},{"id":"q-13-03-3","question":"A furnace pressure switch that trips repeatedly indicates:","options":["Normal operation","Blocked condensate drain (on 90%+ furnaces), blocked flue, or failed inducer","Low gas pressure","Thermostat wiring issue"],"correctAnswer":1,"explanation":"Repeated pressure switch trips on a 90%+ furnace often mean a blocked condensate drain — the water backs up and blocks the pressure port."},{"id":"q-13-03-4","question":"Carbon monoxide (CO) in the living space from an HVAC system most likely indicates:","options":["Normal combustion","Cracked heat exchanger, blocked flue, or backdrafting","Low gas pressure","Dirty filter"],"correctAnswer":1,"explanation":"CO in the living space is a life-safety emergency. Evacuate, ventilate, and inspect the heat exchanger and flue system before restarting."},{"id":"q-13-03-5","question":"A furnace that short-cycles (turns on and off rapidly) is most commonly caused by:","options":["Low gas pressure","High-limit switch tripping due to overheating from restricted airflow","Thermostat failure","Igniter failure"],"correctAnswer":1,"explanation":"Short cycling = high-limit tripping. The heat exchanger overheats because airflow is restricted. Check filter, blower, and duct system."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-77'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-13-04-1","question":"The subcooling method of charging is used on systems with:","options":["Fixed orifice metering devices","TXV metering devices","Capillary tubes","No metering device"],"correctAnswer":1,"explanation":"TXV systems are charged by subcooling. The TXV self-adjusts superheat, so subcooling is the reliable charging indicator."},{"id":"q-13-04-2","question":"Bubbles in the liquid line sight glass indicate:","options":["Normal operation","Low refrigerant charge — insufficient liquid is reaching the metering device","Overcharge","Air in the system only"],"correctAnswer":1,"explanation":"Bubbles mean flash gas is forming in the liquid line — the charge is low or there is a restriction causing pressure drop before the metering device."},{"id":"q-13-04-3","question":"To add refrigerant to a system with a TXV, charge into the:","options":["High side as vapor","Low side as vapor with the system running","High side as liquid with system off","Either side — it does not matter"],"correctAnswer":1,"explanation":"Add refrigerant vapor to the low side (suction) with the system running. Never add liquid to the suction side — it will slug the compressor."},{"id":"q-13-04-4","question":"A system that is overcharged should be corrected by:","options":["Adding more refrigerant","Recovering refrigerant until subcooling or superheat reaches target","Running the system harder","Replacing the metering device"],"correctAnswer":1,"explanation":"Overcharge is corrected by recovering refrigerant in small increments until the system reaches target subcooling or superheat."},{"id":"q-13-04-5","question":"Non-condensable gases are removed from a system by:","options":["Adding refrigerant","Recovering all refrigerant, evacuating, and recharging with virgin refrigerant","Running the system at high load","Purging through the Schrader valve"],"correctAnswer":1,"explanation":"Non-condensables cannot be purged selectively. The system must be fully recovered, evacuated to remove air/moisture, and recharged."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-78'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-13-05-1","question":"When explaining a repair to a homeowner, you should:","options":["Use maximum technical jargon to appear knowledgeable","Explain the problem and solution in plain language they can understand","Just hand them the invoice","Avoid explaining — it takes too long"],"correctAnswer":1,"explanation":"Clear communication builds trust. Explain what failed, why, what you did, and what to watch for — without unnecessary jargon."},{"id":"q-13-05-2","question":"Before starting work, a professional technician should:","options":["Begin immediately without discussion","Introduce themselves, confirm the complaint, and explain what they will do","Ask for payment upfront","Check the equipment without speaking to the customer"],"correctAnswer":1,"explanation":"Professional service starts with introduction, complaint confirmation, and a brief explanation of the diagnostic process."},{"id":"q-13-05-3","question":"If a repair will cost more than the estimate, you should:","options":["Complete the work and surprise the customer with the bill","Stop work, contact the customer, explain the situation, and get approval before proceeding","Reduce the scope of work without telling the customer","Complete the work and offer a discount"],"correctAnswer":1,"explanation":"Always get customer approval before exceeding an estimate. Surprise bills destroy trust and can create legal disputes."},{"id":"q-13-05-4","question":"Service documentation should include:","options":["Customer name only","Date, complaint, findings, work performed, parts used, and system operating parameters after repair","Invoice amount only","Technician name only"],"correctAnswer":1,"explanation":"Complete service records protect the technician, help future technicians, and are required for warranty and EPA compliance."},{"id":"q-13-05-5","question":"When a customer is upset about a recurring problem, the best response is:","options":["Blame the previous technician","Acknowledge their frustration, take ownership, and focus on solving the problem","Offer a refund immediately","Argue that the previous repair was correct"],"correctAnswer":1,"explanation":"Acknowledge the frustration, take ownership of the solution, and focus on fixing the problem — not defending past work."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-79'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-13-01","question":"The first step in systematic troubleshooting is:","options":["Replace the most common failed part","Verify the customer complaint","Check refrigerant charge","Call for help"],"correctAnswer":1,"explanation":"Always verify the complaint first. Then gather data, isolate the problem, test, repair, and verify the fix."},{"id":"q-13-02","question":"A bad run capacitor on a compressor will cause:","options":["No effect","Higher amperage draw and possible overheating","Lower refrigerant pressure","Louder operation only"],"correctAnswer":1,"explanation":"A weak or failed run capacitor causes the compressor to draw excessive amps, overheat, and potentially trip on overload."},{"id":"q-13-03","question":"A frozen evaporator coil is most commonly caused by:","options":["Overcharge","Low airflow or low refrigerant charge","High ambient temperature","Dirty condenser"],"correctAnswer":1,"explanation":"Low airflow (dirty filter, closed registers) or low charge causes the coil temperature to drop below freezing."},{"id":"q-13-04","question":"If a furnace igniter glows but gas does not ignite:","options":["Replace the igniter","Check the gas valve and gas supply","Replace the thermostat","Clean the filter"],"correctAnswer":1,"explanation":"If the igniter works but gas doesn''t flow, check the gas valve, gas pressure, and gas supply."},{"id":"q-13-05","question":"When explaining a repair to a homeowner, you should:","options":["Use as much technical jargon as possible","Explain the problem and solution in simple terms","Just hand them the invoice","Tell them to Google it"],"correctAnswer":1,"explanation":"Professional communication means explaining problems and solutions clearly without unnecessary jargon."},{"id":"q-m13-06","question":"The first step in systematic troubleshooting is:","options":["Replace the most common failed part","Verify the customer complaint","Check refrigerant charge","Call for help"],"correctAnswer":1,"explanation":"Always verify the complaint first. Then gather data, isolate the problem, test, repair, and verify the fix."},{"id":"q-m13-07","question":"A gas furnace that ignites then shuts off after a few seconds most likely has:","options":["A gas pressure problem","A dirty or failed flame sensor","A cracked heat exchanger","A bad thermostat"],"correctAnswer":1,"explanation":"Ignites then shuts off = flame sensor not proving the flame. Clean the flame sensor — most common cause."},{"id":"q-m13-08","question":"A furnace pressure switch that trips repeatedly on a 90%+ furnace often means:","options":["Normal operation","Blocked condensate drain","Low gas pressure","Thermostat wiring issue"],"correctAnswer":1,"explanation":"On 90%+ furnaces, a blocked condensate drain backs up water and blocks the pressure port — most common cause."},{"id":"q-m13-09","question":"CO in the living space from an HVAC system requires:","options":["Normal operation — ignore it","Immediate evacuation and inspection of heat exchanger and flue","Low gas pressure check only","Filter replacement"],"correctAnswer":1,"explanation":"CO in the living space is a life-safety emergency. Evacuate, ventilate, and inspect before restarting."},{"id":"q-m13-10","question":"If the condenser fan runs but the compressor does not, check:","options":["The filter","Capacitor, contactor contacts, compressor overload, and windings","Refrigerant charge first","The thermostat only"],"correctAnswer":1,"explanation":"Fan runs but compressor does not: contactor is closing. Check compressor-specific circuit: capacitor, overload, windings."},{"id":"q-m13-11","question":"A heat pump that heats but does not cool most likely has:","options":["Low refrigerant charge","Reversing valve stuck in heating position or O-terminal wiring issue","Failed compressor","Dirty filter"],"correctAnswer":1,"explanation":"Heats but no cooling = reversing valve stuck in heating position, or O-terminal not energizing in cooling mode."},{"id":"q-m13-12","question":"Auxiliary heat running continuously in mild weather (above 40°F) indicates:","options":["Normal operation","Heat pump is not operating — check compressor, reversing valve, or charge","High efficiency mode","Correct thermostat setting"],"correctAnswer":1,"explanation":"Aux heat should only run when the heat pump cannot keep up. Continuous aux in mild weather = heat pump not contributing."},{"id":"q-m13-13","question":"After completing a repair, the technician must:","options":["Leave immediately","Verify the repair solved the complaint and system is operating within spec","Only check the thermostat","File paperwork only"],"correctAnswer":1,"explanation":"Always verify the repair: confirm the complaint is resolved and check operating parameters."},{"id":"q-m13-14","question":"When a repair will cost more than the estimate, you should:","options":["Complete the work and surprise the customer","Stop, contact the customer, explain, and get approval before proceeding","Reduce scope without telling the customer","Complete the work and offer a discount"],"correctAnswer":1,"explanation":"Always get customer approval before exceeding an estimate. Surprise bills destroy trust."},{"id":"q-m13-15","question":"Service documentation should include:","options":["Customer name only","Date, complaint, findings, work performed, parts used, and operating parameters after repair","Invoice amount only","Technician name only"],"correctAnswer":1,"explanation":"Complete service records protect the technician, help future technicians, and are required for warranty and EPA compliance."},{"id":"q-m13-16","question":"High head pressure and low suction pressure together typically indicates:","options":["Overcharge","Restriction in the liquid line, metering device, or dirty condenser","Normal operation","Undercharge only"],"correctAnswer":1,"explanation":"Low suction + high head = restriction. Refrigerant is trapped on the high side and starved on the low side."},{"id":"q-m13-17","question":"A \"shotgun\" approach (replacing parts without diagnosis) is problematic because:","options":["It is too slow","It wastes parts and money, may not fix the real problem, and damages customer trust","It is too accurate","It is required by some manufacturers"],"correctAnswer":1,"explanation":"Replacing parts without diagnosis wastes money, may not fix the root cause, and erodes customer confidence."},{"id":"q-m13-18","question":"When a customer is upset about a recurring problem, the best response is:","options":["Blame the previous technician","Acknowledge frustration, take ownership, and focus on solving the problem","Offer a refund immediately","Argue that the previous repair was correct"],"correctAnswer":1,"explanation":"Acknowledge the frustration, take ownership of the solution, and focus on fixing the problem."},{"id":"q-m13-19","question":"Safety violations during a competency assessment result in:","options":["A point deduction only","Immediate stop of that station — safety is non-negotiable","A warning only","No consequence if the task is completed"],"correctAnswer":1,"explanation":"Safety violations result in immediate station failure. Safety is always the first priority."},{"id":"q-m13-20","question":"When you encounter a problem beyond your skill level, you should:","options":["Guess and hope for the best","Acknowledge the limit and contact your supervisor or a more experienced technician","Pretend you fixed it","Charge the customer anyway"],"correctAnswer":1,"explanation":"Knowing your limits and asking for help is professional. Guessing on complex systems can cause expensive damage."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-80'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-14-01-1","question":"The \"Fatal Four\" in construction are:","options":["Cuts, burns, falls, and electrocution","Falls, struck-by, caught-in/between, and electrocution","Falls, heat stroke, chemical exposure, and noise","Electrocution, fire, explosion, and falls"],"correctAnswer":1,"explanation":"OSHA''s Fatal Four account for over 60% of construction deaths: falls, struck-by objects, caught-in/between, and electrocution."},{"id":"q-14-01-2","question":"Fall protection is required in general industry at heights of:","options":["3 feet","4 feet","6 feet","10 feet"],"correctAnswer":1,"explanation":"General industry (OSHA 1910): fall protection required at 4 feet. Construction (OSHA 1926): 6 feet. Always use protection at or above these heights."},{"id":"q-14-01-3","question":"A personal fall arrest system (PFAS) must limit fall distance to:","options":["No limit","6 feet or less, with total fall distance not exceeding 18.5 feet","10 feet","20 feet"],"correctAnswer":1,"explanation":"PFAS must arrest a fall within 6 feet of the work surface and limit deceleration force to 1,800 lbs."},{"id":"q-14-01-4","question":"Ladders must extend how far above the landing when used for roof access?","options":["1 foot","3 feet","5 feet","6 feet"],"correctAnswer":1,"explanation":"Ladders used for roof or elevated surface access must extend at least 3 feet above the landing point."},{"id":"q-14-01-5","question":"The correct angle for a portable ladder is:","options":["45 degrees (1:1 ratio)","75 degrees (4:1 ratio — 1 foot out for every 4 feet up)","90 degrees (vertical)","60 degrees"],"correctAnswer":1,"explanation":"The 4:1 rule: for every 4 feet of ladder height, the base should be 1 foot from the wall. This gives approximately 75 degrees."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-81'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-14-02-1","question":"The six steps of Lockout/Tagout (LOTO) in order are:","options":["Tag, lock, test, notify, isolate, release","Notify, identify, isolate, lock, tag, verify zero energy","Lock, tag, test, notify, isolate, release","Identify, notify, lock, tag, test, release"],"correctAnswer":1,"explanation":"LOTO sequence: Notify affected employees → Identify all energy sources → Isolate energy → Apply lock and tag → Release stored energy → Verify zero energy."},{"id":"q-14-02-2","question":"Stored energy that must be released before LOTO work includes:","options":["Electrical energy only","Electrical, pneumatic, hydraulic, gravitational, thermal, and spring energy","Electrical and pneumatic only","Only energy above 50V"],"correctAnswer":1,"explanation":"All forms of stored energy must be released: capacitors discharged, springs relaxed, pneumatic lines bled, gravity loads blocked."},{"id":"q-14-02-3","question":"Each worker performing LOTO must:","options":["Share one lock with the crew","Apply their own personal lock to the energy isolation point","Only sign the tag","Rely on the supervisor''s lock"],"correctAnswer":1,"explanation":"Each worker applies their own lock. No one can remove another person''s lock — this ensures no one can energize equipment while anyone is working on it."},{"id":"q-14-02-4","question":"After applying LOTO, you must verify zero energy by:","options":["Trusting the tag","Attempting to start the equipment and testing with a meter","Checking the breaker position only","Asking a coworker"],"correctAnswer":1,"explanation":"Always verify: attempt to start the equipment (should not start) and test with a meter to confirm zero voltage."},{"id":"q-14-02-5","question":"Tagout only (no lock) is permitted when:","options":["The equipment is small","The energy isolation point cannot physically accept a lock — and additional precautions are taken","The job takes less than 5 minutes","The supervisor approves it verbally"],"correctAnswer":1,"explanation":"Tagout only is a last resort when lockout is physically impossible. Additional precautions (removing fuses, blocking valves) must compensate."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-82'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-14-03-1","question":"GHS (Globally Harmonized System) standardizes:","options":["Equipment safety ratings","Chemical hazard communication — labels and Safety Data Sheets worldwide","Electrical safety standards","Fall protection requirements"],"correctAnswer":1,"explanation":"GHS standardizes chemical hazard communication globally — consistent pictograms, signal words, and SDS format across all countries."},{"id":"q-14-03-2","question":"An SDS (Safety Data Sheet) has how many sections?","options":["8","12","16","24"],"correctAnswer":2,"explanation":"GHS-format SDS has 16 standardized sections covering identification, hazards, composition, first aid, fire fighting, handling, and more."},{"id":"q-14-03-3","question":"The signal word \"DANGER\" on a GHS label indicates:","options":["A minor hazard","A severe hazard that can cause death or serious injury","A moderate hazard","No specific hazard level"],"correctAnswer":1,"explanation":"\"DANGER\" = severe hazard. \"WARNING\" = moderate hazard. Both require precautionary measures, but DANGER demands immediate attention."},{"id":"q-14-03-4","question":"Employees must have access to SDS for all hazardous chemicals:","options":["Only during training","At all times during their work shift","Only when requested","Only in the safety office"],"correctAnswer":1,"explanation":"OSHA requires SDS to be readily accessible to employees during their work shift — electronic access is acceptable if always available."},{"id":"q-14-03-5","question":"The GHS skull and crossbones pictogram indicates:","options":["Flammable material","Acute toxicity — can cause death or serious harm in small amounts","Environmental hazard","Corrosive material"],"correctAnswer":1,"explanation":"The skull and crossbones indicates acute toxicity — the substance can cause death or serious injury from a single exposure."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-83'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-14-05-1","question":"A hot work permit is required for:","options":["Any work above 80°F","Welding, cutting, brazing, or grinding near flammable materials","Working in direct sunlight","Using power tools"],"correctAnswer":1,"explanation":"Hot work permits are required for any work that produces sparks or open flame near flammable materials — welding, cutting, brazing, grinding."},{"id":"q-14-05-2","question":"A fire watch must be maintained for how long after hot work is completed?","options":["5 minutes","30 minutes minimum","1 hour","Until the next day"],"correctAnswer":1,"explanation":"A fire watch must continue for at least 30 minutes after hot work ends — smoldering materials can ignite long after the work is done."},{"id":"q-14-05-3","question":"The correct fire extinguisher class for a flammable liquid fire is:","options":["Class A","Class B","Class C","Class D"],"correctAnswer":1,"explanation":"Class B extinguishers are rated for flammable liquid fires (gasoline, oil, refrigerant). ABC extinguishers cover all common fire types."},{"id":"q-14-05-4","question":"PASS stands for:","options":["Pull, Aim, Squeeze, Sweep","Push, Aim, Spray, Sweep","Pull, Activate, Spray, Sweep","Point, Aim, Squeeze, Spray"],"correctAnswer":0,"explanation":"PASS: Pull the pin, Aim at the base of the fire, Squeeze the handle, Sweep side to side. The standard fire extinguisher technique."},{"id":"q-14-05-5","question":"Flammable refrigerants (A2L and A3) require:","options":["No special precautions","Elimination of ignition sources, proper ventilation, and A2L-rated tools and equipment","Only a fire extinguisher nearby","OSHA permit only"],"correctAnswer":1,"explanation":"A2L refrigerants (R-32, R-454B) require ignition source elimination and proper ventilation. A3 refrigerants (R-290, R-600a) require non-sparking tools."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-85'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-14-06-1","question":"PPE is considered the last line of defense because:","options":["It is too expensive","Engineering and administrative controls should eliminate hazards first — PPE only protects the individual if hazards remain","It is uncomfortable","OSHA does not require it"],"correctAnswer":1,"explanation":"The hierarchy of controls: eliminate → substitute → engineering controls → administrative controls → PPE. PPE is the last resort."},{"id":"q-14-06-2","question":"Safety glasses must meet which standard for impact protection?","options":["OSHA 1910.133","ANSI Z87.1","NFPA 70E","ASTM F2413"],"correctAnswer":1,"explanation":"ANSI Z87.1 is the standard for eye and face protection. Look for the Z87 marking on safety glasses to verify compliance."},{"id":"q-14-06-3","question":"Hearing protection is required when noise levels exceed:","options":["70 dBA for 8 hours","85 dBA for 8 hours (action level)","90 dBA for 8 hours","100 dBA for any duration"],"correctAnswer":1,"explanation":"OSHA''s action level is 85 dBA for 8 hours — hearing protection must be provided. The permissible exposure limit (PEL) is 90 dBA."},{"id":"q-14-06-4","question":"Gloves used when handling refrigerants should be:","options":["Standard latex gloves","Cryogenic or insulated gloves rated for low-temperature exposure","Cotton work gloves","No gloves needed"],"correctAnswer":1,"explanation":"Liquid refrigerant causes cryogenic burns. Use insulated or cryogenic gloves rated for the refrigerant''s boiling point temperature."},{"id":"q-14-06-5","question":"A respirator is required when working with refrigerants in:","options":["All outdoor conditions","Enclosed or poorly ventilated spaces where refrigerant concentration could displace oxygen","Any condition","Never — refrigerants are safe to breathe"],"correctAnswer":1,"explanation":"Refrigerants displace oxygen in enclosed spaces. In confined or poorly ventilated areas, use a supplied-air respirator or SCBA."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-86'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-14-01","question":"OSHA stands for:","options":["Occupational Safety and Health Administration","Office of Safety and Hazard Assessment","Organization for Safe HVAC Applications","Operational Standards for Heating and Air"],"correctAnswer":0},{"id":"q-14-02","question":"Fall protection is required at heights of:","options":["4 feet (general industry) or 6 feet (construction)","10 feet","15 feet","20 feet"],"correctAnswer":0,"explanation":"General industry: 4 feet. Construction: 6 feet. Always use fall protection at or above these heights."},{"id":"q-14-03","question":"Lockout/tagout (LOTO) is used to:","options":["Lock doors","Ensure equipment is de-energized before service","Tag inventory","Lock refrigerant cylinders"],"correctAnswer":1,"explanation":"LOTO ensures hazardous energy sources are isolated and locked out before maintenance or service work."},{"id":"q-14-04","question":"A Safety Data Sheet (SDS) provides information about:","options":["Equipment warranties","Chemical hazards, handling, and emergency procedures","Building codes","Insurance requirements"],"correctAnswer":1,"explanation":"SDS (formerly MSDS) contains hazard information, safe handling procedures, first aid, and emergency response for chemicals."},{"id":"q-14-05","question":"Workers have the right to:","options":["Refuse all work","A safe workplace and to report hazards without retaliation","Set their own safety rules","Ignore OSHA standards"],"correctAnswer":1,"explanation":"OSHA guarantees workers the right to a safe workplace and protection from retaliation for reporting hazards."},{"id":"q-14-06","question":"A confined space requires:","options":["No special precautions","Atmospheric testing, a permit, and a standby person","Only a flashlight","Just verbal warning"],"correctAnswer":1,"explanation":"Permit-required confined spaces need atmospheric testing, entry permits, attendants, and rescue plans."},{"id":"q-14-07","question":"The correct fire extinguisher for an electrical fire is:","options":["Type A (water)","Type B (flammable liquids)","Type C (electrical) or ABC","Type D (metals)"],"correctAnswer":2,"explanation":"Class C extinguishers are rated for electrical fires. ABC extinguishers cover all common fire types."},{"id":"q-14-08","question":"GHS labels on chemical containers must include:","options":["Only the product name","Hazard pictograms, signal word, hazard statements, and precautionary statements","Just a skull and crossbones","The manufacturer''s phone number only"],"correctAnswer":1,"explanation":"GHS labels require pictograms, signal words (Danger/Warning), hazard statements, precautionary statements, and supplier info."},{"id":"q-m14-09","question":"The \"Fatal Four\" in construction are:","options":["Cuts, burns, falls, electrocution","Falls, struck-by, caught-in/between, and electrocution","Falls, heat stroke, chemical exposure, noise","Electrocution, fire, explosion, falls"],"correctAnswer":1,"explanation":"OSHA''s Fatal Four account for over 60% of construction deaths."},{"id":"q-m14-10","question":"Ladders must extend how far above the landing for roof access?","options":["1 foot","3 feet","5 feet","6 feet"],"correctAnswer":1,"explanation":"Ladders used for roof access must extend at least 3 feet above the landing point."},{"id":"q-m14-11","question":"The correct ladder angle (4:1 rule) means:","options":["45 degrees","1 foot out for every 4 feet up (≈75 degrees)","90 degrees vertical","60 degrees"],"correctAnswer":1,"explanation":"For every 4 feet of ladder height, the base should be 1 foot from the wall — approximately 75 degrees."},{"id":"q-m14-12","question":"Stored energy that must be released before LOTO work includes:","options":["Electrical energy only","Electrical, pneumatic, hydraulic, gravitational, thermal, and spring energy","Electrical and pneumatic only","Only energy above 50V"],"correctAnswer":1,"explanation":"All forms of stored energy must be released: capacitors discharged, springs relaxed, pneumatic lines bled."},{"id":"q-m14-13","question":"An SDS (Safety Data Sheet) has how many sections?","options":["8","12","16","24"],"correctAnswer":2,"explanation":"GHS-format SDS has 16 standardized sections covering identification, hazards, composition, first aid, and more."},{"id":"q-m14-14","question":"The confined space attendant''s primary duty is:","options":["Entering to help if needed","Monitoring entrants and conditions from outside — never entering the space","Operating rescue equipment inside","Testing the atmosphere inside"],"correctAnswer":1,"explanation":"The attendant stays outside, monitors entrants and conditions, and initiates rescue if needed — they do NOT enter."},{"id":"q-m14-15","question":"A fire watch must be maintained for how long after hot work?","options":["5 minutes","30 minutes minimum","1 hour","Until the next day"],"correctAnswer":1,"explanation":"A fire watch must continue for at least 30 minutes after hot work ends — smoldering materials can ignite later."},{"id":"q-m14-16","question":"PASS stands for:","options":["Pull, Aim, Squeeze, Sweep","Push, Aim, Spray, Sweep","Pull, Activate, Spray, Sweep","Point, Aim, Squeeze, Spray"],"correctAnswer":0,"explanation":"Pull the pin, Aim at the base of the fire, Squeeze the handle, Sweep side to side."},{"id":"q-m14-17","question":"Hearing protection is required when noise levels exceed:","options":["70 dBA for 8 hours","85 dBA for 8 hours (action level)","90 dBA for 8 hours","100 dBA for any duration"],"correctAnswer":1,"explanation":"OSHA''s action level is 85 dBA for 8 hours — hearing protection must be provided."},{"id":"q-m14-18","question":"Gloves for handling refrigerants should be:","options":["Standard latex gloves","Cryogenic or insulated gloves rated for low-temperature exposure","Cotton work gloves","No gloves needed"],"correctAnswer":1,"explanation":"Liquid refrigerant causes cryogenic burns. Use insulated or cryogenic gloves rated for the refrigerant''s boiling point."},{"id":"q-m14-19","question":"PPE is the last line of defense because:","options":["It is too expensive","Engineering and administrative controls should eliminate hazards first","It is uncomfortable","OSHA does not require it"],"correctAnswer":1,"explanation":"Hierarchy of controls: eliminate → substitute → engineering → administrative → PPE. PPE is the last resort."},{"id":"q-m14-20","question":"A2L refrigerants (R-32, R-454B) require:","options":["No special precautions","Elimination of ignition sources, proper ventilation, and A2L-rated tools","Only a fire extinguisher nearby","OSHA permit only"],"correctAnswer":1,"explanation":"A2L refrigerants are mildly flammable. Eliminate ignition sources and ensure proper ventilation when working with them."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-88'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-15-02-1","question":"For a severe bleeding wound, the first action is:","options":["Apply a tourniquet immediately","Apply direct pressure with a clean cloth or bandage","Elevate the limb only","Rinse with water"],"correctAnswer":1,"explanation":"Direct pressure is the first step for bleeding control. Apply firm, continuous pressure. Do not remove the cloth — add more on top if it soaks through."},{"id":"q-15-02-2","question":"A tourniquet should be applied when:","options":["Any bleeding occurs","Bleeding from a limb is life-threatening and cannot be controlled by direct pressure","The wound is on the torso","The bleeding has stopped"],"correctAnswer":1,"explanation":"Tourniquets are for life-threatening limb bleeding that cannot be controlled by direct pressure. Apply 2–3 inches above the wound."},{"id":"q-15-02-3","question":"For a suspected electrical shock victim, the first action is:","options":["Touch them to check responsiveness","Ensure the power source is off before touching the victim","Begin CPR immediately","Apply water to cool them"],"correctAnswer":1,"explanation":"Never touch an electrical shock victim until the power source is confirmed off — you could become a second victim."},{"id":"q-15-02-4","question":"Heat stroke (not heat exhaustion) is identified by:","options":["Heavy sweating and weakness","Hot, dry skin, confusion, and body temperature above 104°F — a medical emergency","Mild headache only","Muscle cramps only"],"correctAnswer":1,"explanation":"Heat stroke: hot dry skin, confusion, high body temp — call 911 immediately and cool the victim rapidly. Heat exhaustion: heavy sweating, weakness — move to cool area."},{"id":"q-15-02-5","question":"For a chemical splash to the eyes, the immediate action is:","options":["Apply eye drops","Flush with large amounts of clean water for 15–20 minutes","Cover the eye and seek medical care","Rub the eye to remove the chemical"],"correctAnswer":1,"explanation":"Flush immediately with large amounts of water for 15–20 minutes. Remove contact lenses if present. Seek medical care after flushing."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-90'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-15-03-1","question":"An HVAC technician resume should lead with:","options":["References","A summary of certifications, skills, and relevant experience","Hobbies and interests","Education only"],"correctAnswer":1,"explanation":"Lead with your EPA 608 certification, OSHA 10, and any relevant experience. Employers scan for credentials first."},{"id":"q-15-03-2","question":"Which certifications should be prominently listed on an HVAC resume?","options":["Any certification you have ever heard of","EPA 608 Universal, OSHA 10, CPR/AED, and any NATE credentials","Only college degrees","Driver''s license only"],"correctAnswer":1,"explanation":"EPA 608 Universal is required for employment. OSHA 10 and CPR/AED add value. NATE credentials command higher wages."},{"id":"q-15-03-3","question":"Quantifying accomplishments on a resume means:","options":["Using bullet points","Including specific numbers: \"Serviced 8–12 residential units daily\" rather than \"serviced units\"","Listing job duties only","Using technical jargon"],"correctAnswer":1,"explanation":"Specific numbers make accomplishments concrete and credible. \"Maintained 95% first-call resolution rate\" is stronger than \"fixed equipment.\""},{"id":"q-15-03-4","question":"Resume length for an entry-level HVAC technician should be:","options":["3–4 pages","1 page","2 pages minimum","As long as needed"],"correctAnswer":1,"explanation":"Entry-level resumes should be 1 page. Experienced technicians with 10+ years may use 2 pages. Recruiters spend 6–7 seconds on initial review."},{"id":"q-15-03-5","question":"A cover letter should:","options":["Repeat the resume word for word","Explain why you want this specific job and what you bring to this specific employer","List all your certifications again","Be as long as possible"],"correctAnswer":1,"explanation":"A cover letter connects your skills to the employer''s specific needs. Research the company and explain why you are the right fit for them."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-91'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-15-04-1","question":"The most common HVAC interview question is:","options":["What is your favorite refrigerant?","Tell me about a time you diagnosed a difficult problem — walk me through your process","What is your salary requirement?","Do you have a driver''s license?"],"correctAnswer":1,"explanation":"Behavioral questions (\"tell me about a time...\") are standard. Prepare STAR answers: Situation, Task, Action, Result."},{"id":"q-15-04-2","question":"Professional appearance for an HVAC interview means:","options":["Wearing your work uniform","Clean, neat clothing — business casual at minimum, no visible tattoos if possible","Casual clothes are fine","Wearing a suit always"],"correctAnswer":1,"explanation":"Business casual is appropriate for most HVAC company interviews. Clean, pressed clothes show respect for the opportunity."},{"id":"q-15-04-3","question":"When asked about salary expectations, the best response is:","options":["Name the highest number possible","Research the local market rate and provide a range based on your certifications and experience","Say you will work for anything","Refuse to answer"],"correctAnswer":1,"explanation":"Research BLS data and local job postings. Provide a range: \"Based on my EPA 608 Universal and the local market, I''m targeting $18–22/hr.\""},{"id":"q-15-04-4","question":"Questions you should ask the interviewer include:","options":["Nothing — just answer their questions","What does a typical day look like? What training do you provide? What is the career path here?","How much vacation do I get immediately?","Can I work from home?"],"correctAnswer":1,"explanation":"Asking thoughtful questions shows genuine interest. Ask about training, career development, and what success looks like in the role."},{"id":"q-15-04-5","question":"After an interview, you should:","options":["Wait and see","Send a thank-you email within 24 hours reiterating your interest and a key point from the conversation","Call every day until you hear back","Do nothing — the ball is in their court"],"correctAnswer":1,"explanation":"A thank-you email within 24 hours sets you apart. Reference something specific from the interview to show you were engaged."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-92'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"q-15-05-1","question":"Professional conduct on the job site includes:","options":["Arriving whenever you feel like it","Arriving on time, communicating proactively, and treating customers and coworkers with respect","Doing the minimum required","Avoiding communication with customers"],"correctAnswer":1,"explanation":"Professionalism — punctuality, communication, respect — is what separates technicians who advance from those who stagnate."},{"id":"q-15-05-2","question":"When you encounter a problem beyond your skill level, you should:","options":["Guess and hope for the best","Acknowledge the limit, stop work, and contact your supervisor or a more experienced technician","Pretend you fixed it","Charge the customer anyway"],"correctAnswer":1,"explanation":"Knowing your limits and asking for help is professional. Guessing on complex systems can cause expensive damage and safety hazards."},{"id":"q-15-05-3","question":"Continuing education in HVAC is important because:","options":["It is not important after certification","Refrigerants, equipment, and codes change constantly — staying current protects your career","Only managers need to learn new things","Certifications cover everything forever"],"correctAnswer":1,"explanation":"R-410A is being phased out, A2L refrigerants are coming, variable-speed technology is expanding. Technicians who stop learning become obsolete."},{"id":"q-15-05-4","question":"Social media conduct for HVAC professionals means:","options":["Post anything you want","Never post customer information, job site photos, or complaints about employers online","Only post on personal accounts","Avoid social media entirely"],"correctAnswer":1,"explanation":"Customer privacy, employer reputation, and your own professional image are all at risk from careless social media posts."},{"id":"q-15-05-5","question":"Building a professional network in HVAC includes:","options":["Avoiding other technicians","Joining ACCA, RSES, or local trade associations and attending industry events","Only networking with your employer","Networking is not important in trades"],"correctAnswer":1,"explanation":"ACCA, RSES, and local trade associations connect you with other professionals, training opportunities, and job leads throughout your career."},{"id":"cr-ext-01","question":"What should a resume for an entry-level HVAC technician emphasize?","options":["Years of management experience","EPA 608 certification, OSHA 10, and any hands-on training","College GPA","Unrelated work history only"],"correctAnswer":1,"explanation":"Entry-level HVAC resumes should lead with certifications (EPA 608, OSHA 10), hands-on training, and any relevant technical skills."},{"id":"cr-ext-02","question":"During an HVAC job interview, when asked about a weakness, the best approach is:","options":["Say you have no weaknesses","Describe a genuine area of growth and what you are doing to improve it","Refuse to answer","List multiple serious flaws"],"correctAnswer":1,"explanation":"Employers want self-awareness. Describe a real development area and pair it with concrete steps you are taking — this shows maturity and initiative."},{"id":"cr-ext-03","question":"What does a union apprenticeship typically offer compared to non-union employment?","options":["Lower wages but more flexibility","Structured wage progression, benefits, and formal apprenticeship hours toward journeyman status","Faster path to master technician","No certification requirements"],"correctAnswer":1,"explanation":"Union apprenticeships (UA, IBEW) offer structured wage scales, health benefits, pension, and documented OJT hours required for journeyman licensing."},{"id":"cr-ext-04","question":"What is the primary purpose of a cover letter?","options":["Repeat everything on the resume","Explain why you are a strong fit for this specific employer and role","List references","Describe your salary requirements"],"correctAnswer":1,"explanation":"A cover letter connects your specific skills and experience to the employer''s needs — it should be tailored, not generic."},{"id":"cr-ext-05","question":"Which behavior is most important for maintaining employment as an HVAC technician?","options":["Arriving exactly on time occasionally","Consistent punctuality, professional communication, and completing work correctly","Knowing the most advanced techniques immediately","Having the newest tools"],"correctAnswer":1,"explanation":"Employers consistently cite reliability, communication, and quality work as the top retention factors — technical skills can be developed, but professionalism is expected from day one."},{"id":"cr-ext-06","question":"What does NATE certification demonstrate to employers?","options":["You completed an apprenticeship","Verified technical knowledge across HVAC specialties through third-party testing","You have 10 years of experience","You are licensed to pull permits"],"correctAnswer":1,"explanation":"NATE (North American Technician Excellence) is the industry''s premier third-party certification — it signals verified competency and is valued by residential and commercial employers."},{"id":"cr-ext-07","question":"When a customer complains about a repair you completed, the professional response is:","options":["Argue that the repair was correct","Listen, acknowledge their concern, and offer to return to assess the issue","Ignore the complaint","Blame the equipment manufacturer"],"correctAnswer":1,"explanation":"Customer service is part of the job. Listening without defensiveness and offering to resolve the issue protects your reputation and the company''s relationship with the customer."},{"id":"cr-ext-08","question":"What is the purpose of maintaining a professional portfolio as an HVAC technician?","options":["Required by EPA regulations","Documents certifications, completed projects, and skills for career advancement","Required for union membership","Replaces the need for references"],"correctAnswer":1,"explanation":"A portfolio of certifications, training records, and project documentation supports promotions, wage negotiations, and job applications throughout your career."},{"id":"cr-ext-09","question":"Which of the following is a red flag during a job offer negotiation?","options":["Employer asks about your certifications","Employer refuses to provide a written offer or job description","Employer asks for references","Employer discusses benefits"],"correctAnswer":1,"explanation":"Legitimate employers provide written offers. Refusing to document terms is a warning sign of wage theft, misclassification, or unstable employment."},{"id":"cr-ext-10","question":"What does \"misclassification as an independent contractor\" mean for a worker?","options":["You get paid more","You lose employee protections, benefits, and the employer avoids payroll taxes","You have more flexibility with no downside","It is required for HVAC work"],"correctAnswer":1,"explanation":"Misclassification denies workers unemployment insurance, workers'' comp, overtime protections, and employer tax contributions — it is illegal when the work relationship is actually employment."},{"id":"cr-ext-11","question":"What is the best way to handle a situation where you are unsure how to complete a repair on the job?","options":["Guess and proceed","Tell the customer you cannot help them","Contact your supervisor or a more experienced technician before proceeding","Skip the repair and move on"],"correctAnswer":2,"explanation":"Asking for guidance is professional and prevents costly mistakes. Experienced technicians and supervisors expect new technicians to ask questions."},{"id":"cr-ext-12","question":"Which document proves you are legally authorized to work in the United States for I-9 purposes?","options":["Social Security card alone","A List A document (passport or Employment Authorization Card) OR List B + List C documents combined","Driver''s license alone","Birth certificate alone"],"correctAnswer":1,"explanation":"I-9 verification requires either one List A document (passport, EAD) or a combination of List B (identity) and List C (work authorization) documents."},{"id":"cr-ext-13","question":"What is the purpose of a 90-day probationary period at a new employer?","options":["To delay benefits permanently","To allow both parties to assess fit before full employment terms apply","Required by federal law","To reduce your pay permanently"],"correctAnswer":1,"explanation":"Probationary periods let employers assess performance and let employees evaluate the workplace — most benefits and full protections apply after this period."},{"id":"cr-ext-14","question":"Which professional organization provides networking and continuing education for HVAC technicians?","options":["ABA (American Bar Association)","ACCA (Air Conditioning Contractors of America)","AMA (American Medical Association)","AICPA"],"correctAnswer":1,"explanation":"ACCA is the primary trade association for HVAC contractors and technicians — it offers training, certification, and industry networking."},{"id":"cr-ext-15","question":"What is the most effective way to advance from apprentice to journeyman technician?","options":["Wait for automatic promotion after 5 years","Accumulate documented OJT hours, pass licensing exams, and pursue additional certifications","Change employers frequently","Focus only on residential work"],"correctAnswer":1,"explanation":"Journeyman advancement requires documented OJT hours (typically 8,000 in Indiana), passing the journeyman exam, and often additional certifications like NATE."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-93'
+    AND quiz_questions IS NULL;
+
+UPDATE public.course_lessons
+  SET quiz_questions = '[{"id":"epa-core-01","question":"What is the primary purpose of the Clean Air Act Section 608?","options":["Regulate indoor air quality in commercial buildings","Minimize the release of ozone-depleting refrigerants","Set energy efficiency standards for HVAC equipment","Establish workplace safety requirements for HVAC technicians"],"correctAnswer":1,"explanation":"Section 608 of the Clean Air Act specifically addresses the release of refrigerants that deplete the stratospheric ozone layer."},{"id":"epa-core-02","question":"Which refrigerant classification has the highest ozone depletion potential (ODP)?","options":["HFCs","HFOs","CFCs","HCFCs"],"correctAnswer":2,"explanation":"CFCs (chlorofluorocarbons) like R-12 have the highest ODP because they contain chlorine atoms that are very stable and reach the stratosphere."},{"id":"epa-core-03","question":"It is a violation of federal law to:","options":["Recover refrigerant before servicing equipment","Intentionally vent refrigerant to the atmosphere","Use recycled refrigerant in the same system","Charge a system with recovered refrigerant"],"correctAnswer":1,"explanation":"The Clean Air Act prohibits the knowing venting of refrigerants. Violators face fines up to $44,539 per day per violation."},{"id":"epa-core-04","question":"What does the term ''recovery'' mean?","options":["Cleaning refrigerant to ARI 700 standards","Removing refrigerant and storing it in an external container without testing or processing","Removing contaminants from used refrigerant","Returning used refrigerant to the manufacturer for reprocessing"],"correctAnswer":1,"explanation":"Recovery means removing refrigerant from a system and storing it in an external container. Recycling cleans it for reuse; reclamation restores it to ARI 700 purity."},{"id":"epa-core-05","question":"What is the maximum fine per day for knowingly venting refrigerant?","options":["$10,000","$27,500","$37,500","$44,539"],"correctAnswer":3,"explanation":"As of the most recent adjustment, the maximum fine is $44,539 per day per violation under the Clean Air Act."},{"id":"epa-core-06","question":"R-410A is classified as which type of refrigerant?","options":["CFC","HCFC","HFC","HFO"],"correctAnswer":2,"explanation":"R-410A is an HFC (hydrofluorocarbon). It has zero ODP but does have global warming potential."},{"id":"epa-core-07","question":"Which refrigerant was commonly used in residential AC systems before the R-22 phase-out?","options":["R-12","R-134a","R-22","R-404A"],"correctAnswer":2,"explanation":"R-22 (an HCFC) was the standard residential AC refrigerant for decades. Production was phased out January 1, 2020."},{"id":"epa-core-08","question":"What is the relationship between pressure and temperature in a sealed refrigerant container?","options":["As temperature increases, pressure decreases","As temperature increases, pressure increases","Pressure and temperature are not related","Pressure remains constant regardless of temperature"],"correctAnswer":1,"explanation":"In a sealed container with liquid and vapor present, pressure and temperature have a direct relationship (pressure-temperature relationship)."},{"id":"epa-core-09","question":"Refrigerant cylinders should be stored:","options":["In direct sunlight to keep them warm","In an upright position in a cool, dry area","On their side to prevent valve damage","Near open flames for easy access"],"correctAnswer":1,"explanation":"Cylinders must be stored upright in cool, dry, ventilated areas away from heat sources. Never expose to temperatures above 125 degrees F."},{"id":"epa-core-10","question":"What is ''reclamation'' of refrigerant?","options":["Removing refrigerant from a system into a container","Cleaning refrigerant using oil separation and single or multiple passes through filter-driers","Reprocessing refrigerant to ARI 700 purity standards, equivalent to new product","Returning refrigerant to the same system after minor cleaning"],"correctAnswer":2,"explanation":"Reclamation restores used refrigerant to ARI 700 purity standards (equivalent to virgin refrigerant). Only EPA-certified reclaimers can perform this."},{"id":"epa-core-11","question":"Which substance depletes the ozone layer?","options":["Carbon dioxide","Chlorine","Nitrogen","Hydrogen"],"correctAnswer":1,"explanation":"Chlorine atoms released from CFC and HCFC molecules catalytically destroy ozone in the stratosphere. One chlorine atom can destroy thousands of ozone molecules."},{"id":"epa-core-12","question":"What is the ozone layer''s primary function?","options":["Regulate Earth''s temperature","Filter ultraviolet (UV) radiation from the sun","Produce oxygen for breathing","Prevent acid rain"],"correctAnswer":1,"explanation":"The stratospheric ozone layer absorbs most of the sun''s harmful UV-B radiation, protecting life on Earth from skin cancer and other damage."},{"id":"epa-core-13","question":"Technicians must be certified to:","options":["Purchase any HVAC equipment","Purchase and handle refrigerants","Install ductwork","Perform electrical work on HVAC systems"],"correctAnswer":1,"explanation":"EPA Section 608 certification is required to purchase refrigerants and to service or dispose of equipment containing refrigerants."},{"id":"epa-core-14","question":"What does ASHRAE stand for?","options":["American Society of Heating, Refrigeration and Air-Conditioning Engineers","Association of Safety and Health Regulations for Air Equipment","American Standard for Heating, Refrigerant and Air Exchange","Allied Society of HVAC and Refrigeration Experts"],"correctAnswer":0,"explanation":"ASHRAE sets standards for refrigerant safety classifications, building ventilation, and HVAC system design."},{"id":"epa-core-15","question":"Refrigerant exposure in an enclosed area can cause:","options":["Only minor skin irritation","Oxygen displacement leading to suffocation","Improved air quality","No health effects at normal concentrations"],"correctAnswer":1,"explanation":"Refrigerants are heavier than air and can displace oxygen in enclosed spaces, leading to suffocation. Always ensure adequate ventilation."},{"id":"epa-core-16","question":"What is the Montreal Protocol?","options":["A US federal law regulating HVAC installations","An international treaty to phase out ozone-depleting substances","An EPA regulation on refrigerant recovery","A standard for HVAC equipment efficiency"],"correctAnswer":1,"explanation":"The Montreal Protocol (1987) is an international treaty that established the phase-out schedule for CFCs, HCFCs, and other ozone-depleting substances."},{"id":"epa-core-17","question":"R-22 production in the United States was phased out as of:","options":["January 1, 2010","January 1, 2015","January 1, 2020","January 1, 2025"],"correctAnswer":2,"explanation":"R-22 production and import was banned effective January 1, 2020. Only recycled or reclaimed R-22 can be used for servicing existing equipment."},{"id":"epa-core-18","question":"What color is a recovery cylinder?","options":["Green body with yellow top","Gray body with yellow top","Yellow body with gray top","White body with green top"],"correctAnswer":2,"explanation":"Recovery cylinders are yellow with a gray top. They are designed to hold recovered refrigerant and must meet DOT standards."},{"id":"epa-core-19","question":"Gauge pressure is measured relative to:","options":["Absolute zero","Atmospheric pressure","Vacuum","The boiling point of water"],"correctAnswer":1,"explanation":"Gauge pressure reads 0 at atmospheric pressure (14.7 psia). Absolute pressure = gauge pressure + atmospheric pressure."},{"id":"epa-core-20","question":"Which of the following is NOT a sign of refrigerant exposure?","options":["Dizziness","Nausea","Frostbite on skin contact","Improved mental clarity"],"correctAnswer":3,"explanation":"Refrigerant exposure causes dizziness, nausea, headache, and can cause frostbite on skin contact. It impairs mental function, not improves it."},{"id":"epa-core-21","question":"What must a technician do before opening a system for service?","options":["Vent the refrigerant to speed up the process","Recover the refrigerant to the required level","Add nitrogen to the system","Disconnect the electrical supply only"],"correctAnswer":1,"explanation":"Technicians must recover refrigerant to the required vacuum level before opening a system. Venting is illegal."},{"id":"epa-core-22","question":"Recovery equipment manufactured after November 15, 1993 must be certified by:","options":["OSHA","EPA","An EPA-approved equipment testing organization","The equipment manufacturer"],"correctAnswer":2,"explanation":"Recovery and recycling equipment must be certified by an EPA-approved testing organization (such as UL or ARI) to meet EPA standards."},{"id":"epa-core-23","question":"What is ''recycling'' of refrigerant?","options":["Removing refrigerant and storing it without processing","Cleaning refrigerant by oil separation and passing through filter-driers for reuse","Restoring refrigerant to ARI 700 purity standards","Disposing of refrigerant at an approved facility"],"correctAnswer":1,"explanation":"Recycling means cleaning refrigerant using oil separation and single or multiple passes through filter-driers. It can be done on-site."},{"id":"epa-core-24","question":"Refrigerant sales are restricted to:","options":["Anyone over 18 years old","Licensed contractors only","EPA Section 608 certified technicians","HVAC supply house members"],"correctAnswer":2,"explanation":"Since January 1, 2018, refrigerant sales are restricted to EPA Section 608 certified technicians. Sellers must verify certification."},{"id":"epa-core-25","question":"The four types of EPA Section 608 certification are:","options":["Residential, Commercial, Industrial, Universal","Type I, Type II, Type III, Universal","Basic, Intermediate, Advanced, Master","Small, Medium, Large, Universal"],"correctAnswer":1,"explanation":"Type I (small appliances), Type II (high-pressure), Type III (low-pressure), and Universal (all three types combined)."},{"id":"epa-core-26","question":"Which refrigerant has zero ozone depletion potential AND zero global warming potential?","options":["R-410A","R-22","R-744 (CO2)","R-134a"],"correctAnswer":2,"explanation":"R-744 (CO2) has ODP of 0 and GWP of 1 (the baseline). It is used in transcritical refrigeration systems."},{"id":"epa-core-27","question":"The Kigali Amendment to the Montreal Protocol targets the phase-down of:","options":["CFCs","HCFCs","HFCs","HFOs"],"correctAnswer":2,"explanation":"The 2016 Kigali Amendment added HFCs to the Montreal Protocol phase-down schedule due to their high global warming potential."},{"id":"epa-core-28","question":"What does GWP stand for?","options":["Gas Weight Potential","Global Warming Potential","Greenhouse Water Pressure","Gas Vent Prohibition"],"correctAnswer":1,"explanation":"GWP (Global Warming Potential) measures how much heat a greenhouse gas traps relative to CO2 over 100 years."},{"id":"epa-core-29","question":"R-32 is classified as what ASHRAE safety group?","options":["A1","A2L","B1","A3"],"correctAnswer":1,"explanation":"R-32 is A2L — low toxicity, mildly flammable. A2L refrigerants require special handling to eliminate ignition sources."},{"id":"epa-core-30","question":"Which of the following is an A2L (mildly flammable) refrigerant?","options":["R-22","R-410A","R-454B","R-123"],"correctAnswer":2,"explanation":"R-454B (Opteon XL41) is an A2L refrigerant and a leading replacement for R-410A in new residential equipment."},{"id":"epa-core-31","question":"The stratospheric ozone layer is located approximately how far above Earth''s surface?","options":["1–5 miles","6–30 miles","50–100 miles","100–200 miles"],"correctAnswer":1,"explanation":"The stratospheric ozone layer is located roughly 6–30 miles (10–50 km) above Earth''s surface."},{"id":"epa-core-32","question":"Which organization sets the ARI 700 purity standard for reclaimed refrigerants?","options":["EPA","OSHA","AHRI (formerly ARI)","ASHRAE"],"correctAnswer":2,"explanation":"AHRI (Air-Conditioning, Heating, and Refrigeration Institute, formerly ARI) sets the 700 standard for reclaimed refrigerant purity."},{"id":"epa-core-33","question":"A technician who purchases refrigerant for resale must:","options":["Have no special certification","Be EPA 608 certified","Hold a contractor''s license only","Register with OSHA"],"correctAnswer":1,"explanation":"Anyone purchasing refrigerant — including for resale — must be EPA 608 certified."},{"id":"epa-core-34","question":"What is the ASHRAE safety classification for R-410A?","options":["A1","A2L","B1","A3"],"correctAnswer":0,"explanation":"R-410A is classified A1 — low toxicity, non-flammable. It is safe to handle under normal conditions."},{"id":"epa-core-35","question":"Refrigerant containers must be labeled with:","options":["Only the refrigerant name","Refrigerant type, pressure, and hazard warnings","Only the manufacturer name","No labeling is required"],"correctAnswer":1,"explanation":"Refrigerant containers must be properly labeled with the refrigerant type, pressure rating, and appropriate hazard warnings."},{"id":"epa-core-36","question":"Which of the following is NOT a CFC refrigerant?","options":["R-11","R-12","R-22","R-113"],"correctAnswer":2,"explanation":"R-22 is an HCFC (hydrochlorofluorocarbon), not a CFC. R-11, R-12, and R-113 are all CFCs."},{"id":"epa-core-37","question":"The term ''azeotrope'' describes a refrigerant blend that:","options":["Separates into components at different pressures","Behaves like a single compound and does not fractionate","Has zero ODP","Contains only one chemical compound"],"correctAnswer":1,"explanation":"Azeotropic blends (like R-502) behave as a single substance — they do not fractionate (separate) during normal operation."},{"id":"epa-core-38","question":"A zeotropic refrigerant blend:","options":["Does not change composition during phase change","Has components that evaporate and condense at different rates (temperature glide)","Is always an HFC","Cannot be recovered"],"correctAnswer":1,"explanation":"Zeotropic blends (like R-407C, R-410A) exhibit temperature glide — components change proportion during phase change."},{"id":"epa-core-39","question":"What is temperature glide?","options":["The difference between suction and discharge temperature","The range of temperatures over which a zeotropic blend changes phase","The rate of temperature change during startup","The difference between indoor and outdoor temperature"],"correctAnswer":1,"explanation":"Temperature glide is the difference between the bubble point and dew point of a zeotropic blend during phase change."},{"id":"epa-core-40","question":"Refrigerant that has been recovered and not yet processed is called:","options":["Reclaimed refrigerant","Recycled refrigerant","Recovered refrigerant","Virgin refrigerant"],"correctAnswer":2,"explanation":"Recovered refrigerant has been removed from a system but not yet cleaned or tested. It may be recycled or sent for reclamation."},{"id":"epa-core-41","question":"Which refrigerant is used in most modern motor vehicle air conditioning systems?","options":["R-12","R-22","R-134a","R-410A"],"correctAnswer":2,"explanation":"R-134a replaced R-12 in automotive AC systems. Newer vehicles are transitioning to R-1234yf."},{"id":"epa-core-42","question":"R-1234yf is classified as:","options":["A1 — non-flammable","A2L — mildly flammable","A3 — highly flammable","B1 — toxic"],"correctAnswer":1,"explanation":"R-1234yf is A2L — mildly flammable with very low GWP (4). It is the primary automotive AC refrigerant in new vehicles."},{"id":"epa-core-43","question":"The EPA''s SNAP (Significant New Alternatives Policy) program:","options":["Regulates refrigerant recovery equipment","Evaluates and lists acceptable substitutes for ozone-depleting substances","Sets energy efficiency standards","Certifies HVAC technicians"],"correctAnswer":1,"explanation":"SNAP evaluates substitutes for ozone-depleting substances and lists acceptable alternatives for various end uses."},{"id":"epa-core-44","question":"What is the purpose of a refrigerant identifier?","options":["Measure system pressure","Identify refrigerant type and detect contamination or non-condensables","Measure refrigerant weight","Test for leaks"],"correctAnswer":1,"explanation":"A refrigerant identifier analyzes the refrigerant in a system to confirm its type and detect contamination or mixed refrigerants."},{"id":"epa-core-45","question":"Mixing different refrigerants in a recovery cylinder is:","options":["Acceptable if they are both HFCs","Prohibited — it creates a contaminated blend that cannot be reclaimed","Required for proper recovery","Acceptable with manufacturer approval"],"correctAnswer":1,"explanation":"Never mix refrigerants in a recovery cylinder. Contaminated blends cannot be reclaimed and must be destroyed at significant cost."},{"id":"epa-core-46","question":"The DOT classification for refrigerant cylinders requires them to meet:","options":["OSHA 29 CFR standards","DOT 49 CFR pressure vessel standards","ASHRAE 15 standards","UL 207 standards"],"correctAnswer":1,"explanation":"Refrigerant cylinders must meet DOT 49 CFR pressure vessel standards for safe transport and storage."},{"id":"epa-core-47","question":"What is the purpose of the ''de minimis'' exemption?","options":["Allows venting of any amount of refrigerant","Allows release of refrigerant in trace amounts that are unavoidable during good-faith recovery","Exempts small appliances from all regulations","Allows technicians to vent R-134a"],"correctAnswer":1,"explanation":"The de minimis exemption allows unavoidable trace releases during good-faith recovery efforts. It does not permit intentional venting."},{"id":"epa-core-48","question":"Refrigerant R-404A is primarily used in:","options":["Residential AC","Commercial refrigeration (medium and low temperature)","Centrifugal chillers","Automotive AC"],"correctAnswer":1,"explanation":"R-404A is widely used in commercial refrigeration — supermarket cases, walk-in coolers, and transport refrigeration."},{"id":"epa-core-49","question":"What does the ''H'' in HFC stand for?","options":["Halogen","Hydrogen","Hydro","High"],"correctAnswer":2,"explanation":"HFC = Hydrofluorocarbon. The ''H'' stands for hydro (hydrogen). HFCs contain hydrogen, fluorine, and carbon — no chlorine."},{"id":"epa-core-50","question":"Which refrigerant has the highest GWP among common HVAC refrigerants?","options":["R-22","R-410A","R-404A","R-134a"],"correctAnswer":2,"explanation":"R-404A has a GWP of approximately 3,922 — among the highest of common refrigerants. R-410A is about 2,088."},{"id":"epa-core-51","question":"A technician must keep records of refrigerant purchases for:","options":["1 year","3 years","5 years","10 years"],"correctAnswer":1,"explanation":"EPA regulations require technicians and businesses to maintain refrigerant purchase and disposal records for at least 3 years."},{"id":"epa-core-52","question":"What is the purpose of a pressure relief valve on a refrigerant cylinder?","options":["Regulate operating pressure","Release pressure if the cylinder overheats to prevent explosion","Measure cylinder pressure","Control refrigerant flow"],"correctAnswer":1,"explanation":"Pressure relief valves protect cylinders from catastrophic failure if they are exposed to excessive heat or overfilling."},{"id":"epa-core-53","question":"Refrigerant cylinders should never be exposed to temperatures above:","options":["100°F","125°F","150°F","200°F"],"correctAnswer":1,"explanation":"Refrigerant cylinders must not be exposed to temperatures above 125°F. Higher temperatures increase pressure and risk cylinder failure."},{"id":"epa-core-54","question":"Which of the following actions is legal under EPA Section 608?","options":["Venting R-22 to speed up a repair","Recovering R-22 before opening the system","Mixing R-22 with R-410A in a recovery cylinder","Selling R-22 to an uncertified person"],"correctAnswer":1,"explanation":"Recovering refrigerant before opening a system is required by law. All other options are violations."},{"id":"epa-core-55","question":"The term ''ozone depletion potential'' (ODP) is measured relative to:","options":["R-22","R-12","R-11","CO2"],"correctAnswer":2,"explanation":"ODP is measured relative to R-11, which has an ODP of 1.0. All other refrigerants are compared to this baseline."},{"id":"epa-core-56","question":"HFOs (hydrofluoroolefins) like R-1234yf are considered environmentally preferable because:","options":["They have high ODP","They have very low GWP and zero ODP","They are non-toxic","They are cheaper than HFCs"],"correctAnswer":1,"explanation":"HFOs have near-zero GWP (typically 1–10) and zero ODP, making them the next generation of environmentally friendly refrigerants."},{"id":"epa-core-57","question":"What is the primary difference between R-22 and R-410A?","options":["R-22 is an HFC; R-410A is an HCFC","R-22 is an HCFC with ODP; R-410A is an HFC with zero ODP","They are interchangeable","R-410A has higher ODP"],"correctAnswer":1,"explanation":"R-22 is an HCFC with ODP of 0.05. R-410A is an HFC with zero ODP but higher GWP."},{"id":"epa-core-58","question":"A refrigerant leak that is discovered must be reported to the EPA if:","options":["Any amount leaks","The system has more than 50 lbs and exceeds the applicable leak rate threshold","The leak is from a small appliance","The technician is not certified"],"correctAnswer":1,"explanation":"Systems with more than 50 lbs of refrigerant that exceed the applicable leak rate threshold must be repaired; reporting requirements apply to larger systems."},{"id":"epa-core-59","question":"What is the purpose of a manifold gauge set?","options":["Measure electrical current","Connect to refrigerant lines to measure suction and discharge pressures","Test for refrigerant leaks","Measure airflow"],"correctAnswer":1,"explanation":"Manifold gauges connect to the high and low side service ports to measure system pressures and allow refrigerant charging or recovery."},{"id":"epa-core-60","question":"The low-side (suction) gauge on a manifold set is typically:","options":["Red","Blue","Yellow","Green"],"correctAnswer":1,"explanation":"By convention, the low-side (suction) gauge is blue, the high-side (discharge) gauge is red, and the center utility hose is yellow."},{"id":"epa-core-61","question":"Refrigerant R-502 was commonly used in:","options":["Residential AC","Low-temperature commercial refrigeration","Centrifugal chillers","Automotive AC"],"correctAnswer":1,"explanation":"R-502 (a CFC/HCFC blend) was widely used in low-temperature commercial refrigeration before being phased out."},{"id":"epa-core-62","question":"What does ''fractionation'' mean in the context of refrigerant blends?","options":["Separating refrigerant from oil","The preferential evaporation of lower-boiling components from a blend","Measuring refrigerant purity","Mixing two refrigerants together"],"correctAnswer":1,"explanation":"Fractionation occurs when components of a zeotropic blend evaporate at different rates, changing the blend''s composition."},{"id":"epa-core-63","question":"Which of the following is a drop-in replacement for R-22?","options":["R-410A","R-407C","R-134a","R-404A"],"correctAnswer":1,"explanation":"R-407C is a near-drop-in replacement for R-22 in existing systems. R-410A requires different equipment and cannot be used in R-22 systems."},{"id":"epa-core-64","question":"The EPA Section 608 regulations apply to:","options":["Only commercial HVAC systems","All stationary refrigeration and AC equipment","Only systems over 50 lbs","Only new equipment installations"],"correctAnswer":1,"explanation":"Section 608 applies to all stationary refrigeration and AC equipment — residential, commercial, and industrial."},{"id":"epa-core-65","question":"What is the purpose of a filter-drier in a refrigeration system?","options":["Increase system pressure","Remove moisture and contaminants from the refrigerant","Measure refrigerant flow","Control superheat"],"correctAnswer":1,"explanation":"Filter-driers remove moisture, acid, and particulate contaminants that can damage compressors and other components."},{"id":"epa-core-66","question":"Refrigerant that has been reclaimed to ARI 700 standards can be:","options":["Used only in the original system","Sold as equivalent to virgin refrigerant","Used only in commercial systems","Disposed of only"],"correctAnswer":1,"explanation":"Reclaimed refrigerant meeting ARI 700 standards is equivalent to virgin refrigerant and can be sold and used in any compatible system."},{"id":"epa-core-67","question":"What is the primary hazard of liquid refrigerant contact with skin?","options":["Chemical burns from toxicity","Frostbite from rapid evaporation and extreme cold","Allergic reaction","No significant hazard"],"correctAnswer":1,"explanation":"Liquid refrigerant evaporates rapidly on contact with skin, causing frostbite. Always wear gloves and eye protection."},{"id":"epa-core-68","question":"The EPA requires that recovery equipment be used:","options":["Only on systems over 50 lbs","On all refrigerant-containing equipment before opening for service","Only on commercial systems","Only when the technician chooses to"],"correctAnswer":1,"explanation":"Recovery equipment must be used on all refrigerant-containing equipment before opening for service, regardless of size."},{"id":"epa-core-69","question":"Which refrigerant is NOT subject to EPA Section 608 venting prohibition?","options":["R-22","R-410A","R-744 (CO2)","R-134a"],"correctAnswer":2,"explanation":"CO2 (R-744) is not an ozone-depleting substance and is not subject to the Section 608 venting prohibition, though it is a greenhouse gas."},{"id":"epa-core-70","question":"A technician who violates EPA Section 608 regulations may face:","options":["Only a warning letter","Civil penalties up to $44,539 per day per violation and loss of certification","A $500 fine only","No penalties if it is a first offense"],"correctAnswer":1,"explanation":"Violations can result in civil penalties up to $44,539 per day per violation, criminal penalties, and revocation of certification."},{"id":"epa-core-71","question":"What is the purpose of the ''safe disposal'' exemption for small appliances?","options":["Allows venting during disposal","Allows persons other than certified technicians to recover refrigerant from small appliances being disposed of, using approved equipment","Exempts small appliances from all regulations","Allows disposal without recovery"],"correctAnswer":1,"explanation":"The safe disposal exemption allows non-certified persons (e.g., scrap dealers) to recover refrigerant from small appliances using approved equipment."},{"id":"epa-core-72","question":"Refrigerant cylinders must be transported:","options":["In any position","Upright and secured to prevent tipping","On their side to prevent valve damage","In the passenger compartment only"],"correctAnswer":1,"explanation":"Cylinders must be transported upright and secured. They should be in a ventilated area, not the passenger compartment."},{"id":"epa-core-73","question":"What is the ASHRAE 15 standard?","options":["Refrigerant purity standard","Safety standard for refrigeration systems — machinery room requirements, refrigerant quantities, ventilation","Energy efficiency standard","Installation standard for split systems"],"correctAnswer":1,"explanation":"ASHRAE 15 is the Safety Standard for Refrigeration Systems, covering machinery room design, refrigerant quantity limits, and ventilation requirements."},{"id":"epa-core-74","question":"Which of the following refrigerants is flammable (A3 classification)?","options":["R-410A","R-22","R-290 (propane)","R-134a"],"correctAnswer":2,"explanation":"R-290 (propane) is classified A3 — low toxicity but highly flammable. It is used in some small commercial refrigeration equipment."},{"id":"epa-core-75","question":"The EPA Section 608 program is administered by:","options":["OSHA","DOE","EPA''s Office of Air and Radiation","ASHRAE"],"correctAnswer":2,"explanation":"EPA''s Office of Air and Radiation administers the Section 608 refrigerant management program."},{"id":"epa-core-76","question":"There are NO ''drop-in'' replacements for CFC or HCFC refrigerants because:","options":["They are too expensive","Substitute refrigerants have different pressures, lubricant requirements, and materials compatibility","The EPA prohibits substitutes","Only the original refrigerant can be used in any system"],"correctAnswer":1,"explanation":"No true drop-in replacements exist. Substitutes require different oils, may need different seals/hoses, and operate at different pressures."},{"id":"epa-core-77","question":"R-134a requires what type of lubricant?","options":["Mineral oil","Alkylbenzene oil","Polyol ester (POE) oil","Any oil works"],"correctAnswer":2,"explanation":"R-134a is not miscible with mineral oil. It requires polyol ester (POE) oil, which is hygroscopic and must be kept sealed."},{"id":"epa-core-78","question":"R-22 systems typically use what type of lubricant?","options":["POE oil","PAG oil","Mineral oil or alkylbenzene oil","Synthetic oil only"],"correctAnswer":2,"explanation":"R-22 is miscible with mineral oil and alkylbenzene oil. Alkylbenzene is preferred for retrofit situations."},{"id":"epa-core-79","question":"When retrofitting an R-22 system to R-407C, the lubricant must be changed to:","options":["Mineral oil","Alkylbenzene oil","POE oil","No change needed"],"correctAnswer":2,"explanation":"R-407C (an HFC blend) requires POE oil. Mineral oil must be flushed out before charging with R-407C."},{"id":"epa-core-80","question":"Which factor does NOT speed up refrigerant recovery?","options":["Heating the appliance being recovered from","Chilling the recovery vessel","Using larger diameter hoses","Adding more refrigerant to the system"],"correctAnswer":3,"explanation":"Recovery speed is increased by heating the appliance (raises pressure), chilling the recovery vessel (lowers pressure), and using larger/shorter hoses. Adding refrigerant does not help."},{"id":"epa-core-81","question":"Chilling the recovery vessel during recovery:","options":["Slows recovery","Speeds recovery by lowering pressure in the vessel, increasing the pressure differential","Has no effect","Is prohibited"],"correctAnswer":1,"explanation":"A colder recovery vessel has lower internal pressure, creating a greater pressure differential that pulls refrigerant in faster."},{"id":"epa-core-82","question":"Heating the appliance during recovery:","options":["Slows recovery","Speeds recovery by raising system pressure, increasing the pressure differential","Has no effect","Is prohibited"],"correctAnswer":1,"explanation":"Heating the appliance raises refrigerant pressure, increasing the pressure differential that drives refrigerant into the recovery vessel."},{"id":"epa-core-83","question":"Long recovery hoses:","options":["Speed up recovery","Slow recovery due to increased pressure drop and flow resistance","Have no effect on recovery speed","Are required by EPA"],"correctAnswer":1,"explanation":"Long hoses increase flow resistance and pressure drop, slowing recovery. Use the shortest hoses practical."},{"id":"epa-core-84","question":"To avoid mixing refrigerants during recovery, a technician should:","options":["Use the same recovery machine for all refrigerants","Use dedicated recovery equipment per refrigerant type, or purge and change oil between refrigerants","Mix is acceptable if both are HFCs","Only use new recovery cylinders"],"correctAnswer":1,"explanation":"Mixing refrigerants creates a contaminated blend that cannot be reclaimed. Use dedicated equipment or thoroughly purge between refrigerant types."},{"id":"epa-core-85","question":"What is the purpose of evacuating a system before charging?","options":["Remove refrigerant","Remove air (non-condensables) and moisture that would cause problems in the system","Test for leaks only","Cool the system down"],"correctAnswer":1,"explanation":"Evacuation removes air (which raises head pressure and reduces efficiency) and moisture (which causes acid formation and corrosion)."},{"id":"epa-core-86","question":"Nitrogen is used for leak testing instead of compressed air because:","options":["Nitrogen is cheaper","Compressed air contains moisture and oxygen that can contaminate the system and create explosion risk","Nitrogen is required by law","Compressed air is too cold"],"correctAnswer":1,"explanation":"Compressed air contains moisture (causes acid/corrosion) and oxygen (explosion risk with oil at high temperatures). Dry nitrogen is inert and dry."},{"id":"epa-core-87","question":"When using nitrogen for leak testing, you must use:","options":["Any regulator","A pressure regulator and a pressure relief valve","No regulator — full cylinder pressure","Only a relief valve"],"correctAnswer":1,"explanation":"Always use a pressure regulator to control nitrogen pressure and a relief valve to prevent over-pressurization of the system."},{"id":"epa-core-88","question":"Disposable refrigerant cylinders:","options":["Can be refilled once","Must never be refilled — it is illegal and dangerous","Can be refilled if pressure-tested","Can be refilled by certified technicians only"],"correctAnswer":1,"explanation":"Disposable cylinders are designed for single use only. Refilling is illegal under DOT regulations and extremely dangerous."},{"id":"epa-core-89","question":"What is the color code for a recovery cylinder?","options":["All yellow","Yellow body with gray top","Gray body with yellow top","Green body with yellow top"],"correctAnswer":1,"explanation":"Recovery cylinders are yellow with a gray top — the standard DOT color code for used/recovered refrigerant."},{"id":"epa-core-90","question":"A refrigerant cylinder must never be filled beyond what percentage of its capacity?","options":["60%","70%","80%","90%"],"correctAnswer":2,"explanation":"Cylinders must not be filled beyond 80% of capacity by weight to allow for thermal expansion and prevent hydrostatic pressure buildup."},{"id":"epa-core-91","question":"What personal protective equipment (PPE) is required when handling refrigerants?","options":["Only safety glasses","Gloves and goggles (eye protection)","Only a respirator","No PPE required for small amounts"],"correctAnswer":1,"explanation":"Gloves protect against frostbite from liquid refrigerant contact. Goggles protect eyes from refrigerant spray. Both are required."},{"id":"epa-core-92","question":"Refrigerant vapor in high concentrations can cause cardiac sensitization, meaning:","options":["The heart beats faster","The heart becomes sensitized to adrenaline, potentially causing fatal arrhythmia","The heart rate slows","No cardiac effects"],"correctAnswer":1,"explanation":"High concentrations of refrigerant vapor can sensitize the heart to adrenaline (epinephrine), potentially causing fatal cardiac arrhythmia."},{"id":"epa-core-93","question":"The CFC phaseout in the United States was completed by:","options":["January 1, 1990","January 1, 1996","January 1, 2000","January 1, 2010"],"correctAnswer":1,"explanation":"CFC production and import was phased out in the US by January 1, 1996, per the Montreal Protocol schedule."},{"id":"epa-core-94","question":"Which of the following correctly identifies refrigerant types?","options":["R-12 = HFC, R-22 = CFC, R-134a = HCFC","R-12 = CFC, R-22 = HCFC, R-134a = HFC","R-12 = HCFC, R-22 = HFC, R-134a = CFC","R-12 = HFC, R-22 = HFC, R-134a = CFC"],"correctAnswer":1,"explanation":"R-12 is a CFC (phased out 1996), R-22 is an HCFC (phased out 2020), R-134a is an HFC (zero ODP)."},{"id":"epa-core-95","question":"The venting prohibition under Section 608 applies to:","options":["CFCs only","CFCs and HCFCs only","All refrigerants used in stationary equipment, including HFCs and substitutes","Only refrigerants with ODP above 0.1"],"correctAnswer":2,"explanation":"The venting prohibition applies to all refrigerants used in stationary equipment — CFCs, HCFCs, HFCs, and substitutes."},{"id":"epa-core-96","question":"Fractionation of a zeotropic blend during a leak means:","options":["The blend becomes more pure","The composition of the remaining refrigerant changes — lighter components leak faster","The blend separates into layers","No change in composition"],"correctAnswer":1,"explanation":"During a vapor leak, lighter (lower-boiling) components escape faster, changing the blend''s composition. The remaining charge may not perform correctly."},{"id":"epa-core-97","question":"Because of fractionation risk, a leaking zeotropic blend system should be:","options":["Topped off with the same blend","Fully recovered and recharged with a fresh charge","Topped off with the dominant component","Left as-is — fractionation is minor"],"correctAnswer":1,"explanation":"A leaking zeotropic blend should be fully recovered and recharged. Topping off changes the composition further."},{"id":"epa-core-98","question":"ASHRAE Standard 15 requires what safety device in all refrigerant machinery rooms?","options":["A fire suppression system","An oxygen deprivation (refrigerant) sensor with alarm","A pressure relief valve only","A CO detector"],"correctAnswer":1,"explanation":"ASHRAE 15 requires a refrigerant detector/oxygen deprivation sensor with an alarm in all machinery rooms, regardless of refrigerant type."},{"id":"epa-core-99","question":"Refrigerant shipping containers must be labeled with:","options":["Only the refrigerant name","Refrigerant identification and DOT hazard classification label","Only the manufacturer''s name","No labeling required for small containers"],"correctAnswer":1,"explanation":"Refrigerant containers must have the refrigerant identification and the appropriate DOT hazard classification label for transport."},{"id":"epa-core-100","question":"The pressure-temperature (PT) relationship means that for a pure refrigerant in a sealed container:","options":["Pressure and temperature are unrelated","Knowing the pressure tells you the saturation temperature, and vice versa","Temperature is always higher than pressure","Pressure is always higher than temperature"],"correctAnswer":1,"explanation":"For a pure refrigerant with liquid and vapor present, pressure and saturation temperature have a fixed relationship — the PT chart."},{"id":"epa-t1-01","question":"Type I certification covers systems containing:","options":["More than 50 lbs of refrigerant","5 lbs or less of refrigerant","Any amount of high-pressure refrigerant","Only automotive AC systems"],"correctAnswer":1,"explanation":"Type I covers small appliances — systems manufactured, charged, and hermetically sealed with 5 lbs or less of refrigerant."},{"id":"epa-t1-02","question":"Which of the following is a small appliance?","options":["A 5-ton rooftop unit","A household refrigerator","A centrifugal chiller","A split-system heat pump"],"correctAnswer":1,"explanation":"Small appliances include household refrigerators, freezers, window AC units, PTACs, dehumidifiers, vending machines, and water coolers."},{"id":"epa-t1-03","question":"When recovering from a small appliance with an operating compressor, you must recover:","options":["80% of the charge","90% of the charge","100% of the charge","0% — recovery is not required"],"correctAnswer":1,"explanation":"For small appliances with operating compressors, 90% of the refrigerant must be recovered."},{"id":"epa-t1-04","question":"When recovering from a small appliance with a non-operating compressor, you must recover:","options":["90% of the charge","80% of the charge","0 psig","4 inches Hg vacuum"],"correctAnswer":1,"explanation":"For small appliances with non-operating compressors, 80% of the refrigerant must be recovered."},{"id":"epa-t1-05","question":"When is 0% recovery allowed from a small appliance?","options":["When the system has a leak","When the system has leaked to atmospheric pressure","When the technician is in a hurry","0% recovery is never allowed"],"correctAnswer":1,"explanation":"If a small appliance has already leaked to atmospheric pressure (0 psig), no additional recovery is required."},{"id":"epa-t1-06","question":"System-dependent recovery equipment relies on:","options":["Its own compressor","The appliance''s compressor or system pressure","Gravity only","External air pressure"],"correctAnswer":1,"explanation":"System-dependent equipment uses the appliance''s own compressor or internal pressure to push refrigerant into the recovery vessel."},{"id":"epa-t1-07","question":"Self-contained recovery equipment has:","options":["No compressor","Its own compressor to draw refrigerant out","Only a vacuum pump","A heating element only"],"correctAnswer":1,"explanation":"Self-contained equipment has its own compressor and can recover refrigerant regardless of whether the appliance''s compressor works."},{"id":"epa-t1-08","question":"A PTAC unit is classified as:","options":["A high-pressure system","A low-pressure system","A small appliance","A commercial refrigeration system"],"correctAnswer":2,"explanation":"Packaged Terminal Air Conditioners (PTACs) are small appliances containing 5 lbs or less of refrigerant."},{"id":"epa-t1-09","question":"Before disposing of a small appliance, a technician must:","options":["Vent the refrigerant","Recover the refrigerant","Only remove the compressor","No action is required"],"correctAnswer":1,"explanation":"Refrigerant must be recovered from small appliances before disposal."},{"id":"epa-t1-10","question":"Small appliances are exempt from which requirement?","options":["Recovery requirements","Leak repair requirements","Certification requirements","Venting prohibition"],"correctAnswer":1,"explanation":"Small appliances are exempt from leak repair requirements. Recovery and venting prohibition still apply."},{"id":"epa-t1-11","question":"What refrigerant is typically in household refrigerators made after 1995?","options":["R-12","R-22","R-134a","R-410A"],"correctAnswer":2,"explanation":"R-134a (an HFC) replaced R-12 (a CFC) in household refrigerators after the CFC phase-out."},{"id":"epa-t1-12","question":"Recovery cylinders must not be filled beyond:","options":["100% capacity","90% capacity","80% capacity","70% capacity"],"correctAnswer":2,"explanation":"Recovery cylinders must not be filled beyond 80% capacity to allow for thermal expansion."},{"id":"epa-t1-13","question":"The access point on a sealed system is often a:","options":["Schrader valve","Process stub or tube","King valve","Sight glass"],"correctAnswer":1,"explanation":"Small appliances often have a process stub that must be pierced or accessed with a piercing valve for recovery."},{"id":"epa-t1-14","question":"R-12 is classified as a:","options":["HFC","HCFC","CFC","HFO"],"correctAnswer":2,"explanation":"R-12 is a CFC with high ozone depletion potential. Production was phased out in 1996."},{"id":"epa-t1-15","question":"A window air conditioning unit typically contains:","options":["More than 10 lbs","Between 5 and 15 lbs","Less than 5 lbs","No refrigerant"],"correctAnswer":2,"explanation":"Window AC units are small appliances containing less than 5 lbs of refrigerant."},{"id":"epa-t1-16","question":"If a small appliance compressor will not run, use:","options":["System-dependent active recovery","Self-contained recovery","Passive recovery only","No recovery needed"],"correctAnswer":1,"explanation":"When the compressor won''t run, self-contained recovery equipment must be used."},{"id":"epa-t1-17","question":"Recovered refrigerant can be returned to:","options":["Any system","The same owner''s equipment without recycling","Only new systems","Only after reclamation"],"correctAnswer":1,"explanation":"Recovered refrigerant can be returned to the same owner''s equipment. Changing ownership requires reclamation."},{"id":"epa-t1-18","question":"Dehumidifiers are classified as:","options":["High-pressure systems","Low-pressure systems","Small appliances","Commercial equipment"],"correctAnswer":2,"explanation":"Residential dehumidifiers contain less than 5 lbs of refrigerant and are small appliances."},{"id":"epa-t1-19","question":"A vending machine with built-in refrigeration is:","options":["Not regulated by EPA","A small appliance","A commercial system requiring Type II","Exempt from recovery"],"correctAnswer":1,"explanation":"Vending machines with built-in refrigeration are small appliances."},{"id":"epa-t1-20","question":"The purpose of a filter-drier in recovery is to:","options":["Increase speed","Remove moisture and contaminants","Measure refrigerant amount","Prevent backflow"],"correctAnswer":1,"explanation":"Filter-driers remove moisture, acid, and particulate contaminants from refrigerant."},{"id":"epa-t1-21","question":"When recovering from a system with a known leak:","options":["Skip recovery","Recover as much as possible","Only recover if more than 50% remains","Vent the remaining charge"],"correctAnswer":1,"explanation":"Even with a leak, the technician must recover as much refrigerant as possible."},{"id":"epa-t1-22","question":"EPA 608 certifications:","options":["Expire after 1 year","Expire after 3 years","Expire after 5 years","Do not expire"],"correctAnswer":3,"explanation":"EPA Section 608 certifications do not expire once earned."},{"id":"epa-t1-23","question":"A piercing valve should be checked for:","options":["Proper color coding","Leaks before and after use","Electrical continuity","Thread compatibility only"],"correctAnswer":1,"explanation":"Piercing valves must be checked for leaks. A leaking valve would release refrigerant."},{"id":"epa-t1-24","question":"What should be done if a warm appliance needs recovery?","options":["Begin immediately","Allow it to cool first","Add more refrigerant","Vent excess pressure"],"correctAnswer":1,"explanation":"Allowing the system to cool reduces internal pressure, making recovery safer and more efficient."},{"id":"epa-t1-25","question":"Type I certification allows work on:","options":["All HVAC systems","Only small appliances with 5 lbs or less","High-pressure systems","Low-pressure chillers"],"correctAnswer":1,"explanation":"Type I certification covers only small appliances with 5 lbs or less of refrigerant."},{"id":"epa-t1-26","question":"A household refrigerator manufactured after 1995 most likely contains:","options":["R-12","R-22","R-134a","R-410A"],"correctAnswer":2,"explanation":"R-134a replaced R-12 in household refrigerators after the CFC phase-out in 1996."},{"id":"epa-t1-27","question":"What is the maximum charge size for a small appliance?","options":["2 lbs","5 lbs","10 lbs","50 lbs"],"correctAnswer":1,"explanation":"Small appliances are defined as systems manufactured, charged, and hermetically sealed with 5 lbs or less of refrigerant."},{"id":"epa-t1-28","question":"A hermetically sealed system means:","options":["The system has no service valves","The refrigerant circuit is factory-sealed with no service ports","The system uses only HFCs","The compressor is externally driven"],"correctAnswer":1,"explanation":"Hermetically sealed systems are factory-sealed with no service ports. Access requires piercing valves or process stubs."},{"id":"epa-t1-29","question":"When using a system-dependent recovery device, the appliance compressor must:","options":["Be non-operational","Be operational to push refrigerant into the recovery vessel","Be bypassed","Be replaced first"],"correctAnswer":1,"explanation":"System-dependent (passive) recovery relies on the appliance''s own compressor or internal pressure to move refrigerant."},{"id":"epa-t1-30","question":"Recovery efficiency of 90% for small appliances with operating compressors was established:","options":["Before November 15, 1993","After November 15, 1993","After January 1, 2020","After January 1, 2010"],"correctAnswer":1,"explanation":"The 90% recovery requirement applies to small appliances manufactured after November 15, 1993."},{"id":"epa-t1-31","question":"A portable room air conditioner (window unit) is classified as:","options":["Type II high-pressure equipment","A small appliance","Type III low-pressure equipment","Commercial refrigeration"],"correctAnswer":1,"explanation":"Window and portable room AC units contain less than 5 lbs of refrigerant and are small appliances."},{"id":"epa-t1-32","question":"What refrigerant is commonly found in older household refrigerators (pre-1996)?","options":["R-134a","R-22","R-12","R-410A"],"correctAnswer":2,"explanation":"R-12 (a CFC) was used in household refrigerators before the phase-out. It was replaced by R-134a."},{"id":"epa-t1-33","question":"A water cooler with built-in refrigeration is classified as:","options":["Type II equipment","A small appliance","Type III equipment","Not regulated"],"correctAnswer":1,"explanation":"Water coolers with built-in refrigeration contain less than 5 lbs of refrigerant and are small appliances."},{"id":"epa-t1-34","question":"When a small appliance has already leaked to atmospheric pressure, recovery required is:","options":["90%","80%","0% — no recovery required","50%"],"correctAnswer":2,"explanation":"If a small appliance has already leaked to atmospheric pressure (0 psig), no additional recovery is required."},{"id":"epa-t1-35","question":"A piercing valve is used to:","options":["Measure system pressure only","Access a sealed system by piercing the process tube","Recover refrigerant from large systems","Test for leaks"],"correctAnswer":1,"explanation":"Piercing valves clamp onto the process stub of a sealed small appliance to provide access for recovery."},{"id":"epa-t1-36","question":"After using a piercing valve, the technician should:","options":["Leave it in place permanently","Check for leaks and cap the valve","Remove it and seal the tube","Leave it open for future access"],"correctAnswer":1,"explanation":"After recovery, check the piercing valve for leaks and cap it to prevent refrigerant release."},{"id":"epa-t1-37","question":"Self-contained recovery equipment certified after November 15, 1993 must be certified by:","options":["The manufacturer","EPA or an EPA-approved testing organization","OSHA","The state licensing board"],"correctAnswer":1,"explanation":"Recovery equipment must be certified by EPA or an EPA-approved testing organization (such as UL or ETL)."},{"id":"epa-t1-38","question":"A chest freezer is classified as:","options":["Type II equipment","A small appliance","Type III equipment","Commercial refrigeration"],"correctAnswer":1,"explanation":"Household chest freezers contain less than 5 lbs of refrigerant and are small appliances."},{"id":"epa-t1-39","question":"The recovery cylinder used for small appliance refrigerant must be:","options":["Any available cylinder","A DOT-approved recovery cylinder","A new cylinder only","A cylinder rated for the specific refrigerant only"],"correctAnswer":1,"explanation":"Recovery cylinders must meet DOT standards and be appropriate for the refrigerant being recovered."},{"id":"epa-t1-40","question":"What is the purpose of the process stub on a small appliance?","options":["Electrical connection point","Access point for refrigerant recovery and charging","Mounting bracket","Oil drain port"],"correctAnswer":1,"explanation":"The process stub is a small copper tube used as the access point for recovery and charging on sealed small appliances."},{"id":"epa-t1-41","question":"A technician recovering from a small appliance with a non-operating compressor must achieve:","options":["90% recovery","80% recovery","0 psig","500 microns"],"correctAnswer":1,"explanation":"For small appliances with non-operating compressors, 80% of the refrigerant must be recovered."},{"id":"epa-t1-42","question":"Which of the following is NOT a small appliance?","options":["Household refrigerator","Window air conditioner","5-ton split system","Dehumidifier"],"correctAnswer":2,"explanation":"A 5-ton split system contains far more than 5 lbs of refrigerant and is Type II high-pressure equipment."},{"id":"epa-t1-43","question":"Recovered refrigerant from a small appliance can be:","options":["Vented if less than 1 lb","Stored in a recovery cylinder for recycling or reclamation","Mixed with other refrigerants","Disposed of in a drain"],"correctAnswer":1,"explanation":"Recovered refrigerant must be stored in approved recovery cylinders and sent for recycling or reclamation."},{"id":"epa-t1-44","question":"A PTAC (Packaged Terminal Air Conditioner) is commonly found in:","options":["Residential homes","Hotels and motels","Industrial facilities","Centrifugal chiller plants"],"correctAnswer":1,"explanation":"PTACs are the through-the-wall units common in hotel and motel rooms. They are small appliances."},{"id":"epa-t1-45","question":"The refrigerant charge in a typical window AC unit is approximately:","options":["0.5–2 lbs","5–10 lbs","10–20 lbs","20–50 lbs"],"correctAnswer":0,"explanation":"Window AC units typically contain 0.5–2 lbs of refrigerant, well within the 5 lb small appliance threshold."},{"id":"epa-t1-46","question":"Before disposing of a household refrigerator, the refrigerant must be:","options":["Vented — it is a small amount","Recovered by a certified technician or under the safe disposal exemption","Left in the unit","Drained into a container"],"correctAnswer":1,"explanation":"Refrigerant must be recovered before disposal. The safe disposal exemption allows non-certified persons to use approved equipment for this purpose."},{"id":"epa-t1-47","question":"What does ''passive recovery'' mean for small appliances?","options":["Using a vacuum pump","Allowing refrigerant to flow into the recovery vessel using system pressure only","Using the appliance compressor to push refrigerant out","No recovery is performed"],"correctAnswer":1,"explanation":"Passive recovery uses the system''s own pressure differential to move refrigerant into the recovery vessel without an external compressor."},{"id":"epa-t1-48","question":"A recovery cylinder must be labeled with:","options":["Only the technician''s name","The refrigerant type and that it contains used refrigerant","Only the date of recovery","No labeling is required"],"correctAnswer":1,"explanation":"Recovery cylinders must be labeled with the refrigerant type and marked as containing used (recovered) refrigerant."},{"id":"epa-t1-49","question":"R-600a (isobutane) is used in some modern household refrigerators because:","options":["It has high ODP","It has very low GWP and good thermodynamic properties","It is non-flammable","It is cheaper than R-134a only"],"correctAnswer":1,"explanation":"R-600a has near-zero GWP and excellent efficiency. It is A3 (flammable) but used in small charges in sealed household appliances."},{"id":"epa-t1-50","question":"A technician must have Type I certification to service:","options":["Any HVAC system","Only small appliances with 5 lbs or less","High-pressure systems only","Low-pressure chillers only"],"correctAnswer":1,"explanation":"Type I certification is specifically for small appliances with 5 lbs or less of refrigerant."},{"id":"epa-t1-51","question":"What is the primary advantage of self-contained recovery equipment over system-dependent equipment?","options":["It is cheaper","It works even when the appliance compressor is non-functional","It recovers refrigerant faster always","It requires no power"],"correctAnswer":1,"explanation":"Self-contained equipment has its own compressor, so it can recover refrigerant regardless of the appliance''s condition."},{"id":"epa-t1-52","question":"A technician who recovers refrigerant from a small appliance must:","options":["Dispose of it immediately","Store it in an approved recovery cylinder","Return it to the manufacturer","Mix it with new refrigerant"],"correctAnswer":1,"explanation":"Recovered refrigerant must be stored in DOT-approved recovery cylinders for proper handling."},{"id":"epa-t1-53","question":"The safe disposal exemption applies to:","options":["All HVAC equipment","Small appliances being disposed of (not serviced)","Commercial refrigeration only","Any system under 50 lbs"],"correctAnswer":1,"explanation":"The safe disposal exemption applies only to small appliances being disposed of, not to equipment being serviced."},{"id":"epa-t1-54","question":"Which of the following small appliances uses R-290 (propane) as a refrigerant?","options":["All modern refrigerators","Some commercial display cases and household refrigerators in certain markets","Window AC units","Dehumidifiers"],"correctAnswer":1,"explanation":"R-290 is used in some commercial display cases and household refrigerators, particularly in European markets and increasingly in the US."},{"id":"epa-t1-55","question":"When recovering from a small appliance, the recovery vessel should be:","options":["Warm to increase pressure","Cool to increase recovery efficiency","At room temperature only","Temperature does not matter"],"correctAnswer":1,"explanation":"Cooling the recovery vessel increases the pressure differential, improving recovery efficiency and speed."},{"id":"epa-t1-56","question":"A technician finds a small appliance with a broken compressor. The correct recovery method is:","options":["System-dependent active recovery","Self-contained recovery equipment","No recovery needed — compressor is broken","Vent the refrigerant"],"correctAnswer":1,"explanation":"When the compressor is broken, self-contained recovery equipment must be used since system-dependent methods require a working compressor."},{"id":"epa-t1-57","question":"What is the purpose of an oil separator in recovery equipment?","options":["Remove moisture","Separate compressor oil from recovered refrigerant","Measure refrigerant purity","Control recovery speed"],"correctAnswer":1,"explanation":"Oil separators remove compressor oil from recovered refrigerant to prevent oil contamination of the recovery cylinder."},{"id":"epa-t1-58","question":"Small appliances are exempt from which EPA requirement?","options":["Recovery before disposal","Venting prohibition","Mandatory leak repair requirements","Certification requirements"],"correctAnswer":2,"explanation":"Small appliances are exempt from mandatory leak repair requirements. Recovery and venting prohibition still apply."},{"id":"epa-t1-59","question":"A technician recovering from a small appliance should connect the recovery equipment to:","options":["The electrical terminals","The process stub or piercing valve","The condenser coil","The evaporator drain"],"correctAnswer":1,"explanation":"Recovery equipment connects to the process stub (or a piercing valve installed on the process stub) to access the refrigerant circuit."},{"id":"epa-t1-60","question":"After recovery from a small appliance, the technician should verify:","options":["The refrigerant color","That the required recovery percentage was achieved","The refrigerant smell","That the compressor runs"],"correctAnswer":1,"explanation":"The technician must verify that the required recovery percentage (80% or 90% depending on compressor status) was achieved."},{"id":"epa-t1-61","question":"R-134a in a household refrigerator has what ODP?","options":["1.0","0.05","0","0.5"],"correctAnswer":2,"explanation":"R-134a is an HFC with zero ODP. It contains no chlorine or bromine."},{"id":"epa-t1-62","question":"A technician who services small appliances without EPA 608 certification:","options":["Is only subject to a warning","Faces civil penalties up to $44,539 per day","Is exempt if the system is under 2 lbs","Only needs state certification"],"correctAnswer":1,"explanation":"Servicing refrigerant-containing equipment without EPA 608 certification is a federal violation with penalties up to $44,539 per day."},{"id":"epa-t1-63","question":"What is the typical refrigerant charge in a household chest freezer?","options":["0.25–0.75 lbs","5–10 lbs","10–20 lbs","20–50 lbs"],"correctAnswer":0,"explanation":"Household chest freezers typically contain 0.25–0.75 lbs of refrigerant — well within the 5 lb small appliance threshold."},{"id":"epa-t1-64","question":"A vending machine refrigeration system is classified as a small appliance because:","options":["It uses R-134a","It is manufactured, charged, and hermetically sealed with 5 lbs or less of refrigerant","It is portable","It is used commercially"],"correctAnswer":1,"explanation":"Vending machine refrigeration systems meet the small appliance definition — hermetically sealed with 5 lbs or less."},{"id":"epa-t1-65","question":"When is it acceptable to vent refrigerant from a small appliance?","options":["When the charge is less than 1 lb","When the system has already leaked to atmospheric pressure","When the technician is in a hurry","Never — venting is always prohibited"],"correctAnswer":1,"explanation":"If a small appliance has already leaked to atmospheric pressure, no recovery is required. Otherwise, venting is prohibited."},{"id":"epa-t1-66","question":"The process stub on a small appliance is typically made of:","options":["Steel","Copper","Aluminum","Plastic"],"correctAnswer":1,"explanation":"Process stubs are typically small copper tubes that are pinched off after factory charging."},{"id":"epa-t1-67","question":"A technician must keep records of refrigerant recovered from small appliances for:","options":["No records required","1 year","3 years","5 years"],"correctAnswer":2,"explanation":"Records of refrigerant recovery must be kept for at least 3 years."},{"id":"epa-t1-68","question":"Which of the following is a correct statement about Type I recovery requirements?","options":["90% recovery is always required","80% recovery is always required","Recovery requirements depend on whether the compressor is operational","No recovery is required for small appliances"],"correctAnswer":2,"explanation":"Type I recovery: 90% if compressor works, 80% if compressor doesn''t work, 0% if already at atmospheric pressure."},{"id":"epa-t1-69","question":"A dehumidifier with a 2 lb refrigerant charge is classified as:","options":["Type II high-pressure equipment","A small appliance","Type III low-pressure equipment","Not regulated"],"correctAnswer":1,"explanation":"A dehumidifier with 2 lbs of refrigerant is a small appliance — under the 5 lb threshold."},{"id":"epa-t1-70","question":"What should a technician do if a recovery cylinder is nearly full?","options":["Continue filling until it is completely full","Stop recovery and use a new cylinder — never exceed 80% capacity","Vent the remaining refrigerant","Heat the cylinder to compress the refrigerant"],"correctAnswer":1,"explanation":"Recovery cylinders must not exceed 80% capacity. Stop and use a new cylinder when approaching the limit."},{"id":"epa-t1-71","question":"A small appliance that uses R-600a (isobutane) requires:","options":["No special precautions","Elimination of ignition sources due to flammability","Type III certification","Commercial refrigeration certification"],"correctAnswer":1,"explanation":"R-600a is A3 (highly flammable). Eliminate all ignition sources when working on systems containing flammable refrigerants."},{"id":"epa-t1-72","question":"The ''safe disposal'' exemption allows:","options":["Venting refrigerant during disposal","Non-certified persons to recover refrigerant from small appliances being disposed of using approved equipment","Disposal without any refrigerant handling","Certified technicians to skip recovery"],"correctAnswer":1,"explanation":"The safe disposal exemption allows non-certified persons (scrap dealers, appliance retailers) to recover refrigerant from small appliances being disposed of."},{"id":"epa-t1-73","question":"After recovering refrigerant from a small appliance, the technician should:","options":["Immediately recharge the system","Label the recovery cylinder with the refrigerant type","Mix the recovered refrigerant with new refrigerant","Dispose of the recovery cylinder"],"correctAnswer":1,"explanation":"Recovery cylinders must be labeled with the refrigerant type and marked as containing used refrigerant."},{"id":"epa-t1-74","question":"A technician using system-dependent recovery on a small appliance should monitor:","options":["The electrical current","The pressure in the recovery vessel to ensure it does not exceed safe limits","The ambient temperature only","The refrigerant color"],"correctAnswer":1,"explanation":"Monitor recovery vessel pressure to ensure it stays within safe limits during system-dependent recovery."},{"id":"epa-t1-75","question":"Which statement about EPA 608 Type I certification is correct?","options":["It allows work on all refrigerant-containing equipment","It is limited to small appliances with 5 lbs or less of refrigerant","It expires after 5 years","It requires annual renewal"],"correctAnswer":1,"explanation":"Type I certification covers only small appliances (5 lbs or less). It does not expire once earned."},{"id":"epa-t1-76","question":"When using a passive (system-dependent) recovery device on a small appliance with an inoperative compressor, the technician should:","options":["Give up and vent the refrigerant","Install access valves on both the high and low side to maximize recovery","Use only the high side access valve","Use only the low side access valve"],"correctAnswer":1,"explanation":"For inoperative compressors, install access valves on both high and low sides to maximize refrigerant recovery using system pressure."},{"id":"epa-t1-77","question":"To recover from a small appliance with an inoperative compressor using a passive device, the technician can:","options":["Only wait for pressure to equalize","Heat the appliance and/or strike the compressor to try to free it, then use system pressure","Add nitrogen to push refrigerant out","Vent the refrigerant — no other option exists"],"correctAnswer":1,"explanation":"Heating the appliance raises pressure. Striking the compressor may free a stuck compressor. Both help maximize passive recovery."},{"id":"epa-t1-78","question":"Solderless (Schrader-type) access fittings installed during service on a small appliance should be:","options":["Left in place permanently for future service","Removed at the conclusion of service to prevent leaks","Capped but left in place","Replaced with solder fittings"],"correctAnswer":1,"explanation":"Solderless access fittings must be removed at the conclusion of service. They are not designed for permanent installation and can leak."},{"id":"epa-t1-79","question":"R-134a is the likely substitute for R-12 in small appliances because:","options":["It has the same pressure as R-12","It is an HFC with zero ODP and similar thermodynamic properties","It uses the same oil as R-12","It is cheaper than R-12"],"correctAnswer":1,"explanation":"R-134a replaced R-12 in household refrigerators and small appliances. It has zero ODP and similar cooling performance, though it requires POE oil."},{"id":"epa-t1-80","question":"Refrigerants can decompose at high temperatures (such as near open flames or hot surfaces) to produce:","options":["Harmless water vapor","Toxic gases including phosgene and hydrofluoric acid","Oxygen","Carbon dioxide only"],"correctAnswer":1,"explanation":"At high temperatures, refrigerants decompose into toxic products including phosgene (from CFCs) and hydrofluoric acid. Never expose refrigerants to open flames."},{"id":"epa-t1-81","question":"Using pressure and temperature readings together on a small appliance helps a technician:","options":["Measure the refrigerant charge weight","Identify the refrigerant type and detect non-condensable gases","Determine the compressor efficiency","Measure airflow"],"correctAnswer":1,"explanation":"Comparing measured pressure to the PT chart for the expected refrigerant confirms the refrigerant type and reveals non-condensables if pressure is higher than expected."},{"id":"epa-t1-82","question":"Non-condensable gases in a small appliance are indicated by:","options":["Lower than expected pressure for the measured temperature","Higher than expected pressure for the measured temperature","Normal pressure readings","Zero pressure"],"correctAnswer":1,"explanation":"Non-condensables (air) add to system pressure. If measured pressure is higher than the PT chart predicts for the measured temperature, non-condensables are present."},{"id":"epa-t1-83","question":"The recovery efficiency requirement for small appliances manufactured BEFORE November 15, 1993 with an operating compressor is:","options":["90%","80%","70%","60%"],"correctAnswer":1,"explanation":"For small appliances made before November 15, 1993 with an operating compressor, 80% recovery is required."},{"id":"epa-t1-84","question":"The recovery efficiency requirement for small appliances manufactured AFTER November 15, 1993 with an operating compressor is:","options":["80%","90%","95%","100%"],"correctAnswer":1,"explanation":"For small appliances made after November 15, 1993 with an operating compressor, 90% recovery is required."},{"id":"epa-t1-85","question":"A mail-in (open-book) Type I exam has a passing score of:","options":["70%","75%","80%","84%"],"correctAnswer":3,"explanation":"Mail-in open-book Type I exams require 84% to pass. Closed-book proctored exams require 70%."},{"id":"epa-t1-86","question":"A mail-in Type I certification can be used toward Universal certification:","options":["Yes, it counts for the Type I portion","No — Universal requires all sections to be taken as closed-book proctored exams","Yes, if the score was above 90%","Only if taken within the last 2 years"],"correctAnswer":1,"explanation":"Universal certification requires all sections (Core + Type I + II + III) to be taken as closed-book proctored exams. Mail-in Type I does not qualify."},{"id":"epa-t1-87","question":"When operating a compressor to assist passive recovery, the technician should:","options":["Run the compressor until the system reaches 0 psig","Run the compressor to push refrigerant into the recovery vessel, monitoring vessel pressure","Run the compressor at maximum speed only","Never run the compressor during recovery"],"correctAnswer":1,"explanation":"Running the appliance compressor pushes refrigerant into the recovery vessel. Monitor vessel pressure to stay within safe limits."},{"id":"epa-t1-88","question":"A small appliance that uses R-600a (isobutane) presents what additional hazard compared to R-134a?","options":["Higher toxicity","Flammability — R-600a is A3 (highly flammable)","Higher ODP","Higher pressure"],"correctAnswer":1,"explanation":"R-600a is classified A3 — highly flammable. Eliminate all ignition sources before working on appliances containing R-600a."},{"id":"epa-t1-89","question":"What is the correct recovery procedure when a small appliance has both liquid and vapor refrigerant?","options":["Recover vapor only","Recover liquid first, then vapor, to speed up the process","Recover vapor first, then liquid","Order does not matter"],"correctAnswer":1,"explanation":"Recovering liquid first is faster because liquid contains more refrigerant mass per volume than vapor."},{"id":"epa-t1-90","question":"After recovery from a small appliance, the technician should verify the recovery was complete by:","options":["Checking the refrigerant color","Confirming the system pressure is at or below the required recovery level","Smelling the refrigerant","Checking the compressor amperage"],"correctAnswer":1,"explanation":"Verify recovery by confirming system pressure is at or below the required level (0 psig if leaked to atmosphere, or 80%/90% by weight)."},{"id":"epa-t1-91","question":"A technician who cannot achieve the required recovery level due to equipment limitations must:","options":["Vent the remaining refrigerant","Document the problem and use the best available equipment","Stop work entirely","Call the EPA for a waiver"],"correctAnswer":1,"explanation":"If required recovery levels cannot be achieved, the technician must document the problem and recover as much as possible with available equipment."},{"id":"epa-t1-92","question":"The EPA 608 Type I exam consists of:","options":["25 questions (Type I topics only)","50 questions (25 Core + 25 Type I)","75 questions","100 questions"],"correctAnswer":1,"explanation":"The Type I exam has 50 questions: 25 from the Core group (environmental/regulatory) and 25 from the Type I technical group."},{"id":"epa-t1-93","question":"Which of the following is a correct statement about recovery from small appliances?","options":["Recovery is only required for systems over 2 lbs","Recovery is required before any service that involves opening the refrigerant circuit","Recovery is only required before disposal","Recovery is optional for certified technicians"],"correctAnswer":1,"explanation":"Recovery is required before any service that involves opening the refrigerant circuit, not just before disposal."},{"id":"epa-t1-94","question":"A technician finds a small appliance with a charge that has partially leaked. The technician should:","options":["Add refrigerant to top off the charge without recovery","Recover the remaining refrigerant before opening the system","Vent the remaining charge since it is small","Leave the system as-is"],"correctAnswer":1,"explanation":"Even a partial charge must be recovered before opening the system. Venting is prohibited regardless of the amount remaining."},{"id":"epa-t1-95","question":"What is the purpose of installing a high-side access valve on a small appliance with an inoperative compressor?","options":["To add refrigerant","To allow recovery of high-side liquid refrigerant that cannot be moved by the compressor","To measure discharge pressure","To connect the manifold gauge set"],"correctAnswer":1,"explanation":"With an inoperative compressor, high-side liquid refrigerant cannot be moved. A high-side access valve allows direct recovery of that liquid."},{"id":"epa-t1-96","question":"The term ''hermetically sealed'' in the context of small appliances means:","options":["The system has service valves","The compressor and motor are sealed in the same housing with no external shaft seal","The system uses only HFC refrigerants","The system has no moving parts"],"correctAnswer":1,"explanation":"A hermetic compressor has the motor and compressor sealed in the same welded housing, eliminating shaft seals and reducing leak points."},{"id":"epa-t1-97","question":"A technician recovering from a small appliance should connect recovery equipment to:","options":["Only the high side","Only the low side","Both high and low sides when possible for maximum recovery","The electrical terminals"],"correctAnswer":2,"explanation":"Connecting to both high and low sides maximizes recovery efficiency, especially when the compressor is inoperative."},{"id":"epa-t1-98","question":"What happens to refrigerant composition in a zeotropic blend small appliance during a vapor leak?","options":["Composition stays the same","Lighter components leak preferentially, changing the blend composition (fractionation)","Heavier components leak first","Only oil leaks out"],"correctAnswer":1,"explanation":"Fractionation: lighter (lower-boiling) components escape faster during a vapor leak, leaving a charge with altered composition."},{"id":"epa-t1-99","question":"A small appliance technician must be certified under which EPA 608 type?","options":["Type II","Type III","Type I","Universal only"],"correctAnswer":2,"explanation":"Type I certification is required to service small appliances. Universal certification also covers Type I work."},{"id":"epa-t1-100","question":"The safe disposal exemption does NOT apply to:","options":["Household refrigerators being scrapped","Small appliances being serviced and returned to service","Window AC units being disposed of","Vending machines being scrapped"],"correctAnswer":1,"explanation":"The safe disposal exemption applies only to appliances being disposed of — not to equipment being serviced and returned to service."},{"id":"epa-t2-01","question":"Type II certification covers:","options":["Small appliances","High-pressure systems","Low-pressure systems","Motor vehicle AC"],"correctAnswer":1,"explanation":"Type II covers high-pressure equipment such as residential AC, commercial refrigeration, and heat pumps using R-22, R-410A, R-134a, etc."},{"id":"epa-t2-02","question":"For high-pressure systems containing less than 200 lbs of refrigerant, the required recovery level is:","options":["0 psig","4 inches Hg vacuum","10 inches Hg vacuum","15 inches Hg vacuum"],"correctAnswer":0,"explanation":"Systems with less than 200 lbs must be recovered to 0 psig (atmospheric pressure)."},{"id":"epa-t2-03","question":"For high-pressure systems containing 200 lbs or more, the required recovery level is:","options":["0 psig","4 inches Hg vacuum","10 inches Hg vacuum","15 inches Hg vacuum"],"correctAnswer":2,"explanation":"Systems with 200 lbs or more must be recovered to 10 inches Hg vacuum."},{"id":"epa-t2-04","question":"The most accurate instrument for measuring deep vacuum is a:","options":["Compound gauge","Micron gauge (electronic vacuum gauge)","Manometer","Bourdon tube gauge"],"correctAnswer":1,"explanation":"A micron gauge (electronic vacuum gauge) measures vacuum in microns and is the most accurate for deep vacuum measurement."},{"id":"epa-t2-05","question":"A standing pressure test is used to:","options":["Measure superheat","Check for leaks in a pressurized system","Determine subcooling","Measure airflow"],"correctAnswer":1,"explanation":"A standing pressure test pressurizes the system with dry nitrogen and monitors for pressure drop, indicating a leak."},{"id":"epa-t2-06","question":"The leak rate that triggers mandatory repair for comfort cooling equipment is:","options":["5% per year","10% per year","20% per year","35% per year"],"correctAnswer":1,"explanation":"Comfort cooling systems (residential/commercial AC) must be repaired if the annual leak rate exceeds 10%."},{"id":"epa-t2-07","question":"The leak rate that triggers mandatory repair for commercial refrigeration is:","options":["5% per year","10% per year","20% per year","35% per year"],"correctAnswer":2,"explanation":"Commercial refrigeration and industrial process refrigeration must be repaired if the annual leak rate exceeds 20%."},{"id":"epa-t2-08","question":"After a major repair, a system should be leak-tested with:","options":["Refrigerant","Dry nitrogen","Compressed air","Oxygen"],"correctAnswer":1,"explanation":"Dry nitrogen is used for pressure testing. Never use oxygen or compressed air (moisture and contaminants)."},{"id":"epa-t2-09","question":"Triple evacuation involves:","options":["Three recovery attempts","Pulling vacuum, breaking with nitrogen, repeating three times","Using three vacuum pumps simultaneously","Evacuating three separate circuits"],"correctAnswer":1,"explanation":"Triple evacuation: pull vacuum, break with dry nitrogen, pull vacuum, break with nitrogen, pull final vacuum. Removes moisture effectively."},{"id":"epa-t2-10","question":"The purpose of evacuation is to:","options":["Remove refrigerant","Remove air and moisture from the system","Test for leaks","Charge the system"],"correctAnswer":1,"explanation":"Evacuation removes air (non-condensables) and moisture from the system before charging with refrigerant."},{"id":"epa-t2-11","question":"A system should be evacuated to at least:","options":["1000 microns","500 microns","250 microns","It depends on the manufacturer"],"correctAnswer":1,"explanation":"Most manufacturers require evacuation to 500 microns or below. Some require 250 microns."},{"id":"epa-t2-12","question":"Non-condensable gases in a system cause:","options":["Lower head pressure","Higher head pressure","Lower suction pressure","No effect"],"correctAnswer":1,"explanation":"Non-condensables (air) raise head pressure because they cannot condense and take up space in the condenser."},{"id":"epa-t2-13","question":"An electronic leak detector should be checked for sensitivity using:","options":["Soap bubbles","A reference leak (calibrated leak)","Nitrogen","UV dye"],"correctAnswer":1,"explanation":"Electronic leak detectors should be calibrated using a reference leak to verify they can detect the minimum leak rate."},{"id":"epa-t2-14","question":"R-410A operates at approximately what pressure compared to R-22?","options":["Same pressure","50% higher pressure","60% higher pressure","Lower pressure"],"correctAnswer":2,"explanation":"R-410A operates at approximately 60% higher pressure than R-22, requiring different gauges and equipment rated for higher pressures."},{"id":"epa-t2-15","question":"Superheat is the temperature of refrigerant vapor above its:","options":["Condensing temperature","Saturation (boiling) temperature","Ambient temperature","Subcooling temperature"],"correctAnswer":1,"explanation":"Superheat = actual suction line temperature minus the saturation temperature at suction pressure."},{"id":"epa-t2-16","question":"Subcooling is the temperature of liquid refrigerant below its:","options":["Evaporating temperature","Saturation (condensing) temperature","Ambient temperature","Superheat temperature"],"correctAnswer":1,"explanation":"Subcooling = saturation temperature at discharge pressure minus the actual liquid line temperature."},{"id":"epa-t2-17","question":"What causes frost on a suction line?","options":["Overcharge","Undercharge or restricted airflow","High ambient temperature","Dirty condenser"],"correctAnswer":1,"explanation":"Frost on the suction line indicates low superheat, often caused by undercharge, restricted airflow, or a stuck-open TXV."},{"id":"epa-t2-18","question":"Before using recovery equipment on a different refrigerant, you should:","options":["Just connect and start","Change the oil and clean or replace filter-driers to prevent cross-contamination","Only change the hoses","No action needed if using the same equipment"],"correctAnswer":1,"explanation":"Cross-contamination of refrigerants makes them unusable. Equipment must be cleaned between different refrigerant types."},{"id":"epa-t2-19","question":"A TXV (thermostatic expansion valve) controls:","options":["Compressor speed","Refrigerant flow into the evaporator","Condenser fan speed","System pressure"],"correctAnswer":1,"explanation":"The TXV meters refrigerant flow into the evaporator based on superheat, maintaining optimal evaporator performance."},{"id":"epa-t2-20","question":"What is the purpose of a sight glass in a refrigeration system?","options":["Measure temperature","Indicate liquid refrigerant condition and moisture content","Control refrigerant flow","Filter contaminants"],"correctAnswer":1,"explanation":"A sight glass shows whether liquid refrigerant is present (bubbles indicate low charge) and may have a moisture indicator."},{"id":"epa-t2-21","question":"When charging R-410A, it must be charged as a:","options":["Vapor only","Liquid only","Either vapor or liquid","Gas at high pressure"],"correctAnswer":1,"explanation":"R-410A is a near-azeotropic blend and must be charged as a liquid to maintain proper composition."},{"id":"epa-t2-22","question":"Moisture in a refrigeration system can cause:","options":["Higher efficiency","Acid formation and copper plating","Lower head pressure","Faster cooling"],"correctAnswer":1,"explanation":"Moisture reacts with refrigerant and oil to form acids, which cause copper plating, sludge, and compressor failure."},{"id":"epa-t2-23","question":"The king valve is located on the:","options":["Suction line","Liquid line at the receiver outlet","Compressor discharge","Evaporator inlet"],"correctAnswer":1,"explanation":"The king valve is at the liquid receiver outlet. Closing it allows pump-down of the low side for service."},{"id":"epa-t2-24","question":"What does a high head pressure and high suction pressure indicate?","options":["Undercharge","Overcharge or non-condensables","Restriction in the liquid line","Low airflow over evaporator"],"correctAnswer":1,"explanation":"Both pressures being high typically indicates overcharge, non-condensable gases, or a dirty/blocked condenser."},{"id":"epa-t2-25","question":"Leak repair must be completed within how many days for comfort cooling systems?","options":["15 days","30 days","45 days","120 days"],"correctAnswer":1,"explanation":"Comfort cooling systems must have leaks repaired within 30 days of discovery. Extensions may be available with a retrofit/retirement plan."},{"id":"epa-t2-26","question":"What is the recovery requirement for high-pressure systems with less than 200 lbs of refrigerant when using equipment manufactured after November 15, 1993?","options":["0 psig","4 in. Hg vacuum","10 in. Hg vacuum","500 microns"],"correctAnswer":0,"explanation":"Systems under 200 lbs must be recovered to 0 psig using equipment manufactured after November 15, 1993."},{"id":"epa-t2-27","question":"What is the recovery requirement for high-pressure systems with 200 lbs or more using equipment manufactured after November 15, 1993?","options":["0 psig","4 in. Hg vacuum","10 in. Hg vacuum","500 microns"],"correctAnswer":2,"explanation":"Systems with 200 lbs or more must be recovered to 10 in. Hg vacuum using post-1993 equipment."},{"id":"epa-t2-28","question":"What is the recovery requirement for high-pressure systems under 200 lbs using equipment manufactured BEFORE November 15, 1993?","options":["0 psig","4 in. Hg vacuum","10 in. Hg vacuum","500 microns"],"correctAnswer":1,"explanation":"Using pre-1993 equipment on systems under 200 lbs requires recovery to 4 in. Hg vacuum."},{"id":"epa-t2-29","question":"What is the recovery requirement for high-pressure systems 200 lbs or more using equipment manufactured BEFORE November 15, 1993?","options":["0 psig","4 in. Hg vacuum","10 in. Hg vacuum","15 in. Hg vacuum"],"correctAnswer":3,"explanation":"Using pre-1993 equipment on systems with 200 lbs or more requires recovery to 15 in. Hg vacuum."},{"id":"epa-t2-30","question":"R-410A requires manifold gauges rated for at least:","options":["250 psig","400 psig","800 psig","1,000 psig"],"correctAnswer":2,"explanation":"R-410A operates at much higher pressures than R-22. Gauges must be rated for at least 800 psig on the high side."},{"id":"epa-t2-31","question":"What is the normal operating suction pressure range for R-410A in a residential AC system at 75°F indoor conditions?","options":["50–70 psig","100–130 psig","200–250 psig","300–350 psig"],"correctAnswer":1,"explanation":"R-410A suction pressure typically runs 100–130 psig at normal residential cooling conditions."},{"id":"epa-t2-32","question":"What is the normal operating discharge pressure range for R-410A in a residential AC system?","options":["100–150 psig","200–250 psig","300–400 psig","400–500 psig"],"correctAnswer":2,"explanation":"R-410A discharge pressure typically runs 300–400 psig at normal residential cooling conditions."},{"id":"epa-t2-33","question":"A fixed orifice metering device (piston) is charged using:","options":["Subcooling method","Superheat method","Weight method only","Sight glass only"],"correctAnswer":1,"explanation":"Fixed orifice (piston) systems are charged using the superheat method. TXV systems use subcooling."},{"id":"epa-t2-34","question":"Target superheat for a fixed orifice system is typically:","options":["0–5°F","10–20°F","25–35°F","40–50°F"],"correctAnswer":1,"explanation":"Target superheat for fixed orifice systems is typically 10–20°F at the suction line near the evaporator."},{"id":"epa-t2-35","question":"Target subcooling for a TXV system is typically:","options":["0–5°F","10–15°F","25–35°F","40–50°F"],"correctAnswer":1,"explanation":"Target subcooling for TXV systems is typically 10–15°F at the liquid line, per manufacturer specifications."},{"id":"epa-t2-36","question":"What does a low suction pressure and low discharge pressure together indicate?","options":["Overcharge","Undercharge or refrigerant leak","Non-condensables","Dirty condenser"],"correctAnswer":1,"explanation":"Both pressures low = undercharge. The system does not have enough refrigerant to build normal operating pressures."},{"id":"epa-t2-37","question":"What does a high suction pressure and high discharge pressure together indicate?","options":["Undercharge","Overcharge or non-condensables in the system","Restriction in the liquid line","Low airflow over evaporator"],"correctAnswer":1,"explanation":"Both pressures high = overcharge or non-condensables. Too much refrigerant or air in the system raises both pressures."},{"id":"epa-t2-38","question":"What does a low suction pressure and high discharge pressure together indicate?","options":["Undercharge","Overcharge","Restriction in the metering device or liquid line","Normal operation at high load"],"correctAnswer":2,"explanation":"Low suction + high discharge = restriction. Refrigerant is backed up on the high side and starved on the low side."},{"id":"epa-t2-39","question":"The purpose of a liquid line filter-drier is to:","options":["Increase system pressure","Remove moisture and contaminants from the liquid refrigerant","Measure refrigerant flow","Control superheat"],"correctAnswer":1,"explanation":"Liquid line filter-driers protect the metering device and compressor from moisture, acid, and particulate contamination."},{"id":"epa-t2-40","question":"A clogged filter-drier will cause:","options":["High suction pressure","A pressure drop across the drier and starved evaporator","High discharge pressure only","No effect on system operation"],"correctAnswer":1,"explanation":"A clogged filter-drier restricts refrigerant flow, causing a pressure drop and starving the evaporator of refrigerant."},{"id":"epa-t2-41","question":"What is the purpose of an accumulator on the suction line?","options":["Increase suction pressure","Prevent liquid refrigerant from reaching the compressor","Store excess refrigerant","Measure superheat"],"correctAnswer":1,"explanation":"The accumulator traps liquid refrigerant and oil, allowing only vapor to enter the compressor, preventing liquid slugging."},{"id":"epa-t2-42","question":"Liquid slugging in a compressor is caused by:","options":["High superheat","Liquid refrigerant entering the compressor","Low discharge pressure","High ambient temperature"],"correctAnswer":1,"explanation":"Liquid slugging occurs when liquid refrigerant enters the compressor. Liquids are incompressible and can destroy the compressor."},{"id":"epa-t2-43","question":"What is the purpose of a crankcase heater on a compressor?","options":["Heat the refrigerant before compression","Prevent refrigerant migration into the oil during off cycles","Increase compressor efficiency","Reduce starting current"],"correctAnswer":1,"explanation":"Crankcase heaters keep the oil warm during off cycles, preventing refrigerant from migrating into and diluting the oil."},{"id":"epa-t2-44","question":"A scroll compressor differs from a reciprocating compressor in that it:","options":["Uses pistons","Uses two spiral scrolls to compress refrigerant","Operates at lower pressures","Requires more oil"],"correctAnswer":1,"explanation":"Scroll compressors use two interlocking spiral scrolls — one fixed, one orbiting — to compress refrigerant continuously."},{"id":"epa-t2-45","question":"What is the purpose of a hard start kit?","options":["Increase compressor speed","Provide extra starting torque to a compressor that struggles to start","Reduce starting current","Protect against overload"],"correctAnswer":1,"explanation":"Hard start kits add a start capacitor and potential relay to provide extra starting torque for compressors with high starting loads."},{"id":"epa-t2-46","question":"A dual-run capacitor has how many terminals?","options":["2","3","4","5"],"correctAnswer":1,"explanation":"A dual-run capacitor has three terminals: HERM (compressor), FAN (fan motor), and C (common)."},{"id":"epa-t2-47","question":"What is the purpose of a high-pressure switch?","options":["Measure discharge pressure","Shut down the compressor if discharge pressure exceeds safe limits","Control refrigerant flow","Measure superheat"],"correctAnswer":1,"explanation":"The high-pressure switch is a safety device that shuts down the compressor if discharge pressure exceeds the setpoint."},{"id":"epa-t2-48","question":"What is the purpose of a low-pressure switch?","options":["Measure suction pressure","Shut down the compressor if suction pressure drops below safe limits","Control refrigerant flow","Measure subcooling"],"correctAnswer":1,"explanation":"The low-pressure switch shuts down the compressor if suction pressure drops too low, protecting against loss of charge."},{"id":"epa-t2-49","question":"A heat pump in heating mode has the outdoor coil acting as the:","options":["Condenser","Evaporator","Metering device","Accumulator"],"correctAnswer":1,"explanation":"In heating mode, the reversing valve redirects refrigerant so the outdoor coil absorbs heat from outdoor air (evaporator)."},{"id":"epa-t2-50","question":"The balance point of a heat pump is:","options":["The outdoor temperature at which the heat pump operates most efficiently","The outdoor temperature at which heat pump output equals building heat loss","The indoor setpoint temperature","The temperature at which defrost activates"],"correctAnswer":1,"explanation":"The balance point is the outdoor temperature where heat pump capacity equals building heat loss. Below this, supplemental heat is needed."},{"id":"epa-t2-51","question":"What is the purpose of a defrost cycle on a heat pump?","options":["Cool the indoor coil","Melt frost that accumulates on the outdoor coil in heating mode","Increase heating capacity","Test the reversing valve"],"correctAnswer":1,"explanation":"In heating mode, the outdoor coil can frost over. Defrost temporarily reverses the cycle to melt the frost."},{"id":"epa-t2-52","question":"During defrost, the heat pump temporarily switches to:","options":["Heating mode at higher capacity","Cooling mode to send hot refrigerant to the outdoor coil","Fan-only mode","Emergency heat only"],"correctAnswer":1,"explanation":"During defrost, the cycle reverses to cooling mode, sending hot discharge gas to the outdoor coil to melt frost."},{"id":"epa-t2-53","question":"What is the purpose of a bi-flow filter-drier in a heat pump?","options":["Filter refrigerant in one direction only","Filter refrigerant flowing in either direction (heating and cooling modes)","Measure refrigerant flow","Control superheat"],"correctAnswer":1,"explanation":"Heat pumps reverse refrigerant flow, so bi-flow filter-driers are used to filter in both directions."},{"id":"epa-t2-54","question":"A variable-speed (inverter-driven) compressor adjusts capacity by:","options":["Cycling on and off","Varying the compressor motor speed","Bypassing refrigerant","Changing the refrigerant type"],"correctAnswer":1,"explanation":"Inverter-driven compressors vary motor speed to precisely match the load, improving efficiency and comfort."},{"id":"epa-t2-55","question":"What is the purpose of a check valve in a heat pump refrigerant circuit?","options":["Prevent refrigerant from flowing backward through a metering device","Measure refrigerant flow","Control superheat","Filter contaminants"],"correctAnswer":0,"explanation":"Check valves allow refrigerant to bypass a metering device in one flow direction, allowing the same metering device to work in both heating and cooling modes."},{"id":"epa-t2-56","question":"Refrigerant R-407C is a replacement for R-22 with what characteristic?","options":["Zero temperature glide","Temperature glide of approximately 7°F","Higher ODP than R-22","Same pressure as R-410A"],"correctAnswer":1,"explanation":"R-407C has a temperature glide of approximately 7°F. It must be charged as a liquid to maintain proper composition."},{"id":"epa-t2-57","question":"What is the purpose of a suction line accumulator in a heat pump?","options":["Increase suction pressure","Protect the compressor from liquid refrigerant during mode switching","Store excess refrigerant","Measure superheat"],"correctAnswer":1,"explanation":"During mode switching (heating to cooling or vice versa), liquid refrigerant can flood back. The accumulator protects the compressor."},{"id":"epa-t2-58","question":"A comfort cooling system with more than 50 lbs of refrigerant must be repaired if the annual leak rate exceeds:","options":["5%","10%","20%","35%"],"correctAnswer":1,"explanation":"Comfort cooling systems (residential and commercial AC) must be repaired if the annual leak rate exceeds 10%."},{"id":"epa-t2-59","question":"Commercial refrigeration systems must be repaired if the annual leak rate exceeds:","options":["10%","20%","30%","35%"],"correctAnswer":1,"explanation":"Commercial refrigeration systems must be repaired if the annual leak rate exceeds 20%."},{"id":"epa-t2-60","question":"Industrial process refrigeration systems must be repaired if the annual leak rate exceeds:","options":["10%","20%","30%","35%"],"correctAnswer":2,"explanation":"Industrial process refrigeration systems must be repaired if the annual leak rate exceeds 30%."},{"id":"epa-t2-61","question":"After a major repair, a system must be leak-tested before recharging using:","options":["Refrigerant at operating pressure","Dry nitrogen at 150 psig or manufacturer''s specified test pressure","Compressed air","Oxygen"],"correctAnswer":1,"explanation":"Dry nitrogen is used for pressure testing after major repairs. Never use oxygen (explosion risk) or compressed air (moisture)."},{"id":"epa-t2-62","question":"What is the purpose of a standing vacuum test?","options":["Measure system charge","Verify system integrity — a rising vacuum indicates a leak","Measure superheat","Test the compressor"],"correctAnswer":1,"explanation":"After evacuation, a standing vacuum test monitors for rising pressure (vacuum loss), which indicates a leak or moisture in the system."},{"id":"epa-t2-63","question":"A micron gauge reads 500 microns after evacuation. The technician then isolates the vacuum pump and the reading rises to 1,500 microns. This indicates:","options":["Normal — vacuum always rises slightly","A leak or moisture in the system","The vacuum pump is too powerful","The system is properly evacuated"],"correctAnswer":1,"explanation":"A rising vacuum after isolation indicates either a leak (air entering) or moisture boiling off. The system is not ready to charge."},{"id":"epa-t2-64","question":"What is the purpose of a refrigerant recovery machine''s oil separator?","options":["Remove moisture from refrigerant","Separate compressor oil from recovered refrigerant to prevent contamination of the recovery cylinder","Measure refrigerant purity","Control recovery speed"],"correctAnswer":1,"explanation":"The oil separator prevents recovery machine oil from contaminating the recovered refrigerant in the recovery cylinder."},{"id":"epa-t2-65","question":"When charging R-410A into a system, the refrigerant must be added as:","options":["Vapor from the top of the cylinder","Liquid from the bottom of the cylinder (cylinder inverted)","Either vapor or liquid","Gas at low pressure only"],"correctAnswer":1,"explanation":"R-410A is a near-azeotropic blend that must be charged as liquid to maintain proper composition. Invert the cylinder to charge liquid."},{"id":"epa-t2-66","question":"What is the purpose of a liquid line solenoid valve?","options":["Control compressor speed","Stop refrigerant flow to the evaporator when the system shuts down (pump-down)","Measure liquid refrigerant temperature","Filter contaminants"],"correctAnswer":1,"explanation":"Liquid line solenoid valves close when the system shuts down, preventing refrigerant migration to the evaporator (pump-down control)."},{"id":"epa-t2-67","question":"A pump-down cycle:","options":["Removes refrigerant from the system","Moves refrigerant from the low side to the high side before shutdown","Adds refrigerant to the system","Tests the compressor"],"correctAnswer":1,"explanation":"Pump-down moves refrigerant from the low side to the receiver/high side before shutdown, preventing liquid migration during the off cycle."},{"id":"epa-t2-68","question":"What is the purpose of a receiver in a refrigeration system?","options":["Store excess refrigerant and ensure a solid liquid supply to the metering device","Measure refrigerant charge","Filter contaminants","Control superheat"],"correctAnswer":0,"explanation":"The receiver stores excess refrigerant and ensures a continuous supply of liquid refrigerant to the metering device under varying load conditions."},{"id":"epa-t2-69","question":"A sight glass with a green moisture indicator means:","options":["The system is overcharged","Moisture content is acceptable","The system needs evacuation","The refrigerant is contaminated"],"correctAnswer":1,"explanation":"A green moisture indicator in the sight glass means moisture is within acceptable limits. Yellow indicates moisture is present."},{"id":"epa-t2-70","question":"What is the purpose of a hot gas bypass valve?","options":["Recover refrigerant","Prevent evaporator freeze-up at low loads by bypassing hot discharge gas to the suction side","Increase system capacity","Control condenser fan speed"],"correctAnswer":1,"explanation":"Hot gas bypass prevents evaporator freeze-up at low loads by introducing hot discharge gas to maintain minimum evaporator pressure."},{"id":"epa-t2-71","question":"A compressor with high amperage draw and low suction pressure most likely has:","options":["A refrigerant overcharge","A worn or failed compressor (internal leak)","A dirty condenser","A bad capacitor"],"correctAnswer":1,"explanation":"High amperage with low suction pressure suggests the compressor is working hard but not pumping effectively — internal wear or failure."},{"id":"epa-t2-72","question":"What is the purpose of a crankcase pressure regulator (CPR)?","options":["Regulate discharge pressure","Limit suction pressure to the compressor during pulldown to prevent motor overload","Control refrigerant flow","Measure crankcase oil level"],"correctAnswer":1,"explanation":"CPR valves limit suction pressure during pulldown (when a warm system starts up), preventing compressor motor overload."},{"id":"epa-t2-73","question":"An evaporator pressure regulator (EPR) is used to:","options":["Increase evaporator pressure","Maintain minimum evaporator pressure to prevent freezing in multi-temperature systems","Control superheat","Measure evaporator temperature"],"correctAnswer":1,"explanation":"EPR valves maintain minimum evaporator pressure in multi-temperature systems, preventing the warmest evaporator from freezing."},{"id":"epa-t2-74","question":"What is the purpose of a head pressure control valve?","options":["Limit discharge pressure","Maintain minimum head pressure in cold weather to ensure proper refrigerant flow","Control compressor speed","Measure discharge temperature"],"correctAnswer":1,"explanation":"Head pressure control valves maintain minimum condensing pressure in cold weather, ensuring adequate pressure differential for refrigerant flow."},{"id":"epa-t2-75","question":"A technician must verify that a high-pressure system is properly evacuated before charging. The correct sequence is:","options":["Charge first, then evacuate","Pressure test with nitrogen, then evacuate to 500 microns or below, then charge","Evacuate, then pressure test, then charge","Charge, then pressure test"],"correctAnswer":1,"explanation":"Correct sequence: pressure test with nitrogen to verify no leaks, then evacuate to 500 microns or below, then charge with refrigerant."},{"id":"epa-t2-76","question":"System-dependent recovery equipment is prohibited on high-pressure systems containing more than:","options":["5 lbs","10 lbs","15 lbs","50 lbs"],"correctAnswer":2,"explanation":"System-dependent recovery equipment cannot be used on high-pressure systems with more than 15 lbs of refrigerant. Self-contained equipment is required."},{"id":"epa-t2-77","question":"A ''major repair'' on a high-pressure system is defined as:","options":["Any repair costing over $500","Any repair that involves opening the refrigerant circuit (breaking a refrigerant-containing joint)","Replacing the compressor only","Any repair requiring more than 1 hour"],"correctAnswer":1,"explanation":"A major repair is any repair that involves opening the refrigerant circuit — breaking a joint, replacing a component, etc."},{"id":"epa-t2-78","question":"After a major repair on a high-pressure system, before recharging, the technician must:","options":["Charge immediately","Leak test with nitrogen, then evacuate to required level","Only evacuate — no leak test needed","Only leak test — no evacuation needed"],"correctAnswer":1,"explanation":"After a major repair: pressure test with nitrogen to verify the repair, then evacuate to the required level before recharging."},{"id":"epa-t2-79","question":"For a non-major repair on a high-pressure system with a leak, the recovery requirement is:","options":["Same as major repair","0 psig (atmospheric pressure)","10 in. Hg vacuum","No recovery required"],"correctAnswer":1,"explanation":"For non-major repairs on leaky systems, recovery to 0 psig is required. Major repairs require deeper evacuation."},{"id":"epa-t2-80","question":"The preferred gas for leak testing a high-pressure system is:","options":["Pure refrigerant at operating pressure","Nitrogen alone, or nitrogen with a trace of HCFC-22 as a tracer","Compressed air","Oxygen"],"correctAnswer":1,"explanation":"Nitrogen alone is best. Nitrogen with a trace of HCFC-22 as a tracer gas is also acceptable. Never use compressed air (moisture) or oxygen (explosion risk)."},{"id":"epa-t2-81","question":"After reaching the required vacuum level, a technician should wait before charging because:","options":["The vacuum pump needs to cool down","A pressure rise indicates residual liquid refrigerant or moisture that needs more time to evacuate","The refrigerant needs to warm up","Waiting is not necessary"],"correctAnswer":1,"explanation":"After isolation, monitor for pressure rise. Rising pressure means liquid refrigerant is still boiling off or moisture is present — continue evacuation."},{"id":"epa-t2-82","question":"Signs of a refrigerant leak in a hermetically sealed high-pressure system include:","options":["Low head pressure only","Excessive superheat and oil traces around fittings and joints","High suction pressure","Normal operating pressures"],"correctAnswer":1,"explanation":"Excessive superheat (starved evaporator) and oil traces (oil migrates with refrigerant through leak points) are key signs of a leak."},{"id":"epa-t2-83","question":"A comfort cooling system with more than 50 lbs of refrigerant that exceeds the 10% annual leak rate must be repaired within:","options":["15 days","30 days","60 days","120 days"],"correctAnswer":1,"explanation":"Comfort cooling systems must be repaired within 30 days of discovering the leak rate exceeds 10% annually."},{"id":"epa-t2-84","question":"An extension to the 30-day leak repair deadline may be granted if:","options":["The technician is busy","The owner submits a retrofit or retirement plan within 30 days","The system is over 10 years old","The refrigerant is R-410A"],"correctAnswer":1,"explanation":"A one-time extension is available if the owner submits a written plan to retrofit or retire the equipment within the 30-day window."},{"id":"epa-t2-85","question":"Leak repair records for systems with more than 50 lbs of refrigerant must be kept for:","options":["1 year","3 years","5 years","10 years"],"correctAnswer":1,"explanation":"Leak repair records must be maintained for at least 3 years and made available to EPA inspectors upon request."},{"id":"epa-t2-86","question":"To speed up recovery from a high-pressure system, a technician should:","options":["Add more refrigerant first","Recover liquid refrigerant first, then vapor","Recover vapor first, then liquid","Only recover vapor"],"correctAnswer":1,"explanation":"Recovering liquid first is faster — liquid contains far more refrigerant mass per volume than vapor."},{"id":"epa-t2-87","question":"To speed up recovery, the recovery vessel should be:","options":["Heated","Chilled (placed in ice or cold water)","At room temperature","Pressurized with nitrogen"],"correctAnswer":1,"explanation":"Chilling the recovery vessel lowers its internal pressure, increasing the pressure differential that drives refrigerant in faster."},{"id":"epa-t2-88","question":"Hydrocarbons (propane, isobutane) are NOT approved for retrofitting high-pressure HVAC systems because:","options":["They are too expensive","They are highly flammable and not approved by EPA SNAP for this use","They have high ODP","They are not available in the US"],"correctAnswer":1,"explanation":"EPA SNAP has not approved hydrocarbon refrigerants for retrofit of residential or commercial AC systems due to flammability risk."},{"id":"epa-t2-89","question":"ASHRAE Standard 15 requires an oxygen deprivation sensor in machinery rooms because:","options":["Refrigerants are toxic","All refrigerants can displace oxygen and cause suffocation, regardless of toxicity","Only toxic refrigerants require sensors","Only flammable refrigerants require sensors"],"correctAnswer":1,"explanation":"ASHRAE 15 requires oxygen deprivation sensors for all refrigerant machinery rooms — all refrigerants can displace oxygen."},{"id":"epa-t2-90","question":"A hermetic compressor should never be energized while under vacuum because:","options":["It wastes electricity","The motor windings can overheat and burn out without refrigerant vapor for cooling","It will draw in air","The oil will foam"],"correctAnswer":1,"explanation":"Hermetic compressor motors are cooled by refrigerant vapor. Running under vacuum removes this cooling, causing motor winding failure."},{"id":"epa-t2-91","question":"The psig to psia conversion is:","options":["psia = psig − 14.7","psia = psig + 14.7","psia = psig × 14.7","psia = psig ÷ 14.7"],"correctAnswer":1,"explanation":"Absolute pressure (psia) = gauge pressure (psig) + atmospheric pressure (14.7 psi). PT charts use psia; gauges read psig."},{"id":"epa-t2-92","question":"On a PT chart, the listed pressure for R-410A at 40°F is approximately 118 psig. This means the absolute pressure is:","options":["118 psia","103.3 psia","132.7 psia","14.7 psia"],"correctAnswer":2,"explanation":"psia = psig + 14.7 = 118 + 14.7 = 132.7 psia. PT charts may list either psig or psia — always check the chart header."},{"id":"epa-t2-93","question":"In a high-pressure system, the refrigerant in the liquid line is in what state?","options":["Superheated vapor","Saturated vapor","Subcooled liquid","Two-phase mixture"],"correctAnswer":2,"explanation":"The liquid line carries subcooled liquid refrigerant from the condenser to the metering device. Subcooling ensures no flash gas at the metering device."},{"id":"epa-t2-94","question":"In a high-pressure system, the refrigerant in the suction line is in what state?","options":["Subcooled liquid","Saturated liquid","Superheated vapor","Two-phase mixture"],"correctAnswer":2,"explanation":"The suction line carries superheated vapor from the evaporator to the compressor. Superheat ensures no liquid reaches the compressor."},{"id":"epa-t2-95","question":"The receiver in a refrigeration system stores refrigerant in what state?","options":["Superheated vapor","Subcooled liquid","Saturated liquid (liquid and vapor)","Frozen solid"],"correctAnswer":2,"explanation":"The receiver stores refrigerant as saturated liquid (with some vapor space above). It acts as a reservoir to accommodate charge variations."},{"id":"epa-t2-96","question":"The accumulator in a refrigeration system stores refrigerant in what state?","options":["Subcooled liquid","Superheated vapor","Saturated mixture — traps liquid, allows only vapor to pass to compressor","Frozen solid"],"correctAnswer":2,"explanation":"The accumulator traps liquid refrigerant and oil, allowing only vapor to pass to the compressor, preventing liquid slugging."},{"id":"epa-t2-97","question":"To reduce cross-contamination when switching between refrigerant types on recovery equipment:","options":["Just connect and start — contamination is minor","Change the compressor oil and replace filter-driers in the recovery machine","Only change the hoses","No action needed if both refrigerants are HFCs"],"correctAnswer":1,"explanation":"Change the recovery machine''s compressor oil and replace its filter-driers between different refrigerant types to prevent cross-contamination."},{"id":"epa-t2-98","question":"The EPA 608 Type II exam consists of:","options":["25 questions (Type II topics only)","50 questions (25 Core + 25 Type II)","75 questions","100 questions"],"correctAnswer":1,"explanation":"The Type II exam has 50 questions: 25 from the Core group and 25 from the Type II technical group."},{"id":"epa-t2-99","question":"A high-pressure system with 150 lbs of R-410A requires recovery to what level before a major repair, using post-1993 equipment?","options":["4 in. Hg vacuum","0 psig","10 in. Hg vacuum","500 microns"],"correctAnswer":1,"explanation":"High-pressure systems under 200 lbs require recovery to 0 psig using post-November 15, 1993 equipment before major repairs."},{"id":"epa-t2-100","question":"A high-pressure system with 250 lbs of R-410A requires recovery to what level before a major repair, using post-1993 equipment?","options":["0 psig","4 in. Hg vacuum","10 in. Hg vacuum","500 microns"],"correctAnswer":2,"explanation":"High-pressure systems with 200 lbs or more require recovery to 10 in. Hg vacuum using post-November 15, 1993 equipment."},{"id":"epa-t3-01","question":"Type III certification covers:","options":["Small appliances","High-pressure systems","Low-pressure systems (chillers)","Motor vehicle AC"],"correctAnswer":2,"explanation":"Type III covers low-pressure equipment such as centrifugal chillers using R-11, R-123, and similar low-pressure refrigerants."},{"id":"epa-t3-02","question":"Low-pressure refrigerants operate at pressures:","options":["Above atmospheric at all times","Below atmospheric pressure during normal operation","The same as high-pressure systems","Only above 100 psig"],"correctAnswer":1,"explanation":"Low-pressure systems operate below atmospheric pressure (in vacuum) during normal operation, which means air leaks IN rather than refrigerant leaking out."},{"id":"epa-t3-03","question":"R-11 boils at approximately what temperature at atmospheric pressure?","options":["−40°F","−21°F","32°F","74.5°F"],"correctAnswer":3,"explanation":"R-11 boils at approximately 74.5°F at atmospheric pressure, which is why these systems operate in vacuum at normal room temperatures."},{"id":"epa-t3-04","question":"The primary concern with low-pressure systems is:","options":["High-pressure explosions","Air and moisture leaking INTO the system","Refrigerant leaking out rapidly","Electrical hazards"],"correctAnswer":1,"explanation":"Since low-pressure systems operate in vacuum, the main concern is air and moisture leaking into the system rather than refrigerant leaking out."},{"id":"epa-t3-05","question":"A purge unit on a low-pressure chiller is used to:","options":["Add refrigerant","Remove non-condensable gases (air) from the system","Control water temperature","Regulate compressor speed"],"correctAnswer":1,"explanation":"Purge units automatically remove air and non-condensables that leak into the low-pressure system."},{"id":"epa-t3-06","question":"For low-pressure systems under 200 lbs, the required recovery level is:","options":["0 psig","25 inches Hg vacuum","25 mm Hg absolute","10 inches Hg vacuum"],"correctAnswer":0,"explanation":"Low-pressure systems under 200 lbs must be recovered to 0 psig."},{"id":"epa-t3-07","question":"For low-pressure systems 200 lbs or more, the required recovery level is:","options":["0 psig","25 inches Hg vacuum","25 mm Hg absolute","10 inches Hg vacuum"],"correctAnswer":2,"explanation":"Low-pressure systems with 200 lbs or more must be recovered to 25 mm Hg absolute."},{"id":"epa-t3-08","question":"Water freezing in a low-pressure chiller can cause:","options":["Improved efficiency","Tube rupture in the evaporator","Higher refrigerant charge","Better heat transfer"],"correctAnswer":1,"explanation":"If water freezes in the evaporator tubes, the expanding ice can rupture the tubes, causing a catastrophic refrigerant release."},{"id":"epa-t3-09","question":"A rupture disc on a low-pressure chiller is designed to:","options":["Regulate pressure","Release pressure if it exceeds safe limits","Prevent air from entering","Control refrigerant flow"],"correctAnswer":1,"explanation":"Rupture discs are safety devices that burst at a predetermined pressure to prevent vessel failure."},{"id":"epa-t3-10","question":"Hydrolysis in a low-pressure system refers to:","options":["Water reacting with refrigerant to form acids","Hydrogen gas formation","Water evaporation","Oil breakdown from heat"],"correctAnswer":0,"explanation":"Hydrolysis is the chemical reaction between water and refrigerant that produces hydrochloric and hydrofluoric acids, damaging system components."},{"id":"epa-t3-11","question":"R-123 is the replacement for:","options":["R-22","R-11","R-12","R-502"],"correctAnswer":1,"explanation":"R-123 (an HCFC) replaced R-11 (a CFC) in centrifugal chillers. R-123 has a much lower ODP."},{"id":"epa-t3-12","question":"A high-efficiency purge unit should have a loss rate of less than:","options":["0.5 lbs per year","0.1 lbs of refrigerant per pound of air purged","5% of total charge","1 lb per day"],"correctAnswer":1,"explanation":"High-efficiency purge units lose less than 0.1 lbs of refrigerant per pound of air removed."},{"id":"epa-t3-13","question":"Before opening a low-pressure system for service, the technician must:","options":["Pressurize with nitrogen to 10 psig","Recover refrigerant to required levels","Drain the water side","Add oil"],"correctAnswer":1,"explanation":"Refrigerant must be recovered to the required level before opening any system for service."},{"id":"epa-t3-14","question":"Low-pressure systems should NEVER be pressurized above:","options":["5 psig","10 psig","The manufacturer''s specified test pressure","50 psig"],"correctAnswer":2,"explanation":"Never exceed the manufacturer''s specified test pressure. Low-pressure vessels are not designed for high pressures."},{"id":"epa-t3-15","question":"What happens if a low-pressure system is exposed to atmospheric pressure?","options":["Nothing significant","Air and moisture enter the system","Refrigerant pressure increases","The compressor speeds up"],"correctAnswer":1,"explanation":"Since low-pressure systems operate in vacuum, any opening allows air and moisture to enter."},{"id":"epa-t3-16","question":"Centrifugal compressors in chillers use what type of compression?","options":["Reciprocating pistons","Rotating scrolls","Centrifugal force (impeller)","Screw rotors"],"correctAnswer":2,"explanation":"Centrifugal compressors use a high-speed impeller to accelerate refrigerant vapor, converting velocity to pressure."},{"id":"epa-t3-17","question":"The leak rate trigger for industrial process refrigeration is:","options":["10%","20%","30%","35%"],"correctAnswer":2,"explanation":"Industrial process refrigeration systems must be repaired if the annual leak rate exceeds 30%."},{"id":"epa-t3-18","question":"When using nitrogen to pressurize a low-pressure system for leak testing:","options":["Use as much pressure as needed","Never exceed 10 psig unless manufacturer allows more","Always use 150 psig","Nitrogen is not used on low-pressure systems"],"correctAnswer":1,"explanation":"Low-pressure systems should not be pressurized above 10 psig with nitrogen unless the manufacturer specifies a higher test pressure."},{"id":"epa-t3-19","question":"R-123 has what ASHRAE safety classification?","options":["A1 (low toxicity, no flame)","B1 (higher toxicity, no flame)","A2 (low toxicity, low flammability)","B2 (higher toxicity, low flammability)"],"correctAnswer":1,"explanation":"R-123 is classified B1 — higher toxicity but non-flammable. Machinery rooms with R-123 require refrigerant monitors."},{"id":"epa-t3-20","question":"A chiller''s evaporator operates at what pressure relative to atmosphere?","options":["Above atmospheric","Below atmospheric (vacuum)","Exactly atmospheric","It varies with load"],"correctAnswer":1,"explanation":"Low-pressure chiller evaporators operate below atmospheric pressure (in vacuum) during normal operation."},{"id":"epa-t3-21","question":"What is the function of the economizer on a centrifugal chiller?","options":["Reduce energy costs","Flash cool liquid refrigerant to improve efficiency","Control water flow","Monitor refrigerant level"],"correctAnswer":1,"explanation":"The economizer flash-cools liquid refrigerant between the condenser and evaporator, improving system efficiency."},{"id":"epa-t3-22","question":"Excessive purging from a chiller indicates:","options":["Normal operation","A leak allowing air into the system","Overcharge of refrigerant","Low water temperature"],"correctAnswer":1,"explanation":"Frequent purging means air is continuously entering the system through a leak that needs to be found and repaired."},{"id":"epa-t3-23","question":"The condenser in a low-pressure chiller typically operates:","options":["In deep vacuum","At or slightly above atmospheric pressure","At very high pressure","Below 0 psig always"],"correctAnswer":1,"explanation":"The condenser in a low-pressure system operates at or slightly above atmospheric pressure, unlike the evaporator which is in vacuum."},{"id":"epa-t3-24","question":"Before recovering refrigerant from a low-pressure system, the technician should:","options":["Heat the refrigerant to increase pressure","Cool the system to reduce pressure","Add nitrogen","Drain the oil first"],"correctAnswer":0,"explanation":"Heating the refrigerant (e.g., raising chilled water temperature) increases pressure above 0 psig, making recovery possible without a vacuum."},{"id":"epa-t3-25","question":"A machinery room containing R-123 must have:","options":["No special requirements","A refrigerant monitor/detector and alarm","Only a fire extinguisher","Windows for ventilation only"],"correctAnswer":1,"explanation":"Due to R-123''s B1 toxicity classification, machinery rooms must have refrigerant monitors, alarms, and mechanical ventilation."},{"id":"epa-t3-26","question":"R-11 is classified as what type of refrigerant?","options":["HFC","HCFC","CFC","HFO"],"correctAnswer":2,"explanation":"R-11 (trichlorofluoromethane) is a CFC with an ODP of 1.0 — the baseline for ozone depletion potential."},{"id":"epa-t3-27","question":"R-123 is classified as what type of refrigerant?","options":["CFC","HCFC","HFC","HFO"],"correctAnswer":1,"explanation":"R-123 is an HCFC with a much lower ODP (0.02) than R-11 (1.0). It replaced R-11 in centrifugal chillers."},{"id":"epa-t3-28","question":"What is the boiling point of R-123 at atmospheric pressure?","options":["−40°F","−21°F","82°F","212°F"],"correctAnswer":2,"explanation":"R-123 boils at approximately 82°F at atmospheric pressure, which is why low-pressure systems operate in vacuum at normal temperatures."},{"id":"epa-t3-29","question":"What is the boiling point of R-11 at atmospheric pressure?","options":["−40°F","−21°F","74.5°F","212°F"],"correctAnswer":2,"explanation":"R-11 boils at approximately 74.5°F at atmospheric pressure."},{"id":"epa-t3-30","question":"A centrifugal chiller evaporator typically operates at what absolute pressure?","options":["Above 14.7 psia","Below 14.7 psia (in vacuum)","Exactly 14.7 psia","Above 100 psia"],"correctAnswer":1,"explanation":"Low-pressure chiller evaporators operate below atmospheric pressure (below 14.7 psia) — in vacuum — during normal operation."},{"id":"epa-t3-31","question":"What is the primary reason air leaks INTO a low-pressure system rather than refrigerant leaking out?","options":["The refrigerant is heavier than air","The system operates below atmospheric pressure (in vacuum)","The refrigerant is non-toxic","The system has no service valves"],"correctAnswer":1,"explanation":"Since the system operates below atmospheric pressure, the pressure differential drives air inward through any leak."},{"id":"epa-t3-32","question":"Non-condensable gases in a low-pressure chiller cause:","options":["Lower head pressure","Higher condenser pressure and reduced efficiency","Lower evaporator pressure","No effect"],"correctAnswer":1,"explanation":"Non-condensables (air) accumulate in the condenser, raising condenser pressure and reducing chiller efficiency."},{"id":"epa-t3-33","question":"A purge unit on a centrifugal chiller operates:","options":["Manually only","Automatically to continuously remove non-condensables","Only during startup","Only during shutdown"],"correctAnswer":1,"explanation":"Modern purge units operate automatically, continuously monitoring and removing non-condensable gases from the condenser."},{"id":"epa-t3-34","question":"The purge unit removes non-condensables by:","options":["Heating the refrigerant","Separating refrigerant from air and venting the air while recovering the refrigerant","Compressing the air into the refrigerant","Draining the air through the oil system"],"correctAnswer":1,"explanation":"Purge units separate refrigerant vapor from air, recover the refrigerant, and vent the air (with minimal refrigerant loss)."},{"id":"epa-t3-35","question":"A high-efficiency purge unit must lose less than how much refrigerant per pound of air purged?","options":["0.5 lbs","0.1 lbs","1.0 lbs","0.01 lbs"],"correctAnswer":1,"explanation":"High-efficiency purge units must lose less than 0.1 lbs of refrigerant per pound of air removed."},{"id":"epa-t3-36","question":"What is the purpose of the economizer on a centrifugal chiller?","options":["Remove non-condensables","Flash-cool liquid refrigerant between the condenser and evaporator to improve efficiency","Control water flow","Monitor refrigerant level"],"correctAnswer":1,"explanation":"The economizer flash-cools liquid refrigerant, reducing the load on the evaporator and improving overall chiller efficiency."},{"id":"epa-t3-37","question":"Centrifugal chiller capacity is typically controlled by:","options":["Cycling the compressor on and off","Inlet guide vanes (IGVs) that vary refrigerant flow into the compressor","Changing the refrigerant charge","Varying condenser water flow only"],"correctAnswer":1,"explanation":"Inlet guide vanes (IGVs) modulate refrigerant flow into the centrifugal compressor, allowing continuous capacity control."},{"id":"epa-t3-38","question":"What is ''surge'' in a centrifugal compressor?","options":["Normal high-capacity operation","Unstable reverse flow of refrigerant through the compressor at low load","High-speed operation","Startup condition"],"correctAnswer":1,"explanation":"Surge occurs when the compressor cannot maintain flow against the head pressure, causing refrigerant to flow backward. It is damaging and must be avoided."},{"id":"epa-t3-39","question":"To prevent surge, centrifugal chillers use:","options":["Higher refrigerant charge","Hot gas bypass or inlet guide vane control at low loads","Faster compressor speed","Lower condenser water temperature"],"correctAnswer":1,"explanation":"Hot gas bypass and IGV control prevent surge by maintaining minimum flow through the compressor at low loads."},{"id":"epa-t3-40","question":"What is the purpose of the oil management system on a centrifugal chiller?","options":["Cool the refrigerant","Lubricate bearings and return oil from the refrigerant circuit to the compressor","Filter non-condensables","Control capacity"],"correctAnswer":1,"explanation":"The oil management system lubricates compressor bearings and recovers oil that migrates into the refrigerant circuit."},{"id":"epa-t3-41","question":"Oil dilution in a low-pressure chiller occurs when:","options":["Too much oil is added","Refrigerant migrates into the oil during off cycles, thinning it","The oil overheats","The compressor runs too fast"],"correctAnswer":1,"explanation":"Refrigerant can migrate into the oil sump during off cycles, diluting the oil and reducing lubrication effectiveness."},{"id":"epa-t3-42","question":"Before opening a low-pressure chiller for service, the technician must first:","options":["Pressurize with nitrogen","Recover refrigerant to the required level","Drain the chilled water","Remove the purge unit"],"correctAnswer":1,"explanation":"Refrigerant must be recovered to the required level (0 psig for under 200 lbs, 25 mm Hg absolute for 200 lbs or more) before opening."},{"id":"epa-t3-43","question":"To facilitate recovery from a low-pressure chiller, the technician can:","options":["Cool the system to reduce pressure","Heat the refrigerant (raise chilled water temperature) to increase pressure above 0 psig","Add nitrogen to increase pressure","Use a vacuum pump to pull refrigerant out"],"correctAnswer":1,"explanation":"Heating the refrigerant raises its pressure above 0 psig, making recovery possible without requiring a vacuum on the recovery side."},{"id":"epa-t3-44","question":"What is the maximum nitrogen pressure for leak testing a low-pressure chiller?","options":["5 psig","10 psig","150 psig","Manufacturer''s specified test pressure"],"correctAnswer":3,"explanation":"Never exceed the manufacturer''s specified test pressure. Low-pressure vessels are not designed for high pressures."},{"id":"epa-t3-45","question":"A rupture disc on a low-pressure chiller is designed to burst at:","options":["Any pressure above atmospheric","A predetermined pressure to prevent vessel failure","10 psig always","The normal operating pressure"],"correctAnswer":1,"explanation":"Rupture discs are one-time safety devices that burst at a predetermined pressure to relieve overpressure and prevent catastrophic failure."},{"id":"epa-t3-46","question":"After a rupture disc bursts on a low-pressure chiller:","options":["It resets automatically","It must be replaced — it is a one-time device","The system can continue operating","It can be repaired in the field"],"correctAnswer":1,"explanation":"Rupture discs are one-time devices. After bursting, they must be replaced before the system can be returned to service."},{"id":"epa-t3-47","question":"What is the purpose of the chilled water pump in a chiller system?","options":["Circulate refrigerant","Circulate chilled water from the evaporator to the building cooling coils","Cool the condenser","Lubricate the compressor"],"correctAnswer":1,"explanation":"The chilled water pump circulates water between the chiller evaporator and the building''s air handling units."},{"id":"epa-t3-48","question":"What is the purpose of the condenser water pump in a water-cooled chiller?","options":["Circulate chilled water","Circulate condenser water between the chiller condenser and the cooling tower","Lubricate the compressor","Control refrigerant flow"],"correctAnswer":1,"explanation":"The condenser water pump circulates water between the chiller condenser and the cooling tower, rejecting heat."},{"id":"epa-t3-49","question":"A cooling tower rejects heat by:","options":["Refrigeration","Evaporative cooling — water evaporation removes heat from the condenser water","Conduction to the ground","Radiation only"],"correctAnswer":1,"explanation":"Cooling towers use evaporative cooling — a small portion of water evaporates, removing large amounts of heat from the remaining water."},{"id":"epa-t3-50","question":"Approach temperature in a cooling tower is:","options":["The difference between entering and leaving water temperature","The difference between leaving water temperature and wet-bulb temperature","The outdoor dry-bulb temperature","The condenser water supply temperature"],"correctAnswer":1,"explanation":"Approach temperature is the difference between the cooling tower leaving water temperature and the ambient wet-bulb temperature."},{"id":"epa-t3-51","question":"What is the purpose of blowdown in a cooling tower?","options":["Remove non-condensables","Remove concentrated minerals and contaminants by draining a portion of the water","Increase water flow","Test water quality"],"correctAnswer":1,"explanation":"Blowdown removes concentrated minerals that build up as water evaporates, preventing scale and corrosion."},{"id":"epa-t3-52","question":"Legionella bacteria can grow in cooling towers when:","options":["Water temperature is below 32°F","Water temperature is between 77–113°F with stagnant conditions","Water is treated with biocide","Water flow is continuous"],"correctAnswer":1,"explanation":"Legionella thrives in warm, stagnant water (77–113°F). Cooling towers require regular water treatment and maintenance."},{"id":"epa-t3-53","question":"What is the leaving chilled water temperature (LCHWT) for a typical comfort cooling chiller?","options":["32°F","44–45°F","55–60°F","65–70°F"],"correctAnswer":1,"explanation":"Typical comfort cooling chillers produce chilled water at 44–45°F leaving the evaporator."},{"id":"epa-t3-54","question":"What is the chilled water temperature differential (delta-T) for a typical chiller system?","options":["1–2°F","5–10°F","15–20°F","25–30°F"],"correctAnswer":1,"explanation":"Typical chilled water systems have a 10°F delta-T — 44°F supply and 54°F return."},{"id":"epa-t3-55","question":"What is the condenser water supply temperature for a typical water-cooled chiller?","options":["44°F","55°F","85°F","120°F"],"correctAnswer":2,"explanation":"Condenser water typically enters the chiller at 85°F and leaves at 95°F in standard design conditions."},{"id":"epa-t3-56","question":"A chiller''s COP (coefficient of performance) is calculated as:","options":["Cooling capacity divided by power input","Power input divided by cooling capacity","Cooling capacity times power input","Condenser load divided by evaporator load"],"correctAnswer":0,"explanation":"COP = cooling capacity (tons or BTU/hr) divided by power input (kW or BTU/hr). Higher COP = more efficient."},{"id":"epa-t3-57","question":"kW/ton is a measure of:","options":["Chiller cooling capacity","Chiller energy efficiency — lower is better","Refrigerant charge","Condenser water flow"],"correctAnswer":1,"explanation":"kW/ton measures how many kilowatts of electricity are consumed per ton of cooling. Lower kW/ton = more efficient."},{"id":"epa-t3-58","question":"What is the purpose of a chiller''s oil cooler?","options":["Cool the refrigerant","Remove heat from the compressor oil to maintain proper viscosity","Cool the condenser water","Reduce discharge temperature"],"correctAnswer":1,"explanation":"The oil cooler removes heat from compressor oil, maintaining proper viscosity for lubrication."},{"id":"epa-t3-59","question":"Hydrolysis in a low-pressure chiller produces:","options":["Nitrogen gas","Hydrochloric and hydrofluoric acids","Carbon dioxide","Oxygen"],"correctAnswer":1,"explanation":"Water reacting with R-11 or R-123 produces hydrochloric and hydrofluoric acids, which corrode system components."},{"id":"epa-t3-60","question":"What is the purpose of a moisture indicator in a low-pressure chiller?","options":["Measure refrigerant level","Detect moisture in the refrigerant circuit","Measure oil level","Control purge unit operation"],"correctAnswer":1,"explanation":"Moisture indicators detect water in the refrigerant circuit, which can cause hydrolysis and acid formation."},{"id":"epa-t3-61","question":"A low-pressure chiller that has been open to atmosphere must be:","options":["Recharged immediately","Evacuated and dehydrated before recharging","Pressurized with nitrogen only","Inspected visually only"],"correctAnswer":1,"explanation":"After being open to atmosphere, the system must be thoroughly evacuated and dehydrated to remove air and moisture before recharging."},{"id":"epa-t3-62","question":"What is the purpose of a chiller''s capacity control system?","options":["Control refrigerant charge","Match chiller output to building cooling load to maintain setpoint efficiently","Control condenser water temperature","Monitor refrigerant purity"],"correctAnswer":1,"explanation":"Capacity control matches chiller output to the actual cooling load, maintaining the chilled water setpoint while minimizing energy use."},{"id":"epa-t3-63","question":"A chiller that is ''hunting'' (cycling capacity up and down rapidly) may indicate:","options":["Normal operation","Oversized chiller, control system issue, or low load conditions","Undercharge","Dirty condenser"],"correctAnswer":1,"explanation":"Hunting typically indicates an oversized chiller for the current load, a control system problem, or very low load conditions."},{"id":"epa-t3-64","question":"What is the purpose of a chiller''s evaporator freeze protection?","options":["Prevent refrigerant from freezing","Shut down the chiller if chilled water temperature approaches 32°F to prevent tube freezing","Control chilled water flow","Monitor refrigerant level"],"correctAnswer":1,"explanation":"Freeze protection shuts down the chiller if chilled water temperature drops too low, preventing ice formation and tube rupture."},{"id":"epa-t3-65","question":"The leak rate threshold for industrial process refrigeration requiring repair is:","options":["10%","20%","30%","35%"],"correctAnswer":2,"explanation":"Industrial process refrigeration systems must be repaired if the annual leak rate exceeds 30%."},{"id":"epa-t3-66","question":"What is the purpose of a chiller log?","options":["Record refrigerant purchases only","Track operating parameters to identify trends and detect problems early","Record technician certifications","Document customer complaints only"],"correctAnswer":1,"explanation":"Chiller logs record daily operating parameters (pressures, temperatures, amps, water temperatures) to identify trends and catch problems early."},{"id":"epa-t3-67","question":"A centrifugal chiller''s impeller speed is typically:","options":["1,750 RPM","3,600 RPM","10,000–20,000 RPM","100,000 RPM"],"correctAnswer":2,"explanation":"Centrifugal compressor impellers typically spin at 10,000–20,000 RPM to generate sufficient velocity for compression."},{"id":"epa-t3-68","question":"What is the purpose of a variable frequency drive (VFD) on a centrifugal chiller?","options":["Control refrigerant flow","Vary compressor speed to match load and improve part-load efficiency","Control condenser water flow","Monitor refrigerant purity"],"correctAnswer":1,"explanation":"VFDs vary compressor motor speed, allowing the chiller to operate efficiently at part load — a major efficiency improvement."},{"id":"epa-t3-69","question":"A chiller with a VFD can achieve efficiency improvements at part load because:","options":["It uses less refrigerant","Reducing speed reduces power consumption by the cube of the speed ratio","It bypasses the condenser","It uses a smaller impeller"],"correctAnswer":1,"explanation":"Centrifugal fan/pump laws: power varies with the cube of speed. Reducing speed to 80% reduces power to about 51%."},{"id":"epa-t3-70","question":"What is the purpose of a chiller''s oil heater?","options":["Heat the refrigerant","Prevent refrigerant migration into the oil during off cycles","Heat the chilled water","Warm the compressor before startup"],"correctAnswer":1,"explanation":"Oil heaters keep the oil warm during off cycles, preventing refrigerant from migrating into and diluting the oil."},{"id":"epa-t3-71","question":"Before starting a centrifugal chiller after a long shutdown, the technician should:","options":["Start immediately at full load","Verify oil level, check for refrigerant migration, run oil heater, and start at minimum load","Add refrigerant first","Test the purge unit only"],"correctAnswer":1,"explanation":"Pre-startup checks include verifying oil level, ensuring oil heater has been on, checking for refrigerant migration, and starting at minimum load."},{"id":"epa-t3-72","question":"What is the purpose of a chiller''s condenser pressure transducer?","options":["Measure chilled water temperature","Monitor condenser (high-side) pressure for control and safety","Control refrigerant charge","Measure oil pressure"],"correctAnswer":1,"explanation":"Condenser pressure transducers monitor high-side pressure for capacity control, safety cutouts, and performance monitoring."},{"id":"epa-t3-73","question":"A low-pressure chiller that shows increasing purge frequency over time indicates:","options":["Normal aging","A developing leak allowing air to enter the system","Overcharge of refrigerant","Improving efficiency"],"correctAnswer":1,"explanation":"Increasing purge frequency means more air is entering the system — a leak is developing and must be found and repaired."},{"id":"epa-t3-74","question":"What is the purpose of a chiller''s evaporator pressure transducer?","options":["Measure chilled water flow","Monitor evaporator (low-side) pressure for control, freeze protection, and safety","Control refrigerant charge","Measure oil temperature"],"correctAnswer":1,"explanation":"Evaporator pressure transducers monitor low-side pressure for capacity control, freeze protection, and safety cutouts."},{"id":"epa-t3-75","question":"Type III certification is required to service:","options":["Any refrigerant-containing equipment","Low-pressure systems such as centrifugal chillers using R-11, R-113, or R-123","High-pressure systems only","Small appliances only"],"correctAnswer":1,"explanation":"Type III certification covers low-pressure equipment — centrifugal chillers and similar systems using low-pressure refrigerants."},{"id":"epa-t3-76","question":"The preferred method to pressurize a low-pressure chiller for leak testing is:","options":["Nitrogen at 150 psig","Hot water method or a built-in pressurization device (e.g., Prevac)","Compressed air","Refrigerant at operating pressure"],"correctAnswer":1,"explanation":"The preferred pressurization methods for low-pressure chillers are the hot water method or a built-in device like Prevac. Nitrogen is acceptable but must not exceed 10 psig."},{"id":"epa-t3-77","question":"The maximum pressure for pressurizing a low-pressure chiller with nitrogen for leak testing is:","options":["5 psig","10 psig","50 psig","150 psig"],"correctAnswer":1,"explanation":"Low-pressure chiller vessels are not designed for high pressures. Never exceed 10 psig with nitrogen unless the manufacturer specifies a higher test pressure."},{"id":"epa-t3-78","question":"Excessive purging from a low-pressure chiller''s purge unit is a sign of:","options":["Normal operation","A leak allowing air to enter the system","Overcharge of refrigerant","High efficiency operation"],"correctAnswer":1,"explanation":"Frequent or excessive purging means air is continuously entering through a leak. The leak must be found and repaired."},{"id":"epa-t3-79","question":"Before recovering refrigerant from a low-pressure chiller, the technician should heat the refrigerant to:","options":["Freeze the water side","Raise refrigerant pressure above 0 psig to enable recovery without pulling a vacuum on the recovery side","Cool the system for safety","Increase refrigerant viscosity"],"correctAnswer":1,"explanation":"Heating raises the refrigerant pressure above atmospheric, allowing recovery equipment to push refrigerant into the recovery vessel without needing to pull a vacuum."},{"id":"epa-t3-80","question":"During recovery from a low-pressure chiller, the technician must also recover:","options":["Only liquid refrigerant","Both liquid AND vapor refrigerant","Only vapor refrigerant","Only the refrigerant in the evaporator"],"correctAnswer":1,"explanation":"Both liquid and vapor must be recovered from low-pressure systems. Recovering only liquid leaves significant vapor refrigerant in the system."},{"id":"epa-t3-81","question":"Before removing oil from a low-pressure chiller, the oil should be heated to approximately:","options":["70°F","100°F","130°F","200°F"],"correctAnswer":2,"explanation":"Heating oil to 130°F before removal drives dissolved refrigerant out of the oil, minimizing refrigerant release when the oil is drained."},{"id":"epa-t3-82","question":"During evacuation of a low-pressure chiller, the water in the chiller tubes must be:","options":["Left in place — it helps cooling","Circulated or removed to prevent freezing as the system pressure drops below atmospheric","Heated to boiling","Drained completely before starting"],"correctAnswer":1,"explanation":"As the chiller is evacuated, pressure drops and water temperature can fall below 32°F. Circulating or removing the water prevents tube-rupturing ice formation."},{"id":"epa-t3-83","question":"When recharging a low-pressure chiller, refrigerant vapor should be introduced:","options":["After all the liquid","Before liquid, to prevent freezing of water in the evaporator tubes","Only as liquid","It does not matter"],"correctAnswer":1,"explanation":"Introducing vapor first warms the evaporator tubes slightly, preventing the sudden temperature drop that could freeze water in the tubes when liquid is added."},{"id":"epa-t3-84","question":"Refrigerant should be charged into a centrifugal chiller through:","options":["The condenser charging valve","The evaporator charging valve","The purge unit","The oil separator"],"correctAnswer":1,"explanation":"Centrifugal chillers are charged through the evaporator charging valve to ensure proper distribution and prevent liquid slugging of the compressor."},{"id":"epa-t3-85","question":"After reaching the required vacuum on a low-pressure chiller, the technician should wait and monitor because:","options":["The vacuum pump needs to cool","A pressure rise indicates residual liquid refrigerant boiling off or a leak — more evacuation is needed","The refrigerant needs to settle","Waiting is not required"],"correctAnswer":1,"explanation":"After isolation, monitor for pressure rise. Rising pressure means liquid is still present or there is a leak — continue evacuation until pressure stabilizes."},{"id":"epa-t3-86","question":"For low-pressure systems under 200 lbs, the recovery requirement before a major repair using post-1993 equipment is:","options":["25 mm Hg absolute","0 psig","10 in. Hg vacuum","500 microns"],"correctAnswer":1,"explanation":"Low-pressure systems under 200 lbs must be recovered to 0 psig before major repairs using post-November 15, 1993 equipment."},{"id":"epa-t3-87","question":"For low-pressure systems with 200 lbs or more, the recovery requirement before a major repair using post-1993 equipment is:","options":["0 psig","25 mm Hg absolute","10 in. Hg vacuum","500 microns"],"correctAnswer":1,"explanation":"Low-pressure systems with 200 lbs or more must be recovered to 25 mm Hg absolute before major repairs using post-November 15, 1993 equipment."},{"id":"epa-t3-88","question":"A ''major repair'' on a low-pressure system is defined as:","options":["Any repair costing over $1,000","Any repair that involves opening the refrigerant circuit","Replacing the purge unit only","Any repair requiring more than 4 hours"],"correctAnswer":1,"explanation":"A major repair is any repair that involves opening the refrigerant circuit — breaking a refrigerant-containing joint or replacing a component."},{"id":"epa-t3-89","question":"For a non-major repair on a low-pressure system, the allowable pressurization methods are:","options":["Nitrogen at any pressure","Controlled hot water or a Prevac-type device only","Refrigerant at operating pressure","Compressed air"],"correctAnswer":1,"explanation":"For non-major repairs, low-pressure systems may be pressurized using controlled hot water or a built-in pressurization device (Prevac). Nitrogen must not exceed 10 psig."},{"id":"epa-t3-90","question":"The annual leak rate threshold requiring repair for comfort cooling low-pressure systems (over 50 lbs) is:","options":["5%","10%","20%","35%"],"correctAnswer":1,"explanation":"Comfort cooling systems (including low-pressure chillers used for comfort cooling) must be repaired if the annual leak rate exceeds 10%."},{"id":"epa-t3-91","question":"The annual leak rate threshold requiring repair for industrial process low-pressure refrigeration is:","options":["10%","20%","30%","35%"],"correctAnswer":2,"explanation":"Industrial process refrigeration systems must be repaired if the annual leak rate exceeds 30%."},{"id":"epa-t3-92","question":"ASHRAE Standard 15 requires a refrigerant sensor specifically for R-123 because:","options":["R-123 is flammable","R-123 has a B1 (higher toxicity) safety classification requiring detection before dangerous concentrations are reached","R-123 has high ODP","R-123 is heavier than air"],"correctAnswer":1,"explanation":"R-123 is classified B1 (higher toxicity). ASHRAE 15 requires a refrigerant sensor/alarm in R-123 machinery rooms to detect leaks before concentrations reach dangerous levels."},{"id":"epa-t3-93","question":"The high-pressure cut-out on recovery equipment used with low-pressure appliances must be set to prevent:","options":["The recovery vessel from overfilling","The recovery equipment from over-pressurizing the low-pressure vessel during recovery","The compressor from overheating","The refrigerant from freezing"],"correctAnswer":1,"explanation":"Recovery equipment used on low-pressure systems must have a high-pressure cut-out to prevent the recovery machine from pressurizing the low-pressure vessel above safe limits."},{"id":"epa-t3-94","question":"R-245fa is a low-pressure refrigerant used as a replacement for:","options":["R-22","R-11 and R-123 in some centrifugal chiller applications","R-410A","R-134a"],"correctAnswer":1,"explanation":"R-245fa (an HFC) is used in some centrifugal chillers as a low-pressure refrigerant, replacing R-11 and R-123."},{"id":"epa-t3-95","question":"R-113 is classified as what type of refrigerant?","options":["HFC","HCFC","CFC","HFO"],"correctAnswer":2,"explanation":"R-113 is a CFC (trichlorotrifluoroethane) with high ODP. It was used in some centrifugal chillers and has been phased out."},{"id":"epa-t3-96","question":"A low-pressure chiller that shows a steady rise in condenser pressure over several weeks, with no change in load, most likely has:","options":["A refrigerant overcharge","Non-condensable gas accumulation from a developing air leak","A failing compressor","A dirty evaporator"],"correctAnswer":1,"explanation":"Steadily rising condenser pressure with constant load indicates non-condensable gas (air) accumulating from a developing leak."},{"id":"epa-t3-97","question":"The EPA 608 Type III exam consists of:","options":["25 questions (Type III topics only)","50 questions (25 Core + 25 Type III)","75 questions","100 questions"],"correctAnswer":1,"explanation":"The Type III exam has 50 questions: 25 from the Core group and 25 from the Type III technical group."},{"id":"epa-t3-98","question":"A low-pressure chiller''s evaporator pressure gauge reads 26 in. Hg vacuum. This means the absolute pressure is approximately:","options":["26 psia","3.9 psia","14.7 psia","0 psia"],"correctAnswer":1,"explanation":"26 in. Hg vacuum = approximately 3.9 psia (14.7 − (26 × 0.491) ≈ 14.7 − 12.8 = 1.9 psia). Low-pressure chillers operate well below atmospheric."},{"id":"epa-t3-99","question":"When a low-pressure chiller is shut down for an extended period, the main concern is:","options":["Refrigerant overcharge","Air and moisture leaking into the system through seals and gaskets","Oil degradation only","Electrical corrosion"],"correctAnswer":1,"explanation":"During extended shutdown, the system may warm above the refrigerant''s boiling point, creating a slight positive pressure — but cooling can pull it back into vacuum, drawing in air through any imperfect seals."},{"id":"epa-t3-100","question":"The Universal EPA 608 exam consists of:","options":["50 questions","75 questions","100 questions (25 Core + 25 Type I + 25 Type II + 25 Type III)","150 questions"],"correctAnswer":2,"explanation":"The Universal exam has 100 questions: 25 Core + 25 Type I + 25 Type II + 25 Type III. Passing score is 70% on each section."}]'::jsonb
+  WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+    AND slug = 'hvac-lesson-94'
+    AND quiz_questions IS NULL;
+
+-- Verify
+SELECT COUNT(*) AS still_missing
+FROM public.course_lessons
+WHERE course_id = '0ba9a61c-1f1b-4019-be6f-90e92eba2bc0'
+  AND quiz_questions IS NULL
+  AND lesson_type = 'lesson';
+
+
+
+-- ── 20260606000002_stripe_webhook_secret_app_secrets.sql ──────────────────────────────────────────
+
+-- Ensure STRIPE_WEBHOOK_SECRET exists in app_secrets so the webhook handler
+-- can load it via hydrateProcessEnv() at runtime.
+--
+-- The canonical Stripe webhook handler (app/api/webhooks/stripe/route.ts) reads
+-- process.env.STRIPE_WEBHOOK_SECRET after calling hydrateProcessEnv(). In
+-- production, secrets live in this table — not in Netlify env vars — because
+-- Netlify's Lambda 4KB env var limit prevents injecting all secrets.
+--
+-- ACTION REQUIRED after applying this migration:
+--   1. Get your webhook signing secret from Stripe Dashboard →
+--      Developers → Webhooks → select the endpoint → Signing secret
+--   2. Run this UPDATE in Supabase SQL Editor:
+--
+--      UPDATE app_secrets
+--      SET value = 'whsec_YOUR_ACTUAL_SECRET_HERE'
+--      WHERE key = 'STRIPE_WEBHOOK_SECRET';
+--
+--   3. Verify the endpoint is registered for:
+--      https://www.elevateforhumanity.org/api/webhooks/stripe
+--
+-- This migration inserts a placeholder row so the key exists in the table.
+-- The placeholder value will cause signature verification to fail (400) until
+-- you update it with the real secret — which is safer than silently dropping
+-- events (the previous behavior when the key was missing).
+
+INSERT INTO app_secrets (key, value, scope, description)
+VALUES (
+  'STRIPE_WEBHOOK_SECRET',
+  'REPLACE_WITH_REAL_WHSEC_FROM_STRIPE_DASHBOARD',
+  'runtime',
+  'Stripe webhook signing secret for /api/webhooks/stripe. Get from Stripe Dashboard → Developers → Webhooks.'
+)
+ON CONFLICT (key) DO UPDATE
+  SET
+    scope = 'runtime',
+    description = EXCLUDED.description,
+    updated_at = now()
+  -- Only update description/scope — do NOT overwrite an existing real secret value
+  WHERE app_secrets.value = '' OR app_secrets.value IS NULL OR app_secrets.value = 'REPLACE_WITH_REAL_WHSEC_FROM_STRIPE_DASHBOARD';
+
+
+
+-- ── 20260607000001_booth_rental_tables.sql ──────────────────────────────────────────
+
+-- Booth rental subscriptions
+-- Tracks active Stripe subscriptions for booth/suite renters.
+
+CREATE TABLE IF NOT EXISTS public.booth_rental_subscriptions (
+  id                      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  stripe_session_id       text UNIQUE,
+  stripe_customer_id      text,
+  stripe_subscription_id  text,
+  discipline              text NOT NULL CHECK (discipline IN ('barber', 'cosmetologist', 'nail_tech', 'esthetician')),
+  renter_name             text NOT NULL,
+  renter_email            text NOT NULL,
+  booth_number            text,
+  payment_status          text NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'active', 'past_due', 'suspended', 'cancelled')),
+  mou_signed              boolean NOT NULL DEFAULT false,
+  mou_signed_at           timestamptz,
+  days_past_due           integer NOT NULL DEFAULT 0,
+  late_fee_total_cents    integer NOT NULL DEFAULT 0,
+  notes                   text,
+  created_at              timestamptz NOT NULL DEFAULT now(),
+  updated_at              timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_booth_rental_subscriptions_email    ON public.booth_rental_subscriptions (renter_email);
+CREATE INDEX IF NOT EXISTS idx_booth_rental_subscriptions_status   ON public.booth_rental_subscriptions (payment_status);
+CREATE INDEX IF NOT EXISTS idx_booth_rental_subscriptions_stripe   ON public.booth_rental_subscriptions (stripe_subscription_id);
+
+-- Booth rental agreements (signed MOUs)
+-- One row per signed agreement. Stores signature data URL for audit trail.
+
+CREATE TABLE IF NOT EXISTS public.booth_rental_agreements (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  stripe_session_id   text,
+  stripe_customer_id  text,
+  discipline          text NOT NULL,
+  renter_name         text NOT NULL,
+  renter_email        text NOT NULL,
+  printed_name        text NOT NULL,
+  signature_data_url  text NOT NULL,
+  signed_at           timestamptz NOT NULL,
+  ip_address          text,
+  created_at          timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_booth_rental_agreements_email    ON public.booth_rental_agreements (renter_email);
+CREATE INDEX IF NOT EXISTS idx_booth_rental_agreements_session  ON public.booth_rental_agreements (stripe_session_id);
+
+-- Apprentice hours — add discipline column if missing
+
+ALTER TABLE public.apprentice_hours
+  ADD COLUMN IF NOT EXISTS discipline text,
+  ADD COLUMN IF NOT EXISTS total_minutes integer,
+  ADD COLUMN IF NOT EXISTS category text DEFAULT 'practical',
+  ADD COLUMN IF NOT EXISTS submitted_at timestamptz DEFAULT now();
+
+-- RLS: staff and admin can read all booth rental records
+ALTER TABLE public.booth_rental_subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.booth_rental_agreements    ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Staff can read booth_rental_subscriptions"
+  ON public.booth_rental_subscriptions FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE profiles.id = auth.uid()
+        AND profiles.role IN ('admin', 'super_admin', 'staff')
+    )
+  );
+
+CREATE POLICY "Staff can read booth_rental_agreements"
+  ON public.booth_rental_agreements FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE profiles.id = auth.uid()
+        AND profiles.role IN ('admin', 'super_admin', 'staff')
+    )
+  );
+
+-- Service role can insert/update (used by API routes)
+CREATE POLICY "Service role full access booth_rental_subscriptions"
+  ON public.booth_rental_subscriptions FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+CREATE POLICY "Service role full access booth_rental_agreements"
+  ON public.booth_rental_agreements FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+
+
+-- ── 20260608000001_exam_bookings_add_on.sql ──────────────────────────────────────────
+
+-- Add add-on tracking columns to exam_bookings.
+-- add_on: candidate selected the Certification Success Package at checkout
+-- add_on_paid: payment confirmed (set by webhook after Stripe success)
+
+ALTER TABLE public.exam_bookings
+  ADD COLUMN IF NOT EXISTS add_on       boolean NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS add_on_paid  boolean NOT NULL DEFAULT false;
+
+COMMENT ON COLUMN public.exam_bookings.add_on      IS 'True when candidate selected the Certification Success Package ($59) at checkout';
+COMMENT ON COLUMN public.exam_bookings.add_on_paid IS 'True after Stripe payment confirmed the add-on charge';
+
+
+
+-- ── 20260608000001_fix_hyphenated_tables_missing_tables_rls_indexes.sql ──────────────────────────────────────────
+
+-- =============================================================================
+-- Migration: fix hyphenated table names, create missing tables, fill RLS gaps,
+--            add missing indexes
+-- Apply in: Supabase Dashboard → SQL Editor
+-- =============================================================================
+
+-- ── 1. RENAME HYPHENATED TABLES TO UNDERSCORES ───────────────────────────────
+-- Only rename if the hyphenated version exists and the underscore version does not.
+
+DO $$
+BEGIN
+  -- enrollment-documents → enrollment_documents
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='enrollment-documents')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='enrollment_documents') THEN
+    ALTER TABLE public."enrollment-documents" RENAME TO enrollment_documents;
+  END IF;
+
+  -- credential-uploads → credential_uploads
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='credential-uploads')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='credential_uploads') THEN
+    ALTER TABLE public."credential-uploads" RENAME TO credential_uploads;
+  END IF;
+
+  -- apprentice-uploads → apprentice_uploads
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='apprentice-uploads')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='apprentice_uploads') THEN
+    ALTER TABLE public."apprentice-uploads" RENAME TO apprentice_uploads;
+  END IF;
+
+  -- program-holder-documents → program_holder_documents
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='program-holder-documents')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='program_holder_documents') THEN
+    ALTER TABLE public."program-holder-documents" RENAME TO program_holder_documents;
+  END IF;
+
+  -- partner-documents → partner_documents
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='partner-documents')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='partner_documents') THEN
+    ALTER TABLE public."partner-documents" RENAME TO partner_documents;
+  END IF;
+
+  -- shop-onboarding → shop_onboarding
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='shop-onboarding')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='shop_onboarding') THEN
+    ALTER TABLE public."shop-onboarding" RENAME TO shop_onboarding;
+  END IF;
+
+  -- course-content → course_content
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='course-content')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='course_content') THEN
+    ALTER TABLE public."course-content" RENAME TO course_content;
+  END IF;
+
+  -- audit-archive → audit_archive
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='audit-archive')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='audit_archive') THEN
+    ALTER TABLE public."audit-archive" RENAME TO audit_archive;
+  END IF;
+
+  -- tax-documents → tax_documents
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='tax-documents')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='tax_documents') THEN
+    ALTER TABLE public."tax-documents" RENAME TO tax_documents;
+  END IF;
+
+  -- scorm-packages → scorm_packages
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='scorm-packages')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='scorm_packages') THEN
+    ALTER TABLE public."scorm-packages" RENAME TO scorm_packages;
+  END IF;
+
+  -- course-videos → course_videos
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='course-videos')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='course_videos') THEN
+    ALTER TABLE public."course-videos" RENAME TO course_videos;
+  END IF;
+
+  -- provider-exports → provider_exports
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='provider-exports')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='provider_exports') THEN
+    ALTER TABLE public."provider-exports" RENAME TO provider_exports;
+  END IF;
+
+  -- sam-documents → sam_documents
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='sam-documents')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='sam_documents') THEN
+    ALTER TABLE public."sam-documents" RENAME TO sam_documents;
+  END IF;
+
+  -- module-certificates → module_certificates (already exists as storage bucket — table may not exist)
+  IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='module-certificates')
+     AND NOT EXISTS (SELECT 1 FROM pg_tables WHERE schemaname='public' AND tablename='module_certificates') THEN
+    ALTER TABLE public."module-certificates" RENAME TO module_certificates;
+  END IF;
+END $$;
+
+-- ── 2. CREATE MISSING TABLES ─────────────────────────────────────────────────
+
+-- at_risk_students — referenced in /admin/at-risk page
+CREATE TABLE IF NOT EXISTS public.at_risk_students (
+  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id           uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  enrollment_id     uuid REFERENCES public.program_enrollments(id) ON DELETE SET NULL,
+  program_id        uuid REFERENCES public.programs(id) ON DELETE SET NULL,
+  risk_level        text NOT NULL DEFAULT 'medium' CHECK (risk_level IN ('low','medium','high','critical')),
+  risk_factors      jsonb DEFAULT '[]',
+  last_activity_at  timestamptz,
+  days_inactive     integer DEFAULT 0,
+  progress_percent  numeric(5,2) DEFAULT 0,
+  flagged_at        timestamptz DEFAULT now(),
+  resolved_at       timestamptz,
+  resolved_by       uuid REFERENCES public.profiles(id),
+  notes             text,
+  created_at        timestamptz DEFAULT now(),
+  updated_at        timestamptz DEFAULT now()
+);
+
+-- student_interventions — follow-up actions for at-risk students
+CREATE TABLE IF NOT EXISTS public.student_interventions (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  at_risk_id      uuid REFERENCES public.at_risk_students(id) ON DELETE SET NULL,
+  intervention_type text NOT NULL DEFAULT 'outreach' CHECK (intervention_type IN ('outreach','call','email','meeting','referral','other')),
+  status          text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','in_progress','completed','cancelled')),
+  notes           text,
+  outcome         text,
+  assigned_to     uuid REFERENCES public.profiles(id),
+  due_at          timestamptz,
+  completed_at    timestamptz,
+  created_by      uuid REFERENCES public.profiles(id),
+  created_at      timestamptz DEFAULT now(),
+  updated_at      timestamptz DEFAULT now()
+);
+
+-- enrollment_documents — document uploads during enrollment
+CREATE TABLE IF NOT EXISTS public.enrollment_documents (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  enrollment_id   uuid REFERENCES public.program_enrollments(id) ON DELETE CASCADE,
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  document_type   text NOT NULL,
+  file_name       text NOT NULL,
+  file_path       text NOT NULL,
+  file_size       integer,
+  mime_type       text,
+  status          text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected')),
+  reviewed_by     uuid REFERENCES public.profiles(id),
+  reviewed_at     timestamptz,
+  notes           text,
+  created_at      timestamptz DEFAULT now(),
+  updated_at      timestamptz DEFAULT now()
+);
+
+-- credential_uploads — certification credential uploads
+CREATE TABLE IF NOT EXISTS public.credential_uploads (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  certificate_id  uuid REFERENCES public.certificates(id) ON DELETE SET NULL,
+  file_name       text NOT NULL,
+  file_path       text NOT NULL,
+  file_size       integer,
+  mime_type       text,
+  verified        boolean DEFAULT false,
+  verified_by     uuid REFERENCES public.profiles(id),
+  verified_at     timestamptz,
+  created_at      timestamptz DEFAULT now()
+);
+
+-- apprentice_uploads — apprentice hour submission documents
+CREATE TABLE IF NOT EXISTS public.apprentice_uploads (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  submission_id   uuid,
+  file_name       text NOT NULL,
+  file_path       text NOT NULL,
+  file_size       integer,
+  mime_type       text,
+  created_at      timestamptz DEFAULT now()
+);
+
+-- program_holder_documents — program holder identity/compliance docs
+CREATE TABLE IF NOT EXISTS public.program_holder_documents (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  document_type   text NOT NULL,
+  file_name       text NOT NULL,
+  file_path       text NOT NULL,
+  file_size       integer,
+  mime_type       text,
+  status          text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected')),
+  reviewed_by     uuid REFERENCES public.profiles(id),
+  reviewed_at     timestamptz,
+  created_at      timestamptz DEFAULT now()
+);
+
+-- partner_documents — partner onboarding documents
+CREATE TABLE IF NOT EXISTS public.partner_documents (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  partner_id      uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
+  document_type   text NOT NULL,
+  file_name       text NOT NULL,
+  file_path       text NOT NULL,
+  file_size       integer,
+  mime_type       text,
+  status          text NOT NULL DEFAULT 'pending',
+  created_at      timestamptz DEFAULT now()
+);
+
+-- shop_onboarding — shop seller onboarding state
+CREATE TABLE IF NOT EXISTS public.shop_onboarding (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  step            text NOT NULL DEFAULT 'identity',
+  completed_steps jsonb DEFAULT '[]',
+  data            jsonb DEFAULT '{}',
+  completed_at    timestamptz,
+  created_at      timestamptz DEFAULT now(),
+  updated_at      timestamptz DEFAULT now()
+);
+
+-- course_content — SCORM/xAPI content packages
+CREATE TABLE IF NOT EXISTS public.course_content (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  course_id       uuid REFERENCES public.courses(id) ON DELETE CASCADE,
+  package_type    text NOT NULL DEFAULT 'scorm' CHECK (package_type IN ('scorm','xapi','video','pdf')),
+  title           text,
+  file_path       text NOT NULL,
+  file_size       bigint,
+  manifest        jsonb DEFAULT '{}',
+  version         text,
+  created_by      uuid REFERENCES public.profiles(id),
+  created_at      timestamptz DEFAULT now()
+);
+
+-- audit_archive — long-term audit log archive
+CREATE TABLE IF NOT EXISTS public.audit_archive (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  original_id     uuid,
+  table_name      text NOT NULL,
+  action          text NOT NULL,
+  actor_id        uuid,
+  record_id       uuid,
+  old_data        jsonb,
+  new_data        jsonb,
+  archived_at     timestamptz DEFAULT now()
+);
+
+-- tax_documents — tax client document uploads
+CREATE TABLE IF NOT EXISTS public.tax_documents (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id       uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
+  document_type   text NOT NULL,
+  tax_year        integer,
+  file_name       text NOT NULL,
+  file_path       text NOT NULL,
+  file_size       integer,
+  mime_type       text,
+  status          text NOT NULL DEFAULT 'pending',
+  created_at      timestamptz DEFAULT now()
+);
+
+-- scorm_packages — SCORM package registry
+CREATE TABLE IF NOT EXISTS public.scorm_packages (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  course_id       uuid REFERENCES public.courses(id) ON DELETE CASCADE,
+  title           text NOT NULL,
+  version         text DEFAULT '1.2',
+  file_path       text NOT NULL,
+  manifest        jsonb DEFAULT '{}',
+  created_by      uuid REFERENCES public.profiles(id),
+  created_at      timestamptz DEFAULT now()
+);
+
+-- course_videos — video assets attached to lessons
+CREATE TABLE IF NOT EXISTS public.course_videos (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  lesson_id       uuid REFERENCES public.course_lessons(id) ON DELETE CASCADE,
+  course_id       uuid REFERENCES public.courses(id) ON DELETE CASCADE,
+  title           text,
+  video_url       text,
+  storage_path    text,
+  duration_seconds integer,
+  thumbnail_url   text,
+  transcript      text,
+  generated_by    text DEFAULT 'manual' CHECK (generated_by IN ('manual','did','openai_tts','heygen','synthesia')),
+  status          text DEFAULT 'ready' CHECK (status IN ('pending','processing','ready','failed')),
+  created_by      uuid REFERENCES public.profiles(id),
+  created_at      timestamptz DEFAULT now(),
+  updated_at      timestamptz DEFAULT now()
+);
+
+-- provider_exports — provider data export jobs
+CREATE TABLE IF NOT EXISTS public.provider_exports (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id     uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
+  export_type     text NOT NULL,
+  status          text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','processing','complete','failed')),
+  file_path       text,
+  error           text,
+  created_at      timestamptz DEFAULT now(),
+  completed_at    timestamptz
+);
+
+-- sam_documents — SAM.gov registration documents
+CREATE TABLE IF NOT EXISTS public.sam_documents (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  document_type   text NOT NULL,
+  file_name       text NOT NULL,
+  file_path       text NOT NULL,
+  uei             text,
+  cage_code       text,
+  expiry_date     date,
+  verified        boolean DEFAULT false,
+  created_at      timestamptz DEFAULT now()
+);
+
+-- video_generation_jobs — async video generation queue
+CREATE TABLE IF NOT EXISTS public.video_generation_jobs (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  lesson_id       uuid REFERENCES public.course_lessons(id) ON DELETE SET NULL,
+  course_id       uuid REFERENCES public.courses(id) ON DELETE SET NULL,
+  provider        text NOT NULL DEFAULT 'did' CHECK (provider IN ('did','heygen','synthesia','openai_tts','ffmpeg')),
+  status          text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','processing','complete','failed')),
+  input           jsonb DEFAULT '{}',
+  output_url      text,
+  error           text,
+  created_by      uuid REFERENCES public.profiles(id),
+  created_at      timestamptz DEFAULT now(),
+  updated_at      timestamptz DEFAULT now()
+);
+
+-- generated_images — DALL-E / AI generated images
+CREATE TABLE IF NOT EXISTS public.generated_images (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  prompt          text NOT NULL,
+  image_url       text,
+  storage_path    text,
+  attached_to     text,
+  attached_id     uuid,
+  created_by      uuid REFERENCES public.profiles(id),
+  created_at      timestamptz DEFAULT now()
+);
+
+-- tts_audio_files — OpenAI TTS generated audio
+CREATE TABLE IF NOT EXISTS public.tts_audio_files (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  lesson_id       uuid REFERENCES public.course_lessons(id) ON DELETE SET NULL,
+  text_hash       text,
+  voice           text DEFAULT 'onyx',
+  storage_path    text NOT NULL,
+  duration_seconds numeric(8,2),
+  created_at      timestamptz DEFAULT now()
+);
+
+-- onboarding_progress — learner onboarding step tracking
+CREATE TABLE IF NOT EXISTS public.onboarding_progress (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  step            text NOT NULL,
+  completed       boolean DEFAULT false,
+  data            jsonb DEFAULT '{}',
+  completed_at    timestamptz,
+  created_at      timestamptz DEFAULT now(),
+  updated_at      timestamptz DEFAULT now()
+  UNIQUE(user_id, step)
+);
+
+-- ── 3. RLS POLICIES ──────────────────────────────────────────────────────────
+
+ALTER TABLE public.at_risk_students ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.student_interventions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.enrollment_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.credential_uploads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.apprentice_uploads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.program_holder_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.partner_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.shop_onboarding ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.course_content ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_archive ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.tax_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.scorm_packages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.course_videos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.provider_exports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sam_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.video_generation_jobs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.generated_images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.tts_audio_files ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.onboarding_progress ENABLE ROW LEVEL SECURITY;
+
+-- Admin full access
+CREATE POLICY "admin_full_access_at_risk_students" ON public.at_risk_students
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+CREATE POLICY "admin_full_access_student_interventions" ON public.student_interventions
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+CREATE POLICY "admin_full_access_audit_archive" ON public.audit_archive
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin')));
+
+CREATE POLICY "admin_full_access_video_generation_jobs" ON public.video_generation_jobs
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+CREATE POLICY "admin_full_access_generated_images" ON public.generated_images
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+-- Users own their own rows
+CREATE POLICY "users_own_enrollment_documents" ON public.enrollment_documents
+  FOR ALL TO authenticated USING (user_id = auth.uid());
+
+CREATE POLICY "users_own_credential_uploads" ON public.credential_uploads
+  FOR ALL TO authenticated USING (user_id = auth.uid());
+
+CREATE POLICY "users_own_apprentice_uploads" ON public.apprentice_uploads
+  FOR ALL TO authenticated USING (user_id = auth.uid());
+
+CREATE POLICY "users_own_program_holder_documents" ON public.program_holder_documents
+  FOR ALL TO authenticated USING (user_id = auth.uid());
+
+CREATE POLICY "users_own_partner_documents" ON public.partner_documents
+  FOR ALL TO authenticated USING (partner_id = auth.uid());
+
+CREATE POLICY "users_own_shop_onboarding" ON public.shop_onboarding
+  FOR ALL TO authenticated USING (user_id = auth.uid());
+
+CREATE POLICY "users_own_tax_documents" ON public.tax_documents
+  FOR ALL TO authenticated USING (client_id = auth.uid());
+
+CREATE POLICY "users_own_sam_documents" ON public.sam_documents
+  FOR ALL TO authenticated USING (user_id = auth.uid());
+
+CREATE POLICY "users_own_onboarding_progress" ON public.onboarding_progress
+  FOR ALL TO authenticated USING (user_id = auth.uid());
+
+CREATE POLICY "users_own_provider_exports" ON public.provider_exports
+  FOR ALL TO authenticated USING (provider_id = auth.uid());
+
+CREATE POLICY "users_own_tts_audio_files" ON public.tts_audio_files
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+-- Course content readable by enrolled users
+CREATE POLICY "enrolled_users_read_course_content" ON public.course_content
+  FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "admin_manage_course_content" ON public.course_content
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+CREATE POLICY "enrolled_users_read_course_videos" ON public.course_videos
+  FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "admin_manage_course_videos" ON public.course_videos
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+CREATE POLICY "enrolled_users_read_scorm_packages" ON public.scorm_packages
+  FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "admin_manage_scorm_packages" ON public.scorm_packages
+  FOR ALL TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+-- Admin read access on user-owned tables
+CREATE POLICY "admin_read_enrollment_documents" ON public.enrollment_documents
+  FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+CREATE POLICY "admin_read_credential_uploads" ON public.credential_uploads
+  FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+CREATE POLICY "admin_read_tax_documents" ON public.tax_documents
+  FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin','super_admin','staff')));
+
+-- ── 4. INDEXES ───────────────────────────────────────────────────────────────
+
+CREATE INDEX IF NOT EXISTS idx_at_risk_students_user_id ON public.at_risk_students(user_id);
+CREATE INDEX IF NOT EXISTS idx_at_risk_students_risk_level ON public.at_risk_students(risk_level);
+CREATE INDEX IF NOT EXISTS idx_at_risk_students_resolved_at ON public.at_risk_students(resolved_at) WHERE resolved_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_student_interventions_user_id ON public.student_interventions(user_id);
+CREATE INDEX IF NOT EXISTS idx_student_interventions_status ON public.student_interventions(status);
+CREATE INDEX IF NOT EXISTS idx_enrollment_documents_user_id ON public.enrollment_documents(user_id);
+CREATE INDEX IF NOT EXISTS idx_enrollment_documents_enrollment_id ON public.enrollment_documents(enrollment_id);
+CREATE INDEX IF NOT EXISTS idx_onboarding_progress_user_id ON public.onboarding_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_video_generation_jobs_status ON public.video_generation_jobs(status);
+CREATE INDEX IF NOT EXISTS idx_video_generation_jobs_lesson_id ON public.video_generation_jobs(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_course_videos_lesson_id ON public.course_videos(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_course_videos_course_id ON public.course_videos(course_id);
+CREATE INDEX IF NOT EXISTS idx_tts_audio_files_lesson_id ON public.tts_audio_files(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_generated_images_attached_id ON public.generated_images(attached_id);
+
+-- Existing table indexes that may be missing
+CREATE INDEX IF NOT EXISTS idx_program_enrollments_user_id ON public.program_enrollments(user_id);
+CREATE INDEX IF NOT EXISTS idx_program_enrollments_program_id ON public.program_enrollments(program_id);
+CREATE INDEX IF NOT EXISTS idx_program_enrollments_status ON public.program_enrollments(status);
+CREATE INDEX IF NOT EXISTS idx_applications_status ON public.applications(status);
+CREATE INDEX IF NOT EXISTS idx_applications_user_id ON public.applications(user_id);
+CREATE INDEX IF NOT EXISTS idx_applications_email ON public.applications(email);
+CREATE INDEX IF NOT EXISTS idx_course_lessons_course_id ON public.course_lessons(course_id);
+CREATE INDEX IF NOT EXISTS idx_course_lessons_module_id ON public.course_lessons(module_id);
+CREATE INDEX IF NOT EXISTS idx_lesson_progress_user_id ON public.lesson_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_lesson_progress_lesson_id ON public.lesson_progress(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles(email);
+CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles(role);
+CREATE INDEX IF NOT EXISTS idx_certificates_user_id ON public.certificates(user_id);
+
+
+
+-- ── 20260608000002_exam_booking_leads.sql ──────────────────────────────────────────
+
+-- Captures partial booking intent before the full form is completed.
+-- Used to trigger 24hr and 48hr follow-up emails when a lead doesn't convert.
+-- Upserts on (lower(email), exam_type) — re-submitting refreshes the lead instead of erroring.
+
+CREATE TABLE IF NOT EXISTS public.exam_booking_leads (
+  id                uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  email             text        NOT NULL,
+  exam_type         text        NOT NULL,       -- e.g. 'CCMA', 'CPT'
+  first_name        text,
+  phone             text,
+  source            text        NOT NULL DEFAULT 'booking_form',
+  converted         boolean     NOT NULL DEFAULT false,
+  converted_at      timestamptz,
+  follow_up_1_sent  boolean     NOT NULL DEFAULT false,
+  follow_up_2_sent  boolean     NOT NULL DEFAULT false,
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now()
+);
+
+-- Unique constraint the API upserts on — same email + exam = refresh, not duplicate
+CREATE UNIQUE INDEX IF NOT EXISTS exam_booking_leads_email_exam_unique
+  ON public.exam_booking_leads (lower(email), exam_type);
+
+-- Index for cron job — find unconverted leads with unsent follow-ups
+CREATE INDEX IF NOT EXISTS exam_booking_leads_follow_up
+  ON public.exam_booking_leads (created_at, converted, follow_up_1_sent, follow_up_2_sent);
+
+-- Auto-update updated_at on any row change
+CREATE OR REPLACE FUNCTION public.set_exam_booking_leads_updated_at()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE TRIGGER exam_booking_leads_updated_at
+  BEFORE UPDATE ON public.exam_booking_leads
+  FOR EACH ROW EXECUTE FUNCTION public.set_exam_booking_leads_updated_at();
+
+COMMENT ON TABLE public.exam_booking_leads IS 'Partial booking intent captured before checkout. Drives 24hr/48hr follow-up email sequence. Upserts on (email, exam_type).';
+
+
+
+-- ── 20260609000001_program_lessons_add_checkpoint_type.sql ──────────────────────────────────────────
+
+-- Add 'checkpoint' to program_lessons.lesson_type CHECK constraint.
+-- The builder route was mapping checkpoint → lesson as a workaround; this removes that need.
+
+ALTER TABLE public.program_lessons
+  DROP CONSTRAINT IF EXISTS program_lessons_lesson_type_check;
+
+ALTER TABLE public.program_lessons
+  ADD CONSTRAINT program_lessons_lesson_type_check
+  CHECK (lesson_type IN ('lesson', 'quiz', 'lab', 'exam', 'orientation', 'checkpoint', 'assignment'));
+

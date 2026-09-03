@@ -1,0 +1,75 @@
+name: Supabase Migration Audit (supervised)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/seeds/**'
+      - 'scripts/lint-migrations.cjs'
+      - 'scripts/audit-migration-discipline.mjs'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/seeds/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-migration-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  migration-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies deterministically
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Lint migration history
+        run: node scripts/lint-migrations.cjs
+
+      - name: Audit migration discipline
+        run: node scripts/audit-migration-discipline.mjs
+
+      - name: Verify migration changes are reviewable
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE="HEAD~1"
+          fi
+          git diff --name-status "$BASE" HEAD -- supabase/migrations supabase/seeds || true
+          if git diff --name-status "$BASE" HEAD -- supabase/migrations | grep -Eq '^D'; then
+            echo '::error::Migration deletion detected. Migration history must not be rewritten during supervised recovery.'
+            exit 1
+          fi
+
+      - name: Recovery database policy
+        run: |
+          echo 'Database audit passed.'
+          echo 'This workflow does NOT apply migrations or seed production data.'
+          echo 'Production database writes require explicit supervised execution after dependency/reference tracing.'

@@ -1,0 +1,42 @@
+name: GPU Worker CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/media-gpu-worker/**'
+      - 'lib/video/gpu-video-client.ts'
+      - 'lib/video/process-video-job.ts'
+      - '.github/workflows/gpu-worker-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Python syntax
+        run: python -m py_compile services/media-gpu-worker/worker.py
+      - name: Docker build
+        run: docker build -f services/media-gpu-worker/Dockerfile -t elevate-media-gpu-worker:${{ github.sha }} .
+
+  validate-typescript:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=8192
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck media integration
+        run: pnpm exec tsc --noEmit --pretty false

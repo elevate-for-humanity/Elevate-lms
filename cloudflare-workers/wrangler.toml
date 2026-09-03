@@ -1,0 +1,22 @@
+name = "elevate-scorm-worker"
+main = "scorm-player-worker.js"
+compatibility_date = "2024-12-02"
+
+# R2 Bucket Binding
+[[r2_buckets]]
+binding = "SCORM_BUCKET"
+bucket_name = "elevate-scorm-courses"
+
+# KV Namespace for tracking (optional)
+[[kv_namespaces]]
+binding = "SCORM_TRACKING"
+id = "your-kv-namespace-id"
+
+# Routes
+routes = [
+  { pattern = "scorm.elevateforhumanity.org/*", zone_name = "elevateforhumanity.org" }
+]
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"

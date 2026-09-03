@@ -1,0 +1,57 @@
+name: Align Root Next Version
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-root-next-version.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: align-root-next-version
+  cancel-in-progress: true
+
+jobs:
+  align:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Align root Next.js to deployed runtime
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const p = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          for (const section of ['dependencies', 'devDependencies', 'optionalDependencies']) {
+            if (p[section] && p[section].next) p[section].next = '15.5.23';
+          }
+          fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
+          NODE
+          pnpm install --lockfile-only --no-frozen-lockfile
+      - name: Verify single Next.js production version
+        run: |
+          node scripts/verify-next-version-parity.cjs
+          grep -n '"next"' package.json | head
+      - name: Commit package and lockfile to repair branch
+        run: |
+          if git diff --quiet -- package.json pnpm-lock.yaml; then
+            echo 'No version changes required.'
+            exit 0
+          fi
+          git config user.name 'elevate-ci'
+          git config user.email 'actions@users.noreply.github.com'
+          git checkout -B fix/root-next-15.5.23
+          git add package.json pnpm-lock.yaml
+          git commit -m 'fix(deps): align root Next.js to 15.5.23'
+          git push --force-with-lease origin HEAD:fix/root-next-15.5.23

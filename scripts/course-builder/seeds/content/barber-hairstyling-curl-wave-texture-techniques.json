@@ -1,0 +1,337 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "What is the primary purpose of using a heat protectant spray before styling hair with thermal tools?",
+        "choices": [
+          "To add volume to the hair",
+          "To shield the hair from thermal damage",
+          "To make the hair shinier",
+          "To help the hair dry faster"
+        ],
+        "answerIndex": 1,
+        "rationale": "A heat protectant spray is used to shield the hair from thermal damage caused by high temperatures of styling tools.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which thermal tool is typically used to create soft waves in hair?",
+        "choices": ["Curling iron", "Flat iron", "Blow dryer", "Crimping iron"],
+        "answerIndex": 1,
+        "rationale": "A flat iron is commonly used to create soft waves by twisting the iron while gliding it down the hair.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What should a barber do if they notice a thermal tool has a damaged cord?",
+        "choices": [
+          "Use it carefully",
+          "Wrap the cord with tape",
+          "Replace the tool",
+          "Continue using it"
+        ],
+        "answerIndex": 2,
+        "rationale": "A damaged cord can be a safety hazard, so the tool should be replaced to ensure safety.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "A client presents with fine hair and wants to add volume. Which product should the barber use?",
+        "choices": ["Smoothing serum", "Volumizing spray", "Heavy pomade", "Oil-based gel"],
+        "answerIndex": 1,
+        "rationale": "A volumizing spray is designed to add lift and body to fine hair, enhancing volume.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "During a service, you notice the client's hair is very coarse. What is the best temperature setting for thermal tools?",
+        "choices": ["Low", "Medium", "High", "Very high"],
+        "answerIndex": 2,
+        "rationale": "Coarse hair can withstand higher temperatures, so a medium to high setting is appropriate.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the best approach to ensure even distribution of styling products in the hair?",
+        "choices": [
+          "Apply to the scalp first",
+          "Start with a small amount and use a comb",
+          "Use a large amount immediately",
+          "Apply only to the ends"
+        ],
+        "answerIndex": 1,
+        "rationale": "Starting with a small amount and using a comb ensures even distribution without weighing down the hair.",
+        "type": "applied"
+      },
+      {
+        "prompt": "Which of the following is a key benefit of mastering curl and wave techniques for a barber?",
+        "choices": [
+          "Increased client satisfaction",
+          "Reduced service time",
+          "Lower product costs",
+          "Easier tool maintenance"
+        ],
+        "answerIndex": 0,
+        "rationale": "Mastering these techniques allows barbers to offer a wider range of styles, leading to increased client satisfaction.",
+        "type": "recall"
+      },
+      {
+        "prompt": "A new client asks for a polished and controlled look for their naturally curly hair. What technique should the barber use?",
+        "choices": [
+          "Introduce tight curls",
+          "Create soft waves",
+          "Use a crimping iron",
+          "Straighten the hair"
+        ],
+        "answerIndex": 1,
+        "rationale": "Creating soft waves can help tame and define naturally curly hair, offering a polished look.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is the primary reason for dividing hair into sections before styling with a flat iron?",
+        "choices": [
+          "To dry the hair faster",
+          "To ensure even styling",
+          "To apply more product",
+          "To make the hair shinier"
+        ],
+        "answerIndex": 1,
+        "rationale": "Dividing hair into sections ensures even styling and allows for better control of the tool.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which styling product is best suited for controlling frizz in curly hair?",
+        "choices": ["Volumizing spray", "Smoothing serum", "Texturizing powder", "Dry shampoo"],
+        "answerIndex": 1,
+        "rationale": "A smoothing serum is designed to control frizz and add shine to curly hair.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What should a barber do if a client expresses discomfort from the heat during styling?",
+        "choices": [
+          "Ignore the complaint",
+          "Continue with the same setting",
+          "Lower the heat setting",
+          "Use more product"
+        ],
+        "answerIndex": 2,
+        "rationale": "Lowering the heat setting can help alleviate discomfort and prevent burns.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "A client presents with naturally straight hair and wants more movement. What technique should the barber consider?",
+        "choices": [
+          "Straightening",
+          "Creating curls",
+          "Using a crimping iron",
+          "Shaving the sides"
+        ],
+        "answerIndex": 1,
+        "rationale": "Introducing curls can add volume and movement to naturally straight hair.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "Which is the BEST approach to ensure client safety when using a curling iron?",
+        "choices": [
+          "Use the highest heat setting",
+          "Keep the heated section away from the scalp",
+          "Use the curling iron quickly",
+          "Apply extra styling product"
+        ],
+        "answerIndex": 1,
+        "rationale": "Keeping the heated section away from the scalp helps prevent burns and ensures client safety.",
+        "type": "applied"
+      },
+      {
+        "prompt": "What is the role of a light-hold hairspray in finishing a hairstyle?",
+        "choices": [
+          "To add moisture",
+          "To set the style",
+          "To straighten the hair",
+          "To add color"
+        ],
+        "answerIndex": 1,
+        "rationale": "A light-hold hairspray is used to set the style, helping maintain the desired look.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which tool is most appropriate for achieving tight, defined curls?",
+        "choices": ["Flat iron", "Curling iron", "Blow dryer", "Crimping iron"],
+        "answerIndex": 1,
+        "rationale": "A curling iron is specifically designed to create tight, defined curls.",
+        "type": "recall"
+      },
+      {
+        "prompt": "What is the best action if a barber notices uneven heating in a flat iron?",
+        "choices": [
+          "Continue using it",
+          "Use it only on low heat",
+          "Replace or repair the tool",
+          "Shake the iron"
+        ],
+        "answerIndex": 2,
+        "rationale": "Uneven heating can damage hair or cause burns, so the tool should be replaced or repaired.",
+        "type": "applied"
+      },
+      {
+        "prompt": "A client with damaged hair requests styling with a flat iron. What should the barber consider?",
+        "choices": [
+          "Use high heat settings",
+          "Avoid using a heat protectant",
+          "Use a lower heat setting",
+          "Apply more styling product"
+        ],
+        "answerIndex": 2,
+        "rationale": "Using a lower heat setting helps prevent further damage to already compromised hair.",
+        "type": "scenario"
+      },
+      {
+        "prompt": "What is a key consideration when selecting styling products for a client?",
+        "choices": ["Client's hair type", "Client's age", "Time of day", "Weather conditions"],
+        "answerIndex": 0,
+        "rationale": "The client's hair type is crucial in selecting the appropriate styling products to achieve the desired outcome.",
+        "type": "recall"
+      },
+      {
+        "prompt": "Which is the BEST method to prevent burns when using thermal tools near the scalp?",
+        "choices": [
+          "Use a comb as a barrier",
+          "Apply more styling product",
+          "Use the tool quickly",
+          "Lower the heat setting"
+        ],
+        "answerIndex": 0,
+        "rationale": "Using a comb as a barrier between the tool and the scalp helps prevent burns.",
+        "type": "applied"
+      },
+      {
+        "prompt": "Why is it important to communicate with clients during the styling process?",
+        "choices": [
+          "To sell more products",
+          "To ensure their comfort and safety",
+          "To reduce service time",
+          "To increase service costs"
+        ],
+        "answerIndex": 1,
+        "rationale": "Communication ensures that clients are comfortable and safe during the styling process.",
+        "type": "recall"
+      }
+    ]
+  },
+  "flashcards": [
+    {
+      "term": "Curl Patterns",
+      "definition": "Techniques used to create tight, defined curls using thermal tools like curling irons."
+    },
+    {
+      "term": "Wave Patterns",
+      "definition": "Techniques for creating soft, flowing waves using tools such as flat irons and wands."
+    },
+    {
+      "term": "Thermal Tools",
+      "definition": "Equipment like curling irons and flat irons used to style hair by applying heat."
+    },
+    {
+      "term": "Heat Protectant Spray",
+      "definition": "A product applied to hair before using thermal tools to prevent heat damage."
+    },
+    {
+      "term": "Sectioning Hair",
+      "definition": "Dividing hair into manageable parts to ensure even styling and easier handling."
+    },
+    {
+      "term": "Flat Iron",
+      "definition": "A tool used to straighten hair or create waves by applying heat and pressure."
+    },
+    {
+      "term": "Volumizing Spray",
+      "definition": "A styling product that adds lift and body to fine or limp hair."
+    },
+    {
+      "term": "Smoothing Serum",
+      "definition": "A product used to reduce frizz and add shine to curly or wavy hair."
+    },
+    {
+      "term": "Alternating Waves",
+      "definition": "A technique where waves are styled in different directions to achieve a natural look."
+    },
+    {
+      "term": "Client Safety",
+      "definition": "Ensuring the client's well-being by properly handling tools and communicating during styling."
+    },
+    {
+      "term": "Tool Inspection",
+      "definition": "Checking thermal tools for damage or malfunction before use to ensure safety."
+    },
+    {
+      "term": "Temperature Adjustment",
+      "definition": "Setting the thermal tool's heat level according to the client's hair type to prevent damage."
+    },
+    {
+      "term": "Product Application",
+      "definition": "The process of applying styling products to hair, focusing on mid-lengths and ends."
+    },
+    {
+      "term": "Indiana State Board Exam",
+      "definition": "A certification test for barbers in Indiana that includes a focus on curl, wave, and texture techniques."
+    },
+    {
+      "term": "Light-hold Hairspray",
+      "definition": "A finishing product used to set hairstyles without making hair stiff or sticky."
+    }
+  ],
+  "content": "# Hairstyling: Curl, Wave & Texture Techniques\n\nIn the world of barbering, mastering the art of hairstyling is crucial for delivering versatile and satisfying results to your clients. In Indiana, where the barbering industry is vibrant and competitive, being proficient in curl, wave, and texture techniques can set you apart. These skills are not only essential for client satisfaction but are also a significant component of the Indiana barber written exam, forming 25% of the total exam content.\n\n## Understanding Curl and Wave Patterns\n\nCurl and wave patterns are fundamental techniques that every barber must understand. These patterns form the basis of many popular hairstyles and can dramatically alter a client's appearance. A solid grasp of these techniques allows barbers to offer a wider range of styles, from classic looks to modern trends.\n\nTo create curls and waves, barbers typically use thermal tools such as curling irons, flat irons, and wands. Each tool can produce different effects, and choosing the right one depends on the desired outcome. For instance, a curling iron can create tight, defined curls, while a flat iron may be used to achieve soft waves. Understanding the nuances of these tools and how they interact with different hair types is crucial for achieving optimal results.\n\nMoreover, the ability to manipulate curl and wave patterns can help barbers correct or enhance natural hair textures. For clients with naturally straight hair, introducing curls can add volume and movement. Conversely, for clients with naturally curly hair, waves can help to tame and define the texture, offering a polished and controlled look.\n\n## Safe Use of Thermal Tools\n\nThe use of thermal tools is a staple in hairstyling, but it comes with the responsibility of ensuring client safety. Proper handling and usage of these tools are essential to prevent burns and other injuries, both to the client and the barber.\n\nBefore using any thermal tool, it's important to inspect it for any damage or malfunction. Ensure that cords are intact and that the tool heats evenly. When using the tool, always adjust the temperature according to the client's hair type. Fine or damaged hair requires lower heat settings, while coarser hair can withstand higher temperatures.\n\nTo prevent burns, always keep the heated section of the tool away from the client's scalp and skin. When curling or waving, use a comb or your fingers to create a barrier between the tool and the scalp. Additionally, communicate with your client throughout the process to ensure their comfort and safety.\n\n## Selecting and Applying Styling Products\n\nStyling products play a crucial role in achieving and maintaining the desired texture and hold of a hairstyle. The correct selection and application of these products can enhance the longevity and appearance of curls and waves.\n\nWhen selecting a styling product, consider the client's hair type and the desired outcome. For example, a mousse or volumizing spray can add lift and body to fine hair, while a smoothing serum or cream can help control frizz in curly hair. Always read the product label for instructions and recommendations.\n\nTo apply the product, start with a small amount and distribute it evenly through the hair, focusing on the mid-lengths and ends. Avoid applying too much product near the scalp, as this can weigh the hair down and create an oily appearance. Using a comb or your fingers, work the product through the hair to ensure even coverage.\n\n## Step-by-Step: Creating Soft Waves with a Flat Iron\n\nCreating soft waves with a flat iron is a versatile technique that can be used on various hair types. Follow these steps to achieve a natural, wavy look:\n\n1. **Prepare the Hair:** Begin by washing and drying the hair. Apply a heat protectant spray to shield the hair from thermal damage.\n2. **Section the Hair:** Divide the hair into manageable sections using clips. Start with the bottom layers and work your way up.\n3. **Heat the Flat Iron:** Set the flat iron to an appropriate temperature for the client's hair type.\n4. **Create the Waves:** Take a small section of hair and place the flat iron near the roots. Twist the iron away from the face while gliding it down the length of the hair. Release the hair and allow the wave to set.\n5. **Repeat:** Continue this process throughout the hair, alternating the direction of the waves for a more natural look.\n6. **Finish with Product:** Once all sections are waved, apply a light-hold hairspray to set the style.\n\n## Exam Relevance: Indiana State Board\n\nIn Indiana, the state board exam for barbers includes a significant focus on haircutting and styling, which encompasses curl, wave, and texture techniques. This domain represents 25% of the written exam, testing your understanding of proper tool usage, styling techniques, and product application. Being well-versed in these areas not only prepares you for the exam but also ensures you can deliver professional and safe hairstyling services.\n\n## Key Takeaway\n\nMastering curl, wave, and texture techniques is essential for any successful barber in Indiana. These skills not only enhance your service offerings but are also a critical component of the state board exam. By understanding the use of thermal tools, selecting the right styling products, and practicing safe handling, you can achieve a wide range of styles while ensuring client safety and satisfaction.",
+  "procedures": [
+    {
+      "step": 1,
+      "instruction": "Wash and dry the client's hair thoroughly to ensure a clean base for styling.",
+      "safetyNote": "SAFETY: Ensure all tools and hands are sanitized before starting."
+    },
+    {
+      "step": 2,
+      "instruction": "Apply a heat protectant spray evenly throughout the hair to prevent thermal damage.",
+      "safetyNote": null
+    },
+    {
+      "step": 3,
+      "instruction": "Divide the hair into manageable sections using clips, starting from the bottom layers.",
+      "safetyNote": null
+    },
+    {
+      "step": 4,
+      "instruction": "Inspect the flat iron for any damage and ensure it heats evenly.",
+      "safetyNote": "SAFETY: Check the tool for damage and ensure cords are intact."
+    },
+    {
+      "step": 5,
+      "instruction": "Set the flat iron to an appropriate temperature based on the client's hair type.",
+      "safetyNote": "SAFETY: Use lower heat settings for fine or damaged hair."
+    },
+    {
+      "step": 6,
+      "instruction": "Take a small section of hair and place the flat iron near the roots.",
+      "safetyNote": "SAFETY: Keep the heated section away from the scalp to prevent burns."
+    },
+    {
+      "step": 7,
+      "instruction": "Twist the flat iron away from the face while gliding it down the length of the hair to create a wave.",
+      "safetyNote": null
+    },
+    {
+      "step": 8,
+      "instruction": "Release the hair gently and allow the wave to set naturally.",
+      "safetyNote": null
+    },
+    {
+      "step": 9,
+      "instruction": "Repeat the waving process throughout all sections of the hair, alternating the direction of the waves for a natural look.",
+      "safetyNote": null
+    },
+    {
+      "step": 10,
+      "instruction": "Once all sections are waved, apply a light-hold hairspray to set the style.",
+      "safetyNote": null
+    },
+    {
+      "step": 11,
+      "instruction": "Check the overall style for evenness and make any necessary adjustments.",
+      "safetyNote": null
+    }
+  ]
+}

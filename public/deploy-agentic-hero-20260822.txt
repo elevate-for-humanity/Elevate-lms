@@ -1,0 +1,2 @@
+Agentic homepage hero deployment trigger.
+Created 2026-08-22.

@@ -1,0 +1,22 @@
+
+> efh-autopilot@2.0.0 supabase:test /workspaces/Elevate-lms
+> tsx scripts/test-supabase-connection.ts
+
+┌─────────┬────────────────────────────────────────┬───────────────────────────────┬────────────────────────────────────────────┐
+│ (index) │ id                                     │ slug                          │ title                                      │
+├─────────┼────────────────────────────────────────┼───────────────────────────────┼────────────────────────────────────────────┤
+│ 0       │ '27871f9c-06f3-4317-8ead-cd0f4787710c' │ 'barber-2024'                 │ 'Professional Barber Program'              │
+│ 1       │ 'c61bd644-a0a6-45e4-a72d-771220e15ede' │ 'barber'                      │ 'Barber Training'                          │
+│ 2       │ '7a7a8ad7-bac8-4883-b0cd-97d8353be94b' │ 'esthetician-apprenticeship'  │ 'Esthetician Apprenticeship'               │
+│ 3       │ 'e65cb45c-3168-4c14-8fcc-1a20d172fff9' │ 'bookkeeping-fundamentals'    │ 'Bookkeeping Fundamentals'                 │
+│ 4       │ 'ae3feb62-1e1b-4dcd-a124-b7ee2e70bd86' │ 'nha-medical-admin-assistant' │ 'Medical Administrative Assistant Program' │
+└─────────┴────────────────────────────────────────┴───────────────────────────────┴────────────────────────────────────────────┘
+┌─────────┬────────────────────────────────────────┬───────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────┐
+│ (index) │ id                                     │ slug                              │ title                                                                                 │
+├─────────┼────────────────────────────────────────┼───────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+│ 0       │ '566e2ef7-6861-4736-9807-b4ff868fc908' │ 'bookkeeping'                     │ 'Intuit QuickBooks Online Certified User + Intuit Certified Bookkeeping Professional' │
+│ 1       │ '7b7ceb17-3db2-46ef-81aa-5442f9061fec' │ 'culinary-apprenticeship'         │ 'Culinary Apprenticeship'                                                             │
+│ 2       │ '03beb37c-86ab-4f28-8679-15e9e9d3a56d' │ 'customer-service-representative' │ 'Customer Service Representative'                                                     │
+│ 3       │ 'fe2672eb-c17e-4510-ba5b-8d6e64e522d4' │ 'insurance-agent'                 │ 'Insurance Agent'                                                                     │
+│ 4       │ '1dc7de1a-aed5-4eed-b093-0a0fb9c10f30' │ 'phlebotomy-technician'           │ 'Phlebotomy Technician'                                                               │
+└─────────┴────────────────────────────────────────┴───────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────┘

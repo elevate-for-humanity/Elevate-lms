@@ -1,0 +1,51 @@
+.courseBuilderLight :global(.bg-slate-950) {
+  background-color: rgb(255 255 255) !important;
+}
+
+.courseBuilderLight :global(.bg-slate-900),
+.courseBuilderLight :global(.bg-slate-900\/70) {
+  background-color: rgb(248 250 252) !important;
+}
+
+.courseBuilderLight :global(.border-slate-800),
+.courseBuilderLight :global(.border-slate-700) {
+  border-color: rgb(226 232 240) !important;
+}
+
+.courseBuilderLight :global(.text-white),
+.courseBuilderLight :global(.text-slate-100) {
+  color: rgb(15 23 42) !important;
+}
+
+.courseBuilderLight :global(.text-slate-300),
+.courseBuilderLight :global(.text-slate-400),
+.courseBuilderLight :global(.text-slate-500) {
+  color: rgb(71 85 105) !important;
+}
+
+.courseBuilderLight :global(.text-cyan-400) {
+  color: rgb(2 132 199) !important;
+}
+
+.courseBuilderLight :global(.bg-cyan-500) {
+  background-color: rgb(15 23 42) !important;
+  color: white !important;
+}
+
+.courseBuilderLight :global(.hover\:bg-slate-800:hover) {
+  background-color: rgb(241 245 249) !important;
+}
+
+.courseBuilderLight :global(input),
+.courseBuilderLight :global(textarea),
+.courseBuilderLight :global(select) {
+  background-color: white !important;
+  color: rgb(15 23 42) !important;
+  border-color: rgb(203 213 225) !important;
+}
+
+.courseBuilderLight :global(section),
+.courseBuilderLight :global(form),
+.courseBuilderLight :global(aside) {
+  box-shadow: none;
+}

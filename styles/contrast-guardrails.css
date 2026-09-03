@@ -1,0 +1,332 @@
+/*
+ * Platform typography/contrast/accessibility guardrails.
+ * Scope is opt-in via .efh-contrast on each app root.
+ */
+
+.efh-contrast {
+  color: #0f172a;
+  font-weight: 500;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+}
+
+.efh-contrast :is(p, li, label, td, th, dd, dt, blockquote, figcaption) {
+  color: inherit;
+  text-underline-offset: 0.16em;
+}
+
+.efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) :is(.text-slate-300, .text-gray-300, .text-zinc-300, .text-slate-400, .text-gray-400, .text-zinc-400) {
+  color: #475569 !important;
+}
+
+.efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) :is(.opacity-40, .opacity-50, .opacity-60, .opacity-70) {
+  opacity: 1 !important;
+}
+
+.efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) :is(.text-slate-500, .text-gray-500) {
+  color: #334155 !important;
+}
+
+.efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) :is(.text-slate-600, .text-gray-600) {
+  color: #334155 !important;
+}
+
+.efh-contrast :is(input, textarea, select)::placeholder {
+  color: #475569;
+  opacity: 1;
+}
+
+.efh-contrast .font-light {
+  font-weight: 500 !important;
+}
+
+.efh-contrast :is(p, li, label, td, th, dd, dt):not(.font-bold):not(.font-semibold):not(.font-black) {
+  font-weight: 500;
+}
+
+/* WCAG 2.2 focus appearance: never rely on browser-default focus being visible. */
+.efh-contrast :is(a, button, input, select, textarea, summary, [role='button'], [role='link'], [tabindex]):focus-visible {
+  outline: 3px solid #2563eb !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 2px #ffffff !important;
+}
+
+/* Touch/click targets should not collapse below a usable minimum on primary controls. */
+.efh-contrast :is(button, [role='button'], input[type='button'], input[type='submit'], input[type='reset']) {
+  min-height: 44px;
+}
+
+/* Links embedded in prose must remain visually identifiable without color alone. */
+.efh-contrast :is(p, li, dd, figcaption) a:not([class]) {
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+}
+
+/* Respect users who request less animation or motion. */
+@media (prefers-reduced-motion: reduce) {
+  .efh-contrast *,
+  .efh-contrast *::before,
+  .efh-contrast *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Improve readability for forced-colors/high-contrast environments. */
+@media (forced-colors: active) {
+  .efh-contrast :is(a, button, input, select, textarea, summary) {
+    forced-color-adjust: auto;
+  }
+}
+
+/* Dark surfaces must never inherit the root dark foreground. */
+.efh-contrast
+  :is(
+    .bg-black,
+    .bg-slate-950,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-gray-950,
+    .bg-gray-900,
+    .bg-zinc-950,
+    .bg-zinc-900,
+    .bg-brand-blue-700,
+    .bg-brand-blue-800,
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
+  ) {
+  color: #f8fafc;
+}
+
+.efh-contrast
+  :is(
+    .bg-black,
+    .bg-slate-950,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-gray-950,
+    .bg-gray-900,
+    .bg-zinc-950,
+    .bg-zinc-900,
+    .bg-brand-blue-700,
+    .bg-brand-blue-800,
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
+  )
+  :is(.text-slate-300, .text-gray-300, .text-zinc-300) {
+  color: #f1f5f9 !important;
+}
+
+.efh-contrast
+  :is(
+    .bg-black,
+    .bg-slate-950,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-gray-950,
+    .bg-gray-900,
+    .bg-zinc-950,
+    .bg-zinc-900,
+    .bg-brand-blue-700,
+    .bg-brand-blue-800,
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
+  )
+  :is(.text-slate-400, .text-gray-400, .text-zinc-400) {
+  color: #e2e8f0 !important;
+}
+
+.efh-contrast
+  :is(
+    .bg-black,
+    .bg-slate-950,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-gray-950,
+    .bg-gray-900,
+    .bg-zinc-950,
+    .bg-zinc-900,
+    .bg-brand-blue-700,
+    .bg-brand-blue-800,
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
+  ):is(
+    .text-slate-500,
+    .text-slate-600,
+    .text-slate-700,
+    .text-slate-800,
+    .text-gray-500,
+    .text-gray-600,
+    .text-gray-700,
+    .text-gray-800,
+    .text-zinc-500,
+    .text-zinc-600,
+    .text-zinc-700,
+    .text-zinc-800
+  ),
+.efh-contrast
+  :is(
+    .bg-black,
+    .bg-slate-950,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-gray-950,
+    .bg-gray-900,
+    .bg-zinc-950,
+    .bg-zinc-900,
+    .bg-brand-blue-700,
+    .bg-brand-blue-800,
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
+  )
+  > :is(
+    .text-slate-500,
+    .text-slate-600,
+    .text-slate-700,
+    .text-slate-800,
+    .text-gray-500,
+    .text-gray-600,
+    .text-gray-700,
+    .text-gray-800,
+    .text-zinc-500,
+    .text-zinc-600,
+    .text-zinc-700,
+    .text-zinc-800
+  ) {
+  color: #f1f5f9 !important;
+}
+
+.efh-contrast
+  :is(
+    .bg-black,
+    .bg-slate-950,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-gray-950,
+    .bg-gray-900,
+    .bg-zinc-950,
+    .bg-zinc-900,
+    .bg-brand-blue-700,
+    .bg-brand-blue-800,
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
+  )
+  .text-white {
+  color: #ffffff !important;
+}
+
+.efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) {
+  color: #0f172a;
+}
+
+/* A light card can be nested inside a dark CTA or hero. The card owns its
+ * foreground; an outer dark-surface rule must never turn it white-on-white. */
+.efh-contrast
+  :is(.bg-white, .bg-slate-50, .bg-gray-50)
+  :is(
+    .text-slate-500,
+    .text-slate-600,
+    .text-slate-700,
+    .text-slate-800,
+    .text-slate-900,
+    .text-slate-950,
+    .text-gray-500,
+    .text-gray-600,
+    .text-gray-700,
+    .text-gray-800,
+    .text-gray-900
+  ) {
+  color: #0f172a !important;
+}
+
+/* White text on the framework's 500/600 green and blue shades misses AA for
+ * normal-size labels. Keep the hue but use the accessible brand depth. */
+.efh-contrast :is(.bg-green-500, .bg-green-600) {
+  background-color: #166534 !important;
+}
+
+.efh-contrast :is(.bg-blue-500, .bg-blue-600, .bg-brand-blue-500, .bg-brand-blue-600) {
+  background-color: #1e40af !important;
+}
+
+/* Orange remains a brand accent, but white text requires the darker AA-safe shade. */
+.efh-contrast :is(.bg-orange-600, .bg-brand-orange-500, .bg-brand-orange-600) {
+  background-color: #c2410c !important;
+}
+
+.efh-contrast :is(.text-orange-600, .text-brand-orange-500, .text-brand-orange-600) {
+  color: #9a3412 !important;
+}
+
+/* Interface and compliance text must remain readable on phones. */
+.efh-contrast
+  :is(
+    .text-\[8px\],
+    .text-\[9px\],
+    .text-\[10px\],
+    .text-\[11px\],
+    .text-\[0\.5rem\],
+    .text-\[0\.6rem\],
+    .text-\[0\.625rem\],
+    .text-\[0\.6875rem\]
+  ) {
+  font-size: 0.75rem !important;
+  line-height: 1rem !important;
+}
+
+.efh-contrast
+  :is(
+    .bg-black,
+    .bg-slate-950,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-gray-950,
+    .bg-gray-900,
+    .bg-zinc-950,
+    .bg-zinc-900
+  )
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .text-black,
+    .text-slate-950,
+    .text-slate-900,
+    .text-slate-800,
+    .text-gray-950,
+    .text-gray-900,
+    .text-zinc-950,
+    .text-zinc-900
+  ) {
+  color: #f8fafc !important;
+}
+
+/* A light control nested in a dark section keeps its explicitly dark label.
+   This must follow the dark-surface rule above so CTA text never becomes
+   white-on-white (for example the Indiana Career Connect button). */
+.efh-contrast
+  :is(.bg-black, .bg-slate-950, .bg-slate-900, .bg-slate-800, .bg-gray-950, .bg-gray-900)
+  :is(.bg-white, .bg-slate-50, .bg-gray-50):is(.text-black, .text-slate-950, .text-slate-900, .text-slate-800, .text-gray-950, .text-gray-900),
+.efh-contrast
+  :is(.bg-black, .bg-slate-950, .bg-slate-900, .bg-slate-800, .bg-gray-950, .bg-gray-900)
+  :is(.bg-white, .bg-slate-50, .bg-gray-50)
+  :is(.text-black, .text-slate-950, .text-slate-900, .text-slate-800, .text-gray-950, .text-gray-900) {
+  color: #0f172a !important;
+}

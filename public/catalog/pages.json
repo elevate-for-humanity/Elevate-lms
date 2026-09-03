@@ -1,0 +1,1531 @@
+{
+  "generated": "2025-10-07T17:38:02.128Z",
+  "total": 93,
+  "categories": [
+    "admin-portal",
+    "ai-tools",
+    "analytics",
+    "general",
+    "government",
+    "instructor-portal",
+    "learning",
+    "philanthropy",
+    "productivity",
+    "programs",
+    "student-portal"
+  ],
+  "pages": [
+    {
+      "title": "Admin Console",
+      "path": "/admin-console",
+      "category": "admin-portal",
+      "image": "",
+      "excerpt": "Access Admin Console features and tools",
+      "file": "AdminConsole.jsx"
+    },
+    {
+      "title": "Admin Dashboard",
+      "path": "/admin-dashboard",
+      "category": "admin-portal",
+      "image": "",
+      "excerpt": "Access Admin Dashboard features and tools",
+      "file": "AdminDashboard.jsx"
+    },
+    {
+      "title": "A I Tutor",
+      "path": "/a-i-tutor",
+      "category": "ai-tools",
+      "image": "",
+      "excerpt": "Access A I Tutor features and tools",
+      "file": "AITutor.jsx"
+    },
+    {
+      "title": "Durable A I",
+      "path": "/durable-a-i",
+      "category": "ai-tools",
+      "image": "",
+      "excerpt": "Access Durable A I features and tools",
+      "file": "DurableAI.jsx"
+    },
+    {
+      "title": "Elevate Brain",
+      "path": "/elevate-brain",
+      "category": "ai-tools",
+      "image": "",
+      "excerpt": "Access Elevate Brain features and tools",
+      "file": "ElevateBrain.jsx"
+    },
+    {
+      "title": "Main Landing",
+      "path": "/main-landing",
+      "category": "ai-tools",
+      "image": "",
+      "excerpt": "Access Main Landing features and tools",
+      "file": "MainLanding.jsx"
+    },
+    {
+      "title": "Notebook L M",
+      "path": "/notebook-l-m",
+      "category": "ai-tools",
+      "image": "",
+      "excerpt": "Access Notebook L M features and tools",
+      "file": "NotebookLM.jsx"
+    },
+    {
+      "title": "Analytics",
+      "path": "/analytics",
+      "category": "analytics",
+      "image": "",
+      "excerpt": "Access Analytics features and tools",
+      "file": "Analytics.jsx"
+    },
+    {
+      "title": "Analytics Dashboard",
+      "path": "/analytics-dashboard",
+      "category": "analytics",
+      "image": "",
+      "excerpt": "Access Analytics Dashboard features and tools",
+      "file": "AnalyticsDashboard.jsx"
+    },
+    {
+      "title": "Google Analytics Setup",
+      "path": "/google-analytics-setup",
+      "category": "analytics",
+      "image": "",
+      "excerpt": "Access Google Analytics Setup features and tools",
+      "file": "GoogleAnalyticsSetup.jsx"
+    },
+    {
+      "title": "About",
+      "path": "/about",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access About features and tools",
+      "file": "About.jsx"
+    },
+    {
+      "title": "Accessibility",
+      "path": "/accessibility",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Accessibility features and tools",
+      "file": "Accessibility.jsx"
+    },
+    {
+      "title": "Accessibility Settings",
+      "path": "/accessibility-settings",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Accessibility Settings features and tools",
+      "file": "AccessibilitySettings.jsx"
+    },
+    {
+      "title": "Account",
+      "path": "/account",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Account features and tools",
+      "file": "Account.jsx"
+    },
+    {
+      "title": "Assignment",
+      "path": "/assignment",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Assignment features and tools",
+      "file": "Assignment.jsx"
+    },
+    {
+      "title": "Bing Site Verification",
+      "path": "/bing-site-verification",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Bing Site Verification features and tools",
+      "file": "BingSiteVerification.jsx"
+    },
+    {
+      "title": "Branding",
+      "path": "/branding",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Branding features and tools",
+      "file": "Branding.jsx"
+    },
+    {
+      "title": "Business Hub",
+      "path": "/business-hub",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Business Hub features and tools",
+      "file": "BusinessHub.jsx"
+    },
+    {
+      "title": "Certificates",
+      "path": "/certificates",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Certificates features and tools",
+      "file": "Certificates.jsx"
+    },
+    {
+      "title": "Clone Landing",
+      "path": "/clone-landing",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Clone Landing features and tools",
+      "file": "CloneLanding.jsx"
+    },
+    {
+      "title": "Community",
+      "path": "/community",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Community features and tools",
+      "file": "Community.jsx"
+    },
+    {
+      "title": "Community Hub",
+      "path": "/community-hub",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Community Hub features and tools",
+      "file": "CommunityHub.jsx"
+    },
+    {
+      "title": "Compliance",
+      "path": "/compliance",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Compliance features and tools",
+      "file": "Compliance.jsx"
+    },
+    {
+      "title": "Connect",
+      "path": "/connect",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Connect features and tools",
+      "file": "Connect.jsx"
+    },
+    {
+      "title": "Curriculum Upload",
+      "path": "/curriculum-upload",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Curriculum Upload features and tools",
+      "file": "CurriculumUpload.jsx"
+    },
+    {
+      "title": "Durable Features",
+      "path": "/durable-features",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Durable Features features and tools",
+      "file": "DurableFeatures.jsx"
+    },
+    {
+      "title": "Durable Landing",
+      "path": "/durable-landing",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Durable Landing features and tools",
+      "file": "DurableLanding.jsx"
+    },
+    {
+      "title": "Durable Pricing",
+      "path": "/durable-pricing",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Durable Pricing features and tools",
+      "file": "DurablePricing.jsx"
+    },
+    {
+      "title": "Durable Templates",
+      "path": "/durable-templates",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Durable Templates features and tools",
+      "file": "DurableTemplates.jsx"
+    },
+    {
+      "title": "Ecommerce",
+      "path": "/ecommerce",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Ecommerce features and tools",
+      "file": "Ecommerce.jsx"
+    },
+    {
+      "title": "Ecosystem",
+      "path": "/ecosystem",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Ecosystem features and tools",
+      "file": "Ecosystem.jsx"
+    },
+    {
+      "title": "Educator Hub",
+      "path": "/educator-hub",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Educator Hub features and tools",
+      "file": "EducatorHub.jsx"
+    },
+    {
+      "title": "Forgot Password",
+      "path": "/forgot-password",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Forgot Password features and tools",
+      "file": "ForgotPassword.jsx"
+    },
+    {
+      "title": "Forms",
+      "path": "/forms",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Forms features and tools",
+      "file": "Forms.jsx"
+    },
+    {
+      "title": "Funding Impact",
+      "path": "/funding-impact",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Funding Impact features and tools",
+      "file": "FundingImpact.jsx"
+    },
+    {
+      "title": "Get Started",
+      "path": "/get-started",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Get Started features and tools",
+      "file": "GetStarted.jsx"
+    },
+    {
+      "title": "Google Site Verification",
+      "path": "/google-site-verification",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Google Site Verification features and tools",
+      "file": "GoogleSiteVerification.jsx"
+    },
+    {
+      "title": "Groups",
+      "path": "/groups",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Groups features and tools",
+      "file": "Groups.jsx"
+    },
+    {
+      "title": "Home",
+      "path": "/",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Home features and tools",
+      "file": "Home.jsx"
+    },
+    {
+      "title": "Hub",
+      "path": "/hub",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Hub features and tools",
+      "file": "Hub.jsx"
+    },
+    {
+      "title": "Integrations",
+      "path": "/integrations",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Integrations features and tools",
+      "file": "Integrations.jsx"
+    },
+    {
+      "title": "Kingdom Konnect",
+      "path": "/kingdom-konnect",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Kingdom Konnect features and tools",
+      "file": "KingdomKonnect.jsx"
+    },
+    {
+      "title": "Login",
+      "path": "/login",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Login features and tools",
+      "file": "Login.jsx"
+    },
+    {
+      "title": "Mobile App",
+      "path": "/mobile-app",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Mobile App features and tools",
+      "file": "MobileApp.jsx"
+    },
+    {
+      "title": "Not Found",
+      "path": "/not-found",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Not Found features and tools",
+      "file": "NotFound.jsx"
+    },
+    {
+      "title": "Notifications",
+      "path": "/notifications",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Notifications features and tools",
+      "file": "Notifications.jsx"
+    },
+    {
+      "title": "Partners",
+      "path": "/partners",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Partners features and tools",
+      "file": "Partners.jsx"
+    },
+    {
+      "title": "Pay",
+      "path": "/pay",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Pay features and tools",
+      "file": "Pay.jsx"
+    },
+    {
+      "title": "Privacy Policy",
+      "path": "/privacy-policy",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Privacy Policy features and tools",
+      "file": "PrivacyPolicy.jsx"
+    },
+    {
+      "title": "Quiz",
+      "path": "/quiz",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Quiz features and tools",
+      "file": "Quiz.jsx"
+    },
+    {
+      "title": "Refund Policy",
+      "path": "/refund-policy",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Refund Policy features and tools",
+      "file": "RefundPolicy.jsx"
+    },
+    {
+      "title": "Reset Password",
+      "path": "/reset-password",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Reset Password features and tools",
+      "file": "ResetPassword.jsx"
+    },
+    {
+      "title": "Search Results",
+      "path": "/search-results",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Search Results features and tools",
+      "file": "SearchResults.jsx"
+    },
+    {
+      "title": "Serene Comfort Care",
+      "path": "/serene-comfort-care",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Serene Comfort Care features and tools",
+      "file": "SereneComfortCare.jsx"
+    },
+    {
+      "title": "Settings",
+      "path": "/settings",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Settings features and tools",
+      "file": "Settings.jsx"
+    },
+    {
+      "title": "Sitemap",
+      "path": "/sitemap",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Sitemap features and tools",
+      "file": "Sitemap.jsx"
+    },
+    {
+      "title": "Sites",
+      "path": "/sites",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Sites features and tools",
+      "file": "Sites.jsx"
+    },
+    {
+      "title": "Some Page",
+      "path": "/some-page",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Some Page features and tools",
+      "file": "SomePage.jsx"
+    },
+    {
+      "title": "Support",
+      "path": "/support",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Support features and tools",
+      "file": "Support.jsx"
+    },
+    {
+      "title": "Terms Of Service",
+      "path": "/terms-of-service",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Terms Of Service features and tools",
+      "file": "TermsOfService.jsx"
+    },
+    {
+      "title": "Thank You",
+      "path": "/thank-you",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Thank You features and tools",
+      "file": "ThankYou.jsx"
+    },
+    {
+      "title": "Urban Build Crew",
+      "path": "/urban-build-crew",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Urban Build Crew features and tools",
+      "file": "UrbanBuildCrew.jsx"
+    },
+    {
+      "title": "User Management",
+      "path": "/user-management",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access User Management features and tools",
+      "file": "UserManagement.jsx"
+    },
+    {
+      "title": "Verify Certificate",
+      "path": "/verify-certificate",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Verify Certificate features and tools",
+      "file": "VerifyCertificate.jsx"
+    },
+    {
+      "title": "Vids",
+      "path": "/vids",
+      "category": "general",
+      "image": "",
+      "excerpt": "Access Vids features and tools",
+      "file": "Vids.jsx"
+    },
+    {
+      "title": "Government",
+      "path": "/government",
+      "category": "government",
+      "image": "",
+      "excerpt": "Access Government features and tools",
+      "file": "Government.jsx"
+    },
+    {
+      "title": "Instructor",
+      "path": "/instructor",
+      "category": "instructor-portal",
+      "image": "",
+      "excerpt": "Access Instructor features and tools",
+      "file": "Instructor.jsx"
+    },
+    {
+      "title": "Instructor Edit",
+      "path": "/instructor-edit",
+      "category": "instructor-portal",
+      "image": "",
+      "excerpt": "Access Instructor Edit features and tools",
+      "file": "InstructorEdit.jsx"
+    },
+    {
+      "title": "Instructor New",
+      "path": "/instructor-new",
+      "category": "instructor-portal",
+      "image": "",
+      "excerpt": "Access Instructor New features and tools",
+      "file": "InstructorNew.jsx"
+    },
+    {
+      "title": "Course",
+      "path": "/course",
+      "category": "learning",
+      "image": "",
+      "excerpt": "Access Course features and tools",
+      "file": "Course.jsx"
+    },
+    {
+      "title": "Course Builder",
+      "path": "/course-builder",
+      "category": "learning",
+      "image": "",
+      "excerpt": "Access Course Builder features and tools",
+      "file": "CourseBuilder.jsx"
+    },
+    {
+      "title": "Course Catalog",
+      "path": "/course-catalog",
+      "category": "learning",
+      "image": "",
+      "excerpt": "Access Course Catalog features and tools",
+      "file": "CourseCatalog.jsx"
+    },
+    {
+      "title": "Course Detail",
+      "path": "/course-detail",
+      "category": "learning",
+      "image": "",
+      "excerpt": "Access Course Detail features and tools",
+      "file": "CourseDetail.jsx"
+    },
+    {
+      "title": "Course Library",
+      "path": "/course-library",
+      "category": "learning",
+      "image": "",
+      "excerpt": "Access Course Library features and tools",
+      "file": "CourseLibrary.jsx"
+    },
+    {
+      "title": "L M S",
+      "path": "/l-m-s",
+      "category": "learning",
+      "image": "",
+      "excerpt": "Access L M S features and tools",
+      "file": "LMS.jsx"
+    },
+    {
+      "title": "L M S Landing",
+      "path": "/l-m-s-landing",
+      "category": "learning",
+      "image": "",
+      "excerpt": "Access L M S Landing features and tools",
+      "file": "LMSLanding.jsx"
+    },
+    {
+      "title": "Donate",
+      "path": "/donate",
+      "category": "philanthropy",
+      "image": "",
+      "excerpt": "Access Donate features and tools",
+      "file": "Donate.jsx"
+    },
+    {
+      "title": "Donate Page",
+      "path": "/donate-page",
+      "category": "philanthropy",
+      "image": "",
+      "excerpt": "Access Donate Page features and tools",
+      "file": "DonatePage.jsx"
+    },
+    {
+      "title": "Philanthropy",
+      "path": "/philanthropy",
+      "category": "philanthropy",
+      "image": "",
+      "excerpt": "Access Philanthropy features and tools",
+      "file": "Philanthropy.jsx"
+    },
+    {
+      "title": "Calendar",
+      "path": "/calendar",
+      "category": "productivity",
+      "image": "",
+      "excerpt": "Access Calendar features and tools",
+      "file": "Calendar.jsx"
+    },
+    {
+      "title": "Docs",
+      "path": "/docs",
+      "category": "productivity",
+      "image": "",
+      "excerpt": "Access Docs features and tools",
+      "file": "Docs.jsx"
+    },
+    {
+      "title": "Email",
+      "path": "/email",
+      "category": "productivity",
+      "image": "",
+      "excerpt": "Access Email features and tools",
+      "file": "Email.jsx"
+    },
+    {
+      "title": "File Manager",
+      "path": "/file-manager",
+      "category": "productivity",
+      "image": "",
+      "excerpt": "Access File Manager features and tools",
+      "file": "FileManager.jsx"
+    },
+    {
+      "title": "Profile",
+      "path": "/profile",
+      "category": "productivity",
+      "image": "",
+      "excerpt": "Access Profile features and tools",
+      "file": "Profile.jsx"
+    },
+    {
+      "title": "Sheets",
+      "path": "/sheets",
+      "category": "productivity",
+      "image": "",
+      "excerpt": "Access Sheets features and tools",
+      "file": "Sheets.jsx"
+    },
+    {
+      "title": "Slides",
+      "path": "/slides",
+      "category": "productivity",
+      "image": "",
+      "excerpt": "Access Slides features and tools",
+      "file": "Slides.jsx"
+    },
+    {
+      "title": "Verify Email",
+      "path": "/verify-email",
+      "category": "productivity",
+      "image": "",
+      "excerpt": "Access Verify Email features and tools",
+      "file": "VerifyEmail.jsx"
+    },
+    {
+      "title": "Video Meeting",
+      "path": "/video-meeting",
+      "category": "productivity",
+      "image": "",
+      "excerpt": "Access Video Meeting features and tools",
+      "file": "VideoMeeting.jsx"
+    },
+    {
+      "title": "Programs",
+      "path": "/programs",
+      "category": "programs",
+      "image": "",
+      "excerpt": "Access Programs features and tools",
+      "file": "Programs.jsx"
+    },
+    {
+      "title": "Student",
+      "path": "/student",
+      "category": "student-portal",
+      "image": "",
+      "excerpt": "Access Student features and tools",
+      "file": "Student.jsx"
+    },
+    {
+      "title": "Student Dashboard",
+      "path": "/student-dashboard",
+      "category": "student-portal",
+      "image": "",
+      "excerpt": "Access Student Dashboard features and tools",
+      "file": "StudentDashboard.jsx"
+    },
+    {
+      "title": "Student Handbook",
+      "path": "/student-handbook",
+      "category": "student-portal",
+      "image": "",
+      "excerpt": "Access Student Handbook features and tools",
+      "file": "StudentHandbook.jsx"
+    },
+    {
+      "title": "Student Hub",
+      "path": "/student-hub",
+      "category": "student-portal",
+      "image": "",
+      "excerpt": "Access Student Hub features and tools",
+      "file": "StudentHub.jsx"
+    }
+  ],
+  "byCategory": {
+    "admin-portal": [
+      {
+        "title": "Admin Console",
+        "path": "/admin-console",
+        "category": "admin-portal",
+        "image": "",
+        "excerpt": "Access Admin Console features and tools",
+        "file": "AdminConsole.jsx"
+      },
+      {
+        "title": "Admin Dashboard",
+        "path": "/admin-dashboard",
+        "category": "admin-portal",
+        "image": "",
+        "excerpt": "Access Admin Dashboard features and tools",
+        "file": "AdminDashboard.jsx"
+      }
+    ],
+    "ai-tools": [
+      {
+        "title": "A I Tutor",
+        "path": "/a-i-tutor",
+        "category": "ai-tools",
+        "image": "",
+        "excerpt": "Access A I Tutor features and tools",
+        "file": "AITutor.jsx"
+      },
+      {
+        "title": "Durable A I",
+        "path": "/durable-a-i",
+        "category": "ai-tools",
+        "image": "",
+        "excerpt": "Access Durable A I features and tools",
+        "file": "DurableAI.jsx"
+      },
+      {
+        "title": "Elevate Brain",
+        "path": "/elevate-brain",
+        "category": "ai-tools",
+        "image": "",
+        "excerpt": "Access Elevate Brain features and tools",
+        "file": "ElevateBrain.jsx"
+      },
+      {
+        "title": "Main Landing",
+        "path": "/main-landing",
+        "category": "ai-tools",
+        "image": "",
+        "excerpt": "Access Main Landing features and tools",
+        "file": "MainLanding.jsx"
+      },
+      {
+        "title": "Notebook L M",
+        "path": "/notebook-l-m",
+        "category": "ai-tools",
+        "image": "",
+        "excerpt": "Access Notebook L M features and tools",
+        "file": "NotebookLM.jsx"
+      }
+    ],
+    "analytics": [
+      {
+        "title": "Analytics",
+        "path": "/analytics",
+        "category": "analytics",
+        "image": "",
+        "excerpt": "Access Analytics features and tools",
+        "file": "Analytics.jsx"
+      },
+      {
+        "title": "Analytics Dashboard",
+        "path": "/analytics-dashboard",
+        "category": "analytics",
+        "image": "",
+        "excerpt": "Access Analytics Dashboard features and tools",
+        "file": "AnalyticsDashboard.jsx"
+      },
+      {
+        "title": "Google Analytics Setup",
+        "path": "/google-analytics-setup",
+        "category": "analytics",
+        "image": "",
+        "excerpt": "Access Google Analytics Setup features and tools",
+        "file": "GoogleAnalyticsSetup.jsx"
+      }
+    ],
+    "general": [
+      {
+        "title": "About",
+        "path": "/about",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access About features and tools",
+        "file": "About.jsx"
+      },
+      {
+        "title": "Accessibility",
+        "path": "/accessibility",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Accessibility features and tools",
+        "file": "Accessibility.jsx"
+      },
+      {
+        "title": "Accessibility Settings",
+        "path": "/accessibility-settings",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Accessibility Settings features and tools",
+        "file": "AccessibilitySettings.jsx"
+      },
+      {
+        "title": "Account",
+        "path": "/account",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Account features and tools",
+        "file": "Account.jsx"
+      },
+      {
+        "title": "Assignment",
+        "path": "/assignment",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Assignment features and tools",
+        "file": "Assignment.jsx"
+      },
+      {
+        "title": "Bing Site Verification",
+        "path": "/bing-site-verification",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Bing Site Verification features and tools",
+        "file": "BingSiteVerification.jsx"
+      },
+      {
+        "title": "Branding",
+        "path": "/branding",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Branding features and tools",
+        "file": "Branding.jsx"
+      },
+      {
+        "title": "Business Hub",
+        "path": "/business-hub",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Business Hub features and tools",
+        "file": "BusinessHub.jsx"
+      },
+      {
+        "title": "Certificates",
+        "path": "/certificates",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Certificates features and tools",
+        "file": "Certificates.jsx"
+      },
+      {
+        "title": "Clone Landing",
+        "path": "/clone-landing",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Clone Landing features and tools",
+        "file": "CloneLanding.jsx"
+      },
+      {
+        "title": "Community",
+        "path": "/community",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Community features and tools",
+        "file": "Community.jsx"
+      },
+      {
+        "title": "Community Hub",
+        "path": "/community-hub",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Community Hub features and tools",
+        "file": "CommunityHub.jsx"
+      },
+      {
+        "title": "Compliance",
+        "path": "/compliance",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Compliance features and tools",
+        "file": "Compliance.jsx"
+      },
+      {
+        "title": "Connect",
+        "path": "/connect",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Connect features and tools",
+        "file": "Connect.jsx"
+      },
+      {
+        "title": "Curriculum Upload",
+        "path": "/curriculum-upload",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Curriculum Upload features and tools",
+        "file": "CurriculumUpload.jsx"
+      },
+      {
+        "title": "Durable Features",
+        "path": "/durable-features",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Durable Features features and tools",
+        "file": "DurableFeatures.jsx"
+      },
+      {
+        "title": "Durable Landing",
+        "path": "/durable-landing",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Durable Landing features and tools",
+        "file": "DurableLanding.jsx"
+      },
+      {
+        "title": "Durable Pricing",
+        "path": "/durable-pricing",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Durable Pricing features and tools",
+        "file": "DurablePricing.jsx"
+      },
+      {
+        "title": "Durable Templates",
+        "path": "/durable-templates",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Durable Templates features and tools",
+        "file": "DurableTemplates.jsx"
+      },
+      {
+        "title": "Ecommerce",
+        "path": "/ecommerce",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Ecommerce features and tools",
+        "file": "Ecommerce.jsx"
+      },
+      {
+        "title": "Ecosystem",
+        "path": "/ecosystem",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Ecosystem features and tools",
+        "file": "Ecosystem.jsx"
+      },
+      {
+        "title": "Educator Hub",
+        "path": "/educator-hub",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Educator Hub features and tools",
+        "file": "EducatorHub.jsx"
+      },
+      {
+        "title": "Forgot Password",
+        "path": "/forgot-password",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Forgot Password features and tools",
+        "file": "ForgotPassword.jsx"
+      },
+      {
+        "title": "Forms",
+        "path": "/forms",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Forms features and tools",
+        "file": "Forms.jsx"
+      },
+      {
+        "title": "Funding Impact",
+        "path": "/funding-impact",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Funding Impact features and tools",
+        "file": "FundingImpact.jsx"
+      },
+      {
+        "title": "Get Started",
+        "path": "/get-started",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Get Started features and tools",
+        "file": "GetStarted.jsx"
+      },
+      {
+        "title": "Google Site Verification",
+        "path": "/google-site-verification",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Google Site Verification features and tools",
+        "file": "GoogleSiteVerification.jsx"
+      },
+      {
+        "title": "Groups",
+        "path": "/groups",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Groups features and tools",
+        "file": "Groups.jsx"
+      },
+      {
+        "title": "Home",
+        "path": "/",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Home features and tools",
+        "file": "Home.jsx"
+      },
+      {
+        "title": "Hub",
+        "path": "/hub",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Hub features and tools",
+        "file": "Hub.jsx"
+      },
+      {
+        "title": "Integrations",
+        "path": "/integrations",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Integrations features and tools",
+        "file": "Integrations.jsx"
+      },
+      {
+        "title": "Kingdom Konnect",
+        "path": "/kingdom-konnect",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Kingdom Konnect features and tools",
+        "file": "KingdomKonnect.jsx"
+      },
+      {
+        "title": "Login",
+        "path": "/login",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Login features and tools",
+        "file": "Login.jsx"
+      },
+      {
+        "title": "Mobile App",
+        "path": "/mobile-app",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Mobile App features and tools",
+        "file": "MobileApp.jsx"
+      },
+      {
+        "title": "Not Found",
+        "path": "/not-found",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Not Found features and tools",
+        "file": "NotFound.jsx"
+      },
+      {
+        "title": "Notifications",
+        "path": "/notifications",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Notifications features and tools",
+        "file": "Notifications.jsx"
+      },
+      {
+        "title": "Partners",
+        "path": "/partners",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Partners features and tools",
+        "file": "Partners.jsx"
+      },
+      {
+        "title": "Pay",
+        "path": "/pay",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Pay features and tools",
+        "file": "Pay.jsx"
+      },
+      {
+        "title": "Privacy Policy",
+        "path": "/privacy-policy",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Privacy Policy features and tools",
+        "file": "PrivacyPolicy.jsx"
+      },
+      {
+        "title": "Quiz",
+        "path": "/quiz",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Quiz features and tools",
+        "file": "Quiz.jsx"
+      },
+      {
+        "title": "Refund Policy",
+        "path": "/refund-policy",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Refund Policy features and tools",
+        "file": "RefundPolicy.jsx"
+      },
+      {
+        "title": "Reset Password",
+        "path": "/reset-password",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Reset Password features and tools",
+        "file": "ResetPassword.jsx"
+      },
+      {
+        "title": "Search Results",
+        "path": "/search-results",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Search Results features and tools",
+        "file": "SearchResults.jsx"
+      },
+      {
+        "title": "Serene Comfort Care",
+        "path": "/serene-comfort-care",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Serene Comfort Care features and tools",
+        "file": "SereneComfortCare.jsx"
+      },
+      {
+        "title": "Settings",
+        "path": "/settings",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Settings features and tools",
+        "file": "Settings.jsx"
+      },
+      {
+        "title": "Sitemap",
+        "path": "/sitemap",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Sitemap features and tools",
+        "file": "Sitemap.jsx"
+      },
+      {
+        "title": "Sites",
+        "path": "/sites",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Sites features and tools",
+        "file": "Sites.jsx"
+      },
+      {
+        "title": "Some Page",
+        "path": "/some-page",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Some Page features and tools",
+        "file": "SomePage.jsx"
+      },
+      {
+        "title": "Support",
+        "path": "/support",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Support features and tools",
+        "file": "Support.jsx"
+      },
+      {
+        "title": "Terms Of Service",
+        "path": "/terms-of-service",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Terms Of Service features and tools",
+        "file": "TermsOfService.jsx"
+      },
+      {
+        "title": "Thank You",
+        "path": "/thank-you",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Thank You features and tools",
+        "file": "ThankYou.jsx"
+      },
+      {
+        "title": "Urban Build Crew",
+        "path": "/urban-build-crew",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Urban Build Crew features and tools",
+        "file": "UrbanBuildCrew.jsx"
+      },
+      {
+        "title": "User Management",
+        "path": "/user-management",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access User Management features and tools",
+        "file": "UserManagement.jsx"
+      },
+      {
+        "title": "Verify Certificate",
+        "path": "/verify-certificate",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Verify Certificate features and tools",
+        "file": "VerifyCertificate.jsx"
+      },
+      {
+        "title": "Vids",
+        "path": "/vids",
+        "category": "general",
+        "image": "",
+        "excerpt": "Access Vids features and tools",
+        "file": "Vids.jsx"
+      }
+    ],
+    "government": [
+      {
+        "title": "Government",
+        "path": "/government",
+        "category": "government",
+        "image": "",
+        "excerpt": "Access Government features and tools",
+        "file": "Government.jsx"
+      }
+    ],
+    "instructor-portal": [
+      {
+        "title": "Instructor",
+        "path": "/instructor",
+        "category": "instructor-portal",
+        "image": "",
+        "excerpt": "Access Instructor features and tools",
+        "file": "Instructor.jsx"
+      },
+      {
+        "title": "Instructor Edit",
+        "path": "/instructor-edit",
+        "category": "instructor-portal",
+        "image": "",
+        "excerpt": "Access Instructor Edit features and tools",
+        "file": "InstructorEdit.jsx"
+      },
+      {
+        "title": "Instructor New",
+        "path": "/instructor-new",
+        "category": "instructor-portal",
+        "image": "",
+        "excerpt": "Access Instructor New features and tools",
+        "file": "InstructorNew.jsx"
+      }
+    ],
+    "learning": [
+      {
+        "title": "Course",
+        "path": "/course",
+        "category": "learning",
+        "image": "",
+        "excerpt": "Access Course features and tools",
+        "file": "Course.jsx"
+      },
+      {
+        "title": "Course Builder",
+        "path": "/course-builder",
+        "category": "learning",
+        "image": "",
+        "excerpt": "Access Course Builder features and tools",
+        "file": "CourseBuilder.jsx"
+      },
+      {
+        "title": "Course Catalog",
+        "path": "/course-catalog",
+        "category": "learning",
+        "image": "",
+        "excerpt": "Access Course Catalog features and tools",
+        "file": "CourseCatalog.jsx"
+      },
+      {
+        "title": "Course Detail",
+        "path": "/course-detail",
+        "category": "learning",
+        "image": "",
+        "excerpt": "Access Course Detail features and tools",
+        "file": "CourseDetail.jsx"
+      },
+      {
+        "title": "Course Library",
+        "path": "/course-library",
+        "category": "learning",
+        "image": "",
+        "excerpt": "Access Course Library features and tools",
+        "file": "CourseLibrary.jsx"
+      },
+      {
+        "title": "L M S",
+        "path": "/l-m-s",
+        "category": "learning",
+        "image": "",
+        "excerpt": "Access L M S features and tools",
+        "file": "LMS.jsx"
+      },
+      {
+        "title": "L M S Landing",
+        "path": "/l-m-s-landing",
+        "category": "learning",
+        "image": "",
+        "excerpt": "Access L M S Landing features and tools",
+        "file": "LMSLanding.jsx"
+      }
+    ],
+    "philanthropy": [
+      {
+        "title": "Donate",
+        "path": "/donate",
+        "category": "philanthropy",
+        "image": "",
+        "excerpt": "Access Donate features and tools",
+        "file": "Donate.jsx"
+      },
+      {
+        "title": "Donate Page",
+        "path": "/donate-page",
+        "category": "philanthropy",
+        "image": "",
+        "excerpt": "Access Donate Page features and tools",
+        "file": "DonatePage.jsx"
+      },
+      {
+        "title": "Philanthropy",
+        "path": "/philanthropy",
+        "category": "philanthropy",
+        "image": "",
+        "excerpt": "Access Philanthropy features and tools",
+        "file": "Philanthropy.jsx"
+      }
+    ],
+    "productivity": [
+      {
+        "title": "Calendar",
+        "path": "/calendar",
+        "category": "productivity",
+        "image": "",
+        "excerpt": "Access Calendar features and tools",
+        "file": "Calendar.jsx"
+      },
+      {
+        "title": "Docs",
+        "path": "/docs",
+        "category": "productivity",
+        "image": "",
+        "excerpt": "Access Docs features and tools",
+        "file": "Docs.jsx"
+      },
+      {
+        "title": "Email",
+        "path": "/email",
+        "category": "productivity",
+        "image": "",
+        "excerpt": "Access Email features and tools",
+        "file": "Email.jsx"
+      },
+      {
+        "title": "File Manager",
+        "path": "/file-manager",
+        "category": "productivity",
+        "image": "",
+        "excerpt": "Access File Manager features and tools",
+        "file": "FileManager.jsx"
+      },
+      {
+        "title": "Profile",
+        "path": "/profile",
+        "category": "productivity",
+        "image": "",
+        "excerpt": "Access Profile features and tools",
+        "file": "Profile.jsx"
+      },
+      {
+        "title": "Sheets",
+        "path": "/sheets",
+        "category": "productivity",
+        "image": "",
+        "excerpt": "Access Sheets features and tools",
+        "file": "Sheets.jsx"
+      },
+      {
+        "title": "Slides",
+        "path": "/slides",
+        "category": "productivity",
+        "image": "",
+        "excerpt": "Access Slides features and tools",
+        "file": "Slides.jsx"
+      },
+      {
+        "title": "Verify Email",
+        "path": "/verify-email",
+        "category": "productivity",
+        "image": "",
+        "excerpt": "Access Verify Email features and tools",
+        "file": "VerifyEmail.jsx"
+      },
+      {
+        "title": "Video Meeting",
+        "path": "/video-meeting",
+        "category": "productivity",
+        "image": "",
+        "excerpt": "Access Video Meeting features and tools",
+        "file": "VideoMeeting.jsx"
+      }
+    ],
+    "programs": [
+      {
+        "title": "Programs",
+        "path": "/programs",
+        "category": "programs",
+        "image": "",
+        "excerpt": "Access Programs features and tools",
+        "file": "Programs.jsx"
+      }
+    ],
+    "student-portal": [
+      {
+        "title": "Student",
+        "path": "/student",
+        "category": "student-portal",
+        "image": "",
+        "excerpt": "Access Student features and tools",
+        "file": "Student.jsx"
+      },
+      {
+        "title": "Student Dashboard",
+        "path": "/student-dashboard",
+        "category": "student-portal",
+        "image": "",
+        "excerpt": "Access Student Dashboard features and tools",
+        "file": "StudentDashboard.jsx"
+      },
+      {
+        "title": "Student Handbook",
+        "path": "/student-handbook",
+        "category": "student-portal",
+        "image": "",
+        "excerpt": "Access Student Handbook features and tools",
+        "file": "StudentHandbook.jsx"
+      },
+      {
+        "title": "Student Hub",
+        "path": "/student-hub",
+        "category": "student-portal",
+        "image": "",
+        "excerpt": "Access Student Hub features and tools",
+        "file": "StudentHub.jsx"
+      }
+    ]
+  }
+}

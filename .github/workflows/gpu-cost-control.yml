@@ -1,0 +1,41 @@
+name: GPU Cost Control
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: GPU capacity action
+        required: true
+        type: choice
+        default: auto
+        options: [auto, sleep, wake-video]
+  schedule:
+    - cron: '*/10 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gpu-cost-control
+  cancel-in-progress: true
+
+jobs:
+  control:
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_GPU_PROJECT_ID: elevate-media-gpu
+      SUPABASE_URL: https://cuxzzpsyufcewtmicszk.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main, clean: true }
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Enforce demand-based GPU capacity
+        run: node scripts/northflank/control-gpu-cost.mjs "${{ github.event_name == 'workflow_dispatch' && inputs.action || 'auto' }}"

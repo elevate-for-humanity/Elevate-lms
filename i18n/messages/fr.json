@@ -1,0 +1,187 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "submit": "Soumettre",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "back": "Retour",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "viewAll": "Voir tout",
+    "learnMore": "En savoir plus",
+    "getStarted": "Commencer",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter",
+    "signUp": "S'inscrire",
+    "free": "Gratuit",
+    "freeWithWIOA": "Gratuit avec WIOA"
+  },
+  "nav": {
+    "home": "Accueil",
+    "programs": "Programmes",
+    "courses": "Cours",
+    "about": "À propos",
+    "contact": "Contact",
+    "apply": "Postuler maintenant",
+    "dashboard": "Tableau de bord",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "help": "Aide"
+  },
+  "home": {
+    "hero": {
+      "title": "Lancez votre nouvelle carrière en 8-16 semaines",
+      "titleHighlight": "100% Gratuit",
+      "subtitle": "Les programmes de main-d'œuvre de l'Indiana paient votre formation. Pas de prêts. Pas de dettes. Juste de vraies compétences et un vrai emploi.",
+      "cta": "Postuler maintenant — C'est gratuit",
+      "ctaSecondary": "Explorer les programmes"
+    },
+    "stats": {
+      "studentsEnrolled": "Étudiants inscrits",
+      "jobPlacementRate": "Taux de placement",
+      "programsOffered": "Programmes de formation",
+      "employerPartners": "Partenaires employeurs"
+    },
+    "programs": {
+      "title": "Programmes de formation professionnelle",
+      "subtitle": "Choisissez parmi la santé, les métiers spécialisés, la technologie et plus encore. La plupart des programmes sont entièrement financés par WIOA.",
+      "viewAll": "Voir tous les programmes"
+    },
+    "howItWorks": {
+      "title": "Comment ça marche",
+      "step1": {
+        "title": "Postulez en ligne",
+        "description": "Complétez une candidature rapide en moins de 5 minutes"
+      },
+      "step2": {
+        "title": "Vérifiez l'éligibilité",
+        "description": "Nous vérifions votre éligibilité WIOA pour une formation gratuite"
+      },
+      "step3": {
+        "title": "Commencez la formation",
+        "description": "Débutez votre programme avec une instruction pratique"
+      },
+      "step4": {
+        "title": "Trouvez un emploi",
+        "description": "Nos services de carrière vous connectent avec des employeurs"
+      }
+    },
+    "cta": {
+      "title": "Prêt à commencer votre nouvelle carrière?",
+      "subtitle": "Rejoignez des milliers d'habitants de l'Indiana qui ont lancé de nouvelles carrières grâce à nos programmes de formation gratuits.",
+      "button": "Postuler maintenant — Gratuit",
+      "phone": "Appeler {phone}"
+    }
+  },
+  "programs": {
+    "title": "Programmes de formation",
+    "subtitle": "Explorez nos programmes de formation professionnelle",
+    "categories": {
+      "all": "Tous",
+      "healthcare": "Santé",
+      "technology": "Technologie",
+      "trades": "Métiers spécialisés",
+      "business": "Affaires"
+    },
+    "duration": "{weeks} semaines",
+    "funding": {
+      "free": "Gratuit",
+      "wioaEligible": "Gratuit avec WIOA/WRG",
+      "selfPay": "ou ${price} auto-paiement"
+    }
+  },
+  "enrollment": {
+    "title": "Inscrivez-vous à un programme",
+    "subtitle": "Sélectionnez un programme pour commencer votre inscription",
+    "steps": {
+      "selectProgram": "Sélectionner le programme",
+      "personalInfo": "Informations personnelles",
+      "eligibility": "Éligibilité",
+      "review": "Révision",
+      "complete": "Terminer"
+    },
+    "form": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "dateOfBirth": "Date de naissance",
+      "address": "Adresse",
+      "city": "Ville",
+      "state": "État",
+      "zipCode": "Code postal"
+    },
+    "success": {
+      "title": "Inscription réussie!",
+      "subtitle": "Bienvenue chez Elevate for Humanity. Nous sommes ravis de vous avoir!",
+      "nextSteps": "Prochaines étapes",
+      "checkEmail": "Vérifiez votre e-mail pour confirmation",
+      "goToDashboard": "Aller au tableau de bord"
+    }
+  },
+  "courses": {
+    "title": "Cours",
+    "searchPlaceholder": "Rechercher des cours...",
+    "filters": {
+      "all": "Tous",
+      "inProgress": "En cours",
+      "completed": "Terminés",
+      "notStarted": "Non commencés"
+    },
+    "progress": "{percent}% Terminé",
+    "continue": "Continuer l'apprentissage",
+    "start": "Commencer le cours",
+    "completed": "Terminé"
+  },
+  "dashboard": {
+    "welcome": "Bon retour, {name}!",
+    "myCourses": "Mes cours",
+    "progress": "Progression",
+    "achievements": "Réalisations",
+    "hours": "Heures enregistrées",
+    "streak": "Jours consécutifs",
+    "points": "Points",
+    "noCourses": "Pas encore de cours",
+    "enrollNow": "Inscrivez-vous à un programme pour commencer"
+  },
+  "errors": {
+    "notFound": "Page non trouvée",
+    "notFoundMessage": "La page que vous recherchez n'existe pas.",
+    "serverError": "Erreur serveur",
+    "serverErrorMessage": "Quelque chose s'est mal passé de notre côté. Veuillez réessayer.",
+    "unauthorized": "Non autorisé",
+    "unauthorizedMessage": "Vous devez vous connecter pour accéder à cette page.",
+    "goHome": "Aller à l'accueil",
+    "tryAgain": "Réessayer",
+    "contactSupport": "Contacter le support"
+  },
+  "footer": {
+    "tagline": "Infrastructure de main-d'œuvre",
+    "description": "Connecter le financement public, la demande des employeurs et la formation certifiée.",
+    "quickLinks": "Liens rapides",
+    "programs": "Programmes",
+    "about": "À propos",
+    "contact": "Contact",
+    "careers": "Carrières",
+    "legal": "Légal",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "accessibility": "Accessibilité",
+    "connect": "Connecter",
+    "copyright": "© {year} Elevate for Humanity. Tous droits réservés."
+  },
+  "accessibility": {
+    "skipToContent": "Passer au contenu principal",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "loading": "Chargement, veuillez patienter",
+    "expandSection": "Développer la section",
+    "collapseSection": "Réduire la section"
+  }
+}

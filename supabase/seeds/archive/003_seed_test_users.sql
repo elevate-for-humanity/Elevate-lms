@@ -1,0 +1,11 @@
+-- DEPRECATED: Test users should not be seeded in production
+-- Users are created via Supabase Auth signup flow
+-- This file is kept for reference only
+
+-- Seed test users (DEPRECATED - DO NOT USE IN PRODUCTION)
+-- INSERT INTO users (email)
+-- VALUES
+--   ('admin@elevateforhumanity.org'),
+--   ('student@example.com'),
+--   ('instructor@example.com')
+-- ON CONFLICT (email) DO NOTHING;

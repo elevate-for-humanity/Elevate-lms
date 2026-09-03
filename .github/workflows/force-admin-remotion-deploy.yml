@@ -1,0 +1,96 @@
+name: Force Admin Remotion Exact Deploy
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: northflank-admin-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: startsWith(github.event.issue.title, '[FORCE ADMIN REMOTION]')
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 90
+    env:
+      TARGET_SHA: ${{ github.sha }}
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+      NORTHFLANK_TARGET_SERVICE: admin
+      DEPLOY_BRANCH: main
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+      NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
+      NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TARGET_SHA }}
+          fetch-depth: 0
+          clean: true
+      - name: Prove exact target
+        run: |
+          set -Eeuo pipefail
+          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
+          git fetch origin main --depth=200
+          git merge-base --is-ancestor "$TARGET_SHA" origin/main
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Enforce canonical Admin service config
+        run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
+      - name: Trigger exact Admin build
+        id: build
+        env:
+          GITHUB_SHA: ${{ env.TARGET_SHA }}
+          BUILD_SHA: ${{ env.TARGET_SHA }}
+        run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
+      - name: Wait and verify exact build
+        run: |
+          set -Eeuo pipefail
+          test -n "${{ steps.build.outputs.build_id }}"
+          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --timeout-ms 3600000
+          pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --sha "$TARGET_SHA"
+      - name: Deploy exact build
+        run: |
+          set -Eeuo pipefail
+          pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --sha "$TARGET_SHA"
+          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 3600000
+      - name: Require exact live SHA
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          : >/tmp/result.txt
+          for i in $(seq 1 40); do
+            code=$(curl -sS --max-time 10 -o /tmp/version.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/version || true)
+            live=$(node -e "try{const d=require('/tmp/version.json');process.stdout.write(d.commitSha||d.commit||'')}catch{}")
+            echo "attempt=$i http=$code live=$live expected=$TARGET_SHA" | tee -a /tmp/result.txt
+            if [ "$code" = 200 ] && [ "$live" = "$TARGET_SHA" ]; then
+              curl -fsS https://admin.elevateforhumanity.org/api/health >>/tmp/result.txt
+              exit 0
+            fi
+            sleep 15
+          done
+          exit 1
+      - name: Post deployment result
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs'); let out='No result'; try{out=fs.readFileSync('/tmp/result.txt','utf8')}catch{}
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:context.issue.number,body:`Exact Admin Remotion deploy: **${{ job.status }}**\n\n\`\`\`text\n${out.slice(-16000)}\n\`\`\``});

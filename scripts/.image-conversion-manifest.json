@@ -1,0 +1,440 @@
+[
+  {
+    "orig": "public/images/pages/forklift.jpg",
+    "webp": "public/images/pages/forklift.webp",
+    "origRel": "/images/pages/forklift.jpg",
+    "webpRel": "/images/pages/forklift.webp"
+  },
+  {
+    "orig": "public/images/pages/funding-impact-1.jpg",
+    "webp": "public/images/pages/funding-impact-1.webp",
+    "origRel": "/images/pages/funding-impact-1.jpg",
+    "webpRel": "/images/pages/funding-impact-1.webp"
+  },
+  {
+    "orig": "public/images/pages/governance-page-1.jpg",
+    "webp": "public/images/pages/governance-page-1.webp",
+    "origRel": "/images/pages/governance-page-1.jpg",
+    "webpRel": "/images/pages/governance-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/government-1.jpg",
+    "webp": "public/images/pages/government-1.webp",
+    "origRel": "/images/pages/government-1.jpg",
+    "webpRel": "/images/pages/government-1.webp"
+  },
+  {
+    "orig": "public/images/pages/government-5.jpg",
+    "webp": "public/images/pages/government-5.webp",
+    "origRel": "/images/pages/government-5.jpg",
+    "webpRel": "/images/pages/government-5.webp"
+  },
+  {
+    "orig": "public/images/pages/graduation-ceremony.jpg",
+    "webp": "public/images/pages/graduation-ceremony.webp",
+    "origRel": "/images/pages/graduation-ceremony.jpg",
+    "webpRel": "/images/pages/graduation-ceremony.webp"
+  },
+  {
+    "orig": "public/images/pages/grievance-page-1.jpg",
+    "webp": "public/images/pages/grievance-page-1.webp",
+    "origRel": "/images/pages/grievance-page-1.jpg",
+    "webpRel": "/images/pages/grievance-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/help-page-1.jpg",
+    "webp": "public/images/pages/help-page-1.webp",
+    "origRel": "/images/pages/help-page-1.jpg",
+    "webpRel": "/images/pages/help-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/higher-ed-hero.jpg",
+    "webp": "public/images/pages/higher-ed-hero.webp",
+    "origRel": "/images/pages/higher-ed-hero.jpg",
+    "webpRel": "/images/pages/higher-ed-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/hp-wioa-real.jpg",
+    "webp": "public/images/pages/hp-wioa-real.webp",
+    "origRel": "/images/pages/hp-wioa-real.jpg",
+    "webpRel": "/images/pages/hp-wioa-real.webp"
+  },
+  {
+    "orig": "public/images/pages/hvac-hero.jpg",
+    "webp": "public/images/pages/hvac-hero.webp",
+    "origRel": "/images/pages/hvac-hero.jpg",
+    "webpRel": "/images/pages/hvac-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/industries-page-1.jpg",
+    "webp": "public/images/pages/industries-page-1.webp",
+    "origRel": "/images/pages/industries-page-1.jpg",
+    "webpRel": "/images/pages/industries-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/instructor-credentials-page-1.jpg",
+    "webp": "public/images/pages/instructor-credentials-page-1.webp",
+    "origRel": "/images/pages/instructor-credentials-page-1.jpg",
+    "webpRel": "/images/pages/instructor-credentials-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/instructor-page-2.jpg",
+    "webp": "public/images/pages/instructor-page-2.webp",
+    "origRel": "/images/pages/instructor-page-2.jpg",
+    "webpRel": "/images/pages/instructor-page-2.webp"
+  },
+  {
+    "orig": "public/images/pages/instructor-page-6.jpg",
+    "webp": "public/images/pages/instructor-page-6.webp",
+    "origRel": "/images/pages/instructor-page-6.jpg",
+    "webpRel": "/images/pages/instructor-page-6.webp"
+  },
+  {
+    "orig": "public/images/pages/instructor-page-8.jpg",
+    "webp": "public/images/pages/instructor-page-8.webp",
+    "origRel": "/images/pages/instructor-page-8.jpg",
+    "webpRel": "/images/pages/instructor-page-8.webp"
+  },
+  {
+    "orig": "public/images/pages/it-help-desk.jpg",
+    "webp": "public/images/pages/it-help-desk.webp",
+    "origRel": "/images/pages/it-help-desk.jpg",
+    "webpRel": "/images/pages/it-help-desk.webp"
+  },
+  {
+    "orig": "public/images/pages/job-placement.jpg",
+    "webp": "public/images/pages/job-placement.webp",
+    "origRel": "/images/pages/job-placement.jpg",
+    "webpRel": "/images/pages/job-placement.webp"
+  },
+  {
+    "orig": "public/images/pages/learner-page-1.jpg",
+    "webp": "public/images/pages/learner-page-1.webp",
+    "origRel": "/images/pages/learner-page-1.jpg",
+    "webpRel": "/images/pages/learner-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/lms-page-10.jpg",
+    "webp": "public/images/pages/lms-page-10.webp",
+    "origRel": "/images/pages/lms-page-10.jpg",
+    "webpRel": "/images/pages/lms-page-10.webp"
+  },
+  {
+    "orig": "public/images/pages/lms-page-12.jpg",
+    "webp": "public/images/pages/lms-page-12.webp",
+    "origRel": "/images/pages/lms-page-12.jpg",
+    "webpRel": "/images/pages/lms-page-12.webp"
+  },
+  {
+    "orig": "public/images/pages/lms-page-4.jpg",
+    "webp": "public/images/pages/lms-page-4.webp",
+    "origRel": "/images/pages/lms-page-4.jpg",
+    "webpRel": "/images/pages/lms-page-4.webp"
+  },
+  {
+    "orig": "public/images/pages/locations-page-1.jpg",
+    "webp": "public/images/pages/locations-page-1.webp",
+    "origRel": "/images/pages/locations-page-1.jpg",
+    "webpRel": "/images/pages/locations-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/medical-assistant-desk.jpg",
+    "webp": "public/images/pages/medical-assistant-desk.webp",
+    "origRel": "/images/pages/medical-assistant-desk.jpg",
+    "webpRel": "/images/pages/medical-assistant-desk.webp"
+  },
+  {
+    "orig": "public/images/pages/medical-assistant-hero.jpg",
+    "webp": "public/images/pages/medical-assistant-hero.webp",
+    "origRel": "/images/pages/medical-assistant-hero.jpg",
+    "webpRel": "/images/pages/medical-assistant-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/medical-assistant.jpg",
+    "webp": "public/images/pages/medical-assistant.webp",
+    "origRel": "/images/pages/medical-assistant.jpg",
+    "webpRel": "/images/pages/medical-assistant.webp"
+  },
+  {
+    "orig": "public/images/pages/mentorship-page-11.jpg",
+    "webp": "public/images/pages/mentorship-page-11.webp",
+    "origRel": "/images/pages/mentorship-page-11.jpg",
+    "webpRel": "/images/pages/mentorship-page-11.webp"
+  },
+  {
+    "orig": "public/images/pages/mentorship-page-3.jpg",
+    "webp": "public/images/pages/mentorship-page-3.webp",
+    "origRel": "/images/pages/mentorship-page-3.jpg",
+    "webpRel": "/images/pages/mentorship-page-3.webp"
+  },
+  {
+    "orig": "public/images/pages/micro-programs.jpg",
+    "webp": "public/images/pages/micro-programs.webp",
+    "origRel": "/images/pages/micro-programs.jpg",
+    "webpRel": "/images/pages/micro-programs.webp"
+  },
+  {
+    "orig": "public/images/pages/mobile-app-page-1.jpg",
+    "webp": "public/images/pages/mobile-app-page-1.webp",
+    "origRel": "/images/pages/mobile-app-page-1.jpg",
+    "webpRel": "/images/pages/mobile-app-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/ojt-and-funding-page-1.jpg",
+    "webp": "public/images/pages/ojt-and-funding-page-1.webp",
+    "origRel": "/images/pages/ojt-and-funding-page-1.jpg",
+    "webpRel": "/images/pages/ojt-and-funding-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/partner-page-14.jpg",
+    "webp": "public/images/pages/partner-page-14.webp",
+    "origRel": "/images/pages/partner-page-14.jpg",
+    "webpRel": "/images/pages/partner-page-14.webp"
+  },
+  {
+    "orig": "public/images/pages/partner-page-7.jpg",
+    "webp": "public/images/pages/partner-page-7.webp",
+    "origRel": "/images/pages/partner-page-7.jpg",
+    "webpRel": "/images/pages/partner-page-7.webp"
+  },
+  {
+    "orig": "public/images/pages/partners-pub-page-1.jpg",
+    "webp": "public/images/pages/partners-pub-page-1.webp",
+    "origRel": "/images/pages/partners-pub-page-1.jpg",
+    "webpRel": "/images/pages/partners-pub-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/pathways-page-10.jpg",
+    "webp": "public/images/pages/pathways-page-10.webp",
+    "origRel": "/images/pages/pathways-page-10.jpg",
+    "webpRel": "/images/pages/pathways-page-10.webp"
+  },
+  {
+    "orig": "public/images/pages/pathways-page-6.jpg",
+    "webp": "public/images/pages/pathways-page-6.webp",
+    "origRel": "/images/pages/pathways-page-6.jpg",
+    "webpRel": "/images/pages/pathways-page-6.webp"
+  },
+  {
+    "orig": "public/images/pages/pathways.jpg",
+    "webp": "public/images/pages/pathways.webp",
+    "origRel": "/images/pages/pathways.jpg",
+    "webpRel": "/images/pages/pathways.webp"
+  },
+  {
+    "orig": "public/images/pages/platform-page-10.jpg",
+    "webp": "public/images/pages/platform-page-10.webp",
+    "origRel": "/images/pages/platform-page-10.jpg",
+    "webpRel": "/images/pages/platform-page-10.webp"
+  },
+  {
+    "orig": "public/images/pages/platform-page-12.jpg",
+    "webp": "public/images/pages/platform-page-12.webp",
+    "origRel": "/images/pages/platform-page-12.jpg",
+    "webpRel": "/images/pages/platform-page-12.webp"
+  },
+  {
+    "orig": "public/images/pages/prog-hero-main-2.jpg",
+    "webp": "public/images/pages/prog-hero-main-2.webp",
+    "origRel": "/images/pages/prog-hero-main-2.jpg",
+    "webpRel": "/images/pages/prog-hero-main-2.webp"
+  },
+  {
+    "orig": "public/images/pages/programs-admin-attendance-hero.jpg",
+    "webp": "public/images/pages/programs-admin-attendance-hero.webp",
+    "origRel": "/images/pages/programs-admin-attendance-hero.jpg",
+    "webpRel": "/images/pages/programs-admin-attendance-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/programs-admin-students-hero.jpg",
+    "webp": "public/images/pages/programs-admin-students-hero.webp",
+    "origRel": "/images/pages/programs-admin-students-hero.jpg",
+    "webpRel": "/images/pages/programs-admin-students-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/programs-cdl-waitlist-hero.jpg",
+    "webp": "public/images/pages/programs-cdl-waitlist-hero.webp",
+    "origRel": "/images/pages/programs-cdl-waitlist-hero.jpg",
+    "webpRel": "/images/pages/programs-cdl-waitlist-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/programs-electrical-apply-hero.jpg",
+    "webp": "public/images/pages/programs-electrical-apply-hero.webp",
+    "origRel": "/images/pages/programs-electrical-apply-hero.jpg",
+    "webpRel": "/images/pages/programs-electrical-apply-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/programs-hvac-curriculum-hero.jpg",
+    "webp": "public/images/pages/programs-hvac-curriculum-hero.webp",
+    "origRel": "/images/pages/programs-hvac-curriculum-hero.jpg",
+    "webpRel": "/images/pages/programs-hvac-curriculum-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/programs-medical-apply-d2.jpg",
+    "webp": "public/images/pages/programs-medical-apply-d2.webp",
+    "origRel": "/images/pages/programs-medical-apply-d2.jpg",
+    "webpRel": "/images/pages/programs-medical-apply-d2.webp"
+  },
+  {
+    "orig": "public/images/pages/resources-page-1.jpg",
+    "webp": "public/images/pages/resources-page-1.webp",
+    "origRel": "/images/pages/resources-page-1.jpg",
+    "webpRel": "/images/pages/resources-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/rise-foundation-page-2.jpg",
+    "webp": "public/images/pages/rise-foundation-page-2.webp",
+    "origRel": "/images/pages/rise-foundation-page-2.jpg",
+    "webpRel": "/images/pages/rise-foundation-page-2.webp"
+  },
+  {
+    "orig": "public/images/pages/share-page-1.jpg",
+    "webp": "public/images/pages/share-page-1.webp",
+    "origRel": "/images/pages/share-page-1.jpg",
+    "webpRel": "/images/pages/share-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/store-compliance-ferpa-hero.jpg",
+    "webp": "public/images/pages/store-compliance-ferpa-hero.webp",
+    "origRel": "/images/pages/store-compliance-ferpa-hero.jpg",
+    "webpRel": "/images/pages/store-compliance-ferpa-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/store-licenses-checkout-hero.jpg",
+    "webp": "public/images/pages/store-licenses-checkout-hero.webp",
+    "origRel": "/images/pages/store-licenses-checkout-hero.jpg",
+    "webpRel": "/images/pages/store-licenses-checkout-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/store-licenses-success-hero.jpg",
+    "webp": "public/images/pages/store-licenses-success-hero.webp",
+    "origRel": "/images/pages/store-licenses-success-hero.jpg",
+    "webpRel": "/images/pages/store-licenses-success-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/store-success-hero.jpg",
+    "webp": "public/images/pages/store-success-hero.webp",
+    "origRel": "/images/pages/store-success-hero.jpg",
+    "webpRel": "/images/pages/store-success-hero.webp"
+  },
+  {
+    "orig": "public/images/pages/student-portal-page-2.jpg",
+    "webp": "public/images/pages/student-portal-page-2.webp",
+    "origRel": "/images/pages/student-portal-page-2.jpg",
+    "webpRel": "/images/pages/student-portal-page-2.webp"
+  },
+  {
+    "orig": "public/images/pages/student-portal-page-9.jpg",
+    "webp": "public/images/pages/student-portal-page-9.webp",
+    "origRel": "/images/pages/student-portal-page-9.jpg",
+    "webpRel": "/images/pages/student-portal-page-9.webp"
+  },
+  {
+    "orig": "public/images/pages/student-support-page-1.jpg",
+    "webp": "public/images/pages/student-support-page-1.webp",
+    "origRel": "/images/pages/student-support-page-1.jpg",
+    "webpRel": "/images/pages/student-support-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/supersonic-page-3.jpg",
+    "webp": "public/images/pages/supersonic-page-3.webp",
+    "origRel": "/images/pages/supersonic-page-3.jpg",
+    "webpRel": "/images/pages/supersonic-page-3.webp"
+  },
+  {
+    "orig": "public/images/pages/supersonic-page-4.jpg",
+    "webp": "public/images/pages/supersonic-page-4.webp",
+    "origRel": "/images/pages/supersonic-page-4.jpg",
+    "webpRel": "/images/pages/supersonic-page-4.webp"
+  },
+  {
+    "orig": "public/images/pages/supersonic-tax-cert.jpg",
+    "webp": "public/images/pages/supersonic-tax-cert.webp",
+    "origRel": "/images/pages/supersonic-tax-cert.jpg",
+    "webpRel": "/images/pages/supersonic-tax-cert.webp"
+  },
+  {
+    "orig": "public/images/pages/training-cohort.jpg",
+    "webp": "public/images/pages/training-cohort.webp",
+    "origRel": "/images/pages/training-cohort.jpg",
+    "webpRel": "/images/pages/training-cohort.webp"
+  },
+  {
+    "orig": "public/images/pages/training-page-3.jpg",
+    "webp": "public/images/pages/training-page-3.webp",
+    "origRel": "/images/pages/training-page-3.jpg",
+    "webpRel": "/images/pages/training-page-3.webp"
+  },
+  {
+    "orig": "public/images/pages/tuition-fees-page-1.jpg",
+    "webp": "public/images/pages/tuition-fees-page-1.webp",
+    "origRel": "/images/pages/tuition-fees-page-1.jpg",
+    "webpRel": "/images/pages/tuition-fees-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/welding.jpg",
+    "webp": "public/images/pages/welding.webp",
+    "origRel": "/images/pages/welding.jpg",
+    "webpRel": "/images/pages/welding.webp"
+  },
+  {
+    "orig": "public/images/pages/workforce-board-page-1.jpg",
+    "webp": "public/images/pages/workforce-board-page-1.webp",
+    "origRel": "/images/pages/workforce-board-page-1.jpg",
+    "webpRel": "/images/pages/workforce-board-page-1.webp"
+  },
+  {
+    "orig": "public/images/pages/workone-packet-1.jpg",
+    "webp": "public/images/pages/workone-packet-1.webp",
+    "origRel": "/images/pages/workone-packet-1.jpg",
+    "webpRel": "/images/pages/workone-packet-1.webp"
+  },
+  {
+    "orig": "public/images/partners/hero.jpg",
+    "webp": "public/images/partners/hero.webp",
+    "origRel": "/images/partners/hero.jpg",
+    "webpRel": "/images/partners/hero.webp"
+  },
+  {
+    "orig": "public/images/programs/workforce-readiness-hero.jpg",
+    "webp": "public/images/programs/workforce-readiness-hero.webp",
+    "origRel": "/images/programs/workforce-readiness-hero.jpg",
+    "webpRel": "/images/programs/workforce-readiness-hero.webp"
+  },
+  {
+    "orig": "public/images/team/elizabeth-greene.jpg",
+    "webp": "public/images/team/elizabeth-greene.webp",
+    "origRel": "/images/team/elizabeth-greene.jpg",
+    "webpRel": "/images/team/elizabeth-greene.webp"
+  },
+  {
+    "orig": "public/images/testimonials/employer-2.jpg",
+    "webp": "public/images/testimonials/employer-2.webp",
+    "origRel": "/images/testimonials/employer-2.jpg",
+    "webpRel": "/images/testimonials/employer-2.webp"
+  },
+  {
+    "orig": "public/images/trades/hero-program-electrical.jpg",
+    "webp": "public/images/trades/hero-program-electrical.webp",
+    "origRel": "/images/trades/hero-program-electrical.jpg",
+    "webpRel": "/images/trades/hero-program-electrical.webp"
+  },
+  {
+    "orig": "public/images/trades/hero-program-plumbing.jpg",
+    "webp": "public/images/trades/hero-program-plumbing.webp",
+    "origRel": "/images/trades/hero-program-plumbing.jpg",
+    "webpRel": "/images/trades/hero-program-plumbing.webp"
+  },
+  {
+    "orig": "public/og-default.jpg",
+    "webp": "public/og-default.webp",
+    "origRel": "/og-default.jpg",
+    "webpRel": "/og-default.webp"
+  },
+  {
+    "orig": "public/what-we-do-hero.jpg",
+    "webp": "public/what-we-do-hero.webp",
+    "origRel": "/what-we-do-hero.jpg",
+    "webpRel": "/what-we-do-hero.webp"
+  }
+]

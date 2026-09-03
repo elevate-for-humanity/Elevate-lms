@@ -1,0 +1,461 @@
+import type { ModuleSeed } from '../../../lib/curriculum/course-builder-types';
+
+export const module2: ModuleSeed = {
+  slug: 'barber-module-2',
+  title: 'Module 2: Hair Science & Scalp Analysis',
+  order: 2,
+  objective:
+    'Apply hair science and scalp analysis to guide service decisions and client consultations.',
+  lessons: [
+    {
+      slug: 'barber-lesson-8',
+      title: 'Structure of the Hair and Scalp',
+      durationMin: 20,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.25,
+      content:
+        'The hair shaft has three layers. Cuticle: outermost layer — overlapping scales that protect the cortex, determines shine and porosity. Cortex: middle layer — contains melanin (color) and keratin (strength). Medulla: inner core — not always present, more common in coarse hair.\n\nThe scalp has five layers: skin, connective tissue, aponeurosis, loose connective tissue, and periosteum. Hair follicles are embedded in the dermis. Each follicle produces one hair strand. Sebaceous glands produce sebum, which lubricates the hair and scalp.',
+      competencyChecks: [
+        {
+          id: 'hair-shaft-layers',
+          type: 'KNOWLEDGE',
+          description: 'Names the three layers of the hair shaft and states the function of each',
+          required: true,
+        },
+        {
+          id: 'follicle-function',
+          type: 'KNOWLEDGE',
+          description: 'Identifies the follicle and explains its role in hair growth',
+          required: true,
+        },
+        {
+          id: 'cuticle-service-impact',
+          type: 'KNOWLEDGE',
+          description:
+            'Explains how cuticle condition affects service outcomes and product selection',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-9',
+      title: 'Hair Growth Cycle',
+      durationMin: 15,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.25,
+      content:
+        'The hair growth cycle has three phases. Anagen: active growth phase — lasts 2–7 years, 85–90% of hair at any time. Catagen: transition phase — hair detaches from follicle, lasts 2–3 weeks. Telogen: resting/shedding phase — lasts 3–4 months, normal to shed 50–100 hairs per day.\n\nClients often worry about shedding. Explain that telogen shedding is normal. Excessive shedding may indicate stress, nutrition, or medical issues — refer to a physician.',
+      competencyChecks: [
+        {
+          id: 'three-phases',
+          type: 'KNOWLEDGE',
+          description:
+            'Names and describes all three phases of the hair growth cycle with correct durations',
+          required: true,
+        },
+        {
+          id: 'anagen-percentage',
+          type: 'KNOWLEDGE',
+          description: 'States what percentage of hair is in anagen at any given time (85–90%)',
+          required: true,
+        },
+        {
+          id: 'shedding-referral',
+          type: 'KNOWLEDGE',
+          description:
+            'Identifies when to refer a client for excessive shedding vs normal telogen loss',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-10',
+      title: 'Hair Texture, Density & Porosity',
+      durationMin: 20,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.25,
+      content:
+        "Texture: diameter of the individual hair strand — fine, medium, or coarse. Density: number of hairs per square inch on the scalp. Porosity: hair's ability to absorb and retain moisture.\n\nDecision logic: Fine hair — use lighter pressure, avoid over-thinning, choose softer lines. Coarse hair — use firmer tension, expect more resistance, check blend frequently. High porosity — product absorbs fast, apply evenly and work quickly. Low porosity — product may sit on top, use heat or steam to open cuticle.",
+      competencyChecks: [
+        {
+          id: 'texture-assessment',
+          type: 'TECHNIQUE',
+          description:
+            'Assesses hair texture by feel and visual inspection and names the result correctly',
+          required: true,
+        },
+        {
+          id: 'porosity-identification',
+          type: 'KNOWLEDGE',
+          description: 'Identifies high vs low porosity and explains the difference in behavior',
+          required: true,
+        },
+        {
+          id: 'technique-adjustment',
+          type: 'TECHNIQUE',
+          description:
+            'Adjusts technique based on texture and density findings — not a one-size approach',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-11',
+      title: 'Scalp Conditions & Disorders',
+      durationMin: 20,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.25,
+      content:
+        'Common scalp conditions: Dandruff (Pityriasis) — dry flaking, service allowed. Seborrheic Dermatitis — oily flaking and redness, service with caution, refer if severe. Tinea Capitis (Ringworm) — fungal infection, DO NOT SERVICE, refer immediately. Psoriasis — thick silvery scales, service allowed unless open lesions present. Alopecia — hair loss, service allowed, refer to physician for diagnosis.\n\nStop condition: If you observe open lesions, active infection, or contagious scalp conditions — stop the consultation and refer the client to a physician. Do not perform the service.',
+      competencyChecks: [
+        {
+          id: 'five-conditions',
+          type: 'KNOWLEDGE',
+          description:
+            'Identifies at least 5 common scalp conditions and states service status for each',
+          required: true,
+        },
+        {
+          id: 'referral-identification',
+          type: 'SAFETY',
+          description:
+            'Correctly identifies which conditions require immediate referral to a physician',
+          required: true,
+        },
+        {
+          id: 'stop-condition',
+          type: 'SAFETY',
+          description:
+            'Stops service when a contraindicated scalp condition is observed — no exceptions',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-12',
+      title: 'Client Consultation',
+      durationMin: 20,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.25,
+      content:
+        'Consultation sequence: Greet the client and introduce yourself. Ask about the desired service and any specific concerns. Inspect the scalp and hair for contraindications before touching. Confirm the service plan and set realistic expectations. Ask about allergies, sensitivities, or recent chemical services. Document findings if required by shop protocol.\n\nScreen for: open cuts, abrasions, or active skin conditions; recent chemical services; sensitivity to products, razors, or heat; medical conditions affecting the scalp or hair.',
+      competencyChecks: [
+        {
+          id: 'consult-before-touch',
+          type: 'PROCEDURE',
+          description: 'Completes consultation before touching the client — never skips this step',
+          required: true,
+        },
+        {
+          id: 'contraindication-screen',
+          type: 'SAFETY',
+          description: 'Screens for contraindications during consultation and acts on findings',
+          required: true,
+        },
+        {
+          id: 'service-plan-confirm',
+          type: 'PROCEDURE',
+          description: 'Confirms service plan with client before beginning',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-13',
+      title: 'Shampoo & Scalp Massage',
+      durationMin: 15,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.25,
+      content:
+        'Shampoo procedure: Drape client with neck strip and cape. Wet hair thoroughly with warm water. Apply shampoo and work into a lather using fingertip (not fingernail) pressure. Rinse thoroughly — no product residue. Apply conditioner if needed, process, and rinse. Towel dry gently.\n\nScalp massage: Use the pads of the fingers, not the nails. Apply firm but gentle rotary movements across the scalp. Massage stimulates circulation and relaxes the client. Stop immediately if the client reports discomfort.\n\nSanitation: Use clean towels for every client. Disinfect shampoo bowl between clients.',
+      competencyChecks: [
+        {
+          id: 'drape-before-shampoo',
+          type: 'PROCEDURE',
+          description: 'Drapes client correctly with neck strip and cape before shampooing',
+          required: true,
+        },
+        {
+          id: 'fingertip-pressure',
+          type: 'TECHNIQUE',
+          description: 'Uses fingertip pressure — not fingernails — throughout shampoo and massage',
+          required: true,
+        },
+        {
+          id: 'thorough-rinse',
+          type: 'TECHNIQUE',
+          description: 'Rinses thoroughly with no product residue remaining',
+          required: true,
+        },
+        {
+          id: 'bowl-disinfection',
+          type: 'SANITATION',
+          description: 'Disinfects shampoo bowl between clients',
+          required: true,
+        },
+      ],
+    },
+    // ── Science Foundations orphan lessons ──────────────────────────────────
+    {
+      slug: 'barber-anatomy-physiology-for-barbers',
+      title: 'Anatomy & Physiology for Barbers',
+      durationMin: 45,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.75,
+      curriculumChapter: 'Barbering Ch. 2 — General Anatomy & Physiology',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'anat-systems',
+          type: 'KNOWLEDGE',
+          description:
+            'Identifies body systems relevant to barbering services (integumentary, muscular, skeletal, circulatory)',
+          required: true,
+        },
+        {
+          id: 'anat-facial-muscles',
+          type: 'KNOWLEDGE',
+          description: 'Names the primary facial muscles affected by shaving and massage services',
+          required: true,
+        },
+        {
+          id: 'anat-nerves',
+          type: 'KNOWLEDGE',
+          description: 'Identifies cranial nerves relevant to facial services',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-skin-structure-growth',
+      title: 'Skin Structure & Growth',
+      durationMin: 45,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.75,
+      curriculumChapter: 'Barbering Ch. 3 — Skin Structure and Growth',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'skin-layers',
+          type: 'KNOWLEDGE',
+          description: 'Identifies the three layers of the skin and their functions',
+          required: true,
+        },
+        {
+          id: 'skin-appendages',
+          type: 'KNOWLEDGE',
+          description:
+            'Describes skin appendages including sebaceous glands, sweat glands, and hair follicles',
+          required: true,
+        },
+        {
+          id: 'skin-fitzpatrick',
+          type: 'KNOWLEDGE',
+          description: 'Explains the Fitzpatrick scale and its relevance to chemical services',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-skin-disorders-diseases',
+      title: 'Skin Disorders & Diseases',
+      durationMin: 45,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.75,
+      curriculumChapter: 'Barbering Ch. 4 — Skin Disorders and Diseases',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'skin-contraindications',
+          type: 'SAFETY',
+          description: 'Identifies skin conditions that contraindicate barbering services',
+          required: true,
+        },
+        {
+          id: 'skin-contagious',
+          type: 'SAFETY',
+          description: 'Distinguishes between contagious and non-contagious skin conditions',
+          required: true,
+        },
+        {
+          id: 'skin-referral',
+          type: 'KNOWLEDGE',
+          description: 'Describes when to refer a client to a physician for skin conditions',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-principles-of-hair-design',
+      title: 'Principles of Hair Design',
+      durationMin: 45,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.75,
+      curriculumChapter: 'Barbering Ch. 7 — Principles of Hair Design',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'design-elements',
+          type: 'KNOWLEDGE',
+          description:
+            'Identifies the five elements of hair design: line, form, space, texture, color',
+          required: true,
+        },
+        {
+          id: 'design-principles',
+          type: 'KNOWLEDGE',
+          description: 'Explains design principles: proportion, balance, rhythm, emphasis, harmony',
+          required: true,
+        },
+        {
+          id: 'design-face-shapes',
+          type: 'KNOWLEDGE',
+          description: 'Recommends appropriate styles for the seven face shapes',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-electricity-electrical-safety',
+      title: 'Electricity & Electrical Safety',
+      durationMin: 45,
+      domain: 'SAFETY_SANITATION',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.75,
+      curriculumChapter: 'Foundations Ch. 7 — Electricity & Electrical Safety',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'elec-types',
+          type: 'KNOWLEDGE',
+          description: 'Distinguishes between AC and DC current and their barbering applications',
+          required: true,
+        },
+        {
+          id: 'elec-safety',
+          type: 'SAFETY',
+          description:
+            'Identifies electrical safety practices to prevent shock and fire in the barbershop',
+          required: true,
+        },
+        {
+          id: 'elec-modalities',
+          type: 'KNOWLEDGE',
+          description: 'Describes galvanic, faradic, and sinusoidal current modalities',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-hair-loss-services',
+      title: 'Hair Loss Services & Treatment Protocols',
+      durationMin: 45,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'TECHNICAL_INSTRUCTION',
+      hoursCredit: 0.75,
+      curriculumChapter: 'Barbering Ch. 16 — Hair Loss Services',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'hair-loss-types',
+          type: 'KNOWLEDGE',
+          description: 'Identifies the four primary types of hair loss and their causes',
+          required: true,
+        },
+        {
+          id: 'hair-loss-scope',
+          type: 'KNOWLEDGE',
+          description: 'Describes the Indiana barber scope of practice for hair loss services',
+          required: true,
+        },
+        {
+          id: 'hair-loss-referral',
+          type: 'KNOWLEDGE',
+          description: 'Identifies conditions requiring physician referral',
+          required: true,
+        },
+      ],
+    },
+  ],
+  checkpoint: {
+    slug: 'barber-module-2-checkpoint',
+    title: 'Hair Science Checkpoint',
+    durationMin: 20,
+    domain: 'HAIR_SCALP',
+    ojtCategory: 'ASSESSMENT',
+    hoursCredit: 0.25,
+    passingScore: 70,
+    questions: [
+      {
+        prompt: 'Which layer of the hair shaft contains melanin and keratin?',
+        choices: ['Cuticle', 'Cortex', 'Medulla', 'Follicle'],
+        answerIndex: 1,
+        rationale:
+          'The cortex is the middle layer and contains both melanin (color) and keratin (strength).',
+      },
+      {
+        prompt: 'During which phase does hair actively grow?',
+        choices: ['Telogen', 'Catagen', 'Anagen', 'Exogen'],
+        answerIndex: 2,
+        rationale: 'Anagen is the active growth phase, lasting 2–7 years.',
+      },
+      {
+        prompt: 'A client has tinea capitis. What is the correct action?',
+        choices: [
+          'Proceed with the service using gloves',
+          'Apply antifungal shampoo and continue',
+          'Refuse the service and refer to a physician',
+          'Use a stronger disinfectant on tools after',
+        ],
+        answerIndex: 2,
+        rationale:
+          'Tinea capitis is a contagious fungal infection. Service must be refused and the client referred.',
+      },
+      {
+        prompt: 'Hair with high porosity will:',
+        choices: [
+          'Resist moisture absorption',
+          'Absorb moisture quickly but lose it fast',
+          'Always be coarse in texture',
+          'Require no product',
+        ],
+        answerIndex: 1,
+        rationale:
+          'High porosity hair has an open or damaged cuticle — it absorbs quickly but cannot retain moisture well.',
+      },
+      {
+        prompt: 'What is the purpose of a client consultation before service?',
+        choices: [
+          'To upsell products',
+          'To assess needs, screen for contraindications, and confirm the service plan',
+          'To fill time before the appointment',
+          "To check the client's payment method",
+        ],
+        answerIndex: 1,
+        rationale:
+          'Consultation protects the client and the barber by identifying contraindications and setting expectations.',
+      },
+      {
+        prompt: 'Which describes hair density?',
+        choices: [
+          'The diameter of individual strands',
+          'The number of hairs per square inch',
+          'The ability to absorb moisture',
+          'The phase of the growth cycle',
+        ],
+        answerIndex: 1,
+        rationale: 'Density refers to how many hairs are present per square inch on the scalp.',
+      },
+    ],
+  },
+};

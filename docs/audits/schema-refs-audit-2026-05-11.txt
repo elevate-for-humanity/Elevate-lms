@@ -1,0 +1,8 @@
+=== Elevate LMS — Schema Reference Audit ===
+Code references: 934 unique tables
+Migration-defined tables: 1459
+
+Tables referenced in code but NOT defined in any migration (count >= 5):
+-----------------------------------------------------------------------
+
+Total gaps (>= 5 refs): 0

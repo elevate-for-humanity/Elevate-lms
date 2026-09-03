@@ -1,0 +1,42 @@
+import { NextRequest } from 'next/server';
+import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { safeInternalError } from '@/lib/api/safe-error';
+import { approveTask } from '@/lib/devstudio/os/task-runner';
+import { jsonOk, tableNotReadyResponse } from '@/lib/devstudio/os/api-helpers';
+import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+type RouteContext = { params: Promise<{ id: string }> };
+
+export async function POST(request: NextRequest, context: RouteContext) {
+  const rateLimited = await applyRateLimit(request, 'strict');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
+  const { id } = await context.params;
+
+  try {
+    const db = await requireAdminClient();
+    const tenantId = await resolveTenantIdForUser(auth.id).catch(() => null);
+    await approveTask(db, id, auth.id, {
+      actorRoles: auth.effectiveRoles,
+      tenantId,
+      requestHeaders: request.headers,
+      adminOrigin: request.nextUrl.origin,
+      appOrigin: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org',
+      approvalGranted: true,
+    });
+    const { data: task } = await db.from('ai_tasks').select('*').eq('id', id).single();
+    return jsonOk({ task, approved: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : '';
+    if (message.includes('not found')) return tableNotReadyResponse();
+    return safeInternalError(err, 'Failed to approve task');
+  }
+}

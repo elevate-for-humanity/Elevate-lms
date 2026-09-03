@@ -1,0 +1,3 @@
+Force rebuild trigger: Monday, Jun 29, 2026, 02:05:00
+Ensuring all 3 split containers pick up the surgical Dockerfiles.
+Logic sync: 115c099 (Green) + split-app.mjs (8GB Protection)

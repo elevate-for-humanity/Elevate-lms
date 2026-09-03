@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "branch": "consolidation/unified-platform",
+  "canonicalRepository": "elevate-for-humanity/Elevate-lms",
+  "donorRepositories": [],
+  "repositoryScope": {
+    "include": ["elevate-for-humanity/Elevate-lms"],
+    "exclude": ["elevateforhumanity/fix2"],
+    "rule": "Consolidate only implementations already present in Elevate-lms. Do not import, compare, merge, or depend on fix2."
+  },
+  "policy": {
+    "preserveFeaturesBeforeDeletion": true,
+    "requireFeatureParity": true,
+    "requireBuildBeforeDeletion": true,
+    "requireTypecheckBeforeDeletion": true,
+    "requireRouteVerificationBeforeDeletion": true,
+    "requireSchemaAuditBeforeDeletion": true,
+    "requireRlsAuditBeforeDeletion": true,
+    "requireRollbackPath": true
+  },
+  "canonicalDomains": {
+    "marketing": {"target": "apps/marketing", "status": "canonical"},
+    "admin": {"target": "apps/admin", "status": "canonical"},
+    "lms": {"target": "apps/lms", "status": "canonical"},
+    "platformApi": {"target": "apps/app", "status": "shared-backend"},
+    "courseBuilder": {"target": "scripts/course-builder + lib/course-builder + apps/admin/app/admin/course-builder", "status": "consolidate"},
+    "devStudio": {"target": "apps/admin/app/dev-studio + lib/devstudio", "status": "consolidate"},
+    "orchestrator": {"target": "components/OrchestratorAdmin.tsx + lib/autopilot + canonical worker", "status": "consolidate", "requiredEnv": ["NEXT_PUBLIC_AUTOPILOT_ORCHESTRATOR_URL"]},
+    "supabase": {"target": "supabase/migrations + shared Supabase clients", "status": "canonical", "project": "elevate"},
+    "cloudflare": {"target": "canonical Workers/KV/R2/DNS configuration", "status": "canonicalize"},
+    "northflankDocker": {"target": "Dockerfile + deployment health/build gates", "status": "canonicalize"},
+    "github": {"target": "elevate-for-humanity/Elevate-lms", "status": "canonical"},
+    "documentation": {"target": "README.md + docs/architecture + docs/operations", "status": "consolidate-last"},
+    "pluginsAndIntegrations": {"status": "preserve"}
+  },
+  "deletionGate": [
+    "inventory duplicate implementations inside Elevate-lms",
+    "identify unique capabilities",
+    "merge unique capabilities into canonical implementation",
+    "redirect all imports/routes/callers",
+    "run targeted tests",
+    "run typecheck and production build",
+    "run schema/RLS/integrity checks where applicable",
+    "record rollback commit",
+    "only then delete obsolete implementation"
+  ]
+}

@@ -1,0 +1,446 @@
+import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
+import { Metadata } from 'next';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ProgressDashboard } from '@/components/ProgressDashboard';
+import { ProgressTrackingDashboard } from '@/components/ProgressTrackingDashboard';
+import { LmsHeroBanner } from '@/components/lms/LmsHeroBanner';
+import {
+  TrendingUp,
+  Clock,
+  BookOpen,
+  Award,
+  Target,
+  Calendar,
+  ChevronRight,
+  Play,
+} from 'lucide-react';
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/lms/progress',
+  },
+  title: 'My Progress | Student Portal',
+  description: 'Track your learning progress, completed lessons, and achievements.',
+};
+
+export const dynamic = 'force-dynamic';
+
+export default async function ProgressPage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  let enrollments: any[] = [];
+  let recentActivity: any[] = [];
+  const stats = {
+    totalCourses: 0,
+    completedCourses: 0,
+    totalLessons: 0,
+    completedLessons: 0,
+    totalHours: 0,
+    streak: 0,
+  };
+
+  try {
+    // Get enrollments
+    const { data: enrollmentData } = await supabase
+      .from('program_enrollments')
+      .select(
+        'id, status, progress_percent, course_id, program_id, updated_at, completed_lessons, enrolled_at',
+      )
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false });
+
+    if (enrollmentData) {
+      // Hydrate course details separately (no FK on program_enrollments.course_id)
+      const courseIds = [...new Set(enrollmentData.map((e) => e.course_id).filter(Boolean))];
+      const { data: coursesData } = courseIds.length
+        ? await supabase
+            .from('courses')
+            .select('id, title, description, thumbnail_url, total_lessons, duration_hours')
+            .in('id', courseIds)
+        : { data: [] };
+      const courseMap = Object.fromEntries((coursesData || []).map((c) => [c.id, c]));
+
+      enrollments = enrollmentData.map((e) => ({ ...e, courses: courseMap[e.course_id] ?? null }));
+      stats.totalCourses = enrollments.length;
+      stats.completedCourses = enrollments.filter((e) => e.status === 'completed').length;
+
+      enrollments.forEach((e) => {
+        stats.totalLessons += e.courses?.total_lessons || 0;
+        stats.completedLessons += e.completed_lessons || 0;
+        stats.totalHours += e.courses?.duration_hours || 0;
+      });
+    }
+
+    // Get recent progress activity (student_progress has no FK to courses/lessons)
+    const { data: progressData } = await supabase
+      .from('student_progress')
+      .select(
+        'id, course_id, lesson_id, progress_percentage, completed, last_accessed_at, updated_at',
+      )
+      .eq('student_id', user.id)
+      .order('updated_at', { ascending: false })
+      .limit(10);
+
+    if (progressData) {
+      // Hydrate course titles
+      const pCourseIds = [...new Set(progressData.map((p) => p.course_id).filter(Boolean))];
+      const { data: pCourses } = pCourseIds.length
+        ? await supabase.from('courses').select('id, title').in('id', pCourseIds)
+        : { data: [] };
+      const pCourseMap = Object.fromEntries((pCourses || []).map((c) => [c.id, c]));
+
+      recentActivity = progressData.map((p) => ({
+        ...p,
+        courses: pCourseMap[p.course_id] ?? null,
+        lessons: null, // lesson title lookup omitted — lesson_id references curriculum_lessons
+      }));
+    }
+
+    // Calculate streak (days of consecutive activity)
+    const { data: activityDates } = await supabase
+      .from('student_progress')
+      .select('updated_at')
+      .eq('student_id', user.id)
+      .order('updated_at', { ascending: false })
+      .limit(30);
+
+    if (activityDates && activityDates.length > 0) {
+      let streak = 1;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const firstActivity = activityDates[0];
+      if (!firstActivity) throw new Error('ACTIVITY_DATE_MISSING');
+      const lastActivity = new Date(firstActivity.updated_at);
+      lastActivity.setHours(0, 0, 0, 0);
+
+      // Check if last activity was today or yesterday
+      const diffDays = Math.floor(
+        (today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24),
+      );
+      if (diffDays <= 1) {
+        for (let i = 1; i < activityDates.length; i++) {
+          const currentActivity = activityDates[i];
+          const previousActivity = activityDates[i - 1];
+          if (!currentActivity || !previousActivity) continue;
+          const current = new Date(currentActivity.updated_at);
+          const prev = new Date(previousActivity.updated_at);
+          current.setHours(0, 0, 0, 0);
+          prev.setHours(0, 0, 0, 0);
+
+          const dayDiff = Math.floor((prev.getTime() - current.getTime()) / (1000 * 60 * 60 * 24));
+          if (dayDiff === 1) {
+            streak++;
+          } else if (dayDiff > 1) {
+            break;
+          }
+        }
+        stats.streak = streak;
+      }
+    }
+  } catch (error) {
+    logger.error('Error', normalizeError(error, 'Failed to load progress'), getErrorContext(error));
+  }
+
+  // Calculate overall progress percentage
+  const overallProgress =
+    stats.totalLessons > 0 ? Math.round((stats.completedLessons / stats.totalLessons) * 100) : 0;
+
+  // Format relative time
+  const formatTimeAgo = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
+
+  return (
+    <div className="min-h-screen bg-white py-8">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Progress' }]} />
+      </div>
+      <div className="max-w-7xl mx-auto px-4">
+        <LmsHeroBanner
+          title="My Progress"
+          subtitle={`${stats.completedLessons} lessons completed across ${stats.totalCourses} courses. ${overallProgress}% overall completion.`}
+          image="/images/pages/career-services-page-7.webp"
+          eyebrow="Learning Analytics"
+          cta={{ label: 'Continue Learning', href: '/lms/courses' }}
+        />
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-brand-blue-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-slate-900">{stats.totalCourses}</div>
+                <div className="text-xs text-slate-600">Courses</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
+                <span className="text-slate-400 flex-shrink-0">•</span>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-slate-900">{stats.completedCourses}</div>
+                <div className="text-xs text-slate-600">Completed</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-brand-blue-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-slate-900">{stats.completedLessons}</div>
+                <div className="text-xs text-slate-600">Lessons Done</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-brand-orange-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-slate-900">{stats.totalHours}</div>
+                <div className="text-xs text-slate-600">Hours</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-brand-red-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-slate-900">{overallProgress}%</div>
+                <div className="text-xs text-slate-600">Overall</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <Award aria-label="award" className="w-5 h-5 text-yellow-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-slate-900">{stats.streak}</div>
+                <div className="text-xs text-slate-600">Day Streak</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Course Progress */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+              <div className="p-6 border-b border-slate-200">
+                <h2 className="text-xl font-bold text-slate-900">Course Progress</h2>
+              </div>
+
+              {enrollments.length > 0 ? (
+                <div className="divide-y divide-slate-200">
+                  {enrollments.map((enrollment) => {
+                    const progress =
+                      enrollment.courses?.total_lessons > 0
+                        ? Math.round(
+                            ((enrollment.completed_lessons || 0) /
+                              enrollment.courses.total_lessons) *
+                              100,
+                          )
+                        : 0;
+
+                    return (
+                      <Link
+                        key={enrollment.id}
+                        href={`/lms/courses/${enrollment.course_id}`}
+                        className="block p-6 hover:bg-white transition"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                            {enrollment.courses?.thumbnail_url ? (
+                              <Image
+                                alt={enrollment.courses.title || 'Course thumbnail'}
+                                src={enrollment.courses.thumbnail_url}
+                                fill
+                                className="object-cover rounded-xl"
+                                sizes="64px"
+                                
+                              />
+                            ) : (
+                              <BookOpen className="w-8 h-8 text-slate-400" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="font-bold text-slate-900 truncate">
+                                {enrollment.courses?.title || 'Course'}
+                              </h3>
+                              <span
+                                className={`px-2 py-1 rounded text-xs font-medium ${
+                                  enrollment.status === 'completed'
+                                    ? 'bg-brand-green-100 text-brand-green-700'
+                                    : 'bg-brand-blue-100 text-brand-blue-700'
+                                }`}
+                              >
+                                {enrollment.status === 'completed' ? 'Completed' : 'In Progress'}
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-600 mb-3">
+                              {enrollment.completed_lessons || 0} of{' '}
+                              {enrollment.courses?.total_lessons || 0} lessons completed
+                            </p>
+                            <div className="flex items-center gap-4">
+                              <div className="flex-1">
+                                <div className="h-2 bg-white rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full rounded-full ${
+                                      progress === 100 ? 'bg-brand-green-500' : 'bg-brand-blue-500'
+                                    }`}
+                                    style={{ width: `${progress}%` }}
+                                  />
+                                </div>
+                              </div>
+                              <span className="text-sm font-medium text-slate-700 w-12 text-right">
+                                {progress}%
+                              </span>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-slate-400 flex-shrink-0" />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="p-16 text-center">
+                  <BookOpen className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">No Courses Yet</h3>
+                  <p className="text-slate-600 mb-6">
+                    Enroll in courses to start tracking your progress.
+                  </p>
+                  <Link
+                    href="/lms/courses"
+                    className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
+                  >
+                    Browse Courses
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Recent Activity */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6">
+              <h3 className="font-bold text-slate-900 mb-4">Recent Activity</h3>
+
+              {recentActivity.length > 0 ? (
+                <div className="space-y-4">
+                  {recentActivity.slice(0, 5).map((activity, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-brand-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Play className="w-4 h-4 text-brand-green-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-slate-900 truncate">
+                          {activity.lessons?.title || 'Lesson'}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {activity.courses?.title} • {formatTimeAgo(activity.updated_at)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-600 text-center py-4">No recent activity</p>
+              )}
+            </div>
+
+            {/* Learning Streak */}
+            <div className="bg-brand-orange-500 rounded-2xl p-6 text-white">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Award aria-label="award" className="w-8 h-8" />
+                </div>
+                <div>
+                  <div className="text-4xl font-black">{stats.streak}</div>
+                  <div className="text-brand-orange-100">Day Streak</div>
+                </div>
+              </div>
+              <p className="text-sm text-brand-orange-100">
+                {stats.streak > 0
+                  ? "Keep it up! You're on a roll!"
+                  : 'Start learning today to build your streak!'}
+              </p>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-6">
+              <h3 className="font-bold text-slate-900 mb-4">Quick Actions</h3>
+              <div className="space-y-2">
+                <Link
+                  href="/lms/courses"
+                  className="block w-full text-center bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition"
+                >
+                  Continue Learning
+                </Link>
+                <Link
+                  href="/lms/certificates"
+                  className="block w-full text-center border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-white transition"
+                >
+                  View Certificates
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Dashboard */}
+          <div className="mt-8">
+            <ProgressDashboard userId={user.id} />
+          </div>
+
+          {/* Progress Tracking */}
+          <div className="mt-8">
+            <ProgressTrackingDashboard />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

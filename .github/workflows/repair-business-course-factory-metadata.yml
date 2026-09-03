@@ -1,0 +1,33 @@
+name: Course Factory Metadata Contract
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/course-factory/**'
+      - 'scripts/check-course-factory-authority.mjs'
+      - '.github/workflows/repair-business-course-factory-metadata.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  metadata-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify canonical Course Factory ownership
+        run: node scripts/check-course-factory-authority.mjs
+      - name: Verify metadata normalization remains in the canonical publisher
+        shell: bash
+        run: |
+          grep -F "duration_hours: totalDurationMinutes / 60" lib/course-factory/publisher.ts
+          grep -F "passing_score: passingScore" lib/course-factory/publisher.ts
+          grep -F "generation_progress: 100" lib/course-factory/publisher.ts
+          grep -F "total_lessons:" lib/course-factory/publisher.ts
+          grep -F "Canonical course metadata normalization failed" lib/course-factory/publisher.ts

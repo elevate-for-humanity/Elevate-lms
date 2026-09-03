@@ -1,0 +1,16 @@
+app/api/admin/courses/[courseId]/quiz/route.ts
+app/api/admin/courses/ai-builder/route.ts
+app/api/admin/courses/ingest/route.ts
+app/api/ai-studio/generate-avatar/route.ts
+app/api/chat/message/route.ts
+app/api/courses/[courseId]/route.ts
+app/api/courses/authoring/route.ts
+app/api/courses/authoring/save/route.ts
+app/api/courses/create/route.ts
+app/api/courses/save/route.ts
+app/api/cron/weekly-reminders/route.ts
+app/api/enroll/auto/route.ts
+app/api/notifications/broadcast/route.ts
+app/api/push/send/route.ts
+app/api/stripe/webhook/route.ts
+app/api/studio/share/route.ts

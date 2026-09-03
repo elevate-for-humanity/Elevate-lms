@@ -1,0 +1,67 @@
+﻿# Dockerfile.northflank-lms
+# Optimized for 8GB Heap / 1,746 Routes
+# Using Next.js Standalone Mode
+
+FROM node:22-bookworm AS builder
+
+# Cache invalidation
+RUN echo "nf-cache-invalidate-20260627-final-pitch"
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 build-essential ca-certificates libcairo2-dev libpango1.0-dev \
+    libjpeg-dev libgif-dev librsvg2-dev && rm -rf /var/lib/apt/lists/*
+
+# Stable PNPM 9.12.3 (matches verified lockfile)
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/admin/package.json apps/admin/package.json
+COPY packages/db/package.json packages/db/package.json
+COPY packages/shared/package.json packages/shared/package.json
+COPY packages/ui/package.json packages/ui/package.json
+COPY . .
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+# 8GB heap limit
+ENV NODE_OPTIONS=--max-old-space-size=8192
+ENV NEXT_STANDALONE_OUTPUT=1
+ENV BUILD_SCOPE=1
+ENV CI=true
+
+# Re-enable Webpack cache for 8GB stability
+ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=
+
+# Install dependencies (Strict Frozen Lockfile - Verified Stable)
+RUN pnpm install --frozen-lockfile
+
+# Build Next.js
+ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+# Compile with safety checks
+RUN pnpm run build:lms:compile
+
+# --- Runtime stage ---
+FROM node:22-bookworm-slim AS runner
+
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl fonts-liberation && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+ENV NODE_ENV=production
+ENV PORT=8080
+ENV HOSTNAME=0.0.0.0
+
+# Copy standalone build (pruned node_modules)
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+
+EXPOSE 8080
+CMD ["node", "server.js"]

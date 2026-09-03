@@ -1,0 +1,18 @@
+{
+  "name": "elevate-studio-ide",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create elevate-studio",
+    "db:migrate": "wrangler d1 execute elevate-studio --file=./schema.sql",
+    "r2:create": "wrangler r2 bucket create elevate-studio-files",
+    "setup": "npm run db:create && npm run r2:create && npm run db:migrate"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241205.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.99.0"
+  }
+}

@@ -1,0 +1,55 @@
+name: Video Worker Scheduler
+
+# Queue checkpoint: restart stalled barber instructional candidate after worker recovery
+
+# Canonical Course Builder render-queue trigger. Keep this workflow thin: the Admin runtime owns rendering.
+# A main-branch workflow update also performs an immediate bounded queue check.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/video-worker-smoke.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: canonical-video-worker-scheduler
+  cancel-in-progress: false
+
+env:
+  ADMIN_URL: ${{ secrets.ADMIN_URL }}
+  CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+jobs:
+  process-next-video:
+    name: Process next canonical video job
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require scheduler credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CRON_SECRET" || { echo '::error::CRON_SECRET is not configured'; exit 1; }
+          if [ -z "$ADMIN_URL" ]; then
+            echo 'ADMIN_URL=https://admin.elevateforhumanity.org' >> "$GITHUB_ENV"
+          fi
+
+      - name: Call Admin-owned video queue worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(curl -sS --max-time 45 -o /tmp/video-worker.json -w '%{http_code}' \
+            -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H 'Content-Type: application/json' || true)
+          cat /tmp/video-worker.json 2>/dev/null || true
+          case "$status" in
+            200|202) ;;
+            *) echo "::error::Video worker returned HTTP $status"; exit 1 ;;
+          esac
+          node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('/tmp/video-worker.json','utf8')); if(p.ok!==true) process.exit(1); console.log('Video worker contract accepted:', p);"

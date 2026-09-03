@@ -1,0 +1,916 @@
+// PUBLIC ROUTE: public program application submission
+
+// app/api/applications/route.ts
+import { NextResponse } from 'next/server';
+import { getAdminClient } from '@/lib/supabase/admin';
+import { getProgramEnrollmentState } from '@/lib/programs/program-state';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getRedisClient } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { provisionAccount } from '@/lib/enrollment/provision-account';
+
+import { auditMutation } from '@/lib/api/withAudit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { organization } from '@/lib/config/organization';
+import { normalizeApplicationModalityPreference } from '@/lib/applications/modality-preference';
+import { getStripe } from '@/lib/stripe/client';
+// approveApplication is called by /api/admin/applications/[id]/approve - not here
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
+
+const PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS = new Set([
+  'barber-apprenticeship',
+  'cosmetology-apprenticeship',
+  'nail-technician-apprenticeship',
+  'esthetician-apprenticeship',
+]);
+
+function getAllowedOrigins(): Set<string> {
+  const configured = (process.env.APPLICATION_INTAKE_ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean);
+
+  const defaults = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    PLATFORM_DEFAULTS.siteUrl,
+    process.env.NEXT_PUBLIC_ADMIN_URL,
+  ].filter(Boolean) as string[];
+
+  return new Set([...configured, ...defaults]);
+}
+
+function getRequestOrigin(req: Request): string {
+  return req.headers.get('origin') || '';
+}
+
+function isAllowedOrigin(origin: string, allowedOrigins: Set<string>): boolean {
+  if (!origin) return true;
+  return allowedOrigins.has(origin);
+}
+
+function corsHeadersForOrigin(origin: string, allowedOrigins: Set<string>) {
+  const fallback = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+  const allowOrigin = origin && allowedOrigins.has(origin) ? origin : fallback;
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Idempotency-Key',
+    Vary: 'Origin',
+  } as const;
+}
+
+async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true;
+  if (!token) return false;
+
+  try {
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        secret,
+        response: token,
+        remoteip: ip,
+      }),
+    });
+    const result = (await response.json()) as { success?: boolean };
+    return !!result.success;
+  } catch {
+    return false;
+  }
+}
+
+function getClientIp(req: Request): string {
+  return (
+    req.headers.get('cf-connecting-ip') ||
+    req.headers.get('x-real-ip') ||
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    'unknown'
+  );
+}
+
+async function claimIdempotencyKey(
+  rawKey: string,
+  fingerprint: string,
+): Promise<{ duplicate: boolean; samePayload: boolean }> {
+  if (!rawKey) return { duplicate: false, samePayload: false };
+
+  const redis = getRedisClient();
+  if (!redis) return { duplicate: false, samePayload: false };
+
+  const key = `idempotency:applications:${rawKey}`;
+  const ttlSeconds = Number(process.env.APPLICATION_INTAKE_IDEMPOTENCY_TTL_SECONDS || '86400');
+  const value = JSON.stringify({ fingerprint, at: new Date().toISOString() });
+
+  try {
+    const setResult = await redis.set(key, value, { nx: true, ex: ttlSeconds });
+    const claimed = setResult === 'OK' || (setResult as unknown) === 1 || (setResult as unknown) === true;
+    if (claimed) {
+      return { duplicate: false, samePayload: false };
+    }
+
+    const existing = await redis.get(key);
+    const samePayload =
+      typeof existing === 'string' &&
+      existing.includes(`"fingerprint":"${fingerprint.replace(/"/g, '\\"')}"`);
+    return { duplicate: true, samePayload };
+  } catch (error) {
+    logger.warn('[api/applications] idempotency check unavailable; continuing', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return { duplicate: false, samePayload: false };
+  }
+}
+
+// CORS preflight for cross-origin form submissions
+export async function OPTIONS(req: Request) {
+  const allowedOrigins = getAllowedOrigins();
+  const origin = getRequestOrigin(req);
+  if (!isAllowedOrigin(origin, allowedOrigins)) {
+    return NextResponse.json({ error: 'Origin not allowed' }, { status: 403 });
+  }
+
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeadersForOrigin(origin, allowedOrigins),
+  });
+}
+
+// Public endpoint - anonymous application submissions
+async function _POST(req: Request) {
+  try {
+    const allowedOrigins = getAllowedOrigins();
+    const origin = getRequestOrigin(req);
+    if (!isAllowedOrigin(origin, allowedOrigins)) {
+      return NextResponse.json(
+        { error: 'Origin not allowed' },
+        { status: 403, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
+    const body = await req.json();
+
+    // Normalize all public application forms at this canonical boundary.
+    // Older forms use programInterest/fundingSource while newer program pages
+    // use program/programSlug/fundingType.
+    body.program = body.program || body.programInterest || body.programSlug || body.program_slug;
+    body.programSlug =
+      body.programSlug || body.program_slug || body.programInterest || body.program;
+    body.fundingType =
+      body.fundingType ||
+      body.funding_type ||
+      body.fundingInterest ||
+      body.fundingSource ||
+      null;
+    body.zip = body.zip || body.zipCode || body.postalCode || '';
+
+    const normalizedProgram = String(body.program || '').trim().toLowerCase();
+    const normalizedFunding = String(body.fundingType || '').trim().toLowerCase();
+    const isApprenticeshipApplication = normalizedProgram.includes('apprenticeship');
+    const isNonSelfPayApprenticeship =
+      isApprenticeshipApplication &&
+      normalizedFunding !== '' &&
+      !normalizedFunding.startsWith('self_pay') &&
+      !normalizedFunding.startsWith('self-pay');
+
+    if (
+      isNonSelfPayApprenticeship &&
+      body.apprenticeshipFundingApprovalAcknowledged !== true
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'Apprenticeship funding is not currently available. Choose self-pay unless you already have written approval or Elevate specifically told you funding is available.',
+        },
+        { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    const rawModalityPreference = body.modalityPreference ?? body.modality_preference;
+    const modalityPreference = normalizeApplicationModalityPreference(rawModalityPreference);
+    if (
+      typeof rawModalityPreference === 'string' &&
+      rawModalityPreference.trim() !== '' &&
+      !modalityPreference
+    ) {
+      return NextResponse.json(
+        { error: 'Invalid modality preference. Choose in-person, virtual, or hybrid.' },
+        { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    // Honeypot field for commodity bots.
+    if (body.website && String(body.website).trim() !== '') {
+      return NextResponse.json(
+        { ok: true, accepted: true },
+        { status: 202, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    // Same-origin forms are already constrained by the origin allowlist, public
+    // contact rate limiter, and honeypot above. Require Turnstile only when a
+    // caller actually supplies a token or when the request is cross-origin.
+    // This keeps the canonical API compatible with the existing student/CDL
+    // forms, which do not render a Turnstile widget.
+    const turnstileToken = body.turnstileToken || body.cfTurnstileToken || '';
+    const isSameOriginSubmission = !!origin && allowedOrigins.has(origin);
+    if (turnstileToken || !isSameOriginSubmission) {
+      const clientIp = getClientIp(req);
+      const humanVerified = await verifyTurnstile(turnstileToken, clientIp);
+      if (!humanVerified) {
+        return NextResponse.json(
+          { error: 'Bot verification failed' },
+          { status: 403, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
+    }
+
+    // Basic required fields - core fields that all forms must have
+    const coreRequired = ['firstName', 'lastName', 'phone', 'email'];
+
+    // Program is required but can come from different field names
+    const program = body.program || body.programSlug;
+    if (!program) {
+      return NextResponse.json(
+        { error: 'Missing required field: program' },
+        { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    for (const field of coreRequired) {
+      if (!body[field] || String(body[field]).trim() === '') {
+        return NextResponse.json(
+          { error: `Missing required field: ${field}` },
+          { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
+    }
+
+    const normalizedPhone = String(body.phone || '').replace(/\D/g, '');
+    const idempotencyKey =
+      (req.headers.get('x-idempotency-key') || body.idempotencyKey || '').trim().toLowerCase();
+    if (idempotencyKey && idempotencyKey.length < 12) {
+      return NextResponse.json(
+        { error: 'Invalid idempotency key' },
+        { status: 400, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    const fingerprint = `${String(body.email || '').toLowerCase().trim()}|${program}|${normalizedPhone}`;
+    if (idempotencyKey) {
+      const claim = await claimIdempotencyKey(idempotencyKey, fingerprint);
+      if (claim.duplicate) {
+        return NextResponse.json(
+          {
+            error: claim.samePayload
+              ? 'Duplicate submission detected. Your application is already being processed.'
+              : 'Idempotency key has already been used with a different payload.',
+          },
+          { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
+    }
+
+    const supabase = await getAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        {
+          error:
+            `Service temporarily unavailable. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
+        },
+        { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    const applicationIntent = body.applicationIntent === 'enrollment' ? 'enrollment' : 'inquiry';
+    if (applicationIntent === 'enrollment' && PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(program)) {
+      const paymentSessionId = String(body.paymentSessionId || '').trim();
+      if (!paymentSessionId) {
+        return NextResponse.json(
+          { error: 'Verified payment is required before this enrollment application can be submitted.' },
+          { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
+      const stripe = getStripe();
+      if (!stripe) {
+        return NextResponse.json(
+          { error: 'Payment verification is temporarily unavailable.' },
+          { status: 503, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
+      const paymentSession = await stripe.checkout.sessions.retrieve(paymentSessionId);
+      const paid = ['paid', 'no_payment_required'].includes(paymentSession.payment_status || '');
+      const paidProgram = paymentSession.metadata?.program_slug || '';
+      const paidEmail = (paymentSession.customer_details?.email || paymentSession.customer_email || '').toLowerCase().trim();
+      const applicantEmail = String(body.email || '').toLowerCase().trim();
+      if (!paid || paidProgram !== program || (paidEmail && paidEmail !== applicantEmail)) {
+        return NextResponse.json(
+          { error: 'Payment could not be verified for this applicant and program.' },
+          { status: 402, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
+    }
+
+    // Program state gate - reject submissions for waitlisted or closed programs
+    const enrollmentState = await getProgramEnrollmentState(supabase, program);
+    if (enrollmentState === 'waitlist') {
+      return NextResponse.json(
+        {
+          error: 'This program is currently waitlisted. Join the waitlist to be notified when the next cohort opens.',
+          waitlisted: true,
+          waitlistUrl: `/programs/${program}`,
+        },
+        { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+    if (enrollmentState === 'closed') {
+      return NextResponse.json(
+        { error: 'This program is not currently accepting applications.' },
+        { status: 410, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    // Dedup: block same email + program within 24 hours.
+    // Excludes intake-form mirrors - those are pre-application inquiries, not submissions.
+    // Allows re-application after the window (e.g. student applies months later).
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: recentApp } = await supabase
+      .from('applications')
+      .select('id')
+      .eq('email', body.email.toLowerCase().trim())
+      .eq('program_interest', program)
+      .neq('source', 'intake-form')
+      .gte('created_at', oneDayAgo)
+      .limit(1)
+      .maybeSingle();
+
+    let recentByPhone: { id: string } | null = null;
+    if (normalizedPhone.length >= 10) {
+      const phoneQuery = await supabase
+        .from('applications')
+        .select('id')
+        .eq('normalized_phone', normalizedPhone)
+        .eq('program_interest', program)
+        .neq('source', 'intake-form')
+        .gte('created_at', oneDayAgo)
+        .limit(1)
+        .maybeSingle();
+      if (!phoneQuery.error) {
+        recentByPhone = phoneQuery.data;
+      }
+    }
+
+    if (recentApp || recentByPhone) {
+      return NextResponse.json(
+        {
+          error:
+            `An application for this program was already submitted with this email in the last 24 hours. Please call ${PLATFORM_DEFAULTS.supportPhone} if you need to make changes.`,
+        },
+        { status: 409, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    // Reuse an existing active application for the same applicant/program.
+    // A WorkOne or document update must advance the original application, not
+    // create a second admissions record.
+    const { data: activeApp } = await supabase
+      .from('applications')
+      .select('id, reference_number, status, program_interest, funding_type, payment_status')
+      .eq('email', body.email.toLowerCase().trim())
+      .eq('program_interest', program)
+      .not('status', 'in', '("rejected","withdrawn","duplicate")')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (activeApp) {
+      return NextResponse.json(
+        {
+          ok: true,
+          existing: true,
+          id: activeApp.id,
+          program: activeApp.program_interest ?? program,
+          referenceNumber: activeApp.reference_number ?? activeApp.id,
+          applicationStatus: activeApp.status,
+          nextStepUrl:
+            activeApp.status === 'pending_workone' || activeApp.status === 'pending_funding'
+              ? `/apply/pending-workone?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
+              : String(activeApp.funding_type || '').startsWith('self_pay') &&
+                  activeApp.payment_status !== 'paid' &&
+                  PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(activeApp.program_interest ?? program)
+                ? `/programs/${encodeURIComponent(activeApp.program_interest ?? program)}/payment-setup?ref=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`
+                : `/apply/track?id=${encodeURIComponent(activeApp.reference_number ?? activeApp.id)}`,
+        },
+        { status: 200, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+      );
+    }
+
+    // Generate reference number
+    const referenceNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
+
+    // Build notes field with all the extra data
+    const notes = [
+      `Reference: ${referenceNumber}`,
+      body.city ? `City: ${body.city}` : '',
+      body.state ? `State: ${body.state}` : '',
+      body.address ? `Address: ${body.address}` : '',
+      body.zip ? `ZIP: ${body.zip}` : '',
+      `Program Interest: ${program}`,
+      body.preferredContact ? `Preferred Contact: ${body.preferredContact}` : '',
+      body.fundingType ? `Funding Type: ${body.fundingType}` : '',
+      body.workoneIntakeCompleted
+        ? `WorkOne Intake Completed: ${body.workoneIntakeCompleted}`
+        : '',
+      body.workoneAppointmentDate
+        ? `WorkOne Appointment Date: ${body.workoneAppointmentDate}`
+        : '',
+      body.workoneCenter ? `WorkOne Center: ${body.workoneCenter}` : '',
+      body.workoneChecklist && Array.isArray(body.workoneChecklist)
+        ? `WorkOne Checklist: ${body.workoneChecklist.join(', ')}`
+        : '',
+      body.source ? `Source: ${body.source}` : '',
+      body.hasHostShop ? `Has Host Shop: ${body.hasHostShop}` : '',
+      body.hostShopName ? `Host Shop Name: ${body.hostShopName}` : '',
+      body.howDidYouHear ? `How Did You Hear: ${body.howDidYouHear}` : '',
+      body.hasCaseManager ? `Has Case Manager: ${body.hasCaseManager}` : '',
+      body.caseManagerAgency ? `Case Manager Agency: ${body.caseManagerAgency}` : '',
+      body.supportNeeds ? `Support Needs: ${body.supportNeeds}` : '',
+      // Transfer hours are stored in transfer_hours_claimed column - not duplicated here.
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    // Insert into applications table
+    // Parse claimed transfer hours - stored in structured column, not notes.
+    // Does not affect pricing. Progress credit only.
+    const transferHoursClaimed = Math.max(
+      0,
+      parseInt(body.transferHours ?? body.transfer_hours_claimed ?? '0') || 0,
+    );
+
+    // Determine application status based on the actual funding/intake state.
+    // WIOA / WRG applications remain the same application while WorkOne work is
+    // completed; the applicant must never be told to submit a replacement one.
+    const FUNDED_TYPES = ['wioa', 'wrg'];
+    const fundingType = body.fundingType || body.fundingInterest || null;
+    const eligibilityStatus = body.fundingEligibilityStatus || null;
+    const isFunded = FUNDED_TYPES.includes(fundingType);
+    const workOneReferral = String(body.hasWorkOneReferral || '').trim().toLowerCase();
+    const workOneIntake = String(body.workoneIntakeCompleted || '').trim().toLowerCase();
+    const needsWorkOne =
+      isFunded &&
+      (eligibilityStatus === 'needs_appointment' ||
+        workOneReferral === 'no' ||
+        workOneIntake === 'not_started');
+
+    let applicationStatus: string;
+    if (needsWorkOne) {
+      applicationStatus = 'pending_workone';
+    } else if (isFunded) {
+      applicationStatus = 'pending_admin_review';
+    } else {
+      applicationStatus = 'submitted';
+    }
+
+    // Core insert payload - columns confirmed to exist in all environments
+    const corePayload: Record<string, any> = {
+      first_name: body.firstName,
+      last_name: body.lastName,
+      phone: body.phone,
+      email: body.email,
+      normalized_email: body.email.toLowerCase().trim(),
+      normalized_phone: body.phone.replace(/\D/g, ''),
+      city: body.city || 'Not provided',
+      zip: body.zip || '00000',
+      program_interest: program,
+      program_slug: body.programSlug || body.program_slug || null,
+      support_notes: notes,
+      status: applicationStatus,
+      source: body.source || 'website',
+      contact_preference: body.preferredContact || 'phone',
+      transfer_hours_claimed: transferHoursClaimed,
+      funding_type: fundingType,
+      funding_eligibility_status: eligibilityStatus,
+      reference_number: referenceNumber,
+      type: 'student',
+      date_of_birth: body.dateOfBirth || null,
+      county_of_residence: body.countyOfResidence || null,
+      household_income: body.householdIncome ? Number(body.householdIncome) : null,
+      family_size: body.familySize ? Number(body.familySize) : null,
+      modality_preference: modalityPreference,
+    };
+
+    let { data, error }: any = await supabase
+      .from('applications')
+      .insert(corePayload)
+      .select()
+      .maybeSingle();
+
+    // Three-tier retry - each tier strips more columns to handle DB environments
+    // where migrations haven't been applied yet.
+    //
+    // Tier 1 (corePayload): all columns including recent migrations
+    // Tier 2: strip columns from migrations 20260425–20260621 (funding_eligibility_status,
+    //         normalized_email/phone, county_of_residence, household_income, family_size,
+    //         modality_preference, transfer_hours_claimed, type)
+    // Tier 3 (baseline): only the 15 columns present in the original schema baseline
+    //         (20260227000003) - this MUST succeed or the DB is broken
+    //
+    // Error codes:
+    //   42703 = unknown column
+    //   23514 = check constraint violation (status values not yet in constraint)
+    //   23502 = not-null violation (column exists but has unexpected NOT NULL)
+
+    const isRetryableError = (e: any) =>
+      e &&
+      (e.code === '42703' ||
+        e.code === '23514' ||
+        e.code === '23502' ||
+        e.message?.includes('column') ||
+        e.message?.includes('constraint') ||
+        e.message?.includes('check') ||
+        e.message?.includes('violates'));
+
+    // Tier 2 - strip columns from post-baseline migrations
+    if (isRetryableError(error)) {
+      logger.warn('[api/applications] Tier-2 retry - stripping extended columns', {
+        code: error.code,
+        message: error.message,
+      });
+      const tier2 = await supabase
+        .from('applications')
+        .insert({
+          ...corePayload,
+          // Strip columns added in migrations that may not be live yet.
+          // Keep this list in sync with corePayload - any column not in the
+          // baseline schema (20260227000003) must be stripped here.
+          normalized_email: undefined,
+          normalized_phone: undefined,
+          county_of_residence: undefined,
+          household_income: undefined,
+          family_size: undefined,
+          modality_preference: undefined,
+          transfer_hours_claimed: undefined,
+          funding_eligibility_status: undefined,
+          funding_type: undefined,       // added in 20260425000001
+          program_slug: undefined,       // added in 20260224000002 (applications table)
+          date_of_birth: undefined,      // added in 20260304120000
+          type: undefined,
+          status: 'submitted',
+        })
+        .select()
+        .maybeSingle();
+      data = tier2.data;
+      error = tier2.error;
+    }
+
+    // Tier 3 - absolute baseline: only columns guaranteed in 20260227000003
+    if (isRetryableError(error)) {
+      logger.warn('[api/applications] Tier-3 retry - baseline columns only', {
+        code: error.code,
+        message: error.message,
+      });
+      const tier3 = await supabase
+        .from('applications')
+        .insert({
+          first_name: body.firstName,
+          last_name: body.lastName,
+          phone: body.phone,
+          email: body.email,
+          city: body.city || 'Not provided',
+          zip: body.zip || '00000',
+          program_interest: program,
+          support_notes: notes,
+          status: 'submitted',
+          source: body.source || 'website',
+          contact_preference: body.preferredContact || 'phone',
+          reference_number: referenceNumber, // CRITICAL: include ref number so email has it
+        })
+        .select()
+        .maybeSingle();
+      data = tier3.data;
+      error = tier3.error;
+    }
+
+    if (error || !data) {
+      logger.error('[api/applications] All insert tiers failed', {
+        code: (error as any)?.code,
+        message: (error as any)?.message,
+        details: (error as any)?.details,
+        hint: (error as any)?.hint,
+        program,
+        email: body.email,
+      });
+      return NextResponse.json(
+        {
+          error: `Failed to save application. Please call ${PLATFORM_DEFAULTS.supportPhone} for immediate assistance.`,
+          debug: process.env.NODE_ENV === 'development' ? (error as any)?.message : undefined,
+        },
+        { status: 500 },
+      );
+    }
+
+    // Provision auth account immediately so the applicant can access the portal
+    // and complete onboarding while their application is under review.
+    // Admin still approves before enrollment is activated.
+    let userId: string | null = null;
+    let passwordSetupLink: string | null = null;
+
+    if (supabase) {
+      const programSlug = body.programSlug || body.preferredProgramId || '';
+      const { data: programRow } = await supabase
+        .from('programs')
+        .select('title')
+        .eq('slug', programSlug)
+        .maybeSingle();
+      const programName =
+        programRow?.title ||
+        programSlug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) ||
+        'your program';
+
+      const provision = await provisionAccount({
+        db: supabase,
+        email: body.email,
+        fullName: (body.firstName + ' ' + body.lastName).trim() || body.email,
+        phone: body.phone || null,
+        programName,
+        programSlug,
+        postLoginUrl: '/onboarding/learner',
+        enrollmentStatus: 'pending',
+        sendWelcomeEmail: false,
+      });
+
+      if (provision.error) {
+        logger.warn('[Applications] provisionAccount non-fatal', { error: provision.error, email: body.email });
+      } else {
+        userId = provision.userId ?? null;
+        passwordSetupLink = provision.passwordSetupLink ?? null;
+        logger.info('[Applications] Account provisioned', { userId, isNewUser: provision.isNewUser });
+      }
+
+      // Link provisioned userId back to the application row
+      if (userId && data?.id) {
+        await supabase
+          .from('applications')
+          .update({ user_id: userId })
+          .eq('id', data.id)
+          .then(undefined, (err) =>
+            logger.warn('[Applications] Failed to link user_id', { err: String(err) }),
+          );
+      }
+    }
+
+    logger.info('[Applications] Saved', {
+      applicationId: data.id,
+      fundingType,
+      eligibilityStatus,
+      applicationStatus,
+    });
+
+    // Send email notifications - direct call, no self-fetch
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+    let emailStatus: { student: string; staff: string } = {
+      student: 'not-attempted',
+      staff: 'not-attempted',
+    };
+    try {
+      logger.info('[Applications] Sending confirmation email', {
+        to: body.email,
+        ref: referenceNumber,
+        hasPasswordLink: !!passwordSetupLink,
+      });
+
+      // Build password setup section (only for new users)
+      const passwordSection = passwordSetupLink
+        ? '<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">' +
+          '<h3 style="margin-top: 0; color: #065f46;">Your Student Account Is Ready</h3>' +
+          '<p style="margin-bottom: 16px;">We created your student portal account. Set your password to log in:</p>' +
+          '<p style="text-align: center; margin: 16px 0;">' +
+            '<a href="' + passwordSetupLink + '" style="display: inline-block; background: #ea580c; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">Set Your Password &amp; Log In</a>' +
+          '</p>' +
+          '<p style="color: #64748b; font-size: 13px; margin-bottom: 0;">This link expires in 24 hours. After setting your password, you can log in anytime at <a href="' + siteUrl + '/login" style="color: #059669;">' + siteUrl + '/login</a></p>' +
+        '</div>'
+        : '';
+
+      // Confirmation + onboarding email to applicant
+      // Build next-steps content based on application status
+      const fundingLabel: Record<string, string> = {
+        wioa: 'WIOA (Workforce Innovation and Opportunity Act)',
+        wrg: 'Workforce Ready Grant / Next Level Jobs',
+      };
+      const fundingName = fundingType ? fundingLabel[fundingType] || fundingType : null;
+      const pendingWorkOneUrl = `${siteUrl}/apply/pending-workone?ref=${encodeURIComponent(referenceNumber)}&funding=${encodeURIComponent(fundingType || 'workone')}`;
+
+      const nextStepsHtml = needsWorkOne
+        ? `
+        <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #92400e;">Action Required - Complete Your WorkOne Intake</h3>
+          <p style="color: #78350f;">You selected <strong>${fundingName}</strong> as your funding option. Your Elevate application is saved under reference <strong>${referenceNumber}</strong> and will remain the same application while WorkOne completes its eligibility and funding review.</p>
+          <h4 style="color: #92400e; margin-bottom: 8px;">Your next steps:</h4>
+          <ol style="color: #78350f; padding-left: 20px; line-height: 1.8;">
+            <li>Maintain or create your Indiana Career Connect profile</li>
+            <li>Complete your WorkOne intake appointment</li>
+            <li>Receive your eligibility/funding decision from WorkOne</li>
+            <li>Use your WorkOne progress link or contact Elevate so we can update this same application</li>
+          </ol>
+          <p style="margin-bottom: 12px; color: #78350f;"><strong>Do not submit a second application.</strong> Your current application and reference number remain active.</p>
+          <a href="${pendingWorkOneUrl}" style="display: inline-block; background: #1d4ed8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-right: 8px;">Continue WorkOne Steps</a>
+          <a href="https://www.in.gov/dwd/workone/workone-locations/" style="display: inline-block; background: #374151; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Find a WorkOne Center</a>
+        </div>
+        ${passwordSection}
+      `
+        : isFunded
+          ? `
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 20px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #1e40af;">Application Received - Pending Admin Review</h3>
+          <p style="color: #1e3a8a;">You selected <strong>${fundingName}</strong> as your funding option. Your application has been received and is pending review by our enrollment team.</p>
+          <h4 style="color: #1e40af; margin-bottom: 8px;">What happens next:</h4>
+          <ol style="color: #1e3a8a; padding-left: 20px; line-height: 1.8;">
+            <li>Our enrollment team reviews your application (1–2 business days)</li>
+            <li>We verify your funding status with ${fundingType === 'wioa' ? 'WorkOne' : 'Indiana Career Connect'}</li>
+            <li>Once verified, we contact you to complete enrollment and schedule your start date</li>
+            <li>You begin training - no tuition due until funding is confirmed</li>
+          </ol>
+        </div>
+        ${passwordSection}
+      `
+          : `
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:20px;margin:20px 0;">
+          <h3 style="margin-top:0;color:#14532d;">Application Received - Under Review</h3>
+          <p style="color:#166534;">Your application for <strong>${body.program}</strong> has been received. Our enrollment team will review it and reach out within 1–2 business days.</p>
+          <ol style="color:#166534;padding-left:20px;line-height:1.8;">
+            <li>Enrollment team reviews your application</li>
+            <li>We confirm your payment and program details</li>
+            <li>You receive your account setup link and onboarding instructions by email</li>
+            <li>You begin training</li>
+          </ol>
+          <p style="color:#166534;margin-bottom:0;"><strong>Questions?</strong> Call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color:#ea580c;">${PLATFORM_DEFAULTS.supportPhone}</a> or email <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color:#ea580c;">info@${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
+        </div>
+        ${passwordSection}
+      `;
+
+      const emailSubject = needsWorkOne
+        ? `Action Required - Complete WorkOne Intake [Ref: ${referenceNumber}]`
+        : isFunded
+          ? `Application Received - Pending Review [Ref: ${referenceNumber}]`
+          : `Welcome to ${PLATFORM_DEFAULTS.orgName} - ${body.program} [Ref: ${referenceNumber}]`;
+
+      const studentEmailResult = await sendEmail({
+        to: body.email,
+        subject: emailSubject,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="padding: 24px; text-align: center; border-radius: 8px 8px 0 0; border-bottom: 2px solid #e5e7eb;">
+              <h1 style="margin: 0; font-size: 24px;">${needsWorkOne ? 'Next Step Required' : 'Welcome to ' + PLATFORM_DEFAULTS.orgName + '!'}</h1>
+            </div>
+            <div style="padding: 24px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
+              <p style="font-size: 16px;">Hi ${body.firstName},</p>
+              <p>Your application for <strong>${body.program}</strong> has been received${needsWorkOne ? ', and it is being held while you complete the WorkOne step.' : isFunded ? ' and is pending admin review.' : ' and is under review.'}</p>
+
+              ${nextStepsHtml}
+
+              ${
+                !needsWorkOne
+                  ? `
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                <h3 style="margin-top: 0; color: #ea580c;">Want to Talk Sooner?</h3>
+                <p style="margin-bottom: 12px;">Schedule your advisor call now:</p>
+                <a href="https://calendly.com/elevate4humanityedu" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
+              </div>`
+                  : ''}
+
+              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
+                <p style="margin: 0; font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a;">${referenceNumber}</p>
+                <p style="margin: 8px 0 0 0; font-size: 12px; color: #64748b;">Application ID: ${data.id}</p>
+              </div>
+
+              <p>Questions? Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color: #ea580c; font-weight: bold;">${PLATFORM_DEFAULTS.supportPhone}</a> or email <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color: #ea580c;">info@${PLATFORM_DEFAULTS.canonicalDomain}</a></p>
+              <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+              <p style="color: #64748b; font-size: 13px; text-align: center;">
+                ${PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute<br />
+                ${organization.address}<br />
+                <a href="${siteUrl}" style="color: #3b82f6;">${PLATFORM_DEFAULTS.canonicalDomain}</a>
+              </p>
+            </div>
+          </div>
+        `,
+      });
+
+      // Send staff email in parallel (don't wait for it to finish before responding)
+      const staffSubject = needsWorkOne
+        ? `! Pending WorkOne [${referenceNumber}]: ${body.firstName} ${body.lastName}`
+        : isFunded
+          ? `🔵 Admin Review Required [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${fundingName}`
+          : `New Application [${referenceNumber}]: ${body.firstName} ${body.lastName} - ${body.program}`;
+
+      const staffEmailResult = await sendEmail({
+        to: 'elevate4humanityedu@gmail.com',
+        subject: staffSubject,
+        html: `
+          <h2>New Application Received</h2>
+          ${needsWorkOne ? `<div style="background:#fffbeb;border:2px solid #f59e0b;border-radius:8px;padding:16px;margin-bottom:16px;"><strong>! WORKONE STEP PENDING.</strong> Keep this application open. Do not enroll until funding is authorized, and update this same record when WorkOne evidence is received.</div>` : ''}
+          ${isFunded && !needsWorkOne ? `<div style="background:#eff6ff;border:2px solid #3b82f6;border-radius:8px;padding:16px;margin-bottom:16px;"><strong>🔵 ADMIN REVIEW REQUIRED before enrollment.</strong> Verify ${fundingName} approval with the agency before approving this application.</div>` : ''}
+          <p><strong>Reference:</strong> ${referenceNumber}</p>
+          <p><strong>Name:</strong> ${body.firstName} ${body.lastName}</p>
+          <p><strong>Email:</strong> ${body.email}</p>
+          <p><strong>Phone:</strong> ${body.phone}</p>
+          <p><strong>Program:</strong> ${body.program}</p>
+          <p><strong>Location:</strong> ${body.city || 'N/A'}, ${body.zip || 'N/A'}</p>
+          <p><strong>Preferred Contact:</strong> ${body.preferredContact || 'phone'}</p>
+          <p><strong>Funding Type:</strong> ${fundingName || 'Self-pay / Not specified'}</p>
+          <p><strong>Funding Eligibility Status:</strong> ${eligibilityStatus || 'N/A'}</p>
+          <p><strong>Application Status:</strong> ${applicationStatus}</p>
+          ${body.hasCaseManager ? `<p><strong>Has Case Manager:</strong> ${body.hasCaseManager}</p>` : ''}
+          ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
+          ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ''}
+          <div style="text-align:center;margin:24px 0;">
+            <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review Application -></a>
+          </div>
+          <p style="font-size:12px;color:#6b7280;text-align:center;">Application ID: ${data.id}</p>
+        `,
+      });
+
+      if (staffEmailResult.success) {
+        logger.info('[Applications] Staff email sent');
+      } else {
+        logger.error('[Applications] Staff email FAILED', undefined, { error: (staffEmailResult as any).error });
+      }
+      emailStatus = {
+        student: studentEmailResult.success ? 'sent' : (studentEmailResult as any).error || 'failed',
+        staff: staffEmailResult.success ? 'sent' : (staffEmailResult as any).error || 'failed',
+      };
+    } catch (emailError) {
+      logger.error(
+        '[Applications] Email send threw exception',
+        emailError instanceof Error ? emailError : undefined,
+      );
+      emailStatus = { student: 'exception', staff: 'exception' };
+    }
+
+    // Queue automation jobs for post-submission processing (non-blocking)
+    try {
+      const adminDb = await getAdminClient();
+      if (adminDb) {
+        await adminDb.from('job_queue').insert({
+          type: 'application_submitted',
+          payload: {
+            applicationId: data.id,
+            programSlug: body.programSlug || body.preferredProgramId || null,
+            email: body.email,
+            firstName: body.firstName,
+            lastName: body.lastName,
+            fundingType: body.fundingType || null,
+          },
+          run_after: new Date().toISOString(),
+        });
+        logger.info('[Applications] Automation job queued', { applicationId: data.id });
+      }
+    } catch (queueError) {
+      logger.warn('[Applications] Failed to queue automation job', queueError instanceof Error ? queueError.message : String(queueError));
+    }
+
+    const requiresSelfPayCheckout =
+      String(fundingType || '').startsWith('self_pay') &&
+      PAYMENT_REQUIRED_ENROLLMENT_PROGRAMS.has(data.program_interest ?? program);
+    const nextStepUrl = needsWorkOne
+      ? `/apply/pending-workone?ref=${encodeURIComponent(referenceNumber)}&funding=${encodeURIComponent(fundingType || 'workone')}`
+      : requiresSelfPayCheckout
+        ? `/programs/${encodeURIComponent(data.program_interest ?? program)}/payment-setup?ref=${encodeURIComponent(referenceNumber)}`
+        : `/apply/success?ref=${encodeURIComponent(referenceNumber)}&program=${encodeURIComponent(data.program_interest ?? program)}`;
+
+    return NextResponse.json(
+      {
+        ok: true,
+        id: data.id,
+        email: data.email,
+        program: data.program_interest ?? program,
+        referenceNumber: referenceNumber,
+        applicationStatus,
+        nextStepUrl,
+        emailStatus,
+      },
+      { status: 200, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+    );
+  } catch (error) {
+    const allowedOrigins = getAllowedOrigins();
+    const origin = getRequestOrigin(req);
+    return NextResponse.json(
+      {
+        error: 'Unexpected error. Please call 317-314-3757 for immediate assistance.',
+      },
+      { status: 500, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+    );
+  }
+}
+export const POST = withApiAudit('/api/applications', _POST);

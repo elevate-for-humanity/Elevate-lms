@@ -1,0 +1,136 @@
+name: Recover Marketing (supervised existing build)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_id:
+        description: 'Existing successful Northflank Marketing build ID'
+        required: true
+        type: string
+      sha:
+        description: 'Exact main-branch commit SHA contained in that build'
+        required: true
+        type: string
+      apply_config:
+        description: 'Reapply canonical Marketing service config before redeploy'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: northflank-marketing-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover-marketing:
+    name: Recover Marketing from an existing verified build
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing' }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+      NEXT_PUBLIC_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+      NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
+      NEXT_PUBLIC_LMS_URL: https://app.elevateforhumanity.org
+      NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
+
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          clean: true
+
+      - name: Validate requested recovery SHA belongs to main
+        id: validate
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          REQUESTED_SHA="${{ inputs.sha }}"
+          [[ "$REQUESTED_SHA" =~ ^[a-fA-F0-9]{7,40}$ ]] || { echo '::error::Invalid SHA format'; exit 1; }
+          git fetch origin main --depth=200
+          RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
+          test -n "$RESOLVED_SHA" || { echo '::error::Requested SHA cannot be resolved'; exit 1; }
+          git merge-base --is-ancestor "$RESOLVED_SHA" origin/main || { echo "::error::Recovery SHA is not contained in main: $RESOLVED_SHA"; exit 1; }
+          echo "sha=$RESOLVED_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout exact validated commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.validate.outputs.sha }}
+          fetch-depth: 1
+          clean: true
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies deterministically
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Verify recovery inputs
+        run: |
+          set -euo pipefail
+          test -n "${{ inputs.build_id }}" || { echo 'build_id is required'; exit 1; }
+          test "$(git rev-parse HEAD)" = "${{ steps.validate.outputs.sha }}"
+          test -n "${NORTHFLANK_API_TOKEN:-}" || { echo 'NORTHFLANK_API_TOKEN is missing'; exit 1; }
+          echo "Recovery will reuse build ${{ inputs.build_id }} for ${{ steps.validate.outputs.sha }}"
+
+      - name: Reapply canonical Marketing service configuration
+        if: inputs.apply_config == true
+        run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute
+
+      - name: Verify existing build matches validated SHA
+        run: |
+          pnpm tsx scripts/northflank/verify-build.ts \
+            "$NORTHFLANK_MARKETING_SERVICE_ID" \
+            --build-id "${{ inputs.build_id }}" \
+            --sha "${{ steps.validate.outputs.sha }}"
+
+      - name: Deploy existing Marketing build
+        run: |
+          pnpm tsx scripts/northflank/trigger-deployment.ts \
+            "$NORTHFLANK_MARKETING_SERVICE_ID" \
+            --build-id "${{ inputs.build_id }}" \
+            --sha "${{ steps.validate.outputs.sha }}"
+
+      - name: Wait for Marketing recovery
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 1800000
+
+      - name: Verify recovered deployment SHA
+        run: pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ steps.validate.outputs.sha }}"
+
+      - name: Verify recovered public endpoints
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 30); do
+            ping=$(curl -sS --max-time 10 -o /tmp/ping.json -w "%{http_code}" https://www.elevateforhumanity.org/api/ping || true)
+            health=$(curl -sS --max-time 10 -o /tmp/health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/health || true)
+            version=$(curl -sS --max-time 10 -o /tmp/version.json -w "%{http_code}" https://www.elevateforhumanity.org/api/version || true)
+            live_sha="$(node -e "try{const d=require('/tmp/version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
+            echo "Attempt $i/30 ping=$ping health=$health version=$version sha=${live_sha:-missing}"
+            if [ "$ping" = "200" ] && [ "$health" = "200" ] && [ "$version" = "200" ] && [ "$live_sha" = "${{ steps.validate.outputs.sha }}" ]; then
+              echo 'Marketing recovery verified.'
+              exit 0
+            fi
+            sleep 10
+          done
+          echo '::error::Marketing did not recover to the requested SHA.'
+          exit 1

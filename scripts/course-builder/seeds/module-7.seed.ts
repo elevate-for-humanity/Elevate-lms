@@ -1,0 +1,336 @@
+import type { ModuleSeed } from '../../../lib/curriculum/course-builder-types';
+
+export const module7: ModuleSeed = {
+  slug: 'barber-module-7',
+  title: 'Module 7: Professional & Business Skills',
+  order: 7,
+  objective:
+    'Apply professional standards, business knowledge, and client retention strategies to build a sustainable barbering career.',
+  lessons: [
+    {
+      slug: 'barber-lesson-40',
+      title: 'Building Your Clientele',
+      durationMin: 20,
+      domain: 'BUSINESS_PROFESSIONAL',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.25,
+      content:
+        "Clients decide within the first 30 seconds whether they will return. Be on time, be clean, be professional. Your station reflects your standards — a clean, organized station signals competence before you pick up a tool.\n\nRetention strategies: Remember names — use the client's name during the service. Client card — keep notes on style, products used, and last visit, review before each appointment. Follow up — a text after a new client's first visit goes a long way. Rebook — recommend the next appointment before they leave the chair.\n\nSocial media: Post your work consistently. Before-and-after photos with client permission are the most effective content. Use local hashtags and tag your shop location. Respond to comments and DMs promptly.\n\nEvery client who leaves without a next appointment is a client you may lose. Recommend rebooking at the end of every service.",
+      competencyChecks: [
+        {
+          id: 'retention-strategies',
+          type: 'KNOWLEDGE',
+          description:
+            'Identifies at least 3 client retention strategies and explains the purpose of each',
+          required: true,
+        },
+        {
+          id: 'client-card',
+          type: 'KNOWLEDGE',
+          description: 'Explains the purpose of a client card and what information to track',
+          required: true,
+        },
+        {
+          id: 'rebook-recommendation',
+          type: 'PROCEDURE',
+          description:
+            'States the rebook recommendation at the end of service — every client, every time',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-41',
+      title: 'Booth Rental vs. Commission vs. Ownership',
+      durationMin: 20,
+      domain: 'BUSINESS_PROFESSIONAL',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.25,
+      content:
+        'Business models: Commission — work for the shop owner, receive 40–60% of service revenue, shop provides clients, supplies, and equipment, good for new barbers. Booth rental — pay a weekly or monthly fee to use a chair, keep 100% of service revenue, self-employed and responsible for taxes, supplies, and clients. Shop ownership — own the business, maximum income potential, maximum responsibility, requires business license, shop license, and startup capital.\n\nTypical career path: Most barbers start on commission to build skills and clientele. Move to booth rental when clientele is strong enough to cover the booth fee and generate profit. Consider ownership after 5+ years of experience and a solid client base.\n\nBooth renters are self-employed. You pay both the employee and employer portions of Social Security and Medicare taxes — approximately 15.3% on top of income tax. Set aside 25–30% of gross income for taxes.',
+      competencyChecks: [
+        {
+          id: 'commission-model',
+          type: 'KNOWLEDGE',
+          description: 'Describes the commission model and its advantages for new barbers',
+          required: true,
+        },
+        {
+          id: 'booth-rental-finances',
+          type: 'KNOWLEDGE',
+          description:
+            'Explains what booth rental means financially — revenue kept, expenses owned',
+          required: true,
+        },
+        {
+          id: 'self-employment-tax',
+          type: 'KNOWLEDGE',
+          description:
+            'Identifies the tax obligations of a self-employed barber including self-employment tax rate',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-42',
+      title: 'Pricing, Tipping & Financial Basics',
+      durationMin: 20,
+      domain: 'BUSINESS_PROFESSIONAL',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.25,
+      content:
+        'Setting your prices: Research local market rates. Factor in your experience level — new barbers typically price below market. Price for the service, not the time. Raise prices as your clientele grows.\n\nTipping: The standard tip for barbering is 15–20%. Never expect a tip but always appreciate one. Make it easy — have a tip jar or use a payment system that prompts for tips.\n\nFinancial basics for self-employed barbers: Track all income — cash and card, every dollar must be reported. Set aside 25–30% of gross income for taxes. Keep receipts — all business expenses (supplies, tools, education) are deductible. Pay estimated taxes quarterly to avoid IRS penalties.',
+      competencyChecks: [
+        {
+          id: 'price-research',
+          type: 'KNOWLEDGE',
+          description:
+            'Explains how to research and set competitive prices based on market and experience',
+          required: true,
+        },
+        {
+          id: 'tip-standard',
+          type: 'KNOWLEDGE',
+          description: 'States the standard tip percentage for barbering (15–20%)',
+          required: true,
+        },
+        {
+          id: 'quarterly-taxes',
+          type: 'KNOWLEDGE',
+          description:
+            'Explains the quarterly estimated tax requirement and consequence of non-payment',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-43',
+      title: 'Professionalism & Ethics',
+      durationMin: 15,
+      domain: 'BUSINESS_PROFESSIONAL',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.25,
+      content:
+        "The barber's code: No negative talk — never speak negatively about other barbers or shops. Confidentiality — what happens in the chair stays in the chair, client conversations are private. Scope of practice — do not perform services outside your license, refer when appropriate. Honesty — be honest about what you can and cannot achieve, never promise results you cannot deliver.\n\nHandling difficult clients: Stay calm. Listen without interrupting. Offer to fix the issue at no charge if it is your error. If a client is abusive or threatening, you have the right to refuse service. Document incidents per shop policy.\n\nIndiana requires continuing education for license renewal. The barbering industry evolves constantly — attend trade shows, watch tutorials, and practice new techniques.",
+      competencyChecks: [
+        {
+          id: 'barbers-code',
+          type: 'KNOWLEDGE',
+          description: "States the four elements of the barber's code without prompting",
+          required: true,
+        },
+        {
+          id: 'complaint-handling',
+          type: 'PROCEDURE',
+          description:
+            'Describes how to handle a client complaint professionally — calm, listen, offer to fix',
+          required: true,
+        },
+        {
+          id: 'scope-of-practice',
+          type: 'KNOWLEDGE',
+          description: "Identifies services outside the barber's scope of practice",
+          required: true,
+        },
+        {
+          id: 'ce-requirement',
+          type: 'KNOWLEDGE',
+          description: "States Indiana's continuing education requirement for license renewal",
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-44',
+      title: 'Styling Products & Finishing',
+      durationMin: 15,
+      domain: 'BUSINESS_PROFESSIONAL',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.25,
+      content:
+        'Styling products: Pomade — medium to high hold, medium to high shine, classic barbershop finish. Clay — medium to high hold, matte finish, modern styles. Cream — light hold, natural finish, good for textured or curly hair. Gel — strong hold, high shine, waves and slick styles. Wax — flexible hold, mustaches and detailed styling.\n\nApplication technique: Start with a small amount — you can always add more. Warm product between palms before applying. Work through hair evenly from roots to ends. Style with comb or fingers to desired shape. Add more product only if needed — avoid buildup.\n\nProduct selection logic: IF client wants shine → pomade or gel. IF client wants matte → clay or cream. IF client has textured/curly hair → cream or light pomade. IF client wants maximum hold → gel or strong pomade.',
+      competencyChecks: [
+        {
+          id: 'product-identification',
+          type: 'KNOWLEDGE',
+          description: 'Identifies all five product types and their hold/finish characteristics',
+          required: true,
+        },
+        {
+          id: 'product-selection',
+          type: 'TECHNIQUE',
+          description: 'Selects appropriate product based on hair type and desired finish',
+          required: true,
+        },
+        {
+          id: 'application-technique',
+          type: 'TECHNIQUE',
+          description:
+            'Applies product correctly — warms between palms, works evenly through hair, does not over-apply',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-haircoloring-application-procedures',
+      title: 'Haircoloring Application Procedures',
+      durationMin: 60,
+      domain: 'CHEMICAL_SERVICES',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 1.0,
+      curriculumChapter: 'Barbering Ch. 15 — Haircoloring',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'color-patch-test',
+          type: 'SAFETY',
+          description: 'Performs a patch test 24–48 hours before oxidative color application',
+          required: true,
+        },
+        {
+          id: 'color-strand-test',
+          type: 'TECHNIQUE',
+          description: 'Performs a strand test to assess color result and processing time',
+          required: true,
+        },
+        {
+          id: 'color-application',
+          type: 'TECHNIQUE',
+          description:
+            'Applies haircolor using correct sectioning and timing per manufacturer instructions',
+          required: true,
+        },
+        {
+          id: 'color-ppe',
+          type: 'SAFETY',
+          description: 'Wears gloves and protective cape throughout color service',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-permanent-waves-chemical-texture-services',
+      title: 'Permanent Waves & Chemical Texture Services',
+      durationMin: 60,
+      domain: 'CHEMICAL_SERVICES',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 1.0,
+      curriculumChapter: 'Barbering Ch. 14 — Chemical Texture Services',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'perm-test-curl',
+          type: 'TECHNIQUE',
+          description: 'Performs a test curl to assess processing time',
+          required: true,
+        },
+        {
+          id: 'perm-neutralizer',
+          type: 'TECHNIQUE',
+          description:
+            'Applies neutralizer correctly after processing to re-harden disulfide bonds',
+          required: true,
+        },
+        {
+          id: 'perm-contraindications',
+          type: 'SAFETY',
+          description: 'Identifies contraindications for chemical texture services',
+          required: true,
+        },
+        {
+          id: 'perm-ppe',
+          type: 'SAFETY',
+          description: 'Wears appropriate PPE throughout chemical texture service',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-nail-care-services',
+      title: 'Nail Care & Basic Manicure Services',
+      durationMin: 45,
+      domain: 'SAFETY_SANITATION',
+      ojtCategory: 'TECHNICAL_INSTRUCTION',
+      hoursCredit: 0.75,
+      curriculumChapter: 'Barbering Appendix — Nail Care & Services',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'nail-anatomy',
+          type: 'KNOWLEDGE',
+          description: 'Identifies nail anatomy: plate, bed, lunula, cuticle, free edge',
+          required: true,
+        },
+        {
+          id: 'nail-disorders',
+          type: 'KNOWLEDGE',
+          description: 'Identifies nail disorders that contraindicate nail services',
+          required: true,
+        },
+        {
+          id: 'nail-sanitation',
+          type: 'SAFETY',
+          description: 'Demonstrates correct disinfection of metal nail implements between clients',
+          required: true,
+        },
+      ],
+    },
+  ],
+  checkpoint: {
+    slug: 'barber-module-7-checkpoint',
+    title: 'Professional Skills Checkpoint',
+    durationMin: 20,
+    domain: 'BUSINESS_PROFESSIONAL',
+    ojtCategory: 'ASSESSMENT',
+    hoursCredit: 0.25,
+    passingScore: 70,
+    questions: [
+      {
+        prompt: 'In a booth rental arrangement, who keeps 100% of service revenue?',
+        choices: ['The shop owner', 'The barber', 'They split it 50/50', 'The landlord'],
+        answerIndex: 1,
+        rationale:
+          'Booth renters are self-employed and keep all service revenue after paying their booth fee.',
+      },
+      {
+        prompt: 'What percentage of income should a self-employed barber set aside for taxes?',
+        choices: ['5–10%', '10–15%', '25–30%', '50%'],
+        answerIndex: 2,
+        rationale:
+          'Self-employed individuals pay both income tax and self-employment tax, totaling approximately 25–30%.',
+      },
+      {
+        prompt: 'Which styling product provides high hold with a matte finish?',
+        choices: ['Pomade', 'Gel', 'Clay', 'Cream'],
+        answerIndex: 2,
+        rationale:
+          'Clay provides medium to high hold with a matte finish, popular for modern styles.',
+      },
+      {
+        prompt: 'The standard tip for barbering services is:',
+        choices: ['5–10%', '15–20%', '25–30%', 'Tips are not expected'],
+        answerIndex: 1,
+        rationale:
+          '15–20% is the standard tip for personal service professionals including barbers.',
+      },
+      {
+        prompt: 'Which business model is recommended for a barber just starting out?',
+        choices: ['Booth rental', 'Shop ownership', 'Commission', 'Freelance'],
+        answerIndex: 2,
+        rationale:
+          'Commission is best for new barbers — the shop provides clients, supplies, and equipment while skills are being built.',
+      },
+      {
+        prompt: 'What is the most effective social media content for barbers?',
+        choices: [
+          'Motivational quotes',
+          'Before-and-after photos of client work',
+          'Product advertisements',
+          'Shop interior photos',
+        ],
+        answerIndex: 1,
+        rationale: 'Before-and-after photos showcase your skill directly and attract new clients.',
+      },
+    ],
+  },
+};

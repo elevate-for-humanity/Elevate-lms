@@ -1,0 +1,174 @@
+import { createClient } from '@/lib/supabase/server';
+import { NextResponse } from 'next/server';
+import type Stripe from 'stripe';
+import { stripe } from '@/lib/stripe/client';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { withRuntime } from '@/lib/api/withRuntime';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
+const webhookSecret =
+  process.env.STRIPE_WEBHOOK_SECRET_DONATIONS || process.env.STRIPE_WEBHOOK_SECRET!;
+
+async function _POST(request: Request) {
+  try {
+    const body = await request.text();
+    const signature = request.headers.get('stripe-signature');
+
+    if (!signature) {
+      return NextResponse.json({ error: 'No signature provided' }, { status: 400 });
+    }
+
+    let event: Stripe.Event;
+
+    try {
+      event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    } catch {
+      return NextResponse.json(
+        { error: 'Webhook Error: Internal server error' },
+        { status: 400 },
+      );
+    }
+
+    const supabase = await createClient();
+
+    const { data: existing } = await supabase
+      .from('stripe_webhook_events')
+      .select('id')
+      .eq('stripe_event_id', event.id)
+      .maybeSingle();
+
+    if (existing) {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+
+    await supabase
+      .from('stripe_webhook_events')
+      .insert({ stripe_event_id: event.id, event_type: event.type, status: 'processing' })
+      .then(() => {}, () => {});
+
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const donationId = session.metadata?.donation_id;
+
+        if (donationId) {
+          await supabase
+            .from('donations')
+            .update({
+              payment_status: 'succeeded',
+              stripe_payment_intent_id: session.payment_intent as string,
+              stripe_subscription_id: (session.subscription as string) || null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', donationId);
+
+          const { data: donation } = await supabase
+            .from('donations')
+            .select('*')
+            .eq('id', donationId)
+            .maybeSingle();
+
+          if (donation && !donation.receipt_sent) {
+            await supabase.from('email_queue').insert({
+              to_email: donation.donor_email,
+              from_email: PLATFORM_DEFAULTS.emailFromAddress,
+              subject: 'Thank you for your donation - Receipt',
+              template_name: 'donation_receipt',
+              template_data: {
+                donorName: donation.donor_name,
+                amount: donation.amount,
+                date: new Date().toISOString(),
+                transactionId: session.payment_intent,
+              },
+              related_type: 'donation',
+              related_id: donation.id,
+            });
+
+            await supabase
+              .from('donations')
+              .update({
+                receipt_sent: true,
+                receipt_sent_at: new Date().toISOString(),
+              })
+              .eq('id', donationId);
+          }
+
+          if (donation?.user_id) {
+            await supabase.from('conversions').insert({
+              user_id: donation.user_id,
+              conversion_type: 'donation_made',
+              value: donation.amount,
+            });
+          }
+        }
+        break;
+      }
+
+      case 'payment_intent.payment_failed': {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const { data: donation } = await supabase
+          .from('donations')
+          .select('id')
+          .eq('stripe_payment_intent_id', paymentIntent.id)
+          .maybeSingle();
+
+        if (donation) {
+          await supabase
+            .from('donations')
+            .update({ payment_status: 'failed', updated_at: new Date().toISOString() })
+            .eq('id', donation.id);
+        }
+        break;
+      }
+
+      case 'charge.refunded': {
+        const charge = event.data.object as Stripe.Charge;
+        const { data: donation } = await supabase
+          .from('donations')
+          .select('id')
+          .eq('stripe_payment_intent_id', charge.payment_intent as string)
+          .maybeSingle();
+
+        if (donation) {
+          await supabase
+            .from('donations')
+            .update({ payment_status: 'refunded', updated_at: new Date().toISOString() })
+            .eq('id', donation.id);
+        }
+        break;
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription;
+        const { data: donation } = await supabase
+          .from('donations')
+          .select('id')
+          .eq('stripe_subscription_id', subscription.id)
+          .maybeSingle();
+
+        if (donation) {
+          await supabase
+            .from('donations')
+            .update({ payment_status: 'cancelled', updated_at: new Date().toISOString() })
+            .eq('id', donation.id);
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+
+    return NextResponse.json({ received: true });
+  } catch {
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
+  }
+}
+
+export const POST = withRuntime(
+  withApiAudit('/api/donate/webhook', _POST, { actor_type: 'webhook', skip_body: true }),
+);

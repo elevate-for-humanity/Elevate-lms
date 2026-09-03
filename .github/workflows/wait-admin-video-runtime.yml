@@ -1,0 +1,64 @@
+name: Wait Admin Video Runtime
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  wait:
+    if: startsWith(github.event.issue.title, '[WAIT ADMIN VIDEO]')
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+    steps:
+      - name: Wait for Admin build and deployment
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_PROJECT_ID}"
+          auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}")
+          : >/tmp/wait.txt
+          for i in $(seq 1 60); do
+            curl -fsS "${auth[@]}" "$base/services/${NORTHFLANK_ADMIN_SERVICE_ID}" >/tmp/service.json
+            node <<'NODE' >/tmp/state.txt
+          const fs=require('fs'); const raw=JSON.parse(fs.readFileSync('/tmp/service.json','utf8')); const s=raw.data||raw;
+          const b=s.status?.build?.status||s.build?.status||s.buildStatus||'unknown';
+          const d=s.status?.deployment?.status||s.deployment?.status||s.deploymentStatus||'unknown';
+          console.log(`${b}|${d}`);
+          NODE
+            state=$(cat /tmp/state.txt)
+            echo "attempt=$i state=$state" | tee -a /tmp/wait.txt
+            case "$state" in
+              SUCCESS\|COMPLETED) break ;;
+              FAILURE\|*|FAILED\|*|ERROR\|*|CRASHED\|*) exit 1 ;;
+            esac
+            sleep 15
+          done
+          state=$(tail -n1 /tmp/state.txt)
+          test "$state" = 'SUCCESS|COMPLETED'
+          for i in $(seq 1 20); do
+            code=$(curl -sS --max-time 10 -o /tmp/health.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/health || true)
+            if [ "$code" = 200 ] && grep -q '"ready":true' /tmp/health.json; then
+              echo 'live-health=ready' >> /tmp/wait.txt
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'live-health=failed' >> /tmp/wait.txt
+          exit 1
+      - name: Post gate result
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs'); let out='No wait output.'; try{out=fs.readFileSync('/tmp/wait.txt','utf8')}catch{}
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:context.issue.number,body:`Admin video runtime gate: **${{ job.status }}**\n\n\`\`\`text\n${out.slice(-12000)}\n\`\`\``});

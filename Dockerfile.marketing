@@ -1,0 +1,169 @@
+# syntax=docker/dockerfile:1.7
+FROM node:22-alpine AS base
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Northflank has previously resolved Corepack's pnpm shim to the wrong pnpm
+# version. Remove the shim first, install the repository-pinned pnpm directly,
+# and fail the image build if the executable is not exactly the expected version.
+RUN corepack disable || true \
+    && npm install -g pnpm@10.28.2 \
+    && test "$(pnpm --version)" = "10.28.2"
+
+WORKDIR /workspace
+
+FROM base AS dependencies
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/admin/package.json ./apps/admin/package.json
+COPY apps/lms/package.json ./apps/lms/package.json
+COPY apps/marketing/package.json ./apps/marketing/package.json
+COPY packages/config/package.json ./packages/config/package.json
+COPY packages/db/package.json ./packages/db/package.json
+COPY packages/shared/package.json ./packages/shared/package.json
+COPY packages/ui/package.json ./packages/ui/package.json
+
+# Marketing does not use the ffmpeg-static binary at runtime. The repository's
+# last known-good Northflank recovery removed it from pnpm's allowed build
+# scripts because its GitHub-hosted postinstall download repeatedly failed with
+# ECONNRESET/socket-hang-up and blocked otherwise valid images.
+RUN node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); if (p.pnpm?.onlyBuiltDependencies) p.pnpm.onlyBuiltDependencies=p.pnpm.onlyBuiltDependencies.filter((name)=>name!=='ffmpeg-static'); fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\n');"
+RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+FROM base AS builder
+
+ARG NF_GIT_SHA
+ARG BUILD_TIMESTAMP=unknown
+ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ARG NEXT_PUBLIC_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
+ARG NEXT_PUBLIC_LMS_URL=https://app.elevateforhumanity.org
+ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+ENV NODE_ENV=production
+ENV CI=true
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV NEXT_STANDALONE_OUTPUT=1
+ENV NF_GIT_SHA=$NF_GIT_SHA
+ENV GITHUB_SHA=$NF_GIT_SHA
+ENV GIT_SHA=$NF_GIT_SHA
+ENV NEXT_PUBLIC_GIT_SHA=$NF_GIT_SHA
+ENV NEXT_PUBLIC_BUILD_ID="marketing-$NF_GIT_SHA"
+ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_LMS_URL=$NEXT_PUBLIC_LMS_URL
+ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+COPY --from=dependencies /workspace/node_modules ./node_modules
+# pnpm keeps direct workspace dependencies (including browser polyfills) in the
+# workspace package's node_modules. Copy that directory as well so the
+# container build resolves the same dependency graph as local/CI builds.
+COPY --from=dependencies /workspace/apps/marketing/node_modules ./apps/marketing/node_modules
+COPY . .
+
+RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \
+    && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+    && echo "Marketing public build arguments verified"
+
+# Website Builder defaults and shared authenticated portal contracts are release
+# invariants. Stop the image before compilation if fake seeded claims or stale
+# proof/demo links return.
+RUN node scripts/verify-portal-production-contracts.mjs
+
+RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); fs.writeFileSync('/tmp/elevate-build-timestamp', ts); console.log('Marketing build timestamp:', ts)"
+
+RUN EFFECTIVE_SHA="${NF_GIT_SHA}" && \
+    EFFECTIVE_BUILT_AT="$(cat /tmp/elevate-build-timestamp)" && \
+    test -n "${EFFECTIVE_SHA}" && \
+    test "${EFFECTIVE_SHA}" != "unknown" && \
+    echo "${EFFECTIVE_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && \
+    echo "Marketing build SHA validated: ${EFFECTIVE_SHA}" && \
+    printf '{"service":"marketing","commit":"%s","builtAt":"%s"}\n' \
+      "${EFFECTIVE_SHA}" "${EFFECTIVE_BUILT_AT}" > /workspace/public/version.json
+
+RUN node scripts/stamp-sw.mjs
+
+RUN echo "Verifying marketing service-worker cache versions..." && \
+    ! grep -R -q '__CACHE_VERSION__' /workspace/public/sw.js /workspace/public/sw-marketing.js 2>/dev/null && \
+    echo "Marketing service workers stamped correctly"
+
+RUN pnpm --filter @elevate/marketing build
+RUN test -d /workspace/apps/marketing/.next
+RUN test -f /workspace/apps/marketing/.next/BUILD_ID
+
+FROM node:22-alpine AS runner
+
+WORKDIR /app
+
+ARG NF_GIT_SHA
+ARG BUILD_TIMESTAMP=unknown
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+ENV NF_GIT_SHA=$NF_GIT_SHA
+ENV GITHUB_SHA=$NF_GIT_SHA
+ENV GIT_SHA=$NF_GIT_SHA
+ENV NEXT_PUBLIC_GIT_SHA=$NF_GIT_SHA
+ENV NEXT_PUBLIC_BUILD_ID="marketing-$NF_GIT_SHA"
+ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+
+RUN apk add --no-cache curl \
+    && addgroup -g 1001 nodejs \
+    && adduser -S -u 1001 -G nodejs nextjs
+
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/apps/marketing/.next/standalone \
+    ./
+
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/apps/marketing/.next/static \
+    ./apps/marketing/.next/static/
+
+COPY --from=builder --chown=nextjs:nodejs /workspace/public ./public/
+COPY --from=builder --chown=nextjs:nodejs /workspace/public ./apps/marketing/public/
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./public/data/hero-banners.json
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./apps/marketing/public/data/hero-banners.json
+
+RUN test -f /app/public/version.json && \
+    test -f /app/apps/marketing/public/version.json && \
+    test -f /app/public/manifest-marketing.json && \
+    test -f /app/apps/marketing/public/manifest-marketing.json && \
+    test -f /app/apps/marketing/server.js && \
+    test -s /app/public/data/hero-banners.json && \
+    test -s /app/apps/marketing/public/data/hero-banners.json && \
+    test -s /app/public/images/partners/razors-image-storefront.webp && \
+    test -s /app/apps/marketing/public/images/partners/razors-image-storefront.webp && \
+    test -s /app/public/images/heroes/hero-homepage.webp && \
+    test -s /app/apps/marketing/public/images/heroes/hero-homepage.webp && \
+    test -s /app/public/images/pages/barber-apprenticeship-hero.jpg && \
+    test -s /app/public/images/pages/workforce-training.webp && \
+    test -s /app/public/images/pages/about-supportive-services.webp && \
+    test -s /app/public/images/pages/about-employer-partners.webp && \
+    test -f /app/public/sw-marketing.js && \
+    test -f /app/public/sw.js && \
+    grep -q 'LEGACY_WORKER_RETIREMENT' /app/public/sw.js && \
+    ! grep -q "addEventListener('fetch'" /app/public/sw.js && \
+    echo "Marketing runtime assets verified from canonical public tree"
+
+RUN sed -i '/"type": *"module"/d' /app/package.json 2>/dev/null || true
+
+USER nextjs
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/ping" || exit 1
+
+CMD ["node", "--max-old-space-size=4096", "apps/marketing/server.js"]

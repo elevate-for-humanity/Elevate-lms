@@ -1,0 +1,42 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "submit": "Soumettre",
+    "next": "Suivant",
+    "back": "Retour",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "viewAll": "Voir tout",
+    "learnMore": "En savoir plus",
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter",
+    "free": "Gratuit",
+    "freeWithWIOA": "Gratuit avec WIOA"
+  },
+  "nav": {
+    "home": "Accueil",
+    "programs": "Programmes",
+    "courses": "Cours",
+    "about": "À propos",
+    "contact": "Contact",
+    "apply": "Postuler",
+    "dashboard": "Tableau de bord"
+  },
+  "offline": {
+    "youAreOffline": "Vous êtes hors ligne",
+    "downloadForOffline": "Télécharger hors ligne",
+    "downloading": "Téléchargement...",
+    "availableOffline": "Disponible hors ligne",
+    "removeOffline": "Supprimer les données hors ligne"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "noNotifications": "Aucune notification",
+    "markAllRead": "Tout marquer comme lu",
+    "viewAll": "Voir tout"
+  }
+}

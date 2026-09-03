@@ -1,0 +1,128 @@
+import Image from 'next/image';
+import Link from 'next/link';
+import { QUICK_STATS } from '../barber-program-data';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export function BarberHero() {
+  return (
+    <>
+      {/* Hero — image only, no text or gradient overlay on the photo. */}
+      <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden bg-slate-100">
+        <Image
+          src="/images/pages/programs-barber-hero-new.webp"
+          alt="Barber apprentice cutting hair in a licensed barbershop"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+          placeholder="empty"
+        />
+      </section>
+
+      {/* Headline — below the image frame */}
+      <section className="pt-8 pb-2">
+        <div className="max-w-5xl mx-auto px-4">
+          <h1 className="text-3xl md:text-5xl font-black text-slate-950 mb-2">
+            Barber Apprenticeship Program
+          </h1>
+          <p className="text-slate-800 text-lg max-w-2xl">
+            2,000-hour licensed training. Earn while you learn. Funding and payment options
+            available.
+          </p>
+        </div>
+      </section>
+
+      {/* Waitlist Notice Banner */}
+      <section className="bg-amber-50 border-y border-amber-300">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse" />
+            <span className="font-bold text-amber-950 text-sm uppercase tracking-wide">
+              Waitlist Open
+            </span>
+          </div>
+          <p className="text-amber-950 text-sm leading-snug">
+            We are actively matching apprentices with licensed host barbershops in the Indianapolis
+            area. Spots are limited — join the waitlist and we will contact you as soon as a
+            placement is confirmed.
+          </p>
+        </div>
+      </section>
+
+      {/* CTAs below hero */}
+      <section className="py-6 border-b border-slate-200 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              href="/programs/barber-apprenticeship/apply"
+              className="inline-flex items-center justify-center rounded-lg bg-red-600 px-6 py-3 text-base font-semibold text-white hover:bg-red-700 transition-colors"
+            >
+              Apply Now
+            </Link>
+            <Link
+              href="/funding?program=barber-apprenticeship"
+              className="inline-flex items-center justify-center rounded-lg border-2 border-slate-300 px-6 py-3 text-base font-semibold text-slate-950 hover:bg-slate-50 transition-colors"
+            >
+              Check Funding Eligibility
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Stats */}
+      <section className="py-6 border-b border-slate-200 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {QUICK_STATS.map((s) => (
+              <div
+                key={s.label}
+                className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center"
+              >
+                <div className="text-2xl font-black text-slate-950">{s.val}</div>
+                <div className="mt-1 text-slate-700 text-sm font-semibold">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 1 — Program Overview */}
+      <section id="program-overview" className="py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-black text-slate-950 mb-6">
+                Program Overview
+              </h2>
+              <p className="text-slate-700 leading-relaxed text-lg mb-6">
+                The Barber Apprenticeship Program is a competency-based workforce training program
+                designed to prepare participants for employment in the barbering industry through
+                structured Related Technical Instruction (RTI) and supervised On-the-Job Training
+                (OJT) in licensed barbershop environments. This program follows an
+                apprenticeship-style training model combining classroom instruction, LMS-based
+                modules, and real-world client service under licensed supervision.
+              </p>
+              <div className="bg-white border border-slate-200 rounded-xl p-6">
+                <p className="text-sm text-slate-800 leading-relaxed italic">
+                  INTraining Program ID: #10004637 &middot; Provider: 2Exclusive LLC-S &middot;
+                  Location: {PLATFORM_DEFAULTS.orgName} Training Center, Indianapolis, Indiana
+                  (Marion County)
+                </p>
+              </div>
+            </div>
+            <div className="relative h-80 lg:h-96 rounded-2xl overflow-hidden shadow-lg">
+              <Image
+                src="/images/pages/barber-apprenticeship-hero.jpg"
+                alt="Barber apprentice training in licensed shop"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+                placeholder="empty"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

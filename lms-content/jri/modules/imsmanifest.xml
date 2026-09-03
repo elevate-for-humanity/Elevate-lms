@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<manifest
+        xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"
+        xmlns:adlseq="http://www.adlnet.org/xsd/adlseq_v1p3"
+        xmlns:adlnav="http://www.adlnet.org/xsd/adlnav_v1p3"
+        xmlns:imsss="http://www.imsglobal.org/xsd/imsss"
+        xmlns:lom="http://ltsc.ieee.org/xsd/LOM"
+        identifier="RSD_pvAAKBUPig_P1z6gpgBp5NC5ikE" version="1"
+        xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd http://www.adlnet.org/xsd/adlcp_v1p3 adlcp_v1p3.xsd http://www.adlnet.org/xsd/adlseq_v1p3 adlseq_v1p3.xsd http://www.adlnet.org/xsd/adlnav_v1p3 adlnav_v1p3.xsd http://www.imsglobal.org/xsd/imsss imsss_v1p0.xsd http://ltsc.ieee.org/xsd/LOM lom.xsd">
+    <metadata>
+        <schema>ADL SCORM</schema>
+        <schemaversion>2004 3rd Edition</schemaversion>
+        <adlcp:location>metadata.xml</adlcp:location>
+    </metadata>
+    <organizations default="B0">
+        <organization identifier="B0" adlseq:objectivesGlobalToSystem="false">
+            <title>0-JRI- Introduction to Job Ready Indy (JRI)</title>
+            <item identifier="i1" identifierref="r1" isvisible="true">
+                <title>0-JRI- Introduction to Job Ready Indy (JRI)</title>
+                <imsss:sequencing>
+                    <imsss:deliveryControls completionSetByContent="true" objectiveSetByContent="true" />
+                </imsss:sequencing>
+            </item>
+            <imsss:sequencing>
+                <imsss:controlMode choice="true" flow="true" />
+            </imsss:sequencing>
+        </organization>
+    </organizations>
+    <resources>
+        <resource identifier="r1" type="webcontent" adlcp:scormType="sco" href="dispatch.html">
+            <file href="blank.html"/>
+            <file href="goodbye.html"/>
+            <file href="dispatch.html"/>
+            <file href="configuration.js"/>
+            <file href="utils.js"/>
+        </resource>
+    </resources>
+</manifest>

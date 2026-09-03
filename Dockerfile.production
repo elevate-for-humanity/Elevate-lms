@@ -1,0 +1,94 @@
+# =============================================================================
+# UNIFIED ELEVATE PLATFORM - PRODUCTION DOCKERFILE
+# =============================================================================
+# Single container for all domains:
+# - www.elevateforhumanity.org (Marketing)
+# - app.elevateforhumanity.org (LMS/Student)
+# - admin.elevateforhumanity.org (Admin)
+#
+# All APIs are unified in app/api/
+# No separate container builds for marketing, LMS, or admin.
+# =============================================================================
+
+# =============================================================================
+# STAGE 1: Dependencies
+# =============================================================================
+FROM node:22-bookworm-slim AS dependencies
+
+WORKDIR /app
+
+# Enable corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies (frozen lockfile)
+RUN pnpm install --frozen-lockfile --prod=false
+
+# =============================================================================
+# STAGE 2: Builder
+# =============================================================================
+FROM node:22-bookworm-slim AS builder
+
+WORKDIR /app
+
+# Enable corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+
+# Copy dependencies from previous stage
+COPY --from=dependencies /app/node_modules ./node_modules
+
+# Copy source code
+COPY . .
+
+# Disable telemetry
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Optimize for production
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+
+# Build the application with standalone output
+ENV NEXT_STANDALONE_OUTPUT=1
+
+RUN pnpm build
+
+# =============================================================================
+# STAGE 3: Runtime
+# =============================================================================
+FROM node:22-bookworm-slim AS runtime
+
+WORKDIR /app
+
+# Environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=8080
+ENV HOSTNAME=0.0.0.0
+
+# Install runtime dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        git \
+        ca-certificates \
+        postgresql-client \
+        && rm -rf /var/lib/apt/lists/*
+
+# Copy standalone output
+COPY --from=builder /app/.next/standalone ./
+
+# Copy static assets
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=45s --retries=3 \
+    CMD curl -fsS http://127.0.0.1:8080/api/ready || exit 1
+
+# Start server
+CMD ["node", "server.js"]

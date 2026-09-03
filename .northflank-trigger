@@ -1,0 +1,5 @@
+# Trigger Northflank VCS build
+# Production deploy requested for barber host shop restoration
+merge_sha=5c2bb417c482dfb4208c6ace17c9046ffc7f0103
+requested_at=2026-09-03T14:25:21.567Z
+services=marketing

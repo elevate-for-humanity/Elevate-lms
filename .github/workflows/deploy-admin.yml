@@ -1,0 +1,216 @@
+name: Deploy Admin
+
+# Deployment checkpoint: strict-boundary repair convergence
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/admin/**'
+      - 'lib/**'
+      - 'remotion-src/**'
+      - 'packages/**'
+      - 'components/admin/**'
+      - 'components/studio/**'
+      - 'components/pwa/**'
+      - 'public/**'
+      - 'scripts/northflank/**'
+      - 'scripts/course-factory/**'
+      - 'scripts/verify-admin-instrumentation-boundary.mjs'
+      - 'scripts/guard-admin-routes.sh'
+      - 'instrumentation.ts'
+      - 'scripts/verify-no-retired-admin-ui-routes.mjs'
+      - 'scripts/verify-portal-production-contracts.mjs'
+      - 'next.config.mjs'
+      - 'tailwind.config.js'
+      - 'tsconfig.json'
+      - 'proxy.ts'
+      - 'Dockerfile.admin'
+      - 'Dockerfile.northflank-admin'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/deploy-admin.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: northflank-admin-deploy
+  # Northflank images take several minutes to build. Cancelling an active run
+  # on every shared-library commit can leave production pinned to an old image
+  # indefinitely when commits arrive faster than builds complete. Finish the
+  # active deployment; GitHub will retain only the newest pending run.
+  cancel-in-progress: false
+
+jobs:
+  deploy-admin:
+    name: Build and deploy admin on Northflank
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+      NORTHFLANK_TARGET_SERVICE: admin
+      DEPLOY_BRANCH: main
+      NORTHFLANK_EPHEMERAL_STORAGE_MB: '32768'
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+      NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
+      NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
+      NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
+      NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
+
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@v4
+        with: { fetch-depth: 0, clean: true }
+
+      - name: Prove deployment SHA belongs to main
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          REQUESTED_SHA="${{ github.sha }}"
+          git fetch origin main --depth=200
+          RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
+          test -n "$RESOLVED_SHA"
+          git merge-base --is-ancestor "$RESOLVED_SHA" origin/main
+          test "$RESOLVED_SHA" = "$(git rev-parse HEAD)"
+          test "$(git status --porcelain)" = ""
+
+      - name: Set build environment variables
+        run: |
+          echo "GITHUB_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+          echo "BUILD_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+
+      - name: Generate version file
+        run: |
+          cat > public/version.json <<EOF
+          {"service":"admin","commit":"${{ github.sha }}","builtAt":"$(date -u +%Y-%m-%dT%H:%M:%SZ)"}
+          EOF
+
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies deterministically
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Enforce Admin instrumentation boundary
+        run: node scripts/verify-admin-instrumentation-boundary.mjs
+      - name: Enforce portal production contracts
+        run: node scripts/verify-portal-production-contracts.mjs
+      - name: Reconcile canonical Admin database binding
+        run: pnpm tsx scripts/northflank/sync-admin-database-env.ts
+      - name: Enforce canonical Northflank Admin runtime configuration
+        run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
+      - name: Enforce canonical Admin domain assignment
+        run: pnpm tsx scripts/northflank/configure-admin-domain.ts
+      - name: Verify Admin health-check contract
+        run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
+
+      - name: Trigger Admin build
+        id: trigger_admin_build
+        run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
+      - name: Require concrete build id
+        run: test -n "${{ steps.trigger_admin_build.outputs.build_id }}"
+      - name: Wait for Admin build to complete
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --timeout-ms 3600000
+      - name: Verify exact Admin build succeeded
+        run: pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
+      - name: Deploy exact Admin build
+        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
+      - name: Wait for Admin deployment
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 3600000
+      - name: Verify deployed SHA matches main
+        env: { EXPECTED_SHA: '${{ github.sha }}' }
+        run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status
+
+      - name: Smoke Admin liveness, readiness, dependency health, and exact live SHA
+        run: |
+          set -euo pipefail
+          EXPECTED_SHA="${{ github.sha }}"
+          for i in $(seq 1 20); do
+            ping_status=$(curl -sS --max-time 10 -o /tmp/admin-ping.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/ping?deploy=${EXPECTED_SHA}" || true)
+            ready_status=$(curl -sS --max-time 10 -o /tmp/admin-ready.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/ready?deploy=${EXPECTED_SHA}" || true)
+            health_status=$(curl -sS --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
+            version_status=$(curl -sS --max-time 10 -o /tmp/admin-version.json -w "%{http_code}" "https://admin.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
+            LIVE_SHA="$(node -e "try{const d=require('/tmp/admin-version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
+            echo "Attempt $i/20: ping=$ping_status ready=$ready_status health=$health_status version=$version_status live_sha=${LIVE_SHA:-missing}"
+            if [ "$ping_status" = 200 ] \
+              && [ "$ready_status" = 200 ] \
+              && [ "$health_status" = 200 ] \
+              && [ "$version_status" = 200 ] \
+              && grep -q '"ok":true' /tmp/admin-ping.json \
+              && grep -q '"ready":true' /tmp/admin-ready.json \
+              && grep -q '"healthy":true' /tmp/admin-health.json \
+              && [ "$LIVE_SHA" = "$EXPECTED_SHA" ]; then
+              echo "ADMIN DEPLOYMENT VERIFIED: $EXPECTED_SHA is live, ready, and dependency-healthy"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::error::Admin production did not converge to exact SHA $EXPECTED_SHA with healthy runtime contracts"
+          cat /tmp/admin-ping.json 2>/dev/null || true
+          cat /tmp/admin-ready.json 2>/dev/null || true
+          cat /tmp/admin-health.json 2>/dev/null || true
+          cat /tmp/admin-version.json 2>/dev/null || true
+          exit 1
+
+      - name: Smoke canonical Admin and installed-PWA contracts
+        run: |
+          set -euo pipefail
+          for url in \
+            'https://admin.elevateforhumanity.org/dashboard' \
+            'https://admin.elevateforhumanity.org/dashboard?utm_source=homescreen&utm_medium=pwa' \
+            'https://admin.elevateforhumanity.org/manifest-admin.json' \
+            'https://admin.elevateforhumanity.org/sw-admin.js' \
+            'https://admin.elevateforhumanity.org/offline.html'; do
+            status=$(curl -sS -L --max-time 20 -o /tmp/admin-smoke -w "%{http_code}" "$url" || true)
+            case "$status" in 2*|3*) ;; *) echo "::error::$url failed HTTP $status"; exit 1;; esac
+          done
+          manifest=$(curl -fsSL --max-time 20 https://admin.elevateforhumanity.org/manifest-admin.json)
+          echo "$manifest" | grep -q '"start_url"[[:space:]]*:[[:space:]]*"/dashboard"' || { echo '::error::Admin manifest does not use canonical /dashboard start_url'; exit 1; }
+          worker=$(curl -fsSL --max-time 20 https://admin.elevateforhumanity.org/sw-admin.js)
+          echo "$worker" | grep -q 'Service Worker — Admin Domain' || { echo '::error::Admin service worker is not the canonical worker'; exit 1; }
+
+      - name: Wake durable Course Builder queue
+        run: |
+          set -euo pipefail
+          wake_url="https://admin.elevateforhumanity.org/api/cron/process-course-builder-jobs"
+          for attempt in $(seq 1 5); do
+            status=$(curl --silent --show-error --max-time 300 \
+              --max-redirs 0 \
+              -o /tmp/course-builder-wake.json \
+              -w "%{http_code}" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              "$wake_url" || true)
+            case "$status" in
+              2*)
+                echo "Course Builder queue wake succeeded on attempt $attempt"
+                cat /tmp/course-builder-wake.json
+                exit 0
+                ;;
+              000|502|503|504)
+                echo "::warning::Transient queue wake failure HTTP $status on attempt $attempt/5"
+                if [ "$attempt" -lt 5 ]; then sleep $((attempt * 15)); fi
+                ;;
+              *)
+                echo "::error::Course Builder queue wake failed with non-retryable HTTP $status"
+                cat /tmp/course-builder-wake.json 2>/dev/null || true
+                exit 1
+                ;;
+            esac
+          done
+          echo "::error::Course Builder queue wake did not recover after 5 attempts"
+          cat /tmp/course-builder-wake.json 2>/dev/null || true
+          exit 1

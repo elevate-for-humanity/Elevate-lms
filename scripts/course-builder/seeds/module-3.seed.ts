@@ -1,0 +1,315 @@
+import type { ModuleSeed } from '../../../lib/curriculum/course-builder-types';
+
+export const module3: ModuleSeed = {
+  slug: 'barber-module-3',
+  title: 'Module 3: Haircutting Fundamentals',
+  order: 3,
+  objective:
+    'Execute foundational haircutting techniques with correct posture, sectioning, and elevation.',
+  lessons: [
+    {
+      slug: 'barber-lesson-15',
+      title: 'Tools of the Trade',
+      durationMin: 20,
+      domain: 'TOOLS_EQUIPMENT',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.25,
+      content:
+        'Standard barbering tools: Clippers — electric cutting tool for bulk removal and fades, requires blade disinfection after each use. Trimmers/Edgers — smaller precision tool for outlines and detail work. Shears — scissors for cutting and texturizing, keep sharp and clean. Straight Razor — used for shaving and edging, blade must be replaced between clients. Combs — nonporous, must be disinfected between clients. Brushes — neck brush and cleaning brush, disinfect between clients.\n\nClipper blade maintenance: Turn off and unplug. Brush all visible hair from the blade. Apply clipper disinfectant spray — keep blade visibly wet for full contact time. Allow to dry before reuse. Oil the blade lightly after disinfection to prevent rust.\n\nStraight razor blades must be replaced between every client. A used blade is a single-use item.',
+      competencyChecks: [
+        {
+          id: 'tool-identification',
+          type: 'KNOWLEDGE',
+          description:
+            'Identifies all standard barbering tools by name and function without prompting',
+          required: true,
+        },
+        {
+          id: 'clipper-disinfection',
+          type: 'SANITATION',
+          description:
+            'Performs clipper blade disinfection in correct sequence with correct dwell time',
+          required: true,
+        },
+        {
+          id: 'razor-blade-replacement',
+          type: 'SAFETY',
+          description: 'Replaces straight razor blade between clients — never reuses a blade',
+          required: true,
+        },
+        {
+          id: 'nonporous-disinfection',
+          type: 'SANITATION',
+          description: 'Disinfects all nonporous tools between clients',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-16',
+      title: 'Sectioning & Parting',
+      durationMin: 20,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.25,
+      content:
+        'Consistent sections create consistent results. Uneven sections lead to uneven cuts. Sections control the amount of hair you work with at one time. Parts create visual guides that keep the cut organized.\n\nBasic sectioning sequence: Start at the nape — establish the perimeter first. Create a horizontal part from ear to ear across the crown. Clip the top section out of the way. Work in horizontal sections from nape to crown. Release the top section and work from front to back.\n\nA guide line is the first section cut — all subsequent sections are matched to it. Keep your guide visible at all times.',
+      competencyChecks: [
+        {
+          id: 'consistent-sections',
+          type: 'TECHNIQUE',
+          description:
+            'Creates consistent horizontal sections from nape to crown without gaps or overlaps',
+          required: true,
+        },
+        {
+          id: 'guide-line',
+          type: 'TECHNIQUE',
+          description: 'Establishes and maintains a visible guide line throughout the cut',
+          required: true,
+        },
+        {
+          id: 'clean-clips',
+          type: 'PROCEDURE',
+          description: 'Clips sections cleanly without tangling or distorting the hair',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-17',
+      title: 'Elevation & Overdirection',
+      durationMin: 20,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'THEORY',
+      hoursCredit: 0.25,
+      content:
+        'Elevation: the angle at which hair is held away from the head before cutting. 0° (no elevation) — maximum weight, blunt perimeter, no layering. 45° — moderate weight removal, soft layers. 90° — significant weight removal, uniform layers. 180° — maximum weight removal, highly layered.\n\nOverdirection: pulling hair away from its natural fall to create weight or length variation. Overdirecting toward the front adds length at the back. Overdirecting toward the back adds length at the front. Use overdirection to create graduation or to maintain length in specific areas.',
+      competencyChecks: [
+        {
+          id: 'elevation-demonstration',
+          type: 'TECHNIQUE',
+          description: 'Demonstrates 0°, 45°, and 90° elevation on a mannequin with correct angle',
+          required: true,
+        },
+        {
+          id: 'elevation-weight-effect',
+          type: 'KNOWLEDGE',
+          description: 'Explains the weight effect of each elevation angle without prompting',
+          required: true,
+        },
+        {
+          id: 'overdirection-application',
+          type: 'TECHNIQUE',
+          description: 'Uses overdirection to achieve a specific shape as directed',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-18',
+      title: 'Clipper Cutting Basics',
+      durationMin: 25,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.5,
+      content:
+        "Guard sizes: #0 (no guard) — closest cut, skin fade. #1 — 1/8 inch. #2 — 1/4 inch. #3 — 3/8 inch. #4 — 1/2 inch. #8 — 1 inch, longest standard guard.\n\nBasic clipper technique: Select the appropriate guard. Start at the nape and work upward against the grain. Use smooth, consistent strokes. Check for evenness by combing through after each pass. Blend between guard sizes using a flicking motion at the transition.\n\nCutting against the grain (against hair growth direction) gives a closer, more even cut. Know which direction the client's hair grows before you start.",
+      competencyChecks: [
+        {
+          id: 'guard-selection',
+          type: 'KNOWLEDGE',
+          description: 'Selects correct guard for desired length without reference chart',
+          required: true,
+        },
+        {
+          id: 'against-grain',
+          type: 'TECHNIQUE',
+          description:
+            'Cuts against the grain for even results — identifies growth direction first',
+          required: true,
+        },
+        {
+          id: 'guard-blending',
+          type: 'TECHNIQUE',
+          description: 'Blends between guard sizes without visible lines',
+          required: true,
+        },
+        {
+          id: 'clipper-disinfection-post',
+          type: 'SANITATION',
+          description: 'Disinfects clipper blade after each client',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-19',
+      title: 'Scissor Over Comb',
+      durationMin: 25,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.5,
+      content:
+        'Scissor over comb technique: Hold the comb at the desired angle against the head. Slide the comb upward through the hair. Cut the hair that extends above the comb teeth. Keep the comb moving — do not stop mid-stroke. Work in small sections for even results. Check blend by combing through and looking for lines.\n\nUse for: blending between clipper lengths, areas where clippers cannot reach (around the ears, nape), soft tapers on fine or thin hair.\n\nCommon error: Stopping the comb mid-stroke creates a visible line. Keep the comb moving continuously while cutting.',
+      competencyChecks: [
+        {
+          id: 'comb-angle',
+          type: 'TECHNIQUE',
+          description: 'Maintains consistent comb angle throughout the stroke',
+          required: true,
+        },
+        {
+          id: 'continuous-motion',
+          type: 'TECHNIQUE',
+          description: 'Keeps comb moving continuously — no stops mid-stroke',
+          required: true,
+        },
+        {
+          id: 'blend-check',
+          type: 'TECHNIQUE',
+          description: 'Blends clipper and scissor work without visible lines',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-lesson-20',
+      title: 'Taper & Fade Fundamentals',
+      durationMin: 25,
+      domain: 'HAIRCUTTING',
+      ojtCategory: 'PRACTICAL',
+      hoursCredit: 0.5,
+      content:
+        'A taper gradually decreases length from top to nape — hair is never cut to the skin. A fade cuts to the skin at the nape and sides, blending upward to longer lengths. Both require a smooth, invisible transition between lengths.\n\nLow fade procedure: Establish the fade line at the desired height (low = at or below the occipital bone). Use a #0 or open blade to cut the skin line. Work upward with increasing guard sizes (#1, #2, #3). Blend each transition using a flicking motion. Check the blend from all angles. Use trimmers to clean the hairline and edges.\n\nAfter each guard change, comb through and look for a visible line. If you see a line, blend it before moving on.',
+      competencyChecks: [
+        {
+          id: 'fade-line',
+          type: 'TECHNIQUE',
+          description: 'Establishes a clean fade line at the correct height',
+          required: true,
+        },
+        {
+          id: 'transition-blend',
+          type: 'TECHNIQUE',
+          description: 'Blends between guard sizes without visible lines',
+          required: true,
+        },
+        {
+          id: 'multi-angle-check',
+          type: 'PROCEDURE',
+          description: 'Checks blend from multiple angles during the cut — not just at the end',
+          required: true,
+        },
+        {
+          id: 'hairline-cleanup',
+          type: 'TECHNIQUE',
+          description: 'Cleans hairline with trimmers after fading',
+          required: true,
+        },
+      ],
+    },
+    {
+      slug: 'barber-trichology-hair-loss-science',
+      title: 'Trichology: Hair Loss Science',
+      durationMin: 45,
+      domain: 'HAIR_SCALP',
+      ojtCategory: 'TECHNICAL_INSTRUCTION',
+      hoursCredit: 0.75,
+      curriculumChapter: 'Barbering Ch. 6 — Hair and Scalp Disorders & Diseases',
+      content: 'See sidecar.',
+      competencyChecks: [
+        {
+          id: 'trich-alopecia-types',
+          type: 'KNOWLEDGE',
+          description:
+            'Identifies androgenetic, alopecia areata, traction, and telogen effluvium alopecia',
+          required: true,
+        },
+        {
+          id: 'trich-dht',
+          type: 'KNOWLEDGE',
+          description: 'Explains the role of DHT in androgenetic alopecia',
+          required: true,
+        },
+        {
+          id: 'trich-referral',
+          type: 'KNOWLEDGE',
+          description: 'Identifies scalp conditions requiring physician referral',
+          required: true,
+        },
+      ],
+    },
+  ],
+  checkpoint: {
+    slug: 'barber-module-3-checkpoint',
+    title: 'Haircutting Fundamentals Checkpoint',
+    durationMin: 20,
+    domain: 'HAIRCUTTING',
+    ojtCategory: 'ASSESSMENT',
+    hoursCredit: 0.25,
+    passingScore: 70,
+    questions: [
+      {
+        prompt: 'What guard size produces a 1/4-inch cut?',
+        choices: ['#1', '#2', '#3', '#4'],
+        answerIndex: 1,
+        rationale: 'Guard #2 = 1/4 inch.',
+      },
+      {
+        prompt: 'What does 90-degree elevation do to the hair?',
+        choices: [
+          'Creates maximum weight',
+          'Removes significant weight and creates layers',
+          'Creates a blunt perimeter',
+          'Has no effect on weight',
+        ],
+        answerIndex: 1,
+        rationale:
+          '90-degree elevation holds hair straight out from the head, removing significant weight.',
+      },
+      {
+        prompt: 'What is the correct action when you see a visible blend line during a fade?',
+        choices: [
+          'Continue and fix at the end',
+          'Blend it immediately before moving on',
+          'Switch to a smaller guard',
+          'Start the fade over',
+        ],
+        answerIndex: 1,
+        rationale:
+          'Blend lines should be corrected immediately — waiting makes them harder to fix.',
+      },
+      {
+        prompt: 'What is the key error to avoid in scissor-over-comb technique?',
+        choices: [
+          'Using too much tension',
+          'Stopping the comb mid-stroke',
+          'Cutting too close to the head',
+          'Using the wrong shear size',
+        ],
+        answerIndex: 1,
+        rationale: 'Stopping the comb mid-stroke creates a visible line in the cut.',
+      },
+      {
+        prompt: 'A straight razor blade must be replaced:',
+        choices: ['Once a week', 'Once a day', 'Between every client', 'When it looks dull'],
+        answerIndex: 2,
+        rationale:
+          'Straight razor blades are single-use items and must be replaced between every client.',
+      },
+      {
+        prompt: 'What is the difference between a taper and a fade?',
+        choices: [
+          'A taper cuts to the skin; a fade does not',
+          'A fade cuts to the skin; a taper does not',
+          'They are the same technique',
+          'A taper uses clippers; a fade uses scissors',
+        ],
+        answerIndex: 1,
+        rationale:
+          'A fade cuts to the skin at the nape/sides. A taper gradually decreases length without reaching the skin.',
+      },
+    ],
+  },
+};

@@ -1,0 +1,140 @@
+# Production redeploy trigger: Wan inference diagnostics
+name: Deploy GPU Video Worker
+
+# Paid L4 capacity must never start from an ordinary source push. Validation
+# remains automatic in gpu-worker-ci.yml; production capacity is explicit.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_gpu_cost:
+        description: 'Type DEPLOY_GPU to provision the paid GPU worker'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: northflank-gpu-video-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-gpu-worker:
+    if: github.event.inputs.confirm_gpu_cost == 'DEPLOY_GPU'
+    name: Provision canonical GPU worker
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 180
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+      NORTHFLANK_GPU_PROJECT_ID: elevate-media-gpu
+      NORTHFLANK_GPU_REGION: us-central
+      NORTHFLANK_GPU_SERVICE_ID: elevate-gpu-worker
+      NORTHFLANK_GPU_TYPE: l4-24
+      NORTHFLANK_GPU_COUNT: '1'
+      NORTHFLANK_GPU_DEPLOYMENT_PLAN: nf-gpu-l4-24-1g
+      NORTHFLANK_GPU_BUILD_PLAN: nf-compute-800-16
+      NORTHFLANK_GPU_MODEL_VOLUME_ID: elevate-gpu-models-rwx
+      NORTHFLANK_GPU_MODEL_VOLUME_MB: '153600'
+      NORTHFLANK_GPU_MODEL_STORAGE_CLASS: nf-multi-rw
+      NORTHFLANK_GPU_EPHEMERAL_MB: '256000'
+      NORTHFLANK_GPU_BUILD_EPHEMERAL_MB: '32768'
+      GPU_VIDEO_PROVIDER: wan
+      GPU_MAX_CONCURRENCY: '1'
+      WAN_MIN_VRAM_GB: '22'
+      GITHUB_SHA: ${{ github.sha }}
+      BUILD_SHA: ${{ github.sha }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          clean: true
+
+      - name: Verify production credentials
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -n "$NORTHFLANK_API_TOKEN"
+          test -n "$NORTHFLANK_TEAM_ID"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Validate GPU worker source
+        run: |
+          python -m py_compile services/media-gpu-worker/worker.py
+          python -m py_compile services/media-gpu-worker/bootstrap_models.py
+          pnpm tsx scripts/northflank/provision-gpu-worker.ts
+
+      - name: Provision GPU worker
+        run: pnpm tsx scripts/northflank/provision-gpu-worker.ts --execute
+
+      - name: Normalize canonical service configuration
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_GPU_PROJECT_ID}"
+          auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" -H 'Content-Type: application/json')
+          cat >/tmp/gpu-config.json <<'JSON'
+          {
+            "disabledCI": false,
+            "vcsData": {
+              "projectUrl": "https://github.com/elevate-for-humanity/Elevate-lms",
+              "projectType": "github",
+              "projectBranch": "main"
+            },
+            "buildConfiguration": {
+              "pathIgnoreRules": [
+                "services/media-gpu-worker/**",
+                "scripts/northflank/provision-gpu-worker.ts"
+              ],
+              "isAllowList": true,
+              "ciIgnoreFlagsEnabled": true,
+              "ciIgnoreFlags": ["[skip ci]", "[ci skip]", "[northflank skip]", "[skip northflank]"]
+            },
+            "deployment": {
+              "type": "deployment",
+              "instances": 1,
+              "strategy": {"type": "recreate"},
+              "gracePeriodSeconds": 180
+            }
+          }
+          JSON
+          curl -fsS -X PATCH "${auth[@]}" --data-binary @/tmp/gpu-config.json "$base/services/combined/${NORTHFLANK_GPU_SERVICE_ID}" >/tmp/gpu-normalize.json
+
+      - name: Verify canonical state
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_GPU_PROJECT_ID}"
+          curl -fsS -H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}" >/tmp/gpu-final.json
+          node <<'NODE'
+          const fs=require('fs');
+          const raw=JSON.parse(fs.readFileSync('/tmp/gpu-final.json','utf8'));
+          const s=raw.data||raw;
+          const instances=Number(s.deployment?.instances ?? s.deployment?.spec?.instances ?? 0);
+          const rules=s.buildConfiguration?.pathIgnoreRules||[];
+          const expected=['services/media-gpu-worker/**','scripts/northflank/provision-gpu-worker.ts'];
+          console.log(JSON.stringify({id:s.id||s.name,instances,disabledCI:s.disabledCI,isAllowList:s.buildConfiguration?.isAllowList,pathIgnoreRules:rules,buildStatus:s.status?.build?.status||null,deploymentStatus:s.status?.deployment?.status||null},null,2));
+          if ((s.id||s.name)!=='elevate-gpu-worker') throw new Error('Canonical GPU service missing');
+          if (instances!==1) throw new Error(`Expected 1 GPU instance; got ${instances}`);
+          if (s.disabledCI!==false) throw new Error('GPU CI is disabled');
+          if (s.buildConfiguration?.isAllowList!==true) throw new Error('GPU rules are not allow-list mode');
+          if (!expected.every(r=>rules.includes(r))) throw new Error('GPU path rules are incomplete');
+          NODE

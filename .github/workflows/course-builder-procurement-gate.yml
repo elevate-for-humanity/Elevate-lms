@@ -1,0 +1,72 @@
+name: Course Builder Procurement Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'components/admin/course-builder/**'
+      - 'components/lms/**'
+      - 'apps/admin/app/studio/courses/**'
+      - 'apps/admin/app/api/admin/course-builder/**'
+      - 'apps/admin/app/api/admin/lms/courses/**'
+      - 'apps/lms/app/api/courses/**'
+      - 'apps/lms/app/api/learner/**'
+      - 'apps/lms/app/lms/courses/**'
+      - 'lib/course-factory/**'
+      - 'lib/course-builder/**'
+      - 'supabase/migrations/**'
+      - 'scripts/audit-course-builder-procurement.mjs'
+      - '.github/workflows/course-builder-procurement-gate.yml'
+  pull_request:
+    paths:
+      - 'components/admin/course-builder/**'
+      - 'components/lms/**'
+      - 'apps/admin/app/studio/courses/**'
+      - 'apps/admin/app/api/admin/course-builder/**'
+      - 'apps/admin/app/api/admin/lms/courses/**'
+      - 'apps/lms/app/api/courses/**'
+      - 'apps/lms/app/api/learner/**'
+      - 'apps/lms/app/lms/courses/**'
+      - 'lib/course-factory/**'
+      - 'lib/course-builder/**'
+      - 'supabase/migrations/**'
+      - 'scripts/audit-course-builder-procurement.mjs'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: course-builder-procurement-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  architecture:
+    name: Procurement architecture
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify canonical Course Builder architecture
+        run: node scripts/audit-course-builder-procurement.mjs
+      - name: Verify Studio architecture
+        run: node scripts/check-studio-architecture.mjs
+
+  builds:
+    name: Admin and LMS production builds
+    runs-on: ubuntu-latest
+    needs: architecture
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build Admin
+        run: pnpm --filter @elevate/admin build
+      - name: Build LMS
+        run: pnpm --filter @elevate/lms build

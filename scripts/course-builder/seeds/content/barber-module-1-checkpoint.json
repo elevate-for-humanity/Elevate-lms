@@ -1,0 +1,227 @@
+{
+  "quiz": {
+    "passingScore": 70,
+    "questions": [
+      {
+        "prompt": "While performing a haircut, you accidentally cut your finger. What is the first step you should take to ensure infection control?",
+        "choices": [
+          "Stop the service and apply pressure to the wound",
+          "Continue the service and bandage later",
+          "Rinse the wound with water and continue",
+          "Ask a colleague to take over immediately"
+        ],
+        "answerIndex": 0,
+        "rationale": "Stopping the service immediately to address the wound prevents contamination and ensures proper infection control."
+      },
+      {
+        "prompt": "A client notices a barber using the same comb on multiple clients without cleaning it. What is the most appropriate action the client should expect from the barber?",
+        "choices": [
+          "Explain that it's not necessary to clean combs",
+          "Apologize and clean the comb before continuing",
+          "Ignore the comment and continue working",
+          "Offer a discount for the oversight"
+        ],
+        "answerIndex": 1,
+        "rationale": "The barber should apologize and clean the comb to maintain hygiene standards and prevent cross-contamination."
+      },
+      {
+        "prompt": "What is the correct procedure for disinfecting a pair of scissors after use?",
+        "choices": [
+          "Rinse with hot water and dry with a towel",
+          "Wipe with a damp cloth and store",
+          "Immerse in an EPA-registered disinfectant",
+          "Spray with alcohol and wipe immediately"
+        ],
+        "answerIndex": 2,
+        "rationale": "Immersing in an EPA-registered disinfectant ensures thorough disinfection, meeting industry standards."
+      },
+      {
+        "prompt": "During a busy day, you notice that the floor is wet from a spill. What should you do to maintain safety in the barbershop?",
+        "choices": [
+          "Place a wet floor sign and continue working",
+          "Ignore it and hope it dries quickly",
+          "Ask a client to be careful when walking",
+          "Mop it up immediately and then place a sign"
+        ],
+        "answerIndex": 3,
+        "rationale": "Mopping up the spill immediately and placing a sign prevents accidents and maintains a safe environment."
+      },
+      {
+        "prompt": "A client enters the barbershop with visible lice. What is the appropriate course of action?",
+        "choices": [
+          "Proceed with the haircut and clean tools afterward",
+          "Politely refuse service and recommend treatment",
+          "Use a lice comb and continue service",
+          "Ask the client to wait while you consult a colleague"
+        ],
+        "answerIndex": 1,
+        "rationale": "Refusing service and recommending treatment is necessary to prevent the spread of lice to other clients and staff."
+      },
+      {
+        "prompt": "How often should barbershop tools be disinfected to ensure proper infection control?",
+        "choices": [
+          "Once a week",
+          "After each client",
+          "At the end of the day",
+          "When visibly dirty"
+        ],
+        "answerIndex": 1,
+        "rationale": "Disinfecting tools after each client prevents cross-contamination and maintains hygiene standards."
+      },
+      {
+        "prompt": "What is the primary purpose of using a neck strip under a cape during a haircut?",
+        "choices": [
+          "To prevent hair from falling inside the collar",
+          "To provide extra comfort",
+          "To prevent direct contact between the cape and the client's skin",
+          "To enhance the appearance of the cape"
+        ],
+        "answerIndex": 2,
+        "rationale": "Using a neck strip prevents direct contact, reducing the risk of cross-contamination between clients."
+      },
+      {
+        "prompt": "A client complains of a burning sensation after a haircut. What could be the likely cause?",
+        "choices": [
+          "Dull scissors",
+          "Incorrect hair products",
+          "Improper tool disinfection",
+          "Allergy to the cape material"
+        ],
+        "answerIndex": 2,
+        "rationale": "Improper tool disinfection can lead to irritation or infection, causing a burning sensation."
+      },
+      {
+        "prompt": "What is the recommended method for cleaning electrical tools such as clippers?",
+        "choices": [
+          "Immerse in water",
+          "Wipe with a disinfectant cloth",
+          "Use a brush to remove hair and spray with disinfectant",
+          "Rinse under running water"
+        ],
+        "answerIndex": 2,
+        "rationale": "Using a brush to remove hair and spraying with disinfectant ensures cleanliness without damaging the electrical components."
+      },
+      {
+        "prompt": "If a client has an open wound on their scalp, what should a barber do?",
+        "choices": [
+          "Proceed with caution",
+          "Cover the wound with a bandage and continue",
+          "Refuse service until the wound is healed",
+          "Use antiseptic on the wound and proceed"
+        ],
+        "answerIndex": 2,
+        "rationale": "Refusing service until the wound is healed prevents infection and maintains safety standards."
+      },
+      {
+        "prompt": "What is the most effective way to ensure that a barbershop maintains high hygiene standards?",
+        "choices": [
+          "Conduct weekly deep cleaning",
+          "Implement a daily cleaning schedule",
+          "Rely on visual inspections",
+          "Use air fresheners regularly"
+        ],
+        "answerIndex": 1,
+        "rationale": "Implementing a daily cleaning schedule ensures consistent maintenance of hygiene standards."
+      },
+      {
+        "prompt": "A client reports a rash after using a new hair product. What should the barber do?",
+        "choices": [
+          "Ignore it as a coincidence",
+          "Switch to a different product immediately",
+          "Advise the client to see a dermatologist",
+          "Offer a refund"
+        ],
+        "answerIndex": 2,
+        "rationale": "Advising the client to see a dermatologist ensures professional medical advice is sought for the rash."
+      },
+      {
+        "prompt": "What is the correct action if a barber notices a colleague not following proper sanitation procedures?",
+        "choices": [
+          "Report to management immediately",
+          "Ignore it to avoid conflict",
+          "Discuss the issue privately with the colleague",
+          "Wait for a client to notice and complain"
+        ],
+        "answerIndex": 2,
+        "rationale": "Discussing the issue privately with the colleague allows for a direct and constructive resolution."
+      },
+      {
+        "prompt": "Which of the following is a critical step in preventing the spread of infection in a barbershop?",
+        "choices": [
+          "Using disposable gloves for each client",
+          "Washing hands only when visibly dirty",
+          "Sharing tools among barbers",
+          "Relying solely on hand sanitizers"
+        ],
+        "answerIndex": 0,
+        "rationale": "Using disposable gloves for each client minimizes direct contact and prevents the spread of infection."
+      },
+      {
+        "prompt": "What should a barber do if they suspect a client has a contagious skin condition?",
+        "choices": [
+          "Proceed with the service and clean tools afterward",
+          "Refuse service and suggest medical consultation",
+          "Use extra disinfectant during the service",
+          "Ask the client to reschedule"
+        ],
+        "answerIndex": 1,
+        "rationale": "Refusing service and suggesting medical consultation prevents potential spread and ensures client safety."
+      },
+      {
+        "prompt": "How should a barber handle linens and towels that have been used on clients?",
+        "choices": [
+          "Shake them out and reuse",
+          "Store them in a closed container until laundered",
+          "Hang them to air dry",
+          "Fold and place back in storage"
+        ],
+        "answerIndex": 1,
+        "rationale": "Storing used linens and towels in a closed container prevents contamination until they can be properly laundered."
+      },
+      {
+        "prompt": "A barber notices a client with a fungal infection on their nails. What is the appropriate response?",
+        "choices": [
+          "Ignore it and proceed with the service",
+          "Recommend an antifungal treatment and refuse nail services",
+          "Cover the nails with polish",
+          "Use extra disinfectant on the nails"
+        ],
+        "answerIndex": 1,
+        "rationale": "Recommending treatment and refusing nail services prevents spreading the infection and ensures client safety."
+      },
+      {
+        "prompt": "What is the most effective way to prevent the spread of respiratory infections in a barbershop?",
+        "choices": [
+          "Encourage mask-wearing for clients and staff",
+          "Increase the use of air fresheners",
+          "Keep doors and windows closed",
+          "Limit conversation during services"
+        ],
+        "answerIndex": 0,
+        "rationale": "Encouraging mask-wearing helps reduce the transmission of respiratory infections in close-contact environments like barbershops."
+      },
+      {
+        "prompt": "What should be done with single-use items after they have been used on a client?",
+        "choices": [
+          "Sanitize and reuse",
+          "Dispose of immediately in a trash bin",
+          "Store for future use",
+          "Give to the client as a takeaway"
+        ],
+        "answerIndex": 1,
+        "rationale": "Disposing of single-use items immediately prevents cross-contamination and maintains hygiene standards."
+      },
+      {
+        "prompt": "A barber accidentally drops a comb on the floor during a service. What should they do next?",
+        "choices": [
+          "Pick it up and continue using it",
+          "Rinse it with water and continue",
+          "Clean it with a disinfectant before reuse",
+          "Ignore it and use a new comb"
+        ],
+        "answerIndex": 3,
+        "rationale": "Using a new comb ensures hygiene and prevents potential contamination from the floor."
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "serviceType": "combined",
+  "name": "Elevate-lms",
+  "billing": {
+    "deploymentPlan": "nf-compute-400"
+  },
+  "buildEngineConfiguration": {
+    "buildEngine": "buildkit"
+  },
+  "vcsData": {
+    "projectUrl": "https://github.com/elevate-for-humanity/Elevate-lms",
+    "projectBranch": "main",
+    "dockerFilePath": "/Dockerfile.northflank-lms",
+    "dockerWorkDir": "/"
+  },
+  "buildSecrets": {
+    "NEXT_PUBLIC_SUPABASE_URL": "",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "",
+    "SUPABASE_SERVICE_ROLE_KEY": "",
+    "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org",
+    "NEXT_PUBLIC_ADMIN_URL": "https://admin.elevateforhumanity.org",
+    "NEXT_PUBLIC_APP_URL": "https://app.elevateforhumanity.org"
+  },
+  "buildArgs": {
+    "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org",
+    "NEXT_PUBLIC_ADMIN_URL": "https://admin.elevateforhumanity.org",
+    "NEXT_PUBLIC_APP_URL": "https://app.elevateforhumanity.org"
+  },
+  "deployment": {
+    "healthCheck": {
+      "enabled": true,
+      "path": "/api/ping",
+      "port": 3000,
+      "protocol": "HTTP",
+      "initialDelaySeconds": 60,
+      "periodSeconds": 10,
+      "timeoutSeconds": 5,
+      "failureThreshold": 3
+    },
+    "startupProbe": {
+      "enabled": true,
+      "path": "/api/ping",
+      "port": 3000,
+      "protocol": "HTTP",
+      "initialDelaySeconds": 30,
+      "periodSeconds": 10,
+      "timeoutSeconds": 5,
+      "failureThreshold": 12
+    },
+    "readinessProbe": {
+      "enabled": true,
+      "path": "/api/health",
+      "port": 3000,
+      "protocol": "HTTP",
+      "initialDelaySeconds": 10,
+      "periodSeconds": 10,
+      "timeoutSeconds": 5,
+      "failureThreshold": 3
+    }
+  }
+}

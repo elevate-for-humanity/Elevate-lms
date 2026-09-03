@@ -1,0 +1,48 @@
+name: Delete Legacy GPU Build Service
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/delete-legacy-gpu-build-service.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  delete-legacy-gpu-build-service:
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      LEGACY_GPU_BUILD_SERVICE_ID: elevate-gpu-worker-build
+    steps:
+      - name: Delete legacy GPU build service from main platform only
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -n "$NORTHFLANK_API_TOKEN"
+          base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_PROJECT_ID}"
+          auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" -H 'Content-Type: application/json')
+          code=$(curl -sS -o /tmp/before.json -w '%{http_code}' "${auth[@]}" "$base/services/${LEGACY_GPU_BUILD_SERVICE_ID}" || true)
+          echo "before_http=$code"
+          if [ "$code" = "200" ]; then
+            dcode=$(curl -sS -o /tmp/delete.json -w '%{http_code}' -X DELETE "${auth[@]}" "$base/services/${LEGACY_GPU_BUILD_SERVICE_ID}?delete_child_objects=true" || true)
+            echo "delete_http=$dcode"
+            if [ "$dcode" != "200" ] && [ "$dcode" != "202" ] && [ "$dcode" != "204" ]; then
+              cat /tmp/delete.json || true
+              exit 1
+            fi
+          elif [ "$code" != "404" ]; then
+            cat /tmp/before.json || true
+            exit 1
+          fi
+          sleep 5
+          after=$(curl -sS -o /tmp/after.json -w '%{http_code}' "${auth[@]}" "$base/services/${LEGACY_GPU_BUILD_SERVICE_ID}" || true)
+          echo "after_http=$after"
+          test "$after" = "404"
+          echo "legacy_gpu_build_service_removed=true"

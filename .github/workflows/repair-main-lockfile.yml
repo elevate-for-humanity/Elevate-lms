@@ -1,0 +1,49 @@
+name: Repair Main Lockfile
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/repair-main-lockfile.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair-lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Regenerate lockfile from current package configuration
+        run: pnpm install --lockfile-only --no-frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Verify frozen install accepts repaired lockfile
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Push repaired lockfile branch
+        run: |
+          set -euo pipefail
+          git config user.name "elevateforhumanity"
+          git config user.email "Elizabethpowell6262@gmail.com"
+          git switch -c fix/pnpm-lock-sync-20260814
+          git add pnpm-lock.yaml
+          git commit -m "fix(deps): sync pnpm lockfile with overrides"
+          git push --force-with-lease origin fix/pnpm-lock-sync-20260814

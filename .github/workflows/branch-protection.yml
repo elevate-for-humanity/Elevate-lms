@@ -1,0 +1,68 @@
+name: Branch Cleanup Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: branch-cleanup-audit
+  cancel-in-progress: true
+
+jobs:
+  audit-stale-branches:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch remote branches
+        run: git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+
+      - name: Report branches older than 30 days without open PRs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          owner="${REPO%%/*}"
+          current_time=$(date +%s)
+
+          mapfile -t branches < <(
+            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
+              | grep -v '^HEAD$' \
+              | grep -v '^main$' \
+              | grep -v '^dependabot/' \
+              | grep -v '^release/production-recovery-' \
+              | sort
+          )
+
+          for branch in "${branches[@]}"; do
+            last_commit=$(git log -1 --format=%ct "origin/${branch}")
+            days_old=$(( (current_time - last_commit) / 86400 ))
+
+            if [ "$days_old" -le 30 ]; then
+              continue
+            fi
+
+            if ! open_prs=$(gh api -X GET search/issues \
+              -f q="repo:${REPO} is:pr is:open head:${owner}:${branch}" \
+              --jq '.total_count'); then
+              echo "ERROR: Could not verify PR state for $branch; refusing to classify it as deletable."
+              exit 1
+            fi
+
+            if [ "$open_prs" -gt 0 ]; then
+              echo "KEEP: $branch (${days_old} days old) — open pull request exists."
+            else
+              echo "REVIEW: $branch (${days_old} days old) — no open pull request found."
+            fi
+          done
+
+          echo "Audit complete. No branches were deleted."

@@ -1,0 +1,3 @@
+Production convergence trigger for Marketing, Admin, and LMS.
+Base main SHA: 3a23b51dab29ff02a88e8d5248c37d10226900f2
+Purpose: force exact-SHA production rebuild/deploy verification across all three services.

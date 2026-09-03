@@ -1,0 +1,14 @@
+-- DEPRECATED: Programs are now seeded in 000_master_seed.sql
+-- This file is kept for reference only
+-- DO NOT USE - Use 000_master_seed.sql instead
+
+-- Seed default programs (DEPRECATED - DO NOT USE)
+-- INSERT INTO courses (slug, title, metadata)
+-- VALUES
+--   ('barber-training', 'Barber Training Program', '{"modules": [], "duration": "12 months", "description": "Master the art of barbering with hands-on training"}'),
+--   ('cna-training', 'Certified Nursing Assistant', '{"modules": [], "duration": "8 weeks", "description": "Start your healthcare career with CNA certification"}'),
+--   ('hvac-training', 'HVAC Technician Program', '{"modules": [], "duration": "6 months", "description": "Learn heating, ventilation, and air conditioning systems"}'),
+--   ('welding-training', 'Welding Certification Program', '{"modules": [], "duration": "4 months", "description": "Become a certified welder with industry-standard training"}'),
+--   ('cdl-training', 'Commercial Driver''s License', '{"modules": [], "duration": "4 weeks", "description": "Get your CDL and start a trucking career"}'),
+--   ('it-support', 'IT Support Specialist', '{"modules": [], "duration": "3 months", "description": "Launch your tech career with CompTIA certifications"}')
+-- ON CONFLICT (slug) DO NOTHING;

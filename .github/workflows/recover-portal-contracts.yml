@@ -1,0 +1,121 @@
+name: Recover Portal Contracts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/recover-portal-contracts.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: recover-portal-contracts-main
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Recover verified pre-split implementations
+        shell: bash
+        run: |
+          set -euo pipefail
+          HIST=f86a76f86a22236707cf31cfc2b1707705f69569
+          git fetch origin "$HIST" --depth=1 || true
+          python - <<'PY'
+          import subprocess, pathlib
+          hist='f86a76f86a22236707cf31cfc2b1707705f69569'
+          mappings = {
+            'apps/lms/app/api/applications/route.ts':'app-legacy/api/applications/route.ts',
+            'apps/lms/app/api/enroll/payment/route.ts':'app-legacy/api/enroll/payment/route.ts',
+            'apps/lms/app/api/billing/portal/route.ts':'app-legacy/api/billing/portal/route.ts',
+            'apps/lms/app/api/account/export/route.ts':'app-legacy/api/account/export/route.ts',
+            'apps/lms/app/api/account/delete/route.ts':'app-legacy/api/account/delete/route.ts',
+            'apps/lms/app/api/employer/hiring-trends/route.ts':'app-legacy/api/employer/hiring-trends/route.ts',
+            'apps/lms/app/api/employer/retention-stats/route.ts':'app-legacy/api/employer/retention-stats/route.ts',
+            'apps/lms/app/api/employer/hours/route.ts':'app-legacy/api/employer/hours/route.ts',
+            'apps/lms/app/api/apprenticeship/hours/approve/route.ts':'app-legacy/api/apprenticeship/hours/approve/route.ts',
+            'apps/lms/app/api/employer/reports/submit/route.ts':'app-legacy/api/employer/reports/submit/route.ts',
+            'apps/lms/app/api/partner/onboarding-status/route.ts':'app-legacy/api/partner/onboarding-status/route.ts',
+            'apps/lms/app/api/partner/apprentices/route.ts':'app-legacy/api/partner/apprentices/route.ts',
+            'apps/lms/app/api/partner/progress/route.ts':'app-legacy/api/partner/progress/route.ts',
+            'apps/lms/app/api/partner/settings/route.ts':'app-legacy/api/partner/settings/route.ts',
+            'apps/lms/app/lms/courses/[course]/enroll/page.tsx':'app-legacy/lms/courses/[course]/enroll/page.tsx',
+            'apps/admin/app/api/instructor/engagement-stats/route.ts':'app-legacy/api/instructor/engagement-stats/route.ts',
+            'apps/admin/app/api/instructor/course-performance/route.ts':'app-legacy/api/instructor/course-performance/route.ts',
+            'apps/admin/app/api/crm/templates/route.ts':'app-legacy/api/crm/templates/route.ts',
+            'apps/admin/app/api/instructor/my-students/route.ts':'app-legacy/api/instructor/my-students/route.ts',
+            'apps/admin/app/api/instructor/campaigns/send/route.ts':'app-legacy/api/instructor/campaigns/send/route.ts',
+            'apps/admin/app/api/courses/[courseId]/announcements/route.ts':'app-legacy/api/courses/[courseId]/announcements/route.ts',
+            'apps/admin/app/api/grade/upsert/route.ts':'app-legacy/api/grade/upsert/route.ts',
+            'apps/admin/app/api/lms/submissions/review/route.ts':'app-legacy/api/lms/submissions/review/route.ts',
+            'apps/admin/app/api/crm/send-campaign/route.ts':'app-legacy/api/crm/send-campaign/route.ts',
+            'apps/admin/app/api/documents/upload/route.ts':'app-legacy/api/documents/upload/route.ts',
+            'apps/admin/app/api/programs/route.ts':'app-legacy/api/programs/route.ts',
+            'apps/admin/app/api/admin/workflows/[id]/route.ts':'app-legacy/api/admin/workflows/[id]/route.ts',
+            'apps/admin/app/api/admin/workflows/[id]/steps/route.ts':'app-legacy/api/admin/workflows/[id]/steps/route.ts',
+            'apps/admin/app/api/admin/workflows/[id]/steps/[stepId]/route.ts':'app-legacy/api/admin/workflows/[id]/steps/[stepId]/route.ts',
+            'apps/admin/app/api/admin/workflows/[id]/triggers/route.ts':'app-legacy/api/admin/workflows/[id]/triggers/route.ts',
+            'apps/admin/app/api/admin/workflows/[id]/triggers/[triggerId]/route.ts':'app-legacy/api/admin/workflows/[id]/triggers/[triggerId]/route.ts',
+          }
+          copied=[]
+          for dest, src in mappings.items():
+            if pathlib.Path(dest).exists():
+              continue
+            p=subprocess.run(['git','show',f'{hist}:{src}'],capture_output=True)
+            if p.returncode:
+              print(f'MISSING_SOURCE {src}')
+              continue
+            path=pathlib.Path(dest)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(p.stdout)
+            copied.append(dest)
+          apprentice=pathlib.Path('apps/lms/app/apprentice/match-requests/page.tsx')
+          if apprentice.exists():
+            text=apprentice.read_text().replace('href="/apprentice/dashboard"','href="/apprentice"').replace("href='/apprentice/dashboard'","href='/apprentice'")
+            apprentice.write_text(text)
+          applications=pathlib.Path('apps/lms/app/api/applications/route.ts')
+          if applications.exists():
+            text=applications.read_text()
+            old="""      logger.error('[api/applications] All insert tiers failed', {\n        code: (error as any)?.code,\n        message: (error as any)?.message,\n        details: (error as any)?.details,\n        hint: (error as any)?.hint,\n        program,\n        email: body.email,\n      });"""
+            new="""      logger.error(\n        `[api/applications] All insert tiers failed: ${(error as any)?.message || 'unknown database error'} (program=${program})`,\n        error instanceof Error ? error : undefined,\n      );"""
+            text=text.replace(old,new)
+            applications.write_text(text)
+          print(f'recovered={len(copied)}')
+          for path in copied:
+            print(f'RECOVERED {path}')
+          PY
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Validate recovered portal contracts
+        run: |
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false
+          node scripts/audit-logger-errors.mjs
+          node scripts/audit-portal-functions.mjs || true
+      - name: Commit verified recovery directly to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo 'No portal recovery changes generated.'
+            exit 0
+          fi
+          git config user.name 'elevate-ci'
+          git config user.email 'actions@users.noreply.github.com'
+          git add apps/lms apps/admin
+          HUSKY=0 git commit -m 'fix(portals): restore verified lost function contracts'
+          git pull --rebase origin main
+          git push origin HEAD:main

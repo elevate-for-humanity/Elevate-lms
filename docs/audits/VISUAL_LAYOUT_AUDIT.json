@@ -1,0 +1,2981 @@
+{
+  "scannedFiles": 2490,
+  "generatedAt": "2026-06-03T23:57:47.564Z",
+  "canonicalHero": "h-[38vh] min-h-[220px] max-h-[420px]",
+  "summary": {
+    "oversizedHero": {
+      "critical": 0,
+      "high": 47,
+      "medium": 0,
+      "low": 0
+    },
+    "imagePerf": {
+      "critical": 0,
+      "high": 9,
+      "medium": 416,
+      "low": 40
+    },
+    "layoutText": {
+      "critical": 0,
+      "high": 112,
+      "medium": 4,
+      "low": 0
+    },
+    "oversizedHeroTotal": 47,
+    "imagePerfTotal": 465,
+    "layoutTextTotal": 116,
+    "marketingPagesWithHeroButNotCanonical": 331
+  },
+  "topOversizedHeroFiles": [
+    [
+      "app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx",
+      [
+        {
+          "file": "app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx",
+          "line": 1648,
+          "match": "max-h-[640px]",
+          "id": "max-h-600-plus",
+          "re": {},
+          "severity": "high",
+          "message": "max-height >560px (exceeds design standard)"
+        },
+        {
+          "file": "app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx",
+          "line": 1268,
+          "match": "clamp(320px,44vw,640px)",
+          "id": "clamp-max-600-plus",
+          "re": {},
+          "severity": "high",
+          "message": "clamp() max >560px"
+        }
+      ]
+    ],
+    [
+      "components/ModerationDashboard.tsx",
+      [
+        {
+          "file": "components/ModerationDashboard.tsx",
+          "line": 319,
+          "match": "h-[90vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        },
+        {
+          "file": "components/ModerationDashboard.tsx",
+          "line": 324,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/admin/dashboard/LizzyContainerWrapper.tsx",
+      [
+        {
+          "file": "components/admin/dashboard/LizzyContainerWrapper.tsx",
+          "line": 12,
+          "match": "min-h-[420px]",
+          "id": "min-h-420-plus",
+          "re": {},
+          "severity": "high",
+          "message": "min-height ≥420px on hero-like container"
+        },
+        {
+          "file": "components/admin/dashboard/LizzyContainerWrapper.tsx",
+          "line": 68,
+          "match": "min-h-[420px]",
+          "id": "min-h-420-plus",
+          "re": {},
+          "severity": "high",
+          "message": "min-height ≥420px on hero-like container"
+        }
+      ]
+    ],
+    [
+      "app/apprentice/not-found.tsx",
+      [
+        {
+          "file": "app/apprentice/not-found.tsx",
+          "line": 5,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/apps/website-builder/WebsiteBuilderApp.tsx",
+      [
+        {
+          "file": "app/apps/website-builder/WebsiteBuilderApp.tsx",
+          "line": 199,
+          "match": "h-[90vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/employer/not-found.tsx",
+      [
+        {
+          "file": "app/employer/not-found.tsx",
+          "line": 5,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/funding/not-found.tsx",
+      [
+        {
+          "file": "app/funding/not-found.tsx",
+          "line": 6,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/lms/not-found.tsx",
+      [
+        {
+          "file": "app/lms/not-found.tsx",
+          "line": 5,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/loading.tsx",
+      [
+        {
+          "file": "app/loading.tsx",
+          "line": 6,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/login/not-found.tsx",
+      [
+        {
+          "file": "app/login/not-found.tsx",
+          "line": 5,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/mentor/not-found.tsx",
+      [
+        {
+          "file": "app/mentor/not-found.tsx",
+          "line": 5,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/program-holder/not-found.tsx",
+      [
+        {
+          "file": "app/program-holder/not-found.tsx",
+          "line": 6,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/programs/loading.tsx",
+      [
+        {
+          "file": "app/programs/loading.tsx",
+          "line": 3,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/programs/not-found.tsx",
+      [
+        {
+          "file": "app/programs/not-found.tsx",
+          "line": 6,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/store/add-ons/analytics-pro/page.tsx",
+      [
+        {
+          "file": "app/store/add-ons/analytics-pro/page.tsx",
+          "line": 98,
+          "match": "h-[50vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/store/add-ons/compliance-automation/page.tsx",
+      [
+        {
+          "file": "app/store/add-ons/compliance-automation/page.tsx",
+          "line": 99,
+          "match": "h-[50vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "app/store/not-found.tsx",
+      [
+        {
+          "file": "app/store/not-found.tsx",
+          "line": 5,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/ContextualHelp.tsx",
+      [
+        {
+          "file": "components/ContextualHelp.tsx",
+          "line": 206,
+          "match": "h-[80vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/DataExportDialog.tsx",
+      [
+        {
+          "file": "components/DataExportDialog.tsx",
+          "line": 323,
+          "match": "h-[90vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/ElevateChatWidget.tsx",
+      [
+        {
+          "file": "components/ElevateChatWidget.tsx",
+          "line": 121,
+          "match": "h-[85vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/EligibilityModal.tsx",
+      [
+        {
+          "file": "components/EligibilityModal.tsx",
+          "line": 22,
+          "match": "h-[90vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/FeedbackWidget.tsx",
+      [
+        {
+          "file": "components/FeedbackWidget.tsx",
+          "line": 99,
+          "match": "h-[90vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/NotificationBell.tsx",
+      [
+        {
+          "file": "components/NotificationBell.tsx",
+          "line": 105,
+          "match": "h-[80vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/OnboardingFlow.tsx",
+      [
+        {
+          "file": "components/OnboardingFlow.tsx",
+          "line": 49,
+          "match": "h-[90vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/ProgramPageTemplate.tsx",
+      [
+        {
+          "file": "components/ProgramPageTemplate.tsx",
+          "line": 63,
+          "match": "min-h-[600px]",
+          "id": "min-h-420-plus",
+          "re": {},
+          "severity": "high",
+          "message": "min-height ≥420px on hero-like container"
+        }
+      ]
+    ],
+    [
+      "components/SurveyModal.tsx",
+      [
+        {
+          "file": "components/SurveyModal.tsx",
+          "line": 228,
+          "match": "h-[90vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/TutorialSystem.tsx",
+      [
+        {
+          "file": "components/TutorialSystem.tsx",
+          "line": 105,
+          "match": "h-[90vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/admin/AdminNav.tsx",
+      [
+        {
+          "file": "components/admin/AdminNav.tsx",
+          "line": 149,
+          "match": "h-[75vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/blocks/AccordionSection.tsx",
+      [
+        {
+          "file": "components/blocks/AccordionSection.tsx",
+          "line": 48,
+          "match": "max-h-[600px]",
+          "id": "max-h-600-plus",
+          "re": {},
+          "severity": "high",
+          "message": "max-height >560px (exceeds design standard)"
+        }
+      ]
+    ],
+    [
+      "components/chat/AILiveChat.tsx",
+      [
+        {
+          "file": "components/chat/AILiveChat.tsx",
+          "line": 233,
+          "match": "h-[70vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/course/DragDropBuilder.tsx",
+      [
+        {
+          "file": "components/course/DragDropBuilder.tsx",
+          "line": 369,
+          "match": "h-[90vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/demo/TourOverlay.tsx",
+      [
+        {
+          "file": "components/demo/TourOverlay.tsx",
+          "line": 140,
+          "match": "h-[80vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/home/VideoHeroSection.tsx",
+      [
+        {
+          "file": "components/home/VideoHeroSection.tsx",
+          "line": 57,
+          "match": "min-h-[520px]",
+          "id": "min-h-420-plus",
+          "re": {},
+          "severity": "high",
+          "message": "min-height ≥420px on hero-like container"
+        }
+      ]
+    ],
+    [
+      "components/marketing/HeroCarousel.tsx",
+      [
+        {
+          "file": "components/marketing/HeroCarousel.tsx",
+          "line": 85,
+          "match": "h-[72vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/marketing/MarketingPageContent.tsx",
+      [
+        {
+          "file": "components/marketing/MarketingPageContent.tsx",
+          "line": 19,
+          "match": "min-h-[440px]",
+          "id": "min-h-420-plus",
+          "re": {},
+          "severity": "high",
+          "message": "min-height ≥420px on hero-like container"
+        }
+      ]
+    ],
+    [
+      "components/programs/ProgramPageContract.tsx",
+      [
+        {
+          "file": "components/programs/ProgramPageContract.tsx",
+          "line": 149,
+          "match": "h-[70vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/programs/VisualProgramTemplate.tsx",
+      [
+        {
+          "file": "components/programs/VisualProgramTemplate.tsx",
+          "line": 459,
+          "match": "h-[50vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/programs/WorkforceProgramPage.tsx",
+      [
+        {
+          "file": "components/programs/WorkforceProgramPage.tsx",
+          "line": 186,
+          "match": "h-[55vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/site/SearchModal.client.tsx",
+      [
+        {
+          "file": "components/site/SearchModal.client.tsx",
+          "line": 189,
+          "match": "h-[50vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ],
+    [
+      "components/store/StoreGuideChat.tsx",
+      [
+        {
+          "file": "components/store/StoreGuideChat.tsx",
+          "line": 253,
+          "match": "h-[60vh]",
+          "id": "vh-50-plus",
+          "re": {},
+          "severity": "high",
+          "message": "Hero/viewport height ≥50vh (often oversized)"
+        }
+      ]
+    ]
+  ],
+  "topImagePerfFiles": [
+    [
+      "app/government/page.tsx",
+      [
+        {
+          "file": "app/government/page.tsx",
+          "line": 141,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/government/page.tsx",
+          "line": 180,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/government/page.tsx",
+          "line": 278,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/government/page.tsx",
+          "line": 300,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/government/page.tsx",
+          "line": 320,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/government/page.tsx",
+          "line": 342,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/government/page.tsx",
+          "line": 438,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/government/page.tsx",
+          "line": 460,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/government/page.tsx",
+          "line": 482,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/government/page.tsx",
+          "line": 504,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+      [
+        {
+          "file": "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+          "line": 172,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+          "line": 297,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+          "line": 444,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+          "line": 487,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+          "line": 172,
+          "match": "<Image sizes=\"100vw\"\n            src={MODULE_PHOTO[index] || MODULE_PHOTO[0]}\n  ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+          "line": 297,
+          "match": "<Image sizes=\"100vw\"\n          src=\"/images/pages/hvac-hero.webp\"\n          alt=",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+          "line": 444,
+          "match": "<Image sizes=\"100vw\"\n                src=\"/images/pages/comp-home-highlight-succ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+          "line": 487,
+          "match": "<Image sizes=\"100vw\"\n                    src={MODULE_PHOTO[i]}\n                 ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        }
+      ]
+    ],
+    [
+      "components/ProgramCTA.tsx",
+      [
+        {
+          "file": "components/ProgramCTA.tsx",
+          "line": 35,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ProgramCTA.tsx",
+          "line": 53,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ProgramCTA.tsx",
+          "line": 69,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ProgramCTA.tsx",
+          "line": 101,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ProgramCTA.tsx",
+          "line": 118,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ProgramCTA.tsx",
+          "line": 192,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ProgramCTA.tsx",
+          "line": 219,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ProgramCTA.tsx",
+          "line": 246,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "app/programs/barber-apprenticeship/host-shops/page.tsx",
+      [
+        {
+          "file": "app/programs/barber-apprenticeship/host-shops/page.tsx",
+          "line": 36,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/barber-apprenticeship/host-shops/page.tsx",
+          "line": 53,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/barber-apprenticeship/host-shops/page.tsx",
+          "line": 105,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/barber-apprenticeship/host-shops/page.tsx",
+          "line": 117,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/barber-apprenticeship/host-shops/page.tsx",
+          "line": 53,
+          "match": "<Image sizes=\"100vw\"\n                src=\"/images/pages/barber-training.webp\"\n  ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/barber-apprenticeship/host-shops/page.tsx",
+          "line": 105,
+          "match": "<Image sizes=\"100vw\"\n                src=\"/images/pages/barber-gallery-2.webp\"\n ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/barber-apprenticeship/host-shops/page.tsx",
+          "line": 117,
+          "match": "<Image sizes=\"100vw\"\n                src=\"/images/pages/barber-gallery-3.webp\"\n ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        }
+      ]
+    ],
+    [
+      "app/programs/cosmetology-apprenticeship/host-shops/page.tsx",
+      [
+        {
+          "file": "app/programs/cosmetology-apprenticeship/host-shops/page.tsx",
+          "line": 37,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/cosmetology-apprenticeship/host-shops/page.tsx",
+          "line": 55,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/cosmetology-apprenticeship/host-shops/page.tsx",
+          "line": 110,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/cosmetology-apprenticeship/host-shops/page.tsx",
+          "line": 122,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/cosmetology-apprenticeship/host-shops/page.tsx",
+          "line": 55,
+          "match": "<Image sizes=\"100vw\"\n                src=\"/images/pages/cosmetology-apprenticesh",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/cosmetology-apprenticeship/host-shops/page.tsx",
+          "line": 110,
+          "match": "<Image sizes=\"100vw\"\n                src=\"/images/pages/cosmetology.webp\"\n      ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/cosmetology-apprenticeship/host-shops/page.tsx",
+          "line": 122,
+          "match": "<Image sizes=\"100vw\"\n                src=\"https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/barber-styling-hair.webp",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        }
+      ]
+    ],
+    [
+      "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+      [
+        {
+          "file": "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+          "line": 35,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+          "line": 57,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+          "line": 89,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+          "line": 99,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+          "line": 57,
+          "match": "<Image sizes=\"100vw\"\n                src=\"/images/pages/cosmetology-hero.webp\"\n ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+          "line": 89,
+          "match": "<Image sizes=\"100vw\"\n                src=\"/images/pages/cosmetology-hero.webp\"\n ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+          "line": 99,
+          "match": "<Image sizes=\"100vw\"\n                src=\"/images/pages/cosmetology-hero.webp\"\n ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        }
+      ]
+    ],
+    [
+      "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+      [
+        {
+          "file": "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+          "line": 35,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+          "line": 57,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+          "line": 86,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+          "line": 93,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+          "line": 57,
+          "match": "<Image sizes=\"100vw\" src=\"/images/pages/nail-technician.webp\"\n                al",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+          "line": 86,
+          "match": "<Image sizes=\"100vw\" src=\"/images/pages/nail-technician.webp\"\n                al",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+          "line": 93,
+          "match": "<Image sizes=\"100vw\" src=\"/images/pages/nail-technician.webp\"\n                al",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        }
+      ]
+    ],
+    [
+      "app/workone-partner-packet/page.tsx",
+      [
+        {
+          "file": "app/workone-partner-packet/page.tsx",
+          "line": 171,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/workone-partner-packet/page.tsx",
+          "line": 245,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/workone-partner-packet/page.tsx",
+          "line": 268,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/workone-partner-packet/page.tsx",
+          "line": 291,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/workone-partner-packet/page.tsx",
+          "line": 314,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/workone-partner-packet/page.tsx",
+          "line": 407,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "app/calendar/page.tsx",
+      [
+        {
+          "file": "app/calendar/page.tsx",
+          "line": 80,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/calendar/page.tsx",
+          "line": 101,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/calendar/page.tsx",
+          "line": 141,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/calendar/page.tsx",
+          "line": 172,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/calendar/page.tsx",
+          "line": 264,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "components/marketing/PartnerLogos.tsx",
+      [
+        {
+          "file": "components/marketing/PartnerLogos.tsx",
+          "line": 17,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/marketing/PartnerLogos.tsx",
+          "line": 26,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/marketing/PartnerLogos.tsx",
+          "line": 35,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/marketing/PartnerLogos.tsx",
+          "line": 44,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/marketing/PartnerLogos.tsx",
+          "line": 53,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "app/career-services/courses/my-courses/page.tsx",
+      [
+        {
+          "file": "app/career-services/courses/my-courses/page.tsx",
+          "line": 113,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/career-services/courses/my-courses/page.tsx",
+          "line": 156,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/career-services/courses/my-courses/page.tsx",
+          "line": 113,
+          "match": "<Image sizes=\"100vw\"\n                      src={purchase.course?.image_url || '/",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/career-services/courses/my-courses/page.tsx",
+          "line": 156,
+          "match": "<Image sizes=\"100vw\"\n                      src={course.image_url || '/images/pag",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        }
+      ]
+    ],
+    [
+      "app/funding/jri/page.tsx",
+      [
+        {
+          "file": "app/funding/jri/page.tsx",
+          "line": 46,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/funding/jri/page.tsx",
+          "line": 233,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/funding/jri/page.tsx",
+          "line": 46,
+          "match": "<Image sizes=\"100vw\"\n            src=\"/images/pages/jri-hero.webp\"\n            a",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/funding/jri/page.tsx",
+          "line": 233,
+          "match": "<Image sizes=\"100vw\"\n                    src={program.image}\n                   ",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        }
+      ]
+    ],
+    [
+      "app/onboarding/page.tsx",
+      [
+        {
+          "file": "app/onboarding/page.tsx",
+          "line": 51,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/onboarding/page.tsx",
+          "line": 79,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/onboarding/page.tsx",
+          "line": 120,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/onboarding/page.tsx",
+          "line": 160,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "app/store/compliance/wioa/page.tsx",
+      [
+        {
+          "file": "app/store/compliance/wioa/page.tsx",
+          "line": 148,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/store/compliance/wioa/page.tsx",
+          "line": 202,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/store/compliance/wioa/page.tsx",
+          "line": 235,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/store/compliance/wioa/page.tsx",
+          "line": 321,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "app/store/demo/employer/page.tsx",
+      [
+        {
+          "file": "app/store/demo/employer/page.tsx",
+          "line": 196,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/store/demo/employer/page.tsx",
+          "line": 288,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/store/demo/employer/page.tsx",
+          "line": 196,
+          "match": "<Image sizes=\"100vw\" src={candidate.image} alt={candidate.name} fill",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/store/demo/employer/page.tsx",
+          "line": 288,
+          "match": "<Image sizes=\"100vw\" src={candidate.image} alt={candidate.name} fill",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        }
+      ]
+    ],
+    [
+      "app/store/licenses/page.tsx",
+      [
+        {
+          "file": "app/store/licenses/page.tsx",
+          "line": 54,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/store/licenses/page.tsx",
+          "line": 418,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/store/licenses/page.tsx",
+          "line": 54,
+          "match": "<Image sizes=\"100vw\"\n          src=\"/images/pages/store-licensing-enterprise-her",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/store/licenses/page.tsx",
+          "line": 418,
+          "match": "<Image sizes=\"100vw\"\n          src=\"/images/business/team-4.webp\"\n          alt=",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        }
+      ]
+    ],
+    [
+      "app/store/licenses/school-license/page.tsx",
+      [
+        {
+          "file": "app/store/licenses/school-license/page.tsx",
+          "line": 27,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/store/licenses/school-license/page.tsx",
+          "line": 286,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/store/licenses/school-license/page.tsx",
+          "line": 27,
+          "match": "<Image sizes=\"100vw\"\n          src=\"/images/pages/about-hero.webp\"\n          alt",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        },
+        {
+          "file": "app/store/licenses/school-license/page.tsx",
+          "line": 286,
+          "match": "<Image sizes=\"100vw\" src={item.img} alt={item.title} fill",
+          "id": "fill-no-sizes",
+          "re": {},
+          "severity": "low",
+          "message": "next/image fill without sizes (may over-fetch)"
+        }
+      ]
+    ],
+    [
+      "app/success/page.tsx",
+      [
+        {
+          "file": "app/success/page.tsx",
+          "line": 40,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/success/page.tsx",
+          "line": 64,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/success/page.tsx",
+          "line": 89,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/success/page.tsx",
+          "line": 113,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "app/tutoring/TutoringClient.tsx",
+      [
+        {
+          "file": "app/tutoring/TutoringClient.tsx",
+          "line": 89,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/tutoring/TutoringClient.tsx",
+          "line": 110,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/tutoring/TutoringClient.tsx",
+          "line": 137,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/tutoring/TutoringClient.tsx",
+          "line": 160,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "app/wioa-eligibility/page.tsx",
+      [
+        {
+          "file": "app/wioa-eligibility/page.tsx",
+          "line": 36,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/wioa-eligibility/page.tsx",
+          "line": 103,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/wioa-eligibility/page.tsx",
+          "line": 158,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/wioa-eligibility/page.tsx",
+          "line": 255,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "app/writing-center/page.tsx",
+      [
+        {
+          "file": "app/writing-center/page.tsx",
+          "line": 106,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/writing-center/page.tsx",
+          "line": 140,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/writing-center/page.tsx",
+          "line": 168,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/writing-center/page.tsx",
+          "line": 210,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "components/ProgramHighlights.tsx",
+      [
+        {
+          "file": "components/ProgramHighlights.tsx",
+          "line": 75,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ProgramHighlights.tsx",
+          "line": 96,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ProgramHighlights.tsx",
+          "line": 122,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ProgramHighlights.tsx",
+          "line": 135,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "components/UniversalMarketingPage.tsx",
+      [
+        {
+          "file": "components/UniversalMarketingPage.tsx",
+          "line": 64,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/UniversalMarketingPage.tsx",
+          "line": 145,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/UniversalMarketingPage.tsx",
+          "line": 160,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/UniversalMarketingPage.tsx",
+          "line": 192,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "components/lms/MarcusInstructor.tsx",
+      [
+        {
+          "file": "components/lms/MarcusInstructor.tsx",
+          "line": 121,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/lms/MarcusInstructor.tsx",
+          "line": 152,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/lms/MarcusInstructor.tsx",
+          "line": 204,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/lms/MarcusInstructor.tsx",
+          "line": 235,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "components/programs/PublicProgramPage.tsx",
+      [
+        {
+          "file": "components/programs/PublicProgramPage.tsx",
+          "line": 235,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/programs/PublicProgramPage.tsx",
+          "line": 318,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/programs/PublicProgramPage.tsx",
+          "line": 443,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/programs/PublicProgramPage.tsx",
+          "line": 491,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "components/ui/HeroSection.tsx",
+      [
+        {
+          "file": "components/ui/HeroSection.tsx",
+          "line": 160,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ui/HeroSection.tsx",
+          "line": 261,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ui/HeroSection.tsx",
+          "line": 331,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/ui/HeroSection.tsx",
+          "line": 338,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "components/ui/VideoHero.tsx",
+      [
+        {
+          "file": "components/ui/VideoHero.tsx",
+          "line": 15,
+          "match": "preloadFull",
+          "id": "preload-full-hero",
+          "re": {},
+          "severity": "high",
+          "message": "preloadFull downloads entire hero video on load"
+        },
+        {
+          "file": "components/ui/VideoHero.tsx",
+          "line": 23,
+          "match": "preloadFull",
+          "id": "preload-full-hero",
+          "re": {},
+          "severity": "high",
+          "message": "preloadFull downloads entire hero video on load"
+        },
+        {
+          "file": "components/ui/VideoHero.tsx",
+          "line": 43,
+          "match": "preloadFull",
+          "id": "preload-full-hero",
+          "re": {},
+          "severity": "high",
+          "message": "preloadFull downloads entire hero video on load"
+        },
+        {
+          "file": "components/ui/VideoHero.tsx",
+          "line": 43,
+          "match": "preloadFull",
+          "id": "preload-full-hero",
+          "re": {},
+          "severity": "high",
+          "message": "preloadFull downloads entire hero video on load"
+        }
+      ]
+    ],
+    [
+      "components/video/CanonicalVideo.tsx",
+      [
+        {
+          "file": "components/video/CanonicalVideo.tsx",
+          "line": 53,
+          "match": "preloadFull",
+          "id": "preload-full-hero",
+          "re": {},
+          "severity": "high",
+          "message": "preloadFull downloads entire hero video on load"
+        },
+        {
+          "file": "components/video/CanonicalVideo.tsx",
+          "line": 68,
+          "match": "preloadFull",
+          "id": "preload-full-hero",
+          "re": {},
+          "severity": "high",
+          "message": "preloadFull downloads entire hero video on load"
+        },
+        {
+          "file": "components/video/CanonicalVideo.tsx",
+          "line": 275,
+          "match": "preloadFull",
+          "id": "preload-full-hero",
+          "re": {},
+          "severity": "high",
+          "message": "preloadFull downloads entire hero video on load"
+        },
+        {
+          "file": "components/video/CanonicalVideo.tsx",
+          "line": 306,
+          "match": "preloadFull",
+          "id": "preload-full-hero",
+          "re": {},
+          "severity": "high",
+          "message": "preloadFull downloads entire hero video on load"
+        }
+      ]
+    ],
+    [
+      "app/news/page.tsx",
+      [
+        {
+          "file": "app/news/page.tsx",
+          "line": 39,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/news/page.tsx",
+          "line": 91,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "app/news/page.tsx",
+          "line": 136,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ],
+    [
+      "components/PathwayBlock.tsx",
+      [
+        {
+          "file": "components/PathwayBlock.tsx",
+          "line": 33,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/PathwayBlock.tsx",
+          "line": 57,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        },
+        {
+          "file": "components/PathwayBlock.tsx",
+          "line": 81,
+          "match": "sizes=\"100vw\"",
+          "id": "sizes-100vw",
+          "re": {},
+          "severity": "medium",
+          "message": "sizes=100vw loads full viewport width image (heavy LCP)"
+        }
+      ]
+    ]
+  ],
+  "topLayoutTextFiles": [
+    [
+      "app/lms/(app)/courses/[courseId]/page.tsx",
+      [
+        {
+          "file": "app/lms/(app)/courses/[courseId]/page.tsx",
+          "line": 268,
+          "match": "heroImage}\n            alt={course.title}\n            fill\n            className",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/lms/(app)/courses/[courseId]/page.tsx",
+          "line": 532,
+          "match": "heroImage}\n          alt={course.title}\n          fill\n          className=\"obje",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/lms/(app)/courses/[courseId]/page.tsx",
+          "line": 275,
+          "match": "absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-90",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        },
+        {
+          "file": "app/lms/(app)/courses/[courseId]/page.tsx",
+          "line": 540,
+          "match": "absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-slate-90",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        },
+        {
+          "file": "app/lms/(app)/courses/[courseId]/page.tsx",
+          "line": 633,
+          "match": "bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5`}\n            ",
+          "id": "invisible-white-on-white",
+          "re": {},
+          "severity": "high",
+          "message": "Possible white text on white background"
+        }
+      ]
+    ],
+    [
+      "app/help/page.tsx",
+      [
+        {
+          "file": "app/help/page.tsx",
+          "line": 44,
+          "match": "hero-training-1.webp\"\n            alt=\"Student receiving personalized help and s",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/help/page.tsx",
+          "line": 206,
+          "match": "hero-training-2.webp\"\n                alt=\"Student using help resources on lapto",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/help/page.tsx",
+          "line": 213,
+          "match": "absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 to-transparent\" />\n    ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/program-holder/dashboard/page.tsx",
+      [
+        {
+          "file": "app/program-holder/dashboard/page.tsx",
+          "line": 200,
+          "match": "Hero */}\n      <div className=\"relative h-56 sm:h-72 w-full overflow-hidden\">\n  ",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/program-holder/dashboard/page.tsx",
+          "line": 205,
+          "match": "absolute inset-0 flex items-end\">\n          <div className=\"max-w-7xl mx-auto w-",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        },
+        {
+          "file": "app/program-holder/dashboard/page.tsx",
+          "line": 253,
+          "match": "absolute inset-0 bg-brand-blue-950/50\" />\n                <div className=\"absolu",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "components/programs/VisualProgramTemplate.tsx",
+      [
+        {
+          "file": "components/programs/VisualProgramTemplate.tsx",
+          "line": 205,
+          "match": "absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 to-transparent\" />\n    ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        },
+        {
+          "file": "components/programs/VisualProgramTemplate.tsx",
+          "line": 398,
+          "match": "absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 to-transparent\" />\n    ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        },
+        {
+          "file": "components/programs/VisualProgramTemplate.tsx",
+          "line": 467,
+          "match": "absolute inset-0 bg-slate-900/70\" />\n          <div className=\"absolute inset-0 ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/partners/training-sites/page.tsx",
+      [
+        {
+          "file": "app/partners/training-sites/page.tsx",
+          "line": 199,
+          "match": "hero.webp\"\n          alt={`${PLATFORM_DEFAULTS.orgName} training sites and emplo",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/partners/training-sites/page.tsx",
+          "line": 206,
+          "match": "absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 t",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/programs/building-services-technician/page.tsx",
+      [
+        {
+          "file": "app/programs/building-services-technician/page.tsx",
+          "line": 34,
+          "match": "hero.jpg\"\n          alt=\"Building Services Technician working on facility mainte",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/programs/building-services-technician/page.tsx",
+          "line": 42,
+          "match": "absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 t",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/programs/direct-support-professional/page.tsx",
+      [
+        {
+          "file": "app/programs/direct-support-professional/page.tsx",
+          "line": 30,
+          "match": "Hero Banner */}\n      <section className=\"relative w-full\" style={{ height: 'cla",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/programs/direct-support-professional/page.tsx",
+          "line": 41,
+          "match": "absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 t",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+      [
+        {
+          "file": "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+          "line": 30,
+          "match": "Hero */}\n      <section className=\"relative h-[38vh] min-h-[220px] max-h-[420px]",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/programs/esthetician-apprenticeship/host-shops/page.tsx",
+          "line": 39,
+          "match": "absolute inset-0 bg-gradient-to-t from-brand-blue-900/70 to-transparent\" />\n    ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+      [
+        {
+          "file": "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+          "line": 298,
+          "match": "hero.webp\"\n          alt=\"HVAC technician\"\n          fill\n          className=\"o",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/programs/hvac-technician/course/HvacCourseHome.tsx",
+          "line": 304,
+          "match": "absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10\" />\n   ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+      [
+        {
+          "file": "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+          "line": 30,
+          "match": "Hero */}\n      <section className=\"relative h-[38vh] min-h-[220px] max-h-[420px]",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/programs/nail-technician-apprenticeship/host-shops/page.tsx",
+          "line": 39,
+          "match": "absolute inset-0 bg-gradient-to-t from-brand-blue-900/70 to-transparent\" />\n    ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/scholarships/page.tsx",
+      [
+        {
+          "file": "app/scholarships/page.tsx",
+          "line": 189,
+          "match": "hero.webp\"\n          alt=\"Scholarships and Financial Aid\"\n          fill\n       ",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/scholarships/page.tsx",
+          "line": 195,
+          "match": "absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 t",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/search/page.tsx",
+      [
+        {
+          "file": "app/search/page.tsx",
+          "line": 284,
+          "match": "hero.webp\"\n                alt=\"Employer partnerships\"\n                fill\n    ",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/search/page.tsx",
+          "line": 296,
+          "match": "absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),t",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/store/licenses/page.tsx",
+      [
+        {
+          "file": "app/store/licenses/page.tsx",
+          "line": 55,
+          "match": "hero.webp\"\n          alt=\"Workforce training platform\"\n          fill\n          ",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/store/licenses/page.tsx",
+          "line": 424,
+          "match": "absolute inset-0 bg-zinc-900/90\" />\n\n        <div className=\"relative z-10 max-w",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/testing/[provider]/page.tsx",
+      [
+        {
+          "file": "app/testing/[provider]/page.tsx",
+          "line": 122,
+          "match": "heroImg}\n          alt={provider.name}\n          fill\n          className=\"objec",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "app/testing/[provider]/page.tsx",
+          "line": 130,
+          "match": "absolute inset-0 bg-gradient-to-t ${accent} via-transparent to-transparent opaci",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "components/HomeHeroWithVoiceover.tsx",
+      [
+        {
+          "file": "components/HomeHeroWithVoiceover.tsx",
+          "line": 177,
+          "match": "hero-poster.webp\"\n        className=\"absolute inset-0 w-full h-full object-cover",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "components/HomeHeroWithVoiceover.tsx",
+          "line": 194,
+          "match": "absolute inset-0 flex items-center\">\n          <div className=\"max-w-7xl mx-auto",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "components/admin/dashboard/DashboardShell.tsx",
+      [
+        {
+          "file": "components/admin/dashboard/DashboardShell.tsx",
+          "line": 455,
+          "match": "hero.webp\"\n          alt=\"\"\n          fill\n          className=\"object-cover\"\n  ",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "components/admin/dashboard/DashboardShell.tsx",
+          "line": 454,
+          "match": "<Image\n          src=\"/images/pages/admin-dashboard-hero.webp\"\n          alt=\"\"",
+          "id": "empty-alt",
+          "re": {},
+          "severity": "medium",
+          "message": "Empty image alt text"
+        }
+      ]
+    ],
+    [
+      "components/home/Pathways.tsx",
+      [
+        {
+          "file": "components/home/Pathways.tsx",
+          "line": 23,
+          "match": "absolute inset-0 \" />\n              <div className=\"absolute bottom-0 left-0 rig",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        },
+        {
+          "file": "components/home/Pathways.tsx",
+          "line": 43,
+          "match": "absolute inset-0 \" />\n              <div className=\"absolute bottom-0 left-0 rig",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "components/lms/LessonPlayer.tsx",
+      [
+        {
+          "file": "components/lms/LessonPlayer.tsx",
+          "line": 487,
+          "match": "absolute inset-0 flex flex-col items-center justify-center pointer-events-none\">",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        },
+        {
+          "file": "components/lms/LessonPlayer.tsx",
+          "line": 588,
+          "match": "absolute inset-0 flex flex-col items-center justify-center bg-black/80\">\n       ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "components/security/ProtectedImage.tsx",
+      [
+        {
+          "file": "components/security/ProtectedImage.tsx",
+          "line": 52,
+          "match": "absolute inset-0 z-10\"\n        style={{\n          background:\n            'repea",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        },
+        {
+          "file": "components/security/ProtectedImage.tsx",
+          "line": 91,
+          "match": "absolute inset-0 z-20 flex items-center justify-center bg-black/80\">\n          <",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "components/templates/PageHero.tsx",
+      [
+        {
+          "file": "components/templates/PageHero.tsx",
+          "line": 13,
+          "match": "Hero?: string;\n}\n\nexport default function PageHero({ title, description, forceHe",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        },
+        {
+          "file": "components/templates/PageHero.tsx",
+          "line": 70,
+          "match": "absolute inset-0 flex items-center justify-center text-center px-4\">\n          <",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/apply/ApplyAvatarGuide.tsx",
+      [
+        {
+          "file": "app/apply/ApplyAvatarGuide.tsx",
+          "line": 68,
+          "match": "absolute inset-0 flex items-center justify-center pointer-events-none\">\n        ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/apply/ApplyHeroVideo.tsx",
+      [
+        {
+          "file": "app/apply/ApplyHeroVideo.tsx",
+          "line": 25,
+          "match": "absolute inset-0 w-full h-full object-cover\"\n        autoPlayOnMount\n        thr",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/blog/loading.tsx",
+      [
+        {
+          "file": "app/blog/loading.tsx",
+          "line": 6,
+          "match": "Hero Skeleton */}\n      <div className=\"bg-gradient-to",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        }
+      ]
+    ],
+    [
+      "app/financing/page.tsx",
+      [
+        {
+          "file": "app/financing/page.tsx",
+          "line": 89,
+          "match": "Hero */}\n      <section className=\"bg-gradient-to",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        }
+      ]
+    ],
+    [
+      "app/for-agencies/page.tsx",
+      [
+        {
+          "file": "app/for-agencies/page.tsx",
+          "line": 111,
+          "match": "absolute inset-0 flex items-end\">\n          <div className=\"max-w-4xl mx-auto px",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/founder/page.tsx",
+      [
+        {
+          "file": "app/founder/page.tsx",
+          "line": 35,
+          "match": "absolute inset-0 flex items-center px-6\">\n          <div className=\"max-w-6xl mx",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/funding/jri/page.tsx",
+      [
+        {
+          "file": "app/funding/jri/page.tsx",
+          "line": 47,
+          "match": "hero.webp\"\n            alt=\"Second chance career training\"\n            fill\n    ",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        }
+      ]
+    ],
+    [
+      "app/government/page.tsx",
+      [
+        {
+          "file": "app/government/page.tsx",
+          "line": 55,
+          "match": "absolute inset-0 w-full h-full object-cover pointer-events-none\"\n          />\n  ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/lms/(app)/collaborate/meetings/page.tsx",
+      [
+        {
+          "file": "app/lms/(app)/collaborate/meetings/page.tsx",
+          "line": 72,
+          "match": "Hero Section */}\n      <div className=\"bg-gradient-to",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        }
+      ]
+    ],
+    [
+      "app/lms/(app)/courses/page.tsx",
+      [
+        {
+          "file": "app/lms/(app)/courses/page.tsx",
+          "line": 106,
+          "match": "absolute inset-0 flex items-center justify-center\">\n                        <Boo",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/my-dashboard/MyDashboard.tsx",
+      [
+        {
+          "file": "app/my-dashboard/MyDashboard.tsx",
+          "line": 153,
+          "match": "bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3\">\n      ",
+          "id": "invisible-white-on-white",
+          "re": {},
+          "severity": "high",
+          "message": "Possible white text on white background"
+        }
+      ]
+    ],
+    [
+      "app/news/page.tsx",
+      [
+        {
+          "file": "app/news/page.tsx",
+          "line": 94,
+          "match": "absolute inset-0 bg-gradient-to-br from-brand-blue-600 to-brand-blue-800 flex it",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/onboarding/employer/hiring-needs/page.tsx",
+      [
+        {
+          "file": "app/onboarding/employer/hiring-needs/page.tsx",
+          "line": 170,
+          "match": "Hero Section */}\n      <div className=\"bg-gradient-to",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        }
+      ]
+    ],
+    [
+      "app/onboarding/learner/orientation/OrientationAvatar.tsx",
+      [
+        {
+          "file": "app/onboarding/learner/orientation/OrientationAvatar.tsx",
+          "line": 50,
+          "match": "absolute inset-0 flex items-end justify-center pb-12 pointer-events-none\">\n     ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/parent-portal/dashboard/page.tsx",
+      [
+        {
+          "file": "app/parent-portal/dashboard/page.tsx",
+          "line": 97,
+          "match": "<Image\n          src=\"/images/pages/about-career-training.webp\"\n          alt=\"\"",
+          "id": "empty-alt",
+          "re": {},
+          "severity": "medium",
+          "message": "Empty image alt text"
+        }
+      ]
+    ],
+    [
+      "app/programs/[program]/courses/page.tsx",
+      [
+        {
+          "file": "app/programs/[program]/courses/page.tsx",
+          "line": 102,
+          "match": "absolute inset-0 bg-slate-900/60 flex items-center justify-center\">\n          <d",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/programs/barber-apprenticeship/apply/ApprenticeForm.tsx",
+      [
+        {
+          "file": "app/programs/barber-apprenticeship/apply/ApprenticeForm.tsx",
+          "line": 527,
+          "match": "absolute inset-0 w-full h-full object-cover\"\n          />\n        </div>\n       ",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/programs/barber-apprenticeship/orientation/OrientationClient.tsx",
+      [
+        {
+          "file": "app/programs/barber-apprenticeship/orientation/OrientationClient.tsx",
+          "line": 208,
+          "match": "absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/50 hov",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ],
+    [
+      "app/programs/cosmetology-apprenticeship/orientation/page.tsx",
+      [
+        {
+          "file": "app/programs/cosmetology-apprenticeship/orientation/page.tsx",
+          "line": 168,
+          "match": "hero.webp\"\n          alt=\"Cosmetology apprenticeship salon training\"\n          f",
+          "id": "hero-gradient-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Gradient overlay near hero (forbidden on hero frame)"
+        }
+      ]
+    ],
+    [
+      "app/programs/drug-alcohol-specimen-collector/page.tsx",
+      [
+        {
+          "file": "app/programs/drug-alcohol-specimen-collector/page.tsx",
+          "line": 43,
+          "match": "absolute inset-0 bg-gradient-to-t from-brand-blue-900/80 via-brand-blue-800/40 t",
+          "id": "hero-text-overlay",
+          "re": {},
+          "severity": "high",
+          "message": "Headline/text overlaid on hero media"
+        }
+      ]
+    ]
+  ],
+  "marketingPagesNoCanonical": [
+    "app/about/mission/page.tsx",
+    "app/about/page.tsx",
+    "app/about/partners/page.tsx",
+    "app/about/team/carl-brown/page.tsx",
+    "app/about/team/carlina-wilkes/page.tsx",
+    "app/about/team/clystjah-woodley/page.tsx",
+    "app/about/team/delores-reynolds/page.tsx",
+    "app/about/team/elizabeth-greene/page.tsx",
+    "app/about/team/jozanna-george/page.tsx",
+    "app/about/team/leslie-wafford/page.tsx",
+    "app/about/team/sharon-douglass/page.tsx",
+    "app/academic-calendar/page.tsx",
+    "app/academic-integrity/page.tsx",
+    "app/accessibility/page.tsx",
+    "app/agency-referral-workforce-training-indiana/page.tsx",
+    "app/ai/page.tsx",
+    "app/ai-chat/page.tsx",
+    "app/ai-tutor/page.tsx",
+    "app/alumni/page.tsx",
+    "app/apply/employer/page.tsx",
+    "app/apply/fssa/waitlist/page.tsx",
+    "app/apply/staff/page.tsx",
+    "app/apply/track/page.tsx",
+    "app/apprentice/handbook/page.tsx",
+    "app/apprentice/hours/log/page.tsx",
+    "app/apprenticeships/ipla-exam/page.tsx",
+    "app/apprenticeships/page.tsx",
+    "app/approvals/page.tsx",
+    "app/banking/direct-deposit/page.tsx",
+    "app/banking/page.tsx",
+    "app/banking/prepaid-card/page.tsx",
+    "app/blog/[slug]/page.tsx",
+    "app/blog/author/[author]/page.tsx",
+    "app/blog/category/[category]/page.tsx",
+    "app/blog/page.tsx",
+    "app/booking/page.tsx",
+    "app/booth-rental/apply/page.tsx",
+    "app/booth-rental/page.tsx",
+    "app/calendar/page.tsx",
+    "app/career-counseling/page.tsx",
+    "app/career-services/career-counseling/page.tsx",
+    "app/career-services/courses/[slug]/page.tsx",
+    "app/career-services/courses/my-courses/page.tsx",
+    "app/career-services/courses/page.tsx",
+    "app/career-services/interview-prep/page.tsx",
+    "app/career-services/job-placement/page.tsx",
+    "app/career-services/ongoing-support/page.tsx",
+    "app/career-services/resume-building/page.tsx",
+    "app/careers/page.tsx",
+    "app/certificates/page.tsx",
+    "app/check-eligibility/page.tsx",
+    "app/client-portal/page.tsx",
+    "app/cm/page.tsx",
+    "app/community-services/page.tsx",
+    "app/compliance/competency-verification/barber/page.tsx",
+    "app/compliance/competency-verification/page.tsx",
+    "app/compliance/credential-partners/page.tsx",
+    "app/compliance/ojt-training-plan/page.tsx",
+    "app/consumer-education/page.tsx",
+    "app/contact/page.tsx",
+    "app/contracts/page.tsx",
+    "app/cookies/page.tsx",
+    "app/courses/page.tsx",
+    "app/create-course/page.tsx",
+    "app/creator/products/page.tsx",
+    "app/directory/page.tsx",
+    "app/disclosures/training-delivery/page.tsx",
+    "app/dmca/page.tsx",
+    "app/docs/page.tsx",
+    "app/donate/monthly/page.tsx",
+    "app/donate/page.tsx",
+    "app/educatorhub/page.tsx",
+    "app/eligibility/page.tsx",
+    "app/eligibility/quiz/page.tsx",
+    "app/email/page.tsx",
+    "app/employer/hours/page.tsx",
+    "app/employer-workforce-partnerships-indiana/page.tsx",
+    "app/employers/directory/page.tsx",
+    "app/employers/page.tsx",
+    "app/employment-support/page.tsx"
+  ],
+  "criticalHits": []
+}

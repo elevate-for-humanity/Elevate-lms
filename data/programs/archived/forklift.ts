@@ -1,0 +1,270 @@
+import type { ProgramSchema } from '@/lib/programs/program-schema';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export const FORKLIFT: ProgramSchema = {
+  slug: 'forklift',
+  title: 'Forklift Operator Certification',
+  subtitle:
+    'Earn OSHA-compliant forklift operator certification in 1 week. Hands-on training on sit-down, stand-up, and reach truck forklifts.',
+  sector: 'skilled-trades',
+  category: 'Warehouse & Logistics',
+  programType: 'workforce',
+  heroImage: '/images/pexels/forklift.webp',
+  heroImageAlt: 'Forklift operator training in a warehouse setting',
+  videoSrc: '/videos/hvac-hero-final.mp4',
+  deliveryMode: 'hybrid',
+  deliveredBy: 'Partner',
+  durationWeeks: 1,
+  hoursPerWeekMin: 20,
+  hoursPerWeekMax: 24,
+  hoursBreakdown: { onlineInstruction: 4, handsOnLab: 12, examPrep: 4, careerPlacement: 4 },
+  schedule: 'Mon–Thu, 8:00 AM–2:00 PM',
+  cohortSize: '8–12 participants per cohort',
+  fundingStatement:
+    'WIOA and Next Level Jobs funding available for eligible Indiana residents. You must qualify — eligibility is not guaranteed. Self-pay options available.',
+  selfPayCost: '$500',
+  fundingOptions: ['wioa', 'impact', 'self_pay'],
+  badge: 'Quick Cert',
+  badgeColor: 'green',
+  credentials: [
+    {
+      name: 'OSHA-Compliant Forklift Operator Certification',
+      issuer: 'Elevate for Humanity (OSHA-compliant)',
+      description:
+        'Certification meeting OSHA 29 CFR 1910.178 powered industrial truck requirements.',
+      validity: '3 years',
+    },
+    {
+      name: 'Warehouse Safety Awareness',
+      issuer: 'Elevate for Humanity',
+      description: 'Covers warehouse hazard recognition and safe material handling.',
+      validity: '3 years',
+    },
+    {
+      name: 'CPR/AED/First Aid',
+      issuer: 'American Heart Association',
+      description: 'Emergency response certification.',
+      validity: '2 years',
+    },
+  ],
+  outcomes: [
+    {
+      statement: 'Operate a sit-down counterbalance forklift safely in a warehouse environment',
+      assessedAt: 'Day 3',
+    },
+    { statement: 'Perform pre-operation inspection per OSHA requirements', assessedAt: 'Day 1' },
+    { statement: 'Stack and retrieve pallets at heights up to 15 feet', assessedAt: 'Day 3' },
+    { statement: 'Navigate narrow aisles and loading docks without incident', assessedAt: 'Day 4' },
+    { statement: 'Pass written and practical forklift operator evaluation', assessedAt: 'Day 4' },
+  ],
+  careerPathway: [
+    {
+      title: 'Forklift Operator',
+      timeframe: '0–6 months',
+      requirements: 'Forklift certification',
+      salaryRange: '$30,000–$38,000',
+    },
+    {
+      title: 'Warehouse Associate',
+      timeframe: '6–12 months',
+      requirements: 'Forklift cert + warehouse experience',
+      salaryRange: '$32,000–$42,000',
+    },
+    {
+      title: 'Warehouse Lead',
+      timeframe: '1–3 years',
+      requirements: 'Experience + leadership',
+      salaryRange: '$38,000–$48,000',
+    },
+    {
+      title: 'Warehouse Supervisor',
+      timeframe: '3+ years',
+      requirements: 'Lead experience + management skills',
+      salaryRange: '$45,000–$60,000',
+    },
+  ],
+  weeklySchedule: [
+    {
+      week: 'Day 1',
+      title: 'Safety & Pre-Operation',
+      competencyMilestone: 'Complete pre-operation inspection checklist',
+    },
+    {
+      week: 'Day 2',
+      title: 'Basic Operation & Maneuvering',
+      competencyMilestone: 'Drive forklift forward, reverse, and turn safely',
+    },
+    {
+      week: 'Day 3',
+      title: 'Load Handling & Stacking',
+      competencyMilestone: 'Stack pallets at height and retrieve without damage',
+    },
+    {
+      week: 'Day 4',
+      title: 'Evaluation & Certification',
+      competencyMilestone: 'Pass written and practical operator evaluation',
+    },
+  ],
+  curriculum: [
+    {
+      title: 'OSHA Safety Standards',
+      topics: [
+        '29 CFR 1910.178 requirements',
+        'Pre-operation inspection',
+        'Load capacity and stability',
+        'Pedestrian safety',
+        'Refueling and charging',
+      ],
+    },
+    {
+      title: 'Forklift Operation',
+      topics: [
+        'Sit-down counterbalance',
+        'Stand-up reach truck',
+        'Steering and maneuvering',
+        'Ramp and incline operation',
+        'Dock operations',
+      ],
+    },
+    {
+      title: 'Load Handling',
+      topics: [
+        'Pallet stacking techniques',
+        'Load centering and balance',
+        'High-reach operations',
+        'Narrow aisle navigation',
+        'Uneven surface operation',
+      ],
+    },
+  ],
+  complianceAlignment: [
+    {
+      standard: 'OSHA 29 CFR 1910.178',
+      description: 'Training meets OSHA powered industrial truck operator requirements.',
+    },
+    {
+      standard: 'WIOA Title I',
+      description: 'Program meets WIOA eligibility for short-term training.',
+    },
+  ],
+  trainingPhases: [
+    {
+      phase: 1,
+      title: 'Classroom & Safety',
+      weeks: 'Day 1',
+      focus: 'OSHA standards, pre-operation inspection, and safety rules.',
+      labCompetencies: [
+        'Complete pre-operation inspection',
+        'Identify forklift hazards',
+        'Demonstrate emergency stop procedure',
+      ],
+    },
+    {
+      phase: 2,
+      title: 'Hands-On Operation',
+      weeks: 'Days 2–3',
+      focus: 'Driving, maneuvering, and load handling.',
+      labCompetencies: [
+        'Drive forklift safely in warehouse',
+        'Stack pallets at 15-foot height',
+        'Navigate narrow aisles and docks',
+      ],
+    },
+    {
+      phase: 3,
+      title: 'Evaluation & Certification',
+      weeks: 'Day 4',
+      focus: 'Written and practical evaluation.',
+      labCompetencies: [
+        'Pass written safety exam',
+        'Pass practical driving evaluation',
+        'Receive OSHA-compliant certification card',
+      ],
+    },
+  ],
+  credentialPipeline: [
+    {
+      training: 'Forklift Operator (1 week)',
+      certification: 'OSHA-Compliant Forklift Certification',
+      certBody: 'Elevate for Humanity',
+      jobRole: 'Forklift Operator / Warehouse Associate',
+    },
+  ],
+  laborMarket: {
+    medianSalary: 36220,
+    salaryRange: '$30,000–$60,000',
+    growthRate: '5% (faster than average)',
+    source: 'U.S. Bureau of Labor Statistics',
+    sourceYear: 2024,
+    region: 'Indianapolis-Carmel-Anderson MSA',
+  },
+  careers: [
+    { title: 'Forklift Operator', salary: '$30,000–$38,000' },
+    { title: 'Warehouse Associate', salary: '$32,000–$42,000' },
+    { title: 'Shipping/Receiving Clerk', salary: '$34,000–$44,000' },
+    { title: 'Warehouse Supervisor', salary: '$45,000–$60,000' },
+  ],
+  cta: {
+    applyHref: '/apply?program=forklift',
+    requestInfoHref: '/programs/forklift/request-info',
+    careerConnectHref:
+      'https://www.indianacareerconnect.com/jobs/search?q=forklift+operator&location=Indiana',
+    advisorHref: '/contact',
+    courseHref: '/programs/forklift',
+  },
+  admissionRequirements: [
+    '18 years or older',
+    'Valid government-issued ID',
+    'Able to lift 50 lbs',
+    'No prior forklift experience required',
+  ],
+  equipmentIncluded: 'All training materials and certification card included',
+  modality: 'Hybrid — Online safety theory via LMS, hands-on forklift training at Elevate facility',
+  facilityInfo: 'Elevate training center, Indianapolis',
+  employerPartners: [
+    'Indianapolis-area warehouses and distribution centers',
+    'Logistics companies',
+  ],
+  pricingIncludes: [
+    '24 instructional hours',
+    'OSHA-compliant certification card',
+    'CPR/First Aid certification',
+    'All training materials',
+  ],
+  paymentTerms:
+    'WIOA and Next Level Jobs funding available for eligible Indiana residents — eligibility not guaranteed. Self-pay: $500.',
+  faqs: [
+    {
+      question: 'How long is the certification valid?',
+      answer:
+        'OSHA requires re-evaluation every 3 years. Your certification card is valid for 3 years from the date of issue.',
+    },
+    {
+      question: 'Do I need experience?',
+      answer:
+        'No. This program teaches you from scratch. You will learn on real forklifts in a controlled environment.',
+    },
+    {
+      question: 'What types of forklifts will I learn?',
+      answer:
+        'You will train on sit-down counterbalance and stand-up reach truck forklifts — the two most common types in warehouses.',
+    },
+  ],
+  breadcrumbs: [
+    { label: 'Home', href: '/' },
+    { label: 'Programs', href: '/programs' },
+    { label: 'Forklift Operator' },
+  ],
+  metaTitle: 'Forklift Operator Certification | OSHA-Compliant | Indianapolis',
+  metaDescription:
+    'Earn OSHA-compliant forklift certification in 1 week. Hands-on training on sit-down and reach truck forklifts. Indianapolis. WIOA funding available for eligible Indiana residents.',
+
+
+  funding: {
+    wioa_eligible: false,
+    fssa_eligible: false,
+    wrg_eligible: false,
+    jobReadyIndyEligible: false,
+    fundingNotes: 'Short certification. Eligibility for standalone WIOA/FSSA funding determined by the applicable workforce agency.',
+  },
+};

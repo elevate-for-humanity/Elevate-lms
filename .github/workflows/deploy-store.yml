@@ -1,0 +1,204 @@
+name: Deploy Store → production
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/marketing/app/store/**'
+      - 'apps/marketing/app/api/store/**'
+      - 'apps/marketing/app/api/webhooks/store/**'
+      - 'apps/marketing/middleware.ts'
+      - 'lib/platform/**'
+      - 'lib/store/**'
+      - 'lib/workspace/**'
+      - 'lib/tenant/**'
+      - 'scripts/northflank/configure-store.ts'
+      - 'scripts/northflank/configure-store-domain.ts'
+      - 'scripts/northflank/attach-store-secret-group.ts'
+      - 'scripts/northflank/resolve-store-runtime-url.ts'
+      - 'Dockerfile.marketing'
+      - '.github/workflows/deploy-store.yml'
+
+concurrency:
+  group: store-production
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  statuses: write
+
+env:
+  NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+  NORTHFLANK_TEAM_ID: elevates-team
+  NORTHFLANK_PROJECT_ID: elevate-platform
+  NORTHFLANK_STORE_SERVICE_ID: elevate-store
+  NORTHFLANK_STORE_SERVICE_NAME: Elevate Subscription Store
+  NORTHFLANK_SECRET_GROUP_ID: elevate-production-env
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+  STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+  NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+  NEXT_PUBLIC_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+  NEXT_PUBLIC_STORE_URL: https://store.elevateforhumanity.org
+  STORE_URL: https://store.elevateforhumanity.org
+  NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
+  NEXT_PUBLIC_LMS_URL: https://app.elevateforhumanity.org
+  NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
+
+jobs:
+  deploy-store:
+    name: Store SaaS Acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Mark store acceptance pending
+        run: |
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -d "{\"state\":\"pending\",\"context\":\"Store SaaS Acceptance\",\"description\":\"Provisioning isolated store and validating production runtime\",\"target_url\":\"${RUN_URL}\"}" >/dev/null
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Require deploy credentials
+        run: |
+          test -n "$NORTHFLANK_API_TOKEN"
+          test -n "$NEXT_PUBLIC_SUPABASE_URL"
+          test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          test -n "$NEXTAUTH_SECRET"
+          test -n "$STRIPE_SECRET_KEY"
+
+      - name: Validate isolated store service contract
+        run: pnpm exec tsx scripts/northflank/configure-store.ts
+
+      - name: Provision or reconcile isolated store service
+        run: pnpm exec tsx scripts/northflank/configure-store.ts --execute
+
+      - name: Attach existing production secret group without rewriting secrets
+        run: pnpm exec tsx scripts/northflank/attach-store-secret-group.ts
+
+      - name: Resolve Northflank public store URL
+        id: runtime
+        run: pnpm exec tsx scripts/northflank/resolve-store-runtime-url.ts
+
+      - name: Register branded store domain in Northflank and expose CNAME target
+        run: pnpm exec tsx scripts/northflank/configure-store-domain.ts
+
+      - name: Verify and assign branded store domain
+        run: pnpm exec tsx scripts/northflank/configure-store-domain.ts --execute
+
+      - name: Trigger one exact-SHA build
+        id: build
+        run: pnpm exec tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_STORE_SERVICE_ID"
+
+      - name: Wait for exact build
+        run: pnpm exec tsx scripts/northflank/wait-service.ts "$NORTHFLANK_STORE_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --timeout-ms 3600000
+
+      - name: Verify build belongs to this commit
+        run: pnpm exec tsx scripts/northflank/verify-build.ts "$NORTHFLANK_STORE_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --sha "$GITHUB_SHA"
+
+      - name: Deploy verified store build
+        run: pnpm exec tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_STORE_SERVICE_ID" --build-id "${{ steps.build.outputs.build_id }}" --sha "$GITHUB_SHA"
+
+      - name: Wait for exact production revision on Northflank runtime
+        shell: bash
+        env:
+          RUNTIME_URL: ${{ steps.runtime.outputs.url }}
+        run: |
+          set -euo pipefail
+          expected="$GITHUB_SHA"
+          for i in $(seq 1 60); do
+            if body=$(curl -fsS --max-time 15 "${RUNTIME_URL}/version.json" 2>/dev/null); then
+              current=$(node -e 'try{const x=JSON.parse(process.argv[1]);process.stdout.write(String(x.commit||""))}catch{}' "$body")
+              echo "store revision=${current:-missing}; expected=${expected}"
+              if [ "$current" = "$expected" ]; then
+                exit 0
+              fi
+            fi
+            sleep 10
+          done
+          echo "Store did not serve expected SHA $expected at ${RUNTIME_URL}" >&2
+          exit 1
+
+      - name: Production store smoke and isolation acceptance
+        shell: bash
+        env:
+          RUNTIME_URL: ${{ steps.runtime.outputs.url }}
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 20 "${RUNTIME_URL}/api/ping" >/tmp/store-ping.json
+          curl -fsS --max-time 20 "${RUNTIME_URL}/api/health" >/tmp/store-health.json
+          curl -fsS --max-time 30 "${RUNTIME_URL}/store" >/tmp/store.html
+          test -s /tmp/store.html
+
+          root_headers=$(curl -fsSI --max-time 20 "${RUNTIME_URL}/")
+          echo "$root_headers" | grep -qiE '^location: .*/store'
+
+          about_headers=$(curl -fsSI --max-time 20 "${RUNTIME_URL}/about")
+          echo "$about_headers" | grep -qiE '^location: https://www\.elevateforhumanity\.org/about'
+
+          status=$(curl -sS -o /tmp/checkout-unauth.json -w '%{http_code}' \
+            -X POST -H 'content-type: application/json' \
+            --data '{"planId":"solo","interval":"monthly","addonSlugs":[]}' \
+            "${RUNTIME_URL}/api/store/platform-checkout")
+          test "$status" = "401"
+          grep -q 'Authentication required' /tmp/checkout-unauth.json
+
+          echo "Accepted isolated store runtime at ${RUNTIME_URL}"
+
+      - name: Branded store domain acceptance
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 60); do
+            if curl -fsS --max-time 20 https://store.elevateforhumanity.org/api/ping >/dev/null 2>&1 \
+              && curl -fsS --max-time 30 https://store.elevateforhumanity.org/store >/dev/null 2>&1; then
+              echo 'Accepted branded store domain https://store.elevateforhumanity.org'
+              exit 0
+            fi
+            echo "Waiting for branded store DNS/SSL (${i}/60)..."
+            sleep 10
+          done
+          echo 'Branded store domain did not become healthy within the acceptance window.' >&2
+          exit 1
+
+      - name: Report store acceptance status
+        if: always()
+        run: |
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          if [ "${{ job.status }}" = "success" ]; then
+            STATE=success
+            DESC="Dedicated store built, deployed, isolated and branded domain accepted"
+          else
+            STATE=failure
+            DESC="Store production acceptance failed; inspect workflow logs"
+          fi
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -d "{\"state\":\"${STATE}\",\"context\":\"Store SaaS Acceptance\",\"description\":\"${DESC}\",\"target_url\":\"${RUN_URL}\"}" >/dev/null

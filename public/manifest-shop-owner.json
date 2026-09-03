@@ -1,0 +1,65 @@
+{
+  "id": "org.elevateforhumanity.hostshop",
+  "name": "Elevate Host Shop Portal",
+  "short_name": "Host Shop",
+  "description": "Manage apprentices, review hours, record attendance, verify competencies, and maintain host-site records.",
+  "start_url": "/host-shop/dashboard",
+  "scope": "/host-shop/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#1e40af",
+  "categories": ["business", "education", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Host Shop Dashboard",
+      "short_name": "Dashboard",
+      "url": "/host-shop/dashboard"
+    },
+    {
+      "name": "My Apprentices",
+      "short_name": "Apprentices",
+      "url": "/host-shop/dashboard/apprentices"
+    },
+    {
+      "name": "Review Pending Hours",
+      "short_name": "Hours",
+      "url": "/host-shop/dashboard/hours/pending"
+    },
+    {
+      "name": "Record Attendance",
+      "short_name": "Attendance",
+      "url": "/host-shop/dashboard/attendance/record"
+    },
+    {
+      "name": "Competency Sign-Offs",
+      "short_name": "Skills",
+      "url": "/host-shop/dashboard/competencies"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

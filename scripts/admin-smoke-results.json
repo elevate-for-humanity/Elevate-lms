@@ -1,0 +1,1538 @@
+[
+  {
+    "route": "/admin",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 293981
+  },
+  {
+    "route": "/admin/accreditation",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296501
+  },
+  {
+    "route": "/admin/accreditation/report",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297610
+  },
+  {
+    "route": "/admin/activity",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296458
+  },
+  {
+    "route": "/admin/advanced-tools",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296437
+  },
+  {
+    "route": "/admin/affiliates",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 340377
+  },
+  {
+    "route": "/admin/affiliates/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 328070
+  },
+  {
+    "route": "/admin/ai-console",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299411
+  },
+  {
+    "route": "/admin/ai-tutor-logs",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296912
+  },
+  {
+    "route": "/admin/analytics",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296787
+  },
+  {
+    "route": "/admin/analytics/engagement",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297285
+  },
+  {
+    "route": "/admin/analytics/learning",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297327
+  },
+  {
+    "route": "/admin/analytics/programs",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297269
+  },
+  {
+    "route": "/admin/api-keys",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296726
+  },
+  {
+    "route": "/admin/applicants",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296482
+  },
+  {
+    "route": "/admin/applicants-live",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296521
+  },
+  {
+    "route": "/admin/applications",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297039
+  },
+  {
+    "route": "/admin/apprenticeships",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298625
+  },
+  {
+    "route": "/admin/at-risk",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296753
+  },
+  {
+    "route": "/admin/audit-logs",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296420
+  },
+  {
+    "route": "/admin/automation",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299468
+  },
+  {
+    "route": "/admin/automation-qa",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296853
+  },
+  {
+    "route": "/admin/autopilot",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299471
+  },
+  {
+    "route": "/admin/barriers",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296213
+  },
+  {
+    "route": "/admin/blog",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 302126
+  },
+  {
+    "route": "/admin/campaigns",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297056
+  },
+  {
+    "route": "/admin/campaigns/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296564
+  },
+  {
+    "route": "/admin/career-courses/create",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297868
+  },
+  {
+    "route": "/admin/cash-advances",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296748
+  },
+  {
+    "route": "/admin/cash-advances/pending",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297258
+  },
+  {
+    "route": "/admin/cash-advances/reports",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297255
+  },
+  {
+    "route": "/admin/cash-advances/settings",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297263
+  },
+  {
+    "route": "/admin/certificates",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296566
+  },
+  {
+    "route": "/admin/certificates/bulk",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297825
+  },
+  {
+    "route": "/admin/certificates/issue",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297244
+  },
+  {
+    "route": "/admin/certifications",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296671
+  },
+  {
+    "route": "/admin/certifications/bulk",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297325
+  },
+  {
+    "route": "/admin/cohorts",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 438551
+  },
+  {
+    "route": "/admin/completions",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296191
+  },
+  {
+    "route": "/admin/compliance",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296997
+  },
+  {
+    "route": "/admin/compliance-audit",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298589
+  },
+  {
+    "route": "/admin/compliance/agreements",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297435
+  },
+  {
+    "route": "/admin/compliance/deletions",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297201
+  },
+  {
+    "route": "/admin/compliance/exports",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297176
+  },
+  {
+    "route": "/admin/compliance/financial-assurance",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 383316
+  },
+  {
+    "route": "/admin/contacts",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296165
+  },
+  {
+    "route": "/admin/copilot",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296156
+  },
+  {
+    "route": "/admin/copilot/deploy",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297829
+  },
+  {
+    "route": "/admin/course-builder",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296825
+  },
+  {
+    "route": "/admin/course-builder/assessments",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296664
+  },
+  {
+    "route": "/admin/course-builder/media",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296614
+  },
+  {
+    "route": "/admin/course-builder/templates",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296699
+  },
+  {
+    "route": "/admin/course-generator",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298644
+  },
+  {
+    "route": "/admin/course-import",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296791
+  },
+  {
+    "route": "/admin/course-templates",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296813
+  },
+  {
+    "route": "/admin/courses",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296412
+  },
+  {
+    "route": "/admin/courses/builder",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297218
+  },
+  {
+    "route": "/admin/courses/bulk-operations",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296966
+  },
+  {
+    "route": "/admin/courses/create",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297909
+  },
+  {
+    "route": "/admin/courses/manage",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297213
+  },
+  {
+    "route": "/admin/courses/partners",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 310769
+  },
+  {
+    "route": "/admin/crm",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296692
+  },
+  {
+    "route": "/admin/crm/appointments",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297372
+  },
+  {
+    "route": "/admin/crm/appointments/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298359
+  },
+  {
+    "route": "/admin/crm/campaigns",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297068
+  },
+  {
+    "route": "/admin/crm/campaigns/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299404
+  },
+  {
+    "route": "/admin/crm/contacts",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296891
+  },
+  {
+    "route": "/admin/crm/contacts/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297511
+  },
+  {
+    "route": "/admin/crm/deals",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296248
+  },
+  {
+    "route": "/admin/crm/deals/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298305
+  },
+  {
+    "route": "/admin/crm/follow-ups",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297380
+  },
+  {
+    "route": "/admin/crm/leads",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296844
+  },
+  {
+    "route": "/admin/crm/leads/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297510
+  },
+  {
+    "route": "/admin/curriculum",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296596
+  },
+  {
+    "route": "/admin/curriculum/upload",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297274
+  },
+  {
+    "route": "/admin/dashboard",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 389173
+  },
+  {
+    "route": "/admin/dashboard/etpl",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 385821
+  },
+  {
+    "route": "/admin/data-processor",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296551
+  },
+  {
+    "route": "/admin/delegates",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296207
+  },
+  {
+    "route": "/admin/dev-studio",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299758
+  },
+  {
+    "route": "/admin/docs",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296793
+  },
+  {
+    "route": "/admin/docs/mou",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297129
+  },
+  {
+    "route": "/admin/document-center",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296567
+  },
+  {
+    "route": "/admin/documents",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296200
+  },
+  {
+    "route": "/admin/documents/review",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297509
+  },
+  {
+    "route": "/admin/documents/upload",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297247
+  },
+  {
+    "route": "/admin/editor",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298453
+  },
+  {
+    "route": "/admin/email-marketing",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298623
+  },
+  {
+    "route": "/admin/email-marketing/analytics",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 301028
+  },
+  {
+    "route": "/admin/email-marketing/automation",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 301142
+  },
+  {
+    "route": "/admin/email-marketing/automation/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 303547
+  },
+  {
+    "route": "/admin/email-marketing/campaigns/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 301999
+  },
+  {
+    "route": "/admin/employers",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296799
+  },
+  {
+    "route": "/admin/employers-playbook",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296614
+  },
+  {
+    "route": "/admin/employers/onboarding",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 304280
+  },
+  {
+    "route": "/admin/enrollment-jobs",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296728
+  },
+  {
+    "route": "/admin/enrollments",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296827
+  },
+  {
+    "route": "/admin/etpl-alignment",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296808
+  },
+  {
+    "route": "/admin/external-modules",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298215
+  },
+  {
+    "route": "/admin/external-modules/approvals",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299155
+  },
+  {
+    "route": "/admin/external-progress",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296821
+  },
+  {
+    "route": "/admin/ferpa",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296802
+  },
+  {
+    "route": "/admin/ferpa/training",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297770
+  },
+  {
+    "route": "/admin/files",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296132
+  },
+  {
+    "route": "/admin/funding",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296175
+  },
+  {
+    "route": "/admin/funding-playbook",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296813
+  },
+  {
+    "route": "/admin/governance",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 404500
+  },
+  {
+    "route": "/admin/governance/authoritative-docs",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 314631
+  },
+  {
+    "route": "/admin/governance/compliance",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 337754
+  },
+  {
+    "route": "/admin/governance/contact",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 355661
+  },
+  {
+    "route": "/admin/governance/data",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 365799
+  },
+  {
+    "route": "/admin/governance/legal",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 376780
+  },
+  {
+    "route": "/admin/governance/operational-controls",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 353380
+  },
+  {
+    "route": "/admin/governance/security",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 336406
+  },
+  {
+    "route": "/admin/governance/seo-indexing",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 362319
+  },
+  {
+    "route": "/admin/gradebook",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296205
+  },
+  {
+    "route": "/admin/grants",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 332404
+  },
+  {
+    "route": "/admin/grants/intake",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296905
+  },
+  {
+    "route": "/admin/grants/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 326083
+  },
+  {
+    "route": "/admin/grants/revenue",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297179
+  },
+  {
+    "route": "/admin/grants/submissions",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296980
+  },
+  {
+    "route": "/admin/grants/workflow",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296864
+  },
+  {
+    "route": "/admin/hours-export",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298142
+  },
+  {
+    "route": "/admin/hr",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296079
+  },
+  {
+    "route": "/admin/hr/employees",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297184
+  },
+  {
+    "route": "/admin/hr/employees/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298136
+  },
+  {
+    "route": "/admin/hr/leave",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297170
+  },
+  {
+    "route": "/admin/hr/payroll",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297179
+  },
+  {
+    "route": "/admin/hr/time",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297103
+  },
+  {
+    "route": "/admin/hsi-enrollments",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296561
+  },
+  {
+    "route": "/admin/hvac-activation",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296442
+  },
+  {
+    "route": "/admin/impact",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296167
+  },
+  {
+    "route": "/admin/import",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296815
+  },
+  {
+    "route": "/admin/inbox",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297116
+  },
+  {
+    "route": "/admin/incentives",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298549
+  },
+  {
+    "route": "/admin/incentives/create",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 333765
+  },
+  {
+    "route": "/admin/instructors",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298152
+  },
+  {
+    "route": "/admin/instructors/performance",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299186
+  },
+  {
+    "route": "/admin/intake",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298493
+  },
+  {
+    "route": "/admin/integrations",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298156
+  },
+  {
+    "route": "/admin/integrations/google-classroom",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299174
+  },
+  {
+    "route": "/admin/integrations/salesforce",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299197
+  },
+  {
+    "route": "/admin/internal-docs",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296522
+  },
+  {
+    "route": "/admin/jobs",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 349921
+  },
+  {
+    "route": "/admin/jobs/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 332905
+  },
+  {
+    "route": "/admin/jri",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296164
+  },
+  {
+    "route": "/admin/leads",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296679
+  },
+  {
+    "route": "/admin/leads/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296541
+  },
+  {
+    "route": "/admin/learner",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296533
+  },
+  {
+    "route": "/admin/lessons",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296387
+  },
+  {
+    "route": "/admin/license",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296144
+  },
+  {
+    "route": "/admin/license-requests",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297232
+  },
+  {
+    "route": "/admin/licenses",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296145
+  },
+  {
+    "route": "/admin/licenses/create",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 323119
+  },
+  {
+    "route": "/admin/licensing",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298121
+  },
+  {
+    "route": "/admin/live-chat",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298540
+  },
+  {
+    "route": "/admin/marketing",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296793
+  },
+  {
+    "route": "/admin/marketplace",
+    "http_status": 308,
+    "result": "REDIRECT",
+    "body_size": 12
+  },
+  {
+    "route": "/admin/marketplace/creators",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297795
+  },
+  {
+    "route": "/admin/marketplace/payouts",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297790
+  },
+  {
+    "route": "/admin/marketplace/products",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297796
+  },
+  {
+    "route": "/admin/media-studio",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298568
+  },
+  {
+    "route": "/admin/migrations",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296185
+  },
+  {
+    "route": "/admin/mobile-sync",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296208
+  },
+  {
+    "route": "/admin/moderation",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299239
+  },
+  {
+    "route": "/admin/modules",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296693
+  },
+  {
+    "route": "/admin/modules/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297629
+  },
+  {
+    "route": "/admin/monitoring",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298500
+  },
+  {
+    "route": "/admin/monitoring/setup",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 300598
+  },
+  {
+    "route": "/admin/mou",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296156
+  },
+  {
+    "route": "/admin/next-steps",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298543
+  },
+  {
+    "route": "/admin/notifications",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298611
+  },
+  {
+    "route": "/admin/operations",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296233
+  },
+  {
+    "route": "/admin/outcomes",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296187
+  },
+  {
+    "route": "/admin/partner-enrollments",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296707
+  },
+  {
+    "route": "/admin/partner-inquiries",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296822
+  },
+  {
+    "route": "/admin/partners",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296751
+  },
+  {
+    "route": "/admin/partners/lms-integrations",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297300
+  },
+  {
+    "route": "/admin/payroll",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298094
+  },
+  {
+    "route": "/admin/payroll-cards",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296533
+  },
+  {
+    "route": "/admin/performance-dashboard",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296942
+  },
+  {
+    "route": "/admin/portal-map",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298537
+  },
+  {
+    "route": "/admin/program-generator",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296837
+  },
+  {
+    "route": "/admin/program-holder-acknowledgements",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296785
+  },
+  {
+    "route": "/admin/program-holder-documents",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298328
+  },
+  {
+    "route": "/admin/program-holders",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296579
+  },
+  {
+    "route": "/admin/program-holders/verification",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297468
+  },
+  {
+    "route": "/admin/programs",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296482
+  },
+  {
+    "route": "/admin/programs/builder",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297223
+  },
+  {
+    "route": "/admin/programs/catalog",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 401904
+  },
+  {
+    "route": "/admin/programs/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297355
+  },
+  {
+    "route": "/admin/progress",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296184
+  },
+  {
+    "route": "/admin/promo-codes",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296833
+  },
+  {
+    "route": "/admin/quiz-builder",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296731
+  },
+  {
+    "route": "/admin/quizzes",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296397
+  },
+  {
+    "route": "/admin/rapids",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298467
+  },
+  {
+    "route": "/admin/rapids/apprentices",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299493
+  },
+  {
+    "route": "/admin/reporting",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296997
+  },
+  {
+    "route": "/admin/reports",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 368503
+  },
+  {
+    "route": "/admin/reports/caseload",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297233
+  },
+  {
+    "route": "/admin/reports/charts",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296892
+  },
+  {
+    "route": "/admin/reports/enrollment",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 318864
+  },
+  {
+    "route": "/admin/reports/financial",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 323358
+  },
+  {
+    "route": "/admin/reports/leads",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 320679
+  },
+  {
+    "route": "/admin/reports/partners",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297525
+  },
+  {
+    "route": "/admin/reports/samples",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 327927
+  },
+  {
+    "route": "/admin/reports/users",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 321373
+  },
+  {
+    "route": "/admin/retention",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296186
+  },
+  {
+    "route": "/admin/review-queue",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296774
+  },
+  {
+    "route": "/admin/sap",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296482
+  },
+  {
+    "route": "/admin/security",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296213
+  },
+  {
+    "route": "/admin/settings",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296762
+  },
+  {
+    "route": "/admin/shops",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296773
+  },
+  {
+    "route": "/admin/shops/geocoding",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297954
+  },
+  {
+    "route": "/admin/signatures",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296852
+  },
+  {
+    "route": "/admin/signatures/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297175
+  },
+  {
+    "route": "/admin/site-health",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296207
+  },
+  {
+    "route": "/admin/social-media",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298510
+  },
+  {
+    "route": "/admin/social-media/campaigns/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 301916
+  },
+  {
+    "route": "/admin/store",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296117
+  },
+  {
+    "route": "/admin/store/catalog",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297219
+  },
+  {
+    "route": "/admin/store/clones",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298794
+  },
+  {
+    "route": "/admin/students",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296578
+  },
+  {
+    "route": "/admin/students/export",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298870
+  },
+  {
+    "route": "/admin/success",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296195
+  },
+  {
+    "route": "/admin/support",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298502
+  },
+  {
+    "route": "/admin/syllabus-generator",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296843
+  },
+  {
+    "route": "/admin/system-health",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296795
+  },
+  {
+    "route": "/admin/system-monitor",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298184
+  },
+  {
+    "route": "/admin/system-status",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298436
+  },
+  {
+    "route": "/admin/tax-filing",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296516
+  },
+  {
+    "route": "/admin/tax-filing/applications",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297033
+  },
+  {
+    "route": "/admin/tax-filing/applications/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 329825
+  },
+  {
+    "route": "/admin/tax-filing/preparers",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296962
+  },
+  {
+    "route": "/admin/tax-filing/reports",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296942
+  },
+  {
+    "route": "/admin/tax-filing/training",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296993
+  },
+  {
+    "route": "/admin/tenants",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296196
+  },
+  {
+    "route": "/admin/test-emails",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298975
+  },
+  {
+    "route": "/admin/test-payments",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299380
+  },
+  {
+    "route": "/admin/transfer-hours",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296499
+  },
+  {
+    "route": "/admin/users",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296996
+  },
+  {
+    "route": "/admin/users/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297091
+  },
+  {
+    "route": "/admin/verifications/review",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296938
+  },
+  {
+    "route": "/admin/video-generator",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298183
+  },
+  {
+    "route": "/admin/video-manager",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298571
+  },
+  {
+    "route": "/admin/videos",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296505
+  },
+  {
+    "route": "/admin/videos/upload",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 297195
+  },
+  {
+    "route": "/admin/waitlist",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296450
+  },
+  {
+    "route": "/admin/wioa",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 298662
+  },
+  {
+    "route": "/admin/wioa/documents",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 339662
+  },
+  {
+    "route": "/admin/wioa/eligibility",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 327675
+  },
+  {
+    "route": "/admin/wioa/reports",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 397238
+  },
+  {
+    "route": "/admin/wioa/verify",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 299283
+  },
+  {
+    "route": "/admin/workflows",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296180
+  },
+  {
+    "route": "/admin/wotc",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 296622
+  },
+  {
+    "route": "/admin/wotc/new",
+    "http_status": 200,
+    "result": "COMPILES_OK",
+    "body_size": 345528
+  }
+]

@@ -1,0 +1,149 @@
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export type NetworkMapPin = {
+  id: string;
+  kind: 'workone' | 'elevate' | 'host_shop' | 'satellite';
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  phone?: string;
+  lat: number;
+  lng: number;
+  programs?: string[];
+  href?: string;
+};
+
+/** Marion County / Indy metro — used on barber program map */
+export const BARBER_WORKFORCE_NETWORK_PINS: NetworkMapPin[] = [
+  {
+    id: 'elevate-keystone',
+    kind: 'elevate',
+    name: `${PLATFORM_DEFAULTS.orgName} — Keystone`,
+    address: '8888 Keystone Crossing, Suite 1300',
+    city: 'Indianapolis',
+    state: 'IN',
+    zip: '46240',
+    phone: '(317) 760-7908',
+    lat: 39.9142,
+    lng: -86.065,
+    programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
+    href: '/contact',
+  },
+  {
+    id: 'kountry-kutz',
+    kind: 'host_shop',
+    name: 'Kountry Kutz Barbershop',
+    address: 'New Palestine area',
+    city: 'New Palestine',
+    state: 'IN',
+    zip: '46163',
+    lat: 39.721,
+    lng: -85.889,
+    programs: ['barber-apprenticeship'],
+  },
+  {
+    id: 'style-and-scissor-sullivan',
+    kind: 'host_shop',
+    name: 'Style and Scissor Salon (Corinne Yvette Meid)',
+    address: '10 E Washington St',
+    city: 'Sullivan',
+    state: 'IN',
+    zip: '47882',
+    lat: 39.0951,
+    lng: -87.4058,
+    programs: ['barber-apprenticeship', 'cosmetology-apprenticeship', 'nail-technician-apprenticeship'],
+  },
+  {
+    id: 'workone-sullivan',
+    kind: 'workone',
+    name: 'WorkOne — Sullivan County area',
+    address: 'Serving Sullivan County (nearest center may vary)',
+    city: 'Sullivan',
+    state: 'IN',
+    zip: '47882',
+    phone: '(812) 234-6602',
+    lat: 39.0951,
+    lng: -87.4058,
+    href: 'https://www.in.gov/dwd/workone/workone-locations/',
+  },
+  {
+    id: 'workone-east',
+    kind: 'workone',
+    name: 'WorkOne Indianapolis — East',
+    address: '7251 E 86th St',
+    city: 'Indianapolis',
+    state: 'IN',
+    zip: '46256',
+    phone: '(317) 842-8801',
+    lat: 39.908,
+    lng: -86.01,
+    href: 'https://www.in.gov/dwd/workone/workone-locations/',
+  },
+  {
+    id: 'workone-nw',
+    kind: 'workone',
+    name: 'WorkOne Indianapolis — Northwest',
+    address: '3901 N Shadeland Ave',
+    city: 'Indianapolis',
+    state: 'IN',
+    zip: '46226',
+    phone: '(317) 921-1600',
+    lat: 39.828,
+    lng: -86.045,
+    href: 'https://www.in.gov/dwd/workone/workone-locations/',
+  },
+  {
+    id: 'workone-sw',
+    kind: 'workone',
+    name: 'WorkOne Indianapolis — Southwest',
+    address: '1200 Madison Ave',
+    city: 'Indianapolis',
+    state: 'IN',
+    zip: '46225',
+    phone: '(317) 684-2400',
+    lat: 39.752,
+    lng: -86.158,
+    href: 'https://www.in.gov/dwd/workone/workone-locations/',
+  },
+  {
+    id: 'workone-meadows',
+    kind: 'workone',
+    name: 'WorkOne Marion County',
+    address: '3901 Meadows Dr',
+    city: 'Indianapolis',
+    state: 'IN',
+    zip: '46205',
+    phone: '(317) 684-2400',
+    lat: 39.828,
+    lng: -86.12,
+    href: 'https://www.in.gov/dwd/workone/workone-locations/',
+  },
+  {
+    id: 'employindy',
+    kind: 'satellite',
+    name: 'EmployIndy / WorkOne satellite',
+    address: '1845 W 18th St, Suite B',
+    city: 'Indianapolis',
+    state: 'IN',
+    zip: '46202',
+    phone: '(317) 639-4400',
+    lat: 39.791,
+    lng: -86.171,
+    href: 'https://www.indianacareerconnect.com',
+  },
+  {
+    id: 'workone-express-library',
+    kind: 'satellite',
+    name: 'WorkOne Express — Central Library',
+    address: '40 E St. Clair St',
+    city: 'Indianapolis',
+    state: 'IN',
+    zip: '46204',
+    phone: '(317) 275-4100',
+    lat: 39.776,
+    lng: -86.156,
+    href: 'https://www.in.gov/dwd/workone/workone-locations/',
+  },
+];

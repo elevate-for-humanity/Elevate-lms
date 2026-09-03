@@ -1,0 +1,222 @@
+name: Compliance Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: compliance-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: '10.28.2'
+
+jobs:
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Recovery hardening regression check
+        run: node scripts/verify-recovery-gate-hardening.mjs
+      - name: Dependency security audit
+        run: pnpm audit --audit-level high
+
+  registered-apprenticeship:
+    name: Registered Apprenticeship Architecture
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Enforce canonical registered-apprenticeship architecture
+        run: node scripts/check-registered-apprenticeship-architecture.mjs
+
+  e2e-enrollment:
+    name: E2E Enrollment Flow
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Install Playwright
+        run: pnpm exec playwright install chromium webkit --with-deps
+      - name: Build application
+        run: pnpm run ci:build
+        env:
+          NODE_OPTIONS: '--max-old-space-size=6144'
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - name: Build marketing app
+        run: pnpm --filter @elevate/marketing build --no-lint
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+      - name: Start server
+        run: pnpm --filter @elevate/marketing run start &
+        env:
+          NODE_ENV: production
+          PORT: 3000
+          HOSTNAME: 127.0.0.1
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+          NEXTAUTH_SECRET: ci-test-secret-do-not-use-in-production
+          NEXTAUTH_URL: http://127.0.0.1:3000
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || '' }}
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY || '' }}
+          TEST_MODE: 'true'
+      - name: Wait for server
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ >/dev/null; then
+              echo 'Marketing server is ready.'
+              exit 0
+            fi
+            sleep 2
+          done
+          echo '::error::Marketing server did not become ready within 120 seconds.'
+          exit 1
+      - name: Run canonical application-flow tests
+        run: pnpm exec playwright test tests/e2e/canonical-application-flow.spec.ts --config playwright.config.ts
+        env:
+          # Match the production-mode server started above. Without this,
+          # Playwright targets localhost and may start a second dev server,
+          # so the compliance test does not exercise the built application.
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: test-results/
+          retention-days: 7
+
+  accessibility:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Install Playwright
+        run: pnpm exec playwright install chromium webkit --with-deps
+      - name: Build application
+        run: pnpm run ci:build
+        env:
+          NODE_OPTIONS: '--max-old-space-size=6144'
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - name: Build marketing app
+        run: pnpm --filter @elevate/marketing build --no-lint
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+      - name: Start server
+        run: pnpm --filter @elevate/marketing run start &
+        env:
+          NODE_ENV: production
+          PORT: 3000
+          HOSTNAME: 127.0.0.1
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+          NEXTAUTH_SECRET: ci-test-secret-do-not-use-in-production
+          NEXTAUTH_URL: http://127.0.0.1:3000
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || '' }}
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY || '' }}
+          TEST_MODE: 'true'
+      - name: Wait for server
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ >/dev/null; then
+              echo 'Marketing server is ready.'
+              exit 0
+            fi
+            sleep 2
+          done
+          echo '::error::Marketing server did not become ready within 120 seconds.'
+          exit 1
+      - name: Run accessibility tests
+        run: pnpm exec playwright test tests/e2e/accessibility.spec.ts --config playwright.config.ts
+      - name: Homepage config leak smoke
+        run: pnpm exec playwright test tests/e2e/home-config-leaks.spec.ts --config playwright.config.ts
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-results
+          path: test-results/
+          retention-days: 7
+
+  compliance-files:
+    name: Compliance Files Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify compliance components exist
+        run: |
+          set -euo pipefail
+          test -f components/compliance/PathwayDisclosure.tsx
+          test -f components/compliance/ComplianceGuardrails.tsx
+          test -f components/compliance/ComplianceNotice.tsx
+          test -f components/EligibilityNotice.tsx
+      - name: Verify legal pages exist
+        run: |
+          set -euo pipefail
+          test -f apps/marketing/app/legal/disclosures/page.tsx
+          test -d apps/marketing/app/terms
+          test -d apps/marketing/app/legal/privacy
+      - name: Verify audit packet exists
+        run: |
+          set -euo pipefail
+          test -d audit-packet
+          test -f audit-packet/EXECUTIVE_SUMMARY.md
+          test -f audit-packet/AUDIT_REPORT.md

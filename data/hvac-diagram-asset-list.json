@@ -1,0 +1,182 @@
+```json
+{
+  "modules": [
+    {
+      "id": "01",
+      "name": "Program Orientation",
+      "diagrams": {
+        "system_overview": "Illustration of a complete HVAC system and where different modules fit into the overall course.",
+        "component_diagram": "Diagram not applicable for orientation module.",
+        "how_it_works": "Flow chart showing the structure of the HVAC course.",
+        "field_photo_prompt": "Generate a realistic classroom setting with students and an instructor starting an HVAC training program.",
+        "troubleshooting": "Diagram not applicable for orientation module."
+      }
+    },
+    {
+      "id": "02",
+      "name": "System Components",
+      "diagrams": {
+        "system_overview": "Full HVAC system diagram highlighting various components like compressor, condenser, evaporator, etc.",
+        "component_diagram": "Zoomed-in labeled diagram of a typical compressor and its parts.",
+        "how_it_works": "Cross-section showing how individual HVAC components connect and work together.",
+        "field_photo_prompt": "Generate a realistic photo of an HVAC system with all key components highlighted.",
+        "troubleshooting": "Fault diagram showing common component issues, like a seized compressor or faulty capacitor."
+      }
+    },
+    {
+      "id": "03",
+      "name": "Electrical",
+      "diagrams": {
+        "system_overview": "HVAC system diagram with electrical components such as motors and control boards highlighted.",
+        "component_diagram": "Detailed schematic of an HVAC electrical circuit board.",
+        "how_it_works": "Process flow diagram showing electrical current flow within an HVAC system.",
+        "field_photo_prompt": "Generate a realistic photo of an HVAC control board with wiring and connections.",
+        "troubleshooting": "Diagram highlighting common electrical faults, such as short circuits or open circuits."
+      }
+    },
+    {
+      "id": "04",
+      "name": "Refrigeration Cycle",
+      "diagrams": {
+        "system_overview": "HVAC system highlighting the refrigeration path among other elements.",
+        "component_diagram": "Labeled diagram of a refrigeration cycle detailing each phase like evaporation, compression, condensation, and expansion.",
+        "how_it_works": "Cross-section of a refrigerator with detailed explanation of the cooling process.",
+        "field_photo_prompt": "Generate a realistic photo of HVAC refrigeration components, including coils and compressor.",
+        "troubleshooting": "Diagram showing common issues in the refrigeration cycle, such as refrigerant leaks or blocked filters."
+      }
+    },
+    {
+      "id": "05",
+      "name": "Heating Systems",
+      "diagrams": {
+        "system_overview": "Full HVAC diagram highlighting the heating components like the furnace and heat exchanger.",
+        "component_diagram": "Detailed diagram of a furnace with labeled parts.",
+        "how_it_works": "Cross-section showing airflow and heat exchange processes in a heating system.",
+        "field_photo_prompt": "Generate a realistic photo of a furnace system installation with ductwork.",
+        "troubleshooting": "Diagram showing common heating system issues, such as a failed ignition system or clogged burner."
+      }
+    },
+    {
+      "id": "06",
+      "name": "EPA608 Refrigerants",
+      "diagrams": {
+        "system_overview": "HVAC system diagram focusing on refrigerant paths and regulation spots.",
+        "component_diagram": "Diagram of refrigerant flow control components like valves and gauges.",
+        "how_it_works": "Process flow showing how refrigerants are managed and cycled in an HVAC system.",
+        "field_photo_prompt": "Generate a realistic photo of refrigerant cylinders and servicing tools.",
+        "troubleshooting": "Diagram showing potential regulatory and usage issues with common refrigerants."
+      }
+    },
+    {
+      "id": "07",
+      "name": "Air Distribution",
+      "diagrams": {
+        "system_overview": "Overall HVAC system showing air distribution routes through ductwork.",
+        "component_diagram": "Labeled diagram of ductwork and air handlers.",
+        "how_it_works": "Flow diagram showing air movement through HVAC duct systems.",
+        "field_photo_prompt": "Generate a realistic photo of HVAC ductwork installations in a residential setting.",
+        "troubleshooting": "Diagram showing common air distribution issues, such as blockages or leaks in ductwork."
+      }
+    },
+    {
+      "id": "08",
+      "name": "Controls/Thermostats",
+      "diagrams": {
+        "system_overview": "HVAC schematic emphasizing control mechanisms like thermostats and sensors.",
+        "component_diagram": "Detailed diagram of a programmable thermostat with labeled components.",
+        "how_it_works": "Diagram showing the process of how a thermostat regulates HVAC system operation.",
+        "field_photo_prompt": "Generate a realistic photo of a wall-mounted digital thermostat in use.",
+        "troubleshooting": "Diagram showing common thermostat issues, such as miscalibration or power supply problems."
+      }
+    },
+    {
+      "id": "09",
+      "name": "Installation",
+      "diagrams": {
+        "system_overview": "Complete HVAC installation workflow from components to setup.",
+        "component_diagram": "Schematic showing key parts involved in a new HVAC installation.",
+        "how_it_works": "Flow chart detailing the step-by-step installation procedure of HVAC systems.",
+        "field_photo_prompt": "Generate a realistic photo of technicians installing an HVAC system in a new building.",
+        "troubleshooting": "Diagram showing issues encountered during installation, like improper sealing or alignment."
+      }
+    },
+    {
+      "id": "10",
+      "name": "Service/Maintenance",
+      "diagrams": {
+        "system_overview": "Diagram showing areas of an HVAC system that require regular maintenance.",
+        "component_diagram": "Labeled diagram of serviceable parts such as filters and belts.",
+        "how_it_works": "Flow chart outlining a routine maintenance schedule and tasks.",
+        "field_photo_prompt": "Generate a realistic photo of a technician performing maintenance on an HVAC unit.",
+        "troubleshooting": "Diagram showing maintenance-related issues like clogged filters or worn belts."
+      }
+    },
+    {
+      "id": "11",
+      "name": "Troubleshooting",
+      "diagrams": {
+        "system_overview": "HVAC system map highlighting diagnostic points.",
+        "component_diagram": "Diagram of diagnostic tools and their application points in an HVAC system.",
+        "how_it_works": "Process flow outlining the step-by-step troubleshooting procedure.",
+        "field_photo_prompt": "Generate a realistic photo of a technician using diagnostic tools on an HVAC system.",
+        "troubleshooting": "Diagram showing a comprehensive list of HVAC issues and diagnostic methods."
+      }
+    },
+    {
+      "id": "12",
+      "name": "Commercial Systems",
+      "diagrams": {
+        "system_overview": "Diagram comparing typical components between residential and commercial HVAC systems.",
+        "component_diagram": "Labeled diagram of a commercial rooftop HVAC unit.",
+        "how_it_works": "Cross-section showing the operation of a commercial HVAC system.",
+        "field_photo_prompt": "Generate a realistic photo of a commercial HVAC system on a rooftop.",
+        "troubleshooting": "Diagram showing common issues unique to commercial systems, like building pressure imbalances."
+      }
+    },
+    {
+      "id": "13",
+      "name": "Heat Pumps",
+      "diagrams": {
+        "system_overview": "Diagram highlighting the heat pump component in a dual system HVAC setup.",
+        "component_diagram": "Detailed diagram of a heat pump system with parts labeled.",
+        "how_it_works": "Cross-section illustrating the heat exchange process in a heat pump.",
+        "field_photo_prompt": "Generate a realistic photo of a residential heat pump installation.",
+        "troubleshooting": "Diagram showing typical heat pump problems like frost build-up or valve malfunctions."
+      }
+    },
+    {
+      "id": "14",
+      "name": "Indoor Air Quality",
+      "diagrams": {
+        "system_overview": "HVAC system highlighting filters and air quality monitors.",
+        "component_diagram": "Diagram of air filtration systems with labeled parts.",
+        "how_it_works": "Flow process explaining how air quality is maintained in HVAC systems.",
+        "field_photo_prompt": "Generate a realistic photo of a high-efficiency HVAC air filter.",
+        "troubleshooting": "Diagram showing issues impacting air quality like mold growth in ducts."
+      }
+    },
+    {
+      "id": "15",
+      "name": "Business/Career",
+      "diagrams": {
+        "system_overview": "Diagram not applicable for business module.",
+        "component_diagram": "Diagram not applicable for business module.",
+        "how_it_works": "Flow chart of career pathways and professional progression in the HVAC industry.",
+        "field_photo_prompt": "Generate an image of an HVAC business office workflow environment.",
+        "troubleshooting": "Diagram not applicable for business module."
+      }
+    },
+    {
+      "id": "16",
+      "name": "EPA608 Exam Prep",
+      "diagrams": {
+        "system_overview": "Diagram showing critical knowledge areas for the EPA608 certification.",
+        "component_diagram": "Diagram not applicable for exam prep.",
+        "how_it_works": "Flow chart of topics and review areas for EPA608 exam preparation.",
+        "field_photo_prompt": "Generate a realistic image of a study group preparing for the EPA608 certification exam.",
+        "troubleshooting": "Diagram not applicable for exam prep."
+      }
+    }
+  ]
+}
+```

@@ -1,0 +1,60 @@
+{
+  "id": "org.elevateforhumanity.student",
+  "name": "Elevate Learner Portal",
+  "short_name": "Elevate Learn",
+  "description": "Courses, progress, certifications, assignments, schedules, and learner support.",
+  "start_url": "/lms/dashboard",
+  "scope": "/lms",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Learner Dashboard",
+      "short_name": "Dashboard",
+      "url": "/lms/dashboard"
+    },
+    {
+      "name": "My Courses",
+      "short_name": "Courses",
+      "url": "/lms/courses"
+    },
+    {
+      "name": "Assignments",
+      "short_name": "Assignments",
+      "url": "/lms/assignments"
+    },
+    {
+      "name": "Certificates",
+      "short_name": "Certificates",
+      "url": "/lms/certificates"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

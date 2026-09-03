@@ -1,0 +1,1 @@
+{"id":"/videos/barber-voiceover-script.txt","path":"/videos/barber-voiceover-script.txt","sha":"bf8bafd964b9b4d00456325ded888a018499f00d","mime_type":"text/plain","size":2186,"site_id":"0a9378d2-a1d1-4062-9e9a-7be3105044df","deploy_id":"69df0487a1f5810008a809b3"}

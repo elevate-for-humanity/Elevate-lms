@@ -1,0 +1,169 @@
+{
+  "version": 7,
+  "updated": "2026-08-22",
+  "surfaces": {
+    "studentApplication": {
+      "function": "Complete public student training application",
+      "canonical": { "app": "marketing", "path": "/apply/student" },
+      "compatibility": [
+        { "app": "marketing", "path": "/apply", "target": "/apply/student" },
+        { "app": "marketing", "path": "/enrollment-v2", "target": "/apply/student" },
+        { "app": "marketing", "path": "/enrollment-v2/apply", "target": "/apply/student" },
+        { "app": "marketing", "path": "/enrollment-v2/documents", "target": "/apply/student" },
+        { "app": "marketing", "path": "/enrollment-v2/funding", "target": "/funding" },
+        { "app": "marketing", "path": "/enrollment-v2/program", "target": "/programs" }
+      ],
+      "api": {
+        "canonical": { "app": "marketing", "path": "/api/applications" },
+        "compatibility": [
+          { "app": "marketing", "path": "/api/enrollment-v2/apply", "mode": "adapter" }
+        ]
+      }
+    },
+    "studentPortal": {
+      "function": "Student LMS dashboard and learning workspace",
+      "canonical": { "app": "lms", "path": "/lms/dashboard" },
+      "operational": [
+        { "app": "lms", "path": "/lms/courses", "purpose": "Assigned course catalog" }
+      ]
+    },
+    "apprenticePortal": {
+      "function": "Registered apprenticeship OJT, RTI, competencies, documents, and program-specific progress",
+      "canonical": { "app": "lms", "path": "/apprentice" },
+      "operational": [
+        { "app": "lms", "path": "/apprentice/timeclock", "purpose": "OJT timeclock and hour entry" }
+      ]
+    },
+    "hostSites": {
+      "function": "Apprenticeship Host Site information, approval, application, directory, and portal access",
+      "canonical": { "app": "marketing", "path": "/partners/host-shops" },
+      "application": { "app": "marketing", "path": "/partners/host-shop/apply" },
+      "portal": { "app": "lms", "path": "/host-shop/dashboard" },
+      "operational": [
+        { "app": "lms", "path": "/host-shop/dashboard/board", "purpose": "Host Site apprentice/OJT operational board" }
+      ],
+      "compatibility": [
+        { "app": "marketing", "path": "/partners/barber-host-shop", "target": "/partners/host-shops" },
+        { "app": "marketing", "path": "/apprenticeships/host-shop", "target": "/partners/host-shops" },
+        { "app": "marketing", "path": "/programs/barber-apprenticeship/host-shops", "target": "/partners/host-shops" },
+        { "app": "marketing", "path": "/partners/barber-host-shop/apply", "target": "/partners/host-shop/apply" },
+        { "app": "lms", "path": "/cosmetology-host-shop/dashboard", "target": "/host-shop/dashboard" }
+      ],
+      "informational": [
+        { "app": "marketing", "path": "/apprenticeship-sponsor", "purpose": "Sponsor-of-record governance and compliance; not a second employer application" }
+      ]
+    },
+    "employerPublic": {
+      "function": "General public employer partnership and workforce solution overview",
+      "canonical": { "app": "marketing", "path": "/employers" },
+      "compatibility": [
+        { "app": "marketing", "path": "/employer", "target": "/employers" }
+      ],
+      "informational": [
+        { "app": "marketing", "path": "/hire-graduates", "purpose": "Hiring-specific recruiting and candidate pathway page" }
+      ],
+      "operational": [
+        { "app": "lms", "path": "/employer/dashboard", "purpose": "Authenticated employer job posting and candidate management" }
+      ]
+    },
+    "parentPortal": {
+      "function": "Parent/guardian learner progress visibility",
+      "canonical": { "app": "lms", "path": "/parent-portal/dashboard" }
+    },
+    "workforcePortal": {
+      "function": "Workforce partner participant management, placements, outcomes, and reporting",
+      "canonical": { "app": "lms", "path": "/workforce/dashboard" },
+      "operational": [
+        { "app": "lms", "path": "/workforce/participants", "purpose": "Participant search and filtered workforce list" }
+      ]
+    },
+    "caseManagerPortal": {
+      "function": "Assigned caseload, participant detail, placement, and case-manager reporting",
+      "canonical": { "app": "marketing", "path": "/case-manager/dashboard" },
+      "operational": [
+        { "app": "marketing", "path": "/case-manager/participants", "purpose": "Assignment-scoped participant list" },
+        { "app": "marketing", "path": "/case-manager/participants/[id]", "purpose": "Assignment-scoped participant detail" }
+      ]
+    },
+    "workforceBoardPortal": {
+      "function": "Workforce board oversight and aggregate outcomes",
+      "canonical": { "app": "marketing", "path": "/workforce-board/dashboard" }
+    },
+    "providerPortal": {
+      "function": "Training provider programs, onboarding, compliance, domains, and enrollment operations",
+      "canonical": { "app": "marketing", "path": "/provider/dashboard" }
+    },
+    "programHolderPortal": {
+      "function": "Program holder training programs, students, hours, documents, and required actions",
+      "canonical": { "app": "lms", "path": "/program-holder/dashboard" }
+    },
+    "creatorPortal": {
+      "function": "Authenticated creator workspace for learning products, content, and publishing",
+      "canonical": { "app": "lms", "path": "/creator/products" }
+    },
+    "adminPortal": {
+      "function": "Platform administration and operational command center",
+      "canonical": { "app": "admin", "path": "/dashboard" },
+      "operational": [
+        { "app": "admin", "path": "/applications", "purpose": "Application operations" },
+        { "app": "admin", "path": "/students", "purpose": "Student operations" },
+        { "app": "admin", "path": "/programs", "purpose": "Program operations" },
+        { "app": "admin", "path": "/crm", "purpose": "CRM operations" },
+        { "app": "admin", "path": "/system-health", "purpose": "System health operations" }
+      ]
+    },
+    "instructorPortal": {
+      "function": "Instructor student, course, submission, OJT, and signoff operations",
+      "canonical": { "app": "admin", "path": "/instructor/dashboard" }
+    },
+    "staffPortal": {
+      "function": "Staff student, enrollment, support, and operational workflows",
+      "canonical": { "app": "admin", "path": "/staff-portal/dashboard" }
+    },
+    "testingOperations": {
+      "function": "Authenticated testing-center booking, session, slot, and proctor operations",
+      "canonical": { "app": "admin", "path": "/testing-center" }
+    },
+    "courseBuilder": {
+      "function": "Create and manage course content",
+      "canonical": { "app": "admin", "path": "/course-builder" },
+      "informational": [
+        { "app": "marketing", "path": "/store/course-builder", "purpose": "Public Store description that launches the Admin builder" }
+      ]
+    },
+    "websiteBuilder": {
+      "function": "Create, edit, preview, and publish customer websites",
+      "canonical": { "app": "marketing", "path": "/apps/website-builder" },
+      "informational": [
+        { "app": "marketing", "path": "/store/apps/website-builder", "purpose": "Public Store product and plan page" }
+      ]
+    },
+    "devStudio": {
+      "function": "Platform development and operations workspace",
+      "canonical": { "app": "admin", "path": "/studio" },
+      "informational": [
+        { "app": "marketing", "path": "/store/dev-studio", "purpose": "Public Store description that launches Admin Studio" }
+      ]
+    },
+    "authentication": {
+      "function": "User sign-in",
+      "canonical": { "app": "lms", "path": "/login" },
+      "compatibility": [
+        { "app": "marketing", "path": "/login", "target": "https://app.elevateforhumanity.org/login" }
+      ],
+      "informational": [
+        { "app": "admin", "path": "/login", "purpose": "Separate staff/admin authentication surface" }
+      ]
+    },
+    "testing": {
+      "function": "Public testing and credential exam discovery",
+      "canonical": { "app": "marketing", "path": "/testing" },
+      "operational": [
+        { "app": "admin", "path": "/testing-center", "purpose": "Authenticated booking/session/slot operations" }
+      ],
+      "informational": [
+        { "app": "marketing", "path": "/store/testing", "purpose": "Store/catalog testing products and services" }
+      ]
+    }
+  }
+}

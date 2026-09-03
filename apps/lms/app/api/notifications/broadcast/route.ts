@@ -1,0 +1,222 @@
+import { safeInternalError } from '@/lib/api/safe-error';
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import webpush from 'web-push';
+import { logger } from '@/lib/logger';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
+import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
+
+// Configure VAPID
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT || 'mailto:info@elevateforhumanity.org',
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY,
+  );
+}
+
+async function _POST(req: Request) {
+  try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
+    const { apiRequireAdmin } = await import('@/lib/admin/guards');
+    try {
+      const auth = await apiRequireAdmin(req);
+      if (auth.error) return auth.error;
+    } catch (e) {
+      return e instanceof Response
+        ? e
+        : NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const supabase = await createClient();
+    const { title, body, targetAudience, url, icon } = await req.json();
+
+    // Get target users
+    const users = await getTargetUsers(supabase, targetAudience);
+
+    if (users.length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'No users found for target audience',
+        },
+        { status: 400 },
+      );
+    }
+
+    const results = [];
+    let sent = 0;
+    let failed = 0;
+
+    for (const user of users) {
+      try {
+        // Get user's push subscriptions
+        const { data: subscriptions } = await supabase
+          .from('push_subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('active', true);
+
+        if (!subscriptions || subscriptions.length === 0) {
+          continue;
+        }
+
+        // Send to each subscription
+        for (const subscription of subscriptions) {
+          try {
+            const payload = JSON.stringify({
+              title,
+              body,
+              icon: icon || '/icon-192x192.png',
+              badge: '/icon-192x192.png',
+              url: url || '/',
+              timestamp: Date.now(),
+            });
+
+            await webpush.sendNotification(subscription.subscription_data, payload);
+
+            sent++;
+
+            // Log notification
+            await supabase.from('notification_logs').insert({
+              user_id: user.id,
+              title,
+              body,
+              type: 'push',
+              status: 'sent',
+              sent_at: new Date().toISOString(),
+            });
+          } catch (error) {
+            logger.error(
+              `Error sending to subscription ${subscription.id}`,
+              normalizeError(error, `Failed to send to subscription ${subscription.id}`),
+              getErrorContext(error),
+            );
+            failed++;
+
+            // If subscription is invalid (410 Gone), mark as inactive
+            if ((error as any).statusCode === 410) {
+              await supabase
+                .from('push_subscriptions')
+                .update({ active: true })
+                .eq('id', subscription.id);
+            }
+
+            // Log failure
+            await supabase.from('notification_logs').insert({
+              user_id: user.id,
+              title,
+              body,
+              type: 'push',
+              status: 'failed',
+              error_message: toErrorMessage(error),
+            });
+          }
+        }
+      } catch (error) {
+        logger.error(
+          `Error processing user ${user.id}`,
+          normalizeError(error, 'Failed to process user'),
+          getErrorContext(error),
+        );
+        failed++;
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      summary: {
+        total: users.length,
+        sent,
+        failed,
+      },
+    });
+  } catch (error) {
+    logger.error(
+      'Broadcast notification error',
+      normalizeError(error, 'Broadcast notification error'),
+      getErrorContext(error),
+    );
+    return safeInternalError(error as Error, 'Internal server error');
+  }
+}
+
+async function getTargetUsers(supabase: any, targetAudience: string) {
+  let query;
+
+  switch (targetAudience) {
+    case 'all-students':
+      query = supabase
+        .from('students')
+        .select('id, email, first_name, last_name')
+        .not('email', 'is', null);
+      break;
+
+    case 'active-students':
+      query = supabase
+        .from('students')
+        .select('id, email, first_name, last_name')
+        .eq('status', 'active')
+        .not('email', 'is', null);
+      break;
+
+    case 'barber-students':
+      query = supabase
+        .from('students')
+        .select('id, email, first_name, last_name')
+        .eq('program_name', 'Barber Program')
+        .eq('status', 'active')
+        .not('email', 'is', null);
+      break;
+
+    case 'cna-students':
+      query = supabase
+        .from('students')
+        .select('id, email, first_name, last_name')
+        .eq('program_name', 'CNA Program')
+        .eq('status', 'active')
+        .not('email', 'is', null);
+      break;
+
+    case 'cdl-students':
+      query = supabase
+        .from('students')
+        .select('id, email, first_name, last_name')
+        .eq('program_name', 'CDL Program')
+        .eq('status', 'active')
+        .not('email', 'is', null);
+      break;
+
+    case 'all-staff':
+      query = supabase
+        .from('staff')
+        .select('id, email, first_name, last_name')
+        .not('email', 'is', null);
+      break;
+
+    default:
+      return [];
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    logger.error(
+      'Error fetching users',
+      normalizeError(error, 'Failed to fetch users'),
+      getErrorContext(error),
+    );
+    return [];
+  }
+
+  return data || [];
+}
+export const POST = withApiAudit('/api/notifications/broadcast', _POST);

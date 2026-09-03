@@ -1,0 +1,66 @@
+{
+  "id": "org.elevateforhumanity.lms",
+  "name": "Elevate Learning & Apprenticeship",
+  "short_name": "Elevate",
+  "description": "Learner, apprentice, host shop, employer, and workforce dashboards for Elevate for Humanity.",
+  "start_url": "/lms/dashboard?utm_source=homescreen&utm_medium=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#1E3A5F",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["education", "business", "productivity"],
+  "icons": [
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Learner Dashboard",
+      "short_name": "Learner",
+      "url": "/lms/dashboard"
+    },
+    {
+      "name": "Apprentice Dashboard",
+      "short_name": "Apprentice",
+      "url": "/apprentice"
+    },
+    {
+      "name": "Host Shop Dashboard",
+      "short_name": "Host Shop",
+      "url": "/host-shop/dashboard"
+    },
+    {
+      "name": "Employer Dashboard",
+      "short_name": "Employer",
+      "url": "/employer/dashboard"
+    },
+    {
+      "name": "Workforce Dashboard",
+      "short_name": "Workforce",
+      "url": "/workforce/dashboard"
+    }
+  ],
+  "screenshots": [],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

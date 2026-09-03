@@ -1,0 +1,152 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+import { createClient } from '@/lib/supabase/server';
+import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+export const dynamic = 'force-dynamic';
+
+/**
+ * AI Blog Post Generator
+ * Generates blog posts from site content (programs, success stories, etc.)
+ */
+
+async function _POST(request: NextRequest) {
+  try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
+    const supabase = await createClient();
+
+    // Check if user is admin
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { topic, programSlug, category } = body;
+
+    // Fetch site content for context
+    let context = '';
+
+    if (programSlug) {
+      // Get program details
+      const { data: program } = await supabase
+        .from('programs')
+        .select('*')
+        .eq('slug', programSlug)
+        .maybeSingle();
+
+      if (program) {
+        context = `Program: ${program.title}\nDescription: ${program.description}\nOutcomes: ${program.outcomes?.join(', ')}\n`;
+      }
+    }
+
+    if (!isAIAvailable()) {
+      return NextResponse.json(
+        { error: 'The canonical AI provider is not configured' },
+        { status: 503 },
+      );
+    }
+
+    const completion = await aiChat({
+      messages: [
+        {
+          role: 'system',
+          content: `You are a professional content writer for ${PLATFORM_DEFAULTS.orgName}, a workforce development organization in Indianapolis, Indiana. Write engaging, informative blog posts about career training, apprenticeships, and workforce development. Use a professional but accessible tone. Include practical information, statistics when relevant, and clear calls-to-action.`,
+        },
+        {
+          role: 'user',
+          content: `Write a comprehensive blog post about: ${topic}\n\nContext from our site:\n${context}\n\nThe post should:\n- Be 800-1200 words\n- Use markdown formatting\n- Include relevant headings (##)\n- Provide actionable information\n- End with a call-to-action\n- Be SEO-friendly\n- Include information about WIOA funding if relevant\n- Mention our contact info: ${PLATFORM_DEFAULTS.supportPhone}, info@${PLATFORM_DEFAULTS.canonicalDomain}`,
+        },
+      ],
+      temperature: 0.7,
+      maxTokens: 2400,
+    });
+
+    const content = completion.content?.trim();
+    if (!content) {
+      return NextResponse.json({ error: 'The content generator returned an empty response' }, { status: 502 });
+    }
+
+    // Generate title and excerpt
+    const metaCompletion = await aiChat({
+      messages: [
+        {
+          role: 'system',
+          content: 'Generate a compelling blog post title and 2-sentence excerpt.',
+        },
+        {
+          role: 'user',
+          content: `Based on this blog post content, generate:\n1. A catchy, SEO-friendly title (60 chars max)\n2. A compelling 2-sentence excerpt (150 chars max)\n\nContent:\n${content?.substring(0, 500)}...\n\nReturn as JSON: {"title": "...", "excerpt": "..."}`,
+        },
+      ],
+      temperature: 0.7,
+      maxTokens: 300,
+    });
+
+    const metaContent = metaCompletion.content;
+    if (!metaContent) {
+      return NextResponse.json({ error: 'The metadata generator returned an empty response' }, { status: 502 });
+    }
+    const meta = JSON.parse(metaContent.replace(/```json?/g, '').replace(/```/g, '').trim());
+
+    // Generate slug from title
+    const slug = meta.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    // Calculate reading time (avg 200 words per minute)
+    const wordCount = content?.split(/\s+/).length || 0;
+    const readingTime = Math.ceil(wordCount / 200);
+
+    // Save to database
+    const { data: blogPost, error } = await supabase
+      .from('blog_posts')
+      .insert({
+        title: meta.title,
+        slug,
+        excerpt: meta.excerpt,
+        content,
+        category: category || 'Resource',
+        status: 'draft', // Admin can review before publishing
+        author_name: PLATFORM_DEFAULTS.orgName,
+        reading_time: readingTime,
+        tags: [topic, programSlug].filter(Boolean),
+      })
+      .select()
+      .maybeSingle();
+
+    if (error) {
+      return NextResponse.json({ error: 'Failed to save blog post' }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      blogPost,
+      message: 'Blog post generated successfully (saved as draft)',
+    });
+  } catch (error) {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+export const POST = withApiAudit('/api/blog/generate', _POST);

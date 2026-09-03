@@ -1,0 +1,128 @@
+# Course Builder executor wake contract: queued runs must be claimed on API activity (2026-08-25).
+FROM node:22-alpine AS base
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN corepack enable
+RUN corepack prepare pnpm@10.28.2 --activate
+
+WORKDIR /app
+
+FROM base AS dependencies
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/admin/package.json ./apps/admin/package.json
+
+RUN pnpm install --frozen-lockfile
+
+FROM base AS builder
+
+ARG GITHUB_SHA=unknown
+ARG GIT_SHA=unknown
+ARG NEXT_PUBLIC_GIT_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
+
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=16384"
+ENV NEXT_STANDALONE_OUTPUT=1
+ENV GITHUB_SHA=$GITHUB_SHA
+ENV GIT_SHA=$GIT_SHA
+ENV NEXT_PUBLIC_GIT_SHA=$NEXT_PUBLIC_GIT_SHA
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /app/apps/admin/node_modules ./apps/admin/node_modules
+COPY . .
+
+# Fail before compilation if authenticated Admin regresses to public widgets,
+# stale proof/demo IDs, or Website Builder starts seeding invented business data.
+RUN node scripts/verify-portal-production-contracts.mjs
+
+# Admin document navigations must remain browser-owned. Intercepting them in
+# the service worker can resolve without a Response and surface as ERR_FAILED.
+RUN ! grep -Fq "event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' })" /app/public/sw-admin.js
+
+# Failed or completed Course Builder tasks must expose a supported retry path.
+RUN grep -Fq "Start new run" /app/components/studio/AgenticCourseRunPanel.tsx
+
+# Capture a real build timestamp even when the platform does not inject one.
+RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); console.log('Admin build timestamp:', ts)"
+
+# Stamp the admin service worker with the current deployment SHA before build.
+RUN node scripts/stamp-sw.mjs
+RUN ! grep -q '__CACHE_VERSION__' /app/public/sw-admin.js || \
+    (echo "ERROR: __CACHE_VERSION__ still present in sw-admin.js" && exit 1)
+
+RUN pnpm --filter @elevate/admin build
+RUN test -d /app/apps/admin/.next
+RUN test -f /app/apps/admin/.next/BUILD_ID
+RUN test -f /app/public/sw-admin.js
+
+FROM node:22-alpine AS runner
+
+WORKDIR /app
+
+ARG GITHUB_SHA=unknown
+ARG GIT_SHA=unknown
+ARG NEXT_PUBLIC_GIT_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV ELEVATE_SERVICE=admin
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+ENV GITHUB_SHA=$GITHUB_SHA
+ENV GIT_SHA=$GIT_SHA
+ENV NEXT_PUBLIC_GIT_SHA=$NEXT_PUBLIC_GIT_SHA
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+ENV REMOTION_BROWSER_EXECUTABLE=/usr/bin/chromium-browser
+
+# FFmpeg/ffprobe are required by the canonical Media Studio commercial renderer.
+RUN apk add --no-cache curl ffmpeg \
+    && addgroup -g 1001 nodejs \
+    && adduser -S -u 1001 -G nodejs nextjs
+
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/static ./apps/admin/.next/static
+
+# Public assets are available at both standalone root and app-relative paths.
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./apps/admin/public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./apps/admin/public
+
+# The Admin-owned video worker bundles Remotion compositions at runtime.
+# Standalone output tracing cannot discover a source directory opened by path,
+# so ship the canonical root Remotion project at the exact Admin cwd path used
+# by lib/video/remotion-render.ts. This remains one composition tree, not a fork.
+COPY --from=builder --chown=nextjs:nodejs /app/remotion-src ./apps/admin/remotion-src
+RUN test -f /app/apps/admin/remotion-src/index.ts
+
+RUN test -f /app/public/sw-admin.js \
+    && test -f /app/apps/admin/public/sw-admin.js
+
+# Next's monorepo standalone output keeps the admin launcher and its bundled
+# node_modules under /app/apps/admin. Preserve that location so CommonJS module
+# resolution can find next and the traced runtime dependencies. Rename only the
+# extension because the package is type=module while the generated launcher is CJS.
+RUN if [ -f /app/apps/admin/server.js ]; then \
+      cp /app/apps/admin/server.js /app/apps/admin/server.cjs; \
+    elif [ -f /app/server.js ]; then \
+      cp /app/server.js /app/server.cjs; \
+    else \
+      echo "ERROR: No runnable server.js in runtime image"; \
+      find /app -maxdepth 5 -name "server.js" -print; \
+      exit 1; \
+    fi
+
+USER nextjs
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/version" || exit 1
+
+CMD ["sh", "-c", "if [ -f /app/apps/admin/server.cjs ]; then exec node --max-old-space-size=4096 /app/apps/admin/server.cjs; else exec node --max-old-space-size=4096 /app/server.cjs; fi"]

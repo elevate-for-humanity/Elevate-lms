@@ -1,0 +1,71 @@
+import { Metadata } from 'next';
+import { blurDataURL } from '@/lib/ui/blur-placeholder';
+import Image from 'next/image';
+import { createClient } from '@/lib/supabase/server';
+import StaffApplicationForm from './StaffApplicationForm';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
+export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Staff / Instructor Application',
+  description: 'Join our team to support student success and workforce development.',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/apply/staff',
+  },
+};
+
+export default async function StaffApplicationPage() {
+  const supabase = await createClient();
+
+  // Fetch application settings
+  const { data: settings } = await supabase
+    .from('site_settings')
+    .select('*')
+    .eq('key', 'staff_applications')
+    .maybeSingle();
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero */}
+      <div className="relative h-[200px] sm:h-[260px] overflow-hidden">
+          <Image
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+          src="/images/pages/apply-hero.webp"
+          alt="Join our team"
+          fill
+          sizes="100vw"
+          className="object-cover"
+          priority
+        />
+        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded">
+          <span className="text-sm font-bold text-slate-900">{PLATFORM_DEFAULTS.orgName}</span>
+        </div>
+      </div>
+
+      {/* Breadcrumbs */}
+      <div className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Apply', href: '/apply' }, { label: 'Staff' }]} />
+        </div>
+      </div>
+
+      <section className="border-b border-slate-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <p className="text-xs font-semibold tracking-widest text-brand-blue-700 uppercase mb-2">
+            Staff / Instructor Application
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-black mb-3">Join Our Team</h1>
+          <p className="text-base sm:text-lg text-black max-w-3xl">
+            Support student success and workforce development as part of our team.
+          </p>
+        </div>
+      </section>
+
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <StaffApplicationForm />
+      </section>
+    </div>
+  );
+}

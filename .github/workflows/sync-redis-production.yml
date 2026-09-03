@@ -1,0 +1,70 @@
+name: Sync Redis production secret
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/northflank/sync-redis-secret.ts'
+      - '.github/workflows/sync-redis-production.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-redis-production
+  cancel-in-progress: true
+
+jobs:
+  sync-redis:
+    name: Sync Redis configuration to Northflank
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_SECRET_GROUP_ID: ${{ secrets.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env' }}
+      NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing' }}
+      NORTHFLANK_LMS_SERVICE_ID: ${{ secrets.NORTHFLANK_LMS_SERVICE_ID || 'elevate-lms' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Redis and Northflank secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${REDIS_URL:-}" && ( -z "${UPSTASH_REDIS_REST_URL:-}" || -z "${UPSTASH_REDIS_REST_TOKEN:-}" ) ]]; then
+            echo '::error::Configure REDIS_URL or both UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN'
+            exit 1
+          fi
+          test -n "${NORTHFLANK_API_TOKEN:-}" || { echo '::error::NORTHFLANK_API_TOKEN GitHub secret is missing'; exit 1; }
+          echo 'Redis and Northflank credentials are configured.'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Merge Redis configuration into shared production secret group and restart services
+        run: pnpm tsx scripts/northflank/sync-redis-secret.ts
+
+      - name: Verify Redis secret linkage
+        run: pnpm tsx scripts/northflank/verify-linkage.ts

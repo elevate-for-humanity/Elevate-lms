@@ -1,0 +1,69 @@
+name: LMS Build Diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lms-build-diagnostic.yml'
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  diagnose:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.issue.title == 'RUN LMS BUILD DIAGNOSTIC'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Build LMS and capture output
+        id: build
+        shell: bash
+        run: |
+          set +e
+          pnpm run build:lms:phased > /tmp/lms-build.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 220 /tmp/lms-build.log > /tmp/lms-build-tail.log
+          exit 0
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          BUILD_SCOPE: LMS
+      - name: Post result to issue 705
+        uses: actions/github-script@v7
+        env:
+          EXIT_CODE: ${{ steps.build.outputs.exit_code }}
+        with:
+          script: |
+            const fs = require('fs');
+            const tail = fs.readFileSync('/tmp/lms-build-tail.log', 'utf8').slice(-24000);
+            const ok = process.env.EXIT_CODE === '0';
+            const body = `${ok ? 'LMS BUILD PASS' : 'LMS BUILD FAIL'}\n\nCommit: ${context.sha}\nExit code: ${process.env.EXIT_CODE}\n\n\`\`\`text\n${tail}\n\`\`\``;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 705,
+              body,
+            });
+      - name: Fail workflow when build failed
+        if: steps.build.outputs.exit_code != '0'
+        run: exit 1
+
+# diagnostic-trigger: 2026-08-20-course-factory-await-fix

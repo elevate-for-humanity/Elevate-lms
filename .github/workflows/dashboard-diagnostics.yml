@@ -1,0 +1,128 @@
+name: Dashboard Diagnostics
+
+# Comprehensive diagnostics are intentionally manual to avoid duplicating the blocking CI gates.
+# Required repository secrets:
+#   NEXT_PUBLIC_SUPABASE_URL      — Supabase project URL (used by schema check)
+#   SUPABASE_SERVICE_ROLE_KEY     — Supabase service-role key (used by schema check)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dashboard-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # -----------------------------------------------------------------------
+      # Setup
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install Node dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Install system tools (jq)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y jq
+
+      - name: Install tsx globally
+        run: npm install -g tsx
+
+      - name: Make scripts executable
+        run: |
+          chmod +x scripts/*.sh scripts/ci/*.sh || true
+
+      # -----------------------------------------------------------------------
+      # 1. Schema validation
+      # Requires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY secrets.
+      # If secrets are absent the step is skipped instead of failing the run.
+      # -----------------------------------------------------------------------
+      - name: Schema validation (check-dashboard-schema.mjs)
+        # Allow the job to continue even if credentials are missing
+        continue-on-error: true
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [[ -z "$NEXT_PUBLIC_SUPABASE_URL" || -z "$SUPABASE_SERVICE_ROLE_KEY" ]]; then
+            echo "⚠️  Supabase secrets not configured — skipping live schema check."
+            echo "   Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY"
+            echo "   to repository secrets to enable this check."
+            exit 0
+          fi
+          node scripts/check-dashboard-schema.mjs
+
+      # -----------------------------------------------------------------------
+      # 2. Redirect conflict scan (Netlify + Next.js redirects)
+      # -----------------------------------------------------------------------
+      - name: Redirect conflict scan (check-redirect-conflicts.mjs)
+        continue-on-error: true
+        run: node scripts/check-redirect-conflicts.mjs
+
+      # -----------------------------------------------------------------------
+      # 3. Page stubs / placeholder content scan
+      # -----------------------------------------------------------------------
+      - name: Page stub audit (audit-stubs.ts)
+        continue-on-error: true
+        run: tsx scripts/audit-stubs.ts
+
+      # -----------------------------------------------------------------------
+      # 4. Static broken-link audit
+      # -----------------------------------------------------------------------
+      - name: Broken link audit (audit-broken-links.ts)
+        # Non-blocking: broken links should be reviewed but must not block CI
+        continue-on-error: true
+        run: tsx scripts/audit-broken-links.ts
+
+      # -----------------------------------------------------------------------
+      # 5. Image reference normalization
+      # -----------------------------------------------------------------------
+      - name: Fix broken image references (fix-broken-images.sh)
+        run: bash scripts/fix-broken-images.sh
+
+      # -----------------------------------------------------------------------
+      # 6. Production readiness validation
+      # validate-production.sh starts a local simple-server on port 5005.
+      # It exits 0 regardless of individual endpoint results, so we run it
+      # non-blocking to capture its PASS/FAIL output in the log.
+      # -----------------------------------------------------------------------
+      - name: Production readiness validation (validate-production.sh)
+        continue-on-error: true
+        run: bash scripts/validate-production.sh
+
+      # -----------------------------------------------------------------------
+      # Artifacts
+      # -----------------------------------------------------------------------
+      - name: Upload diagnostic artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-diagnostics-${{ github.run_number }}
+          path: |
+            broken-links-report.json
+            stub-audit-report.json
+            /tmp/link-check-results.json
+          # broken-links-report.json is written by scripts/audit-broken-links.ts
+          # stub-audit-report.json is written by scripts/audit-stubs.ts
+          # /tmp/link-check-results.json is written by scripts/check-links.sh (if run externally)
+          if-no-files-found: ignore
+          retention-days: 14

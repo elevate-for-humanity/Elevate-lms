@@ -1,0 +1,8 @@
+{
+  "authProvider": "supabase",
+  "apiProvider": "supabase",
+  "externalApiBaseUrl": "",
+  "externalAuthIssuer": "",
+  "externalAuthClientId": "",
+  "externalAuthNotes": "Change these when wrapping around a client's existing auth or API."
+}

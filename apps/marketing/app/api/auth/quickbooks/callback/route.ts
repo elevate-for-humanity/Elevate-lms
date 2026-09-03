@@ -53,9 +53,26 @@ export async function GET(request: NextRequest) {
     return redirect('error=state_unavailable');
   }
 
-  const clientId     = process.env.QB_CLIENT_ID;
-  const clientSecret = process.env.QB_CLIENT_SECRET;
-  const redirectUri  = process.env.QB_REDIRECT_URI ||
+  let stored: Record<string, string> = {};
+  try {
+    const { getAdminClient } = await import('@/lib/supabase/admin');
+    const supabase = await getAdminClient();
+    if (supabase) {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('key, value')
+        .in('key', ['QB_CLIENT_ID', 'QB_CLIENT_SECRET', 'QB_REDIRECT_URI']);
+      stored = Object.fromEntries((data ?? []).map((row) => [row.key, row.value]));
+    }
+  } catch (err) {
+    logger.error('[QB callback] failed to load Admin OAuth settings:', err);
+  }
+
+  const clientId = stored.QB_CLIENT_ID || process.env.QB_CLIENT_ID;
+  const clientSecret = stored.QB_CLIENT_SECRET || process.env.QB_CLIENT_SECRET;
+  const redirectUri =
+    stored.QB_REDIRECT_URI ||
+    process.env.QB_REDIRECT_URI ||
     `${base}/api/auth/quickbooks/callback`;
 
   if (!clientId || !clientSecret) return redirect('error=not_configured');

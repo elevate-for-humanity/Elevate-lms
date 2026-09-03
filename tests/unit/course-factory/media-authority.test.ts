@@ -86,6 +86,12 @@ describe('canonical Course Factory media architecture', () => {
     expect(worker).toContain('activeBeforeClaim');
   });
 
+  it('schedules the video worker on the Admin service that owns its route', () => {
+    const scheduler = read('.github/workflows/cron-scheduler.yml');
+    expect(scheduler).toContain('$ADMIN_URL/api/internal/videos/process-queue');
+    expect(scheduler).not.toContain('$APP_URL/api/internal/videos/process-queue');
+  });
+
   it('claims work atomically and renews an expiring database lease', () => {
     const migration = read('supabase/migrations/20260828190000_harden_video_worker_lifecycle.sql');
     const renderer = read('lib/video/process-video-job.ts');

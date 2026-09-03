@@ -137,7 +137,7 @@ jobs:
 
       - name: Start next lesson video render
         run: |
-          curl -sf -X POST "$APP_URL/api/internal/videos/process-queue" \
+          curl -sf -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             --max-time 30 || echo "::warning::video-render-queue failed"

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeLessonContract } from '@/lib/course-factory/content-generator';
+import { normalizeLessonContract } from '@/lib/course-factory/lesson-contract-normalizer';
 
 describe('lesson contract normalization', () => {
   it('derives a missing exercise verification step from its own artifact and criteria', () => {

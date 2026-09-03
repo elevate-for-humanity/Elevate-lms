@@ -60,6 +60,7 @@ env:
   GOOGLE_CLOUD_API_KEY: ${{ secrets.GOOGLE_CLOUD_API_KEY }}
   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
   CLOUDFLARE_AI_API_TOKEN: ${{ secrets.CLOUDFLARE_AI_API_TOKEN }}
+  CLOUDFLARE_AI_MODEL: '@cf/meta/llama-4-scout-17b-16e-instruct'
   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
   AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
@@ -149,13 +150,19 @@ jobs:
           tail -n 120 /tmp/course-install.log > /tmp/course-install-tail.log || true
           exit 0
 
-      - name: Require production Supabase; AI providers are optional enrichment
+      - name: Require production Supabase and canonical Cloudflare Workers AI
         id: credentials
         shell: bash
         run: |
           set +e
           code=0
           test -n "$SUPABASE_URL" && test -n "$SUPABASE_SERVICE_ROLE_KEY" || code=1
+          test "$AI_PROVIDER" = "cloudflare" || code=1
+          test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$CLOUDFLARE_AI_API_TOKEN" || code=1
+          case "$CLOUDFLARE_AI_MODEL" in
+            @cf/*) ;;
+            *) code=1 ;;
+          esac
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 

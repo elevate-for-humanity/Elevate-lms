@@ -12,6 +12,7 @@ const CompleteAttemptSchema = z.object({
   correctAnswers: z.number().int().nonnegative().max(500),
   domainScores: z.record(z.string(), z.number().min(0).max(100)).default({}),
   timeSpentSeconds: z.number().int().nonnegative().max(86_400).optional(),
+  sectionKey: z.enum(['core', 'type-i', 'type-ii', 'type-iii', 'universal']),
 });
 
 async function ensureEnrollment(db: Awaited<ReturnType<typeof createClient>>, userId: string, courseId: string) {
@@ -60,17 +61,23 @@ export async function POST(
 
   const parsed = CompleteAttemptSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: 'Invalid practice assessment result', details: parsed.error.flatten() }, { status: 400 });
-  const { totalQuestions, correctAnswers, domainScores, timeSpentSeconds } = parsed.data;
+  const { totalQuestions, correctAnswers, domainScores, timeSpentSeconds, sectionKey } = parsed.data;
   if (correctAnswers > totalQuestions) return NextResponse.json({ error: 'correctAnswers cannot exceed totalQuestions' }, { status: 400 });
 
   const { data: existing, error: countError } = await db
     .from('practice_attempts')
-    .select('attempt_number')
+    .select('attempt_number,domain_scores')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .order('attempt_number', { ascending: false });
   if (countError) return NextResponse.json({ error: 'Unable to verify attempts' }, { status: 500 });
-  if ((existing ?? []).length >= 6) return NextResponse.json({ error: 'PRACTICE_ATTEMPT_LIMIT', maxAttempts: 6 }, { status: 409 });
+  const sectionAttempts = (existing ?? []).filter((attempt) => {
+    const scores = attempt.domain_scores;
+    return scores && typeof scores === 'object' && !Array.isArray(scores) && scores.sectionKey === sectionKey;
+  }).length;
+  if (sectionAttempts >= 6) {
+    return NextResponse.json({ error: 'PRACTICE_ATTEMPT_LIMIT', sectionKey, maxAttempts: 6 }, { status: 409 });
+  }
 
   const attemptNumber = Number((existing ?? [])[0]?.attempt_number ?? 0) + 1;
   const score = Math.round((correctAnswers / totalQuestions) * 10000) / 100;
@@ -84,7 +91,7 @@ export async function POST(
       score,
       total_questions: totalQuestions,
       correct_answers: correctAnswers,
-      domain_scores: domainScores,
+      domain_scores: { ...domainScores, sectionKey },
       time_spent_seconds: timeSpentSeconds ?? null,
       status: 'completed',
       completed_at: now,
@@ -101,6 +108,6 @@ export async function POST(
     mastered: score >= 80 && weakDomains.length === 0,
     weakDomains,
     nextAction: weakDomains.length ? 'focused_review' : attemptNumber < 6 ? 'continue_spaced_review' : 'readiness_report',
-    remaining: Math.max(0, 6 - attemptNumber),
+    remaining: Math.max(0, 6 - sectionAttempts - 1),
   });
 }

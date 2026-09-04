@@ -31,6 +31,11 @@ export const isR2Configured = () => {
   return Boolean(config.accountId && config.accessKeyId && config.secretAccessKey);
 };
 
+// Course media needs a stable browser-readable URL after upload. R2 API
+// credentials alone only produce a private S3 endpoint, which returns HTTP 400
+// when the media quality gate or learner player fetches it anonymously.
+export const isR2PublicDeliveryConfigured = () => Boolean(r2Config().publicUrl);
+
 // Create S3-compatible client for R2
 const getR2Client = () => {
   if (!isR2Configured()) {

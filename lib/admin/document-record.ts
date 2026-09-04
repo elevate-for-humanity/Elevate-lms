@@ -2,6 +2,8 @@ const ADMIN_DOCUMENT_BUCKETS = new Set([
   'documents',
   'enrollment-documents',
   'program-holder-documents',
+  'provider-documents',
+  'shop-onboarding',
   'apprentice-uploads',
   'tax-documents',
 ]);

@@ -33,6 +33,48 @@ function assetIdentity(lessonId: string, assetKind: string, assetKey?: string | 
   return `${lessonId}:${assetKind}:${assetKey ?? ''}`;
 }
 
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>');
+}
+
+function canonicalLessonNarration(lesson: Record<string, any>): string {
+  const content =
+    typeof lesson.rendered_html === 'string' && lesson.rendered_html.trim()
+      ? lesson.rendered_html
+      : typeof lesson.content === 'string'
+        ? lesson.content
+        : lesson.content && typeof lesson.content === 'object' && typeof lesson.content.html === 'string'
+          ? lesson.content.html
+          : '';
+
+  const plain = decodeHtmlEntities(
+    String(content)
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<\/(p|div|section|article|h[1-6]|li|ul|ol|table|tr|blockquote)>/gi, '. ')
+      .replace(/<br\s*\/?>/gi, '. ')
+      .replace(/<[^>]+>/g, ' '),
+  )
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .replace(/([.!?])\s*\1+/g, '$1')
+    .trim();
+
+  if (plain.length < 1_200) {
+    throw new Error(
+      `Lesson "${lesson.title}" does not contain enough canonical instruction for a full lesson video`,
+    );
+  }
+
+  return plain;
+}
+
 /**
  * Canonical course-media enqueue service.
  * Course Builder/Factory owns orchestration; lib/video owns rendering mechanics.
@@ -58,7 +100,7 @@ export async function queueCourseLessonVideos(
   let lessonQuery = db
     .from('course_lessons')
     .select(
-      'id, module_id, title, script, bullet_points, scene_data, content_json, video_config, video_url, video_status, media_origin, media_quality_status, order_index',
+      'id, module_id, title, content, rendered_html, script, bullet_points, scene_data, content_json, video_config, video_url, video_status, media_origin, media_quality_status, order_index',
     )
     .eq('course_id', input.courseId);
   if (input.lessonId) lessonQuery = lessonQuery.eq('id', input.lessonId);
@@ -148,14 +190,15 @@ export async function queueCourseLessonVideos(
         (!mainInFlight && (!onlyMissing || !mainComplete));
 
       if (shouldQueueMain) {
+        const lessonNarration = canonicalLessonNarration(lesson);
         const job = await ensureQueued(existingLessonJob, () => createJob({
           lesson_id: lesson.id,
           course_id: input.courseId,
           lesson_title: lesson.title,
           script:
             candidateIndex === 0
-              ? `${generateInstructorIntro(instructor, course.title)} ${lesson.script ?? ''}`.trim()
-              : String(lesson.script ?? '').trim(),
+              ? `${generateInstructorIntro(instructor, course.title)} ${lessonNarration}`.trim()
+              : lessonNarration,
           bullet_points: Array.isArray(lesson.bullet_points) ? (lesson.bullet_points as string[]) : [],
           scene_data: lesson.scene_data ?? null,
           asset_kind: 'lesson',

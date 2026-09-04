@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - requireProgramHolder verifies the authenticated user and active holder relationship before any acknowledgement write.
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';

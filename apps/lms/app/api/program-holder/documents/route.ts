@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - requireProgramHolder verifies the authenticated user and active holder relationship before any protected document write.
 import { randomUUID } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';

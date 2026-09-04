@@ -13,6 +13,8 @@ import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 import { WebsiteClaimsPanel } from '@/components/website-builder/WebsiteClaimsPanel';
 
+export const metadata = { robots: { index: false, follow: false } };
+
 export const dynamic = 'force-dynamic';
 
 type Props = { params: Promise<{ websiteId: string }> };

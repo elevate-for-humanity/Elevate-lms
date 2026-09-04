@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   AlertTriangle,
   BookOpen,
@@ -13,6 +14,7 @@ import { ProgramHolderDocumentUpload } from './ProgramHolderDocumentUpload';
 import { ProgramHolderTrainingLogForm } from './ProgramHolderTrainingLogForm';
 import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseoutForm';
 import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
+import { getProgramCardImage } from '@/lib/images/programImages';
 
 type Section =
   | 'dashboard'
@@ -111,6 +113,22 @@ export async function ProgramHolderWorkspaceView({
           value={pendingHours.length}
           helper="Training-hour reviews"
         />
+      </section>
+      <section aria-labelledby="program-holder-programs-heading">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h2 id="program-holder-programs-heading" className="text-xl font-black text-slate-950">
+              Your programs
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Approved training pathways connected to this Program Holder account.
+            </p>
+          </div>
+          <Link href="/program-holder/programs" className="text-sm font-bold text-blue-700">
+            View details
+          </Link>
+        </div>
+        <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} compact />
       </section>
       <section className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -374,45 +392,67 @@ function Programs({ data }: { data: any }) {
         title="HVAC Program"
         description="Review approved program ownership, delivery readiness, credentials, and course assignments."
       />
-      <div className="grid gap-5 lg:grid-cols-2">
-        {data.programs.map((program: any) => {
-          const courses = data.courseAssignments.filter(
-            (item: any) => item.program_id === program.id,
-          );
-          return (
-            <article
-              key={program.id}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-            >
+      <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} />
+    </div>
+  );
+}
+
+function ProgramCards({
+  programs,
+  courseAssignments,
+  compact = false,
+}: {
+  programs: any[];
+  courseAssignments: any[];
+  compact?: boolean;
+}) {
+  if (!programs.length) {
+    return (
+      <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">
+        No approved programs are connected yet.
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-5 md:grid-cols-2">
+      {programs.map((program: any) => {
+        const courses = courseAssignments.filter((item: any) => item.program_id === program.id);
+        return (
+          <article key={program.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className={`relative ${compact ? 'h-36' : 'h-48'} bg-slate-200`}>
+              <Image
+                src={getProgramCardImage(program.slug || program.id)}
+                alt={`${program.title || program.name || 'Training program'} hands-on training`}
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+            <div className={compact ? 'p-5' : 'p-6'}>
               <BookOpen className="h-7 w-7 text-blue-700" />
-              <h2 className="mt-3 text-2xl font-black">{program.title || program.name}</h2>
+              <h3 className="mt-3 text-2xl font-black">{program.title || program.name}</h3>
               <p className="mt-2 text-sm text-slate-600">
                 {program.slug} · {program.is_active ? 'Active' : program.status || 'Inactive'}
               </p>
-              <dl className="mt-5 space-y-3 text-sm">
-                <Row
-                  label="Credential"
-                  value={program.credential_name || 'EPA 608 / HVAC credential pathway'}
-                />
-                <Row
-                  label="Program hours"
-                  value={
-                    program.duration_hours
-                      ? String(program.duration_hours)
-                      : 'Review program record'
-                  }
-                />
-                <Row label="Course assignments" value={String(courses.length)} />
-              </dl>
-              {!courses.length && (
-                <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">
-                  HVAC is assigned, but no delivery course is connected yet.
-                </div>
+              {!compact && (
+                <>
+                  <dl className="mt-5 space-y-3 text-sm">
+                    <Row label="Credential" value={program.credential_name || 'Credential pathway'} />
+                    <Row label="Program hours" value={program.duration_hours ? String(program.duration_hours) : 'Review program record'} />
+                    <Row label="Course assignments" value={String(courses.length)} />
+                  </dl>
+                  {!courses.length && (
+                    <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-bold text-amber-900">
+                      This program is assigned, but no delivery course is connected yet.
+                    </div>
+                  )}
+                </>
               )}
-            </article>
-          );
-        })}
-      </div>
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }

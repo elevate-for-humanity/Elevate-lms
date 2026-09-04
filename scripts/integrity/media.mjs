@@ -197,7 +197,9 @@ const portalRequirements = [
   ['Learner', 'apps/lms/app/lms/(app)/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'learningTools']],
   ['Apprentice', 'apps/lms/app/apprentice/page.tsx', ['<Image', 'getProgramHeroImage', 'Apprentice tools']],
   ['Host Shop', 'apps/lms/app/host-shop/dashboard/HostShopDashboardView.tsx', ['<Image', 'PortalImageCard', 'Host Shop tools']],
-  ['Program Holder', 'apps/lms/app/program-holder/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'Your programs']],
+  // The page delegates every holder mode to the shared workspace component;
+  // validate the implementation owner instead of the thin route entrypoint.
+  ['Program Holder', 'components/program-holder/ProgramHolderWorkspaceView.tsx', ['<Image', 'getProgramCardImage', 'Your programs']],
 ];
 for (const [name, relPath, markers] of portalRequirements) {
   const source = fs.readFileSync(path.join(rootDir, relPath), 'utf8');

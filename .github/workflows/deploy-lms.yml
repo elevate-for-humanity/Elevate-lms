@@ -35,6 +35,7 @@ on:
       - 'components/auth/**'
       - 'components/career/**'
       - 'components/pwa/**'
+      - 'components/CalendarWidget.tsx'
       - 'components/SocialLearningCommunity.tsx'
       - 'components/careers/**'
       - 'packages/shared-utils/**'

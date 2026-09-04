@@ -1,5 +1,6 @@
 import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { WebsiteLifecyclePanel } from '@/components/website-builder/WebsiteLifecyclePanel';
 import { WebsiteAdvancedSettings } from '@/components/website-builder/WebsiteAdvancedSettings';
 import { AutonomousWebsiteBuilder } from '@/components/website-builder/AutonomousWebsiteBuilder';
@@ -25,7 +26,8 @@ export default async function WebsiteEditorPage({ params }: Props) {
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) redirect(access.upgradeUrl || `/store/apps/website-builder?reason=${encodeURIComponent(access.reason || 'inactive')}`);
 
-  const { data: site } = await supabase
+  const admin = await requireAdminClient();
+  const { data: site } = await admin
     .from('user_websites')
     .select('id, user_id, site_name, subdomain, is_published, site_config')
     .eq('id', websiteId)

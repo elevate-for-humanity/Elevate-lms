@@ -17,11 +17,7 @@ export default async function ReviewDocumentPage({ params }: { params: Promise<{
   const { id } = await params;
   const db = await requireAdminClient();
 
-  const { data: rawDocument } = await db
-    .from('documents')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
+  const { data: rawDocument } = await db.from('documents').select('*').eq('id', id).maybeSingle();
 
   if (!rawDocument) {
     redirect('/documents/review');
@@ -38,15 +34,12 @@ export default async function ReviewDocumentPage({ params }: { params: Promise<{
   const document = { ...rawDocument, profiles: docReviewProfile ?? null };
 
   // Generate signed URL via centralized admin document access
-  let viewUrl = document.file_url;
-  if (document.file_path) {
-    const url = await getAdminDocumentUrl({
-      adminId: user.id,
-      documentId: document.id,
-      context: 'document_review',
-    });
-    if (url) viewUrl = url;
-  }
+  const signedUrl = await getAdminDocumentUrl({
+    adminId: user.id,
+    documentId: document.id,
+    context: 'document_review',
+  });
+  const viewUrl = signedUrl || document.file_url;
 
   // Pass signed URL to client component via the document object
   const documentWithUrl = { ...document, file_url: viewUrl };

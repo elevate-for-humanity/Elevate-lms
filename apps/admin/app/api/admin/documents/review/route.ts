@@ -23,9 +23,9 @@ async function _POST(request: NextRequest) {
     const supabase = await createClient();
     const db = await requireAdminClient();
 
-    const { documentId, action, rejectionReason, adminId } = await request.json();
+    const { documentId, action, rejectionReason } = await request.json();
 
-    if (!documentId || !action) {
+    if (!documentId || !['approve', 'reject'].includes(action)) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -36,7 +36,8 @@ async function _POST(request: NextRequest) {
       operation: 'update',
       rowData: {
         status,
-        reviewed_by: adminId,
+        verification_status: status,
+        reviewed_by: auth.id,
         reviewed_at: new Date().toISOString(),
         rejection_reason: action === 'reject' ? rejectionReason : null,
       },

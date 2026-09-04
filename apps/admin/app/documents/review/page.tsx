@@ -4,6 +4,10 @@ import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { FileText, XCircle, Clock, Eye } from 'lucide-react';
+import {
+  normalizeDocumentReviewStatus,
+  resolveDocumentStorageLocator,
+} from '@/lib/admin/document-record';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +36,8 @@ export default async function AdminDocumentReviewPage() {
   const documents = (rawDocuments ?? []).map((d: any) => ({
     ...d,
     profiles: docProfileMap[d.user_id] ?? null,
+    review_status: normalizeDocumentReviewStatus(d.status),
+    has_storage_locator: Boolean(resolveDocumentStorageLocator(d)),
   }));
 
   // Document viewing is handled on-demand via SecureDocumentLink,
@@ -42,9 +48,9 @@ export default async function AdminDocumentReviewPage() {
     view_url: null, // URLs generated on-demand via SecureDocumentLink
   }));
 
-  const pendingDocs = docsWithUrls.filter((d) => d.status === 'pending') || [];
-  const approvedDocs = docsWithUrls.filter((d) => d.status === 'approved') || [];
-  const rejectedDocs = docsWithUrls.filter((d) => d.status === 'rejected') || [];
+  const pendingDocs = docsWithUrls.filter((d) => d.review_status === 'pending') || [];
+  const approvedDocs = docsWithUrls.filter((d) => d.review_status === 'approved') || [];
+  const rejectedDocs = docsWithUrls.filter((d) => d.review_status === 'rejected') || [];
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -138,7 +144,7 @@ export default async function AdminDocumentReviewPage() {
                   className="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
                 >
                   <div className="flex items-center gap-3 flex-1">
-                    {getStatusIcon(doc.status)}
+                    {getStatusIcon(doc.review_status)}
                     <div className="flex-1">
                       <h3 className="font-semibold text-black">{doc.file_name}</h3>
                       <p className="text-sm text-black">
@@ -206,7 +212,7 @@ export default async function AdminDocumentReviewPage() {
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition"
                 >
                   <div className="flex items-center gap-3 flex-1">
-                    {getStatusIcon(doc.status)}
+                    {getStatusIcon(doc.review_status)}
                     <div className="flex-1">
                       <h3 className="font-semibold text-black">{doc.file_name}</h3>
                       <p className="text-sm text-black">
@@ -226,11 +232,11 @@ export default async function AdminDocumentReviewPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <span
-                      className={`px-3 py-2 rounded-full text-xs font-semibold border ${getStatusBadge(doc.status)}`}
+                      className={`px-3 py-2 rounded-full text-xs font-semibold border ${getStatusBadge(doc.review_status)}`}
                     >
-                      {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                      {doc.review_status.charAt(0).toUpperCase() + doc.review_status.slice(1)}
                     </span>
-                    {doc.file_path ? (
+                    {doc.has_storage_locator ? (
                       <SecureDocumentLink documentId={doc.id} />
                     ) : (
                       <span className="text-slate-500 text-sm">No file</span>

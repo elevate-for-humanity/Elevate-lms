@@ -7,7 +7,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function ResetPasswordPage() {
-  return <ResetPasswordForm />;
+export default async function ResetPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ portal?: string; mode?: string }>;
+}) {
+  const params = await searchParams;
+  return <ResetPasswordForm portal={params.portal} mode={params.mode} />;
 }
-

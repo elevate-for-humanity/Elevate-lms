@@ -13,27 +13,58 @@ export default async function ApprenticeshipsPage() {
   const db = await requireAdminClient();
 
   const [
-    { count: totalEnrollments },
-    { count: activeEnrollments },
+    { data: apprentices, error: apprenticesError },
     pendingHoursResult,
-    { data: enrollments },
   ] = await Promise.all([
-    db.from('apprenticeship_enrollments').select('*', { count: 'exact', head: true }),
-    db.from('apprenticeship_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    db.from('apprentices')
+      .select('id,user_id,program_id,status,start_date,enrollment_date,hours_completed,total_hours_required,created_at')
+      .order('created_at', { ascending: false })
+      .limit(100),
     db
       .from('progress_entries')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'submitted')
       .is('verified_by', null),
-    db.from('apprenticeship_enrollments')
-      .select(`
-        id, status, start_date, total_hours_required, total_hours_completed, created_at,
-        profiles:student_id(full_name, email),
-        apprenticeship_programs:program_id(name, slug)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(50),
   ]);
+
+  if (apprenticesError) throw apprenticesError;
+
+  const canonicalApprentices = apprentices ?? [];
+  const userIds = [...new Set(canonicalApprentices.map((row: any) => row.user_id).filter(Boolean))];
+  const programIds = [...new Set(canonicalApprentices.map((row: any) => row.program_id).filter(Boolean))];
+
+  const [{ data: profiles }, { data: programs }, { data: hourSummaries }] = await Promise.all([
+    userIds.length
+      ? db.from('profiles').select('id,full_name,email').in('id', userIds)
+      : Promise.resolve({ data: [] }),
+    programIds.length
+      ? db.from('programs').select('id,name,slug,total_hours,required_hours').in('id', programIds)
+      : Promise.resolve({ data: [] }),
+    userIds.length
+      ? db.from('student_hour_summary').select('student_id,total_approved_hours,total_pending_hours').in('student_id', userIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const profileById = new Map((profiles ?? []).map((row: any) => [row.id, row]));
+  const programById = new Map((programs ?? []).map((row: any) => [row.id, row]));
+  const hoursByUserId = new Map((hourSummaries ?? []).map((row: any) => [row.student_id, row]));
+  const enrollments = canonicalApprentices.map((row: any) => {
+    const profile: any = profileById.get(row.user_id);
+    const program: any = programById.get(row.program_id);
+    const hours: any = hoursByUserId.get(row.user_id);
+    return {
+      ...row,
+      profile,
+      program,
+      total_hours_completed: Number(hours?.total_approved_hours ?? row.hours_completed ?? 0),
+      total_hours_pending: Number(hours?.total_pending_hours ?? 0),
+      total_hours_required: Number(row.total_hours_required || program?.required_hours || program?.total_hours || 0),
+      start_date: row.start_date || row.enrollment_date,
+    };
+  });
+
+  const totalEnrollments = enrollments.length;
+  const activeEnrollments = enrollments.filter((row: any) => row.status === 'active').length;
 
   const pendingHours = pendingHoursResult.count ?? 0;
 
@@ -63,12 +94,20 @@ export default async function ApprenticeshipsPage() {
             <h1 className="text-2xl font-bold text-slate-900">Apprenticeships</h1>
             <p className="mt-1 text-sm text-slate-500">DOL-registered apprenticeship enrollments and OJT hours</p>
           </div>
-          <Link
-            href="/rapids"
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50"
-          >
-            RAPIDS Export →
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/timeclock"
+              className="flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+            >
+              <Clock className="h-4 w-4" /> Live Timeclock
+            </Link>
+            <Link
+              href="/rapids"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50"
+            >
+              RAPIDS Export →
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -115,17 +154,18 @@ export default async function ApprenticeshipsPage() {
                   return (
                     <tr key={e.id} className="hover:bg-slate-50">
                       <td className="px-4 py-3">
-                        <p className="text-xs font-medium text-slate-800">{e.profiles?.full_name ?? '—'}</p>
-                        <p className="text-xs text-slate-400">{e.profiles?.email ?? '—'}</p>
+                        <p className="text-xs font-medium text-slate-800">{e.profile?.full_name ?? '—'}</p>
+                        <p className="text-xs text-slate-400">{e.profile?.email ?? '—'}</p>
                       </td>
-                      <td className="px-4 py-3 text-xs text-slate-600">{e.apprenticeship_programs?.name ?? '—'}</td>
+                      <td className="px-4 py-3 text-xs text-slate-600">{e.program?.name ?? '—'}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-100">
                             <div className="h-full rounded-full bg-brand-blue-500" style={{ width: `${pct}%` }} />
                           </div>
                           <span className="text-xs tabular-nums text-slate-600">
-                            {e.total_hours_completed ?? 0}/{e.total_hours_required ?? '?'}h
+                            {e.total_hours_completed ?? 0}/{e.total_hours_required || '?'}h
+                            {e.total_hours_pending > 0 ? ` (${e.total_hours_pending} pending)` : ''}
                           </span>
                         </div>
                       </td>

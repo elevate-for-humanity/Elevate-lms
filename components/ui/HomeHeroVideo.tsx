@@ -100,13 +100,13 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/generations-hair/salon-service.webp',
-    alt: 'Generations Hair Co stylist providing a professional salon service',
-    label: 'Build confidence through real client service',
+    src: '/images/partners/salon-saloon/team-sign.webp',
+    alt: 'Salon Saloon professional team gathered inside their modern salon',
+    label: 'Join a polished professional salon community',
     description:
-      'Move from learning to working with a clear pathway, practical support, and measurable progress.',
+      'Build your career alongside a polished salon team with workplace guidance and measurable progress.',
     exposureClass: 'brightness-[1.10]',
-    focalClass: 'object-[center_44%]',
+    focalClass: 'object-center',
   },
 ];
 
@@ -170,7 +170,6 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       aria-label="Elevate for Humanity homepage highlights"
       data-scroll-narration
       data-narration={HOME_NARRATION}
-      data-narration-src={revisionedHeroAsset('/audio/narration/home-hero.mp3')}
     >
       <div className="mx-auto grid max-w-7xl items-center gap-8 py-0 sm:py-10 lg:grid-cols-[0.84fr_1.16fr] lg:gap-12 lg:px-8 lg:py-12">
         <div className="relative z-20 order-2 px-4 pb-10 sm:px-6 sm:pb-4 lg:order-1 lg:px-0">

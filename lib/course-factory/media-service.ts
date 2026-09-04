@@ -52,6 +52,15 @@ const NON_NARRATED_KEYS = new Set([
   'captionUrl',
   'transcriptUrl',
   'visualPrompt',
+  'visual_prompt',
+  'instructions',
+  'expectedArtifact',
+  'autoGrade',
+  'automations',
+  'actions',
+  'reflectionPrompt',
+  'expertFeedbackPrompt',
+  'prompt',
   'status',
   'type',
 ]);
@@ -223,10 +232,13 @@ export async function queueCourseLessonVideos(
           lesson_id: lesson.id,
           course_id: input.courseId,
           lesson_title: lesson.title,
-          script:
-            candidateIndex === 0
-              ? `${generateInstructorIntro(instructor, course.title)} ${lessonNarration}`.trim()
-              : lessonNarration,
+          script: [
+            candidateIndex === 0 ? generateInstructorIntro(instructor, course.title) : '',
+            Array.isArray(lesson.bullet_points) && lesson.bullet_points.length
+              ? `By the end of this lesson, you will be able to: ${lesson.bullet_points.join('. ')}.`
+              : '',
+            lessonNarration,
+          ].filter(Boolean).join(' ').trim(),
           bullet_points: Array.isArray(lesson.bullet_points) ? (lesson.bullet_points as string[]) : [],
           scene_data: lesson.scene_data ?? null,
           asset_kind: 'lesson',

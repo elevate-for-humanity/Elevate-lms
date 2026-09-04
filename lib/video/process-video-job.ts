@@ -136,29 +136,33 @@ function persistedInstructionalScript(input: {
   jobScript: string;
   contentJson: unknown;
 }): string {
-  const content = input.contentJson && typeof input.contentJson === 'object'
-    ? input.contentJson as Record<string, unknown>
-    : {};
-  const experience = content.experience && typeof content.experience === 'object'
-    ? content.experience as Record<string, unknown>
-    : {};
-  const readingGuide = experience.readingGuide && typeof experience.readingGuide === 'object'
-    ? experience.readingGuide as Record<string, unknown>
-    : {};
+  const content =
+    input.contentJson && typeof input.contentJson === 'object'
+      ? (input.contentJson as Record<string, unknown>)
+      : {};
+  const experience =
+    content.experience && typeof content.experience === 'object'
+      ? (content.experience as Record<string, unknown>)
+      : {};
+  const readingGuide =
+    experience.readingGuide && typeof experience.readingGuide === 'object'
+      ? (experience.readingGuide as Record<string, unknown>)
+      : {};
   const sections = Array.isArray(readingGuide.sections) ? readingGuide.sections : [];
   const sectionNarration = sections.flatMap((section) => {
     if (!section || typeof section !== 'object') return [];
     const row = section as Record<string, unknown>;
-    return [row.heading, row.body].filter((value): value is string =>
-      typeof value === 'string' && value.trim().length > 0,
+    return [row.heading, row.body].filter(
+      (value): value is string => typeof value === 'string' && value.trim().length > 0,
     );
   });
   const takeaways = Array.isArray(readingGuide.keyTakeaways)
     ? readingGuide.keyTakeaways.filter((value): value is string => typeof value === 'string')
     : [];
-  const practicalTask = experience.practicalTask && typeof experience.practicalTask === 'object'
-    ? experience.practicalTask as Record<string, unknown>
-    : {};
+  const practicalTask =
+    experience.practicalTask && typeof experience.practicalTask === 'object'
+      ? (experience.practicalTask as Record<string, unknown>)
+      : {};
   const practicalInstructions = Array.isArray(practicalTask.instructions)
     ? practicalTask.instructions.filter((value): value is string => typeof value === 'string')
     : [];
@@ -172,7 +176,9 @@ function persistedInstructionalScript(input: {
     practicalInstructions.length
       ? `Apply the lesson in this order: ${practicalInstructions.join('. ')}.`
       : '',
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
 /** Render one already-claimed canonical video job. GPU generation is an optional
@@ -241,22 +247,24 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     // repairs and deployments, so their persisted script may contain stale
     // trade or instructor identity. Prefer the current governed narration and
     // keep the job copy only as a compatibility fallback.
-    const baseScript = [
-      // Course Builder synchronizes the full canonical narration into the
-      // durable job. It must win over legacy lesson script columns, which may
-      // contain only a short teaser from an older build.
-      job.script,
-      lesson?.script_text,
-      lesson?.script,
-      videoConfig.narration,
-      videoConfig.transcript,
-      job.lesson_title,
-    ]
-      .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
-      ?.trim() ?? job.lesson_title;
-    const configuredInstructorId = [videoConfig.instructorId, videoConfig.instructor_id]
-      .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
-      ?.trim() ?? '';
+    const baseScript =
+      [
+        // Course Builder synchronizes the full canonical narration into the
+        // durable job. It must win over legacy lesson script columns, which may
+        // contain only a short teaser from an older build.
+        job.script,
+        lesson?.script_text,
+        lesson?.script,
+        videoConfig.narration,
+        videoConfig.transcript,
+        job.lesson_title,
+      ]
+        .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
+        ?.trim() ?? job.lesson_title;
+    const configuredInstructorId =
+      [videoConfig.instructorId, videoConfig.instructor_id]
+        .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
+        ?.trim() ?? '';
     const instructor = configuredInstructorId
       ? getInstructorById(configuredInstructorId)
       : getInstructorForCourse(courseTitle);
@@ -298,19 +306,25 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     if (repairedScript.repaired) {
       const now = new Date().toISOString();
       const [{ error: lessonRepairError }, { error: jobRepairError }] = await Promise.all([
-        db.from('course_lessons').update({
-          script,
-          script_text: script,
-          video_status: 'rendering',
-          video_error: null,
-          updated_at: now,
-        }).eq('id', job.lesson_id),
-        db.from('video_jobs').update({
-          script,
-          scene_data: null,
-          error_message: null,
-          updated_at: now,
-        }).eq('id', job.id),
+        db
+          .from('course_lessons')
+          .update({
+            script,
+            script_text: script,
+            video_status: 'rendering',
+            video_error: null,
+            updated_at: now,
+          })
+          .eq('id', job.lesson_id),
+        db
+          .from('video_jobs')
+          .update({
+            script,
+            scene_data: null,
+            error_message: null,
+            updated_at: now,
+          })
+          .eq('id', job.id),
       ]);
       if (lessonRepairError || jobRepairError) {
         throw new Error(
@@ -326,7 +340,8 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     }
     const suppliedScenes =
       !repairedScript.repaired &&
-      Array.isArray(persistedSceneData.scenes) && persistedSceneData.scenes.length > 0;
+      Array.isArray(persistedSceneData.scenes) &&
+      persistedSceneData.scenes.length > 0;
     let generatedPlan: LessonRenderPlanDraft | null = null;
     if (!suppliedScenes) {
       try {
@@ -342,6 +357,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
             typeof lesson?.compliance_profile_key === 'string'
               ? lesson.compliance_profile_key
               : undefined,
+          lessonType: lesson?.lesson_type ?? undefined,
           requiresPracticalEvidence:
             lesson?.evidence_type === 'practical' || lesson?.lesson_type === 'lab',
         });
@@ -350,11 +366,15 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         // course. directMedia() deterministically derives an evidence-bearing
         // storyboard from the governed narration when the optional AI provider
         // is unavailable, rate-limited, or misconfigured.
-        logger.warn('[video-worker] AI scene enrichment unavailable; using deterministic storyboard', {
-          jobId: job.id,
-          courseId: job.course_id,
-          error: scenePlanError instanceof Error ? scenePlanError.message : String(scenePlanError),
-        });
+        logger.warn(
+          '[video-worker] AI scene enrichment unavailable; using deterministic storyboard',
+          {
+            jobId: job.id,
+            courseId: job.course_id,
+            error:
+              scenePlanError instanceof Error ? scenePlanError.message : String(scenePlanError),
+          },
+        );
       }
     }
     const sceneData = generatedPlan ? generatedSceneData(generatedPlan) : persistedSceneData;

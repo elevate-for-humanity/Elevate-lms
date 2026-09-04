@@ -36,6 +36,7 @@ export async function generateLessonScenes(opts: {
   examDomain?: string | null;
   passingScore?: number | null;
   requiresPracticalEvidence?: boolean;
+  lessonType?: string;
 }): Promise<LessonRenderPlanDraft> {
   const plainContent = stripHtml(opts.content);
   const seed = opts.seed ?? `${opts.lessonId}-${Date.now()}`;
@@ -58,6 +59,7 @@ export async function generateLessonScenes(opts: {
     examDomain: opts.examDomain,
     passingScore: opts.passingScore,
     requiresPracticalEvidence: opts.requiresPracticalEvidence,
+    lessonType: opts.lessonType ?? (opts.requiresPracticalEvidence ? 'procedure' : 'theory'),
   });
 
   let lastError: Error | null = null;

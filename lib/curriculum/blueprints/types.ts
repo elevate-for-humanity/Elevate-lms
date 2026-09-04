@@ -1,6 +1,13 @@
 /** Canonical credential-blueprint types shared by generator, auditor, and seeded curricula. */
 
-export type EnrollmentType = 'standard' | 'apprentice' | 'employer-sponsored' | 'workforce-funded' | string;
+import type { LearningExperienceProfile } from '../learning-experience';
+
+export type EnrollmentType =
+  | 'standard'
+  | 'apprentice'
+  | 'employer-sponsored'
+  | 'workforce-funded'
+  | string;
 
 export type InteractionSpecs = {
   includeKnowledgeChecks?: boolean;
@@ -141,6 +148,8 @@ export type BlueprintGenerationRules = {
   requireFinalExam?: boolean;
   passingScore?: number;
   allowedLessonTypes?: string[];
+  /** Enforces the complete AI-generated learning sequence before publication. */
+  learningExperienceProfile?: LearningExperienceProfile;
   [key: string]: unknown;
 };
 
@@ -163,12 +172,7 @@ export type BlueprintCertificateRequirements = {
 
 export type BlueprintVideoConfig = {
   videoGenerator: 'runway' | 'remotion' | 'canvas-slides' | 'manual';
-  template:
-    | 'elevate-slide'
-    | 'trade-demonstration'
-    | 'talking-head'
-    | 'screencast'
-    | 'custom';
+  template: 'elevate-slide' | 'trade-demonstration' | 'talking-head' | 'screencast' | 'custom';
   instructorName: string;
   instructorId?: string;
   instructorTitle: string;
@@ -182,6 +186,12 @@ export type BlueprintVideoConfig = {
   logoPath?: string;
   backgroundMusic?: boolean;
   captions?: boolean;
+  /** Critical hand-skill scenes may never be satisfied by generic stock footage. */
+  criticalProcedureMedia?: Array<'original_capture' | 'licensed_demonstration'>;
+  stockFootageContextOnly?: boolean;
+  requireFullDemonstration?: boolean;
+  requireStepMicrovideos?: boolean;
+  requireHumanTechnicalReview?: boolean;
   [key: string]: unknown;
 };
 

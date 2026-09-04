@@ -3,6 +3,11 @@
  * Single source of truth for the course builder pipeline.
  */
 import { HVAC_COURSE_ID } from '@/lib/courses/hvac-uuids';
+import type {
+  LearningExperienceProfile,
+  LearningPhase,
+  MediaEvidencePolicy,
+} from '@/lib/curriculum/learning-experience';
 // BARBER_COURSE_ID not imported from @/lib/barber/constants — that module re-exports
 // from this file, creating a circular dependency. Use the literal directly here.
 const BARBER_COURSE_ID_SCHEMA = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
@@ -223,6 +228,12 @@ export interface BuilderLesson {
   instructorRequirement?: InstructorRequirement | null;
   minimumSeatTimeMinutes?: number | null;
   fieldworkEligible?: boolean;
+  /** Universal AI-generated course experience and publication evidence. */
+  learningExperience?: {
+    profile: LearningExperienceProfile;
+    phases: Array<{ phase: LearningPhase; order: number; required: boolean }>;
+    mediaPolicy: MediaEvidencePolicy;
+  };
 }
 
 export interface BuilderModule {
@@ -263,7 +274,10 @@ export interface ProgramBuilderTemplate {
 //
 // content is overridden from Record<string,unknown> to string because the
 // pipeline stores rendered HTML in course_lessons.content (text column).
-export type CourseLesson = Omit<BuilderLesson, 'content' | 'quizQuestions' | 'orderIndex' | 'lessonType'> & {
+export type CourseLesson = Omit<
+  BuilderLesson,
+  'content' | 'quizQuestions' | 'orderIndex' | 'lessonType'
+> & {
   type: LessonType;
   order: number;
   orderIndex?: number;

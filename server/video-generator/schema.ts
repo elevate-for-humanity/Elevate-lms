@@ -26,9 +26,29 @@ export const SceneLayoutSchema = z.enum([
 ]);
 export const SceneTransitionSchema = z.enum(['cut', 'fade', 'crossfade']);
 export const InstructionalSceneTypeSchema = z.enum([
-  'problem_hook', 'mental_model', 'system_diagram', 'equipment_closeup',
-  'worked_example', 'field_scenario', 'common_mistake', 'safety_warning',
-  'memory_recap', 'knowledge_check',
+  'problem_hook',
+  'mental_model',
+  'system_diagram',
+  'equipment_closeup',
+  'worked_example',
+  'field_scenario',
+  'common_mistake',
+  'safety_warning',
+  'memory_recap',
+  'knowledge_check',
+  'service_setup',
+  'sanitation_check',
+  'procedure_step',
+  'critical_closeup',
+  'quality_check',
+  'cleanup_aftercare',
+  'evidence_capture',
+]);
+export const SceneAssetRequirementSchema = z.enum([
+  'stock_context',
+  'generated_diagram',
+  'original_capture',
+  'licensed_demonstration',
 ]);
 
 export const LessonSceneDraftSchema = z.object({
@@ -46,6 +66,8 @@ export const LessonSceneDraftSchema = z.object({
   subcaption: z.string().max(120).optional(),
   videoQuery: z.string().min(3).max(120),
   visualFocus: z.string().min(5).max(200).optional(),
+  assetRequirement: SceneAssetRequirementSchema,
+  procedureStepNumber: z.number().int().positive().optional(),
   layout: SceneLayoutSchema,
   minClipSeconds: z.number().min(3).max(20).optional(),
   maxClipSeconds: z.number().min(3).max(30).optional(),
@@ -98,6 +120,24 @@ export const LessonRenderPlanDraftSchema = z
           code: z.ZodIssueCode.custom,
           path: ['scenes'],
           message: `Scene ${scene.id}: minClipSeconds > maxClipSeconds`,
+        });
+      }
+      const exactTechnique = ['procedure_step', 'critical_closeup'].includes(scene.sceneType);
+      if (
+        exactTechnique &&
+        !['original_capture', 'licensed_demonstration'].includes(scene.assetRequirement)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['scenes'],
+          message: `Scene ${scene.id}: exact procedure technique requires original or licensed demonstration media`,
+        });
+      }
+      if (scene.sceneType === 'procedure_step' && scene.procedureStepNumber === undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['scenes'],
+          message: `Scene ${scene.id}: procedure_step requires procedureStepNumber`,
         });
       }
     }

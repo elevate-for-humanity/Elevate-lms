@@ -114,6 +114,10 @@ export function buildAtomicPayload(
           .sort((a, b) => a.order - b.order)
           .map((lesson, lessonPosition) => {
             const extra = lesson as typeof lesson & Record<string, any>;
+            const learningExperience =
+              extra.learningExperience && typeof extra.learningExperience === 'object'
+                ? extra.learningExperience
+                : null;
             const stepType = normalizeLessonType(extra, lesson.slug);
             const content = normalizeLessonContent(lesson.content, lesson.objective);
             const experience =
@@ -142,10 +146,14 @@ export function buildAtomicPayload(
                   .map((objective) => objective.trim()),
               ),
             );
-            if (experience && !LearningIntelligenceSchema.safeParse(experience.intelligence).success) {
-              const competencyKeys = Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
-                ? lesson.competencyKeys
-                : (courseModule.competencies ?? []).map((competency) => competency.competencyKey);
+            if (
+              experience &&
+              !LearningIntelligenceSchema.safeParse(experience.intelligence).success
+            ) {
+              const competencyKeys =
+                Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
+                  ? lesson.competencyKeys
+                  : (courseModule.competencies ?? []).map((competency) => competency.competencyKey);
               experience.intelligence = compileLearningIntelligence({
                 lessonSlug: lesson.slug,
                 lessonTitle: lesson.title,
@@ -197,7 +205,10 @@ export function buildAtomicPayload(
               order_index: (modulePosition + 1) * 1000 + (lessonPosition + 1),
               objective: lesson.objective ?? null,
               content,
-              content_json: experience ? { experience } : {},
+              content_json: {
+                ...(experience ? { experience } : {}),
+                ...(learningExperience ? { learning_experience: learningExperience } : {}),
+              },
               rendered_html: renderedHtml,
               quiz_questions:
                 lesson.quizQuestions?.map((question, index) => ({
@@ -251,7 +262,8 @@ export function buildAtomicPayload(
               requires_instructor_signoff:
                 extra.requiresInstructorSignoff ?? Boolean(governedPractical && stepType === 'lab'),
               instructor_requirement: extra.instructorRequirement ?? null,
-              minimum_seat_time_minutes: extra.minimumSeatTimeMinutes ?? lesson.durationMinutes ?? null,
+              minimum_seat_time_minutes:
+                extra.minimumSeatTimeMinutes ?? lesson.durationMinutes ?? null,
               fieldwork_eligible: extra.fieldworkEligible ?? false,
               is_required: extra.isRequired ?? true,
               ai_generated: extra.aiGenerated ?? Boolean(experience),

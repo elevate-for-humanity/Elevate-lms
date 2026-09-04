@@ -13,6 +13,8 @@ HARD RULES:
 - visualFocus and videoQuery must describe the exact physical action or diagram required by the narration.
 - Do not repeat visualFocus or videoQuery within one lesson.
 - Do not reproduce proprietary textbook language, images, diagrams, videos, or test questions.
+- AI may create original scripts, narration, diagrams, scenarios, and storyboards. It must never imply that generated or stock imagery demonstrates an exact regulated hand technique.
+- Tag every scene with assetRequirement. Use stock_context only for environment/context, generated_diagram for explanatory graphics, and original_capture or licensed_demonstration for procedure_step and critical_closeup scenes.
 - Build one memorable teaching model for the lesson. Give it a short name, a plain-language map, a memory anchor, one misconception to correct, and a transfer question.
 - For an eight-scene lesson use this instructional sequence: problem_hook, mental_model, system_diagram, equipment_closeup or field_scenario, worked_example, common_mistake or safety_warning, memory_recap, knowledge_check.
 - A knowledge_check must ask the learner to apply the model to a new situation; it must not merely repeat a definition.
@@ -24,7 +26,7 @@ export function buildSceneGenerationUserPrompt(opts: {
   content: string;
   seed: string;
   profile: InstructionalDomainProfile;
-  lessonType?: 'intro' | 'skill' | 'theory' | 'review';
+  lessonType?: string;
   sceneCount?: number;
   occupationTitle?: string;
   dolCompetencyId?: string | null;
@@ -40,9 +42,15 @@ export function buildSceneGenerationUserPrompt(opts: {
 }): string {
   const sceneCount = opts.sceneCount ?? 8;
   const isIntro = opts.lessonType === 'intro';
+  const isProcedure =
+    opts.lessonType === 'procedure' ||
+    opts.lessonType === 'skill' ||
+    opts.requiresPracticalEvidence;
   const arc = isIntro
     ? opts.profile.introductionArc.map((item, index) => `Scene ${index + 1}: ${item}`).join('\n')
-    : `Create ${sceneCount} scenes in this arc: problem hook; memorable mental model; exact system diagram; equipment close-up or field scenario; worked example; common mistake or safety warning; memory recap; application-based knowledge check.`;
+    : isProcedure
+      ? `Create ${sceneCount} scenes covering service setup; sanitation/PPE check; numbered procedure steps; critical close-ups; correct-versus-incorrect technique; quality check; cleanup/aftercare; learner evidence capture. The plan is both a full demonstration and a source for one microvideo per numbered procedure step.`
+      : `Create ${sceneCount} scenes in this arc: problem hook; memorable mental model; exact system diagram; equipment close-up or field scenario; worked example; common mistake or safety warning; memory recap; application-based knowledge check.`;
 
   return `Create an original ${opts.profile.label} instructional video plan.
 
@@ -74,5 +82,5 @@ SCENE ARC:
 ${arc}
 
 Return exactly ${sceneCount} scenes using this JSON shape:
-{"lessonId":"${opts.lessonId}","title":"${opts.title}","voice":"onyx","videoStyle":"${opts.profile.videoStyle}","targetResolution":"1920x1080","teachingModel":{"name":"Short memorable model name","memoryAnchor":"A concise memory anchor","plainLanguageMap":"How the parts and relationships work in plain language","misconception":"A likely misconception and its correction","transferQuestion":"A new situation where the learner applies the model"},"scenes":[{"id":"scene-1","order":1,"sceneType":"problem_hook","instructionalObjective":"Observable learner outcome","dolCompetencyId":"${opts.dolCompetencyId ?? 'not-applicable'}","stateRequirement":"${opts.stateRequirement ?? 'not-supplied'}","examDomain":"${opts.examDomain ?? 'not-supplied'}","demonstrationStep":"Exact action or diagram","evidenceExpectation":"Required learner or verifier evidence","narration":"Two to four original instructional sentences.","caption":"Concrete on-screen instruction","subcaption":"One supporting line","videoQuery":"Specific obtainable footage or diagram","visualFocus":"Exact visible action","layout":"lower_third","minClipSeconds":6,"maxClipSeconds":12,"transitionIn":"fade","transitionOut":"cut"}]}`;
+{"lessonId":"${opts.lessonId}","title":"${opts.title}","voice":"onyx","videoStyle":"${opts.profile.videoStyle}","targetResolution":"1920x1080","teachingModel":{"name":"Short memorable model name","memoryAnchor":"A concise memory anchor","plainLanguageMap":"How the parts and relationships work in plain language","misconception":"A likely misconception and its correction","transferQuestion":"A new situation where the learner applies the model"},"scenes":[{"id":"scene-1","order":1,"sceneType":"problem_hook","instructionalObjective":"Observable learner outcome","dolCompetencyId":"${opts.dolCompetencyId ?? 'not-applicable'}","stateRequirement":"${opts.stateRequirement ?? 'not-supplied'}","examDomain":"${opts.examDomain ?? 'not-supplied'}","demonstrationStep":"Exact action or diagram","evidenceExpectation":"Required learner or verifier evidence","narration":"Two to four original instructional sentences.","caption":"Concrete on-screen instruction","subcaption":"One supporting line","videoQuery":"Specific obtainable footage or diagram","visualFocus":"Exact visible action","assetRequirement":"stock_context","procedureStepNumber":1,"layout":"lower_third","minClipSeconds":6,"maxClipSeconds":12,"transitionIn":"fade","transitionOut":"cut"}]}`;
 }

@@ -22,7 +22,20 @@ export type InstructionalSceneType =
   | 'common_mistake'
   | 'safety_warning'
   | 'memory_recap'
-  | 'knowledge_check';
+  | 'knowledge_check'
+  | 'service_setup'
+  | 'sanitation_check'
+  | 'procedure_step'
+  | 'critical_closeup'
+  | 'quality_check'
+  | 'cleanup_aftercare'
+  | 'evidence_capture';
+
+export type SceneAssetRequirement =
+  | 'stock_context'
+  | 'generated_diagram'
+  | 'original_capture'
+  | 'licensed_demonstration';
 
 export interface TeachingModel {
   name: string;
@@ -51,6 +64,9 @@ export interface LessonSceneDraft {
   videoQuery: string;
   /** Exactly what should be visible on screen — drives video selection over raw videoQuery */
   visualFocus?: string;
+  assetRequirement: SceneAssetRequirement;
+  /** Stable step number lets the builder emit one reusable microvideo per procedure step. */
+  procedureStepNumber?: number;
   layout: SceneLayout;
   minClipSeconds?: number;
   maxClipSeconds?: number;

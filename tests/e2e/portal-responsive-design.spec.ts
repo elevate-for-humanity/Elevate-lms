@@ -45,7 +45,26 @@ async function login(page: Page, loginBase: string, email: string, password: str
 
 async function assertResponsivePage(page: Page, pathOrUrl: string) {
   const target = /^https?:\/\//.test(pathOrUrl) ? pathOrUrl : `${BASE}${pathOrUrl}`;
-  const response = await page.goto(target, { waitUntil: 'domcontentloaded' });
+  let response: Awaited<ReturnType<Page['goto']>> = null;
+  let lastNavigationError: unknown;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      // Installed service workers and slower mobile WebKit can delay the
+      // DOMContentLoaded navigation signal after the destination has committed.
+      // Certify the rendered document, not that transport-level timing detail.
+      response = await page.goto(target, { waitUntil: 'commit', timeout: 30_000 });
+      await expect.poll(() => page.evaluate(() => document.readyState), {
+        message: `${target} did not produce an interactive document`,
+        timeout: 30_000,
+      }).toMatch(/interactive|complete/);
+      lastNavigationError = undefined;
+      break;
+    } catch (error) {
+      lastNavigationError = error;
+      if (attempt < 2) await page.waitForTimeout(1_000);
+    }
+  }
+  if (lastNavigationError) throw lastNavigationError;
   expect(response?.status() ?? 200, `${target} returned server error`).toBeLessThan(500);
   expect(page.url(), `${target} unexpectedly returned to login`).not.toMatch(/\/login(?:\?|$)/);
   expect(page.url(), `${target} redirected to unauthorized`).not.toContain('/unauthorized');
@@ -118,7 +137,7 @@ function roleSuite(name: string, key: keyof typeof creds, loginBase: string, pat
     const credentials = creds[key];
     test.skip(!credentials[0] || !credentials[1], `Disposable ${name} identity is required`);
     test(`critical ${name} surfaces fit the active device viewport`, async ({ page }, testInfo) => {
-      test.setTimeout(180_000);
+      test.setTimeout(240_000);
       await certify(page, testInfo, key, credentials, loginBase, paths);
     });
   });

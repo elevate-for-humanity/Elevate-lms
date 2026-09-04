@@ -82,7 +82,7 @@ function collectInstructionalText(value: unknown, key = '', seen = new Set<strin
       .replace(/\s+([,.;:!?])/g, '$1')
       .trim();
     const internalDirective =
-      /\b(the narration should|the script should|apply this to .{0,160} by identifying|end with the action the learner|as an ai|return (?:valid )?json|prompt engineering)\b/i;
+      /\b(the narration should|the script should|in this clip|apply this to .{0,160} by identifying|end with the action the learner|as an ai|return (?:valid )?json|prompt engineering)\b/i;
     if (normalized.length < 3 || internalDirective.test(normalized) || seen.has(normalized)) return [];
     seen.add(normalized);
     return [normalized];

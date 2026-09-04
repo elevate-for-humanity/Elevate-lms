@@ -133,6 +133,12 @@ export default async function HostShopDashboardLayout({ children }: { children: 
       }}
       role="host_shop"
     >
+      <section className="mb-4 rounded-2xl border-2 border-blue-300 bg-blue-50 px-5 py-4 text-blue-950 shadow-sm" role="status" aria-label="Host Shop action notice">
+        <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-800">Host Shop action required</p>
+        <h2 className="mt-1 text-lg font-black">Your production Host Shop portal is ready.</h2>
+        <p className="mt-1 text-sm font-semibold leading-6">Sign in now and complete every required onboarding, agreement, and compliance document shown in your readiness checklist.</p>
+        <a href="/host-shop/dashboard/documents" className="mt-3 inline-flex rounded-xl bg-blue-950 px-4 py-2 text-sm font-black text-white hover:bg-blue-900">Complete required documents</a>
+      </section>
       <HostShopReadinessBanner items={readinessItems} />
       {children}
     </PlatformShell>

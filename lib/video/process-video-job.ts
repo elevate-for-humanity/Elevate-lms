@@ -242,11 +242,14 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     // trade or instructor identity. Prefer the current governed narration and
     // keep the job copy only as a compatibility fallback.
     const baseScript = [
+      // Course Builder synchronizes the full canonical narration into the
+      // durable job. It must win over legacy lesson script columns, which may
+      // contain only a short teaser from an older build.
+      job.script,
       lesson?.script_text,
       lesson?.script,
       videoConfig.narration,
       videoConfig.transcript,
-      job.script,
       job.lesson_title,
     ]
       .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
@@ -275,11 +278,14 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         program?.type,
       ].find((value): value is string => typeof value === 'string' && value.trim().length > 0) ??
       null;
-    const persistedScript = persistedInstructionalScript({
-      lessonTitle: job.lesson_title,
-      jobScript: baseScript,
-      contentJson: lesson?.content_json,
-    });
+    const persistedScript =
+      baseScript.split(/\s+/).filter(Boolean).length >= 180
+        ? baseScript
+        : persistedInstructionalScript({
+            lessonTitle: job.lesson_title,
+            jobScript: baseScript,
+            contentJson: lesson?.content_json,
+          });
     const repairedScript = repairInstructionalScript({
       lessonTitle: job.lesson_title,
       lessonType: lesson?.lesson_type,

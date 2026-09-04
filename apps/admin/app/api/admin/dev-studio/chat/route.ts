@@ -809,11 +809,43 @@ function enforceEvidenceBoundary(
 ): string {
   if (!isOperationalDiagnosticRequest(query)) return message;
 
+  const browserRecord = records.find((record) => record.tool === 'scan_live_page');
+  if (browserRecord) {
+    try {
+      const result = JSON.parse(browserRecord.result) as {
+        target?: string;
+        results?: Array<{ audit?: { url?: string } }>;
+      };
+      const target = result.target ? new URL(result.target) : null;
+      const finalUrls = (result.results ?? [])
+        .map((entry) => entry.audit?.url)
+        .filter((url): url is string => Boolean(url));
+      const authenticationBlocked =
+        target?.hostname === 'admin.elevateforhumanity.org' &&
+        finalUrls.some((url) => {
+          try {
+            const finalUrl = new URL(url);
+            return (
+              finalUrl.hostname === 'admin.elevateforhumanity.org' &&
+              finalUrl.pathname === '/login'
+            );
+          } catch {
+            return false;
+          }
+        });
+
+      if (authenticationBlocked) {
+        return `Problem:\nThe isolated Studio Browser could not verify the protected admin page because it was redirected to the admin login screen. This is an authentication boundary, not evidence that the dashboard is broken.\n\nEvidence used:\n- scan_live_page targeted ${result.target}\n- Final browser URL redirected to ${finalUrls.find((url) => url.includes('/login'))}\n\nLikely causes:\n- The isolated browser does not share the administrator's authenticated session.\n- Protected admin routes correctly require an authenticated admin session.\n\nAffected files/routes/tables:\n- /api/admin/dev-studio/browser/session\n- /api/admin/dev-studio/chat\n- Protected route requested: ${target.pathname}\n\nConfidence:\nHigh confidence that authentication blocked this audit. No conclusion is made about the protected page's functionality.\n\nNext debug step:\nRun the audit with an explicitly authenticated Studio Browser session, or use authenticated admin tools and route-level diagnostics. Do not report the dashboard as failed from this redirect.`;
+      }
+    } catch {
+      // The existing invalid-evidence handling below provides the deterministic fallback.
+    }
+  }
+
   const requestsBrowserEvidence =
     /\b(?:live|homepage|home page|browser|console|network|mobile|accessibility|layout|broken control)\b/i.test(
       query,
     );
-  const browserRecord = records.find((record) => record.tool === 'scan_live_page');
   if (requestsBrowserEvidence) {
     let browserFailure = '';
     if (browserRecord) {

@@ -5,9 +5,12 @@ const APPRENTICE_EMAIL = process.env.E2E_APPRENTICE_EMAIL || process.env.TEST_ST
 const APPRENTICE_PASSWORD = process.env.E2E_APPRENTICE_PASSWORD || process.env.TEST_STUDENT_PASSWORD || '';
 const HOST_EMAIL = process.env.E2E_HOST_SHOP_EMAIL || '';
 const HOST_PASSWORD = process.env.E2E_HOST_SHOP_PASSWORD || '';
+const ADMIN_BASE = process.env.PLAYWRIGHT_ADMIN_URL || 'https://admin.elevateforhumanity.org';
+const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL || '';
+const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD || '';
 
-async function login(page: Page, email: string, password: string) {
-  const response = await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+async function login(page: Page, email: string, password: string, base = BASE) {
+  const response = await page.goto(`${base}/login`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   expect(response?.status() ?? 200, 'Login route returned a server error').toBeLessThan(500);
 
   const emailInput = page.locator('input[type="email"], input[name="email"]').first();
@@ -123,6 +126,25 @@ test.describe('Registered apprenticeship authorization', () => {
         ),
         'Synthetic government ID upload did not persist',
       ).toBe(true);
+
+      expect(ADMIN_EMAIL, 'Disposable admin email was not provisioned').toBeTruthy();
+      expect(ADMIN_PASSWORD, 'Disposable admin password was not provisioned').toBeTruthy();
+      const adminPage = await page.context().newPage();
+      try {
+        await login(adminPage, ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_BASE);
+        const adminReview = await adminPage.goto(`${ADMIN_BASE}/documents/review`, {
+          waitUntil: 'domcontentloaded',
+          timeout: 30_000,
+        });
+        expect(adminReview?.status() ?? 200, 'Admin document review returned a server error').toBeLessThan(500);
+        expect(adminPage.url()).not.toMatch(/\/(?:login|unauthorized)(?:\?|$)/);
+        await expect(adminPage.locator('body')).toContainText('qa-synthetic-government-id.png');
+        await expect(adminPage.locator('body')).toContainText('[QA E2E] Barber Apprentice');
+        await expect(adminPage.locator('body')).toContainText(/Government Id/i);
+        await expect(adminPage.locator('body')).toContainText(/Pending/i);
+      } finally {
+        await adminPage.close();
+      }
     } finally {
       const cleanupResponse = await page.request.delete(
         `${BASE}/api/apprentice/documents?id=${encodeURIComponent(uploaded.document.id)}`,

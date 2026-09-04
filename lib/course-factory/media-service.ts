@@ -255,7 +255,9 @@ export async function queueCourseLessonVideos(
             lessonNarration,
           ].filter(Boolean).join(' ').trim(),
           bullet_points: Array.isArray(lesson.bullet_points) ? (lesson.bullet_points as string[]) : [],
-          scene_data: lesson.scene_data ?? null,
+          // A refreshed full narration requires a fresh storyboard. Reusing
+          // lesson.scene_data from an older teaser causes visual/narration drift.
+          scene_data: null,
           asset_kind: 'lesson',
         }));
         existingByAsset.set(lessonKey, job);

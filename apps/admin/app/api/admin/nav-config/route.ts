@@ -7,8 +7,8 @@ import { safeError } from '@/lib/api/safe-error';
 
 function normalizeAdminHref(href: string): string {
   if (href === '/') return '/';
-  if (href.startsWith('/')) return href.slice('/'.length) || '/';
-  return href;
+  const withoutLegacyPrefix = href.replace(/^\/admin(?=\/|$)/, '');
+  return withoutLegacyPrefix.startsWith('/') ? withoutLegacyPrefix : `/${withoutLegacyPrefix}`;
 }
 
 function normalizeAdminNavSections(sections: NavSection[]): NavSection[] {
@@ -17,6 +17,25 @@ function normalizeAdminNavSections(sections: NavSection[]): NavSection[] {
     href: normalizeAdminHref(section.href),
     items: section.items.map((item) => ({ ...item, href: normalizeAdminHref(item.href) })),
   }));
+}
+
+function mergeWithCanonicalNav(configured: NavSection[]): NavSection[] {
+  const merged = normalizeAdminNavSections(configured).map((section) => ({
+    ...section,
+    items: [...section.items],
+  }));
+  for (const canonicalSection of normalizeAdminNavSections(DEFAULT_NAV)) {
+    const existing = merged.find((section) => section.href === canonicalSection.href || section.label === canonicalSection.label);
+    if (!existing) {
+      merged.push(canonicalSection);
+      continue;
+    }
+    const knownHrefs = new Set(existing.items.map((item) => item.href));
+    for (const item of canonicalSection.items) {
+      if (!knownHrefs.has(item.href)) existing.items.push(item);
+    }
+  }
+  return merged;
 }
 
 /**
@@ -51,7 +70,7 @@ export async function GET(request: NextRequest) {
       try {
         const parsed = JSON.parse(data.value);
         if (isNavSections(parsed)) {
-          return NextResponse.json({ sections: normalizeAdminNavSections(parsed), source: 'db' });
+          return NextResponse.json({ sections: mergeWithCanonicalNav(parsed), source: 'db+canonical' });
         }
       } catch {
         // fall through to default

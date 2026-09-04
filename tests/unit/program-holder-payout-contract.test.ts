@@ -11,6 +11,8 @@ describe('Program Holder payout contract', () => {
   const panel = read('components/program-holder/PayoutAccessPanel.tsx');
   const migration = read('supabase/migrations/20260903203628_program_holder_stripe_connect_v2.sql');
   const paymentRoute = read('apps/admin/app/api/admin/enrollments/mark-payout-paid/route.ts');
+  const releaseService = read('lib/program-holder/release-payment.ts');
+  const cronRoute = read('apps/admin/app/api/cron/program-holder-payouts/route.ts');
 
   it('uses holder-scoped authorization for every payout action', () => {
     expect(route).toContain('requireProgramHolder');
@@ -38,7 +40,25 @@ describe('Program Holder payout contract', () => {
     expect(route).toContain('getProgramHolderPaymentReadiness');
     expect(route).toContain('if (!readiness.ready)');
     expect(paymentRoute).toContain('getProgramHolderPaymentReadiness');
-    expect(paymentRoute).toContain('Payment is on hold until Program Holder onboarding is complete.');
+    expect(paymentRoute).toContain('getStudentPaymentReadiness');
+  });
+
+  it('releases money through Stripe before recording paid state', () => {
+    expect(releaseService).toContain('stripe.transfers.create');
+    expect(releaseService.indexOf('stripe.transfers.create')).toBeLessThan(
+      releaseService.indexOf("increment_1_status: 'paid'"),
+    );
+    expect(releaseService).toContain('idempotencyKey');
+  });
+
+  it('automatically processes only admin-approved due schedules', () => {
+    expect(cronRoute).toContain(".eq('increment_1_status', 'approved')");
+    expect(cronRoute).toContain(".lte('increment_1_release_date', today)");
+  });
+
+  it('does not call a missing QuickBooks endpoint', () => {
+    expect(paymentRoute).not.toContain('/api/quickbooks/contractor-payment');
+    expect(releaseService).toContain('recordContractorPaymentInQuickBooks');
   });
 
   it('removes authenticated-wide payout reads', () => {

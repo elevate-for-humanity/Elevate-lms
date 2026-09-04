@@ -29,6 +29,7 @@ on:
           - enrollment-automation
           - stale-applications
           - process-notifications
+          - program-holder-payouts
           - expire-exam-authorizations
           - expire-credentials
           - expire-licenses
@@ -91,6 +92,7 @@ jobs:
          || github.event.inputs.job == 'workflow-schedule-processor'
          || github.event.inputs.job == 'ai-operator'
          || github.event.inputs.job == 'video-render-queue'
+         || github.event.inputs.job == 'program-holder-payouts'
          ))
     steps:
       - name: Process notifications
@@ -99,6 +101,13 @@ jobs:
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             --max-time 30 || echo "::warning::process-notifications failed"
+
+      - name: Release approved Program Holder payments
+        run: |
+          curl -sf -X GET "$ADMIN_URL/api/cron/program-holder-payouts" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 55 || echo "::warning::program-holder-payouts failed"
 
       - name: Process provisioning jobs
         run: |

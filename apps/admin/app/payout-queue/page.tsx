@@ -82,7 +82,15 @@ export default async function PayoutQueuePage({
   const filterStatus = params.status ?? 'all';
 
   // Check if QuickBooks is connected
-  const qbConnected = !!(process.env.QB_ACCESS_TOKEN && process.env.QB_REALM_ID);
+  const { data: qbRows } = await db
+    .from('app_settings')
+    .select('key,value')
+    .in('key', ['QB_ACCESS_TOKEN', 'QB_REALM_ID']);
+  const qbSettings = Object.fromEntries((qbRows ?? []).map((row: any) => [row.key, row.value]));
+  const qbConnected = !!(
+    (qbSettings.QB_ACCESS_TOKEN || process.env.QB_ACCESS_TOKEN) &&
+    (qbSettings.QB_REALM_ID || process.env.QB_REALM_ID)
+  );
 
   // Fetch payout queue
   let query = db
@@ -163,7 +171,7 @@ export default async function PayoutQueuePage({
         {!qbConnected && (
           <div className="mb-4 flex items-center justify-between gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-sm">
             <span className="text-amber-800">
-              <strong>QuickBooks not connected</strong> — payouts will be marked paid locally only.
+              <strong>QuickBooks not connected</strong> — Stripe transfers can run, but accounting records will remain pending.
             </span>
             <Link
               href="/integrations/quickbooks"
@@ -176,7 +184,7 @@ export default async function PayoutQueuePage({
         {qbConnected && (
           <div className="mb-4 flex items-center gap-2 px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700">
             <CheckCircle className="w-4 h-4" />
-            <span><strong>QuickBooks connected</strong> — approving a payout will create a contractor payment automatically.</span>
+            <span><strong>QuickBooks connected</strong> — Stripe-confirmed transfers will be recorded automatically.</span>
           </div>
         )}
 

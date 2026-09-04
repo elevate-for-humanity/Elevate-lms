@@ -19,7 +19,7 @@ export default function ApprovePayButton({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   async function handlePay() {
-    if (!confirm(`Approve & pay ${holderName ?? 'this program holder'}${amount ? ` — $${amount.toLocaleString()}` : ''}?\n\n${qbConnected ? 'This will also push a contractor payment to QuickBooks.' : 'QuickBooks is not connected — payment will be marked paid locally only.'}`)) return;
+    if (!confirm(`Approve and release ${holderName ?? 'this program holder'}${amount ? ` — $${amount.toLocaleString()}` : ''} through Stripe now?\n\n${qbConnected ? 'After Stripe confirms the transfer, it will be recorded in QuickBooks.' : 'QuickBooks is not connected, so the accounting record will remain pending.'}`)) return;
 
     setState('loading');
     setErrorMsg(null);
@@ -30,7 +30,6 @@ export default function ApprovePayButton({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           enrollment_id:       enrollmentId,
-          push_to_quickbooks:  qbConnected,
         }),
       });
 
@@ -88,7 +87,7 @@ export default function ApprovePayButton({
       ) : (
         <DollarSign className="w-3 h-3" />
       )}
-      {qbConnected ? 'Approve & Pay' : 'Mark Paid'}
+      Approve & Release
     </button>
   );
 }

@@ -227,8 +227,8 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
                 unoptimized
                 sizes="(min-width: 1024px) 58vw, 100vw"
                 aria-hidden={index !== activeSlide}
-                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${SALON_EDITORIAL_GRADE} ${candidate.exposureClass} ${candidate.focalClass} ${
-                  index === activeSlide ? 'z-10 opacity-100' : 'z-0 opacity-0'
+                className={`absolute inset-0 h-full w-full object-cover transform-gpu transition-[opacity,transform] duration-1000 ease-in-out motion-reduce:transition-none ${SALON_EDITORIAL_GRADE} ${candidate.exposureClass} ${candidate.focalClass} ${
+                  index === activeSlide ? 'z-10 scale-100 opacity-100' : 'z-0 scale-[1.015] opacity-0'
                 }`}
               />
             ))}

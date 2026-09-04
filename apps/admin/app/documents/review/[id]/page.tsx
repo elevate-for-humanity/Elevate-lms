@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { DocumentReviewForm } from '@/components/admin/DocumentReviewForm';
 import { getAdminDocumentUrl } from '@/lib/admin/document-access';
@@ -13,15 +13,11 @@ export const metadata: Metadata = {
 };
 
 export default async function ReviewDocumentPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireRole(['admin']);
+  const { user } = await requireRole(['admin']);
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const db = await requireAdminClient();
 
-
-  // Guard against null user
-  if (!user) redirect('/login');
-  const { data: rawDocument } = await supabase
+  const { data: rawDocument } = await db
     .from('documents')
     .select('*')
     .eq('id', id)
@@ -33,7 +29,7 @@ export default async function ReviewDocumentPage({ params }: { params: Promise<{
 
   // Hydrate profile separately (documents.user_id has no FK to profiles)
   const { data: docReviewProfile } = rawDocument.user_id
-    ? await supabase
+    ? await db
         .from('profiles')
         .select('id, full_name, email, role')
         .eq('id', rawDocument.user_id)

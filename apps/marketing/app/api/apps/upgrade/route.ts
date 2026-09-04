@@ -12,7 +12,7 @@ import { syncIndividualAppLifecycle } from '@/lib/platform/subscription-lifecycl
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const SITE_URL = 'https://www.elevateforhumanity.org';
+const STORE_URL = 'https://store.elevateforhumanity.org';
 
 export async function POST(request: NextRequest) {
   await hydrateProcessEnv();
@@ -142,8 +142,8 @@ export async function POST(request: NextRequest) {
     metadata,
     subscription_data: { metadata },
     line_items: [{ price: stripePrice.id, quantity: 1 }],
-    success_url: `${SITE_URL}/store/apps/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${SITE_URL}/store/apps/${catalog.slug}?checkout=cancelled`,
+    success_url: `${STORE_URL}/store/apps/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${STORE_URL}/store/apps/${catalog.slug}?checkout=cancelled`,
   });
 
   if (!session.url) return NextResponse.json({ error: 'Stripe did not return a checkout URL' }, { status: 502 });

@@ -154,6 +154,17 @@ export async function createJob(input: CreateJobInput): Promise<VideoJob> {
           script: input.script ?? null,
           bullet_points: input.bullet_points ?? [],
           scene_data: input.scene_data ?? null,
+          // Draft is an authoring state. Once Course Builder supplies the
+          // canonical lesson payload, the same durable job must become
+          // claimable by the renderer instead of remaining stranded.
+          ...(existing.status === 'draft'
+            ? {
+                status: 'queued' as const,
+                queued_at: new Date().toISOString(),
+                error_message: null,
+                review_status: 'not_ready' as const,
+              }
+            : {}),
           updated_at: new Date().toISOString(),
         })
         .eq('id', existing.id)

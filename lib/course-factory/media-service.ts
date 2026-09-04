@@ -58,6 +58,10 @@ const NON_NARRATED_KEYS = new Set([
   'autoGrade',
   'automations',
   'actions',
+  'action',
+  'targetedActions',
+  'nextActionOnMastery',
+  'nextActionBelowMastery',
   'reflectionPrompt',
   'expertFeedbackPrompt',
   'prompt',
@@ -185,7 +189,10 @@ export async function queueCourseLessonVideos(
     // createJob is an upsert-by-canonical-identity and synchronizes refreshed
     // lesson narration/scene data into any non-rendering existing job.
     const current = await create();
-    if (current.status === 'failed' || (force && current.status !== 'rendering')) {
+    // A queued job is already renderer-ready and must not consume retry budget.
+    // Force only replaces a completed asset or retries a failed asset after the
+    // canonical source has been deliberately repaired.
+    if (current.status === 'failed' || (force && current.status === 'complete')) {
       return resetCanonicalMediaJob(
         {
           courseId: current.course_id,
@@ -193,7 +200,13 @@ export async function queueCourseLessonVideos(
           assetKind: current.asset_kind ?? 'lesson',
           assetKey: current.asset_key,
         },
-        { force, reason: force ? 'Authorized Course Factory media repair' : current.error_message ?? 'Retrying failed media asset' },
+        {
+          force,
+          sourceRepaired: force && current.status === 'failed',
+          reason: force
+            ? 'Authorized Course Factory media source repair'
+            : current.error_message ?? 'Retrying failed media asset',
+        },
       );
     }
     return current;

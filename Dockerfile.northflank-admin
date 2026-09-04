@@ -172,12 +172,13 @@ RUN set -eux; \
 
 RUN set -eux; \
     LOG=/tmp/admin-runtime-smoke.log; \
-    node --max-http-header-size=32768 apps/admin/server.js >"${LOG}" 2>&1 & \
+    SMOKE_PORT=3100; \
+    PORT="${SMOKE_PORT}" node --max-http-header-size=32768 apps/admin/server.js >"${LOG}" 2>&1 & \
     PID=$!; \
     trap 'cat "${LOG}" || true; kill "${PID}" 2>/dev/null || true' EXIT; \
     READY=0; \
     for attempt in $(seq 1 30); do \
-      if curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/tmp/admin-ping.json 2>/tmp/admin-ping.err; then \
+      if curl --fail --silent --show-error "http://127.0.0.1:${SMOKE_PORT}/api/ping" >/tmp/admin-ping.json 2>/tmp/admin-ping.err; then \
         READY=1; \
         break; \
       fi; \

@@ -85,7 +85,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
-        <div className="h-14 flex items-center gap-2 px-4 sm:px-6">
+        <div className="flex h-14 min-w-0 items-center gap-1 px-2 sm:gap-2 sm:px-4 lg:px-6">
           <Link href="/dashboard" className="flex items-center gap-2 flex-shrink-0">
             <LogoImage alt="Elevate" width={28} height={42} className="w-auto h-8" />
             <span className="font-bold text-slate-900 text-sm hidden sm:block">
@@ -147,13 +147,15 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               </Link>
               <Link
                 href="/applications"
+                aria-label="Applications"
                 className={`inline-flex min-h-10 items-center rounded-lg px-2.5 text-xs font-bold sm:px-3 sm:text-sm ${isActive(pathname, '/applications') ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-700 hover:bg-slate-100'}`}
               >
-                Applications
+                <span className="sm:hidden">Apps</span>
+                <span className="hidden sm:inline">Applications</span>
               </Link>
               <Link
                 href="/studio"
-                className={`hidden min-h-10 items-center rounded-lg px-3 text-sm font-bold md:inline-flex ${isActive(pathname, '/studio') ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-700 hover:bg-slate-100'}`}
+                className={`hidden min-h-10 items-center rounded-lg px-3 text-sm font-bold xl:inline-flex ${isActive(pathname, '/studio') ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-700 hover:bg-slate-100'}`}
               >
                 Admin AI
               </Link>
@@ -162,7 +164,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
             {/* Search */}
             <form
               onSubmit={handleSearch}
-              className="hidden md:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5"
+              className="hidden items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 xl:flex"
             >
               <Search className="w-3.5 h-3.5 text-slate-400" />
               <input
@@ -210,7 +212,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
             </div>
 
             {/* Settings + User */}
-            <div className="hidden md:flex items-center gap-1 pl-3 border-l border-slate-200">
+            <div className="hidden items-center gap-1 border-l border-slate-200 pl-3 xl:flex">
               <Link href="/settings" className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100">
                 <Settings className="w-4 h-4" />
               </Link>
@@ -229,7 +231,8 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 sm:px-3 sm:text-sm 2xl:hidden"
             >
               {navExpanded ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-              <span>All tools</span>
+              <span className="sm:hidden">Tools</span>
+              <span className="hidden sm:inline">All tools</span>
             </button>
           </div>
         </div>

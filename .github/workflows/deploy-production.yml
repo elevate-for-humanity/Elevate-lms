@@ -42,6 +42,9 @@ jobs:
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      QB_CLIENT_ID: ${{ secrets.QB_CLIENT_ID }}
+      QB_CLIENT_SECRET: ${{ secrets.QB_CLIENT_SECRET }}
+      QB_REDIRECT_URI: https://www.elevateforhumanity.org/api/auth/quickbooks/callback
 
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
@@ -82,6 +85,8 @@ jobs:
             SUPABASE_SERVICE_ROLE_KEY
             NEXTAUTH_SECRET
             STRIPE_SECRET_KEY
+            QB_CLIENT_ID
+            QB_CLIENT_SECRET
           )
           for name in "${required[@]}"; do
             test -n "${!name:-}" || { echo "$name GitHub secret is missing"; exit 1; }
@@ -95,6 +100,9 @@ jobs:
           else
             pnpm tsx scripts/northflank/sync-env.ts --execute
           fi
+
+      - name: Merge QuickBooks OAuth configuration
+        run: pnpm tsx scripts/northflank/sync-quickbooks-env.ts --execute
 
       - name: Configure all Northflank production services
         run: pnpm tsx scripts/northflank/configure-services.ts --all --execute

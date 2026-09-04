@@ -2,3 +2,4 @@ Deploy current protected main to production.
 Triggered 2026-08-27 to deploy removal of the hardcoded legacy course catalog, persisted-course integrity enforcement, and hardened SCORM exports to Northflank.
 Triggered 2026-08-27 to deploy the pnpm authority repair and executable contract fixes from current main.
 Triggered 2026-08-27 to validate the repaired UTF-8 pnpm lockfile on current main.
+Triggered 2026-09-04 to merge verified QuickBooks OAuth credentials into Northflank and deploy all services.

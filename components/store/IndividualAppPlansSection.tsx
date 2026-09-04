@@ -25,7 +25,8 @@ export function IndividualAppPlansSection({ catalog }: Props) {
       const data = await res.json();
       if (!res.ok) {
         if (res.status === 401) {
-          window.location.href = `/login?redirect=${encodeURIComponent(`/store/apps/${catalog.slug}`)}`;
+          const returnUrl = `https://store.elevateforhumanity.org/store/apps/${catalog.slug}`;
+          window.location.href = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(returnUrl)}`;
           return;
         }
         throw new Error(data.error || 'Checkout failed');

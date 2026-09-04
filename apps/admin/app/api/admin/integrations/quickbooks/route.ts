@@ -29,10 +29,9 @@ const QB_BASE      = 'https://quickbooks.api.intuit.com/v3/company';
 const QB_AUTH_BASE = 'https://appcenter.intuit.com/connect/oauth2';
 const QB_TOKEN_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer';
 
-const SCOPES = [
-  'com.intuit.quickbooks.accounting',
-  'com.intuit.quickbooks.payment',
-].join(' ');
+// Accounting access covers company and employee records used by this dashboard.
+// Do not request Payments: Intuit rejects a second Payments service connection.
+const SCOPES = 'com.intuit.quickbooks.accounting';
 
 async function getQuickBooksConfig() {
   const db = await requireAdminClient();

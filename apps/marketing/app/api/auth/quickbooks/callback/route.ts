@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { verifyQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -35,24 +36,6 @@ export async function GET(request: NextRequest) {
   if (!code)  return redirect('error=no_code');
   if (!state) return redirect('error=invalid_state');
 
-  try {
-    const { getAdminClient } = await import('@/lib/supabase/admin');
-    const supabase = await getAdminClient();
-    if (!supabase) return redirect('error=state_unavailable');
-    const { data: stateRow } = await supabase
-      .from('app_settings')
-      .select('value, updated_at')
-      .eq('key', 'QB_OAUTH_STATE')
-      .maybeSingle();
-    const stateAge = stateRow?.updated_at ? Date.now() - new Date(stateRow.updated_at).getTime() : Number.POSITIVE_INFINITY;
-    if (stateRow?.value !== state || stateAge > 10 * 60 * 1000) {
-      return redirect('error=invalid_state');
-    }
-    await supabase.from('app_settings').delete().eq('key', 'QB_OAUTH_STATE');
-  } catch {
-    return redirect('error=state_unavailable');
-  }
-
   let stored: Record<string, string> = {};
   try {
     const { getAdminClient } = await import('@/lib/supabase/admin');
@@ -78,6 +61,9 @@ export async function GET(request: NextRequest) {
     `${base}/api/auth/quickbooks/callback`;
 
   if (!clientId || !clientSecret) return redirect('error=not_configured');
+  if (!verifyQuickBooksOAuthState(state, clientSecret)) {
+    return redirect('error=invalid_state');
+  }
 
   try {
     // Exchange code for tokens

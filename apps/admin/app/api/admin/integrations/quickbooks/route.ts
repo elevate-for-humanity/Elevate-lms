@@ -20,7 +20,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
-import { randomBytes } from 'node:crypto';
+import { createQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-state';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -125,12 +125,14 @@ export async function GET(request: NextRequest) {
 
   if (action === 'auth_url') {
     const config = await getQuickBooksConfig();
-    const { clientId, redirectUri } = config;
-    if (!clientId) return safeError('QB_CLIENT_ID not configured', 503);
+    const { clientId, clientSecret, redirectUri } = config;
+    if (!clientId || !clientSecret) {
+      return safeError('QuickBooks OAuth credentials are not configured', 503);
+    }
 
-    const state = randomBytes(32).toString('base64url');
-    const db = await requireAdminClient();
-    await db.from('app_settings').upsert({ key: 'QB_OAUTH_STATE', value: state, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    // Self-contained, signed state supports concurrent authorization attempts
+    // across the admin and public callback domains without a shared mutable nonce.
+    const state = createQuickBooksOAuthState(clientSecret);
     const url   = new URL(QB_AUTH_BASE);
     url.searchParams.set('client_id',     clientId);
     url.searchParams.set('redirect_uri',  redirectUri);

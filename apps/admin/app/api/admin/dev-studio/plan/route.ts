@@ -95,16 +95,32 @@ async function loadPlan(
   }
 }
 
-async function currentTask(
-  db: Awaited<ReturnType<typeof requireAdminClient>>,
-  taskId: string,
-) {
+async function currentTask(db: Awaited<ReturnType<typeof requireAdminClient>>, taskId: string) {
   const { data } = await db
     .from('ai_tasks')
-    .select('id,status,attempts,result,result_json,tool_output,error_message,approval_reason,approval_status,tool_name,requires_approval')
+    .select(
+      'id,status,attempts,result,result_json,tool_output,error_message,approval_reason,approval_status,tool_name,requires_approval',
+    )
     .eq('id', taskId)
     .single();
   return data as Record<string, any> | null;
+}
+
+function taskEvidence(task: Record<string, any> | null): unknown {
+  if (!task) return null;
+  if (task.tool_output !== undefined && task.tool_output !== null) return task.tool_output;
+  if (task.result_json?.payload !== undefined) return task.result_json.payload;
+  return task.result_json ?? task.result ?? null;
+}
+
+function safeEvidenceSummary(value: unknown): string | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  const safeKeys = ['connected', 'status', 'message', 'company_name', 'last_sync', 'ok'];
+  const summary = Object.fromEntries(
+    safeKeys.filter((key) => record[key] !== undefined).map((key) => [key, record[key]]),
+  );
+  return Object.keys(summary).length ? JSON.stringify(summary) : null;
 }
 
 export async function POST(req: NextRequest) {
@@ -118,7 +134,8 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}));
   const goal = typeof body.goal === 'string' ? body.goal.trim() : '';
-  const params = body.params && typeof body.params === 'object' ? body.params as Record<string, string> : {};
+  const params =
+    body.params && typeof body.params === 'object' ? (body.params as Record<string, string>) : {};
   const tenantId = typeof body.tenantId === 'string' ? body.tenantId : undefined;
   const resumePlanId = typeof body.planId === 'string' ? body.planId.trim() : '';
 
@@ -133,20 +150,28 @@ export async function POST(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       const write = (line: string) => {
-        try { controller.enqueue(enc(line)); } catch { /* stream closed */ }
+        try {
+          controller.enqueue(enc(line));
+        } catch {
+          /* stream closed */
+        }
       };
 
       try {
         let plan = resumePlanId ? await loadPlan(db, resumePlanId, auth.id) : null;
         if (!plan) {
           plan = decomposePlan(goal, params);
-          const shared = await loadSharedContext({ goal, tenantId, userId: auth.id }).catch(() => null);
+          const shared = await loadSharedContext({ goal, tenantId, userId: auth.id }).catch(
+            () => null,
+          );
           await persistPlan(db, plan, auth.id, tenantId);
           write(`\x1b[1mAI Planner — governed execution\x1b[0m`);
           write(`${DIM}Goal: ${plan.goal}${RST}`);
           write(`${DIM}Plan ID: ${plan.id}${RST}`);
           if (shared) {
-            write(`${DIM}Context: ${shared.shortTermMemory.length} memories · ${shared.workflowMemory.length} workflow runs · ${shared.provenance.length} provenance references${RST}`);
+            write(
+              `${DIM}Context: ${shared.shortTermMemory.length} memories · ${shared.workflowMemory.length} workflow runs · ${shared.provenance.length} provenance references${RST}`,
+            );
           }
         } else {
           write(`\x1b[1mAI Planner — resuming checkpoint\x1b[0m`);
@@ -159,7 +184,12 @@ export async function POST(req: NextRequest) {
         await emitEvent('planner.started', 'ai', {
           actor_id: auth.id,
           actor_type: 'ai',
-          payload: { goal: plan.goal, plan_id: plan.id, step_count: plan.steps.length, resumed: Boolean(resumePlanId) },
+          payload: {
+            goal: plan.goal,
+            plan_id: plan.id,
+            step_count: plan.steps.length,
+            resumed: Boolean(resumePlanId),
+          },
           message: `AI planner ${resumePlanId ? 'resumed' : 'started'}: ${plan.goal}`,
         });
 
@@ -168,7 +198,11 @@ export async function POST(req: NextRequest) {
         const maxPasses = plan.steps.length + 2;
         let pass = 0;
 
-        while (plan.steps.some((step) => step.status === 'pending') && pass < maxPasses && !awaitingApproval) {
+        while (
+          plan.steps.some((step) => step.status === 'pending') &&
+          pass < maxPasses &&
+          !awaitingApproval
+        ) {
           pass += 1;
           let progressed = false;
 
@@ -219,7 +253,7 @@ export async function POST(req: NextRequest) {
 
               let evaluation = evaluateExecution({
                 tool: String(task.tool_name ?? 'advisory'),
-                result: task.result_json ?? task.result ?? task.tool_output,
+                result: taskEvidence(task),
                 error: task.error_message ?? null,
                 attempts: Number(task.attempts ?? 1),
                 maxAttempts: step.max_attempts ?? 2,
@@ -231,7 +265,9 @@ export async function POST(req: NextRequest) {
                 const tool = task.tool_name ? getAITool(String(task.tool_name)) : null;
                 const safelyRetryable = !tool || tool.idempotent;
                 if (safelyRetryable && Number(task.attempts ?? 1) < (step.max_attempts ?? 2)) {
-                  write(`${DIM}Retrying safely after evaluator classified the result as retryable.${RST}`);
+                  write(
+                    `${DIM}Retrying safely after evaluator classified the result as retryable.${RST}`,
+                  );
                   await runTaskExecution(db, step.task_id, auth.id, {
                     actorRoles: auth.effectiveRoles,
                     tenantId: tenantId ?? null,
@@ -242,7 +278,7 @@ export async function POST(req: NextRequest) {
                   task = await currentTask(db, step.task_id);
                   evaluation = evaluateExecution({
                     tool: String(task?.tool_name ?? 'advisory'),
-                    result: task?.result_json ?? task?.result ?? task?.tool_output,
+                    result: taskEvidence(task),
                     error: task?.error_message ?? null,
                     attempts: Number(task?.attempts ?? 2),
                     maxAttempts: step.max_attempts ?? 2,
@@ -256,13 +292,19 @@ export async function POST(req: NextRequest) {
               step.output = JSON.stringify({
                 task_id: step.task_id,
                 tool: task?.tool_name ?? null,
-                result: task?.result_json ?? task?.result ?? null,
+                result: taskEvidence(task),
                 evaluation,
               });
 
               if (evaluation.status === 'PASS') {
                 step.status = 'done';
                 write(`${PASS} Step ${step.order} verified: ${step.title}`);
+                const evidence = safeEvidenceSummary(taskEvidence(task));
+                write(
+                  evidence
+                    ? `${DIM}Evidence: ${evidence}${RST}`
+                    : `${DIM}Evidence captured in task ${step.task_id}.${RST}`,
+                );
               } else if (evaluation.status === 'REQUIRES_HUMAN_REVIEW') {
                 step.status = 'awaiting_approval';
                 plan.status = 'awaiting_approval';
@@ -307,11 +349,15 @@ export async function POST(req: NextRequest) {
 
         const doneCount = plan.steps.filter((step) => step.status === 'done').length;
         const skippedCount = plan.steps.filter((step) => step.status === 'skipped').length;
-        const waitingCount = plan.steps.filter((step) => step.status === 'awaiting_approval').length;
+        const waitingCount = plan.steps.filter(
+          (step) => step.status === 'awaiting_approval',
+        ).length;
 
         if (waitingCount > 0) plan.status = 'awaiting_approval';
-        else if (failedSteps > 0 || plan.steps.some((step) => step.status === 'failed')) plan.status = 'failed';
-        else if (plan.steps.every((step) => step.status === 'done' || step.status === 'skipped')) plan.status = 'done';
+        else if (failedSteps > 0 || plan.steps.some((step) => step.status === 'failed'))
+          plan.status = 'failed';
+        else if (plan.steps.every((step) => step.status === 'done' || step.status === 'skipped'))
+          plan.status = 'done';
 
         await persistPlan(db, plan, auth.id, tenantId);
 
@@ -340,7 +386,11 @@ export async function POST(req: NextRequest) {
         logger.error('[dev-studio/plan] planner execution failed', error);
         write(`${FAIL} Planner execution failed`);
       } finally {
-        try { controller.enqueue(done()); } catch { /* stream closed */ }
+        try {
+          controller.enqueue(done());
+        } catch {
+          /* stream closed */
+        }
         controller.close();
       }
     },

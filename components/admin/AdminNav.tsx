@@ -97,7 +97,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
           <nav
             ref={navRef}
             aria-label="Admin section shortcuts"
-            className="hidden xl:flex items-center gap-0 flex-1 overflow-x-auto min-w-0"
+            className="hidden 2xl:flex items-center gap-0 flex-1 min-w-0"
             style={{ scrollbarWidth: 'none' }}
           >
             {NAV.map((section) => {
@@ -214,7 +214,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               <Link href="/settings" className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100">
                 <Settings className="w-4 h-4" />
               </Link>
-              <span className="text-sm text-slate-700 px-1 hidden xl:block">{userName}</span>
+              <span className="hidden px-1 text-sm text-slate-700 2xl:block">{userName}</span>
               <button onClick={signOut} className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-rose-600 hover:bg-red-50">
                 <LogOut className="w-4 h-4" />
               </button>
@@ -226,7 +226,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               onClick={() => setNavExpanded(!navExpanded)}
               aria-expanded={navExpanded}
               aria-controls="admin-all-tools-menu"
-              className="xl:hidden inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 sm:px-3 sm:text-sm"
+              className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 sm:px-3 sm:text-sm 2xl:hidden"
             >
               {navExpanded ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
               <span>All tools</span>
@@ -235,7 +235,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
         </div>
 
         {/* Horizontal Mobile Nav - Scrollable */}
-        <div id="admin-all-tools-menu" className={`xl:hidden overflow-hidden border-t border-slate-200 transition-all duration-300 ${navExpanded ? 'max-h-[80vh]' : 'max-h-0'}`}>
+        <div id="admin-all-tools-menu" className={`overflow-hidden border-t border-slate-200 transition-all duration-300 2xl:hidden ${navExpanded ? 'max-h-[80vh]' : 'max-h-0'}`}>
           <div className="max-h-[80vh] overflow-y-auto px-4 py-3">
             <div className="grid gap-2 sm:grid-cols-2">
               {NAV.map((section) => (

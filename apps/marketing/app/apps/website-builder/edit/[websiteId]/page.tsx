@@ -44,7 +44,6 @@ export default async function WebsiteEditorPage({ params }: Props) {
   return (
     <>
       <WebsiteLifecyclePanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
-      <ZeroCodeStructureEditor websiteId={site.id} initialConfig={config} />
       <AutonomousWebsiteBuilder
         websiteId={site.id}
         initialSiteName={name}
@@ -52,6 +51,7 @@ export default async function WebsiteEditorPage({ params }: Props) {
         initiallyPublished={Boolean(site.is_published)}
         initialConfig={config}
       />
+      <ZeroCodeStructureEditor websiteId={site.id} initialConfig={config} />
       <BusinessCardsPanel websiteId={site.id} />
       <WebsiteClaimsPanel websiteId={site.id} />
       <DomainPanel websiteId={site.id} isPublished={Boolean(site.is_published)} />

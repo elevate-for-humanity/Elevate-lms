@@ -35,7 +35,7 @@ interface HomeHeroSlide {
   toneClass: string;
 }
 
-const HOME_SLIDE_SECONDS = 12;
+const HOME_SLIDE_SECONDS = 6;
 const DEPLOYED_COMMIT_SHA = process.env.NEXT_PUBLIC_GIT_SHA?.trim();
 
 function revisionedHeroAsset(src: string): string {
@@ -57,12 +57,12 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/style-and-scissor-salon/pink-nail-work.webp',
-    alt: 'Professional nail work created inside a participating beauty salon',
-    label: 'Turn talent into a professional pathway',
+    src: '/images/partners/salon-saloon/team-studio.webp',
+    alt: 'Salon Saloon professionals gathered inside their modern studio',
+    label: 'Grow with a professional salon team',
     description:
-      'Build technique, confidence, and documented experience through supervised, hands-on training.',
-    toneClass: 'brightness-[1.03] contrast-[1.04] saturate-[1.05] object-center',
+      'Train in a polished workplace where apprentices learn service, teamwork, and professional standards.',
+    toneClass: 'brightness-[1.05] contrast-[1.03] saturate-[1.02] object-[center_48%]',
   },
   {
     type: 'image',
@@ -84,21 +84,21 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/kountry-kutz-official.webp',
-    alt: 'Kountry Kutz participating apprenticeship host barbershop',
-    label: 'Earn while you learn inside a Host Shop',
+    src: '/images/partners/generations-hair/stylist-at-work.webp',
+    alt: 'Generations Hair Co professional stylist reflected in a salon mirror',
+    label: 'Practice inside a polished workplace',
     description:
-      'Apprentices gain supervised experience while participating businesses develop future talent.',
-    toneClass: 'brightness-[1.04] contrast-[1.04] saturate-[1.03] object-center',
+      'Build confidence through supervised service, professional routines, and direct workplace experience.',
+    toneClass: 'brightness-[1.04] contrast-[1.03] saturate-[1.02] object-[center_42%]',
   },
   {
     type: 'image',
-    src: '/images/partners/cals-kutz-confidence-restored.webp',
-    alt: 'Professional barber service at Cals Kutz Studio',
-    label: 'Build confidence through real experience',
+    src: '/images/partners/generations-hair/salon-service.webp',
+    alt: 'Generations Hair Co stylist providing a professional salon service',
+    label: 'Build confidence through real client service',
     description:
       'Move from learning to working with a clear pathway, practical support, and measurable progress.',
-    toneClass: 'brightness-[1.04] contrast-[1.04] saturate-[1.03] object-center',
+    toneClass: 'brightness-[1.04] contrast-[1.03] saturate-[1.02] object-[center_44%]',
   },
 ];
 

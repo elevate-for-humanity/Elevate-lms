@@ -1020,12 +1020,23 @@ export async function courseFactory(
         limit: input.videoQueueLimit ?? null,
       });
       videosQueued = media.queued + media.microclipsQueued;
+      if (media.lessonVideosReady !== media.attempted) {
+        throw new Error(
+          `Lesson video queue gate failed: ${media.lessonVideosReady}/${media.attempted} primary lesson videos are queued, rendering, or quality-approved.`,
+        );
+      }
       if (media.failed > 0) {
-        logger.warn('[course-factory] Some media jobs failed to enqueue', media);
+        logger.warn('[course-factory] Optional microclip enqueue warnings', media);
       }
     }
 
-    tracker.emit('complete', 'Canonical Course Factory completed successfully.', 100);
+    tracker.emit(
+      'complete',
+      input.videoMode === 'off'
+        ? 'Canonical course package completed successfully.'
+        : 'Canonical course package completed and every primary lesson video entered the governed media pipeline.',
+      100,
+    );
     return {
       ok: true,
       courseId: published.courseId,

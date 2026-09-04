@@ -59,7 +59,7 @@ async function expectBrowserDeniedFromPortal(page: Page, path: string) {
 test.describe('Registered apprenticeship authorization', () => {
   test.skip(!APPRENTICE_EMAIL || !APPRENTICE_PASSWORD, 'Authenticated apprentice credentials are required');
 
-  test('apprentice can use canonical dashboard surfaces but cannot use Host Shop verifier API', async ({ page }) => {
+  test('apprentice can use canonical dashboard surfaces but cannot use Host Shop verifier API', async ({ page, browser }) => {
     await login(page, APPRENTICE_EMAIL, APPRENTICE_PASSWORD);
 
     await expectPortalRoute(page, '/apprentice', /apprentice|registered|competenc|RTI/i);
@@ -129,7 +129,10 @@ test.describe('Registered apprenticeship authorization', () => {
 
       expect(ADMIN_EMAIL, 'Disposable admin email was not provisioned').toBeTruthy();
       expect(ADMIN_PASSWORD, 'Disposable admin password was not provisioned').toBeTruthy();
-      const adminPage = await page.context().newPage();
+      // Keep the admin session isolated so its shared-domain auth cookies cannot
+      // replace the apprentice session needed for ownership-scoped cleanup.
+      const adminContext = await browser.newContext();
+      const adminPage = await adminContext.newPage();
       try {
         await login(adminPage, ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_BASE);
         const adminReview = await adminPage.goto(`${ADMIN_BASE}/documents/review`, {
@@ -143,7 +146,7 @@ test.describe('Registered apprenticeship authorization', () => {
         await expect(adminPage.locator('body')).toContainText(/Government Id/i);
         await expect(adminPage.locator('body')).toContainText(/Pending/i);
       } finally {
-        await adminPage.close();
+        await adminContext.close();
       }
     } finally {
       const cleanupResponse = await page.request.delete(

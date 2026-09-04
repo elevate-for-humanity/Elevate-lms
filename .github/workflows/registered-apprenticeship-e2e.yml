@@ -10,10 +10,6 @@ on:
       - 'playwright.config.ts'
       - 'tests/e2e/registered-apprenticeship-authenticated.spec.ts'
       - 'tests/e2e/portal-responsive-design.spec.ts'
-      - 'apps/admin/app/documents/review/**'
-      - 'apps/admin/app/api/admin/documents/review/route.ts'
-      - 'components/admin/DocumentReviewForm.tsx'
-      - 'lib/admin/document-access.ts'
       - 'scripts/check-registered-apprenticeship-architecture.mjs'
       - 'scripts/qa/provision-apprenticeship-e2e.mjs'
       - 'scripts/qa/provision-learner-program-holder-e2e.mjs'
@@ -21,6 +17,7 @@ on:
   workflow_run:
     workflows:
       - Deploy LMS
+      - Deploy Admin
     types:
       - completed
 

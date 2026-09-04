@@ -6,12 +6,8 @@ on:
       program:
         description: Course package to build through Dev Studio -> Course Builder
         required: true
-        type: choice
+        type: string
         default: business-administration
-        options:
-          - business-administration
-          - esb
-          - hvac-technician
   issues:
     types: [opened, reopened]
 
@@ -45,7 +41,9 @@ jobs:
       github.event_name != 'issues' ||
       github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE' ||
       github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE' ||
-      github.event.issue.title == 'RUN HVAC COURSE BUILDER ACCEPTANCE'
+      github.event.issue.title == 'RUN HVAC COURSE BUILDER ACCEPTANCE' ||
+      github.event.issue.title == 'RUN BARBER COURSE BUILDER ACCEPTANCE' ||
+      github.event.issue.title == 'RUN COSMETOLOGY COURSE BUILDER ACCEPTANCE'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:
@@ -125,6 +123,10 @@ jobs:
           fi
           if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN HVAC COURSE BUILDER ACCEPTANCE" ]; then
             target="hvac-technician"
+          elif [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN BARBER COURSE BUILDER ACCEPTANCE" ]; then
+            target="barber-apprenticeship"
+          elif [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN COSMETOLOGY COURSE BUILDER ACCEPTANCE" ]; then
+            target="cosmetology-apprenticeship"
           fi
           echo "program=$target" >> "$GITHUB_OUTPUT"
 
@@ -146,8 +148,10 @@ jobs:
             pnpm tsx scripts/backfill-hvac-script-text.ts --force
             pnpm tsx scripts/course-builder/run.ts --course hvac-technician --mode refresh
             pnpm tsx scripts/check-hvac-content.ts
-          else
+          elif [ "${{ steps.target.outputs.program }}" = "business-administration" ]; then
             pnpm tsx scripts/course-factory/build-business-program.ts
+          else
+            pnpm tsx scripts/course-builder/run.ts --course "${{ steps.target.outputs.program }}" --mode refresh
           fi
 
       - name: Verify Admin and LMS consumers after governed publication

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { requireRole } from '@/lib/auth/require-role';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import ProgramManagerClient from './ProgramManagerClient';
 
 export const dynamic = 'force-dynamic';
@@ -14,19 +14,18 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
 
 export default async function ManageProgramPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile || !['admin', 'org_admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
+  await requireRole(['admin', 'super_admin', 'org_admin', 'staff']);
+  const supabase = await requireAdminClient();
 
   const { data: byCode } = await supabase.from('programs').select('id,title,code,slug').eq('code', code).maybeSingle();
   const { data: bySlug } = byCode ? { data: null } : await supabase.from('programs').select('id,title,code,slug').eq('slug', code).maybeSingle();
-  const program = byCode ?? bySlug;
+  const { data: byId } = byCode || bySlug
+    ? { data: null }
+    : await supabase.from('programs').select('id,title,code,slug').eq('id', code).maybeSingle();
+  const program = byCode ?? bySlug ?? byId;
 
   if (!program?.id) {
-    return <div className="p-8"><h1 className="text-2xl font-bold text-slate-900">Program not found</h1><p className="mt-2 text-slate-500">No program with code or slug &quot;{code}&quot;</p><Link href="/programs" className="mt-4 inline-block text-brand-blue-600 hover:underline">← Back to programs</Link></div>;
+    return <div className="p-8"><h1 className="text-2xl font-bold text-slate-900">Program not found</h1><p className="mt-2 text-slate-500">No program with ID, code, or slug &quot;{code}&quot;</p><Link href="/programs" className="mt-4 inline-block text-brand-blue-600 hover:underline">← Back to programs</Link></div>;
   }
 
   const programCode = program.code || program.slug || code;

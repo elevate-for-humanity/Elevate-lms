@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 
@@ -190,6 +190,7 @@ function recommend(goal: Goal, org: OrgType): Recommendation[] {
 export function GuidedProductInterview() {
   const [goal, setGoal] = useState<Goal | null>(null);
   const [org, setOrg] = useState<OrgType | null>(null);
+  const orgQuestionRef = useRef<HTMLDivElement>(null);
   const recommendations = useMemo(() => (goal && org ? recommend(goal, org) : []), [goal, org]);
   const guidedTrialHref = useMemo(() => {
     if (!goal || !org || recommendations.length === 0) return '/store/trial';
@@ -227,21 +228,35 @@ export function GuidedProductInterview() {
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => setGoal(item.id)}
+                  aria-pressed={goal === item.id}
+                  onClick={() => {
+                    setGoal(item.id);
+                    window.requestAnimationFrame(() => {
+                      orgQuestionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    });
+                  }}
                   className={`rounded-xl border px-4 py-3 text-left text-sm font-bold transition ${goal === item.id ? 'border-brand-red-600 bg-brand-red-50 text-brand-red-800' : 'border-slate-200 bg-white text-slate-800 hover:border-slate-300'}`}
                 >
                   {item.label}
                 </button>
               ))}
             </div>
-            <p className="mt-7 text-sm font-black uppercase tracking-wider text-slate-500">
-              2. Who is this for?
-            </p>
+            <div ref={orgQuestionRef} className="mt-7 scroll-mt-24">
+              <p className="text-sm font-black uppercase tracking-wider text-slate-500">
+                2. Who is this for?
+              </p>
+              {goal ? (
+                <p className="mt-2 text-sm font-semibold text-brand-red-700">
+                  Goal selected. Choose who this is for to see your recommendations.
+                </p>
+              ) : null}
+            </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               {ORGS.map((item) => (
                 <button
                   key={item.id}
                   type="button"
+                  aria-pressed={org === item.id}
                   onClick={() => setOrg(item.id)}
                   className={`rounded-xl border px-4 py-3 text-left text-sm font-bold transition ${org === item.id ? 'border-brand-red-600 bg-brand-red-50 text-brand-red-800' : 'border-slate-200 bg-white text-slate-800 hover:border-slate-300'}`}
                 >

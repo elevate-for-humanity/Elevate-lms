@@ -572,7 +572,8 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
       scenes,
       primaryColor: instructor.topBarColor,
       accentColor: instructor.accentColor,
-      backgroundColor: '#0f172a',
+      backgroundColor: '#f8fafc',
+      surfaceMode: 'bright',
       logoText: 'Elevate LMS',
     };
     const totalFrames = 90 + scenes.reduce((sum, scene) => sum + scene.durationFrames, 0);

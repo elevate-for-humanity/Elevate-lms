@@ -69,7 +69,7 @@ function retryBackoffElapsed(job: VideoJob, now = Date.now()): boolean {
 
 export async function resetCanonicalMediaJob(
   identity: CourseMediaIdentity,
-  options: { force?: boolean; reason?: string } = {},
+  options: { force?: boolean; sourceRepaired?: boolean; reason?: string } = {},
 ): Promise<VideoJob> {
   const db = await requireAdminClient();
   let query = db
@@ -90,7 +90,7 @@ export async function resetCanonicalMediaJob(
   // Force may bypass backoff and terminal classification for an operator repair,
   // but it must never bypass the hard retry ceiling. Otherwise deterministic
   // renderer failures loop forever and repeatedly consume paid GPU capacity.
-  if ((job.retry_count ?? 0) >= COURSE_MEDIA_MAX_RETRIES) {
+  if ((job.retry_count ?? 0) >= COURSE_MEDIA_MAX_RETRIES && !options.sourceRepaired) {
     throw new Error(`Retry limit reached for media job ${job.id}`);
   }
   if (job.status === 'failed' && !isCourseMediaFailureRetryable(job.error_message) && !options.force) {
@@ -101,7 +101,9 @@ export async function resetCanonicalMediaJob(
   }
 
   const now = new Date().toISOString();
-  const nextRetry = (job.retry_count ?? 0) + 1;
+  // A deliberate operator repair changes the canonical source and starts a
+  // fresh bounded retry budget. Ordinary transient failures retain the ceiling.
+  const nextRetry = options.sourceRepaired ? 1 : (job.retry_count ?? 0) + 1;
   const { data: reset, error: resetError } = await db
     .from('video_jobs')
     .update({

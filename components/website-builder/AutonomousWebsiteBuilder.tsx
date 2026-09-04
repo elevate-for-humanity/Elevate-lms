@@ -2,13 +2,16 @@
 
 import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Loader2, Mic, MicOff, Save, Send, Sparkles, Volume2 } from 'lucide-react';
+import { ExternalLink, Loader2, Mic, MicOff, Monitor, Save, Send, Smartphone, Sparkles, Tablet, Volume2 } from 'lucide-react';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import { PublicTenantComposableSite } from '@/components/tenant/PublicTenantComposableSite';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 type Message = { role: 'user' | 'assistant'; content: string };
+type Device = 'desktop' | 'tablet' | 'mobile';
+
+const PREVIEW_WIDTHS: Record<Device, number> = { desktop: 1280, tablet: 768, mobile: 390 };
 
 type SaveResponse = {
   website?: { site_name?: string; site_config?: TenantSiteConfig; is_published?: boolean };
@@ -41,6 +44,7 @@ export function AutonomousWebsiteBuilder({
   const [published, setPublished] = useState(initiallyPublished);
   const [selectedPage, setSelectedPage] = useState('/');
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [device, setDevice] = useState<Device>('desktop');
   const [instruction, setInstruction] = useState('');
   const [busy, setBusy] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -210,8 +214,28 @@ export function AutonomousWebsiteBuilder({
           </aside>
 
           <section className="min-w-0 overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-2"><span className="text-xs font-black uppercase tracking-wider text-slate-500">Live visual draft · {page?.title}</span><Link href={`/apps/website-builder/edit/${websiteId}/preview`} className="text-xs font-black text-brand-red-700 hover:underline">Responsive preview</Link></div>
-            <div className="max-h-[820px] overflow-y-auto"><PublicTenantComposableSite site={site} pathname={page?.slug || '/'} /></div>
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2">
+              <span className="text-xs font-black uppercase tracking-wider text-slate-500">Live visual draft · {page?.title}</span>
+              <div className="flex items-center gap-2">
+                <div className="flex rounded-lg border border-slate-200 bg-white p-0.5" aria-label="Preview device">
+                  {([
+                    ['desktop', Monitor, 'Desktop'],
+                    ['tablet', Tablet, 'Tablet'],
+                    ['mobile', Smartphone, 'Mobile'],
+                  ] as const).map(([id, Icon, label]) => (
+                    <button key={id} type="button" onClick={() => setDevice(id)} aria-label={`Preview on ${label}`} aria-pressed={device === id} className={`rounded-md p-1.5 ${device === id ? 'bg-slate-950 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>
+                      <Icon className="h-4 w-4" />
+                    </button>
+                  ))}
+                </div>
+                <Link href={`/apps/website-builder/edit/${websiteId}/preview`} className="text-xs font-black text-brand-red-700 hover:underline">Full preview</Link>
+              </div>
+            </div>
+            <div className="max-h-[820px] overflow-auto bg-slate-100 p-2 sm:p-4">
+              <div className="mx-auto overflow-hidden bg-white shadow-sm transition-[width] duration-200" style={{ width: `min(100%, ${PREVIEW_WIDTHS[device]}px)` }}>
+                <PublicTenantComposableSite site={site} pathname={page?.slug || '/'} />
+              </div>
+            </div>
           </section>
 
           <aside className="flex min-h-[640px] flex-col overflow-hidden rounded-2xl border border-brand-red-200 bg-white shadow-xl">

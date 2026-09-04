@@ -12,6 +12,8 @@ describe('HVAC credential intelligence', () => {
     expect(HVAC_EPA608_BLUEPRINT.videoConfig?.videoGenerator).toBe('remotion');
     expect(HVAC_EPA608_BLUEPRINT.videoConfig?.template).toBe('trade-demonstration');
     expect(HVAC_EPA608_BLUEPRINT.videoConfig?.instructorId).toBe('marcus-johnson');
+    expect(HVAC_EPA608_BLUEPRINT.videoConfig?.surfaceMode).toBe('bright');
+    expect(HVAC_EPA608_BLUEPRINT.videoConfig?.backgroundColor).toBe('#f8fafc');
     expect(HVAC_EPA608_BLUEPRINT.videoConfig?.generateDalleImage).toBe(false);
   });
 
@@ -25,6 +27,7 @@ describe('HVAC credential intelligence', () => {
     expect(publisher).toContain('getInstructorForBlueprint(courseTitle, videoConfig)');
     expect(queue).toContain('Never render a stale queued job');
     expect(media).toContain('const current = await create()');
+    expect(media).toContain("existingLessonJob?.status === 'queued'");
   });
 
   it('does not require third-party prep courseware', () => {

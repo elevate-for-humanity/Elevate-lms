@@ -5,6 +5,8 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import HostShopMouPreview from '@/components/partners/HostShopMouPreview';
 import type { HostShopMouProgram } from '@/lib/partners/host-shop-mou-sections';
 import HostShopMouSignForm from './HostShopMouSignForm';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +20,7 @@ function normalizeProgram(value: unknown): HostShopMouProgram | null {
 }
 
 export default async function HostShopMouPage({ searchParams }: { searchParams: Promise<{ program?: string }> }) {
+  await requireRole(HOST_SHOP_ROLES);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/host-shop/login?redirect=/host-shop/mou');

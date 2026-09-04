@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { requireRole } from '@/lib/auth/require-role';
+import { PROGRAM_HOLDER_ROLES } from '@/lib/rbac/role-matrix';
 
 export const metadata: Metadata = {
   title: { default: 'Program Holder Portal', template: '%s | Elevate Program Holder' },
@@ -12,6 +14,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ProgramHolderPortalLayout({ children }: { children: React.ReactNode }) {
+export const dynamic = 'force-dynamic';
+
+export default async function ProgramHolderPortalLayout({ children }: { children: React.ReactNode }) {
+  // Protect every Program Holder route, including pages that do not perform
+  // their own data lookup. Page-level guards remain defense in depth.
+  await requireRole(PROGRAM_HOLDER_ROLES);
+
   return children;
 }

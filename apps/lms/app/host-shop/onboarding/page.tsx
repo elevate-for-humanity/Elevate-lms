@@ -3,10 +3,13 @@ import { redirect } from 'next/navigation';
 import { CheckCircle2, Circle, FileText, PenLine, ShieldCheck } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getHostShopBoard } from '@/lib/partner/board';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HostShopOnboardingPage() {
+  await requireRole(HOST_SHOP_ROLES);
   const supabase = await createClient();
   const {
     data: { user },

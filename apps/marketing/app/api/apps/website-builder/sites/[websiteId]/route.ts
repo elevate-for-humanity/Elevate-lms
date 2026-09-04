@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
 import { bridgeLegacyPatchIntoComposition } from '@/lib/tenant/legacy-composition-bridge';
 import { validateSiteConfig } from '@/lib/tenant/site-validation';
@@ -27,7 +28,7 @@ function parseSubdomain(value: unknown): { valid: boolean; value: string | null 
   return { valid: true, value: slug };
 }
 
-async function loadOwnedSite(supabase: Awaited<ReturnType<typeof createClient>>, websiteId: string, userId: string) {
+async function loadOwnedSite(supabase: Awaited<ReturnType<typeof requireAdminClient>>, websiteId: string, userId: string) {
   const { data: site, error } = await supabase
     .from('user_websites')
     .select('id, user_id, site_name, subdomain, site_config, is_published')
@@ -38,7 +39,7 @@ async function loadOwnedSite(supabase: Awaited<ReturnType<typeof createClient>>,
   return { site: site as SiteRow, error: null };
 }
 
-async function snapshotRevision(supabase: Awaited<ReturnType<typeof createClient>>, site: SiteRow, userId: string, reason: string) {
+async function snapshotRevision(supabase: Awaited<ReturnType<typeof requireAdminClient>>, site: SiteRow, userId: string, reason: string) {
   await supabase.from('website_revisions').insert({
     website_id: site.id,
     user_id: userId,
@@ -59,7 +60,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) return NextResponse.json({ error: 'Website Builder subscription or active trial required', reason: access.reason }, { status: 403 });
 
-  const { site, error: readError } = await loadOwnedSite(supabase, websiteId, user.id);
+  const admin = await requireAdminClient();
+  const { site, error: readError } = await loadOwnedSite(admin, websiteId, user.id);
   if (readError) return NextResponse.json({ error: readError.message }, { status: 500 });
   if (!site) return NextResponse.json({ error: 'Website not found' }, { status: 404 });
 
@@ -73,7 +75,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   // Verification state is server authority. Never trust claims embedded in a
   // browser-supplied site_config, even when the rest of the draft is editable.
   try {
-    merged.claims = await loadVerifiedWebsiteClaims(supabase, websiteId);
+    merged.claims = await loadVerifiedWebsiteClaims(admin, websiteId);
   } catch {
     return NextResponse.json({ error: 'Claim verification service is unavailable; the website was not saved or published.' }, { status: 503 });
   }
@@ -86,7 +88,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (!parsed.valid) return NextResponse.json({ error: 'Subdomain can contain only letters, numbers, and hyphens' }, { status: 400 });
     requestedSubdomain = parsed.value;
     if (requestedSubdomain) {
-      const { data: taken } = await supabase.from('user_websites').select('id').eq('subdomain', requestedSubdomain).neq('id', websiteId).maybeSingle();
+      const { data: taken } = await admin.from('user_websites').select('id').eq('subdomain', requestedSubdomain).neq('id', websiteId).maybeSingle();
       if (taken) return NextResponse.json({ error: 'That subdomain is already in use' }, { status: 409 });
     }
     update.subdomain = requestedSubdomain;
@@ -111,9 +113,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 
   const reason = body.publish === true ? 'publish' : body.publish === false ? 'unpublish' : 'save';
-  await snapshotRevision(supabase, site, user.id, reason);
+  await snapshotRevision(admin, site, user.id, reason);
 
-  const { data: saved, error: saveError } = await supabase.from('user_websites').update(update).eq('id', websiteId).eq('user_id', user.id).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
+  const { data: saved, error: saveError } = await admin.from('user_websites').update(update).eq('id', websiteId).eq('user_id', user.id).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
   if (saveError || !saved) return NextResponse.json({ error: saveError?.message || 'Could not save website' }, { status: 500 });
 
   validation = validateSiteConfig(saved.site_config as TenantSiteConfig);
@@ -130,11 +132,12 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) return NextResponse.json({ error: 'Website Builder subscription or active trial required', reason: access.reason }, { status: 403 });
 
-  const { site, error: readError } = await loadOwnedSite(supabase, websiteId, user.id);
+  const admin = await requireAdminClient();
+  const { site, error: readError } = await loadOwnedSite(admin, websiteId, user.id);
   if (readError) return NextResponse.json({ error: readError.message }, { status: 500 });
   if (!site) return NextResponse.json({ error: 'Website not found' }, { status: 404 });
 
-  const { error } = await supabase.from('user_websites').delete().eq('id', websiteId).eq('user_id', user.id);
+  const { error } = await admin.from('user_websites').delete().eq('id', websiteId).eq('user_id', user.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
 }

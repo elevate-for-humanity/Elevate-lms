@@ -1,7 +1,7 @@
 import { SecureDocumentLink } from '@/components/admin/SecureDocumentLink';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { FileText, XCircle, Clock, Eye } from 'lucide-react';
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function AdminDocumentReviewPage() {
   await requireRole(['admin']);
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
 
   // Get all documents with user info
   const { data: rawDocuments, error: documentsError } = await supabase

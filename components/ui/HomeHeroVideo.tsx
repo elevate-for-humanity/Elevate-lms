@@ -32,10 +32,12 @@ interface HomeHeroSlide {
   alt: string;
   label: string;
   description: string;
-  toneClass: string;
+  exposureClass: string;
+  focalClass: string;
 }
 
 const HOME_SLIDE_SECONDS = 6;
+const SALON_EDITORIAL_GRADE = 'contrast-[1.05] saturate-[1.06] sepia-[0.04]';
 const DEPLOYED_COMMIT_SHA = process.env.NEXT_PUBLIC_GIT_SHA?.trim();
 
 function revisionedHeroAsset(src: string): string {
@@ -53,7 +55,8 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Train with working professionals in a real salon',
     description:
       'Explore structured apprenticeships connected to participating local shops, experienced professionals, and supervised workplace learning.',
-    toneClass: 'brightness-[1.10] contrast-[1.03] saturate-[1.04] object-center',
+    exposureClass: 'brightness-[1.12]',
+    focalClass: 'object-center',
   },
   {
     type: 'image',
@@ -62,7 +65,8 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Grow with a professional salon team',
     description:
       'Train in a polished workplace where apprentices learn service, teamwork, and professional standards.',
-    toneClass: 'brightness-[1.14] contrast-[1.02] saturate-[1.05] object-[center_48%]',
+    exposureClass: 'brightness-[1.11]',
+    focalClass: 'object-[center_48%]',
   },
   {
     type: 'image',
@@ -71,7 +75,8 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'See the professional standard apprentices work toward',
     description:
       'Develop technique, consistency, and confidence through structured training in a real salon environment.',
-    toneClass: 'brightness-[1.10] contrast-[1.03] saturate-[1.05] object-[center_42%]',
+    exposureClass: 'brightness-[1.10]',
+    focalClass: 'object-[center_42%]',
   },
   {
     type: 'image',
@@ -80,7 +85,8 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Learn beside working beauty professionals',
     description:
       'Connect theory with supervised client service, workplace routines, and professional expectations.',
-    toneClass: 'brightness-[1.14] contrast-[1.03] saturate-[1.05] object-center',
+    exposureClass: 'brightness-[1.12]',
+    focalClass: 'object-center',
   },
   {
     type: 'image',
@@ -89,7 +95,8 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Practice inside a polished workplace',
     description:
       'Build confidence through supervised service, professional routines, and direct workplace experience.',
-    toneClass: 'brightness-[1.12] contrast-[1.03] saturate-[1.04] object-[center_42%]',
+    exposureClass: 'brightness-[1.11]',
+    focalClass: 'object-[center_42%]',
   },
   {
     type: 'image',
@@ -98,7 +105,8 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Build confidence through real client service',
     description:
       'Move from learning to working with a clear pathway, practical support, and measurable progress.',
-    toneClass: 'brightness-[1.10] contrast-[1.03] saturate-[1.04] object-[center_44%]',
+    exposureClass: 'brightness-[1.10]',
+    focalClass: 'object-[center_44%]',
   },
 ];
 
@@ -219,11 +227,15 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
                 unoptimized
                 sizes="(min-width: 1024px) 58vw, 100vw"
                 aria-hidden={index !== activeSlide}
-                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${candidate.toneClass} ${
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${SALON_EDITORIAL_GRADE} ${candidate.exposureClass} ${candidate.focalClass} ${
                   index === activeSlide ? 'z-10 opacity-100' : 'z-0 opacity-0'
                 }`}
               />
             ))}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(135deg,rgba(255,248,238,0.12)_0%,transparent_48%,rgba(15,23,42,0.08)_100%)] mix-blend-soft-light"
+            />
           </div>
           {slides.length > 1 ? (
             <>

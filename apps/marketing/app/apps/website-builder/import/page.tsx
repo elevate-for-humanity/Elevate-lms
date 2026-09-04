@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import WebsiteImportClient from './WebsiteImportClient';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,13 @@ export const metadata: Metadata = {
 export default async function WebsiteImportPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/apps/website-builder/import');
+  if (!user) {
+    const returnUrl = 'https://store.elevateforhumanity.org/apps/website-builder/import';
+    redirect(`https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(returnUrl)}`);
+  }
+
+  const access = await getWebsiteBuilderAccess(user.id, supabase);
+  if (access.isAdmin) return <WebsiteImportClient />;
 
   const { data: subscription } = await supabase
     .from('user_app_subscriptions')

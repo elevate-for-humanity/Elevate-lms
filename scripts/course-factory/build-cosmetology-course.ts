@@ -416,34 +416,63 @@ async function main() {
     );
   }
 
-  const result = await courseFactory(
-    {
-      courseId: COURSE_ID,
-      programId: program.id,
-      programSlug: PROGRAM_SLUG,
-      blueprint,
-      mode: 'refresh',
-      contentSource: 'ai',
-      // Media is queued once, after the package audit. This prevents GPU work
-      // from starting for a course package that later fails validation.
-      videoMode: 'off',
-    },
-    (stage, message, progress) =>
-      console.log(`[Cosmetology Course Builder] ${stage} ${progress ?? ''} ${message}`),
-  );
-  if (result.courseId && result.courseId !== COURSE_ID) {
-    fail(`Course Factory changed canonical identity to ${result.courseId}`);
-  }
-  if (!result.ok) {
-    fail(
-      `Course Factory could not automatically repair the generated package: ${JSON.stringify(result.errors ?? result)}`,
+  // The production database is the durable checkpoint. A runner timeout can
+  // prevent actions/cache from saving even though every lesson was committed.
+  // Reuse the persisted package only after the same strict audit used before
+  // media generation; otherwise continue through normal AI enrichment.
+  let persistedPackageReady = false;
+  try {
+    await auditPackage(db, COURSE_ID);
+    persistedPackageReady = true;
+    console.log(
+      '[Cosmetology Course Builder] complete persisted package passed audit; skipping redundant AI regeneration',
+    );
+  } catch (error) {
+    console.log(
+      `[Cosmetology Course Builder] persisted package requires enrichment: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
-  if (result.moduleCount !== EXPECTED_MODULES || result.lessonCount !== EXPECTED_LESSONS) {
-    fail(`Factory returned ${result.moduleCount} modules/${result.lessonCount} lessons`);
-  }
-  if ((result.generationFailures ?? []).length) {
-    fail(`Lesson generation failures: ${JSON.stringify(result.generationFailures)}`);
+
+  if (!persistedPackageReady) {
+    const result = await courseFactory(
+      {
+        courseId: COURSE_ID,
+        programId: program.id,
+        programSlug: PROGRAM_SLUG,
+        blueprint,
+        mode: 'refresh',
+        contentSource: 'ai',
+        // Media is queued once, after the package audit. This prevents GPU work
+        // from starting for a course package that later fails validation.
+        videoMode: 'off',
+      },
+      (stage, message, progress) =>
+        console.log(`[Cosmetology Course Builder] ${stage} ${progress ?? ''} ${message}`),
+    );
+    if (result.courseId && result.courseId !== COURSE_ID) {
+      fail(`Course Factory changed canonical identity to ${result.courseId}`);
+    }
+    if (!result.ok) {
+      fail(
+        `Course Factory could not automatically repair the generated package: ${JSON.stringify(result.errors ?? result)}`,
+      );
+    }
+    if (result.moduleCount !== EXPECTED_MODULES || result.lessonCount !== EXPECTED_LESSONS) {
+      fail(`Factory returned ${result.moduleCount} modules/${result.lessonCount} lessons`);
+    }
+    if ((result.generationFailures ?? []).length) {
+      fail(`Lesson generation failures: ${JSON.stringify(result.generationFailures)}`);
+    }
+
+    // Final exams and other generated assessments are created after the
+    // pre-generation repair pass. Repair their measurable objectives before
+    // the package audit so a valid assessment cannot fail on ordering alone.
+    const postGenerationRepairs = await repairPersistedLessonObjectives(COURSE_ID);
+    if (postGenerationRepairs > 0) {
+      console.log(
+        `[Cosmetology Course Builder] repaired ${postGenerationRepairs} post-generation lesson objectives`,
+      );
+    }
   }
 
   await updateJob(db, {

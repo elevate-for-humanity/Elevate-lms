@@ -63,7 +63,7 @@ async function main() {
     .from('course_lessons')
     .update({
       video_url: null,
-      video_status: 'draft',
+      video_status: 'pending',
       video_generated_at: null,
       media_quality_status: 'unverified',
       media_quality_evidence: {},
@@ -84,7 +84,7 @@ async function main() {
       status: 'draft',
       video_url: null,
       error_message: null,
-      review_status: null,
+      review_status: 'not_ready',
       quality_evidence: {},
       completed_at: null,
       lease_token: null,

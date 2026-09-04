@@ -144,9 +144,9 @@ export function ZeroCodeStructureEditor({ websiteId, initialConfig }: { websiteI
   return (
     <section className="border-b border-slate-200 bg-white">
       <div className="mx-auto max-w-7xl px-4 py-5">
-        <details className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-5" open>
-          <summary className="cursor-pointer text-lg font-black text-slate-950">Zero-code page & section editor</summary>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Build the site with buttons and fields. PARIS remains available for autonomous changes, but routine website editing does not require prompts or code.</p>
+        <details className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-5">
+          <summary className="cursor-pointer text-lg font-black text-slate-950">Detailed page & section controls</summary>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Open these controls when you need to add, rename, reorder, or precisely edit pages and sections. Routine changes still require no code.</p>
           {(message || error) ? <div className={`mt-4 rounded-xl border p-3 text-sm font-semibold ${error ? 'border-red-200 bg-red-50 text-red-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`}>{error || message}</div> : null}
 
           <div className="mt-5 grid gap-5 lg:grid-cols-[280px_1fr]">

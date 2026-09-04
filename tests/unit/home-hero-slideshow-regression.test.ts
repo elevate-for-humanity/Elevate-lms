@@ -29,6 +29,11 @@ describe('homepage hero slideshow rendering', () => {
     expect(Math.max(...brightnessValues) - Math.min(...brightnessValues)).toBeLessThanOrEqual(0.02);
   });
 
+  it('uses narration sentence boundaries that prevent swallowed phrases', () => {
+    expect(source).toContain('You will learn by doing. You will build real confidence.');
+    expect(source).not.toContain('Learn by doing, build real confidence');
+  });
+
   it('uses the sharp Salon Saloon team portrait for the final slide', () => {
     expect(source).toContain("src: '/images/partners/salon-saloon/team-sign.webp'");
     expect(source).not.toContain("src: '/images/partners/generations-hair/salon-service.webp'");

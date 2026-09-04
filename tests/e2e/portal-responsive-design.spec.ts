@@ -31,13 +31,16 @@ async function login(page: Page, loginBase: string, email: string, password: str
   await expect(submit).toBeEnabled({ timeout: 20_000 });
   await emailInput.fill(email);
   await passwordInput.fill(password);
-  await Promise.all([
-    page.waitForURL((url) => !url.pathname.includes('/login'), {
-      timeout: 60_000,
-      waitUntil: 'domcontentloaded',
-    }),
-    submit.click(),
-  ]);
+  await submit.click();
+  // A navigation handled by the installed PWA worker can reject waitForURL even
+  // after the browser reaches the authenticated destination. Polling the actual
+  // location verifies the user-visible result without coupling auth to the
+  // navigation transport.
+  await expect.poll(() => new URL(page.url()).pathname, {
+    message: `${loginBase} did not leave the login route`,
+    timeout: 60_000,
+  }).not.toMatch(/\/login(?:\/|$)/);
+  await page.waitForLoadState('domcontentloaded').catch(() => undefined);
 }
 
 async function assertResponsivePage(page: Page, pathOrUrl: string) {
@@ -53,13 +56,27 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
     const body = document.body;
     const viewportWidth = window.innerWidth;
     const scrollWidth = Math.max(doc.scrollWidth, body?.scrollWidth || 0);
-    const main = document.querySelector('main') || document.querySelector('[role="main"]') || body;
-    const mainRect = main?.getBoundingClientRect();
-    const visibleCritical = Array.from(document.querySelectorAll('button, input, select, textarea, a[href]')).filter((element) => {
+    const isRendered = (element: Element) => {
       const el = element as HTMLElement;
       const style = window.getComputedStyle(el);
       const rect = el.getBoundingClientRect();
-      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+      return style.display !== 'none'
+        && style.visibility !== 'hidden'
+        && Number(style.opacity) !== 0
+        && !el.closest('[aria-hidden="true"], [inert]')
+        && rect.width > 0
+        && rect.height > 0;
+    };
+    const main = Array.from(document.querySelectorAll('main, [role="main"]')).find(isRendered) || body;
+    const mainRect = main?.getBoundingClientRect();
+    const visibleCritical = Array.from(document.querySelectorAll('button, input, select, textarea, a[href]')).filter((element) => {
+      const rect = (element as HTMLElement).getBoundingClientRect();
+      // Menus intentionally parked outside the viewport are not visible to the
+      // user. Keep partially visible controls in scope so real clipping still
+      // fails certification.
+      const intersectsViewport = rect.right > 0 && rect.left < viewportWidth
+        && rect.bottom > 0 && rect.top < window.innerHeight;
+      return isRendered(element) && intersectsViewport;
     });
     const clippedCritical = visibleCritical.filter((element) => {
       const rect = (element as HTMLElement).getBoundingClientRect();

@@ -30,7 +30,8 @@ export async function POST(
     return NextResponse.json({ error: 'Website Builder subscription or active trial required', reason: access.reason, upgradeUrl: access.upgradeUrl }, { status: 403 });
   }
 
-  const { data: site } = await supabase
+  const admin = await requireAdminClient();
+  const { data: site } = await admin
     .from('user_websites')
     .select('id, user_id')
     .eq('id', websiteId)
@@ -47,7 +48,6 @@ export async function POST(
   if (!ALLOWED.has(file.type)) return NextResponse.json({ error: 'Use JPG, PNG, WebP, or GIF' }, { status: 415 });
   if (file.size <= 0 || file.size > MAX_BYTES) return NextResponse.json({ error: 'Image must be 10 MB or smaller' }, { status: 413 });
 
-  const admin = await requireAdminClient();
   const ext = extensionFor(file.type);
   const assetId = crypto.randomUUID();
   const path = `${user.id}/${websiteId}/${kind}/${assetId}.${ext}`;

@@ -40,4 +40,45 @@ describe('Course Factory publisher objectives', () => {
       'Document the sanitation procedure.',
     ]);
   });
+
+  it('persists a universal learning contract at the shared publisher boundary', () => {
+    const modules = buildAtomicPayload(
+      [
+        {
+          slug: 'skills',
+          title: 'Skills',
+          orderIndex: 1,
+          domainKey: 'skills',
+          competencies: [],
+          lessons: [
+            {
+              slug: 'guided-service',
+              title: 'Guided Service',
+              order: 1,
+              lessonType: 'lab',
+              practicalRequired: true,
+              content: '<p>Practice the service safely.</p>',
+            },
+          ],
+        },
+      ] as any,
+      'Universal Skills Course',
+    );
+
+    const contract = modules[0].lessons[0].content_json.learning_experience;
+    expect(contract.profile).toBe('hands_on_procedure');
+    expect(contract.phases.map((item: { phase: string }) => item.phase)).toEqual(
+      expect.arrayContaining([
+        'full_demonstration',
+        'step_microvideos',
+        'guided_practice',
+        'rubric',
+        'evidence_submission',
+      ]),
+    );
+    expect(contract.mediaPolicy).toMatchObject({
+      stockFootageContextOnly: true,
+      requireHumanTechnicalReview: true,
+    });
+  });
 });

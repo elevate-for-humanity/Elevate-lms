@@ -7,6 +7,7 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForBlueprint } from '@/lib/ai-instructors';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
+import { buildLearningExperience } from '@/lib/curriculum/learning-experience';
 import type { BlueprintModule, BuildMode, ValidationResult } from './types';
 import { compileLearningIntelligence, LearningIntelligenceSchema } from './learning-intelligence';
 import { inferStepType } from './validator';
@@ -114,10 +115,6 @@ export function buildAtomicPayload(
           .sort((a, b) => a.order - b.order)
           .map((lesson, lessonPosition) => {
             const extra = lesson as typeof lesson & Record<string, any>;
-            const learningExperience =
-              extra.learningExperience && typeof extra.learningExperience === 'object'
-                ? extra.learningExperience
-                : null;
             const stepType = normalizeLessonType(extra, lesson.slug);
             const content = normalizeLessonContent(lesson.content, lesson.objective);
             const experience =
@@ -127,6 +124,17 @@ export function buildAtomicPayload(
                 ? (content.experience as Record<string, any>)
                 : null;
             const governedPractical = extra.practicalRequired ?? stepType === 'lab';
+            // This is the final shared persistence boundary for every Course
+            // Builder entry point. Generate the universal experience here so
+            // dedicated, AI, blueprint, recovery, and Admin builds cannot
+            // bypass the publication contract.
+            const learningExperience =
+              extra.learningExperience && typeof extra.learningExperience === 'object'
+                ? extra.learningExperience
+                : buildLearningExperience({
+                    lessonType: stepType,
+                    practicalRequired: governedPractical,
+                  });
             const learningPoints = Array.isArray(content?.learning_points)
               ? content.learning_points.filter(
                   (point): point is string => typeof point === 'string' && point.trim().length > 0,

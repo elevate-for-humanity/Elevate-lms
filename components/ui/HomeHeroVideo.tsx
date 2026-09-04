@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, CreditCard, Store } from 'lucide-react';
-import HeroVideo from '@/components/marketing/HeroVideo';
 
 export interface HeroBanner {
   pageKey: string;
@@ -53,7 +53,7 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Train with working professionals in a real salon',
     description:
       'Explore structured apprenticeships connected to participating local shops, experienced professionals, and supervised workplace learning.',
-    toneClass: 'brightness-[1.05] contrast-[1.03] saturate-[1.03] object-center',
+    toneClass: 'brightness-[1.10] contrast-[1.03] saturate-[1.04] object-center',
   },
   {
     type: 'image',
@@ -62,7 +62,7 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Grow with a professional salon team',
     description:
       'Train in a polished workplace where apprentices learn service, teamwork, and professional standards.',
-    toneClass: 'brightness-[1.05] contrast-[1.03] saturate-[1.02] object-[center_48%]',
+    toneClass: 'brightness-[1.14] contrast-[1.02] saturate-[1.05] object-[center_48%]',
   },
   {
     type: 'image',
@@ -71,7 +71,7 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'See the professional standard apprentices work toward',
     description:
       'Develop technique, consistency, and confidence through structured training in a real salon environment.',
-    toneClass: 'brightness-[1.04] contrast-[1.03] saturate-[1.04] object-[center_42%]',
+    toneClass: 'brightness-[1.10] contrast-[1.03] saturate-[1.05] object-[center_42%]',
   },
   {
     type: 'image',
@@ -80,7 +80,7 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Learn beside working beauty professionals',
     description:
       'Connect theory with supervised client service, workplace routines, and professional expectations.',
-    toneClass: 'brightness-[1.03] contrast-[1.04] saturate-[1.03] object-center',
+    toneClass: 'brightness-[1.14] contrast-[1.03] saturate-[1.05] object-center',
   },
   {
     type: 'image',
@@ -89,7 +89,7 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Practice inside a polished workplace',
     description:
       'Build confidence through supervised service, professional routines, and direct workplace experience.',
-    toneClass: 'brightness-[1.04] contrast-[1.03] saturate-[1.02] object-[center_42%]',
+    toneClass: 'brightness-[1.12] contrast-[1.03] saturate-[1.04] object-[center_42%]',
   },
   {
     type: 'image',
@@ -98,7 +98,7 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Build confidence through real client service',
     description:
       'Move from learning to working with a clear pathway, practical support, and measurable progress.',
-    toneClass: 'brightness-[1.04] contrast-[1.03] saturate-[1.02] object-[center_44%]',
+    toneClass: 'brightness-[1.10] contrast-[1.03] saturate-[1.04] object-[center_44%]',
   },
 ];
 
@@ -208,23 +208,22 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         <div
           className="relative order-1 w-full overflow-hidden bg-[#f4f1ec] lg:order-2"
         >
-          <div
-            key={`${slide.type}-${slide.src || activeSlide}`}
-            className="relative z-10"
-          >
-            <HeroVideo
-              mountedFrameImage={revisionedHeroAsset(slide.src)}
-              transcript={banner.transcript || HOME_NARRATION}
-              showSoundControl={false}
-              showTranscriptControl={false}
-              analyticsName={banner.analyticsName}
-              overlayMode="none"
-              mediaFit="cover"
-              mediaClassName={slide.toneClass}
-              soundButtonVariant="prominent"
-              heightClassName="h-[clamp(480px,72svh,760px)] lg:h-[clamp(400px,62vh,680px)]"
-              deferVideoMs={0}
-            />
+          <div className="relative z-10 h-[clamp(480px,72svh,760px)] lg:h-[clamp(400px,62vh,680px)]">
+            {slides.map((candidate, index) => (
+              <Image
+                key={candidate.src}
+                src={revisionedHeroAsset(candidate.src)}
+                alt={candidate.alt}
+                fill
+                priority={index < 2}
+                unoptimized
+                sizes="(min-width: 1024px) 58vw, 100vw"
+                aria-hidden={index !== activeSlide}
+                className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${candidate.toneClass} ${
+                  index === activeSlide ? 'z-10 opacity-100' : 'z-0 opacity-0'
+                }`}
+              />
+            ))}
           </div>
           {slides.length > 1 ? (
             <>

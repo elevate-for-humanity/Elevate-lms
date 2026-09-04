@@ -18,6 +18,7 @@ import { isAIAvailable } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
 import { queueCourseLessonVideos } from './media-service';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { markCourseMediaPendingWithClient } from '@/lib/course-builder/build-lifecycle';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 import { loadBlueprintWithProgram } from './blueprint-loader';
 import {
@@ -806,6 +807,7 @@ async function enrichBlueprint(
           lesson,
           moduleTitle: courseModule.title,
           courseTitle,
+          courseId: input.courseId,
           state: input.state ?? enriched.state,
           checkpointNamespace: `${enriched.id}:${enriched.version}`,
           standardsBlock: [
@@ -944,10 +946,43 @@ export async function courseFactory(
       throw new Error('AI service is required to generate complete lesson and assessment content.');
     }
 
+    let scaffoldCourseId = input.courseId;
+    if (!input.dryRun && input.videoMode !== 'off') {
+      tracker.emit('publish', 'Creating the canonical draft shell for unified lesson builds.', 10);
+      const scaffold = await publishCourse({
+        blueprint,
+        courseTitle,
+        programId: input.programId,
+        contentSource: 'blueprint',
+        mode: 'missing-only',
+        evidence,
+      });
+      if (!scaffold.success || !scaffold.courseId) {
+        throw new Error(scaffold.errors.join('; ') || 'Unable to create canonical course shell');
+      }
+      scaffoldCourseId = scaffold.courseId;
+      const db = await requireAdminClient();
+      const { error: shellStateError } = await db
+        .from('courses')
+        .update({
+          generation_status: 'generating',
+          generation_progress: 10,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', scaffoldCourseId);
+      if (shellStateError) throw shellStateError;
+    }
+
     const enriched =
       input.contentSource === 'blueprint'
         ? { blueprint, assessmentsGenerated: 0 }
-        : await enrichBlueprint(blueprint, courseTitle, input, tracker, evidence.standardsBlock);
+        : await enrichBlueprint(
+            blueprint,
+            courseTitle,
+            { ...input, courseId: scaffoldCourseId },
+            tracker,
+            evidence.standardsBlock,
+          );
 
     tracker.emit('validate', 'Validating the complete generated course package.', 80);
     const packageAudit = validateBlueprint(enriched.blueprint, { requireGeneratedContent: true });
@@ -1028,14 +1063,18 @@ export async function courseFactory(
       if (media.failed > 0) {
         logger.warn('[course-factory] Optional microclip enqueue warnings', media);
       }
+      await markCourseMediaPendingWithClient({
+        db: await requireAdminClient(),
+        courseId: published.courseId,
+      });
     }
 
     tracker.emit(
       'complete',
       input.videoMode === 'off'
         ? 'Canonical course package completed successfully.'
-        : 'Canonical course package completed and every primary lesson video entered the governed media pipeline.',
-      100,
+        : 'Canonical course content completed; the unified build remains active until every primary lesson video is attached and verified.',
+      input.videoMode === 'off' ? 100 : 95,
     );
     return {
       ok: true,
@@ -1045,6 +1084,7 @@ export async function courseFactory(
       lessonCount: published.lessonCount,
       assessmentsGenerated: enriched.assessmentsGenerated,
       videosQueued,
+      completionState: input.videoMode === 'off' ? 'content_only' : 'media_pending',
       errors: [],
     };
   } catch (error) {

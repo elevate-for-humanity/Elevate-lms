@@ -100,7 +100,9 @@ describe('canonical Course Factory media architecture', () => {
     expect(route).toContain('export const maxDuration = 3600');
     expect(handler).toContain('resumableMediaCheckpoint');
     expect(handler).toContain('Resuming completed build at media finalization');
-    expect(handler).toContain("generation_status: 'completed'");
+    expect(handler).toContain("generation_status: 'generating'");
+    expect(handler).toContain('generation_progress: 95');
+    expect(read('lib/course-builder/build-lifecycle.ts')).toContain("generation_status: 'completed'");
   });
 
   it('claims work atomically and renews an expiring database lease', () => {
@@ -155,6 +157,44 @@ describe('canonical Course Factory media architecture', () => {
     const manager = read('lib/course-factory/media-manager.ts');
     expect(manager).toContain('lessonStateMismatches === 0');
     expect(manager).toContain('microclipStateMismatches === 0');
+  });
+
+  it('treats media as part of one draft course build instead of publishing from the worker', () => {
+    const factory = read('lib/course-factory/factory.ts');
+    const lifecycle = read('lib/course-builder/build-lifecycle.ts');
+    const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
+    expect(factory).toContain('Creating the canonical draft shell for unified lesson builds.');
+    expect(factory).toContain("completionState: input.videoMode === 'off' ? 'content_only' : 'media_pending'");
+    expect(lifecycle).toContain('finalizeUnifiedCourseBuildWithClient');
+    expect(lifecycle).toContain("state: 'ready_for_review'");
+    expect(lifecycle).not.toContain('publishPersistedCourseWithClient');
+    expect(worker).toContain('finalizeUnifiedCourseBuildWithClient');
+    expect(worker).not.toContain('finalizeCourseAutomaticallyIfReadyWithClient');
+  });
+
+  it('starts the primary video after each locked lesson narration', () => {
+    const checkpoints = read('lib/course-factory/generation-checkpoints.ts');
+    const media = read('lib/course-factory/media-service.ts');
+    expect(checkpoints).toContain('Its primary video can render while the next lesson is generated.');
+    expect(checkpoints).toContain('lessonId: target.id');
+    expect(media).toContain('sourceChanged');
+    expect(media).toContain('Canonical lesson narration changed during unified course rebuild');
+  });
+
+  it('does not let obsolete opt-out microclips block primary lesson readiness', () => {
+    const manager = read('lib/course-factory/media-manager.ts');
+    expect(manager).toContain('videoConfig.enableMicroclips === true');
+    expect(manager).toContain('const canonicalRows = rows.filter');
+    expect(manager).toContain('jobsTotal: canonicalRows.length');
+  });
+
+  it('guards superseded-media deletion behind a verified replacement package', () => {
+    const cleanup = read('scripts/course-builder/retire-superseded-course-media.ts');
+    expect(cleanup).toContain("args.includes('--execute')");
+    expect(cleanup).toContain('if (!media.completePackage)');
+    expect(cleanup).toContain('Refusing to retire media from a published or active course');
+    expect(cleanup).toContain("storage.from('course-videos').remove");
+    expect(cleanup).toContain(".eq('asset_kind', 'lesson')");
   });
 
   it('keeps ESB acceptance fixed to 35 lesson videos and 70 microclips', () => {

@@ -1,6 +1,6 @@
 import { courseFactory } from '@/lib/course-factory';
 import { normalizeGeneratedCourseForGovernance } from '@/lib/course-factory/post-generation-governance';
-import { finalizeCourseAutomaticallyIfReadyWithClient } from '@/lib/course-builder/persisted-publish-service';
+import { finalizeUnifiedCourseBuildWithClient } from '@/lib/course-builder/build-lifecycle';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { FactoryInput, FactoryStage } from '@/lib/course-factory/types';
@@ -79,8 +79,8 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
     const { error: resumeError } = await db
       .from('courses')
       .update({
-        generation_status: 'completed',
-        generation_progress: 100,
+        generation_status: 'generating',
+        generation_progress: 95,
         updated_at: new Date().toISOString(),
       })
       .eq('id', checkpointCourseId);
@@ -107,14 +107,10 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
   const governance = checkpointCourseId
     ? (result.governance ?? (await normalizeGeneratedCourseForGovernance(result.courseId)))
     : await normalizeGeneratedCourseForGovernance(result.courseId);
-  const finalization = await finalizeCourseAutomaticallyIfReadyWithClient({
+  const finalization = await finalizeUnifiedCourseBuildWithClient({
     db,
     courseId: result.courseId,
   });
-  if (finalization.state === 'quality_gate_failed') {
-    const blockers = finalization.publication.blocking_issues.join('; ');
-    throw new Error(`Automated course repair exhausted: ${blockers}`);
-  }
   if (!finalization.ok) {
     const now = new Date();
     const retryAt = new Date(now.getTime() + 5 * 60_000);

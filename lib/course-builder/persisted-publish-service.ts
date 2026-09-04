@@ -4,7 +4,6 @@ import { createClient } from '../supabase/server';
 import { publishCourse } from '../lms/course-service';
 import { logAdminAudit, AdminAction } from '../admin/audit-log';
 import { normalizeGeneratedCourseForGovernance } from '../course-factory/post-generation-governance';
-import { getCourseMediaState } from '../course-factory/media-manager';
 
 const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam', 'final_exam']);
 const PRACTICAL_TYPES = new Set(['practical', 'lab', 'fieldwork', 'observation', 'practicum']);
@@ -391,48 +390,4 @@ export async function publishPersistedCourse(input: {
   request?: NextRequest;
 }) {
   return publishPersistedCourseWithClient({ ...input, db: await createClient() });
-}
-
-/**
- * Idempotent terminal step for AI-controlled course builds. Media completion
- * invokes this function; it never starts paid work and never publishes a
- * partial package.
- */
-export async function finalizeCourseAutomaticallyIfReadyWithClient(input: {
-  db: SupabaseClient;
-  courseId: string;
-  actorId?: string;
-}) {
-  const { data: course, error } = await input.db
-    .from('courses')
-    .select('id,status,generation_status,created_by')
-    .eq('id', input.courseId)
-    .maybeSingle();
-  if (error) throw error;
-  if (!course) return { ok: false as const, state: 'missing' as const };
-  if (course.status === 'published' || course.generation_status === 'published') {
-    return { ok: true as const, state: 'already_published' as const };
-  }
-  if (!['completed', 'review'].includes(String(course.generation_status ?? ''))) {
-    return { ok: false as const, state: 'generation_pending' as const };
-  }
-
-  // Automated publication is a system action. Human attribution is optional;
-  // the approval evidence and immutable audit records remain authoritative.
-  const actorId = input.actorId ?? course.created_by ?? null;
-
-  const media = await getCourseMediaState(input.courseId, { verifyUrls: true });
-  if (!media.completePackage) {
-    return { ok: false as const, state: 'media_pending' as const, media };
-  }
-
-  const publication = await publishPersistedCourseWithClient({
-    db: input.db,
-    courseId: input.courseId,
-    actorId,
-    label: 'Automated quality-gate publication',
-  });
-  return publication.ok
-    ? { ok: true as const, state: 'published' as const, media, publication }
-    : { ok: false as const, state: 'quality_gate_failed' as const, media, publication };
 }

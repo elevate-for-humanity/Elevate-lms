@@ -41,6 +41,8 @@ interface LessonGenerationInput {
   standardsBlock?: string;
   /** Invalidates durable/database checkpoints when the governing blueprint changes. */
   checkpointNamespace?: string;
+  /** Canonical draft shell used to persist and queue this lesson as one unit. */
+  courseId?: string;
 }
 
 const GOVERNED_COURSE_RULES = `
@@ -127,6 +129,26 @@ export async function generateLessonContent(
       lesson: input.lesson.slug,
       courseTitle: input.courseTitle,
     });
+    try {
+      const content = JSON.parse(cached.content) as Record<string, any>;
+      await persistLessonGenerationCheckpoint({
+        courseId: input.courseId,
+        courseTitle: input.courseTitle,
+        canonicalLessonSlug: input.lesson.slug,
+        lessonSlug: checkpointSlug,
+        objective: cached.objective,
+        html: String(content.html ?? ''),
+        learningPoints: cached.learning_points,
+        scenario: cached.scenario,
+        quizQuestions: cached.quiz_questions,
+        experience: content.experience as Record<string, any>,
+      });
+    } catch (error) {
+      logger.warn('[course-factory/content-generator] Cached lesson handoff failed', {
+        lesson: input.lesson.slug,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
     return cached;
   }
 
@@ -284,7 +306,9 @@ The content must be original, job-ready, factually grounded, and aligned to the 
       };
 
       await persistLessonGenerationCheckpoint({
+        courseId: input.courseId,
         courseTitle: input.courseTitle,
+        canonicalLessonSlug: input.lesson.slug,
         lessonSlug: checkpointSlug,
         objective: parsed.objective,
         html: parsed.content,

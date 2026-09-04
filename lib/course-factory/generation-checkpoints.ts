@@ -25,17 +25,20 @@ type LessonTarget = {
 async function resolveLessonTarget(
   courseTitle: string,
   lessonSlug: string,
+  requestedCourseId?: string,
 ): Promise<LessonTarget | null> {
   try {
     const db = await requireAdminClient();
-    const { data: courses, error: courseError } = await db
-      .from('courses')
-      .select('id')
-      .eq('title', courseTitle)
-      .limit(2);
-    if (courseError || !courses || courses.length !== 1) return null;
-
-    const courseId = String(courses[0].id);
+    let courseId = requestedCourseId?.trim() ?? '';
+    if (!courseId) {
+      const { data: courses, error: courseError } = await db
+        .from('courses')
+        .select('id')
+        .eq('title', courseTitle)
+        .limit(2);
+      if (courseError || !courses || courses.length !== 1) return null;
+      courseId = String(courses[0].id);
+    }
     const { data: lessons, error: lessonError } = await db
       .from('course_lessons')
       .select('id')
@@ -232,7 +235,10 @@ export async function loadLessonGenerationCheckpoint(
 }
 
 export async function persistLessonGenerationCheckpoint(input: {
+  courseId?: string;
   courseTitle: string;
+  /** Durable journals may be versioned; database lesson identity is not. */
+  canonicalLessonSlug?: string;
   lessonSlug: string;
   objective: string;
   html: string;
@@ -260,7 +266,8 @@ export async function persistLessonGenerationCheckpoint(input: {
     payload: durableCheckpoint,
   });
 
-  const target = await resolveLessonTarget(input.courseTitle, input.lessonSlug);
+  const canonicalLessonSlug = input.canonicalLessonSlug ?? input.lessonSlug;
+  const target = await resolveLessonTarget(input.courseTitle, canonicalLessonSlug, input.courseId);
   if (!target) return;
 
   try {
@@ -272,6 +279,15 @@ export async function persistLessonGenerationCheckpoint(input: {
     const quickClips = Array.isArray(input.experience.quickClips) ? input.experience.quickClips : [];
     const now = new Date().toISOString();
 
+    const { data: persistedLesson } = await db
+      .from('course_lessons')
+      .select('content_json')
+      .eq('id', target.id)
+      .maybeSingle();
+    const existingContentJson = persistedLesson?.content_json && typeof persistedLesson.content_json === 'object'
+      ? persistedLesson.content_json as Record<string, unknown>
+      : {};
+
     const { error } = await db
       .from('course_lessons')
       .update({
@@ -281,7 +297,7 @@ export async function persistLessonGenerationCheckpoint(input: {
           scenario: input.scenario,
           experience: input.experience,
         },
-        content_json: { experience: input.experience },
+        content_json: { ...existingContentJson, experience: input.experience },
         rendered_html: input.html,
         learning_objectives: [input.objective, ...input.learningPoints].slice(0, 5),
         quiz_questions: input.quizQuestions,
@@ -316,10 +332,22 @@ export async function persistLessonGenerationCheckpoint(input: {
     if (error) {
       logger.warn('[course-factory/checkpoint] lesson checkpoint write skipped', {
         courseTitle: input.courseTitle,
-        lessonSlug: input.lessonSlug,
+        lessonSlug: canonicalLessonSlug,
         error: error.message,
       });
       return;
+    }
+
+    // Persisting the locked narration is the handoff boundary for one unified
+    // lesson. Its primary video can render while the next lesson is generated.
+    const { queueCourseLessonVideos } = await import('./media-service');
+    const media = await queueCourseLessonVideos({
+      courseId: target.courseId,
+      lessonId: target.id,
+      onlyMissing: true,
+    });
+    if (media.lessonVideosReady !== 1) {
+      throw new Error(`Lesson media handoff failed for ${canonicalLessonSlug}`);
     }
 
     const [{ count: generated }, { count: total }] = await Promise.all([
@@ -347,7 +375,7 @@ export async function persistLessonGenerationCheckpoint(input: {
   } catch (error) {
     logger.warn('[course-factory/checkpoint] lesson checkpoint failed safely', {
       courseTitle: input.courseTitle,
-      lessonSlug: input.lessonSlug,
+      lessonSlug: canonicalLessonSlug,
       error: error instanceof Error ? error.message : String(error),
     });
   }

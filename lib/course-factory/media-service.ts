@@ -139,6 +139,15 @@ export async function queueCourseLessonVideos(
     );
   }
 
+  const { data: firstLesson, error: firstLessonError } = await db
+    .from('course_lessons')
+    .select('id')
+    .eq('course_id', input.courseId)
+    .order('order_index', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (firstLessonError) throw new Error(`Failed to resolve course introduction lesson: ${firstLessonError.message}`);
+
   let lessonQuery = db
     .from('course_lessons')
     .select(
@@ -187,6 +196,7 @@ export async function queueCourseLessonVideos(
   async function ensureQueued(
     _existing: VideoJob | undefined,
     create: () => Promise<VideoJob>,
+    replaceCompletedSource = false,
   ): Promise<VideoJob> {
     // createJob is an upsert-by-canonical-identity and synchronizes refreshed
     // lesson narration/scene data into any non-rendering existing job.
@@ -194,7 +204,7 @@ export async function queueCourseLessonVideos(
     // A queued job is already renderer-ready and must not consume retry budget.
     // Force only replaces a completed asset or retries a failed asset after the
     // canonical source has been deliberately repaired.
-    if (current.status === 'failed' || (force && current.status === 'complete')) {
+    if (current.status === 'failed' || ((force || replaceCompletedSource) && current.status === 'complete')) {
       return resetCanonicalMediaJob(
         {
           courseId: current.course_id,
@@ -203,10 +213,12 @@ export async function queueCourseLessonVideos(
           assetKey: current.asset_key,
         },
         {
-          force,
-          sourceRepaired: force && current.status === 'failed',
-          reason: force
-            ? 'Authorized Course Factory media source repair'
+          force: force || replaceCompletedSource,
+          sourceRepaired: (force || replaceCompletedSource) && current.status === 'failed',
+          reason: replaceCompletedSource
+            ? 'Canonical lesson narration changed during unified course rebuild'
+            : force
+              ? 'Authorized Course Factory media source repair'
             : current.error_message ?? 'Retrying failed media asset',
         },
       );
@@ -214,7 +226,7 @@ export async function queueCourseLessonVideos(
     return current;
   }
 
-  for (const [candidateIndex, lesson] of candidates.entries()) {
+  for (const lesson of candidates) {
     try {
       const videoConfig = lesson.video_config && typeof lesson.video_config === 'object'
         ? lesson.video_config as Record<string, unknown>
@@ -227,6 +239,18 @@ export async function queueCourseLessonVideos(
         : getInstructorForCourse(course.title);
       const lessonKey = assetIdentity(lesson.id, 'lesson', null);
       const existingLessonJob = existingByAsset.get(lessonKey);
+      const lessonNarration = canonicalLessonNarration(lesson);
+      const canonicalScript = [
+        lesson.id === firstLesson?.id ? generateInstructorIntro(instructor, course.title) : '',
+        Array.isArray(lesson.bullet_points) && lesson.bullet_points.length
+          ? `By the end of this lesson, you will be able to: ${lesson.bullet_points.join('. ')}.`
+          : '',
+        lessonNarration,
+      ].filter(Boolean).join(' ').trim();
+      const sourceChanged = Boolean(
+        existingLessonJob?.status === 'complete' &&
+        (existingLessonJob.script ?? '').trim() !== canonicalScript,
+      );
       const hasVideo = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
       const mainComplete = hasVideo && lesson.video_status === 'complete'
         && lesson.media_origin === 'generated' && lesson.media_quality_status === 'approved'
@@ -237,29 +261,23 @@ export async function queueCourseLessonVideos(
       // a curriculum refresh. Only a renderer-owned active lease is immutable.
       const shouldQueueMain =
         force ||
+        sourceChanged ||
         existingLessonJob?.status === 'queued' ||
         existingLessonJob?.status === 'draft' ||
         (!mainInFlight && (!onlyMissing || !mainComplete));
 
       if (shouldQueueMain) {
-        const lessonNarration = canonicalLessonNarration(lesson);
         const job = await ensureQueued(existingLessonJob, () => createJob({
           lesson_id: lesson.id,
           course_id: input.courseId,
           lesson_title: lesson.title,
-          script: [
-            candidateIndex === 0 ? generateInstructorIntro(instructor, course.title) : '',
-            Array.isArray(lesson.bullet_points) && lesson.bullet_points.length
-              ? `By the end of this lesson, you will be able to: ${lesson.bullet_points.join('. ')}.`
-              : '',
-            lessonNarration,
-          ].filter(Boolean).join(' ').trim(),
+          script: canonicalScript,
           bullet_points: Array.isArray(lesson.bullet_points) ? (lesson.bullet_points as string[]) : [],
           // A refreshed full narration requires a fresh storyboard. Reusing
           // lesson.scene_data from an older teaser causes visual/narration drift.
           scene_data: null,
           asset_kind: 'lesson',
-        }));
+        }), sourceChanged);
         existingByAsset.set(lessonKey, job);
         if (job.status === 'queued') queued += 1;
         if (job.status === 'queued' || job.status === 'rendering' || job.status === 'complete') {

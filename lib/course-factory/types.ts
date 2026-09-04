@@ -57,6 +57,8 @@ export interface FactoryOutput {
   lessonVideosQueued?: number;
   /** Short concept-clip jobs queued by this build. */
   microclipsQueued?: number;
+  /** The course is not build-complete until required lesson media is attached and verified. */
+  completionState?: 'content_only' | 'media_pending' | 'ready_for_review';
   generationFailures?: Array<{ slug: string; reason: string }>;
   warnings?: string[];
   errors?: string[];

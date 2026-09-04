@@ -37,7 +37,7 @@ if (/export async function resetJob\s*\(/.test(jobQueue)) {
 }
 
 const worker = requireFile('apps/admin/app/api/internal/videos/process-queue/route.ts');
-for (const token of ['courseId', 'processClaimedVideoJob', 'await Promise.allSettled', 'finalizeCourseAutomaticallyIfReadyWithClient', "eq('status', 'queued')", "order('asset_kind'", 'lease_expires_at.gt.', 'started_at.gt.']) {
+for (const token of ['courseId', 'processClaimedVideoJob', 'await Promise.allSettled', 'finalizeUnifiedCourseBuildWithClient', "eq('status', 'queued')", "order('asset_kind'", 'lease_expires_at.gt.', 'started_at.gt.']) {
   if (!worker.includes(token)) failures.push(`renderer worker missing ${token}`);
 }
 for (const forbidden of ['Unexpected server response: 403', 'retried403', 'after(async', "eq('status', 'failed')", 'resetCanonicalMediaJob', 'recoverCourseMediaJobs']) {

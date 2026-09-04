@@ -3,7 +3,7 @@ import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { VideoJob } from '@/lib/video/job-queue';
 import { processClaimedVideoJob } from '@/lib/video/process-video-job';
-import { finalizeCourseAutomaticallyIfReadyWithClient } from '@/lib/course-builder/persisted-publish-service';
+import { finalizeUnifiedCourseBuildWithClient } from '@/lib/course-builder/build-lifecycle';
 import { COURSE_MEDIA_STALE_RENDER_MS } from '@/lib/course-factory/media-manager';
 
 export const runtime = 'nodejs';
@@ -234,15 +234,11 @@ export async function POST(request: NextRequest) {
   const courseIds = [...new Set(claimedJobs.map((job) => job.course_id).filter(Boolean))];
   for (const completedCourseId of courseIds) {
     try {
-      const finalization = await finalizeCourseAutomaticallyIfReadyWithClient({
+      const finalization = await finalizeUnifiedCourseBuildWithClient({
         db,
         courseId: completedCourseId,
-        // This is a secret-authenticated internal worker, not an interactive
-        // user session. An empty actor is recorded as system automation by the
-        // canonical publication service.
-        actorId: '',
       });
-      logger.info('[video-worker] Automated course finalization checked', {
+      logger.info('[video-worker] Unified draft course finalization checked', {
         courseId: completedCourseId,
         state: finalization.state,
       });

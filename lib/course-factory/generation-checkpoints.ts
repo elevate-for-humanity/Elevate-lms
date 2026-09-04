@@ -71,12 +71,17 @@ export function normalizePersistedLessonObjectives(input: {
   content?: unknown;
 }): string[] {
   const content = record(input.content);
+  const experience = record(content?.experience);
+  const readingGuide = record(experience?.readingGuide);
+  const remediation = record(experience?.remediation);
   return Array.from(
     new Set(
       [
         ...textArray(input.learningObjectives),
         typeof input.objective === 'string' ? input.objective : '',
         ...textArray(content?.learning_points),
+        ...textArray(readingGuide?.keyTakeaways),
+        ...textArray(remediation?.objectiveMap),
       ]
         .map((value) => value.trim())
         .filter(Boolean),

@@ -319,6 +319,19 @@ export function normalizeLessonContract(raw: string): string {
       };
     }
 
+    if (Array.isArray(experience.resources)) {
+      experience.resources = experience.resources.map(
+        (resource: Record<string, unknown>, index: number) => ({
+          ...resource,
+          content: expandToMinimum(
+            resource?.content,
+            40,
+            `Resource ${index + 1} must provide complete, reusable learner directions grounded in the lesson.`,
+          ),
+        }),
+      );
+    }
+
     if (!Array.isArray(experience.resources) || experience.resources.length < 2) {
       experience.resources = [
         {

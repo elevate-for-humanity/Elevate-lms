@@ -4,6 +4,8 @@ import {
   selectStudioAgent,
   shouldOrchestrateMessage,
 } from '@/lib/devstudio/ellie-message-router';
+import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
+import { decomposePlan } from '@/lib/platform/planner';
 
 describe('routeEllieMessage', () => {
   it('routes explicit deploy commands to command execution', () => {
@@ -51,6 +53,27 @@ describe('shouldOrchestrateMessage', () => {
   it('keeps informational questions conversational', () => {
     expect(shouldOrchestrateMessage('What is QuickBooks used for?')).toBe(false);
     expect(shouldOrchestrateMessage('Explain the apprenticeship workflow')).toBe(false);
+  });
+});
+
+describe('durable orchestration planning', () => {
+  it('grounds QuickBooks in its canonical live integration', () => {
+    expect(planAIToolFromCommand('Check QuickBooks connection status')).toEqual({
+      name: 'quickbooks.status',
+      input: {},
+    });
+    expect(planAIToolFromCommand('Sync QuickBooks payroll')).toEqual({
+      name: 'quickbooks.syncPayroll',
+      input: { action: 'sync_payroll' },
+    });
+  });
+
+  it('preserves the requested operational outcome in the durable plan', () => {
+    const audit = decomposePlan('Audit the live admin dashboard');
+    expect(audit.steps[0]?.command).toBe('Audit the live admin dashboard');
+
+    const deploy = decomposePlan('Deploy the approved Admin build');
+    expect(deploy.steps.at(-1)?.command).toBe('Deploy the approved Admin build');
   });
 });
 

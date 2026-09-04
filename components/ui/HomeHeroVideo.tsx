@@ -46,7 +46,7 @@ function revisionedHeroAsset(src: string): string {
   return `${src}${separator}v=${encodeURIComponent(DEPLOYED_COMMIT_SHA)}`;
 }
 const HOME_NARRATION =
-  'Welcome to Elevate for Humanity. Ready to build a career you can be proud of? Explore hands-on training and earn-while-you-learn apprenticeship pathways connected to local professionals. Learn by doing, build real confidence, and take a clear next step toward your future. Choose the path that fits you, and let’s get started.';
+  'Welcome to Elevate for Humanity. Ready to build a career you can be proud of? Explore hands-on training and earn-while-you-learn apprenticeship pathways connected to local professionals. You will learn by doing. You will build real confidence. And you will have a clear next step toward your future. Choose the path that fits you, and let’s get started.';
 const HOME_SLIDES: HomeHeroSlide[] = [
   {
     type: 'image',

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const runtime = 'nodejs';
@@ -22,7 +23,8 @@ async function authorize(websiteId: string) {
     };
   }
 
-  const { data: site, error } = await supabase
+  const admin = await requireAdminClient();
+  const { data: site, error } = await admin
     .from('user_websites')
     .select('id, user_id, site_name, subdomain, site_config, is_published')
     .eq('id', websiteId)
@@ -31,7 +33,7 @@ async function authorize(websiteId: string) {
   if (!site || site.user_id !== user.id) {
     return { supabase, user, site: null, response: NextResponse.json({ error: 'Website not found' }, { status: 404 }) };
   }
-  return { supabase, user, site, response: null };
+  return { supabase: admin, user, site, response: null };
 }
 
 export async function GET(

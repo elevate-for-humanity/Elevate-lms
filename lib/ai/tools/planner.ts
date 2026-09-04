@@ -16,7 +16,9 @@ export function asAIRecord(value: unknown): Record<string, unknown> {
 function extractUuid(text: string): string | null {
   // Database identities include newer UUID versions; routing must not discard
   // a valid persisted UUID merely because its version nibble is above v5.
-  return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i)?.[0] ?? null;
+  return (
+    text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i)?.[0] ?? null
+  );
 }
 
 function extractNamedFilter(command: string, label: string): string | null {
@@ -24,7 +26,10 @@ function extractNamedFilter(command: string, label: string): string | null {
   return match?.[1]?.trim() || null;
 }
 
-function wioaFollowupInput(command: string, context: Record<string, unknown>): Record<string, unknown> {
+function wioaFollowupInput(
+  command: string,
+  context: Record<string, unknown>,
+): Record<string, unknown> {
   const input = { ...asAIRecord(context.toolInput) };
   const lower = command.toLowerCase();
   if (/30\s*[- ]?day/.test(lower)) input.type = '30-day';
@@ -37,19 +42,32 @@ function wioaFollowupInput(command: string, context: Record<string, unknown>): R
 }
 
 function isOpenHandsStatusCommand(lower: string): boolean {
-  return /\bopenhands\b/.test(lower) && /\b(status|progress|state|check|result|finished|running)\b/.test(lower);
+  return (
+    /\bopenhands\b/.test(lower) &&
+    /\b(status|progress|state|check|result|finished|running)\b/.test(lower)
+  );
 }
 
 function isEngineeringCommand(lower: string): boolean {
   if (/\bopenhands\b/.test(lower)) return true;
-  const engineeringNoun = /\b(code|codebase|repo|repository|github|pull request|pr\b|branch|commit|typescript|javascript|route|component|api endpoint|test file|regression test|ci\b|workflow file|source file)\b/.test(lower);
-  const engineeringVerb = /\b(fix|debug|refactor|implement|modify|change|update|edit|review|write|add|remove|clean up|cleanup|test)\b/.test(lower);
+  const engineeringNoun =
+    /\b(code|codebase|repo|repository|github|pull request|pr\b|branch|commit|typescript|javascript|route|component|api endpoint|test file|regression test|ci\b|workflow file|source file)\b/.test(
+      lower,
+    );
+  const engineeringVerb =
+    /\b(fix|debug|refactor|implement|modify|change|update|edit|review|write|add|remove|clean up|cleanup|test)\b/.test(
+      lower,
+    );
   return engineeringNoun && engineeringVerb;
 }
 
 function isLiveBrowserWork(lower: string): boolean {
-  const browserTarget = /\b(live (site|website|page|dashboard)|cloud browser|browser|production (site|page|dashboard)|host shop dashboard)\b/.test(lower);
-  const action = /\b(open|audit|check|inspect|test|verify|fix|repair|click through|walk through)\b/.test(lower);
+  const browserTarget =
+    /\b(live (site|website|page|dashboard)|cloud browser|browser|production (site|page|dashboard)|host shop dashboard)\b/.test(
+      lower,
+    );
+  const action =
+    /\b(open|audit|check|inspect|test|verify|fix|repair|click through|walk through)\b/.test(lower);
   return browserTarget && action;
 }
 
@@ -73,30 +91,76 @@ export function planAIToolFromCommand(
   const contextId = typeof context.id === 'string' ? context.id : null;
   const id = contextId ?? extractUuid(command);
 
-  const personAtElevate = command.match(/\bwho is\s+(.+?)\s+(?:at|with)\s+elevate(?:\s+for\s+humanity)?\b/i);
+  if (/\bquickbooks\b/.test(lower)) {
+    if (/\b(sync|import|refresh)\b/.test(lower) && /\b(payroll|employees?)\b/.test(lower)) {
+      return {
+        name: 'quickbooks.syncPayroll',
+        input: { ...asAIRecord(context.toolInput), action: 'sync_payroll' },
+      };
+    }
+    if (
+      /\b(sync|import|refresh)\b/.test(lower) &&
+      /\b(expenses?|purchases?|transactions?)\b/.test(lower)
+    ) {
+      return {
+        name: 'quickbooks.syncExpenses',
+        input: { ...asAIRecord(context.toolInput), action: 'sync_expenses' },
+      };
+    }
+    if (
+      /\b(connect|reconnect|authorize|authorization|oauth|auth url|authorization link)\b/.test(
+        lower,
+      )
+    ) {
+      return { name: 'quickbooks.authorization', input: {} };
+    }
+    return { name: 'quickbooks.status', input: {} };
+  }
+
+  const personAtElevate = command.match(
+    /\bwho is\s+(.+?)\s+(?:at|with)\s+elevate(?:\s+for\s+humanity)?\b/i,
+  );
   if (personAtElevate?.[1]) {
     return { name: 'organization.directory', input: { query: personAtElevate[1].trim() } };
   }
 
-  if (/\bwioa\b/.test(lower) && /\b(follow[- ]?ups?|30\s*[- ]?day|overdue|past due|missing|missed)\b/.test(lower)) {
+  if (
+    /\bwioa\b/.test(lower) &&
+    /\b(follow[- ]?ups?|30\s*[- ]?day|overdue|past due|missing|missed)\b/.test(lower)
+  ) {
     return { name: 'wioa.followups', input: wioaFollowupInput(command, context) };
   }
-  if (/\bwioa\b/.test(lower) && /\b(performance|outcomes?|metrics?|narrative|report|earnings|credential|skill gain)\b/.test(lower)) {
+  if (
+    /\bwioa\b/.test(lower) &&
+    /\b(performance|outcomes?|metrics?|narrative|report|earnings|credential|skill gain)\b/.test(
+      lower,
+    )
+  ) {
     return { name: 'wioa.performance', input: asAIRecord(context.toolInput) };
   }
   if (/\bwioa\b/.test(lower) && /\b(list|show|find|search|participants?)\b/.test(lower)) {
     return { name: 'wioa.list', input: asAIRecord(context.toolInput) };
   }
-  if (/\b(list|show|review|find|search)\b.*\bapplications?\b/.test(lower) || /\bpending applications?\b/.test(lower)) {
+  if (
+    /\b(list|show|review|find|search)\b.*\bapplications?\b/.test(lower) ||
+    /\bpending applications?\b/.test(lower)
+  ) {
     return { name: 'applications.search', input: asAIRecord(context.toolInput) };
   }
   if (/\bapprove\b.*\bapplication\b/.test(lower)) {
-    return { name: 'applications.approve', input: { ...asAIRecord(context.toolInput), ...(id ? { id } : {}) } };
+    return {
+      name: 'applications.approve',
+      input: { ...asAIRecord(context.toolInput), ...(id ? { id } : {}) },
+    };
   }
   if (/\b(list|show|find|search)\b.*\bstudents?\b/.test(lower)) {
     return { name: 'students.search', input: asAIRecord(context.toolInput) };
   }
-  if (/\b(assign|start|create)\b.*\b(ai[- ]?(counselor|coach|coaching)|student[- ]?success intervention)\b/.test(lower)) {
+  if (
+    /\b(assign|start|create)\b.*\b(ai[- ]?(counselor|coach|coaching)|student[- ]?success intervention)\b/.test(
+      lower,
+    )
+  ) {
     return {
       name: 'risk.assignCounselor',
       input: { ...asAIRecord(context.toolInput), ...(id ? { userId: id } : {}) },
@@ -114,7 +178,11 @@ export function planAIToolFromCommand(
   if (/\b(system|platform)\b.*\b(health|status)\b|\bhealth check\b/.test(lower)) {
     return { name: 'system.health', input: {} };
   }
-  if (/\b(create|make|generate|render)\b.*\b(commercial|promo|promotional)\b.*\bvideo\b|\bcommercial video\b/.test(lower)) {
+  if (
+    /\b(create|make|generate|render)\b.*\b(commercial|promo|promotional)\b.*\bvideo\b|\bcommercial video\b/.test(
+      lower,
+    )
+  ) {
     const duration = Number(lower.match(/\b(15|30|45|60|90)\s*[- ]?second/)?.[1] ?? 30);
     const aspectRatio = lower.includes('9:16') ? '9:16' : lower.includes('1:1') ? '1:1' : '16:9';
     return {
@@ -136,7 +204,10 @@ export function planAIToolFromCommand(
       },
     };
   }
-  if (/\b(store demos?|demo routes?)\b/.test(lower) && /\b(scan|audit|inspect|test|verify|fix|repair)\b/.test(lower)) {
+  if (
+    /\b(store demos?|demo routes?)\b/.test(lower) &&
+    /\b(scan|audit|inspect|test|verify|fix|repair)\b/.test(lower)
+  ) {
     return {
       name: 'openhands.execute',
       input: {
@@ -150,19 +221,28 @@ export function planAIToolFromCommand(
   // not match the real workflow" hijack a browser or engineering audit.
   if (
     /\b(workflows?|course build|course generation)\b/.test(lower) &&
-    /\b(status|progress|state|current|running|failed|failure|completion|queue|task)\b/.test(lower) &&
-    !/\b(store demos?|demo routes?|live browser|public store|broken links?|mobile layout|console errors?|api errors?)\b/.test(lower)
+    /\b(status|progress|state|current|running|failed|failure|completion|queue|task)\b/.test(
+      lower,
+    ) &&
+    !/\b(store demos?|demo routes?|live browser|public store|broken links?|mobile layout|console errors?|api errors?)\b/.test(
+      lower,
+    )
   ) {
     return { name: 'workflows.inspect', input: asAIRecord(context.toolInput) };
   }
   if (/\b(analytics|metrics|dashboard numbers)\b/.test(lower)) {
     return { name: 'analytics.read', input: asAIRecord(context.toolInput) };
   }
-  if (/\bpayout\b.*\b(queue|pending|list|show)\b|\b(queue|pending|list|show)\b.*\bpayout/.test(lower)) {
+  if (
+    /\bpayout\b.*\b(queue|pending|list|show)\b|\b(queue|pending|list|show)\b.*\bpayout/.test(lower)
+  ) {
     return { name: 'payouts.list', input: asAIRecord(context.toolInput) };
   }
   if (/\bmark\b.*\bpayout\b.*\bpaid\b/.test(lower)) {
-    return { name: 'payouts.markPaid', input: { ...asAIRecord(context.toolInput), ...(id ? { enrollmentId: id } : {}) } };
+    return {
+      name: 'payouts.markPaid',
+      input: { ...asAIRecord(context.toolInput), ...(id ? { enrollmentId: id } : {}) },
+    };
   }
   if (/\b(issue|generate)\b.*\bcertificate/.test(lower)) {
     return { name: 'certificates.issue', input: asAIRecord(context.toolInput) };
@@ -173,7 +253,9 @@ export function planAIToolFromCommand(
   if (
     /\b(course|lesson)\b/.test(lower) &&
     /\b(videos?|media|mp4s?|captions?|transcripts?|assets?)\b/.test(lower) &&
-    /\b(repair|fix|replace|restore|recover|rerender|re-render|audit|publish|finish|resume)\b/.test(lower)
+    /\b(repair|fix|replace|restore|recover|rerender|re-render|audit|publish|finish|resume)\b/.test(
+      lower,
+    )
   ) {
     return {
       name: 'courses.generate',
@@ -223,7 +305,10 @@ export function planAIToolFromCommand(
   if (/\brun\b.*\btests?\b/.test(lower)) {
     return { name: 'workflows.runTests', input: asAIRecord(context.toolInput) };
   }
-  if (/\bdeploy\b/.test(lower) && !/\b(?:do not|don't|dont|never|without)\s+(?:\w+\s+){0,2}deploy\b/.test(lower)) {
+  if (
+    /\bdeploy\b/.test(lower) &&
+    !/\b(?:do not|don't|dont|never|without)\s+(?:\w+\s+){0,2}deploy\b/.test(lower)
+  ) {
     return { name: 'deployments.autopilot', input: asAIRecord(context.toolInput) };
   }
   if (/\bapply\b.*\bmigrations?\b|\brun\b.*\bmigrations?\b/.test(lower)) {

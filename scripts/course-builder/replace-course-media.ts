@@ -40,7 +40,7 @@ async function main() {
   const connected = (lessons ?? []).filter(
     (lesson) => typeof lesson.video_url === 'string' && lesson.video_url.trim(),
   );
-  if (expected !== null && connected.length !== expected) {
+  if (expected !== null && connected.length !== expected && connected.length !== 0) {
     throw new Error(
       `Expected exactly ${expected} connected videos for ${courseSlug}; found ${connected.length}. No files were deleted.`,
     );
@@ -71,12 +71,6 @@ async function main() {
     })
     .in('id', lessonIds);
   if (canonicalError) throw new Error(canonicalError.message);
-
-  const { error: consumerError } = await db
-    .from('lms_lessons')
-    .update({ video_url: null })
-    .in('id', lessonIds);
-  if (consumerError) throw new Error(consumerError.message);
 
   const { error: jobError } = await db
     .from('video_jobs')

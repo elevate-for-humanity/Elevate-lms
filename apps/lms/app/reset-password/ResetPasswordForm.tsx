@@ -258,3 +258,22 @@ export default function ResetPasswordForm({ portal, mode }: { portal?: string; m
               </div>
 
               <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+              >
+                {loading ? 'Updating…' : 'Update Password'}
+              </button>
+            </form>
+          )}
+        </div>
+
+        <p className="text-center text-slate-500 text-sm mt-6">
+          <Link href="/login" className="text-brand-blue-600 hover:underline">
+            Back to Login
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

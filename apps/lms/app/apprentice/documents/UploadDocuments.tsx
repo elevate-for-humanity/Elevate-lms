@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AlertCircle, CheckCircle, Upload } from 'lucide-react';
 import { getDocumentUploadGuidance } from './document-guidance';
 
@@ -12,6 +13,7 @@ interface DocumentType {
 }
 
 export default function UploadDocuments({ programSlug }: { programSlug: string }) {
+  const router = useRouter();
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +72,9 @@ export default function UploadDocuments({ programSlug }: { programSlug: string }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Upload failed');
       setSuccess('Document uploaded and sent for review.');
-      setTimeout(() => window.location.reload(), 700);
+      // Refresh server-rendered document status without rebooting the entire LMS.
+      // A hard reload flashes the global loading shell and resets the portal UI.
+      setTimeout(() => router.refresh(), 700);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
     } finally {

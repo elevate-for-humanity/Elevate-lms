@@ -40,12 +40,12 @@ export function CalendarWidget({ userId }: { userId: string }) {
   const selectedDateEvents = selectedDate ? dateEvents(selectedDate) : [];
 
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-6">
-      <div className="mb-6 flex items-center justify-between">
+    <section className="rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-bold text-black">Calendar</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center justify-between gap-2 sm:justify-end">
           <button type="button" onClick={() => setCurrentDate(new Date(year, month - 1))} className="rounded-lg p-2 hover:bg-slate-100" aria-label="Previous month"><ChevronLeft className="h-5 w-5" /></button>
-          <span className="min-w-[150px] text-center text-sm font-medium text-black">{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+          <span className="min-w-0 flex-1 text-center text-sm font-medium text-black sm:min-w-[150px] sm:flex-none">{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
           <button type="button" onClick={() => setCurrentDate(new Date(year, month + 1))} className="rounded-lg p-2 hover:bg-slate-100" aria-label="Next month"><ChevronRight className="h-5 w-5" /></button>
         </div>
       </div>

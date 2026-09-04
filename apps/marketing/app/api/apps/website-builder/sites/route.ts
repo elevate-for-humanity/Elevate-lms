@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
 import { ensureComposableSiteConfig, sanitizePages } from '@/lib/tenant/site-composition';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
@@ -81,7 +82,8 @@ export async function POST(request: NextRequest) {
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) return NextResponse.json({ error: 'Website Builder subscription or active trial required', reason: access.reason }, { status: 403 });
 
-  const { data: ownedSites } = await supabase.from('user_websites').select('id, site_config').eq('user_id', user.id).order('updated_at', { ascending: false });
+  const admin = await requireAdminClient();
+  const { data: ownedSites } = await admin.from('user_websites').select('id, site_config').eq('user_id', user.id).order('updated_at', { ascending: false });
   const reusable = (ownedSites || []).find((site) => interviewPending(site.site_config));
   const completedCount = (ownedSites || []).filter((site) => !interviewPending(site.site_config)).length;
   const plan = access.plan || 'starter';
@@ -95,8 +97,8 @@ export async function POST(request: NextRequest) {
   const payload = { user_id: user.id, site_name: siteName, template_id: config.template.id, site_config: config, is_published: false, status: 'draft', updated_at: new Date().toISOString() };
 
   const query = reusable?.id
-    ? supabase.from('user_websites').update(payload).eq('id', reusable.id).eq('user_id', user.id)
-    : supabase.from('user_websites').insert({ ...payload, created_at: new Date().toISOString() });
+    ? admin.from('user_websites').update(payload).eq('id', reusable.id).eq('user_id', user.id)
+    : admin.from('user_websites').insert({ ...payload, created_at: new Date().toISOString() });
   const { data: site, error } = await query.select('id, site_name, subdomain, is_published, updated_at').maybeSingle();
   if (error || !site) return NextResponse.json({ error: error?.message || 'Could not create website' }, { status: 500 });
   return NextResponse.json({ website: site }, { status: reusable?.id ? 200 : 201 });

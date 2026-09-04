@@ -5,7 +5,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
-const SCROLL_SETTLE_MS = 90;
+const SCROLL_SETTLE_MS = 350;
 
 function narrationFor(section: HTMLElement) {
   return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';
@@ -156,7 +156,6 @@ export function ScrollNarrator() {
 
     window.addEventListener('scroll', stopAndScheduleNarration, { passive: true });
     window.addEventListener('wheel', stopAndScheduleNarration, { passive: true });
-    window.addEventListener('touchstart', stopAndScheduleNarration, { passive: true });
     window.addEventListener('pointerdown', scheduleNarration, { passive: true });
     window.addEventListener('keydown', scheduleNarration);
     window.addEventListener('resize', scheduleNarration);
@@ -164,7 +163,6 @@ export function ScrollNarrator() {
     return () => {
       window.removeEventListener('scroll', stopAndScheduleNarration);
       window.removeEventListener('wheel', stopAndScheduleNarration);
-      window.removeEventListener('touchstart', stopAndScheduleNarration);
       window.removeEventListener('pointerdown', scheduleNarration);
       window.removeEventListener('keydown', scheduleNarration);
       window.removeEventListener('resize', scheduleNarration);

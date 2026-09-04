@@ -43,7 +43,8 @@ jobs:
       github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE' ||
       github.event.issue.title == 'RUN HVAC COURSE BUILDER ACCEPTANCE' ||
       github.event.issue.title == 'RUN BARBER COURSE BUILDER ACCEPTANCE' ||
-      github.event.issue.title == 'RUN COSMETOLOGY COURSE BUILDER ACCEPTANCE'
+      github.event.issue.title == 'RUN COSMETOLOGY COURSE BUILDER ACCEPTANCE' ||
+      github.event.issue.title == 'RUN COSMETOLOGY UNIFIED COURSE REBUILD'
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:
@@ -125,7 +126,7 @@ jobs:
             target="hvac-technician"
           elif [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN BARBER COURSE BUILDER ACCEPTANCE" ]; then
             target="barber-apprenticeship"
-          elif [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN COSMETOLOGY COURSE BUILDER ACCEPTANCE" ]; then
+          elif [ "${{ github.event_name }}" = "issues" ] && { [ "${{ github.event.issue.title }}" = "RUN COSMETOLOGY COURSE BUILDER ACCEPTANCE" ] || [ "${{ github.event.issue.title }}" = "RUN COSMETOLOGY UNIFIED COURSE REBUILD" ]; }; then
             target="cosmetology-apprenticeship"
           fi
           echo "program=$target" >> "$GITHUB_OUTPUT"
@@ -151,6 +152,9 @@ jobs:
           elif [ "${{ steps.target.outputs.program }}" = "business-administration" ]; then
             pnpm tsx scripts/course-factory/build-business-program.ts
           else
+            if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.number }}" = "1030" ] && [ "${{ steps.target.outputs.program }}" = "cosmetology-apprenticeship" ]; then
+              pnpm tsx scripts/course-builder/replace-course-media.ts --course cosmetology-apprenticeship --expected 34
+            fi
             pnpm tsx scripts/course-builder/run.ts --course "${{ steps.target.outputs.program }}" --mode refresh
           fi
 

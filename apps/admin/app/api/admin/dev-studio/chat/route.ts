@@ -40,6 +40,39 @@ type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
 type ChatProvider = 'auto' | 'groq' | 'openai' | 'gemini' | 'anthropic';
 type StudioAgent = 'ADMIN_AI';
 
+const PUBLIC_ORIGIN = 'https://www.elevateforhumanity.org';
+const ADMIN_ORIGIN = 'https://admin.elevateforhumanity.org';
+const ADMIN_ROUTE_PREFIXES = [
+  '/dashboard',
+  '/studio',
+  '/students',
+  '/applications',
+  '/programs',
+  '/system-health',
+  '/settings',
+  '/integrations',
+  '/operations',
+];
+
+/** Keep browser evidence on the canonical application that owns the route. */
+function normalizeElevateAuditUrl(value: unknown): string {
+  const raw = typeof value === 'string' && value.trim() ? value.trim() : PUBLIC_ORIGIN;
+  try {
+    const url = new URL(raw, PUBLIC_ORIGIN);
+    const isElevateHost = /(^|\.)elevateforhumanity\.org$/i.test(url.hostname);
+    const isAdminRoute = ADMIN_ROUTE_PREFIXES.some(
+      (prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`),
+    );
+
+    if (isElevateHost && isAdminRoute) {
+      return `${ADMIN_ORIGIN}${url.pathname}${url.search}${url.hash}`;
+    }
+    return url.toString();
+  } catch {
+    return PUBLIC_ORIGIN;
+  }
+}
+
 function normalizeAgent(_value: unknown): StudioAgent {
   return 'ADMIN_AI';
 }
@@ -202,7 +235,8 @@ const TOOLS: any[] = [
         properties: {
           url: {
             type: 'string',
-            description: 'Elevate production URL. Defaults to https://www.elevateforhumanity.org',
+            description:
+              'Exact Elevate production URL. Admin routes such as /dashboard, /studio, /students, /applications, /programs, /settings, and /system-health belong to https://admin.elevateforhumanity.org. Public marketing routes belong to https://www.elevateforhumanity.org.',
           },
           include_mobile: {
             type: 'boolean',
@@ -982,7 +1016,7 @@ async function execTool(
       try {
         return JSON.stringify(
           await runStudioBrowserAudit({
-            url: typeof args.url === 'string' ? args.url : undefined,
+            url: normalizeElevateAuditUrl(args.url),
             includeMobile: args.include_mobile !== false,
           }),
           null,

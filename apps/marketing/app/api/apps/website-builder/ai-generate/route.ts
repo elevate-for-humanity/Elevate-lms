@@ -11,6 +11,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
 import { missingRequiredWebsiteAnswers, type WebsiteInterviewAnswers } from '@/lib/website-builder/interview';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,19 +41,26 @@ async function _POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user?.id) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
-  const [subscriptionResult, sitesResult] = await Promise.all([
-    supabase.from('user_app_subscriptions').select('plan, status, trial_ends_at').eq('user_id', user.id).eq('app_slug', 'website-builder').maybeSingle(),
+  const [access, sitesResult] = await Promise.all([
+    getWebsiteBuilderAccess(user.id, supabase),
     supabase.from('user_websites').select('id, site_config, organization_id, subdomain').eq('user_id', user.id).order('updated_at', { ascending: false }),
   ]);
-  const subscription = subscriptionResult.data;
   const ownedSites = sitesResult.data;
 
-  if (!subscription || !['trial', 'active'].includes(subscription.status || '')) return NextResponse.json({ error: 'Website Builder subscription required' }, { status: 403 });
-  if (subscription.status === 'trial' && subscription.trial_ends_at && new Date(subscription.trial_ends_at) < new Date()) return NextResponse.json({ error: 'Website Builder trial has expired', upgradeUrl: '/store/apps/website-builder' }, { status: 403 });
+  if (!access.allowed) {
+    return NextResponse.json(
+      {
+        error: 'Website Builder subscription or active trial required',
+        reason: access.reason,
+        upgradeUrl: access.upgradeUrl || '/store/apps/website-builder',
+      },
+      { status: 403 },
+    );
+  }
 
   const reusable = (ownedSites || []).find((site) => placeholder(site.site_config));
   const completedCount = (ownedSites || []).filter((site) => !placeholder(site.site_config)).length;
-  const plan = subscription.plan || 'starter';
+  const plan = access.plan || 'starter';
   const limit = PLAN_SITE_LIMITS[plan] ?? 1;
   if (!reusable && limit !== null && completedCount >= limit) return NextResponse.json({ error: `${plan} plan allows ${limit} website${limit === 1 ? '' : 's'}`, upgradeUrl: '/store/apps/website-builder' }, { status: 409 });
 
@@ -128,7 +136,9 @@ async function _POST(request: NextRequest) {
     );
   }
 
-  const credit = await consumeWebsiteBuilderCredits(supabase, user.id, 'initial_site_generation');
+  const credit = access.isAdmin
+    ? { allowed: true, charged: 0, balance: null as number | null, upgradeUrl: null as string | null, error: null as string | null }
+    : await consumeWebsiteBuilderCredits(supabase, user.id, 'initial_site_generation');
   if (!credit.allowed) return NextResponse.json({ error: credit.error || 'Not enough Website Builder credits', creditsRemaining: credit.balance, upgradeUrl: credit.upgradeUrl || '/store/apps/website-builder' }, { status: 402 });
 
   const payload = { user_id: user.id, site_name: businessName, template_id: config.template.id, site_config: config, is_published: false, status: 'draft', updated_at: new Date().toISOString() };

@@ -11,7 +11,11 @@ import { mkdtemp, readFile, rm, stat, unlink, writeFile } from 'fs/promises';
 import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
-import { uploadToR2, isR2Configured } from '@/lib/cloudflare-r2';
+import {
+  uploadToR2,
+  isR2Configured,
+  isR2PublicDeliveryConfigured,
+} from '@/lib/cloudflare-r2';
 import { isStorageConfigured } from '@/lib/storage/file-storage';
 import { logger } from '@/lib/logger';
 import { videoEncoderArgs } from './ffmpeg-runtime';
@@ -81,9 +85,9 @@ export function shouldUploadCourseMediaToR2(
 ): boolean {
   const backend = resolveCourseVideoStorageBackend();
   if (backend === 'supabase') return false;
-  if (!isR2Configured()) {
+  if (!isR2Configured() || !isR2PublicDeliveryConfigured()) {
     if (backend === 'r2') {
-      logger.warn('[upload-lesson-media] COURSE_VIDEO_STORAGE_BACKEND=r2 but Cloudflare R2 not configured');
+      logger.warn('[upload-lesson-media] COURSE_VIDEO_STORAGE_BACKEND=r2 but Cloudflare R2 public delivery is not configured');
     }
     return false;
   }

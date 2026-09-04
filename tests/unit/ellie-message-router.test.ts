@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { routeEllieMessage, selectStudioAgent } from '@/lib/devstudio/ellie-message-router';
+import {
+  routeEllieMessage,
+  selectStudioAgent,
+  shouldOrchestrateMessage,
+} from '@/lib/devstudio/ellie-message-router';
 
 describe('routeEllieMessage', () => {
   it('routes explicit deploy commands to command execution', () => {
@@ -34,6 +38,19 @@ describe('routeEllieMessage', () => {
   it('keeps conversational repair follow-ups in the stateful tool orchestrator', () => {
     expect(routeEllieMessage('Can u fix this')).toBe('platform');
     expect(routeEllieMessage('Please continue and correct it')).toBe('platform');
+  });
+});
+
+describe('shouldOrchestrateMessage', () => {
+  it('sends requested outcomes and operational verification through the durable planner', () => {
+    expect(shouldOrchestrateMessage('Fix QuickBooks and verify the connection')).toBe(true);
+    expect(shouldOrchestrateMessage('Audit the live admin dashboard')).toBe(true);
+    expect(shouldOrchestrateMessage('Deploy the approved build')).toBe(true);
+  });
+
+  it('keeps informational questions conversational', () => {
+    expect(shouldOrchestrateMessage('What is QuickBooks used for?')).toBe(false);
+    expect(shouldOrchestrateMessage('Explain the apprenticeship workflow')).toBe(false);
   });
 });
 

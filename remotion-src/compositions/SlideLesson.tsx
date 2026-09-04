@@ -61,6 +61,7 @@ export interface SlideLessonProps {
   primaryColor: string; // e.g. '#f97316'
   accentColor: string; // e.g. '#3b82f6'
   backgroundColor: string; // e.g. '#0f172a'
+  surfaceMode?: 'bright' | 'dark';
   logoText?: string; // defaults to 'Elevate LMS'
 }
 
@@ -85,7 +86,7 @@ function slideUp(frame: number, fps: number, delay = 0): number {
 
 // ── Brand bar ─────────────────────────────────────────────────────────────────
 
-function BrandBar({ color, logoText }: { color: string; logoText: string }) {
+function BrandBar({ color, logoText, bright = false }: { color: string; logoText: string; bright?: boolean }) {
   return (
     <div
       style={{
@@ -126,7 +127,7 @@ function BrandBar({ color, logoText }: { color: string; logoText: string }) {
         </div>
         <span
           style={{
-            color: '#fff',
+            color: bright ? '#0f172a' : '#fff',
             fontWeight: 700,
             fontSize: 16,
             fontFamily: 'sans-serif',
@@ -144,15 +145,18 @@ function BrandBar({ color, logoText }: { color: string; logoText: string }) {
 
 function BrandedIntro({ props, frame }: { props: SlideLessonProps; frame: number }) {
   const { fps } = useVideoConfig();
+  const bright = props.surfaceMode === 'bright';
   return (
     <AbsoluteFill
       style={{
-        background: `linear-gradient(135deg, ${props.backgroundColor} 0%, #1e293b 100%)`,
+        background: bright
+          ? `linear-gradient(135deg, ${props.backgroundColor} 0%, #dbeafe 100%)`
+          : `linear-gradient(135deg, ${props.backgroundColor} 0%, #1e293b 100%)`,
         justifyContent: 'center',
         alignItems: 'center',
       }}
     >
-      <BrandBar color={props.primaryColor} logoText={props.logoText ?? 'Elevate LMS'} />
+      <BrandBar color={props.primaryColor} logoText={props.logoText ?? 'Elevate LMS'} bright={bright} />
 
       {/* Decorative orb */}
       <div
@@ -188,7 +192,7 @@ function BrandedIntro({ props, frame }: { props: SlideLessonProps; frame: number
             transform: `translateY(${slideUp(frame, fps, 0)}px)`,
             fontSize: 60,
             fontWeight: 900,
-            color: '#fff',
+            color: bright ? '#0f172a' : '#fff',
             fontFamily: 'sans-serif',
             lineHeight: 1.15,
           }}
@@ -218,10 +222,12 @@ function CaptionBar({
   text,
   frame,
   primaryColor,
+  bright,
 }: {
   text: string;
   frame: number;
   primaryColor: string;
+  bright: boolean;
 }) {
   return (
     <div
@@ -230,7 +236,7 @@ function CaptionBar({
         bottom: 0,
         left: 0,
         right: 0,
-        background: 'rgba(0,0,0,0.72)',
+        background: bright ? 'rgba(255,255,255,0.94)' : 'rgba(0,0,0,0.72)',
         borderTop: `2px solid ${primaryColor}55`,
         padding: '14px 60px',
         opacity: fadeIn(frame, 10, 15),
@@ -238,13 +244,13 @@ function CaptionBar({
     >
       <p
         style={{
-          color: '#f1f5f9',
+          color: bright ? '#0f172a' : '#f1f5f9',
           fontSize: 22,
           fontFamily: 'sans-serif',
           lineHeight: 1.5,
           margin: 0,
           textAlign: 'center',
-          textShadow: '0 1px 3px rgba(0,0,0,0.8)',
+          textShadow: bright ? 'none' : '0 1px 3px rgba(0,0,0,0.8)',
         }}
       >
         {text}
@@ -338,6 +344,7 @@ function SceneSlide({
   props: SlideLessonProps;
 }) {
   const { fps } = useVideoConfig();
+  const bright = props.surfaceMode === 'bright';
   const instructionalLayout = instructionalLayoutForScene({ title: scene.title, action: scene.narration, sceneType: scene.sceneType });
   const instructionalBackgroundPosition =
     `${50 + Math.sin(frame / (fps * 2)) * 30}% ${50 + Math.cos(frame / (fps * 2.5)) * 20}%`;
@@ -364,6 +371,7 @@ function SceneSlide({
             width: '100%',
             height: '100%',
             objectFit: 'cover',
+            filter: bright ? 'brightness(1.1) saturate(1.06) contrast(1.02)' : undefined,
           }}
           startFrom={0}
           loop
@@ -378,6 +386,7 @@ function SceneSlide({
             width: '100%',
             height: '100%',
             objectFit: 'cover',
+            filter: bright ? 'brightness(1.1) saturate(1.06) contrast(1.02)' : undefined,
           }}
         />
       ) : null}
@@ -388,12 +397,14 @@ function SceneSlide({
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.28) 58%, rgba(15,23,42,0.08) 100%)',
+            background: bright
+              ? 'linear-gradient(90deg, rgba(248,250,252,0.94) 0%, rgba(248,250,252,0.72) 58%, rgba(248,250,252,0.32) 100%)'
+              : 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.28) 58%, rgba(15,23,42,0.08) 100%)',
           }}
         />
       )}
 
-      <BrandBar color={props.primaryColor} logoText={props.logoText ?? 'Elevate LMS'} />
+      <BrandBar color={props.primaryColor} logoText={props.logoText ?? 'Elevate LMS'} bright={bright || Boolean(instructionalLayout)} />
 
       {/* Scene number badge */}
       <div
@@ -436,10 +447,10 @@ function SceneSlide({
             transform: `translateY(${slideUp(frame, fps, 8)}px)`,
             fontSize: instructionalLayout ? 42 : 52,
             fontWeight: 900,
-            color: instructionalLayout ? '#0f172a' : '#fff',
+            color: instructionalLayout || bright ? '#0f172a' : '#fff',
             fontFamily: 'sans-serif',
             lineHeight: 1.2,
-            textShadow: instructionalLayout ? 'none' : '0 2px 12px rgba(0,0,0,0.6)',
+            textShadow: instructionalLayout || bright ? 'none' : '0 2px 12px rgba(0,0,0,0.6)',
             borderLeft: `5px solid ${props.primaryColor}`,
             paddingLeft: 24,
           }}
@@ -463,7 +474,7 @@ function SceneSlide({
                 }}
               >
                 <div style={{ width: 10, height: 10, borderRadius: '50%', background: props.accentColor, flexShrink: 0, marginTop: 10 }} />
-                <div style={{ color: '#e2e8f0', fontSize: 28, fontFamily: 'sans-serif', lineHeight: 1.5, textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
+                <div style={{ color: bright ? '#0f172a' : '#e2e8f0', fontSize: 28, fontFamily: 'sans-serif', lineHeight: 1.5, textShadow: bright ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
                   {bullet}
                 </div>
               </div>
@@ -476,7 +487,7 @@ function SceneSlide({
       {scene.audioSrc && <Audio src={scene.audioSrc} volume={1.35} />}
 
       {/* Caption bar */}
-      <CaptionBar text={scene.narration} frame={frame} primaryColor={props.primaryColor} />
+      <CaptionBar text={scene.narration} frame={frame} primaryColor={props.primaryColor} bright={bright} />
     </AbsoluteFill>
   );
 }
@@ -485,15 +496,18 @@ function SceneSlide({
 
 function BrandedOutro({ props, frame }: { props: SlideLessonProps; frame: number }) {
   const { fps } = useVideoConfig();
+  const bright = props.surfaceMode === 'bright';
   return (
     <AbsoluteFill
       style={{
-        background: `linear-gradient(135deg, #0f172a 0%, #1e293b 100%)`,
+        background: bright
+          ? 'linear-gradient(135deg, #f8fafc 0%, #dbeafe 100%)'
+          : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
         justifyContent: 'center',
         alignItems: 'center',
       }}
     >
-      <BrandBar color={props.primaryColor} logoText={props.logoText ?? 'Elevate LMS'} />
+      <BrandBar color={props.primaryColor} logoText={props.logoText ?? 'Elevate LMS'} bright={bright} />
 
       <div style={{ textAlign: 'center', padding: '0 120px', maxWidth: 1100 }}>
         <div
@@ -516,7 +530,7 @@ function BrandedOutro({ props, frame }: { props: SlideLessonProps; frame: number
             transform: `translateY(${slideUp(frame, fps, 18)}px)`,
             fontSize: 42,
             fontWeight: 800,
-            color: '#fff',
+            color: bright ? '#0f172a' : '#fff',
             fontFamily: 'sans-serif',
             lineHeight: 1.3,
             marginBottom: 40,

@@ -141,6 +141,8 @@ test.describe('Registered apprenticeship authorization', () => {
         });
         expect(adminReview?.status() ?? 200, 'Admin document review returned a server error').toBeLessThan(500);
         expect(adminPage.url()).not.toMatch(/\/(?:login|unauthorized)(?:\?|$)/);
+        // This assertion certifies that the deployed Admin review queue reads
+        // the same canonical documents table written by the apprentice API.
         await expect(adminPage.locator('body')).toContainText('qa-synthetic-government-id.png');
         await expect(adminPage.locator('body')).toContainText('[QA E2E] Barber Apprentice');
         await expect(adminPage.locator('body')).toContainText(/Government Id/i);

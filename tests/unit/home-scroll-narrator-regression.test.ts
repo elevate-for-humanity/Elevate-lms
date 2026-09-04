@@ -15,7 +15,8 @@ describe('homepage scroll narration lifecycle', () => {
     expect(scrollHandler).toContain('scheduleNarration()');
     expect(source).toContain("window.addEventListener('scroll', stopAndScheduleNarration");
     expect(source).toContain("window.addEventListener('wheel', stopAndScheduleNarration");
-    expect(source).toContain("window.addEventListener('touchstart', stopAndScheduleNarration");
+    expect(source).not.toContain("window.addEventListener('touchstart', stopAndScheduleNarration");
+    expect(source).toContain('const SCROLL_SETTLE_MS = 350');
   });
 
   it('releases narration when no page section owns the viewport', () => {

@@ -51,11 +51,13 @@ async function getQuickBooksConfig() {
   const stored = Object.fromEntries((data ?? []).map((row) => [row.key, row.value]));
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
   return {
-    clientId: stored.QB_CLIENT_ID || process.env.QB_CLIENT_ID || '',
-    clientSecret: stored.QB_CLIENT_SECRET || process.env.QB_CLIENT_SECRET || '',
+    // Deployment secrets are authoritative for OAuth app credentials.
+    // app_settings may contain legacy values and is used only as a fallback.
+    clientId: process.env.QB_CLIENT_ID || stored.QB_CLIENT_ID || '',
+    clientSecret: process.env.QB_CLIENT_SECRET || stored.QB_CLIENT_SECRET || '',
     redirectUri:
-      stored.QB_REDIRECT_URI ||
       process.env.QB_REDIRECT_URI ||
+      stored.QB_REDIRECT_URI ||
       `${siteUrl}/api/auth/quickbooks/callback`,
     accessToken: stored.QB_ACCESS_TOKEN || process.env.QB_ACCESS_TOKEN || '',
     refreshToken: stored.QB_REFRESH_TOKEN || process.env.QB_REFRESH_TOKEN || '',

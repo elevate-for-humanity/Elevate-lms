@@ -20,7 +20,10 @@ const PROTECTED_PREFIXES = [
   '/learner',
   '/apprentice',
   '/admin-preview',
-  '/host-shop/dashboard',
+  // Protect the complete Host Shop operational namespace. The login route is
+  // explicitly exempted in isProtectedPath so onboarding, MOU, orientation,
+  // resources, and any future child route fail closed before React renders.
+  '/host-shop',
   '/parent-portal/dashboard',
   '/parent-portal/student',
   '/employer',
@@ -36,6 +39,10 @@ const PROTECTED_PREFIXES = [
 ] as const;
 
 function isProtectedPath(pathname: string) {
+  if (pathname === '/host-shop/login' || pathname.startsWith('/host-shop/login/')) {
+    return false;
+  }
+
   // Any route explicitly named as a dashboard is private even if a new role
   // namespace is added and forgotten in PROTECTED_PREFIXES.
   if (pathname === '/dashboard' || pathname.includes('/dashboard/')) return true;

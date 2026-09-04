@@ -8,10 +8,11 @@ const expectedUserId = process.env.EXPECTED_USER_ID?.trim();
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
 const sendgridKey = process.env.SENDGRID_API_KEY?.trim();
+const resendKey = process.env.RESEND_API_KEY?.trim();
 const siteUrl = (process.env.LMS_SITE_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
 
-if (!email || !expectedUserId || !supabaseUrl || !serviceRoleKey || !sendgridKey) {
-  throw new Error('TARGET_EMAIL, EXPECTED_USER_ID, NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and SENDGRID_API_KEY are required');
+if (!email || !expectedUserId || !supabaseUrl || !serviceRoleKey || (!sendgridKey && !resendKey)) {
+  throw new Error('Target identity, Supabase admin credentials, and one email provider key are required');
 }
 
 const admin = createClient(supabaseUrl, serviceRoleKey, {
@@ -67,11 +68,24 @@ const message = {
   }],
 };
 
-const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
-  method: 'POST',
-  headers: { Authorization: `Bearer ${sendgridKey}`, 'Content-Type': 'application/json' },
-  body: JSON.stringify(message),
-});
-if (!response.ok) throw new Error(`Credential email failed with SendGrid status ${response.status}`);
+const response = sendgridKey
+  ? await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${sendgridKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(message),
+    })
+  : await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'Elevate for Humanity <info@elevateforhumanity.org>',
+        to: [email],
+        bcc: ['elevate4humanityedu@gmail.com'],
+        reply_to: 'elevate4humanityedu@gmail.com',
+        subject: message.subject,
+        html: message.content[0].value,
+      }),
+    });
+if (!response.ok) throw new Error(`Credential email provider rejected the request with status ${response.status}`);
 
 console.log(`Password reset, sign-in verified, and credential email accepted for ${email}; user_id=${expectedUserId}`);

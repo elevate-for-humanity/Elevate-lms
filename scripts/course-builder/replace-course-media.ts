@@ -65,7 +65,7 @@ async function main() {
       video_url: null,
       video_status: 'draft',
       video_generated_at: null,
-      media_quality_status: null,
+      media_quality_status: 'unverified',
       media_quality_evidence: {},
       media_verified_at: null,
     })

@@ -62,6 +62,17 @@ function objectivesCoverage(objectives: string[], script: string): number {
   return objectives.filter((objective) => keywordCoverage(objective, script) >= 0.5).length / objectives.length;
 }
 
+function containsBarberTradeIdentity(script: string, instructor: string): boolean {
+  // Indiana's licensing agency legitimately includes "Cosmetology and Barbering"
+  // in its name. Exclude that regulator reference while continuing to reject an
+  // actual barber instructor, barbering credential, or barber-trade narration.
+  const narrationWithoutAgencyNames = script
+    .replace(/\bindiana state board of cosmetology and barbering\b/gi, '')
+    .replace(/\bstate board of cosmetology and barbering\b/gi, '');
+  const barberIdentity = /\b(?:master |licensed |student |apprentice )?barber(?:ing)?(?: instructor| educator| specialist| license| credential| apprenticeship| program| trade| career| services?)?\b/i;
+  return barberIdentity.test(instructor) || barberIdentity.test(narrationWithoutAgencyNames);
+}
+
 function sceneAlignment(storyboard: MediaStoryboard): number {
   if (!storyboard.scenes.length) return 0;
   const aligned = storyboard.scenes.filter((scene) => {
@@ -119,7 +130,7 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
   if (sceneNarrationAlignment < 0.75) {
     failures.push(`only ${Math.round(sceneNarrationAlignment * 100)}% of scenes visually align with their narration`);
   }
-  if (courseDomain === 'cosmetology' && /\bbarber|barbering\b/.test(`${input.script} ${combinedInstructor}`.toLowerCase())) {
+  if (courseDomain === 'cosmetology' && containsBarberTradeIdentity(input.script, combinedInstructor)) {
     failures.push('cosmetology lesson contains a barbering instructor or trade identity');
   }
   if (courseDomain === 'barbering' && /cosmetology education specialist/.test(combinedInstructor)) {

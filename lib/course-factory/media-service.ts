@@ -139,7 +139,13 @@ export async function queueCourseLessonVideos(
         && existingLessonJob?.review_status === 'approved'
         && hasCanonicalMediaQualityEvidence(existingLessonJob.quality_evidence);
       const mainInFlight = lesson.video_status === 'queued' || lesson.video_status === 'rendering';
-      const shouldQueueMain = force || (!mainInFlight && (!onlyMissing || !mainComplete));
+      // Queued/draft jobs still need their canonical payload synchronized after
+      // a curriculum refresh. Only a renderer-owned active lease is immutable.
+      const shouldQueueMain =
+        force ||
+        existingLessonJob?.status === 'queued' ||
+        existingLessonJob?.status === 'draft' ||
+        (!mainInFlight && (!onlyMissing || !mainComplete));
 
       if (shouldQueueMain) {
         const job = await ensureQueued(existingLessonJob, () => createJob({

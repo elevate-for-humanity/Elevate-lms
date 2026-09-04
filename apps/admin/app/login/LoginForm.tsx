@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
@@ -42,6 +42,7 @@ async function readAdminLoginResponse(res: Response): Promise<AdminLoginResponse
 }
 
 export default function AdminLoginForm({ redirectTo, initialError }: { redirectTo?: string; initialError?: string }) {
+  const [hydrated, setHydrated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -54,6 +55,10 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
 
   const next = getSafeRedirect(redirectTo ?? null);
 
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   // Do not auto-redirect merely because a shared Supabase cookie exists.
   // Sessions are deliberately scoped to .elevateforhumanity.org so a student,
   // employer, or partner can arrive on the Admin subdomain with a valid session.
@@ -61,6 +66,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!hydrated) return;
     setLoading(true);
     setError('');
 
@@ -151,6 +157,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={!hydrated || loading}
                 autoComplete="email"
                 className="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent text-sm"
                 placeholder="you@elevateforhumanity.org"
@@ -175,6 +182,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={!hydrated || loading}
                 autoComplete="current-password"
                 className="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent text-sm"
                 placeholder="••••••••"
@@ -183,7 +191,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={!hydrated || loading}
               className="w-full py-2.5 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors text-sm"
             >
               {loading ? 'Signing in…' : 'Sign In'}

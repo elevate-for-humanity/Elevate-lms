@@ -269,7 +269,10 @@ export async function queueCourseLessonVideos(
         lessonVideosReady += 1;
       }
 
-      for (const clip of readQuickClips(lesson.content_json)) {
+      // Supplemental quick clips are explicit opt-in assets. The universal
+      // builder defaults to one unified full instructional video per lesson;
+      // activities and knowledge checks remain in the lesson flow.
+      for (const clip of videoConfig.enableMicroclips === true ? readQuickClips(lesson.content_json) : []) {
         const clipId = typeof clip.id === 'string' ? clip.id : '';
         if (!clipId) continue;
         const hasRenderedClip = typeof clip.videoUrl === 'string' && clip.videoUrl.trim().length > 0;

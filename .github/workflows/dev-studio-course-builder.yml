@@ -153,9 +153,10 @@ jobs:
             pnpm tsx scripts/course-factory/build-business-program.ts
           else
             if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.number }}" = "1030" ] && [ "${{ steps.target.outputs.program }}" = "cosmetology-apprenticeship" ]; then
-              pnpm tsx scripts/course-builder/replace-course-media.ts --course cosmetology-apprenticeship --expected 34
+              pnpm tsx scripts/course-builder/requeue-course-media.ts --course cosmetology-apprenticeship
+            else
+              pnpm tsx scripts/course-builder/run.ts --course "${{ steps.target.outputs.program }}" --mode refresh
             fi
-            pnpm tsx scripts/course-builder/run.ts --course "${{ steps.target.outputs.program }}" --mode refresh
           fi
 
       - name: Verify Admin and LMS consumers after governed publication

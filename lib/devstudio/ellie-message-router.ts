@@ -23,6 +23,11 @@ const NATURAL_ACTION_RE =
   /\b(?:fix|repair|correct|change|update|edit|improve|finish|complete|continue|check|inspect|test|verify|open|show|find|explain|help)\b/i;
 const DETERMINISTIC_COMMAND_RE =
   /\b(?:deploy|run (?:the )?tests?|apply (?:all )?migrations?|rollback (?:the )?migration|git push)\b/i;
+const EXECUTION_VERB_RE =
+  /\b(?:build|create|generate|fix|repair|correct|change|update|edit|improve|finish|complete|continue|deploy|publish|run|apply|rollback|push|sync|connect|reconnect|configure|execute|approve|send|issue|assign|mark|remove|add|onboard)\b/i;
+const VERIFIED_OPERATION_RE = /\b(?:audit|test|verify|check|inspect)\b/i;
+const EXECUTABLE_TARGET_RE =
+  /\b(?:quickbooks|integration|workflow|deployment|production|live site|dashboard|website|browser|repository|repo|code|route|component|schema|migration|course|lesson|student|application|enrollment|payout|certificate|email|database|rls|platform|system)\b/i;
 export const OUTCOME_REQUEST_PATTERNS = [
   'build (a )?course',
   'create (a )?course',
@@ -44,6 +49,17 @@ export function routeEllieMessage(message: string): EllieMessageRoute {
   // and produces a misleading analysis-only response.
   if (NATURAL_ACTION_RE.test(message)) return 'platform';
   return 'platform';
+}
+
+/**
+ * Decide whether the single Admin AI surface should create a durable plan.
+ * Questions remain on the conversational path; requested outcomes and
+ * evidence-producing operational checks enter plan → execute → evaluate.
+ */
+export function shouldOrchestrateMessage(message: string): boolean {
+  if (OUTCOME_REQUEST_RE.test(message) || DETERMINISTIC_COMMAND_RE.test(message)) return true;
+  if (EXECUTION_VERB_RE.test(message)) return true;
+  return VERIFIED_OPERATION_RE.test(message) && EXECUTABLE_TARGET_RE.test(message);
 }
 
 /** All requests enter one orchestrator. Internal capabilities are selected by

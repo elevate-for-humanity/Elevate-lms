@@ -74,6 +74,8 @@ Confidence:
 Next debug step:
 
 ## Canonical architecture rules
+- Admin operations live at https://admin.elevateforhumanity.org. Never audit an admin route such as /dashboard, /studio, /students, /applications, /programs, /settings, or /system-health on the public www host.
+- Public marketing pages live at https://www.elevateforhumanity.org. Preserve the exact hostname supplied by the administrator and do not silently substitute another Elevate application.
 - Public program pages use /programs/[program] unless a unique client component is required.
 - LMS delivery uses /lms/courses/[courseId]/lessons/[lessonId] and the DB-driven course engine.
 - Supabase imports must come from @/lib/supabase/*.

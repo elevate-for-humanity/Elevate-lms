@@ -68,11 +68,13 @@ export async function GET(request: NextRequest) {
     logger.error('[QB callback] failed to load Admin OAuth settings:', err);
   }
 
-  const clientId = stored.QB_CLIENT_ID || process.env.QB_CLIENT_ID;
-  const clientSecret = stored.QB_CLIENT_SECRET || process.env.QB_CLIENT_SECRET;
+  // Deployment secrets are authoritative for OAuth app credentials.
+  // app_settings may contain legacy values and is used only as a fallback.
+  const clientId = process.env.QB_CLIENT_ID || stored.QB_CLIENT_ID;
+  const clientSecret = process.env.QB_CLIENT_SECRET || stored.QB_CLIENT_SECRET;
   const redirectUri =
-    stored.QB_REDIRECT_URI ||
     process.env.QB_REDIRECT_URI ||
+    stored.QB_REDIRECT_URI ||
     `${base}/api/auth/quickbooks/callback`;
 
   if (!clientId || !clientSecret) return redirect('error=not_configured');

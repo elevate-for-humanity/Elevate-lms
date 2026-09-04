@@ -25,7 +25,8 @@ import {
   fetchAiHealth,
   routeEllieMessage,
   selectStudioAgent,
-  streamExecuteCommand,
+  shouldOrchestrateMessage,
+  streamOrchestratedPlan,
   streamPlatformChat,
   type EllieMessageRoute,
   type StudioSpecialist,
@@ -432,59 +433,18 @@ export default function UnifiedEllieChat({
     const assistantIdx = messages.length + 1;
 
     try {
-      if (/\bopenhands\b/i.test(text)) {
-        setMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: '', provider: 'openhands', route: 'platform', agent },
-        ]);
-        const response = await fetch('/api/admin/dev-studio/openhands/agent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            task: text,
-            confirmationText: text.includes('CONFIRM OPENHANDS EXECUTION')
-              ? 'CONFIRM OPENHANDS EXECUTION'
-              : '',
-          }),
-        });
-        const result = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
-        if (!response.ok) {
-          const approval = result.requiredConfirmation
-            ? ` Approval required: include ${result.requiredConfirmation} in the request.`
-            : '';
-          throw new Error(`${result.error || 'OpenHands dispatch failed.'}${approval}`);
-        }
-        setMessages((prev) => {
-          const next = [...prev];
-          const row = next[assistantIdx];
-          if (row?.role === 'assistant') {
-            next[assistantIdx] = {
-              ...row,
-              content: `OpenHands execution started. Task ${result.taskId}; start task ${result.startTaskId}; status ${result.status}.`,
-              provider: 'openhands',
-              route: 'platform',
-              capabilitiesUsed: ['lizzy', 'ai-devops-engineer', 'ai-developer'],
-              toolCalls: [{
-                tool: 'openhands.execute',
-                args: { repository: 'configured production repository' },
-                result: JSON.stringify(result),
-              }],
-            };
-          }
-          return next;
-        });
-      } else if (route === 'command') {
+      if (!attachment && shouldOrchestrateMessage(text)) {
         setMessages((prev) => [
           ...prev,
           {
             role: 'assistant',
-            content: `▶ ${ELLIE_ROUTE_LABEL.command}\n`,
-            provider: 'execute',
+            content: `▶ ${ELLIE_ROUTE_LABEL[route]}\n`,
+            provider: 'orchestrator',
             route,
             agent,
           },
         ]);
-        await streamExecuteCommand(text, (line) => {
+        await streamOrchestratedPlan(text, (line) => {
           setMessages((prev) => {
             const next = [...prev];
             const row = next[assistantIdx];

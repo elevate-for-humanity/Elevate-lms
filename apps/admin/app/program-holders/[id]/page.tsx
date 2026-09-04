@@ -6,6 +6,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ProgramHolderAdminDocumentUpload } from './ProgramHolderAdminDocumentUpload';
+import { OpenPortalPreviewButton } from '@/components/admin/OpenPortalPreviewButton';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -127,9 +128,18 @@ export default async function ProgramHolderDetailPage({
                 one workspace.
               </p>
             </div>
-            <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black uppercase tracking-wide">
-              {holder.status || 'pending'}
-            </span>
+            <div className="flex flex-col items-end gap-3">
+              <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black uppercase tracking-wide">
+                {holder.status || 'pending'}
+              </span>
+              {holder.user_id ? (
+                <OpenPortalPreviewButton
+                  targetUserId={holder.user_id}
+                  label="Open Program Holder Portal"
+                  reason={`Admin review of Program Holder ${id}`}
+                />
+              ) : null}
+            </div>
           </div>
         </div>
       </section>

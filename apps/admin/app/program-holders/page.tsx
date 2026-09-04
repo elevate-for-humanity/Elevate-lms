@@ -47,9 +47,20 @@ export default async function AdminProgramHoldersPage() {
     countMap[pc.program_holder_id] = (countMap[pc.program_holder_id] || 0) + 1;
   });
 
-  const items = holders || [];
+  // QA fixtures remain in the database for auditability but must never be
+  // presented as production organizations or included in operating totals.
+  const items = (holders || []).filter((holder: any) => {
+    const email = String(holder.contact_email || '').toLowerCase();
+    const organization = String(holder.organization_name || holder.name || '').trim();
+    const contact = String(holder.contact_name || '').trim();
+    return (
+      !email.endsWith('@qa.invalid') &&
+      !/^\[qa(?:\s|\])/i.test(organization) &&
+      !/^\[qa(?:\s|\])/i.test(contact)
+    );
+  });
   const pending = items.filter((h: any) => h.status === 'pending').length;
-  const active = items.filter((h: any) => h.status === 'active').length;
+  const active = items.filter((h: any) => ['active', 'approved'].includes(h.status)).length;
 
   return (
     <div className="min-h-screen bg-white">

@@ -19,6 +19,8 @@ export interface QueueCourseLessonVideosResult {
   microclipsQueued: number;
   skipped: number;
   failed: number;
+  /** Primary lesson-video jobs accepted by the renderer queue or already valid. */
+  lessonVideosReady: number;
 }
 
 function readQuickClips(contentJson: unknown): Array<Record<string, any>> {
@@ -43,28 +45,53 @@ function decodeHtmlEntities(value: string): string {
     .replace(/&gt;/gi, '>');
 }
 
-function canonicalLessonNarration(lesson: Record<string, any>): string {
-  const content =
-    typeof lesson.rendered_html === 'string' && lesson.rendered_html.trim()
-      ? lesson.rendered_html
-      : typeof lesson.content === 'string'
-        ? lesson.content
-        : lesson.content && typeof lesson.content === 'object' && typeof lesson.content.html === 'string'
-          ? lesson.content.html
-          : '';
+const NON_NARRATED_KEYS = new Set([
+  'id',
+  'videoUrl',
+  'audioUrl',
+  'captionUrl',
+  'transcriptUrl',
+  'visualPrompt',
+  'status',
+  'type',
+]);
 
-  const plain = decodeHtmlEntities(
-    String(content)
+function collectInstructionalText(value: unknown, key = '', seen = new Set<string>()): string[] {
+  if (value == null || NON_NARRATED_KEYS.has(key)) return [];
+  if (typeof value === 'string') {
+    const normalized = decodeHtmlEntities(value)
       .replace(/<script[\s\S]*?<\/script>/gi, ' ')
       .replace(/<style[\s\S]*?<\/style>/gi, ' ')
       .replace(/<\/(p|div|section|article|h[1-6]|li|ul|ol|table|tr|blockquote)>/gi, '. ')
       .replace(/<br\s*\/?>/gi, '. ')
-      .replace(/<[^>]+>/g, ' '),
-  )
-    .replace(/\s+/g, ' ')
-    .replace(/\s+([,.;:!?])/g, '$1')
-    .replace(/([.!?])\s*\1+/g, '$1')
-    .trim();
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/\s+([,.;:!?])/g, '$1')
+      .trim();
+    if (normalized.length < 3 || seen.has(normalized)) return [];
+    seen.add(normalized);
+    return [normalized];
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => collectInstructionalText(item, key, seen));
+  }
+  if (typeof value === 'object') {
+    return Object.entries(value as Record<string, unknown>)
+      .flatMap(([childKey, child]) => collectInstructionalText(child, childKey, seen));
+  }
+  return [];
+}
+
+function canonicalLessonNarration(lesson: Record<string, any>): string {
+  // Persisted lessons contain both a short display HTML fragment and the full
+  // structured lesson experience. Narration must be derived from the richest
+  // canonical source so readings, procedures, activities, knowledge checks,
+  // explanations, and remediation stay synchronized with the video.
+  const sources = [lesson.rendered_html, lesson.content, lesson.content_json]
+    .map((source) => collectInstructionalText(source).join(' '))
+    .map((source) => source.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+  const plain = sources.sort((left, right) => right.length - left.length)[0] ?? '';
 
   if (plain.length < 1_200) {
     throw new Error(
@@ -140,6 +167,7 @@ export async function queueCourseLessonVideos(
   let queued = 0;
   let microclipsQueued = 0;
   let failed = 0;
+  let lessonVideosReady = 0;
 
   async function ensureQueued(
     _existing: VideoJob | undefined,
@@ -205,6 +233,11 @@ export async function queueCourseLessonVideos(
         }));
         existingByAsset.set(lessonKey, job);
         if (job.status === 'queued') queued += 1;
+        if (job.status === 'queued' || job.status === 'rendering' || job.status === 'complete') {
+          lessonVideosReady += 1;
+        }
+      } else if (mainComplete || mainInFlight) {
+        lessonVideosReady += 1;
       }
 
       for (const clip of readQuickClips(lesson.content_json)) {
@@ -250,5 +283,6 @@ export async function queueCourseLessonVideos(
     microclipsQueued,
     skipped: Math.max(rows.length - candidates.length, 0),
     failed,
+    lessonVideosReady,
   };
 }

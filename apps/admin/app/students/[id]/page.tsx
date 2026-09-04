@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import EnrollmentVoucherPanel from '@/components/admin/EnrollmentVoucherPanel';
 import { logger } from '@/lib/logger';
+import { OpenLearnerPortalButton } from '@/components/admin/students/OpenLearnerPortalButton';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false }, title: 'Student Profile | Admin' };
@@ -114,7 +115,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
         <Link href="/students" className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"><ArrowLeft className="h-4 w-4" /></Link>
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-950 text-lg font-black text-white">{initials}</div>
         <div className="min-w-0 flex-1"><h1 className="text-2xl font-black text-slate-950">{name}</h1><div className="mt-2 flex flex-wrap items-center gap-2"><Badge status={student.enrollment_status} />{student.student_number && <span className="font-mono text-xs text-slate-500">#{student.student_number}</span>}<span className="text-xs text-slate-500">Joined {fmtDate(student.created_at)}</span></div></div>
-        {student.email && <a href={`mailto:${student.email}`} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold text-slate-700"><Mail className="h-4 w-4" />Email</a>}
+        <div className="flex flex-wrap items-start gap-2"><OpenLearnerPortalButton studentId={student.id} />{student.email && <a href={`mailto:${student.email}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold text-slate-700"><Mail className="h-4 w-4" />Email</a>}</div>
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[.75fr_1.25fr]">

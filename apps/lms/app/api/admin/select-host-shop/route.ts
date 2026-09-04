@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireRoles } from '@/lib/admin/guards';
 import { HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { verifyPortalPreviewHandoff } from '@/lib/admin/portal-preview-handoff';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -9,12 +10,9 @@ export const runtime = 'nodejs';
 const APP_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
 
 export async function GET(request: NextRequest) {
-  const actor = await apiRequireRoles(
-    request,
-    ['admin', 'super_admin', 'org_admin'],
-    { adminOverride: true },
-  );
-  if (actor.error) return actor.error;
+  const handoff = verifyPortalPreviewHandoff(request.nextUrl.searchParams.get('handoff')?.trim() || '');
+  const actor = handoff ? null : await apiRequireRoles(request, ['admin', 'super_admin', 'org_admin'], { adminOverride: true });
+  if (actor?.error) return actor.error;
 
   const shopId = request.nextUrl.searchParams.get('shop_id')?.trim();
   const requestedPartnerId = request.nextUrl.searchParams.get('partner_id')?.trim();
@@ -24,7 +22,13 @@ export async function GET(request: NextRequest) {
   }
 
   const db = await requireAdminClient();
-  let partnerId = requestedPartnerId || '';
+  if (handoff) {
+    const { data: handoffActor } = await db.from('profiles').select('id,role').eq('id', handoff.actorId).maybeSingle();
+    if (!handoffActor?.id || !['admin', 'super_admin', 'org_admin'].includes(String(handoffActor.role || ''))) {
+      return NextResponse.json({ error: 'Invalid Host Shop handoff' }, { status: 403 });
+    }
+  }
+  let partnerId = handoff?.targetId || requestedPartnerId || '';
 
   if (shopId) {
     const { data: shop, error: shopError } = await db

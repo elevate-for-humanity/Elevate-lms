@@ -61,6 +61,13 @@ interface UnifiedEllieChatProps {
   onOpenPreview?: () => void;
   embedded?: boolean;
   fileContext?: string;
+  onPreviewTarget?: (url: string) => void;
+}
+
+function findElevatePreviewUrl(value: unknown): string | null {
+  const text = typeof value === 'string' ? value : JSON.stringify(value ?? '');
+  const match = text.match(/https:\/\/(?:www|admin|app)\.elevateforhumanity\.org(?:\/[^\s"'<>]*)?/i);
+  return match?.[0] ?? null;
 }
 
 interface StudioJob {
@@ -266,6 +273,7 @@ export default function UnifiedEllieChat({
   onOpenPreview,
   embedded = false,
   fileContext,
+  onPreviewTarget,
 }: UnifiedEllieChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -338,6 +346,8 @@ export default function UnifiedEllieChat({
         body: JSON.stringify({ actionId: action.id, decision }),
       });
       const data = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+      const actionPreview = findElevatePreviewUrl(data?.result);
+      if (decision === 'approve' && actionPreview) onPreviewTarget?.(actionPreview);
       const outcome: NonNullable<ChatMessage['actionOutcome']> = response.ok
         ? {
             status:
@@ -475,6 +485,8 @@ export default function UnifiedEllieChat({
             });
           },
           onDone: (meta) => {
+            const preview = findElevatePreviewUrl(meta.toolCalls);
+            if (preview) onPreviewTarget?.(preview);
             setMessages((prev) => {
               const next = [...prev];
               const row = next[assistantIdx];

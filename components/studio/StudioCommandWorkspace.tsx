@@ -25,6 +25,13 @@ export default function StudioCommandWorkspace({
 }) {
   const [inspectionOpen, setInspectionOpen] = useState(false);
   const [mode, setMode] = useState<InspectionMode>('preview');
+  const [previewUrl, setPreviewUrl] = useState('https://admin.elevateforhumanity.org/dashboard');
+
+  const openPreview = (url?: string) => {
+    if (url) setPreviewUrl(url);
+    setMode('preview');
+    setInspectionOpen(true);
+  };
 
   return (
     <div className="relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white lg:flex-row">
@@ -41,7 +48,7 @@ export default function StudioCommandWorkspace({
             Open preview
           </button>
         </div>
-        <UnifiedEllieChat embedded onOpenPreview={() => setInspectionOpen(true)} />
+        <UnifiedEllieChat embedded onOpenPreview={() => openPreview()} onPreviewTarget={openPreview} />
       </section>
 
       {inspectionOpen ? (
@@ -77,7 +84,7 @@ export default function StudioCommandWorkspace({
               <RepositoryLivePreview
                 filePath={null}
                 content=""
-                initialUrl="https://www.elevateforhumanity.org"
+                initialUrl={previewUrl}
               />
             ) : (
               <CloudBrowserWorkspace />

@@ -72,6 +72,65 @@ test.describe('Registered apprenticeship authorization', () => {
     ];
     for (const path of readOnlySurfaces) await expectPortalRoute(page, path);
 
+    // Exercise the authenticated document workflow with synthetic evidence.
+    // The upload is verified through the same API that renders the dashboard,
+    // then removed so production never accumulates disposable QA documents.
+    const requirementsResponse = await page.request.get(
+      `${BASE}/api/apprentice/documents?program=barber-apprenticeship`,
+      { failOnStatusCode: false },
+    );
+    expect(requirementsResponse.status()).toBe(200);
+    const requirements = await requirementsResponse.json();
+    const governmentId = requirements.documentTypes?.find(
+      (item: any) => item.document_type === 'government_id',
+    );
+    expect(governmentId?.id, 'Government-issued ID requirement is missing').toBeTruthy();
+
+    const syntheticPng = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+      'base64',
+    );
+    const uploadResponse = await page.request.post(`${BASE}/api/apprentice/documents`, {
+      multipart: {
+        file: {
+          name: 'qa-synthetic-government-id.png',
+          mimeType: 'image/png',
+          buffer: syntheticPng,
+        },
+        documentTypeId: governmentId.id,
+        programSlug: 'barber-apprenticeship',
+      },
+      failOnStatusCode: false,
+    });
+    expect(uploadResponse.status()).toBe(200);
+    const uploaded = await uploadResponse.json();
+    expect(uploaded?.document?.id).toBeTruthy();
+
+    try {
+      const verifyUploadResponse = await page.request.get(
+        `${BASE}/api/apprentice/documents?program=barber-apprenticeship`,
+        { failOnStatusCode: false },
+      );
+      expect(verifyUploadResponse.status()).toBe(200);
+      const verifiedDocuments = await verifyUploadResponse.json();
+      expect(
+        verifiedDocuments.uploadedDocuments?.some(
+          (document: any) =>
+            document.id === uploaded.document.id &&
+            document.file_name === 'qa-synthetic-government-id.png' &&
+            document.document_type === 'government_id' &&
+            document.status === 'pending',
+        ),
+        'Synthetic government ID upload did not persist',
+      ).toBe(true);
+    } finally {
+      const cleanupResponse = await page.request.delete(
+        `${BASE}/api/apprentice/documents?id=${encodeURIComponent(uploaded.document.id)}`,
+        { failOnStatusCode: false },
+      );
+      expect(cleanupResponse.status()).toBe(200);
+    }
+
     // Keep a direct API assertion for server-side authorization.
     const forbidden = await page.request.patch(`${BASE}/api/host-shop/competencies`, {
       data: { enrollmentId: '00000000-0000-0000-0000-000000000000', competencyId: 'not-authorized', completed: true },

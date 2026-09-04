@@ -29,6 +29,12 @@ describe('homepage hero slideshow rendering', () => {
     expect(Math.max(...brightnessValues) - Math.min(...brightnessValues)).toBeLessThanOrEqual(0.02);
   });
 
+  it('uses the sharp Salon Saloon team portrait for the final slide', () => {
+    expect(source).toContain("src: '/images/partners/salon-saloon/team-sign.webp'");
+    expect(source).not.toContain("src: '/images/partners/generations-hair/salon-service.webp'");
+    expect(source).not.toContain("data-narration-src={revisionedHeroAsset('/audio/narration/home-hero.mp3')}");
+  });
+
   it('crossfades naturally without unmounting or exposing a blank frame', () => {
     expect(source).toContain('transition-[opacity,transform] duration-1000 ease-in-out');
     expect(source).toContain('motion-reduce:transition-none');

@@ -53,10 +53,7 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
       // DOMContentLoaded navigation signal after the destination has committed.
       // Certify the rendered document, not that transport-level timing detail.
       response = await page.goto(target, { waitUntil: 'commit', timeout: 30_000 });
-      await expect.poll(() => page.evaluate(() => document.readyState), {
-        message: `${target} did not produce an interactive document`,
-        timeout: 30_000,
-      }).toMatch(/interactive|complete/);
+      await page.waitForLoadState('domcontentloaded', { timeout: 30_000 });
       lastNavigationError = undefined;
       break;
     } catch (error) {

@@ -100,22 +100,24 @@ export async function queueCourseLessonVideos(
   let failed = 0;
 
   async function ensureQueued(
-    existing: VideoJob | undefined,
+    _existing: VideoJob | undefined,
     create: () => Promise<VideoJob>,
   ): Promise<VideoJob> {
-    if (!existing) return create();
-    if (existing.status === 'failed' || (force && existing.status !== 'rendering')) {
+    // createJob is an upsert-by-canonical-identity and synchronizes refreshed
+    // lesson narration/scene data into any non-rendering existing job.
+    const current = await create();
+    if (current.status === 'failed' || (force && current.status !== 'rendering')) {
       return resetCanonicalMediaJob(
         {
-          courseId: existing.course_id,
-          lessonId: existing.lesson_id,
-          assetKind: existing.asset_kind ?? 'lesson',
-          assetKey: existing.asset_key,
+          courseId: current.course_id,
+          lessonId: current.lesson_id,
+          assetKind: current.asset_kind ?? 'lesson',
+          assetKey: current.asset_key,
         },
-        { force, reason: force ? 'Authorized Course Factory media repair' : existing.error_message ?? 'Retrying failed media asset' },
+        { force, reason: force ? 'Authorized Course Factory media repair' : current.error_message ?? 'Retrying failed media asset' },
       );
     }
-    return existing;
+    return current;
   }
 
   for (const [candidateIndex, lesson] of candidates.entries()) {

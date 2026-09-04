@@ -170,6 +170,7 @@ export type BlueprintVideoConfig = {
     | 'screencast'
     | 'custom';
   instructorName: string;
+  instructorId?: string;
   instructorTitle: string;
   instructorImagePath: string;
   brandName?: string;

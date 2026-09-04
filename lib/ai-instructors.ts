@@ -150,6 +150,25 @@ export function getInstructorById(instructorId: string): AIInstructor {
   return instructor;
 }
 
+/** Resolve the instructor declared by a governed blueprint before title inference. */
+export function getInstructorForBlueprint(
+  courseName: string,
+  videoConfig?: { instructorId?: string; instructorName?: string } | null,
+): AIInstructor {
+  const configuredId = videoConfig?.instructorId?.trim();
+  if (configuredId) return getInstructorById(configuredId);
+
+  const configuredName = videoConfig?.instructorName?.trim().toLocaleLowerCase();
+  if (configuredName) {
+    const instructor = AI_INSTRUCTORS.find(
+      (candidate) => candidate.name.toLocaleLowerCase() === configuredName,
+    );
+    if (!instructor) throw new Error(`AI_INSTRUCTOR_MISSING:${videoConfig?.instructorName}`);
+    return instructor;
+  }
+  return getInstructorForCourse(courseName);
+}
+
 /**
  * Generate instructor introduction script
  */

@@ -53,7 +53,44 @@ GOVERNED COURSE RULES:
 - Keep all content original and brand-neutral; do not reproduce Milady or any proprietary textbook or test bank.
 - Support accessibility with plain language, meaningful headings, narration that works without visuals, and text instruction that works without video.
 - Produce complete, learner-ready content with no placeholders, TODOs, unsupported links, or promises of automatic licensure or state-board passage.
+- Keep every workplace, person, tool, credential, and visual inside the named course discipline. Never borrow a setting or role from another trade.
+- Do not name, invent, or introduce an instructor in narration. The governed media layer adds the approved instructor identity after content validation.
 `.trim();
+
+const CROSS_DOMAIN_MARKERS: Array<{ family: RegExp; forbidden: RegExp }> = [
+  {
+    family: /\b(hvac|refriger|epa[_ -]?608|heating|air[_ -]?conditioning)\b/i,
+    forbidden: /\b(cosmetolog|salon|barber|haircut|esthetician|nail technician|technology training lead|certiport-certified it)\b/i,
+  },
+  {
+    family: /\b(cosmetolog|salon|barber|esthetic|nail)\b/i,
+    forbidden: /\b(hvac technician|refrigerant recovery|epa[_ -]?608|technology training lead|certiport-certified it)\b/i,
+  },
+];
+
+const GOVERNED_INSTRUCTOR_MARKERS =
+  /\b(Dr\. Sarah Chen|Marcus Johnson|Avery Brooks|James Williams|Lisa Martinez|Robert Davis|Angela Thompson)\b/i;
+
+/** Reject structurally valid output that belongs to the wrong training domain. */
+export function assertLessonDomainIsolation(
+  context: Pick<LessonGenerationInput, 'courseTitle' | 'moduleTitle' | 'lesson'>,
+  generated: unknown,
+): void {
+  const familyText = `${context.courseTitle} ${context.moduleTitle} ${context.lesson.domainKey ?? ''}`;
+  const output = JSON.stringify(generated);
+  if (GOVERNED_INSTRUCTOR_MARKERS.test(output)) {
+    throw new Error(
+      'Lesson generation violated domain isolation: instructor identity is owned by the governed media layer',
+    );
+  }
+  for (const rule of CROSS_DOMAIN_MARKERS) {
+    if (rule.family.test(familyText) && rule.forbidden.test(output)) {
+      throw new Error(
+        `Lesson generation violated domain isolation: cross-discipline content matched ${String(rule.forbidden)}`,
+      );
+    }
+  }
+}
 
 /**
  * Keep the complete lesson contract inside the smallest production provider's
@@ -231,6 +268,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
         generatedLessonContentSchema,
         'Lesson generation',
       );
+      assertLessonDomainIsolation(input, parsed);
 
       const generated: GeneratedLessonContent = {
         objective: parsed.objective,

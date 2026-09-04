@@ -4,14 +4,27 @@ import { HVAC_EPA608_BLUEPRINT } from '@/lib/curriculum/blueprints/hvac-epa-608'
 
 describe('HVAC credential intelligence', () => {
   it('uses original, source-grounded EPA 608 material and the instructional renderer', () => {
-    expect(HVAC_EPA608_BLUEPRINT.version).toBe('2.0.0');
+    expect(HVAC_EPA608_BLUEPRINT.version).toBe('2.1.0');
     expect(HVAC_EPA608_BLUEPRINT.sourceAuthority).toBe('U.S. Environmental Protection Agency');
     expect(HVAC_EPA608_BLUEPRINT.sourceReference).toContain('40 CFR Part 82, Subpart F');
     expect(HVAC_EPA608_BLUEPRINT.generationRules.originalContentRequired).toBe(true);
     expect(HVAC_EPA608_BLUEPRINT.generationRules.prohibitProtectedExamQuestions).toBe(true);
     expect(HVAC_EPA608_BLUEPRINT.videoConfig?.videoGenerator).toBe('remotion');
     expect(HVAC_EPA608_BLUEPRINT.videoConfig?.template).toBe('trade-demonstration');
+    expect(HVAC_EPA608_BLUEPRINT.videoConfig?.instructorId).toBe('marcus-johnson');
     expect(HVAC_EPA608_BLUEPRINT.videoConfig?.generateDalleImage).toBe(false);
+  });
+
+  it('prevents cross-trade prompts and stale queued media payloads', () => {
+    const generator = readFileSync('lib/course-factory/content-generator.ts', 'utf8');
+    const publisher = readFileSync('lib/course-factory/publisher.ts', 'utf8');
+    const queue = readFileSync('lib/video/job-queue.ts', 'utf8');
+    const media = readFileSync('lib/course-factory/media-service.ts', 'utf8');
+    expect(generator).toContain('assertLessonDomainIsolation(input, parsed)');
+    expect(generator).toContain('cross-discipline content');
+    expect(publisher).toContain('getInstructorForBlueprint(courseTitle, videoConfig)');
+    expect(queue).toContain('Never render a stale queued job');
+    expect(media).toContain('const current = await create()');
   });
 
   it('does not require third-party prep courseware', () => {

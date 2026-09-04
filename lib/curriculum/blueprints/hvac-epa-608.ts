@@ -25,6 +25,7 @@ const HVAC_VIDEO_CONFIG: BlueprintVideoConfig = {
   videoGenerator: 'remotion',
   template: 'trade-demonstration',
   instructorName: 'Marcus Johnson',
+  instructorId: 'marcus-johnson',
   instructorTitle: 'Master HVAC Technician',
   instructorImagePath: '/images/team/instructors/instructor-trades.jpg',
   topBarColor: '#f97316',
@@ -45,7 +46,7 @@ const HVAC_VIDEO_CONFIG: BlueprintVideoConfig = {
 
 export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
   id: 'hvac-epa608-v2',
-  version: '2.0.0',
+  version: '2.1.0',
   credentialSlug: 'epa-608',
   credentialTitle: 'EPA Section 608 Technician Certification',
   state: 'federal',

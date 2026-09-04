@@ -144,6 +144,27 @@ export async function createJob(input: CreateJobInput): Promise<VideoJob> {
   const assetKind = input.asset_kind ?? 'lesson';
   const existing = await findCanonicalJob(supabase, input);
   if (existing) {
+    // A curriculum refresh may replace narration and scene direction while
+    // retaining the canonical asset identity. Never render a stale queued job.
+    if (existing.status !== 'rendering') {
+      const { data: refreshed, error: refreshError } = await supabase
+        .from('video_jobs')
+        .update({
+          lesson_title: input.lesson_title,
+          script: input.script ?? null,
+          bullet_points: input.bullet_points ?? [],
+          scene_data: input.scene_data ?? null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existing.id)
+        .select('*')
+        .single();
+      if (refreshError || !refreshed) {
+        throw refreshError ?? new Error('Unable to refresh video job source');
+      }
+      await syncLessonJobLink(supabase, refreshed as VideoJob);
+      return refreshed as VideoJob;
+    }
     await syncLessonJobLink(supabase, existing);
     return existing;
   }

@@ -5,7 +5,7 @@
  * persists an already-validated package through one PostgreSQL transaction.
  */
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getInstructorForCourse } from '@/lib/ai-instructors';
+import { getInstructorForBlueprint } from '@/lib/ai-instructors';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 import type { BlueprintModule, BuildMode, ValidationResult } from './types';
 import { compileLearningIntelligence, LearningIntelligenceSchema } from './learning-intelligence';
@@ -92,8 +92,12 @@ function normalizeLessonType(lesson: Record<string, any>, slug: string): string 
   return inferStepType(slug);
 }
 
-export function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
-  const instructor = getInstructorForCourse(courseTitle);
+export function buildAtomicPayload(
+  modules: BlueprintModule[],
+  courseTitle: string,
+  videoConfig?: CredentialBlueprint['videoConfig'],
+) {
+  const instructor = getInstructorForBlueprint(courseTitle, videoConfig);
   return [...modules]
     .sort((a, b) => a.orderIndex - b.orderIndex)
     .map((courseModule, modulePosition) => {
@@ -284,7 +288,10 @@ export async function publishCourse(input: PublishInput): Promise<PublishResult>
   const db = await requireAdminClient();
   try {
     const sourceModules = modulesFrom(input);
-    const modules = buildAtomicPayload(sourceModules, input.courseTitle);
+    const governedVideoConfig = Array.isArray(input.blueprint)
+      ? undefined
+      : input.blueprint.videoConfig;
+    const modules = buildAtomicPayload(sourceModules, input.courseTitle, governedVideoConfig);
     const courseSlug = slugFrom(input);
     const { data, error } = await (db as any).rpc('publish_course_package_atomic', {
       p_program_id: input.programId ?? null,

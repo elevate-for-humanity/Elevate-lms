@@ -136,7 +136,29 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
             })}
           </nav>
 
-          <div className="flex items-center gap-1 ml-auto">
+          <div className="ml-auto flex items-center gap-1">
+            {/* Core records stay visible at every breakpoint; the full catalog remains in All tools. */}
+            <div className="flex items-center gap-1">
+              <Link
+                href="/students"
+                className={`inline-flex min-h-10 items-center rounded-lg px-2.5 text-xs font-bold sm:px-3 sm:text-sm ${isActive(pathname, '/students') ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-700 hover:bg-slate-100'}`}
+              >
+                Students
+              </Link>
+              <Link
+                href="/applications"
+                className={`inline-flex min-h-10 items-center rounded-lg px-2.5 text-xs font-bold sm:px-3 sm:text-sm ${isActive(pathname, '/applications') ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-700 hover:bg-slate-100'}`}
+              >
+                Applications
+              </Link>
+              <Link
+                href="/studio"
+                className={`hidden min-h-10 items-center rounded-lg px-3 text-sm font-bold md:inline-flex ${isActive(pathname, '/studio') ? 'bg-brand-red-50 text-brand-red-700' : 'text-slate-700 hover:bg-slate-100'}`}
+              >
+                Admin AI
+              </Link>
+            </div>
+
             {/* Search */}
             <form
               onSubmit={handleSearch}
@@ -198,18 +220,22 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
               </button>
             </div>
 
-            {/* Mobile Nav Toggle */}
+            {/* Complete navigation catalog */}
             <button
+              type="button"
               onClick={() => setNavExpanded(!navExpanded)}
-              className="xl:hidden w-9 h-9 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100"
+              aria-expanded={navExpanded}
+              aria-controls="admin-all-tools-menu"
+              className="xl:hidden inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-bold text-slate-700 hover:bg-slate-100 sm:px-3 sm:text-sm"
             >
-              {navExpanded ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              {navExpanded ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+              <span>All tools</span>
             </button>
           </div>
         </div>
 
         {/* Horizontal Mobile Nav - Scrollable */}
-        <div className={`xl:hidden overflow-hidden border-t border-slate-200 transition-all duration-300 ${navExpanded ? 'max-h-[80vh]' : 'max-h-0'}`}>
+        <div id="admin-all-tools-menu" className={`xl:hidden overflow-hidden border-t border-slate-200 transition-all duration-300 ${navExpanded ? 'max-h-[80vh]' : 'max-h-0'}`}>
           <div className="max-h-[80vh] overflow-y-auto px-4 py-3">
             <div className="grid gap-2 sm:grid-cols-2">
               {NAV.map((section) => (

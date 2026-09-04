@@ -405,7 +405,7 @@ export const footerNavigation = {
       { label: 'Funding & Support', href: '/funding' },
       { label: 'Career Services', href: '/career-services' },
       { label: 'Employment Support', href: '/employment-support' },
-      { label: 'Success Stories', href: '/success' },
+      { label: 'Success Stories', href: '/success-stories' },
       { label: 'Student Login', href: '/lms/dashboard' },
     ],
   },

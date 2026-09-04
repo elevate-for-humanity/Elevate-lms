@@ -130,29 +130,35 @@ export default function LoginPage() {
         new Set([profile.role, ...secondaryRoles].filter(Boolean)),
       ) as string[];
 
-      let destination: string;
-      let allowRequestedRedirect = true;
+      const requestedDestination = safeRedirect
+        ? resolveRoleCompatiblePostLoginUrl(safeRedirect, profile.role, effectiveRoles)
+        : '';
+      const isStoreReturn =
+        requestedDestination.startsWith('https://store.elevateforhumanity.org/store');
 
-      if (profile.role === 'employer' && profile.onboarding_completed !== true) {
+      let destination: string;
+
+      // Store checkout is a shared buyer surface, not a role-owned portal.
+      // Preserve this return for students and apprentices too; otherwise a
+      // successful checkout sign-in incorrectly strands them in their portal.
+      if (isStoreReturn) {
+        destination = requestedDestination;
+      } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
         destination = `${siteUrls.app}/onboarding/employer`;
-        allowRequestedRedirect = false;
       } else if (effectiveRoles.some((role) => APPRENTICE_ROLES.has(role))) {
         // Resolve program context while keeping every apprenticeship on the
-        // canonical /apprentice runtime. Do not let a stale redirect override it.
+        // canonical /apprentice runtime. Non-Store redirects cannot override it.
         destination = await resolveStudentHomePath(
           supabase,
           userId,
           typeof profile.portal_type === 'string' ? profile.portal_type : undefined,
         );
-        allowRequestedRedirect = false;
+      } else if (safeRedirect) {
+        destination = requestedDestination;
       } else {
         // portal_type is retained as enrollment metadata, not as permission to
         // invent /portal/* routes. Role ownership determines the actual portal.
         destination = resolveDashboardUrl(profile.role, effectiveRoles);
-      }
-
-      if (safeRedirect && allowRequestedRedirect) {
-        destination = resolveRoleCompatiblePostLoginUrl(safeRedirect, profile.role, effectiveRoles);
       }
 
       window.location.assign(destination);

@@ -56,7 +56,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programIds.length
       ? db
           .from('programs')
-          .select('id,name,title,slug,status,is_active,credential_name,duration_hours')
+          .select('id,name,title,slug,status,is_active,credential_name,total_hours')
           .in('id', programIds)
           .order('title')
       : Promise.resolve({ data: [] }),

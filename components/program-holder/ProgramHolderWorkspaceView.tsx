@@ -439,7 +439,7 @@ function ProgramCards({
                 <>
                   <dl className="mt-5 space-y-3 text-sm">
                     <Row label="Credential" value={program.credential_name || 'Credential pathway'} />
-                    <Row label="Program hours" value={program.duration_hours ? String(program.duration_hours) : 'Review program record'} />
+                    <Row label="Program hours" value={program.total_hours ? String(program.total_hours) : 'Review program record'} />
                     <Row label="Course assignments" value={String(courses.length)} />
                   </dl>
                   {!courses.length && (

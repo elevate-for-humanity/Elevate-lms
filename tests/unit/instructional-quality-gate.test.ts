@@ -32,6 +32,15 @@ describe('instructional quality gate', () => {
     }).failures).toEqual([]);
   });
 
+  it('allows the official Indiana cosmetology and barbering regulator name', () => {
+    const result = instructionalQualityFailures({
+      courseTitle: 'Cosmetology Apprenticeship', lessonTitle: 'Indiana Cosmetology License Requirements',
+      script: `${longInstruction} The Indiana State Board of Cosmetology and Barbering regulates this license.`,
+      instructor, storyboard: storyboard(),
+    });
+    expect(result.failures.some((failure) => failure.includes('barbering instructor'))).toBe(false);
+  });
+
   it('rejects a barber instructor in a cosmetology lesson', () => {
     const result = instructionalQualityFailures({
       courseTitle: 'Cosmetology Apprenticeship', lessonTitle: 'Sanitation and Disinfection',

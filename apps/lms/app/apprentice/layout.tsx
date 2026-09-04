@@ -90,6 +90,19 @@ export default async function Layout({ children }: { children: React.ReactNode }
           </a>
         </div>
       )}
+      <section className="mb-4 rounded-2xl border-2 border-amber-400 bg-amber-50 px-5 py-4 text-amber-950 shadow-sm" role="status" aria-label="Apprentice start notice">
+        <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Apprentice notice</p>
+        <h2 className="mt-1 text-lg font-black">Theory coursework opens September 11, 2026.</h2>
+        <p className="mt-1 text-sm font-semibold leading-6">
+          You can sign in and use your apprentice portal now. Please complete and upload every required document before theory begins.
+        </p>
+        <a
+          href="/apprentice/documents"
+          className="mt-3 inline-flex rounded-xl bg-amber-950 px-4 py-2 text-sm font-black text-white hover:bg-amber-900"
+        >
+          Complete required documents
+        </a>
+      </section>
       <div className="mt-4">{children}</div>
       <ParisFloatingWrapper
         surface="learner"

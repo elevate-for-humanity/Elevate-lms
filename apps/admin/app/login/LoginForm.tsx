@@ -16,6 +16,26 @@ type AdminLoginResponse = {
   effectiveRoles?: string[];
 };
 
+function getAuthorizedLanding(response: AdminLoginResponse, requestedRedirect?: string): string {
+  if (requestedRedirect) return getSafeRedirect(requestedRedirect);
+
+  const roles = new Set(
+    [response.role, ...(response.effectiveRoles ?? [])]
+      .filter((role): role is string => typeof role === 'string')
+      .map((role) => role.trim().toLowerCase()),
+  );
+
+  // Instructors authenticate through the Admin service but do not have access
+  // to the Admin dashboard. Send single-role instructors directly to their
+  // authorized portal so middleware never has to bounce them through
+  // /unauthorized (a redirect chain mobile PWA workers reject).
+  const administrativeRoles = ['super_admin', 'admin', 'org_admin', 'advisor', 'staff', 'test_admin'];
+  const hasAdministrativeRole = administrativeRoles.some((role) => roles.has(role));
+  if (roles.has('instructor') && !hasAdministrativeRole) return '/instructor/dashboard';
+
+  return '/dashboard';
+}
+
 async function readAdminLoginResponse(res: Response): Promise<AdminLoginResponse> {
   const contentType = res.headers.get('content-type')?.toLowerCase() ?? '';
 
@@ -90,7 +110,7 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
         return;
       }
 
-      window.location.href = next;
+      window.location.href = getAuthorizedLanding(body, redirectTo);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Admin authentication request failed. Please retry.');
     } finally {

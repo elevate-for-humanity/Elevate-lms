@@ -5,12 +5,10 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import Link from 'next/link';
-import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 
-export default function ResetPasswordForm() {
+export default function ResetPasswordForm({ portal, mode }: { portal?: string; mode?: string }) {
   const router = useRouter();
-  const searchParams = useSafeSearchParams();
-  const programHolder = searchParams.get('portal') === 'program-holder';
+  const programHolder = portal === 'program-holder';
   const destination = programHolder ? '/program-holder/onboarding' : '/lms';
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -25,7 +23,7 @@ export default function ResetPasswordForm() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getSession().then(({ data }) => {
-      const recoveryMode = searchParams.get('mode') === 'recovery';
+      const recoveryMode = mode === 'recovery';
       if (data.session && recoveryMode) {
         setSessionReady(true);
       } else {
@@ -36,7 +34,7 @@ export default function ResetPasswordForm() {
         setSessionReady(true);
       }
     });
-  }, [router, searchParams]);
+  }, [mode, router]);
 
   const handleRecoveryRequest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -260,22 +258,3 @@ export default function ResetPasswordForm() {
               </div>
 
               <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
-              >
-                {loading ? 'Updating…' : 'Update Password'}
-              </button>
-            </form>
-          )}
-        </div>
-
-        <p className="text-center text-slate-500 text-sm mt-6">
-          <Link href="/login" className="text-brand-blue-600 hover:underline">
-            Back to Login
-          </Link>
-        </p>
-      </div>
-    </div>
-  );
-}

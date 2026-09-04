@@ -1,6 +1,7 @@
 import {
   ELLIE_ROUTE_LABEL,
   routeEllieMessage,
+  shouldOrchestrateMessage,
   selectStudioAgent,
   type StudioSpecialist,
   type EllieMessageRoute,
@@ -17,11 +18,56 @@ export type UnifiedChatMessage = {
 
 export {
   routeEllieMessage,
+  shouldOrchestrateMessage,
   selectStudioAgent,
   ELLIE_ROUTE_LABEL,
   type EllieMessageRoute,
   type StudioSpecialist,
 };
+
+export async function streamOrchestratedPlan(
+  goal: string,
+  onLine: (text: string) => void,
+): Promise<void> {
+  const res = await fetch('/api/admin/dev-studio/plan', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ goal }),
+  });
+  if (!res.ok || !res.body) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error((data as { error?: string }).error || `HTTP ${res.status}`);
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  const consume = (event: string) => {
+    const raw = event
+      .split('\n')
+      .filter((line) => line.startsWith('data: '))
+      .map((line) => line.slice(6).trim())
+      .join('');
+    if (!raw || raw === '[DONE]') return;
+    try {
+      const parsed = JSON.parse(raw) as { text?: string; line?: string };
+      const line = parsed.text ?? parsed.line;
+      if (line) onLine(`${line}\n`);
+    } catch {
+      onLine(`${raw}\n`);
+    }
+  };
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const events = buffer.split('\n\n');
+    buffer = events.pop() ?? '';
+    for (const event of events) consume(event);
+  }
+  if (buffer.trim()) consume(buffer);
+}
 
 export async function fetchAiHealth(): Promise<{
   ok: boolean;

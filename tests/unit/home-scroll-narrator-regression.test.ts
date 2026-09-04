@@ -5,12 +5,17 @@ import { describe, expect, it } from 'vitest';
 const source = fs.readFileSync(path.resolve('components/home/ScrollNarrator.tsx'), 'utf8');
 
 describe('homepage scroll narration lifecycle', () => {
-  it('does not stop active narration for routine scroll scheduling', () => {
-    const scheduler = source.slice(
-      source.indexOf('const scheduleNarration'),
-      source.indexOf("window.addEventListener('scroll'"),
+  it('stops active narration immediately when scrolling begins', () => {
+    const scrollHandler = source.slice(
+      source.indexOf('const stopAndScheduleNarration'),
+      source.indexOf('// Resolve the initially visible section'),
     );
-    expect(scheduler).not.toContain('stop()');
+    expect(scrollHandler).toContain('lastNarrationRef.current = null');
+    expect(scrollHandler).toContain('stop()');
+    expect(scrollHandler).toContain('scheduleNarration()');
+    expect(source).toContain("window.addEventListener('scroll', stopAndScheduleNarration");
+    expect(source).toContain("window.addEventListener('wheel', stopAndScheduleNarration");
+    expect(source).toContain("window.addEventListener('touchstart', stopAndScheduleNarration");
   });
 
   it('releases narration when no page section owns the viewport', () => {

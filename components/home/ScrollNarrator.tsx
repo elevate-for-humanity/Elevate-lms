@@ -141,22 +141,30 @@ export function ScrollNarrator() {
       }, SCROLL_SETTLE_MS);
     };
 
+    const stopAndScheduleNarration = () => {
+      // Stop at the first scroll signal. Restart only after the viewport has
+      // settled and a section clearly owns the visitor's attention.
+      lastNarrationRef.current = null;
+      stop();
+      scheduleNarration();
+    };
+
     // Resolve the initially visible section without requiring a throwaway
     // scroll gesture. Browser media policy still keeps actual playback under
     // the visitor's interaction/permission boundary.
     scheduleNarration();
 
-    window.addEventListener('scroll', scheduleNarration, { passive: true });
-    window.addEventListener('wheel', scheduleNarration, { passive: true });
-    window.addEventListener('touchstart', scheduleNarration, { passive: true });
+    window.addEventListener('scroll', stopAndScheduleNarration, { passive: true });
+    window.addEventListener('wheel', stopAndScheduleNarration, { passive: true });
+    window.addEventListener('touchstart', stopAndScheduleNarration, { passive: true });
     window.addEventListener('pointerdown', scheduleNarration, { passive: true });
     window.addEventListener('keydown', scheduleNarration);
     window.addEventListener('resize', scheduleNarration);
 
     return () => {
-      window.removeEventListener('scroll', scheduleNarration);
-      window.removeEventListener('wheel', scheduleNarration);
-      window.removeEventListener('touchstart', scheduleNarration);
+      window.removeEventListener('scroll', stopAndScheduleNarration);
+      window.removeEventListener('wheel', stopAndScheduleNarration);
+      window.removeEventListener('touchstart', stopAndScheduleNarration);
       window.removeEventListener('pointerdown', scheduleNarration);
       window.removeEventListener('keydown', scheduleNarration);
       window.removeEventListener('resize', scheduleNarration);

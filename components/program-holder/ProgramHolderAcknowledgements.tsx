@@ -13,6 +13,7 @@ export function ProgramHolderAcknowledgements() {
       body: JSON.stringify({
         handbook: formData.get('handbook') === 'yes',
         rights: formData.get('rights') === 'yes',
+        non_compete: formData.get('non_compete') === 'yes',
       }),
     });
     const result = await response.json();
@@ -28,9 +29,9 @@ export function ProgramHolderAcknowledgements() {
     <form action={submit} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <h2 className="text-lg font-black">Required onboarding acknowledgements</h2>
       <p className="mt-1 text-sm text-slate-600">
-        Review the Program Holder handbook and rights and responsibilities before accepting.
+        Review the Program Holder handbook, rights and responsibilities, and non-compete terms before accepting.
       </p>
-      <div className="mt-4 space-y-3">
+      <div className="mt-3 flex flex-wrap gap-3 text-sm font-bold text-blue-700">\n        <a href="/program-holder/handbook" target="_blank" rel="noreferrer">Read Program Holder Handbook</a>\n        <a href="/legal/program-host-agreement" target="_blank" rel="noreferrer">Read Program Holder Agreement</a>\n      </div>\n      <div className="mt-4 space-y-3">
         <label className="flex items-start gap-3 rounded-xl border p-4 text-sm font-semibold">
           <input name="handbook" value="yes" type="checkbox" required className="mt-1" /> I reviewed
           and accept the Program Holder handbook.
@@ -38,6 +39,9 @@ export function ProgramHolderAcknowledgements() {
         <label className="flex items-start gap-3 rounded-xl border p-4 text-sm font-semibold">
           <input name="rights" value="yes" type="checkbox" required className="mt-1" /> I reviewed
           and accept the rights and responsibilities.
+        </label>
+        <label className="flex items-start gap-3 rounded-xl border p-4 text-sm font-semibold">
+          <input name="non_compete" value="yes" type="checkbox" required className="mt-1" /> I reviewed and agree to the Program Holder non-compete and non-solicitation terms.
         </label>
       </div>
       <button

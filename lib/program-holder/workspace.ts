@@ -82,7 +82,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         'id,user_id,full_name,email,phone,status,enrollment_state,program_id,program_slug,training_start_date,training_end_date,student_start_date,expected_end_date,start_date',
       )
       .eq('program_holder_id', holderId)
-      .in('status', ['pending', 'approved', 'scheduled', 'ready', 'funded'])
+      .in('status', ['active', 'enrolled', 'pending', 'approved', 'scheduled', 'ready', 'funded'])
       .order('training_start_date', { ascending: true, nullsFirst: false }),
     db
       .from('program_holder_students')

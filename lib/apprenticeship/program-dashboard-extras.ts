@@ -12,12 +12,12 @@ const EXTRAS: Record<string, ProgramDashboardExtras> = {
   'barber-apprenticeship': {
     brandSubtitle: 'Elevate for Humanity — Indiana Barber RTI',
     rtiCourseTitle: 'Barber Apprenticeship RTI',
-    complianceBasePath: '/compliance/competency-verification/barber',
+    complianceBasePath: '/apprentice/competencies',
   },
   'cosmetology-apprenticeship': {
     brandSubtitle: 'Indiana Cosmetology Apprenticeship RTI',
     rtiCourseTitle: 'Cosmetology Apprenticeship RTI',
-    complianceBasePath: '/compliance/competency-verification/cosmetology',
+    complianceBasePath: '/apprentice/competencies',
   },
   'esthetician-apprenticeship': {
     brandSubtitle: 'Indiana Esthetician Apprenticeship RTI',
@@ -49,8 +49,8 @@ export function complianceLinksForProgram(programSlug: string): { label: string;
   const base = EXTRAS[programSlug]?.complianceBasePath;
   if (!base) return [];
   return [
-    { label: 'OJT hours log', href: `${base}/ojt-hours-log` },
+    { label: 'OJT hours log', href: '/apprentice/hours' },
     { label: 'Competency verification', href: base },
-    { label: 'Monthly OJT evaluation', href: `${base}/monthly-ojt-evaluation` },
+    { label: 'Documents and evaluations', href: '/apprentice/documents' },
   ];
 }

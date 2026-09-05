@@ -5,7 +5,7 @@ import { ExternalLink, MapPin, Navigation, Phone, ShieldCheck } from 'lucide-rea
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { getFeaturedHostPartnerBySlug, type FeaturedHostPartner } from '@/lib/apprenticeship-programs/host-partners';
 import { getPublicHostShopBySlug } from '@/lib/partners/public-host-shops';
-import { getApprovedShopByPublicSlug } from '@/lib/programs/host-shops';
+import { getApprovedShopByPublicSlug, type HostShop } from '@/lib/programs/host-shops';
 
 export const dynamic = 'force-dynamic';
 const SITE_URL = 'https://www.elevateforhumanity.org';
@@ -27,6 +27,12 @@ function programLabel(program: string) {
   if (program.includes('nail')) return 'Nail Technician Apprenticeship';
   return 'Barber Apprenticeship';
 }
+function businessType(programs: string[]) {
+  return programs.some((program) => program.includes('barber')) ? 'HairSalon' : 'BeautySalon';
+}
+function absoluteMediaUrl(url: string) {
+  return new URL(url, SITE_URL).toString();
+}
 function dedupeMedia(items: Array<{ url: string; alt?: string; source?: string }>) {
   const seen = new Set<string>();
   return items.filter((item) => {
@@ -42,20 +48,40 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const [profile, approved] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug)]);
   if (!profile || !approved) {
     const featured = getFeaturedHostPartnerBySlug(slug);
+    if (!featured && approved) {
+      const canonical = `${SITE_URL}/host-shops/${approved.publicSlug}`;
+      const description = approved.description || `${approved.name} is an approved Elevate apprenticeship Host Site${approved.city ? ` in ${approved.city}, ${approved.state}` : ''}.`;
+      return {
+        title: `${approved.name}${approved.city ? ` in ${approved.city}, ${approved.state}` : ''} | Host Site`,
+        description,
+        keywords: [approved.name, `${approved.city} ${approved.state} host shop`, ...approved.programs.map(programLabel)].filter(Boolean),
+        alternates: { canonical },
+        robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+        openGraph: { title: `${approved.name} | Apprenticeship Host Site`, description, url: canonical, type: 'website' },
+      };
+    }
     if (!featured) return {};
     const canonical = `${SITE_URL}/host-shops/${featured.slug}`;
     const image = featured.media?.find((media) => media.kind !== 'video');
     return {
-      title: `${featured.dba ?? featured.name} | Apprenticeship Host Shop Partner`,
+      title: `${featured.dba ?? featured.name} in ${featured.city}, ${featured.state} | Host Shop`,
       description: featured.marketingBlurb ?? featured.note,
+      keywords: [
+        featured.dba ?? featured.name,
+        `${featured.businessType === 'BarberShop' ? 'barbershop' : 'hair salon'} in ${featured.city}`,
+        `${featured.city} ${featured.state} apprenticeship host shop`,
+        ...featured.programs.map(programLabel),
+      ],
       alternates: { canonical },
+      robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
       openGraph: {
         title: `${featured.dba ?? featured.name} | Apprenticeship Host Shop Partner`,
         description: featured.marketingBlurb ?? featured.note,
         url: canonical,
         type: 'website',
-        images: image ? [{ url: image.src, alt: image.alt }] : undefined,
+        images: image ? [{ url: absoluteMediaUrl(image.src), alt: image.alt }] : undefined,
       },
+      twitter: { card: 'summary_large_image', title: `${featured.dba ?? featured.name} | Elevate Host Shop`, description: featured.marketingBlurb ?? featured.note, images: image ? [absoluteMediaUrl(image.src)] : undefined },
     };
   }
   const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
@@ -63,10 +89,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
   const image = gallery[0]?.url || profile.logo_url || profile.flyer_url;
   return {
-    title: `${approved.name} | Apprenticeship Host Site`,
+    title: `${approved.name}${approved.city ? ` in ${approved.city}, ${approved.state}` : ''} | Host Site`,
     description,
+    keywords: [approved.name, `${approved.city} ${approved.state} host shop`, ...approved.programs.map(programLabel)].filter(Boolean),
     alternates: { canonical },
+    robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
     openGraph: { title: `${approved.name} | Apprenticeship Host Site`, description, url: canonical, type: 'website', images: image ? [{ url: image, alt: `${approved.name} Host Site` }] : undefined },
+    twitter: { card: 'summary_large_image', title: `${approved.name} | Elevate Host Site`, description, images: image ? [image] : undefined },
   };
 }
 
@@ -75,6 +104,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const [profile, approved] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug)]);
   if (!profile || !approved) {
     const featured = getFeaturedHostPartnerBySlug(slug);
+    if (!featured && approved) return <ApprovedHostShopProfile shop={approved} />;
     if (!featured) return notFound();
     return <FeaturedHostShopProfile shop={featured} />;
   }
@@ -92,14 +122,18 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'HealthAndBeautyBusiness',
+    '@type': businessType(programs),
+    '@id': `${canonical}#business`,
     name: approved.name,
     url: canonical,
     description: approved.description || undefined,
     telephone: approved.phone || undefined,
-    image: items.map((item) => item.url),
+    image: items.map((item) => absoluteMediaUrl(item.url)),
     address: address ? { '@type': 'PostalAddress', streetAddress: approved.address || undefined, addressLocality: approved.city || undefined, addressRegion: approved.state || undefined, postalCode: approved.zip || undefined, addressCountry: 'US' } : undefined,
-    sameAs: [externalUrl, mapUrl].filter(Boolean),
+    sameAs: [externalUrl].filter(Boolean),
+    hasMap: mapUrl,
+    parentOrganization: { '@id': `${SITE_URL}/#organization` },
+    knowsAbout: programs.map(programLabel),
   };
 
   return (
@@ -154,6 +188,63 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   );
 }
 
+function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
+  const address = [shop.address, shop.city, shop.state, shop.zip].filter(Boolean).join(', ');
+  const canonical = `${SITE_URL}/host-shops/${shop.publicSlug}`;
+  const mapUrl = address ? directionsUrl(address) : undefined;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': businessType(shop.programs),
+    '@id': `${canonical}#business`,
+    name: shop.name,
+    url: canonical,
+    description: shop.description,
+    telephone: shop.phone || undefined,
+    address: address ? {
+      '@type': 'PostalAddress',
+      streetAddress: shop.address || undefined,
+      addressLocality: shop.city || undefined,
+      addressRegion: shop.state || undefined,
+      postalCode: shop.zip || undefined,
+      addressCountry: 'US',
+    } : undefined,
+    hasMap: mapUrl,
+    parentOrganization: { '@id': `${SITE_URL}/#organization` },
+    knowsAbout: shop.programs.map(programLabel),
+  };
+
+  return (
+    <main className="overflow-x-hidden bg-white text-slate-950">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+      <section className="border-b border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-brand-blue-950 px-4 py-16 text-white sm:px-6 sm:py-24">
+        <div className="mx-auto max-w-6xl">
+          <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-emerald-950"><ShieldCheck className="h-4 w-4" /> Approved Elevate Host Site</p>
+          <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">{shop.name}</h1>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">{shop.description}</p>
+          <div className="mt-6 flex flex-wrap gap-2">{shop.programs.map((program) => <span key={program} className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-black">{programLabel(program)}</span>)}</div>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            {shop.phone ? <a href={`tel:${shop.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-extrabold text-white"><Phone className="h-4 w-4" /> Call {shop.phone}</a> : null}
+            {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-extrabold"><Navigation className="h-4 w-4" /> Map & directions</a> : null}
+          </div>
+        </div>
+      </section>
+      <section className="px-4 py-12 sm:px-6">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <h2 className="text-2xl font-black">Approved training location</h2>
+            {address ? <p className="mt-5 flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-5 font-bold"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /> {address}</p> : null}
+            <p className="mt-5 text-sm leading-6 text-slate-600">Apprentice placement depends on occupation fit, supervisor capacity, sponsor review, and current availability.</p>
+          </div>
+          {address ? <div className="aspect-[16/10] overflow-hidden rounded-2xl border border-slate-300"><iframe title={`Map — ${shop.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+        </div>
+      </section>
+      <section className="border-y border-slate-200 bg-slate-50 px-4 py-12 text-center sm:px-6">
+        <div className="mx-auto max-w-4xl"><h2 className="text-3xl font-black">Explore opportunities with {shop.name}</h2><p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-700">Apply through Elevate and select this Host Site. Staff will confirm the program and current placement availability.</p><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">{shop.programs.map((program) => <Link key={program} href={applyHref(program, shop.name, shop.id)} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white">Apply — {programLabel(program)}</Link>)}<Link href="/partners/host-shops" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-black">View network</Link></div></div>
+      </section>
+    </main>
+  );
+}
+
 function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
   const address = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
   const imageItems = (shop.media ?? [])
@@ -161,9 +252,45 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
     .map((media) => ({ url: media.src, alt: media.alt }));
   const videoUrl = shop.media?.find((media) => media.kind === 'video')?.src;
   const mapUrl = directionsUrl(address);
+  const canonical = `${SITE_URL}/host-shops/${shop.slug}`;
+  const publicUrls = [shop.websiteUrl, shop.bookingUrl, shop.socialUrl, shop.onlineListingUrl].filter(Boolean);
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': shop.businessType === 'BarberShop' ? 'HairSalon' : 'BeautySalon',
+    '@id': `${canonical}#business`,
+    name: shop.dba ?? shop.name,
+    legalName: shop.dba ? shop.name : undefined,
+    url: canonical,
+    description: shop.marketingBlurb ?? shop.note,
+    telephone: shop.phone,
+    image: imageItems.map((item) => absoluteMediaUrl(item.url)),
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: shop.address,
+      addressLocality: shop.city,
+      addressRegion: shop.state,
+      postalCode: shop.zip,
+      addressCountry: 'US',
+    },
+    hasMap: mapUrl,
+    sameAs: publicUrls,
+    parentOrganization: { '@id': `${SITE_URL}/#organization` },
+    knowsAbout: shop.programs.map(programLabel),
+    potentialAction: shop.bookingUrl ? { '@type': 'ReserveAction', target: shop.bookingUrl, name: `Book with ${shop.dba ?? shop.name}` } : undefined,
+  };
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Host Shops', item: `${SITE_URL}/partners/host-shops` },
+      { '@type': 'ListItem', position: 2, name: shop.dba ?? shop.name, item: canonical },
+    ],
+  };
 
   return (
     <main className="overflow-x-hidden bg-white text-slate-950">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c') }} />
       {videoUrl ? (
         <section className="relative isolate h-[clamp(380px,58vh,600px)] overflow-hidden bg-black">
           <video

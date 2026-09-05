@@ -169,25 +169,6 @@ export default async function CompliancePage() {
               </p>
             </Link>
             <Link
-              href="/compliance/competency-verification"
-              className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block"
-            >
-              <h3 className="font-semibold text-slate-900">Competency Verification Matrix</h3>
-              <p className="text-sm text-slate-700 mt-1">
-                Per-program assessment rubrics with competency-to-assessment mapping and pass
-                criteria
-              </p>
-            </Link>
-            <Link
-              href="/compliance/competency-verification/barber"
-              className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block"
-            >
-              <h3 className="font-semibold text-slate-900">Barber Apprenticeship Rubric</h3>
-              <p className="text-sm text-slate-700 mt-1">
-                6-section, 30-competency RAPIDS-aligned rubric for barbershop apprenticeship
-              </p>
-            </Link>
-            <Link
               href="/workone-partner-packet"
               className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition block"
             >

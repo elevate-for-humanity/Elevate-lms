@@ -8,6 +8,8 @@ import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { loadProgramForPage, loadProgramMetadataSource } from '@/lib/programs/load-program-page';
 import { getProgramOgImageUrl } from '@/lib/programs/og-images';
+import Link from 'next/link';
+import { EMPLOYER_TALENT_PATHWAYS } from '@/lib/marketing/employer-talent-network';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,7 +67,10 @@ export default async function PublicProgramPage({
   const price = Number.parseInt(resolved.selfPayCost.replace(/[^0-9]/g, ''), 10);
   const isBusinessProgram = resolved.slug === 'business-administration';
   const isBookkeepingProgram = resolved.slug === 'bookkeeping';
-  const configuredBanner = isBusinessProgram ? null : heroBanners[resolved.slug] ?? null;
+  const employerPathway = EMPLOYER_TALENT_PATHWAYS.find(
+    (item) => item.programSlug === resolved.slug,
+  );
+  const configuredBanner = isBusinessProgram ? null : (heroBanners[resolved.slug] ?? null);
   const banner: HeroBannerConfig = isBusinessProgram
     ? {
         pageKey: resolved.slug,
@@ -153,6 +158,30 @@ export default async function PublicProgramPage({
           ) : undefined
         }
       />
+      {employerPathway ? (
+        <section className="border-t border-slate-200 bg-slate-950 px-4 py-12 text-white">
+          <div className="mx-auto flex max-w-6xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-cyan-300">
+                For employers
+              </p>
+              <h2 className="mt-2 text-3xl font-black">
+                Need emerging {employerPathway.name.toLowerCase()} talent?
+              </h2>
+              <p className="mt-2 max-w-2xl leading-7 text-slate-200">
+                Review candidate skills, potential roles, regional pages, and the employer
+                partnership process.
+              </p>
+            </div>
+            <Link
+              href={`/employers/talent-network/${employerPathway.slug}`}
+              className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-white px-6 py-3 font-black text-slate-950"
+            >
+              Open Employer Network
+            </Link>
+          </div>
+        </section>
+      ) : null}
       {resolved.slug === 'cpr-first-aid' ? (
         <section
           aria-labelledby="cpr-provider-contact"
@@ -169,7 +198,10 @@ export default async function PublicProgramPage({
               <div>
                 <dt className="font-semibold text-slate-950">Email</dt>
                 <dd className="mt-1">
-                  <a className="font-medium text-blue-700 underline" href="mailto:sharen710@gmail.com">
+                  <a
+                    className="font-medium text-blue-700 underline"
+                    href="mailto:sharen710@gmail.com"
+                  >
                     info@centtech.org
                   </a>
                 </dd>

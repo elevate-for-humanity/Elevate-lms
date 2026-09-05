@@ -16,6 +16,17 @@ const PROTECTED_PORTAL_PREFIXES = [
   '/provider',
 ] as const;
 
+// Competency forms are operational apprenticeship records. They used to be
+// rendered by the public marketing app, which made blank sign-off sheets and
+// agreements crawlable. Keep one hard boundary here: the marketing host never
+// serves this route family and hands it to the authenticated LMS instead.
+const PRIVATE_APP_REDIRECTS = [
+  {
+    prefix: '/compliance/competency-verification',
+    destination: '/apprenticeship/compliance',
+  },
+] as const;
+
 const ELEVATE_PUBLIC_HOSTS = new Set([
   'elevateforhumanity.org',
   'www.elevateforhumanity.org',
@@ -86,6 +97,18 @@ export async function middleware(req: NextRequest) {
   if (storeRuntimeResponse) return storeRuntimeResponse;
 
   const host = requestHost(req);
+
+  const privateAppRoute = PRIVATE_APP_REDIRECTS.find(
+    ({ prefix }) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+  if (privateAppRoute) {
+    const destination = new URL(privateAppRoute.destination, LMS_HOST);
+    const response = NextResponse.redirect(destination, 308);
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    return response;
+  }
+
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', `${pathname}${search}`);
 

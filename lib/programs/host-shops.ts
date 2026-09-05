@@ -89,6 +89,14 @@ function businessKey(value: string | null | undefined) {
     .replace(/[^a-z0-9]/g, '');
 }
 
+function publicSlug(name: string, id: string) {
+  const base = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'host-shop';
+  return `${base}-${id.replace(/-/g, '').slice(0, 8)}`;
+}
+
 function parseMedia(value: unknown): HostShopMedia[] {
   if (!Array.isArray(value)) return [];
   const seen = new Set<string>();
@@ -206,7 +214,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       const enriched: HostShop = {
         ...shop,
         phone: sourceVerifiedPublicPhone || shop.phone,
-        publicSlug: profile?.public_slug ?? undefined,
+        // Every approved operational Host Site needs a stable public destination,
+        // even before optional promotional media is added to public_host_shops.
+        publicSlug: profile?.public_slug ?? publicSlug(shop.name, shop.id),
         description: profile?.description || approvedDescription(shop),
         website: profile?.website_url || profile?.website || undefined,
         googleMapsUrl: approvedMapsUrl(shop),

@@ -7,10 +7,15 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const MAX_BYTES = 10 * 1024 * 1024;
-const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const IMAGE_MAX_BYTES = 10 * 1024 * 1024;
+const VIDEO_MAX_BYTES = 100 * 1024 * 1024;
+const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const VIDEO_TYPES = new Set(['video/mp4', 'video/webm', 'video/quicktime']);
 
 function ext(file: File) {
+  if (file.type === 'video/mp4') return 'mp4';
+  if (file.type === 'video/webm') return 'webm';
+  if (file.type === 'video/quicktime') return 'mov';
   if (file.type === 'image/png') return 'png';
   if (file.type === 'image/webp') return 'webp';
   if (file.type === 'image/gif') return 'gif';
@@ -26,11 +31,14 @@ export async function POST(request: NextRequest) {
   const form = await request.formData();
   const kind = String(form.get('kind') || '');
   const file = form.get('file');
-  if (kind !== 'logo' && kind !== 'flyer') {
-    return NextResponse.json({ ok: false, error: 'Choose logo or flyer.' }, { status: 400 });
+  if (kind !== 'logo' && kind !== 'flyer' && kind !== 'video') {
+    return NextResponse.json({ ok: false, error: 'Choose logo, flyer, or video.' }, { status: 400 });
   }
-  if (!(file instanceof File) || file.size <= 0 || file.size > MAX_BYTES || !ALLOWED.has(file.type)) {
-    return NextResponse.json({ ok: false, error: 'Upload a JPG, PNG, WEBP, or GIF image no larger than 10 MB.' }, { status: 400 });
+  const isVideo = kind === 'video';
+  const allowedTypes = isVideo ? VIDEO_TYPES : IMAGE_TYPES;
+  const maxBytes = isVideo ? VIDEO_MAX_BYTES : IMAGE_MAX_BYTES;
+  if (!(file instanceof File) || file.size <= 0 || file.size > maxBytes || !allowedTypes.has(file.type)) {
+    return NextResponse.json({ ok: false, error: isVideo ? 'Upload an MP4, WEBM, or MOV video no larger than 100 MB.' : 'Upload a JPG, PNG, WEBP, or GIF image no larger than 10 MB.' }, { status: 400 });
   }
 
   const db = await requireAdminClient();
@@ -46,7 +54,7 @@ export async function POST(request: NextRequest) {
 
   const { data: publicData } = db.storage.from('website-assets').getPublicUrl(path);
   const publicUrl = publicData.publicUrl;
-  const field = kind === 'logo' ? 'logo_url' : 'flyer_url';
+  const field = kind === 'logo' ? 'logo_url' : kind === 'flyer' ? 'flyer_url' : 'video_url';
   const { error: updateError } = await db
     .from('partners')
     .update({ [field]: publicUrl, updated_at: new Date().toISOString() })

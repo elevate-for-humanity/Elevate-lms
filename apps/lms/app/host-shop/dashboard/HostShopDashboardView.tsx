@@ -352,6 +352,19 @@ export default async function HostShopDashboardView() {
           className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-800 px-5 py-3 text-sm font-black text-white hover:bg-blue-900"
         />
       </section>
+      <section className="mb-6 overflow-hidden rounded-2xl border border-fuchsia-300 bg-gradient-to-r from-slate-950 via-blue-950 to-fuchsia-950 p-5 text-white shadow-lg sm:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-200">Host Shop Network launch</p>
+            <h2 className="mt-2 text-2xl font-black">Put your shop in front of apprentices and local customers.</h2>
+            <p className="mt-2 text-sm font-medium leading-6 text-slate-200">Confirm your public profile, upload a logo, flyer, photos, or a short shop video, then share your profile link from your website, Google Business Profile, and social pages. Visibility and results vary; a complete, accurate profile gives people more ways to discover and contact your business.</p>
+          </div>
+          <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
+            <Link href="/host-shop/dashboard/profile" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950">Complete My Network Profile</Link>
+            <a href="https://www.elevateforhumanity.org/partners/host-shops" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-black text-white">View the Public Network</a>
+          </div>
+        </div>
+      </section>
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
           <div className="p-6 sm:p-8">

@@ -104,7 +104,6 @@ const footerLinks = {
 
   compliance: [
     { name: 'Compliance', href: '/compliance' },
-    { name: 'Competency Verification', href: '/compliance/competency-verification' },
     { name: 'Credential Partners', href: '/compliance/credential-partners' },
     { name: 'Internship Agreement', href: '/compliance/internship-agreement' },
     { name: 'Internship Evaluation', href: '/compliance/internship-evaluation' },

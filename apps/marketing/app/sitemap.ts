@@ -4,6 +4,13 @@ import { getApprovedShops } from '@/lib/programs/host-shops';
 import { STATIC_PROGRAM_MAP } from '@/data/programs';
 import { STATIC_POSTS } from '@/content/blog/posts';
 import { getDb } from '@/lib/lms/api';
+import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
+import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
+import { HVAC_EMPLOYER_REGIONS } from '@/lib/marketing/hvac-employer-regions';
+import {
+  EMPLOYER_NETWORK_REGIONS,
+  EMPLOYER_TALENT_PATHWAYS,
+} from '@/lib/marketing/employer-talent-network';
 
 /**
  * Canonical public sitemap authority.
@@ -48,6 +55,63 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly',
     priority: 0.82,
   }));
+
+  // Curated Host Shop profiles must remain discoverable even when the database
+  // is unavailable during sitemap generation. The final de-duplication also
+  // handles shops that exist in both the curated and approved-record sources.
+  const featuredHostShopRoutes: MetadataRoute.Sitemap = FEATURED_BEAUTY_HOST_PARTNERS.map(
+    (shop) => ({
+      url: `${PUBLIC_SITE_ORIGIN}/host-shops/${shop.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.86,
+    }),
+  );
+
+  const hostShopRegionRoutes: MetadataRoute.Sitemap = HOST_SHOP_REGIONS.map((region) => ({
+    url: `${PUBLIC_SITE_ORIGIN}/partners/host-shops/indiana/${region.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.8,
+  }));
+
+  const hvacEmployerRoutes: MetadataRoute.Sitemap = [
+    {
+      url: `${PUBLIC_SITE_ORIGIN}/employers/hvac-partners`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.86,
+    },
+    ...HVAC_EMPLOYER_REGIONS.map((region) => ({
+      url: `${PUBLIC_SITE_ORIGIN}/employers/hvac-partners/indiana/${region.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.78,
+    })),
+  ];
+
+  const employerTalentRoutes: MetadataRoute.Sitemap = [
+    {
+      url: `${PUBLIC_SITE_ORIGIN}/employers/talent-network`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.88,
+    },
+    ...EMPLOYER_TALENT_PATHWAYS.flatMap((pathway) => [
+      {
+        url: `${PUBLIC_SITE_ORIGIN}/employers/talent-network/${pathway.slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.84,
+      },
+      ...EMPLOYER_NETWORK_REGIONS.map((region) => ({
+        url: `${PUBLIC_SITE_ORIGIN}/employers/talent-network/${pathway.slug}/indiana/${region.slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.76,
+      })),
+    ]),
+  ];
 
   const staticBlogRoutes: MetadataRoute.Sitemap = STATIC_POSTS.filter((post) => post.published).map(
     (post) => ({
@@ -99,6 +163,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticRoutes,
     ...trustAndBuyerRoutes,
     ...programRoutes,
+    ...featuredHostShopRoutes,
+    ...hostShopRegionRoutes,
+    ...hvacEmployerRoutes,
+    ...employerTalentRoutes,
     ...staticBlogRoutes,
     ...databaseBlogRoutes,
     ...hostShopRoutes,

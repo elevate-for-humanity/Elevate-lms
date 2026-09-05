@@ -19,6 +19,7 @@ const PROTECTED_PREFIXES = [
   '/lms/support',
   '/learner',
   '/apprentice',
+  '/apprenticeship',
   '/admin-preview',
   // Protect the complete Host Shop operational namespace. The login route is
   // explicitly exempted in isProtectedPath so onboarding, MOU, orientation,

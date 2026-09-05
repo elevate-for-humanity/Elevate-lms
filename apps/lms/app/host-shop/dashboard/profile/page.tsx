@@ -16,7 +16,7 @@ export default async function HostShopProfilePage() {
   const db = await requireAdminClient();
   const partnerId = board.partner?.id;
   const { data: publicProfile } = partnerId
-    ? await db.from('partners').select('logo_url,flyer_url,public_slug,verification_status').eq('id', partnerId).maybeSingle()
+    ? await db.from('partners').select('logo_url,flyer_url,video_url,public_slug,verification_status').eq('id', partnerId).maybeSingle()
     : { data: null };
   const publicProfileUrl = publicProfile?.verification_status === 'verified' && publicProfile?.public_slug
     ? `https://www.elevateforhumanity.org/host-shops/${publicProfile.public_slug}`
@@ -34,7 +34,7 @@ export default async function HostShopProfilePage() {
         <section className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-brand-green-700"/><h2 className="font-black">Compliance</h2></div><div className="mt-5 space-y-3 text-sm"><div className="flex justify-between"><span>MOU</span><b>{board.partner?.mou_signed ? 'Signed' : 'Pending'}</b></div><div className="flex justify-between"><span>Orientation</span><b>{board.partner?.onboarding_completed ? 'Complete' : 'Incomplete'}</b></div><div className="flex justify-between"><span>Documents</span><b>{board.requiredDocumentCount ? `${board.acceptedDocumentCount}/${board.requiredDocumentCount} accepted` : board.partner?.documents_verified ? 'Verified' : 'Pending'}</b></div></div><Link href="/host-shop/dashboard/documents" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-brand-blue-700"><FileText className="h-4 w-4"/> Review documents</Link></section>
       </div>
 
-      {!isPlatformAdmin ? <HostShopPublicMediaForm logoUrl={publicProfile?.logo_url} flyerUrl={publicProfile?.flyer_url} publicProfileUrl={publicProfileUrl} /> : null}
+      {!isPlatformAdmin ? <HostShopPublicMediaForm logoUrl={publicProfile?.logo_url} flyerUrl={publicProfile?.flyer_url} videoUrl={publicProfile?.video_url} publicProfileUrl={publicProfileUrl} /> : null}
 
       <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><MapPin className="h-5 w-5 text-brand-blue-700"/><h2 className="font-black">Active shop locations</h2></div>{board.shops.length === 0 ? <p className="mt-4 text-sm text-slate-500">No active shop location is linked to this partner record.</p> : <div className="mt-4 grid gap-3 sm:grid-cols-2">{board.shops.map((shop) => <div key={shop.id} className="rounded-xl border border-slate-200 p-4"><div className="flex items-start gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-brand-green-700"/><div><p className="font-black">{shop.name}</p><p className="mt-1 text-sm text-slate-600">{[shop.city, shop.state].filter(Boolean).join(', ') || 'Location details not provided'}</p></div></div></div>)}</div>}</section>
     </main>

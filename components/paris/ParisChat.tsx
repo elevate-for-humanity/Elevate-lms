@@ -28,11 +28,12 @@ interface ParisChatProps {
   onComplete?: (recommendations: string[]) => void;
   showHeader?: boolean;
   className?: string;
-  surface?: 'public' | 'learner' | 'store';
+  surface?: 'public' | 'learner' | 'store' | 'portal';
   courseTitle?: string | null;
   nextLessonTitle?: string | null;
   courseProgress?: number | null;
   voiceEnabled?: boolean;
+  portalRole?: string | null;
 }
 
 const PATHWAYS = [
@@ -58,6 +59,15 @@ const STORE_GREETING: Message = {
 I'll ask a few focused questions, recommend the smallest setup that fits, explain useful add-ons, and walk you through the relevant demos. What are you trying to accomplish first?`,
 };
 
+function portalGreeting(portalRole?: string | null): Message {
+  return {
+    role: 'assistant',
+    content: `Hi — I'm PARIS, your authenticated portal assistant${portalRole ? ` for the ${portalRole.replaceAll('_', ' ')} workspace` : ''}.
+
+I can help you understand red to-dos, draft student notes and outreach, organize onboarding, and explain where to upload documents or record progress. I can prefill drafts, but you must review and submit official hours, milestones, compliance records, agreements, and messages.`,
+  };
+}
+
 function learnerGreeting(courseTitle?: string | null, nextLessonTitle?: string | null): Message {
   return {
     role: 'assistant',
@@ -76,12 +86,14 @@ export default function ParisChat({
   nextLessonTitle,
   courseProgress,
   voiceEnabled = false,
+  portalRole,
 }: ParisChatProps) {
   const learnerSurface = surface === 'learner';
+  const portalSurface = surface === 'portal';
   const storeSurface = surface === 'store';
   const voice = useNaturalVoice();
   const [messages, setMessages] = useState<Message[]>([
-    learnerSurface ? learnerGreeting(courseTitle, nextLessonTitle) : storeSurface ? STORE_GREETING : PUBLIC_GREETING,
+    learnerSurface ? learnerGreeting(courseTitle, nextLessonTitle) : portalSurface ? portalGreeting(portalRole) : storeSurface ? STORE_GREETING : PUBLIC_GREETING,
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -137,6 +149,7 @@ export default function ParisChat({
             courseTitle: courseTitle || null,
             nextLessonTitle: nextLessonTitle || null,
             courseProgress: typeof courseProgress === 'number' ? courseProgress : null,
+            portalRole: portalRole || null,
           },
         }),
       });
@@ -156,7 +169,9 @@ export default function ParisChat({
         ...previous,
         {
           role: 'assistant',
-          content: learnerSurface
+          content: portalSurface
+            ? 'I cannot reach live portal guidance right now. Use the red to-do list and student records on this dashboard, or contact an administrator. I will not submit official records without your review.'
+            : learnerSurface
             ? 'I cannot retrieve your course guidance right now. Please continue from your learner dashboard or contact your instructor. I will not guess about your progress or graded work.'
             : storeSurface
               ? 'I cannot reach the live advisor right now. You can still compare current plans at /store/plans or explore the interactive demos at /store/demos.'
@@ -167,7 +182,7 @@ export default function ParisChat({
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  }, [autoSpeak, courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, storeSurface, surface, voice]);
+  }, [autoSpeak, courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, storeSurface, portalSurface, portalRole, surface, voice]);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();

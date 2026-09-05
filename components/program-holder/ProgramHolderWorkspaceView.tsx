@@ -15,6 +15,7 @@ import { ProgramHolderTrainingLogForm } from './ProgramHolderTrainingLogForm';
 import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseoutForm';
 import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
 import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificationPreferences';
+import { WorkOneOutreachButton } from './WorkOneOutreachButton';
 import { getProgramCardImage } from '@/lib/images/programImages';
 
 type Section =
@@ -219,6 +220,7 @@ export async function ProgramHolderWorkspaceView({
               <p className="mt-1 text-sm text-slate-600">{callQueue.length} applicants have no completed call outcome and {data.applicants.length} are not enrolled.</p>
             </div>
             <Link href="/program-holder/students/pending" className="inline-flex min-h-10 items-center rounded-xl bg-amber-100 px-4 py-2 text-sm font-black text-amber-950">Open full queue</Link>
+            <WorkOneOutreachButton count={data.applicants.length} />
           </div>
           <div className="mt-4 grid gap-2">
             {callQueue.slice(0, 6).map((row) => (

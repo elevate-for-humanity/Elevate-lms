@@ -16,6 +16,7 @@ import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseout
 import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
 import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificationPreferences';
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
+import { StudentCommunicationActions } from './StudentCommunicationActions';
 import { AlumniCareerOutreachButton } from './AlumniCareerOutreachButton';
 import { getProgramCardImage } from '@/lib/images/programImages';
 
@@ -431,7 +432,10 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
               <Row label="Next action" value={row.next_required_action || 'Continue training'} />
               <Row label="WorkOne hours" value={`${Math.min(48, Number(row.total_hours_completed || 0))} of 48 complete`} />
             </dl>
-            <Link href="/program-holder/hours" className="mt-4 inline-flex min-h-10 items-center rounded-lg bg-blue-700 px-3 py-2 text-xs font-black text-white">Record progress</Link>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link href="/program-holder/hours" className="inline-flex min-h-10 items-center rounded-lg bg-blue-700 px-3 py-2 text-xs font-black text-white">Record progress</Link>
+              <StudentCommunicationActions enrollmentId={row.id} studentName={row.full_name || 'Student'} hasEmail={Boolean(row.email)} hasPhone={Boolean(row.phone)} />
+            </div>
           </article>
         )) : (
           <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center text-sm text-slate-500">No confirmed student enrollments are linked.</div>
@@ -448,6 +452,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             <th className="px-3 py-3">WorkOne hours</th>
             <th className="px-3 py-3">Training dates</th>
             <th className="px-3 py-3">Next action</th>
+            <th className="px-3 py-3">Contact</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -471,11 +476,12 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <span className="block">End: {row.training_end_date || 'Missing'}</span>
                 </td>
                 <td className="px-3 py-4">{row.next_required_action || 'Continue training'}</td>
+                <td className="px-3 py-4"><StudentCommunicationActions enrollmentId={row.id} studentName={row.full_name || 'Student'} hasEmail={Boolean(row.email)} hasPhone={Boolean(row.phone)} /></td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={7} className="px-3 py-8 text-center text-slate-500">
+              <td colSpan={8} className="px-3 py-8 text-center text-slate-500">
                 No confirmed student enrollments are linked.
               </td>
             </tr>

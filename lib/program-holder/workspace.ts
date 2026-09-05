@@ -71,7 +71,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('program_enrollments')
       .select(
-        'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified',
+        'id,user_id,full_name,email,phone,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified',
       )
       .eq('program_holder_id', holderId)
       .in('status', ['active', 'enrolled', 'completed', 'graduated'])

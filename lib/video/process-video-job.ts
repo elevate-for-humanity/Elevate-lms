@@ -20,12 +20,19 @@ import { renderStoryboardVideo } from './remotion-render';
 import { uploadLessonMediaBuffer } from './upload-lesson-media';
 import { generateLessonScenes } from '@/server/video-generator/generateLessonScenes';
 import type { LessonRenderPlanDraft } from '@/server/video-generator/types';
+import { assertNarrationProviderConfigured } from './edge-tts';
 
 const REMOTION_PROVIDER = 'remotion';
 const REMOTION_MODEL = 'ElevateLesson';
 
 async function hydrateMediaRuntimeSecrets(): Promise<void> {
   const missing = [
+    'AI_NARRATION_PROVIDER',
+    'CLOUDFLARE_ACCOUNT_ID',
+    'CLOUDFLARE_AI_API_TOKEN',
+    'CLOUDFLARE_API_TOKEN',
+    'CLOUDFLARE_TTS_MODEL',
+    'AI_GATEWAY_ID',
     'ELEVENLABS_API_KEY',
     'GEMINI_API_KEY',
     'OPENAI_API_KEY',
@@ -37,7 +44,14 @@ async function hydrateMediaRuntimeSecrets(): Promise<void> {
   const { data: runtimeSettings } = await db
     .from('platform_settings')
     .select('key,value')
-    .in('key', ['AI_PROVIDER', 'AI_TRANSCRIPTION_MODEL'])
+    .in('key', [
+      'AI_PROVIDER',
+      'AI_PROVIDER_ORDER',
+      'AI_NARRATION_PROVIDER',
+      'CLOUDFLARE_TTS_MODEL',
+      'AI_GATEWAY_ID',
+      'AI_TRANSCRIPTION_MODEL',
+    ])
     .eq('is_active', true);
   for (const setting of runtimeSettings ?? []) {
     if (
@@ -209,6 +223,10 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
 
   try {
     await hydrateMediaRuntimeSecrets();
+    // Validate the canonical media route before scene planning or any GPU
+    // request. A missing route must never consume rendering capacity or spend
+    // GPU time only to fail later at narration.
+    assertNarrationProviderConfigured();
     const db = createAdminClient();
     const { data: course } = await db
       .from('courses')

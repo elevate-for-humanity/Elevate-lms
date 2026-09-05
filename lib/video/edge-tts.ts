@@ -1,14 +1,10 @@
 /**
  * Universal narration adapter used by the Remotion lesson renderer.
  *
- * Narration priority:
- *   1. ElevenLabs authenticated MP3
- *   2. Gemini authenticated TTS, transcoded to MP3
- *   3. OpenAI authenticated MP3
- *   4. Edge TTS (zero-cost public endpoint)
- *
- * Edge TTS can reject datacenter traffic with HTTP 403. Production therefore
- * never depends on that public endpoint as the sole narration provider.
+ * This module is retained under its historical filename because renderers
+ * import it directly. Provider selection, however, is authoritative: one
+ * configured narration route owns the request and production never silently
+ * bypasses Elevate orchestration through a commercial fallback chain.
  */
 
 import { spawn } from 'node:child_process';
@@ -42,6 +38,61 @@ const OPENAI_VOICE_MAP: Record<EdgeTTSVoice, 'alloy' | 'echo' | 'fable' | 'onyx'
 };
 
 export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
+export const DEFAULT_CLOUDFLARE_TTS_MODEL = '@cf/deepgram/aura-1';
+
+export type NarrationProvider =
+  | 'cloudflare'
+  | 'elevenlabs'
+  | 'gemini'
+  | 'openai'
+  | 'edge'
+  | 'local';
+
+export function configuredNarrationProvider(
+  env: NodeJS.ProcessEnv = process.env,
+): NarrationProvider {
+  const configured = (
+    env.AI_NARRATION_PROVIDER ||
+    env.AI_MEDIA_PROVIDER ||
+    (env.NODE_ENV === 'production' ? 'cloudflare' : 'local')
+  )
+    .trim()
+    .toLowerCase();
+  if (
+    configured === 'cloudflare' ||
+    configured === 'elevenlabs' ||
+    configured === 'gemini' ||
+    configured === 'openai' ||
+    configured === 'edge' ||
+    configured === 'local'
+  ) return configured;
+  throw new Error(`Unsupported AI_NARRATION_PROVIDER "${configured}"`);
+}
+
+export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = process.env): void {
+  const provider = configuredNarrationProvider(env);
+  if (provider === 'cloudflare') {
+    const accountId = env.CLOUDFLARE_ACCOUNT_ID?.trim();
+    const token = (env.CLOUDFLARE_AI_API_TOKEN || env.CLOUDFLARE_API_TOKEN)?.trim();
+    if (!accountId || !token) {
+      throw new Error(
+        'Cloudflare narration route is selected but CLOUDFLARE_ACCOUNT_ID/CLOUDFLARE_AI_API_TOKEN are not configured',
+      );
+    }
+  }
+  if (provider === 'elevenlabs' && !env.ELEVENLABS_API_KEY?.trim()) {
+    throw new Error('ElevenLabs narration route is selected but ELEVENLABS_API_KEY is not configured');
+  }
+  if (provider === 'gemini' && !env.GEMINI_API_KEY?.trim()) {
+    throw new Error('Gemini narration route is selected but GEMINI_API_KEY is not configured');
+  }
+  if (provider === 'openai' && !env.OPENAI_API_KEY?.trim()) {
+    throw new Error('OpenAI narration route is selected but OPENAI_API_KEY is not configured');
+  }
+  if (env.NODE_ENV === 'production' && (provider === 'edge' || provider === 'local')) {
+    throw new Error(`${provider} narration is diagnostic-only and cannot be selected in production`);
+  }
+}
 
 function narrationFailureDetail(error: unknown): string {
   const raw = error instanceof Error ? error.message : String(error);
@@ -157,6 +208,56 @@ async function generateElevenLabsNarration(text: string): Promise<Buffer> {
   return Buffer.from(await response.arrayBuffer());
 }
 
+async function generateCloudflareNarration(text: string): Promise<Buffer> {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
+  const token = (
+    process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN
+  )?.trim();
+  if (!accountId || !token) throw new Error('Cloudflare Workers AI narration is not configured');
+  const model = process.env.CLOUDFLARE_TTS_MODEL?.trim() || DEFAULT_CLOUDFLARE_TTS_MODEL;
+  if (!model.startsWith('@cf/')) {
+    throw new Error('CLOUDFLARE_TTS_MODEL must be a Cloudflare Workers AI model identifier');
+  }
+  const gatewayId = process.env.AI_GATEWAY_ID?.trim() || 'default';
+  const speaker = process.env.CLOUDFLARE_TTS_SPEAKER?.trim() || 'orion';
+  const response = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'cf-aig-gateway-id': gatewayId,
+        'Content-Type': 'application/json',
+        Accept: 'audio/mpeg, application/json',
+      },
+      body: JSON.stringify(
+        model.includes('melotts')
+          ? { prompt: text, lang: 'en' }
+          : { text, speaker, encoding: 'mp3' },
+      ),
+      signal: AbortSignal.timeout(120_000),
+    },
+  );
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '');
+    throw new Error(
+      `Cloudflare Workers AI ${model} returned ${response.status}${detail ? `: ${detail.slice(0, 240)}` : ''}`,
+    );
+  }
+  const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
+  if (contentType.startsWith('audio/')) {
+    const audio = Buffer.from(await response.arrayBuffer());
+    if (!audio.length) throw new Error('Cloudflare Workers AI returned empty narration audio');
+    return audio;
+  }
+  const payload = await response.json().catch(() => null);
+  const encoded = payload?.result?.audio ?? payload?.audio ?? payload?.result;
+  if (typeof encoded !== 'string' || !encoded) {
+    throw new Error('Cloudflare Workers AI returned no narration audio');
+  }
+  return Buffer.from(encoded.replace(/^data:audio\/[^;]+;base64,/, ''), 'base64');
+}
+
 async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promise<Buffer> {
   if (!isOpenAIConfigured()) throw new Error('OpenAI narration is not configured');
   const openai = getOpenAIClient();
@@ -179,39 +280,25 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
   const normalizedText = text.trim();
   if (!normalizedText) throw new Error('Narration requires non-empty text');
   const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%', pitch = '0Hz', volume = '+0%' } = options;
-  const failures: string[] = [];
-
-  const recordFailure = (provider: string, error: unknown) => {
-    const detail = narrationFailureDetail(error);
-    failures.push(`${provider}: ${detail}`);
-    return detail;
-  };
-
-  if (process.env.ELEVENLABS_API_KEY?.trim()) {
-    try { return await generateElevenLabsNarration(normalizedText); }
-    catch (error) { logger.warn('[Narration] ElevenLabs unavailable; trying Gemini', { error: recordFailure('ElevenLabs', error) }); }
-  }
-  if (process.env.GEMINI_API_KEY?.trim()) {
-    try { return await generateGeminiNarration(normalizedText); }
-    catch (error) { logger.warn('[Narration] Gemini TTS unavailable; trying OpenAI', { error: recordFailure('Gemini', error) }); }
-  }
-  if (isOpenAIConfigured()) {
-    try { return await generateOpenAINarration(normalizedText, voice); }
-    catch (error) { logger.warn('[Narration] OpenAI TTS unavailable; trying Edge TTS', { error: recordFailure('OpenAI', error) }); }
-  }
-
+  assertNarrationProviderConfigured();
+  const provider = configuredNarrationProvider();
   try {
-    const audio = await tts(normalizedText, { voice, rate, pitch, volume });
-    return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
-  } catch (edgeError) {
-    logger.warn('[Narration] Edge TTS unavailable', { error: recordFailure('Edge TTS', edgeError) });
+    if (provider === 'cloudflare') return await generateCloudflareNarration(normalizedText);
+    if (provider === 'elevenlabs') return await generateElevenLabsNarration(normalizedText);
+    if (provider === 'gemini') return await generateGeminiNarration(normalizedText);
+    if (provider === 'openai') return await generateOpenAINarration(normalizedText, voice);
+    if (provider === 'edge') {
+      const audio = await tts(normalizedText, { voice, rate, pitch, volume });
+      return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
+    }
+    logger.info('[Narration] Using explicitly selected local narration');
+    return await generateLocalNarration(normalizedText);
+  } catch (error) {
+    throw new Error(
+      `Configured narration route "${provider}" failed; no provider bypass was attempted: ${narrationFailureDetail(error)}`,
+      { cause: error },
+    );
   }
-
-  if (process.env.NODE_ENV !== 'production') {
-    logger.info('[Narration] Using diagnostic-only local espeak-ng fallback');
-    return generateLocalNarration(normalizedText);
-  }
-  throw new Error(`No publication-quality narration provider is available. Attempts: ${failures.join(' | ') || 'none configured'}`);
 }
 
 export function buildLessonScript(lesson: { title: string; moduleTitle: string; objective: string; keyPoints: string[]; example: string; summary: string }): string {

@@ -181,6 +181,20 @@ describe('canonical Course Factory media architecture', () => {
     expect(media).toContain('Canonical lesson narration changed during unified course rebuild');
   });
 
+  it('completes a lesson only after matching version-locked media passes', () => {
+    const checkpoints = read('lib/course-factory/generation-checkpoints.ts');
+    const media = read('lib/course-factory/media-service.ts');
+    const renderer = read('lib/video/process-video-job.ts');
+    const queue = read('lib/video/job-queue.ts');
+    const manager = read('lib/course-factory/media-manager.ts');
+    expect(checkpoints).toContain("generation_status: 'generating'");
+    expect(checkpoints).toContain('source_fingerprint: sourceFingerprint');
+    expect(media).toContain('has no locked unified-media fingerprint');
+    expect(renderer).toContain('MEDIA_SOURCE_VERSION_MISMATCH');
+    expect(queue).toContain("generation_status: 'generated'");
+    expect(manager).toContain("lesson.generation_status !== 'generated'");
+  });
+
   it('does not let obsolete opt-out microclips block primary lesson readiness', () => {
     const manager = read('lib/course-factory/media-manager.ts');
     expect(manager).toContain('videoConfig.enableMicroclips === true');

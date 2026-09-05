@@ -377,7 +377,9 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         );
       }
     }
-    const sceneData = generatedPlan ? generatedSceneData(generatedPlan) : persistedSceneData;
+    const sceneData = generatedPlan
+      ? { ...persistedSceneData, ...generatedSceneData(generatedPlan) }
+      : persistedSceneData;
     const isMicroclip = job.asset_kind === 'microclip';
     // Every render is an immutable candidate. Approval, not rendering, changes
     // the learner-facing lesson URL.
@@ -601,7 +603,10 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       });
       return;
     }
-    const completedStoryboard = result.sceneData ?? storyboard;
+    const completedStoryboard = {
+      ...(result.sceneData ?? storyboard),
+      source_contract: persistedSceneData.source_contract ?? null,
+    };
     const qualityEvidence = await enforceMediaQuality({
       videoUrl: result.videoUrl,
       expectedDurationSeconds: result.duration ?? 0,
@@ -612,6 +617,28 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       expectedScript: script,
       instructionalQuality,
     });
+    const sourceContract = persistedSceneData.source_contract && typeof persistedSceneData.source_contract === 'object'
+      ? persistedSceneData.source_contract as Record<string, unknown>
+      : {};
+    const expectedFingerprint = typeof sourceContract.fingerprint === 'string'
+      ? sourceContract.fingerprint
+      : '';
+    const { data: currentLessonSource, error: currentLessonSourceError } = await db
+      .from('course_lessons')
+      .select('video_config')
+      .eq('id', job.lesson_id)
+      .maybeSingle();
+    const currentVideoConfig = currentLessonSource?.video_config && typeof currentLessonSource.video_config === 'object'
+      ? currentLessonSource.video_config as Record<string, unknown>
+      : {};
+    if (
+      currentLessonSourceError ||
+      !expectedFingerprint ||
+      currentVideoConfig.source_fingerprint !== expectedFingerprint ||
+      currentVideoConfig.narration_locked !== true
+    ) {
+      throw new Error('MEDIA_SOURCE_VERSION_MISMATCH');
+    }
     await markComplete(job.id, {
       video_url: result.videoUrl,
       ...(result.audioUrl ? { audio_url: result.audioUrl } : {}),

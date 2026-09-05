@@ -240,6 +240,12 @@ export async function queueCourseLessonVideos(
       const lessonKey = assetIdentity(lesson.id, 'lesson', null);
       const existingLessonJob = existingByAsset.get(lessonKey);
       const lessonNarration = canonicalLessonNarration(lesson);
+      const sourceFingerprint = typeof videoConfig.source_fingerprint === 'string'
+        ? videoConfig.source_fingerprint.trim()
+        : '';
+      if (!sourceFingerprint) {
+        throw new Error(`Lesson "${lesson.title}" has no locked unified-media fingerprint`);
+      }
       const canonicalScript = [
         lesson.id === firstLesson?.id ? generateInstructorIntro(instructor, course.title) : '',
         Array.isArray(lesson.bullet_points) && lesson.bullet_points.length
@@ -275,7 +281,13 @@ export async function queueCourseLessonVideos(
           bullet_points: Array.isArray(lesson.bullet_points) ? (lesson.bullet_points as string[]) : [],
           // A refreshed full narration requires a fresh storyboard. Reusing
           // lesson.scene_data from an older teaser causes visual/narration drift.
-          scene_data: null,
+          scene_data: {
+            source_contract: {
+              version: Number(videoConfig.source_contract_version ?? 1),
+              fingerprint: sourceFingerprint,
+              narration_locked: videoConfig.narration_locked === true,
+            },
+          },
           asset_kind: 'lesson',
         }), sourceChanged);
         existingByAsset.set(lessonKey, job);

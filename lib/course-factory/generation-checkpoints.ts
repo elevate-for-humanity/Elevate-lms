@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { createHash } from 'node:crypto';
+
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { QuizQuestion } from './types';
@@ -165,7 +167,11 @@ export async function loadLessonGenerationCheckpoint(
       .select('content,content_json,learning_objectives,quiz_questions,generation_status,script,script_text')
       .eq('id', target.id)
       .maybeSingle();
-    if (error || !data || data.generation_status !== 'generated') return null;
+    if (
+      error ||
+      !data ||
+      !['generating', 'generated'].includes(String(data.generation_status ?? ''))
+    ) return null;
 
     const content = record(data.content);
     const contentJson = record(data.content_json);
@@ -278,6 +284,14 @@ export async function persistLessonGenerationCheckpoint(input: {
     const resources = Array.isArray(input.experience.resources) ? input.experience.resources : null;
     const quickClips = Array.isArray(input.experience.quickClips) ? input.experience.quickClips : [];
     const now = new Date().toISOString();
+    const sourceFingerprint = createHash('sha256')
+      .update(JSON.stringify({
+        narration,
+        objective: input.objective,
+        learningPoints: input.learningPoints,
+        visualPrompt: input.experience.visualPrompt ?? null,
+      }))
+      .digest('hex');
 
     const { data: persistedLesson } = await db
       .from('course_lessons')
@@ -306,6 +320,11 @@ export async function persistLessonGenerationCheckpoint(input: {
         bullet_points: input.learningPoints,
         resources,
         scene_data: {
+          source_contract: {
+            version: 1,
+            fingerprint: sourceFingerprint,
+            narration_locked: true,
+          },
           visual_prompt: input.experience.visualPrompt ?? null,
           scenario: input.experience.scenario ?? null,
           case_study: input.experience.caseStudy ?? null,
@@ -316,6 +335,9 @@ export async function persistLessonGenerationCheckpoint(input: {
         },
         video_config: {
           enabled: true,
+          source_fingerprint: sourceFingerprint,
+          source_contract_version: 1,
+          narration_locked: true,
           narration,
           visual_prompt: input.experience.visualPrompt ?? null,
           quick_clips: quickClips,
@@ -324,7 +346,9 @@ export async function persistLessonGenerationCheckpoint(input: {
         },
         ai_generated: true,
         approved: false,
-        generation_status: 'generated',
+        // Text, narration, and the visual plan are one incomplete lesson
+        // package until the matching rendered media passes verification.
+        generation_status: 'generating',
         last_generated_at: now,
         updated_at: now,
       })
@@ -355,7 +379,7 @@ export async function persistLessonGenerationCheckpoint(input: {
         .from('course_lessons')
         .select('id', { count: 'exact', head: true })
         .eq('course_id', target.courseId)
-        .eq('generation_status', 'generated'),
+        .in('generation_status', ['generating', 'generated']),
       db
         .from('course_lessons')
         .select('id', { count: 'exact', head: true })

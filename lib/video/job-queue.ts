@@ -375,6 +375,10 @@ export async function markComplete(
       media_quality_status: 'approved',
       media_quality_evidence: result.quality_evidence ?? {},
       media_verified_at: now,
+      // This is the only transition that completes a unified lesson build.
+      // The video has already passed narration, visual, caption, and media
+      // quality gates and still matches the locked source fingerprint.
+      generation_status: 'generated',
       scene_data: result.scene_data ?? null,
       duration_seconds: result.duration_seconds ?? null,
       updated_at: now,

@@ -5,6 +5,9 @@ export const HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
   { type: 'epa_608', label: 'EPA Section 608 technician certification' },
   { type: 'w9', label: 'Completed IRS Form W-9' },
   { type: 'hvac_training_plan', label: 'Approved HVAC syllabus and training plan' },
+  { type: 'profile_photo', label: 'Program Holder profile picture' },
+  { type: 'student_photo', label: 'Student training photos' },
+  { type: 'student_video', label: 'Student training videos' },
 ] as const;
 
 export type ProgramHolderReadiness = {
@@ -32,8 +35,8 @@ export async function getStudentPaymentReadiness(db: any, enrollmentId: string) 
     ...(!student.training_start_date ? [`${name}: training start date`] : []),
     ...(!student.training_end_date ? [`${name}: training end date`] : []),
     ...(Number(student.progress_percent || 0) < 100 ? [`${name}: final progress`] : []),
-    ...(Number(student.total_hours_completed || 0) <= 0
-      ? [`${name}: completed hands-on hours`]
+    ...(Number(student.total_hours_completed || 0) < 48
+      ? [`${name}: 48 completed WorkOne training hours`]
       : []),
     ...(!student.lms_completed ? [`${name}: coursework completion verification`] : []),
     ...(!student.practical_skills_verified ? [`${name}: practical skills verification`] : []),

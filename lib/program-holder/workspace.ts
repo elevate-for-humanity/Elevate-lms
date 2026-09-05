@@ -15,6 +15,7 @@ export type ProgramHolderWorkspace = {
   payoutProfile: any | null;
   payoutSchedules: any[];
   notificationPreferences: any | null;
+  acknowledgements: any[];
 };
 
 /** Canonical, holder-scoped data contract shared by every Program Holder page. */
@@ -36,6 +37,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       payoutProfile: null,
       payoutSchedules: [],
       notificationPreferences: null,
+      acknowledgements: [],
     };
   }
 
@@ -53,6 +55,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     payoutRes,
     schedulesRes,
     notificationRes,
+    acknowledgementsRes,
   ] = await Promise.all([
     db
       .from('program_holders')
@@ -134,6 +137,10 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .select('email_course_updates,sms_urgent,sms_phone')
       .eq('user_id', profile.id)
       .maybeSingle(),
+    db
+      .from('program_holder_acknowledgements')
+      .select('document_type,acknowledged_at')
+      .eq('user_id', profile.id),
   ]);
 
   return {
@@ -151,6 +158,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     payoutProfile: payoutRes.data ?? null,
     payoutSchedules: schedulesRes.data ?? [],
     notificationPreferences: notificationRes.data ?? null,
+    acknowledgements: acknowledgementsRes.data ?? [],
   };
 }
 

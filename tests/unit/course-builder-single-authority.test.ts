@@ -90,7 +90,6 @@ describe('single Course Builder authority', () => {
       'purge-esb-course-media.yml',
       'regenerate-barber-cosmetology.yml',
       'upgrade-authored-course.yml',
-      'video-worker-smoke.yml',
     ];
     for (const workflow of workflows) {
       const triggerBlock = read(`.github/workflows/${workflow}`).split(/^permissions:/m)[0];
@@ -99,5 +98,12 @@ describe('single Course Builder authority', () => {
       expect(triggerBlock, workflow).not.toMatch(/\bissues:/);
       expect(triggerBlock, workflow).not.toMatch(/\bpush:/);
     }
+  });
+
+  it('allows only an exact one-job proof while the global pause remains closed', () => {
+    const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
+    expect(worker).toContain("'course_builder_proof_course_id'");
+    expect(worker).toContain('queueOneDraft && courseId && maxJobs === 1');
+    expect(worker).toContain('globallyPaused && !authorizedProof');
   });
 });

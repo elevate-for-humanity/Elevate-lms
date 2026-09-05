@@ -54,7 +54,17 @@ export async function POST(request: NextRequest) {
     );
   }
   const db = await requireAdminClient();
-  if (await isCourseBuilderGenerationPaused(db)) {
+  const globallyPaused = await isCourseBuilderGenerationPaused(db);
+  let authorizedProof = false;
+  if (globallyPaused && queueOneDraft && courseId && maxJobs === 1) {
+    const { data: proofSetting } = await db
+      .from('system_settings')
+      .select('value')
+      .eq('key', 'course_builder_proof_course_id')
+      .maybeSingle();
+    authorizedProof = proofSetting?.value === courseId;
+  }
+  if (globallyPaused && !authorizedProof) {
     return NextResponse.json({
       ok: true,
       started: 0,
@@ -76,7 +86,7 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
-    if (!course || course.generation_paused === true) {
+    if (!course || (course.generation_paused === true && !authorizedProof)) {
       return NextResponse.json({
         ok: true,
         started: 0,

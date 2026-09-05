@@ -1047,6 +1047,13 @@ export async function courseFactory(
 
     let videosQueued = 0;
     if (input.videoMode !== 'off' && published.courseId) {
+      // The atomic publisher persists content before media exists. Enter the
+      // media-pending state before queueing so an enqueue failure can never
+      // leave a text-only course falsely marked 100% complete.
+      await markCourseMediaPendingWithClient({
+        db: await requireAdminClient(),
+        courseId: published.courseId,
+      });
       tracker.emit('media', 'Queueing missing lesson videos and microclips.', 93);
       const media = await queueCourseLessonVideos({
         courseId: published.courseId,
@@ -1063,10 +1070,6 @@ export async function courseFactory(
       if (media.failed > 0) {
         logger.warn('[course-factory] Optional microclip enqueue warnings', media);
       }
-      await markCourseMediaPendingWithClient({
-        db: await requireAdminClient(),
-        courseId: published.courseId,
-      });
     }
 
     tracker.emit(

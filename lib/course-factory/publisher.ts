@@ -4,6 +4,7 @@
  * Course Factory owns generation, validation and package assembly. This module
  * persists an already-validated package through one PostgreSQL transaction.
  */
+import { createHash } from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForBlueprint } from '@/lib/ai-instructors';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
@@ -154,6 +155,19 @@ export function buildAtomicPayload(
                   .map((objective) => objective.trim()),
               ),
             );
+            const narration = typeof experience?.narrationScript === 'string'
+              ? experience.narrationScript
+              : null;
+            const sourceFingerprint = experience
+              ? createHash('sha256')
+                  .update(JSON.stringify({
+                    narration,
+                    objective: lesson.objective ?? null,
+                    learningPoints,
+                    visualPrompt: experience.visualPrompt ?? null,
+                  }))
+                  .digest('hex')
+              : null;
             if (
               experience &&
               !LearningIntelligenceSchema.safeParse(experience.intelligence).success
@@ -236,10 +250,15 @@ export function buildAtomicPayload(
               duration_minutes: lesson.durationMinutes ?? null,
               video_url: extra.videoUrl ?? lesson.videoFile ?? null,
               video_config:
-                extra.videoConfig ??
-                (experience
+                experience
                   ? {
+                      ...(extra.videoConfig && typeof extra.videoConfig === 'object'
+                        ? extra.videoConfig
+                        : {}),
                       enabled: true,
+                      source_fingerprint: sourceFingerprint,
+                      source_contract_version: 1,
+                      narration_locked: true,
                       instructor: instructor.name,
                       instructor_id: instructor.id,
                       instructor_avatar: instructor.avatar,
@@ -249,7 +268,7 @@ export function buildAtomicPayload(
                       captions: true,
                       transcript: experience.narrationScript ?? null,
                     }
-                  : null),
+                  : (extra.videoConfig ?? null),
               learning_objectives: learningObjectives.length ? learningObjectives : null,
               competency_checks: lesson.competencyChecks ?? experience?.knowledgeChecks ?? null,
               instructor_notes: instructorNotes,
@@ -281,9 +300,16 @@ export function buildAtomicPayload(
               script: extra.script ?? experience?.narrationScript ?? null,
               bullet_points: extra.bulletPoints ?? learningPoints,
               scene_data:
-                extra.sceneData ??
-                (experience
+                experience
                   ? {
+                      ...(extra.sceneData && typeof extra.sceneData === 'object'
+                        ? extra.sceneData
+                        : {}),
+                      source_contract: {
+                        version: 1,
+                        fingerprint: sourceFingerprint,
+                        narration_locked: true,
+                      },
                       visual_prompt: experience.visualPrompt ?? null,
                       scenario: experience.scenario ?? null,
                       case_study: experience.caseStudy ?? null,
@@ -293,10 +319,12 @@ export function buildAtomicPayload(
                       readiness: experience.readiness ?? null,
                       intelligence: experience.intelligence ?? null,
                     }
-                  : null),
+                  : (extra.sceneData ?? null),
               // course_lessons_generation_status_check accepts queued/generating/generated/approved.
               // Blueprint-only shells are durable work waiting for enrichment, so queued is canonical.
-              generation_status: experience ? 'generated' : 'queued',
+              // A lesson with authored content is still incomplete until the
+              // matching version-locked media is rendered and verified.
+              generation_status: experience ? 'generating' : 'queued',
               last_generated_at: experience ? new Date().toISOString() : null,
             };
           }),

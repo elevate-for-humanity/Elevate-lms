@@ -144,10 +144,10 @@ export async function generateLessonContent(
         experience: content.experience as Record<string, any>,
       });
     } catch (error) {
-      logger.warn('[course-factory/content-generator] Cached lesson handoff failed', {
+      logger.error('[course-factory/content-generator] Cached lesson handoff failed', error, {
         lesson: input.lesson.slug,
-        error: error instanceof Error ? error.message : String(error),
       });
+      throw error;
     }
     return cached;
   }

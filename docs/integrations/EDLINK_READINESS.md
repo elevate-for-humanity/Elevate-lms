@@ -3,21 +3,22 @@
 ## Decision
 
 Elevate must not be represented as Edlink-connected yet. The repository has the
-canonical records needed for rostering, but it does not currently expose a
-production OneRoster provider or active LTI 1.3 endpoints.
+canonical records needed for rostering and a disabled, read-only OneRoster 1.2
+provider. LTI 1.3 endpoints are not active and Edlink credentials are not yet
+provisioned.
 
 ## Side-by-side architecture
 
 | Capability | Edlink requirement | Elevate source | Gap |
 | --- | --- | --- | --- |
-| Organizations | Stable school/district identity | Platform and tenant configuration | Publish an approved sourced ID |
-| Users | Stable IDs, roles, names, emails | `profiles` and Supabase Auth | Define least-privilege field mapping |
-| Courses | Stable course identity | `courses` | Define sourced-ID and status rules |
-| Classes | A scheduled offering of a course | Programs/cohorts need a canonical class projection | Add class projection; do not equate course with class |
-| Enrollments | User-to-class relationship and role | `program_enrollments` | Map status and roles idempotently |
+| Organizations | Stable school/district identity | `/api/oneroster/v1p2/orgs` | Confirm the approved sourced ID |
+| Users | Stable IDs, roles, names, emails | Read-only projection from active cohort members and `profiles` | Approve least-privilege fields |
+| Courses | Stable course identity | Read-only catalog projection from active `programs` | Confirm Edlink mapping |
+| Classes | A scheduled offering of a course | Read-only projection from `cohorts` | Confirm program/course relationship |
+| Enrollments | User-to-class relationship and role | Read-only projection from `program_enrollments` | Validate status mapping |
 | Results | Assignment/line-item scores | Grade and progress domains | Keep disabled until roster sync is certified |
 | LTI launch | OIDC initiation, signed launch, deployment | Only schema/docs remain active | Restore as an LMS-platform feature, then certify |
-| Operations | Credentials, webhooks, retries, audit | General integration status only | Add Edlink connection and sync ledger |
+| Operations | Credentials, webhooks, retries, audit | Short-lived scoped tokens and disabled-by-default provider | Add Edlink webhook and sync ledger after approval |
 
 ## Required phases
 

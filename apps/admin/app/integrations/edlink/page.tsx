@@ -28,8 +28,8 @@ const requirements: Array<{
   {
     requirement: 'Supported data connection',
     edlink: 'A supported LMS/SIS provider or an approved OneRoster/LTI connection.',
-    elevate: 'Custom Next.js and Supabase LMS; no production OneRoster provider is present.',
-    state: 'blocked',
+    elevate: 'A read-only OneRoster 1.2 provider is present and remains disabled until Edlink approval.',
+    state: 'partial',
   },
   {
     requirement: 'LTI 1.3',
@@ -77,6 +77,9 @@ export default async function EdlinkIntegrationPage() {
     clientSecret: Boolean(process.env.EDLINK_CLIENT_SECRET),
     connectionId: Boolean(process.env.EDLINK_CONNECTION_ID),
     webhookSecret: Boolean(process.env.EDLINK_WEBHOOK_SECRET),
+    oneRosterClient: Boolean(process.env.ONEROSTER_CLIENT_ID),
+    oneRosterSecret: Boolean(process.env.ONEROSTER_CLIENT_SECRET),
+    oneRosterTokenSecret: Boolean(process.env.ONEROSTER_TOKEN_SECRET),
   };
   const credentialCount = Object.values(configured).filter(Boolean).length;
   const credentialsReady = configured.clientId && configured.clientSecret && configured.connectionId;
@@ -110,7 +113,9 @@ export default async function EdlinkIntegrationPage() {
         <section className="grid gap-4 md:grid-cols-3">
           <div className="rounded-xl border border-slate-200 bg-white p-5">
             <p className="text-sm font-semibold text-slate-600">Credential fields</p>
-            <p className="mt-2 text-3xl font-bold text-slate-950">{credentialCount}/4</p>
+            <p className="mt-2 text-3xl font-bold text-slate-950">
+              {credentialCount}/{Object.keys(configured).length}
+            </p>
           </div>
           <div className="rounded-xl border border-slate-200 bg-white p-5">
             <p className="text-sm font-semibold text-slate-600">Outbound student sync</p>

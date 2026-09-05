@@ -17,6 +17,7 @@ jobs:
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -32,73 +33,86 @@ jobs:
         shell: bash
         run: |
           node --input-type=module <<'NODE'
+          import crypto from 'node:crypto';
           import { createClient } from '@supabase/supabase-js';
 
           const email = 'hairbyjayci@gmail.com';
           const fullName = 'Jayci Martinez';
           const partnerId = '6937ee7a-231c-46db-a861-e3163e490781';
           const applicationId = '281ef334-3097-40fc-9564-118c43c3ba86';
-          const db = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL,
-            process.env.SUPABASE_SERVICE_ROLE_KEY,
-            { auth: { autoRefreshToken: false, persistSession: false } },
-          );
+          for (const key of ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SENDGRID_API_KEY']) {
+            if (!process.env[key]) throw new Error(`Missing required production secret: ${key}`);
+          }
+          const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+            auth: { autoRefreshToken: false, persistSession: false },
+          });
 
           let user = null;
+          let created = false;
           for (let page = 1; page <= 10 && !user; page += 1) {
             const { data, error } = await db.auth.admin.listUsers({ page, perPage: 1000 });
-            if (error) throw error;
+            if (error) throw new Error(`Auth lookup failed: ${error.message}`);
             user = data.users.find((candidate) => candidate.email?.toLowerCase() === email);
             if (data.users.length < 1000) break;
           }
 
           if (!user) {
-            const { data, error } = await db.auth.admin.inviteUserByEmail(email, {
-              data: { full_name: fullName, portal: 'host_shop' },
-              redirectTo: 'https://app.elevateforhumanity.org/auth/callback?redirect=%2Fhost-shop%2Fonboarding',
+            const password = `${crypto.randomUUID().replaceAll('-', '')}Aa1!`;
+            const { data, error } = await db.auth.admin.createUser({
+              email,
+              password,
+              email_confirm: true,
+              user_metadata: { full_name: fullName, portal: 'host_shop' },
             });
-            if (error || !data.user) throw error || new Error('Invitation returned no user');
+            if (error || !data.user) throw new Error(`User creation failed: ${error?.message || 'no user returned'}`);
             user = data.user;
+            created = true;
           }
 
-          const { data: existingProfile, error: profileReadError } = await db
-            .from('profiles')
-            .select('id,role')
-            .eq('id', user.id)
-            .maybeSingle();
-          if (profileReadError) throw profileReadError;
+          const { data: existingProfile, error: profileReadError } = await db.from('profiles')
+            .select('id,role').eq('id', user.id).maybeSingle();
+          if (profileReadError) throw new Error(`Profile lookup failed: ${profileReadError.message}`);
 
           const protectedRoles = new Set(['admin', 'super_admin', 'org_admin', 'staff']);
-          const profileRole = existingProfile && protectedRoles.has(existingProfile.role)
-            ? existingProfile.role
-            : 'partner';
+          const profileRole = existingProfile && protectedRoles.has(existingProfile.role) ? existingProfile.role : 'partner';
           const { error: profileError } = await db.from('profiles').upsert({
-            id: user.id,
-            email,
-            full_name: fullName,
-            first_name: 'Jayci',
-            last_name: 'Martinez',
-            role: profileRole,
+            id: user.id, email, full_name: fullName, first_name: 'Jayci', last_name: 'Martinez', role: profileRole,
           }, { onConflict: 'id' });
-          if (profileError) throw profileError;
+          if (profileError) throw new Error(`Profile write failed: ${profileError.message}`);
 
           const { error: membershipError } = await db.from('partner_users').upsert({
-            user_id: user.id,
-            partner_id: partnerId,
-            role: 'partner_admin',
-            status: 'active',
+            user_id: user.id, partner_id: partnerId, role: 'partner_admin', status: 'active',
           }, { onConflict: 'user_id,partner_id' });
-          if (membershipError) throw membershipError;
+          if (membershipError) throw new Error(`Membership write failed: ${membershipError.message}`);
 
+          const now = new Date().toISOString();
           const { error: applicationError } = await db.from('host_shop_applications')
-            .update({ email, contact_email: email, updated_at: new Date().toISOString() })
-            .eq('id', applicationId);
-          if (applicationError) throw applicationError;
-
+            .update({ email, contact_email: email, updated_at: now }).eq('id', applicationId);
+          if (applicationError) throw new Error(`Application update failed: ${applicationError.message}`);
           const { error: partnerError } = await db.from('partners')
-            .update({ contact_email: email, updated_at: new Date().toISOString() })
-            .eq('id', partnerId);
-          if (partnerError) throw partnerError;
+            .update({ contact_email: email, updated_at: now }).eq('id', partnerId);
+          if (partnerError) throw new Error(`Partner update failed: ${partnerError.message}`);
 
-          console.log(JSON.stringify({ ok: true, userId: user.id, partnerId, invited: true }));
+          const redirectTo = 'https://app.elevateforhumanity.org/auth/callback?redirect=%2Fhost-shop%2Fonboarding';
+          const { data: link, error: linkError } = await db.auth.admin.generateLink({
+            type: 'recovery', email, options: { redirectTo },
+          });
+          if (linkError || !link?.properties?.action_link) {
+            throw new Error(`Activation link failed: ${linkError?.message || 'no link returned'}`);
+          }
+
+          const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              personalizations: [{ to: [{ email, name: fullName }] }],
+              from: { email: 'support@elevateforhumanity.org', name: 'Elevate for Humanity' },
+              reply_to: { email: 'elevate4humanityedu@gmail.com' },
+              subject: 'Activate your Generations Hair Host Shop portal',
+              content: [{ type: 'text/html', value: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#0f172a;line-height:1.65"><h1>Activate the Generations Hair portal</h1><p>Hello Jayci,</p><p>Your account is connected to <strong>Generations Hair LLC DBA Generations Wedding Co</strong> with Host Shop administrator access.</p><p><a href="${link.properties.action_link}" style="display:inline-block;background:#dc2626;color:white;padding:14px 22px;border-radius:10px;text-decoration:none;font-weight:800">Activate Secure Portal Access</a></p><p>This secure link expires. After activation, use <a href="https://app.elevateforhumanity.org/host-shop/login">the Host Shop login</a> to complete the Generations profile, documents, agreement, orientation, and media.</p><p>Elevate for Humanity<br>(317) 314-3757</p></div>` }],
+            }),
+          });
+          if (response.status !== 202) throw new Error(`SendGrid activation delivery failed with HTTP ${response.status}`);
+
+          console.log(JSON.stringify({ ok: true, userId: user.id, partnerId, created, activationSent: true }));
           NODE

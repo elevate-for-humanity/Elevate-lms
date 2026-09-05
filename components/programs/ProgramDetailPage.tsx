@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
  */
 
 import EnrollmentPipeline from '@/components/programs/EnrollmentPipeline';
+import ProgramCohortFlyer from '@/components/programs/ProgramCohortFlyer';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -399,6 +400,8 @@ export default function ProgramDetailPage({
           </div>
         </div>
       </section>
+
+      <ProgramCohortFlyer programSlug={p.slug} programTitle={p.title} />
 
       {/* DECISION PANEL — answers the questions visitors need before applying */}
       <section className="border-b border-slate-200 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-4 py-12 sm:py-16">

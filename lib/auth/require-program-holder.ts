@@ -1,6 +1,7 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import { requirePortalAccess } from '@/lib/auth/portal-access';
+import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 
 interface ProgramHolderProfile {
   id: string;
@@ -33,7 +34,21 @@ export interface ProgramHolderAdminContext {
   db: any;
 }
 
-export type ProgramHolderContext = ProgramHolderScopedContext | ProgramHolderAdminContext;
+export interface ProgramHolderPreviewContext {
+  mode: 'preview';
+  isPlatformAdmin: true;
+  user: { id: string; email?: string };
+  profile: ProgramHolderProfile;
+  holderId: string;
+  tenantId: string | null;
+  programIds: string[];
+  db: any;
+}
+
+export type ProgramHolderContext =
+  | ProgramHolderScopedContext
+  | ProgramHolderAdminContext
+  | ProgramHolderPreviewContext;
 
 /**
  * Canonical Program Holder portal context.
@@ -45,6 +60,34 @@ export type ProgramHolderContext = ProgramHolderScopedContext | ProgramHolderAdm
 export async function requireProgramHolder(): Promise<ProgramHolderContext> {
   const access = await requirePortalAccess('programholder');
   const db = await requireAdminClient();
+
+  if (access.isPlatformAdmin) {
+    const preview = await resolvePortalPreviewSubject(db, access.user.id);
+    if (preview.previewing && preview.userId !== access.user.id) {
+      const { data: targetProfile } = await db
+        .from('profiles')
+        .select('id,role,full_name,email,program_holder_id,tenant_id')
+        .eq('id', preview.userId)
+        .maybeSingle();
+      if (targetProfile?.program_holder_id && targetProfile.role === 'program_holder') {
+        const { data: associations } = await db
+          .from('program_holder_programs')
+          .select('program_id')
+          .eq('program_holder_id', targetProfile.program_holder_id)
+          .eq('status', 'active');
+        return {
+          mode: 'preview',
+          isPlatformAdmin: true,
+          user: { id: targetProfile.id, email: targetProfile.email || undefined },
+          profile: targetProfile,
+          holderId: targetProfile.program_holder_id,
+          tenantId: targetProfile.tenant_id ?? null,
+          programIds: (associations || []).map((item: { program_id: string }) => item.program_id),
+          db,
+        };
+      }
+    }
+  }
 
   const profile: ProgramHolderProfile = {
     id: access.profile.id,

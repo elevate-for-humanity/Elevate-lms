@@ -1,0 +1,56 @@
+name: Restart Admin Renderer
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: restart-admin-renderer
+  cancel-in-progress: false
+
+jobs:
+  restart:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == '[RESTART ADMIN RENDERER]'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.26.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Restart current Admin deployment
+        run: pnpm tsx scripts/northflank/restart-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
+      - name: Record restart
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'Admin renderer restart completed. Existing database leases will be recovered by the durable queue policy.'
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });

@@ -10,6 +10,7 @@ import {
   ChevronDown,
   LogOut,
   ShieldCheck,
+  Users,
 } from 'lucide-react';
 import type {
   UserRole,

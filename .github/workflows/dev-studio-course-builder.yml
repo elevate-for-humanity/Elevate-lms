@@ -1,6 +1,8 @@
 name: Dev Studio Course Builder Control Plane
 
 on:
+  issues:
+    types: [edited]
   workflow_dispatch:
     inputs:
       program:
@@ -34,6 +36,112 @@ env:
   CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
 jobs:
+  hvac-one-lesson-canary:
+    if: github.event_name == 'issues' && github.event.issue.number == 1041 && github.event.issue.title == 'RUN HVAC ONE LESSON VIDEO CANARY'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      issues: write
+    env:
+      ADMIN_URL: ${{ secrets.ADMIN_URL }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      HVAC_COURSE_ID: f0593164-55be-5867-98e7-8a86770a8dd0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+
+      - name: Record exact canary revision
+        id: tested
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Validate bounded Cloudflare canary configuration
+        shell: bash
+        run: |
+          test -n "$ADMIN_URL"
+          test -n "$CRON_SECRET"
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          test -f .github/COURSE_MEDIA_PAUSED
+          grep -q "DEFAULT_CLOUDFLARE_TTS_MODEL" lib/video/edge-tts.ts
+          grep -q "no provider bypass was attempted" lib/video/edge-tts.ts
+
+      - name: Render exactly one paused-mode HVAC lesson
+        id: canary
+        shell: bash
+        run: |
+          response=$(curl --fail-with-body --silent --show-error \
+            --max-time 1800 \
+            -X POST "${ADMIN_URL%/}/api/internal/videos/process-queue" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --data "{\"courseId\":\"$HVAC_COURSE_ID\",\"maxJobs\":1,\"queueOneDraft\":true}")
+          printf '%s\n' "$response"
+          test "$(jq -r '.started' <<<"$response")" = "1"
+          test "$(jq -r '.jobs | length' <<<"$response")" = "1"
+          job_id=$(jq -r '.jobs[0].jobId' <<<"$response")
+          lesson_id=$(jq -r '.jobs[0].lessonId' <<<"$response")
+          test -n "$job_id"
+          test -n "$lesson_id"
+          echo "job_id=$job_id" >> "$GITHUB_OUTPUT"
+          echo "lesson_id=$lesson_id" >> "$GITHUB_OUTPUT"
+
+      - name: Verify persisted video and playback
+        id: verify
+        shell: bash
+        run: |
+          api="${SUPABASE_URL%/}/rest/v1/video_jobs?id=eq.${{ steps.canary.outputs.job_id }}&select=id,lesson_id,lesson_title,status,video_url,duration_seconds,last_provider,last_provider_model,scene_count,review_status,error_message"
+          record=$(curl --fail-with-body --silent --show-error "$api" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" | jq -c '.[0]')
+          test "$(jq -r '.status' <<<"$record")" = "complete"
+          test "$(jq -r '.review_status' <<<"$record")" = "approved"
+          video_url=$(jq -r '.video_url' <<<"$record")
+          test -n "$video_url"
+          test "$video_url" != "null"
+          content_type=$(curl --fail --silent --show-error --location --head "$video_url" | tr -d '\r' | awk -F': ' 'tolower($1)=="content-type"{print tolower($2); exit}')
+          case "$content_type" in video/*) ;; *) echo "Unexpected content type: $content_type"; exit 1 ;; esac
+          echo "record=$(printf '%s' "$record" | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+      - name: Post canary evidence
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          JOB_STATUS: ${{ job.status }}
+          TESTED_SHA: ${{ steps.tested.outputs.sha }}
+          JOB_RECORD_B64: ${{ steps.verify.outputs.record }}
+        with:
+          script: |
+            let record = {};
+            try {
+              record = JSON.parse(Buffer.from(process.env.JOB_RECORD_B64 || '', 'base64').toString('utf8') || '{}');
+            } catch {}
+            const body = [
+              `HVAC ONE-LESSON VIDEO CANARY ${process.env.JOB_STATUS === 'success' ? 'PASS' : 'FAIL'}`,
+              '',
+              `Tested main SHA: ${process.env.TESTED_SHA || 'unknown'}`,
+              `Lesson: ${record.lesson_title || 'unavailable'} (${record.lesson_id || '${{ steps.canary.outputs.lesson_id }}' || 'unavailable'})`,
+              `Job: ${record.id || '${{ steps.canary.outputs.job_id }}' || 'unavailable'}`,
+              `Provider/model: ${record.last_provider || 'unavailable'} / ${record.last_provider_model || 'unavailable'}`,
+              `Duration/scenes: ${record.duration_seconds ?? 'unavailable'}s / ${record.scene_count ?? 'unavailable'}`,
+              `Review: ${record.review_status || 'unavailable'}`,
+              `Video: ${record.video_url || 'unavailable'}`,
+              record.error_message ? `Error: ${record.error_message}` : '',
+              '',
+              'Bulk GPU generation remained paused. The HVAC course was not published by this canary.',
+            ].filter(Boolean).join('\n');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+
   dev-studio-course-builder:
     if: >-
       github.event_name != 'issues' ||

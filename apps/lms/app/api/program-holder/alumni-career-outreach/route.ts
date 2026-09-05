@@ -3,8 +3,6 @@ import { NextResponse } from 'next/server';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 import { hydrateProcessEnv } from '@/lib/secrets';
 
-const TARGET_NAMES = ['Austin Fletcher', 'Ethan House', 'Pedro Carpintero'];
-
 export async function POST() {
   const ctx = await requireProgramHolder();
   if (ctx.mode !== 'holder') {
@@ -20,7 +18,7 @@ export async function POST() {
     .select('id,user_id,full_name,email,status,enrollment_state')
     .eq('program_holder_id', ctx.holderId)
     .in('status', ['completed', 'graduated'])
-    .in('full_name', TARGET_NAMES);
+    .eq('next_required_action', 'COMPLETE_ALUMNI_ONBOARDING_AND_CAREER_SERVICES');
 
   if (error) return NextResponse.json({ error: 'Graduate records could not be loaded.' }, { status: 500 });
 

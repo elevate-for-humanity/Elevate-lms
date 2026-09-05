@@ -37,6 +37,7 @@ export function ProgramHolderAdminDocumentUpload({ holderId }: { holderId: strin
           <option value="government_id">Government photo ID</option>
           <option value="insurance">Liability insurance</option>
           <option value="epa_608">EPA 608 credential</option>
+          <option value="state_program_approval">State program approval</option>
           <option value="legacy_mou_reference">Prior MOU reference</option>
           <option value="mou_draft">Unsigned current MOU draft</option>
         </select>

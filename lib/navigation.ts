@@ -138,6 +138,8 @@ export const NAV_ITEMS: NavItem[] = [
     href: '/online-apps',
     subItems: [
       { name: 'Choose Your Portal', href: '/online-apps', isSectionLink: true },
+      { name: 'Creator Studio', href: ROUTES.creatorPortal, isSectionLink: true, isAuth: true },
+      { name: 'Testing Center Operations', href: ROUTES.testingPortal, isSectionLink: true, isAuth: true },
       {
         name: 'Secure Sign In',
         href: ROUTES.login,

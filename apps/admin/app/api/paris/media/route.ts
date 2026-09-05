@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 
 export async function GET(request: NextRequest) {
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
   const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get('query');
   const page = searchParams.get('page') || '1';
@@ -16,17 +20,12 @@ export async function GET(request: NextRequest) {
     }, { status: 400 });
   }
 
-  // If no Pexels API key, return demo data
+  // Never present synthetic demo assets as live provider results.
   if (!PEXELS_API_KEY) {
-    return NextResponse.json({
-      success: true,
-      source: 'demo',
-      query,
-      total_results: 100,
-      page: parseInt(page),
-      per_page: parseInt(perPage),
-      photos: generateDemoPhotos(parseInt(perPage)),
-    });
+    return NextResponse.json(
+      { success: false, configured: false, error: 'Media search is not configured' },
+      { status: 503 },
+    );
   }
 
   try {
@@ -76,79 +75,33 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Media search error:', error);
     
-    // Fallback to demo data
-    return NextResponse.json({
-      success: true,
-      source: 'demo',
-      query,
-      total_results: 100,
-      page: parseInt(page),
-      per_page: parseInt(perPage),
-      photos: generateDemoPhotos(parseInt(perPage)),
-    });
+    return NextResponse.json(
+      { success: false, error: 'Media search provider is unavailable' },
+      { status: 502 },
+    );
   }
-}
-
-// Generate demo photos for testing
-function generateDemoPhotos(count: number) {
-  const categories = [
-    { query: 'professional workplace', color: '1a365d' },
-    { query: 'students learning', color: '2c5282' },
-    { query: 'healthcare training', color: '38a169' },
-    { query: 'construction work', color: 'd69e2e' },
-    { query: 'technology office', color: '805ad5' },
-  ];
-
-  const photos = [];
-  for (let i = 0; i < count; i++) {
-    const category = categories[i % categories.length];
-    const width = [800, 1200, 1600][i % 3];
-    const height = [600, 800, 900][i % 3];
-    
-    photos.push({
-      id: `demo_${i}`,
-      url: `https://picsum.photos/seed/${category.query}/${width}/${height}`,
-      thumbnail: `https://picsum.photos/seed/${category.query}/400/300`,
-      alt: `${category.query} professional photo`,
-      photographer: 'Demo Photographer',
-      photographer_url: 'https://example.com',
-      width,
-      height,
-      avg_color: `#${category.color}`,
-      source: 'demo',
-    });
-  }
-
-  return photos;
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
   try {
     const body = await request.json();
-    const { action, imageUrl, prompt, type } = body;
+    const { action } = body;
 
     if (action === 'generate') {
-      // AI image generation would go here
-      // For now, return demo data
-      return NextResponse.json({
-        success: true,
-        action: 'generate',
-        imageUrl: `https://picsum.photos/1920/1080?random=${Date.now()}`,
-        prompt,
-        type,
-        message: 'Image generated successfully!',
-      });
+      return NextResponse.json(
+        { success: false, action: 'generate', error: 'Image generation is not configured' },
+        { status: 501 },
+      );
     }
 
     if (action === 'edit') {
-      // Image editing would go here
-      return NextResponse.json({
-        success: true,
-        action: 'edit',
-        imageUrl,
-        edits: body.edits,
-        message: 'Image edited successfully!',
-      });
+      return NextResponse.json(
+        { success: false, action: 'edit', error: 'Image editing is not configured' },
+        { status: 501 },
+      );
     }
 
     return NextResponse.json({ 

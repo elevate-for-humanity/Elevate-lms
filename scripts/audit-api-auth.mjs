@@ -2,7 +2,7 @@
 /**
  * audit-api-auth.mjs
  *
- * Scans all app/api route.ts files and flags any that:
+ * Scans all application API route files and flags any that:
  *   1. Are not explicitly marked PUBLIC ROUTE, CRON ROUTE, or WEBHOOK
  *   2. Have no recognizable auth pattern
  *
@@ -17,7 +17,12 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join, relative } from 'path';
 
 const ROOT = new URL('..', import.meta.url).pathname;
-const API_DIR = join(ROOT, 'app/api');
+const API_DIRS = [
+  join(ROOT, 'apps/admin/app/api'),
+  join(ROOT, 'apps/lms/app/api'),
+  join(ROOT, 'apps/marketing/app/api'),
+  join(ROOT, 'app/api'), // Backward-compatible with the former single-app layout.
+].filter(existsSync);
 const FAIL_ON_NEW = process.argv.includes('--fail-on-new');
 
 // Patterns that indicate intentional public/system access
@@ -33,6 +38,8 @@ const EXEMPT_PATTERNS = [
 
 // Patterns that indicate auth is present
 const AUTH_PATTERNS = [
+  /apiRequireDevStudio/,
+  /capabilityHealthResponse/,
   /apiRequireAdmin/,
   /apiAuthGuard/,
   /apiRequireInstructor/,
@@ -57,6 +64,7 @@ const AUTH_PATTERNS = [
   /getMyPartnerContext/,
   /withRuntime\(\{\s*cron/,
   /cron:\s*['"]bearer['"]/,
+  /from ['"]@\/lib\/admin\/media-(?:assets|asset-item)-route['"]/,
 ];
 
 function walk(dir) {
@@ -69,18 +77,57 @@ function walk(dir) {
   return results;
 }
 
-const routes = walk(API_DIR);
+const MODULE_EXTENSIONS = ['', '.ts', '.tsx', '.js', '.jsx', '.mjs'];
+
+function resolveLocalModule(fromFile, specifier) {
+  const base = specifier.startsWith('@/')
+    ? join(ROOT, specifier.slice(2))
+    : specifier.startsWith('.')
+      ? join(new URL('.', `file://${fromFile}`).pathname, specifier)
+      : null;
+  if (!base) return null;
+  for (const suffix of MODULE_EXTENSIONS) {
+    const candidate = `${base}${suffix}`;
+    if (existsSync(candidate) && statSync(candidate).isFile()) return candidate;
+  }
+  for (const suffix of MODULE_EXTENSIONS.slice(1)) {
+    const candidate = join(base, `index${suffix}`);
+    if (existsSync(candidate) && statSync(candidate).isFile()) return candidate;
+  }
+  return null;
+}
+
+function moduleClosure(file, seen = new Set(), depth = 0) {
+  if (seen.has(file) || depth > 5) return '';
+  seen.add(file);
+  const content = readFileSync(file, 'utf8');
+  const dependencies = [];
+  const importPattern = /(?:from\s*|import\s*)['"]([^'"]+)['"]/g;
+  for (const match of content.matchAll(importPattern)) {
+    const dependency = resolveLocalModule(file, match[1]);
+    if (dependency) dependencies.push(moduleClosure(dependency, seen, depth + 1));
+  }
+  return [content, ...dependencies].join('\n');
+}
+
+if (API_DIRS.length === 0) {
+  console.error('[auth-audit] FAIL — no application API directories were found.');
+  process.exit(1);
+}
+
+const routes = API_DIRS.flatMap(walk);
 const unguarded = [];
 
 for (const route of routes) {
   const content = readFileSync(route, 'utf8');
+  const authContext = moduleClosure(route);
   const rel = relative(ROOT, route);
 
   // Skip if explicitly exempt
   if (EXEMPT_PATTERNS.some((p) => p.test(content))) continue;
 
   // Skip if has auth
-  if (AUTH_PATTERNS.some((p) => p.test(content))) continue;
+  if (AUTH_PATTERNS.some((p) => p.test(authContext))) continue;
 
   unguarded.push(rel);
 }
@@ -107,11 +154,16 @@ const KNOWN_BASELINE = new Set([
   'app/api/web-vitals/route.ts',             // analytics ingestion
 ]);
 
-const newUnguarded = unguarded.filter((r) => !KNOWN_BASELINE.has(r));
-const baselineUnguarded = unguarded.filter((r) => KNOWN_BASELINE.has(r));
+function baselineKey(route) {
+  return route.replace(/^apps\/(?:admin|lms|marketing)\//, '');
+}
+
+const newUnguarded = unguarded.filter((r) => !KNOWN_BASELINE.has(baselineKey(r)));
+const baselineUnguarded = unguarded.filter((r) => KNOWN_BASELINE.has(baselineKey(r)));
 
 console.log('\n=== API Auth Audit ===\n');
 console.log(`Total routes scanned: ${routes.length}`);
+console.log(`Application roots:    ${API_DIRS.length}`);
 console.log(`Unguarded (total):    ${unguarded.length}`);
 console.log(`Known baseline:       ${baselineUnguarded.length}`);
 console.log(`NEW unguarded:        ${newUnguarded.length}`);

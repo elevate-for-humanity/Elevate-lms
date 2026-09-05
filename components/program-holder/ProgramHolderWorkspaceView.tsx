@@ -16,6 +16,7 @@ import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseout
 import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
 import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificationPreferences';
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
+import { getProgramCardImage } from '@/lib/images/programImages';
 
 type Section =
   | 'dashboard'

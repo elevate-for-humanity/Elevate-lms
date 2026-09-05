@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { usePathname } from 'next/navigation';
 import {
   Search,
@@ -352,6 +353,7 @@ export function PlatformShell({
           </div>
         </main>
       </div>
+      <ParisFloatingWrapper surface="portal" portalRole={ROLE_DISPLAY_NAMES[role]} />
     </div>
   );
 }

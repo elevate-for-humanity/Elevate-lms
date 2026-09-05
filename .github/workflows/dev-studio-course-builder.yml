@@ -8,8 +8,6 @@ on:
         required: true
         type: string
         default: business-administration
-  issues:
-    types: [opened, reopened]
 
 permissions:
   contents: read

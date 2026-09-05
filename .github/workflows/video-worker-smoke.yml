@@ -6,12 +6,6 @@ name: Video Worker Scheduler
 # A main-branch workflow update also performs an immediate bounded queue check.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '*/5 * * * *'
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/video-worker-smoke.yml'
 
 permissions:
   contents: read

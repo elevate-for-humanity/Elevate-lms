@@ -18,6 +18,7 @@ import { auditCourseTemplate } from './audit';
 import type { ProgramBuilderTemplate } from './schema';
 import { adaptProgramTemplateToBlueprint } from './publish-adapter';
 import { requireAdminClient } from '../supabase/admin';
+import { assertCourseBuilderGenerationEnabled } from './generation-control';
 
 const courseProgramConfigSchema = z.object({
   id: z.string().uuid().optional(),
@@ -119,6 +120,8 @@ export async function courseFactory(
   input: FactoryInput,
   progress?: ProgressCallback,
 ): Promise<FactoryOutput> {
+  const controlDb = await requireAdminClient();
+  await assertCourseBuilderGenerationEnabled(controlDb, input.courseId);
   if (input.contentSource === 'curriculum_lessons') {
     if (!input.courseId) {
       return {

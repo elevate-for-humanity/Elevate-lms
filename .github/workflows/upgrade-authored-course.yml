@@ -7,16 +7,6 @@ on:
         description: Existing canonical course UUID to upgrade in place
         required: true
         type: string
-  push:
-    branches: [main]
-    paths:
-      - 'lib/course-factory/authored-content-compiler.ts'
-      - 'lib/course-factory/persisted-authored-upgrade.ts'
-      - 'lib/course-factory/experience-contract.ts'
-      - 'lib/curriculum/blueprints/barber/**'
-      - 'scripts/course-factory/upgrade-authored-course.ts'
-      - 'supabase/migrations/20260825123000_atomic_authored_course_experience_upgrade.sql'
-      - '.github/workflows/upgrade-authored-course.yml'
 
 permissions:
   contents: read

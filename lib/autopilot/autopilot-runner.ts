@@ -1,4 +1,3 @@
-import { buildCourse } from './ai-course-builder';
 import { scanRepo } from './repo-scanner';
 import { enhanceImages } from './media-enhancer';
 import { generateSitemap } from './sitemap-generator';
@@ -16,11 +15,6 @@ export async function runAutopilot(
 ): Promise<{ success?: boolean; error?: string; data?: any }> {
   try {
     switch (type) {
-      case 'course':
-        // Build AI-powered course content
-        const courseResult = await buildCourse(payload);
-        return { success: true, data: courseResult };
-
       case 'scan':
         // Scan repository for content and structure
         const scanResult = await scanRepo();
@@ -44,7 +38,7 @@ export async function runAutopilot(
       default:
         return {
           success: false,
-          error: `Unknown autopilot mode: ${type}. Valid modes: course, scan, media, sitemap, deploy`,
+          error: `Unknown autopilot mode: ${type}. Valid modes: scan, media, sitemap, deploy`,
         };
     }
   } catch (error) {
@@ -60,7 +54,7 @@ export async function runAutopilot(
  * Get list of available autopilot tasks
  */
 export function getAvailableAutopilotTasks(): string[] {
-  return ['course', 'scan', 'media', 'sitemap', 'deploy'];
+  return ['scan', 'media', 'sitemap', 'deploy'];
 }
 
 /**

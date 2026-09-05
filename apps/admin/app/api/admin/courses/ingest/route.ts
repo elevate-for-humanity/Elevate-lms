@@ -4,12 +4,11 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { ingestCourse } from '@/lib/ai/course-ingestion';
-import { saveCourseBlueprint } from '@/lib/db/courses';
 import { isOpenAIConfigured, getOpenAIClient } from '@/lib/ai/openai-client';
 import { loadIndustryStandards } from '@/lib/industry/standards-loader';
 import { buildBlueprintSystemPrompt } from '@/lib/ai/prompts/course-blueprint';
 import { logger } from '@/lib/logger';
-import { queueCourseMedia } from '@/lib/course-builder/orchestrator';
+import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
 import {
   SAFE_CHARS,
   MAX_CHARS,
@@ -58,10 +57,7 @@ async function resolveIndustryContext(args: {
 
     const socCode = program?.soc_code?.trim() || null;
     const credentialCode =
-      explicitCredential ||
-      program?.code?.trim() ||
-      program?.credential_type?.trim() ||
-      null;
+      explicitCredential || program?.code?.trim() || program?.credential_type?.trim() || null;
 
     return { socCode, credentialCode };
   } catch (err) {
@@ -91,6 +87,11 @@ async function _POST(request: Request) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
+  const db = await requireAdminClient();
+  if (await isCourseBuilderGenerationPaused(db)) {
+    return NextResponse.json({ error: 'COURSE_BUILDER_GENERATION_PAUSED' }, { status: 423 });
+  }
+
   if (!isOpenAIConfigured()) {
     return NextResponse.json(
       { error: 'AI features are not configured. Add OPENAI_API_KEY to enable course ingestion.' },
@@ -114,52 +115,17 @@ async function _POST(request: Request) {
     preview_only,
     blueprint_override,
     compile_lessons,
-    queue_videos,
-    video_queue_limit,
   } = body;
 
-  // blueprint_override: client sends back the edited blueprint for the save pass
-  // In this case we skip AI entirely and go straight to persistence
-  if (!preview_only && blueprint_override) {
-    try {
-      const result = await saveCourseBlueprint(blueprint_override, {
-        program_id: program_id || null,
-        created_by: auth.id,
-      });
-
-      let videoQueueResult: Awaited<ReturnType<typeof queueCourseMedia>> | null = null;
-      if (queue_videos !== false && result.courseId) {
-        try {
-          videoQueueResult = await queueCourseMedia({
-            courseId: result.courseId,
-            limit: typeof video_queue_limit === 'number' ? video_queue_limit : null,
-            onlyMissing: true,
-          });
-        } catch (err) {
-          logger.warn('[courses/ingest] Failed to queue videos after blueprint save', {
-            courseId: result.courseId,
-            error: err instanceof Error ? err.message : String(err),
-          });
-        }
-      }
-
-      return NextResponse.json(
-        {
-          courseId: result.courseId,
-          moduleCount: result.moduleCount,
-          lessonCount: result.lessonCount,
-          questionCount: result.questionCount,
-          warnings: blueprint_override.warnings ?? [],
-          videosQueued: videoQueueResult?.queued ?? 0,
-          videoQueueFailed: videoQueueResult?.failed ?? 0,
-          videoStudioUrl: `/video-generator?courseId=${result.courseId}`,
-          studioCommand: `Build premium course for ${result.courseId} with queued videos`,
-        },
-        { status: 201 },
-      );
-    } catch (err: any) {
-      return NextResponse.json({ error: 'Failed to save course draft.' }, { status: 500 });
-    }
+  if (!preview_only || blueprint_override) {
+    return NextResponse.json(
+      {
+        error: 'PARALLEL_COURSE_PERSISTENCE_RETIRED',
+        message: 'Submit reviewed source material through the canonical Course Builder.',
+        canonicalEndpoint: '/api/admin/course-builder',
+      },
+      { status: 410 },
+    );
   }
 
   if (
@@ -266,48 +232,7 @@ async function _POST(request: Request) {
       blueprint.warnings = [...ingestionWarnings, ...(blueprint.warnings || [])];
     }
 
-    // preview_only: return blueprint for the review screen without persisting
-    if (preview_only) {
-      return NextResponse.json({ blueprint }, { status: 200 });
-    }
-
-    // Save draft to database
-    const result = await saveCourseBlueprint(blueprint, {
-      program_id: program_id || null,
-      created_by: auth.id,
-    });
-
-    let videoQueueResult: Awaited<ReturnType<typeof queueCourseMedia>> | null = null;
-    if (queue_videos !== false && result.courseId) {
-      try {
-        videoQueueResult = await queueCourseMedia({
-          courseId: result.courseId,
-          limit: typeof video_queue_limit === 'number' ? video_queue_limit : null,
-          onlyMissing: true,
-        });
-      } catch (err) {
-        logger.warn('[courses/ingest] Failed to queue videos after ingest save', {
-          courseId: result.courseId,
-          error: err instanceof Error ? err.message : String(err),
-        });
-      }
-    }
-
-    return NextResponse.json(
-      {
-        courseId: result.courseId,
-        moduleCount: result.moduleCount,
-        lessonCount: result.lessonCount,
-        questionCount: result.questionCount,
-        warnings: blueprint.warnings,
-        blueprint,
-        videosQueued: videoQueueResult?.queued ?? 0,
-        videoQueueFailed: videoQueueResult?.failed ?? 0,
-        videoStudioUrl: `/video-generator?courseId=${result.courseId}`,
-        studioCommand: `Build premium course for ${result.courseId} with queued videos`,
-      },
-      { status: 201 },
-    );
+    return NextResponse.json({ blueprint }, { status: 200 });
   } catch (err: any) {
     const msg = err?.message || '';
 
@@ -367,6 +292,11 @@ async function _POST(request: Request) {
 async function _GET(request: Request) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
+
+  const db = await requireAdminClient();
+  if (await isCourseBuilderGenerationPaused(db)) {
+    return NextResponse.json({ error: 'COURSE_BUILDER_GENERATION_PAUSED' }, { status: 423 });
+  }
 
   const { searchParams } = new URL(request.url);
   const jobId = searchParams.get('job_id');

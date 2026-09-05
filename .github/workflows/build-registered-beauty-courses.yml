@@ -1,15 +1,6 @@
 name: Build Registered Beauty Courses
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/course-factory/build-registered-beauty-courses.ts'
-      - '.github/workflows/build-registered-beauty-courses.yml'
-      - 'lib/ai/ai-service.ts'
-      - 'lib/supabase/admin.ts'
-  issues:
-    types: [opened, reopened]
   workflow_dispatch:
 
 permissions:

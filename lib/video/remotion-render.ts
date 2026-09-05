@@ -98,15 +98,25 @@ export function normalizeRemotionMediaUrl(value: unknown): string | null {
   }
 }
 
+export function normalizeSlideLessonScenes(scenes: SceneData[]): SceneData[] {
+  return scenes.map((scene) => ({
+    ...scene,
+    clipUrl: normalizeRemotionMediaUrl(scene.clipUrl),
+    imageUrl: normalizeRemotionMediaUrl(scene.imageUrl),
+    audioSrc: normalizeRemotionMediaUrl(scene.audioSrc),
+  }));
+}
+
 function vttTimestamp(seconds: number): string {
   const milliseconds = Math.max(0, Math.round(seconds * 1000));
   const hours = Math.floor(milliseconds / 3_600_000);
   const minutes = Math.floor((milliseconds % 3_600_000) / 60_000);
   const secs = Math.floor((milliseconds % 60_000) / 1000);
   const millis = milliseconds % 1000;
-  return [hours, minutes, secs]
-    .map((value) => String(value).padStart(2, '0'))
-    .join(':') + `.${String(millis).padStart(3, '0')}`;
+  return (
+    [hours, minutes, secs].map((value) => String(value).padStart(2, '0')).join(':') +
+    `.${String(millis).padStart(3, '0')}`
+  );
 }
 
 export function buildStoryboardWebVtt(scenes: SceneData[]): string {
@@ -326,7 +336,10 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
     // ── Step 2: Fetch background image ────────────────────────────────────────
     logger.info(`[RemotionRender] Fetching background image (domain: ${domainKey})`);
     const imageQuery = input.visualPrompt?.replace(/[^a-zA-Z0-9 ,'-]/g, ' ').slice(0, 180);
-    const backgroundImageSrc = await getPexelsImage(domainKey, imageQuery ? { query: imageQuery } : {});
+    const backgroundImageSrc = await getPexelsImage(
+      domainKey,
+      imageQuery ? { query: imageQuery } : {},
+    );
 
     // ── Step 3: Build Remotion props ──────────────────────────────────────────
     const segmentFrames = calcSegmentFrames(duration);
@@ -433,7 +446,9 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
 /** Render the canonical Media Director storyboard through the existing rich
  * SlideLesson composition. Each scene gets its own narration and relevant
  * full-frame motion or image fallback instead of collapsing to one backdrop. */
-export async function renderStoryboardVideo(input: StoryboardRenderInput): Promise<RemotionRenderResult> {
+export async function renderStoryboardVideo(
+  input: StoryboardRenderInput,
+): Promise<RemotionRenderResult> {
   const paths = getOutputPaths(input.lessonId);
   const instructor = getInstructor(input.instructorId);
   try {
@@ -455,7 +470,11 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
     for (const [index, scene] of input.storyboard.scenes.entries()) {
       const narration = scene.dialogue?.trim() || scene.action.trim();
       const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
-      const audioSrc = await uploadLessonMediaBuffer(audio, `${input.lessonId}-scene-${index + 1}`, 'mp3');
+      const audioSrc = await uploadLessonMediaBuffer(
+        audio,
+        `${input.lessonId}-scene-${index + 1}`,
+        'mp3',
+      );
       const visualIntent = deriveInstructionalVisualIntent({
         domainKey: /hvac|epa 608|refriger/i.test(input.courseTitle) ? 'hvac_epa608' : null,
         title: scene.subject,
@@ -465,11 +484,13 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
       });
       const query = visualIntent.query;
       const instructionalLayout = visualIntent.deterministicDiagram
-        ? instructionalLayoutForScene({ title: scene.subject, action: scene.action, sceneType: scene.sceneType })
+        ? instructionalLayoutForScene({
+            title: scene.subject,
+            action: scene.action,
+            sceneType: scene.sceneType,
+          })
         : null;
-      let clipUrl = instructionalLayout
-        ? null
-        : normalizeRemotionMediaUrl(scene.sourceVideoUrl);
+      let clipUrl = instructionalLayout ? null : normalizeRemotionMediaUrl(scene.sourceVideoUrl);
       let lipSyncedInstructor = false;
 
       // A visible instructor may appear only when the delivered narration is
@@ -504,11 +525,14 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
             };
           }
         } catch (error) {
-          logger.warn('[RemotionRender] Lip-synced instructor unavailable; using non-speaking cinematic footage', {
-            lessonId: input.lessonId,
-            scene: index + 1,
-            error: error instanceof Error ? error.message : String(error),
-          });
+          logger.warn(
+            '[RemotionRender] Lip-synced instructor unavailable; using non-speaking cinematic footage',
+            {
+              lessonId: input.lessonId,
+              scene: index + 1,
+              error: error instanceof Error ? error.message : String(error),
+            },
+          );
         }
       }
 
@@ -530,7 +554,9 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
           });
           const contentType = imageResponse.headers.get('content-type')?.toLowerCase() ?? '';
           if (!imageResponse.ok || !contentType.startsWith('image/')) {
-            throw new Error(`AI image returned ${imageResponse.status} ${contentType || 'without an image content type'}`);
+            throw new Error(
+              `AI image returned ${imageResponse.status} ${contentType || 'without an image content type'}`,
+            );
           }
           const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
           if (!imageBuffer.length || imageBuffer.length > 20 * 1024 * 1024) {
@@ -543,11 +569,14 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
             contentType,
           );
         } catch (error) {
-          logger.warn('[RemotionRender] AI scene image unavailable; using the bright instructional canvas', {
-            lessonId: input.lessonId,
-            scene: index + 1,
-            error: error instanceof Error ? error.message : String(error),
-          });
+          logger.warn(
+            '[RemotionRender] AI scene image unavailable; using the bright instructional canvas',
+            {
+              lessonId: input.lessonId,
+              scene: index + 1,
+              error: error instanceof Error ? error.message : String(error),
+            },
+          );
           imageUrl = null;
         }
       }
@@ -593,21 +622,30 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
         }
       }
       if (!clipUrl) {
-        clipUrl = normalizeRemotionMediaUrl(await getPexelsVideoClip(query, {
-          minDuration: 3,
-          maxDuration: 30,
-          perPage: 8,
-        }));
+        clipUrl = normalizeRemotionMediaUrl(
+          await getPexelsVideoClip(query, {
+            minDuration: 3,
+            maxDuration: 30,
+            perPage: 8,
+          }),
+        );
       }
       const currentScene = resolvedStoryboard.scenes[index];
       if (!currentScene) throw new Error(`MEDIA_SCENE_MISSING:${index}`);
       const resolvedProvider = instructionalLayout
         ? 'remotion'
         : currentScene.resolvedProvider ||
-          (clipUrl ? 'pexels' : imageUrl?.includes('pollinations') ? 'pollinations' : imageUrl ? 'pexels' : undefined);
+          (clipUrl
+            ? 'pexels'
+            : imageUrl?.includes('pollinations')
+              ? 'pollinations'
+              : imageUrl
+                ? 'pexels'
+                : undefined);
       const resolvedModel = instructionalLayout
         ? `deterministic-${instructionalLayout.kind}`
-        : currentScene.resolvedModel || (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined);
+        : currentScene.resolvedModel ||
+          (clipUrl ? 'stock-video' : imageUrl ? 'still-image' : undefined);
       resolvedStoryboard.scenes[index] = {
         ...currentScene,
         ...(imageUrl ? { referenceImageUrl: imageUrl } : {}),
@@ -638,17 +676,20 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
       });
     }
 
+    // Final trust boundary before Chromium. Runtime provider and storage values
+    // must be normalized even when their SDK declarations claim strings.
+    const normalizedScenes = normalizeSlideLessonScenes(scenes);
     const props: SlideLessonProps & Record<string, unknown> = {
       courseTitle: input.courseTitle,
       lessonTitle: input.storyboard.title,
-      scenes,
+      scenes: normalizedScenes,
       primaryColor: instructor.topBarColor,
       accentColor: instructor.accentColor,
       backgroundColor: '#f8fafc',
       surfaceMode: 'bright',
       logoText: 'Elevate LMS',
     };
-    const totalFrames = 90 + scenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
+    const totalFrames = 90 + normalizedScenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
     const bundleUrl = await getBundleUrl();
     const { renderMedia, selectComposition } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;

@@ -1,8 +1,16 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { assertCourseBuilderGenerationEnabled } from '@/lib/course-builder/generation-control';
 import { createJob, type VideoJob } from '@/lib/video/job-queue';
-import { hasCanonicalMediaQualityEvidence, resetCanonicalMediaJob } from '@/lib/course-factory/media-manager';
+import {
+  hasCanonicalMediaQualityEvidence,
+  resetCanonicalMediaJob,
+} from '@/lib/course-factory/media-manager';
 import { logger } from '@/lib/logger';
-import { generateInstructorIntro, getInstructorById, getInstructorForCourse } from '@/lib/ai-instructors';
+import {
+  generateInstructorIntro,
+  getInstructorById,
+  getInstructorForCourse,
+} from '@/lib/ai-instructors';
 
 export interface QueueCourseLessonVideosInput {
   courseId: string;
@@ -83,7 +91,8 @@ function collectInstructionalText(value: unknown, key = '', seen = new Set<strin
       .trim();
     const internalDirective =
       /\b(the narration should|the script should|in this clip|apply this to .{0,160} by identifying|end with the action the learner|as an ai|return (?:valid )?json|prompt engineering)\b/i;
-    if (normalized.length < 3 || internalDirective.test(normalized) || seen.has(normalized)) return [];
+    if (normalized.length < 3 || internalDirective.test(normalized) || seen.has(normalized))
+      return [];
     seen.add(normalized);
     return [normalized];
   }
@@ -91,8 +100,9 @@ function collectInstructionalText(value: unknown, key = '', seen = new Set<strin
     return value.flatMap((item) => collectInstructionalText(item, key, seen));
   }
   if (typeof value === 'object') {
-    return Object.entries(value as Record<string, unknown>)
-      .flatMap(([childKey, child]) => collectInstructionalText(child, childKey, seen));
+    return Object.entries(value as Record<string, unknown>).flatMap(([childKey, child]) =>
+      collectInstructionalText(child, childKey, seen),
+    );
   }
   return [];
 }
@@ -127,6 +137,7 @@ export async function queueCourseLessonVideos(
   input: QueueCourseLessonVideosInput,
 ): Promise<QueueCourseLessonVideosResult> {
   const db = await requireAdminClient();
+  await assertCourseBuilderGenerationEnabled(db, input.courseId);
   const { data: course, error: courseError } = await db
     .from('courses')
     .select('title')
@@ -146,7 +157,8 @@ export async function queueCourseLessonVideos(
     .order('order_index', { ascending: true })
     .limit(1)
     .maybeSingle();
-  if (firstLessonError) throw new Error(`Failed to resolve course introduction lesson: ${firstLessonError.message}`);
+  if (firstLessonError)
+    throw new Error(`Failed to resolve course introduction lesson: ${firstLessonError.message}`);
 
   let lessonQuery = db
     .from('course_lessons')
@@ -162,7 +174,8 @@ export async function queueCourseLessonVideos(
     .from('course_modules')
     .select('id, order_index')
     .eq('course_id', input.courseId);
-  if (moduleError) throw new Error(`Failed to load module order for video queue: ${moduleError.message}`);
+  if (moduleError)
+    throw new Error(`Failed to load module order for video queue: ${moduleError.message}`);
 
   const { data: existingJobs, error: jobsError } = await db
     .from('video_jobs')
@@ -172,7 +185,10 @@ export async function queueCourseLessonVideos(
 
   const existingByAsset = new Map<string, VideoJob>();
   for (const job of (existingJobs ?? []) as VideoJob[]) {
-    existingByAsset.set(assetIdentity(job.lesson_id, job.asset_kind ?? 'lesson', job.asset_key), job);
+    existingByAsset.set(
+      assetIdentity(job.lesson_id, job.asset_kind ?? 'lesson', job.asset_key),
+      job,
+    );
   }
 
   const moduleOrder = new Map((modules ?? []).map((row) => [row.id, Number(row.order_index)]));
@@ -186,7 +202,8 @@ export async function queueCourseLessonVideos(
   const onlyMissing = input.onlyMissing !== false;
   const force = input.force === true;
   let candidates = rows;
-  if (typeof input.limit === 'number' && input.limit > 0) candidates = candidates.slice(0, input.limit);
+  if (typeof input.limit === 'number' && input.limit > 0)
+    candidates = candidates.slice(0, input.limit);
 
   let queued = 0;
   let microclipsQueued = 0;
@@ -204,7 +221,10 @@ export async function queueCourseLessonVideos(
     // A queued job is already renderer-ready and must not consume retry budget.
     // Force only replaces a completed asset or retries a failed asset after the
     // canonical source has been deliberately repaired.
-    if (current.status === 'failed' || ((force || replaceCompletedSource) && current.status === 'complete')) {
+    if (
+      current.status === 'failed' ||
+      ((force || replaceCompletedSource) && current.status === 'complete')
+    ) {
       return resetCanonicalMediaJob(
         {
           courseId: current.course_id,
@@ -219,7 +239,7 @@ export async function queueCourseLessonVideos(
             ? 'Canonical lesson narration changed during unified course rebuild'
             : force
               ? 'Authorized Course Factory media source repair'
-            : current.error_message ?? 'Retrying failed media asset',
+              : (current.error_message ?? 'Retrying failed media asset'),
         },
       );
     }
@@ -228,21 +248,24 @@ export async function queueCourseLessonVideos(
 
   for (const lesson of candidates) {
     try {
-      const videoConfig = lesson.video_config && typeof lesson.video_config === 'object'
-        ? lesson.video_config as Record<string, unknown>
-        : {};
-      const instructorId = [videoConfig.instructorId, videoConfig.instructor_id]
-        .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
-        ?.trim() ?? '';
+      const videoConfig =
+        lesson.video_config && typeof lesson.video_config === 'object'
+          ? (lesson.video_config as Record<string, unknown>)
+          : {};
+      const instructorId =
+        [videoConfig.instructorId, videoConfig.instructor_id]
+          .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
+          ?.trim() ?? '';
       const instructor = instructorId
         ? getInstructorById(instructorId)
         : getInstructorForCourse(course.title);
       const lessonKey = assetIdentity(lesson.id, 'lesson', null);
       const existingLessonJob = existingByAsset.get(lessonKey);
       const lessonNarration = canonicalLessonNarration(lesson);
-      const sourceFingerprint = typeof videoConfig.source_fingerprint === 'string'
-        ? videoConfig.source_fingerprint.trim()
-        : '';
+      const sourceFingerprint =
+        typeof videoConfig.source_fingerprint === 'string'
+          ? videoConfig.source_fingerprint.trim()
+          : '';
       if (!sourceFingerprint) {
         throw new Error(`Lesson "${lesson.title}" has no locked unified-media fingerprint`);
       }
@@ -252,16 +275,22 @@ export async function queueCourseLessonVideos(
           ? `By the end of this lesson, you will be able to: ${lesson.bullet_points.join('. ')}.`
           : '',
         lessonNarration,
-      ].filter(Boolean).join(' ').trim();
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .trim();
       const sourceChanged = Boolean(
         existingLessonJob?.status === 'complete' &&
         (existingLessonJob.script ?? '').trim() !== canonicalScript,
       );
       const hasVideo = typeof lesson.video_url === 'string' && lesson.video_url.trim().length > 0;
-      const mainComplete = hasVideo && lesson.video_status === 'complete'
-        && lesson.media_origin === 'generated' && lesson.media_quality_status === 'approved'
-        && existingLessonJob?.review_status === 'approved'
-        && hasCanonicalMediaQualityEvidence(existingLessonJob.quality_evidence);
+      const mainComplete =
+        hasVideo &&
+        lesson.video_status === 'complete' &&
+        lesson.media_origin === 'generated' &&
+        lesson.media_quality_status === 'approved' &&
+        existingLessonJob?.review_status === 'approved' &&
+        hasCanonicalMediaQualityEvidence(existingLessonJob.quality_evidence);
       const mainInFlight = lesson.video_status === 'queued' || lesson.video_status === 'rendering';
       // Queued/draft jobs still need their canonical payload synchronized after
       // a curriculum refresh. Only a renderer-owned active lease is immutable.
@@ -273,23 +302,30 @@ export async function queueCourseLessonVideos(
         (!mainInFlight && (!onlyMissing || !mainComplete));
 
       if (shouldQueueMain) {
-        const job = await ensureQueued(existingLessonJob, () => createJob({
-          lesson_id: lesson.id,
-          course_id: input.courseId,
-          lesson_title: lesson.title,
-          script: canonicalScript,
-          bullet_points: Array.isArray(lesson.bullet_points) ? (lesson.bullet_points as string[]) : [],
-          // A refreshed full narration requires a fresh storyboard. Reusing
-          // lesson.scene_data from an older teaser causes visual/narration drift.
-          scene_data: {
-            source_contract: {
-              version: Number(videoConfig.source_contract_version ?? 1),
-              fingerprint: sourceFingerprint,
-              narration_locked: videoConfig.narration_locked === true,
-            },
-          },
-          asset_kind: 'lesson',
-        }), sourceChanged);
+        const job = await ensureQueued(
+          existingLessonJob,
+          () =>
+            createJob({
+              lesson_id: lesson.id,
+              course_id: input.courseId,
+              lesson_title: lesson.title,
+              script: canonicalScript,
+              bullet_points: Array.isArray(lesson.bullet_points)
+                ? (lesson.bullet_points as string[])
+                : [],
+              // A refreshed full narration requires a fresh storyboard. Reusing
+              // lesson.scene_data from an older teaser causes visual/narration drift.
+              scene_data: {
+                source_contract: {
+                  version: Number(videoConfig.source_contract_version ?? 1),
+                  fingerprint: sourceFingerprint,
+                  narration_locked: videoConfig.narration_locked === true,
+                },
+              },
+              asset_kind: 'lesson',
+            }),
+          sourceChanged,
+        );
         existingByAsset.set(lessonKey, job);
         if (job.status === 'queued') queued += 1;
         if (job.status === 'queued' || job.status === 'rendering' || job.status === 'complete') {
@@ -302,29 +338,34 @@ export async function queueCourseLessonVideos(
       // Supplemental quick clips are explicit opt-in assets. The universal
       // builder defaults to one unified full instructional video per lesson;
       // activities and knowledge checks remain in the lesson flow.
-      for (const clip of videoConfig.enableMicroclips === true ? readQuickClips(lesson.content_json) : []) {
+      for (const clip of videoConfig.enableMicroclips === true
+        ? readQuickClips(lesson.content_json)
+        : []) {
         const clipId = typeof clip.id === 'string' ? clip.id : '';
         if (!clipId) continue;
-        const hasRenderedClip = typeof clip.videoUrl === 'string' && clip.videoUrl.trim().length > 0;
+        const hasRenderedClip =
+          typeof clip.videoUrl === 'string' && clip.videoUrl.trim().length > 0;
         const clipKey = assetIdentity(lesson.id, 'microclip', clipId);
         const existingClipJob = existingByAsset.get(clipKey);
         if (!force && hasRenderedClip && existingClipJob?.status === 'complete') continue;
 
-        const job = await ensureQueued(existingClipJob, () => createJob({
-          lesson_id: lesson.id,
-          course_id: input.courseId,
-          lesson_title: `${lesson.title} — ${String(clip.title ?? clipId)}`,
-          script: String(clip.script ?? ''),
-          bullet_points: [String(clip.objective ?? '')].filter(Boolean),
-          scene_data: {
+        const job = await ensureQueued(existingClipJob, () =>
+          createJob({
+            lesson_id: lesson.id,
+            course_id: input.courseId,
+            lesson_title: `${lesson.title} — ${String(clip.title ?? clipId)}`,
+            script: String(clip.script ?? ''),
+            bullet_points: [String(clip.objective ?? '')].filter(Boolean),
+            scene_data: {
+              asset_kind: 'microclip',
+              asset_key: clipId,
+              visual_prompt: clip.visualPrompt ?? null,
+              target_duration_seconds: clip.durationSeconds ?? 180,
+            },
             asset_kind: 'microclip',
             asset_key: clipId,
-            visual_prompt: clip.visualPrompt ?? null,
-            target_duration_seconds: clip.durationSeconds ?? 180,
-          },
-          asset_kind: 'microclip',
-          asset_key: clipId,
-        }));
+          }),
+        );
         existingByAsset.set(clipKey, job);
         if (job.status === 'queued') microclipsQueued += 1;
       }

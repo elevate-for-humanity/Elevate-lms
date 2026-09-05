@@ -2,40 +2,6 @@ name: Unified Course Builder Acceptance
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/course-factory/build-esb-acceptance.ts'
-      - 'scripts/course-factory/build-business-program.ts'
-      - 'scripts/check-course-factory-authority.mjs'
-      - 'scripts/check-studio-architecture.mjs'
-      - 'scripts/check-course-media-authority.mjs'
-      - 'scripts/audit-course-builder-procurement.mjs'
-      - 'tests/unit/course-factory/media-authority.test.ts'
-      - 'tests/unit/course-builder-route-consolidation.test.ts'
-      - '.github/workflows/build-esb-acceptance.yml'
-      - 'lib/ai/ai-service.ts'
-      - 'lib/ai/providers/**'
-      - 'lib/curriculum/blueprints/**'
-      - 'lib/curriculum/lesson-content-schema.ts'
-      - 'lib/curriculum/normalize-lesson-content.ts'
-      - 'lib/course-factory/**'
-      - 'lib/course-builder/**'
-      - 'lib/devstudio/course-builder-controller.ts'
-      - 'lib/platform/launch-foundation.ts'
-      - 'lib/video/**'
-      - 'components/lms/**'
-      - 'apps/lms/app/lms/courses/**'
-      - 'apps/lms/app/api/learner/interactions/**'
-      - 'apps/lms/app/api/onboarding/launch/route.ts'
-      - 'apps/admin/app/api/admin/course-builder/**'
-      - 'apps/admin/app/api/admin/lms/courses/generate/route.ts'
-      - 'apps/admin/app/api/admin/courses/**'
-      - 'apps/admin/app/api/admin/dev-studio/chat/route.ts'
-      - 'apps/admin/app/api/internal/videos/process-queue/route.ts'
-      - 'components/admin/course-builder/UnifiedCourseBuilder.tsx'
-  issues:
-    types: [opened, reopened]
 
 permissions:
   contents: read

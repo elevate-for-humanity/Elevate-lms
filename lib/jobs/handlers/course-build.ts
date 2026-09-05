@@ -4,6 +4,7 @@ import { finalizeUnifiedCourseBuildWithClient } from '@/lib/course-builder/build
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { FactoryInput, FactoryStage } from '@/lib/course-factory/types';
+import { assertCourseBuilderGenerationEnabled } from '@/lib/course-builder/generation-control';
 
 export interface CourseBuildJob {
   id: string;
@@ -20,11 +21,14 @@ function resumableMediaCheckpoint(job: CourseBuildJob): string | null {
   if (!finalization || typeof finalization !== 'object') return null;
   if ((finalization as { state?: unknown }).state !== 'media_pending') return null;
   const requestedCourseId = job.tool_args.courseId;
-  return !requestedCourseId || requestedCourseId === checkpoint.courseId ? checkpoint.courseId : null;
+  return !requestedCourseId || requestedCourseId === checkpoint.courseId
+    ? checkpoint.courseId
+    : null;
 }
 
 export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
   const db = await requireAdminClient();
+  await assertCourseBuilderGenerationEnabled(db, job.tool_args.courseId);
   const progressWrites: PromiseLike<unknown>[] = [];
   const checkpointCourseId = resumableMediaCheckpoint(job);
 

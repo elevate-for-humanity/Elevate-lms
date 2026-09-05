@@ -1,8 +1,7 @@
 name: Purge ESB Course Media
 
 on:
-  issues:
-    types: [opened, reopened]
+  workflow_dispatch:
 
 permissions:
   contents: read

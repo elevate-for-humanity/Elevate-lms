@@ -32,6 +32,7 @@ import { reviewCanonicalCourse, reviewCanonicalLessons } from '@/lib/course-buil
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
+import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
 import {
   CourseBuilderCreditsError,
   getCourseBuilderCreditBalance,
@@ -213,6 +214,23 @@ export async function POST(req: NextRequest) {
   }
 
   const action = String(body.action || 'generate') as CourseBuilderAction;
+  if (
+    ['generate', 'generate-from-blueprint', 'queue-media', 'repair', 'generate-missing'].includes(
+      action,
+    )
+  ) {
+    const db = await requireAdminClient();
+    if (await isCourseBuilderGenerationPaused(db)) {
+      return NextResponse.json(
+        {
+          error: 'COURSE_BUILDER_GENERATION_PAUSED',
+          message:
+            'Course and video generation are paused during the authority consolidation audit.',
+        },
+        { status: 423 },
+      );
+    }
+  }
 
   if (action === 'generate-from-blueprint') {
     if (!body.blueprintId || !body.programId) {

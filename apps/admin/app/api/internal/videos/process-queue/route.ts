@@ -5,6 +5,7 @@ import type { VideoJob } from '@/lib/video/job-queue';
 import { processClaimedVideoJob } from '@/lib/video/process-video-job';
 import { finalizeUnifiedCourseBuildWithClient } from '@/lib/course-builder/build-lifecycle';
 import { COURSE_MEDIA_STALE_RENDER_MS } from '@/lib/course-factory/media-manager';
+import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -53,6 +54,14 @@ export async function POST(request: NextRequest) {
     );
   }
   const db = await requireAdminClient();
+  if (await isCourseBuilderGenerationPaused(db)) {
+    return NextResponse.json({
+      ok: true,
+      started: 0,
+      reason: 'course-builder-generation-paused',
+      courseId,
+    });
+  }
   const maxConcurrent = renderConcurrency();
 
   if (courseId) {
@@ -62,7 +71,10 @@ export async function POST(request: NextRequest) {
       .eq('id', courseId)
       .maybeSingle();
     if (courseError) {
-      return NextResponse.json({ error: 'Unable to inspect course generation state' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Unable to inspect course generation state' },
+        { status: 500 },
+      );
     }
     if (!course || course.generation_paused === true) {
       return NextResponse.json({

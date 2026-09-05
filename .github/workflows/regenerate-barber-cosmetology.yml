@@ -1,11 +1,6 @@
 name: Regenerate Cosmetology Course
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/regenerate-barber-cosmetology.yml'
-      - 'scripts/course-factory/regenerate-barber-cosmetology.ts'
   workflow_dispatch:
 
 permissions:

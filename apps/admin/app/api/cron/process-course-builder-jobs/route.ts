@@ -9,6 +9,7 @@ import {
 } from '@/lib/jobs/handlers/course-build';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
+import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,9 @@ async function _GET(request: Request) {
   }
 
   const db = await requireAdminClient();
+  if (await isCourseBuilderGenerationPaused(db)) {
+    return NextResponse.json({ processed: 0, reason: 'course-builder-generation-paused' });
+  }
   const workerId = `course-builder:${randomUUID()}`;
 
   // Count eligible work before claiming. A 2xx `processed: 0` while eligible

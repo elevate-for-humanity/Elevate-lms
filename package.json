@@ -260,6 +260,7 @@
     "ci:build": "pnpm run build:lms:phased",
     "ci:check": "pnpm archetype:check && pnpm typecheck && pnpm lint && pnpm seo:check",
     "check:safety": "python3 scripts/audit-build-safety.py",
+    "security:credentials": "node scripts/security/credential-scan.mjs",
     "check:all": "pnpm check:safety && pnpm lint && pnpm typecheck",
     "seo:check": "node scripts/ci/seo-check.mjs",
     "seo:validate": "node scripts/ci/seo-validation.ts",

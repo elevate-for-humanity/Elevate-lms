@@ -266,18 +266,6 @@ export function PlatformShell({
       </header>
 
       <div className="flex min-w-0">
-        {false && sidebarOpen && (
-          <button
-            type="button"
-            className="fixed inset-0 z-[60] cursor-default bg-black/60 backdrop-blur-[1px] lg:hidden"
-            onClick={() => {
-              setSidebarOpen(false);
-              menuButtonRef.current?.focus();
-            }}
-            aria-label="Close portal navigation"
-          />
-        )}
-
         <aside
           ref={drawerRef}
           id="portal-navigation-drawer"

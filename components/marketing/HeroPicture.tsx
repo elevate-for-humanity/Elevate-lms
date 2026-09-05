@@ -35,6 +35,8 @@ export interface HeroPictureProps {
   children?: React.ReactNode;
   /** Canonical site-wide hero height. Override only for a documented layout need. */
   heightStyle?: string;
+  /** Render the complete artwork at its native 4:3 ratio instead of cropping it. */
+  preserveAspectRatio?: boolean;
   priority?: boolean;
 }
 
@@ -52,6 +54,7 @@ export default function HeroPicture({
   className = '',
   children,
   heightStyle,
+  preserveAspectRatio = false,
   priority = true,
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
@@ -61,18 +64,33 @@ export default function HeroPicture({
   return (
     <div className={`w-full ${className}`}>
       <section
-        className={`relative w-full overflow-hidden bg-slate-900 ${heightStyle ?? canonicalHeight}`}
+        className={`relative w-full overflow-hidden ${preserveAspectRatio ? 'bg-white' : 'bg-slate-900'} ${
+          preserveAspectRatio ? '' : (heightStyle ?? canonicalHeight)
+        }`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero image'}
       >
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes="100vw"
-          className="object-cover object-center"
-          priority={priority}
-          placeholder="empty"
-        />
+        {preserveAspectRatio ? (
+          <Image
+            src={src}
+            alt={alt}
+            width={1536}
+            height={1152}
+            sizes="100vw"
+            className="h-auto w-full"
+            priority={priority}
+            placeholder="empty"
+          />
+        ) : (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="100vw"
+            className="object-cover object-center"
+            priority={priority}
+            placeholder="empty"
+          />
+        )}
 
         {showBrandBug && (
           <div className="absolute left-4 top-4 z-10">

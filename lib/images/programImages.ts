@@ -320,8 +320,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   bookkeeping: {
     card: `${P}/bookkeeping-ledger.webp`,
-    hero: '/images/pexels/bookkeeping.webp',
-    alt: 'Bookkeeping student working with financial records',
+    hero: '/images/programs/accounting-financial-empowerment-hero.png',
+    alt: 'Elevate Accounting and Financial Empowerment Career Pathway Program overview',
   },
   'finance-bookkeeping-accounting': {
     card: `${P}/business-sector.webp`,

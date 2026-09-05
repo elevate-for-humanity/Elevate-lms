@@ -10,12 +10,15 @@ export function ParisFloatingButton({
   courseTitle,
   nextLessonTitle,
   courseProgress,
+  portalRole,
 }: ParisLearnerContext) {
   const [isOpen, setIsOpen] = useState(false);
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
   const learnerSurface = surface === 'learner';
+  const portalSurface = surface === 'portal';
+  const assistantLabel = learnerSurface ? 'PARIS Learning Assistant' : portalSurface ? 'PARIS Portal Assistant' : 'PARIS Career Assistant';
 
   return (
     <>
@@ -23,7 +26,7 @@ export function ParisFloatingButton({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={learnerSurface ? 'PARIS Learning Assistant' : 'PARIS Career Assistant'}
+          aria-label={assistantLabel}
           className="fixed inset-0 z-[9999] flex h-[100dvh] items-stretch overscroll-contain sm:pointer-events-none sm:items-end sm:justify-end sm:p-6 sm:pb-24"
         >
           <div
@@ -43,7 +46,7 @@ export function ParisFloatingButton({
                     {learnerSurface ? 'PARIS Learning Assistant' : 'PARIS Career Assistant'}
                   </span>
                   <span className="block max-w-[300px] truncate text-xs text-slate-600">
-                    {learnerSurface ? courseTitle || 'Your Elevate coursework' : 'Admissions and career navigation'}
+                    {learnerSurface ? courseTitle || 'Your Elevate coursework' : portalSurface ? `${portalRole || 'Authenticated'} workspace help` : 'Admissions and career navigation'}
                   </span>
                 </div>
               </div>
@@ -63,6 +66,7 @@ export function ParisFloatingButton({
                 courseTitle={courseTitle}
                 nextLessonTitle={nextLessonTitle}
                 courseProgress={courseProgress}
+                portalRole={portalRole}
                 voiceEnabled
               />
             </div>
@@ -72,11 +76,11 @@ export function ParisFloatingButton({
 
       <button
         onClick={open}
-        aria-label={learnerSurface ? 'Open PARIS Learning Assistant for course help' : 'Open PARIS Career Assistant'}
+        aria-label={learnerSurface ? 'Open PARIS Learning Assistant for course help' : portalSurface ? 'Open PARIS Portal Assistant' : 'Open PARIS Career Assistant'}
         className="fixed bottom-20 right-4 z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-4 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 md:bottom-6 md:right-6"
       >
         <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
-        <span>{learnerSurface ? 'Ask PARIS · Course help' : 'Ask PARIS'}</span>
+        <span>{learnerSurface ? 'Ask PARIS · Course help' : portalSurface ? 'Ask PARIS · Portal help' : 'Ask PARIS'}</span>
       </button>
     </>
   );

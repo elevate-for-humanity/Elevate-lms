@@ -17,7 +17,6 @@ jobs:
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -40,7 +39,7 @@ jobs:
           const fullName = 'Jayci Martinez';
           const partnerId = '6937ee7a-231c-46db-a861-e3163e490781';
           const applicationId = '281ef334-3097-40fc-9564-118c43c3ba86';
-          for (const key of ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SENDGRID_API_KEY']) {
+          for (const key of ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY']) {
             if (!process.env[key]) throw new Error(`Missing required production secret: ${key}`);
           }
           const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
@@ -101,7 +100,9 @@ jobs:
             throw new Error(`Activation link failed: ${linkError?.message || 'no link returned'}`);
           }
 
-          const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
+          let activationSent = false;
+          if (process.env.SENDGRID_API_KEY) {
+            const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
             method: 'POST',
             headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -112,7 +113,9 @@ jobs:
               content: [{ type: 'text/html', value: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#0f172a;line-height:1.65"><h1>Activate the Generations Hair portal</h1><p>Hello Jayci,</p><p>Your account is connected to <strong>Generations Hair LLC DBA Generations Wedding Co</strong> with Host Shop administrator access.</p><p><a href="${link.properties.action_link}" style="display:inline-block;background:#dc2626;color:white;padding:14px 22px;border-radius:10px;text-decoration:none;font-weight:800">Activate Secure Portal Access</a></p><p>This secure link expires. After activation, use <a href="https://app.elevateforhumanity.org/host-shop/login">the Host Shop login</a> to complete the Generations profile, documents, agreement, orientation, and media.</p><p>Elevate for Humanity<br>(317) 314-3757</p></div>` }],
             }),
           });
-          if (response.status !== 202) throw new Error(`SendGrid activation delivery failed with HTTP ${response.status}`);
+            if (response.status !== 202) console.warn(`SendGrid activation delivery returned HTTP ${response.status}`);
+            else activationSent = true;
+          }
 
-          console.log(JSON.stringify({ ok: true, userId: user.id, partnerId, created, activationSent: true }));
+          console.log(JSON.stringify({ ok: true, userId: user.id, partnerId, created, activationSent }));
           NODE

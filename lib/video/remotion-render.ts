@@ -491,11 +491,44 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
         }
       }
 
-      const imageUrl = lipSyncedInstructor
+      let imageUrl = lipSyncedInstructor
         ? CANONICAL_TALKING_INSTRUCTOR_IMAGE
         : instructionalLayout
           ? null
           : scene.referenceImageUrl || await getPexelsImage('default', { query });
+      // Pollinations can take longer than Chromium's delayRender window. Fetch
+      // the generated image once on the server and persist it beside the lesson
+      // media before Remotion starts. The composition then reads a stable CDN
+      // object instead of waiting on a live image-generation endpoint.
+      if (imageUrl?.includes('image.pollinations.ai/')) {
+        try {
+          const imageResponse = await fetch(imageUrl, {
+            cache: 'no-store',
+            signal: AbortSignal.timeout(90_000),
+          });
+          const contentType = imageResponse.headers.get('content-type')?.toLowerCase() ?? '';
+          if (!imageResponse.ok || !contentType.startsWith('image/')) {
+            throw new Error(`AI image returned ${imageResponse.status} ${contentType || 'without an image content type'}`);
+          }
+          const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+          if (!imageBuffer.length || imageBuffer.length > 20 * 1024 * 1024) {
+            throw new Error(`AI image size is invalid (${imageBuffer.length} bytes)`);
+          }
+          const extension = contentType.includes('png') ? 'png' : 'jpg';
+          imageUrl = await uploadCourseVideosObject(
+            imageBuffer,
+            `generated-lessons/lesson-${input.lessonId}-scene-${index + 1}.${extension}`,
+            contentType,
+          );
+        } catch (error) {
+          logger.warn('[RemotionRender] AI scene image unavailable; using the bright instructional canvas', {
+            lessonId: input.lessonId,
+            scene: index + 1,
+            error: error instanceof Error ? error.message : String(error),
+          });
+          imageUrl = null;
+        }
+      }
       let generated: Awaited<ReturnType<typeof generateGpuVideo>> = null;
       if (!clipUrl && canGenerateMotion) {
         try {

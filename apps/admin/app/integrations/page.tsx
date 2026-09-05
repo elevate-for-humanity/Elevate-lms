@@ -168,10 +168,22 @@ const INTEGRATIONS: Integration[] = [
     configUrl: '/integrations/gemini',
   },
   {
+    name: 'Intuit for Education / Edlink',
+    slug: 'edlink',
+    description:
+      'Connect Intuit for Education to Elevate for class rostering and learning-data exchange. Configuration stays disabled until Edlink credentials and a verified OneRoster or LTI connection are present.',
+    icon: GraduationCap,
+    category: 'learning',
+    envVars: ['EDLINK_CLIENT_ID', 'EDLINK_CLIENT_SECRET', 'EDLINK_CONNECTION_ID'],
+    status: 'not_configured',
+    configUrl: '/integrations/edlink',
+    docsUrl: 'https://ed.link/docs/providers',
+  },
+  {
     name: 'LTI 1.3',
     slug: 'lti',
     description:
-      'Learning Tools Interoperability — allows Canvas, Moodle, and other LMS platforms to embed Elevate courses. Config URL: /api/lti/config · JWKS: /api/lti/jwks · Launch: /api/lti/launch',
+      'Learning Tools Interoperability foundation. The database contract exists, but the production endpoints must be restored and certified before this can be marked active.',
     icon: GraduationCap,
     category: 'learning',
     envVars: ['LTI_TOOL_URL', 'LTI_PLATFORM_JWKS_URI', 'LTI_CLIENT_ID'],

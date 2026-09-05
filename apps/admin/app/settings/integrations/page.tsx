@@ -11,6 +11,11 @@ export default async function IntegrationSettingsPage() {
 
   const integrations = [
     {
+      title: 'Intuit for Education / Edlink',
+      description: 'Review roster-sync readiness, privacy gates, credentials, and connection requirements',
+      href: '/integrations/edlink',
+    },
+    {
       title: 'Environment Manager',
       description: 'Review runtime/configuration status and manage non-secret platform settings',
       href: '/integrations/env-manager',

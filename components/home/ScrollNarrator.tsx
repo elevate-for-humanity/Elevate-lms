@@ -153,6 +153,10 @@ export function ScrollNarrator() {
     void narrateVisibleSection();
   };
 
+  // The Bookkeeping hero is a dense, full-width informational graphic. Keep
+  // the floating narrator from covering its instructor, benefits, or pathway copy.
+  if (pathname === '/programs/bookkeeping') return null;
+
   return (
     <div className="fixed bottom-24 left-4 z-[80] sm:bottom-6 sm:left-6">
       <button

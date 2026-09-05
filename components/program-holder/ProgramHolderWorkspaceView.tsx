@@ -68,6 +68,13 @@ export async function ProgramHolderWorkspaceView({
   );
   const completedRequirements = complianceItems.filter((item) => item.complete).length;
   const missingRequirements = complianceItems.length - completedRequirements;
+  const primaryProgramLabel = data.programs[0]?.title || data.programs[0]?.name || 'Assigned program';
+  const callQueue = data.applicants.filter((row) => !row.call_date || !row.call_outcome);
+  const payoutReady = Boolean(
+    data.payoutProfile?.payouts_enabled &&
+    data.payoutProfile?.transfers_enabled &&
+    data.payoutProfile?.verification_status === 'active',
+  );
 
   if (section === 'students')
     return <Students title="Enrolled Students" rows={data.enrollments} programs={data.programs} />;
@@ -85,6 +92,7 @@ export async function ProgramHolderWorkspaceView({
         enrolled={data.enrollments.length}
         active={active.length}
         completed={completed.length}
+        programLabel={primaryProgramLabel}
       />
     );
   if (section === 'payouts')
@@ -95,7 +103,7 @@ export async function ProgramHolderWorkspaceView({
     <div className="space-y-6 sm:space-y-8">
       <DashboardHero
         title={data.holder?.organization_name || data.holder?.name || 'Program Holder'}
-        programLabel={isHvac ? 'HVAC Certification' : 'Workforce Training'}
+        programLabel={primaryProgramLabel}
         status={data.holder?.status || 'active'}
         complianceScore={complianceScore}
       />
@@ -105,7 +113,7 @@ export async function ProgramHolderWorkspaceView({
           value={data.enrollments.length}
           helper="Canonical program enrollments"
         />
-        <Metric label="Active Students" value={active.length} helper="Currently enrolled in HVAC" />
+        <Metric label="Active Students" value={active.length} helper={`Currently enrolled in ${primaryProgramLabel}`} />
         <Metric label="At-Risk Students" value={atRisk.length} helper="Flagged for follow-up" />
         <Metric
           label="Pending Verifications"
@@ -113,6 +121,23 @@ export async function ProgramHolderWorkspaceView({
           helper="Training-hour reviews"
         />
       </section>
+      {(!payoutReady || missingRequirements > 0) && (
+        <section role="alert" className="rounded-2xl border-2 border-red-300 bg-red-50 p-4 shadow-sm sm:p-6">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0 text-red-700" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-red-700">Payment action required</p>
+              <h2 className="mt-1 text-xl font-black text-red-950">Complete setup before Elevate can release payment</h2>
+              <p className="mt-2 text-sm leading-6 text-red-900">{missingRequirements} onboarding requirements remain incomplete. {payoutReady ? 'Your payout account is connected.' : 'Your debit card or bank account is not ready for payouts.'}</p>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <Link href="/program-holder/documents" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-700 px-4 py-2 text-sm font-black text-white">Complete documents</Link>
+                <Link href="/program-holder/compliance" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900">Review every requirement</Link>
+                <Link href="/program-holder/payouts" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900">Add debit card or bank</Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
       <section aria-labelledby="program-holder-actions-heading">
         <div className="mb-4">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Your workspace</p>
@@ -151,12 +176,40 @@ export async function ProgramHolderWorkspaceView({
         <article className="rounded-2xl border border-slate-200 bg-slate-950 p-4 text-white shadow-sm sm:p-6">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-300">Next best action</p>
           <h2 className="mt-2 text-xl font-black">Finish onboarding for payment readiness</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-300">Upload required business and HVAC records, complete acknowledgements, and connect the delivery course before funds can be released.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-300">Upload required business and training records, complete acknowledgements, and connect the delivery course before funds can be released.</p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link href="/program-holder/documents" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950">Upload documents</Link>
             <Link href="/program-holder/compliance" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-600 px-4 py-2 text-sm font-black text-white">View requirements</Link>
           </div>
         </article>
+      </section>
+      <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+        <article className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">Call and enrollment queue</p>
+              <h2 className="mt-1 text-xl font-black text-slate-950">People who still need follow-up</h2>
+              <p className="mt-1 text-sm text-slate-600">{callQueue.length} applicants have no completed call outcome and {data.applicants.length} are not enrolled.</p>
+            </div>
+            <Link href="/program-holder/students/pending" className="inline-flex min-h-10 items-center rounded-xl bg-amber-100 px-4 py-2 text-sm font-black text-amber-950">Open full queue</Link>
+          </div>
+          <div className="mt-4 grid gap-2">
+            {callQueue.slice(0, 6).map((row) => (
+              <div key={row.id} className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="break-words font-black text-slate-950">{row.applicant_name || 'Applicant'}</p>
+                  <p className="break-all text-xs text-slate-500">{row.applicant_email || 'No email on file'}</p>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-800">Not enrolled</span>
+                  {row.applicant_phone ? <a href={`tel:${row.applicant_phone}`} className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white">Call</a> : <span className="text-xs font-bold text-slate-500">Phone missing</span>}
+                </div>
+              </div>
+            ))}
+            {!callQueue.length && <p className="rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-900">Every applicant has a recorded call outcome.</p>}
+          </div>
+        </article>
+        <div className="min-w-0">{payoutPanel}</div>
       </section>
       <section aria-labelledby="program-holder-programs-heading">
         <div className="mb-4 flex items-center justify-between gap-3">
@@ -178,7 +231,7 @@ export async function ProgramHolderWorkspaceView({
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-xl font-black">Enrolled HVAC students</h2>
+              <h2 className="text-xl font-black">Enrolled {primaryProgramLabel} students</h2>
               <p className="mt-1 text-sm text-slate-600">
                 Only confirmed enrollments appear here. Applicants stay in the separate Applicants
                 queue.
@@ -488,11 +541,12 @@ function Applicants({ rows, programs }: { rows: any[]; programs: any[] }) {
   );
 }
 function Programs({ data }: { data: any }) {
+  const label = data.programs[0]?.title || data.programs[0]?.name || 'Program Delivery';
   return (
     <div className="space-y-6">
       <Hero
         eyebrow="Program Delivery"
-        title="HVAC Program"
+        title={label}
         description="Review approved program ownership, delivery readiness, credentials, and course assignments."
       />
       <ProgramCards programs={data.programs} courseAssignments={data.courseAssignments} />
@@ -638,7 +692,7 @@ function Compliance({
       <Hero
         eyebrow="Program Oversight"
         title="Compliance"
-        description="Track the operational requirements that keep the HVAC program ready for delivery and reporting."
+        description="Track the operational requirements that keep the assigned program ready for delivery, payment, and reporting."
       />
       <section className="grid gap-5 lg:grid-cols-[280px_1fr]">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
@@ -676,7 +730,7 @@ function Documents({ rows }: { rows: any[] }) {
       <Hero
         eyebrow="Compliance Records"
         title="Documents"
-        description="Upload and track protected Program Holder onboarding records for HVAC delivery and payment readiness."
+        description="Upload and track protected Program Holder onboarding records for program delivery and payment readiness."
       />
       <ProgramHolderDocumentUpload />
       <ProgramHolderAcknowledgements />
@@ -711,18 +765,20 @@ function Reports({
   enrolled,
   active,
   completed,
+  programLabel,
 }: {
   rows: any[];
   enrolled: number;
   active: number;
   completed: number;
+  programLabel: string;
 }) {
   return (
     <div className="space-y-6">
       <Hero
         eyebrow="Outcomes & Reporting"
         title="Reports"
-        description="Enrollment and completion figures are generated from David’s canonical HVAC enrollment records."
+        description={`Enrollment and completion figures are generated from canonical ${programLabel} enrollment records.`}
       />
       <section className="grid gap-4 sm:grid-cols-3">
         <Metric label="Total Enrolled" value={enrolled} helper="Confirmed enrollments" />

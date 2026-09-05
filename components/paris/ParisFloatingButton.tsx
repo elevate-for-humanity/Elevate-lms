@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { X, MessageCircle } from 'lucide-react';
 import ParisChat from './ParisChat';
 import type { ParisLearnerContext } from './ParisFloatingWrapper';
@@ -13,12 +14,17 @@ export function ParisFloatingButton({
   portalRole,
 }: ParisLearnerContext) {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
   const learnerSurface = surface === 'learner';
   const portalSurface = surface === 'portal';
   const assistantLabel = learnerSurface ? 'PARIS Learning Assistant' : portalSurface ? 'PARIS Portal Assistant' : 'PARIS Career Assistant';
+
+  // Keep the information-dense Bookkeeping hero unobstructed. PARIS remains
+  // available throughout authenticated portals and on other public pages.
+  if (surface === 'public' && pathname === '/programs/bookkeeping') return null;
 
   return (
     <>

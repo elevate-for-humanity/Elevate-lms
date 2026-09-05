@@ -64,6 +64,22 @@ SCOPE AND LEARNER-SAFETY RULES:
 - Keep answers under 180 words and give one clear next step.`;
 }
 
+async function hasAuthenticatedPortalSession(): Promise<boolean> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  return Boolean(user);
+}
+
+const PORTAL_SYSTEM_PROMPT = `You are PARIS, the authenticated portal assistant for ${PLATFORM_DEFAULTS.orgName}.
+
+PORTAL OPERATING RULES:
+- Help the signed-in user navigate their dashboard, understand required red to-dos, organize onboarding, draft notes and student outreach, and prepare progress updates.
+- You may draft or prefill proposed text, checklists, and next steps. Clearly label drafts.
+- Never claim you submitted, approved, signed, certified, paid, enrolled, messaged, or changed a record unless a dedicated tool confirms it.
+- The human user must review and submit official hours, milestones, compliance records, agreements, certifications, payments, and outbound messages.
+- Do not request or expose sensitive student data. Do not guess private information or claim access to dashboard records.
+- Keep answers under 180 words and give one clear next step.`;
+
 async function loadTrustedLearnerContext(): Promise<TrustedLearnerContext | null> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -213,6 +229,7 @@ async function callOpenAI(messages: any[], systemPrompt: string): Promise<{ repl
 
 async function _POST(req: NextRequest) {
   let learnerRequested = false;
+  let portalRequested = false;
   try {
     const body = await req.json().catch(() => null);
 
@@ -226,6 +243,7 @@ async function _POST(req: NextRequest) {
     }));
 
     learnerRequested = body.context?.surface === 'learner';
+    portalRequested = body.context?.surface === 'portal';
     const learnerContext = learnerRequested ? await loadTrustedLearnerContext() : null;
     if (learnerRequested && !learnerContext) {
       return NextResponse.json(
@@ -233,7 +251,10 @@ async function _POST(req: NextRequest) {
         { status: 403 },
       );
     }
-    const systemPrompt = learnerContext ? learnerSystemPrompt(learnerContext) : PARIS_SYSTEM_PROMPT;
+    if (portalRequested && !(await hasAuthenticatedPortalSession())) {
+      return NextResponse.json({ error: 'Authenticated portal session is unavailable.' }, { status: 403 });
+    }
+    const systemPrompt = learnerContext ? learnerSystemPrompt(learnerContext) : portalRequested ? PORTAL_SYSTEM_PROMPT : PARIS_SYSTEM_PROMPT;
 
     // Try PARIS AI (Anthropic) first
     const anthropicResult = await callAnthropic(messages, systemPrompt);
@@ -254,7 +275,7 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ reply: fallbackReply, provider: 'demo' });
   } catch (error) {
     logger.error('Chat API error', normalizeError(error, 'Chat API failed'), getErrorContext(error));
-    if (learnerRequested) {
+    if (learnerRequested || portalRequested) {
       return NextResponse.json({ error: 'Learner guidance is temporarily unavailable.' }, { status: 503 });
     }
     const fallbackReply = `I'm having technical difficulties. Please call ${PLATFORM_DEFAULTS.supportPhone} or visit ${PLATFORM_DEFAULTS.canonicalDomain}/apply to get started!`;

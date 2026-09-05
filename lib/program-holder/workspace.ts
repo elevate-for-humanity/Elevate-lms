@@ -3,8 +3,10 @@ import { requireProgramHolder } from '@/lib/auth/require-program-holder';
 export type ProgramHolderWorkspace = {
   mode: 'admin' | 'holder';
   holder: any | null;
+  profile: any | null;
   programs: any[];
   enrollments: any[];
+  upcomingEnrollments: any[];
   applicants: any[];
   hours: any[];
   documents: any[];
@@ -12,6 +14,7 @@ export type ProgramHolderWorkspace = {
   courseAssignments: any[];
   payoutProfile: any | null;
   payoutSchedules: any[];
+  notificationPreferences: any | null;
 };
 
 /** Canonical, holder-scoped data contract shared by every Program Holder page. */
@@ -21,8 +24,10 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     return {
       mode: 'admin',
       holder: null,
+      profile: null,
       programs: [],
       enrollments: [],
+      upcomingEnrollments: [],
       applicants: [],
       hours: [],
       documents: [],
@@ -30,6 +35,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       courseAssignments: [],
       payoutProfile: null,
       payoutSchedules: [],
+      notificationPreferences: null,
     };
   }
 
@@ -38,6 +44,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     holderRes,
     programsRes,
     enrollmentsRes,
+    upcomingRes,
     applicantsRes,
     hoursRes,
     documentsRes,
@@ -45,6 +52,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     coursesRes,
     payoutRes,
     schedulesRes,
+    notificationRes,
   ] = await Promise.all([
     db
       .from('program_holders')
@@ -68,6 +76,14 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .eq('program_holder_id', holderId)
       .in('status', ['active', 'enrolled', 'completed', 'graduated'])
       .order('enrolled_at', { ascending: false }),
+    db
+      .from('program_enrollments')
+      .select(
+        'id,user_id,full_name,email,phone,status,enrollment_state,program_id,program_slug,training_start_date,training_end_date,student_start_date,expected_end_date,start_date',
+      )
+      .eq('program_holder_id', holderId)
+      .in('status', ['pending', 'approved', 'scheduled', 'ready', 'funded'])
+      .order('training_start_date', { ascending: true, nullsFirst: false }),
     db
       .from('program_holder_students')
       .select('id,applicant_name,applicant_email,applicant_phone,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome')
@@ -113,13 +129,20 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       )
       .eq('program_holder_id', holderId)
       .order('created_at', { ascending: false }),
+    db
+      .from('notification_preferences')
+      .select('email_course_updates,sms_urgent,sms_phone')
+      .eq('user_id', profile.id)
+      .maybeSingle(),
   ]);
 
   return {
     mode: 'holder',
     holder: holderRes.data ?? null,
+    profile,
     programs: programsRes.data ?? [],
     enrollments: enrollmentsRes.data ?? [],
+    upcomingEnrollments: upcomingRes.data ?? [],
     applicants: applicantsRes.data ?? [],
     hours: hoursRes.data ?? [],
     documents: documentsRes.data ?? [],
@@ -127,6 +150,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     courseAssignments: coursesRes.data ?? [],
     payoutProfile: payoutRes.data ?? null,
     payoutSchedules: schedulesRes.data ?? [],
+    notificationPreferences: notificationRes.data ?? null,
   };
 }
 

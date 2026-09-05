@@ -59,7 +59,18 @@ export function PlatformShell({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
 
-  const sections = getNavigationForRole(role);
+  const baseSections = getNavigationForRole(role);
+  const sections = role === 'program_holder'
+    ? baseSections.map((section) => ({
+        ...section,
+        items: [
+          ...section.items,
+          { id: 'at-risk', label: 'At-Risk Students', href: '/program-holder/students/at-risk', icon: Users },
+          { id: 'onboarding', label: 'Onboarding', href: '/program-holder/onboarding', icon: ShieldCheck },
+          { id: 'agreement', label: 'MOU & Agreement', href: '/program-holder/rights-responsibilities', icon: ShieldCheck },
+        ],
+      }))
+    : baseSections;
 
   useEffect(() => {
     setSidebarOpen(false);

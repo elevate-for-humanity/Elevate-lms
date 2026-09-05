@@ -81,17 +81,12 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // Admin HTML remains network-only because it can contain sensitive records.
-  // The only cached navigation response is the public offline shell, returned
-  // after the network fails; authenticated pages themselves are never stored.
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() =>
-        caches.match('/offline.html'),
-      ),
-    );
-    return;
-  }
+  // Admin pages are authenticated and may contain sensitive records. Do not
+  // intercept document navigation: if both the network request and optional
+  // offline cache fail, respondWith can resolve without a Response and Android
+  // Chromium displays ERR_FAILED. Let the browser own redirects, retry, and
+  // its native offline handling instead.
+  if (request.mode === 'navigate') return;
 
   if (
     request.headers.has('range') ||

@@ -12,6 +12,7 @@ import {
   LogOut,
   ShieldCheck,
   Users,
+  Download,
 } from 'lucide-react';
 import type {
   UserRole,
@@ -70,6 +71,7 @@ export function PlatformShell({
           { id: 'at-risk', label: 'At-Risk Students', href: '/program-holder/students/at-risk', icon: Users },
           { id: 'onboarding', label: 'Onboarding', href: '/program-holder/onboarding', icon: ShieldCheck },
           { id: 'agreement', label: 'MOU & Agreement', href: '/program-holder/rights-responsibilities', icon: ShieldCheck },
+          { id: 'install-app', label: 'Install App', href: '/install', icon: Download },
         ],
       }))
     : baseSections;

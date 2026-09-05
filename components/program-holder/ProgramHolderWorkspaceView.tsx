@@ -16,6 +16,7 @@ import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseout
 import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
 import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificationPreferences';
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
+import { AlumniCareerOutreachButton } from './AlumniCareerOutreachButton';
 import { getProgramCardImage } from '@/lib/images/programImages';
 
 type Section =
@@ -295,6 +296,7 @@ export async function ProgramHolderWorkspaceView({
             >
               Manage Students
             </Link>
+            <AlumniCareerOutreachButton count={completed.length} />
           </div>
           <EnrollmentTable rows={data.enrollments.slice(0, 8)} programs={data.programs} />
         </div>
@@ -516,5 +518,3 @@ function Students({ title, rows, programs }: { title: string; rows: any[]; progr
           className="min-h-11 flex-1 rounded-xl border border-slate-300 bg-white px-4"
         />
         <details className="relative">
-          <summary className="flex min-h-11 cursor-pointer items-center rounded-xl border border-slate-300 bg-white px-4 font-bold">
-            Filter

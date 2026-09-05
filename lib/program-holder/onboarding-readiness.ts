@@ -28,16 +28,6 @@ export async function getStudentPaymentReadiness(db: any, enrollmentId: string) 
     .maybeSingle();
   if (!student) return { ready: false, missing: ['Student enrollment record'] };
   const name = student.full_name || 'Student';
-  const incompleteBackWork = (graduated || []).flatMap((student: any) => {
-    const name = student.full_name || 'Graduated student';
-    const gaps = [] as string[];
-    if (!student.training_start_date || !student.training_end_date) gaps.push('training dates');
-    if (Number(student.total_hours_completed || 0) < 48) gaps.push('48-hour WorkOne record');
-    if (!student.lms_completed) gaps.push('coursework verification');
-    if (!student.practical_skills_verified) gaps.push('skills verification');
-    if (!student.certificate_issued_at) gaps.push('credential date');
-    return gaps.length ? [`${name}: ${gaps.join(', ')}`] : [];
-  });
   const missing = [
     ...(!['completed', 'graduated'].includes(String(student.status))
       ? [`${name}: graduation closeout`]
@@ -111,6 +101,16 @@ export async function getProgramHolderPaymentReadiness(
         { type: 'business_license', label: 'Business license' },
         { type: 'insurance', label: 'Insurance certificate' },
       ];
+  const incompleteBackWork = (graduated || []).flatMap((student: any) => {
+    const name = student.full_name || 'Graduated student';
+    const gaps = [] as string[];
+    if (!student.training_start_date || !student.training_end_date) gaps.push('training dates');
+    if (Number(student.total_hours_completed || 0) < 48) gaps.push('48-hour WorkOne record');
+    if (!student.lms_completed) gaps.push('coursework verification');
+    if (!student.practical_skills_verified) gaps.push('skills verification');
+    if (!student.certificate_issued_at) gaps.push('credential date');
+    return gaps.length ? [`${name}: ${gaps.join(', ')}`] : [];
+  });
   const missing = [
     ...(!mouSigned ? ['Signed current Program Holder MOU'] : []),
     ...(!handbookAcknowledged ? ['Program Holder handbook acknowledgement'] : []),

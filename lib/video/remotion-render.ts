@@ -79,6 +79,25 @@ function enabled(value: string | undefined): boolean {
   return value?.trim().toLowerCase() === 'true';
 }
 
+/** Never pass provider response objects into Remotion media components.
+ * Some media providers return `{url}`/`{src}` wrappers even when their SDK
+ * types claim a string. Chromium stringifies those values to `[object Object]`
+ * and the entire paid render fails after narration has already been created. */
+export function normalizeRemotionMediaUrl(value: unknown): string | null {
+  let candidate: unknown = value;
+  if (candidate && typeof candidate === 'object' && !Array.isArray(candidate)) {
+    const record = candidate as Record<string, unknown>;
+    candidate = record.url ?? record.src ?? record.href ?? record.publicUrl ?? record.public_url;
+  }
+  if (typeof candidate !== 'string' || !candidate.trim()) return null;
+  try {
+    const parsed = new URL(candidate.trim());
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 function vttTimestamp(seconds: number): string {
   const milliseconds = Math.max(0, Math.round(seconds * 1000));
   const hours = Math.floor(milliseconds / 3_600_000);
@@ -448,7 +467,9 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
       const instructionalLayout = visualIntent.deterministicDiagram
         ? instructionalLayoutForScene({ title: scene.subject, action: scene.action, sceneType: scene.sceneType })
         : null;
-      let clipUrl = instructionalLayout ? null : scene.sourceVideoUrl || null;
+      let clipUrl = instructionalLayout
+        ? null
+        : normalizeRemotionMediaUrl(scene.sourceVideoUrl);
       let lipSyncedInstructor = false;
 
       // A visible instructor may appear only when the delivered narration is
@@ -495,7 +516,8 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
         ? CANONICAL_TALKING_INSTRUCTOR_IMAGE
         : instructionalLayout
           ? null
-          : scene.referenceImageUrl || await getPexelsImage('default', { query });
+          : normalizeRemotionMediaUrl(scene.referenceImageUrl) ||
+            normalizeRemotionMediaUrl(await getPexelsImage('default', { query }));
       // Pollinations can take longer than Chromium's delayRender window. Fetch
       // the generated image once on the server and persist it beside the lesson
       // media before Remotion starts. The composition then reads a stable CDN
@@ -571,11 +593,11 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
         }
       }
       if (!clipUrl) {
-        clipUrl = await getPexelsVideoClip(query, {
+        clipUrl = normalizeRemotionMediaUrl(await getPexelsVideoClip(query, {
           minDuration: 3,
           maxDuration: 30,
           perPage: 8,
-        });
+        }));
       }
       const currentScene = resolvedStoryboard.scenes[index];
       if (!currentScene) throw new Error(`MEDIA_SCENE_MISSING:${index}`);

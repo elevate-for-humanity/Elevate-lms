@@ -17,7 +17,8 @@ describe('SlideLesson audiovisual policy', () => {
   });
 
   it('uses lip-synced instructor video only for the opening scene', () => {
-    expect(renderer).toContain("index === 0 && process.env.DID_API_KEY");
+    expect(renderer).toContain('enabled(process.env.ENABLE_DID_LESSON_INSTRUCTOR)');
+    expect(renderer).toContain('process.env.DID_API_KEY?.trim()');
     expect(renderer).toContain("resolvedProvider: 'd-id'");
     expect(renderer).toContain("resolvedModel: 'talks-lip-sync'");
   });

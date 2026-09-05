@@ -8,7 +8,8 @@ import { HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS } from '@/lib/program-holder/onb
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 const MAX_BYTES = 10 * 1024 * 1024;
-const MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png']);
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+const MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'video/mp4']);
 const DOCUMENT_TYPES = new Set(HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type));
 
 export async function POST(request: NextRequest) {
@@ -23,9 +24,10 @@ export async function POST(request: NextRequest) {
   const documentType = String(form.get('documentType') || '');
   if (!(file instanceof File) || !DOCUMENT_TYPES.has(documentType as any))
     return NextResponse.json({ error: 'Choose a required document and file.' }, { status: 400 });
-  if (!MIME_TYPES.has(file.type) || file.size <= 0 || file.size > MAX_BYTES)
+  const maxBytes = file.type === 'video/mp4' ? MAX_VIDEO_BYTES : MAX_BYTES;
+  if (!MIME_TYPES.has(file.type) || file.size <= 0 || file.size > maxBytes)
     return NextResponse.json(
-      { error: 'Upload a PDF, JPG, or PNG no larger than 10 MB.' },
+      { error: 'Upload a PDF, JPG, or PNG up to 10 MB, or an MP4 video up to 50 MB.' },
       { status: 400 },
     );
 

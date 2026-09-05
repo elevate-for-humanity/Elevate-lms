@@ -28,6 +28,16 @@ export async function getStudentPaymentReadiness(db: any, enrollmentId: string) 
     .maybeSingle();
   if (!student) return { ready: false, missing: ['Student enrollment record'] };
   const name = student.full_name || 'Student';
+  const incompleteBackWork = (graduated || []).flatMap((student: any) => {
+    const name = student.full_name || 'Graduated student';
+    const gaps = [] as string[];
+    if (!student.training_start_date || !student.training_end_date) gaps.push('training dates');
+    if (Number(student.total_hours_completed || 0) < 48) gaps.push('48-hour WorkOne record');
+    if (!student.lms_completed) gaps.push('coursework verification');
+    if (!student.practical_skills_verified) gaps.push('skills verification');
+    if (!student.certificate_issued_at) gaps.push('credential date');
+    return gaps.length ? [`${name}: ${gaps.join(', ')}`] : [];
+  });
   const missing = [
     ...(!['completed', 'graduated'].includes(String(student.status))
       ? [`${name}: graduation closeout`]
@@ -65,7 +75,7 @@ export async function getProgramHolderPaymentReadiness(
     };
   }
 
-  const [{ data: acknowledgements }, { data: documents }] = await Promise.all([
+  const [{ data: acknowledgements }, { data: documents }, { data: graduated }] = await Promise.all([
     db
       .from('program_holder_acknowledgements')
       .select('document_type')
@@ -74,6 +84,11 @@ export async function getProgramHolderPaymentReadiness(
       .from('program_holder_documents')
       .select('document_type,status,approved')
       .eq('user_id', holder.user_id),
+    db
+      .from('program_enrollments')
+      .select('full_name,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,certificate_issued_at')
+      .eq('program_holder_id', holderId)
+      .in('status', ['completed', 'graduated']),
   ]);
 
   const approvedTypes = new Set(
@@ -101,6 +116,7 @@ export async function getProgramHolderPaymentReadiness(
     ...(!handbookAcknowledged ? ['Program Holder handbook acknowledgement'] : []),
     ...(!rightsAcknowledged ? ['Rights and responsibilities acknowledgement'] : []),
     ...required.filter((item) => !approvedTypes.has(item.type)).map((item) => item.label),
+    ...incompleteBackWork,
   ];
 
   return {

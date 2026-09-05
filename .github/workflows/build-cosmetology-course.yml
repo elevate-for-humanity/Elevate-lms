@@ -1,29 +1,9 @@
 name: Build Cosmetology Course
-# Dedicated production runner; subsequent main pushes are resumable through lesson checkpoints.
+# Paid production runner. It is manual-only so an unrelated source push can
+# never start or resume course generation without an explicit operator action.
 
 on:
   workflow_dispatch:
-  issues:
-    types: [reopened]
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/build-cosmetology-course.yml'
-      - 'scripts/course-factory/build-cosmetology-course.ts'
-      - 'scripts/course-factory/wait-for-cosmetology-database.mjs'
-      - 'lib/course-factory/content-generator.ts'
-      - 'lib/course-factory/lesson-contract-normalizer.ts'
-      - 'lib/course-factory/publisher.ts'
-      - 'lib/course-factory/generation-checkpoints.ts'
-      - 'lib/course-factory/durable-generation-journal.ts'
-      - 'lib/course-factory/learning-intelligence.ts'
-      - 'lib/course-factory/post-generation-governance.ts'
-      - 'lib/video/instructional-quality-gate.ts'
-      - 'tests/unit/instructional-quality-gate.test.ts'
-      - 'lib/industry/onet.ts'
-      - 'lib/industry/careeronestop.ts'
-      - 'lib/course-builder/persisted-publish-service.ts'
-      - 'lib/curriculum/blueprints/cosmetology.ts'
 
 permissions:
   contents: read
@@ -68,10 +48,6 @@ env:
 
 jobs:
   build:
-    if: >-
-      github.event_name != 'issues' ||
-      (github.event.issue.number == 928 &&
-       github.event.issue.title == 'RUN COSMETOLOGY COURSE PRODUCTION BUILD')
     runs-on: ubuntu-latest
     # Full regulated-course generation can exceed three hours when the provider
     # repairs individual lesson or exam contracts. GitHub-hosted jobs allow six.

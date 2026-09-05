@@ -343,12 +343,15 @@ async function main() {
     fail(`Canonical program lookup failed: ${programError?.message ?? 'missing'}`);
   const { data: course, error: courseError } = await requiredDbOperation(
     'canonical course lookup',
-    () => db.from('courses').select('id,program_id,slug').eq('id', COURSE_ID).maybeSingle(),
+    () => db.from('courses').select('id,program_id,slug,generation_paused').eq('id', COURSE_ID).maybeSingle(),
   );
   if (courseError || !course?.id)
     fail(`Canonical course lookup failed: ${courseError?.message ?? 'missing'}`);
   if (course.slug !== PROGRAM_SLUG || course.program_id !== program.id) {
     fail('Canonical course identity does not match the cosmetology program');
+  }
+  if (course.generation_paused === true) {
+    fail('Cosmetology generation is paused; refusing to start AI or media work');
   }
 
   await reconcileAbandonedJobs(db);

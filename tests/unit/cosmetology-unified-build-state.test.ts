@@ -21,4 +21,10 @@ describe('Cosmetology unified build state', () => {
     expect(source).toContain('PENDING_40_VERIFIED_LESSON_VIDEO_PACKAGES');
     expect(source).toContain('all 40 matching videos are attached and verified');
   });
+
+  it('refuses paid work while production generation is paused', () => {
+    expect(source).toContain("select('id,program_id,slug,generation_paused')");
+    expect(source).toContain('generation_paused === true');
+    expect(source).toContain('refusing to start AI or media work');
+  });
 });

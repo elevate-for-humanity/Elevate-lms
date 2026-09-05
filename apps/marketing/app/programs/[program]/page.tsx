@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { notFound, permanentRedirect } from 'next/navigation';
 
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
@@ -63,6 +64,7 @@ export default async function PublicProgramPage({
 
   const price = Number.parseInt(resolved.selfPayCost.replace(/[^0-9]/g, ''), 10);
   const isBusinessProgram = resolved.slug === 'business-administration';
+  const isBookkeepingProgram = resolved.slug === 'bookkeeping';
   const configuredBanner = isBusinessProgram ? null : heroBanners[resolved.slug] ?? null;
   const banner: HeroBannerConfig = isBusinessProgram
     ? {
@@ -132,7 +134,25 @@ export default async function PublicProgramPage({
           funding_eligible: !resolved.isSelfPay,
         }}
       />
-      <ProgramDetailPage program={resolved} banner={banner} />
+      <ProgramDetailPage
+        program={resolved}
+        banner={banner}
+        heroOverride={
+          isBookkeepingProgram ? (
+            <div className="w-full overflow-hidden bg-white">
+              <Image
+                src="/images/heroes/bookkeeping-accounting-financial-empowerment.png"
+                alt="Accounting and Financial Empowerment Career Pathway Program led by Dr. Carlina A. Wilkes"
+                width={1536}
+                height={1152}
+                priority
+                sizes="100vw"
+                className="h-auto w-full"
+              />
+            </div>
+          ) : undefined
+        }
+      />
       {resolved.slug === 'cpr-first-aid' ? (
         <section
           aria-labelledby="cpr-provider-contact"

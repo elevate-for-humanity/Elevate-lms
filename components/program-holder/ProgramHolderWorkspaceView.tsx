@@ -134,6 +134,11 @@ export async function ProgramHolderWorkspaceView({
         programLabel={primaryProgramLabel}
         status={data.holder?.status || 'active'}
         complianceScore={complianceScore}
+        heroImage={
+          data.holder?.id === '34876b7d-bce0-44fb-9550-5dc5fff00791'
+            ? '/images/programs/carlina-accounting-financial-empowerment.svg'
+            : '/images/trades/hero-program-hvac.jpg'
+        }
       />
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Metric
@@ -273,6 +278,26 @@ export async function ProgramHolderWorkspaceView({
         </article>
         <ProgramHolderNotificationPreferences initial={data.notificationPreferences} phone={data.profile?.phone || data.holder?.contact_phone || ''} />
       </section>
+      <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm sm:p-6">
+        <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Weekly student oversight</p>
+        <h2 className="mt-1 text-xl font-black text-slate-950">Progress reports due every Friday</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-700">
+          Complete one report for each active student. Record lessons learned, skills practiced,
+          attendance and hours, assignments and scores, supporting evidence, checks performed,
+          barriers, authorized parent or guardian communication, and next-week goals.
+        </p>
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <Link href="/program-holder/reports/new" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-4 py-2 text-sm font-black text-white">
+            Start weekly progress report
+          </Link>
+          <Link href="/program-holder/reports" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-black text-emerald-950">
+            Review submitted reports
+          </Link>
+        </div>
+        <p className="mt-3 text-xs font-bold text-emerald-950">
+          Paris can guide each field and flag missing information, but the Program Holder must verify and submit the report.
+        </p>
+      </section>
       <section aria-labelledby="program-holder-programs-heading">
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
@@ -367,10 +392,11 @@ function Hero({
   );
 }
 
-function DashboardHero({ title, programLabel, status, complianceScore }: { title: string; programLabel: string; status: string; complianceScore: number }) {
+function DashboardHero({ title, programLabel, status, complianceScore, heroImage }: { title: string; programLabel: string; status: string; complianceScore: number; heroImage: string }) {
+  const isCarlinaBanner = heroImage.includes('carlina-accounting');
   return (
-    <section className="relative min-w-0 overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl sm:rounded-3xl">
-      <Image src="/images/trades/hero-program-hvac.jpg" alt="HVAC technician training workspace" fill priority sizes="100vw" className="object-cover object-center opacity-55" />
+    <section className={`relative min-w-0 overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl sm:rounded-3xl ${isCarlinaBanner ? 'min-h-[300px] sm:min-h-[420px]' : ''}`}>
+      <Image src={heroImage} alt={isCarlinaBanner ? "Dr. Carlina A. Wilkes accounting and financial empowerment career pathway" : "Program training workspace"} fill priority sizes="100vw" className={isCarlinaBanner ? "object-contain object-center" : "object-cover object-center opacity-55"} />
       <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/60" />
       <div className="relative grid gap-5 p-5 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div className="min-w-0">

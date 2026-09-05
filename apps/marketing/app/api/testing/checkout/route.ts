@@ -1,6 +1,6 @@
 // PUBLIC ROUTE: server-authoritative testing checkout.
 import { NextRequest, NextResponse } from 'next/server';
-import { getStripe } from '@/lib/stripe/client';
+import { getStripeWriteClient } from '@/lib/stripe/client';
 import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   await hydrateProcessEnv();
-  const stripe = getStripe();
+  const stripe = getStripeWriteClient();
   if (!stripe) {
     return NextResponse.json({ error: 'Payment system not configured.' }, { status: 503 });
   }
@@ -171,7 +171,6 @@ export async function POST(request: NextRequest) {
         booking_type: bookingType,
         participant_count: String(participantCount),
         add_on: addOnSelected ? 'true' : 'false',
-        pending_booking_id: '',
         slot_id: slot.id,
       },
     });

@@ -3,7 +3,7 @@ import 'server-only';
 // and is only available after hydrateProcessEnv() runs at request time.
 // Callers must use getStripe() after hydrating secrets.
 import { withResilience, breakers } from '@/lib/resilience';
-import { getStripeRuntimeKey } from './runtime-key';
+import { getStripeRuntimeKey, getStripeWriteKey } from './runtime-key';
 
 type StripeInstance = import('stripe').default;
 
@@ -30,6 +30,19 @@ function isUsableStripeKey(value: string | undefined | null): value is string {
 
 export function getStripe(): StripeInstance | null {
   const key = getStripeRuntimeKey();
+  if (!isUsableStripeKey(key)) return null;
+  if (!_StripeClass) {
+    _StripeClass = require('stripe').default ?? require('stripe');
+  }
+  return new _StripeClass!(key, {
+    apiVersion: '2026-07-29.dahlia' as any,
+    typescript: true,
+  });
+}
+
+/** Returns a client authorized for payment mutations such as creating Checkout Sessions. */
+export function getStripeWriteClient(): StripeInstance | null {
+  const key = getStripeWriteKey();
   if (!isUsableStripeKey(key)) return null;
   if (!_StripeClass) {
     _StripeClass = require('stripe').default ?? require('stripe');

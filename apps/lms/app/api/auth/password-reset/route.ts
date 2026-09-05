@@ -31,28 +31,35 @@ export async function POST(request: NextRequest) {
     const resetPath = programHolder
       ? '/reset-password?portal=program-holder&mode=recovery'
       : '/reset-password?mode=recovery';
-    const redirectTo = `${siteUrls.app}/api/auth/recovery-callback?next=${encodeURIComponent(resetPath)}`;
     const { data, error } = await db.auth.admin.generateLink({
       type: 'recovery',
       email,
-      options: { redirectTo },
     });
 
-    if (error || !data?.properties?.action_link) {
+    const hashedToken = data?.properties?.hashed_token;
+    if (error || !hashedToken) {
       logger.warn('[password-reset] Recovery link generation failed', {
-        error: error?.message ?? 'No action link returned',
+        error: error?.message ?? 'No hashed recovery token returned',
       });
       return NextResponse.json(GENERIC_RESPONSE);
     }
 
+    // Keep recovery on the first-party app origin. Verify the one-time token
+    // server-side and establish the session cookie before showing the form.
+    const recoveryUrl = new URL('/api/auth/recovery-callback', siteUrls.app);
+    recoveryUrl.searchParams.set('token_hash', hashedToken);
+    recoveryUrl.searchParams.set('type', 'recovery');
+    recoveryUrl.searchParams.set('next', resetPath);
+    const recoveryLink = recoveryUrl.toString();
+
     const delivery = await sendEmail({
       to: email,
       subject: `Reset your password — ${PLATFORM_DEFAULTS.orgName}`,
-      text: `Use this secure link to reset your password: ${data.properties.action_link}\n\nThis link expires. If you did not request it, ignore this email.`,
+      text: `Use this secure link to reset your password: ${recoveryLink}\n\nThis link expires. If you did not request it, ignore this email.`,
       html: `<div style="max-width:600px;margin:0 auto;padding:32px;font-family:Arial,sans-serif;color:#0f172a">
         <h1 style="font-size:24px;margin:0 0 16px">Reset your password</h1>
         <p style="line-height:1.6">Use the secure button below to choose a new password for your ${programHolder ? 'Program Holder' : 'Elevate'} account.</p>
-        <p style="margin:28px 0"><a href="${data.properties.action_link}" style="display:inline-block;padding:14px 24px;background:#1d4ed8;color:#fff;text-decoration:none;border-radius:6px;font-weight:700">Reset Password</a></p>
+        <p style="margin:28px 0"><a href="${recoveryLink}" style="display:inline-block;padding:14px 24px;background:#1d4ed8;color:#fff;text-decoration:none;border-radius:6px;font-weight:700">Reset Password</a></p>
         <p style="font-size:13px;color:#64748b;line-height:1.6">This link expires. If you did not request a password reset, you can ignore this email.</p>
       </div>`,
     });

@@ -66,6 +66,8 @@ export async function ProgramHolderWorkspaceView({
   const complianceScore = Math.round(
     (complianceItems.filter((item) => item.complete).length / complianceItems.length) * 100,
   );
+  const completedRequirements = complianceItems.filter((item) => item.complete).length;
+  const missingRequirements = complianceItems.length - completedRequirements;
 
   if (section === 'students')
     return <Students title="Enrolled Students" rows={data.enrollments} programs={data.programs} />;
@@ -90,15 +92,12 @@ export async function ProgramHolderWorkspaceView({
   if (section === 'settings') return <Settings holder={data.holder} />;
 
   return (
-    <div className="space-y-8">
-      <Hero
-        eyebrow="Program Holder Portal"
+    <div className="space-y-6 sm:space-y-8">
+      <DashboardHero
         title={data.holder?.organization_name || data.holder?.name || 'Program Holder'}
-        description={
-          isHvac
-            ? 'Your HVAC Certification program, enrolled students, training progress, and compliance requirements are connected below.'
-            : 'Your programs, enrolled students, training progress, and compliance requirements are connected below.'
-        }
+        programLabel={isHvac ? 'HVAC Certification' : 'Workforce Training'}
+        status={data.holder?.status || 'active'}
+        complianceScore={complianceScore}
       />
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Metric
@@ -113,6 +112,51 @@ export async function ProgramHolderWorkspaceView({
           value={pendingHours.length}
           helper="Training-hour reviews"
         />
+      </section>
+      <section aria-labelledby="program-holder-actions-heading">
+        <div className="mb-4">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Your workspace</p>
+          <h2 id="program-holder-actions-heading" className="mt-1 text-xl font-black text-slate-950 sm:text-2xl">
+            Run the program from one place
+          </h2>
+          <p className="mt-1 text-sm text-slate-600">Open the work that needs attention without searching through the menu.</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <ActionLink href="/program-holder/students/pending" icon={<Users className="h-5 w-5" />} title="Review applicants" detail={`${data.applicants.length} waiting for review`} tone="amber" />
+          <ActionLink href="/program-holder/hours" icon={<Clock className="h-5 w-5" />} title="Record training" detail={`${pendingHours.length} logs awaiting verification`} tone="blue" />
+          <ActionLink href="/program-holder/documents" icon={<FileText className="h-5 w-5" />} title="Complete documents" detail={`${data.documents.length} documents on file`} tone="violet" />
+          <ActionLink href="/program-holder/compliance" icon={<ShieldCheck className="h-5 w-5" />} title="Resolve compliance" detail={`${missingRequirements} requirements incomplete`} tone="emerald" />
+          <ActionLink href="/program-holder/programs" icon={<BookOpen className="h-5 w-5" />} title="Open program delivery" detail={`${data.courseAssignments.length} course assignments`} tone="blue" />
+          <ActionLink href="/program-holder/payouts" icon={<CheckCircle2 className="h-5 w-5" />} title="Manage payouts" detail={String(data.holder?.payout_status || 'Setup required').replaceAll('_', ' ')} tone="emerald" />
+        </div>
+      </section>
+      <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-black text-slate-950">Program readiness</h2>
+              <p className="mt-1 text-sm text-slate-600">{completedRequirements} of {complianceItems.length} requirements complete.</p>
+            </div>
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-black text-blue-800">{complianceScore}%</span>
+          </div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {complianceItems.map((item) => (
+              <div key={item.label} className="flex min-w-0 items-center gap-2 rounded-xl border border-slate-200 p-3">
+                {item.complete ? <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" /> : <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />}
+                <span className="min-w-0 text-sm font-bold text-slate-800">{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </article>
+        <article className="rounded-2xl border border-slate-200 bg-slate-950 p-4 text-white shadow-sm sm:p-6">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-300">Next best action</p>
+          <h2 className="mt-2 text-xl font-black">Finish onboarding for payment readiness</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-300">Upload required business and HVAC records, complete acknowledgements, and connect the delivery course before funds can be released.</p>
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+            <Link href="/program-holder/documents" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950">Upload documents</Link>
+            <Link href="/program-holder/compliance" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-600 px-4 py-2 text-sm font-black text-white">View requirements</Link>
+          </div>
+        </article>
       </section>
       <section aria-labelledby="program-holder-programs-heading">
         <div className="mb-4 flex items-center justify-between gap-3">
@@ -197,13 +241,49 @@ function Hero({
   description: string;
 }) {
   return (
-    <section className="rounded-3xl bg-gradient-to-r from-slate-950 via-blue-950 to-blue-800 p-7 text-white shadow-lg">
+    <section className="min-w-0 overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-blue-950 to-blue-800 p-5 text-white shadow-lg sm:rounded-3xl sm:p-7">
       <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">{eyebrow}</p>
-      <h1 className="mt-2 text-3xl font-black sm:text-4xl">{title}</h1>
+      <h1 className="mt-2 break-words text-2xl font-black sm:text-4xl">{title}</h1>
       <p className="mt-3 max-w-3xl text-sm font-medium leading-6 text-blue-50 sm:text-base">
         {description}
       </p>
     </section>
+  );
+}
+
+function DashboardHero({ title, programLabel, status, complianceScore }: { title: string; programLabel: string; status: string; complianceScore: number }) {
+  return (
+    <section className="relative min-w-0 overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl sm:rounded-3xl">
+      <Image src={getProgramCardImage('hvac-technician')} alt="HVAC training workspace" fill priority sizes="100vw" className="object-cover opacity-35" />
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/60" />
+      <div className="relative grid gap-5 p-5 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div className="min-w-0">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">Program Holder Command Center</p>
+          <h1 className="mt-2 break-words text-2xl font-black leading-tight sm:text-4xl">{title}</h1>
+          <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-200 sm:text-base">Manage enrollment, instruction, compliance, records, reporting, and payouts for {programLabel}.</p>
+          <div className="mt-4 flex flex-wrap gap-2 text-xs font-black">
+            <span className="rounded-full bg-emerald-400/20 px-3 py-1.5 text-emerald-100">Account {status.replaceAll('_', ' ')}</span>
+            <span className="rounded-full bg-white/15 px-3 py-1.5 text-white">{programLabel}</span>
+            <span className="rounded-full bg-blue-400/20 px-3 py-1.5 text-blue-100">Compliance {complianceScore}%</span>
+          </div>
+        </div>
+        <Link href="/program-holder/hours" className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm sm:w-auto">Record training hours</Link>
+      </div>
+    </section>
+  );
+}
+
+function ActionLink({ href, icon, title, detail, tone }: { href: string; icon: React.ReactNode; title: string; detail: string; tone: 'amber' | 'blue' | 'violet' | 'emerald' }) {
+  const colors = { amber: 'bg-amber-50 text-amber-800', blue: 'bg-blue-50 text-blue-800', violet: 'bg-violet-50 text-violet-800', emerald: 'bg-emerald-50 text-emerald-800' };
+  return (
+    <Link href={href} className="group flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
+      <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${colors[tone]}`}>{icon}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-black text-slate-950">{title}</span>
+        <span className="block truncate text-sm text-slate-600">{detail}</span>
+      </span>
+      <span aria-hidden="true" className="text-xl text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-700">→</span>
+    </Link>
   );
 }
 function Metric({
@@ -226,7 +306,29 @@ function Metric({
 
 function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
   return (
-    <div className="mt-5 overflow-x-auto">
+    <div className="mt-5 min-w-0">
+      <div className="grid gap-3 md:hidden">
+        {rows.length ? rows.map((row) => (
+          <article key={row.id} data-testid="student-card" className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div className="flex min-w-0 items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="break-words font-black text-slate-950">{row.full_name || 'Student'}</p>
+                <p className="break-all text-xs text-slate-500">{row.email || ''}</p>
+              </div>
+              <span className="shrink-0 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-black text-blue-800">{Number(row.progress_percent || 0)}%</span>
+            </div>
+            <dl className="mt-4 grid gap-2 text-sm">
+              <Row label="Program" value={programTitle(programs, row.program_id, row.program_slug)} />
+              <Row label="Enrollment" value={String(row.enrollment_state || row.status || 'enrolled').replaceAll('_', ' ')} />
+              <Row label="Training" value={`${row.training_start_date || 'Start missing'} — ${row.training_end_date || 'End missing'}`} />
+              <Row label="Next action" value={row.next_required_action || 'Continue training'} />
+            </dl>
+          </article>
+        )) : (
+          <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center text-sm text-slate-500">No confirmed student enrollments are linked.</div>
+        )}
+      </div>
+      <div className="hidden overflow-x-auto md:block">
       <table className="min-w-full text-left text-sm">
         <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
           <tr>
@@ -269,6 +371,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
           )}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

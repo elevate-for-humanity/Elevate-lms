@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const resetPath = programHolder
       ? '/reset-password?portal=program-holder&mode=recovery'
       : '/reset-password?mode=recovery';
-    const redirectTo = `${siteUrls.app}/auth/callback?next=${encodeURIComponent(resetPath)}`;
+    const redirectTo = `${siteUrls.app}/api/auth/recovery-callback?next=${encodeURIComponent(resetPath)}`;
     const { data, error } = await db.auth.admin.generateLink({
       type: 'recovery',
       email,

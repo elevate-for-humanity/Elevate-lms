@@ -71,6 +71,14 @@ export async function ProgramHolderWorkspaceView({
       label: 'HVAC license or instructor credential',
       complete: !isHvac || Boolean(data.holder?.hvac_license_url),
     },
+    {
+      label: 'Program Holder handbook acknowledgement',
+      complete: data.acknowledgements.some((item) => item.document_type === 'handbook'),
+    },
+    {
+      label: 'Non-compete agreement',
+      complete: data.acknowledgements.some((item) => item.document_type === 'non_compete'),
+    },
     { label: 'Required program documents', complete: data.documents.length > 0 },
     {
       label: 'Profile picture',

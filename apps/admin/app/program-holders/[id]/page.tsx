@@ -64,6 +64,13 @@ export default async function ProgramHolderDetailPage({
     .eq('program_holder_id', id)
     .order('work_date', { ascending: false })
     .limit(100);
+  const { data: applicantNotes } = await db
+    .from('program_holder_students')
+    .select('id,applicant_name,applicant_email,call_notes,call_date,call_outcome,updated_at')
+    .eq('program_holder_id', id)
+    .not('call_notes', 'is', null)
+    .order('updated_at', { ascending: false })
+    .limit(50);
   const learnerByUserId = new Map(learners.map((learner: any) => [learner.user_id, learner]));
 
   const canDecide = ['admin', 'super_admin'].includes(String(profile.role ?? ''));
@@ -230,6 +237,23 @@ export default async function ProgramHolderDetailPage({
               No training logs have been submitted yet.
             </p>
           )}
+        </section>
+
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-lg font-black text-slate-950">Program Holder follow-up notes</h2>
+          <p className="mt-1 text-sm text-slate-600">Notes entered in David’s applicant workflow appear here for Admin review with outcome and update time.</p>
+          <div className="mt-4 grid gap-3">
+            {applicantNotes?.length ? applicantNotes.map((note: any) => (
+              <article key={note.id} className="rounded-xl border border-slate-200 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-black">{note.applicant_name || note.applicant_email || 'Applicant'}</p>
+                  <span className="text-xs font-bold uppercase text-slate-500">{note.call_outcome || 'note recorded'}</span>
+                </div>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">{note.call_notes}</p>
+                <p className="mt-2 text-xs text-slate-500">{note.updated_at ? new Date(note.updated_at).toLocaleString() : note.call_date || ''}</p>
+              </article>
+            )) : <p className="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-500">No Program Holder follow-up notes have been recorded.</p>}
+          </div>
         </section>
 
         <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

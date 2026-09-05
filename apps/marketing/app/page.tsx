@@ -94,6 +94,13 @@ export default function HomePage() {
       <StructuredData />
       <main>
         <HomeHeroVideo banner={heroBanners.home} />
+        <div
+          data-scroll-narration
+          data-narration="An apprenticeship lets you learn with structure while gaining supervised experience on the job. We help connect the classroom, the employer, and your progress records."
+          data-narration-src="/audio/narration/apprenticeship.mp3"
+        >
+          <HomeApprenticeshipSales />
+        </div>
         <HostShopShowcase
           shops={HOME_HOST_SHOPS}
           videoTourShopSlug="salon-saloon"
@@ -107,13 +114,6 @@ export default function HomePage() {
           data-narration-src="/audio/narration/career-pathways.mp3"
         >
           <HomeCareerPathways />
-        </div>
-        <div
-          data-scroll-narration
-          data-narration="An apprenticeship lets you learn with structure while gaining supervised experience on the job. We help connect the classroom, the employer, and your progress records."
-          data-narration-src="/audio/narration/apprenticeship.mp3"
-        >
-          <HomeApprenticeshipSales />
         </div>
         <div
           data-scroll-narration

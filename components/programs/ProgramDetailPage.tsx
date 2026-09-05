@@ -447,6 +447,10 @@ export default function ProgramDetailPage({
               Price & Enrollment
             </p>
             <div className="mt-2 text-4xl font-black">{p.selfPayCost}</div>
+            <p className="mt-3 text-sm font-bold leading-6 text-white">
+              Can’t afford to pay {p.selfPayCost} in full? See if you qualify for available BNPL or
+              installment options.
+            </p>
             {bnplDepositStart && (
               <p className="mt-2 text-sm font-semibold text-slate-200">
                 Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.
@@ -470,7 +474,7 @@ export default function ProgramDetailPage({
                 href={`/programs/${p.slug}/payment/bnpl`}
                 className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100"
               >
-                See BNPL & Payment Options
+                See If You Qualify · BNPL Options
               </Link>
               <Link
                 href={requestInfoHref}

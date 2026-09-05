@@ -5,8 +5,6 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
-const SCROLL_SETTLE_MS = 350;
-
 function narrationFor(section: HTMLElement) {
   return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';
 }
@@ -37,10 +35,11 @@ function mostVisiblePageSection() {
 
 export function ScrollNarrator() {
   const pathname = usePathname();
-  const [enabled, setEnabled] = useState(true);
+  const [enabled, setEnabled] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  const lastNarrationRef = useRef<{ section: HTMLElement; text: string; source?: string } | null>(null);
-  const timerRef = useRef<number | null>(null);
+  const lastNarrationRef = useRef<{ section: HTMLElement; text: string; source?: string } | null>(
+    null,
+  );
   const { play, prepare, stop, isLoading, isPlaying } = useNaturalVoice();
 
   const narrateVisibleSection = useCallback(async () => {
@@ -84,8 +83,6 @@ export function ScrollNarrator() {
   }, [pathname, stop]);
 
   useEffect(() => {
-    if (!enabled) return;
-
     const sections = Array.from(
       document.querySelectorAll<HTMLElement>('main [data-scroll-narration]'),
     ).filter((section) => section.dataset.narrationDisabled !== 'true');
@@ -124,51 +121,25 @@ export function ScrollNarrator() {
 
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, [enabled, pathname, prepare]);
+  }, [pathname, prepare]);
 
   useEffect(() => {
-    if (!enabled) {
-      lastNarrationRef.current = null;
-      if (timerRef.current) window.clearTimeout(timerRef.current);
-      stop();
-      return;
-    }
-
-    const scheduleNarration = () => {
-      if (timerRef.current) window.clearTimeout(timerRef.current);
-      timerRef.current = window.setTimeout(() => {
-        void narrateVisibleSection();
-      }, SCROLL_SETTLE_MS);
-    };
-
-    const stopAndScheduleNarration = () => {
-      // Stop at the first scroll signal. Restart only after the viewport has
-      // settled and a section clearly owns the visitor's attention.
+    const stopNarrationOnScroll = () => {
+      // Scrolling is never a playback trigger. Stop the current narration and
+      // require another explicit press before any section can speak again.
       lastNarrationRef.current = null;
       stop();
-      scheduleNarration();
+      setEnabled(false);
     };
 
-    // Resolve the initially visible section without requiring a throwaway
-    // scroll gesture. Browser media policy still keeps actual playback under
-    // the visitor's interaction/permission boundary.
-    scheduleNarration();
-
-    window.addEventListener('scroll', stopAndScheduleNarration, { passive: true });
-    window.addEventListener('wheel', stopAndScheduleNarration, { passive: true });
-    window.addEventListener('pointerdown', scheduleNarration, { passive: true });
-    window.addEventListener('keydown', scheduleNarration);
-    window.addEventListener('resize', scheduleNarration);
+    window.addEventListener('scroll', stopNarrationOnScroll, { passive: true });
+    window.addEventListener('wheel', stopNarrationOnScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', stopAndScheduleNarration);
-      window.removeEventListener('wheel', stopAndScheduleNarration);
-      window.removeEventListener('pointerdown', scheduleNarration);
-      window.removeEventListener('keydown', scheduleNarration);
-      window.removeEventListener('resize', scheduleNarration);
-      if (timerRef.current) window.clearTimeout(timerRef.current);
+      window.removeEventListener('scroll', stopNarrationOnScroll);
+      window.removeEventListener('wheel', stopNarrationOnScroll);
     };
-  }, [enabled, narrateVisibleSection, stop]);
+  }, [stop]);
 
   const toggle = () => {
     setNotice(null);
@@ -194,10 +165,10 @@ export function ScrollNarrator() {
               ? 'Natural narration is preparing. Tap to stop.'
               : isPlaying
                 ? 'Stop page narration'
-                : 'Page narration is active on scroll. Tap to turn it off.'
-            : 'Turn on page narration'
+                : 'Play narration for this section'
+            : 'Play narration for this section'
         }
-        title={enabled ? 'Guided page narration on' : 'Guided page narration off'}
+        title={isPlaying || isLoading ? 'Stop narration' : 'Play section narration'}
         className={`inline-flex h-12 w-12 min-h-0 min-w-0 touch-manipulation items-center justify-center rounded-full border-2 border-white p-0 text-white shadow-xl transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 ${
           enabled ? 'bg-emerald-700 hover:bg-emerald-800' : 'bg-blue-700 hover:bg-blue-800'
         }`}
@@ -214,8 +185,8 @@ export function ScrollNarrator() {
               ? 'Preparing narration'
               : isPlaying
                 ? 'Stop narration'
-                : 'Narration on'
-            : 'Narration off'}
+                : 'Play narration'
+            : 'Play narration'}
         </span>
       </button>
       {notice ? (

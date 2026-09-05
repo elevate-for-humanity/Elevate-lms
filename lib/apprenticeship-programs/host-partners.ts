@@ -99,6 +99,16 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
       'A multicultural Bloomington barbershop focused on professional grooming, customer service, hair and scalp care, and hands-on barber development.',
     media: [
       {
+        src: '/images/partners/razors-image-logo.jpg',
+        alt: "Razor's Image Barbershop official logo",
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/razors-image-storefront-2026.jpg',
+        alt: "Razor's Image Barbershop storefront in Bloomington, Indiana",
+        kind: 'photo',
+      },
+      {
         src: '/images/partners/razors-image-apprenticeship-flyer.webp',
         alt: "Original Razor's Image Barber Apprenticeship Program artwork",
         kind: 'flyer',
@@ -140,12 +150,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     zip: '47882',
     address: '10 E Washington St',
     phone: '(812) 638-2090',
-    programs: [
-      'barber-apprenticeship',
-      'cosmetology-apprenticeship',
-      'nail-technician-apprenticeship',
-    ],
-    note: 'Sullivan host salon partner supporting barber and beauty apprenticeship pathways.',
+    programs: ['cosmetology-apprenticeship'],
+    note: 'Sullivan host salon partner supporting the cosmetology apprenticeship pathway.',
     marketingBlurb:
       'A community salon and barber shop in downtown Sullivan offering hair services and traditional barbering in a local, client-focused setting.',
     media: [
@@ -181,14 +187,14 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
   },
   {
     slug: 'generations-hair-llc',
-    name: 'Generations Hair LLC',
+    name: 'Generations Hair LLC DBA Generations Wedding Co',
     businessType: 'HairSalon',
     city: 'Martinsville',
     state: 'IN',
     zip: '46151',
-    address: '134 N Sycamore St',
+    address: '2005 Deer Lake Dr',
     programs: ['cosmetology-apprenticeship'],
-    note: 'Located inside Cat Eye Collective in Martinsville.',
+    note: 'Published cosmetology apprenticeship host site in Martinsville.',
     marketingBlurb:
       'An independent Martinsville hair business located inside Cat Eye Collective and participating in the Elevate apprenticeship host-shop network.',
     media: [
@@ -270,6 +276,19 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     ],
     socialUrl: 'https://www.instagram.com/midwesternmanes/',
     socialLabel: 'Contact / view shop photos',
+  },
+  {
+    slug: 'mesmerized-by-beauty-cosmetology-academy',
+    name: 'Mesmerized by Beauty Cosmetology Academy',
+    businessType: 'HairSalon',
+    city: 'Indianapolis',
+    state: 'IN',
+    zip: '46268',
+    address: 'Indianapolis, IN 46268',
+    programs: ['cosmetology-apprenticeship'],
+    note: 'Published cosmetology apprenticeship host site in Indianapolis.',
+    marketingBlurb:
+      'An Indianapolis cosmetology training and host-site option in Elevate’s published apprenticeship network. Current placement capacity is confirmed during enrollment.',
   },
   {
     slug: 'salon-saloon',

@@ -16,7 +16,6 @@ import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseout
 import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
 import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificationPreferences';
 import { WorkOneOutreachButton } from './WorkOneOutreachButton';
-import { getProgramCardImage } from '@/lib/images/programImages';
 
 type Section =
   | 'dashboard'
@@ -354,7 +353,7 @@ function Hero({
 function DashboardHero({ title, programLabel, status, complianceScore }: { title: string; programLabel: string; status: string; complianceScore: number }) {
   return (
     <section className="relative min-w-0 overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl sm:rounded-3xl">
-      <Image src={getProgramCardImage('hvac-technician')} alt="HVAC training workspace" fill priority sizes="100vw" className="object-cover opacity-35" />
+      <Image src="/images/trades/hero-program-hvac.jpg" alt="HVAC technician training workspace" fill priority sizes="100vw" className="object-cover object-center opacity-55" />
       <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/60" />
       <div className="relative grid gap-5 p-5 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div className="min-w-0">

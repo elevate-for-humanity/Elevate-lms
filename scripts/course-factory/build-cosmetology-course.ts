@@ -499,8 +499,12 @@ async function main() {
       status: 'draft',
       is_active: false,
       published_at: null,
-      generation_status: 'completed',
-      generation_progress: 90,
+      // The course is not complete when media is merely queued. Every lesson
+      // remains one unified in-progress package until its locked narration,
+      // visual plan, rendered video, and quality evidence are promoted by the
+      // canonical video completion transition.
+      generation_status: 'generating',
+      generation_progress: 95,
       total_lessons: EXPECTED_LESSONS,
       review_status: 'draft',
     })
@@ -508,11 +512,11 @@ async function main() {
   if (stateError) fail(`Final safe-state update failed: ${stateError.message}`);
 
   await updateJob(db, {
-    status: 'completed',
+    status: 'running',
     stage: 'media',
-    progress: 100,
-    message: 'Course package is complete; automated media and procurement acceptance will publish it when every gate passes.',
-    completed_at: new Date().toISOString(),
+    progress: 95,
+    message: 'Unified lesson packages are rendering; this build remains incomplete until all 40 matching videos are attached and verified.',
+    completed_at: null,
     details: {
       course_id: COURSE_ID,
       modules: EXPECTED_MODULES,
@@ -521,7 +525,7 @@ async function main() {
       microclips_queued: media.microclipsQueued,
     },
   });
-  console.log('COSMETOLOGY_COURSE_BUILD_READY');
+  console.log('COSMETOLOGY_COURSE_BUILD_MEDIA_PENDING');
   console.log(
     JSON.stringify(
       {
@@ -533,7 +537,8 @@ async function main() {
         microclipsQueued: media.microclipsQueued,
         dashboardConnection:
           'program_courses registered; active enrollments attach on approved publication',
-        publication: 'PENDING_AUTOMATED_MEDIA_AND_PROCUREMENT_ACCEPTANCE',
+        completion: 'PENDING_40_VERIFIED_LESSON_VIDEO_PACKAGES',
+        publication: 'PENDING_HUMAN_REVIEW_AFTER_MEDIA_ACCEPTANCE',
       },
       null,
       2,

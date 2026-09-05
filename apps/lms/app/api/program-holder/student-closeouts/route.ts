@@ -31,8 +31,8 @@ export async function POST(request: Request) {
       { error: 'Completion dates must be valid and cannot be in the future.' },
       { status: 400 },
     );
-  if (!Number.isFinite(hours) || hours <= 0 || hours > 1000)
-    return NextResponse.json({ error: 'Enter valid completed hands-on hours.' }, { status: 400 });
+  if (!Number.isFinite(hours) || hours < 48 || hours > 1000)
+    return NextResponse.json({ error: 'WorkOne closeout requires at least 48 completed training hours.' }, { status: 400 });
   if (
     body.lms_completed !== 'true' ||
     body.practical_skills_verified !== 'true' ||

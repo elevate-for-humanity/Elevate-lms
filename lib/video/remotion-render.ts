@@ -75,6 +75,10 @@ export interface StoryboardRenderInput {
   instructorId?: string;
 }
 
+function enabled(value: string | undefined): boolean {
+  return value?.trim().toLowerCase() === 'true';
+}
+
 function vttTimestamp(seconds: number): string {
   const milliseconds = Math.max(0, Math.round(seconds * 1000));
   const hours = Math.floor(milliseconds / 3_600_000);
@@ -419,7 +423,14 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
     // GPU instructional scenes flow through
     // the compositor, captions/transcript generation, compression, and the
     // canonical quality gate.
-    const canGenerateMotion = await gpuVideoAvailable();
+    // Full lesson storyboards can contain many scenes. Sending every scene to
+    // the long-running GPU endpoint serially can keep one lesson leased for
+    // hours and starve the entire course queue. Rich, narration-aligned stock
+    // motion and deterministic teaching diagrams remain the default. GPU
+    // enhancement is an explicit deployment choice until it has a bounded,
+    // asynchronous per-scene contract.
+    const canGenerateMotion =
+      enabled(process.env.ENABLE_GPU_LESSON_SCENES) && (await gpuVideoAvailable());
     const resolvedStoryboard: MediaStoryboard = structuredClone(input.storyboard);
 
     for (const [index, scene] of input.storyboard.scenes.entries()) {
@@ -443,7 +454,13 @@ export async function renderStoryboardVideo(input: StoryboardRenderInput): Promi
       // A visible instructor may appear only when the delivered narration is
       // actually driving the mouth movement. Keep this to the opening scene so
       // the rest of the lesson can teach with cinematic and exact graphics.
-      if (index === 0 && process.env.DID_API_KEY?.trim()) {
+      // D-ID polling is also an optional enrichment. It must not sit in the
+      // critical path of the canonical lesson render unless explicitly enabled.
+      if (
+        index === 0 &&
+        enabled(process.env.ENABLE_DID_LESSON_INSTRUCTOR) &&
+        process.env.DID_API_KEY?.trim()
+      ) {
         try {
           const { createTalk, pollTalkResult } = await import('@/lib/d-id/generate-talk');
           const talk = await createTalk({

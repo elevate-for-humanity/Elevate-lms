@@ -239,7 +239,8 @@ describe('canonical Course Factory media architecture', () => {
     const renderer = read('lib/video/remotion-render.ts');
     expect(worker).not.toContain('ENABLE_DIRECT_GPU_MICROCLIPS');
     expect(renderer).not.toContain('ENABLE_GPU_INSTRUCTIONAL_SCENES');
-    expect(renderer).toContain('const canGenerateMotion = await gpuVideoAvailable()');
+    expect(renderer).toContain('enabled(process.env.ENABLE_GPU_LESSON_SCENES)');
+    expect(renderer).toContain('enabled(process.env.ENABLE_DID_LESSON_INSTRUCTOR)');
     expect(worker).toContain('const result = await renderStoryboardVideo');
   });
 

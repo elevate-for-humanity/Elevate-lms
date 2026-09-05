@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { isQaE2EIdentity } from '@/lib/qa/is-qa-e2e-identity';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -271,6 +272,9 @@ async function _POST(request: NextRequest) {
     });
 
     try {
+      if (isQaE2EIdentity(user.email)) {
+        return NextResponse.json({ success: true, document: docRecord });
+      }
       const [{ data: studentProfile }, { data: admins }] = await Promise.all([
         db.from('profiles').select('full_name,email').eq('id', user.id).maybeSingle(),
         db.from('profiles').select('email').in('role', ['admin', 'super_admin']),

@@ -48,6 +48,7 @@ export default function FeaturedHostPartners({
       {programSlug !== 'cosmetology-apprenticeship' ? (
         <HostShopShowcase
           shops={shops}
+          enableNarration={programSlug !== 'barber-apprenticeship'}
           mediaOverrides={{
             'generations-hair-llc': {
               src: '/images/partners/generations-hair/highlighted-curls-home.webp',

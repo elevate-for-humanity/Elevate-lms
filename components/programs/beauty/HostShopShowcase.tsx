@@ -47,6 +47,7 @@ export default function HostShopShowcase({
   shops,
   videoTourShopSlug,
   autoPlayVideoOnVisible = false,
+  enableNarration = true,
   narration,
   narrationSrc,
   mediaOverrides,
@@ -56,6 +57,8 @@ export default function HostShopShowcase({
   videoTourShopSlug?: string;
   /** Start the designated tour, muted, when its section enters the viewport. */
   autoPlayVideoOnVisible?: boolean;
+  /** Disable page narration when the featured media already carries its own spoken audio. */
+  enableNarration?: boolean;
   /** Page-specific natural narration used while this section is dominant. */
   narration?: string;
   /** Pre-rendered narration removes runtime voice-generation delay. */
@@ -173,11 +176,13 @@ export default function HostShopShowcase({
     <section
       ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
-      data-scroll-narration
-      data-narration-src={narrationSrc}
+      data-scroll-narration={enableNarration ? true : undefined}
+      data-narration-src={enableNarration ? narrationSrc : undefined}
       data-narration={
-        narration ??
-        'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.'
+        enableNarration
+          ? narration ??
+            'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.'
+          : undefined
       }
       className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-12 text-slate-950 sm:px-6 sm:py-16"
       onMouseEnter={() => setInteracting(true)}
@@ -222,16 +227,6 @@ export default function HostShopShowcase({
             <div className="relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[390px]">
               {image?.kind === 'video' ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
-                  {image.backdropSrc ? (
-                    <Image
-                      src={image.backdropSrc}
-                      alt=""
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 58vw"
-                      className="-z-10 scale-110 object-cover opacity-45 blur-xl"
-                      aria-hidden="true"
-                    />
-                  ) : null}
                   <video
                     key={image.src}
                     src={image.src}

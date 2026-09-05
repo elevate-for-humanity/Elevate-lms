@@ -16,6 +16,7 @@ import { signInSchema } from '@/lib/api/validation-schemas';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { emailService } from '@/lib/notifications/email';
+import { isQaE2EIdentity } from '@/lib/qa/is-qa-e2e-identity';
 
 const OWNER_ALERT_PROFILE_ID = '964dc85a-bce8-4e67-92eb-198ffafb2384';
 
@@ -69,6 +70,20 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
   // Notify the platform owner when a real apprentice or Host Shop user signs in.
   // Alert delivery is isolated so a mail-provider failure never blocks authentication.
   try {
+    if (isQaE2EIdentity(data.user.email)) {
+      return NextResponse.json(
+        {
+          success: true,
+          user: {
+            id: data.user.id,
+            email: data.user.email,
+            firstName: data.user.user_metadata?.first_name,
+            lastName: data.user.user_metadata?.last_name,
+          },
+        },
+        { headers: { 'Cache-Control': 'no-store, private, max-age=0' } },
+      );
+    }
     const db = await requireAdminClient();
     const [{ data: profile }, { data: apprentice }, { data: partnerLinks }, { data: owner }] = await Promise.all([
       db.from('profiles').select('full_name,email').eq('id', data.user.id).maybeSingle(),

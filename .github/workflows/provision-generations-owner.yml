@@ -1,0 +1,104 @@
+name: Provision Generations Host Shop Owner
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/provision-generations-owner.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  provision:
+    name: Invite Jayci and connect Generations
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Provision approved Host Shop owner
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { createClient } from '@supabase/supabase-js';
+
+          const email = 'hairbyjayci@gmail.com';
+          const fullName = 'Jayci Martinez';
+          const partnerId = '6937ee7a-231c-46db-a861-e3163e490781';
+          const applicationId = '281ef334-3097-40fc-9564-118c43c3ba86';
+          const db = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY,
+            { auth: { autoRefreshToken: false, persistSession: false } },
+          );
+
+          let user = null;
+          for (let page = 1; page <= 10 && !user; page += 1) {
+            const { data, error } = await db.auth.admin.listUsers({ page, perPage: 1000 });
+            if (error) throw error;
+            user = data.users.find((candidate) => candidate.email?.toLowerCase() === email);
+            if (data.users.length < 1000) break;
+          }
+
+          if (!user) {
+            const { data, error } = await db.auth.admin.inviteUserByEmail(email, {
+              data: { full_name: fullName, portal: 'host_shop' },
+              redirectTo: 'https://app.elevateforhumanity.org/auth/callback?redirect=%2Fhost-shop%2Fonboarding',
+            });
+            if (error || !data.user) throw error || new Error('Invitation returned no user');
+            user = data.user;
+          }
+
+          const { data: existingProfile, error: profileReadError } = await db
+            .from('profiles')
+            .select('id,role')
+            .eq('id', user.id)
+            .maybeSingle();
+          if (profileReadError) throw profileReadError;
+
+          const protectedRoles = new Set(['admin', 'super_admin', 'org_admin', 'staff']);
+          const profileRole = existingProfile && protectedRoles.has(existingProfile.role)
+            ? existingProfile.role
+            : 'partner';
+          const { error: profileError } = await db.from('profiles').upsert({
+            id: user.id,
+            email,
+            full_name: fullName,
+            first_name: 'Jayci',
+            last_name: 'Martinez',
+            role: profileRole,
+          }, { onConflict: 'id' });
+          if (profileError) throw profileError;
+
+          const { error: membershipError } = await db.from('partner_users').upsert({
+            user_id: user.id,
+            partner_id: partnerId,
+            role: 'partner_admin',
+            status: 'active',
+          }, { onConflict: 'user_id,partner_id' });
+          if (membershipError) throw membershipError;
+
+          const { error: applicationError } = await db.from('host_shop_applications')
+            .update({ email, contact_email: email, updated_at: new Date().toISOString() })
+            .eq('id', applicationId);
+          if (applicationError) throw applicationError;
+
+          const { error: partnerError } = await db.from('partners')
+            .update({ contact_email: email, updated_at: new Date().toISOString() })
+            .eq('id', partnerId);
+          if (partnerError) throw partnerError;
+
+          console.log(JSON.stringify({ ok: true, userId: user.id, partnerId, invited: true }));
+          NODE

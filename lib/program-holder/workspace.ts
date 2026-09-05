@@ -70,7 +70,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .order('enrolled_at', { ascending: false }),
     db
       .from('program_holder_students')
-      .select('id,applicant_name,applicant_email,status,application_status,program_id,created_at')
+      .select('id,applicant_name,applicant_email,applicant_phone,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome')
       .eq('program_holder_id', holderId)
       .in('status', ['applied', 'pending'])
       .order('created_at', { ascending: false }),

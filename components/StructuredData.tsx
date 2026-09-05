@@ -2,6 +2,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { PROGRAMS } from '@/lib/programs/canonical-data';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
+import { organization } from '@/lib/config/organization';
 
 export default function StructuredData() {
   const barber = PROGRAMS['barber-apprenticeship'];
@@ -32,9 +33,7 @@ export default function StructuredData() {
     email: PLATFORM_DEFAULTS.supportEmail,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Indianapolis',
-      addressRegion: 'IN',
-      addressCountry: 'US',
+      ...organization.postalAddress,
     },
     areaServed: {
       '@type': 'State',
@@ -149,7 +148,13 @@ export default function StructuredData() {
         position: index + 1,
         url: `${canonicalSiteUrl}/host-shops/${shop.slug}`,
         item: {
-          '@type': shop.businessType ?? 'LocalBusiness',
+          // Schema.org has no BarberShop type. HairSalon is the closest valid
+          // business type; additionalType preserves the more specific meaning.
+          '@type': shop.businessType === 'BarberShop' ? 'HairSalon' : (shop.businessType ?? 'LocalBusiness'),
+          additionalType:
+            shop.businessType === 'BarberShop'
+              ? 'https://www.wikidata.org/wiki/Q133215'
+              : undefined,
           '@id': `${canonicalSiteUrl}/host-shops/${shop.slug}#business`,
           name: shop.dba ?? shop.name,
           legalName: shop.dba ? shop.name : undefined,
@@ -166,7 +171,6 @@ export default function StructuredData() {
             postalCode: shop.zip,
             addressCountry: 'US',
           },
-          parentOrganization: { '@id': `${canonicalSiteUrl}/#organization` },
         },
       };
     }),

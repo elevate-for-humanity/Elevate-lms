@@ -13,7 +13,6 @@ export const SOCIAL_LINKS = {
 export const PARTNER_LINKS = {
   riseForwardFoundation: '/rise-forward-foundation',
   curvatureBodySculpting: 'https://www.facebook.com/curvaturebodysculpt/',
-  supersonicFastCash: '/locations',
 } as const;
 
 export const CREATOR_LINKS = {

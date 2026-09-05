@@ -5,6 +5,7 @@
 
 import Script from 'next/script';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { organization } from '@/lib/config/organization';
 
 const SITE_URL = PLATFORM_DEFAULTS.siteUrl;
 const ORG_NAME = PLATFORM_DEFAULTS.orgName;
@@ -128,11 +129,7 @@ export function ProgramStructuredData({
       sameAs: SITE_URL,
       address: {
         '@type': 'PostalAddress',
-        streetAddress: '6331 N Keystone Ave, Suite D, Indianapolis, IN 46220',
-        addressLocality: 'Indianapolis',
-        addressRegion: 'IN',
-        postalCode: '46240',
-        addressCountry: 'US',
+        ...organization.postalAddress,
       },
     },
     ...(image && { image }),
@@ -189,11 +186,7 @@ export function OrganizationStructuredData() {
       'Nonprofit workforce development institute in Indianapolis providing career training at no cost to eligible Indiana residents through WIOA and state funding. Programs in healthcare, skilled trades, technology, barbering, and business.',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '6331 N Keystone Ave, Suite D, Indianapolis, IN 46220',
-      addressLocality: 'Indianapolis',
-      addressRegion: 'IN',
-      postalCode: '46240',
-      addressCountry: 'US',
+      ...organization.postalAddress,
     },
     telephone: `+1-${PLATFORM_DEFAULTS.supportPhone}`,
     email: `info@${PLATFORM_DEFAULTS.canonicalDomain}`,
@@ -203,7 +196,6 @@ export function OrganizationStructuredData() {
       'https://www.youtube.com/@elevateforhumanity',
       'https://www.instagram.com/elevateforhumanity',
     ],
-    foundingDate: '2019',
     areaServed: {
       '@type': 'State',
       name: 'Indiana',
@@ -380,11 +372,7 @@ export function ServiceStructuredData({
       url: SITE_URL,
       address: {
         '@type': 'PostalAddress',
-        streetAddress: '6331 N Keystone Ave, Suite D, Indianapolis, IN 46220',
-        addressLocality: 'Indianapolis',
-        addressRegion: 'IN',
-        postalCode: '46240',
-        addressCountry: 'US',
+        ...organization.postalAddress,
       },
     },
     areaServed: { '@type': 'State', name: 'Indiana' },

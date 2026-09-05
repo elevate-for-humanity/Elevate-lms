@@ -68,13 +68,6 @@ export function SiteFooter() {
               >
                 Curvature Body Sculpting <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
               </a>
-              <span aria-hidden="true"> · </span>
-              <Link
-                href={PARTNER_LINKS.supersonicFastCash}
-                className="font-bold text-blue-800 hover:underline"
-              >
-                Supersonic Fast Cash
-              </Link>
             </div>
             <div className="mt-5 flex gap-3">
               <a

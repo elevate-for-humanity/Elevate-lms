@@ -14,6 +14,13 @@ export const organization = {
 
   // Canonical administrative/contact address
   address: '120 E Market St, Suite 930, Indianapolis, IN 46204',
+  postalAddress: {
+    streetAddress: '120 E Market St, Suite 930',
+    addressLocality: 'Indianapolis',
+    addressRegion: 'IN',
+    postalCode: '46204',
+    addressCountry: 'US',
+  },
 
   // Testing is scheduled by program/provider; use the public testing page for current location details.
   testingAddress: '120 E Market St, Suite 930, Indianapolis, IN 46204',

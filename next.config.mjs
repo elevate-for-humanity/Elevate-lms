@@ -360,11 +360,6 @@ const nextConfig = {
         key: 'X-Robots-Tag',
         value: 'noindex, nofollow, noarchive',
       });
-    } else {
-      securityHeaders.push({
-        key: 'X-Robots-Tag',
-        value: 'noai, noimageai',
-      });
     }
 
     return [

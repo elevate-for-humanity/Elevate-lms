@@ -1,9 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, CreditCard, Store } from 'lucide-react';
+import HeroVideo from '@/components/marketing/HeroVideo';
 
 export interface HeroBanner {
   pageKey: string;
@@ -215,27 +215,21 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         <div
           className="relative order-1 w-full overflow-hidden bg-[#f4f1ec] lg:order-2"
         >
-          <div className="relative z-10 h-[clamp(480px,72svh,760px)] lg:h-[clamp(400px,62vh,680px)]">
-            {slides.map((candidate, index) => (
-              <Image
-                key={candidate.src}
-                src={revisionedHeroAsset(candidate.src)}
-                alt={candidate.alt}
-                fill
-                priority={index < 2}
-                unoptimized
-                sizes="(min-width: 1024px) 58vw, 100vw"
-                aria-hidden={index !== activeSlide}
-                className={`absolute inset-0 h-full w-full object-cover transform-gpu transition-[opacity,transform] duration-1000 ease-in-out motion-reduce:transition-none ${SALON_EDITORIAL_GRADE} ${candidate.exposureClass} ${candidate.focalClass} ${
-                  index === activeSlide ? 'z-10 scale-100 opacity-100' : 'z-0 scale-[1.015] opacity-0'
-                }`}
-              />
-            ))}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(135deg,rgba(255,248,238,0.12)_0%,transparent_48%,rgba(15,23,42,0.08)_100%)] mix-blend-soft-light"
-            />
-          </div>
+          <HeroVideo
+            demoSlides={slides.map((candidate) => ({
+              src: revisionedHeroAsset(candidate.src),
+              alt: candidate.alt,
+              label: candidate.label,
+              className: `${candidate.exposureClass} ${candidate.focalClass}`,
+            }))}
+            demoActiveSlideIndex={activeSlide}
+            analyticsName={`${banner.analyticsName}-${activeSlide + 1}`}
+            heightClassName="h-[clamp(480px,72svh,760px)] lg:h-[clamp(400px,62vh,680px)]"
+            mediaClassName={SALON_EDITORIAL_GRADE}
+            overlayMode="none"
+            showSoundControl={false}
+            showTranscriptControl={false}
+          />
           {slides.length > 1 ? (
             <>
               <button

@@ -15,6 +15,7 @@ export interface HeroDemoSlide {
   src: string;
   alt: string;
   label?: string;
+  className?: string;
 }
 
 export interface HeroVideoProps {
@@ -40,6 +41,7 @@ export interface HeroVideoProps {
   /** Optional shared color treatment for a coordinated media set. */
   mediaClassName?: string;
   demoSlides?: HeroDemoSlide[];
+  demoActiveSlideIndex?: number;
   demoStartSeconds?: number;
   demoSlideSeconds?: number;
   heightClassName?: string;
@@ -77,6 +79,8 @@ export default function HeroVideo({
   showSoundControl = true,
   showTranscriptControl = true,
   deferVideoMs = 0,
+  demoSlides,
+  demoActiveSlideIndex = 0,
 }: HeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -253,7 +257,25 @@ export default function HeroVideo({
         className={`relative isolate w-full overflow-hidden flex items-end bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
-        {mountedFrameImage || posterImage ? (
+        {demoSlides?.length ? (
+          demoSlides.map((slide, index) => (
+            <Image
+              key={slide.src}
+              src={slide.src}
+              alt={slide.alt}
+              fill
+              priority={index < 2}
+              unoptimized
+              sizes="100vw"
+              aria-hidden={index !== demoActiveSlideIndex}
+              className={`absolute inset-0 z-0 h-full w-full ${mediaClass} transform-gpu object-center transition-[opacity,transform] duration-1000 ease-in-out motion-reduce:transition-none ${mediaClassName} ${slide.className || ''} ${
+                index === demoActiveSlideIndex
+                  ? 'scale-100 opacity-100'
+                  : 'scale-[1.015] opacity-0'
+              }`}
+            />
+          ))
+        ) : mountedFrameImage || posterImage ? (
           <Image
             src={mountedFrameImage || posterImage || ''}
             alt=""

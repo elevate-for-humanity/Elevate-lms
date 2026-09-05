@@ -133,7 +133,7 @@ export function PlatformShell({
               ref={menuButtonRef}
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 lg:hidden"
+              className="hidden min-h-11 min-w-11 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500"
               aria-label="Open portal navigation"
               aria-expanded={sidebarOpen}
               aria-controls="portal-navigation-drawer"
@@ -229,10 +229,32 @@ export function PlatformShell({
             </div>
           </div>
         </div>
+        <nav
+          aria-label={`${ROLE_DISPLAY_NAMES[role]} mobile navigation`}
+          className="flex max-w-full gap-2 overflow-x-auto border-t border-slate-100 bg-white px-3 py-2 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
+        >
+          {sections.flatMap((section) => section.items).map((item) => {
+            const Icon = item.icon;
+            const active = isActiveHref(item.href, pathname);
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                aria-current={active ? 'page' : undefined}
+                className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-bold ${
+                  active ? 'bg-blue-700 text-white' : 'border border-slate-200 bg-slate-50 text-slate-800'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
       </header>
 
       <div className="flex min-w-0">
-        {sidebarOpen && (
+        {false && sidebarOpen && (
           <button
             type="button"
             className="fixed inset-0 z-[60] cursor-default bg-black/60 backdrop-blur-[1px] lg:hidden"
@@ -250,7 +272,7 @@ export function PlatformShell({
           role={sidebarOpen ? 'dialog' : undefined}
           aria-modal={sidebarOpen ? true : undefined}
           aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation`}
-          className={`fixed inset-y-0 left-0 z-[70] w-[min(20rem,calc(100vw-2.5rem))] max-w-full transform bg-slate-950 text-white shadow-2xl transition-transform duration-200 ease-in-out lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100dvh-4rem)] lg:!w-64 lg:shrink-0 lg:translate-x-0 lg:shadow-none ${
+          className={`hidden bg-slate-950 text-white lg:sticky lg:top-16 lg:z-20 lg:block lg:h-[calc(100dvh-4rem)] lg:w-64 lg:shrink-0 lg:shadow-none ${
             sidebarOpen
               ? 'translate-x-0 visible pointer-events-auto'
               : '-translate-x-full invisible pointer-events-none lg:visible lg:pointer-events-auto'

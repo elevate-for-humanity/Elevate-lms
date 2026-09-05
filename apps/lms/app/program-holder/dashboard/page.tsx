@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: 'Program Holder Dashboard', descripti
 export default async function Page() {
   const context = await requireProgramHolder();
   if (context.mode === 'admin') return <AdminProgramHolderPreview />;
-  return <ProgramHolderWorkspaceView section="dashboard" payoutPanel={<PayoutAccessPanel />} />;
+  return <ProgramHolderWorkspaceView section="dashboard" payoutPanel={context.mode === 'holder' ? <PayoutAccessPanel /> : undefined} />;
 }
 
 function AdminProgramHolderPreview() {

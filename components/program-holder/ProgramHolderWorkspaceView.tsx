@@ -14,6 +14,7 @@ import { ProgramHolderDocumentUpload } from './ProgramHolderDocumentUpload';
 import { ProgramHolderTrainingLogForm } from './ProgramHolderTrainingLogForm';
 import { ProgramHolderStudentCloseoutForm } from './ProgramHolderStudentCloseoutForm';
 import { ProgramHolderAcknowledgements } from './ProgramHolderAcknowledgements';
+import { ProgramHolderNotificationPreferences } from './ProgramHolderNotificationPreferences';
 import { getProgramCardImage } from '@/lib/images/programImages';
 
 type Section =
@@ -44,6 +45,13 @@ export async function ProgramHolderWorkspaceView({
   const completed = data.enrollments.filter((row) =>
     ['completed', 'graduated'].includes(row.enrollment_state || row.status),
   );
+  const incompleteBackWork = completed.filter((row) =>
+    Number(row.total_hours_completed || 0) < 48 ||
+    !row.training_start_date ||
+    !row.training_end_date ||
+    !row.lms_completed ||
+    !row.practical_skills_verified,
+  );
   const atRisk = data.enrollments.filter((row) => row.at_risk);
   const pendingHours = data.hours.filter((row) =>
     ['pending', 'submitted'].includes(row.approval_status || row.status),
@@ -61,6 +69,15 @@ export async function ProgramHolderWorkspaceView({
       complete: !isHvac || Boolean(data.holder?.hvac_license_url),
     },
     { label: 'Required program documents', complete: data.documents.length > 0 },
+    {
+      label: 'Profile picture',
+      complete: Boolean(data.profile?.avatar_url) || data.documents.some((row) => row.document_type === 'profile_photo'),
+    },
+    {
+      label: 'Student photos and training videos',
+      complete: data.documents.some((row) => ['student_photo', 'student_video'].includes(row.document_type)),
+    },
+    { label: 'Graduated-student back work and 48-hour sign-offs', complete: incompleteBackWork.length === 0 },
     { label: 'Course delivery assignment', complete: data.courseAssignments.length > 0 },
   ];
   const complianceScore = Math.round(
@@ -129,10 +146,20 @@ export async function ProgramHolderWorkspaceView({
               <p className="text-xs font-black uppercase tracking-[0.16em] text-red-700">Payment action required</p>
               <h2 className="mt-1 text-xl font-black text-red-950">Complete setup before Elevate can release payment</h2>
               <p className="mt-2 text-sm leading-6 text-red-900">{missingRequirements} onboarding requirements remain incomplete. {payoutReady ? 'Your payout account is connected.' : 'Your debit card or bank account is not ready for payouts.'}</p>
+              <p className="mt-2 rounded-xl bg-red-100 p-3 text-sm font-black text-red-950">You will not be able to receive funds until every required to-do below is completed and approved.</p>
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                {complianceItems.filter((item) => !item.complete).map((item) => (
+                  <li key={item.label} className="flex items-center gap-2 rounded-lg border border-red-200 bg-white p-3 text-sm font-bold text-red-950">
+                    <AlertTriangle className="h-4 w-4 shrink-0 text-red-700" /> {item.label}
+                  </li>
+                ))}
+                {!payoutReady && <li className="flex items-center gap-2 rounded-lg border border-red-200 bg-white p-3 text-sm font-bold text-red-950"><AlertTriangle className="h-4 w-4 shrink-0 text-red-700" /> Debit card or bank payout account</li>}
+              </ul>
               <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 <Link href="/program-holder/documents" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-700 px-4 py-2 text-sm font-black text-white">Complete documents</Link>
                 <Link href="/program-holder/compliance" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900">Review every requirement</Link>
                 <Link href="/program-holder/payouts" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900">Add debit card or bank</Link>
+                {incompleteBackWork.length > 0 && <Link href="/program-holder/students" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900">Complete prior student records</Link>}
               </div>
             </div>
           </div>
@@ -199,9 +226,11 @@ export async function ProgramHolderWorkspaceView({
                 <div className="min-w-0">
                   <p className="break-words font-black text-slate-950">{row.applicant_name || 'Applicant'}</p>
                   <p className="break-all text-xs text-slate-500">{row.applicant_email || 'No email on file'}</p>
+                  <p className="mt-1 text-xs font-bold text-slate-700">{row.applicant_phone || 'No phone on file'}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-800">Not enrolled</span>
+                  {row.applicant_email && <a href={`mailto:${row.applicant_email}`} className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900">Email</a>}
                   {row.applicant_phone ? <a href={`tel:${row.applicant_phone}`} className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white">Call</a> : <span className="text-xs font-bold text-slate-500">Phone missing</span>}
                 </div>
               </div>
@@ -210,6 +239,22 @@ export async function ProgramHolderWorkspaceView({
           </div>
         </article>
         <div className="min-w-0">{payoutPanel}</div>
+      </section>
+      <section className="grid gap-4 lg:grid-cols-2">
+        <article className="rounded-2xl border border-blue-200 bg-white p-4 shadow-sm sm:p-6">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Starting soon</p>
+          <h2 className="mt-1 text-xl font-black text-slate-950">Incoming students</h2>
+          <p className="mt-1 text-sm text-slate-600">Only names and training dates are shown here. Voucher and funding documents remain private.</p>
+          <div className="mt-4 grid gap-2">
+            {data.upcomingEnrollments.length ? data.upcomingEnrollments.map((row) => (
+              <div key={row.id} className="rounded-xl border border-slate-200 p-3">
+                <p className="font-black text-slate-950">{row.full_name || 'Incoming student'}</p>
+                <p className="mt-1 text-sm text-slate-700">Start: {row.training_start_date || row.student_start_date || row.start_date || 'Not set'} · End: {row.training_end_date || row.expected_end_date || 'Not set'}</p>
+              </div>
+            )) : <p className="rounded-xl bg-slate-50 p-4 text-sm font-bold text-slate-600">No future-dated enrollments are linked yet.</p>}
+          </div>
+        </article>
+        <ProgramHolderNotificationPreferences initial={data.notificationPreferences} phone={data.profile?.phone || data.holder?.contact_phone || ''} />
       </section>
       <section aria-labelledby="program-holder-programs-heading">
         <div className="mb-4 flex items-center justify-between gap-3">
@@ -375,7 +420,9 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
               <Row label="Enrollment" value={String(row.enrollment_state || row.status || 'enrolled').replaceAll('_', ' ')} />
               <Row label="Training" value={`${row.training_start_date || 'Start missing'} — ${row.training_end_date || 'End missing'}`} />
               <Row label="Next action" value={row.next_required_action || 'Continue training'} />
+              <Row label="WorkOne hours" value={`${Math.min(48, Number(row.total_hours_completed || 0))} of 48 complete`} />
             </dl>
+            <Link href="/program-holder/hours" className="mt-4 inline-flex min-h-10 items-center rounded-lg bg-blue-700 px-3 py-2 text-xs font-black text-white">Record progress</Link>
           </article>
         )) : (
           <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center text-sm text-slate-500">No confirmed student enrollments are linked.</div>
@@ -389,6 +436,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             <th className="px-3 py-3">Program</th>
             <th className="px-3 py-3">Enrollment</th>
             <th className="px-3 py-3">Progress</th>
+            <th className="px-3 py-3">WorkOne hours</th>
             <th className="px-3 py-3">Training dates</th>
             <th className="px-3 py-3">Next action</th>
           </tr>
@@ -408,6 +456,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   {String(row.enrollment_state || row.status || 'enrolled').replaceAll('_', ' ')}
                 </td>
                 <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
+                <td className="px-3 py-4 font-bold">{Math.min(48, Number(row.total_hours_completed || 0))} / 48</td>
                 <td className="px-3 py-4 text-xs">
                   <span className="block">Start: {row.training_start_date || 'Missing'}</span>
                   <span className="block">End: {row.training_end_date || 'Missing'}</span>
@@ -417,7 +466,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             ))
           ) : (
             <tr>
-              <td colSpan={6} className="px-3 py-8 text-center text-slate-500">
+              <td colSpan={7} className="px-3 py-8 text-center text-slate-500">
                 No confirmed student enrollments are linked.
               </td>
             </tr>
@@ -514,6 +563,7 @@ function Applicants({ rows, programs }: { rows: any[]; programs: any[] }) {
                 <th className="p-3">Applicant</th>
                 <th className="p-3">Program</th>
                 <th className="p-3">Status</th>
+                <th className="p-3">Contact</th>
                 <th className="p-3">Applied</th>
               </tr>
             </thead>
@@ -527,6 +577,13 @@ function Applicants({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <td className="p-3">{programTitle(programs, row.program_id)}</td>
                   <td className="p-3 capitalize">
                     {row.application_status || row.status || 'pending'}
+                  </td>
+                  <td className="p-3">
+                    <p className="font-medium">{row.applicant_phone || 'No phone on file'}</p>
+                    <div className="mt-1 flex gap-2">
+                      {row.applicant_phone && <a className="font-bold text-blue-700" href={`tel:${row.applicant_phone}`}>Call</a>}
+                      {row.applicant_email && <a className="font-bold text-blue-700" href={`mailto:${row.applicant_email}`}>Email</a>}
+                    </div>
                   </td>
                   <td className="p-3">
                     {row.created_at ? new Date(row.created_at).toLocaleDateString('en-US') : '—'}

@@ -8,6 +8,7 @@
 import { sendEmail as coreSendEmail } from './sendgrid';
 import type { EmailOptions as CoreEmailOptions } from './sendgrid';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { adminUrl } from '@/lib/utils/url-factory';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
@@ -144,7 +145,7 @@ export async function sendAdminProgramHolderNotification(
       <p><strong>Organization:</strong> ${organizationName}</p>
       <p><strong>Contact Email:</strong> ${contactEmail}</p>
       <p><strong>Application ID:</strong> ${applicationId}</p>
-      <p><a href="${PLATFORM_DEFAULTS.siteUrl}/admin/program-holders/${applicationId}">Review Application</a></p>
+      <p><a href="${adminUrl(`/program-holders/${applicationId}`)}">Review Application</a></p>
     `,
     text: `New program holder application from ${organizationName} (${contactEmail})`,
   });
@@ -165,7 +166,7 @@ export async function sendDocumentUploadNotification(
       <h1>New Document Uploaded</h1>
       <p><strong>Program Holder:</strong> ${programHolderName}</p>
       <p><strong>Document Type:</strong> ${documentType}</p>
-      <p><a href="${PLATFORM_DEFAULTS.siteUrl}/admin/program-holder-documents">Review Documents</a></p>
+      <p><a href="${adminUrl('/program-holder-documents')}">Review Documents</a></p>
     `,
     text: `${programHolderName} uploaded a ${documentType} document`,
   });

@@ -174,7 +174,7 @@ export async function handleTestingCheckoutSession(
         .from('testing_slots')
         .select('id, capacity, booked_count')
         .eq('id', rawSlotId)
-        .eq('exam_type', meta.exam_type)
+        .in('exam_type', [meta.exam_type, 'all'])
         .eq('is_cancelled', false)
         .gte('start_time', earliestStart)
         .maybeSingle();

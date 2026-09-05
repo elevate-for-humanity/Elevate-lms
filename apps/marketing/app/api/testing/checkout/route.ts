@@ -108,12 +108,17 @@ export async function POST(request: NextRequest) {
     .from('testing_slots')
     .select('id, exam_type, start_time, capacity, booked_count, is_cancelled')
     .eq('id', slotId)
-    .eq('exam_type', providerKey)
+    .in('exam_type', [providerKey, 'all'])
     .eq('is_cancelled', false)
     .gte('start_time', earliestStart)
     .maybeSingle();
 
-  if (slotError || !slot || slot.booked_count >= slot.capacity) {
+  if (
+    slotError ||
+    !slot ||
+    (slot.exam_type !== providerKey && slot.exam_type !== 'all') ||
+    slot.booked_count >= slot.capacity
+  ) {
     return NextResponse.json(
       { error: 'That appointment is unavailable or does not meet the 24-hour notice requirement.' },
       { status: 409 },

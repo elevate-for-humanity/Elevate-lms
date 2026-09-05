@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, createContext, useContext, ReactNode } from 'react';
-import { ShoppingCart, X, Plus, Minus, Loader2, CreditCard } from 'lucide-react';
+import { ShoppingCart, X, Plus, Minus, Loader2, CreditCard, Check } from 'lucide-react';
 import { useCart } from '@/lib/store/use-cart';
-import { handleTestingCheckout } from '@/lib/store/actions';
 import { addToCart } from '@/lib/store/cart';
 
 // Provider implementation
@@ -21,6 +20,8 @@ interface AddExamToCartButtonProps {
 
 // Add to cart button
 export const AddExamToCartButton = ({ examType, examName, amountCents, active, className }: AddExamToCartButtonProps) => {
+  const [added, setAdded] = useState(false);
+
   const handleAddToCart = () => {
     const product = {
       id: `testing-${examType}-${examName}`.replace(/\s+/g, '-').toLowerCase(),
@@ -35,6 +36,8 @@ export const AddExamToCartButton = ({ examType, examName, amountCents, active, c
       digital: false,
     };
     addToCart(product);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1800);
   };
 
   if (!active) return null;
@@ -44,8 +47,8 @@ export const AddExamToCartButton = ({ examType, examName, amountCents, active, c
       onClick={handleAddToCart}
       className={className ?? 'inline-flex items-center gap-1 border border-brand-red-300 text-brand-red-700 hover:border-brand-red-400 hover:bg-brand-red-50 text-xs font-semibold px-2.5 py-1 rounded-md whitespace-nowrap transition-colors'}
     >
-      <CreditCard className="w-3 h-3" />
-      Add to Cart
+      {added ? <Check className="w-3 h-3" /> : <CreditCard className="w-3 h-3" />}
+      {added ? 'Added to Cart' : 'Add to Cart'}
     </button>
   );
 };
@@ -56,15 +59,22 @@ export default function TestingCart() {
   const [error, setError] = useState<string | null>(null);
 
   const handleCheckout = async () => {
-    setLoading(true);
     setError(null);
-    try {
-      const { url } = await handleTestingCheckout(items);
-      if (url) window.location.href = url;
-    } catch (err) {
-      setError('Checkout failed. Please try again.');
-      setLoading(false);
+    if (items.length !== 1) {
+      setError('Book one exam at a time so each exam has the correct appointment.');
+      return;
     }
+
+    const item = items[0];
+    const providerKeys = ['certiport', 'careersafe', 'workkeys', 'midland', 'esco', 'nrf', 'nha'];
+    const provider = providerKeys.find((key) => item.id.startsWith(`testing-${key}-`));
+    if (!provider) {
+      setError('This exam could not be matched to a testing provider. Remove it and add it again.');
+      return;
+    }
+
+    setLoading(true);
+    window.location.href = `/testing/checkout?provider=${encodeURIComponent(provider)}&exam=${encodeURIComponent(item.name)}`;
   };
 
   if (items.length === 0) {

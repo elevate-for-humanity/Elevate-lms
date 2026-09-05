@@ -10,6 +10,7 @@ const TYPES = new Set([
   'government_id',
   'insurance',
   'epa_608',
+  'state_program_approval',
   'legacy_mou_reference',
   'mou_draft',
 ]);

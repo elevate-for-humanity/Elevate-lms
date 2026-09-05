@@ -107,7 +107,8 @@ const INTEGRATIONS: Integration[] = [
   {
     name: 'Stripe',
     slug: 'stripe',
-    description: 'Payment processing for licensing, course purchases, and subscription billing. Klarna, Afterpay, Zip, and Cash App Pay enabled.',
+    description:
+      'Payment processing for licensing, course purchases, and subscription billing. Klarna, Afterpay, Zip, and Cash App Pay enabled.',
     icon: CreditCard,
     category: 'payments',
     envVars: ['STRIPE_SECRET_KEY', 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'STRIPE_WEBHOOK_SECRET'],
@@ -117,7 +118,8 @@ const INTEGRATIONS: Integration[] = [
   {
     name: 'Affirm',
     slug: 'affirm',
-    description: 'Standalone BNPL — monthly installment financing at 0–36% APR over 3–36 months. No Stripe required.',
+    description:
+      'Standalone BNPL — monthly installment financing at 0–36% APR over 3–36 months. No Stripe required.',
     icon: CreditCard,
     category: 'payments',
     envVars: ['AFFIRM_PUBLIC_KEY', 'AFFIRM_PRIVATE_KEY'],
@@ -183,11 +185,12 @@ const INTEGRATIONS: Integration[] = [
     name: 'LTI 1.3',
     slug: 'lti',
     description:
-      'Learning Tools Interoperability foundation. The database contract exists, but the production endpoints must be restored and certified before this can be marked active.',
+      'Direct LTI 1.3 is not production-active. Platform registration records exist, but Core launch, key management, Names and Roles, and grade services must pass external certification before activation.',
     icon: GraduationCap,
     category: 'learning',
-    envVars: ['LTI_TOOL_URL', 'LTI_PLATFORM_JWKS_URI', 'LTI_CLIENT_ID'],
+    envVars: [],
     status: 'not_configured',
+    configUrl: '/partners/lms-integrations',
     docsUrl: 'https://www.imsglobal.org/spec/lti/v1p3/',
   },
   {
@@ -264,8 +267,8 @@ export default async function AdminIntegrationsPage() {
             <p className="text-sm font-semibold text-slate-900">Environment Manager</p>
             <p className="mt-0.5 text-xs text-slate-600">
               API keys (Groq, OpenAI, Stripe, Supabase, email) stored in{' '}
-              <code className="rounded bg-white px-1">platform_settings</code> — powers Ellie, course
-              builder, and integrations below.
+              <code className="rounded bg-white px-1">platform_settings</code> — powers Ellie,
+              course builder, and integrations below.
             </p>
           </div>
           <span className="inline-flex items-center gap-1 text-sm font-medium text-brand-blue-700">

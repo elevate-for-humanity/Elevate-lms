@@ -42,16 +42,24 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
 
   const provider = new URL(request.url).searchParams.get('provider');
+  if (!provider) return safeError('Provider is required', 400);
   logger.info(`[integrations] sync triggered for provider=${provider} by user=${auth.id}`);
 
   const db = await requireAdminClient();
   if (!db) return safeError('Service unavailable', 503);
 
-  // Update last sync timestamp
-  await db
+  const { data: integration, error } = await db
     .from('integrations')
-    .update({ updated_at: new Date().toISOString() })
-    .eq('slug', provider ?? '');
-
-  return NextResponse.json({ success: true, message: `Sync triggered for ${provider}` });
+    .select('id,slug,status,is_active')
+    .eq('slug', provider)
+    .maybeSingle();
+  if (error) return safeDbError(error, 'Failed to inspect integration');
+  if (!integration) return safeError('Integration is not configured', 404);
+  if (integration.status !== 'active' || integration.is_active !== true) {
+    return safeError('Integration must be connected and verified before synchronization', 409);
+  }
+  return NextResponse.json(
+    { success: false, error: `No production sync adapter is registered for ${provider}` },
+    { status: 501 },
+  );
 }

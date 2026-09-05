@@ -9,9 +9,9 @@ export async function POST(request: Request) {
   if (ctx.mode !== 'holder')
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   const body = await request.json().catch(() => ({}));
-  const types = ['handbook', 'rights'].filter((type) => body[type] === true);
-  if (types.length !== 2)
-    return NextResponse.json({ error: 'Both acknowledgements are required.' }, { status: 400 });
+  const types = ['handbook', 'rights', 'non_compete'].filter((type) => body[type] === true);
+  if (types.length !== 3)
+    return NextResponse.json({ error: 'All three acknowledgements are required.' }, { status: 400 });
   const requestHeaders = await headers();
   for (const documentType of types) {
     const { data: existing } = await ctx.db

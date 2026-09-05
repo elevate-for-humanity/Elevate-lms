@@ -3,7 +3,8 @@
 import { ParisFloatingButton } from './ParisFloatingButton';
 
 export type ParisLearnerContext = {
-  surface?: 'public' | 'learner';
+  surface?: 'public' | 'learner' | 'portal';
+  portalRole?: string | null;
   courseTitle?: string | null;
   nextLessonTitle?: string | null;
   courseProgress?: number | null;

@@ -28,7 +28,7 @@ export function ProgramHolderStudentCloseoutForm({ enrollments }: { enrollments:
     <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
       <h2 className="text-xl font-black">Student graduation closeout</h2>
       <p className="mt-1 text-sm text-slate-700">
-        Document the full hands-on record before that student’s payment can be released.
+        Complete and certify the WorkOne record for every current or previously graduated student. Program Holder funds remain blocked until all back work is complete.
       </p>
       <form action={submit} className="mt-5 grid gap-4 md:grid-cols-2">
         <label className="text-sm font-bold">
@@ -51,7 +51,7 @@ export function ProgramHolderStudentCloseoutForm({ enrollments }: { enrollments:
           <input
             name="total_hours_completed"
             type="number"
-            min="0.25"
+            min="48"
             max="1000"
             step="0.25"
             required

@@ -35,6 +35,29 @@ function decodeHtml(value: string): string {
     .trim();
 }
 
+/**
+ * Removes Course Builder production directions that may exist in legacy
+ * reading guides or job payloads. These are authoring metadata, never learner
+ * narration. The quality gate remains the final fail-closed boundary.
+ */
+function sanitizeInternalInstructions(value: string): string {
+  return value
+    .replace(
+      /\bApply this to\b[\s\S]{0,1200}?\bchecking the result against the stated objective\.\s*/gi,
+      ' ',
+    )
+    .replace(
+      /\bThe instructor should model one concrete example,?\s*name the decision criteria,?\s*and close clip \d+ with an observable learner action\.\s*/gi,
+      ' ',
+    )
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalizeNarration(value: string): string {
+  return sanitizeInternalInstructions(decodeHtml(value));
+}
+
 function words(value: string): string[] {
   return value.match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g) ?? [];
 }
@@ -80,26 +103,34 @@ function checkpointParts(contentJson: Record<string, unknown>): string[] {
 function uniqueParts(parts: string[]): string[] {
   const seen = new Set<string>();
   return parts.filter((part) => {
-    const normalized = decodeHtml(part);
+    const normalized = normalizeNarration(part);
     if (!normalized || seen.has(normalized)) return false;
     seen.add(normalized);
     return true;
-  }).map(decodeHtml);
+  }).map(normalizeNarration);
 }
 
 /**
  * Expands undersized canonical narration from the lesson's governed content.
  * It never invents filler: HTML, reading-guide instruction, and checkpoint
- * explanations are the only repair sources.
+ * explanations are the only repair sources. Legacy authoring directions are
+ * stripped before any text can become learner-facing narration.
  */
 export function repairInstructionalScript(
   input: InstructionalScriptRepairInput,
 ): InstructionalScriptRepairResult {
   const minimumWordCount = minimumWords(input);
-  const baseScript = decodeHtml(input.baseScript);
+  const decodedBaseScript = decodeHtml(input.baseScript);
+  const baseScript = sanitizeInternalInstructions(decodedBaseScript);
   const baseWordCount = words(baseScript).length;
+  const baseWasSanitized = baseScript !== decodedBaseScript;
   if (baseWordCount >= minimumWordCount) {
-    return { script: baseScript, repaired: false, wordCount: baseWordCount, minimumWordCount };
+    return {
+      script: baseScript,
+      repaired: baseWasSanitized,
+      wordCount: baseWordCount,
+      minimumWordCount,
+    };
   }
 
   const content = record(input.content);
@@ -123,7 +154,7 @@ export function repairInstructionalScript(
   const wordCount = repairedWords.length;
   return {
     script,
-    repaired: wordCount >= minimumWordCount && wordCount > baseWordCount,
+    repaired: script !== decodedBaseScript,
     wordCount,
     minimumWordCount,
   };

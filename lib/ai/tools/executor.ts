@@ -292,7 +292,15 @@ export async function executeRegisteredAITool(
       };
       if (tool.method === 'POST') {
         headers.set('content-type', 'application/json');
-        init.body = JSON.stringify(input);
+        // The registry enforces approval before dispatch. Forward the verified
+        // phrase to endpoints that independently enforce the same boundary.
+        // Without this, approved tools such as OpenHands fail a second time at
+        // their route-level guard even though the executor already approved it.
+        init.body = JSON.stringify(
+          typeof context.confirmationText === 'string'
+            ? { ...input, confirmationText: context.confirmationText }
+            : input,
+        );
       }
       const response = await fetch(url, init);
       const contentType = response.headers.get('content-type') ?? '';

@@ -25,9 +25,24 @@ export default async function RapidsPage() {
   ]);
 
   const rawQueue = actionQueue ?? [];
+  const apprenticeProfileIds = [...new Set(
+    rawQueue
+      .filter((item: any) => item.entity_type === 'apprentice')
+      .map((item: any) => item.payload?.student_id)
+      .filter(Boolean),
+  )] as string[];
+  const { data: apprenticeProfiles } = apprenticeProfileIds.length
+    ? await db.from('profiles').select('id,first_name,last_name,email').in('id', apprenticeProfileIds)
+    : { data: [] };
+  const apprenticeNames = new Map(
+    (apprenticeProfiles ?? []).map((profile: any) => [
+      profile.id,
+      [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() || profile.email,
+    ]),
+  );
   const isQaRow = (item: any) => {
     const payload = item.payload ?? {};
-    const searchable = [payload.name, payload.full_name, payload.email, payload.partner_id]
+    const searchable = [payload.name, payload.full_name, payload.email, apprenticeNames.get(payload.student_id), payload.partner_id]
       .filter(Boolean)
       .join(' ')
       .toLowerCase();
@@ -43,21 +58,6 @@ export default async function RapidsPage() {
   const blockedQueue = queue.filter((item: any) => item.status === 'blocked');
   const hostShopQueue = readyQueue.filter((item: any) => item.entity_type === 'host_shop');
   const apprenticeQueue = readyQueue.filter((item: any) => item.entity_type === 'apprentice');
-  const apprenticeProfileIds = [...new Set(
-    queue
-      .filter((item: any) => item.entity_type === 'apprentice')
-      .map((item: any) => item.payload?.student_id)
-      .filter(Boolean),
-  )] as string[];
-  const { data: apprenticeProfiles } = apprenticeProfileIds.length
-    ? await db.from('profiles').select('id,first_name,last_name,email').in('id', apprenticeProfileIds)
-    : { data: [] };
-  const apprenticeNames = new Map(
-    (apprenticeProfiles ?? []).map((profile: any) => [
-      profile.id,
-      [profile.first_name, profile.last_name].filter(Boolean).join(' ').trim() || profile.email,
-    ]),
-  );
   const stats = [
     { label: 'Verified Host Shops ready', value: hostShopQueue.length, icon: Building2 },
     { label: 'Verified apprentices ready', value: apprenticeQueue.length, icon: GraduationCap },
@@ -75,7 +75,7 @@ export default async function RapidsPage() {
 
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-100 px-5 py-4"><h2 className="font-semibold text-slate-900">Automatic RAPIDS action queue</h2><p className="mt-1 text-xs text-slate-500">Host Shop rows are employer/worksite setup records. Apprentice rows are registration records waiting for sponsor submission.</p></div>
-        {!queue.length ? <p className="py-8 text-center text-sm text-slate-400">No pending automatic RAPIDS actions.</p> : <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-slate-50"><tr>{['Entity','Name / Reference','Action','Created','Status'].map((h) => <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{h}</th>)}</tr></thead><tbody className="divide-y divide-slate-100">{queue.map((item: any) => { const p = item.payload || {}; const name = p.name || p.full_name || p.email || apprenticeNames.get(p.student_id) || p.partner_id || p.enrollment_id || item.entity_id; return <tr key={item.id}><td className="px-4 py-3 font-bold capitalize">{item.entity_type.replace('_',' ')}</td><td className="px-4 py-3">{name}</td><td className="px-4 py-3 font-medium">{item.action_type.replaceAll('_',' ')}</td><td className="px-4 py-3 text-slate-500">{new Date(item.created_at).toLocaleDateString()}</td><td className="px-4 py-3"><span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">{item.status}</span></td></tr>; })}</tbody></table></div>}
+        {!queue.length ? <p className="py-8 text-center text-sm text-slate-400">No pending automatic RAPIDS actions.</p> : <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-slate-50"><tr>{['Entity','Name / Reference','Action','Created','Status'].map((h) => <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{h}</th>)}</tr></thead><tbody className="divide-y divide-slate-100">{queue.map((item: any) => { const p = item.payload || {}; const name = p.name || p.full_name || p.email || apprenticeNames.get(p.student_id) || p.partner_id || `Enrollment ${String(p.enrollment_id || item.entity_id).slice(0, 8)}`; return <tr key={item.id}><td className="px-4 py-3 font-bold capitalize">{item.entity_type.replace('_',' ')}</td><td className="px-4 py-3">{name}</td><td className="px-4 py-3 font-medium">{item.action_type.replaceAll('_',' ')}</td><td className="px-4 py-3 text-slate-500">{new Date(item.created_at).toLocaleDateString()}</td><td className="px-4 py-3"><span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">{item.status}</span></td></tr>; })}</tbody></table></div>}
       </section>
 
       <RapidsExportClient />

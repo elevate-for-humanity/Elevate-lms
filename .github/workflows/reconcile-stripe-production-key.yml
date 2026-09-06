@@ -1,0 +1,22 @@
+name: Reconcile Stripe production key
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    name: Validate and synchronize Stripe production key
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      EXPECTED_STRIPE_ACCOUNT_ID: acct_1OKSVyH4a2yrVOt5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate active account and reconcile canonical stores
+        run: node scripts/ops/reconcile-stripe-production-key.mjs

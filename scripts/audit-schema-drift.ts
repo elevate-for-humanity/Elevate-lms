@@ -235,14 +235,14 @@ function parseMigrations(migrationsDir: string): TableSchema {
       }
     }
 
-    const addRe = /ALTER\s+TABLE\s+(?:public\.)?(\w+)\s+ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?"?(\w+)"?\s+\w/gi;
+    const addRe = /ALTER\s+TABLE\s+(?:public\.)?"?(\w+)"?\s+ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?"?(\w+)"?\s+\w/gi;
     while ((m = addRe.exec(sql)) !== null) {
       const t = m[1].toLowerCase();
       if (!schema.has(t)) schema.set(t, new Set());
       schema.get(t)!.add(m[2].toLowerCase());
     }
 
-    const multiRe = /ALTER\s+TABLE\s+(?:public\.)?(\w+)\s*\n([\s\S]*?)(?=;\s*\n|ALTER\s+TABLE|CREATE\s+)/gi;
+    const multiRe = /ALTER\s+TABLE\s+(?:public\.)?"?(\w+)"?\s*\n([\s\S]*?)(?=;\s*\n|ALTER\s+TABLE|CREATE\s+)/gi;
     while ((m = multiRe.exec(sql)) !== null) {
       const t = m[1].toLowerCase();
       const blockRe = /ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?"?(\w+)"?\s+\w/gi;

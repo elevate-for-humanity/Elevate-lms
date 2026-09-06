@@ -205,7 +205,7 @@ function CourseCatalog({
         ? `/api/admin/courses/${course.id}/clone`
         : action === 'publish'
           ? '/api/admin/course-builder'
-          : `/api/admin/lms/courses/${course.id}`;
+          : `/api/admin/courses/${course.id}`;
       const response = await fetch(endpoint, {
         method: action === 'delete' ? 'DELETE' : action === 'unpublish' ? 'PATCH' : 'POST',
         ...(action === 'publish'
@@ -216,7 +216,7 @@ function CourseCatalog({
           : action === 'unpublish'
           ? {
               headers: courseBuilderJsonHeaders(`course-unpublish:${course.id}`),
-              body: JSON.stringify({ status: 'draft' }),
+              body: JSON.stringify({ status: 'draft', is_published: false }),
             }
           : {}),
       });

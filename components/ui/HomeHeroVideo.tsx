@@ -36,7 +36,7 @@ interface HomeHeroSlide {
   focalClass: string;
 }
 
-const HOME_SLIDE_SECONDS = 4;
+const HOME_SLIDE_SECONDS = 5;
 const SALON_EDITORIAL_GRADE = 'contrast-[1.05] saturate-[1.06] sepia-[0.04]';
 const DEPLOYED_COMMIT_SHA = process.env.NEXT_PUBLIC_GIT_SHA?.trim();
 
@@ -50,8 +50,8 @@ const HOME_NARRATION =
 const HOME_SLIDES: HomeHeroSlide[] = [
   {
     type: 'image',
-    src: '/images/partners/salon-saloon/team-sign.webp',
-    alt: 'Salon Saloon professional team gathered inside their modern salon',
+    src: '/images/partners/salon-saloon/team-interior.webp',
+    alt: 'Salon Saloon professional team inside their South Bend salon',
     label: 'Join a polished professional salon community',
     description:
       'Build your career alongside a polished salon team with workplace guidance and measurable progress.',
@@ -70,9 +70,9 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/salon-saloon/team-interior.webp',
-    alt: 'Salon Saloon team inside their participating apprenticeship salon',
-    label: 'Train with working professionals in a real salon',
+    src: '/images/partners/cals-kutz-official.webp',
+    alt: 'Cals Kutz Studio participating apprenticeship barbershop',
+    label: 'Build skills with local barber professionals',
     description:
       'Explore structured apprenticeships connected to participating local shops, experienced professionals, and supervised workplace learning.',
     exposureClass: 'brightness-[1.12]',
@@ -80,9 +80,9 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/salon-saloon/team-studio.webp',
-    alt: 'Salon Saloon professionals gathered inside their modern studio',
-    label: 'Grow with a professional salon team',
+    src: '/images/partners/razors-image-storefront-2026.jpg',
+    alt: "Razor's Image Barbershop storefront in Bloomington, Indiana",
+    label: 'Find participating shops across Indiana',
     description:
       'Train in a polished workplace where apprentices learn service, teamwork, and professional standards.',
     exposureClass: 'brightness-[1.11]',
@@ -90,7 +90,17 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/generations-hair/premium-curls.jpg',
+    src: '/images/partners/b52s-official.webp',
+    alt: "B-52's Barbershop participating apprenticeship host shop",
+    label: 'Learn inside established neighborhood businesses',
+    description:
+      'Connect structured instruction with supervised workplace learning in a participating local shop.',
+    exposureClass: 'brightness-[1.10]',
+    focalClass: 'object-center',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/generations-hair/highlighted-curls-home.webp',
     alt: 'Dimensional curls created by Generations Hair Co',
     label: 'See the professional standard apprentices work toward',
     description:
@@ -100,9 +110,9 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/generations-hair/premium-stylist-at-work.jpg',
-    alt: 'Generations Hair Co stylist working with a client',
-    label: 'Learn beside working beauty professionals',
+    src: '/images/partners/style-and-scissor-salon/contact-card.webp',
+    alt: 'Style and Scissor Salon participating cosmetology host salon',
+    label: 'Connect with a community salon',
     description:
       'Connect theory with supervised client service, workplace routines, and professional expectations.',
     exposureClass: 'brightness-[1.12]',
@@ -110,23 +120,13 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/generations-hair/stylist-at-work.webp',
-    alt: 'Generations Hair Co professional stylist reflected in a salon mirror',
-    label: 'Practice inside a polished workplace',
+    src: '/images/partners/salon-saloon/team-studio.webp',
+    alt: 'Salon Saloon professionals gathered inside their modern studio',
+    label: 'See the professional environment up close',
     description:
       'Build confidence through supervised service, professional routines, and direct workplace experience.',
     exposureClass: 'brightness-[1.11]',
     focalClass: 'object-[center_42%]',
-  },
-  {
-    type: 'image',
-    src: '/images/partners/kountry-kutz/interior-empty.webp',
-    alt: 'Kountry Kutz Barbershop interior prepared for clients and apprentice training',
-    label: 'Train inside a working local barbershop',
-    description:
-      'Build barbering skills at professional stations inside a participating apprenticeship host shop.',
-    exposureClass: 'brightness-[1.10]',
-    focalClass: 'object-center',
   },
 ];
 
@@ -188,9 +188,6 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       role="region"
       aria-roledescription="carousel"
       aria-label="Elevate for Humanity homepage highlights"
-      data-scroll-narration
-      data-narration={HOME_NARRATION}
-      data-narration-src={revisionedHeroAsset('/audio/narration/home-hero.mp3')}
     >
       <div className="mx-auto grid max-w-7xl items-center gap-8 py-0 sm:py-10 lg:grid-cols-[0.84fr_1.16fr] lg:gap-12 lg:px-8 lg:py-12">
         <div className="relative z-20 order-1 px-4 pb-8 pt-8 sm:px-6 sm:pb-4 sm:pt-0 lg:px-0">
@@ -235,6 +232,8 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
 
         <div className="relative order-2 w-full overflow-hidden bg-[#f4f1ec]">
           <HeroVideo
+            voiceoverSrc={revisionedHeroAsset('/audio/narration/home-hero.mp3')}
+            transcript={HOME_NARRATION}
             demoSlides={slides.map((candidate) => ({
               src: revisionedHeroAsset(candidate.src),
               alt: candidate.alt,
@@ -246,7 +245,8 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             heightClassName="h-[clamp(300px,46svh,480px)] sm:h-[clamp(380px,54svh,560px)] lg:h-[clamp(400px,62vh,680px)]"
             mediaClassName={SALON_EDITORIAL_GRADE}
             overlayMode="none"
-            showSoundControl={false}
+            showSoundControl
+            soundButtonVariant="prominent"
             showTranscriptControl={false}
           />
           {slides.length > 1 ? (

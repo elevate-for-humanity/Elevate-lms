@@ -15,6 +15,7 @@ import {
   type PriorityItem,
 } from '@/lib/admin/priority-score';
 import { getSystemHealth } from './dashboard/get-system-health';
+import { isTestOrSuspiciousPayment } from './dashboard/format-metrics';
 
 function n(value: unknown): number {
   const parsed = Number(value ?? 0);
@@ -217,6 +218,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     recentPayments.push({ id: row.id, email: null, amountCents: dollarsToCents(row.amount_paid), label: 'Barber recurring', source: 'barber_recurring', paidAt: row.payment_date ?? row.created_at });
   }
   recentPayments.sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime());
+  const verifiedRecentPayments = recentPayments.filter((payment) => !isTestOrSuspiciousPayment(payment));
 
   if (revenueAllTimeRes.error || revenueThisMonthRes.error) {
     if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
@@ -328,7 +330,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     counts,
     revenueAllTimeCents,
     totalStudents: studentsRes.error ? 0 : studentsRes.count ?? 0,
-    recentPayments: recentPayments.slice(0, 10),
+    recentPayments: verifiedRecentPayments.slice(0, 10),
     operational: {
       needsReview: pendingApplications.length,
       needsReviewDetail: `${pendingApplications.length} applications awaiting review`,

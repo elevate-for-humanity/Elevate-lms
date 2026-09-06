@@ -192,6 +192,7 @@ export async function streamPlatformChat(
 export async function streamExecuteCommand(
   command: string,
   onLine: (text: string) => void,
+  agent: StudioSpecialist = 'LIZZY',
 ): Promise<void> {
   const isSmoke = /smoke.?test|health.?check|check.*platform/i.test(command);
   const res = await fetch(
@@ -201,7 +202,7 @@ export async function streamExecuteCommand(
       : {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ command }),
+          body: JSON.stringify({ command, agent }),
         },
   );
   if (!res.ok || !res.body) {

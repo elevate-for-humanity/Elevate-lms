@@ -42,6 +42,11 @@ type CreditState = {
   metered?: boolean;
   credits?: { balance?: number };
 };
+type HealthState = {
+  status: 'healthy' | 'degraded' | 'unavailable';
+  checks: Array<{ name: string; passed: boolean; message: string }>;
+  checkedAt: string;
+};
 
 const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'courses', label: 'Courses', icon: BookOpen },
@@ -58,6 +63,7 @@ export default function UnifiedCourseBuilder() {
   const [courseId, setCourseId] = useState('');
   const [blueprints, setBlueprints] = useState<BlueprintRow[]>([]);
   const [creditState, setCreditState] = useState<CreditState | null>(null);
+  const [health, setHealth] = useState<HealthState | null>(null);
 
   const selectedCourse = useMemo(
     () => courses.find((course) => course.id === courseId) ?? null,
@@ -82,6 +88,10 @@ export default function UnifiedCourseBuilder() {
       .then((response) => response.json())
       .then((data) => setCreditState(data))
       .catch(() => setCreditState(null));
+    fetch('/api/admin/courses/health', { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((data) => setHealth(data?.checks ? data : null))
+      .catch(() => setHealth(null));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (tab !== 'blueprints' || blueprints.length) return;
@@ -147,6 +157,27 @@ export default function UnifiedCourseBuilder() {
       </div>
 
       <main className="mx-auto max-w-[1600px] p-4">
+        {health ? (
+          <section
+            aria-label="Course Builder health"
+            className={`mb-4 rounded-xl border p-4 ${health.status === 'healthy' ? 'border-emerald-700 bg-emerald-950/40' : 'border-amber-700 bg-amber-950/40'}`}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-bold text-white">Course Builder health: {health.status}</h2>
+              <span className="text-xs text-slate-400">Checked {new Date(health.checkedAt).toLocaleString()}</span>
+            </div>
+            <ul className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+              {health.checks.map((check) => (
+                <li key={check.name} className="rounded-lg bg-slate-950/60 p-3 text-sm">
+                  <div className={check.passed ? 'font-bold text-emerald-300' : 'font-bold text-amber-300'}>
+                    {check.passed ? 'Ready' : 'Needs attention'} · {check.name}
+                  </div>
+                  <p className="mt-1 text-slate-300">{check.message}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
         {tab === 'courses' && (
           <CourseCatalog
             courses={courses}

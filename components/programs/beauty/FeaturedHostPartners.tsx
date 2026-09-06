@@ -41,23 +41,72 @@ export default function FeaturedHostPartners({
         })
       : matchingShops;
 
-  if (!shops.length) return null;
+  if (!shops.length) {
+    const pathway = programLabel(programSlug ?? 'beauty-apprenticeship');
+    const image =
+      programSlug === 'esthetician-apprenticeship'
+        ? '/images/beauty/esthetics-hero.webp'
+        : '/images/pages/nail-tech-hero.webp';
+    return (
+      <section
+        id="host-shops"
+        className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+      >
+        <div className="grid lg:grid-cols-2 lg:items-stretch">
+          <div className="relative min-h-[280px] bg-slate-100 lg:min-h-[420px]">
+            <Image
+              src={image}
+              alt={`${pathway} supervised workplace training`}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
+          <div className="flex flex-col justify-center p-7 sm:p-10">
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
+              {pathway} Host Shops
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+              Placement is matched and verified before training begins.
+            </h2>
+            <p className="mt-4 leading-7 text-slate-700">
+              No public Host Shop is currently assigned to this pathway. Elevate confirms occupation
+              approval, supervisor qualifications, location, and available placement before
+              presenting a shop to an applicant.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/apply/student"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-brand-red-700"
+              >
+                Apply for this pathway
+              </Link>
+              <Link
+                href="/partners/host-shops"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border-2 border-brand-blue-700 px-5 py-2.5 text-sm font-extrabold text-brand-blue-900 hover:bg-sky-50"
+              >
+                Become a Host Shop
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
-      {programSlug !== 'cosmetology-apprenticeship' ? (
-        <HostShopShowcase
-          shops={shops}
-          enableNarration={programSlug !== 'barber-apprenticeship'}
-          mediaOverrides={{
-            'generations-hair-llc': {
-              src: '/images/partners/generations-hair/highlighted-curls-home.webp',
-              alt: 'Highlighted dimensional curls created by Generations Hair LLC in Martinsville, Indiana',
-              kind: 'photo',
-            },
-          }}
-        />
-      ) : null}
+      <HostShopShowcase
+        shops={shops}
+        enableNarration={programSlug !== 'barber-apprenticeship'}
+        mediaOverrides={{
+          'generations-hair-llc': {
+            src: '/images/partners/generations-hair/highlighted-curls-home.webp',
+            alt: 'Highlighted dimensional curls created by Generations Hair LLC in Martinsville, Indiana',
+            kind: 'photo',
+          },
+        }}
+      />
 
       {showDirectory ? (
         <section

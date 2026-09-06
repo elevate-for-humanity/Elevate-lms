@@ -5,6 +5,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { Building2, Clock, CheckCircle, XCircle, Eye, Send } from 'lucide-react';
 import ResendOnboardingButton from './ResendOnboardingButton';
+import { OpenPortalPreviewButton } from '@/components/admin/OpenPortalPreviewButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -165,6 +166,7 @@ export default async function AdminProgramHoldersPage() {
                             Review
                           </Link>
                           <ResendOnboardingButton holderId={h.id} />
+                          {h.user_id ? <OpenPortalPreviewButton targetUserId={h.user_id} label="Open Portal" reason={`Admin review of Program Holder ${h.id}`} /> : null}
                         </div>
                       </td>
                     </tr>

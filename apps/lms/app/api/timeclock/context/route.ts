@@ -5,6 +5,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
+import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,10 +22,31 @@ async function _GET(request: NextRequest) {
 
   const { data: apprentice } = await db
     .from('apprentices')
-    .select('id, user_id, program_id, shop_id, employer_id')
+    .select('id, user_id, program_id, shop_id, employer_id, created_at')
     .eq('user_id', subject.userId)
     .maybeSingle();
   const apprenticeSiteScopeId = apprentice?.shop_id || apprentice?.employer_id || null;
+  const { data: identityDocuments } = apprentice
+    ? await db
+        .from('documents')
+        .select('document_type,status,verification_status,verified,metadata')
+        .eq('user_id', subject.userId)
+        .eq('document_type', 'photo_id')
+    : { data: [] };
+  const { data: providerIdentity } = apprentice
+    ? await db
+        .from('id_verifications')
+        .select('id')
+        .eq('user_id', subject.userId)
+        .in('status', ['approved', 'verified'])
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
+  const identity = evaluateIdentityClockEligibility(
+    apprentice?.created_at,
+    identityDocuments || [],
+    Boolean(providerIdentity),
+  );
 
   // The action endpoint validates apprentice_sites.id, so the context must
   // return that same canonical site identity. Returning shops.id here makes the
@@ -87,13 +109,24 @@ async function _GET(request: NextRequest) {
     allowedSites,
     hoursCompleted,
     hoursRequired: getApprenticeshipRequiredHours(enrollment?.program_slug ?? null) ?? 0,
-    activeShift,
-    canClock: Boolean(apprentice && allowedSites.length && !subject.previewing),
+    activeShift: activeShift
+      ? {
+          entryId: activeShift.id,
+          clockInAt: activeShift.clock_in_at,
+          lunchStartAt: activeShift.lunch_start_at,
+          lunchEndAt: activeShift.lunch_end_at,
+          siteId: activeShift.site_id,
+        }
+      : null,
+    canClock: Boolean(apprentice && allowedSites.length && identity.eligible && !subject.previewing),
+    identityVerification: identity,
     previewing: subject.previewing,
     configurationMessage: !apprentice
       ? 'Apprentice record is not configured.'
       : !allowedSites.length
         ? 'Host Shop geofence coordinates must be verified before clock-in is enabled.'
+        : !identity.eligible
+          ? 'Complete secure ID and selfie verification before clock-in is enabled.'
         : subject.previewing
           ? 'Admin preview is read-only. The learner can clock in from their own account at the verified Host Shop.'
           : null,

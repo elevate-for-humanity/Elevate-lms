@@ -9,6 +9,7 @@ import { checkBarberSuspension } from '@/lib/barber/suspension';
 import { sendEmail } from '@/lib/email/service';
 import { emitEvent } from '@/lib/events/emit';
 import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-entries';
+import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
 
 const MAX_ACCURACY_M = 50;
 const LUNCH_DURATION_MINUTES = 60;
@@ -184,7 +185,7 @@ async function _POST(request: NextRequest) {
 
     const { data: apprentice } = await db
       .from('apprentices')
-      .select('id, employer_id, shop_id')
+      .select('id, employer_id, shop_id, created_at')
       .eq('user_id', user.id)
       .eq('status', 'active')
       .maybeSingle();
@@ -194,6 +195,40 @@ async function _POST(request: NextRequest) {
     }
     if (apprentice_id && apprentice_id !== apprentice.id) {
       return NextResponse.json({ error: 'Forbidden: apprentice_id does not match authenticated user' }, { status: 403 });
+    }
+
+    // Enforce identity at the mutation boundary. Existing open shifts may still
+    // be closed safely; the gate applies when starting a new shift.
+    if (action === 'clock_in') {
+      const { data: identityDocuments } = await db
+        .from('documents')
+        .select('document_type,status,verification_status,verified,metadata')
+        .eq('user_id', user.id)
+        .eq('document_type', 'photo_id');
+      const { data: providerIdentity } = await db
+        .from('id_verifications')
+        .select('id')
+        .eq('user_id', user.id)
+        .in('status', ['approved', 'verified'])
+        .limit(1)
+        .maybeSingle();
+      const identity = evaluateIdentityClockEligibility(
+        apprentice.created_at,
+        identityDocuments || [],
+        Boolean(providerIdentity),
+      );
+      if (!identity.eligible) {
+        await writeComplianceAlert(db, 'identity_verification_required', {
+          apprentice_id: apprentice.id,
+          action,
+          verification_basis: identity.basis,
+          timestamp: new Date().toISOString(),
+        });
+        return NextResponse.json(
+          { error: 'Complete secure ID and selfie verification before clock-in.', code: 'IDENTITY_VERIFICATION_REQUIRED' },
+          { status: 403 },
+        );
+      }
     }
 
     let resolvedProgramId = program_id ?? null;

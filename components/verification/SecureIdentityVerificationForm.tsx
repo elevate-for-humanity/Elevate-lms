@@ -38,7 +38,7 @@ const EMPTY_FIELDS: IdentityFields = {
 const FILE_ACCEPT = 'image/jpeg,image/png,image/webp';
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 
-export function SecureIdentityVerificationForm() {
+export function SecureIdentityVerificationForm({ providerVerified = false }: { providerVerified?: boolean }) {
   const router = useRouter();
   const [fields, setFields] = useState<IdentityFields>(EMPTY_FIELDS);
   const [idFront, setIdFront] = useState<File | null>(null);
@@ -83,7 +83,7 @@ export function SecureIdentityVerificationForm() {
       setError('Enter your complete 9-digit Social Security number.');
       return;
     }
-    if (!idFront || !selfie || (fields.idType !== 'passport' && !idBack)) {
+    if (!providerVerified && (!idFront || !selfie || (fields.idType !== 'passport' && !idBack))) {
       setError(
         'Upload the front of your government-issued ID, the back unless you are using a passport, and a clear selfie.',
       );
@@ -94,9 +94,9 @@ export function SecureIdentityVerificationForm() {
     try {
       const body = new FormData();
       Object.entries(fields).forEach(([key, value]) => body.append(key, value));
-      body.append('idFront', idFront);
+      if (idFront) body.append('idFront', idFront);
       if (idBack) body.append('idBack', idBack);
-      body.append('selfie', selfie);
+      if (selfie) body.append('selfie', selfie);
 
       const response = await fetch('/api/verification/submit', {
         method: 'POST',
@@ -129,7 +129,7 @@ export function SecureIdentityVerificationForm() {
         </div>
       ) : null}
 
-      <section className="rounded-xl border border-slate-300 bg-white p-5 sm:p-6">
+      {!providerVerified ? <section className="rounded-xl border border-slate-300 bg-white p-5 sm:p-6">
         <h2 className="text-xl font-black text-slate-950">Legal identity</h2>
         <p className="mt-2 text-sm leading-6 text-slate-700">
           Enter the information exactly as it appears on your government records.
@@ -173,7 +173,11 @@ export function SecureIdentityVerificationForm() {
             </p>
           </div>
         </div>
-      </section>
+      </section> : (
+        <div className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm font-bold text-emerald-950">
+          Your government ID and live selfie match are verified. Complete the protected enrollment record below; no identity images need to be uploaded again.
+        </div>
+      )}
 
       <section className="rounded-xl border border-slate-300 bg-white p-5 sm:p-6">
         <h2 className="text-xl font-black text-slate-950">Current address</h2>

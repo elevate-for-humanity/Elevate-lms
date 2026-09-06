@@ -70,6 +70,15 @@ export async function POST(request: NextRequest) {
     const idBack = form.get('idBack');
     const selfie = form.get('selfie');
     const passport = idType === 'passport';
+    const db = await requireAdminClient();
+    const { data: providerVerification } = await db
+      .from('id_verifications')
+      .select('id')
+      .eq('user_id', user.id)
+      .in('status', ['approved', 'verified'])
+      .limit(1)
+      .maybeSingle();
+    const providerVerified = Boolean(providerVerification);
 
     if (!firstName || !lastName || !dateOfBirth || !streetAddress || !city || !state || !zipCode || !idType) {
       return NextResponse.json({ error: 'Complete all required identity fields.' }, { status: 400 });
@@ -77,7 +86,7 @@ export async function POST(request: NextRequest) {
     if (!isValidSSN(ssn)) {
       return NextResponse.json({ error: 'Enter a valid 9-digit Social Security number.' }, { status: 400 });
     }
-    if (!validImageFile(idFront) || !validImageFile(selfie) || (!passport && !validImageFile(idBack))) {
+    if (!providerVerified && (!validImageFile(idFront) || !validImageFile(selfie) || (!passport && !validImageFile(idBack)))) {
       return NextResponse.json(
         { error: 'Upload a valid ID front, required ID back, and selfie. Images must be JPG, PNG, or WEBP and no larger than 10 MB each.' },
         { status: 400 },
@@ -90,18 +99,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unable to securely store identity information. Please try again.' }, { status: 500 });
     }
 
-    const db = await requireAdminClient();
+    if (providerVerified) {
+      return NextResponse.json({
+        success: true,
+        verification: { status: 'verified', ssnOnFile: true, documents: [] },
+      });
+    }
+
+    // The validation above guarantees these file types for the staff-review fallback.
+    const verifiedIdFront = idFront as File;
+    const verifiedSelfie = selfie as File;
+
     const nonce = Date.now();
     const uploads: Array<{ kind: 'front' | 'back' | 'selfie'; file: File; path: string }> = [
       {
         kind: 'front',
-        file: idFront,
-        path: `${user.id}/identity/id-front-${nonce}.${extensionFor(idFront)}`,
+        file: verifiedIdFront,
+        path: `${user.id}/identity/id-front-${nonce}.${extensionFor(verifiedIdFront)}`,
       },
       {
         kind: 'selfie',
-        file: selfie,
-        path: `${user.id}/identity/selfie-${nonce}.${extensionFor(selfie)}`,
+        file: verifiedSelfie,
+        path: `${user.id}/identity/selfie-${nonce}.${extensionFor(verifiedSelfie)}`,
       },
     ];
     if (validImageFile(idBack)) {
@@ -205,7 +224,7 @@ export async function GET(request: NextRequest) {
   const [{ data: docs }, { data: secureIdentity }] = await Promise.all([
     db
       .from('documents')
-      .select('id, document_type, status, verification_status, created_at')
+      .select('id, document_type, status, verification_status, metadata, created_at')
       .eq('user_id', user.id)
       .eq('document_type', 'photo_id')
       .order('created_at', { ascending: false }),
@@ -213,9 +232,18 @@ export async function GET(request: NextRequest) {
   ]);
 
   const rows = docs ?? [];
-  const approved = rows.some((row) =>
-    ['approved', 'verified'].includes(String(row.verification_status || row.status || '').toLowerCase()),
+  const approvedParts = new Set(
+    rows
+      .filter((row) => ['approved', 'verified'].includes(String(row.verification_status || row.status || '').toLowerCase()))
+      .map((row: any) => String(row.metadata?.identity_part || '').toLowerCase())
+      .filter(Boolean),
   );
+  const passport = rows.some(
+    (row: any) =>
+      ['approved', 'verified'].includes(String(row.verification_status || row.status || '').toLowerCase()) &&
+      String(row.metadata?.id_type || '').toLowerCase() === 'passport',
+  );
+  const approved = approvedParts.has('front') && approvedParts.has('selfie') && (passport || approvedParts.has('back'));
 
   return NextResponse.json({
     success: true,

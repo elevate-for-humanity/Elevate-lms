@@ -68,6 +68,19 @@ async function _POST(request: NextRequest) {
     const verifiedAt = new Date().toISOString();
 
     try {
+      if (session.metadata?.purpose === 'learner_identity' && userId) {
+        const { error: learnerError } = await supabase
+          .from('id_verifications')
+          .update({
+            status: 'verified',
+            verified_at: verifiedAt,
+            metadata: { purpose: 'learner_identity', provider_status: session.status },
+          })
+          .eq('stripe_verification_session_id', session.id)
+          .eq('user_id', userId);
+        if (learnerError) processingError = true;
+      }
+
       // Prefer exact match by Stripe verification session ID to avoid cross-updating rows.
       let verifyUpdateError: { message?: string } | null = null;
       const sessionScopedUpdate = await supabase
@@ -114,6 +127,19 @@ async function _POST(request: NextRequest) {
     const failureReason = session.last_error?.reason || 'Verification failed';
 
     try {
+      if (session.metadata?.purpose === 'learner_identity' && userId) {
+        const { error: learnerError } = await supabase
+          .from('id_verifications')
+          .update({
+            status: 'failed',
+            rejection_reason: failureReason,
+            metadata: { purpose: 'learner_identity', provider_status: session.status },
+          })
+          .eq('stripe_verification_session_id', session.id)
+          .eq('user_id', userId);
+        if (learnerError) processingError = true;
+      }
+
       // Prefer exact match by Stripe verification session ID to avoid cross-updating rows.
       let failUpdateError: { message?: string } | null = null;
       const sessionScopedUpdate = await supabase

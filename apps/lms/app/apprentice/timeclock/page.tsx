@@ -517,6 +517,25 @@ export default function TimeclockPage() {
             </div>
           )}
 
+          {/* Eligibility warning (identity or read-only preview) */}
+          {!isClockedIn && context.allowedSites.length > 0 && !context.canClock && (
+            <div className="mb-6 rounded-lg bg-yellow-50 p-4">
+              <div className="flex items-start">
+                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-yellow-600" />
+                <div className="ml-2">
+                  <p className="text-sm text-yellow-800">
+                    {context.configurationMessage || 'Clock-in is not available for this account.'}
+                  </p>
+                  {context.configurationMessage?.includes('ID and selfie') && (
+                    <Link href="/verify-identity" className="mt-2 inline-flex text-sm font-bold text-brand-blue-700 hover:underline">
+                      Complete identity verification
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Location Status */}
           <div className="mb-6 p-4 bg-white rounded-lg">
             <div className="flex items-center justify-between">

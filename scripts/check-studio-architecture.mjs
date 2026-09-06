@@ -62,6 +62,27 @@ for (const invariant of [
     fail(`Studio Browser deployment is missing credit-safe invariant: ${invariant}`);
   }
 }
+
+const browserAgentRoute = read('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+const browserPlanner = read('lib/devstudio/browser-planner.ts');
+for (const forbiddenProviderBypass of [
+  'getOpenAIClient',
+  'OPENAI_COMPUTER_MODEL',
+  'client.responses.create',
+  "from 'openai'",
+]) {
+  if (browserAgentRoute.includes(forbiddenProviderBypass)) {
+    fail(`Studio browser agent bypasses the canonical AI provider: ${forbiddenProviderBypass}`);
+  }
+}
+if (!browserPlanner.includes("providerPolicy: 'owned-only'")) {
+  fail('Studio browser planner is not restricted to Elevate-owned inference');
+}
+for (const providerNeutralInvariant of ['planBrowserTurn', '/snapshot']) {
+  if (!browserAgentRoute.includes(providerNeutralInvariant)) {
+    fail(`Studio browser agent is missing provider-neutral invariant: ${providerNeutralInvariant}`);
+  }
+}
 for (const oversizedImage of [
   'mcr.microsoft.com/playwright',
   'playwright install firefox',

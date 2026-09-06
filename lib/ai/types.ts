@@ -281,6 +281,8 @@ export interface ChatCompletionOptions {
   temperature?: number;
   maxTokens?: number;
   provider?: AIProviderName | string;
+  /** Restrict inference to infrastructure owned and operated by Elevate. */
+  providerPolicy?: 'canonical' | 'owned-only';
   /** Require provider-native JSON output when supported. */
   jsonMode?: boolean;
 }

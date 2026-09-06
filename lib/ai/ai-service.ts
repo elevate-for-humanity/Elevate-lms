@@ -47,25 +47,38 @@ const imageProviders: Record<string, () => AIImageProvider> = {
 // first AI_PROVIDER_ORDER entry remains a migration-compatible way to select
 // that same single authority. Course generation must repair a failed provider,
 // never produce divergent artifacts through a silent provider substitution.
-const PROVIDER_DISCOVERY_ORDER = ['elevate', 'cloudflare', 'groq', 'gemini', 'google', 'anthropic', 'azure', 'openai'];
+const PROVIDER_DISCOVERY_ORDER = [
+  'elevate',
+  'cloudflare',
+  'groq',
+  'gemini',
+  'google',
+  'anthropic',
+  'azure',
+  'openai',
+];
 let discoveredProviderName: string | null = null;
 
 function configuredProviderName(): string {
   const explicit = process.env.AI_PROVIDER?.trim().toLowerCase();
   if (explicit) return explicit;
   if (discoveredProviderName) return discoveredProviderName;
-  const ordered = process.env.AI_PROVIDER_ORDER?.split(',')
-    .map((name) => name.trim().toLowerCase())
-    .filter((name) => name && name !== 'none') ?? [];
-  const candidates = [...ordered, ...PROVIDER_DISCOVERY_ORDER]
-    .filter((name, index, names) => names.indexOf(name) === index);
+  const ordered =
+    process.env.AI_PROVIDER_ORDER?.split(',')
+      .map((name) => name.trim().toLowerCase())
+      .filter((name) => name && name !== 'none') ?? [];
+  const candidates = [...ordered, ...PROVIDER_DISCOVERY_ORDER].filter(
+    (name, index, names) => names.indexOf(name) === index,
+  );
   const discovered = candidates.find((name) => {
     const createProvider = chatProviders[name];
     return Boolean(createProvider && createProvider().isAvailable());
   });
   if (!discovered) return ordered[0] ?? PROVIDER_DISCOVERY_ORDER[0]!;
   discoveredProviderName = discovered;
-  logger.warn(`[aiChat] AI_PROVIDER is not explicitly set; locking this process to discovered provider "${discovered}"`);
+  logger.warn(
+    `[aiChat] AI_PROVIDER is not explicitly set; locking this process to discovered provider "${discovered}"`,
+  );
   return discovered;
 }
 const CIRCUIT_RECOVERY_WAIT_MS = 31_000;
@@ -89,9 +102,12 @@ function isTerminalProviderError(error: unknown): boolean {
 
 function disableProviderForProcess(providerName: string, error: unknown): void {
   disabledChatProviders.add(providerName);
-  logger.warn(`[aiChat] provider "${providerName}" quarantined for this process after terminal credential/billing failure`, {
-    error: error instanceof Error ? error.message : String(error),
-  });
+  logger.warn(
+    `[aiChat] provider "${providerName}" quarantined for this process after terminal credential/billing failure`,
+    {
+      error: error instanceof Error ? error.message : String(error),
+    },
+  );
 }
 
 function configuredDefaultProvider(): string {
@@ -106,16 +122,29 @@ function resolveChatProvider(): AIProvider {
     if (!createProvider) throw new Error(`Unknown AI chat provider: ${preferred}`);
     const provider = createProvider();
     if (provider.isAvailable()) return provider;
-    throw new Error(`Configured AI provider "${preferred}" is unavailable; repair its canonical configuration`);
+    throw new Error(
+      `Configured AI provider "${preferred}" is unavailable; repair its canonical configuration`,
+    );
   }
 
-  throw new Error(`Configured AI provider "${preferred}" is unknown or disabled; repair AI_PROVIDER configuration`);
+  throw new Error(
+    `Configured AI provider "${preferred}" is unknown or disabled; repair AI_PROVIDER configuration`,
+  );
 }
 
 function resolveConfiguredChatProvider(options: ChatCompletionOptions): AIProvider {
+  if (options.providerPolicy === 'owned-only') {
+    const provider = new ElevateProvider();
+    if (provider.isAvailable()) return provider;
+    throw new Error(
+      'Elevate-owned AI is unavailable; repair ELEVATE_LLM_URL / ELEVATE_LLM_SECRET before retrying',
+    );
+  }
   const configured = configuredDefaultProvider();
   if (options.provider && options.provider !== 'none' && options.provider !== configured) {
-    throw new Error(`Provider override "${options.provider}" is not allowed; configured authority is "${configured}"`);
+    throw new Error(
+      `Provider override "${options.provider}" is not allowed; configured authority is "${configured}"`,
+    );
   }
   return resolveChatProvider();
 }
@@ -165,9 +194,12 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
     } catch (error) {
       if (isTerminalProviderError(error)) disableProviderForProcess(provider.name, error);
       if (pass === 0 && allowCircuitRecoveryWait && error instanceof CircuitOpenError) {
-        logger.warn('[aiChat] configured provider attempts ended with an open circuit; waiting for provider recovery window', {
-          waitMs: CIRCUIT_RECOVERY_WAIT_MS,
-        });
+        logger.warn(
+          '[aiChat] configured provider attempts ended with an open circuit; waiting for provider recovery window',
+          {
+            waitMs: CIRCUIT_RECOVERY_WAIT_MS,
+          },
+        );
         await sleep(CIRCUIT_RECOVERY_WAIT_MS);
         provider = resolveConfiguredChatProvider(options);
         continue;
@@ -184,8 +216,13 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
 
 export async function* aiChatStream(options: ChatCompletionOptions): AsyncIterable<string> {
   const provider = resolveChatProvider();
-  if ('chatStream' in provider && typeof (provider as { chatStream?: unknown }).chatStream === 'function') {
-    const streamProvider = provider as { chatStream: (opts: ChatCompletionOptions) => AsyncIterable<string> };
+  if (
+    'chatStream' in provider &&
+    typeof (provider as { chatStream?: unknown }).chatStream === 'function'
+  ) {
+    const streamProvider = provider as {
+      chatStream: (opts: ChatCompletionOptions) => AsyncIterable<string>;
+    };
     yield* streamProvider.chatStream(options);
   } else {
     const result = await provider.chat(options);
@@ -225,7 +262,10 @@ Return ONLY a JSON array, no markdown fences.`,
   });
 
   try {
-    const cleaned = result.content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+    const cleaned = result.content
+      .replace(/```json?\n?/g, '')
+      .replace(/```/g, '')
+      .trim();
     return JSON.parse(cleaned);
   } catch {
     logger.error('Failed to parse quiz generation response');
@@ -255,19 +295,36 @@ Passing threshold is 80%. Be specific in feedback. Return ONLY JSON.`,
   });
 
   try {
-    const cleaned = result.content.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
+    const cleaned = result.content
+      .replace(/```json?\n?/g, '')
+      .replace(/```/g, '')
+      .trim();
     return JSON.parse(cleaned);
   } catch {
-    return { score: 0, maxScore, feedback: 'Unable to grade automatically. Please contact your instructor.', passed: false };
+    return {
+      score: 0,
+      maxScore,
+      feedback: 'Unable to grade automatically. Please contact your instructor.',
+      passed: false,
+    };
   }
 }
 
 export function getActiveProviderName(): string {
-  try { return resolveChatProvider().name; } catch { return 'none'; }
+  try {
+    return resolveChatProvider().name;
+  } catch {
+    return 'none';
+  }
 }
 
 export function isAIAvailable(): boolean {
-  try { resolveChatProvider(); return true; } catch { return false; }
+  try {
+    resolveChatProvider();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function resetProviders(): void {

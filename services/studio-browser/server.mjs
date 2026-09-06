@@ -210,7 +210,33 @@ async function createSession(target, viewport, authCookies = []) {
 async function runAction(session, action) {
   session.lastSeen = Date.now();
   const page = session.page;
-  if (action.type === 'click' || action.type === 'double_click')
+  if (action.type === 'click_ref') {
+    const ref = String(action.ref || '').slice(0, 80);
+    if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
+    await page.locator(`[data-studio-ref="${ref}"]`).first().click({ timeout: 10_000 });
+  } else if (action.type === 'fill_ref') {
+    const ref = String(action.ref || '').slice(0, 80);
+    if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
+    await page
+      .locator(`[data-studio-ref="${ref}"]`)
+      .first()
+      .fill(String(action.text || '').slice(0, 4000), { timeout: 10_000 });
+  } else if (action.type === 'select_ref') {
+    const ref = String(action.ref || '').slice(0, 80);
+    if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
+    await page
+      .locator(`[data-studio-ref="${ref}"]`)
+      .first()
+      .selectOption(String(action.value || '').slice(0, 1000), { timeout: 10_000 });
+  } else if (action.type === 'press_ref') {
+    const ref = String(action.ref || '').slice(0, 80);
+    const key = String(action.key || '').slice(0, 80);
+    if (!key) throw new Error('Browser key is required');
+    if (ref) {
+      if (!/^e\d+$/.test(ref)) throw new Error('Invalid browser control reference');
+      await page.locator(`[data-studio-ref="${ref}"]`).first().press(key, { timeout: 10_000 });
+    } else await page.keyboard.press(key);
+  } else if (action.type === 'click' || action.type === 'double_click')
     await page.mouse.click(Number(action.x), Number(action.y), {
       button: action.button || 'left',
       clickCount: action.type === 'double_click' || action.clickCount === 2 ? 2 : 1,
@@ -338,6 +364,75 @@ export async function auditPage(session) {
   };
 }
 
+export async function snapshotPage(session) {
+  session.lastSeen = Date.now();
+  await session.page
+    .waitForLoadState('domcontentloaded', { timeout: 10_000 })
+    .catch(() => undefined);
+  return session.page.evaluate(() => {
+    const visible = (element) => {
+      const style = window.getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return (
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        rect.width > 0 &&
+        rect.height > 0
+      );
+    };
+    const clean = (value, max = 300) =>
+      String(value || '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, max);
+    const accessibleName = (element) =>
+      clean(
+        element.getAttribute('aria-label') ||
+          element.getAttribute('title') ||
+          element.textContent ||
+          element.getAttribute('placeholder'),
+      );
+    const elements = [
+      ...document.querySelectorAll(
+        'button, a[href], input, select, textarea, [role="button"], [contenteditable="true"]',
+      ),
+    ]
+      .filter(visible)
+      .slice(0, 80);
+    const controls = elements.map((element, index) => {
+      const ref = `e${index + 1}`;
+      element.setAttribute('data-studio-ref', ref);
+      const tag = element.tagName.toLowerCase();
+      const explicitRole = element.getAttribute('role');
+      const role = explicitRole || (tag === 'a' ? 'link' : tag === 'button' ? 'button' : tag);
+      return {
+        ref,
+        role,
+        name: accessibleName(element),
+        type: clean(element.getAttribute('type'), 40) || undefined,
+        value: tag === 'select' ? clean(element.value, 500) : undefined,
+        placeholder: clean(element.getAttribute('placeholder'), 160) || undefined,
+        href: tag === 'a' ? clean(element.href, 1000) : undefined,
+        disabled: Boolean(element.disabled || element.getAttribute('aria-disabled') === 'true'),
+      };
+    });
+    const headings = [...document.querySelectorAll('h1, h2, h3, h4, h5, h6')]
+      .filter(visible)
+      .slice(0, 40)
+      .map((element) => ({
+        level: Number(element.tagName.slice(1)),
+        text: clean(element.textContent, 240),
+      }));
+    return {
+      title: clean(document.title, 300),
+      url: window.location.href,
+      visibleText: clean(document.body?.innerText, 6_000),
+      headings,
+      controls,
+    };
+  });
+}
+
 function scheduleFrame(session, delay = frameIntervalMs) {
   if (session.frameTimer || !session.streams.size || !sessions.has(session.id)) return;
   session.frameTimer = setTimeout(() => {
@@ -426,7 +521,7 @@ const server = http.createServer(async (req, res) => {
       });
     }
     const match = url.pathname.match(
-      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|actions|events|audit))?$/,
+      /^\/sessions\/([^/]+)(?:\/(stream|screenshot|snapshot|actions|events|audit))?$/,
     );
     if (!match) return json(res, 404, { error: 'Not found' });
     const session = sessions.get(match[1]);
@@ -449,6 +544,8 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'GET' && match[2] === 'events')
       return json(res, 200, { events: session.events, url: session.page.url() });
+    if (req.method === 'GET' && match[2] === 'snapshot')
+      return json(res, 200, await snapshotPage(session));
     if (req.method === 'GET' && match[2] === 'audit')
       return json(res, 200, await auditPage(session));
     if (req.method === 'POST' && match[2] === 'actions') {

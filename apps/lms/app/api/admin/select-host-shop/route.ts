@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const shopId = request.nextUrl.searchParams.get('shop_id')?.trim();
   const requestedPartnerId = request.nextUrl.searchParams.get('partner_id')?.trim();
 
-  if (!shopId && !requestedPartnerId) {
+  if (!shopId && !requestedPartnerId && !handoff) {
     return NextResponse.json({ error: 'shop_id or partner_id is required' }, { status: 400 });
   }
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'node:crypto';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { VideoJob } from '@/lib/video/job-queue';
@@ -19,6 +20,7 @@ function renderConcurrency(): number {
 
 interface QueueRequestOptions {
   courseId: string | null;
+  jobId: string | null;
   maxJobs: number | null;
   queueOneDraft: boolean;
 }
@@ -27,16 +29,18 @@ async function requestedOptions(request: NextRequest): Promise<QueueRequestOptio
   try {
     const body = await request.json();
     const value = body && typeof body.courseId === 'string' ? body.courseId.trim() : '';
+    const jobValue = body && typeof body.jobId === 'string' ? body.jobId.trim() : '';
     const requestedMax = Number(body?.maxJobs);
     return {
       courseId: value || null,
+      jobId: jobValue || null,
       maxJobs: Number.isFinite(requestedMax)
         ? Math.max(1, Math.min(Math.trunc(requestedMax), 4))
         : null,
       queueOneDraft: body?.queueOneDraft === true,
     };
   } catch {
-    return { courseId: null, maxJobs: null, queueOneDraft: false };
+    return { courseId: null, jobId: null, maxJobs: null, queueOneDraft: false };
   }
 }
 
@@ -46,10 +50,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { courseId, maxJobs, queueOneDraft } = await requestedOptions(request);
+  const { courseId, jobId, maxJobs, queueOneDraft } = await requestedOptions(request);
   if (queueOneDraft && (!courseId || maxJobs !== 1)) {
     return NextResponse.json(
       { error: 'queueOneDraft requires an exact courseId and maxJobs=1' },
+      { status: 400 },
+    );
+  }
+  if (jobId && (!queueOneDraft || !courseId || maxJobs !== 1)) {
+    return NextResponse.json(
+      { error: 'jobId requires an exact courseId, queueOneDraft=true, and maxJobs=1' },
       { status: 400 },
     );
   }
@@ -194,7 +204,31 @@ export async function POST(request: NextRequest) {
   // Postgres owns the concurrency boundary. FOR UPDATE SKIP LOCKED prevents
   // separate Admin instances from rendering the same canonical asset.
   let claimedRows: VideoJob[] = [];
-  if (courseId) {
+  if (courseId && jobId) {
+    const claimedAt = new Date();
+    const { data: claimed, error: claimError } = await db
+      .from('video_jobs')
+      .update({
+        status: 'rendering',
+        started_at: claimedAt.toISOString(),
+        completed_at: null,
+        heartbeat_at: claimedAt.toISOString(),
+        lease_token: randomUUID(),
+        lease_expires_at: new Date(claimedAt.getTime() + 900_000).toISOString(),
+        updated_at: claimedAt.toISOString(),
+      })
+      .eq('id', jobId)
+      .eq('course_id', courseId)
+      .eq('status', 'queued')
+      .is('dead_lettered_at', null)
+      .select('*')
+      .maybeSingle();
+    if (claimError) {
+      logger.error('[video-worker] Exact queue claim failed', claimError, { courseId, jobId });
+      return NextResponse.json({ error: 'Unable to claim the requested video job' }, { status: 500 });
+    }
+    if (claimed) claimedRows = [claimed as VideoJob];
+  } else if (courseId) {
     const { data, error: claimError } = await db.rpc('claim_video_jobs', {
       p_limit: availableSlots,
       p_course_id: courseId,

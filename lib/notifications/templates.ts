@@ -34,7 +34,8 @@ export type TemplateKey =
   | 'provider_approved'
   | 'compliance_expiring'
   | 'program_approved'
-  | 'program_rejected';
+  | 'program_rejected'
+  | 'portal_completion_reminder';
 
 const BRAND_COLOR = '#7c3aed';
 const SUPPORT_EMAIL = PLATFORM_DEFAULTS.supportEmail;
@@ -70,6 +71,21 @@ function button(text: string, url: string): string {
 
 export function getTemplate(key: TemplateKey, data: Record<string, any>): EmailTemplate {
   switch (key) {
+    case 'portal_completion_reminder': {
+      const portalUrl = data.portal_url || `${PLATFORM_DEFAULTS.siteUrl}/login`;
+      const action = data.next_action || 'complete the remaining portal requirements';
+      return {
+        subject: `Action needed: ${action}`,
+        html: baseTemplate(`
+          <h2 style="color: ${BRAND_COLOR};">Your portal checklist needs attention</h2>
+          <p>Hi ${data.name || 'there'},</p>
+          <p>Your next required step is to <strong>${action}</strong>.</p>
+          <p>These reminders stop automatically when the portal records the requirement as complete.</p>
+          ${button('Open Your Portal →', portalUrl)}
+        `),
+        text: `Your portal checklist needs attention\n\nHi ${data.name || 'there'},\n\nYour next required step is to ${action}. These reminders stop automatically when the portal records it as complete.\n\nOpen your portal: ${portalUrl}`,
+      };
+    }
     case 'theory_schedule_start': {
       const dashboardUrl = data.dashboard_url || `${PLATFORM_DEFAULTS.siteUrl}/apprentice`;
       return {

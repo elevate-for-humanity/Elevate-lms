@@ -10,6 +10,8 @@ export type CatalogMicrocourse = {
   description: string | null;
   category: string;
   duration_hours: number | null;
+  is_free: boolean;
+  provider_enrollment_url: string | null;
   retail_price_cents: number;
   currency: string;
   microcourse_providers: { display_name: string } | null;
@@ -51,6 +53,7 @@ export default function MicrocourseCart({ courses }: { courses: CatalogMicrocour
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {courses.map((course) => {
           const selected = cart.includes(course.slug);
+          const isFree = course.is_free;
           return (
             <article key={course.id} className="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <p className="text-sm font-semibold text-blue-700">{course.microcourse_providers?.display_name}</p>
@@ -58,19 +61,21 @@ export default function MicrocourseCart({ courses }: { courses: CatalogMicrocour
               <p className="mt-3 flex-1 text-slate-600">{course.description}</p>
               <div className="mt-5 flex items-end justify-between gap-4">
                 <div>
-                  <p className="text-2xl font-black">{money(course.retail_price_cents, course.currency)}</p>
-                  <p className="text-xs text-slate-500">Installments may be available at Stripe checkout.</p>
+                  <p className="text-2xl font-black">{isFree ? 'Free' : money(course.retail_price_cents, course.currency)}</p>
+                  <p className="text-xs text-slate-500">{isFree ? 'No payment or credit card required.' : 'Installments may be available at Stripe checkout.'}</p>
                 </div>
-                <button onClick={() => checkout([course.slug])} disabled={busy}
-                  className="rounded-xl bg-blue-700 px-4 py-3 font-semibold text-white disabled:opacity-60">
-                  Pay now
-                </button>
+                {isFree ? (
+                  <a href={course.provider_enrollment_url || '/login'} className="rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white">Enroll free</a>
+                ) : (
+                  <button onClick={() => checkout([course.slug])} disabled={busy}
+                    className="rounded-xl bg-blue-700 px-4 py-3 font-semibold text-white disabled:opacity-60">Pay now</button>
+                )}
               </div>
-              <button onClick={() => toggle(course.slug)}
+              {!isFree && <button onClick={() => toggle(course.slug)}
                 className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-3 font-semibold">
                 {selected ? <X size={18} /> : <ShoppingCart size={18} />}
                 {selected ? 'Remove from cart' : 'Add to cart'}
-              </button>
+              </button>}
             </article>
           );
         })}

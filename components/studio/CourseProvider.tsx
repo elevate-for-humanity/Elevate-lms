@@ -457,14 +457,13 @@ async function performSave(
   if (!state.autosave.isDirty) return;
   dispatch({ type: 'SET_SAVING', saving: true });
   try {
-    const res = await fetch(`/api/admin/lms/courses/${state.course.id}`, {
+    const res = await fetch(`/api/admin/courses/${state.course.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title: state.course.title,
         description: state.course.description,
-        short_description: state.course.short_description,
-        status: state.course.status,
+        subtitle: state.course.short_description,
         thumbnail_url: state.course.thumbnail_url,
         duration_hours: state.course.duration_hours,
       }),

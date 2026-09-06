@@ -48,7 +48,7 @@ jobs:
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      HVAC_COURSE_ID: f0593164-55be-5867-98e7-8a86770a8dd0
+      HVAC_COURSE_ID: 0ba9a61c-1f1b-4019-be6f-90e92eba2bc0
     steps:
       - uses: actions/checkout@v4
         with:

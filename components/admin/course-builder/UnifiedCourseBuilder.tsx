@@ -22,6 +22,12 @@ type CourseRow = {
   status?: string;
   duration_hours?: number | null;
 };
+type ProgramRow = {
+  id: string;
+  title: string;
+  status?: string | null;
+  is_active?: boolean | null;
+};
 type BlueprintRow = {
   id: string;
   title: string;
@@ -48,6 +54,7 @@ const TABS: Array<{ id: Tab; label: string; icon: any }> = [
 export default function UnifiedCourseBuilder() {
   const [tab, setTab] = useState<Tab>('courses');
   const [courses, setCourses] = useState<CourseRow[]>([]);
+  const [programs, setPrograms] = useState<ProgramRow[]>([]);
   const [courseId, setCourseId] = useState('');
   const [blueprints, setBlueprints] = useState<BlueprintRow[]>([]);
   const [creditState, setCreditState] = useState<CreditState | null>(null);
@@ -67,6 +74,10 @@ export default function UnifiedCourseBuilder() {
 
   useEffect(() => {
     void loadCourses();
+    fetch('/api/admin/dev-studio/programs', { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((data) => setPrograms(Array.isArray(data?.data) ? data.data : []))
+      .catch(() => setPrograms([]));
     fetch('/api/admin/course-builder?action=credits', { cache: 'no-store' })
       .then((response) => response.json())
       .then((data) => setCreditState(data))
@@ -139,6 +150,7 @@ export default function UnifiedCourseBuilder() {
         {tab === 'courses' && (
           <CourseCatalog
             courses={courses}
+            programs={programs}
             onChanged={loadCourses}
             onCreated={async (id) => {
               await loadCourses();
@@ -172,10 +184,12 @@ export default function UnifiedCourseBuilder() {
 
 function CourseCatalog({
   courses,
+  programs,
   onChanged,
   onCreated,
 }: {
   courses: CourseRow[];
+  programs: ProgramRow[];
   onChanged: () => void | Promise<void>;
   onCreated: (id: string) => void | Promise<void>;
 }) {
@@ -247,12 +261,18 @@ function CourseCatalog({
           {!courses.length && <p className="text-sm text-slate-400">No courses found.</p>}
         </div>
       </section>
-      <CreateCoursePanel onCreated={onCreated} />
+      <CreateCoursePanel programs={programs} onCreated={onCreated} />
     </div>
   );
 }
 
-function CreateCoursePanel({ onCreated }: { onCreated: (id: string) => void | Promise<void> }) {
+function CreateCoursePanel({
+  programs,
+  onCreated,
+}: {
+  programs: ProgramRow[];
+  onCreated: (id: string) => void | Promise<void>;
+}) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -308,12 +328,20 @@ function CreateCoursePanel({ onCreated }: { onCreated: (id: string) => void | Pr
         placeholder="Learner audience"
         className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
       />
-      <input
+      <select
         name="programId"
         required
-        placeholder="Canonical program UUID"
+        defaultValue=""
+        aria-label="Canonical program"
         className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
-      />
+      >
+        <option value="" disabled>Select a canonical program</option>
+        {programs
+          .filter((program) => program.is_active !== false && program.status !== 'archived')
+          .map((program) => (
+            <option key={program.id} value={program.id}>{program.title}</option>
+          ))}
+      </select>
       <div className="grid gap-3 sm:grid-cols-2">
         <input
           name="moduleCount"

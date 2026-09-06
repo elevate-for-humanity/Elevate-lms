@@ -3,24 +3,41 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getStripeWriteClient } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import {
+  apprenticeshipIdempotencyKey,
+  findExistingApprenticeshipSubscription,
+} from '@/lib/stripe/subscription-guard';
 
 const PROGRAM_CONFIG = {
-  'barber-apprenticeship': { table: 'barber_subscriptions', product: 'Barber Apprenticeship — Weekly Tuition' },
-  'cosmetology-apprenticeship': { table: 'cosmetology_subscriptions', product: 'Cosmetology Apprenticeship — Weekly Tuition' },
+  'barber-apprenticeship': {
+    table: 'barber_subscriptions',
+    product: 'Barber Apprenticeship — Weekly Tuition',
+  },
+  'cosmetology-apprenticeship': {
+    table: 'cosmetology_subscriptions',
+    product: 'Cosmetology Apprenticeship — Weekly Tuition',
+  },
 } as const;
 
 function nextMondayEpoch(): number {
   const now = new Date();
-  const days = ((8 - now.getUTCDay()) % 7) || 7;
-  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + days, 12));
+  const days = (8 - now.getUTCDay()) % 7 || 7;
+  const monday = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + days, 12),
+  );
   return Math.floor(monday.getTime() / 1000);
 }
 
 export async function GET(req: NextRequest) {
   await hydrateProcessEnv();
   const userDb = await createClient();
-  const { data: { user } } = await userDb.auth.getUser();
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
+  const {
+    data: { user },
+  } = await userDb.auth.getUser();
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(
+    /\/$/,
+    '',
+  );
   if (!user) return NextResponse.redirect(`${appUrl}/login?redirect=/apprentice/billing`);
 
   const sessionId = req.nextUrl.searchParams.get('session_id');
@@ -37,9 +54,10 @@ export async function GET(req: NextRequest) {
   const programSlug = session.metadata?.program_slug as keyof typeof PROGRAM_CONFIG | undefined;
   const config = programSlug ? PROGRAM_CONFIG[programSlug] : undefined;
   const setupIntent = session.setup_intent;
-  const paymentMethodId = typeof setupIntent === 'object' && setupIntent && typeof setupIntent.payment_method === 'string'
-    ? setupIntent.payment_method
-    : null;
+  const paymentMethodId =
+    typeof setupIntent === 'object' && setupIntent && typeof setupIntent.payment_method === 'string'
+      ? setupIntent.payment_method
+      : null;
   const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
   if (!enrollmentId || !config || !paymentMethodId || !customerId) {
     return NextResponse.redirect(`${appUrl}/apprentice/billing?setup=incomplete`);
@@ -47,14 +65,27 @@ export async function GET(req: NextRequest) {
 
   const admin = await requireAdminClient();
   const [{ data: enrollment }, { data: pricing }] = await Promise.all([
-    admin.from('program_enrollments').select('id,user_id,stripe_subscription_id,amount_paid_cents,down_payment').eq('id', enrollmentId).eq('user_id', user.id).maybeSingle(),
-    admin.from('program_pricing').select('tuition_cents').eq('program_slug', programSlug).eq('active', true).maybeSingle(),
+    admin
+      .from('program_enrollments')
+      .select('id,user_id,stripe_subscription_id,amount_paid_cents,down_payment')
+      .eq('id', enrollmentId)
+      .eq('user_id', user.id)
+      .maybeSingle(),
+    admin
+      .from('program_pricing')
+      .select('tuition_cents')
+      .eq('program_slug', programSlug)
+      .eq('active', true)
+      .maybeSingle(),
   ]);
   if (!enrollment || enrollment.stripe_subscription_id || !pricing?.tuition_cents) {
     return NextResponse.redirect(`${appUrl}/apprentice/billing?setup=already-configured`);
   }
   const requiredDepositCents = Math.max(0, Math.round(Number(enrollment.down_payment || 0) * 100));
-  if (requiredDepositCents > 0 && Number(enrollment.amount_paid_cents || 0) < requiredDepositCents) {
+  if (
+    requiredDepositCents > 0 &&
+    Number(enrollment.amount_paid_cents || 0) < requiredDepositCents
+  ) {
     return NextResponse.redirect(`${appUrl}/apprentice/billing?setup=deposit-required`);
   }
 
@@ -68,37 +99,60 @@ export async function GET(req: NextRequest) {
   const unscheduledRemainderCents = remainingCents - weeklyCents * installmentCount;
 
   await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId }).catch(() => {});
-  await stripe.customers.update(customerId, { invoice_settings: { default_payment_method: paymentMethodId } });
-  const price = await stripe.prices.create({
-    currency: 'usd',
-    unit_amount: weeklyCents,
-    recurring: { interval: 'week' },
-    product_data: { name: config.product },
-    metadata: { program_slug: programSlug, installment_count: String(installmentCount) },
+  await stripe.customers.update(customerId, {
+    invoice_settings: { default_payment_method: paymentMethodId },
   });
   const startDate = nextMondayEpoch();
-  const subscription = await stripe.subscriptions.create({
-    customer: customerId,
-    default_payment_method: paymentMethodId,
-    items: [{ price: price.id }],
-    trial_end: startDate,
-    cancel_at: startDate + installmentCount * 7 * 24 * 60 * 60,
-    proration_behavior: 'none',
-    metadata: {
-      kind: 'apprenticeship_weekly_tuition',
-      enrollment_id: enrollment.id,
-      user_id: user.id,
-      program_slug: programSlug,
-      installment_count: String(installmentCount),
-      scheduled_amount_cents: String(weeklyCents * installmentCount),
-      unscheduled_remainder_cents: String(unscheduledRemainderCents),
-      authorized_checkout_session_id: session.id,
-    },
+  let subscription = await findExistingApprenticeshipSubscription({
+    stripe,
+    customerId,
+    enrollmentId: enrollment.id,
+    programSlug,
+    checkoutSessionId: session.id,
   });
+  if (!subscription) {
+    const price = await stripe.prices.create(
+      {
+        currency: 'usd',
+        unit_amount: weeklyCents,
+        recurring: { interval: 'week' },
+        product_data: { name: config.product },
+        metadata: { program_slug: programSlug, installment_count: String(installmentCount) },
+      },
+      { idempotencyKey: apprenticeshipIdempotencyKey('price', enrollment.id) },
+    );
+    subscription = await stripe.subscriptions.create(
+      {
+        customer: customerId,
+        default_payment_method: paymentMethodId,
+        items: [{ price: price.id }],
+        trial_end: startDate,
+        cancel_at: startDate + installmentCount * 7 * 24 * 60 * 60,
+        proration_behavior: 'none',
+        metadata: {
+          kind: 'apprenticeship_weekly_tuition',
+          enrollment_id: enrollment.id,
+          user_id: user.id,
+          program_slug: programSlug,
+          installment_count: String(installmentCount),
+          scheduled_amount_cents: String(weeklyCents * installmentCount),
+          unscheduled_remainder_cents: String(unscheduledRemainderCents),
+          authorized_checkout_session_id: session.id,
+        },
+      },
+      { idempotencyKey: apprenticeshipIdempotencyKey('subscription', enrollment.id) },
+    );
+  }
 
   const now = new Date().toISOString();
   const nextPayment = new Date(startDate * 1000).toISOString();
-  const { data: existingSub } = await admin.from(config.table).select('id').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle();
+  const { data: existingSub } = await admin
+    .from(config.table)
+    .select('id')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
   const subscriptionPayload = {
     user_id: user.id,
     enrollment_id: enrollment.id,
@@ -122,26 +176,37 @@ export async function GET(req: NextRequest) {
     next_payment_date: nextPayment,
     updated_at: now,
   };
-  if (existingSub?.id) await admin.from(config.table).update(subscriptionPayload).eq('id', existingSub.id);
+  if (existingSub?.id)
+    await admin.from(config.table).update(subscriptionPayload).eq('id', existingSub.id);
   else await admin.from(config.table).insert(subscriptionPayload);
 
-  await Promise.all([
-    admin.from('program_enrollments').update({
-      stripe_customer_id: customerId,
-      stripe_subscription_id: subscription.id,
-      stripe_subscription_status: subscription.status,
-      payment_plan_months: null,
-      next_payment_date: nextPayment,
-      balance_remaining: remainingCents / 100,
-      updated_at: now,
-    }).eq('id', enrollment.id),
-    admin.from('billing_authorizations').update({
-      status: 'authorized',
-      stripe_subscription_id: subscription.id,
-      stripe_payment_method_id: paymentMethodId,
-      completed_at: now,
-    }).eq('stripe_checkout_session_id', session.id).eq('user_id', user.id),
+  const [enrollmentSync, authorizationSync] = await Promise.all([
+    admin
+      .from('program_enrollments')
+      .update({
+        stripe_customer_id: customerId,
+        stripe_subscription_id: subscription.id,
+        stripe_subscription_status: subscription.status,
+        payment_plan_months: null,
+        next_payment_date: nextPayment,
+        balance_remaining: remainingCents / 100,
+        updated_at: now,
+      })
+      .eq('id', enrollment.id),
+    admin
+      .from('billing_authorizations')
+      .update({
+        status: 'authorized',
+        stripe_subscription_id: subscription.id,
+        stripe_payment_method_id: paymentMethodId,
+        completed_at: now,
+      })
+      .eq('stripe_checkout_session_id', session.id)
+      .eq('user_id', user.id),
   ]);
+  if (enrollmentSync.error || authorizationSync.error) {
+    return NextResponse.redirect(`${appUrl}/apprentice/billing?setup=sync-pending`);
+  }
 
   return NextResponse.redirect(`${appUrl}/apprentice/billing?setup=success`);
 }

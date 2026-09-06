@@ -135,6 +135,7 @@ describe('POST /api/billing/setup', () => {
             program_slug: programSlug,
           }),
         }),
+        { idempotencyKey: `apprenticeship-setup:${arranged.enrollment.id}` },
       );
       const checkoutArgs = mocks.checkoutCreate.mock.calls.at(-1)?.[0];
       expect(checkoutArgs).not.toHaveProperty('payment_method_types');

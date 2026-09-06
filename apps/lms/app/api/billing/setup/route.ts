@@ -6,6 +6,7 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { resolveStripeCustomer } from '@/lib/stripe/customer-resolver';
+import { apprenticeshipIdempotencyKey } from '@/lib/stripe/subscription-guard';
 
 const SUPPORTED_TABLES: Record<string, 'barber_subscriptions' | 'cosmetology_subscriptions'> = {
   'barber-apprenticeship': 'barber_subscriptions',
@@ -115,27 +116,30 @@ async function _POST(req: NextRequest) {
     /\/$/,
     '',
   );
-  const session = await stripe.checkout.sessions.create({
-    mode: 'setup',
-    currency: 'usd',
-    customer: customerId,
-    client_reference_id: user.id,
-    success_url: `${appUrl}/api/billing/setup/complete?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${appUrl}/apprentice/billing?setup=cancelled`,
-    metadata: {
-      kind: 'apprenticeship_billing_setup',
-      user_id: user.id,
-      enrollment_id: enrollment.id,
-      program_slug: enrollment.program_slug,
-      authorization: 'weekly_tuition_autopay',
-    },
-    custom_text: {
-      submit: {
-        message:
-          'By saving this payment method, you authorize the finite weekly tuition schedule disclosed in your Elevate dashboard. Card data is stored by Stripe, not Elevate.',
+  const session = await stripe.checkout.sessions.create(
+    {
+      mode: 'setup',
+      currency: 'usd',
+      customer: customerId,
+      client_reference_id: user.id,
+      success_url: `${appUrl}/api/billing/setup/complete?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/apprentice/billing?setup=cancelled`,
+      metadata: {
+        kind: 'apprenticeship_billing_setup',
+        user_id: user.id,
+        enrollment_id: enrollment.id,
+        program_slug: enrollment.program_slug,
+        authorization: 'weekly_tuition_autopay',
+      },
+      custom_text: {
+        submit: {
+          message:
+            'By saving this payment method, you authorize the finite weekly tuition schedule disclosed in your Elevate dashboard. Card data is stored by Stripe, not Elevate.',
+        },
       },
     },
-  });
+    { idempotencyKey: apprenticeshipIdempotencyKey('setup', enrollment.id) },
+  );
 
   await admin.from('billing_authorizations').insert({
     user_id: user.id,

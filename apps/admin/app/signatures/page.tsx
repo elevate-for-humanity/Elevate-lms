@@ -32,8 +32,7 @@ export default async function SignaturesPage() {
     db
       .from('signature_documents')
       .select('id, title, type, created_at')
-      .order('created_at', { ascending: false })
-      .limit(20),
+      .order('created_at', { ascending: false }),
   ]);
 
   if (signaturesResult.error) console.error('[Signatures] query failed:', signaturesResult.error.message);
@@ -157,7 +156,7 @@ export default async function SignaturesPage() {
                             Signer: {signature.signer_name || signature.signer_email || 'Unknown'}
                           </p>
                           <p className="text-sm text-black">
-                            Signed: {new Date(signature.created_at).toLocaleDateString()}
+                            {signature.status === 'completed' ? 'Signed' : 'Requested'}: {new Date(signature.created_at).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">

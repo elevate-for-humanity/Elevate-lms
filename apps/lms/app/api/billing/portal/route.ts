@@ -5,6 +5,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolveStripeCustomer } from '@/lib/stripe/customer-resolver';
 
 async function _POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'payment');
@@ -26,7 +27,7 @@ async function _POST(req: NextRequest) {
       admin.from('profiles').select('stripe_customer_id').eq('id', user.id).maybeSingle(),
       admin
         .from('program_enrollments')
-        .select('stripe_customer_id')
+        .select('id,stripe_customer_id')
         .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
         .not('stripe_customer_id', 'is', null)
         .order('created_at', { ascending: false })
@@ -34,22 +35,28 @@ async function _POST(req: NextRequest) {
         .maybeSingle(),
     ]);
 
-    const customerCandidates = [enrollment?.stripe_customer_id, profile?.stripe_customer_id];
-    const stripeCustomerId = customerCandidates.find(
-      (value) => typeof value === 'string' && value.startsWith('cus_'),
-    );
-
-    if (!stripeCustomerId) {
-      return NextResponse.json({ error: 'No billing account found' }, { status: 404 });
-    }
-
     const stripe = getStripe();
     if (!stripe) {
       return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
     }
 
+    const { customer } = await resolveStripeCustomer({
+      stripe,
+      email: user.email || '',
+      candidateIds: [enrollment?.stripe_customer_id, profile?.stripe_customer_id],
+    });
+    if (!customer) {
+      return NextResponse.json({ error: 'No billing account found' }, { status: 404 });
+    }
+    if (enrollment && enrollment.stripe_customer_id !== customer.id) {
+      await admin
+        .from('program_enrollments')
+        .update({ stripe_customer_id: customer.id })
+        .eq('id', enrollment.id);
+    }
+
     const session = await stripe.billingPortal.sessions.create({
-      customer: stripeCustomerId,
+      customer: customer.id,
       return_url: `${(
         process.env.NEXT_PUBLIC_LMS_URL ||
         process.env.NEXT_PUBLIC_APP_URL ||

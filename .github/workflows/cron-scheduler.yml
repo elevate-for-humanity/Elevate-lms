@@ -64,6 +64,7 @@ on:
           - ops-scan
           - qa-scan
           - video-render-queue
+          - portal-completion-reminders
 
   # ── Daily jobs — 8 AM UTC ──────────────────────────────────────────────────
   schedule:
@@ -73,6 +74,7 @@ on:
     - cron: '0 9 * * 1' # weekly-monday-9am
     - cron: '0 2 * * *' # daily-2am (maintenance: guardrails + memory cleanup)
     - cron: '*/30 * * * *' # every-30-min (missed clock-out enforcement)
+    - cron: '0 14,22 * * *' # twice daily, Indiana daytime hours
 
 env:
   ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
@@ -80,6 +82,20 @@ env:
   CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
 jobs:
+  portal-completion-reminders:
+    name: Portal completion reminders (twice daily)
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'schedule' && github.event.schedule == '0 14,22 * * *'
+      || (github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'portal-completion-reminders')
+    steps:
+      - name: Queue incomplete portal reminders
+        run: |
+          curl -sf -X GET "$ADMIN_URL/api/cron/portal-completion-reminders" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 60
+
   # ── Every 5 minutes: queue processors ─────────────────────────────────────
   queue-processors:
     name: Queue processors (every 5 min)

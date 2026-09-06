@@ -5,6 +5,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { resolveStripeCustomer } from '@/lib/stripe/customer-resolver';
 
 const SUPPORTED_TABLES: Record<string, 'barber_subscriptions' | 'cosmetology_subscriptions'> = {
   'barber-apprenticeship': 'barber_subscriptions',
@@ -71,19 +72,21 @@ async function _POST(req: NextRequest) {
   const stripe = getStripe();
   if (!stripe) return NextResponse.json({ error: 'Stripe is not configured.' }, { status: 503 });
 
-  let customerId = enrollment.stripe_customer_id as string | null;
-  if (!customerId) {
-    const existing = await stripe.customers.list({ email: user.email, limit: 1 });
-    const customer =
-      existing.data[0] ??
-      (await stripe.customers.create({
-        email: user.email,
-        name: enrollment.full_name || undefined,
-        metadata: { user_id: user.id, enrollment_id: enrollment.id },
-      }));
-    customerId = customer.id;
-    // profiles.stripe_customer_id is a legacy UUID column in production; Stripe
-    // customer IDs belong on the enrollment where the schema stores them as text.
+  const { customer } = await resolveStripeCustomer({
+    stripe,
+    email: user.email,
+    name: enrollment.full_name,
+    candidateIds: [enrollment.stripe_customer_id],
+    metadata: { user_id: user.id, enrollment_id: enrollment.id },
+    createIfMissing: true,
+  });
+  if (!customer) {
+    return NextResponse.json({ error: 'Unable to create a secure billing account.' }, { status: 502 });
+  }
+  const customerId = customer.id;
+  if (customerId !== enrollment.stripe_customer_id) {
+    // Stripe customer IDs belong on the enrollment; the profile column is a
+    // legacy UUID in production and must not receive `cus_` values.
     await admin
       .from('program_enrollments')
       .update({ stripe_customer_id: customerId })

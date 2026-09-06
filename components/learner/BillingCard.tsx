@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { CreditCard, AlertCircle, Clock, DollarSign, CalendarDays } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { askParisForPortalHelp } from '@/lib/paris/portal-support';
 
 export interface BillingSummary {
   program: 'barber' | 'cosmetology';
@@ -125,19 +126,26 @@ export default function BillingCard({
         json = {};
       }
       if (!res.ok) {
-        setError(
-          json.error ??
-            `Unable to open secure Stripe billing (${res.status}). Please contact support.`,
-        );
+        const message = json.error ?? 'The secure billing page did not open.';
+        setError('PARIS is ready to help resolve this billing setup issue.');
+        askParisForPortalHelp({ workflow: 'billing_setup', message, status: res.status });
         return;
       }
       if (!json.url) {
-        setError('The secure billing link was not returned. Please try again or contact support.');
+        setError('PARIS is ready to help resolve this billing setup issue.');
+        askParisForPortalHelp({
+          workflow: 'billing_setup',
+          message: 'The secure billing link was not returned.',
+        });
         return;
       }
       window.location.href = json.url;
     } catch {
-      setError('Unable to reach the billing portal. Please try again.');
+      setError('PARIS is ready to help resolve this billing setup issue.');
+      askParisForPortalHelp({
+        workflow: 'billing_setup',
+        message: 'The billing service could not be reached.',
+      });
     } finally {
       setLoading(false);
     }

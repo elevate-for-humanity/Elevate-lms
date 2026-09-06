@@ -3,6 +3,7 @@ import { apiRequireRoles } from '@/lib/admin/guards';
 import { HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { verifyPortalPreviewHandoff } from '@/lib/admin/portal-preview-handoff';
+import { HOST_SHOP_PREVIEW_SESSION_COOKIE } from '@/lib/admin/host-shop-preview';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -81,5 +82,18 @@ export async function GET(request: NextRequest) {
     path: '/',
     maxAge: 60 * 60,
   });
+  if (handoff) {
+    response.cookies.set(
+      HOST_SHOP_PREVIEW_SESSION_COOKIE,
+      request.nextUrl.searchParams.get('handoff') || '',
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60,
+      },
+    );
+  }
   return response;
 }

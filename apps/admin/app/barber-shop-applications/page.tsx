@@ -94,21 +94,9 @@ export default async function BarberShopApplicationsPage() {
 
   const { data: applications, error } = await supabase
     .from('barbershop_partner_applications')
-    .select(`
-      id, created_at, shop_legal_name, shop_dba_name,
-      owner_name, contact_name, contact_email, contact_phone,
-      shop_city, shop_state, shop_zip, shop_physical_address,
-      indiana_shop_license_number,
-      supervisor_name, supervisor_license_number,
-      compensation_model, workers_comp_status,
-      has_general_liability, apprentices_on_payroll,
-      can_supervise_and_verify,
-      mou_acknowledged, mou_signed_at, mou_signer_name,
-      consent_acknowledged, consent_signed_at, consent_signer_name,
-      employer_acceptance_acknowledged, employer_acceptance_signed_at, employer_acceptance_signer_name,
-      ein, ein_document_path, ein_qa_notes,
-      number_of_employees, notes, status
-    `)
+    // Select the live row shape so an older deployment schema does not make the
+    // entire review queue fail when an optional intake column has not migrated yet.
+    .select('*')
     .order('created_at', { ascending: false });
 
   const rows = (applications ?? []) as Application[];

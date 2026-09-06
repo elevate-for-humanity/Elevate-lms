@@ -93,7 +93,9 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-red-700" /> {shop.city},{' '}
                   {shop.state}
                 </p>
-                <h3 className="mt-3 text-2xl font-black leading-tight">{shop.name}</h3>
+                <h3 className="mt-3 text-2xl font-black leading-tight text-slate-950">
+                  {shop.name}
+                </h3>
                 <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-700">
                   {shop.description}
                 </p>

@@ -9,6 +9,10 @@ import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/ope
 
 const CONFIRMATION = 'CONFIRM OPENHANDS EXECUTION';
 
+function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
+  return effectiveRoles.some((role) => hasPermission(role, 'access_dev_tools'));
+}
+
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
@@ -18,8 +22,8 @@ export async function POST(request: NextRequest) {
 
   // Autonomous repository execution is a dev-tool capability. Keep it
   // privileged even though read/chat Studio access is available to admins.
-  if (!hasPermission(auth.role, 'access_dev_tools')) {
-    return NextResponse.json({ error: 'Super admin required for autonomous agent execution' }, { status: 403 });
+  if (!canAccessDevTools(auth.effectiveRoles)) {
+    return NextResponse.json({ error: 'Admin dev-tool access is required for autonomous agent execution' }, { status: 403 });
   }
 
   try {
@@ -102,8 +106,8 @@ export async function GET(request: NextRequest) {
   const conversationId = url.searchParams.get('conversationId');
 
   if (taskId) {
-    if (!hasPermission(auth.role, 'access_dev_tools')) {
-      return NextResponse.json({ error: 'Super admin required for autonomous agent status' }, { status: 403 });
+    if (!canAccessDevTools(auth.effectiveRoles)) {
+      return NextResponse.json({ error: 'Admin dev-tool access is required for autonomous agent status' }, { status: 403 });
     }
     try {
       const lifecycle = await refreshOpenHandsTask({ taskId, actorId: auth.userId });
@@ -130,7 +134,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     configured: config.configured,
-    executable: hasPermission(auth.role, 'access_dev_tools'),
+    executable: canAccessDevTools(auth.effectiveRoles),
     provider: 'openhands',
     apiVersion: 'v1',
     baseUrl: config.origin,

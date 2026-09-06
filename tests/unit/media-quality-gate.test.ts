@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('server-only', () => ({}));
 
 import {
+  cloudflareTranscriptionChunkSeconds,
   MEDIA_QUALITY_GATE_VERSION,
   mediaQualityFailures,
   resolveCloudflareTranscriptionModel,
@@ -54,6 +55,12 @@ describe('canonical media completion quality gate', () => {
       AI_TRANSCRIPTION_PROVIDER: 'cloudflare',
       AI_TRANSCRIPTION_MODEL: '@cf/openai/whisper-large-v3-turbo',
     })).toBe('@cf/openai/whisper-large-v3-turbo');
+  });
+
+  it('keeps transcription chunks below the long-lesson upload boundary', () => {
+    expect(cloudflareTranscriptionChunkSeconds({})).toBe(240);
+    expect(cloudflareTranscriptionChunkSeconds({ AI_TRANSCRIPTION_CHUNK_SECONDS: '900' })).toBe(300);
+    expect(cloudflareTranscriptionChunkSeconds({ AI_TRANSCRIPTION_CHUNK_SECONDS: '5' })).toBe(60);
   });
 
   it('accepts complete evidence', () => {

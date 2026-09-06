@@ -36,16 +36,16 @@ export default function StudioCommandWorkspace({
   return (
     <div className="relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white lg:flex-row">
       <section className={`${inspectionOpen ? 'hidden lg:flex' : 'flex'} min-h-0 min-w-0 flex-1 flex-col`}>
-        <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-gray-50 px-3 py-2 lg:hidden">
+        <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-gray-50 px-3 py-2">
           <MessageSquare className="h-4 w-4 text-gray-500" aria-hidden="true" />
           <span className="text-xs font-semibold text-gray-700">Admin AI</span>
           <button
             type="button"
             onClick={() => setInspectionOpen((current) => !current)}
-            className="ml-auto inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-semibold text-gray-700"
+            className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-800 shadow-sm hover:bg-gray-100"
           >
             <Eye className="h-3.5 w-3.5" aria-hidden="true" />
-            Open preview
+            {inspectionOpen ? 'Close browser preview' : 'Open browser preview'}
           </button>
         </div>
         <UnifiedEllieChat embedded onOpenPreview={() => openPreview()} onPreviewTarget={openPreview} />
@@ -91,17 +91,7 @@ export default function StudioCommandWorkspace({
             )}
           </div>
         </aside>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setInspectionOpen(true)}
-          className="hidden w-10 shrink-0 items-center justify-center border-l border-gray-200 bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900 lg:flex"
-          aria-label="Open live inspection"
-          title="Open live inspection"
-        >
-          <Eye className="h-4 w-4" aria-hidden="true" />
-        </button>
-      )}
+      ) : null}
     </div>
   );
 }

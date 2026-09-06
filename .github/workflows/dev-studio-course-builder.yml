@@ -61,6 +61,7 @@ jobs:
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Validate bounded Cloudflare canary configuration
+        id: preflight
         shell: bash
         run: |
           test -n "$ADMIN_URL"
@@ -116,6 +117,9 @@ jobs:
           JOB_STATUS: ${{ job.status }}
           TESTED_SHA: ${{ steps.tested.outputs.sha }}
           JOB_RECORD_B64: ${{ steps.verify.outputs.record }}
+          PREFLIGHT_STATUS: ${{ steps.preflight.conclusion }}
+          CANARY_STATUS: ${{ steps.canary.conclusion }}
+          VERIFY_STATUS: ${{ steps.verify.conclusion }}
         with:
           script: |
             let record = {};
@@ -126,6 +130,7 @@ jobs:
               `HVAC ONE-LESSON VIDEO CANARY ${process.env.JOB_STATUS === 'success' ? 'PASS' : 'FAIL'}`,
               '',
               `Tested main SHA: ${process.env.TESTED_SHA || 'unknown'}`,
+              `Stages: preflight=${process.env.PREFLIGHT_STATUS || 'not-run'}, queue/render=${process.env.CANARY_STATUS || 'not-run'}, persistence/playback=${process.env.VERIFY_STATUS || 'not-run'}`,
               `Lesson: ${record.lesson_title || 'unavailable'} (${record.lesson_id || '${{ steps.canary.outputs.lesson_id }}' || 'unavailable'})`,
               `Job: ${record.id || '${{ steps.canary.outputs.job_id }}' || 'unavailable'}`,
               `Provider/model: ${record.last_provider || 'unavailable'} / ${record.last_provider_model || 'unavailable'}`,

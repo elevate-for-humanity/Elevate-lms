@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getStripe } from '@/lib/stripe/client';
+import { getStripeWriteClient } from '@/lib/stripe/client';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -23,7 +23,12 @@ async function _POST(req: NextRequest) {
     }
 
     const admin = await requireAdminClient();
-    const [{ data: profile }, { data: enrollment }] = await Promise.all([
+    const [{ data: billingCustomer }, { data: profile }, { data: enrollment }] = await Promise.all([
+      admin
+        .from('user_billing_customers')
+        .select('stripe_customer_id')
+        .eq('user_id', user.id)
+        .maybeSingle(),
       admin.from('profiles').select('stripe_customer_id').eq('id', user.id).maybeSingle(),
       admin
         .from('program_enrollments')
@@ -35,7 +40,7 @@ async function _POST(req: NextRequest) {
         .maybeSingle(),
     ]);
 
-    const stripe = getStripe();
+    const stripe = getStripeWriteClient();
     if (!stripe) {
       return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
     }
@@ -43,7 +48,11 @@ async function _POST(req: NextRequest) {
     const { customer } = await resolveStripeCustomer({
       stripe,
       email: user.email || '',
-      candidateIds: [enrollment?.stripe_customer_id, profile?.stripe_customer_id],
+      candidateIds: [
+        billingCustomer?.stripe_customer_id,
+        enrollment?.stripe_customer_id,
+        profile?.stripe_customer_id,
+      ],
     });
     if (!customer) {
       return NextResponse.json({ error: 'No billing account found' }, { status: 404 });

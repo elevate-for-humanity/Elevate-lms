@@ -17,7 +17,7 @@ vi.mock('@/lib/supabase/admin', () => ({
   })),
 }));
 vi.mock('@/lib/stripe/client', () => ({
-  getStripe: vi.fn(() => ({
+  getStripeWriteClient: vi.fn(() => ({
     checkout: { sessions: { retrieve: mocks.retrieveSession } },
     customers: { update: mocks.updateCustomer },
   })),

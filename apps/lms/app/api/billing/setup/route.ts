@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getStripe } from '@/lib/stripe/client';
+import { getStripeWriteClient } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -70,7 +70,7 @@ async function _POST(req: NextRequest) {
     );
   }
 
-  const stripe = getStripe();
+  const stripe = getStripeWriteClient();
   if (!stripe) return NextResponse.json({ error: 'Stripe is not configured.' }, { status: 503 });
 
   const { customer } = await resolveStripeCustomer({

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getStripe } from '@/lib/stripe/client';
+import { getStripeWriteClient } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
 
 export async function GET(req: NextRequest) {
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.redirect(`${appUrl}/login?redirect=/account/payment-methods`);
 
   const sessionId = req.nextUrl.searchParams.get('session_id');
-  const stripe = getStripe();
+  const stripe = getStripeWriteClient();
   if (!sessionId || !stripe) {
     return NextResponse.redirect(`${appUrl}/account/payment-methods?setup=unavailable`);
   }
@@ -53,4 +53,3 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.redirect(`${appUrl}/account/payment-methods?setup=success`);
 }
-

@@ -15,7 +15,7 @@ vi.mock('@/lib/supabase/admin', () => ({
   requireAdminClient: vi.fn(async () => ({ from: mocks.from })),
 }));
 vi.mock('@/lib/stripe/client', () => ({
-  getStripe: vi.fn(() => ({ checkout: { sessions: { create: mocks.checkoutCreate } } })),
+  getStripeWriteClient: vi.fn(() => ({ checkout: { sessions: { create: mocks.checkoutCreate } } })),
 }));
 vi.mock('@/lib/stripe/customer-resolver', () => ({ resolveStripeCustomer: mocks.resolveCustomer }));
 vi.mock('@/lib/secrets', () => ({ hydrateProcessEnv: vi.fn() }));

@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { execFile } from 'node:child_process';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
@@ -121,6 +121,14 @@ export function resolveCloudflareTranscriptionModel(env: NodeJS.ProcessEnv = pro
   return configured?.startsWith('@cf/') ? configured : '@cf/openai/whisper';
 }
 
+export function cloudflareTranscriptionChunkSeconds(
+  env: NodeJS.ProcessEnv = process.env,
+): number {
+  const configured = Number.parseInt(env.AI_TRANSCRIPTION_CHUNK_SECONDS ?? '', 10);
+  if (!Number.isFinite(configured)) return 240;
+  return Math.min(300, Math.max(60, configured));
+}
+
 async function requireCloudflareTranscriptionCredentials(): Promise<{
   accountId: string;
   token: string;
@@ -147,29 +155,51 @@ async function requireCloudflareTranscriptionCredentials(): Promise<{
 async function transcribeRenderedAudio(videoPath: string, workDir: string): Promise<string> {
   const model = resolveCloudflareTranscriptionModel();
 
-  const audioPath = join(workDir, 'rendered-audio.wav');
+  // Raw WAV expands long lessons enough to exceed the Workers AI request
+  // boundary. Encode bounded mono MP3 segments so quality verification scales
+  // with lesson duration without weakening the transcription requirement.
+  const audioPattern = join(workDir, 'rendered-audio-%03d.mp3');
   await execFileAsync('ffmpeg', [
     '-hide_banner', '-loglevel', 'error', '-y', '-i', videoPath,
-    '-vn', '-ac', '1', '-ar', '16000', audioPath,
+    '-vn', '-ac', '1', '-ar', '16000', '-codec:a', 'libmp3lame', '-b:a', '48k',
+    '-f', 'segment', '-segment_time', String(cloudflareTranscriptionChunkSeconds()),
+    '-reset_timestamps', '1', audioPattern,
   ], { timeout: 120_000, maxBuffer: 2_000_000 });
-  const audio = await readFile(audioPath);
+  const audioPaths = (await readdir(workDir))
+    .filter((name) => /^rendered-audio-\d{3}\.mp3$/.test(name))
+    .sort()
+    .map((name) => join(workDir, name));
+  if (!audioPaths.length) throw new Error('Rendered-audio compression produced no chunks');
   const { accountId, token } = await requireCloudflareTranscriptionCredentials();
-  const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'cf-aig-gateway-id': process.env.AI_GATEWAY_ID?.trim() || 'default',
-        'Content-Type': 'application/octet-stream',
+  const transcriptParts: string[] = [];
+  for (const [index, audioPath] of audioPaths.entries()) {
+    const audio = await readFile(audioPath);
+    const response = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'cf-aig-gateway-id': process.env.AI_GATEWAY_ID?.trim() || 'default',
+          'Content-Type': 'audio/mpeg',
+        },
+        body: audio,
+        signal: AbortSignal.timeout(180_000),
       },
-      body: audio,
-      signal: AbortSignal.timeout(180_000),
-    },
-  );
-  if (!response.ok) throw new Error(`Cloudflare rendered-audio transcription returned HTTP ${response.status}`);
-  const payload = await response.json() as { result?: { text?: string } };
-  const transcript = payload.result?.text?.trim() ?? '';
+    );
+    if (!response.ok) {
+      throw new Error(
+        `Cloudflare rendered-audio transcription chunk ${index + 1}/${audioPaths.length} returned HTTP ${response.status}`,
+      );
+    }
+    const payload = await response.json() as { result?: { text?: string } };
+    const chunkTranscript = payload.result?.text?.trim() ?? '';
+    if (!chunkTranscript) {
+      throw new Error(`Rendered-audio transcription chunk ${index + 1}/${audioPaths.length} is empty`);
+    }
+    transcriptParts.push(chunkTranscript);
+  }
+  const transcript = transcriptParts.join(' ').trim();
   if (!transcript) throw new Error('Rendered-audio transcription is empty');
   return transcript;
 }

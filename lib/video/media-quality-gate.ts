@@ -246,16 +246,34 @@ export async function enforceMediaQuality(input: {
       ['wan', 'ltx', 'remotion'].includes(scene.resolvedProvider ?? ''),
     );
 
-    const [{ stderr: sceneOutput }, { stderr: freezeOutput }, { stderr: blackOutput }] = await Promise.all([
-      execFileAsync('ffmpeg', ['-hide_banner', '-i', videoPath, '-filter:v', "select='gt(scene,0.12)',showinfo", '-f', 'null', '-'], { timeout: 120_000, maxBuffer: 8_000_000 }),
-      execFileAsync('ffmpeg', ['-hide_banner', '-i', videoPath, '-vf', 'freezedetect=n=-45dB:d=2', '-an', '-f', 'null', '-'], { timeout: 120_000, maxBuffer: 8_000_000 }),
-      execFileAsync('ffmpeg', ['-hide_banner', '-i', videoPath, '-vf', 'blackdetect=d=0.3:pix_th=0.10', '-an', '-f', 'null', '-'], { timeout: 120_000, maxBuffer: 8_000_000 }),
-    ]);
+    const actualDurationSeconds = Number(probe.format?.duration ?? 0);
+    // Full-frame audits are CPU-bound. Running three decoders concurrently
+    // starves each process and makes valid long lessons hit the fixed timeout.
+    // Audit sequentially and scale the ceiling with decoded media duration.
+    const analysisTimeoutMs = Math.min(
+      900_000,
+      Math.max(180_000, Math.ceil(actualDurationSeconds * 2_500)),
+    );
+    const { stderr: sceneOutput } = await execFileAsync(
+      'ffmpeg',
+      ['-hide_banner', '-i', videoPath, '-filter:v', "select='gt(scene,0.12)',showinfo", '-f', 'null', '-'],
+      { timeout: analysisTimeoutMs, maxBuffer: 8_000_000 },
+    );
+    const { stderr: freezeOutput } = await execFileAsync(
+      'ffmpeg',
+      ['-hide_banner', '-i', videoPath, '-vf', 'freezedetect=n=-45dB:d=2', '-an', '-f', 'null', '-'],
+      { timeout: analysisTimeoutMs, maxBuffer: 8_000_000 },
+    );
+    const { stderr: blackOutput } = await execFileAsync(
+      'ffmpeg',
+      ['-hide_banner', '-i', videoPath, '-vf', 'blackdetect=d=0.3:pix_th=0.10', '-an', '-f', 'null', '-'],
+      { timeout: analysisTimeoutMs, maxBuffer: 8_000_000 },
+    );
 
     const evidence: MediaQualityEvidence = {
       gateVersion: MEDIA_QUALITY_GATE_VERSION,
       bytes: buffer.length,
-      actualDurationSeconds: Number(probe.format?.duration ?? 0),
+      actualDurationSeconds,
       expectedDurationSeconds: input.expectedDurationSeconds,
       videoStreams: streams.filter((stream) => stream.codec_type === 'video').length,
       audioStreams: streams.filter((stream) => stream.codec_type === 'audio').length,

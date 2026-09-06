@@ -28,9 +28,10 @@ export default async function StudioPage() {
   );
 
   return (
-    <main className="min-h-screen w-full min-w-0 overflow-x-clip bg-gray-50 text-gray-950">
-      <div className="mx-auto w-full min-w-0 max-w-screen-2xl px-3 py-3 sm:px-4 sm:py-5 lg:px-6">
-        <div className="mb-3 flex min-w-0 flex-wrap items-center justify-end gap-2 sm:mb-5">
+    <main className="h-[calc(100dvh-73px)] w-full min-w-0 overflow-hidden bg-white text-gray-950">
+      <div className="flex h-full w-full min-w-0 flex-col">
+        <div className="flex min-h-14 min-w-0 flex-wrap items-center justify-between gap-2 border-b border-gray-200 px-3 py-2 sm:px-6">
+          <div><h1 className="text-base font-black text-gray-950 sm:text-lg">Elevate Admin AI</h1><p className="hidden text-xs font-medium text-gray-500 sm:block">Live tools, approvals, records, code, and deployment evidence</p></div>
           <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
             <Link
               href="/studio/courses"
@@ -52,11 +53,10 @@ export default async function StudioPage() {
           </div>
         </div>
 
-        <section className="min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm sm:rounded-3xl">
-          <div className="flex flex-wrap items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 sm:px-6"><div className="min-w-0 flex-1"><h1 className="text-lg font-black text-gray-950">Elevate Admin AI</h1><p className="text-xs font-medium text-gray-600">One conversation connected to live tools, approvals, and the page being inspected.</p></div><Link href="/studio/courses" className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-indigo-700 px-3 py-2 text-xs font-bold text-white"><BookOpen className="h-4 w-4" />Course Builder</Link></div>
+        <section className="min-h-0 min-w-0 flex-1 overflow-hidden bg-white">
           <div
             id="admin-ai-workspace"
-            className="h-[calc(100dvh-5rem)] min-h-[640px] min-w-0 scroll-mt-3 sm:h-[calc(100dvh-8rem)] sm:min-h-[620px]"
+            className="h-full min-h-0 min-w-0"
           >
             <StudioCommandWorkspace
               workspaces={workspaces.map(({ id, label, route }) => ({ id, label, route }))}
@@ -64,7 +64,7 @@ export default async function StudioPage() {
           </div>
         </section>
 
-        <details className="mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <details className="absolute bottom-24 right-4 z-30 max-w-lg rounded-2xl border border-gray-200 bg-white shadow-xl">
           <summary className="flex min-w-0 cursor-pointer list-none flex-wrap items-center gap-2 px-4 py-4 text-sm font-semibold text-gray-800 marker:hidden sm:px-5">
             <Wrench className="h-4 w-4" aria-hidden="true" />
             Advanced capability surfaces

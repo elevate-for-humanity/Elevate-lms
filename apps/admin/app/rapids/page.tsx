@@ -26,7 +26,21 @@ export default async function RapidsPage() {
     db.from('rapids_action_queue').select('id,entity_type,entity_id,action_type,status,payload,created_at').in('status', ['pending','blocked']).order('created_at', { ascending: true }).limit(100),
   ]);
 
-  const queue = actionQueue ?? [];
+  const rawQueue = actionQueue ?? [];
+  const isQaRow = (item: any) => {
+    const payload = item.payload ?? {};
+    const searchable = [payload.name, payload.full_name, payload.email, payload.partner_id]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return searchable.includes('[qa') || searchable.includes('qa e2e') || searchable.includes('test');
+  };
+  const qaRows = rawQueue.filter(isQaRow);
+  const queue = [...new Map(
+    rawQueue
+      .filter((item: any) => !isQaRow(item))
+      .map((item: any) => [`${item.entity_type}:${item.entity_id}:${item.action_type}`, item]),
+  ).values()] as any[];
   const readyQueue = queue.filter((item: any) => item.status === 'pending');
   const blockedQueue = queue.filter((item: any) => item.status === 'blocked');
   const hostShopQueue = readyQueue.filter((item: any) => item.entity_type === 'host_shop');
@@ -38,13 +52,14 @@ export default async function RapidsPage() {
     { label: 'Blocked — fix before export', value: blockedQueue.length, icon: Clock },
     { label: 'Pending progress', value: pendingProgressResult.count ?? 0, icon: Clock },
     { label: 'Pending completions', value: pendingCompletionResult.count ?? 0, icon: CheckCircle },
+    { label: 'QA/test rows excluded', value: qaRows.length, icon: CheckCircle },
   ];
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6">
       <div><nav className="mb-3 flex items-center gap-1.5 text-xs text-slate-500"><Link href="/dashboard">Admin</Link><ChevronRight className="h-3 w-3"/><span className="font-medium text-slate-900">RAPIDS</span></nav><h1 className="text-2xl font-bold text-slate-900">RAPIDS Work Center</h1><p className="mt-1 text-sm text-slate-500">Verified Host Shops and activated apprentices enter this queue automatically for sponsor RAPIDS processing.</p></div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">{stats.map(({ label, value, icon: Icon }) => <div key={label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><Icon className="mb-3 h-5 w-5 text-slate-600"/><p className="text-2xl font-bold tabular-nums">{value}</p><p className="mt-1 text-xs text-slate-500">{label}</p></div>)}</div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{stats.map(({ label, value, icon: Icon }) => <div key={label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><Icon className="mb-3 h-5 w-5 text-slate-600"/><p className="text-2xl font-bold tabular-nums">{value}</p><p className="mt-1 text-xs text-slate-500">{label}</p></div>)}</div>
 
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="border-b border-slate-100 px-5 py-4"><h2 className="font-semibold text-slate-900">Automatic RAPIDS action queue</h2><p className="mt-1 text-xs text-slate-500">Host Shop rows are employer/worksite setup records. Apprentice rows are registration records waiting for sponsor submission.</p></div>

@@ -44,7 +44,10 @@ export default async function AccreditationPage() {
 
   const standardsByKey = new Map<string, any>();
   for (const standard of rawStandards as any[]) {
-    const key = `${String(standard.category ?? 'other').trim().toLowerCase()}::${String(standard.name ?? '').trim().toLowerCase()}`;
+    // Seed/import jobs historically created the same named requirement in several
+    // categories. The Admin work queue is requirement-based, so show one row per
+    // normalized requirement name and retain every duplicate id for evidence lookup.
+    const key = String(standard.name ?? '').trim().toLowerCase();
     if (!standardsByKey.has(key)) standardsByKey.set(key, { ...standard, duplicateIds: [] });
     standardsByKey.get(key).duplicateIds.push(standard.id);
   }

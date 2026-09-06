@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { requireRole } from '@/lib/auth/require-role';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
@@ -89,20 +89,8 @@ function ComplianceFlag({ ok, label }: { ok: boolean; label: string }) {
 }
 
 export default async function BarberShopApplicationsPage() {
-  const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-
-  // Guard against null user
-  if (!user) redirect('/login');
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (!profile || !['admin', 'staff'].includes(profile.role)) redirect('/');
+  await requireRole(['admin', 'staff']);
+  const supabase = await requireAdminClient();
 
   const { data: applications, error } = await supabase
     .from('barbershop_partner_applications')

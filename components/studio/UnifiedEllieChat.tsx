@@ -25,8 +25,6 @@ import {
   fetchAiHealth,
   routeEllieMessage,
   selectStudioAgent,
-  shouldOrchestrateMessage,
-  streamOrchestratedPlan,
   streamPlatformChat,
   type EllieMessageRoute,
   type StudioSpecialist,
@@ -443,27 +441,7 @@ export default function UnifiedEllieChat({
     const assistantIdx = messages.length + 1;
 
     try {
-      if (!attachment && shouldOrchestrateMessage(text)) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: `▶ ${ELLIE_ROUTE_LABEL[route]}\n`,
-            provider: 'orchestrator',
-            route,
-            agent,
-          },
-        ]);
-        await streamOrchestratedPlan(text, (line) => {
-          setMessages((prev) => {
-            const next = [...prev];
-            const row = next[assistantIdx];
-            if (row?.role === 'assistant')
-              next[assistantIdx] = { ...row, content: row.content + line };
-            return next;
-          });
-        });
-      } else {
+      {
         setMessages((prev) => [
           ...prev,
           { role: 'assistant', content: '', provider: 'admin-ai', route, agent },
@@ -584,9 +562,9 @@ export default function UnifiedEllieChat({
 
       <CourseBuildRuns />
 
-      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 sm:px-6 sm:py-5">
+      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 sm:px-8 sm:py-8">
         {messages.length === 0 ? (
-          <div className="mx-auto flex w-full min-w-0 max-w-4xl flex-col items-center py-5 text-center sm:py-12">
+          <div className="mx-auto flex w-full min-w-0 max-w-5xl flex-col items-center py-8 text-center sm:py-20">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 shadow-sm">
               <Bot className="h-7 w-7 text-gray-800" aria-hidden="true" />
             </div>
@@ -616,7 +594,7 @@ export default function UnifiedEllieChat({
             </div>
           </div>
         ) : (
-          <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
+          <div className="mx-auto flex w-full max-w-5xl flex-col gap-5">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -699,7 +677,7 @@ export default function UnifiedEllieChat({
       </div>
 
       <div className={`min-w-0 shrink-0 border-t p-3 sm:p-4 ${inputAreaClass}`}>
-        <div className="mx-auto w-full min-w-0 max-w-4xl">
+        <div className="mx-auto w-full min-w-0 max-w-5xl">
           {attachment ? (
             <div className="mb-2 flex items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
               <span className="min-w-0 truncate font-semibold">Attached: {attachment.name}</span>

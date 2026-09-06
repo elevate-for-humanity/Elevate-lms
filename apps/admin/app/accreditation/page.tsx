@@ -39,14 +39,28 @@ export default async function AccreditationPage() {
     db.from('accreditation_evidence').select('id, standard_id, status, submitted_at, reviewed_at'),
   ]);
 
-  const standards = standardsRes.data ?? [];
+  const rawStandards = standardsRes.data ?? [];
   const evidence = evidenceRes.data ?? [];
+
+  const standardsByKey = new Map<string, any>();
+  for (const standard of rawStandards as any[]) {
+    const key = `${String(standard.category ?? 'other').trim().toLowerCase()}::${String(standard.name ?? '').trim().toLowerCase()}`;
+    if (!standardsByKey.has(key)) standardsByKey.set(key, { ...standard, duplicateIds: [] });
+    standardsByKey.get(key).duplicateIds.push(standard.id);
+  }
+  const standards = [...standardsByKey.values()];
 
   // Map standard_id → evidence status
   const evidenceMap: Record<string, string> = {};
+  const statusRank: Record<string, number> = { approved: 3, submitted: 2, pending: 2, rejected: 1 };
   for (const e of evidence) {
     const sid = (e as any).standard_id;
-    if (sid) evidenceMap[sid] = (e as any).status ?? 'submitted';
+    const next = (e as any).status ?? 'submitted';
+    if (sid && (statusRank[next] ?? 0) >= (statusRank[evidenceMap[sid]] ?? 0)) evidenceMap[sid] = next;
+  }
+  for (const standard of standards as any[]) {
+    const statuses = standard.duplicateIds.map((id: string) => evidenceMap[id]).filter(Boolean);
+    evidenceMap[standard.id] = statuses.sort((a: string, b: string) => (statusRank[b] ?? 0) - (statusRank[a] ?? 0))[0];
   }
 
   const required = standards.filter((s: any) => s.required);

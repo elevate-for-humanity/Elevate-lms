@@ -9,16 +9,20 @@ export const metadata: Metadata = {
 
 export const revalidate = 300;
 
+type PublicCatalogRow = Omit<CatalogMicrocourse, 'microcourse_providers'> & {
+  provider_display_name: string;
+};
+
 export default async function MicrocoursesPage() {
   const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from('microcourses')
-    .select('id,slug,title,description,category,duration_hours,is_free,provider_enrollment_url,retail_price_cents,currency,microcourse_providers(display_name)')
-    .eq('status', 'active')
-    .order('category')
-    .order('title');
+  const { data, error } = await supabase.rpc('get_public_microcourse_catalog');
 
-  const courses = (data || []) as unknown as CatalogMicrocourse[];
+  const courses = ((data || []) as PublicCatalogRow[]).map(
+    ({ provider_display_name, ...course }) => ({
+      ...course,
+      microcourse_providers: { display_name: provider_display_name },
+    }),
+  );
 
   return (
     <main className="min-h-screen bg-slate-50 px-5 py-16">

@@ -10,7 +10,7 @@ import {
   generateGpuVideo,
   gpuVideoAvailable,
 } from './gpu-video-client';
-import { heartbeatJob, markComplete, markFailed, type VideoJob } from './job-queue';
+import { heartbeatJob, markCandidate, markComplete, markFailed, type VideoJob } from './job-queue';
 import { enforceMediaQuality } from './media-quality-gate';
 import { enforceInstructionalQuality } from './instructional-quality-gate';
 import { repairInstructionalScript } from './instructional-script-repair';
@@ -625,6 +625,15 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       ...(result.sceneData ?? storyboard),
       source_contract: persistedSceneData.source_contract ?? null,
     };
+    await markCandidate(job.id, {
+      video_url: result.videoUrl,
+      ...(result.audioUrl ? { audio_url: result.audioUrl } : {}),
+      ...(result.duration !== undefined ? { duration_seconds: result.duration } : {}),
+      provider: REMOTION_PROVIDER,
+      provider_model: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
+      scene_count: storyboard.scenes.length,
+      scene_data: completedStoryboard,
+    });
     const qualityEvidence = await enforceMediaQuality({
       videoUrl: result.videoUrl,
       expectedDurationSeconds: result.duration ?? 0,

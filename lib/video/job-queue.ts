@@ -275,7 +275,7 @@ export async function markRendering(jobId: string): Promise<void> {
   const now = new Date().toISOString();
   const { data: job } = await supabase
     .from('video_jobs')
-    .update({ status: 'rendering', started_at: now, completed_at: null, updated_at: now })
+    .update({ status: 'rendering', started_at: now, completed_at: null, error_message: null, updated_at: now })
     .eq('id', jobId)
     .select('lesson_id, asset_kind, asset_key')
     .single();
@@ -283,6 +283,43 @@ export async function markRendering(jobId: string): Promise<void> {
   if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, { status: 'rendering', error: null });
   }
+}
+
+
+export async function markCandidate(
+  jobId: string,
+  result: {
+    video_url: string;
+    audio_url?: string;
+    duration_seconds?: number;
+    scene_count?: number;
+    scene_data?: unknown;
+    provider?: string;
+    provider_model?: string;
+  },
+): Promise<void> {
+  const now = new Date().toISOString();
+  const patch: Record<string, unknown> = {
+    // A candidate is durable evidence, but it remains non-promoted until
+    // markComplete records successful quality evidence.
+    video_url: result.video_url,
+    audio_url: result.audio_url ?? null,
+    duration_seconds: result.duration_seconds ?? null,
+    scene_count: result.scene_count ?? null,
+    last_provider: result.provider ?? null,
+    last_provider_model: result.provider_model ?? null,
+    provider: result.provider ?? null,
+    review_status: 'not_ready',
+    quality_evidence: {},
+    updated_at: now,
+  };
+  if (result.scene_data != null) {
+    patch.scene_data = result.scene_data;
+    patch.procedure_schema = result.scene_data;
+  }
+  const { error } = await db().from('video_jobs').update(patch).eq('id', jobId);
+  if (error) throw error;
+  logger.info(`[VideoJob] Candidate persisted before quality review: ${jobId}`);
 }
 
 export async function markComplete(

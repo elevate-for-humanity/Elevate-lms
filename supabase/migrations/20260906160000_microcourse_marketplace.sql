@@ -16,7 +16,7 @@ create table if not exists public.microcourse_providers (
   active boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  check (not active or (stripe_account_id is not null and transfers_capability_status = 'active'))
+  check (stripe_account_id is null or stripe_account_id ~ '^acct_')
 );
 
 create table if not exists public.microcourses (
@@ -28,7 +28,8 @@ create table if not exists public.microcourses (
   description text,
   category text not null,
   duration_hours numeric(8,2) check (duration_hours is null or duration_hours > 0),
-  provider_cost_cents integer not null check (provider_cost_cents > 0),
+  is_free boolean not null default false,
+  provider_cost_cents integer not null default 0 check (provider_cost_cents >= 0),
   markup_bps integer not null default 5000 check (markup_bps = 5000),
   retail_price_cents integer generated always as ((((provider_cost_cents::bigint * (10000 + markup_bps)) + 9999) / 10000)::integer) stored,
   currency text not null default 'usd' check (currency = lower(currency) and length(currency) = 3),
@@ -42,7 +43,8 @@ create table if not exists public.microcourses (
   metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  check (status <> 'active' or (stripe_product_id is not null and stripe_price_id is not null))
+  check (is_free = (provider_cost_cents = 0)),
+  check (status <> 'active' or is_free or (stripe_product_id is not null and stripe_price_id is not null))
 );
 
 create table if not exists public.microcourse_orders (
@@ -135,6 +137,43 @@ revoke insert, update, delete on public.microcourses from anon, authenticated;
 revoke insert, update, delete on public.microcourse_orders from anon, authenticated;
 revoke insert, update, delete on public.microcourse_order_items from anon, authenticated;
 revoke all on public.microcourse_settlement_ledger from anon, authenticated;
+
+
+-- Job Ready Indy is contractually free. It is intentionally cataloged without
+-- a Stripe Product, Price, or provider transfer.
+insert into public.microcourse_providers (provider_key, display_name, active, onboarding_status)
+values ('job-ready-indy', 'Job Ready Indy', true, 'complete')
+on conflict (provider_key) do update set display_name = excluded.display_name, active = true;
+
+insert into public.microcourses (
+  provider_id, slug, title, description, category, duration_hours, is_free,
+  provider_cost_cents, provider_enrollment_url, status, metadata
+)
+select
+  mp.id,
+  p.slug,
+  coalesce(p.title, p.name),
+  coalesce(p.short_description, p.description),
+  'workforce-readiness',
+  coalesce(p.duration_hours, p.estimated_hours, p.training_hours, p.total_hours, p.hours),
+  true,
+  0,
+  '/programs/' || p.slug,
+  'active',
+  jsonb_build_object('source_program_id', p.id, 'funded_by', 'EmployIndy', 'charge_prohibited', true)
+from public.programs p
+cross join public.microcourse_providers mp
+where mp.provider_key = 'job-ready-indy'
+  and p.partner_name = 'Job Ready Indy'
+  and coalesce((p.lms_config->>'free')::boolean, false)
+on conflict (slug) do update set
+  is_free = true,
+  provider_cost_cents = 0,
+  stripe_product_id = null,
+  stripe_price_id = null,
+  provider_enrollment_url = excluded.provider_enrollment_url,
+  status = 'active',
+  metadata = excluded.metadata;
 
 comment on column public.microcourses.provider_cost_cents is 'Amount owed to the certifier, in minor currency units.';
 comment on column public.microcourses.retail_price_cents is 'Provider cost plus the required 50% Elevate markup.';

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   XCircle,
@@ -117,7 +116,9 @@ export function DocumentReviewForm({ document, adminId }: Props) {
             <div>
               <p className="text-sm text-black">Document Type</p>
               <p className="font-semibold text-black">
-                {document.document_type
+                {(typeof document.document_type === 'string' && document.document_type.trim()
+                  ? document.document_type
+                  : 'Uploaded Document')
                   .replace(/_/g, ' ')
                   .replace(/\b\w/g, (l: string) => l.toUpperCase())}
               </p>
@@ -149,7 +150,9 @@ export function DocumentReviewForm({ document, adminId }: Props) {
             <div>
               <p className="text-sm text-black">File Size</p>
               <p className="font-semibold text-black">
-                {(document.file_size / 1024 / 1024).toFixed(2)} MB
+                {typeof document.file_size === 'number'
+                  ? `${(document.file_size / 1024 / 1024).toFixed(2)} MB`
+                  : 'Size unavailable'}
               </p>
             </div>
           </div>
@@ -186,9 +189,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
             <iframe src={docUrl} className="w-full h-[600px]" title="Document Preview" />
           ) : (
             <div className="relative w-full min-h-[400px]">
-              {docUrl && (
-                <Image src={docUrl} alt="Document" fill className="object-contain" sizes="100vw" />
-              )}
+              {docUrl && <img src={docUrl} alt="Document" className="h-auto max-h-[700px] w-full object-contain" />}
             </div>
           )}
         </div>

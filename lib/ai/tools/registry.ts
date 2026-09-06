@@ -750,7 +750,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     risk: 'low',
     scope: 'platform',
     allowedAgents: ['LIZZY', 'ZORA'],
-    allowedRoles: ['super_admin'],
+    allowedRoles: ['admin', 'super_admin'],
     approvalRequired: false,
     idempotent: true,
     timeoutMs: 30_000,
@@ -773,7 +773,7 @@ export function getAIToolCatalogForPrompt(agent: AIAgentId): string {
   return listAIToolsForAgent(agent)
     .map(
       (tool) =>
-        `${tool.name} â ${tool.description} [${tool.classification}/${tool.risk}${tool.approvalRequired ? '/approval-required' : ''}]`,
+        `${tool.name} — ${tool.description} [${tool.classification}/${tool.risk}${tool.approvalRequired ? '/approval-required' : ''}]`,
     )
     .join('\n');
 }

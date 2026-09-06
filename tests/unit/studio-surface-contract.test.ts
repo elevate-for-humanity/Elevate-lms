@@ -109,6 +109,15 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('STUDIO_BROWSER_PUBLIC_URL');
   });
 
+  it('binds browser evidence to the canonical task identity for the full stream', () => {
+    const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
+    const route = source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
+    expect(route).toContain("'X-Studio-Task-Id': taskId");
+    expect(workspace).toContain("response.headers.get('x-studio-task-id')");
+    expect(workspace).toContain('event.taskId !== canonicalTaskId');
+    expect(workspace).toContain('AI browser task identity changed during execution');
+  });
+
   it('does not advertise the unconnected Live Canvas without its feature flag', () => {
     const registry = source('lib/devstudio/workspace-registry.ts');
     expect(registry).toContain("route: '/studio/canvas'");

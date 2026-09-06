@@ -335,6 +335,7 @@ export async function POST(req: NextRequest) {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache, no-transform',
       'X-Accel-Buffering': 'no',
+      'X-Studio-Task-Id': taskId,
     },
   });
 }

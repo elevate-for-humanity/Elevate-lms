@@ -86,6 +86,18 @@ for (const providerNeutralInvariant of ['planBrowserTurn', '/snapshot']) {
 if (!browserAgentRoute.includes('browserTaskMatches')) {
   fail('Studio browser approval resume is not bound to canonical tool input');
 }
+if (!browserAgentRoute.includes("'X-Studio-Task-Id': taskId")) {
+  fail('Studio browser stream does not expose its canonical durable task identity');
+}
+const browserWorkspace = read('components/studio/CloudBrowserWorkspace.tsx');
+for (const taskIdentityInvariant of [
+  "response.headers.get('x-studio-task-id')",
+  'event.taskId !== canonicalTaskId',
+]) {
+  if (!browserWorkspace.includes(taskIdentityInvariant)) {
+    fail(`Studio browser UI is missing task identity invariant: ${taskIdentityInvariant}`);
+  }
+}
 for (const oversizedImage of [
   'mcr.microsoft.com/playwright',
   'playwright install firefox',

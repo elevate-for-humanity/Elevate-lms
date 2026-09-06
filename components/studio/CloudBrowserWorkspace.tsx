@@ -170,6 +170,9 @@ export default function CloudBrowserWorkspace() {
         }
         throw new Error(payload.error || 'AI browser task failed');
       }
+      const canonicalTaskId = response.headers.get('x-studio-task-id') || '';
+      if (!canonicalTaskId) throw new Error('AI browser task response is missing its canonical ID');
+      setActiveTaskId(canonicalTaskId);
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -187,13 +190,14 @@ export default function CloudBrowserWorkspace() {
             ?.slice(6);
           if (!raw) continue;
           const event = JSON.parse(raw);
-          if (event.taskId) setActiveTaskId(event.taskId);
+          if (event.taskId && event.taskId !== canonicalTaskId) {
+            throw new Error('AI browser task identity changed during execution');
+          }
           if (event.type === 'status' || event.type === 'step') setStatus(event.message);
           if (event.type === 'done') {
             completed = true;
             setAgentResult(event.output || `Completed ${event.steps?.length || 0} browser steps.`);
             setStatus('Connected');
-            setActiveTaskId('');
           }
           if (event.type === 'error') throw new Error(event.error || 'AI browser task failed');
         }

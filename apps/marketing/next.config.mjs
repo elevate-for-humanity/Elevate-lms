@@ -85,10 +85,6 @@ const nextConfig = {
       { source: '/partners/barber-host-shop', destination: '/partners/host-shops', permanent: true },
       { source: '/partners/barber-host-shop/apply', destination: '/partners/host-shop/apply', permanent: true },
       { source: '/admin', destination: 'https://admin.elevateforhumanity.org/login', permanent: true },
-      // Old emails, bookmarks, and notifications used /admin/* on the public
-      // origin. Keep those links working by moving the path to the dedicated
-      // Admin service and removing the obsolete /admin prefix.
-      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: true },
       { source: '/student/login', destination: 'https://app.elevateforhumanity.org/login', permanent: true },
       { source: '/videos/cna-hero', destination: '/programs/cna', permanent: true },
       { source: '/student-portal', destination: '/platform/student-portal', permanent: true },

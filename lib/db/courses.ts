@@ -104,6 +104,7 @@ export async function updateCourse(id: string, patch: CourseUpdate) {
     'description',
     'program_id',
     'duration_hours',
+    'thumbnail_url',
     'category',
     'passing_score',
   ] as const) {

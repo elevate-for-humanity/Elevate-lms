@@ -197,7 +197,7 @@ function CourseCatalog({
   const [error, setError] = useState('');
 
   async function mutate(course: CourseRow, action: 'clone' | 'publish' | 'unpublish' | 'delete') {
-    if (action === 'delete' && !window.confirm(`Delete ${course.title}? This cannot be undone.`)) return;
+    if (action === 'delete' && !window.confirm(`Archive ${course.title}? You can restore it later.`)) return;
     setBusyId(course.id);
     setError('');
     try {
@@ -254,7 +254,7 @@ function CourseCatalog({
                   {course.status === 'published' ? 'Unpublish' : 'Publish'}
                 </button>
                 <button disabled={busyId === course.id} onClick={() => void mutate(course, 'clone')} className="rounded-md border border-slate-600 px-2.5 py-1.5 text-slate-200 disabled:opacity-50">Clone</button>
-                <button disabled={busyId === course.id} onClick={() => void mutate(course, 'delete')} className="rounded-md border border-red-800 px-2.5 py-1.5 text-red-300 disabled:opacity-50">Delete</button>
+                <button disabled={busyId === course.id} onClick={() => void mutate(course, 'delete')} className="rounded-md border border-red-800 px-2.5 py-1.5 text-red-300 disabled:opacity-50">Archive</button>
               </div>
             </article>
           ))}

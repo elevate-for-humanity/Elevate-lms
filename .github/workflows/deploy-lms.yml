@@ -1,5 +1,7 @@
 name: Deploy LMS
 
+# Deployment checkpoint: learner-path and notebook production release
+
 on:
   push:
     branches:

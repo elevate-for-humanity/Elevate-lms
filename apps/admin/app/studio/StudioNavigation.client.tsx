@@ -16,7 +16,7 @@ export default function StudioNavigation() {
               <p className="truncate text-sm font-black text-slate-950 sm:text-base">Admin AI Studio</p>
               <p className="hidden items-center gap-1 truncate text-xs font-medium text-slate-600 min-[390px]:flex">
                 <Sparkles className="h-3 w-3" aria-hidden="true" />
-                One orchestrator · all platform capabilities
+                One orchestrator / all platform capabilities
               </p>
             </div>
           </div>

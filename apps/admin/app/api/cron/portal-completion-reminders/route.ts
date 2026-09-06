@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { sendSMS } from '@/lib/notifications/sms';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -115,29 +116,42 @@ async function _GET(req: NextRequest) {
   for (const candidate of candidates) {
     const pref: any = candidate.userId ? prefByUser.get(candidate.userId) : null;
     const templateData = { name: candidate.name, next_action: candidate.action, portal_url: candidate.portalUrl, role: candidate.role };
-    const channels: Array<{ channel: 'email' | 'sms'; value: string }> = [];
-    if (candidate.email && pref?.email_deadlines !== false) channels.push({ channel: 'email', value: candidate.email });
+    if (candidate.email && pref?.email_deadlines !== false) {
+      const dedupe = `portal-completion:${candidate.role}:email:${slot}`;
+      const { data: prior } = await db.from('notification_outbox').select('id')
+        .eq('entity_id', candidate.entityId).eq('entity_type', dedupe).limit(1).maybeSingle();
+      if (!prior) {
+        const { error } = await db.from('notification_outbox').insert({
+          channel: 'email', to_email: candidate.email,
+          template_key: 'portal_completion_reminder', template_data: templateData,
+          status: 'queued', scheduled_for: new Date().toISOString(),
+          entity_type: dedupe, entity_id: candidate.entityId,
+        });
+        if (!error) emailQueued++;
+      }
+    }
     const smsPhone = pref?.sms_phone || candidate.phone;
-    if (smsPhone && pref?.sms_reminders === true && pref?.opted_in_at) channels.push({ channel: 'sms', value: smsPhone });
-
-    for (const target of channels) {
-      const dedupe = `portal-completion:${candidate.role}:${target.channel}:${slot}`;
+    if (smsPhone && pref?.sms_reminders === true && pref?.opted_in_at) {
+      const dedupe = `portal-completion:${candidate.role}:sms:${slot}`;
       const { data: prior } = await db.from('notification_outbox').select('id')
         .eq('entity_id', candidate.entityId).eq('entity_type', dedupe).limit(1).maybeSingle();
       if (prior) continue;
-      const payload: any = {
-        channel: target.channel,
-        template_key: 'portal_completion_reminder',
-        template_data: templateData,
-        status: 'queued',
-        scheduled_for: new Date().toISOString(),
-        entity_type: dedupe,
-        entity_id: candidate.entityId,
-      };
-      if (target.channel === 'email') payload.to_email = target.value;
-      else payload.to_phone = target.value;
-      const { error } = await db.from('notification_outbox').insert(payload);
-      if (!error) target.channel === 'email' ? emailQueued++ : smsQueued++;
+
+      const { data: reservation, error: reserveError } = await db.from('notification_outbox').insert({
+        channel: 'sms', to_phone: smsPhone,
+        template_key: 'portal_completion_reminder', template_data: templateData,
+        status: 'processing', scheduled_for: new Date().toISOString(), processed_at: new Date().toISOString(),
+        entity_type: dedupe, entity_id: candidate.entityId,
+      }).select('id').single();
+      if (reserveError || !reservation) continue;
+
+      const message = `Elevate reminder for ${candidate.name}: please ${candidate.action}. Continue securely at ${candidate.portalUrl}. Reply STOP to opt out.`;
+      const smsResult = await sendSMS(smsPhone, message);
+      await db.from('notification_outbox').update({
+        status: smsResult.success ? 'sent' : 'failed', sent_at: smsResult.success ? new Date().toISOString() : null,
+        attempts: 1, last_error: smsResult.success ? null : 'SMS provider rejected this reminder',
+      }).eq('id', reservation.id);
+      if (smsResult.success) smsQueued++;
     }
   }
   return NextResponse.json({ ok: true, incomplete: candidates.length, emailQueued, smsQueued });

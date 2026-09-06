@@ -1,6 +1,9 @@
 name: Dev Studio Course Builder Control Plane
 
 on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/dev-studio-course-builder.yml]
   issues:
     types: [edited]
   workflow_dispatch:
@@ -37,7 +40,7 @@ env:
 
 jobs:
   hvac-one-lesson-canary:
-    if: github.event_name == 'issues' && github.event.issue.number == 1041 && github.event.issue.title == 'RUN HVAC ONE LESSON VIDEO CANARY'
+    if: (github.event_name == 'issues' && github.event.issue.number == 1041 && github.event.issue.title == 'RUN HVAC ONE LESSON VIDEO CANARY') || (github.event_name == 'push' && github.event.head_commit.message == 'run(hvac): execute approved one-lesson canary 1041')
     runs-on: ubuntu-latest
     timeout-minutes: 45
     permissions:
@@ -138,7 +141,7 @@ jobs:
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              issue_number: 1041,
               body,
             });
 

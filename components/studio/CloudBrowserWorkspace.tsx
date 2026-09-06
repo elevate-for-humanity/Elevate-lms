@@ -144,6 +144,7 @@ export default function CloudBrowserWorkspace() {
 
   async function runAgent(taskId = '') {
     if (!session || !agentTask.trim()) return;
+    if (!taskId) setActiveTaskId('');
     setAgentRunning(true);
     setAgentResult('');
     setError('');

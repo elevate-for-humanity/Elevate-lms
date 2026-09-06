@@ -6,6 +6,7 @@ import { createAiTask } from '@/lib/devstudio/os/task-runner';
 import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
 import {
   browserActionRecords,
+  browserTaskMatches,
   planBrowserTurn,
   type BrowserActionRecord,
   type BrowserSnapshot,
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
       .eq('tool_name', 'browser.execute')
       .maybeSingle();
     task = data;
-    if (!task || task.command !== command || task.tool_input?.sessionId !== sessionId) {
+    if (!browserTaskMatches(task, { command, sessionId })) {
       return NextResponse.json(
         { error: 'Browser task does not match this session or command' },
         { status: 403 },

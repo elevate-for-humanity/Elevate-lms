@@ -21,6 +21,21 @@ export type BrowserSnapshot = {
 
 export type BrowserActionRecord = { type: BrowserAction['type']; ref?: string };
 
+export function browserTaskMatches(
+  task: Record<string, unknown> | null,
+  input: { command: string; sessionId: string },
+): boolean {
+  if (!task || task.tool_name !== 'browser.execute') return false;
+  const toolInput =
+    task.tool_input && typeof task.tool_input === 'object' && !Array.isArray(task.tool_input)
+      ? (task.tool_input as Record<string, unknown>)
+      : {};
+  const canonicalCommand = String(toolInput.task || task.description || '').trim();
+  return (
+    canonicalCommand === input.command && String(toolInput.sessionId || '') === input.sessionId
+  );
+}
+
 export type BrowserAction =
   | { type: 'click_ref'; ref: string }
   | { type: 'fill_ref'; ref: string; text: string }

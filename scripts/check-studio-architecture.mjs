@@ -83,6 +83,9 @@ for (const providerNeutralInvariant of ['planBrowserTurn', '/snapshot']) {
     fail(`Studio browser agent is missing provider-neutral invariant: ${providerNeutralInvariant}`);
   }
 }
+if (!browserAgentRoute.includes('browserTaskMatches')) {
+  fail('Studio browser approval resume is not bound to canonical tool input');
+}
 for (const oversizedImage of [
   'mcr.microsoft.com/playwright',
   'playwright install firefox',

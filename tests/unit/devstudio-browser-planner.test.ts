@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   browserActionRecords,
+  browserTaskMatches,
   validateBrowserTurn,
   type BrowserSnapshot,
 } from '@/lib/devstudio/browser-planner';
@@ -90,5 +91,17 @@ describe('provider-neutral browser planner validation', () => {
         { type: 'navigate', url: 'https://www.elevateforhumanity.org/' },
       ]),
     ).toEqual([{ type: 'fill_ref', ref: 'e2' }, { type: 'navigate' }]);
+  });
+
+  it('matches approval resumes against canonical tool input instead of expanded task text', () => {
+    const task = {
+      tool_name: 'browser.execute',
+      command: 'Browser: inspect Inspect inspect',
+      description: 'inspect',
+      tool_input: { task: 'inspect', sessionId: 'session-1' },
+    };
+    expect(browserTaskMatches(task, { command: 'inspect', sessionId: 'session-1' })).toBe(true);
+    expect(browserTaskMatches(task, { command: 'inspect', sessionId: 'session-2' })).toBe(false);
+    expect(browserTaskMatches(task, { command: 'change it', sessionId: 'session-1' })).toBe(false);
   });
 });

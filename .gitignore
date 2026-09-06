@@ -256,6 +256,7 @@ public/videos/barber-orientation-clips/
 # large local video files — served from R2/CDN in production
 public/videos/*.mp4
 public/videos/**/*.mp4
+!public/videos/partners/kountry-kutz-tour.mp4
 .netlify-quarantine/
 .railway-quarantine/
 exports/northflank-env.production.json

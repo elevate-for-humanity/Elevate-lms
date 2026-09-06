@@ -12,6 +12,7 @@ import type {
 
 const ROTATION_MS = 9000;
 type ShowcaseMedia = FeaturedHostPartnerMedia & { backdropSrc?: string };
+type ShowcaseSequenceItem = { shopSlug: string; media: ShowcaseMedia };
 
 const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
   'kountry-kutz-barbershop': {
@@ -51,6 +52,7 @@ export default function HostShopShowcase({
   narration,
   narrationSrc,
   mediaOverrides,
+  mediaSequence,
 }: {
   shops: FeaturedHostPartner[];
   /** Limit video playback to the designated tour while retaining other shops as still slides. */
@@ -65,29 +67,38 @@ export default function HostShopShowcase({
   narrationSrc?: string;
   /** Page-specific media without changing another surface such as the homepage. */
   mediaOverrides?: Record<string, ShowcaseMedia>;
+  /** Explicit media order for a surface that needs more than one slide per shop. */
+  mediaSequence?: ShowcaseSequenceItem[];
 }) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
   // Keep the rotation representative and brisk: one real photo per shop,
   // instead of letting shops with large portfolios dominate the carousel.
-  const slides = useMemo(
-    () =>
-      shops.flatMap((shop) => {
-        const featured = mediaOverrides?.[shop.slug] ?? FEATURED_MEDIA_BY_SHOP[shop.slug];
-        const media: ShowcaseMedia | undefined =
-          featured?.kind !== 'video' || !videoTourShopSlug || shop.slug === videoTourShopSlug
-            ? (featured ?? shop.media?.find((item) => item.kind !== 'video'))
-            : shop.media?.find((item) => item.kind !== 'video');
-        return media ? [{ shop, media }] : [];
-      }),
-    [mediaOverrides, shops, videoTourShopSlug],
-  );
+  const slides = useMemo(() => {
+    if (mediaSequence?.length) {
+      const shopsBySlug = new Map(shops.map((shop) => [shop.slug, shop]));
+      return mediaSequence.flatMap(({ shopSlug, media }) => {
+        const shop = shopsBySlug.get(shopSlug);
+        return shop ? [{ shop, media }] : [];
+      });
+    }
+
+    return shops.flatMap((shop) => {
+      const featured = mediaOverrides?.[shop.slug] ?? FEATURED_MEDIA_BY_SHOP[shop.slug];
+      const media: ShowcaseMedia | undefined =
+        featured?.kind !== 'video' || !videoTourShopSlug || shop.slug === videoTourShopSlug
+          ? (featured ?? shop.media?.find((item) => item.kind !== 'video'))
+          : shop.media?.find((item) => item.kind !== 'video');
+      return media ? [{ shop, media }] : [];
+    });
+  }, [mediaOverrides, mediaSequence, shops, videoTourShopSlug]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [interacting, setInteracting] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
   const sectionRef = useRef<HTMLElement | null>(null);
+  const userEnabledSoundRef = useRef(false);
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -118,7 +129,9 @@ export default function HostShopShowcase({
         const video = section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]');
         if (!video) return;
         if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
-          video.muted = true;
+          // Browser autoplay requires muted playback. Once a visitor explicitly
+          // enables sound, never let an observer callback silently mute it again.
+          if (!userEnabledSoundRef.current) video.muted = true;
           void video.play().catch(() => undefined);
         } else {
           video.pause();
@@ -133,6 +146,10 @@ export default function HostShopShowcase({
       section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]')?.pause();
     };
   }, [activeIndex, autoPlayVideoOnVisible]);
+
+  useEffect(() => {
+    userEnabledSoundRef.current = false;
+  }, [activeIndex]);
 
   useEffect(() => {
     if (!slides.length) return;
@@ -180,8 +197,8 @@ export default function HostShopShowcase({
       data-narration-src={enableNarration ? narrationSrc : undefined}
       data-narration={
         enableNarration
-          ? narration ??
-            'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.'
+          ? (narration ??
+            'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.')
           : undefined
       }
       className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-12 text-slate-950 sm:px-6 sm:py-16"
@@ -227,6 +244,16 @@ export default function HostShopShowcase({
             <div className="relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[390px]">
               {image?.kind === 'video' ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
+                  {image.backdropSrc ? (
+                    <Image
+                      src={image.backdropSrc}
+                      alt=""
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 58vw"
+                      className="-z-10 scale-110 object-cover opacity-35 blur-xl"
+                      aria-hidden="true"
+                    />
+                  ) : null}
                   <video
                     key={image.src}
                     src={image.src}
@@ -246,6 +273,11 @@ export default function HostShopShowcase({
                     onLoadedMetadata={(event) => {
                       event.currentTarget.defaultPlaybackRate = 0.82;
                       event.currentTarget.playbackRate = 0.82;
+                    }}
+                    onVolumeChange={(event) => {
+                      const video = event.currentTarget;
+                      userEnabledSoundRef.current = !video.muted && video.volume > 0;
+                      if (userEnabledSoundRef.current) stopAllNaturalVoicePlayback();
                     }}
                     onEnded={(event) => {
                       // Hold the final frame. The tour is never cut short, sped up,

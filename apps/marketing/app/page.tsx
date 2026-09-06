@@ -105,8 +105,60 @@ export default function HomePage() {
           shops={HOME_HOST_SHOPS}
           videoTourShopSlug="salon-saloon"
           autoPlayVideoOnVisible
+          mediaSequence={[
+            {
+              shopSlug: 'salon-saloon',
+              media: {
+                src: '/images/partners/salon-saloon/team-sign.webp',
+                alt: 'Salon Saloon team at an Elevate participating Host Salon',
+                kind: 'photo',
+              },
+            },
+            {
+              shopSlug: 'salon-saloon',
+              media: {
+                src: '/videos/partners/salon-saloon-tour.mp4',
+                alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon',
+                kind: 'video',
+                backdropSrc: '/images/partners/salon-saloon/team-sign.webp',
+              },
+            },
+            {
+              shopSlug: 'kountry-kutz-barbershop',
+              media: {
+                src: '/images/partners/kountry-kutz-interior.webp',
+                alt: 'Interior of Kountry Kutz apprenticeship host barbershop',
+                kind: 'photo',
+              },
+            },
+            {
+              shopSlug: 'kountry-kutz-barbershop',
+              media: {
+                src: '/videos/partners/kountry-kutz-tour.mp4',
+                alt: 'Video introduction and tour of Kountry Kutz apprenticeship host barbershop',
+                kind: 'video',
+                backdropSrc: '/images/partners/kountry-kutz-official.webp',
+              },
+            },
+            {
+              shopSlug: 'cals-kutz-studio',
+              media: {
+                src: '/images/partners/cals-kutz-official.webp',
+                alt: 'Cals Kutz Studio apprenticeship host barbershop',
+                kind: 'photo',
+              },
+            },
+            {
+              shopSlug: 'b-52s-barber-shop',
+              media: {
+                src: '/images/partners/b52s-official.webp',
+                alt: "B-52's Barbershop in New Castle",
+                kind: 'photo',
+              },
+            },
+          ]}
           narrationSrc="/audio/narration/host-shop.mp3"
-          narration="Meet Salon Saloon, a new participating Elevate Host Shop serving South Bend. Visit the salon at 1740 South Bend Avenue, Suite A, South Bend, Indiana 46637, or call 269-240-7923. This tour introduces the professional salon environment where cosmetology apprentices can build supervised, hands-on experience while the Host Shop develops future talent. Use the booking link or schedule a Host Shop tour to learn more."
+          narration="Meet participating Elevate Host Shops, including Salon Saloon and Kountry Kutz Barbershop. View each shop's introduction, location, contact information, and workplace training environment, then schedule a Host Shop tour to learn more."
         />
         <div
           data-scroll-narration

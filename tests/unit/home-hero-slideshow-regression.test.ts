@@ -36,8 +36,10 @@ describe('homepage hero slideshow rendering', () => {
 
   it('opens with Salon Saloon and keeps the full hero message ahead of media on mobile', () => {
     const slidesStart = source.indexOf('const HOME_SLIDES');
-    const salonSlide = source.indexOf("src: '/images/partners/salon-saloon/team-sign.webp'");
-    const kountrySlide = source.indexOf("src: '/images/partners/kountry-kutz/interior-empty.webp'");
+    const salonSlide = source.indexOf("src: '/images/partners/salon-saloon/team-interior.webp'");
+    const kountrySlide = source.indexOf(
+      "src: '/images/partners/kountry-kutz/interior-active.webp'",
+    );
 
     expect(salonSlide).toBeGreaterThan(slidesStart);
     expect(salonSlide).toBeLessThan(kountrySlide);
@@ -46,8 +48,9 @@ describe('homepage hero slideshow rendering', () => {
     expect(source).toContain('h-[clamp(300px,46svh,480px)]');
     expect(source).not.toContain("src: '/images/partners/generations-hair/salon-service.webp'");
     expect(source).toContain(
-      "data-narration-src={revisionedHeroAsset('/audio/narration/home-hero.mp3')}",
+      "voiceoverSrc={revisionedHeroAsset('/audio/narration/home-hero.mp3')}",
     );
+    expect(source).toContain('soundButtonVariant="prominent"');
   });
 
   it('crossfades naturally without unmounting or exposing a blank frame', () => {

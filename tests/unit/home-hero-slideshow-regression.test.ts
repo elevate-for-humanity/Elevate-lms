@@ -45,7 +45,7 @@ describe('homepage hero slideshow rendering', () => {
     expect(source).toContain('className="relative order-2 w-full');
     expect(source).toContain('h-[clamp(300px,46svh,480px)]');
     expect(source).not.toContain("src: '/images/partners/generations-hair/salon-service.webp'");
-    expect(source).not.toContain(
+    expect(source).toContain(
       "data-narration-src={revisionedHeroAsset('/audio/narration/home-hero.mp3')}",
     );
   });

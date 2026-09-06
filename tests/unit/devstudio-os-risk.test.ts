@@ -13,6 +13,18 @@ describe('devstudio/os/risk', () => {
     expect(requiresApproval('fix typo in readme')).toBe(false);
   });
 
+  it('does not turn safety prohibitions into requested high-impact actions', () => {
+    expect(
+      requiresApproval(
+        'Open the homepage and report its title. Do not click, submit, publish, message, purchase, or change anything.',
+      ),
+    ).toBe(false);
+  });
+
+  it('still detects an action after negation scope is explicitly reset', () => {
+    expect(requiresApproval('Do not inspect it; instead deploy to production.')).toBe(true);
+  });
+
   it('builds approval reason', () => {
     expect(approvalReason(['deploy', 'auth'])).toContain('deploy');
   });

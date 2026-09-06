@@ -16,9 +16,17 @@ export const metadata: Metadata = {
   description: 'Review and approve uploaded documents',
 };
 
-export default async function AdminDocumentReviewPage() {
+export default async function AdminDocumentReviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   await requireRole(['admin']);
   const supabase = await requireAdminClient();
+  const requestedStatus = (await searchParams).status;
+  const activeStatus = ['pending', 'approved', 'rejected'].includes(requestedStatus ?? '')
+    ? requestedStatus
+    : 'all';
 
   // Get all documents with user info
   const { data: rawDocuments, error: documentsError } = await supabase
@@ -33,12 +41,18 @@ export default async function AdminDocumentReviewPage() {
     ? await supabase.from('profiles').select('id, full_name, email, role').in('id', docUserIds)
     : { data: [] };
   const docProfileMap = Object.fromEntries((docProfiles ?? []).map((p: any) => [p.id, p]));
-  const documents = (rawDocuments ?? []).map((d: any) => ({
+  const hydratedDocuments = (rawDocuments ?? []).map((d: any) => ({
     ...d,
     profiles: docProfileMap[d.user_id] ?? null,
     review_status: normalizeDocumentReviewStatus(d.status),
     has_storage_locator: Boolean(resolveDocumentStorageLocator(d)),
   }));
+  const isQaDocument = (doc: any) =>
+    [doc.file_name, doc.profiles?.full_name, doc.profiles?.email]
+      .filter(Boolean)
+      .some((value) => /(^|[\s_.-])(qa|test|synthetic)([\s_.-]|$)/i.test(String(value)));
+  const qaDocuments = hydratedDocuments.filter(isQaDocument);
+  const documents = hydratedDocuments.filter((doc) => !isQaDocument(doc));
 
   // Document viewing is handled on-demand via SecureDocumentLink,
   // which routes through /api/admin/documents/signed-url with audit logging.
@@ -51,6 +65,10 @@ export default async function AdminDocumentReviewPage() {
   const pendingDocs = docsWithUrls.filter((d) => d.review_status === 'pending') || [];
   const approvedDocs = docsWithUrls.filter((d) => d.review_status === 'approved') || [];
   const rejectedDocs = docsWithUrls.filter((d) => d.review_status === 'rejected') || [];
+  const visibleDocuments =
+    activeStatus === 'all'
+      ? docsWithUrls
+      : docsWithUrls.filter((doc) => doc.review_status === activeStatus);
   const documentTypeLabel = (value: unknown) =>
     typeof value === 'string' && value.trim()
       ? value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
@@ -106,7 +124,7 @@ export default async function AdminDocumentReviewPage() {
           <Link href="/wioa/documents" className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-brand-blue-400"><p className="font-black text-slate-950">WIOA Documents</p><p className="mt-1 text-sm text-slate-700">Open funding eligibility and workforce documentation.</p></Link>
         </div>
         {/* Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid md:grid-cols-5 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-2">
               <FileText className="w-8 h-8 text-brand-blue-600" />
@@ -137,6 +155,13 @@ export default async function AdminDocumentReviewPage() {
               <span className="text-3xl font-bold text-black">{rejectedDocs.length}</span>
             </div>
             <div className="text-sm text-black">Rejected</div>
+          </div>
+          <div className="rounded-lg border bg-slate-50 p-6">
+            <div className="mb-2 flex items-center justify-between">
+              <FileText className="h-8 w-8 text-slate-500" />
+              <span className="text-3xl font-bold text-slate-800">{qaDocuments.length}</span>
+            </div>
+            <div className="text-sm text-slate-700">QA/test uploads excluded</div>
           </div>
         </div>
 
@@ -184,36 +209,27 @@ export default async function AdminDocumentReviewPage() {
           <h2 className="text-2xl font-bold text-black mb-4">All Documents</h2>
 
           {/* Filter Tabs */}
-          <div className="flex gap-2 mb-6 border-b">
-            <button
-              className="px-4 py-2 font-semibold text-brand-blue-600 border-b-2 border-brand-blue-600"
-              aria-label="Action button"
-            >
-              All ({documents?.length || 0})
-            </button>
-            <button
-              className="px-4 py-2 font-semibold text-black hover:text-black"
-              aria-label="Action button"
-            >
-              Pending ({pendingDocs.length})
-            </button>
-            <button
-              className="px-4 py-2 font-semibold text-black hover:text-black"
-              aria-label="Action button"
-            >
-              Approved ({approvedDocs.length})
-            </button>
-            <button
-              className="px-4 py-2 font-semibold text-black hover:text-black"
-              aria-label="Action button"
-            >
-              Rejected ({rejectedDocs.length})
-            </button>
+          <div className="flex flex-wrap gap-2 mb-6 border-b">
+            {[
+              ['all', 'All', documents.length],
+              ['pending', 'Pending', pendingDocs.length],
+              ['approved', 'Approved', approvedDocs.length],
+              ['rejected', 'Rejected', rejectedDocs.length],
+            ].map(([status, label, count]) => (
+              <Link
+                key={String(status)}
+                href={status === 'all' ? '/documents/review' : `/documents/review?status=${status}`}
+                aria-current={activeStatus === status ? 'page' : undefined}
+                className={`px-4 py-2 font-semibold ${activeStatus === status ? 'border-b-2 border-brand-blue-600 text-brand-blue-600' : 'text-black hover:text-brand-blue-700'}`}
+              >
+                {label} ({count})
+              </Link>
+            ))}
           </div>
 
-          {documents && documents.length > 0 ? (
+          {visibleDocuments.length > 0 ? (
             <div className="space-y-3">
-              {documents.map((doc) => (
+              {visibleDocuments.map((doc) => (
                 <div
                   key={doc.id}
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition"

@@ -44,6 +44,8 @@ const TERMINAL_STATUSES = new Set([
   'SUCCESS',
 ]);
 const POLL_MS = 15_000;
+const TRANSIENT_RETRY_BASE_MS = Number(process.env.NORTHFLANK_TRANSIENT_RETRY_BASE_MS || 5_000);
+const TRANSIENT_RETRY_LIMIT = Number(process.env.NORTHFLANK_TRANSIENT_RETRY_LIMIT || 5);
 const SLOT_TIMEOUT_MS = Number(process.env.NORTHFLANK_BUILD_SLOT_TIMEOUT_MS || 3_600_000);
 
 function normalizedStatus(build: NorthflankBuildResponse): string {
@@ -66,6 +68,31 @@ function isSuccessfulForSha(build: NorthflankBuildResponse, sha: string): boolea
   return normalizedStatus(build) === 'SUCCESS';
 }
 
+function isTransientNorthflankError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /\b(408|425|429|500|502|503|504)\b|timeout|ECONNRESET|ETIMEDOUT|fetch failed|socket hang up/i.test(
+    message,
+  );
+}
+
+async function withTransientRetry<T>(operation: string, task: () => Promise<T>): Promise<T> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= TRANSIENT_RETRY_LIMIT; attempt += 1) {
+    try {
+      return await task();
+    } catch (error) {
+      lastError = error;
+      if (!isTransientNorthflankError(error) || attempt === TRANSIENT_RETRY_LIMIT) throw error;
+      const delayMs = Math.min(TRANSIENT_RETRY_BASE_MS * 2 ** (attempt - 1), 60_000);
+      console.warn(
+        `${operation} received a transient Northflank response (attempt ${attempt}/${TRANSIENT_RETRY_LIMIT}); retrying in ${delayMs}ms.`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  throw lastError;
+}
+
 function emitBuildId(buildId: string, reused: boolean) {
   console.log(`${reused ? 'Reusing' : 'Triggered'} Northflank build: ${buildId}`);
   if (process.env.GITHUB_OUTPUT) {
@@ -75,8 +102,10 @@ function emitBuildId(buildId: string, reused: boolean) {
 }
 
 async function listBuilds(projectId: string, serviceId: string) {
-  const result = await nfFetch<NorthflankBuildList>(
-    projectApiPath(projectId, `/services/${serviceId}/build?per_page=20`),
+  const result = await withTransientRetry('List builds', () =>
+    nfFetch<NorthflankBuildList>(
+      projectApiPath(projectId, `/services/${serviceId}/build?per_page=20`),
+    ),
   );
   return Array.isArray(result.builds) ? result.builds : [];
 }
@@ -139,13 +168,15 @@ async function main() {
       return;
     }
 
-    const build = await nfFetch<NorthflankBuildResponse>(buildPath, {
-      method: 'POST',
-      body: JSON.stringify({
-        sha: currentSha,
-        no_cache: process.env.FORCE_FRESH_BUILD === 'true',
+    const build = await withTransientRetry('Trigger build', () =>
+      nfFetch<NorthflankBuildResponse>(buildPath, {
+        method: 'POST',
+        body: JSON.stringify({
+          sha: currentSha,
+          no_cache: process.env.FORCE_FRESH_BUILD === 'true',
+        }),
       }),
-    });
+    );
 
     if (!build.id) {
       throw new Error(`Northflank build response did not include an id: ${JSON.stringify(build)}`);

@@ -166,7 +166,7 @@ export default async function AdminDocumentReviewPage({
         </div>
 
         {/* Pending Documents */}
-        {pendingDocs.length > 0 && (
+        {pendingDocs.length > 0 && (activeStatus === 'all' || activeStatus === 'pending') && (
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
             <h2 className="text-2xl font-bold text-black mb-4">
               Pending Review ({pendingDocs.length})

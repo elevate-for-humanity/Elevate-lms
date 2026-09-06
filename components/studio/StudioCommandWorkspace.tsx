@@ -13,7 +13,7 @@ const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
   ssr: false,
   loading: () => (
     <div className="flex h-full items-center justify-center bg-slate-950 text-sm text-slate-400">
-      Connecting isolated browserâ¦
+      Connecting isolated browser…
     </div>
   ),
 });
@@ -87,7 +87,7 @@ export default function StudioCommandWorkspace({
             </Link>
           ))}
         </nav>
-        <div className="border-t border-white/10 p-3 text-xs text-gray-400">One orchestrator Â· audited tools</div>
+        <div className="border-t border-white/10 p-3 text-xs text-gray-400">One orchestrator / audited tools</div>
       </aside>
       <section className={`${inspectionOpen ? 'hidden lg:flex' : 'flex'} min-h-0 min-w-0 flex-1 flex-col`}>
         <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-gray-50 px-3 py-2">

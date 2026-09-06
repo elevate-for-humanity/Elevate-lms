@@ -99,7 +99,7 @@ export default async function BarberApprenticeshipPage() {
       <HeroVideo
         videoSrcDesktop="/videos/partners/kountry-kutz/shop-tour.mp4"
         videoSrcMobile="/videos/partners/kountry-kutz/shop-tour.mp4"
-        videoPlaybackRate={0.9}
+        videoPlaybackRate={0.7}
         posterImage="/images/partners/kountry-kutz/interior-empty.webp"
         mountedFrameImage="/images/partners/kountry-kutz/interior-empty.webp"
         microLabel={heroBanner.microLabel}
@@ -112,6 +112,28 @@ export default async function BarberApprenticeshipPage() {
         overlayMode="none"
         deferVideoMs={0}
       />
+
+      <section className="border-b border-slate-200 bg-slate-950 px-4 py-7 text-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
+              Featured Host Shop
+            </p>
+            <h2 className="mt-2 text-2xl font-black sm:text-3xl">Tour Kountry Kutz Barbershop</h2>
+            <p className="mt-2 leading-7 text-slate-200">
+              Kountry Kutz is a family-oriented Main Street barbershop in New Palestine, Indiana,
+              offering classic cuts, modern grooming, and supervised workplace experience for the
+              barber apprenticeship pathway.
+            </p>
+          </div>
+          <Link
+            href="/host-shops/kountry-kutz-barbershop"
+            className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
+          >
+            Explore Kountry Kutz <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </div>
+      </section>
 
       <section className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12">
         <div className="mx-auto max-w-6xl">

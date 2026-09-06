@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
-import { hasPermission } from '@/lib/rbac/role-matrix';
+import { hasPermission, normalizeRoles } from '@/lib/rbac/role-matrix';
 import { requiresApproval } from '@/lib/devstudio/os/risk';
 import { buildOpenHandsContextPrompt } from '@/lib/devstudio/openhands/context';
 import { getOpenHandsConfig, getOpenHandsLifecycle } from '@/lib/devstudio/openhands/client';
@@ -10,7 +10,9 @@ import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/ope
 const CONFIRMATION = 'CONFIRM OPENHANDS EXECUTION';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
-  return effectiveRoles.some((role) => hasPermission(role, 'access_dev_tools'));
+  return normalizeRoles([...effectiveRoles]).some((role) =>
+    hasPermission(role, 'access_dev_tools'),
+  );
 }
 
 export async function POST(request: NextRequest) {

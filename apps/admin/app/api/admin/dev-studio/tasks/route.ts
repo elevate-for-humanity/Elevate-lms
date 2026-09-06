@@ -24,7 +24,9 @@ export async function GET(request: NextRequest) {
     const db = await requireAdminClient();
     let query = db
       .from('ai_tasks')
-      .select('id, title, description, status, priority, agent_id, agent_type, trace_id, tool_name, requires_approval, approval_status, risk_tags, result_json, error_message, created_at, updated_at, completed_at')
+      .select(
+        'id, title, description, status, priority, agent_id, agent_type, trace_id, tool_name, requires_approval, approval_status, approval_reason, risk_tags, result_json, tool_output, error_message, created_at, updated_at, completed_at',
+      )
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -45,7 +47,9 @@ export async function GET(request: NextRequest) {
 
     if (agenticError && !isMissingTable(agenticError)) throw agenticError;
 
-    const projectIds = [...new Set((agenticRuns ?? []).map((run) => run.project_id).filter(Boolean))];
+    const projectIds = [
+      ...new Set((agenticRuns ?? []).map((run) => run.project_id).filter(Boolean)),
+    ];
     const { data: projects, error: projectsError } = projectIds.length
       ? await db
           .from('agentic_build_projects')
@@ -56,7 +60,9 @@ export async function GET(request: NextRequest) {
     const projectById = new Map((projects ?? []).map((project) => [project.id, project]));
     const visibleRuns = (agenticRuns ?? []).filter((run) => {
       const project = projectById.get(run.project_id);
-      return project && (project.user_id === auth.id || auth.effectiveRoles.includes('super_admin'));
+      return (
+        project && (project.user_id === auth.id || auth.effectiveRoles.includes('super_admin'))
+      );
     });
     const normalizedAgenticTasks = visibleRuns.map((run) => {
       const project = projectById.get(run.project_id)!;
@@ -69,7 +75,8 @@ export async function GET(request: NextRequest) {
         status: run.status === 'waiting_for_approval' ? 'awaiting_approval' : run.status,
         priority: 'medium',
         requires_approval: run.status === 'waiting_for_approval',
-        approval_reason: run.status === 'waiting_for_approval' ? 'Course acceptance review is required.' : null,
+        approval_reason:
+          run.status === 'waiting_for_approval' ? 'Course acceptance review is required.' : null,
         ai_agents: { name: 'Course Builder AI', role: project.target_type },
         error_message: run.error,
         credits_used: run.credits_used,

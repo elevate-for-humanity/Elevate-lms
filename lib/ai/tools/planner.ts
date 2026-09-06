@@ -209,10 +209,10 @@ export function planAIToolFromCommand(
     /\b(scan|audit|inspect|test|verify|fix|repair)\b/.test(lower)
   ) {
     return {
-      name: 'openhands.execute',
+      name: 'browser.execute',
       input: {
         ...asAIRecord(context.toolInput),
-        task: `Audit and repair the public Store demos using repository and live-browser evidence. Do not publish or deploy. User request: ${command}`,
+        task: command,
       },
     };
   }
@@ -290,14 +290,18 @@ export function planAIToolFromCommand(
   if (isOpenHandsStatusCommand(lower)) {
     return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
   }
-  if (isLiveBrowserWork(lower) || isEngineeringCommand(lower)) {
+  if (isLiveBrowserWork(lower)) {
+    return {
+      name: 'browser.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
+  if (isEngineeringCommand(lower)) {
     return {
       name: 'openhands.execute',
       input: {
         ...asAIRecord(context.toolInput),
-        task: isLiveBrowserWork(lower)
-          ? `Use the configured authenticated cloud-browser and repository capabilities to complete this request end to end. Inspect the live page, capture evidence, repair implementation defects, run relevant checks, and verify the live result. Do not stop at advice when an executable capability is available. User request: ${command}`
-          : command,
+        task: command,
       },
     };
   }

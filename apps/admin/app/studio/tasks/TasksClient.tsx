@@ -18,6 +18,9 @@ interface Task {
   project_id?: string;
   error_message?: string | null;
   credits_used?: number;
+  tool_name?: string | null;
+  trace_id?: string | null;
+  result_json?: Record<string, unknown> | null;
 }
 
 export default function TasksClient() {
@@ -54,8 +57,8 @@ export default function TasksClient() {
     fetchTasks();
   }
 
-  async function rollbackTask(id: string) {
-    await fetch(`/api/admin/dev-studio/tasks/${id}/rollback`, { method: 'POST' });
+  async function cancelTask(id: string) {
+    await fetch(`/api/admin/dev-studio/tasks/${id}/cancel`, { method: 'POST' });
     fetchTasks();
   }
 
@@ -65,12 +68,14 @@ export default function TasksClient() {
 
   const STATUS_STYLES: Record<string, { icon: typeof Clock; color: string; bg: string }> = {
     pending: { icon: Clock, color: 'text-slate-500', bg: 'bg-slate-100' },
+    queued: { icon: Clock, color: 'text-cyan-700', bg: 'bg-cyan-50' },
     awaiting_approval: { icon: ShieldAlert, color: 'text-amber-600', bg: 'bg-amber-50' },
     approved: { icon: CheckCircle, color: 'text-blue-600', bg: 'bg-blue-50' },
     running: { icon: RefreshCw, color: 'text-blue-600', bg: 'bg-blue-50' },
     completed: { icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     failed: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50' },
     rolled_back: { icon: XCircle, color: 'text-slate-500', bg: 'bg-slate-100' },
+    cancelled: { icon: XCircle, color: 'text-slate-500', bg: 'bg-slate-100' },
   };
 
   return (
@@ -150,8 +155,31 @@ export default function TasksClient() {
                           Requires approval: {task.approval_reason}
                         </p>
                       )}
-                      {task.description && <p className="mt-2 line-clamp-3 text-sm text-slate-600">{task.description}</p>}
-                      {task.error_message && <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">{task.error_message}</p>}
+                      {task.description && (
+                        <p className="mt-2 line-clamp-3 text-sm text-slate-600">
+                          {task.description}
+                        </p>
+                      )}
+                      {task.error_message && (
+                        <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                          {task.error_message}
+                        </p>
+                      )}
+                      {(task.tool_name || task.trace_id) && (
+                        <p className="mt-2 font-mono text-[10px] text-slate-400">
+                          {task.tool_name || 'advisory'} · {task.trace_id || task.id}
+                        </p>
+                      )}
+                      {task.result_json && (
+                        <details className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs">
+                          <summary className="cursor-pointer font-semibold text-slate-700">
+                            Task evidence
+                          </summary>
+                          <pre className="mt-2 max-h-56 overflow-auto whitespace-pre-wrap text-[10px] text-slate-600">
+                            {JSON.stringify(task.result_json, null, 2)}
+                          </pre>
+                        </details>
+                      )}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {task.status === 'awaiting_approval' && (
@@ -162,14 +190,25 @@ export default function TasksClient() {
                           >
                             Approve
                           </button>
-                          {task.source !== 'agentic_build' && <button
-                            onClick={() => rollbackTask(task.id)}
-                            className="rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-200 transition"
-                          >
-                            Reject
-                          </button>}
+                          {task.source !== 'agentic_build' && (
+                            <button
+                              onClick={() => cancelTask(task.id)}
+                              className="rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-200 transition"
+                            >
+                              Reject and cancel
+                            </button>
+                          )}
                         </>
                       )}
+                      {task.source !== 'agentic_build' &&
+                        ['queued', 'running'].includes(task.status) && (
+                          <button
+                            onClick={() => cancelTask(task.id)}
+                            className="rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-200 transition"
+                          >
+                            Cancel
+                          </button>
+                        )}
                     </div>
                   </div>
                   <div className="flex items-center gap-3 mt-3 text-xs text-slate-400">
@@ -179,7 +218,14 @@ export default function TasksClient() {
                       {task.status.replace(/_/g, ' ')}
                     </span>
                     <span>{new Date(task.created_at).toLocaleString()}</span>
-                    {task.source === 'agentic_build' && <span>Course Builder{typeof task.credits_used === 'number' ? ` · ${task.credits_used} credits` : ''}</span>}
+                    {task.source === 'agentic_build' && (
+                      <span>
+                        Course Builder
+                        {typeof task.credits_used === 'number'
+                          ? ` · ${task.credits_used} credits`
+                          : ''}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

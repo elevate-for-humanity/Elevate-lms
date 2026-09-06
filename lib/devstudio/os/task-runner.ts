@@ -112,7 +112,11 @@ export async function createAiTask(
   runtime: TaskExecutionRuntimeContext = { actorRoles: [] },
 ) {
   const command = `${input.title} ${input.description ?? ''} ${input.command ?? ''}`.trim();
-  const plannedTool = planAIToolFromCommand(command);
+  const executionMode = input.executionMode ?? 'automatic';
+  const plannedTool = planAIToolFromCommand(command, {
+    toolName: input.toolName,
+    toolInput: input.toolInput,
+  });
   const tool = plannedTool ? getAITool(plannedTool.name) : null;
   const riskTags = Array.from(
     new Set([...detectRiskTags(command), ...(tool?.approvalRequired ? [`tool:${tool.name}`] : [])]),
@@ -151,7 +155,11 @@ export async function createAiTask(
       title: input.title,
       description: input.description ?? null,
       command,
-      status: needsApproval ? 'awaiting_approval' : 'planning',
+      status: needsApproval
+        ? 'awaiting_approval'
+        : executionMode === 'interactive'
+          ? 'queued'
+          : 'planning',
       priority: normalizePriority(input.priority),
       agent_id: agent?.id ?? null,
       agent_type: runtimeAgent,
@@ -170,8 +178,10 @@ export async function createAiTask(
         : null,
       risk_tags: riskTags,
       tool_name: plannedTool?.name ?? null,
-      tool_input: plannedTool?.input ?? null,
-      started_at: new Date().toISOString(),
+      tool_input: plannedTool
+        ? { ...plannedTool.input, __executionMode: executionMode }
+        : { __executionMode: executionMode },
+      started_at: executionMode === 'automatic' && !needsApproval ? new Date().toISOString() : null,
     })
     .select('*')
     .single();
@@ -219,8 +229,18 @@ export async function createAiTask(
       runtime.tenantId,
       input.requestedBy,
     );
-  } else {
+  } else if (executionMode === 'automatic') {
     await runTaskExecution(db, task.id, input.requestedBy, runtime);
+  } else {
+    await appendTaskLog(
+      db,
+      task.id,
+      'Interactive task queued for its dedicated execution runtime.',
+      'info',
+      undefined,
+      runtime.tenantId,
+      input.requestedBy,
+    );
   }
 
   await writeDevAuditLog(db, {
@@ -667,6 +687,7 @@ export async function approveTask(
 ): Promise<void> {
   const { data: task } = await db.from('ai_tasks').select('*').eq('id', taskId).single();
   if (!task) throw new Error('Task not found');
+  const isInteractive = task.tool_input?.__executionMode === 'interactive';
 
   await db
     .from('ai_approvals')
@@ -689,7 +710,7 @@ export async function approveTask(
   await db
     .from('ai_tasks')
     .update({
-      status: 'planning',
+      status: isInteractive ? 'queued' : 'planning',
       requires_approval: false,
       approval_status: 'approved',
       updated_at: new Date().toISOString(),
@@ -704,7 +725,19 @@ export async function approveTask(
     traceId: task.trace_id,
   });
 
-  await runTaskExecution(db, taskId, reviewerId, { ...runtime, approvalGranted: true });
+  if (!isInteractive) {
+    await runTaskExecution(db, taskId, reviewerId, { ...runtime, approvalGranted: true });
+  } else {
+    await appendTaskLog(
+      db,
+      taskId,
+      'Interactive task approved and queued for resume by its dedicated runtime.',
+      'info',
+      undefined,
+      runtime.tenantId ?? task.tenant_id,
+      reviewerId,
+    );
+  }
 }
 
 export async function rollbackTask(

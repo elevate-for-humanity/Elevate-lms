@@ -8,16 +8,16 @@ describe('OpenHands engineering delegation', () => {
     expect(planned?.input.task).toContain('Fix the broken TypeScript route');
   });
 
-  it('routes Store demo repairs to engineering instead of workflow inspection', () => {
+  it('routes explicit live-browser work to the isolated browser runtime', () => {
     const command = 'Fix every public Store demo in the live browser and repository, including claims that do not match the real workflow';
     const planned = planAIToolFromCommand(command);
-    expect(planned?.name).toBe('openhands.execute');
+    expect(planned?.name).toBe('browser.execute');
     expect(planned?.input.task).toContain('Store demo');
   });
 
-  it('does not treat a Store demo audit as workflow status inspection', () => {
+  it('routes browser audits to browser execution instead of OpenHands', () => {
     const planned = planAIToolFromCommand('Scan public Store demo routes and test broken links, mobile layout, console errors, and API errors');
-    expect(planned?.name).toBe('openhands.execute');
+    expect(planned?.name).toBe('browser.execute');
   });
 
   it('routes a commercial request to the canonical Media Studio renderer', () => {

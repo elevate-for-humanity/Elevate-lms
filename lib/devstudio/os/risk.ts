@@ -7,6 +7,19 @@ const RISKY_KEYWORDS = [
   'drop',
   'truncate',
   'production',
+  'buy',
+  'purchase',
+  'checkout',
+  'pay',
+  'remove',
+  'publish',
+  'merge',
+  'push',
+  'send',
+  'email',
+  'message',
+  'submit application',
+  'sign',
 ] as const;
 
 export function detectRiskTags(text: string): string[] {

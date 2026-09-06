@@ -21,7 +21,7 @@ import { isGroqConfigured, getGroqClient } from '@/lib/groq-client';
 import { isGeminiConfigured } from '@/lib/gemini-client';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
-import { aiChat } from '@/lib/ai/ai-service';
+import { aiChat, getActiveProviderName } from '@/lib/ai/ai-service';
 import { getRAGContext } from '@/lib/platform/rag';
 import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
 import { runStudioBrowserAudit } from '@/lib/devstudio/browser-audit';
@@ -826,8 +826,7 @@ function enforceEvidenceBoundary(
           try {
             const finalUrl = new URL(url);
             return (
-              finalUrl.hostname === 'admin.elevateforhumanity.org' &&
-              finalUrl.pathname === '/login'
+              finalUrl.hostname === 'admin.elevateforhumanity.org' && finalUrl.pathname === '/login'
             );
           } catch {
             return false;
@@ -1539,10 +1538,14 @@ async function _POST(req: NextRequest) {
     let assistantMessage: string | null = null;
     let provider = 'none';
     let model = 'none';
-    const providerOrder: Exclude<ChatProvider, 'auto'>[] =
-      providerPreference === 'auto'
-        ? ['groq', 'openai', 'anthropic', 'gemini']
-        : [providerPreference];
+    const canonicalProvider = getActiveProviderName();
+    const providerOrder = [canonicalProvider];
+    if (providerPreference !== 'auto' && providerPreference !== canonicalProvider) {
+      logger.warn('[devstudio/chat] ignored non-canonical provider override', {
+        requested: providerPreference,
+        canonical: canonicalProvider,
+      });
+    }
 
     for (const nextProvider of providerOrder) {
       if (assistantMessage) break;
@@ -1732,14 +1735,13 @@ async function _POST(req: NextRequest) {
     if (!assistantMessage) {
       try {
         const fallbackResult = await aiChat({
-          model: 'gpt-4.1-mini',
           messages: [{ role: 'system', content: systemPrompt }, ...messages],
           temperature: 0.4,
           maxTokens: 2048,
         });
         assistantMessage = fallbackResult.content ?? null;
-        provider = 'aiChat-fallback';
-        model = 'gpt-4.1-mini';
+        provider = fallbackResult.provider ?? canonicalProvider;
+        model = fallbackResult.model;
       } catch (err: unknown) {
         logger.warn('[devstudio/chat] aiChat fallback failed', normalizeError(err));
       }

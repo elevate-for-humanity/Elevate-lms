@@ -41,6 +41,7 @@ export default function CloudBrowserWorkspace() {
   const [agentResult, setAgentResult] = useState('');
   const [agentRunning, setAgentRunning] = useState(false);
   const [approvalRequested, setApprovalRequested] = useState(false);
+  const [activeTaskId, setActiveTaskId] = useState('');
   const imageRef = useRef<HTMLImageElement>(null);
 
   const endpoint = session ? `${session.publicUrl}/sessions/${session.id}` : '';
@@ -128,19 +129,25 @@ export default function CloudBrowserWorkspace() {
   }
 
   async function stop() {
+    if (activeTaskId) {
+      await fetch(`/api/admin/dev-studio/tasks/${activeTaskId}/cancel`, { method: 'POST' }).catch(
+        () => undefined,
+      );
+    }
     if (session)
       await fetch(endpoint, { method: 'DELETE', headers: authHeaders }).catch(() => undefined);
     setSession(null);
     setEvents([]);
     setStatus('Stopped');
+    setActiveTaskId('');
   }
 
-  async function runAgent(confirmed = false) {
+  async function runAgent(taskId = '') {
     if (!session || !agentTask.trim()) return;
     setAgentRunning(true);
     setAgentResult('');
     setError('');
-    if (!confirmed) setApprovalRequested(false);
+    setApprovalRequested(false);
     try {
       const response = await fetch('/api/admin/dev-studio/browser/agent', {
         method: 'POST',
@@ -149,12 +156,13 @@ export default function CloudBrowserWorkspace() {
           task: agentTask,
           sessionId: session.id,
           sessionToken: session.token,
-          confirmed,
+          taskId: taskId || undefined,
         }),
       });
       if (!response.ok || !response.body) {
         const payload = await response.json().catch(() => ({}));
         if (response.status === 409 && payload.approvalRequired) {
+          setActiveTaskId(payload.taskId || '');
           setApprovalRequested(true);
           setError(payload.confirmation || payload.error);
           return;
@@ -178,11 +186,13 @@ export default function CloudBrowserWorkspace() {
             ?.slice(6);
           if (!raw) continue;
           const event = JSON.parse(raw);
+          if (event.taskId) setActiveTaskId(event.taskId);
           if (event.type === 'status' || event.type === 'step') setStatus(event.message);
           if (event.type === 'done') {
             completed = true;
             setAgentResult(event.output || `Completed ${event.steps?.length || 0} browser steps.`);
             setStatus('Connected');
+            setActiveTaskId('');
           }
           if (event.type === 'error') throw new Error(event.error || 'AI browser task failed');
         }
@@ -193,6 +203,25 @@ export default function CloudBrowserWorkspace() {
     } finally {
       setAgentRunning(false);
     }
+  }
+
+  async function approveAndResume() {
+    if (!activeTaskId) return;
+    setAgentRunning(true);
+    setError('');
+    try {
+      const response = await fetch(`/api/admin/dev-studio/tasks/${activeTaskId}/approve`, {
+        method: 'POST',
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || 'Could not approve browser task');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not approve browser task');
+      setAgentRunning(false);
+      return;
+    }
+    setAgentRunning(false);
+    await runAgent(activeTaskId);
   }
 
   useEffect(() => {
@@ -311,11 +340,19 @@ export default function CloudBrowserWorkspace() {
         </div>
         <aside className="flex min-h-0 flex-col border-l border-slate-800 bg-slate-950">
           <div className="border-b border-slate-800 p-3">
-            <p className="mb-1 text-xs font-black text-violet-300">Optional OpenAI Computer Use</p>
+            <p className="mb-1 text-xs font-black text-violet-300">Governed AI Browser Task</p>
             <p className="mb-2 text-[10px] text-slate-500">
-              Runs only when you press Run and may consume API credits. High-impact actions are
-              blocked.
+              Uses the canonical Studio task ledger and isolated browser. High-impact actions pause
+              for server-recorded approval.
             </p>
+            {activeTaskId && (
+              <a
+                href="/studio/tasks"
+                className="mb-2 block truncate rounded border border-slate-800 bg-slate-900 px-2 py-1 text-[10px] text-cyan-300 underline"
+              >
+                Task evidence: {activeTaskId}
+              </a>
+            )}
             <textarea
               value={agentTask}
               onChange={(event) => setAgentTask(event.target.value)}
@@ -324,7 +361,7 @@ export default function CloudBrowserWorkspace() {
               className="w-full rounded border border-slate-700 bg-slate-900 p-2 text-xs"
             />
             <button
-              onClick={() => runAgent(false)}
+              onClick={() => runAgent()}
               disabled={!session || !agentTask.trim() || agentRunning}
               className="mt-2 w-full rounded bg-violet-600 px-3 py-2 text-xs font-black disabled:opacity-50"
             >
@@ -332,11 +369,11 @@ export default function CloudBrowserWorkspace() {
             </button>
             {approvalRequested && (
               <button
-                onClick={() => runAgent(true)}
+                onClick={approveAndResume}
                 disabled={agentRunning}
                 className="mt-2 w-full rounded bg-amber-500 px-3 py-2 text-xs font-black text-slate-950 disabled:opacity-50"
               >
-                Approve exact command and run
+                Approve canonical task and resume
               </button>
             )}
             {agentResult && (

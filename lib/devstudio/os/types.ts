@@ -36,6 +36,9 @@ export interface CreateTaskInput {
   command?: string;
   priority?: number;
   traceId?: string;
+  toolName?: string;
+  toolInput?: Record<string, unknown>;
+  executionMode?: 'automatic' | 'interactive';
 }
 
 export interface TaskPlanStep {

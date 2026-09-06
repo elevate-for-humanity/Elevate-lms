@@ -717,6 +717,24 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     audit: true,
   },
   {
+    name: 'browser.execute',
+    description:
+      'Execute an interactive command in an isolated Studio browser with durable task checkpoints.',
+    method: 'POST',
+    path: '/api/admin/dev-studio/browser/agent',
+    classification: 'write',
+    risk: 'medium',
+    scope: 'platform',
+    allowedAgents: DEVSTUDIO_AGENTS,
+    allowedRoles: PRIVILEGED_ADMIN_ROLES,
+    requiredInput: ['task'],
+    approvalRequired: false,
+    idempotent: false,
+    timeoutMs: 120_000,
+    retryAttempts: 1,
+    audit: true,
+  },
+  {
     name: 'openhands.execute',
     description:
       'Dispatch a privileged software-engineering task to OpenHands Cloud through the canonical Dev Studio runtime.',

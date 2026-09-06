@@ -208,7 +208,7 @@ async function generateElevenLabsNarration(text: string): Promise<Buffer> {
   return Buffer.from(await response.arrayBuffer());
 }
 
-async function generateCloudflareNarration(text: string): Promise<Buffer> {
+async function generateCloudflareNarrationChunk(text: string): Promise<Buffer> {
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
   const token = (
     process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN
@@ -256,6 +256,71 @@ async function generateCloudflareNarration(text: string): Promise<Buffer> {
     throw new Error('Cloudflare Workers AI returned no narration audio');
   }
   return Buffer.from(encoded.replace(/^data:audio\/[^;]+;base64,/, ''), 'base64');
+}
+
+
+const CLOUDFLARE_TTS_MAX_CHARACTERS = 1900;
+
+function cloudflareNarrationChunks(text: string): string[] {
+  const chunks: string[] = [];
+  let remaining = text.replace(/\s+/g, ' ').trim();
+  while (remaining.length > CLOUDFLARE_TTS_MAX_CHARACTERS) {
+    const window = remaining.slice(0, CLOUDFLARE_TTS_MAX_CHARACTERS + 1);
+    const sentenceBreak = Math.max(
+      window.lastIndexOf('. '),
+      window.lastIndexOf('? '),
+      window.lastIndexOf('! '),
+    );
+    const wordBreak = window.lastIndexOf(' ');
+    const splitAt =
+      sentenceBreak >= Math.floor(CLOUDFLARE_TTS_MAX_CHARACTERS * 0.5)
+        ? sentenceBreak + 1
+        : wordBreak > 0
+          ? wordBreak
+          : CLOUDFLARE_TTS_MAX_CHARACTERS;
+    chunks.push(remaining.slice(0, splitAt).trim());
+    remaining = remaining.slice(splitAt).trim();
+  }
+  if (remaining) chunks.push(remaining);
+  return chunks;
+}
+
+async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffer> {
+  if (segments.length === 1) return segments[0];
+  return new Promise((resolve, reject) => {
+    const ffmpeg = spawn('ffmpeg', [
+      '-hide_banner', '-loglevel', 'error',
+      '-f', 'mp3', '-i', 'pipe:0',
+      '-codec:a', 'libmp3lame', '-b:a', '128k', '-f', 'mp3', 'pipe:1',
+    ]);
+    const output: Buffer[] = [];
+    const errors: Buffer[] = [];
+    ffmpeg.stdout.on('data', (chunk: Buffer) => output.push(chunk));
+    ffmpeg.stderr.on('data', (chunk: Buffer) => errors.push(chunk));
+    ffmpeg.on('error', reject);
+    ffmpeg.on('close', (code) => {
+      const result = Buffer.concat(output);
+      if (code !== 0 || !result.length) {
+        reject(new Error(
+          `Cloudflare narration segment composition failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 400)}`,
+        ));
+      } else {
+        resolve(result);
+      }
+    });
+    ffmpeg.stdin.end(Buffer.concat(segments));
+  });
+}
+
+async function generateCloudflareNarration(text: string): Promise<Buffer> {
+  const chunks = cloudflareNarrationChunks(text);
+  const segments: Buffer[] = [];
+  // Keep calls sequential to preserve narration order and avoid burst pressure
+  // on the authoritative provider.
+  for (const chunk of chunks) {
+    segments.push(await generateCloudflareNarrationChunk(chunk));
+  }
+  return normalizeCloudflareMp3Segments(segments);
 }
 
 async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promise<Buffer> {

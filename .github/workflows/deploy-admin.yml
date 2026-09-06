@@ -1,6 +1,6 @@
 name: Deploy Admin
 
-# Deployment checkpoint: strict-boundary repair convergence
+# Deployment checkpoint: learner-path and notebook production release
 
 on:
   push:

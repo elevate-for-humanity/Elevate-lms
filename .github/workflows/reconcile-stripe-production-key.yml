@@ -2,6 +2,11 @@ name: Reconcile Stripe production key
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/reconcile-stripe-production-key.yml'
+      - 'scripts/ops/reconcile-stripe-production-key.mjs'
 
 permissions:
   contents: read

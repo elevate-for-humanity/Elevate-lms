@@ -25,7 +25,7 @@ import {
   fetchAiHealth,
   routeEllieMessage,
   selectStudioAgent,
-  streamPlatformChat,
+  streamExecuteCommand,
   type EllieMessageRoute,
   type StudioSpecialist,
 } from '@/lib/devstudio/ellie-unified-handlers';
@@ -446,39 +446,19 @@ export default function UnifiedEllieChat({
           ...prev,
           { role: 'assistant', content: '', provider: 'admin-ai', route, agent },
         ]);
-        const history = [...messages, userMsg].map((message) => ({
-          role: message.role,
-          content: message.content,
-        }));
-        await streamPlatformChat(history, {
-          agent,
-          fileContext: [fileContext, attachment?.context].filter(Boolean).join('\n\n') || undefined,
-          onToken: (token) => {
+        const command = [text, fileContext, attachment?.context].filter(Boolean).join('\n\n');
+        await streamExecuteCommand(command, (line) => {
             setMessages((prev) => {
               const next = [...prev];
               const row = next[assistantIdx];
               if (row?.role === 'assistant')
-                next[assistantIdx] = { ...row, content: row.content + token };
-              return next;
-            });
-          },
-          onDone: (meta) => {
-            const preview = findElevatePreviewUrl(meta.toolCalls);
-            if (preview) onPreviewTarget?.(preview);
-            setMessages((prev) => {
-              const next = [...prev];
-              const row = next[assistantIdx];
-              if (row?.role === 'assistant') {
                 next[assistantIdx] = {
                   ...row,
-                  provider: meta.provider ?? row.provider,
-                  toolCalls: meta.toolCalls ?? row.toolCalls,
-                  capabilitiesUsed: meta.capabilitiesUsed ?? row.capabilitiesUsed,
+                  provider: 'registered-tools',
+                  content: `${row.content}${row.content ? '\n' : ''}${line}`,
                 };
-              }
               return next;
             });
-          },
         });
       }
     } catch (error) {

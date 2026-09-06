@@ -58,8 +58,38 @@ export type ProgramHolderContext =
  * assigned a fake holder/tenant identity.
  */
 export async function requireProgramHolder(): Promise<ProgramHolderContext> {
-  const access = await requirePortalAccess('programholder');
   const db = await requireAdminClient();
+
+  // A cross-domain Admin preview arrives with a short-lived signed handoff
+  // cookie, not an LMS Supabase session. Resolve that verified handoff before
+  // the normal role guard so the preview does not bounce through /login.
+  const handoffPreview = await resolvePortalPreviewSubject(db, null);
+  if (handoffPreview.previewing && handoffPreview.userId) {
+    const { data: targetProfile } = await db
+      .from('profiles')
+      .select('id,role,full_name,email,program_holder_id,tenant_id')
+      .eq('id', handoffPreview.userId)
+      .maybeSingle();
+    if (targetProfile?.program_holder_id && ['program_holder', 'programholder'].includes(targetProfile.role)) {
+      const { data: associations } = await db
+        .from('program_holder_programs')
+        .select('program_id')
+        .eq('program_holder_id', targetProfile.program_holder_id)
+        .eq('status', 'active');
+      return {
+        mode: 'preview',
+        isPlatformAdmin: true,
+        user: { id: targetProfile.id, email: targetProfile.email || undefined },
+        profile: targetProfile,
+        holderId: targetProfile.program_holder_id,
+        tenantId: targetProfile.tenant_id ?? null,
+        programIds: (associations || []).map((item: { program_id: string }) => item.program_id),
+        db,
+      };
+    }
+  }
+
+  const access = await requirePortalAccess('programholder');
 
   if (access.isPlatformAdmin) {
     const preview = await resolvePortalPreviewSubject(db, access.user.id);

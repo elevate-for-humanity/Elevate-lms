@@ -9,6 +9,7 @@ import { getHostShopBoard } from '@/lib/partner/board';
 import { getHostShopReadinessItems } from '@/lib/partners/host-shop-readiness';
 import HostShopReadinessBanner from '@/components/partners/HostShopReadinessBanner';
 import { headers } from 'next/headers';
+import { resolveHostShopAdminPreview } from '@/lib/admin/host-shop-preview';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +24,13 @@ export default async function HostShopDashboardLayout({ children }: { children: 
   // Relationship data alone is not permission to enter the Host Shop portal.
   // Apprentices can legitimately have an active placement at a shop, so enforce
   // the canonical role taxonomy before resolving partner/shop context.
-  const auth = await requireRole(HOST_SHOP_ROLES);
+  const preview = await resolveHostShopAdminPreview();
+  const auth = preview
+    ? {
+        user: { id: preview.actorId, email: preview.actorEmail },
+        effectiveRoles: [preview.actorRole],
+      }
+    : await requireRole(HOST_SHOP_ROLES);
   const db = await requireAdminClient();
   const { data: actorProfile } = await db
     .from('profiles')

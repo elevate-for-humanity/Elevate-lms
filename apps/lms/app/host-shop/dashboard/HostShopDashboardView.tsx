@@ -12,6 +12,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
 import { PwaInstallButton } from '@/components/pwa/PwaInstallButton';
+import { resolveHostShopAdminPreview } from '@/lib/admin/host-shop-preview';
 
 async function clearAdminPartner() {
   'use server';
@@ -97,7 +98,13 @@ function PortalImageCard({ card }: { card: PortalCard }) {
 }
 
 export default async function HostShopDashboardView() {
-  const { user, effectiveRoles } = await requireRole(HOST_SHOP_ROLES);
+  const preview = await resolveHostShopAdminPreview();
+  const { user, effectiveRoles } = preview
+    ? {
+        user: { id: preview.actorId, email: preview.actorEmail },
+        effectiveRoles: [preview.actorRole],
+      }
+    : await requireRole(HOST_SHOP_ROLES);
   const db = await requireAdminClient();
   const { data: actorProfile } = await db
     .from('profiles')

@@ -70,7 +70,8 @@ jobs:
           test -n "$CRON_SECRET"
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
-          test -f .github/COURSE_MEDIA_PAUSED
+          grep -q "isCourseBuilderGenerationPaused" apps/admin/app/api/internal/videos/process-queue/route.ts
+          grep -q "course_builder_proof_course_id" apps/admin/app/api/internal/videos/process-queue/route.ts
           grep -q "DEFAULT_CLOUDFLARE_TTS_MODEL" lib/video/edge-tts.ts
           grep -q "no provider bypass was attempted" lib/video/edge-tts.ts
 

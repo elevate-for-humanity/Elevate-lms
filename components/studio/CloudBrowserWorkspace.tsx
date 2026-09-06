@@ -149,9 +149,37 @@ export default function CloudBrowserWorkspace() {
           sessionToken: session.token,
         }),
       });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || 'AI browser task failed');
-      setAgentResult(payload.output || `Completed ${payload.steps?.length || 0} browser steps.`);
+      if (!response.ok || !response.body) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || 'AI browser task failed');
+      }
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let completed = false;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const chunks = buffer.split('\n\n');
+        buffer = chunks.pop() ?? '';
+        for (const chunk of chunks) {
+          const raw = chunk
+            .split('\n')
+            .find((line) => line.startsWith('data: '))
+            ?.slice(6);
+          if (!raw) continue;
+          const event = JSON.parse(raw);
+          if (event.type === 'status' || event.type === 'step') setStatus(event.message);
+          if (event.type === 'done') {
+            completed = true;
+            setAgentResult(event.output || `Completed ${event.steps?.length || 0} browser steps.`);
+            setStatus('Connected');
+          }
+          if (event.type === 'error') throw new Error(event.error || 'AI browser task failed');
+        }
+      }
+      if (!completed) throw new Error('AI browser task ended without a result');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'AI browser task failed');
     } finally {
@@ -162,16 +190,19 @@ export default function CloudBrowserWorkspace() {
   useEffect(() => {
     if (!session) return;
     const headers = { Authorization: `Bearer ${session.token}` };
-    const timer = window.setInterval(async () => {
-      const response = await fetch(`${endpoint}/events`, { headers }).catch(() => null);
-      if (response?.ok) {
-        const payload = await response.json();
-        setEvents(payload.events || []);
-        if (payload.url) setTarget(payload.url);
-      }
-    }, 3000);
+    const timer = window.setInterval(
+      async () => {
+        const response = await fetch(`${endpoint}/events`, { headers }).catch(() => null);
+        if (response?.ok) {
+          const payload = await response.json();
+          setEvents(payload.events || []);
+          if (payload.url) setTarget(payload.url);
+        }
+      },
+      agentRunning ? 1000 : 3000,
+    );
     return () => window.clearInterval(timer);
-  }, [endpoint, session]);
+  }, [agentRunning, endpoint, session]);
 
   useEffect(() => {
     if (!session) return;

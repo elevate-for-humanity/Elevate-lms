@@ -1,11 +1,33 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { auditPage, isPrivateAddress } from './server.mjs';
+import { auditPage, isPrivateAddress, runActions } from './server.mjs';
 
 test('blocks private IPv4 networks', () => {
   for (const address of ['127.0.0.1', '10.0.0.4', '172.16.1.2', '192.168.1.2', '169.254.1.1']) {
     assert.equal(isPrivateAddress(address), true, address);
   }
+});
+
+test('batches browser actions in order with one request', async () => {
+  const calls = [];
+  const session = {
+    lastSeen: 0,
+    page: {
+      mouse: { click: async (x, y) => calls.push(['click', x, y]) },
+      keyboard: { insertText: async (value) => calls.push(['type', value]) },
+    },
+  };
+  const result = await runActions(session, {
+    actions: [
+      { type: 'click', x: 10, y: 20 },
+      { type: 'type', text: 'fast' },
+    ],
+  });
+  assert.equal(result.count, 2);
+  assert.deepEqual(calls, [
+    ['click', 10, 20],
+    ['type', 'fast'],
+  ]);
 });
 
 test('allows public IPv4 networks', () => {

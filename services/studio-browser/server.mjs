@@ -11,6 +11,14 @@ const adminOrigin =
   process.env.STUDIO_BROWSER_ADMIN_ORIGIN || 'https://admin.elevateforhumanity.org';
 const sessionTtlMs = Number(process.env.STUDIO_BROWSER_SESSION_TTL_MS || 15 * 60_000);
 const maxSessions = Number(process.env.STUDIO_BROWSER_MAX_SESSIONS || 4);
+const frameIntervalMs = Math.min(
+  1000,
+  Math.max(100, Number(process.env.STUDIO_BROWSER_FRAME_INTERVAL_MS || 160)),
+);
+const frameQuality = Math.min(
+  80,
+  Math.max(35, Number(process.env.STUDIO_BROWSER_FRAME_QUALITY || 60)),
+);
 const allowedDomains = (process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || 'elevateforhumanity.org')
   .split(',')
   .map((value) => value.trim().toLowerCase())
@@ -91,10 +99,22 @@ function authorized(req, session, requestUrl) {
 }
 
 async function getBrowser() {
-  browserPromise ||= chromium.launch({
-    headless: true,
-    args: ['--disable-dev-shm-usage', '--no-sandbox'],
-  });
+  browserPromise ||= chromium
+    .launch({
+      headless: true,
+      args: [
+        '--disable-background-networking',
+        '--disable-component-update',
+        '--disable-dev-shm-usage',
+        '--disable-renderer-backgrounding',
+        '--no-first-run',
+        '--no-sandbox',
+      ],
+    })
+    .catch((error) => {
+      browserPromise = undefined;
+      throw error;
+    });
   return browserPromise;
 }
 
@@ -102,6 +122,7 @@ async function destroySession(id) {
   const session = sessions.get(id);
   if (!session) return;
   sessions.delete(id);
+  if (session.frameTimer) clearTimeout(session.frameTimer);
   for (const stream of session.streams) stream.end();
   await session.context.close().catch(() => undefined);
 }
@@ -126,6 +147,10 @@ async function createSession(target, viewport) {
     createdAt: Date.now(),
     lastSeen: Date.now(),
     streams: new Set(),
+    frameTimer: undefined,
+    frameInFlight: false,
+    framesSent: 0,
+    framesDropped: 0,
     events: [],
   };
   const record = (type, data) => {
@@ -160,7 +185,7 @@ async function runAction(session, action) {
       clickCount: action.type === 'double_click' || action.clickCount === 2 ? 2 : 1,
     });
   else if (action.type === 'type')
-    await page.keyboard.type(String(action.text || '').slice(0, 4000));
+    await page.keyboard.insertText(String(action.text || '').slice(0, 4000));
   else if (action.type === 'keypress')
     await page.keyboard.press(
       (Array.isArray(action.keys) ? action.keys : [action.key])
@@ -193,6 +218,13 @@ async function runAction(session, action) {
   else if (action.type === 'reload')
     await page.reload({ waitUntil: 'domcontentloaded', timeout: 30_000 });
   else throw new Error('Unsupported browser action');
+}
+
+export async function runActions(session, payload) {
+  const actions = Array.isArray(payload?.actions) ? payload.actions.slice(0, 50) : [payload];
+  const startedAt = Date.now();
+  for (const action of actions) await runAction(session, action);
+  return { count: actions.length, durationMs: Date.now() - startedAt };
 }
 
 export async function auditPage(session) {
@@ -275,33 +307,61 @@ export async function auditPage(session) {
   };
 }
 
-async function streamFrames(req, res, session) {
+function scheduleFrame(session, delay = frameIntervalMs) {
+  if (session.frameTimer || !session.streams.size || !sessions.has(session.id)) return;
+  session.frameTimer = setTimeout(() => {
+    session.frameTimer = undefined;
+    void broadcastFrame(session);
+  }, delay);
+  session.frameTimer.unref();
+}
+
+async function broadcastFrame(session) {
+  if (session.frameInFlight || !session.streams.size || !sessions.has(session.id)) return;
+  session.frameInFlight = true;
+  const startedAt = Date.now();
+  try {
+    const image = await session.page.screenshot({
+      type: 'jpeg',
+      quality: frameQuality,
+      animations: 'disabled',
+    });
+    const header = `--studioframe\r\nContent-Type: image/jpeg\r\nContent-Length: ${image.length}\r\n\r\n`;
+    for (const stream of [...session.streams]) {
+      if (stream.destroyed) {
+        session.streams.delete(stream);
+        continue;
+      }
+      const headerWritable = stream.write(header);
+      const imageWritable = stream.write(image);
+      const boundaryWritable = stream.write('\r\n');
+      if (!(headerWritable && imageWritable && boundaryWritable)) session.framesDropped += 1;
+    }
+    session.framesSent += 1;
+  } catch {
+    /* session may be navigating or closing */
+  } finally {
+    session.frameInFlight = false;
+    scheduleFrame(session, Math.max(0, frameIntervalMs - (Date.now() - startedAt)));
+  }
+}
+
+function streamFrames(req, res, session) {
   session.lastSeen = Date.now();
   res.writeHead(200, {
     ...corsHeaders(),
     'content-type': 'multipart/x-mixed-replace; boundary=studioframe',
+    connection: 'keep-alive',
   });
   session.streams.add(res);
-  const send = async () => {
-    if (res.destroyed || !sessions.has(session.id)) return;
-    try {
-      const image = await session.page.screenshot({
-        type: 'jpeg',
-        quality: 68,
-        animations: 'disabled',
-      });
-      res.write(
-        `--studioframe\r\nContent-Type: image/jpeg\r\nContent-Length: ${image.length}\r\n\r\n`,
-      );
-      res.write(image);
-      res.write('\r\n');
-    } catch {
-      /* session may be closing */
+  req.on('close', () => {
+    session.streams.delete(res);
+    if (!session.streams.size && session.frameTimer) {
+      clearTimeout(session.frameTimer);
+      session.frameTimer = undefined;
     }
-    setTimeout(send, 450).unref();
-  };
-  req.on('close', () => session.streams.delete(res));
-  await send();
+  });
+  void broadcastFrame(session);
 }
 
 const server = http.createServer(async (req, res) => {
@@ -315,6 +375,8 @@ const server = http.createServer(async (req, res) => {
         engine: 'playwright-chromium',
         commit: process.env.GIT_SHA || 'MISSING',
         sessions: sessions.size,
+        browserWarm: Boolean(browserPromise),
+        frameIntervalMs,
       });
     if (req.method === 'POST' && url.pathname === '/sessions') {
       if (!sharedSecret || req.headers['x-studio-browser-secret'] !== sharedSecret)
@@ -341,9 +403,10 @@ const server = http.createServer(async (req, res) => {
       return json(res, 401, { error: 'Invalid or expired browser session' });
     if (req.method === 'GET' && match[2] === 'stream') return streamFrames(req, res, session);
     if (req.method === 'GET' && match[2] === 'screenshot') {
+      const quality = Math.min(80, Math.max(35, Number(url.searchParams.get('quality') || 65)));
       const image = await session.page.screenshot({
         type: 'jpeg',
-        quality: 75,
+        quality,
         animations: 'disabled',
       });
       res.writeHead(200, {
@@ -358,8 +421,8 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && match[2] === 'audit')
       return json(res, 200, await auditPage(session));
     if (req.method === 'POST' && match[2] === 'actions') {
-      await runAction(session, await readBody(req));
-      return json(res, 200, { ok: true, url: session.page.url() });
+      const metrics = await runActions(session, await readBody(req));
+      return json(res, 200, { ok: true, url: session.page.url(), ...metrics });
     }
     if (req.method === 'DELETE' && !match[2]) {
       await destroySession(session.id);
@@ -384,5 +447,13 @@ async function shutdown() {
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  server.listen(port, '0.0.0.0', () => console.info(`Studio browser listening on ${port}`));
+  server.listen(port, '0.0.0.0', () => {
+    console.info(`Studio browser listening on ${port}`);
+    void getBrowser().catch((error) =>
+      console.error(
+        'Studio browser pre-warm failed',
+        error instanceof Error ? error.message : error,
+      ),
+    );
+  });
 }

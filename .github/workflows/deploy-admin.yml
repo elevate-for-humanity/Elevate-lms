@@ -1,6 +1,6 @@
 name: Deploy Admin
 
-# Deployment checkpoint: learner-path and notebook production release
+# Deployment checkpoint: authorized learner-path production release
 
 on:
   push:

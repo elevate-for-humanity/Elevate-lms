@@ -139,6 +139,17 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('Live inspection');
   });
 
+  it('greets Store visitors with the PARIS product interview', () => {
+    const wrapper = source('apps/marketing/app/store/StoreClientWrapper.tsx');
+    const guide = source('components/store/StoreGuideChat.tsx');
+    expect(wrapper).toContain("forceOpen={pathname === '/store'}");
+    expect(guide).toContain("I'll start with a quick interview");
+    expect(guide).toContain('Let PARIS interview you');
+    expect(guide).toContain("useState<'recommend' | 'chat'>('chat')");
+    expect(guide).toContain('Guided interview');
+    expect(guide).toContain('aria-label="Minimize PARIS"');
+  });
+
   it('consolidates the legacy testing screen into the governed Testing Center', () => {
     const legacy = source('apps/admin/app/testing/page.tsx');
     const canonical = source('apps/admin/app/testing-center/page.tsx');

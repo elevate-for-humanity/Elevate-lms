@@ -13,12 +13,6 @@ export default function StoreClientWrapper({ children }: StoreClientWrapperProps
   const pathname = usePathname();
   const demoRoute = pathname.startsWith('/store/demo');
   const [activeTourId, setActiveTourId] = useState<string | null>(null);
-  const [showGuide, setShowGuide] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowGuide(true), 3000);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const handleTourTrigger = (e: Event) => {
@@ -45,7 +39,12 @@ export default function StoreClientWrapper({ children }: StoreClientWrapperProps
   return (
     <>
       {children}
-      {showGuide && !demoRoute && <StoreGuideChat onStartTour={handleStartTour} />}
+      {!demoRoute && (
+        <StoreGuideChat
+          onStartTour={handleStartTour}
+          forceOpen={pathname === '/store'}
+        />
+      )}
       {activeTourId && (
         <GuidedTour
           tourId={activeTourId}

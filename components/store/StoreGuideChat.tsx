@@ -2,27 +2,26 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { MessageCircle, Sparkles, Volume2, VolumeX, X } from 'lucide-react';
+import { MessageCircle, Sparkles, Volume2, VolumeX } from 'lucide-react';
 import { GUIDE_STORAGE_KEYS, GuideChoice, storeGuideFlow } from '@/lib/guide/flows';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import ParisChat from '@/components/paris/ParisChat';
 
 type Props = { onStartTour?: (tourId: string) => void; forceOpen?: boolean };
 
+const STORE_INTERVIEW_GREETING =
+  "Hi, I'm PARIS. I'll start with a quick interview, then recommend the best Elevate product, live demo, and starting plan for you.";
+
 export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props) {
   const router = useRouter();
   const naturalVoice = useNaturalVoice();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(forceOpen);
   const [questionId, setQuestionId] = useState('main');
   const [choice, setChoice] = useState<GuideChoice | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [mode, setMode] = useState<'recommend' | 'chat'>('recommend');
+  const [mode, setMode] = useState<'recommend' | 'chat'>('chat');
   const speaking = naturalVoice.isPlaying || naturalVoice.isLoading;
-
-  useEffect(() => {
-    if (forceOpen) setOpen(true);
-  }, [forceOpen]);
 
   const currentQuestion = storeGuideFlow.questions.find((question) => question.id === questionId);
 
@@ -32,9 +31,9 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
     void naturalVoice.play(text, { voice: 'coral', style: 'assistant', rate: 1 });
   };
   function openGuide() {
-    setMode('recommend');
+    setMode('chat');
     setOpen(true);
-    speak("Hi, I'm PARIS, your Elevate Store guide. What are you trying to do? I can show you the best product, a live demo, and the right starting plan.");
+    speak(STORE_INTERVIEW_GREETING);
   }
 
   const toggle = () => {
@@ -71,7 +70,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
   if (!open) {
     return (
       <button type="button" onClick={openGuide} className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-rose-600 to-orange-500 px-5 py-3 font-bold text-white shadow-xl shadow-orange-900/20 transition hover:-translate-y-0.5 hover:shadow-2xl">
-        <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-black text-rose-700 shadow-inner" aria-hidden="true">P<span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></span><span><span className="block text-left text-[10px] font-black uppercase tracking-widest text-white/80">Store guide · tap to hear</span>Ask PARIS</span>
+        <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-black text-rose-700 shadow-inner" aria-hidden="true">P<span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></span><span><span className="block text-left text-[10px] font-black uppercase tracking-widest text-white/80">Quick interview · tap to hear</span>Let PARIS interview you</span>
       </button>
     );
   }
@@ -85,22 +84,22 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
           <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rose-600 to-orange-400 text-xl font-black text-white ring-4 ring-white shadow-lg" aria-label="PARIS avatar">P<span className="absolute -right-0.5 -top-0.5 h-3.5 w-3.5 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></div>
           <div className="flex-1"><p className="text-xs font-black uppercase tracking-[0.16em] text-rose-700">PARIS · Store Guide</p><h2 className="text-lg font-black text-slate-950">PARIS</h2><p className="text-sm font-semibold text-slate-700">{speaking ? 'Explaining your best option…' : 'Tell me what you need. I’ll recommend the right product, demo, and plan.'}</p></div>
           <button type="button" onClick={toggle} aria-label={muted ? 'Unmute natural voice' : 'Mute natural voice'}>{muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</button>
-          <button type="button" onClick={() => { stop(); setOpen(false); }} aria-label="Close"><X className="h-5 w-5" /></button>
+          <button type="button" onClick={() => { stop(); setOpen(false); }} className="rounded-lg px-2 py-1 text-xs font-bold text-slate-700 hover:bg-white" aria-label="Minimize PARIS">Minimize</button>
         </header>
         <div className="grid grid-cols-2 border-y border-slate-200 bg-white p-2">
           <button
             type="button"
-            onClick={() => setMode('recommend')}
-            className={`inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-bold ${mode === 'recommend' ? 'bg-orange-100 text-orange-900' : 'text-slate-600 hover:bg-slate-50'}`}
+            onClick={() => setMode('chat')}
+            className={`inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-bold ${mode === 'chat' ? 'bg-orange-100 text-orange-900' : 'text-slate-600 hover:bg-slate-50'}`}
           >
-            <Sparkles className="h-4 w-4" /> Quick interview
+            <MessageCircle className="h-4 w-4" /> Guided interview
           </button>
           <button
             type="button"
-            onClick={() => setMode('chat')}
-            className={`inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-bold ${mode === 'chat' ? 'bg-cyan-100 text-cyan-900' : 'text-slate-600 hover:bg-slate-50'}`}
+            onClick={() => setMode('recommend')}
+            className={`inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-bold ${mode === 'recommend' ? 'bg-cyan-100 text-cyan-900' : 'text-slate-600 hover:bg-slate-50'}`}
           >
-            <MessageCircle className="h-4 w-4" /> Ask anything
+            <Sparkles className="h-4 w-4" /> Quick choices
           </button>
         </div>
         {mode === 'chat' ? (
@@ -109,6 +108,9 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
         <div className="max-h-[52vh] overflow-y-auto p-4 sm:p-5">
           {!confirmed ? (
             <>
+              <p className="mb-3 rounded-xl bg-cyan-50 px-3 py-2 text-sm font-semibold leading-6 text-slate-800">
+                {STORE_INTERVIEW_GREETING}
+              </p>
               <h3 className="text-lg font-bold text-slate-950">{currentQuestion?.question}</h3>
               <div className="mt-4 space-y-2">
                 {currentQuestion?.choices.map((item) => (

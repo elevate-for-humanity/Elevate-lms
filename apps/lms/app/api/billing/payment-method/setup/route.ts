@@ -68,6 +68,7 @@ async function _POST(req: NextRequest) {
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
   const session = await stripe.checkout.sessions.create({
     mode: 'setup',
+    currency: 'usd',
     customer: customer.id,
     client_reference_id: user.id,
     success_url: `${appUrl}/api/billing/payment-method/complete?session_id={CHECKOUT_SESSION_ID}`,

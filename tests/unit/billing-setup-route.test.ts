@@ -126,6 +126,7 @@ describe('POST /api/billing/setup', () => {
       expect(mocks.checkoutCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           mode: 'setup',
+          currency: 'usd',
           customer: `cus_valid_${suffix}`,
           client_reference_id: arranged.user.id,
           metadata: expect.objectContaining({

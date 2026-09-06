@@ -82,6 +82,7 @@ describe('universal payment-method setup', () => {
     const checkoutArgs = mocks.checkoutCreate.mock.calls[0][0];
     expect(checkoutArgs).toMatchObject({
       mode: 'setup',
+      currency: 'usd',
       customer: 'cus_test_universal',
       client_reference_id: user.id,
       metadata: { kind: 'universal_payment_method_setup', user_id: user.id },

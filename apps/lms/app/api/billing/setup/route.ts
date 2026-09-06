@@ -117,6 +117,7 @@ async function _POST(req: NextRequest) {
   );
   const session = await stripe.checkout.sessions.create({
     mode: 'setup',
+    currency: 'usd',
     customer: customerId,
     client_reference_id: user.id,
     success_url: `${appUrl}/api/billing/setup/complete?session_id={CHECKOUT_SESSION_ID}`,

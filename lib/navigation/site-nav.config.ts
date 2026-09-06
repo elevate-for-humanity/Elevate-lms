@@ -83,6 +83,17 @@ export const headerNavigation: NavGroup[] = [
     ],
   },
   {
+    label: 'Microcourses',
+    href: '/microcourses',
+    items: [
+      { label: 'All Microcourses', href: '/microcourses' },
+      { label: 'Workplace Safety', href: '/microcourses?category=workplace-safety' },
+      { label: 'Food Safety', href: '/microcourses?category=food-safety' },
+      { label: 'Drug Testing', href: '/microcourses?category=drug-testing' },
+      { label: 'Certifications', href: '/microcourses?category=certifications' },
+    ],
+  },
+  {
     label: 'For Students',
     items: [
       {

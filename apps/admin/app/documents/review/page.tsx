@@ -19,11 +19,13 @@ export const metadata: Metadata = {
 export default async function AdminDocumentReviewPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; includeQa?: string }>;
 }) {
   await requireRole(['admin']);
   const supabase = await requireAdminClient();
-  const requestedStatus = (await searchParams).status;
+  const resolvedSearchParams = await searchParams;
+  const requestedStatus = resolvedSearchParams.status;
+  const includeQa = resolvedSearchParams.includeQa === '1';
   const activeStatus = ['pending', 'approved', 'rejected'].includes(requestedStatus ?? '')
     ? requestedStatus
     : 'all';
@@ -52,7 +54,7 @@ export default async function AdminDocumentReviewPage({
       .filter(Boolean)
       .some((value) => /(^|[\s_.-])(qa|test|synthetic)([\s_.-]|$)/i.test(String(value)));
   const qaDocuments = hydratedDocuments.filter(isQaDocument);
-  const documents = hydratedDocuments.filter((doc) => !isQaDocument(doc));
+  const documents = hydratedDocuments.filter((doc) => includeQa || !isQaDocument(doc));
 
   // Document viewing is handled on-demand via SecureDocumentLink,
   // which routes through /api/admin/documents/signed-url with audit logging.
@@ -119,9 +121,30 @@ export default async function AdminDocumentReviewPage({
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="mb-8 grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border-2 border-brand-blue-300 bg-brand-blue-50 p-5"><p className="font-black text-slate-950">Learner & Apprentice Documents</p><p className="mt-1 text-sm text-slate-700">You are viewing the primary learner-document queue below.</p></div>
-          <Link href="/program-holder-documents" className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-brand-blue-400"><p className="font-black text-slate-950">Program Holder Documents</p><p className="mt-1 text-sm text-slate-700">Open agreements, insurance, licenses, and provider files.</p></Link>
-          <Link href="/wioa/documents" className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-brand-blue-400"><p className="font-black text-slate-950">WIOA Documents</p><p className="mt-1 text-sm text-slate-700">Open funding eligibility and workforce documentation.</p></Link>
+          <div className="rounded-2xl border-2 border-brand-blue-300 bg-brand-blue-50 p-5">
+            <p className="font-black text-slate-950">Learner & Apprentice Documents</p>
+            <p className="mt-1 text-sm text-slate-700">
+              You are viewing the primary learner-document queue below.
+            </p>
+          </div>
+          <Link
+            href="/program-holder-documents"
+            className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-brand-blue-400"
+          >
+            <p className="font-black text-slate-950">Program Holder Documents</p>
+            <p className="mt-1 text-sm text-slate-700">
+              Open agreements, insurance, licenses, and provider files.
+            </p>
+          </Link>
+          <Link
+            href="/wioa/documents"
+            className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-brand-blue-400"
+          >
+            <p className="font-black text-slate-950">WIOA Documents</p>
+            <p className="mt-1 text-sm text-slate-700">
+              Open funding eligibility and workforce documentation.
+            </p>
+          </Link>
         </div>
         {/* Stats */}
         <div className="grid md:grid-cols-5 gap-6 mb-8">
@@ -182,8 +205,8 @@ export default async function AdminDocumentReviewPage({
                     <div className="flex-1">
                       <h3 className="font-semibold text-black">{doc.file_name}</h3>
                       <p className="text-sm text-black">
-                        {documentTypeLabel(doc.document_type)}{' '}
-                        •{(doc.profiles as any)?.full_name || 'Unknown User'} (
+                        {documentTypeLabel(doc.document_type)} •
+                        {(doc.profiles as any)?.full_name || 'Unknown User'} (
                         {(doc.profiles as any)?.role}) • Uploaded{' '}
                         {new Date(doc.created_at).toLocaleDateString()}
                       </p>
@@ -218,7 +241,7 @@ export default async function AdminDocumentReviewPage({
             ].map(([status, label, count]) => (
               <Link
                 key={String(status)}
-                href={status === 'all' ? '/documents/review' : `/documents/review?status=${status}`}
+                href={`${status === 'all' ? '/documents/review' : `/documents/review?status=${status}`}${includeQa ? `${status === 'all' ? '?' : '&'}includeQa=1` : ''}`}
                 aria-current={activeStatus === status ? 'page' : undefined}
                 className={`px-4 py-2 font-semibold ${activeStatus === status ? 'border-b-2 border-brand-blue-600 text-brand-blue-600' : 'text-black hover:text-brand-blue-700'}`}
               >
@@ -239,8 +262,8 @@ export default async function AdminDocumentReviewPage({
                     <div className="flex-1">
                       <h3 className="font-semibold text-black">{doc.file_name}</h3>
                       <p className="text-sm text-black">
-                        {documentTypeLabel(doc.document_type)}{' '}
-                        •{(doc.profiles as any)?.full_name || 'Unknown User'} (
+                        {documentTypeLabel(doc.document_type)} •
+                        {(doc.profiles as any)?.full_name || 'Unknown User'} (
                         {(doc.profiles as any)?.role}) • Uploaded{' '}
                         {new Date(doc.created_at).toLocaleDateString()}
                       </p>

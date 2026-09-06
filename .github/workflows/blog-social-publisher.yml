@@ -22,10 +22,21 @@ jobs:
           ADMIN_URL: ${{ secrets.ADMIN_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          test -n "$ADMIN_URL"
-          test -n "$CRON_SECRET"
-          curl --fail-with-body --silent --show-error \
-            -X POST "$ADMIN_URL/api/internal/social-media/process" \
+          if [ -z "$ADMIN_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "Required ADMIN_URL or CRON_SECRET secret is missing"
+            exit 1
+          fi
+          endpoint="${ADMIN_URL%/}/api/internal/social-media/process"
+          response_file="$(mktemp)"
+          status="$(curl --silent --show-error \
+            --retry 3 --retry-all-errors --retry-delay 2 \
+            -o "$response_file" -w '%{http_code}' \
+            -X POST "$endpoint" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
-            --max-time 300
+            --connect-timeout 20 --max-time 300)"
+          echo "Publisher endpoint returned HTTP $status"
+          sed -E 's/(token|secret|authorization)"?[[:space:]]*:[[:space:]]*"[^"]+"/\1":"[redacted]"/Ig' "$response_file"
+          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+            exit 1
+          fi

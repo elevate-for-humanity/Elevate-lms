@@ -127,7 +127,7 @@ async function destroySession(id) {
   await session.context.close().catch(() => undefined);
 }
 
-async function createSession(target, viewport) {
+async function createSession(target, viewport, authCookies = []) {
   if (sessions.size >= maxSessions) throw new Error('Studio browser session capacity reached');
   const browser = await getBrowser();
   const context = await browser.newContext({
@@ -135,6 +135,37 @@ async function createSession(target, viewport) {
     ignoreHTTPSErrors: false,
     acceptDownloads: false,
   });
+  const targetUrl = new URL(target);
+  const safeAuthCookies = Array.isArray(authCookies)
+    ? authCookies
+        .filter(
+          (cookie) =>
+            cookie &&
+            typeof cookie.name === 'string' &&
+            typeof cookie.value === 'string' &&
+            cookie.name.startsWith('sb-') &&
+            (cookie.name.endsWith('-auth-token') || /-auth-token\.\d+$/.test(cookie.name)) &&
+            cookie.name.length <= 200 &&
+            cookie.value.length <= 12_000,
+        )
+        .slice(0, 12)
+        .map((cookie) => ({
+          name: cookie.name,
+          value: cookie.value,
+          domain: '.elevateforhumanity.org',
+          path: '/',
+          httpOnly: true,
+          secure: true,
+          sameSite: 'Lax',
+        }))
+    : [];
+  if (
+    safeAuthCookies.length &&
+    (targetUrl.hostname === 'elevateforhumanity.org' ||
+      targetUrl.hostname.endsWith('.elevateforhumanity.org'))
+  ) {
+    await context.addCookies(safeAuthCookies);
+  }
   const page = await context.newPage();
   const id = crypto.randomUUID();
   const token = crypto.randomBytes(32).toString('base64url');
@@ -385,7 +416,7 @@ const server = http.createServer(async (req, res) => {
       const target = await validateTarget(String(body.url || 'https://www.elevateforhumanity.org'));
       const width = Math.min(1920, Math.max(320, Number(body.width || 1440)));
       const height = Math.min(1080, Math.max(480, Number(body.height || 900)));
-      const session = await createSession(target, { width, height });
+      const session = await createSession(target, { width, height }, body.authCookies);
       return json(res, 201, {
         id: session.id,
         token: session.token,

@@ -2,7 +2,8 @@ import { test, expect, type Page } from '@playwright/test';
 
 const BASE = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
 const APPRENTICE_EMAIL = process.env.E2E_APPRENTICE_EMAIL || process.env.TEST_STUDENT_EMAIL || '';
-const APPRENTICE_PASSWORD = process.env.E2E_APPRENTICE_PASSWORD || process.env.TEST_STUDENT_PASSWORD || '';
+const APPRENTICE_PASSWORD =
+  process.env.E2E_APPRENTICE_PASSWORD || process.env.TEST_STUDENT_PASSWORD || '';
 const HOST_EMAIL = process.env.E2E_HOST_SHOP_EMAIL || '';
 const HOST_PASSWORD = process.env.E2E_HOST_SHOP_PASSWORD || '';
 const ADMIN_BASE = process.env.PLAYWRIGHT_ADMIN_URL || 'https://admin.elevateforhumanity.org';
@@ -10,7 +11,10 @@ const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL || '';
 const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD || '';
 
 async function login(page: Page, email: string, password: string, base = BASE) {
-  const response = await page.goto(`${base}/login`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  const response = await page.goto(`${base}/login`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 30_000,
+  });
   expect(response?.status() ?? 200, 'Login route returned a server error').toBeLessThan(500);
 
   const emailInput = page.locator('input[type="email"], input[name="email"]').first();
@@ -52,14 +56,22 @@ async function expectBrowserDeniedFromPortal(page: Page, path: string) {
       timeout: 15_000,
     })
     .not.toMatch(/^\/host-shop\/dashboard(?:\/|$)/);
-  expect(page.url(), `${path} did not resolve to an authorization/login boundary`).toMatch(/\/(?:unauthorized|host-shop\/login|login)(?:\?|$)/);
+  expect(page.url(), `${path} did not resolve to an authorization/login boundary`).toMatch(
+    /\/(?:unauthorized|host-shop\/login|login)(?:\?|$)/,
+  );
   await expect(page.getByRole('heading', { name: /host shop dashboard/i })).toHaveCount(0);
 }
 
 test.describe('Registered apprenticeship authorization', () => {
-  test.skip(!APPRENTICE_EMAIL || !APPRENTICE_PASSWORD, 'Authenticated apprentice credentials are required');
+  test.skip(
+    !APPRENTICE_EMAIL || !APPRENTICE_PASSWORD,
+    'Authenticated apprentice credentials are required',
+  );
 
-  test('apprentice can use canonical dashboard surfaces but cannot use Host Shop verifier API', async ({ page, browser }) => {
+  test('apprentice can use canonical dashboard surfaces but cannot use Host Shop verifier API', async ({
+    page,
+    browser,
+  }) => {
     await login(page, APPRENTICE_EMAIL, APPRENTICE_PASSWORD);
 
     await expectPortalRoute(page, '/apprentice', /apprentice|registered|competenc|RTI/i);
@@ -135,11 +147,14 @@ test.describe('Registered apprenticeship authorization', () => {
       const adminPage = await adminContext.newPage();
       try {
         await login(adminPage, ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_BASE);
-        const adminReview = await adminPage.goto(`${ADMIN_BASE}/documents/review`, {
+        const adminReview = await adminPage.goto(`${ADMIN_BASE}/documents/review?includeQa=1`, {
           waitUntil: 'domcontentloaded',
           timeout: 30_000,
         });
-        expect(adminReview?.status() ?? 200, 'Admin document review returned a server error').toBeLessThan(500);
+        expect(
+          adminReview?.status() ?? 200,
+          'Admin document review returned a server error',
+        ).toBeLessThan(500);
         expect(adminPage.url()).not.toMatch(/\/(?:login|unauthorized)(?:\?|$)/);
         // This assertion certifies that the deployed Admin review queue reads
         // the same canonical documents table written by the apprentice API.
@@ -160,7 +175,11 @@ test.describe('Registered apprenticeship authorization', () => {
 
     // Keep a direct API assertion for server-side authorization.
     const forbidden = await page.request.patch(`${BASE}/api/host-shop/competencies`, {
-      data: { enrollmentId: '00000000-0000-0000-0000-000000000000', competencyId: 'not-authorized', completed: true },
+      data: {
+        enrollmentId: '00000000-0000-0000-0000-000000000000',
+        competencyId: 'not-authorized',
+        completed: true,
+      },
       failOnStatusCode: false,
     });
     expect([401, 403]).toContain(forbidden.status());
@@ -194,7 +213,9 @@ test.describe('Host Shop production workspace', () => {
     ];
     for (const path of operationalSurfaces) await expectPortalRoute(page, path);
 
-    const listResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, { failOnStatusCode: false });
+    const listResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, {
+      failOnStatusCode: false,
+    });
     expect(listResponse.status()).toBe(200);
     const list = await listResponse.json();
     expect(Array.isArray(list.apprentices)).toBe(true);
@@ -206,24 +227,37 @@ test.describe('Host Shop production workspace', () => {
     }
   });
 
-  test('assigned Host Shop verifier can persist a competency change and restore the original state', async ({ page }) => {
+  test('assigned Host Shop verifier can persist a competency change and restore the original state', async ({
+    page,
+  }) => {
     await login(page, HOST_EMAIL, HOST_PASSWORD);
 
-    const dashboard = await page.goto(`${BASE}/host-shop/dashboard`, { waitUntil: 'domcontentloaded' });
+    const dashboard = await page.goto(`${BASE}/host-shop/dashboard`, {
+      waitUntil: 'domcontentloaded',
+    });
     expect(dashboard?.status() ?? 200).toBeLessThan(500);
     expect(page.url()).not.toContain('/unauthorized');
 
-    const listResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, { failOnStatusCode: false });
+    const listResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, {
+      failOnStatusCode: false,
+    });
     expect(listResponse.status()).toBe(200);
     const list = await listResponse.json();
     expect(Array.isArray(list.apprentices)).toBe(true);
     expect(list.apprentices.length).toBeGreaterThan(0);
 
-    const apprentice = list.apprentices.find((item: any) => item?.standard?.competencies?.length && item?.enrollmentId);
-    expect(apprentice, 'No assigned registered apprentice with competencies found for Host Shop E2E account').toBeTruthy();
+    const apprentice = list.apprentices.find(
+      (item: any) => item?.standard?.competencies?.length && item?.enrollmentId,
+    );
+    expect(
+      apprentice,
+      'No assigned registered apprentice with competencies found for Host Shop E2E account',
+    ).toBeTruthy();
 
     const competency = apprentice.standard.competencies[0];
-    const original = (apprentice.competencyRecords || []).find((row: any) => row.competency_id === competency.id);
+    const original = (apprentice.competencyRecords || []).find(
+      (row: any) => row.competency_id === competency.id,
+    );
     const originalCompleted = Boolean(original?.completed);
     const testCompleted = !originalCompleted;
 
@@ -248,27 +282,44 @@ test.describe('Host Shop production workspace', () => {
     expect(mutate.status()).toBe(200);
 
     try {
-      const verifyResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, { failOnStatusCode: false });
+      const verifyResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, {
+        failOnStatusCode: false,
+      });
       expect(verifyResponse.status()).toBe(200);
       const verifyBody = await verifyResponse.json();
-      const reloadedApprentice = verifyBody.apprentices.find((item: any) => item.enrollmentId === apprentice.enrollmentId);
-      const persisted = (reloadedApprentice?.competencyRecords || []).find((row: any) => row.competency_id === competency.id);
+      const reloadedApprentice = verifyBody.apprentices.find(
+        (item: any) => item.enrollmentId === apprentice.enrollmentId,
+      );
+      const persisted = (reloadedApprentice?.competencyRecords || []).find(
+        (row: any) => row.competency_id === competency.id,
+      );
       expect(Boolean(persisted?.completed)).toBe(testCompleted);
       expect(persisted?.verified_by_name).toBeTruthy();
       if (testCompleted) expect(persisted?.date_completed).toBeTruthy();
     } finally {
       const restore = await page.request.patch(`${BASE}/api/host-shop/competencies`, {
-        data: { enrollmentId: apprentice.enrollmentId, competencyId: competency.id, completed: originalCompleted, notes: original?.notes || null },
+        data: {
+          enrollmentId: apprentice.enrollmentId,
+          competencyId: competency.id,
+          completed: originalCompleted,
+          notes: original?.notes || null,
+        },
         failOnStatusCode: false,
       });
       expect(restore.status()).toBe(200);
     }
 
-    const restoredResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, { failOnStatusCode: false });
+    const restoredResponse = await page.request.get(`${BASE}/api/host-shop/competencies`, {
+      failOnStatusCode: false,
+    });
     expect(restoredResponse.status()).toBe(200);
     const restoredBody = await restoredResponse.json();
-    const restoredApprentice = restoredBody.apprentices.find((item: any) => item.enrollmentId === apprentice.enrollmentId);
-    const restored = (restoredApprentice?.competencyRecords || []).find((row: any) => row.competency_id === competency.id);
+    const restoredApprentice = restoredBody.apprentices.find(
+      (item: any) => item.enrollmentId === apprentice.enrollmentId,
+    );
+    const restored = (restoredApprentice?.competencyRecords || []).find(
+      (row: any) => row.competency_id === competency.id,
+    );
     expect(Boolean(restored?.completed)).toBe(originalCompleted);
   });
 });

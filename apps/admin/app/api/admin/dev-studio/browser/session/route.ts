@@ -51,15 +51,34 @@ export async function POST(req: NextRequest) {
     );
   }
   const body = await req.json().catch(() => ({}));
+  // The browser worker is an isolated Chromium process, so it does not inherit
+  // the Admin request's cookie jar. Forward only Supabase auth-cookie chunks
+  // over the authenticated internal channel. The worker installs them before
+  // the first navigation and never returns or persists them.
+  const authCookies = req.cookies
+    .getAll()
+    .filter(
+      ({ name, value }) =>
+        name.startsWith('sb-') &&
+        (name.endsWith('-auth-token') || /-auth-token\.\d+$/.test(name)) &&
+        value.length > 0,
+    )
+    .slice(0, 12)
+    .map(({ name, value }) => ({ name, value }));
   try {
     const response = await fetch(`${config.internalUrl}/sessions`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-studio-browser-secret': config.secret },
-      body: JSON.stringify({ url: body.url, width: body.width, height: body.height }),
+      body: JSON.stringify({
+        url: body.url,
+        width: body.width,
+        height: body.height,
+        authCookies,
+      }),
       cache: 'no-store',
       signal: AbortSignal.timeout(35_000),
     });
-    const payload = await response.json().catch(() => null) as Record<string, unknown> | null;
+    const payload = (await response.json().catch(() => null)) as Record<string, unknown> | null;
     if (!response.ok || !payload) {
       logger.warn('[studio-browser] Session creation rejected', {
         status: response.status,

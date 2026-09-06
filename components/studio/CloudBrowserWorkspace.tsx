@@ -40,6 +40,7 @@ export default function CloudBrowserWorkspace() {
   const [agentTask, setAgentTask] = useState('');
   const [agentResult, setAgentResult] = useState('');
   const [agentRunning, setAgentRunning] = useState(false);
+  const [approvalRequested, setApprovalRequested] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
   const endpoint = session ? `${session.publicUrl}/sessions/${session.id}` : '';
@@ -134,11 +135,12 @@ export default function CloudBrowserWorkspace() {
     setStatus('Stopped');
   }
 
-  async function runAgent() {
+  async function runAgent(confirmed = false) {
     if (!session || !agentTask.trim()) return;
     setAgentRunning(true);
     setAgentResult('');
     setError('');
+    if (!confirmed) setApprovalRequested(false);
     try {
       const response = await fetch('/api/admin/dev-studio/browser/agent', {
         method: 'POST',
@@ -147,10 +149,16 @@ export default function CloudBrowserWorkspace() {
           task: agentTask,
           sessionId: session.id,
           sessionToken: session.token,
+          confirmed,
         }),
       });
       if (!response.ok || !response.body) {
         const payload = await response.json().catch(() => ({}));
+        if (response.status === 409 && payload.approvalRequired) {
+          setApprovalRequested(true);
+          setError(payload.confirmation || payload.error);
+          return;
+        }
         throw new Error(payload.error || 'AI browser task failed');
       }
       const reader = response.body.getReader();
@@ -316,12 +324,21 @@ export default function CloudBrowserWorkspace() {
               className="w-full rounded border border-slate-700 bg-slate-900 p-2 text-xs"
             />
             <button
-              onClick={runAgent}
+              onClick={() => runAgent(false)}
               disabled={!session || !agentTask.trim() || agentRunning}
               className="mt-2 w-full rounded bg-violet-600 px-3 py-2 text-xs font-black disabled:opacity-50"
             >
               {agentRunning ? 'Running approved task…' : 'Run AI browser task'}
             </button>
+            {approvalRequested && (
+              <button
+                onClick={() => runAgent(true)}
+                disabled={agentRunning}
+                className="mt-2 w-full rounded bg-amber-500 px-3 py-2 text-xs font-black text-slate-950 disabled:opacity-50"
+              >
+                Approve exact command and run
+              </button>
+            )}
             {agentResult && (
               <p className="mt-2 rounded bg-slate-900 p-2 text-[10px] text-slate-300">
                 {agentResult}

@@ -220,11 +220,12 @@ export default function HostShopShowcase({
               id="host-shop-showcase-heading"
               className="mt-2 max-w-4xl text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl"
             >
-              Train in real shops. Discover the businesses behind the apprenticeship.
+              Tour real shops and see how apprenticeship works inside the business.
             </h2>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">
-              This rotating showcase introduces approved host shops, where they are located, and how
-              to visit, book, or learn more.
+              Meet participating Host Shops, explore their workplace environments, and schedule a
+              walk-through to learn how a salon, spa, nail studio, or barbershop can become a Host
+              Shop.
             </p>
           </div>
           <button
@@ -244,16 +245,6 @@ export default function HostShopShowcase({
             <div className="relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[390px]">
               {image?.kind === 'video' ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
-                  {image.backdropSrc ? (
-                    <Image
-                      src={image.backdropSrc}
-                      alt=""
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 58vw"
-                      className="-z-10 scale-110 object-cover opacity-35 blur-xl"
-                      aria-hidden="true"
-                    />
-                  ) : null}
                   <video
                     key={image.src}
                     src={image.src}
@@ -365,7 +356,7 @@ export default function HostShopShowcase({
                   href="/schedule-consultation?type=host-shop-tour"
                   className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-brand-red-700"
                 >
-                  Schedule Your Host Shop Tour
+                  Schedule a Host Shop Walk-Through
                 </Link>
                 <Link
                   href={`/host-shops/${shop.slug}`}

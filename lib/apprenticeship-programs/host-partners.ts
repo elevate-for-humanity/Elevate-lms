@@ -6,6 +6,8 @@ export type FeaturedHostPartnerMedia = {
   src: string;
   alt: string;
   kind?: 'photo' | 'flyer' | 'video';
+  /** Optional presentation speed for a shop tour. */
+  playbackRate?: number;
 };
 
 export type FeaturedHostPartner = {
@@ -48,6 +50,22 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     marketingBlurb:
       'A family-oriented Main Street barbershop serving New Palestine with classic cuts, modern grooming, and an apprenticeship training environment.',
     media: [
+      {
+        src: '/images/partners/kountry-kutz/interior-empty.webp',
+        alt: 'Kountry Kutz Barbershop interior and apprenticeship training stations',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/kountry-kutz/interior-active.webp',
+        alt: 'Barbers and clients inside Kountry Kutz Barbershop in New Palestine',
+        kind: 'photo',
+      },
+      {
+        src: '/videos/partners/kountry-kutz/shop-tour.mp4',
+        alt: 'Guided interior tour of Kountry Kutz Barbershop',
+        kind: 'video',
+        playbackRate: 0.9,
+      },
       {
         src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
         alt: 'Kountry Kutz approved barber apprenticeship site announcement',

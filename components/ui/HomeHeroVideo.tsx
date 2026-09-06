@@ -50,6 +50,26 @@ const HOME_NARRATION =
 const HOME_SLIDES: HomeHeroSlide[] = [
   {
     type: 'image',
+    src: '/images/partners/kountry-kutz/interior-empty.webp',
+    alt: 'Kountry Kutz Barbershop interior prepared for clients and apprentice training',
+    label: 'Train inside a working local barbershop',
+    description:
+      'Build barbering skills at professional stations inside a participating apprenticeship host shop.',
+    exposureClass: 'brightness-[1.06]',
+    focalClass: 'object-center',
+  },
+  {
+    type: 'image',
+    src: '/images/partners/kountry-kutz/interior-active.webp',
+    alt: 'Barbers serving clients inside Kountry Kutz Barbershop',
+    label: 'Learn in the rhythm of a real shop',
+    description:
+      'Experience supervised workplace learning, client service, and professional shop routines.',
+    exposureClass: 'brightness-[1.06]',
+    focalClass: 'object-center',
+  },
+  {
+    type: 'image',
     src: '/images/partners/salon-saloon/team-interior.webp',
     alt: 'Salon Saloon team inside their participating apprenticeship salon',
     label: 'Train with working professionals in a real salon',

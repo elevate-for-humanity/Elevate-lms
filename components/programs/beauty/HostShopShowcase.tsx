@@ -46,6 +46,7 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
 export default function HostShopShowcase({
   shops,
   videoTourShopSlug,
+  portfolioShopSlug,
   autoPlayVideoOnVisible = false,
   enableNarration = true,
   narration,
@@ -55,6 +56,8 @@ export default function HostShopShowcase({
   shops: FeaturedHostPartner[];
   /** Limit video playback to the designated tour while retaining other shops as still slides. */
   videoTourShopSlug?: string;
+  /** Include every verified photo and tour for one featured shop. */
+  portfolioShopSlug?: string;
   /** Start the designated tour, muted, when its section enters the viewport. */
   autoPlayVideoOnVisible?: boolean;
   /** Disable page narration when the featured media already carries its own spoken audio. */
@@ -73,6 +76,9 @@ export default function HostShopShowcase({
   const slides = useMemo(
     () =>
       shops.flatMap((shop) => {
+        if (shop.slug === portfolioShopSlug) {
+          return (shop.media ?? []).map((media) => ({ shop, media }));
+        }
         const featured = mediaOverrides?.[shop.slug] ?? FEATURED_MEDIA_BY_SHOP[shop.slug];
         const media: ShowcaseMedia | undefined =
           featured?.kind !== 'video' || !videoTourShopSlug || shop.slug === videoTourShopSlug
@@ -80,7 +86,7 @@ export default function HostShopShowcase({
             : shop.media?.find((item) => item.kind !== 'video');
         return media ? [{ shop, media }] : [];
       }),
-    [mediaOverrides, shops, videoTourShopSlug],
+    [mediaOverrides, portfolioShopSlug, shops, videoTourShopSlug],
   );
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -236,16 +242,18 @@ export default function HostShopShowcase({
                     data-host-shop-tour
                     poster={image.backdropSrc}
                     onPlay={(event) => {
-                      event.currentTarget.defaultPlaybackRate = 0.82;
-                      event.currentTarget.playbackRate = 0.82;
+                      const playbackRate = image.playbackRate ?? 0.82;
+                      event.currentTarget.defaultPlaybackRate = playbackRate;
+                      event.currentTarget.playbackRate = playbackRate;
                       if (!event.currentTarget.muted) {
                         stopAllNaturalVoicePlayback();
                         event.currentTarget.volume = 1;
                       }
                     }}
                     onLoadedMetadata={(event) => {
-                      event.currentTarget.defaultPlaybackRate = 0.82;
-                      event.currentTarget.playbackRate = 0.82;
+                      const playbackRate = image.playbackRate ?? 0.82;
+                      event.currentTarget.defaultPlaybackRate = playbackRate;
+                      event.currentTarget.playbackRate = playbackRate;
                     }}
                     onEnded={(event) => {
                       // Hold the final frame. The tour is never cut short, sped up,

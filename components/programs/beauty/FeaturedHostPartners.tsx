@@ -48,6 +48,8 @@ export default function FeaturedHostPartners({
       {programSlug !== 'cosmetology-apprenticeship' ? (
         <HostShopShowcase
           shops={shops}
+          videoTourShopSlug={programSlug === 'barber-apprenticeship' ? 'kountry-kutz-barbershop' : undefined}
+          portfolioShopSlug={programSlug === 'barber-apprenticeship' ? 'kountry-kutz-barbershop' : undefined}
           enableNarration={programSlug !== 'barber-apprenticeship'}
           mediaOverrides={{
             'generations-hair-llc': {

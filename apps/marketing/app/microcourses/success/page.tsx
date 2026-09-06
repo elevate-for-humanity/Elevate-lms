@@ -7,7 +7,7 @@ export default function MicrocourseSuccessPage() {
         <p className="font-semibold text-emerald-700">Payment received</p>
         <h1 className="mt-3 text-4xl font-black">Your microcourses are being activated.</h1>
         <p className="mt-4 text-slate-600">Provider payment and course access are completed by the signed Stripe webhook. You will receive access details after settlement succeeds.</p>
-        <Link href="/dashboard" className="mt-8 inline-block rounded-xl bg-slate-950 px-5 py-3 font-bold text-white">Open dashboard</Link>
+        <Link href="/login" className="mt-8 inline-block rounded-xl bg-slate-950 px-5 py-3 font-bold text-white">Sign in to continue</Link>
       </div>
     </main>
   );

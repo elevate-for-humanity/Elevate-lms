@@ -60,6 +60,7 @@ interface UnifiedEllieChatProps {
   embedded?: boolean;
   fileContext?: string;
   onPreviewTarget?: (url: string) => void;
+  preferredAgent?: StudioSpecialist;
 }
 
 function findElevatePreviewUrl(value: unknown): string | null {
@@ -128,7 +129,7 @@ function CourseBuildRuns() {
                   {job.command}
                 </span>
                 <span className="text-gray-500">
-                  {job.stage ?? job.status} · {progress}%
+                  {job.stage ?? job.status} Â· {progress}%
                 </span>
               </div>
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-100">
@@ -251,7 +252,7 @@ function ActionCard({
           onClick={() => void decide('approve')}
           className="rounded-lg bg-gray-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50"
         >
-          {resolving ? 'Working…' : 'Confirm action'}
+          {resolving ? 'Workingâ¦' : 'Confirm action'}
         </button>
         <button
           type="button"
@@ -272,11 +273,12 @@ export default function UnifiedEllieChat({
   embedded = false,
   fileContext,
   onPreviewTarget,
+  preferredAgent,
 }: UnifiedEllieChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [health, setHealth] = useState('checking…');
+  const [health, setHealth] = useState('checkingâ¦');
   const [aiOk, setAiOk] = useState(true);
   const [lastRoute, setLastRoute] = useState<EllieMessageRoute | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -434,7 +436,7 @@ export default function UnifiedEllieChat({
     setInput('');
     setLoading(true);
     const route = attachment ? 'platform' : routeEllieMessage(text);
-    const agent = selectStudioAgent(text);
+    const agent = preferredAgent ?? selectStudioAgent(text);
     setLastRoute(route);
     const userMsg: ChatMessage = { role: 'user', content: text, route, agent };
     setMessages((prev) => [...prev, userMsg]);
@@ -459,7 +461,7 @@ export default function UnifiedEllieChat({
                 };
               return next;
             });
-        });
+        }, agent);
       }
     } catch (error) {
       setMessages((prev) => [
@@ -495,8 +497,8 @@ export default function UnifiedEllieChat({
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">Admin AI</p>
             <p className={`truncate text-[11px] ${mutedTextClass}`}>
-              Platform tools · {health}
-              {lastRoute ? ` · last: ${ELLIE_ROUTE_LABEL[lastRoute]}` : ''}
+              Platform tools Â· {health}
+              {lastRoute ? ` Â· last: ${ELLIE_ROUTE_LABEL[lastRoute]}` : ''}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">
@@ -594,8 +596,8 @@ export default function UnifiedEllieChat({
                     {message.provider && message.role === 'assistant' && (
                       <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
                         {message.provider}
-                        {message.agent ? ' · Admin AI' : ''}
-                        {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
+                        {message.agent ? ` Â· ${message.agent}` : ''}
+                        {message.route ? ` Â· ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
                       </p>
                     )}
                     <p className="whitespace-pre-wrap break-words">{message.content}</p>
@@ -648,7 +650,7 @@ export default function UnifiedEllieChat({
                 <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm">
                   <Loader2 className="h-4 w-4 animate-spin text-gray-700" aria-hidden="true" />
                 </div>
-                <div className={`rounded-2xl px-4 py-3 text-sm ${assistantClass}`}>Working…</div>
+                <div className={`rounded-2xl px-4 py-3 text-sm ${assistantClass}`}>Workingâ¦</div>
               </div>
             )}
             <div ref={endRef} />
@@ -710,7 +712,7 @@ export default function UnifiedEllieChat({
                 }
               }}
               rows={2}
-              placeholder="Tell Admin AI what you need done…"
+              placeholder="Tell Admin AI what you need doneâ¦"
               className={`order-first min-h-[88px] min-w-0 basis-full resize-none rounded-xl border px-3 py-2 text-base outline-none sm:order-none sm:min-h-[52px] sm:flex-1 sm:basis-auto sm:text-sm ${inputClass}`}
             />
             <button
@@ -729,7 +731,7 @@ export default function UnifiedEllieChat({
               ) : (
                 <Mic className="h-5 w-5" aria-hidden="true" />
               )}
-              <span>{listening ? 'Stop' : 'Speak'}</span>
+              <span>{listening ? 'Stop listening' : `Talk to ${preferredAgent ?? 'Lizzy'}`}</span>
             </button>
             <button
               type="button"
@@ -752,7 +754,7 @@ export default function UnifiedEllieChat({
             </p>
           ) : listening ? (
             <p role="status" className="mt-2 text-center text-xs font-medium text-red-700">
-              Listening… tap the microphone again to stop.
+              Listeningâ¦ tap the microphone again to stop.
             </p>
           ) : null}
           <p className="mt-2 text-center text-[11px] text-gray-500">

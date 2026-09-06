@@ -8,7 +8,7 @@
  */
 
 export type EllieMessageRoute = 'command' | 'ops' | 'platform';
-export type StudioSpecialist = 'ADMIN_AI';
+export type StudioSpecialist = 'ELLIE' | 'LIZZY' | 'PARIS';
 
 // Outcome-oriented requests enter the governed command runtime. Keeping these
 // phrases explicit makes the natural-language contract auditable while the
@@ -54,7 +54,7 @@ export function routeEllieMessage(message: string): EllieMessageRoute {
 /**
  * Decide whether the single Admin AI surface should create a durable plan.
  * Questions remain on the conversational path; requested outcomes and
- * evidence-producing operational checks enter plan → execute → evaluate.
+ * evidence-producing operational checks enter plan â execute â evaluate.
  */
 export function shouldOrchestrateMessage(message: string): boolean {
   if (OUTCOME_REQUEST_RE.test(message) || DETERMINISTIC_COMMAND_RE.test(message)) return true;
@@ -65,7 +65,7 @@ export function shouldOrchestrateMessage(message: string): boolean {
 /** All requests enter one orchestrator. Internal capabilities are selected by
  * the server from intent and actual tool calls, never by a UI persona switch. */
 export function selectStudioAgent(_message: string): StudioSpecialist {
-  return 'ADMIN_AI';
+  return 'LIZZY';
 }
 
 export const ELLIE_ROUTE_LABEL: Record<EllieMessageRoute, string> = {

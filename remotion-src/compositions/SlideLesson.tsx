@@ -4,9 +4,9 @@
  * Scene-based lesson video composition.
  *
  * Structure per lesson:
- *   BrandedIntro  — course title + lesson title (fixed 1s)
- *   Scene[]       — title card + bullet points over stock clip or image
- *   BrandedOutro  — recap + quiz reminder (fixed 2s)
+ *   BrandedIntro  â course title + lesson title (fixed 1s)
+ *   Scene[]       â title card + bullet points over stock clip or image
+ *   BrandedOutro  â recap + quiz reminder (fixed 2s)
  *
  * Each scene has:
  *   - Background: Pexels video clip (looped) or fallback image
@@ -31,7 +31,7 @@ import {
 } from 'remotion';
 import { instructionalLayoutForScene, type InstructionalLayout } from '../instructional-layout';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ââ Types âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 export interface SceneData {
   scene_number: number;
@@ -39,7 +39,7 @@ export interface SceneData {
   bullets: string[];
   narration: string;
   clip_keyword: string;
-  /** Resolved Pexels video URL (or null → use image fallback) */
+  /** Resolved Pexels video URL (or null â use image fallback) */
   clipUrl: string | null;
   /** Resolved Pexels/Pollinations image URL */
   imageUrl: string | null;
@@ -65,12 +65,12 @@ export interface SlideLessonProps {
   logoText?: string; // defaults to 'Elevate LMS'
 }
 
-// ── Constants ─────────────────────────────────────────────────────────────────
+// ââ Constants âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 const INTRO_FRAMES = 30; // One readable second; never open on a blank/blurred card.
 const OUTRO_FRAMES = 60;
 
-// ── Animation helpers ─────────────────────────────────────────────────────────
+// ââ Animation helpers âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function fadeIn(frame: number, delay = 0, duration = 20): number {
   return interpolate(frame - delay, [0, duration], [0, 1], {
@@ -84,7 +84,7 @@ function slideUp(frame: number, fps: number, delay = 0): number {
   return interpolate(p, [0, 1], [36, 0]);
 }
 
-// ── Brand bar ─────────────────────────────────────────────────────────────────
+// ââ Brand bar âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function BrandBar({ color, logoText, bright = false }: { color: string; logoText: string; bright?: boolean }) {
   return (
@@ -141,7 +141,7 @@ function BrandBar({ color, logoText, bright = false }: { color: string; logoText
   );
 }
 
-// ── Branded Intro ─────────────────────────────────────────────────────────────
+// ââ Branded Intro âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function BrandedIntro({ props, frame }: { props: SlideLessonProps; frame: number }) {
   const { fps } = useVideoConfig();
@@ -216,7 +216,7 @@ function BrandedIntro({ props, frame }: { props: SlideLessonProps; frame: number
   );
 }
 
-// ── Caption bar ───────────────────────────────────────────────────────────────
+// ââ Caption bar âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function CaptionBar({
   text,
@@ -323,7 +323,7 @@ function InstructionalGraphic({
               fontWeight: 900,
             }}
           >
-            {layout.kind === 'activity' ? '✓' : index + 1}
+            {layout.kind === 'activity' ? 'â' : index + 1}
           </div>
           <div style={{ fontSize: layout.kind === 'lean-canvas' ? 17 : 18, lineHeight: 1.2 }}>{item}</div>
         </div>
@@ -332,22 +332,31 @@ function InstructionalGraphic({
   );
 }
 
-// ── Scene slide ───────────────────────────────────────────────────────────────
+// ââ Scene slide âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function SceneSlide({
   scene,
-  frame,
   props,
 }: {
   scene: SceneData;
-  frame: number;
   props: SlideLessonProps;
 }) {
   const { fps } = useVideoConfig();
+  // useCurrentFrame() is local to the surrounding Sequence. Passing the
+  // composition frame from SlideLesson caused later scenes to enter with all
+  // motion already completed, leaving long frozen stills in rendered lessons.
+  const frame = useCurrentFrame();
   const bright = props.surfaceMode === 'bright';
   const instructionalLayout = instructionalLayoutForScene({ title: scene.title, action: scene.narration, sceneType: scene.sceneType });
   const instructionalBackgroundPosition =
     `${50 + Math.sin(frame / (fps * 2)) * 30}% ${50 + Math.cos(frame / (fps * 2.5)) * 20}%`;
+  const sceneProgress = interpolate(
+    frame,
+    [0, Math.max(1, scene.durationFrames - 1)],
+    [0, 1],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+  );
+  const mediaTransform = `scale(${1.035 + sceneProgress * 0.055}) translate(${(scene.scene_number % 2 ? 1 : -1) * sceneProgress * 1.4}%, ${sceneProgress * -0.8}%)`;
 
   return (
     <AbsoluteFill
@@ -372,6 +381,9 @@ function SceneSlide({
             height: '100%',
             objectFit: 'cover',
             filter: bright ? 'brightness(1.1) saturate(1.06) contrast(1.02)' : undefined,
+            transform: mediaTransform,
+            transformOrigin: scene.scene_number % 2 ? '45% 52%' : '55% 48%',
+            willChange: 'transform',
           }}
           muted
         />
@@ -385,6 +397,9 @@ function SceneSlide({
             height: '100%',
             objectFit: 'cover',
             filter: bright ? 'brightness(1.1) saturate(1.06) contrast(1.02)' : undefined,
+            transform: mediaTransform,
+            transformOrigin: scene.scene_number % 2 ? '45% 52%' : '55% 48%',
+            willChange: 'transform',
           }}
         />
       ) : null}
@@ -490,7 +505,7 @@ function SceneSlide({
   );
 }
 
-// ── Branded Outro ─────────────────────────────────────────────────────────────
+// ââ Branded Outro âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 function BrandedOutro({ props, frame }: { props: SlideLessonProps; frame: number }) {
   const { fps } = useVideoConfig();
@@ -550,7 +565,7 @@ function BrandedOutro({ props, frame }: { props: SlideLessonProps; frame: number
             fontFamily: 'sans-serif',
           }}
         >
-          Complete the knowledge check to continue →
+          Complete the knowledge check to continue â
         </div>
       </div>
 
@@ -568,7 +583,7 @@ function BrandedOutro({ props, frame }: { props: SlideLessonProps; frame: number
   );
 }
 
-// ── Main composition ──────────────────────────────────────────────────────────
+// ââ Main composition ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
   const { fps } = useVideoConfig();
@@ -599,7 +614,7 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
           from={INTRO_FRAMES + sceneOffsets[i]}
           durationInFrames={scene.durationFrames}
         >
-          <SceneSlide scene={scene} frame={frame} props={props} />
+          <SceneSlide scene={scene} props={props} />
         </Sequence>
       ))}
 
@@ -611,7 +626,7 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
   );
 }
 
-// ── Frame calculator ──────────────────────────────────────────────────────────
+// ââ Frame calculator ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 /** Total frames for a SlideLesson composition given its scenes. */
 export function calcSlideLessonFrames(scenes: Pick<SceneData, 'durationFrames'>[]): number {

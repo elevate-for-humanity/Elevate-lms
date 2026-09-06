@@ -69,7 +69,7 @@ export default async function AdminGroupLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <SupabasePublicConfigScript />
       </head>

@@ -5,6 +5,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
 import { resolveBillingOrganizationId } from '@/lib/platform/organization-features';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { resolveStripeCustomer } from '@/lib/stripe/customer-resolver';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,19 +41,34 @@ export async function POST() {
   if (error) {
     return NextResponse.json({ error: 'Billing account could not be loaded' }, { status: 500 });
   }
-  if (!subscription?.stripe_customer_id) {
-    return NextResponse.json({ error: 'No Stripe billing account exists yet.' }, { status: 409 });
-  }
-
   const stripe = getStripe();
   if (!stripe) {
     return NextResponse.json({ error: 'Billing service unavailable' }, { status: 503 });
   }
 
-  const portal = await stripe.billingPortal.sessions.create({
-    customer: subscription.stripe_customer_id,
-    return_url: RETURN_URL,
-  });
+  try {
+    const { customer } = await resolveStripeCustomer({
+      stripe,
+      email: user.email || '',
+      candidateIds: [subscription?.stripe_customer_id],
+    });
+    if (!customer) {
+      return NextResponse.json({ error: 'No Stripe billing account exists yet.' }, { status: 409 });
+    }
+    if (subscription?.stripe_customer_id !== customer.id) {
+      await db
+        .from('organization_subscriptions')
+        .update({ stripe_customer_id: customer.id })
+        .eq('organization_id', organizationId);
+    }
 
-  return NextResponse.json({ url: portal.url });
+    const portal = await stripe.billingPortal.sessions.create({
+      customer: customer.id,
+      return_url: RETURN_URL,
+    });
+
+    return NextResponse.json({ url: portal.url });
+  } catch {
+    return NextResponse.json({ error: 'Unable to open secure billing. Please try again.' }, { status: 502 });
+  }
 }

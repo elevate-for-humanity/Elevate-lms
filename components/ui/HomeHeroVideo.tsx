@@ -36,7 +36,7 @@ interface HomeHeroSlide {
   focalClass: string;
 }
 
-const HOME_SLIDE_SECONDS = 6;
+const HOME_SLIDE_SECONDS = 4;
 const SALON_EDITORIAL_GRADE = 'contrast-[1.05] saturate-[1.06] sepia-[0.04]';
 const DEPLOYED_COMMIT_SHA = process.env.NEXT_PUBLIC_GIT_SHA?.trim();
 

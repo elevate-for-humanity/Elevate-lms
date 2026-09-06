@@ -6,8 +6,6 @@ export type FeaturedHostPartnerMedia = {
   src: string;
   alt: string;
   kind?: 'photo' | 'flyer' | 'video';
-  /** Optional presentation speed for a shop tour. */
-  playbackRate?: number;
 };
 
 export type FeaturedHostPartner = {
@@ -64,7 +62,6 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         src: '/videos/partners/kountry-kutz/shop-tour.mp4',
         alt: 'Guided interior tour of Kountry Kutz Barbershop',
         kind: 'video',
-        playbackRate: 0.9,
       },
       {
         src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',

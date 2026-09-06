@@ -97,14 +97,14 @@ export default async function BarberApprenticeshipPage() {
       />
 
       <HeroVideo
-        videoSrcDesktop={heroBanner.videoSrcDesktop}
-        videoSrcMobile={heroBanner.videoSrcMobile}
-        posterImage="/images/partners/razors-image-logo.jpg"
-        mountedFrameImage="/images/partners/razors-image-logo.jpg"
-        voiceoverSrc={heroBanner.voiceoverSrc}
+        videoSrcDesktop="/videos/partners/kountry-kutz/shop-tour.mp4"
+        videoSrcMobile="/videos/partners/kountry-kutz/shop-tour.mp4"
+        videoPlaybackRate={0.9}
+        posterImage="/images/partners/kountry-kutz/interior-empty.webp"
+        mountedFrameImage="/images/partners/kountry-kutz/interior-empty.webp"
         microLabel={heroBanner.microLabel}
         transcript={heroBanner.transcript}
-        narrateTranscript={!heroBanner.voiceoverSrc}
+        narrateTranscript={false}
         analyticsName="barber-apprenticeship"
         heightClassName="h-[clamp(460px,68vh,780px)]"
         mediaFit="contain"

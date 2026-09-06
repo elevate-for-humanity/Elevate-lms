@@ -21,6 +21,8 @@ export interface HeroDemoSlide {
 export interface HeroVideoProps {
   videoSrcDesktop?: string;
   videoSrcMobile?: string;
+  /** Presentation speed for the looping hero video. */
+  videoPlaybackRate?: number;
   posterImage?: string;
   /** Exact first frame mounted beneath the video to prevent a poster/hydration flash. */
   mountedFrameImage?: string;
@@ -58,6 +60,7 @@ export interface HeroVideoProps {
 export default function HeroVideo({
   videoSrcDesktop,
   videoSrcMobile,
+  videoPlaybackRate = 1,
   posterImage,
   mountedFrameImage,
   voiceoverSrc,
@@ -299,11 +302,19 @@ export default function HeroVideo({
             muted
             disablePictureInPicture
             data-video-ready={videoReady ? 'true' : 'false'}
-            onLoadedData={() => setVideoReady(true)}
+            onLoadedData={(event) => {
+              event.currentTarget.defaultPlaybackRate = videoPlaybackRate;
+              event.currentTarget.playbackRate = videoPlaybackRate;
+              setVideoReady(true);
+            }}
             onCanPlay={() => {
               setVideoReady(true);
               const video = videoRef.current;
-              if (video?.paused) void video.play().catch(() => {});
+              if (video) {
+                video.defaultPlaybackRate = videoPlaybackRate;
+                video.playbackRate = videoPlaybackRate;
+                if (video.paused) void video.play().catch(() => {});
+              }
             }}
             onPlaying={() => setVideoReady(true)}
             onError={() => {

@@ -3,7 +3,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { aiChat } from '@/lib/ai/ai-service';
-import { getAITool, getAIToolCatalogForPrompt, listAIToolsForAgent } from '@/lib/ai/tools/registry';
+import { getAITool, getAIToolCatalogForPrompt, listAIToolsForAgent, type AIAgentId } from '@/lib/ai/tools/registry';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
 import { executeRegisteredAITool } from '@/lib/ai/tools/executor';
 import { getAdminUrl } from '@/lib/utils/siteUrl';
@@ -76,14 +76,14 @@ function heuristicPlan(command: string): PlannedCommand | null {
   return null;
 }
 
-async function classifyCommand(command: string): Promise<PlannedCommand> {
+async function classifyCommand(command: string, agent: AIAgentId): Promise<PlannedCommand> {
   const deterministic = planAIToolFromCommand(command);
   if (deterministic) return { tool: deterministic.name, input: deterministic.input };
 
   const heuristic = heuristicPlan(command);
   if (heuristic) return heuristic;
 
-  const toolCatalog = getAIToolCatalogForPrompt('LIZZY');
+  const toolCatalog = getAIToolCatalogForPrompt(agent);
   const result = await aiChat({
     messages: [
       {
@@ -124,8 +124,8 @@ function summarizePayload(toolName: string, payload: unknown): string {
       const service = asRecord(value);
       const name = String(service.name ?? 'Service');
       const status = String(service.status ?? 'unknown');
-      const message = typeof service.message === 'string' ? ` — ${redactSecrets(service.message)}` : '';
-      return `• ${name}: ${status}${message}`;
+      const message = typeof service.message === 'string' ? ` â ${redactSecrets(service.message)}` : '';
+      return `â¢ ${name}: ${status}${message}`;
     });
     return [`Overall platform status: ${String(record.overall ?? 'unknown')}`, ...lines].join('\n');
   }
@@ -135,7 +135,7 @@ function summarizePayload(toolName: string, payload: unknown): string {
     if (!members.length) return 'No matching active team member was found in the approved organization directory.';
     return members.map((value) => {
       const member = asRecord(value);
-      const summary = [member.name, member.title].filter(Boolean).join(' — ');
+      const summary = [member.name, member.title].filter(Boolean).join(' â ');
       return member.bio ? `${summary}\n${String(member.bio)}` : summary;
     }).join('\n\n');
   }
@@ -152,7 +152,7 @@ function summarizePayload(toolName: string, payload: unknown): string {
 
   try {
     const json = redactSecrets(JSON.stringify(payload, null, 2));
-    return json.length > 2200 ? `${json.slice(0, 2200)}\n…` : json;
+    return json.length > 2200 ? `${json.slice(0, 2200)}\nâ¦` : json;
   } catch {
     return 'Completed.';
   }
@@ -167,6 +167,10 @@ export async function POST(request: NextRequest) {
 
   const body = asRecord(await request.json().catch(() => ({})));
   const command = typeof body.command === 'string' ? body.command.trim() : '';
+  const requestedAgent = typeof body.agent === 'string' ? body.agent.toUpperCase() : 'LIZZY';
+  const agent: AIAgentId = ['ELLIE', 'LIZZY', 'PARIS'].includes(requestedAgent)
+    ? requestedAgent as AIAgentId
+    : 'LIZZY';
   if (!command) return Response.json({ error: 'command is required' }, { status: 400 });
 
   try {
@@ -183,10 +187,10 @@ export async function POST(request: NextRequest) {
       const write = (text: string) => controller.enqueue(sseLine(text));
       try {
         write(`Command: ${command}`);
-        const plan = await classifyCommand(command);
+        const plan = await classifyCommand(command, agent);
 
         if (!plan.tool) {
-          write('Mode: analysis only — no tool executed.');
+          write('Mode: analysis only â no tool executed.');
           if (plan.answer) {
             write(plan.answer);
           } else {
@@ -194,7 +198,7 @@ export async function POST(request: NextRequest) {
               messages: [
                 {
                   role: 'system',
-                  content: `You are LIZZY, the Elevate Dev Studio operations assistant. Answer concisely. Do not claim an action ran. Available registered tools:\n${getAIToolCatalogForPrompt('LIZZY')}`,
+                  content: `You are ${agent}, an Elevate Admin AI specialist. Answer concisely. Do not claim an action ran. Available registered tools:\n${getAIToolCatalogForPrompt(agent)}`,
                 },
                 { role: 'user', content: command },
               ],
@@ -205,7 +209,7 @@ export async function POST(request: NextRequest) {
           }
         } else {
           const tool = getAITool(plan.tool)!;
-          write(`Tool: ${tool.name} · ${tool.classification} · risk ${tool.risk}${plan.explanation ? ` — ${plan.explanation}` : ''}`);
+          write(`Tool: ${tool.name} Â· ${tool.classification} Â· risk ${tool.risk}${plan.explanation ? ` â ${plan.explanation}` : ''}`);
 
           const required = tool.confirmationPhrase;
           const confirmationText = typeof body.confirmationText === 'string'
@@ -218,7 +222,7 @@ export async function POST(request: NextRequest) {
             ...plan.input,
             ...asRecord(body.toolInput),
           }, {
-            agent: 'LIZZY',
+            agent,
             actorId: auth.id,
             actorRoles: auth.effectiveRoles,
             tenantId: typeof body.tenantId === 'string' ? body.tenantId : null,
@@ -233,9 +237,9 @@ export async function POST(request: NextRequest) {
           if (result.status === 'approval_required') {
             write(`Blocked pending human approval. Type exactly: "${result.requiredConfirmation}"`);
           } else if (!result.ok) {
-            write(`Failed · HTTP ${result.httpStatus} · Tool execution failed.`);
+            write(`Failed Â· HTTP ${result.httpStatus} Â· Tool execution failed.`);
           } else {
-            write(`Completed · ${result.tool} · HTTP ${result.httpStatus}`);
+            write(`Completed Â· ${result.tool} Â· HTTP ${result.httpStatus}`);
             write(summarizePayload(result.tool, result.payload));
           }
         }

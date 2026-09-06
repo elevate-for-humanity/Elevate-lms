@@ -51,6 +51,10 @@ export default async function AdminDocumentReviewPage() {
   const pendingDocs = docsWithUrls.filter((d) => d.review_status === 'pending') || [];
   const approvedDocs = docsWithUrls.filter((d) => d.review_status === 'approved') || [];
   const rejectedDocs = docsWithUrls.filter((d) => d.review_status === 'rejected') || [];
+  const documentTypeLabel = (value: unknown) =>
+    typeof value === 'string' && value.trim()
+      ? value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
+      : 'Uploaded Document';
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -96,6 +100,11 @@ export default async function AdminDocumentReviewPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="mb-8 grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border-2 border-brand-blue-300 bg-brand-blue-50 p-5"><p className="font-black text-slate-950">Learner & Apprentice Documents</p><p className="mt-1 text-sm text-slate-700">You are viewing the primary learner-document queue below.</p></div>
+          <Link href="/program-holder-documents" className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-brand-blue-400"><p className="font-black text-slate-950">Program Holder Documents</p><p className="mt-1 text-sm text-slate-700">Open agreements, insurance, licenses, and provider files.</p></Link>
+          <Link href="/wioa/documents" className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-brand-blue-400"><p className="font-black text-slate-950">WIOA Documents</p><p className="mt-1 text-sm text-slate-700">Open funding eligibility and workforce documentation.</p></Link>
+        </div>
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -148,9 +157,7 @@ export default async function AdminDocumentReviewPage() {
                     <div className="flex-1">
                       <h3 className="font-semibold text-black">{doc.file_name}</h3>
                       <p className="text-sm text-black">
-                        {doc.document_type
-                          .replace(/_/g, ' ')
-                          .replace(/\b\w/g, (l) => l.toUpperCase())}{' '}
+                        {documentTypeLabel(doc.document_type)}{' '}
                         •{(doc.profiles as any)?.full_name || 'Unknown User'} (
                         {(doc.profiles as any)?.role}) • Uploaded{' '}
                         {new Date(doc.created_at).toLocaleDateString()}
@@ -216,9 +223,7 @@ export default async function AdminDocumentReviewPage() {
                     <div className="flex-1">
                       <h3 className="font-semibold text-black">{doc.file_name}</h3>
                       <p className="text-sm text-black">
-                        {doc.document_type
-                          .replace(/_/g, ' ')
-                          .replace(/\b\w/g, (l) => l.toUpperCase())}{' '}
+                        {documentTypeLabel(doc.document_type)}{' '}
                         •{(doc.profiles as any)?.full_name || 'Unknown User'} (
                         {(doc.profiles as any)?.role}) • Uploaded{' '}
                         {new Date(doc.created_at).toLocaleDateString()}

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   XCircle,
@@ -26,13 +25,12 @@ export function DocumentReviewForm({ document, adminId }: Props) {
 
   // Auto-refresh URL before it expires (refresh at 45s of 60s TTL)
   useEffect(() => {
-    if (!document.file_path) return;
+    if (!document.file_path && !document.file_url) return;
     const timer = setTimeout(() => setUrlExpired(true), 45_000);
     return () => clearTimeout(timer);
   }, [document.file_path, docUrl]);
 
-  const refreshUrl = useCallback(async () => {
-    if (!document.file_path) return;
+  const refreshUrl = useCallback(async (): Promise<string | null> => {
     setRefreshing(true);
     try {
       const res = await fetch(
@@ -43,12 +41,14 @@ export function DocumentReviewForm({ document, adminId }: Props) {
         if (url) {
           setDocUrl(url);
           setUrlExpired(false);
+          return url;
         }
       }
     } finally {
       setRefreshing(false);
     }
-  }, [document.file_path, document.id]);
+    return null;
+  }, [document.id]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [action, setAction] = useState<'approve' | 'reject' | null>(null);
@@ -116,7 +116,9 @@ export function DocumentReviewForm({ document, adminId }: Props) {
             <div>
               <p className="text-sm text-black">Document Type</p>
               <p className="font-semibold text-black">
-                {document.document_type
+                {(typeof document.document_type === 'string' && document.document_type.trim()
+                  ? document.document_type
+                  : 'Uploaded Document')
                   .replace(/_/g, ' ')
                   .replace(/\b\w/g, (l: string) => l.toUpperCase())}
               </p>
@@ -148,7 +150,9 @@ export function DocumentReviewForm({ document, adminId }: Props) {
             <div>
               <p className="text-sm text-black">File Size</p>
               <p className="font-semibold text-black">
-                {(document.file_size / 1024 / 1024).toFixed(2)} MB
+                {typeof document.file_size === 'number'
+                  ? `${(document.file_size / 1024 / 1024).toFixed(2)} MB`
+                  : 'Size unavailable'}
               </p>
             </div>
           </div>
@@ -159,7 +163,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold">Document Preview</h2>
-          {document.file_path && (
+          {(document.file_path || document.file_url) && (
             <button
               onClick={refreshUrl}
               disabled={refreshing}
@@ -185,17 +189,15 @@ export function DocumentReviewForm({ document, adminId }: Props) {
             <iframe src={docUrl} className="w-full h-[600px]" title="Document Preview" />
           ) : (
             <div className="relative w-full min-h-[400px]">
-              {docUrl && (
-                <Image src={docUrl} alt="Document" fill className="object-contain" sizes="100vw" />
-              )}
+              {docUrl && <img src={docUrl} alt="Document" className="h-auto max-h-[700px] w-full object-contain" />}
             </div>
           )}
         </div>
         <div className="mt-4">
           <button
             onClick={async () => {
-              await refreshUrl();
-              if (docUrl) window.open(docUrl, '_blank', 'noopener,noreferrer');
+              const freshUrl = await refreshUrl();
+              if (freshUrl) window.open(freshUrl, '_blank', 'noopener,noreferrer');
             }}
             className="text-brand-blue-600 hover:underline font-semibold"
           >

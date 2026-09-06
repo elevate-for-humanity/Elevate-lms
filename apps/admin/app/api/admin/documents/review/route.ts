@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { sendEmail } from '@/lib/email';
-import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
@@ -20,7 +19,6 @@ async function _POST(request: NextRequest) {
     const auth = await apiRequireAdmin(request);
     if (auth.error) return auth.error;
 
-    const supabase = await createClient();
     const db = await requireAdminClient();
 
     const { documentId, action, rejectionReason } = await request.json();
@@ -37,6 +35,8 @@ async function _POST(request: NextRequest) {
       rowData: {
         status,
         verification_status: status,
+        verified: action === 'approve',
+        verified_at: action === 'approve' ? new Date().toISOString() : null,
         reviewed_by: auth.id,
         reviewed_at: new Date().toISOString(),
         rejection_reason: action === 'reject' ? rejectionReason : null,
@@ -56,7 +56,7 @@ async function _POST(request: NextRequest) {
     }
 
     // Fetch document record
-    const { data: document } = await supabase
+    const { data: document } = await db
       .from('documents')
       .select('*')
       .eq('id', documentId)
@@ -68,7 +68,7 @@ async function _POST(request: NextRequest) {
 
     // Hydrate profile separately (documents.user_id has no FK to profiles)
     const { data: docUserProfile } = document.user_id
-      ? await supabase
+      ? await db
           .from('profiles')
           .select('id, full_name, email')
           .eq('id', document.user_id)
@@ -104,7 +104,7 @@ async function _POST(request: NextRequest) {
     let employerActivated = false;
     if (action === 'approve' && studentUserId) {
       try {
-        const { data: ownerProfile } = await supabase
+        const { data: ownerProfile } = await db
           .from('profiles')
           .select('role')
           .eq('id', studentUserId)

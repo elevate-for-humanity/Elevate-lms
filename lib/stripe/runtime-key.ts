@@ -9,7 +9,7 @@ export function getStripeRuntimeKey(): string | null {
   return null;
 }
 
-/** Payment mutations require a key with write access. */
+/** Payment mutations require the full server key; restricted keys remain a fallback only. */
 export function getStripeWriteKey(): string | null {
   for (const value of [process.env.STRIPE_SECRET_KEY, process.env.STRIPE_RESTRICTED_KEY]) {
     const key = value?.trim();

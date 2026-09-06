@@ -17,6 +17,7 @@ on:
       - 'lib/marketing/**'
       - 'lib/navigation/**'
       - 'lib/payments/**'
+      - 'lib/stripe/**'
       - 'lib/programs/**'
       - 'lib/rate-limit.ts'
       - 'lib/resend.ts'

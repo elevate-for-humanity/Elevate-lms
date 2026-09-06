@@ -26,13 +26,12 @@ export function DocumentReviewForm({ document, adminId }: Props) {
 
   // Auto-refresh URL before it expires (refresh at 45s of 60s TTL)
   useEffect(() => {
-    if (!document.file_path) return;
+    if (!document.file_path && !document.file_url) return;
     const timer = setTimeout(() => setUrlExpired(true), 45_000);
     return () => clearTimeout(timer);
   }, [document.file_path, docUrl]);
 
-  const refreshUrl = useCallback(async () => {
-    if (!document.file_path) return;
+  const refreshUrl = useCallback(async (): Promise<string | null> => {
     setRefreshing(true);
     try {
       const res = await fetch(
@@ -43,12 +42,14 @@ export function DocumentReviewForm({ document, adminId }: Props) {
         if (url) {
           setDocUrl(url);
           setUrlExpired(false);
+          return url;
         }
       }
     } finally {
       setRefreshing(false);
     }
-  }, [document.file_path, document.id]);
+    return null;
+  }, [document.id]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [action, setAction] = useState<'approve' | 'reject' | null>(null);
@@ -159,7 +160,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold">Document Preview</h2>
-          {document.file_path && (
+          {(document.file_path || document.file_url) && (
             <button
               onClick={refreshUrl}
               disabled={refreshing}
@@ -194,8 +195,8 @@ export function DocumentReviewForm({ document, adminId }: Props) {
         <div className="mt-4">
           <button
             onClick={async () => {
-              await refreshUrl();
-              if (docUrl) window.open(docUrl, '_blank', 'noopener,noreferrer');
+              const freshUrl = await refreshUrl();
+              if (freshUrl) window.open(freshUrl, '_blank', 'noopener,noreferrer');
             }}
             className="text-brand-blue-600 hover:underline font-semibold"
           >

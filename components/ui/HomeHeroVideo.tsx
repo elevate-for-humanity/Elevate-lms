@@ -50,12 +50,12 @@ const HOME_NARRATION =
 const HOME_SLIDES: HomeHeroSlide[] = [
   {
     type: 'image',
-    src: '/images/partners/kountry-kutz/interior-empty.webp',
-    alt: 'Kountry Kutz Barbershop interior prepared for clients and apprentice training',
-    label: 'Train inside a working local barbershop',
+    src: '/images/partners/salon-saloon/team-sign.webp',
+    alt: 'Salon Saloon professional team gathered inside their modern salon',
+    label: 'Join a polished professional salon community',
     description:
-      'Build barbering skills at professional stations inside a participating apprenticeship host shop.',
-    exposureClass: 'brightness-[1.06]',
+      'Build your career alongside a polished salon team with workplace guidance and measurable progress.',
+    exposureClass: 'brightness-[1.10]',
     focalClass: 'object-center',
   },
   {
@@ -65,7 +65,7 @@ const HOME_SLIDES: HomeHeroSlide[] = [
     label: 'Learn in the rhythm of a real shop',
     description:
       'Experience supervised workplace learning, client service, and professional shop routines.',
-    exposureClass: 'brightness-[1.06]',
+    exposureClass: 'brightness-[1.10]',
     focalClass: 'object-center',
   },
   {
@@ -120,11 +120,11 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/salon-saloon/team-sign.webp',
-    alt: 'Salon Saloon professional team gathered inside their modern salon',
-    label: 'Join a polished professional salon community',
+    src: '/images/partners/kountry-kutz/interior-empty.webp',
+    alt: 'Kountry Kutz Barbershop interior prepared for clients and apprentice training',
+    label: 'Train inside a working local barbershop',
     description:
-      'Build your career alongside a polished salon team with workplace guidance and measurable progress.',
+      'Build barbering skills at professional stations inside a participating apprenticeship host shop.',
     exposureClass: 'brightness-[1.10]',
     focalClass: 'object-center',
   },
@@ -192,7 +192,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       data-narration={HOME_NARRATION}
     >
       <div className="mx-auto grid max-w-7xl items-center gap-8 py-0 sm:py-10 lg:grid-cols-[0.84fr_1.16fr] lg:gap-12 lg:px-8 lg:py-12">
-        <div className="relative z-20 order-2 px-4 pb-10 sm:px-6 sm:pb-4 lg:order-1 lg:px-0">
+        <div className="relative z-20 order-1 px-4 pb-8 pt-8 sm:px-6 sm:pb-4 sm:pt-0 lg:px-0">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.13em] text-blue-800">
             <BadgeCheck className="h-4 w-4" aria-hidden="true" />
             Career training built around your next step
@@ -232,9 +232,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           </div>
         </div>
 
-        <div
-          className="relative order-1 w-full overflow-hidden bg-[#f4f1ec] lg:order-2"
-        >
+        <div className="relative order-2 w-full overflow-hidden bg-[#f4f1ec]">
           <HeroVideo
             demoSlides={slides.map((candidate) => ({
               src: revisionedHeroAsset(candidate.src),
@@ -244,7 +242,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             }))}
             demoActiveSlideIndex={activeSlide}
             analyticsName={`${banner.analyticsName}-${activeSlide + 1}`}
-            heightClassName="h-[clamp(480px,72svh,760px)] lg:h-[clamp(400px,62vh,680px)]"
+            heightClassName="h-[clamp(300px,46svh,480px)] sm:h-[clamp(380px,54svh,560px)] lg:h-[clamp(400px,62vh,680px)]"
             mediaClassName={SALON_EDITORIAL_GRADE}
             overlayMode="none"
             showSoundControl={false}

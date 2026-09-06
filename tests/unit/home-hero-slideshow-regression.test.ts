@@ -17,13 +17,15 @@ describe('homepage hero slideshow rendering', () => {
   });
 
   it('uses one shared salon editorial grade with tightly matched exposure', () => {
-    expect(source).toContain("const SALON_EDITORIAL_GRADE = 'contrast-[1.05] saturate-[1.06] sepia-[0.04]'");
+    expect(source).toContain(
+      "const SALON_EDITORIAL_GRADE = 'contrast-[1.05] saturate-[1.06] sepia-[0.04]'",
+    );
     expect(source).toContain('overlayMode="none"');
 
     const brightnessValues = [...source.matchAll(/exposureClass: 'brightness-\[([0-9.]+)\]'/g)].map(
       (match) => Number(match[1]),
     );
-    expect(brightnessValues).toHaveLength(6);
+    expect(brightnessValues).toHaveLength(8);
     expect(Math.max(...brightnessValues) - Math.min(...brightnessValues)).toBeCloseTo(0.02, 5);
   });
 
@@ -32,10 +34,20 @@ describe('homepage hero slideshow rendering', () => {
     expect(source).not.toContain('Learn by doing, build real confidence');
   });
 
-  it('uses the sharp Salon Saloon team portrait for the final slide', () => {
-    expect(source).toContain("src: '/images/partners/salon-saloon/team-sign.webp'");
+  it('opens with Salon Saloon and keeps the full hero message ahead of media on mobile', () => {
+    const slidesStart = source.indexOf('const HOME_SLIDES');
+    const salonSlide = source.indexOf("src: '/images/partners/salon-saloon/team-sign.webp'");
+    const kountrySlide = source.indexOf("src: '/images/partners/kountry-kutz/interior-empty.webp'");
+
+    expect(salonSlide).toBeGreaterThan(slidesStart);
+    expect(salonSlide).toBeLessThan(kountrySlide);
+    expect(source).toContain('className="relative z-20 order-1');
+    expect(source).toContain('className="relative order-2 w-full');
+    expect(source).toContain('h-[clamp(300px,46svh,480px)]');
     expect(source).not.toContain("src: '/images/partners/generations-hair/salon-service.webp'");
-    expect(source).not.toContain("data-narration-src={revisionedHeroAsset('/audio/narration/home-hero.mp3')}");
+    expect(source).not.toContain(
+      "data-narration-src={revisionedHeroAsset('/audio/narration/home-hero.mp3')}",
+    );
   });
 
   it('crossfades naturally without unmounting or exposing a blank frame', () => {

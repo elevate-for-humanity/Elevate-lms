@@ -41,12 +41,24 @@ export async function createCourse(input: CourseCreate) {
     .from('courses')
     .insert({
       title: input.title,
+      short_description: input.subtitle || null,
       description: input.description || null,
       program_id: input.program_id || null,
       duration_hours: input.duration_hours || null,
-      is_active: input.is_published ?? false,
+      is_active: input.is_published === true || input.status === 'published',
+      published_at:
+        input.is_published === true || input.status === 'published'
+          ? new Date().toISOString()
+          : null,
       slug,
-      status: input.is_published ? 'published' : 'draft',
+      status: input.is_published ? 'published' : input.status,
+      category: input.category || null,
+      passing_score: input.passing_score,
+      metadata: {
+        skill_level: input.skill_level,
+        certificate_enabled: input.certificate_enabled,
+        certificate_title: input.certificate_title || null,
+      },
     })
     .select()
     .maybeSingle();
@@ -78,7 +90,56 @@ export async function getCourse(id: string) {
 
 export async function updateCourse(id: string, patch: CourseUpdate) {
   const supabase = await getSupabase();
-  const updateData: Record<string, unknown> = { ...patch, updated_at: new Date().toISOString() };
+  const { data: current, error: currentError } = await supabase
+    .from('courses')
+    .select('metadata, published_at')
+    .eq('id', id)
+    .maybeSingle();
+  if (currentError) throw new Error('Database operation failed');
+  if (!current) return null;
+
+  const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  for (const key of [
+    'title',
+    'description',
+    'program_id',
+    'duration_hours',
+    'category',
+    'passing_score',
+  ] as const) {
+    if (patch[key] !== undefined) updateData[key] = patch[key];
+  }
+  if (patch.subtitle !== undefined) updateData.short_description = patch.subtitle;
+
+  const nextStatus =
+    patch.is_published === true
+      ? 'published'
+      : patch.is_published === false
+        ? 'draft'
+        : patch.status;
+  if (nextStatus) {
+    updateData.status = nextStatus;
+    updateData.is_active = nextStatus === 'published';
+    updateData.published_at =
+      nextStatus === 'published' ? current.published_at || new Date().toISOString() : null;
+  }
+
+  if (
+    patch.skill_level !== undefined ||
+    patch.certificate_enabled !== undefined ||
+    patch.certificate_title !== undefined
+  ) {
+    updateData.metadata = {
+      ...((current.metadata as Record<string, unknown> | null) ?? {}),
+      ...(patch.skill_level !== undefined ? { skill_level: patch.skill_level } : {}),
+      ...(patch.certificate_enabled !== undefined
+        ? { certificate_enabled: patch.certificate_enabled }
+        : {}),
+      ...(patch.certificate_title !== undefined
+        ? { certificate_title: patch.certificate_title }
+        : {}),
+    };
+  }
   const { data, error } = await supabase
     .from('courses')
     .update(updateData)
@@ -92,7 +153,15 @@ export async function updateCourse(id: string, patch: CourseUpdate) {
 
 export async function deleteCourse(id: string) {
   const supabase = await getSupabase();
-  const { error } = await supabase.from('courses').delete().eq('id', id);
+  const { error } = await supabase
+    .from('courses')
+    .update({
+      status: 'archived',
+      is_active: false,
+      published_at: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id);
   if (error) throw new Error('Database operation failed');
   return { ok: true };
 }

@@ -30,8 +30,7 @@ create table if not exists public.microcourses (
   duration_hours numeric(8,2) check (duration_hours is null or duration_hours > 0),
   provider_cost_cents integer not null check (provider_cost_cents > 0),
   markup_bps integer not null default 5000 check (markup_bps = 5000),
-  retail_price_cents integer generated always as
-    (((provider_cost_cents::bigint * (10000 + markup_bps)) + 9999) / 10000)::integer stored,
+  retail_price_cents integer generated always as ((((provider_cost_cents::bigint * (10000 + markup_bps)) + 9999) / 10000)::integer) stored,
   currency text not null default 'usd' check (currency = lower(currency) and length(currency) = 3),
   stripe_product_id text unique,
   stripe_price_id text unique,

@@ -27,12 +27,15 @@ export default async function RapidsPage() {
   ]);
 
   const queue = actionQueue ?? [];
-  const hostShopQueue = queue.filter((item: any) => item.entity_type === 'host_shop');
-  const apprenticeQueue = queue.filter((item: any) => item.entity_type === 'apprentice');
+  const readyQueue = queue.filter((item: any) => item.status === 'pending');
+  const blockedQueue = queue.filter((item: any) => item.status === 'blocked');
+  const hostShopQueue = readyQueue.filter((item: any) => item.entity_type === 'host_shop');
+  const apprenticeQueue = readyQueue.filter((item: any) => item.entity_type === 'apprentice');
   const stats = [
     { label: 'Apprentice registrations', value: pendingReg ?? 0, icon: Clock },
-    { label: 'Host Shops to enter', value: hostShopQueue.length, icon: Building2 },
-    { label: 'Apprentices to enter', value: apprenticeQueue.length, icon: GraduationCap },
+    { label: 'Verified Host Shops ready', value: hostShopQueue.length, icon: Building2 },
+    { label: 'Verified apprentices ready', value: apprenticeQueue.length, icon: GraduationCap },
+    { label: 'Blocked — fix before export', value: blockedQueue.length, icon: Clock },
     { label: 'Pending progress', value: pendingProgressResult.count ?? 0, icon: Clock },
     { label: 'Pending completions', value: pendingCompletionResult.count ?? 0, icon: CheckCircle },
   ];

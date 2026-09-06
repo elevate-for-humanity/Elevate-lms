@@ -42,6 +42,7 @@ import { createOrUpdateEnrollment, linkOrphanedEnrollments } from '@/lib/enrollm
 import { handleCheckoutSessionCompleted } from '@/lib/stripe/handlers/checkout-session-completed-with-store';
 import { markImplementationCheckoutStatus } from '@/lib/store/finalize-implementation-purchase';
 import { processCareerCourseStripeEvent } from '@/lib/payments/career-course-webhook';
+import { processMicrocourseStripeEvent } from '@/lib/microcourses/stripe-webhook';
 import { processSubscriptionEvent } from '@/lib/platform/process-subscription-event';
 import {
   getBillingAuthority,
@@ -286,6 +287,24 @@ async function _POST(request: NextRequest) {
     type: event.type,
     livemode: event.livemode,
   });
+
+  // Microcourse purchases share this canonical signed endpoint. Provider
+  // transfers and access activation happen only after a verified paid event.
+  try {
+    const microcourseResult = await processMicrocourseStripeEvent(event, {
+      stripe: stripeClient,
+      supabase,
+    });
+    if (microcourseResult.handled) {
+      return NextResponse.json(microcourseResult.response);
+    }
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: { subsystem: 'microcourse_webhook', event_type: event.type },
+    });
+    logger.error('[webhook] Microcourse processing failed', error);
+    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
+  }
 
   // Career-course checkouts use the same canonical Stripe endpoint as every
   // other marketing payment. This guarantees enrollment without requiring a

@@ -16,6 +16,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import type { PortalSupportIssue } from '@/lib/paris/portal-support';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -34,6 +35,7 @@ interface ParisChatProps {
   courseProgress?: number | null;
   voiceEnabled?: boolean;
   portalRole?: string | null;
+  portalIssue?: PortalSupportIssue | null;
 }
 
 const PATHWAYS = [
@@ -87,6 +89,7 @@ export default function ParisChat({
   courseProgress,
   voiceEnabled = false,
   portalRole,
+  portalIssue,
 }: ParisChatProps) {
   const learnerSurface = surface === 'learner';
   const portalSurface = surface === 'portal';
@@ -100,6 +103,18 @@ export default function ParisChat({
   const [autoSpeak, setAutoSpeak] = useState(voiceEnabled);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!portalIssue) return;
+    setMessages((previous) => {
+      const marker = `I noticed a problem with ${portalIssue.workflow.replaceAll('_', ' ')}`;
+      if (previous.some((message) => message.content.includes(marker))) return previous;
+      return [...previous, {
+        role: 'assistant',
+        content: `${marker}. I’m here to help. The issue has been securely reported to the workflow repair queue. Tell me what you were trying to do, and I’ll guide you while the system checks the problem.`,
+      }];
+    });
+  }, [portalIssue]);
 
   useEffect(() => {
     try {
@@ -150,6 +165,11 @@ export default function ParisChat({
             nextLessonTitle: nextLessonTitle || null,
             courseProgress: typeof courseProgress === 'number' ? courseProgress : null,
             portalRole: portalRole || null,
+            page: window.location.pathname,
+            portalIssue: portalIssue ? {
+              workflow: portalIssue.workflow,
+              status: portalIssue.status || null,
+            } : null,
           },
         }),
       });
@@ -182,7 +202,7 @@ export default function ParisChat({
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  }, [autoSpeak, courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, storeSurface, portalSurface, portalRole, surface, voice]);
+  }, [autoSpeak, courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, portalIssue, storeSurface, portalSurface, portalRole, surface, voice]);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();

@@ -51,6 +51,7 @@ async function _POST(req: NextRequest) {
       { status: 404 },
     );
   }
+  const subscriptionTable = SUPPORTED_TABLES[enrollment.program_slug];
   if (enrollment.stripe_subscription_id) {
     return NextResponse.json(
       { error: 'Automatic payments are already configured. Use Update Payment Method.' },
@@ -81,16 +82,33 @@ async function _POST(req: NextRequest) {
     createIfMissing: true,
   });
   if (!customer) {
-    return NextResponse.json({ error: 'Unable to create a secure billing account.' }, { status: 502 });
+    return NextResponse.json(
+      { error: 'Unable to create a secure billing account.' },
+      { status: 502 },
+    );
   }
   const customerId = customer.id;
   if (customerId !== enrollment.stripe_customer_id) {
-    // Stripe customer IDs belong on the enrollment; the profile column is a
-    // legacy UUID in production and must not receive `cus_` values.
-    await admin
-      .from('program_enrollments')
-      .update({ stripe_customer_id: customerId })
-      .eq('id', enrollment.id);
+    // Keep the enrollment and its program-specific billing record on the same
+    // verified Stripe customer. The profile column is a legacy UUID in
+    // production and must not receive `cus_` values.
+    const [enrollmentSync, billingSync] = await Promise.all([
+      admin
+        .from('program_enrollments')
+        .update({ stripe_customer_id: customerId })
+        .eq('id', enrollment.id),
+      admin
+        .from(subscriptionTable)
+        .update({ stripe_customer_id: customerId })
+        .eq('user_id', user.id)
+        .is('stripe_subscription_id', null),
+    ]);
+    if (enrollmentSync.error || billingSync.error) {
+      return NextResponse.json(
+        { error: 'Unable to synchronize the secure billing account.' },
+        { status: 502 },
+      );
+    }
   }
 
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(

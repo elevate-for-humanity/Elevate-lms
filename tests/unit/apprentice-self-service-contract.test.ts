@@ -17,7 +17,7 @@ describe('apprentice self-service portal contracts', () => {
     expect(route).toMatch(/db\s*\.from\('apprentice_document_types'\)/);
     expect(route).toContain('resolveEnrollment(db, user.id, programSlug)');
     expect(route).toMatch(/db\.storage\s*\.from\('documents'\)\s*\.upload/);
-    expect(route).toContain("document_type: documentType");
+    expect(route).toContain('document_type: documentType');
     expect(route).toContain('file_size: file.size');
   });
 
@@ -27,7 +27,7 @@ describe('apprentice self-service portal contracts', () => {
     );
     expect(migration).toContain('DROP CONSTRAINT IF EXISTS documents_document_type_check');
     expect(migration).toContain("document_type ~ '^[a-z][a-z0-9_-]{0,127}$'");
-    expect(migration).not.toContain("document_type IN (");
+    expect(migration).not.toContain('document_type IN (');
   });
 
   it('resolves billing ownership through either canonical learner identity column', () => {
@@ -37,5 +37,14 @@ describe('apprentice self-service portal contracts', () => {
     ]) {
       expect(source(path)).toContain('.or(`user_id.eq.${user.id},student_id.eq.${user.id}`)');
     }
+  });
+
+  it('synchronizes a recovered Stripe customer across enrollment and tuition billing', () => {
+    const route = source('apps/lms/app/api/billing/setup/route.ts');
+    expect(route).toContain('const subscriptionTable = SUPPORTED_TABLES[enrollment.program_slug]');
+    expect(route).toContain(".from('program_enrollments')");
+    expect(route).toContain('.from(subscriptionTable)');
+    expect(route).toContain(".is('stripe_subscription_id', null)");
+    expect(route).toContain('enrollmentSync.error || billingSync.error');
   });
 });

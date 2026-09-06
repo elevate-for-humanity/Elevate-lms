@@ -6,10 +6,13 @@ import { Bot, RefreshCw } from 'lucide-react';
 
 interface Agent {
   id: string;
+  slug: string;
   name: string;
   role: string;
   status: string;
   capabilities: string[];
+  voice_enabled: boolean;
+  voice_type?: string | null;
   updated_at: string;
 }
 
@@ -17,6 +20,7 @@ export default function AgentsClient() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [savingVoice, setSavingVoice] = useState<string | null>(null);
 
   async function fetchAgents() {
     setLoading(true);
@@ -36,6 +40,24 @@ export default function AgentsClient() {
   useEffect(() => {
     fetchAgents();
   }, []);
+
+  async function setVoice(agent: Agent, enabled: boolean) {
+    setSavingVoice(agent.id);
+    try {
+      const res = await fetch('/api/admin/dev-studio/agents', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: agent.slug, voiceEnabled: enabled }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setAgents((current) => current.map((item) => item.id === agent.id ? { ...item, voice_enabled: enabled } : item));
+      setError(null);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to update voice access');
+    } finally {
+      setSavingVoice(null);
+    }
+  }
 
   const STATUS_COLORS: Record<string, string> = {
     idle: 'bg-slate-400',
@@ -136,8 +158,18 @@ export default function AgentsClient() {
                 </div>
               )}
               <p className="text-[10px] text-slate-400 mt-4">
-                Updated {new Date(agent.updated_at).toLocaleDateString()}
+                Voice {agent.voice_enabled ? 'enabled' : 'disabled'} · Updated {new Date(agent.updated_at).toLocaleDateString()}
               </p>
+              {['ELLIE', 'LIZZY', 'PARIS'].includes(agent.name.toUpperCase()) ? (
+                <button
+                  type="button"
+                  disabled={savingVoice === agent.id}
+                  onClick={() => void setVoice(agent, !agent.voice_enabled)}
+                  className="mt-3 rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  {savingVoice === agent.id ? 'Saving…' : agent.voice_enabled ? 'Disable voice' : 'Enable voice'}
+                </button>
+              ) : null}
             </div>
           ))}
         </div>

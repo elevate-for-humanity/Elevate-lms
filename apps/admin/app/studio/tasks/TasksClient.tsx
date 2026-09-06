@@ -165,11 +165,12 @@ export default function TasksClient() {
                           {task.error_message}
                         </p>
                       )}
-                      {(task.tool_name || task.trace_id) && (
-                        <p className="mt-2 font-mono text-[10px] text-slate-400">
-                          {task.tool_name || 'advisory'} · {task.trace_id || task.id}
-                        </p>
-                      )}
+                      <p className="mt-2 font-mono text-[10px] text-slate-400">
+                        {task.tool_name || 'advisory'} · Task ID: {task.id}
+                        {task.trace_id && task.trace_id !== task.id
+                          ? ` · Trace ID: ${task.trace_id}`
+                          : ''}
+                      </p>
                       {task.result_json && (
                         <details className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs">
                           <summary className="cursor-pointer font-semibold text-slate-700">

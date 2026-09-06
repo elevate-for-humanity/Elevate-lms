@@ -98,6 +98,10 @@ for (const taskIdentityInvariant of [
     fail(`Studio browser UI is missing task identity invariant: ${taskIdentityInvariant}`);
   }
 }
+const studioTasks = read('apps/admin/app/studio/tasks/TasksClient.tsx');
+if (!studioTasks.includes('Task ID: {task.id}') || studioTasks.includes('{task.trace_id || task.id}')) {
+  fail('Studio task evidence conflates the canonical task ID with its trace ID');
+}
 for (const oversizedImage of [
   'mcr.microsoft.com/playwright',
   'playwright install firefox',

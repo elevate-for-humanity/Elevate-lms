@@ -784,10 +784,10 @@
     "voiceoverSrc": "/audio/heroes/barber.mp3",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Barber License",
-    "durationLabel": "2,000 hours",
+    "durationLabel": "260 RTI hours + 14 competencies",
     "salaryRangeLabel": "$28,000 to $52,000",
     "belowHeroHeadline": "Earn your Indiana Barber License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000 hours — 1,500 OJT in a licensed barbershop + 500 RTI. Earn wages from day one. Graduate with your Indiana Barber License.",
+    "belowHeroSubheadline": "DOL Registered Apprenticeship. Complete 14 verified occupational competencies and 260 hours of related instruction, plus supervised host-shop practice toward the Indiana Barber License.",
     "primaryCta": {
       "label": "Enroll Now",
       "href": "/programs/barber-apprenticeship/apply",
@@ -804,7 +804,7 @@
       "Indiana Barber License",
       "Barbershop Business Certificate"
     ],
-    "transcript": "Elevate's registered, competency-based Barber Apprenticeship requires 14 verified occupational competencies and 260 hours of related instruction, together with supervised host-shop practice. Kountry Kutz, one of Elevate's first participating barber host shops, is located at 56 West Main Street, Suite A, New Palestine, Indiana. Apprentices may earn wages through host-shop employment while learning in a real workplace. Funding may help eligible participants after written authorization. If funding is not approved, buy-now-pay-later options may be available through participating providers, subject to provider approval and terms. Apply to review your program, placement, funding, and payment next steps.",
+    "transcript": "Elevate's registered, competency-based Barber Apprenticeship leads toward the Indiana Barber License through 260 RTI hours + 14 competencies, plus supervised host-shop practice. Kountry Kutz in New Palestine is a participating host shop. Eligible funding may help after written approval; payment-plan options are subject to provider terms.",
     "analyticsName": "barber-apprenticeship",
     "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4"
   },

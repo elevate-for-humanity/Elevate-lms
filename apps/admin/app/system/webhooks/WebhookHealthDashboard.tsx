@@ -34,6 +34,7 @@ interface ProviderHealth {
   baselineDailyAvg: number;
   ratio: number;
   healthy: boolean;
+  state: 'not_configured' | 'configured_no_activity' | 'active' | 'degraded';
   statusBreakdown: Record<string, number>;
   lastEventAt: string | null;
 }
@@ -76,7 +77,17 @@ interface Filters {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const PROVIDERS = ['', 'stripe', 'sezzle', 'affirm', 'jotform', 'calendly', 'resend'];
+const PROVIDERS = [
+  '',
+  'stripe',
+  'sezzle',
+  'affirm',
+  'jotform',
+  'calendly',
+  'resend',
+  'sendgrid-inbound',
+  'teams',
+];
 const STATUSES = [
   '',
   'received',
@@ -105,6 +116,8 @@ const PROVIDER_COLORS: Record<string, string> = {
   resend: 'bg-purple-100 text-purple-800',
   sezzle: 'bg-pink-100 text-pink-800',
   affirm: 'bg-cyan-100 text-cyan-800',
+  'sendgrid-inbound': 'bg-blue-100 text-blue-800',
+  teams: 'bg-violet-100 text-violet-800',
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -163,7 +176,7 @@ function ProviderCard({ p }: { p: ProviderHealth }) {
 
   return (
     <div
-      className={`bg-white rounded-xl border-2 p-5 ${!p.configured ? 'border-amber-300' : p.healthy ? 'border-slate-200' : 'border-red-300'}`}
+      className={`bg-white rounded-xl border-2 p-5 ${p.state === 'not_configured' ? 'border-amber-300' : p.state === 'configured_no_activity' ? 'border-blue-200' : p.state === 'active' ? 'border-slate-200' : 'border-red-300'}`}
     >
       <div className="flex items-center justify-between mb-3">
         <span
@@ -171,14 +184,22 @@ function ProviderCard({ p }: { p: ProviderHealth }) {
         >
           {p.provider}
         </span>
-        {!p.configured ? (
+        {p.state === 'not_configured' ? (
           <span className="rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold uppercase text-amber-800">
             Not configured
           </span>
-        ) : p.healthy ? (
-          <CheckCircle2 className="h-5 w-5 text-green-500" />
+        ) : p.state === 'configured_no_activity' ? (
+          <span className="rounded-full bg-blue-100 px-2 py-1 text-[10px] font-bold uppercase text-blue-800">
+            Configured · no activity
+          </span>
+        ) : p.state === 'active' ? (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-700">
+            <CheckCircle2 className="h-5 w-5" /> Active
+          </span>
         ) : (
-          <AlertTriangle className="h-5 w-5 text-red-500" />
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-700">
+            <AlertTriangle className="h-5 w-5" /> Degraded
+          </span>
         )}
       </div>
 

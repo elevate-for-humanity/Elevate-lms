@@ -22,15 +22,12 @@ export default async function StaffPortalAttendancePage() {
     .select(
       `
       id,
+      enrollment_id,
+      cohort_id,
       date,
-      hours_worked,
-      status,
-      apprentices (
-        id,
-        profiles (
-          full_name
-        )
-      )
+      hours_logged,
+      type,
+      verified
     `,
     )
     .order('date', { ascending: false })
@@ -104,7 +101,7 @@ export default async function StaffPortalAttendancePage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left py-2">Student</th>
+                    <th className="text-left py-2">Enrollment</th>
                     <th className="text-left py-2">Date</th>
                     <th className="text-center py-2">Hours</th>
                     <th className="text-center py-2">Status</th>
@@ -114,25 +111,21 @@ export default async function StaffPortalAttendancePage() {
                   {records.map((record: any) => (
                     <tr key={record.id} className="border-b">
                       <td className="py-3">
-                        {record.apprentices?.profiles?.full_name || 'Unknown'}
+                        <span className="font-mono text-xs">{record.enrollment_id}</span>
                       </td>
                       <td className="py-3 text-slate-700">
                         {new Date(record.date).toLocaleDateString()}
                       </td>
-                      <td className="py-3 text-center">{record.hours_worked || 0}</td>
+                      <td className="py-3 text-center">{record.hours_logged || 0}</td>
                       <td className="py-3 text-center">
                         <span
                           className={`px-2 py-1 rounded text-sm ${
-                            record.status === 'present'
+                            record.verified
                               ? 'bg-brand-green-100 text-brand-green-800'
-                              : record.status === 'absent'
-                                ? 'bg-brand-red-100 text-brand-red-800'
-                                : record.status === 'late'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-white text-slate-900'
+                              : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
-                          {record.status || 'N/A'}
+                          {record.verified ? 'Verified' : 'Pending'} · {record.type}
                         </span>
                       </td>
                     </tr>
@@ -145,20 +138,6 @@ export default async function StaffPortalAttendancePage() {
               No attendance records found. Records will appear here once attendance is taken.
             </p>
           )}
-          <div className="mt-4 flex items-center gap-6 text-sm text-slate-700">
-            <span>
-              <span className="text-brand-green-600">●</span> Present
-            </span>
-            <span>
-              <span className="text-brand-red-600">✗</span> Absent
-            </span>
-            <span>
-              <span className="text-yellow-600">L</span> Late
-            </span>
-            <span>
-              <span className="text-brand-blue-600">E</span> Excused
-            </span>
-          </div>
         </section>
       </div>
     </div>

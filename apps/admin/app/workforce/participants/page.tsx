@@ -1,9 +1,9 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { Users, Search, Plus, Filter, Download, ChevronRight } from 'lucide-react';
+import { Users, Plus, ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Participants | Workforce | Admin | Elevate For Humanity',
@@ -11,13 +11,18 @@ export const metadata: Metadata = {
 
 export default async function ParticipantsPage() {
   await requireRole(['admin', 'super_admin', 'staff']);
-  const db = await createClient();
+  const db = await requireAdminClient();
 
   const { data: participants } = await db
     .from('workforce_participants')
-    .select('*')
+    .select('id,name,email,program_id,status,enrollment_date,created_at')
     .order('created_at', { ascending: false })
     .limit(100);
+  const programIds = [...new Set((participants || []).map((participant) => participant.program_id).filter(Boolean))];
+  const { data: programs } = programIds.length
+    ? await db.from('programs').select('id,title').in('id', programIds)
+    : { data: [] };
+  const programNames = new Map((programs || []).map((program) => [program.id, program.title]));
 
   return (
     <div className="p-6">
@@ -33,40 +38,6 @@ export default async function ParticipantsPage() {
           <Plus className="w-4 h-4" />
           Add Participant
         </Link>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-lg border p-4 mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search participants by name, email, or ID..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <select className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">All Programs</option>
-              <option value="wioa">WIOA</option>
-              <option value="trade">Trade Adjustment Assistance</option>
-              <option value="veteran">Veteran Services</option>
-            </select>
-            <select className="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">All Status</option>
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
-              <option value="withdrawn">Withdrawn</option>
-            </select>
-            <button className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-2">
-              <Download className="w-4 h-4" />
-              Export
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Stats */}
@@ -113,13 +84,15 @@ export default async function ParticipantsPage() {
               participants.map((participant) => (
                 <tr key={participant.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
-                    <div className="font-medium">{participant.full_name || 'N/A'}</div>
+                    <div className="font-medium">{participant.name || 'N/A'}</div>
                     <div className="text-sm text-gray-500">{participant.email || 'N/A'}</div>
                   </td>
                   <td className="px-4 py-3">
                     <span className="inline-flex items-center gap-1">
                       <Users className="w-4 h-4 text-gray-400" />
-                      {participant.program || 'WIOA'}
+                      {participant.program_id
+                        ? programNames.get(participant.program_id) || 'Program record unavailable'
+                        : 'Unassigned'}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -128,21 +101,13 @@ export default async function ParticipantsPage() {
                       participant.status === 'completed' ? 'bg-blue-100 text-blue-700' :
                       'bg-gray-100 text-gray-700'
                     }`}>
-                      {participant.status || 'active'}
+                      {participant.status || 'Unspecified'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
-                    {participant.enrolled_date ? new Date(participant.enrolled_date).toLocaleDateString() : 'N/A'}
+                    {participant.enrollment_date ? new Date(participant.enrollment_date).toLocaleDateString() : 'N/A'}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="w-24 bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-600 h-2 rounded-full"
-                        style={{ width: `${participant.progress || 0}%` }}
-                      />
-                    </div>
-                    <span className="text-xs text-gray-500">{participant.progress || 0}%</span>
-                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-500">Not tracked on this record</td>
                   <td className="px-4 py-3 text-right">
                     <Link
                       href={`/workforce/participants/${participant.id}`}

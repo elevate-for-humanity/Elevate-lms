@@ -82,7 +82,7 @@ BEGIN
     -- Profiles
     'profiles', 'user_profiles',
     -- Notifications
-    'notifications'
+    'notifications', 'workforce_participants'
   ) THEN
     RAISE EXCEPTION 'audited_mutation: table % is not in the allowlist', p_table;
   END IF;

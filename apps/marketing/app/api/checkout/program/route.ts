@@ -6,6 +6,7 @@ import { getStaticProgram } from '@/data/programs/index';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { getMinimumDepositCents } from '@/lib/programs/deposit-policy';
+import { resolveProgramPromotion } from '@/lib/payments/program-promotion';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -186,12 +187,17 @@ export async function POST(request: NextRequest) {
   let promotionCodeId: string | null = null;
   if (couponCode) {
     try {
-      const promotionCodes = await stripe.promotionCodes.list({
+      const promotionResult = await resolveProgramPromotion({
+        admin,
+        stripe,
         code: couponCode,
-        active: true,
-        limit: 1,
+        amountCents: chargeCents,
       });
-      promotionCodeId = promotionCodes.data[0]?.id ?? null;
+      if ('error' in promotionResult) {
+        await admin.from('program_enrollments').delete().eq('id', pendingEnrollment.id).eq('status', 'checkout_pending');
+        return NextResponse.json({ error: promotionResult.error }, { status: 400 });
+      }
+      promotionCodeId = promotionResult.stripePromotionCodeId;
     } catch (error) {
       logger.warn('[program-checkout] Promotion-code lookup failed', {
         slug,

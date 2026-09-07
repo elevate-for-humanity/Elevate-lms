@@ -1,11 +1,11 @@
 import crypto from 'node:crypto';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { createCredentialVerifier } from '@/lib/supabase/credential-verifier';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -79,9 +79,7 @@ export async function POST(req: NextRequest) {
   }
 
   const sendgridKey = process.env.SENDGRID_API_KEY?.trim();
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
-  if (!sendgridKey || !supabaseUrl || !anonKey) {
+  if (!sendgridKey || !process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()) {
     return NextResponse.json({ error: 'Production authentication or email service is unavailable' }, { status: 503 });
   }
 
@@ -93,9 +91,7 @@ export async function POST(req: NextRequest) {
   });
   if (updateError) return NextResponse.json({ error: 'Password update failed' }, { status: 500 });
 
-  const verifier = createSupabaseClient(supabaseUrl, anonKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  const verifier = createCredentialVerifier();
   const { data: verified, error: verifyError } = await verifier.auth.signInWithPassword({
     email: normalizedEmail,
     password,
@@ -107,7 +103,7 @@ export async function POST(req: NextRequest) {
   }
 
   const loginUrl = `${(process.env.NEXT_PUBLIC_SITE_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '')}/login`;
-  const html = `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#172033;line-height:1.6"><h2>Your program-holder account is ready</h2><p>Hello ${escapeHtml(holder.contact_name || 'David')},</p><p>Your permanent Elevate portal login has been set and verified.</p><div style="padding:18px;border:1px solid #dbe3ee;border-radius:10px;background:#f8fafc"><p><strong>Email:</strong> ${escapeHtml(normalizedEmail)}</p><p><strong>Password:</strong> ${escapeHtml(password)}</p><p><a href="${escapeHtml(loginUrl)}">Sign in to Elevate</a></p></div><p>After signing in, you will be routed to the Program Holder dashboard for ${escapeHtml(holder.organization_name)}.</p><p>Elevate for Humanity</p></div>`;
+  const html = `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#172033;line-height:1.6"><h2>Your program-holder account is ready</h2><p>Hello ${escapeHtml(holder.contact_name || 'Program Holder')},</p><p>Your permanent Elevate portal login has been set and verified.</p><div style="padding:18px;border:1px solid #dbe3ee;border-radius:10px;background:#f8fafc"><p><strong>Email:</strong> ${escapeHtml(normalizedEmail)}</p><p><strong>Password:</strong> ${escapeHtml(password)}</p><p><a href="${escapeHtml(loginUrl)}">Sign in to Elevate</a></p></div><p>After signing in, you will be routed to the Program Holder dashboard for ${escapeHtml(holder.organization_name)}.</p><p>Elevate for Humanity</p></div>`;
 
   const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',

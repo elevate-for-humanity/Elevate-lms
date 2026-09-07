@@ -29,6 +29,7 @@ interface Summary {
 
 interface ProviderHealth {
   provider: string;
+  configured: boolean;
   last24h: number;
   baselineDailyAvg: number;
   ratio: number;
@@ -162,7 +163,7 @@ function ProviderCard({ p }: { p: ProviderHealth }) {
 
   return (
     <div
-      className={`bg-white rounded-xl border-2 p-5 ${p.healthy ? 'border-slate-200' : 'border-red-300'}`}
+      className={`bg-white rounded-xl border-2 p-5 ${!p.configured ? 'border-amber-300' : p.healthy ? 'border-slate-200' : 'border-red-300'}`}
     >
       <div className="flex items-center justify-between mb-3">
         <span
@@ -170,7 +171,11 @@ function ProviderCard({ p }: { p: ProviderHealth }) {
         >
           {p.provider}
         </span>
-        {p.healthy ? (
+        {!p.configured ? (
+          <span className="rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold uppercase text-amber-800">
+            Not configured
+          </span>
+        ) : p.healthy ? (
           <CheckCircle2 className="h-5 w-5 text-green-500" />
         ) : (
           <AlertTriangle className="h-5 w-5 text-red-500" />

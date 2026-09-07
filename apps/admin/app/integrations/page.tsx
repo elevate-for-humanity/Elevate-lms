@@ -19,6 +19,7 @@ import {
   ExternalLink,
   Settings,
 } from 'lucide-react';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const metadata: Metadata = {
   title: 'Integrations | Admin | Elevate For Humanity',
@@ -237,6 +238,7 @@ const categoryLabels: Record<string, string> = {
 
 export default async function AdminIntegrationsPage() {
   await requireRole(['admin', 'staff']);
+  await hydrateProcessEnv();
   const integrations = INTEGRATIONS.map((i) => ({
     ...i,
     status: i.envVars.length > 0 ? getStatus(i.envVars) : i.status,
@@ -266,9 +268,8 @@ export default async function AdminIntegrationsPage() {
           <div>
             <p className="text-sm font-semibold text-slate-900">Environment Manager</p>
             <p className="mt-0.5 text-xs text-slate-600">
-              API keys (Groq, OpenAI, Stripe, Supabase, email) stored in{' '}
-              <code className="rounded bg-white px-1">platform_settings</code> — powers Ellie,
-              course builder, and integrations below.
+              Review the effective runtime configuration. Secret values remain in the protected
+              secret store and are never displayed or saved as plaintext settings.
             </p>
           </div>
           <span className="inline-flex items-center gap-1 text-sm font-medium text-brand-blue-700">

@@ -27,4 +27,10 @@ describe('Course Builder health contract', () => {
     expect(studio).toContain('check.issues?.length');
     expect(studio).toContain('Open {issue.title}');
   });
+
+  it('leaves the page-level heading to the Studio route shell', () => {
+    const studio = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+    expect(studio).not.toContain('<h1');
+    expect(studio).toContain('<h2 className="mt-1 text-2xl font-black text-white">Course Builder</h2>');
+  });
 });

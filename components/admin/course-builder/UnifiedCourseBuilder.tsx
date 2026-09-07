@@ -114,7 +114,7 @@ export default function UnifiedCourseBuilder() {
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
               <Bot className="h-4 w-4" /> Unified Course Factory
             </div>
-            <h1 className="mt-1 text-2xl font-black text-white">Course Builder</h1>
+            <h2 className="mt-1 text-2xl font-black text-white">Course Builder</h2>
             <p className="mt-1 max-w-3xl text-sm text-slate-400">
               Build, review, govern, publish, and maintain complete courses from one authority.
             </p>

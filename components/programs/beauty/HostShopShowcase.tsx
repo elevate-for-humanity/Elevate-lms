@@ -129,25 +129,26 @@ export default function HostShopShowcase({
     const observer = new IntersectionObserver(
       ([entry]) => {
         const video = section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]');
-        if (!video) return;
         if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
           // Browser autoplay requires muted video playback. Once a visitor
           // explicitly enables sound, never silently mute it again.
-          if (!userEnabledSoundRef.current) video.muted = true;
-          void video.play().catch(() => undefined);
+          if (video) {
+            if (!userEnabledSoundRef.current) video.muted = true;
+            void video.play().catch(() => undefined);
+          }
 
           // The Host Shop introduction is pre-rendered audio. Start it when
-          // the slideshow becomes visible. If browser policy blocks audible
-          // autoplay, expose an inline control instead of failing silently.
+          // the slideshow becomes visible, including when the active slide is
+          // a still image. Never overlap narration with a playing tour video.
           const narrationAudio = narrationAudioRef.current;
-          if (narrationAudio && video.paused) {
+          if (narrationAudio && (!video || video.paused)) {
             void narrationAudio
               .play()
               .then(() => setNarrationBlocked(false))
               .catch(() => setNarrationBlocked(true));
           }
         } else {
-          video.pause();
+          video?.pause();
           narrationAudioRef.current?.pause();
         }
       },

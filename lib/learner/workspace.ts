@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { getUserEnrollments, type NormalizedEnrollment } from '@/lib/enrollments/getUserEnrollments';
-import { getRequiredAgreements, type RequiredAgreement } from '@/lib/legal/requiredAgreements';
+import { getRequiredAgreementsForProgram, type RequiredAgreement } from '@/lib/legal/requiredAgreements';
 
 export type LearnerRequirement = {
   id: string;
@@ -83,7 +83,7 @@ export async function loadLearnerWorkspace(userId: string, role = 'student'): Pr
       row.accepted_at,
     ]),
   );
-  const agreements = getRequiredAgreements(role).map((agreement) => ({
+  const agreements = getRequiredAgreementsForProgram(role, primaryEnrollment?.program_slug).map((agreement) => ({
     ...agreement,
     signed: signed.has(`${agreement.type}:${agreement.version}`),
     acceptedAt: signed.get(`${agreement.type}:${agreement.version}`) ?? null,

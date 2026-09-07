@@ -2,8 +2,9 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { getRequiredAgreements } from '@/lib/legal/requiredAgreements';
+import { APPRENTICESHIP_AGREEMENT, getRequiredAgreements, isApprenticeshipProgram } from '@/lib/legal/requiredAgreements';
 import { recordAgreementAcceptance } from '@/lib/legal/recordAgreementAcceptance';
+import { getUserEnrollments } from '@/lib/enrollments/getUserEnrollments';
 
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
@@ -31,7 +32,14 @@ export async function POST(req: NextRequest) {
       .eq('id', user.id)
       .maybeSingle();
 
-    const allowed = getRequiredAgreements(profile?.role || 'student').find(
+    let allowedAgreements = getRequiredAgreements(profile?.role || 'student');
+    if (profile?.role === 'student' && agreement_type === APPRENTICESHIP_AGREEMENT.type) {
+      const enrollmentResult = await getUserEnrollments(user.id);
+      if (enrollmentResult.enrollments.some((row) => isApprenticeshipProgram(row.program_slug))) {
+        allowedAgreements = [...allowedAgreements, APPRENTICESHIP_AGREEMENT];
+      }
+    }
+    const allowed = allowedAgreements.find(
       (item) => item.type === agreement_type && item.version === document_version,
     );
     if (!allowed || !user.email) return NextResponse.json({ error: 'Agreement is not required for this account' }, { status: 400 });

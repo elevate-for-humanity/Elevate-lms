@@ -17,6 +17,25 @@ export interface RequiredAgreement {
   documentUrl: string;
 }
 
+export const APPRENTICESHIP_AGREEMENT: RequiredAgreement = {
+  type: 'apprenticeship_agreement',
+  version: '1.0',
+  title: 'Apprenticeship Agreement',
+  description: 'Program terms, supervised work requirements, wage records, related instruction, and apprentice responsibilities',
+  documentUrl: '/lms/legal/apprenticeship-agreement',
+};
+
+export function isApprenticeshipProgram(programSlug?: string | null): boolean {
+  return /apprentice|barber|cosmetology|esthetic|manicur|nail-technician/i.test(programSlug || '');
+}
+
+export function getRequiredAgreementsForProgram(role: string, programSlug?: string | null): RequiredAgreement[] {
+  const agreements = getRequiredAgreements(role);
+  return isApprenticeshipProgram(programSlug)
+    ? [...agreements, APPRENTICESHIP_AGREEMENT]
+    : agreements;
+}
+
 export type UserRole =
   | 'student'
   | 'program_holder'

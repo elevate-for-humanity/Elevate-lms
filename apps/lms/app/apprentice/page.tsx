@@ -615,6 +615,29 @@ export default async function ApprenticePortalPage() {
         </div>
       </section>
 
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">Your employer placement</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">{shopName}</h2>
+            <p className="mt-2 text-sm font-semibold text-slate-700">Supervisor: {supervisorName}</p>
+            {runtime.shop ? (
+              <p className="mt-1 text-sm text-slate-600">
+                {[runtime.shop.address1, runtime.shop.address2, runtime.shop.city, runtime.shop.state, runtime.shop.zip].filter(Boolean).join(', ')}
+              </p>
+            ) : (
+              <p className="mt-1 text-sm font-bold text-amber-800">An employer or Host Shop has not been assigned yet.</p>
+            )}
+          </div>
+          <Link href="/apprentice/documents" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">
+            Open my forms and documents
+          </Link>
+        </div>
+        <p className="mt-5 rounded-xl bg-slate-50 p-4 text-sm font-medium leading-6 text-slate-700">
+          Your enrollment agreement, student MOU, apprenticeship agreement, and acknowledgments are provided in your dashboard for electronic completion. Upload only your supporting evidence. Employer agreements and employer MOUs stay in the employer workspace.
+        </p>
+      </section>
+
       <section
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5"
         aria-label="Apprentice progress"

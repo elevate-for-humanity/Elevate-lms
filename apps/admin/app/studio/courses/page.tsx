@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import UnifiedCourseBuilder from '@/components/admin/course-builder/UnifiedCourseBuilder';
-import styles from './course-builder-light.module.css';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -36,7 +35,7 @@ export default function StudioCoursesPage() {
           </nav>
         </div>
       </header>
-      <section className={styles.courseBuilderLight}>
+      <section>
         <UnifiedCourseBuilder />
       </section>
     </main>

@@ -5,7 +5,15 @@ import { HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS } from '@/lib/program-holder/onb
 describe('HVAC Program Holder onboarding contract', () => {
   it('requires the payment and compliance document set', () => {
     expect(HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS.map((item) => item.type)).toEqual([
-      'government_id', 'business_registration', 'insurance', 'epa_608', 'w9', 'hvac_training_plan',
+      'government_id',
+      'business_registration',
+      'insurance',
+      'epa_608',
+      'w9',
+      'hvac_training_plan',
+      'profile_photo',
+      'student_photo',
+      'student_video',
     ]);
   });
 
@@ -15,11 +23,13 @@ describe('HVAC Program Holder onboarding contract', () => {
     expect(migration).toContain('new.program_holder_id := null');
   });
 
-  it('records the new LLC MOU version and updates the holder record', () => {
+  it('uses the assigned Program Holder record and activates it after signature', () => {
     const page = readFileSync('apps/lms/app/program-holder/sign-mou/page.tsx', 'utf8');
     const action = readFileSync('apps/marketing/app/actions/sign-agreement.ts', 'utf8');
-    expect(page).toContain('2.0-indy-on-demand-services-llc');
-    expect(page).toContain('INDY ON DEMAND SERVICES LLC');
+    expect(page).toContain('agreementVersion={`3.0-${holder.id}`}');
+    expect(page).toContain('{holder.organization_name}');
+    expect(page).toContain("from('program_holder_programs')");
+    expect(page).not.toContain('INDY ON DEMAND SERVICES LLC');
     expect(action).toContain("mou_status: 'signed'");
   });
 });

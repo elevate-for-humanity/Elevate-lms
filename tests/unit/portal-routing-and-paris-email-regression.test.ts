@@ -15,12 +15,29 @@ const inbound = fs.readFileSync(
   'utf8',
 );
 const paris = fs.readFileSync(path.resolve('supabase/functions/paris-response/index.ts'), 'utf8');
+const holderMou = fs.readFileSync(
+  path.resolve('apps/lms/app/program-holder/sign-mou/page.tsx'),
+  'utf8',
+);
+const holderOnboarding = fs.readFileSync(
+  path.resolve('apps/lms/app/program-holder/onboarding/page.tsx'),
+  'utf8',
+);
 
 describe('portal routing and PARIS inbound email', () => {
   it('uses real portal routes and does not link to the removed report form', () => {
     expect(workspace).not.toContain('/program-holder/reports/new');
     expect(workspace).toContain('/program-holder/documents');
     expect(workspace).toContain('/program-holder/sign-mou');
+  });
+
+  it('sends ineligible Program Holder sessions to the real Marketing application', () => {
+    const applicationUrl =
+      'https://www.elevateforhumanity.org/apply/program-holder?status=pending';
+    expect(holderMou).toContain(applicationUrl);
+    expect(holderOnboarding).toContain(applicationUrl);
+    expect(holderMou).not.toContain("redirect('/apply/program-holder?status=pending')");
+    expect(holderOnboarding).not.toContain("redirect('/apply/program-holder?status=pending')");
   });
 
   it('shows HVAC uploads only when HVAC is assigned', () => {

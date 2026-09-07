@@ -130,6 +130,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(health).toContain('ready: true');
     expect(panel).toContain("['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable']");
     expect(panel).toContain("['Repository writes'");
+    expect(panel).toContain('connected GitHub plugin is separate');
   });
 
   it('opens the Studio browser container directly and preserves mobile task width', () => {

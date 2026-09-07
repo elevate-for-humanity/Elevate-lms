@@ -63,7 +63,7 @@ export default function DevStudioHealthPanel() {
 
   const rows = health
     ? [
-        ['GitHub token', !health.hasGitHub ? 'missing' : health.githubTokenValid ? 'valid' : 'invalid'],
+        ['Container GitHub token', !health.hasGitHub ? 'missing' : health.githubTokenValid ? 'valid' : 'invalid'],
         ['Groq', flag(health.hasGroq)],
         ['OpenAI', flag(health.hasOpenAI)],
         ['Anthropic', flag(health.hasAnthropic)],
@@ -72,7 +72,7 @@ export default function DevStudioHealthPanel() {
         ['Supabase service key', flag(health.supabaseServiceKeyPresent)],
         ['Execution mode', health.execution?.mode ?? 'admin-native'],
         ['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable'],
-        ['Repository writes', health.execution?.repositoryWritesReady ? 'ready' : health.hasGitHub ? 'blocked by invalid GitHub token' : 'needs GitHub token'],
+        ['Repository writes', health.execution?.repositoryWritesReady ? 'ready' : health.hasGitHub ? 'container token invalid — connected GitHub plugin is separate' : 'needs container GitHub token'],
         ['Northflank API', flag(health.northflank?.tokenPresent)],
         ['Northflank project', flag(health.northflank?.projectIdPresent)],
       ]

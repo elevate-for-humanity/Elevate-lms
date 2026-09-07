@@ -27,15 +27,23 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    if (action === 'reject' && !String(rejectionReason || '').trim()) {
+      return NextResponse.json({ error: 'A rejection reason is required' }, { status: 400 });
+    }
+
     const status = action === 'approve' ? 'approved' : 'rejected';
+    // `status` is the workflow state, while `verification_status` has its own
+    // database contract: pending | verified | rejected.
+    const verificationStatus = action === 'approve' ? 'verified' : 'rejected';
 
     const { data: updatedDoc, error: updateError } = await auditedMutation({
       table: 'documents',
       operation: 'update',
       rowData: {
         status,
-        verification_status: status,
+        verification_status: verificationStatus,
         verified: action === 'approve',
+        verified_by: action === 'approve' ? auth.id : null,
         verified_at: action === 'approve' ? new Date().toISOString() : null,
         reviewed_by: auth.id,
         reviewed_at: new Date().toISOString(),
@@ -78,26 +86,36 @@ async function _POST(request: NextRequest) {
     const studentUserId = document.user_id;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
 
-    await logAdminAudit({
-      action: AdminAction.DOCUMENT_REVIEWED,
-      actorId: auth.id,
-      entityType: 'documents',
-      entityId: documentId,
-      metadata: { decision: action, file_name: document.file_name, student_user_id: studentUserId },
-      req: request,
-    });
+    // The authoritative audit row was committed atomically by auditedMutation.
+    // Legacy telemetry must never turn a successful review into a false failure.
+    try {
+      await logAdminAudit({
+        action: AdminAction.DOCUMENT_REVIEWED,
+        actorId: auth.id,
+        entityType: 'documents',
+        entityId: documentId,
+        metadata: { decision: action, file_name: document.file_name, student_user_id: studentUserId },
+        req: request,
+      });
+    } catch {
+      // Non-fatal: the transactional audit above is the compliance record.
+    }
 
     if (userProfile?.email) {
-      await sendEmail({
-        to: userProfile.email,
-        subject: `Document ${status === 'approved' ? 'Approved' : 'Rejected'} - ${document.file_name}`,
-        html: `
-          <h2>Document Review Update</h2>
-          <p>Your document <strong>${document.file_name}</strong> has been ${status}.</p>
-          ${status === 'rejected' ? `<p><strong>Reason:</strong> ${rejectionReason}</p>` : ''}
-          <p>Login to view details: <a href="${siteUrl}/lms/documents">View Documents</a></p>
-        `,
-      });
+      try {
+        await sendEmail({
+          to: userProfile.email,
+          subject: `Document ${status === 'approved' ? 'Approved' : 'Rejected'} - ${document.file_name}`,
+          html: `
+            <h2>Document Review Update</h2>
+            <p>Your document <strong>${document.file_name}</strong> has been ${status}.</p>
+            ${status === 'rejected' ? `<p><strong>Reason:</strong> ${rejectionReason}</p>` : ''}
+            <p>Login to view details: <a href="${siteUrl}/lms/documents">View Documents</a></p>
+          `,
+        });
+      } catch {
+        // Notification delivery is best-effort and must not roll back or mask review success.
+      }
     }
 
     // Check if this approval completes employer onboarding

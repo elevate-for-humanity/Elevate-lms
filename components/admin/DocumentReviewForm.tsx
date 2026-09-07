@@ -81,8 +81,8 @@ export function DocumentReviewForm({ document, adminId }: Props) {
 
       router.push('/documents/review?success=true');
       router.refresh();
-    } catch (err: any) {
-      setError('Failed to review document');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to review document');
     } finally {
       setLoading(false);
     }

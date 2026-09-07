@@ -131,7 +131,7 @@ const HOME_SLIDES: HomeHeroSlide[] = [
 ];
 
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
-  const heroRef = useRef<HTMLElement | null>(null);
+  const mediaRef = useRef<HTMLDivElement | null>(null);
   const [heroVisible, setHeroVisible] = useState(false);
   const slides = HOME_SLIDES;
 
@@ -152,12 +152,12 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   );
 
   useEffect(() => {
-    const element = heroRef.current;
+    const element = mediaRef.current;
     if (!element) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => setHeroVisible(entry.isIntersecting && entry.intersectionRatio >= 0.35),
-      { threshold: [0, 0.35, 0.7] },
+      ([entry]) => setHeroVisible(entry.isIntersecting && entry.intersectionRatio >= 0.1),
+      { threshold: [0, 0.1, 0.5] },
     );
     observer.observe(element);
     return () => observer.disconnect();
@@ -174,16 +174,10 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     return () => window.clearInterval(timer);
   }, [activeSlide, heroVisible, paused, slides.length, transitionToSlide]);
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mediaQuery.matches) setPaused(true);
-  }, []);
-
   if (!slide) return null;
 
   return (
     <section
-      ref={heroRef}
       className="relative overflow-hidden border-b border-slate-200 bg-white"
       role="region"
       aria-roledescription="carousel"
@@ -230,7 +224,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           </div>
         </div>
 
-        <div className="relative order-2 w-full overflow-hidden bg-[#f4f1ec]">
+        <div ref={mediaRef} className="relative order-2 w-full overflow-hidden bg-[#f4f1ec]">
           <HeroVideo
             voiceoverSrc={revisionedHeroAsset('/audio/narration/home-hero.mp3')}
             transcript={HOME_NARRATION}

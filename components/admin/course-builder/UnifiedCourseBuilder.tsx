@@ -44,7 +44,12 @@ type CreditState = {
 };
 type HealthState = {
   status: 'healthy' | 'degraded' | 'unavailable';
-  checks: Array<{ name: string; passed: boolean; message: string }>;
+  checks: Array<{
+    name: string;
+    passed: boolean;
+    message: string;
+    issues?: Array<{ courseId: string; title: string; slug: string; issues: string[] }>;
+  }>;
   checkedAt: string;
 };
 
@@ -173,6 +178,23 @@ export default function UnifiedCourseBuilder() {
                     {check.passed ? 'Ready' : 'Needs attention'} · {check.name}
                   </div>
                   <p className="mt-1 text-slate-300">{check.message}</p>
+                  {check.issues?.length ? (
+                    <ul className="mt-2 space-y-2 border-t border-slate-800 pt-2">
+                      {check.issues.map((issue) => (
+                        <li key={issue.courseId}>
+                          <Link
+                            href={`/studio/courses/${issue.courseId}`}
+                            className="font-semibold text-cyan-300 hover:text-cyan-200"
+                          >
+                            Open {issue.title}
+                          </Link>
+                          <span className="block text-xs text-slate-400">
+                            {issue.issues.join(' · ')}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </li>
               ))}
             </ul>

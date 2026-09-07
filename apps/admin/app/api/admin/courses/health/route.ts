@@ -4,12 +4,25 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
+
+interface IntegrityIssue {
+  courseId: string;
+  title: string;
+  slug: string;
+  issues: string[];
+}
 
 interface CapabilityHealth {
   capability: string;
   status: 'healthy' | 'degraded' | 'unavailable';
   configured: boolean;
-  checks: Array<{ name: string; passed: boolean; message: string }>;
+  checks: Array<{
+    name: string;
+    passed: boolean;
+    message: string;
+    issues?: IntegrityIssue[];
+  }>;
   checkedAt: string;
 }
 
@@ -54,26 +67,33 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   try {
     const [{ data: published, error: courseError }, { data: modules, error: moduleError }, { data: lessons, error: lessonError }] = await Promise.all([
-      supabase.from('courses').select('id, duration_hours, program_id').eq('status', 'published'),
+      supabase
+        .from('courses')
+        .select('id, title, slug, duration_hours, program_id')
+        .eq('status', 'published'),
       supabase.from('course_modules').select('course_id'),
       supabase.from('course_lessons').select('course_id'),
     ]);
     if (courseError || moduleError || lessonError) throw new Error('Integrity query failed');
     const moduleCourses = new Set((modules ?? []).map((row) => row.course_id));
     const lessonCourses = new Set((lessons ?? []).map((row) => row.course_id));
-    const invalid = (published ?? []).filter(
-      (course) =>
-        !course.program_id ||
-        Number(course.duration_hours ?? 0) <= 0 ||
-        !moduleCourses.has(course.id) ||
-        !lessonCourses.has(course.id),
-    );
+    const invalid: IntegrityIssue[] = (published ?? []).flatMap((course) => {
+      const issues: string[] = [];
+      if (!course.program_id) issues.push('canonical program missing');
+      if (Number(course.duration_hours ?? 0) <= 0) issues.push('duration must be greater than zero');
+      if (!moduleCourses.has(course.id)) issues.push('canonical modules missing');
+      if (!lessonCourses.has(course.id)) issues.push('canonical lessons missing');
+      return issues.length
+        ? [{ courseId: course.id, title: course.title, slug: course.slug, issues }]
+        : [];
+    });
     checks.push({
       name: 'Published Course Integrity',
       passed: invalid.length === 0,
       message: invalid.length === 0
         ? `${published?.length ?? 0} published courses pass the basic program, duration, module, and lesson checks`
         : `${invalid.length} of ${published?.length ?? 0} published courses require governed repair`,
+      ...(invalid.length ? { issues: invalid } : {}),
     });
     if (invalid.length) status = 'degraded';
   } catch {
@@ -89,9 +109,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   });
   if (generationPaused) status = 'degraded';
 
-  const hasAiKey = !!process.env.OPENAI_API_KEY || !!process.env.ANTHROPIC_API_KEY;
-  checks.push({ name: 'AI Course Builder', passed: hasAiKey, message: hasAiKey ? 'AI provider configured' : 'No AI provider - course builder will use manual mode' });
-  if (!hasAiKey) status = 'degraded';
+  const aiAvailable = isAIAvailable();
+  const provider = getActiveProviderName();
+  checks.push({
+    name: 'AI Course Builder',
+    passed: aiAvailable,
+    message: aiAvailable
+      ? `Canonical ${provider} provider configured`
+      : 'Canonical AI provider is unavailable; manual editing remains available',
+  });
+  if (!aiAvailable) status = 'degraded';
 
   const response: CapabilityHealth = { capability: 'course-builder', status, configured: true, checks, checkedAt: new Date().toISOString() };
   return NextResponse.json(response, { status: status === 'unavailable' ? 503 : 200 });

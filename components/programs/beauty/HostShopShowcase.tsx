@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Phone, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Phone, Play, Volume2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
 import type {
@@ -98,7 +98,9 @@ export default function HostShopShowcase({
   const [reduceMotion, setReduceMotion] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
   const sectionRef = useRef<HTMLElement | null>(null);
+  const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
   const userEnabledSoundRef = useRef(false);
+  const [narrationBlocked, setNarrationBlocked] = useState(false);
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -129,12 +131,24 @@ export default function HostShopShowcase({
         const video = section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]');
         if (!video) return;
         if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
-          // Browser autoplay requires muted playback. Once a visitor explicitly
-          // enables sound, never let an observer callback silently mute it again.
+          // Browser autoplay requires muted video playback. Once a visitor
+          // explicitly enables sound, never silently mute it again.
           if (!userEnabledSoundRef.current) video.muted = true;
           void video.play().catch(() => undefined);
+
+          // The Host Shop introduction is pre-rendered audio. Start it when
+          // the slideshow becomes visible. If browser policy blocks audible
+          // autoplay, expose an inline control instead of failing silently.
+          const narrationAudio = narrationAudioRef.current;
+          if (narrationAudio && video.paused) {
+            void narrationAudio
+              .play()
+              .then(() => setNarrationBlocked(false))
+              .catch(() => setNarrationBlocked(true));
+          }
         } else {
           video.pause();
+          narrationAudioRef.current?.pause();
         }
       },
       { threshold: [0, 0.35, 0.75] },
@@ -210,6 +224,16 @@ export default function HostShopShowcase({
           setInteracting(false);
       }}
     >
+      {autoPlayVideoOnVisible && narrationSrc ? (
+        <audio
+          ref={narrationAudioRef}
+          src={narrationSrc}
+          preload="metadata"
+          onEnded={() => setNarrationBlocked(false)}
+          className="sr-only"
+          aria-hidden="true"
+        />
+      ) : null}
       <div className="mx-auto max-w-6xl">
         <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -228,6 +252,21 @@ export default function HostShopShowcase({
               Shop.
             </p>
           </div>
+          {narrationBlocked ? (
+            <button
+              type="button"
+              onClick={() => {
+                const audio = narrationAudioRef.current;
+                if (!audio) return;
+                audio.currentTime = 0;
+                void audio.play().then(() => setNarrationBlocked(false));
+              }}
+              className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-black text-white hover:bg-brand-blue-800 sm:self-auto"
+            >
+              <Volume2 className="h-4 w-4" aria-hidden="true" />
+              Start Host Shop audio
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => setPaused((value) => !value)}

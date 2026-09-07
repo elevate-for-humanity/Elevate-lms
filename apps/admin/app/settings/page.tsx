@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import Link from 'next/link';
 import { Bell, Shield, CreditCard, Globe, Mail, Webhook, ArrowRight, Share2 } from 'lucide-react';
+import { RUNTIME_INTEGRATIONS, runtimeConfiguration } from '@/lib/integrations/runtime-status';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -26,43 +27,13 @@ export default async function AdminSettingsPage() {
     (settingsRows ?? []).map((r: any) => [r.key, r.value]),
   );
 
-  const integrationChecks = [
-    {
-      name: 'Stripe',
-      ready: Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET),
-    },
-    { name: 'SendGrid', ready: Boolean(process.env.SENDGRID_API_KEY) },
-    {
-      name: 'Supabase',
-      ready: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY),
-    },
-    {
-      name: 'QuickBooks',
-      ready: Boolean(process.env.QB_CLIENT_ID && process.env.QB_CLIENT_SECRET),
-    },
-    {
-      name: 'Google',
-      ready: Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-    },
-    {
-      name: 'Calendly',
-      ready: Boolean(process.env.CALENDLY_API_TOKEN && process.env.CALENDLY_WEBHOOK_SECRET),
-    },
-    { name: 'Teams', ready: Boolean(process.env.TEAMS_WEBHOOK_URL) },
-    {
-      name: 'Zoom',
-      ready: Boolean(
-        process.env.ZOOM_ACCOUNT_ID && process.env.ZOOM_CLIENT_ID && process.env.ZOOM_CLIENT_SECRET,
-      ),
-    },
-  ];
-  const activeIntegrations = integrationChecks.filter((item) => item.ready);
-  const webhookChecks = [
-    process.env.STRIPE_WEBHOOK_SECRET,
-    process.env.CALENDLY_WEBHOOK_SECRET,
-    process.env.TEAMS_WEBHOOK_URL,
-  ];
-  const configuredWebhooks = webhookChecks.filter(Boolean).length;
+  const configuredIntegrations = RUNTIME_INTEGRATIONS.filter(
+    (item) => runtimeConfiguration(item.id).configured,
+  );
+  const webhookIntegrations = RUNTIME_INTEGRATIONS.filter((item) => item.webhook);
+  const configuredWebhooks = webhookIntegrations.filter(
+    (item) => runtimeConfiguration(item.id).configured,
+  ).length;
   const connectedSocial = new Set(
     (socialRows ?? [])
       .filter((row: any) => {
@@ -157,12 +128,12 @@ export default async function AdminSettingsPage() {
       href: '/settings/integrations',
       fields: [
         {
-          label: 'Active Integrations',
-          value: `${activeIntegrations.length} of ${integrationChecks.length}`,
+          label: 'Configured Integrations',
+          value: `${configuredIntegrations.length} of ${RUNTIME_INTEGRATIONS.length}`,
         },
         {
           label: 'Webhook Endpoints',
-          value: `${configuredWebhooks} of ${webhookChecks.length} secured`,
+          value: `${configuredWebhooks} of ${webhookIntegrations.length} configured`,
         },
       ],
     },

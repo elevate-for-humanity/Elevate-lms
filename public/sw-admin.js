@@ -1,14 +1,13 @@
 // Service Worker — Admin Domain
 // __CACHE_VERSION__ replaced at build time by scripts/stamp-sw.mjs.
 const CACHE_VERSION = '__CACHE_VERSION__';
-const CDN = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 
 const PRECACHE_ASSETS = [
   '/offline.html',
   '/manifest-admin.json',
-  `${CDN}/icons/admin-192.png`,
-  `${CDN}/icons/admin-512.png`,
+  '/icon-192.png',
+  '/icon-512.png',
 ];
 
 function isCacheableResponse(response) {
@@ -124,8 +123,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || 'You have a new notification',
-    icon: `${CDN}/icons/admin-192.png`,
-    badge: `${CDN}/icons/admin-96.png`,
+    icon: '/icon-192.png',
+    badge: '/icon-96.png',
     vibrate: [100, 50, 100],
     tag: data.tag || 'elevate-admin',
     renotify: true,

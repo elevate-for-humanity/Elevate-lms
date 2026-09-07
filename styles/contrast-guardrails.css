@@ -263,6 +263,28 @@
   background-color: #1e40af !important;
 }
 
+/* Normal-size white labels need deeper 700-series campaign colors too. */
+.efh-contrast :is(.bg-blue-700, .bg-sky-800) {
+  background-color: #1e3a8a !important;
+}
+
+.efh-contrast :is(.bg-red-500, .bg-red-600, .bg-brand-red-500, .bg-brand-red-600) {
+  background-color: #b91c1c !important;
+}
+
+.efh-contrast :is(.bg-emerald-700, .bg-emerald-800) {
+  background-color: #065f46 !important;
+}
+
+/* Brand link colors must pass AA on white and the light-blue marketing wash. */
+.efh-contrast :is(.text-brand-blue-700, .text-brand-blue-800) {
+  color: #1e40af !important;
+}
+
+.efh-contrast :is(.text-brand-red-600, .text-brand-red-700) {
+  color: #b91c1c !important;
+}
+
 /* Orange remains a brand accent, but white text requires the darker AA-safe shade. */
 .efh-contrast :is(.bg-orange-600, .bg-brand-orange-500, .bg-brand-orange-600) {
   background-color: #c2410c !important;

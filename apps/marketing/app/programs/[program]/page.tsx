@@ -143,7 +143,23 @@ export default async function PublicProgramPage({
         program={resolved}
         banner={banner}
         heroOverride={
-          isBookkeepingProgram ? (
+          isBusinessProgram ? (
+            <Link
+              href={resolved.cta.applyHref}
+              aria-label="Apply for the Business Administration October 15, 2026 cohort"
+              className="block w-full overflow-hidden bg-slate-950"
+            >
+              <Image
+                src="/images/cohorts/business-october-15-cohort-flyer.jpg"
+                alt="Business Administration applications open. Next cohort starts October 15, 2026. New cohorts start the 15th of every month."
+                width={1600}
+                height={900}
+                priority
+                sizes="100vw"
+                className="h-auto w-full"
+              />
+            </Link>
+          ) : isBookkeepingProgram ? (
             <div className="w-full overflow-hidden bg-white">
               <Image
                 src="/images/heroes/bookkeeping-accounting-financial-empowerment.png"

@@ -16,22 +16,37 @@ export default async function CandidatesPage({
 }: {
   searchParams: Promise<{ q?: string; program?: string }>;
 }) {
-  const { user } = await requireRole(['employer', 'recruiter', 'admin']);
+  const { user } = await requireRole(['employer', 'sponsor', 'admin']);
   const supabase = await createClient();
   const filters = await searchParams;
   const query = filters.q?.trim() ?? '';
   const program = filters.program?.trim() ?? '';
 
-  const { data: employerProfile } = await supabase
-    .from('profiles')
-    .select('verified')
-    .eq('id', user.id)
+  const { data: employer } = await supabase
+    .from('employers')
+    .select('id,approved,company_name,business_name')
+    .eq('owner_user_id', user.id)
     .maybeSingle();
-  const canContact = Boolean(employerProfile?.verified);
+  const canContact = Boolean(employer?.approved);
+
+  const { data: referrals } = employer?.id
+    ? await supabase
+        .from('candidate_employer_referrals')
+        .select('candidate_profile_id,status,routed_at')
+        .eq('employer_id', employer.id)
+        .neq('status', 'revoked')
+        .order('routed_at', { ascending: false })
+        .limit(100)
+    : { data: [] };
+  const candidateIds = (referrals ?? []).map((referral: any) => referral.candidate_profile_id);
+  const referralMap = Object.fromEntries(
+    (referrals ?? []).map((referral: any) => [referral.candidate_profile_id, referral]),
+  );
 
   let candidateQuery = supabase
     .from('candidate_employment_profiles')
     .select('id,display_name,headline,city,state,program_name,skills,credential_names,contact_email,contact_phone,resume_url,updated_at')
+    .in('id', candidateIds.length ? candidateIds : ['00000000-0000-0000-0000-000000000000'])
     .eq('available_for_employment', true)
     .eq('consent_status', 'granted')
     .order('updated_at', { ascending: false })
@@ -50,7 +65,9 @@ export default async function CandidatesPage({
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-slate-900">Browse Candidates</h1>
-              <p className="text-slate-700">Find job-ready workers trained in your industry</p>
+              <p className="text-slate-700">
+                Verified graduates routed through your approved program partnerships
+              </p>
             </div>
             <Link
               href="/employer/dashboard"
@@ -78,18 +95,16 @@ export default async function CandidatesPage({
                 />
               </div>
             </div>
-            <select name="program" defaultValue={program} className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
+            <select name="program" defaultValue={program} className="min-h-11 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option value="">All Programs</option>
-              <option value="healthcare">Healthcare</option>
-              <option value="skilled-trades">Skilled Trades</option>
-              <option value="technology">Technology</option>
+              <option value="CDL">CDL Training</option>
             </select>
             <button className="rounded-lg bg-brand-blue-700 px-5 py-2 font-semibold text-white" type="submit">Search</button>
           </div>
         </form>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-3">
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center gap-3">
               <Users className="w-8 h-8 text-brand-blue-600" />
@@ -123,9 +138,9 @@ export default async function CandidatesPage({
         <div className="space-y-4">
           {candidates && candidates.length > 0 ? (
             candidates.map((candidate: any) => (
-              <div key={candidate.id} className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
+              <div key={candidate.id} className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex min-w-0 items-start gap-4">
                     <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center">
                       <Users className="w-6 h-6 text-brand-blue-600" />
                     </div>
@@ -133,6 +148,9 @@ export default async function CandidatesPage({
                       <h3 className="text-lg font-semibold text-slate-900">
                         {candidate.display_name || 'Candidate'}
                       </h3>
+                      <p className="mt-1 text-sm font-semibold text-brand-blue-700">
+                        {candidate.program_name || 'Approved workforce pathway'}
+                      </p>
                       {(candidate.city || candidate.state) && (
                         <div className="flex items-center gap-1 text-sm text-slate-700 mt-1">
                           <MapPin className="w-4 h-4" />
@@ -147,21 +165,21 @@ export default async function CandidatesPage({
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2 sm:justify-end">
                     {canContact ? (
                       <>
-                        {candidate.email && (
+                        {candidate.contact_email && (
                           <a
-                            href={`mailto:${candidate.email}`}
+                            href={`mailto:${candidate.contact_email}`}
                             className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
                           >
                             <Mail className="w-4 h-4" />
                             Contact
                           </a>
                         )}
-                        {candidate.phone && (
+                        {candidate.contact_phone && (
                           <a
-                            href={`tel:${candidate.phone}`}
+                            href={`tel:${candidate.contact_phone}`}
                             className="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-white transition"
                           >
                             <Phone className="w-4 h-4" />
@@ -179,6 +197,9 @@ export default async function CandidatesPage({
                     )}
                   </div>
                 </div>
+                <div className="mt-4 border-t border-slate-100 pt-3 text-xs font-semibold text-slate-500">
+                  Routed {new Date(referralMap[candidate.id]?.routed_at || candidate.updated_at).toLocaleDateString()} · {referralMap[candidate.id]?.status || 'routed'}
+                </div>
               </div>
             ))
           ) : (
@@ -186,7 +207,8 @@ export default async function CandidatesPage({
               <Users className="w-16 h-16 text-slate-700 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-slate-900 mb-2">No Candidates Yet</h3>
               <p className="text-slate-700 mb-6">
-                Candidates will appear here as students complete their training programs.
+                Candidates appear only after verified graduation, employment-sharing consent, and
+                an active employer-program partnership.
               </p>
               <Link
                 href="/employer/dashboard"

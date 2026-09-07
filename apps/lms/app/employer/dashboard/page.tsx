@@ -99,6 +99,14 @@ export default async function EmployerDashboardOrchestrated() {
         .eq('status', 'pending')
     : { data: [] };
 
+  const { count: routedGraduateCount } = employerId
+    ? await supabase
+        .from('candidate_employer_referrals')
+        .select('id', { count: 'exact', head: true })
+        .eq('employer_id', employerId)
+        .neq('status', 'revoked')
+    : { count: 0 };
+
   const apprenticeshipData = employerId
     ? await loadEmployerApprenticeshipData(supabase, employerId)
     : { partnerships: [], mappedPrograms: [], availablePrograms: [], draftProposals: [] };
@@ -145,7 +153,7 @@ export default async function EmployerDashboardOrchestrated() {
       </section>
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
             <MetricCard
               label="Active Job Postings"
               value={postings?.length || 0}
@@ -155,6 +163,12 @@ export default async function EmployerDashboardOrchestrated() {
               label="Pending Applications"
               value={applications?.length || 0}
               icon={<Users className="h-11 w-11 text-brand-green-600" />}
+            />
+            <MetricCard
+              label="Routed Graduates"
+              value={routedGraduateCount || 0}
+              note="Verified completion and learner consent required"
+              icon={<Users className="h-11 w-11 text-cyan-600" />}
             />
             <MetricCard
               label="Mapped Apprenticeship Programs"
@@ -186,12 +200,12 @@ export default async function EmployerDashboardOrchestrated() {
               )}
               {stateData.availableSections.includes('candidates') && (
                 <SectionCard
-                  title="View Candidates"
-                  description="Review applicants and trained candidates"
-                  href="/employer/applications"
+                  title="Routed Graduates"
+                  description={`${routedGraduateCount || 0} consented, verified program graduate${(routedGraduateCount || 0) === 1 ? '' : 's'}`}
+                  href="/employer/candidates"
                   icon={<Users className="h-10 w-10" />}
                   badge={
-                    (applications?.length || 0) > 0 ? `${applications?.length} New` : undefined
+                    (routedGraduateCount || 0) > 0 ? `${routedGraduateCount} Ready` : undefined
                   }
                 />
               )}

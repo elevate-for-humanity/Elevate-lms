@@ -26,12 +26,17 @@ export default function EmployerRegisterPage() {
               <div className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" /><span className="text-slate-700">Work Opportunity Tax Credits</span></div>
               <div className="flex gap-3"><CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" /><span className="text-slate-700">Free recruiting services</span></div>
             </div>
-            <form className="space-y-4">
-              <div><label className="block text-sm font-medium mb-1">Company Name</label><input type="text" className="w-full border rounded-lg px-4 py-2" /></div>
-              <div><label className="block text-sm font-medium mb-1">Contact Email</label><input type="email" className="w-full border rounded-lg px-4 py-2" /></div>
-              <div><label className="block text-sm font-medium mb-1">Phone</label><input type="tel" className="w-full border rounded-lg px-4 py-2" /></div>
-              <button type="submit" className="w-full bg-purple-600 text-white font-bold py-3 rounded-lg hover:bg-purple-700">Register</button>
-            </form>
+            <div className="rounded-xl border border-purple-200 bg-purple-50 p-5 text-sm leading-6 text-slate-700">
+              Employer access begins with the governed partnership application. Elevate reviews
+              hiring needs, verifies the organization, completes required agreements, and then
+              activates the employer dashboard.
+            </div>
+            <Link
+              href="https://www.elevateforhumanity.org/apply/employer"
+              className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-purple-700 px-5 py-3 font-bold text-white hover:bg-purple-800"
+            >
+              Complete Employer Application
+            </Link>
           </div>
         </div>
       </section>

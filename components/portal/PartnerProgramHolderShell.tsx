@@ -45,6 +45,7 @@ const NAV: NavItem[] = [
   { href: '/program-holder/how-to-use', label: 'How to Use', icon: HelpCircle, roles: PH, section: 'Settings' },
   { href: '/program-holder/documentation', label: 'Documentation', icon: Book, roles: PH, section: 'Settings' },
   { href: '/program-holder/support', label: 'Support', icon: LifeBuoy, roles: PH, section: 'Settings' },
+  { href: '/employer/dashboard', label: 'Employer Workspace', icon: Briefcase, roles: PH, section: 'Settings' },
   { href: '/program-holder/settings', label: 'Settings', icon: Settings, roles: PH, section: 'Settings' },
   { href: '/partner/settings', label: 'Settings', icon: Settings, roles: PA, section: 'Settings' },
 ];

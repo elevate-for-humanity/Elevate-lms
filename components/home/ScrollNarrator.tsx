@@ -124,20 +124,24 @@ export function ScrollNarrator() {
   }, [pathname, prepare]);
 
   useEffect(() => {
-    const stopNarrationOnScroll = () => {
-      // Scrolling is never a playback trigger. Stop the current narration and
-      // require another explicit press before any section can speak again.
-      lastNarrationRef.current = null;
-      stop();
-      setEnabled(false);
+    let frame = 0;
+    const stopNarrationAfterLeavingSection = () => {
+      if (!lastNarrationRef.current || frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const current = lastNarrationRef.current?.section;
+        if (!current || mostVisiblePageSection() === current) return;
+        lastNarrationRef.current = null;
+        stop();
+        setEnabled(false);
+      });
     };
 
-    window.addEventListener('scroll', stopNarrationOnScroll, { passive: true });
-    window.addEventListener('wheel', stopNarrationOnScroll, { passive: true });
+    window.addEventListener('scroll', stopNarrationAfterLeavingSection, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', stopNarrationOnScroll);
-      window.removeEventListener('wheel', stopNarrationOnScroll);
+      window.removeEventListener('scroll', stopNarrationAfterLeavingSection);
+      if (frame) window.cancelAnimationFrame(frame);
     };
   }, [stop]);
 

@@ -91,6 +91,14 @@ export default async function ApprenticeDocumentsPage() {
                       {getDocumentUploadGuidance(requirement) ? <p className="mt-1 max-w-3xl text-sm leading-6">{getDocumentUploadGuidance(requirement)}</p> : null}
                       <p className="mt-1 text-sm font-semibold">{requirement.is_required ? 'Required' : 'Optional'} · Accepted: {(requirement.accepted_formats ?? []).join(', ').toUpperCase()} · Max {requirement.max_file_size_mb || 10} MB</p>
                       {document?.file_name ? <p className="mt-2 text-xs font-semibold">Latest upload: {document.file_name}</p> : null}
+                      {!complete && !subject.previewing ? (
+                        <Link
+                          href={`/apprentice/documents?documentType=${encodeURIComponent(requirement.id)}#document-upload`}
+                          className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-black text-white hover:bg-slate-800"
+                        >
+                          {pending ? 'Upload a replacement' : status === 'rejected' ? 'Replace document' : `Upload ${requirement.name}`}
+                        </Link>
+                      ) : null}
                     </div>
                   </div>
                   {complete ? (

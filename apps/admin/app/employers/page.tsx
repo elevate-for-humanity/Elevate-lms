@@ -16,7 +16,7 @@ export default async function AdminEmployersPage() {
   const [employersRes] = await Promise.all([
     db
       .from('employers')
-      .select('id, name, industry, city, state, phone, email, status, created_at', {
+      .select('id, name, business_name, company_name, industry, city, state, phone, contact_phone, email, contact_email, status, approved, created_at', {
         count: 'exact',
       })
       .order('created_at', { ascending: false })
@@ -88,7 +88,7 @@ export default async function AdminEmployersPage() {
                   )}
                 </div>
                 <h3 className="font-semibold text-slate-900 group-hover:text-brand-blue-700 transition-colors">
-                  {e.name ?? '—'}
+                  {e.company_name || e.business_name || e.name || 'Employer'}
                 </h3>
                 {e.industry && <p className="text-xs text-slate-400 mt-0.5">{e.industry}</p>}
                 <div className="mt-3 space-y-1">
@@ -98,16 +98,16 @@ export default async function AdminEmployersPage() {
                       {[e.city, e.state].filter(Boolean).join(', ')}
                     </p>
                   )}
-                  {e.phone && (
+                  {(e.contact_phone || e.phone) && (
                     <p className="flex items-center gap-1.5 text-xs text-slate-500">
                       <Phone className="w-3 h-3 flex-shrink-0" />
-                      {e.phone}
+                      {e.contact_phone || e.phone}
                     </p>
                   )}
-                  {e.email && (
+                  {(e.contact_email || e.email) && (
                     <p className="flex items-center gap-1.5 text-xs text-slate-500">
                       <Mail className="w-3 h-3 flex-shrink-0" />
-                      {e.email}
+                      {e.contact_email || e.email}
                     </p>
                   )}
                 </div>

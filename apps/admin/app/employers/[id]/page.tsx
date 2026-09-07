@@ -3,7 +3,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Building2, Mail, Phone, MapPin, Briefcase, Users, Edit3, ArrowRight } from 'lucide-react';
+import { Building2, Mail, Phone, MapPin, Briefcase, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,14 +25,20 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
   const { data: employer } = await db
     .from('employers')
     .select(
-      'id, name, industry, city, state, status, contact_email, contact_phone, website, created_at, address',
+      'id, name, business_name, company_name, industry, city, state, status, approved, contact_email, contact_phone, website, website_url, created_at, owner_user_id',
     )
     .eq('id', id)
     .maybeSingle();
 
   if (!employer) notFound();
+  const employerName = employer.company_name || employer.business_name || employer.name || 'Employer';
 
-  const [{ data: jobs, count: jobCount }, { data: apprentices, count: apprenticeCount }] =
+  const [
+    { data: jobs, count: jobCount },
+    { count: apprenticeCount },
+    { count: partnershipCount },
+    { count: referralCount },
+  ] =
     await Promise.all([
       db
         .from('job_postings')
@@ -45,6 +51,15 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
         .select('id, student_id, status', { count: 'exact' })
         .eq('employer_id', id)
         .limit(1),
+      db
+        .from('employer_partnerships')
+        .select('id', { count: 'exact', head: true })
+        .eq('employer_id', id),
+      db
+        .from('candidate_employer_referrals')
+        .select('id', { count: 'exact', head: true })
+        .eq('employer_id', id)
+        .neq('status', 'revoked'),
     ]);
 
   const jobRows = jobs ?? [];
@@ -64,10 +79,10 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
               <Link href="/employers" className="hover:text-blue-600">
                 Employers
               </Link>{' '}
-              / {employer.name}
+              / {employerName}
             </div>
             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <Building2 className="w-6 h-6 text-slate-500" /> {employer.name}
+              <Building2 className="w-6 h-6 text-slate-500" /> {employerName}
             </h1>
             <p className="text-slate-500 text-sm mt-0.5">
               {employer.industry} · {employer.city}, {employer.state}
@@ -89,11 +104,13 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
 
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
         {/* Stats */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            { label: 'Open Jobs', value: jobRows.filter((j) => j.status === 'open').length },
+            { label: 'Active Jobs', value: jobRows.filter((j) => ['active', 'open', 'published'].includes(j.status)).length },
             { label: 'Total Jobs', value: jobCount ?? 0 },
             { label: 'Apprentices', value: apprenticeCount ?? 0 },
+            { label: 'Program Partnerships', value: partnershipCount ?? 0 },
+            { label: 'Routed Graduates', value: referralCount ?? 0 },
           ].map((s) => (
             <div
               key={s.label}

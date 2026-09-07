@@ -5,11 +5,14 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import { RUNTIME_INTEGRATIONS, runtimeConfiguration } from '@/lib/integrations/runtime-status';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const PROVIDERS = ['stripe', 'sezzle', 'affirm', 'jotform', 'calendly', 'resend'] as const;
+const PROVIDERS = RUNTIME_INTEGRATIONS.filter((provider) => provider.webhook).map(
+  (provider) => provider.id,
+);
 const VOLUME_DROP_THRESHOLD = 0.5;
 const PAGE_SIZE = 50;
 
@@ -20,6 +23,7 @@ interface ProviderHealth {
   baselineDailyAvg: number;
   ratio: number;
   healthy: boolean;
+  state: 'not_configured' | 'configured_no_activity' | 'active' | 'degraded';
   statusBreakdown: Record<string, number>;
   lastEventAt: string | null;
 }
@@ -122,24 +126,6 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
 
   const providerHealth: ProviderHealth[] = [];
   const alerts: string[] = [];
-  const providerConfiguration: Record<(typeof PROVIDERS)[number], boolean> = {
-    stripe: Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_WEBHOOK_SECRET),
-    sezzle: Boolean(
-      process.env.SEZZLE_MERCHANT_ID &&
-      process.env.SEZZLE_PUBLIC_KEY &&
-      process.env.SEZZLE_PRIVATE_KEY &&
-      process.env.SEZZLE_WEBHOOK_SECRET,
-    ),
-    affirm: Boolean(
-      process.env.AFFIRM_PUBLIC_KEY &&
-      (process.env.AFFIRM_PRIVATE_KEY || process.env.AFFIRM_PRIVATE_API_KEY) &&
-      process.env.AFFIRM_WEBHOOK_SECRET,
-    ),
-    jotform: Boolean(process.env.JOTFORM_API_KEY && process.env.JOTFORM_WEBHOOK_SECRET),
-    calendly: Boolean(process.env.CALENDLY_API_TOKEN && process.env.CALENDLY_WEBHOOK_SECRET),
-    resend: Boolean(process.env.RESEND_API_KEY && process.env.RESEND_WEBHOOK_SECRET),
-  };
-
   for (const provider of PROVIDERS) {
     const [
       { count: recentCount },
@@ -180,15 +166,25 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
     const baseline = baselineCount || 0;
     const baselineDailyAvg = baseline / 7;
     const ratio = baselineDailyAvg > 0 ? recent / baselineDailyAvg : recent > 0 ? 1 : 0;
-    const healthy = baselineDailyAvg === 0 || ratio >= VOLUME_DROP_THRESHOLD;
+    const configured = runtimeConfiguration(provider).configured;
+    const errorCount = (statusBreakdown['errored'] || 0) + (statusBreakdown['failed'] || 0);
+    const volumeHealthy = baselineDailyAvg === 0 || ratio >= VOLUME_DROP_THRESHOLD;
+    const errorHealthy = recent === 0 || errorCount / recent <= 0.2;
+    const healthy = configured && recent > 0 && volumeHealthy && errorHealthy;
+    const state: ProviderHealth['state'] = !configured
+      ? 'not_configured'
+      : recent === 0
+        ? 'configured_no_activity'
+        : healthy
+          ? 'active'
+          : 'degraded';
 
-    if (!healthy) {
+    if (configured && !volumeHealthy) {
       alerts.push(
         `${provider}: ${recent} events in last 24h vs ${baselineDailyAvg.toFixed(1)} daily avg (${(ratio * 100).toFixed(0)}% of baseline)`,
       );
     }
 
-    const errorCount = (statusBreakdown['errored'] || 0) + (statusBreakdown['failed'] || 0);
     if (recent > 0 && errorCount / recent > 0.2) {
       alerts.push(
         `${provider}: ${errorCount}/${recent} events errored/failed in last 24h (${((errorCount / recent) * 100).toFixed(0)}%)`,
@@ -197,11 +193,12 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
 
     providerHealth.push({
       provider,
-      configured: providerConfiguration[provider],
+      configured,
       last24h: recent,
       baselineDailyAvg: Math.round(baselineDailyAvg * 10) / 10,
       ratio: Math.round(ratio * 100) / 100,
       healthy,
+      state,
       statusBreakdown,
       lastEventAt: lastEvent?.received_at || null,
     });
@@ -218,33 +215,22 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
 
   const integrityAlerts: string[] = [];
   if ((paidNotEnrolled.count ?? 0) > 0)
-    integrityAlerts.push(`CRITICAL: ${paidNotEnrolled.count} paid sessions with no enrollment`);
+    integrityAlerts.push(
+      `REVIEW: ${paidNotEnrolled.count} paid sessions are not linked to an enrollment`,
+    );
   if ((enrolledNotPaid.count ?? 0) > 0)
     integrityAlerts.push(
-      `CRITICAL: ${enrolledNotPaid.count} active enrollments with no payment evidence`,
+      `REVIEW: ${enrolledNotPaid.count} active enrollments have no recorded payment evidence`,
     );
   if ((openFlags.count ?? 0) > 0)
     integrityAlerts.push(`WARNING: ${openFlags.count} unresolved payment integrity flags`);
 
   const allAlerts = [...alerts, ...integrityAlerts];
 
-  try {
-    await adminDb.from('webhook_health_log').insert({
-      provider: 'stripe',
-      endpoint_status: allAlerts.some((a) => a.includes('CRITICAL')) ? 'degraded' : 'enabled',
-      events_last_24h: total24h ?? 0,
-      events_failed: failed24h ?? 0,
-      events_processed: processed24h ?? 0,
-      unprocessed_paid_sessions: paidNotEnrolled.count ?? 0,
-      enrolled_not_paid: enrolledNotPaid.count ?? 0,
-      metadata: { alerts: allAlerts },
-    });
-  } catch {
-    // Trend logging is best-effort and must not hide the live health result.
-  }
-
   return NextResponse.json({
-    healthy: allAlerts.length === 0,
+    // Payment reconciliation is reported independently and must not make a
+    // webhook endpoint appear unhealthy.
+    healthy: alerts.length === 0,
     checkedAt: now.toISOString(),
     threshold: VOLUME_DROP_THRESHOLD,
     summary: {
@@ -261,6 +247,8 @@ async function handleSummary(adminDb: NonNullable<SupabaseClient>) {
       open_flags: openFlags.count ?? 0,
     },
     alerts: allAlerts,
+    webhookAlerts: alerts,
+    integrityAlerts,
   });
 }
 

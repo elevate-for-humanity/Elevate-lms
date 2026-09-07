@@ -20,13 +20,18 @@ import {
   Settings,
 } from 'lucide-react';
 import { hydrateProcessEnv } from '@/lib/secrets';
+import {
+  RUNTIME_INTEGRATIONS,
+  runtimeConfiguration,
+  runtimeRequirementPresent,
+} from '@/lib/integrations/runtime-status';
 
 export const metadata: Metadata = {
   title: 'Integrations | Admin | Elevate For Humanity',
   alternates: { canonical: 'https://admin.elevateforhumanity.org/integrations' },
 };
 
-type IntegrationStatus = 'active' | 'configured' | 'not_configured';
+type IntegrationStatus = 'configured' | 'partial' | 'not_configured';
 
 interface Integration {
   name: string;
@@ -42,9 +47,9 @@ interface Integration {
 
 function getStatus(envVars: string[]): IntegrationStatus {
   const allSet = envVars.every((v) => !!process.env[v]);
-  if (allSet && envVars.length > 0) return 'active';
+  if (allSet && envVars.length > 0) return 'configured';
   const someSet = envVars.some((v) => !!process.env[v]);
-  if (someSet) return 'configured';
+  if (someSet) return 'partial';
   return 'not_configured';
 }
 
@@ -109,7 +114,7 @@ const INTEGRATIONS: Integration[] = [
     name: 'Stripe',
     slug: 'stripe',
     description:
-      'Payment processing for licensing, course purchases, and subscription billing. Klarna, Afterpay, Zip, and Cash App Pay enabled.',
+      'Payment processing for licensing, course purchases, and subscription billing. Eligible payment methods are selected dynamically from the live Stripe payment configuration.',
     icon: CreditCard,
     category: 'payments',
     envVars: ['STRIPE_SECRET_KEY', 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', 'STRIPE_WEBHOOK_SECRET'],
@@ -222,8 +227,12 @@ const statusConfig: Record<
   IntegrationStatus,
   { label: string; color: string; Icon: typeof CheckCircle2 }
 > = {
-  active: { label: 'Active', color: 'bg-brand-green-100 text-brand-green-700', Icon: CheckCircle2 },
-  configured: { label: 'Partial', color: 'bg-amber-100 text-amber-700', Icon: AlertCircle },
+  configured: {
+    label: 'Configured',
+    color: 'bg-brand-green-100 text-brand-green-700',
+    Icon: CheckCircle2,
+  },
+  partial: { label: 'Partial', color: 'bg-amber-100 text-amber-700', Icon: AlertCircle },
   not_configured: { label: 'Not Configured', color: 'bg-slate-100 text-slate-500', Icon: XCircle },
 };
 
@@ -239,13 +248,22 @@ const categoryLabels: Record<string, string> = {
 export default async function AdminIntegrationsPage() {
   await requireRole(['admin', 'staff']);
   await hydrateProcessEnv();
-  const integrations = INTEGRATIONS.map((i) => ({
-    ...i,
-    status: i.envVars.length > 0 ? getStatus(i.envVars) : i.status,
-  }));
+  const canonicalIds = new Set(RUNTIME_INTEGRATIONS.map((item) => item.id));
+  const integrations = INTEGRATIONS.map((i) => {
+    if (!canonicalIds.has(i.slug)) {
+      return { ...i, status: i.envVars.length > 0 ? getStatus(i.envVars) : i.status };
+    }
+    const runtime = runtimeConfiguration(i.slug);
+    const status: IntegrationStatus = runtime.configured
+      ? 'configured'
+      : runtime.partial
+        ? 'partial'
+        : 'not_configured';
+    return { ...i, status };
+  });
 
-  const activeCount = integrations.filter((i) => i.status === 'active').length;
   const configuredCount = integrations.filter((i) => i.status === 'configured').length;
+  const partialCount = integrations.filter((i) => i.status === 'partial').length;
 
   const categories = Object.entries(
     integrations.reduce<Record<string, Integration[]>>((acc, i) => {
@@ -285,13 +303,13 @@ export default async function AdminIntegrationsPage() {
             <p className="text-3xl font-bold text-slate-900">{integrations.length}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
-            <p className="text-sm text-slate-500 mb-1">Active</p>
-            <p className="text-3xl font-bold text-brand-green-600">{activeCount}</p>
+            <p className="text-sm text-slate-500 mb-1">Configured</p>
+            <p className="text-3xl font-bold text-brand-green-600">{configuredCount}</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <p className="text-sm text-slate-500 mb-1">Needs Setup</p>
             <p className="text-3xl font-bold text-slate-400">
-              {integrations.length - activeCount - configuredCount}
+              {integrations.length - configuredCount - partialCount}
             </p>
           </div>
         </div>
@@ -346,14 +364,14 @@ export default async function AdminIntegrationsPage() {
                         </a>
                       )}
                     </div>
-                    {integration.status !== 'active' && integration.envVars.length > 0 && (
+                    {integration.status !== 'configured' && integration.envVars.length > 0 && (
                       <div className="mt-3 pt-3 border-t border-slate-100">
                         <p className="text-xs text-slate-400">Required env vars:</p>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {integration.envVars.map((v) => (
                             <span
                               key={v}
-                              className={`text-xs px-1.5 py-0.5 rounded font-mono ${process.env[v] ? 'bg-brand-green-50 text-brand-green-700' : 'bg-slate-100 text-slate-400'}`}
+                              className={`text-xs px-1.5 py-0.5 rounded font-mono ${runtimeRequirementPresent(v) ? 'bg-brand-green-50 text-brand-green-700' : 'bg-slate-100 text-slate-400'}`}
                             >
                               {v}
                             </span>

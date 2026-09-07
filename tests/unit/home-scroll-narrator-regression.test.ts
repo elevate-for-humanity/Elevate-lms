@@ -5,18 +5,16 @@ import { describe, expect, it } from 'vitest';
 const source = fs.readFileSync(path.resolve('components/home/ScrollNarrator.tsx'), 'utf8');
 
 describe('homepage scroll narration lifecycle', () => {
-  it('stops active narration immediately when scrolling begins', () => {
+  it('keeps narration playing through small mobile scroll movement', () => {
     const scrollHandler = source.slice(
-      source.indexOf('const stopAndScheduleNarration'),
-      source.indexOf('// Resolve the initially visible section'),
+      source.indexOf('const stopNarrationAfterLeavingSection'),
+      source.indexOf('const toggle ='),
     );
+    expect(scrollHandler).toContain('mostVisiblePageSection() === current');
     expect(scrollHandler).toContain('lastNarrationRef.current = null');
     expect(scrollHandler).toContain('stop()');
-    expect(scrollHandler).toContain('scheduleNarration()');
-    expect(source).toContain("window.addEventListener('scroll', stopAndScheduleNarration");
-    expect(source).toContain("window.addEventListener('wheel', stopAndScheduleNarration");
-    expect(source).not.toContain("window.addEventListener('touchstart', stopAndScheduleNarration");
-    expect(source).toContain('const SCROLL_SETTLE_MS = 350');
+    expect(source).toContain("window.addEventListener('scroll', stopNarrationAfterLeavingSection");
+    expect(source).not.toContain("window.addEventListener('wheel'");
   });
 
   it('releases narration when no page section owns the viewport', () => {
@@ -28,12 +26,12 @@ describe('homepage scroll narration lifecycle', () => {
     expect(noSection).toContain('lastNarrationRef.current = null');
   });
 
-  it('warms opening narration and evaluates the initial viewport', () => {
+  it('warms opening narration without speaking until the visitor presses play', () => {
     expect(source).toContain('sections.slice(0, 3).forEach(preload)');
-    expect(source).toContain('scheduleNarration();');
+    expect(source).toContain('void narrateVisibleSection();');
   });
 
   it('does not rebuild scroll listeners for transient playback state', () => {
-    expect(source).toContain('[enabled, narrateVisibleSection, stop]');
+    expect(source).toContain('}, [stop]);');
   });
 });

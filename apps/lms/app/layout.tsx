@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import './layout.css';
 import '../../../styles/contrast-guardrails.css';
+import '../../../styles/responsive-guardrails.css';
 import { LmsPwaRegistration } from '@/components/pwa/LmsPwaRegistration';
 import { PwaInstallBanner } from '@/components/pwa/PwaInstallBanner';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
@@ -37,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <SupabasePublicConfigScript />
       </head>
-      <body className="efh-contrast">
+      <body className="lms-portal efh-contrast">
         <SupabaseConfigBootstrap />
         <LmsPwaRegistration />
         {children}

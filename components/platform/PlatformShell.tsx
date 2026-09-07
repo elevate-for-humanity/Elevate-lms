@@ -4,26 +4,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { usePathname } from 'next/navigation';
-import {
-  Search,
-  Menu,
-  X,
-  ChevronDown,
-  LogOut,
-  ShieldCheck,
-  Users,
-  Download,
-} from 'lucide-react';
+import { Search, Menu, X, ChevronDown, LogOut, ShieldCheck, Users, Download } from 'lucide-react';
 import type {
   UserRole,
   NavSection,
   BreadcrumbItem,
   ActionItem,
 } from '@/lib/navigation/navigation-config';
-import {
-  getNavigationForRole,
-  ROLE_DISPLAY_NAMES,
-} from '@/lib/navigation/navigation-config';
+import { getNavigationForRole, ROLE_DISPLAY_NAMES } from '@/lib/navigation/navigation-config';
 
 interface PlatformShellProps {
   user: {
@@ -50,12 +38,7 @@ function isActiveHref(href: string, pathname: string): boolean {
   }
 }
 
-export function PlatformShell({
-  user,
-  role,
-  actions = [],
-  children,
-}: PlatformShellProps) {
+export function PlatformShell({ user, role, actions = [], children }: PlatformShellProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -63,18 +46,34 @@ export function PlatformShell({
   const drawerRef = useRef<HTMLElement>(null);
 
   const baseSections = getNavigationForRole(role);
-  const sections = role === 'program_holder'
-    ? baseSections.map((section) => ({
-        ...section,
-        items: [
-          ...section.items,
-          { id: 'at-risk', label: 'At-Risk Students', href: '/program-holder/students/at-risk', icon: Users },
-          { id: 'onboarding', label: 'Onboarding', href: '/program-holder/onboarding', icon: ShieldCheck },
-          { id: 'agreement', label: 'MOU & Agreement', href: '/program-holder/rights-responsibilities', icon: ShieldCheck },
-          { id: 'install-app', label: 'Install App', href: '/install', icon: Download },
-        ],
-      }))
-    : baseSections;
+  const sections =
+    role === 'program_holder'
+      ? baseSections.map((section) => ({
+          ...section,
+          items: [
+            ...section.items,
+            {
+              id: 'at-risk',
+              label: 'At-Risk Students',
+              href: '/program-holder/students/at-risk',
+              icon: Users,
+            },
+            {
+              id: 'onboarding',
+              label: 'Onboarding',
+              href: '/program-holder/onboarding',
+              icon: ShieldCheck,
+            },
+            {
+              id: 'agreement',
+              label: 'MOU & Agreement',
+              href: '/program-holder/rights-responsibilities',
+              icon: ShieldCheck,
+            },
+            { id: 'install-app', label: 'Install App', href: '/install', icon: Download },
+          ],
+        }))
+      : baseSections;
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -135,9 +134,7 @@ export function PlatformShell({
 
   const userName =
     user.full_name ||
-    (user.first_name && user.last_name
-      ? `${user.first_name} ${user.last_name}`
-      : 'User');
+    (user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : 'User');
 
   return (
     <div className="min-h-dvh w-full overflow-x-clip bg-slate-50">
@@ -148,7 +145,7 @@ export function PlatformShell({
               ref={menuButtonRef}
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="hidden min-h-11 min-w-11 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 lg:hidden"
               aria-label="Open portal navigation"
               aria-expanded={sidebarOpen}
               aria-controls="portal-navigation-drawer"
@@ -160,7 +157,9 @@ export function PlatformShell({
                 <span className="text-sm font-black text-white">E</span>
               </div>
               <div className="hidden min-w-0 md:block">
-                <span className="block truncate font-black text-slate-950">{ROLE_DISPLAY_NAMES[role]}</span>
+                <span className="block truncate font-black text-slate-950">
+                  {ROLE_DISPLAY_NAMES[role]}
+                </span>
                 <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
                   <ShieldCheck className="h-3 w-3 shrink-0" /> Secure role-restricted session
                 </span>
@@ -236,7 +235,10 @@ export function PlatformShell({
                   </p>
                 </div>
                 <form action="/api/auth/signout" method="post">
-                  <button type="submit" className="flex min-h-11 w-full items-center gap-2 px-4 py-2 text-left font-bold text-red-700 hover:bg-red-50">
+                  <button
+                    type="submit"
+                    className="flex min-h-11 w-full items-center gap-2 px-4 py-2 text-left font-bold text-red-700 hover:bg-red-50"
+                  >
                     <LogOut className="h-4 w-4" /> Sign out securely
                   </button>
                 </form>
@@ -246,6 +248,18 @@ export function PlatformShell({
         </div>
       </header>
 
+      {sidebarOpen && (
+        <button
+          type="button"
+          aria-label="Close portal navigation"
+          className="fixed inset-0 z-[60] bg-slate-950/55 backdrop-blur-[1px] lg:hidden"
+          onClick={() => {
+            setSidebarOpen(false);
+            menuButtonRef.current?.focus();
+          }}
+        />
+      )}
+
       <div className="flex min-w-0">
         <aside
           ref={drawerRef}
@@ -253,7 +267,7 @@ export function PlatformShell({
           role={sidebarOpen ? 'dialog' : undefined}
           aria-modal={sidebarOpen ? true : undefined}
           aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation`}
-          className={`hidden bg-slate-950 text-white lg:sticky lg:top-16 lg:z-20 lg:block lg:h-[calc(100dvh-4rem)] lg:w-64 lg:shrink-0 lg:shadow-none ${
+          className={`fixed inset-y-0 left-0 z-[70] block h-dvh w-[min(20rem,calc(100vw-2.5rem))] bg-slate-950 text-white shadow-2xl transition-transform duration-200 lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100dvh-4rem)] lg:w-64 lg:shrink-0 lg:translate-x-0 lg:visible lg:pointer-events-auto lg:shadow-none ${
             sidebarOpen
               ? 'translate-x-0 visible pointer-events-auto'
               : '-translate-x-full invisible pointer-events-none lg:visible lg:pointer-events-auto'
@@ -265,7 +279,9 @@ export function PlatformShell({
                 <h2 className="truncate text-xs font-black uppercase tracking-wider text-slate-300">
                   {ROLE_DISPLAY_NAMES[role]}
                 </h2>
-                <p className="mt-1 text-xs text-slate-400">Use this menu to move through your workspace.</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Use this menu to move through your workspace.
+                </p>
               </div>
               <button
                 ref={closeButtonRef}
@@ -281,7 +297,10 @@ export function PlatformShell({
               </button>
             </div>
 
-            <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-4 pb-[max(1rem,env(safe-area-inset-bottom))]" aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation links`}>
+            <nav
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+              aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation links`}
+            >
               {sections.map((section) => (
                 <div key={section.id} className="mb-4">
                   {section.label && (
@@ -320,22 +339,61 @@ export function PlatformShell({
 
             <div className="hidden shrink-0 border-t border-slate-800 p-4 sm:block">
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-100">
-                <div className="flex items-center gap-2 font-black"><ShieldCheck className="h-4 w-4" /> Secure workspace</div>
-                <p className="mt-1 leading-5 text-emerald-100/90">Your session is authenticated and portal access is role-restricted.</p>
+                <div className="flex items-center gap-2 font-black">
+                  <ShieldCheck className="h-4 w-4" /> Secure workspace
+                </div>
+                <p className="mt-1 leading-5 text-emerald-100/90">
+                  Your session is authenticated and portal access is role-restricted.
+                </p>
               </div>
             </div>
           </div>
         </aside>
 
         <main className="min-w-0 w-full flex-1 overflow-x-clip">
+          {actions.length > 0 && (
+            <div className="max-w-full overflow-x-auto whitespace-nowrap border-b border-slate-200 bg-white px-3 py-2 lg:hidden">
+              <div className="inline-flex gap-2">
+                {actions.map((action) =>
+                  action.href ? (
+                    <Link
+                      key={action.id}
+                      href={action.href}
+                      className="inline-flex min-h-11 items-center rounded-lg bg-slate-100 px-3 text-sm font-bold text-slate-800"
+                    >
+                      {action.label}
+                    </Link>
+                  ) : (
+                    <button
+                      key={action.id}
+                      type="button"
+                      onClick={action.onClick}
+                      className="inline-flex min-h-11 items-center rounded-lg bg-slate-100 px-3 text-sm font-bold text-slate-800"
+                    >
+                      {action.label}
+                    </button>
+                  ),
+                )}
+              </div>
+            </div>
+          )}
           <div className="min-w-0 max-w-full overflow-x-auto break-words p-3 sm:p-4 lg:p-6">
             {children}
           </div>
         </main>
       </div>
-      <ParisFloatingWrapper surface="portal" portalRole={ROLE_DISPLAY_NAMES[role]} autoOpenOnDashboard />
+      <ParisFloatingWrapper
+        surface="portal"
+        portalRole={ROLE_DISPLAY_NAMES[role]}
+        autoOpenOnDashboard
+      />
     </div>
   );
 }
 
-export type { UserRole, NavSection, BreadcrumbItem, ActionItem } from '@/lib/navigation/navigation-config';
+export type {
+  UserRole,
+  NavSection,
+  BreadcrumbItem,
+  ActionItem,
+} from '@/lib/navigation/navigation-config';

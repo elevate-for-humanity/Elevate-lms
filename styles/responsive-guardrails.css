@@ -1,0 +1,128 @@
+/*
+ * Platform-wide responsive safety layer.
+ *
+ * Component styles remain responsible for their intended layout. These rules
+ * provide the invariants every surface needs so long labels, database values,
+ * tables, forms, and media cannot make a page wider than the device viewport.
+ */
+
+html {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body,
+main,
+[data-public-layout-root],
+[data-marketing-main] {
+  min-width: 0;
+  max-width: 100%;
+}
+
+body {
+  overflow-x: clip;
+}
+
+:where(main, header, footer, nav, section, article, aside, form, fieldset, div) {
+  min-width: 0;
+}
+
+:where(img, video, canvas, svg, iframe) {
+  max-width: 100%;
+}
+
+:where(input, select, textarea, button) {
+  max-width: 100%;
+  font: inherit;
+}
+
+:where(p, li, dd, dt, label, legend, h1, h2, h3, h4, h5, h6, a, button, th, td) {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+:where(pre, code) {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+:where([role='dialog'], [role='menu'], [role='listbox']) {
+  max-width: calc(100vw - 1rem);
+}
+
+@media (max-width: 767px) {
+  :where(main) {
+    width: 100%;
+  }
+
+  :where(main) h1 {
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
+    line-height: 1.12;
+  }
+
+  :where(main) h2 {
+    font-size: clamp(1.4rem, 6.5vw, 1.875rem);
+    line-height: 1.2;
+  }
+
+  :where(main) h3 {
+    font-size: clamp(1.15rem, 5vw, 1.5rem);
+    line-height: 1.25;
+  }
+
+  :where(main) table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  :where(main) th,
+  :where(main) td {
+    padding-inline: 0.75rem;
+  }
+
+  :where(main) input:not([type='checkbox']):not([type='radio']),
+  :where(main) select,
+  :where(main) textarea {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-2'],
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-3'],
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-4'],
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-5'],
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-6'],
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-7'],
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-8'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :where(.admin-portal, .lms-portal) main [class*='min-w-['] {
+    min-width: 0;
+  }
+
+  :where(.admin-portal, .lms-portal) main [class*='w-['] {
+    max-width: 100%;
+  }
+
+  .admin-portal :where(main) {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-5'],
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-6'],
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-7'],
+  :where(.admin-portal, .lms-portal) main [class*='grid-cols-8'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

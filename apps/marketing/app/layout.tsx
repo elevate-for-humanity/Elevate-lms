@@ -8,6 +8,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import './layout.css';
 import '../../../styles/contrast-guardrails.css';
+import '../../../styles/responsive-guardrails.css';
 import { MarketingChromeBoundary } from '@/components/site/MarketingChromeBoundary';
 import { I18nProvider } from '@/lib/i18n/context';
 import { ChunkRecovery } from '@/components/system/ChunkRecovery';

@@ -6,9 +6,10 @@
  * mounted here because they compete with the mobile admin navigation layer and
  * expose canned public actions inside a privileged workspace.
  */
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
 import '../../../styles/contrast-guardrails.css';
+import '../../../styles/responsive-guardrails.css';
 import BuildVersionSync from '@/components/BuildVersionSync';
 import { AdminNavShell } from '@/components/admin/AdminNavShell';
 import { DEFAULT_NAV } from '@/lib/admin/nav-config';
@@ -20,54 +21,50 @@ import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBoo
 
 export const metadata: Metadata = {
   title: {
-    default: "Elevate Admin",
-    template: "%s | Elevate Admin",
+    default: 'Elevate Admin',
+    template: '%s | Elevate Admin',
   },
   description:
-    "Manage Elevate for Humanity programs, courses, students, website content, and operations.",
-  manifest: "/manifest-admin.json",
-  applicationName: "Elevate Admin",
+    'Manage Elevate for Humanity programs, courses, students, website content, and operations.',
+  manifest: '/manifest-admin.json',
+  applicationName: 'Elevate Admin',
   robots: { index: false, follow: false },
   appleWebApp: {
     capable: true,
-    title: "Elevate Admin",
-    statusBarStyle: "black-translucent",
+    title: 'Elevate Admin',
+    statusBarStyle: 'black-translucent',
   },
   icons: {
     icon: [
       {
-        url: "/favicon.png",
-        sizes: "192x192",
-        type: "image/png",
+        url: '/favicon.png',
+        sizes: '192x192',
+        type: 'image/png',
       },
       {
-        url: "/favicon.png",
-        sizes: "512x512",
-        type: "image/png",
+        url: '/favicon.png',
+        sizes: '512x512',
+        type: 'image/png',
       },
     ],
     apple: [
       {
-        url: "/apple-touch-icon.png",
-        sizes: "192x192",
-        type: "image/png",
+        url: '/apple-touch-icon.png',
+        sizes: '192x192',
+        type: 'image/png',
       },
     ],
   },
 };
 
 export const viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
-  viewportFit: "cover",
-  themeColor: "#f97316",
+  viewportFit: 'cover',
+  themeColor: '#f97316',
 };
 
-export default async function AdminGroupLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function AdminGroupLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -81,9 +78,7 @@ export default async function AdminGroupLayout({
           <div className="min-h-dvh min-w-0 overflow-x-clip bg-slate-50">
             <BuildVersionSync />
             <AdminNavShell navSections={DEFAULT_NAV} />
-            <main className="min-w-0 overflow-x-clip">
-              {children}
-            </main>
+            <main className="min-w-0 overflow-x-clip">{children}</main>
           </div>
         </I18nProvider>
       </body>

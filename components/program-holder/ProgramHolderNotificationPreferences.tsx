@@ -28,8 +28,8 @@ export function ProgramHolderNotificationPreferences({ initial, phone }: { initi
       <h2 className="mt-1 text-xl font-black text-slate-950">How should we notify you?</h2>
       <p className="mt-1 text-sm text-slate-700">Choose email, text, both, or neither when a student is enrolled into your program.</p>
       <div className="mt-4 grid gap-2">
-        <label className="flex items-center gap-3 rounded-xl border border-blue-200 bg-white p-3 text-sm font-bold"><input name="email_alerts" value="true" type="checkbox" defaultChecked={Boolean(initial?.email_course_updates)} /> Email me about new enrollments</label>
-        <label className="flex items-center gap-3 rounded-xl border border-blue-200 bg-white p-3 text-sm font-bold"><input name="sms_alerts" value="true" type="checkbox" defaultChecked={Boolean(initial?.sms_urgent)} /> Text me about new enrollments</label>
+        <label className="flex min-h-11 items-center gap-3 rounded-xl border border-blue-200 bg-white p-3 text-sm font-bold"><input name="email_alerts" value="true" type="checkbox" defaultChecked={Boolean(initial?.email_course_updates)} className="h-8 w-8 shrink-0 accent-blue-700" /> Email me about new enrollments</label>
+        <label className="flex min-h-11 items-center gap-3 rounded-xl border border-blue-200 bg-white p-3 text-sm font-bold"><input name="sms_alerts" value="true" type="checkbox" defaultChecked={Boolean(initial?.sms_urgent)} className="h-8 w-8 shrink-0 accent-blue-700" /> Text me about new enrollments</label>
         <label className="text-sm font-bold text-slate-800">Mobile number<input name="sms_phone" type="tel" defaultValue={initial?.sms_phone || phone} placeholder="317-555-0123" className="mt-1 min-h-11 w-full rounded-xl border border-blue-200 bg-white px-3 font-normal" /></label>
       </div>
       <button disabled={saving} className="mt-4 min-h-11 rounded-xl bg-blue-700 px-5 text-sm font-black text-white disabled:opacity-50">{saving ? 'Saving…' : 'Save alert preferences'}</button>

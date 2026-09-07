@@ -1,19 +1,18 @@
 'use client';
 import { FormEvent, useState } from 'react';
 
-const options = [
+const commonOptions = [
   ['government_id', 'Government-issued photo ID'],
   ['business_registration', 'Business registration'],
   ['insurance', 'General liability insurance'],
-  ['epa_608', 'EPA Section 608 certification'],
   ['w9', 'IRS Form W-9'],
-  ['hvac_training_plan', 'HVAC syllabus and training plan'],
+  ['training_plan', 'Program syllabus and training plan'],
   ['profile_photo', 'Program Holder profile picture'],
   ['student_photo', 'Student training photo'],
   ['student_video', 'Student training video'],
 ] as const;
 
-export function ProgramHolderDocumentUpload() {
+export function ProgramHolderDocumentUpload({ isHvac = false }: { isHvac?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -37,7 +36,8 @@ export function ProgramHolderDocumentUpload() {
     <form onSubmit={submit} className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
       <h2 className="text-lg font-black text-blue-950">Upload an onboarding document</h2>
       <p className="mt-1 text-sm text-blue-900">
-        PDF, JPG, or PNG up to 10 MB; MP4 video up to 50 MB. Identity documents remain in protected storage.
+        PDF, JPG, or PNG up to 10 MB; MP4 video up to 50 MB. Identity documents remain in protected
+        storage.
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
         <select
@@ -46,7 +46,15 @@ export function ProgramHolderDocumentUpload() {
           className="min-h-11 rounded-xl border border-blue-200 bg-white px-3 text-sm"
         >
           <option value="">Select document type</option>
-          {options.map(([value, label]) => (
+          {[
+            ...commonOptions,
+            ...(isHvac
+              ? ([
+                  ['epa_608', 'EPA Section 608 certification'],
+                  ['hvac_training_plan', 'HVAC syllabus and training plan'],
+                ] as const)
+              : []),
+          ].map(([value, label]) => (
             <option key={value} value={value}>
               {label}
             </option>

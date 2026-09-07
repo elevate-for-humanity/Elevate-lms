@@ -19,6 +19,7 @@ export interface AuthResult {
     last_name?: string;
     full_name?: string;
     company_name?: string | null;
+    avatar_url?: string | null;
     verified?: boolean | null;
   };
   effectiveRoles: UserRole[];

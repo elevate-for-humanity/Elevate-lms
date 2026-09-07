@@ -46,6 +46,16 @@ export default async function SignMouPage() {
     redirect('/program-holder/dashboard');
   }
 
+  const { data: assignments } = await db
+    .from('program_holder_programs')
+    .select('program_id, programs(title,name,slug,credential_name,total_hours)')
+    .eq('program_holder_id', holder.id)
+    .eq('status', 'active');
+  const programs = (assignments || []).map((item: any) => item.programs).filter(Boolean);
+  const programNames =
+    programs.map((program: any) => program.title || program.name).join(', ') ||
+    'the approved assigned program';
+
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-950">
       <div className="mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-9">
@@ -61,14 +71,15 @@ export default async function SignMouPage() {
         <section className="mt-7 rounded-xl border border-blue-200 bg-blue-50 p-5 text-sm leading-6 text-blue-950">
           <h2 className="font-black">Agreement incorporated by reference</h2>
           <p className="mt-2">
-            This Version 2.0 agreement is between Elevate for Humanity Career &amp; Technical
-            Institute and <strong>INDY ON DEMAND SERVICES LLC</strong>. It covers the six-week HVAC
-            program, enrolled-student routing, instructional and recordkeeping duties, the $5,000
-            tuition-value distribution, and the onboarding hold that prevents payment until every
-            required item is approved.
+            This agreement is between Elevate for Humanity Career &amp; Technical Institute and
+            <strong> {holder.organization_name}</strong>. It applies only to the currently assigned
+            program{programs.length === 1 ? '' : 's'}: <strong>{programNames}</strong>. It covers
+            applicant follow-up, enrollment, curriculum delivery, instructor oversight, attendance,
+            hours, competency evidence, weekly progress reporting, privacy, completion records, and
+            payment readiness.
           </p>
           <Link
-            href="/legal/program-host-agreement"
+            href="https://www.elevateforhumanity.org/legal/program-host-agreement"
             target="_blank"
             rel="noopener noreferrer"
             className="mt-3 inline-flex font-bold text-blue-800 underline"
@@ -80,13 +91,13 @@ export default async function SignMouPage() {
         <section className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
           <strong>After signature:</strong> your acceptance is recorded with timestamp and audit
           data. Dashboard access continues, but payout setup and fund access remain locked until the
-          handbook, rights acknowledgement, identity, business registration, insurance, EPA 608
-          certificate, W-9, and HVAC training plan have all been approved.
+          handbook, rights and non-compete acknowledgements, identity, business registration,
+          insurance, W-9, program-specific credentials, and training plan have all been approved.
         </section>
 
         <DocumentSignatureBlock
           agreementType="program_holder_mou"
-          agreementVersion="2.0-indy-on-demand-services-llc"
+          agreementVersion={`3.0-${holder.id}`}
           buttonLabel="Sign Program Holder MOU & Continue"
           nextUrl="/program-holder/dashboard"
         />

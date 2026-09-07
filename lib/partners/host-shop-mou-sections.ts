@@ -27,7 +27,10 @@ const PROGRAM_SLUG: Record<HostShopMouProgram, string | null> = {
   nail: 'nail-technician-apprenticeship',
 };
 
-const LABELS: Record<HostShopMouProgram, { title: string; worksite: string; handbook: string; fullDoc?: string }> = {
+const LABELS: Record<
+  HostShopMouProgram,
+  { title: string; worksite: string; handbook: string; fullDoc?: string }
+> = {
   barber: {
     title: 'Indiana Barber Host Shop Program',
     worksite: 'barbershop',
@@ -63,7 +66,10 @@ function wageText(program: HostShopMouProgram) {
   }
   const standard = contract.standard;
   const milestones = standard.wageMilestones
-    .map((step) => `${step.completedCompetencies} verified competencies: $${step.hourlyRate.toFixed(2)}/hour registered baseline`)
+    .map(
+      (step) =>
+        `${step.completedCompetencies} verified competencies: $${step.hourlyRate.toFixed(2)}/hour registered baseline`,
+    )
     .join('\n• ');
   return `The approved occupation standard contains a registered starting baseline of $${standard.startingHourlyRate.toFixed(2)}/hour and the following competency milestones:\n• ${milestones}\n\nThe Worksite must apply the applicable employer-specific RAPIDS wage schedule and any higher wage required by law. The platform stores employer wage schedules separately from the immutable occupation standard so a host-specific schedule is not overwritten by generic copy.`;
 }
@@ -111,31 +117,43 @@ function buildSections(program: HostShopMouProgram): MouSection[] {
       content: sponsorResponsibilities(program),
     },
     {
-      title: '4. Worksite Responsibilities',
+      title: '4. Applicant Contact and Placement',
+      content: `When an applicant is assigned to the Worksite, the Worksite must promptly call or otherwise contact the applicant, explain the employment and training process, record the outcome in the portal, and coordinate the next eligible step with the Sponsor. Assignment is not enrollment, employment, funding approval, or a promise of placement. The Worksite may access only applicants and apprentices assigned to its own record and must not export or reuse applicant information for unrelated solicitation.`,
+    },
+    {
+      title: '5. Worksite Responsibilities',
       content: worksiteResponsibilities(program),
     },
     {
-      title: '5. Compensation and Wage Evidence',
+      title: '6. Compensation and Wage Evidence',
       content: `${wageText(program)}\n\nThe Worksite is responsible for payroll, withholding, required employer contributions, wage statements, and retention of sufficient wage evidence to support program review. No revenue, reimbursement, commission, funding, or profit is guaranteed by participation in this pathway.`,
     },
     {
-      title: '6. Work Records, RTI, and Competency Verification',
+      title: '7. Work Records, RTI, and Competency Verification',
       content: `Work records, RTI evidence, and competency verification are separate records. Work time must reflect actual supervised employment/training activity. RTI credit is counted only when instruction is documented and verified under the applicable program standard. Competency completion may be recorded only after an authorized verifier has observed sufficient evidence of mastery.\n\nFor competency-based registered occupations, elapsed work hours do not automatically complete competencies and do not replace the required RTI total.`,
     },
     {
-      title: '7. Workforce Funding and Reimbursement',
+      title: '8. Workforce Funding and Reimbursement',
       content: `WIOA, WorkOne OJT reimbursement, supportive services, grants, and other public funding are subject to separate participant/employer eligibility, allowable-cost rules, and written authorization. The Worksite must not represent funding as guaranteed or submit the same allowable cost for duplicate reimbursement. Payroll and training evidence required by an authorized funding agreement must be retained and must agree with the apprenticeship/work records.`,
     },
     {
-      title: '8. Privacy, Confidentiality, and Record Access',
+      title: '9. Privacy, Confidentiality, and Record Access',
       content: `Both parties must protect apprentice/participant personally identifiable information and use it only for authorized program, employment, compliance, funding, or legal purposes. Access to platform records is role-scoped. The Worksite may not share account credentials or disclose protected records to unauthorized persons. Required records may be provided to authorized regulators, funders, auditors, or program administrators when permitted or required by law and the applicable agreement.`,
     },
     {
-      title: '9. Term, Changes, and Termination',
+      title: '10. Term, Changes, and Termination',
       content: `This MOU becomes effective when electronically signed and continues while the Worksite remains approved or until terminated. Either party may provide 30 days written notice to end the worksite relationship, subject to any immediate suspension or termination required for safety, licensing, wage, fraud, discrimination, record-integrity, or other material compliance concerns.\n\nA change in registered occupation requirements, supervisor, worksite, employer registration, wage schedule, licensing, or funding authorization must be documented in the appropriate system of record; it must not be silently changed by editing marketing copy or local spreadsheets.`,
     },
     {
-      title: '10. Electronic Signature and Governing Records',
+      title: '11. Equal Opportunity, Complaints, and No Retaliation',
+      content: `The parties will operate the pathway without unlawful discrimination and, for a registered occupation, consistently with 29 CFR part 30 and the approved standards. Applicants and apprentices must receive the applicable complaint contact and may raise safety, wage, discrimination, privacy, training-quality, or record-integrity concerns without retaliation. The Sponsor remains responsible for routing registered-program complaints to the person or Registration Agency identified in the governing standards.`,
+    },
+    {
+      title: '12. Regulatory Basis and No Substitution',
+      content: `Registered occupations are governed by the approved written standards and apprenticeship agreements required by 29 CFR part 29, including the applicable work process, related instruction, supervision ratio, probation, progressive wage schedule, equal-opportunity pledge, complaint process, and record maintenance. Indiana professional-license pathways must also follow the current Indiana Professional Licensing Agency requirements for the particular occupation and establishment. A dashboard label or this MOU cannot create a license, alter a registered standard, or replace an agency approval.`,
+    },
+    {
+      title: '13. Electronic Signature and Governing Records',
       content: `The electronic signature record, signer identity, document version, timestamp, IP/user-agent audit data, Host Site document record, applicable registered-program standard, employer-specific RAPIDS data, and subsequent approved amendments together form the operational evidence for this worksite agreement.\n\nIf a page, handbook, dashboard, or marketing statement conflicts with an approved registered-program standard or a later signed amendment, the approved standard and controlling signed record govern.`,
     },
   ];
@@ -147,7 +165,9 @@ export function getHostShopMouMeta(program: HostShopMouProgram): HostShopMouMeta
   return {
     documentType: 'Memorandum of Understanding',
     title: labels.title,
-    subtitle: contract ? 'Registered Apprenticeship Worksite Agreement' : 'Host Site Operating Agreement',
+    subtitle: contract
+      ? 'Registered Apprenticeship Worksite Agreement'
+      : 'Host Site Operating Agreement',
     worksiteLabel: `Your ${labels.worksite}`,
     handbookHref: labels.handbook,
     fullDocHref: labels.fullDoc,

@@ -10,6 +10,15 @@ export const HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
   { type: 'student_video', label: 'Student training videos' },
 ] as const;
 
+export const CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
+  { type: 'government_id', label: 'Government-issued photo ID' },
+  { type: 'business_registration', label: 'Business registration for the contracting entity' },
+  { type: 'insurance', label: 'Current general liability insurance certificate' },
+  { type: 'w9', label: 'Completed IRS Form W-9' },
+  { type: 'training_plan', label: 'Approved program syllabus and training plan' },
+  { type: 'profile_photo', label: 'Program Holder profile picture' },
+] as const;
+
 export type ProgramHolderReadiness = {
   ready: boolean;
   missing: string[];
@@ -65,7 +74,12 @@ export async function getProgramHolderPaymentReadiness(
     };
   }
 
-  const [{ data: acknowledgements }, { data: documents }, { data: graduated }] = await Promise.all([
+  const [
+    { data: acknowledgements },
+    { data: documents },
+    { data: graduated },
+    { data: assignments },
+  ] = await Promise.all([
     db
       .from('program_holder_acknowledgements')
       .select('document_type')
@@ -76,9 +90,16 @@ export async function getProgramHolderPaymentReadiness(
       .eq('user_id', holder.user_id),
     db
       .from('program_enrollments')
-      .select('full_name,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,certificate_issued_at')
+      .select(
+        'full_name,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,certificate_issued_at',
+      )
       .eq('program_holder_id', holderId)
       .in('status', ['completed', 'graduated']),
+    db
+      .from('program_holder_programs')
+      .select('programs(slug)')
+      .eq('program_holder_id', holderId)
+      .eq('status', 'active'),
   ]);
 
   const approvedTypes = new Set(
@@ -94,13 +115,10 @@ export async function getProgramHolderPaymentReadiness(
     ['signed', 'fully_executed'].includes(String(holder.mou_status || 'signed'));
   const handbookAcknowledged = acknowledgedTypes.has('handbook');
   const rightsAcknowledged = acknowledgedTypes.has('rights');
-  const required = String(holder.mou_type || '').includes('hvac')
+  const isHvac = (assignments || []).some((item: any) => item.programs?.slug === 'hvac-technician');
+  const required = isHvac
     ? HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS
-    : [
-        { type: 'syllabus', label: 'Syllabus' },
-        { type: 'business_license', label: 'Business license' },
-        { type: 'insurance', label: 'Insurance certificate' },
-      ];
+    : CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS;
   const incompleteBackWork = (graduated || []).flatMap((student: any) => {
     const name = student.full_name || 'Graduated student';
     const gaps = [] as string[];

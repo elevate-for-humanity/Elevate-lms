@@ -31,7 +31,8 @@ export async function releaseProgramHolderPayment(
     .select('id,full_name,program_holder_id,status,payout_status')
     .eq('id', enrollmentId)
     .maybeSingle();
-  if (!enrollment?.program_holder_id) return { released: false, error: 'Enrollment assignment not found.' };
+  if (!enrollment?.program_holder_id)
+    return { released: false, error: 'Enrollment assignment not found.' };
 
   const [{ data: holder }, { data: schedule }, holderReady, studentReady] = await Promise.all([
     db
@@ -48,15 +49,23 @@ export async function releaseProgramHolderPayment(
     getProgramHolderPaymentReadiness(db, enrollment.program_holder_id),
     getStudentPaymentReadiness(db, enrollmentId),
   ]);
-  if (!holder?.user_id || !schedule) return { released: false, error: 'Approved payout schedule not found.' };
+  if (!holder?.user_id || !schedule)
+    return { released: false, error: 'Approved payout schedule not found.' };
 
   const missing = [...holderReady.missing, ...studentReady.missing];
-  if (missing.length) return { released: false, missing, error: 'Payment requirements are incomplete.' };
+  if (missing.length)
+    return { released: false, missing, error: 'Payment requirements are incomplete.' };
   if (schedule.increment_1_status === 'paid') return { released: true, alreadyReleased: true };
   if (schedule.increment_1_status !== 'approved') {
-    return { released: false, error: 'Payment must be approved by an administrator before release.' };
+    return {
+      released: false,
+      error: 'Payment must be approved by an administrator before release.',
+    };
   }
-  if (!schedule.increment_1_release_date || schedule.increment_1_release_date > new Date().toISOString().slice(0, 10)) {
+  if (
+    !schedule.increment_1_release_date ||
+    schedule.increment_1_release_date > new Date().toISOString().slice(0, 10)
+  ) {
     return { released: false, error: 'The approved release date has not arrived.' };
   }
 
@@ -71,7 +80,10 @@ export async function releaseProgramHolderPayment(
     !payoutAccount.payouts_enabled ||
     payoutAccount.verification_status !== 'active'
   ) {
-    return { released: false, error: 'David must finish Stripe payout verification first.' };
+    return {
+      released: false,
+      error: 'The Program Holder must finish Stripe payout verification first.',
+    };
   }
 
   const amountCents = Number(schedule.increment_1_cents || schedule.total_payout_cents || 0);
@@ -109,7 +121,10 @@ export async function releaseProgramHolderPayment(
         quickBooksPaymentId: existing.quickbooks_payment_id,
       };
     }
-    return { released: false, error: 'This payment is already being processed or needs admin review.' };
+    return {
+      released: false,
+      error: 'This payment is already being processed or needs admin review.',
+    };
   }
 
   try {
@@ -139,7 +154,12 @@ export async function releaseProgramHolderPayment(
     await Promise.all([
       db
         .from('program_holder_payout_transactions')
-        .update({ status: 'paid', stripe_transfer_id: transfer.id, paid_at: paidAt, updated_at: paidAt })
+        .update({
+          status: 'paid',
+          stripe_transfer_id: transfer.id,
+          paid_at: paidAt,
+          updated_at: paidAt,
+        })
         .eq('id', transaction.id),
       db
         .from('payout_schedules')
@@ -158,7 +178,7 @@ export async function releaseProgramHolderPayment(
       amountCents,
       enrollmentId,
       stripeTransferId: transfer.id,
-      memo: `HVAC training payment — ${enrollment.full_name || enrollmentId}`,
+      memo: `Program training payment — ${enrollment.full_name || enrollmentId}`,
     });
     await db
       .from('program_holder_payout_transactions')

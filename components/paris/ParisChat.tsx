@@ -62,11 +62,15 @@ I'll ask a few focused questions, recommend the smallest setup that fits, explai
 };
 
 function portalGreeting(portalRole?: string | null): Message {
+  const role = portalRole?.replaceAll('_', ' ') || 'authenticated portal';
+  const ownerPrompt = /program holder|host shop/i.test(role)
+    ? '\n\nI can also help you interview new applicants and organize the follow-up call. Which applicant or required compliance item should we work on first?'
+    : '\n\nWhat would you like to complete first?';
   return {
     role: 'assistant',
-    content: `Hi — I'm PARIS, your authenticated portal assistant${portalRole ? ` for the ${portalRole.replaceAll('_', ' ')} workspace` : ''}.
+    content: `Hi — I'm PARIS, your authenticated portal assistant for the ${role} workspace.
 
-I can help you understand red to-dos, draft student notes and outreach, organize onboarding, and explain where to upload documents or record progress. I can prefill drafts, but you must review and submit official hours, milestones, compliance records, agreements, and messages.`,
+I can help you understand red to-dos, interview applicants, draft student notes and outreach, organize onboarding, and explain where to upload documents or record progress. I can prefill drafts, but you must review and submit official hours, milestones, compliance records, agreements, and messages.${ownerPrompt}`,
   };
 }
 

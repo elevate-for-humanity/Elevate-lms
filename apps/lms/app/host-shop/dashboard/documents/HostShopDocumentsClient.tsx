@@ -45,9 +45,7 @@ function statusClass(status: string) {
   return 'bg-slate-100 text-slate-700';
 }
 
-export default function HostShopDocumentsClient({
-  requirements,
-}: Props) {
+export default function HostShopDocumentsClient({ requirements }: Props) {
   const [workingType, setWorkingType] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -76,7 +74,9 @@ export default function HostShopDocumentsClient({
       {(message || error) && (
         <div
           className={`rounded-xl border p-4 text-sm font-medium ${
-            error ? 'border-red-200 bg-red-50 text-red-800' : 'border-green-200 bg-green-50 text-green-800'
+            error
+              ? 'border-red-200 bg-red-50 text-red-800'
+              : 'border-green-200 bg-green-50 text-green-800'
           }`}
           role="status"
         >
@@ -91,7 +91,10 @@ export default function HostShopDocumentsClient({
           const working = workingType === requirement.document_type;
 
           return (
-            <article key={requirement.document_type} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <article
+              key={requirement.document_type}
+              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+            >
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div className="flex gap-3">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100">
@@ -106,19 +109,30 @@ export default function HostShopDocumentsClient({
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="font-bold text-slate-950">
-                        {requirement.document_name || requirement.document_type.replaceAll('_', ' ')}
+                        {requirement.document_name ||
+                          requirement.document_type.replaceAll('_', ' ')}
                       </h2>
                       {requirement.is_required && (
-                        <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700">Required</span>
+                        <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700">
+                          Required
+                        </span>
                       )}
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusClass(status)}`}>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusClass(status)}`}
+                      >
                         {status}
                       </span>
                     </div>
-                    {requirement.description && <p className="mt-1 text-sm text-slate-600">{requirement.description}</p>}
-                    {document?.file_name && <p className="mt-2 text-xs text-slate-500">{document.file_name}</p>}
+                    {requirement.description && (
+                      <p className="mt-1 text-sm text-slate-600">{requirement.description}</p>
+                    )}
+                    {document?.file_name && (
+                      <p className="mt-2 text-xs text-slate-500">{document.file_name}</p>
+                    )}
                     {document?.rejection_reason && (
-                      <p className="mt-2 text-sm font-medium text-red-700">Review note: {document.rejection_reason}</p>
+                      <p className="mt-2 text-sm font-medium text-red-700">
+                        Review note: {document.rejection_reason}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -135,7 +149,7 @@ export default function HostShopDocumentsClient({
                     </button>
                   )}
                   <Link
-                    href="/host-shop/onboarding/documents"
+                    href={`/host-shop/onboarding/documents?document=${encodeURIComponent(requirement.document_type)}`}
                     className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-brand-blue-700 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-blue-800"
                   >
                     <Upload className="h-4 w-4" />

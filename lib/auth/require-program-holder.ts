@@ -10,6 +10,7 @@ interface ProgramHolderProfile {
   email?: string;
   program_holder_id: string | null;
   tenant_id?: string | null;
+  avatar_url?: string | null;
 }
 
 export interface ProgramHolderScopedContext {
@@ -67,7 +68,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
   if (handoffPreview.previewing && handoffPreview.userId) {
     const { data: targetProfile } = await db
       .from('profiles')
-      .select('id,role,full_name,email,program_holder_id,tenant_id')
+      .select('id,role,full_name,email,program_holder_id,tenant_id,avatar_url')
       .eq('id', handoffPreview.userId)
       .maybeSingle();
     if (targetProfile?.program_holder_id && ['program_holder', 'programholder'].includes(targetProfile.role)) {
@@ -96,7 +97,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     if (preview.previewing && preview.userId !== access.user.id) {
       const { data: targetProfile } = await db
         .from('profiles')
-        .select('id,role,full_name,email,program_holder_id,tenant_id')
+        .select('id,role,full_name,email,program_holder_id,tenant_id,avatar_url')
         .eq('id', preview.userId)
         .maybeSingle();
       if (targetProfile?.program_holder_id && targetProfile.role === 'program_holder') {
@@ -126,6 +127,7 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     email: access.profile.email,
     program_holder_id: access.profile.program_holder_id ?? null,
     tenant_id: access.profile.tenant_id ?? null,
+    avatar_url: access.profile.avatar_url ?? null,
   };
 
   if (access.isPlatformAdmin) {

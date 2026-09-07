@@ -8,6 +8,7 @@ export type ParisLearnerContext = {
   courseTitle?: string | null;
   nextLessonTitle?: string | null;
   courseProgress?: number | null;
+  autoOpenOnDashboard?: boolean;
 };
 
 export function ParisFloatingWrapper(props: ParisLearnerContext) {

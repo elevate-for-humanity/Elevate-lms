@@ -9,6 +9,8 @@ import { HomeSocialAppCTA } from '@/components/home/HomeSocialAppCTA';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeMobileActions } from '@/components/home/HomeMobileActions';
+import { PlatformHubHero } from '@/components/home/PlatformHubHero';
+import { HomeAboutElevate } from '@/components/home/HomeAboutElevate';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
@@ -93,6 +95,8 @@ export default function HomePage() {
     <>
       <StructuredData />
       <main>
+        <PlatformHubHero />
+        <HomeAboutElevate />
         <HomeHeroVideo banner={heroBanners.home} />
         <div
           data-scroll-narration

@@ -4,10 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES, normalizeRole } from '@/lib/rbac/role-matrix';
-import {
-  getHostShopBoard,
-  HOST_SHOP_ADMIN_COOKIE,
-} from '@/lib/partner/board';
+import { getHostShopBoard, HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
@@ -149,8 +146,25 @@ export default async function HostShopDashboardView() {
                 Admin portal access
               </p>
               <h1 className="mt-2 text-3xl font-black text-slate-950">Host Shop PWA</h1>
-              <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-700">This neutral preview confirms that the Host Shop PWA is operational without attaching Admin to a business record. Select a shop from the secured Admin dashboard to open its audited portal.</p>
-              <div className="mt-6 flex flex-wrap gap-3"><a href="https://admin.elevateforhumanity.org/dashboard" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-6 py-3 font-black text-white">Select a Host Shop in Admin</a><a href="https://admin.elevateforhumanity.org/partners" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3 font-black text-slate-950">Manage partners</a></div>
+              <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-700">
+                This neutral preview confirms that the Host Shop PWA is operational without
+                attaching Admin to a business record. Select a shop from the secured Admin dashboard
+                to open its audited portal.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href="https://admin.elevateforhumanity.org/dashboard"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-6 py-3 font-black text-white"
+                >
+                  Select a Host Shop in Admin
+                </a>
+                <a
+                  href="https://admin.elevateforhumanity.org/partners"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3 font-black text-slate-950"
+                >
+                  Manage partners
+                </a>
+              </div>
             </div>
           </section>
         </main>
@@ -362,13 +376,34 @@ export default async function HostShopDashboardView() {
       <section className="mb-6 overflow-hidden rounded-2xl border border-fuchsia-300 bg-gradient-to-r from-slate-950 via-blue-950 to-fuchsia-950 p-5 text-white shadow-lg sm:p-6">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-200">Host Shop Network launch</p>
-            <h2 className="mt-2 text-2xl font-black">Put your shop in front of apprentices and local customers.</h2>
-            <p className="mt-2 text-sm font-medium leading-6 text-slate-200">Confirm your public profile, upload a logo, flyer, photos, or a short shop video, then share your profile link from your website, Google Business Profile, and social pages. Visibility and results vary; a complete, accurate profile gives people more ways to discover and contact your business.</p>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-200">
+              Host Shop Network launch
+            </p>
+            <h2 className="mt-2 text-2xl font-black">
+              Put your shop in front of apprentices and local customers.
+            </h2>
+            <p className="mt-2 text-sm font-medium leading-6 text-slate-200">
+              Confirm your public profile, upload a logo, flyer, photos, or a short shop video, then
+              share your profile link from your website, Google Business Profile, and social pages.
+              Visibility and results vary; a complete, accurate profile gives people more ways to
+              discover and contact your business.
+            </p>
           </div>
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
-            <Link href="/host-shop/dashboard/profile" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950">Complete My Network Profile</Link>
-            <a href="https://www.elevateforhumanity.org/partners/host-shops" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-black text-white">View the Public Network</a>
+            <Link
+              href="/host-shop/dashboard/profile"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950"
+            >
+              Complete My Network Profile
+            </Link>
+            <a
+              href="https://www.elevateforhumanity.org/partners/host-shops"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-black text-white"
+            >
+              View the Public Network
+            </a>
           </div>
         </div>
       </section>
@@ -489,7 +524,7 @@ export default async function HostShopDashboardView() {
             ))}
           </ul>
           <Link
-            href="/host-shop/onboarding/documents"
+            href="/host-shop/dashboard/documents"
             className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-red-700 px-5 py-3 font-black text-white hover:bg-red-800"
           >
             Complete required documents

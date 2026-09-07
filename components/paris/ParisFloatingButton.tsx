@@ -13,6 +13,7 @@ export function ParisFloatingButton({
   nextLessonTitle,
   courseProgress,
   portalRole,
+  autoOpenOnDashboard = false,
 }: ParisLearnerContext) {
   const [isOpen, setIsOpen] = useState(false);
   const [portalIssue, setPortalIssue] = useState<PortalSupportIssue | null>(null);
@@ -41,6 +42,11 @@ export function ParisFloatingButton({
     return () => window.removeEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
   }, []);
 
+  useEffect(() => {
+    if (!autoOpenOnDashboard || surface !== 'portal') return;
+    if (pathname === '/dashboard' || pathname.endsWith('/dashboard')) setIsOpen(true);
+  }, [autoOpenOnDashboard, pathname, surface]);
+
   // Keep the information-dense Bookkeeping hero unobstructed. PARIS remains
   // available throughout authenticated portals and on other public pages.
   if (surface === 'public' && pathname === '/programs/bookkeeping') return null;
@@ -68,7 +74,7 @@ export function ParisFloatingButton({
                 </div>
                 <div>
                   <span className="block font-bold text-slate-800 text-base sm:text-lg">
-                    {learnerSurface ? 'PARIS Learning Assistant' : 'PARIS Career Assistant'}
+                    {learnerSurface ? 'PARIS Learning Assistant' : portalSurface ? 'PARIS Portal Assistant' : 'PARIS Career Assistant'}
                   </span>
                   <span className="block max-w-[300px] truncate text-xs text-slate-600">
                     {learnerSurface ? courseTitle || 'Your Elevate coursework' : portalSurface ? `${portalRole || 'Authenticated'} workspace help` : 'Admissions and career navigation'}

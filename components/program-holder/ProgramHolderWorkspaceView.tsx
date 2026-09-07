@@ -20,6 +20,27 @@ import { StudentCommunicationActions } from './StudentCommunicationActions';
 import { AlumniCareerOutreachButton } from './AlumniCareerOutreachButton';
 import { getProgramCardImage } from '@/lib/images/programImages';
 
+const PROGRAM_HOLDER_PORTRAITS: Record<string, string> = {
+  '34876b7d-bce0-44fb-9550-5dc5fff00791': '/images/carlina-wilkes.jpg',
+  '4bc589d3-bd39-4a50-a724-73e50506c1f1': '/images/jozanna-george.jpg',
+  '01a77939-a012-42a2-8673-db4b264f4259': '/images/ameco-martin.jpg',
+};
+
+function resolveDashboardHero(
+  holderId: string | undefined,
+  avatarUrl: string | null | undefined,
+  programSlug: string | undefined,
+) {
+  if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true };
+  if (holderId && PROGRAM_HOLDER_PORTRAITS[holderId]) {
+    return { src: PROGRAM_HOLDER_PORTRAITS[holderId], isPortrait: true };
+  }
+  return {
+    src: getProgramCardImage(programSlug || 'business-administration'),
+    isPortrait: false,
+  };
+}
+
 type Section =
   | 'dashboard'
   | 'students'
@@ -48,12 +69,13 @@ export async function ProgramHolderWorkspaceView({
   const completed = data.enrollments.filter((row) =>
     ['completed', 'graduated'].includes(row.enrollment_state || row.status),
   );
-  const incompleteBackWork = completed.filter((row) =>
-    Number(row.total_hours_completed || 0) < 48 ||
-    !row.training_start_date ||
-    !row.training_end_date ||
-    !row.lms_completed ||
-    !row.practical_skills_verified,
+  const incompleteBackWork = completed.filter(
+    (row) =>
+      Number(row.total_hours_completed || 0) < 48 ||
+      !row.training_start_date ||
+      !row.training_end_date ||
+      !row.lms_completed ||
+      !row.practical_skills_verified,
   );
   const atRisk = data.enrollments.filter((row) => row.at_risk);
   const pendingHours = data.hours.filter((row) =>
@@ -66,11 +88,15 @@ export async function ProgramHolderWorkspaceView({
       complete: ['active', 'approved'].includes(data.holder?.status),
     },
     { label: 'Memorandum of Understanding', complete: Boolean(data.holder?.mou_signed) },
-    { label: 'HVAC program assignment', complete: isHvac },
-    {
-      label: 'HVAC license or instructor credential',
-      complete: !isHvac || Boolean(data.holder?.hvac_license_url),
-    },
+    ...(isHvac ? [{ label: 'HVAC program assignment', complete: true }] : []),
+    ...(isHvac
+      ? [
+          {
+            label: 'HVAC license or instructor credential',
+            complete: Boolean(data.holder?.hvac_license_url),
+          },
+        ]
+      : []),
     {
       label: 'Program Holder handbook acknowledgement',
       complete: data.acknowledgements.some((item) => item.document_type === 'handbook'),
@@ -82,13 +108,20 @@ export async function ProgramHolderWorkspaceView({
     { label: 'Required program documents', complete: data.documents.length > 0 },
     {
       label: 'Profile picture',
-      complete: Boolean(data.profile?.avatar_url) || data.documents.some((row) => row.document_type === 'profile_photo'),
+      complete:
+        Boolean(data.profile?.avatar_url) ||
+        data.documents.some((row) => row.document_type === 'profile_photo'),
     },
     {
       label: 'Student photos and training videos',
-      complete: data.documents.some((row) => ['student_photo', 'student_video'].includes(row.document_type)),
+      complete: data.documents.some((row) =>
+        ['student_photo', 'student_video'].includes(row.document_type),
+      ),
     },
-    { label: 'Graduated-student back work and 48-hour sign-offs', complete: incompleteBackWork.length === 0 },
+    {
+      label: 'Graduated-student back work and 48-hour sign-offs',
+      complete: incompleteBackWork.length === 0,
+    },
     { label: 'Course delivery assignment', complete: data.courseAssignments.length > 0 },
   ];
   const complianceScore = Math.round(
@@ -96,12 +129,18 @@ export async function ProgramHolderWorkspaceView({
   );
   const completedRequirements = complianceItems.filter((item) => item.complete).length;
   const missingRequirements = complianceItems.length - completedRequirements;
-  const primaryProgramLabel = data.programs[0]?.title || data.programs[0]?.name || 'Assigned program';
+  const primaryProgramLabel =
+    data.programs[0]?.title || data.programs[0]?.name || 'Assigned program';
   const callQueue = data.applicants.filter((row) => !row.call_date || !row.call_outcome);
   const payoutReady = Boolean(
     data.payoutProfile?.payouts_enabled &&
     data.payoutProfile?.transfers_enabled &&
     data.payoutProfile?.verification_status === 'active',
+  );
+  const dashboardHero = resolveDashboardHero(
+    data.holder?.id,
+    data.profile?.avatar_url,
+    data.programs[0]?.slug,
   );
 
   if (section === 'students')
@@ -112,7 +151,7 @@ export async function ProgramHolderWorkspaceView({
     return <Hours rows={data.hours} programs={data.programs} enrollments={data.enrollments} />;
   if (section === 'compliance')
     return <Compliance score={complianceScore} items={complianceItems} atRisk={atRisk.length} />;
-  if (section === 'documents') return <Documents rows={data.documents} />;
+  if (section === 'documents') return <Documents rows={data.documents} isHvac={isHvac} />;
   if (section === 'reports')
     return (
       <Reports
@@ -134,11 +173,8 @@ export async function ProgramHolderWorkspaceView({
         programLabel={primaryProgramLabel}
         status={data.holder?.status || 'active'}
         complianceScore={complianceScore}
-        heroImage={
-          data.holder?.id === '34876b7d-bce0-44fb-9550-5dc5fff00791'
-            ? '/images/programs/carlina-accounting-financial-empowerment.svg'
-            : '/images/trades/hero-program-hvac.jpg'
-        }
+        heroImage={dashboardHero.src}
+        isPortrait={dashboardHero.isPortrait}
       />
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Metric
@@ -146,7 +182,11 @@ export async function ProgramHolderWorkspaceView({
           value={data.enrollments.length}
           helper="Canonical program enrollments"
         />
-        <Metric label="Active Students" value={active.length} helper={`Currently enrolled in ${primaryProgramLabel}`} />
+        <Metric
+          label="Active Students"
+          value={active.length}
+          helper={`Currently enrolled in ${primaryProgramLabel}`}
+        />
         <Metric label="At-Risk Students" value={atRisk.length} helper="Flagged for follow-up" />
         <Metric
           label="Pending Verifications"
@@ -155,27 +195,82 @@ export async function ProgramHolderWorkspaceView({
         />
       </section>
       {(!payoutReady || missingRequirements > 0) && (
-        <section role="alert" className="rounded-2xl border-2 border-red-300 bg-red-50 p-4 shadow-sm sm:p-6">
+        <section
+          role="alert"
+          className="rounded-2xl border-2 border-red-300 bg-red-50 p-4 shadow-sm sm:p-6"
+        >
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0 text-red-700" />
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-red-700">Payment action required</p>
-              <h2 className="mt-1 text-xl font-black text-red-950">Complete setup before Elevate can release payment</h2>
-              <p className="mt-2 text-sm leading-6 text-red-900">{missingRequirements} onboarding requirements remain incomplete. {payoutReady ? 'Your payout account is connected.' : 'Your debit card or bank account is not ready for payouts.'}</p>
-              <p className="mt-2 rounded-xl bg-red-100 p-3 text-sm font-black text-red-950">You will not be able to receive funds until every required to-do below is completed and approved.</p>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-red-700">
+                Payment action required
+              </p>
+              <h2 className="mt-1 text-xl font-black text-red-950">
+                Complete setup before Elevate can release payment
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-red-900">
+                {missingRequirements} onboarding requirements remain incomplete.{' '}
+                {payoutReady
+                  ? 'Your payout account is connected.'
+                  : 'Your debit card or bank account is not ready for payouts.'}
+              </p>
+              <p className="mt-2 rounded-xl bg-red-100 p-3 text-sm font-black text-red-950">
+                You will not be able to receive funds until every required to-do below is completed
+                and approved.
+              </p>
               <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-                {complianceItems.filter((item) => !item.complete).map((item) => (
-                  <li key={item.label} className="flex items-center gap-2 rounded-lg border border-red-200 bg-white p-3 text-sm font-bold text-red-950">
-                    <AlertTriangle className="h-4 w-4 shrink-0 text-red-700" /> {item.label}
+                {complianceItems
+                  .filter((item) => !item.complete)
+                  .map((item) => (
+                    <li
+                      key={item.label}
+                      className="flex items-center gap-2 rounded-lg border border-red-200 bg-white p-3 text-sm font-bold text-red-950"
+                    >
+                      <AlertTriangle className="h-4 w-4 shrink-0 text-red-700" /> {item.label}
+                    </li>
+                  ))}
+                {!payoutReady && (
+                  <li className="flex items-center gap-2 rounded-lg border border-red-200 bg-white p-3 text-sm font-bold text-red-950">
+                    <AlertTriangle className="h-4 w-4 shrink-0 text-red-700" /> Debit card or bank
+                    payout account
                   </li>
-                ))}
-                {!payoutReady && <li className="flex items-center gap-2 rounded-lg border border-red-200 bg-white p-3 text-sm font-bold text-red-950"><AlertTriangle className="h-4 w-4 shrink-0 text-red-700" /> Debit card or bank payout account</li>}
+                )}
               </ul>
               <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                <Link href="/program-holder/documents" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-700 px-4 py-2 text-sm font-black text-white">Complete documents</Link>
-                <Link href="/program-holder/compliance" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900">Review every requirement</Link>
-                <Link href="/program-holder/payouts" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900">Add debit card or bank</Link>
-                {incompleteBackWork.length > 0 && <Link href="/program-holder/students" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900">Complete prior student records</Link>}
+                <Link
+                  href="/program-holder/documents"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-700 px-4 py-2 text-sm font-black text-white"
+                >
+                  Complete documents
+                </Link>
+                {!data.holder?.mou_signed && (
+                  <Link
+                    href="/program-holder/sign-mou"
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900"
+                  >
+                    Read and sign MOU
+                  </Link>
+                )}
+                <Link
+                  href="/program-holder/compliance"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900"
+                >
+                  Review every requirement
+                </Link>
+                <Link
+                  href="/program-holder/payouts"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900"
+                >
+                  Add debit card or bank
+                </Link>
+                {incompleteBackWork.length > 0 && (
+                  <Link
+                    href="/program-holder/students"
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-900"
+                  >
+                    Complete prior student records
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -183,19 +278,62 @@ export async function ProgramHolderWorkspaceView({
       )}
       <section aria-labelledby="program-holder-actions-heading">
         <div className="mb-4">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Your workspace</p>
-          <h2 id="program-holder-actions-heading" className="mt-1 text-xl font-black text-slate-950 sm:text-2xl">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+            Your workspace
+          </p>
+          <h2
+            id="program-holder-actions-heading"
+            className="mt-1 text-xl font-black text-slate-950 sm:text-2xl"
+          >
             Run the program from one place
           </h2>
-          <p className="mt-1 text-sm text-slate-600">Open the work that needs attention without searching through the menu.</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Open the work that needs attention without searching through the menu.
+          </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          <ActionLink href="/program-holder/students/pending" icon={<Users className="h-5 w-5" />} title="Review applicants" detail={`${data.applicants.length} waiting for review`} tone="amber" />
-          <ActionLink href="/program-holder/hours" icon={<Clock className="h-5 w-5" />} title="Record training" detail={`${pendingHours.length} logs awaiting verification`} tone="blue" />
-          <ActionLink href="/program-holder/documents" icon={<FileText className="h-5 w-5" />} title="Complete documents" detail={`${data.documents.length} documents on file`} tone="violet" />
-          <ActionLink href="/program-holder/compliance" icon={<ShieldCheck className="h-5 w-5" />} title="Resolve compliance" detail={`${missingRequirements} requirements incomplete`} tone="emerald" />
-          <ActionLink href="/program-holder/programs" icon={<BookOpen className="h-5 w-5" />} title="Open program delivery" detail={`${data.courseAssignments.length} course assignments`} tone="blue" />
-          <ActionLink href="/program-holder/payouts" icon={<CheckCircle2 className="h-5 w-5" />} title="Manage payouts" detail={String(data.holder?.payout_status || 'Setup required').replaceAll('_', ' ')} tone="emerald" />
+          <ActionLink
+            href="/program-holder/students/pending"
+            icon={<Users className="h-5 w-5" />}
+            title="Review applicants"
+            detail={`${data.applicants.length} waiting for review`}
+            tone="amber"
+          />
+          <ActionLink
+            href="/program-holder/hours"
+            icon={<Clock className="h-5 w-5" />}
+            title="Record training"
+            detail={`${pendingHours.length} logs awaiting verification`}
+            tone="blue"
+          />
+          <ActionLink
+            href="/program-holder/documents"
+            icon={<FileText className="h-5 w-5" />}
+            title="Complete documents"
+            detail={`${data.documents.length} documents on file`}
+            tone="violet"
+          />
+          <ActionLink
+            href="/program-holder/compliance"
+            icon={<ShieldCheck className="h-5 w-5" />}
+            title="Resolve compliance"
+            detail={`${missingRequirements} requirements incomplete`}
+            tone="emerald"
+          />
+          <ActionLink
+            href="/program-holder/programs"
+            icon={<BookOpen className="h-5 w-5" />}
+            title="Open program delivery"
+            detail={`${data.courseAssignments.length} course assignments`}
+            tone="blue"
+          />
+          <ActionLink
+            href="/program-holder/payouts"
+            icon={<CheckCircle2 className="h-5 w-5" />}
+            title="Manage payouts"
+            detail={String(data.holder?.payout_status || 'Setup required').replaceAll('_', ' ')}
+            tone="emerald"
+          />
         </div>
       </section>
       <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
@@ -203,26 +341,52 @@ export async function ProgramHolderWorkspaceView({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="text-xl font-black text-slate-950">Program readiness</h2>
-              <p className="mt-1 text-sm text-slate-600">{completedRequirements} of {complianceItems.length} requirements complete.</p>
+              <p className="mt-1 text-sm text-slate-600">
+                {completedRequirements} of {complianceItems.length} requirements complete.
+              </p>
             </div>
-            <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-black text-blue-800">{complianceScore}%</span>
+            <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-black text-blue-800">
+              {complianceScore}%
+            </span>
           </div>
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             {complianceItems.map((item) => (
-              <div key={item.label} className="flex min-w-0 items-center gap-2 rounded-xl border border-slate-200 p-3">
-                {item.complete ? <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" /> : <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />}
+              <div
+                key={item.label}
+                className="flex min-w-0 items-center gap-2 rounded-xl border border-slate-200 p-3"
+              >
+                {item.complete ? (
+                  <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />
+                )}
                 <span className="min-w-0 text-sm font-bold text-slate-800">{item.label}</span>
               </div>
             ))}
           </div>
         </article>
         <article className="rounded-2xl border border-slate-200 bg-slate-950 p-4 text-white shadow-sm sm:p-6">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-300">Next best action</p>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-300">
+            Next best action
+          </p>
           <h2 className="mt-2 text-xl font-black">Finish onboarding for payment readiness</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-300">Upload required business and training records, complete acknowledgements, and connect the delivery course before funds can be released.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-300">
+            Upload required business and training records, complete acknowledgements, and connect
+            the delivery course before funds can be released.
+          </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-            <Link href="/program-holder/documents" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950">Upload documents</Link>
-            <Link href="/program-holder/compliance" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-600 px-4 py-2 text-sm font-black text-white">View requirements</Link>
+            <Link
+              href="/program-holder/documents"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950"
+            >
+              Upload documents
+            </Link>
+            <Link
+              href="/program-holder/compliance"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-600 px-4 py-2 text-sm font-black text-white"
+            >
+              View requirements
+            </Link>
           </div>
         </article>
       </section>
@@ -230,72 +394,151 @@ export async function ProgramHolderWorkspaceView({
         <article className="min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">Call and enrollment queue</p>
-              <h2 className="mt-1 text-xl font-black text-slate-950">People who still need follow-up</h2>
-              <p className="mt-1 text-sm text-slate-600">{callQueue.length} applicants have no completed call outcome and {data.applicants.length} are not enrolled.</p>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-700">
+                Call and enrollment queue
+              </p>
+              <h2 className="mt-1 text-xl font-black text-slate-950">
+                People who still need follow-up
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                {callQueue.length} applicants have no completed call outcome and{' '}
+                {data.applicants.length} are not enrolled.
+              </p>
             </div>
-            <Link href="/program-holder/students/pending" className="inline-flex min-h-10 items-center rounded-xl bg-amber-100 px-4 py-2 text-sm font-black text-amber-950">Open full queue</Link>
+            <Link
+              href="/program-holder/students/pending"
+              className="inline-flex min-h-10 items-center rounded-xl bg-amber-100 px-4 py-2 text-sm font-black text-amber-950"
+            >
+              Open full queue
+            </Link>
             <WorkOneOutreachButton count={data.applicants.length} />
           </div>
           <div className="mt-4 grid gap-2">
             {callQueue.slice(0, 6).map((row) => (
-              <div key={row.id} className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div
+                key={row.id}
+                className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 p-3 sm:flex-row sm:items-center sm:justify-between"
+              >
                 <div className="min-w-0">
-                  <p className="break-words font-black text-slate-950">{row.applicant_name || 'Applicant'}</p>
-                  <p className="break-all text-xs text-slate-500">{row.applicant_email || 'No email on file'}</p>
-                  <p className="mt-1 text-xs font-bold text-slate-700">{row.applicant_phone || 'No phone on file'}</p>
+                  <p className="break-words font-black text-slate-950">
+                    {row.applicant_name || 'Applicant'}
+                  </p>
+                  <p className="break-all text-xs text-slate-500">
+                    {row.applicant_email || 'No email on file'}
+                  </p>
+                  <p className="mt-1 text-xs font-bold text-slate-700">
+                    {row.applicant_phone || 'No phone on file'}
+                  </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-800">Not enrolled</span>
-                  {row.applicant_email && <a href={`mailto:${row.applicant_email}`} className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900">Email</a>}
-                  {row.applicant_phone ? <a href={`tel:${row.applicant_phone}`} className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white">Call</a> : <span className="text-xs font-bold text-slate-500">Phone missing</span>}
+                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-800">
+                    Not enrolled
+                  </span>
+                  {row.applicant_email && (
+                    <a
+                      href={`mailto:${row.applicant_email}`}
+                      className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900"
+                    >
+                      Email
+                    </a>
+                  )}
+                  {row.applicant_phone ? (
+                    <a
+                      href={`tel:${row.applicant_phone}`}
+                      className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-black text-white"
+                    >
+                      Call
+                    </a>
+                  ) : (
+                    <span className="text-xs font-bold text-slate-500">Phone missing</span>
+                  )}
                 </div>
               </div>
             ))}
-            {!callQueue.length && <p className="rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-900">Every applicant has a recorded call outcome.</p>}
+            {!callQueue.length && (
+              <p className="rounded-xl bg-emerald-50 p-4 text-sm font-bold text-emerald-900">
+                Every applicant has a recorded call outcome.
+              </p>
+            )}
           </div>
         </article>
         <div className="min-w-0">{payoutPanel}</div>
       </section>
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="rounded-2xl border border-blue-200 bg-white p-4 shadow-sm sm:p-6">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Current semester</p>
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">
+            Current semester
+          </p>
           <h2 className="mt-1 text-xl font-black text-slate-950">Current and incoming students</h2>
-          <p className="mt-1 text-sm text-slate-600">Only names and training dates are shown here. Voucher and funding documents remain private.</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Only names and training dates are shown here. Voucher and funding documents remain
+            private.
+          </p>
           <div className="mt-4 grid gap-2">
-            {data.upcomingEnrollments.length ? data.upcomingEnrollments.map((row) => (
-              <div key={row.id} className="rounded-xl border border-slate-200 p-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-black text-slate-950">{row.full_name || 'Incoming student'}</p>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-black ${row.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}>
-                    {row.status === 'active' ? 'In progress' : 'Starting soon'}
-                  </span>
+            {data.upcomingEnrollments.length ? (
+              data.upcomingEnrollments.map((row) => (
+                <div key={row.id} className="rounded-xl border border-slate-200 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="font-black text-slate-950">
+                      {row.full_name || 'Incoming student'}
+                    </p>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-black ${row.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}`}
+                    >
+                      {row.status === 'active' ? 'In progress' : 'Starting soon'}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-slate-700">
+                    Start:{' '}
+                    {row.training_start_date ||
+                      row.student_start_date ||
+                      row.start_date ||
+                      'Not set'}{' '}
+                    · End: {row.training_end_date || row.expected_end_date || 'Not set'}
+                  </p>
                 </div>
-                <p className="mt-1 text-sm text-slate-700">Start: {row.training_start_date || row.student_start_date || row.start_date || 'Not set'} · End: {row.training_end_date || row.expected_end_date || 'Not set'}</p>
-              </div>
-            )) : <p className="rounded-xl bg-slate-50 p-4 text-sm font-bold text-slate-600">No current or future-dated enrollments are linked yet.</p>}
+              ))
+            ) : (
+              <p className="rounded-xl bg-slate-50 p-4 text-sm font-bold text-slate-600">
+                No current or future-dated enrollments are linked yet.
+              </p>
+            )}
           </div>
         </article>
-        <ProgramHolderNotificationPreferences initial={data.notificationPreferences} phone={data.profile?.phone || data.holder?.contact_phone || ''} />
+        <ProgramHolderNotificationPreferences
+          initial={data.notificationPreferences}
+          phone={data.profile?.phone || data.holder?.contact_phone || ''}
+        />
       </section>
       <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm sm:p-6">
-        <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">Weekly student oversight</p>
-        <h2 className="mt-1 text-xl font-black text-slate-950">Progress reports due every Friday</h2>
+        <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">
+          Weekly student oversight
+        </p>
+        <h2 className="mt-1 text-xl font-black text-slate-950">
+          Progress reports due every Friday
+        </h2>
         <p className="mt-2 text-sm leading-6 text-slate-700">
           Complete one report for each active student. Record lessons learned, skills practiced,
           attendance and hours, assignments and scores, supporting evidence, checks performed,
           barriers, authorized parent or guardian communication, and next-week goals.
         </p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          <Link href="/program-holder/reports/new" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-4 py-2 text-sm font-black text-white">
+          <Link
+            href="/program-holder/reports"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-700 px-4 py-2 text-sm font-black text-white"
+          >
             Start weekly progress report
           </Link>
-          <Link href="/program-holder/reports" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-black text-emerald-950">
+          <Link
+            href="/program-holder/reports"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-emerald-300 bg-white px-4 py-2 text-sm font-black text-emerald-950"
+          >
             Review submitted reports
           </Link>
         </div>
         <p className="mt-3 text-xs font-bold text-emerald-950">
-          Paris can guide each field and flag missing information, but the Program Holder must verify and submit the report.
+          Paris can guide each field and flag missing information, but the Program Holder must
+          verify and submit the report.
         </p>
       </section>
       <section aria-labelledby="program-holder-programs-heading">
@@ -336,24 +579,6 @@ export async function ProgramHolderWorkspaceView({
         </div>
         <div className="space-y-6">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="font-black">Compliance Score</h2>
-              <span className="text-2xl font-black text-blue-700">{complianceScore}%</span>
-            </div>
-            <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-100">
-              <div
-                className="h-full rounded-full bg-blue-700"
-                style={{ width: `${complianceScore}%` }}
-              />
-            </div>
-            <Link
-              href="/program-holder/compliance"
-              className="mt-4 inline-flex text-sm font-bold text-blue-700"
-            >
-              Review requirements
-            </Link>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="font-black">Required actions</h2>
             <p className="mt-2 text-sm text-slate-600">
               {data.applicants.length} applicants awaiting enrollment review · {pendingHours.length}{' '}
@@ -392,39 +617,104 @@ function Hero({
   );
 }
 
-function DashboardHero({ title, programLabel, status, complianceScore, heroImage }: { title: string; programLabel: string; status: string; complianceScore: number; heroImage: string }) {
-  const isCarlinaBanner = heroImage.includes('carlina-accounting');
+function DashboardHero({
+  title,
+  programLabel,
+  status,
+  complianceScore,
+  heroImage,
+  isPortrait,
+}: {
+  title: string;
+  programLabel: string;
+  status: string;
+  complianceScore: number;
+  heroImage: string;
+  isPortrait: boolean;
+}) {
   return (
-    <section className={`relative min-w-0 overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl sm:rounded-3xl ${isCarlinaBanner ? 'min-h-[300px] sm:min-h-[420px]' : ''}`}>
-      <Image src={heroImage} alt={isCarlinaBanner ? "Dr. Carlina A. Wilkes accounting and financial empowerment career pathway" : "Program training workspace"} fill priority sizes="100vw" className={isCarlinaBanner ? "object-contain object-center" : "object-cover object-center opacity-55"} />
+    <section className="relative min-h-[300px] min-w-0 overflow-hidden rounded-2xl bg-slate-950 text-white shadow-xl sm:min-h-[380px] sm:rounded-3xl">
+      <Image
+        src={heroImage}
+        alt={`${title} dashboard`}
+        fill
+        priority
+        sizes="100vw"
+        className={`object-cover opacity-60 ${isPortrait ? 'object-top' : 'object-center'}`}
+      />
       <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-blue-950/60" />
       <div className="relative grid gap-5 p-5 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div className="min-w-0">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">Program Holder Command Center</p>
-          <h1 className="mt-2 break-words text-2xl font-black leading-tight sm:text-4xl">{title}</h1>
-          <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-200 sm:text-base">Manage enrollment, instruction, compliance, records, reporting, and payouts for {programLabel}.</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-blue-200">
+            Program Holder Command Center
+          </p>
+          <h1 className="mt-2 break-words text-2xl font-black leading-tight sm:text-4xl">
+            {title}
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-200 sm:text-base">
+            Manage enrollment, instruction, compliance, records, reporting, and payouts for{' '}
+            {programLabel}.
+          </p>
           <div className="mt-4 flex flex-wrap gap-2 text-xs font-black">
-            <span className="rounded-full bg-emerald-400/20 px-3 py-1.5 text-emerald-100">Account {status.replaceAll('_', ' ')}</span>
+            <span className="rounded-full bg-emerald-400/20 px-3 py-1.5 text-emerald-100">
+              Account {status.replaceAll('_', ' ')}
+            </span>
             <span className="rounded-full bg-white/15 px-3 py-1.5 text-white">{programLabel}</span>
-            <span className="rounded-full bg-blue-400/20 px-3 py-1.5 text-blue-100">Compliance {complianceScore}%</span>
+            <span className="rounded-full bg-blue-400/20 px-3 py-1.5 text-blue-100">
+              Compliance {complianceScore}%
+            </span>
           </div>
         </div>
-        <Link href="/program-holder/hours" className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm sm:w-auto">Record training hours</Link>
+        <Link
+          href="/program-holder/hours"
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 shadow-sm sm:w-auto"
+        >
+          Record training hours
+        </Link>
       </div>
     </section>
   );
 }
 
-function ActionLink({ href, icon, title, detail, tone }: { href: string; icon: React.ReactNode; title: string; detail: string; tone: 'amber' | 'blue' | 'violet' | 'emerald' }) {
-  const colors = { amber: 'bg-amber-50 text-amber-800', blue: 'bg-blue-50 text-blue-800', violet: 'bg-violet-50 text-violet-800', emerald: 'bg-emerald-50 text-emerald-800' };
+function ActionLink({
+  href,
+  icon,
+  title,
+  detail,
+  tone,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  detail: string;
+  tone: 'amber' | 'blue' | 'violet' | 'emerald';
+}) {
+  const colors = {
+    amber: 'bg-amber-50 text-amber-800',
+    blue: 'bg-blue-50 text-blue-800',
+    violet: 'bg-violet-50 text-violet-800',
+    emerald: 'bg-emerald-50 text-emerald-800',
+  };
   return (
-    <Link href={href} className="group flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
-      <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${colors[tone]}`}>{icon}</span>
+    <Link
+      href={href}
+      className="group flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+    >
+      <span
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${colors[tone]}`}
+      >
+        {icon}
+      </span>
       <span className="min-w-0 flex-1">
         <span className="block font-black text-slate-950">{title}</span>
         <span className="block truncate text-sm text-slate-600">{detail}</span>
       </span>
-      <span aria-hidden="true" className="text-xl text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-700">→</span>
+      <span
+        aria-hidden="true"
+        className="text-xl text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-700"
+      >
+        →
+      </span>
     </Link>
   );
 }
@@ -450,78 +740,124 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
   return (
     <div className="mt-5 min-w-0">
       <div className="grid gap-3 md:hidden">
-        {rows.length ? rows.map((row) => (
-          <article key={row.id} data-testid="student-card" className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <div className="flex min-w-0 items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="break-words font-black text-slate-950">{row.full_name || 'Student'}</p>
-                <p className="break-all text-xs text-slate-500">{row.email || ''}</p>
+        {rows.length ? (
+          rows.map((row) => (
+            <article
+              key={row.id}
+              data-testid="student-card"
+              className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4"
+            >
+              <div className="flex min-w-0 items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="break-words font-black text-slate-950">
+                    {row.full_name || 'Student'}
+                  </p>
+                  <p className="break-all text-xs text-slate-500">{row.email || ''}</p>
+                </div>
+                <span className="shrink-0 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-black text-blue-800">
+                  {Number(row.progress_percent || 0)}%
+                </span>
               </div>
-              <span className="shrink-0 rounded-full bg-blue-100 px-2.5 py-1 text-xs font-black text-blue-800">{Number(row.progress_percent || 0)}%</span>
-            </div>
-            <dl className="mt-4 grid gap-2 text-sm">
-              <Row label="Program" value={programTitle(programs, row.program_id, row.program_slug)} />
-              <Row label="Enrollment" value={String(row.enrollment_state || row.status || 'enrolled').replaceAll('_', ' ')} />
-              <Row label="Training" value={`${row.training_start_date || 'Start missing'} — ${row.training_end_date || 'End missing'}`} />
-              <Row label="Next action" value={row.next_required_action || 'Continue training'} />
-              <Row label="WorkOne hours" value={`${Math.min(48, Number(row.total_hours_completed || 0))} of 48 complete`} />
-            </dl>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Link href="/program-holder/hours" className="inline-flex min-h-10 items-center rounded-lg bg-blue-700 px-3 py-2 text-xs font-black text-white">Record progress</Link>
-              <StudentCommunicationActions enrollmentId={row.id} studentName={row.full_name || 'Student'} hasEmail={Boolean(row.email)} hasPhone={Boolean(row.phone)} />
-            </div>
-          </article>
-        )) : (
-          <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center text-sm text-slate-500">No confirmed student enrollments are linked.</div>
+              <dl className="mt-4 grid gap-2 text-sm">
+                <Row
+                  label="Program"
+                  value={programTitle(programs, row.program_id, row.program_slug)}
+                />
+                <Row
+                  label="Enrollment"
+                  value={String(row.enrollment_state || row.status || 'enrolled').replaceAll(
+                    '_',
+                    ' ',
+                  )}
+                />
+                <Row
+                  label="Training"
+                  value={`${row.training_start_date || 'Start missing'} — ${row.training_end_date || 'End missing'}`}
+                />
+                <Row label="Next action" value={row.next_required_action || 'Continue training'} />
+                <Row
+                  label="WorkOne hours"
+                  value={`${Math.min(48, Number(row.total_hours_completed || 0))} of 48 complete`}
+                />
+              </dl>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link
+                  href="/program-holder/hours"
+                  className="inline-flex min-h-10 items-center rounded-lg bg-blue-700 px-3 py-2 text-xs font-black text-white"
+                >
+                  Record progress
+                </Link>
+                <StudentCommunicationActions
+                  enrollmentId={row.id}
+                  studentName={row.full_name || 'Student'}
+                  hasEmail={Boolean(row.email)}
+                  hasPhone={Boolean(row.phone)}
+                />
+              </div>
+            </article>
+          ))
+        ) : (
+          <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center text-sm text-slate-500">
+            No confirmed student enrollments are linked.
+          </div>
         )}
       </div>
       <div className="hidden overflow-x-auto md:block">
-      <table className="min-w-full text-left text-sm">
-        <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
-          <tr>
-            <th className="px-3 py-3">Student</th>
-            <th className="px-3 py-3">Program</th>
-            <th className="px-3 py-3">Enrollment</th>
-            <th className="px-3 py-3">Progress</th>
-            <th className="px-3 py-3">WorkOne hours</th>
-            <th className="px-3 py-3">Training dates</th>
-            <th className="px-3 py-3">Next action</th>
-            <th className="px-3 py-3">Contact</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {rows.length ? (
-            rows.map((row) => (
-              <tr key={row.id} data-testid="student-row">
-                <td className="px-3 py-4">
-                  <p className="font-bold">{row.full_name || 'Student'}</p>
-                  <p className="text-xs text-slate-500">{row.email || ''}</p>
-                </td>
-                <td className="px-3 py-4">
-                  {programTitle(programs, row.program_id, row.program_slug)}
-                </td>
-                <td className="px-3 py-4 capitalize">
-                  {String(row.enrollment_state || row.status || 'enrolled').replaceAll('_', ' ')}
-                </td>
-                <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
-                <td className="px-3 py-4 font-bold">{Math.min(48, Number(row.total_hours_completed || 0))} / 48</td>
-                <td className="px-3 py-4 text-xs">
-                  <span className="block">Start: {row.training_start_date || 'Missing'}</span>
-                  <span className="block">End: {row.training_end_date || 'Missing'}</span>
-                </td>
-                <td className="px-3 py-4">{row.next_required_action || 'Continue training'}</td>
-                <td className="px-3 py-4"><StudentCommunicationActions enrollmentId={row.id} studentName={row.full_name || 'Student'} hasEmail={Boolean(row.email)} hasPhone={Boolean(row.phone)} /></td>
-              </tr>
-            ))
-          ) : (
+        <table className="min-w-full text-left text-sm">
+          <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
             <tr>
-              <td colSpan={8} className="px-3 py-8 text-center text-slate-500">
-                No confirmed student enrollments are linked.
-              </td>
+              <th className="px-3 py-3">Student</th>
+              <th className="px-3 py-3">Program</th>
+              <th className="px-3 py-3">Enrollment</th>
+              <th className="px-3 py-3">Progress</th>
+              <th className="px-3 py-3">WorkOne hours</th>
+              <th className="px-3 py-3">Training dates</th>
+              <th className="px-3 py-3">Next action</th>
+              <th className="px-3 py-3">Contact</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {rows.length ? (
+              rows.map((row) => (
+                <tr key={row.id} data-testid="student-row">
+                  <td className="px-3 py-4">
+                    <p className="font-bold">{row.full_name || 'Student'}</p>
+                    <p className="text-xs text-slate-500">{row.email || ''}</p>
+                  </td>
+                  <td className="px-3 py-4">
+                    {programTitle(programs, row.program_id, row.program_slug)}
+                  </td>
+                  <td className="px-3 py-4 capitalize">
+                    {String(row.enrollment_state || row.status || 'enrolled').replaceAll('_', ' ')}
+                  </td>
+                  <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
+                  <td className="px-3 py-4 font-bold">
+                    {Math.min(48, Number(row.total_hours_completed || 0))} / 48
+                  </td>
+                  <td className="px-3 py-4 text-xs">
+                    <span className="block">Start: {row.training_start_date || 'Missing'}</span>
+                    <span className="block">End: {row.training_end_date || 'Missing'}</span>
+                  </td>
+                  <td className="px-3 py-4">{row.next_required_action || 'Continue training'}</td>
+                  <td className="px-3 py-4">
+                    <StudentCommunicationActions
+                      enrollmentId={row.id}
+                      studentName={row.full_name || 'Student'}
+                      hasEmail={Boolean(row.email)}
+                      hasPhone={Boolean(row.phone)}
+                    />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={8} className="px-3 py-8 text-center text-slate-500">
+                  No confirmed student enrollments are linked.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -630,8 +966,19 @@ function Applicants({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <td className="p-3">
                     <p className="font-medium">{row.applicant_phone || 'No phone on file'}</p>
                     <div className="mt-1 flex gap-2">
-                      {row.applicant_phone && <a className="font-bold text-blue-700" href={`tel:${row.applicant_phone}`}>Call</a>}
-                      {row.applicant_email && <a className="font-bold text-blue-700" href={`mailto:${row.applicant_email}`}>Email</a>}
+                      {row.applicant_phone && (
+                        <a className="font-bold text-blue-700" href={`tel:${row.applicant_phone}`}>
+                          Call
+                        </a>
+                      )}
+                      {row.applicant_email && (
+                        <a
+                          className="font-bold text-blue-700"
+                          href={`mailto:${row.applicant_email}`}
+                        >
+                          Email
+                        </a>
+                      )}
                     </div>
                   </td>
                   <td className="p-3">
@@ -682,7 +1029,10 @@ function ProgramCards({
       {programs.map((program: any) => {
         const courses = courseAssignments.filter((item: any) => item.program_id === program.id);
         return (
-          <article key={program.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <article
+            key={program.id}
+            className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+          >
             <div className={`relative ${compact ? 'h-36' : 'h-48'} bg-slate-200`}>
               <Image
                 src={getProgramCardImage(program.slug || program.id)}
@@ -701,8 +1051,16 @@ function ProgramCards({
               {!compact && (
                 <>
                   <dl className="mt-5 space-y-3 text-sm">
-                    <Row label="Credential" value={program.credential_name || 'Credential pathway'} />
-                    <Row label="Program hours" value={program.total_hours ? String(program.total_hours) : 'Review program record'} />
+                    <Row
+                      label="Credential"
+                      value={program.credential_name || 'Credential pathway'}
+                    />
+                    <Row
+                      label="Program hours"
+                      value={
+                        program.total_hours ? String(program.total_hours) : 'Review program record'
+                      }
+                    />
                     <Row label="Course assignments" value={String(courses.length)} />
                   </dl>
                   {!courses.length && (
@@ -830,7 +1188,7 @@ function Compliance({
     </div>
   );
 }
-function Documents({ rows }: { rows: any[] }) {
+function Documents({ rows, isHvac }: { rows: any[]; isHvac: boolean }) {
   return (
     <div className="space-y-6">
       <Hero
@@ -838,7 +1196,7 @@ function Documents({ rows }: { rows: any[] }) {
         title="Documents"
         description="Upload and track protected Program Holder onboarding records for program delivery and payment readiness."
       />
-      <ProgramHolderDocumentUpload />
+      <ProgramHolderDocumentUpload isHvac={isHvac} />
       <ProgramHolderAcknowledgements />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Document register</h2>

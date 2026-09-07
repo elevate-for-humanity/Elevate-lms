@@ -333,7 +333,7 @@ export function PlatformShell({
           </div>
         </main>
       </div>
-      <ParisFloatingWrapper surface="portal" portalRole={ROLE_DISPLAY_NAMES[role]} />
+      <ParisFloatingWrapper surface="portal" portalRole={ROLE_DISPLAY_NAMES[role]} autoOpenOnDashboard />
     </div>
   );
 }

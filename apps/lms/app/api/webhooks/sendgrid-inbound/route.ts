@@ -7,6 +7,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { claimWebhookEvent, finalizeWebhookEvent } from '@/lib/webhooks/event-tracker';
 import { parseInboundEmail, resolveForwardTarget } from '@/lib/email/sendgrid-inbound';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -78,6 +79,26 @@ async function _POST(request: NextRequest) {
         String(result.error),
       );
       return NextResponse.json({ ok: false, error: 'Forward failed' }, { status: 500 });
+    }
+
+    // PARIS handles genuine applicant replies after the staff copy succeeds.
+    // Never feed Elevate's own automated messages back into the responder.
+    const senderEmail = (replyTo || from).match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0]?.toLowerCase();
+    const isElevateSender = senderEmail?.endsWith('@elevateforhumanity.org');
+    if (senderEmail && !isElevateSender) {
+      await hydrateProcessEnv();
+      const functionBase = process.env.SUPABASE_URL?.replace(/\/$/, '');
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (functionBase && serviceKey) {
+        const parisResponse = await fetch(`${functionBase}/functions/v1/paris-response`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${serviceKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: senderEmail, text: text || '', reply_subject: subject }),
+        });
+        if (!parisResponse.ok && parisResponse.status !== 404) {
+          logger.error('[SendGrid Inbound] PARIS response failed', undefined, { status: parisResponse.status, eventId });
+        }
+      }
     }
 
     await finalizeWebhookEvent('sendgrid-inbound', eventId, 'processed');

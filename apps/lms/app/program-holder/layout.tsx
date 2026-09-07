@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { PROGRAM_HOLDER_ROLES } from '@/lib/rbac/role-matrix';
+import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 
 export const metadata: Metadata = {
   title: { default: 'Program Holder Portal', template: '%s | Elevate Program Holder' },
@@ -21,5 +22,10 @@ export default async function ProgramHolderPortalLayout({ children }: { children
   // their own data lookup. Page-level guards remain defense in depth.
   await requireRole(PROGRAM_HOLDER_ROLES);
 
-  return children;
+  return (
+    <>
+      {children}
+      <ParisFloatingWrapper surface="portal" portalRole="Program Holder" autoOpenOnDashboard />
+    </>
+  );
 }

@@ -29,9 +29,28 @@ export function ProgramHolderAcknowledgements() {
     <form action={submit} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <h2 className="text-lg font-black">Required onboarding acknowledgements</h2>
       <p className="mt-1 text-sm text-slate-600">
-        Review the Program Holder handbook, rights and responsibilities, and non-compete terms before accepting.
+        Review the Program Holder handbook, rights and responsibilities, and non-compete terms
+        before accepting.
       </p>
-      <div className="mt-3 flex flex-wrap gap-3 text-sm font-bold text-blue-700">\n        <a href="/program-holder/handbook" target="_blank" rel="noreferrer">Read Program Holder Handbook</a>\n        <a href="/legal/program-host-agreement" target="_blank" rel="noreferrer">Read Program Holder Agreement</a>\n      </div>\n      <div className="mt-4 space-y-3">
+      <div className="mt-3 flex flex-wrap gap-3 text-sm font-bold text-blue-700">
+        <a href="/program-holder/handbook" target="_blank" rel="noreferrer">
+          Read Program Holder Handbook
+        </a>
+        <a href="/program-holder/rights-responsibilities" target="_blank" rel="noreferrer">
+          Read Rights and Responsibilities
+        </a>
+        <a href="/program-holder/non-compete" target="_blank" rel="noreferrer">
+          Read Non-Compete Terms
+        </a>
+        <a
+          href="https://www.elevateforhumanity.org/legal/program-host-agreement"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Read Full Program Holder Agreement
+        </a>
+      </div>
+      <div className="mt-4 space-y-3">
         <label className="flex items-start gap-3 rounded-xl border p-4 text-sm font-semibold">
           <input name="handbook" value="yes" type="checkbox" required className="mt-1" /> I reviewed
           and accept the Program Holder handbook.
@@ -41,7 +60,8 @@ export function ProgramHolderAcknowledgements() {
           and accept the rights and responsibilities.
         </label>
         <label className="flex items-start gap-3 rounded-xl border p-4 text-sm font-semibold">
-          <input name="non_compete" value="yes" type="checkbox" required className="mt-1" /> I reviewed and agree to the Program Holder non-compete and non-solicitation terms.
+          <input name="non_compete" value="yes" type="checkbox" required className="mt-1" /> I
+          reviewed and agree to the Program Holder non-compete and non-solicitation terms.
         </label>
       </div>
       <button

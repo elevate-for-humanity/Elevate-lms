@@ -35,6 +35,13 @@ async function _POST(request: NextRequest) {
     // `status` is the workflow state, while `verification_status` has its own
     // database contract: pending | verified | rejected.
     const verificationStatus = action === 'approve' ? 'verified' : 'rejected';
+    // reviewed_by references auth.users, while verified_by references profiles.
+    // A valid admin service account may not have a matching profile row.
+    const { data: reviewerProfile } = await db
+      .from('profiles')
+      .select('id')
+      .eq('id', auth.id)
+      .maybeSingle();
 
     const { data: updatedDoc, error: updateError } = await auditedMutation({
       table: 'documents',
@@ -43,7 +50,7 @@ async function _POST(request: NextRequest) {
         status,
         verification_status: verificationStatus,
         verified: action === 'approve',
-        verified_by: action === 'approve' ? auth.id : null,
+        verified_by: action === 'approve' && reviewerProfile ? auth.id : null,
         verified_at: action === 'approve' ? new Date().toISOString() : null,
         reviewed_by: auth.id,
         reviewed_at: new Date().toISOString(),
@@ -60,7 +67,10 @@ async function _POST(request: NextRequest) {
     });
 
     if (updateError) {
-      return NextResponse.json({ error: 'Failed to update document' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to update document', code: updateError.code ?? 'DOCUMENT_UPDATE_FAILED' },
+        { status: 500 },
+      );
     }
 
     // Fetch document record

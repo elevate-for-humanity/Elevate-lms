@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ChevronDown, Bell, LogOut, Search, Settings, Plus, Minus } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Bell, LogOut, Search, Settings, Plus, Minus } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import LogoImage from '@/components/site/LogoImage';
 import { DEFAULT_NAV, type NavSection } from '@/lib/admin/nav-config';
@@ -86,6 +86,11 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
     <>
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
         <div className="flex min-h-14 min-w-0 items-center gap-1 px-2 py-1 sm:gap-2 sm:px-4 lg:px-6">
+          {pathname !== '/dashboard' && (
+            <button type="button" onClick={() => router.back()} aria-label="Go back" className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-950">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          )}
           <Link href="/dashboard" className="flex items-center gap-2 flex-shrink-0">
             <LogoImage alt="Elevate" width={28} height={42} className="w-auto h-8" />
             <span className="font-bold text-slate-900 text-sm hidden sm:block">

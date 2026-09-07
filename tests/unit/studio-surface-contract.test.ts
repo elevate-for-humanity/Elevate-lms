@@ -137,7 +137,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     const workspace = source('components/studio/StudioCommandWorkspace.tsx');
     const tasks = source('apps/admin/app/studio/tasks/TasksClient.tsx');
     expect(workspace).toContain("setMode('browser')");
-    expect(workspace).toContain('Open Studio container');
+    expect(workspace).toContain('Active workspace');
     expect(tasks).toContain('flex min-w-0 flex-col gap-4 sm:flex-row');
     expect(tasks).toContain('w-full min-w-0 flex-1 overflow-hidden');
   });
@@ -156,7 +156,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('<UnifiedEllieChat');
     expect(workspace).toContain('<RepositoryLivePreview');
     expect(workspace).toContain('<CloudBrowserWorkspace');
-    expect(workspace).toContain('Live inspection');
+    expect(workspace).toContain('Active workspace');
   });
 
   it('greets Store visitors with the PARIS product interview', () => {

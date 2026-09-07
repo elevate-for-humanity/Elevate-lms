@@ -186,6 +186,8 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'CRM — Campaigns', href: '/crm/campaigns' },
       { label: 'CRM — Follow-Ups', href: '/crm/follow-ups' },
       { label: 'Email Marketing', href: '/email-marketing' },
+      { label: 'Social Media', href: '/social-media' },
+      { label: 'Social Media Accounts', href: '/settings/social-media' },
       { label: 'Blog', href: '/blog' },
       { label: 'Content Management', href: '/content' },
       { label: 'Page Builder', href: '/studio' },

@@ -276,7 +276,7 @@ export default function HostShopShowcase({
                       event.currentTarget.pause();
                     }}
                     preload="metadata"
-                    className="host-showcase-media-enter h-full max-w-full object-contain shadow-2xl"
+                    className="aspect-[9/16] h-full max-h-[640px] w-auto max-w-full object-contain shadow-2xl"
                     aria-label={image.alt}
                   />
                 </div>

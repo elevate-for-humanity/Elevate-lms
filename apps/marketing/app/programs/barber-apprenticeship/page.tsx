@@ -99,12 +99,12 @@ export default async function BarberApprenticeshipPage() {
       <HeroVideo
         videoSrcDesktop="/videos/partners/kountry-kutz/shop-tour.mp4"
         videoSrcMobile="/videos/partners/kountry-kutz/shop-tour.mp4"
-        videoPlaybackRate={0.7}
+        videoPlaybackRate={0.55}
         posterImage="/images/partners/kountry-kutz/interior-empty.webp"
         mountedFrameImage="/images/partners/kountry-kutz/interior-empty.webp"
         microLabel={heroBanner.microLabel}
         transcript={heroBanner.transcript}
-        narrateTranscript={false}
+        narrateTranscript
         analyticsName="barber-apprenticeship"
         heightClassName="h-[clamp(460px,68vh,780px)]"
         mediaFit="contain"
@@ -133,6 +133,33 @@ export default async function BarberApprenticeshipPage() {
             Explore Kountry Kutz <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </div>
+      </section>
+
+      <section aria-label="Kountry Kutz apprenticeship story" className="border-b border-slate-200 bg-white px-4 py-8">
+        <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-3">
+          {[
+            {
+              src: '/images/partners/kountry-kutz/interior-empty.webp',
+              alt: 'Training stations inside Kountry Kutz Barbershop in New Palestine',
+            },
+            {
+              src: '/images/partners/kountry-kutz/interior-active.webp',
+              alt: 'Barbers and clients inside Kountry Kutz Barbershop',
+            },
+            {
+              src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
+              alt: 'Kountry Kutz barber apprenticeship host-shop announcement',
+            },
+          ].map((photo) => (
+            <div key={photo.src} className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
+              <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-contain" />
+            </div>
+          ))}
+        </div>
+        <p className="mx-auto mt-5 max-w-4xl text-center text-base leading-7 text-slate-700">
+          One of Elevate's first barber apprenticeship host shops, Kountry Kutz provides a
+          real-workplace setting at 56 W Main St, Suite A, New Palestine, Indiana.
+        </p>
       </section>
 
       <section className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12">

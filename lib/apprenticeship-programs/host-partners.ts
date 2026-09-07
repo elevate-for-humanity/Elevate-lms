@@ -304,6 +304,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     note: 'Published cosmetology apprenticeship host site in Indianapolis.',
     marketingBlurb:
       'An Indianapolis cosmetology training and host-site option in Elevate’s published apprenticeship network. Current placement capacity is confirmed during enrollment.',
+    websiteUrl: '/schools/mesmerized-by-beauty',
+    websiteLabel: 'Visit Mesmerized by Beauty school page',
   },
   {
     slug: 'salon-saloon',

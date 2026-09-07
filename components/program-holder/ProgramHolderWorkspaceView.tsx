@@ -82,6 +82,23 @@ export async function ProgramHolderWorkspaceView({
     ['pending', 'submitted'].includes(row.approval_status || row.status),
   );
   const isHvac = data.programs.some((program) => program.slug === 'hvac-technician');
+  const approvedDocumentTypes = new Set(
+    data.documents
+      .filter((row) => row.approved === true || row.status === 'approved')
+      .map((row) => row.document_type),
+  );
+  const requiredDocumentTypes = ['government_id', 'business_registration', 'insurance', 'w9'];
+  const studentCloseoutGaps = incompleteBackWork.map((row) => ({
+    id: row.id,
+    name: row.full_name || row.email || 'Student',
+    missing: [
+      Number(row.total_hours_completed || 0) < 48 ? '48 verified training hours' : null,
+      !row.training_start_date ? 'training start date' : null,
+      !row.training_end_date ? 'training end date' : null,
+      !row.lms_completed ? 'coursework completion' : null,
+      !row.practical_skills_verified ? 'practical-skills verification' : null,
+    ].filter(Boolean) as string[],
+  }));
   const complianceItems = [
     {
       label: 'Program-holder approval',
@@ -93,7 +110,8 @@ export async function ProgramHolderWorkspaceView({
       ? [
           {
             label: 'HVAC license or instructor credential',
-            complete: Boolean(data.holder?.hvac_license_url),
+            complete:
+              Boolean(data.holder?.hvac_license_url) || approvedDocumentTypes.has('epa_608'),
           },
         ]
       : []),
@@ -105,7 +123,10 @@ export async function ProgramHolderWorkspaceView({
       label: 'Non-compete agreement',
       complete: data.acknowledgements.some((item) => item.document_type === 'non_compete'),
     },
-    { label: 'Required program documents', complete: data.documents.length > 0 },
+    {
+      label: 'Approved ID, business registration, insurance, and W-9',
+      complete: requiredDocumentTypes.every((type) => approvedDocumentTypes.has(type)),
+    },
     {
       label: 'Profile picture',
       complete:
@@ -236,6 +257,25 @@ export async function ProgramHolderWorkspaceView({
                   </li>
                 )}
               </ul>
+              {studentCloseoutGaps.length > 0 && (
+                <div className="mt-4 rounded-xl border-2 border-red-300 bg-white p-4">
+                  <h3 className="font-black text-red-950">Student completion paperwork</h3>
+                  <p className="mt-1 text-sm text-red-900">
+                    Complete every item below for each graduated student before payment can be
+                    released.
+                  </p>
+                  <ul className="mt-3 space-y-3">
+                    {studentCloseoutGaps.map((student) => (
+                      <li key={student.id} className="rounded-lg bg-red-100 p-3 text-red-950">
+                        <p className="font-black">{student.name}</p>
+                        <p className="mt-1 text-sm font-semibold">
+                          Missing: {student.missing.join(', ')}.
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 <Link
                   href="/program-holder/documents"

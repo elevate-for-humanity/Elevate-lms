@@ -66,7 +66,7 @@ export default async function WorkforcePage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 xl:grid-cols-4">
         <div className="bg-white p-4 rounded-lg border">
           <div className="flex items-center gap-3">
             <div className="bg-blue-100 p-3 rounded-lg">
@@ -114,7 +114,7 @@ export default async function WorkforcePage() {
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {/* Participants Table */}
         <div className="col-span-2 bg-white rounded-lg border">
           <div className="p-4 border-b flex items-center justify-between">

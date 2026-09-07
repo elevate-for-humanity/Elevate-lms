@@ -132,7 +132,7 @@ export default async function AtRiskPage() {
             <TrendingDown className="w-4 h-4 text-slate-600" />
             Response to Intervention (RTI) Tiers
           </h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {RTI_TIERS.map((tier) => (
               <div key={tier.tier} className={`rounded-xl p-4 ${tier.color}`}>
                 <div className="flex items-center gap-2 mb-2">
@@ -146,7 +146,7 @@ export default async function AtRiskPage() {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
             { label: 'Critical Risk', value: criticalCount, icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50' },
             { label: 'Medium Risk', value: mediumCount, icon: AlertTriangle, color: 'text-amber-600', bg: 'bg-amber-50' },

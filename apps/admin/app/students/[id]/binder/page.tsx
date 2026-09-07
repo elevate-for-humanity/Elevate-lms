@@ -120,7 +120,7 @@ export default async function StudentBinderPage({ params }: PageProps) {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 xl:grid-cols-4">
         <div className="bg-white p-4 rounded-lg border">
           <div className="flex items-center gap-3">
             <div className="bg-blue-100 p-3 rounded-lg">
@@ -167,7 +167,7 @@ export default async function StudentBinderPage({ params }: PageProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {/* Documents by Category */}
         <div className="col-span-2 space-y-6">
           {Object.entries(documentsByCategory).map(([category, docs]: [string, any]) => (

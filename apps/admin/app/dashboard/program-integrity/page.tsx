@@ -96,7 +96,7 @@ export default function ProgramIntegrityPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 xl:grid-cols-4">
         <div className="bg-white rounded-xl border p-4">
           <p className="text-2xl font-bold text-slate-900">{programs.length}</p>
           <p className="text-sm text-slate-500">Total Programs</p>

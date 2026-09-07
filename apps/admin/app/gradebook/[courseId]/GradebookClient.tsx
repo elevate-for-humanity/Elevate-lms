@@ -185,7 +185,7 @@ export function GradebookClient({
   return (
     <div>
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-3">
         <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
           <div className="p-3 bg-brand-blue-100 rounded-lg">
             <Users className="w-5 h-5 text-brand-blue-600" />

@@ -137,7 +137,7 @@ export default async function RegisteredRtiReviewPage() {
                 </div>
                 <ShieldCheck className="h-5 w-5 text-brand-blue-700" />
               </div>
-              <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
+              <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
                 <Metric label="Competencies" value={String(contract.completion.competencyCount)} />
                 <Metric label="RTI hours" value={String(contract.completion.requiredRtiHours)} />
                 <Metric label="Pending" value={String(pendingByStandard.get(row.standard_key) || 0)} />

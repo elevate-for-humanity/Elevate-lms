@@ -89,7 +89,7 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
 
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[
             { label: 'Open Jobs', value: jobRows.filter((j) => j.status === 'open').length },
             { label: 'Total Jobs', value: jobCount ?? 0 },

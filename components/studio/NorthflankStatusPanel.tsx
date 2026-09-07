@@ -74,7 +74,7 @@ function ServiceCard({ svc }: { svc: PlatformService }) {
         <p className="text-xs text-red-600 mb-3 bg-red-50 px-2 py-1 rounded">{svc.reason}</p>
       )}
 
-      <div className="grid grid-cols-3 gap-3 mb-3">
+      <div className="grid grid-cols-1 gap-3 mb-3 sm:grid-cols-3">
         <Stat label="Running" value={String(svc.runningCount)} highlight={svc.runningCount > 0} />
         <Stat label="Desired" value={String(svc.desiredCount)} />
         <Stat label="Pending" value={String(svc.pendingCount)} warn={svc.pendingCount > 0} />

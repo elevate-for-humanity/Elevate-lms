@@ -44,7 +44,7 @@ export default async function ReportsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
 
         {/* Live counts */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[
             { label: 'Students',     value: totalStudents ?? 0,    icon: Users,         color: 'text-brand-blue-600', bg: 'bg-brand-blue-50' },
             { label: 'Enrollments',  value: totalEnrollments ?? 0, icon: TrendingUp,    color: 'text-green-600',      bg: 'bg-green-50' },

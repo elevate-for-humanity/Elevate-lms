@@ -109,7 +109,7 @@ export default async function FundingPage() {
           })}
         </div>
 
-        {total > 0 && <div className="grid grid-cols-3 gap-4">
+        {total > 0 && <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[
             { label: 'Total Authorized', value: totalAuthorized, color: 'text-slate-900' },
             { label: 'Paid to Date', value: totalPaid, color: 'text-green-700' },

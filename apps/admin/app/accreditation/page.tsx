@@ -128,7 +128,7 @@ export default async function AccreditationPage() {
               style={{ width: `${readiness}%` }}
             />
           </div>
-          <div className="grid grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-3">
             {[
               { label: 'Met', value: met.length, color: 'text-green-600', bg: 'bg-green-50' },
               {

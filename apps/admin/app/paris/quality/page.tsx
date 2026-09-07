@@ -96,7 +96,7 @@ export default async function AIQualityPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         {/* Key Metrics */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {metrics.map((m) => {
             const Icon = m.icon;
             return (
@@ -155,7 +155,7 @@ export default async function AIQualityPage() {
             <AlertTriangle className="w-4 h-4 text-amber-500" />
             Escalation to Human
           </h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="text-center p-4 bg-slate-50 rounded-xl">
               <p className="text-2xl font-bold text-slate-900">{escalationRate}%</p>
               <p className="text-xs text-slate-500 mt-1">Escalation Rate</p>
@@ -179,7 +179,7 @@ export default async function AIQualityPage() {
         {/* Quick Actions */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
           <h2 className="font-semibold text-slate-900 text-sm mb-4">AI Quality Actions</h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Link href="/studio/agents" className="p-4 rounded-xl border border-slate-200 hover:border-blue-200 hover:bg-blue-50 transition-all">
               <Brain className="w-6 h-6 text-blue-600 mb-2" />
               <p className="text-sm font-medium text-slate-700">Manage Agents</p>

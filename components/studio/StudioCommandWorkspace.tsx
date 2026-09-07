@@ -65,7 +65,7 @@ export default function StudioCommandWorkspace({
         </div>
         <div className="px-3 pb-3">
           <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-wider text-gray-500">AI agent</p>
-          <div className="grid grid-cols-3 gap-1" role="group" aria-label="Choose AI agent">
+          <div className="grid grid-cols-1 gap-1 sm:grid-cols-3" role="group" aria-label="Choose AI agent">
             {(['ELLIE', 'LIZZY', 'PARIS'] as const).map((agent) => (
               <button
                 key={agent}

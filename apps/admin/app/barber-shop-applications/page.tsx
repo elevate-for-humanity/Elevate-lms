@@ -134,7 +134,7 @@ export default async function BarberShopApplicationsPage() {
         </div>
 
         {/* Summary counts */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-3">
           {[
             { label: 'Pending', count: pending.length, color: 'amber' },
             { label: 'Approved', count: approved.length, color: 'green' },

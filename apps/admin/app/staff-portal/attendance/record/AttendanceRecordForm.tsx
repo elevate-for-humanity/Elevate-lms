@@ -106,7 +106,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
   return (
     <div>
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 xl:grid-cols-4">
         <div className="bg-white rounded-lg p-4 border">
           <Users className="w-6 h-6 text-brand-blue-500 mb-1" />
           <p className="text-2xl font-bold">{students.length}</p>

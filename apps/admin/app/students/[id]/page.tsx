@@ -125,7 +125,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
         </aside>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">{[
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">{[
             ['Enrollments', enrollments.length, BookOpen], ['Applications', applications.length, FileText], ['Lessons Done', progressRes.count ?? 0, CheckCircle],
           ].map(([label, value, Icon]) => { const ItemIcon = Icon as typeof BookOpen; return <div key={String(label)} className="rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm"><ItemIcon className="mx-auto h-4 w-4 text-brand-blue-700" /><p className="mt-2 text-2xl font-black text-slate-950">{String(value)}</p><p className="text-xs font-bold text-slate-500">{String(label)}</p></div>; })}</div>
 

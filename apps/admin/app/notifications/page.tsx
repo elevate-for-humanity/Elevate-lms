@@ -84,7 +84,7 @@ export default async function AdminNotificationsPage() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {[
           { label: 'Total Sent', value: totalSent, color: 'text-emerald-600', bg: 'bg-emerald-50' },
           { label: 'Failed', value: totalFailed, color: 'text-red-600', bg: 'bg-red-50' },

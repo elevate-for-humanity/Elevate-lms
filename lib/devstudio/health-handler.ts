@@ -16,6 +16,7 @@ import {
   getDecryptedPlatformSecret,
   hydrateNorthflankEnv,
 } from '@/lib/secrets';
+import { getGitHubToken } from '@/lib/devstudio/github-token';
 
 /**
  * Canonical Admin-owned Dev Studio health implementation.
@@ -49,10 +50,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const hasGemini = isGeminiConfigured() || Boolean(selectedSecrets.GEMINI_API_KEY);
   const hasOpenAI = isOpenAIConfigured() || Boolean(selectedSecrets.OPENAI_API_KEY);
   const hasAnthropic = isAnthropicConfigured() || Boolean(selectedSecrets.ANTHROPIC_API_KEY);
-  const githubToken = process.env.GITHUB_TOKEN ||
-      process.env.GH_TOKEN ||
-      process.env.GITHUB_PAT ||
-      selectedSecrets.GITHUB_TOKEN;
+  const githubToken = await getGitHubToken();
   const hasGitHub = Boolean(githubToken);
   let githubTokenValid = false;
   if (githubToken) {
@@ -118,7 +116,8 @@ export async function handleDevStudioHealth(req: NextRequest) {
     },
     execution: {
       mode: 'admin-native',
-      ready: githubTokenValid,
+      ready: true,
+      repositoryWritesReady: githubTokenValid,
       legacyShellRemoved: true,
     },
     northflank: {

@@ -122,6 +122,25 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(tasks).not.toContain('{task.trace_id || task.id}');
   });
 
+  it('keeps core Studio available when only GitHub repository writes are unavailable', () => {
+    const health = source('lib/devstudio/health-handler.ts');
+    const panel = source('components/studio/DevStudioHealthPanel.tsx');
+    expect(health).toContain('const githubToken = await getGitHubToken()');
+    expect(health).toContain('repositoryWritesReady: githubTokenValid');
+    expect(health).toContain('ready: true');
+    expect(panel).toContain("['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable']");
+    expect(panel).toContain("['Repository writes'");
+  });
+
+  it('opens the Studio browser container directly and preserves mobile task width', () => {
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+    const tasks = source('apps/admin/app/studio/tasks/TasksClient.tsx');
+    expect(workspace).toContain("setMode('browser')");
+    expect(workspace).toContain('Open Studio container');
+    expect(tasks).toContain('flex min-w-0 flex-col gap-4 sm:flex-row');
+    expect(tasks).toContain('w-full min-w-0 flex-1 overflow-hidden');
+  });
+
   it('does not advertise the unconnected Live Canvas without its feature flag', () => {
     const registry = source('lib/devstudio/workspace-registry.ts');
     expect(registry).toContain("route: '/studio/canvas'");
@@ -169,9 +188,9 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(programs).toContain('>Course Library<');
   });
 
-  it('validates GitHub credentials before declaring Studio execution ready', () => {
+  it('validates GitHub credentials before declaring repository writes ready', () => {
     const health = source('lib/devstudio/health-handler.ts');
     expect(health).toContain("fetch('https://api.github.com/user'");
-    expect(health).toContain('ready: githubTokenValid');
+    expect(health).toContain('repositoryWritesReady: githubTokenValid');
   });
 });

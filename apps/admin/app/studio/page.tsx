@@ -64,11 +64,12 @@ export default async function StudioPage() {
           </div>
         </section>
 
-        <details className="absolute bottom-24 right-4 z-30 max-w-lg rounded-2xl border border-gray-200 bg-white shadow-xl">
-          <summary className="flex min-w-0 cursor-pointer list-none flex-wrap items-center gap-2 px-4 py-4 text-sm font-semibold text-gray-800 marker:hidden sm:px-5">
+        <details className="absolute bottom-3 right-3 z-30 max-w-[calc(100%-1.5rem)] rounded-xl border border-gray-200 bg-white shadow-xl sm:bottom-6 sm:right-6 sm:max-w-lg sm:rounded-2xl">
+          <summary className="flex min-w-0 cursor-pointer list-none items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-800 marker:hidden sm:px-5 sm:py-4 sm:text-sm">
             <Wrench className="h-4 w-4" aria-hidden="true" />
-            Advanced capability surfaces
-            <span className="min-w-0 text-xs font-normal text-gray-500 sm:ml-1">
+            <span className="sm:hidden">Advanced tools</span>
+            <span className="hidden sm:inline">Advanced capability surfaces</span>
+            <span className="hidden min-w-0 text-xs font-normal text-gray-500 sm:ml-1 sm:inline">
               for direct inspection and troubleshooting
             </span>
           </summary>

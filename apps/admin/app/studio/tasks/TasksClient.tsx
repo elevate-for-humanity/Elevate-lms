@@ -142,8 +142,8 @@ export default function TasksClient() {
                   <Icon className={`h-5 w-5 ${style.color}`} />
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
+                  <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="w-full min-w-0 flex-1 overflow-hidden">
                       <p className="font-bold text-slate-900">{task.title}</p>
                       {task.ai_agents && (
                         <p className="text-sm text-slate-500 mt-0.5">
@@ -165,7 +165,7 @@ export default function TasksClient() {
                           {task.error_message}
                         </p>
                       )}
-                      <p className="mt-2 font-mono text-[10px] text-slate-400">
+                        <p className="mt-2 break-words font-mono text-[10px] text-slate-500">
                         {task.tool_name || 'advisory'} · Task ID: {task.id}
                         {task.trace_id && task.trace_id !== task.id
                           ? ` · Trace ID: ${task.trace_id}`
@@ -182,19 +182,19 @@ export default function TasksClient() {
                         </details>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0 sm:justify-end">
                       {task.status === 'awaiting_approval' && (
                         <>
                           <button
                             onClick={() => approveTask(task.id)}
-                            className="rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-sm"
+                            className="min-h-11 flex-1 rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 sm:flex-none"
                           >
                             Approve
                           </button>
                           {task.source !== 'agentic_build' && (
                             <button
                               onClick={() => cancelTask(task.id)}
-                              className="rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-200 transition"
+                              className="min-h-11 flex-1 rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 transition hover:bg-red-200 sm:flex-none"
                             >
                               Reject and cancel
                             </button>
@@ -205,7 +205,7 @@ export default function TasksClient() {
                         ['queued', 'running'].includes(task.status) && (
                           <button
                             onClick={() => cancelTask(task.id)}
-                            className="rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-200 transition"
+                            className="min-h-11 flex-1 rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-700 transition hover:bg-red-200 sm:flex-none"
                           >
                             Cancel
                           </button>

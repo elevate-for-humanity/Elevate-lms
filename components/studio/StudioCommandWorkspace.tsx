@@ -96,11 +96,14 @@ export default function StudioCommandWorkspace({
           <span className="text-xs font-semibold text-gray-700">Admin AI</span>
           <button
             type="button"
-            onClick={() => setInspectionOpen((current) => !current)}
+            onClick={() => {
+              if (!inspectionOpen) setMode('browser');
+              setInspectionOpen((current) => !current);
+            }}
             className="ml-auto inline-flex min-h-10 items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-800 shadow-sm hover:bg-gray-100"
           >
             <Eye className="h-3.5 w-3.5" aria-hidden="true" />
-            {inspectionOpen ? 'Close browser preview' : 'Open browser preview'}
+            {inspectionOpen ? 'Close Studio container' : 'Open Studio container'}
           </button>
         </div>
         <UnifiedEllieChat key={conversationKey} preferredAgent={selectedAgent} embedded onOpenPreview={() => openPreview()} onPreviewTarget={openPreview} />

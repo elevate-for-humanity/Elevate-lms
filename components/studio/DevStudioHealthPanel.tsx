@@ -22,6 +22,7 @@ type HealthPayload = Record<string, unknown> & {
   execution?: {
     mode?: string;
     ready?: boolean;
+    repositoryWritesReady?: boolean;
     legacyShellRemoved?: boolean;
   };
   northflank?: {
@@ -70,7 +71,8 @@ export default function DevStudioHealthPanel() {
         ['Supabase URL', flag(health.supabaseUrlPresent)],
         ['Supabase service key', flag(health.supabaseServiceKeyPresent)],
         ['Execution mode', health.execution?.mode ?? 'admin-native'],
-        ['Dev Studio execution', health.execution?.ready ? 'ready' : health.hasGitHub ? 'blocked by invalid GitHub token' : 'needs GitHub token'],
+        ['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable'],
+        ['Repository writes', health.execution?.repositoryWritesReady ? 'ready' : health.hasGitHub ? 'blocked by invalid GitHub token' : 'needs GitHub token'],
         ['Northflank API', flag(health.northflank?.tokenPresent)],
         ['Northflank project', flag(health.northflank?.projectIdPresent)],
       ]

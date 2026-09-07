@@ -311,12 +311,12 @@ export function ApprenticePortalShell({
       {/* Nav */}
       <nav className="bg-white border-b border-slate-200 sticky top-0 z-30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="flex overflow-x-auto gap-0" style={{ scrollbarWidth: 'none' }}>
+          <div className="grid grid-cols-2 gap-1 py-2 sm:grid-cols-3 lg:flex lg:gap-0 lg:py-0">
             {navTabs.map((tab) => (
               <Link
                 key={tab.id}
                 href={tab.href}
-                className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                className={`min-w-0 rounded-lg border-b-2 px-3 py-2 text-center text-sm font-medium transition-colors lg:rounded-none lg:px-4 lg:py-3 ${
                   tab.id === 'dashboard'
                     ? 'border-slate-900 text-slate-900'
                     : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'

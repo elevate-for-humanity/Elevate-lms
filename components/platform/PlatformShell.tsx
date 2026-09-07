@@ -244,28 +244,6 @@ export function PlatformShell({
             </div>
           </div>
         </div>
-        <nav
-          aria-label={`${ROLE_DISPLAY_NAMES[role]} mobile navigation`}
-          className="flex max-w-full gap-2 overflow-x-auto border-t border-slate-100 bg-white px-3 py-2 [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
-        >
-          {sections.flatMap((section) => section.items).map((item) => {
-            const Icon = item.icon;
-            const active = isActiveHref(item.href, pathname);
-            return (
-              <Link
-                key={item.id}
-                href={item.href}
-                aria-current={active ? 'page' : undefined}
-                className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm font-bold ${
-                  active ? 'bg-blue-700 text-white' : 'border border-slate-200 bg-slate-50 text-slate-800'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
       </header>
 
       <div className="flex min-w-0">

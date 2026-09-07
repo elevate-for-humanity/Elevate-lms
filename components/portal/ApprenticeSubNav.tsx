@@ -54,14 +54,14 @@ export function ApprenticeSubNav({
   return (
     <nav className="sticky top-0 z-30 border-b border-slate-200 bg-white">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="flex gap-0 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+        <div className="grid grid-cols-2 gap-1 py-2 sm:grid-cols-3 lg:flex lg:gap-0 lg:py-0">
           {tabs.map((tab) => {
             const active = isActive(pathname, tab.href, tab.id);
             return (
               <Link
                 key={tab.id}
                 href={tab.href}
-                className={`flex-shrink-0 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
+                className={`min-w-0 rounded-lg border-b-2 px-3 py-2 text-center text-sm font-medium transition-colors lg:rounded-none lg:px-4 lg:py-3 ${
                   active
                     ? 'border-slate-900 text-slate-900'
                     : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'

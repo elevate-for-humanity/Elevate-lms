@@ -2,11 +2,17 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Building2, MapPin, Search, ShieldCheck } from 'lucide-react';
+import { MapPin, Search, ShieldCheck } from 'lucide-react';
 import type { HostShopNetworkEntry } from '@/lib/programs/host-shop-network-types';
 import { PROGRAM_LABELS } from '@/lib/programs/host-shops';
 
 type Props = { shops: HostShopNetworkEntry[] };
+
+function representativeShopImage(shop: HostShopNetworkEntry) {
+  return shop.programs.includes('barber-apprenticeship')
+    ? '/images/pages/barber-shop-interior.webp'
+    : '/images/beauty/program-beauty-training.webp';
+}
 
 export default function HostShopNetworkDirectory({ shops }: Props) {
   const [query, setQuery] = useState('');
@@ -67,18 +73,16 @@ export default function HostShopNetworkDirectory({ shops }: Props) {
               className="group overflow-hidden rounded-2xl border border-white/15 bg-white text-slate-950 shadow-xl"
             >
               <div className="relative aspect-[16/10] overflow-hidden bg-slate-200">
-                {shop.image ? (
-                  <img
-                    src={shop.image}
-                    alt={`${shop.name} Host Shop`}
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-300">
-                    <Building2 className="h-16 w-16 text-slate-500" aria-hidden="true" />
-                  </div>
-                )}
+                <img
+                  src={shop.image ?? representativeShopImage(shop)}
+                  alt={
+                    shop.image
+                      ? `${shop.name} Host Shop`
+                      : `Representative ${shop.programs.includes('barber-apprenticeship') ? 'barber' : 'beauty'} apprenticeship training environment`
+                  }
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                  loading="lazy"
+                />
                 <span
                   className={`absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black shadow ${shop.approval === 'approved' ? 'bg-emerald-100 text-emerald-950' : 'bg-blue-100 text-blue-950'}`}
                 >

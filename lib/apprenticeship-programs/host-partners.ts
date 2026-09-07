@@ -152,6 +152,13 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     note: 'Traditional New Castle barbershop and apprenticeship host shop.',
     marketingBlurb:
       'A traditional New Castle barbershop known for classic barber services including haircuts, razor line-ups, fades, and straight-razor shaves.',
+    media: [
+      {
+        src: '/images/partners/b52s-official.webp',
+        alt: "B-52's Barbershop in New Castle, Indiana",
+        kind: 'photo',
+      },
+    ],
     onlineListingUrl: 'https://www.bestprosintown.com/in/new-castle/b-52s-barber-shop-/',
     onlineListingLabel: 'View B-52s shop profile & photos',
   },
@@ -304,6 +311,13 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     note: 'Published cosmetology apprenticeship host site in Indianapolis.',
     marketingBlurb:
       'An Indianapolis cosmetology training and host-site option in Elevate’s published apprenticeship network. Current placement capacity is confirmed during enrollment.',
+    media: [
+      {
+        src: '/images/jozanna-george.jpg',
+        alt: 'Jozanna George of Mesmerized by Beauty Cosmetology Academy',
+        kind: 'photo',
+      },
+    ],
     websiteUrl: '/schools/mesmerized-by-beauty',
     websiteLabel: 'Visit Mesmerized by Beauty school page',
   },

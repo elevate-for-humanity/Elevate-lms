@@ -101,7 +101,7 @@ export default function HomePage() {
         <HomeHeroVideo banner={heroBanners.home} />
         <div
           data-scroll-narration
-          data-narration="Explore Elevate career programs in HVAC, commercial driving, business, bookkeeping, technology, healthcare, and more. Workforce funding may cover training for eligible participants after agency approval. Enrollment is open and upcoming cohorts are forming now."
+          data-narration="Explore Elevate career programs built for real employment opportunities. Train for HVAC and skilled trades, commercial driving, business and entrepreneurship, bookkeeping and finance, information technology, healthcare, and other in-demand fields. Many programs may be free to participants who qualify for workforce funding. Funding is not automatic: the responsible agency must approve the participant, program, and covered costs in writing. If funding is not approved, admissions can explain available self-pay and payment options. Enrollment is open, upcoming cohorts are forming, and PARIS can guide you through program selection, funding steps, the application, required documents, and what to do next."
         >
           <HomeProgramShowcase />
         </div>
@@ -120,18 +120,18 @@ export default function HomePage() {
             {
               shopSlug: 'salon-saloon',
               media: {
-                src: '/images/partners/salon-saloon/team-sign.webp',
-                alt: 'Salon Saloon team at an Elevate participating Host Salon',
-                kind: 'photo',
+                src: '/videos/partners/salon-saloon-tour.mp4',
+                alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon',
+                kind: 'video',
+                backdropSrc: '/images/partners/salon-saloon/team-sign.webp',
               },
             },
             {
               shopSlug: 'salon-saloon',
               media: {
-                src: '/videos/partners/salon-saloon-tour.mp4',
-                alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon',
-                kind: 'video',
-                backdropSrc: '/images/partners/salon-saloon/team-sign.webp',
+                src: '/images/partners/salon-saloon/team-sign.webp',
+                alt: 'Salon Saloon team at an Elevate participating Host Salon',
+                kind: 'photo',
               },
             },
             {
@@ -168,8 +168,7 @@ export default function HomePage() {
               },
             },
           ]}
-          narrationSrc="/audio/narration/host-shop.mp3"
-          narration="Meet participating Elevate Host Shops, including Salon Saloon and Kountry Kutz Barbershop. View each shop's introduction, location, contact information, and workplace training environment, then schedule a Host Shop tour to learn more."
+          narration="Welcome to the Salon Saloon tour in South Bend, Indiana. Salon Saloon is a participating Elevate Host Salon where cosmetology apprentices connect classroom instruction with supervised experience inside a working salon. During apprenticeship, the employer teaches professional routines, client service, safety, sanitation, technical skills, and workplace expectations while documenting the apprentice's progress. Host Shops may use hourly pay, commission, or a combination, but the apprentice's weekly earnings must equal at least the applicable required wage for every compensable hour, with a wage top-up when commission falls short. Continue through the gallery to meet other participating shops, view their locations and contact information, and schedule a Host Shop walk-through."
         />
         <div
           data-scroll-narration

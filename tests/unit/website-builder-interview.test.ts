@@ -9,13 +9,13 @@ describe('PARIS Website Builder interview', () => {
     const questions = getWebsiteInterviewQuestions({});
     const keys = questions.map((question) => question.key);
     expect(keys).toEqual(expect.arrayContaining([
-      'businessName', 'industry', 'audience', 'goal', 'services', 'products',
+      'siteOwnerType', 'businessName', 'industry', 'audience', 'goal', 'services', 'products',
       'pricing', 'payments', 'subscriptions', 'booking', 'locations', 'staff',
       'pages', 'brand', 'assets', 'policies', 'compliance', 'contacts', 'domain',
       'existingWebsite', 'analytics', 'seo', 'accessibility', 'conversion', 'upsell',
     ]));
     expect(missingRequiredWebsiteAnswers({})).toEqual([
-      'businessName', 'industry', 'audience', 'goal', 'services', 'conversion',
+      'siteOwnerType', 'businessName', 'industry', 'audience', 'goal', 'services', 'conversion',
     ]);
   });
 

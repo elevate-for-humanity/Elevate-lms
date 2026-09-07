@@ -25,12 +25,17 @@ describe('homepage hero slideshow rendering', () => {
     const brightnessValues = [...source.matchAll(/exposureClass: 'brightness-\[([0-9.]+)\]'/g)].map(
       (match) => Number(match[1]),
     );
-    expect(brightnessValues).toHaveLength(8);
+    expect(brightnessValues).toHaveLength(6);
     expect(Math.max(...brightnessValues) - Math.min(...brightnessValues)).toBeCloseTo(0.02, 5);
   });
 
   it('uses narration sentence boundaries that prevent swallowed phrases', () => {
-    expect(source).toContain('You will learn by doing. You will build real confidence.');
+    expect(source).toContain('build skills by doing real work');
+    expect(source).toContain('Employers looking to fill open jobs');
+    expect(source).toContain('build a website');
+    expect(source).toContain('narrateTranscript');
+    expect(source).not.toContain('razors-image-storefront-2026.jpg');
+    expect(source).not.toContain('style-and-scissor-salon/contact-card.webp');
     expect(source).not.toContain('Learn by doing, build real confidence');
   });
 
@@ -47,9 +52,7 @@ describe('homepage hero slideshow rendering', () => {
     expect(source).toContain('className="relative order-2 w-full');
     expect(source).toContain('h-[clamp(300px,46svh,480px)]');
     expect(source).not.toContain("src: '/images/partners/generations-hair/salon-service.webp'");
-    expect(source).toContain(
-      "voiceoverSrc={revisionedHeroAsset('/audio/narration/home-hero.mp3')}",
-    );
+    expect(source).toContain('narrateTranscript');
     expect(source).toContain('soundButtonVariant="prominent"');
     expect(source).toContain('ref={mediaRef}');
     expect(source).toContain('entry.intersectionRatio >= 0.1');

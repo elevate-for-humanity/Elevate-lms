@@ -11,7 +11,7 @@ const PROGRAMS = [
 
 export function HomeApprenticeshipSales() {
   return (
-    <section className="overflow-hidden bg-slate-950 px-4 py-14 text-white sm:py-20" aria-labelledby="apprenticeship-sales-heading">
+    <section className="overflow-hidden bg-slate-950 px-4 py-10 text-white sm:py-12" aria-labelledby="apprenticeship-sales-heading">
       <div className="mx-auto grid max-w-6xl gap-9 lg:grid-cols-[1.02fr_.98fr] lg:items-center">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.16em] text-orange-300">Earn While You Learn</p>

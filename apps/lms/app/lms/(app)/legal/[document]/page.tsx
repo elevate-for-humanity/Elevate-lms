@@ -1,5 +1,9 @@
 import { notFound } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
 import { requireRole } from '@/lib/auth/require-role';
+import { loadLearnerWorkspace } from '@/lib/learner/workspace';
+import { getHandbook } from '@/lib/apprenticeship/handbook-content';
+import { AgreementAcceptanceButton } from '@/components/lms/AgreementAcceptanceButton';
 
 const DOCUMENTS: Record<string, { title: string; sections: Array<[string,string]> }> = {
   'enrollment-agreement': { title: 'Enrollment Agreement', sections: [['Training services','Elevate provides the training access, learner support, progress tracking, and credential guidance described in the learner course assignment.'],['Learner commitments','The learner agrees to participate, maintain accurate records, complete required work, and promptly report access or support barriers.'],['Completion','Completion and credential eligibility depend on satisfying program, assessment, attendance, payment or funding, and document requirements.']] },
@@ -20,8 +24,13 @@ const DOCUMENTS: Record<string, { title: string; sections: Array<[string,string]
 };
 
 export default async function LegalDocumentPage({ params }: { params: Promise<{ document: string }> }) {
-  await requireRole(['student','learner','admin']);
-  const document = DOCUMENTS[(await params).document];
+  const { user, profile } = await requireRole(['student','learner','admin']);
+  const slug = (await params).document;
+  const document = DOCUMENTS[slug];
   if (!document) notFound();
-  return <article className="mx-auto max-w-4xl space-y-6"><div><p className="text-xs font-black uppercase tracking-widest text-blue-700">Required legal document</p><h1 className="mt-2 text-3xl font-black">{document.title}</h1><p className="mt-2 text-sm text-slate-600">Version 1.0</p></div>{document.sections.map(([title,body]) => <section key={title} className="rounded-2xl border bg-white p-6"><h2 className="text-lg font-black">{title}</h2><p className="mt-2 leading-7 text-slate-700">{body}</p></section>)}</article>;
+  const workspace = await loadLearnerWorkspace(user.id, profile?.role || 'student');
+  const agreement = workspace.agreements.find((item) => item.documentUrl.endsWith(`/legal/${slug}`));
+  const programSlug = workspace.enrollments[0]?.program_slug || '';
+  const handbook = slug === 'student-handbook' ? getHandbook(programSlug) : null;
+  return <article className="mx-auto max-w-4xl space-y-6 pb-28"><div><p className="text-xs font-black uppercase tracking-widest text-blue-700">Required legal document</p><h1 className="mt-2 text-3xl font-black">{handbook?.programName ? `${handbook.programName} Handbook` : document.title}</h1><p className="mt-2 text-sm text-slate-600">Version {handbook?.version || agreement?.version || '1.0'}{handbook?.effectiveDate ? ` · Effective ${handbook.effectiveDate}` : ''}</p></div>{handbook ? handbook.sections.map((section) => <section key={section.id} className="rounded-2xl border bg-white p-6"><h2 className="text-xl font-black">{section.title}</h2><div className="prose prose-slate mt-4 max-w-none"><ReactMarkdown>{section.content}</ReactMarkdown></div></section>) : document.sections.map(([title,body]) => <section key={title} className="rounded-2xl border bg-white p-6"><h2 className="text-lg font-black">{title}</h2><p className="mt-2 leading-7 text-slate-700">{body}</p></section>)}{agreement ? <div className="sticky bottom-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-300 bg-white/95 p-4 shadow-xl backdrop-blur"><p className="text-sm font-bold text-slate-800">{agreement.signed ? 'This document has been acknowledged.' : 'Finish by recording your acknowledgment.'}</p>{agreement.signed ? <span className="font-black text-emerald-700">Complete</span> : <AgreementAcceptanceButton type={agreement.type} version={agreement.version} />}</div> : null}</article>;
 }

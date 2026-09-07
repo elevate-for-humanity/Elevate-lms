@@ -35,7 +35,7 @@ function mostVisiblePageSection() {
 
 export function ScrollNarrator() {
   const pathname = usePathname();
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
   const lastNarrationRef = useRef<{ section: HTMLElement; text: string; source?: string } | null>(
     null,
@@ -80,7 +80,9 @@ export function ScrollNarrator() {
   useEffect(() => {
     lastNarrationRef.current = null;
     stop();
-  }, [pathname, stop]);
+    const frame = window.requestAnimationFrame(() => void narrateVisibleSection());
+    return () => window.cancelAnimationFrame(frame);
+  }, [narrateVisibleSection, pathname, stop]);
 
   useEffect(() => {
     const sections = Array.from(
@@ -125,25 +127,29 @@ export function ScrollNarrator() {
 
   useEffect(() => {
     let frame = 0;
-    const stopNarrationAfterLeavingSection = () => {
-      if (!lastNarrationRef.current || frame) return;
+    const synchronizeNarrationToScroll = () => {
+      if (!enabled || frame) return;
       frame = window.requestAnimationFrame(() => {
         frame = 0;
         const current = lastNarrationRef.current?.section;
-        if (!current || mostVisiblePageSection() === current) return;
-        lastNarrationRef.current = null;
-        stop();
-        setEnabled(false);
+        const visible = mostVisiblePageSection();
+        if (visible === current) return;
+        if (!visible) {
+          lastNarrationRef.current = null;
+          stop();
+          return;
+        }
+        void narrateVisibleSection();
       });
     };
 
-    window.addEventListener('scroll', stopNarrationAfterLeavingSection, { passive: true });
+    window.addEventListener('scroll', synchronizeNarrationToScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', stopNarrationAfterLeavingSection);
+      window.removeEventListener('scroll', synchronizeNarrationToScroll);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [stop]);
+  }, [enabled, narrateVisibleSection, stop]);
 
   const toggle = () => {
     setNotice(null);

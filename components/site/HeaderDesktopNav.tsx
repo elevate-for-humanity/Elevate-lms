@@ -83,7 +83,7 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
   return (
     <nav
       aria-label="Main navigation"
-      className="flex min-w-0 flex-row flex-nowrap items-center justify-center gap-0 overflow-visible whitespace-nowrap xl:gap-0.5"
+      className="flex w-full min-w-0 flex-row flex-nowrap items-center justify-between gap-0 overflow-visible whitespace-nowrap xl:gap-0.5"
     >
       {primaryItems.map((item) => {
         const key = item.id ?? item.name;

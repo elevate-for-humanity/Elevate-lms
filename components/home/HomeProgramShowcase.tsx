@@ -22,7 +22,7 @@ export function HomeProgramShowcase() {
   }, []);
 
   const program = PROGRAMS[active];
-  return <section className="overflow-hidden bg-sky-50 px-4 py-12 sm:py-20" aria-labelledby="program-showcase-heading">
+  return <section className="overflow-hidden bg-sky-50 px-4 py-10 sm:py-12" aria-labelledby="program-showcase-heading">
     <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
       <div>
         <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">Programs & Funding</p>
@@ -34,8 +34,8 @@ export function HomeProgramShowcase() {
         </div>
         <div className="mt-7 flex flex-col gap-3 sm:flex-row"><Link href="/programs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white">View all programs <ArrowRight className="h-4 w-4" /></Link><Link href="/funding" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-6 py-3 font-black text-slate-950">Check funding steps</Link></div>
       </div>
-      <div className="relative overflow-hidden rounded-3xl border-4 border-white bg-white shadow-xl">
-        <div className="relative aspect-[16/10]"><Image key={program.image} src={program.image} alt={program.alt} fill priority={active === 0} className="object-cover" sizes="(max-width: 1024px) 100vw, 55vw" /></div>
+      <div className="relative min-w-0 overflow-hidden rounded-3xl border-4 border-white bg-white shadow-xl">
+        <div className="relative aspect-[4/5] w-full bg-slate-100 sm:aspect-[16/10]"><Image key={program.image} src={program.image} alt={program.alt} fill priority={active === 0} className="object-contain" sizes="(max-width: 1024px) 100vw, 55vw" /></div>
         <div className="flex items-center justify-between gap-4 border-t border-slate-200 p-4 sm:p-5"><div><p className="text-xs font-black uppercase tracking-wider text-brand-red-700">{program.field}</p><h3 className="mt-1 text-xl font-black text-slate-950">{program.title}</h3></div><Link href={program.href} className="shrink-0 font-black text-brand-blue-800">Program details →</Link></div>
         <div className="flex justify-center gap-2 pb-4">{PROGRAMS.map((item, index) => <button key={item.href} type="button" aria-label={`Show ${item.title}`} aria-current={index === active ? 'true' : undefined} onClick={() => setActive(index)} className={`h-3 rounded-full transition-all ${index === active ? 'w-8 bg-brand-red-700' : 'w-3 bg-slate-300'}`} />)}</div>
       </div>

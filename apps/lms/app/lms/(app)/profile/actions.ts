@@ -35,7 +35,11 @@ export async function uploadAvatar(file: File) {
   if (uploadError) return { error: uploadError.message };
 
   const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
-  await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
+  const { error: profileError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
+  if (profileError) {
+    await supabase.storage.from('avatars').remove([fileName]);
+    return { error: 'The photo uploaded, but your learner profile could not be updated. Please try again.' };
+  }
   revalidatePath('/lms/profile');
   revalidatePath('/lms/settings/profile');
   return { success: true, url: publicUrl };

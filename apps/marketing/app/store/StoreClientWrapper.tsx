@@ -42,7 +42,7 @@ export default function StoreClientWrapper({ children }: StoreClientWrapperProps
       {!demoRoute && (
         <StoreGuideChat
           onStartTour={handleStartTour}
-          forceOpen={pathname === '/store'}
+          forceOpen={pathname === '/store' || pathname === '/store/apps/website-builder'}
         />
       )}
       {activeTourId && (

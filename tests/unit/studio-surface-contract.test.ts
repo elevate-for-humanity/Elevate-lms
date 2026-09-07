@@ -162,7 +162,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
   it('greets Store visitors with the PARIS product interview', () => {
     const wrapper = source('apps/marketing/app/store/StoreClientWrapper.tsx');
     const guide = source('components/store/StoreGuideChat.tsx');
-    expect(wrapper).toContain("forceOpen={pathname === '/store'}");
+    expect(wrapper).toContain("forceOpen={pathname === '/store' || pathname === '/store/apps/website-builder'}");
     expect(guide).toContain("I'll start with a quick interview");
     expect(guide).toContain('Let PARIS interview you');
     expect(guide).toContain("useState<'recommend' | 'chat'>('chat')");

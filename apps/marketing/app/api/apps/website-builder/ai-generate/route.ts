@@ -76,9 +76,10 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Complete the required PARIS interview questions before generation.', missing }, { status: 400 });
   }
   const businessName = safeString(answers.businessName, '', 120);
+  const siteOwnerType = answers.siteOwnerType === 'individual' ? 'individual' : 'business or organization';
   const industry = safeString(answers.industry, '', 500);
   const contactEmail = safeString(user.email, '', 240);
-  const structuredBrief = JSON.stringify(answers, null, 2).slice(0, 24000);
+  const structuredBrief = JSON.stringify({ websiteFor: siteOwnerType, ...answers }, null, 2).slice(0, 24000);
 
   const fallback = buildDefaultSiteConfig({ organizationName: businessName, industry, contactEmail: contactEmail || undefined });
   let config: TenantSiteConfig = fallback;

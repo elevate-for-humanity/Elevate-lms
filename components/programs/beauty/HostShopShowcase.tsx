@@ -208,15 +208,15 @@ export default function HostShopShowcase({
     <section
       ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
-      data-scroll-narration={enableNarration && !autoPlayVideoOnVisible ? true : undefined}
-      data-narration-src={enableNarration && !autoPlayVideoOnVisible ? narrationSrc : undefined}
+      data-scroll-narration={enableNarration ? true : undefined}
+      data-narration-src={enableNarration ? narrationSrc : undefined}
       data-narration={
-        enableNarration && !autoPlayVideoOnVisible
+        enableNarration
           ? (narration ??
             'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.')
           : undefined
       }
-      className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-12 text-slate-950 sm:px-6 sm:py-16"
+      className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-10 text-slate-950 sm:px-6 sm:py-12"
       onMouseEnter={() => setInteracting(true)}
       onMouseLeave={() => setInteracting(false)}
       onFocusCapture={() => setInteracting(true)}

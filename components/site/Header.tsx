@@ -13,12 +13,12 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export default function Header() {
   return (
     <header
-      className="relative z-[100] isolate h-[60px] overflow-visible border-b border-slate-200 bg-white shadow-sm sm:h-[68px]"
+      className="relative z-[100] isolate h-14 overflow-visible border-b border-slate-200 bg-white shadow-sm sm:h-[60px]"
       role="banner"
       data-site-header
       data-header-owner="marketing-root"
     >
-      <div className="mx-auto flex h-full w-full max-w-screen-2xl items-center justify-between gap-2 px-3 xl:gap-3 xl:px-4 2xl:px-6">
+      <div className="flex h-full w-full items-center justify-start gap-2 px-3 xl:gap-3 xl:px-4 2xl:px-5">
         <Link
           href="/"
           className="flex min-w-0 flex-shrink-0 items-center gap-2"
@@ -32,14 +32,14 @@ export default function Header() {
             className="h-10 w-8 shrink-0 object-contain"
             style={{ width: 32, height: 40 }}
           />
-          <span className="hidden whitespace-nowrap text-sm font-extrabold tracking-tight text-slate-950 min-[1320px]:inline">
+          <span className="hidden whitespace-nowrap text-sm font-extrabold tracking-tight text-slate-950 min-[1180px]:inline">
             Elevate for Humanity
           </span>
         </Link>
 
         {/* One responsive contract: compact widths use the drawer; wider screens
             use the horizontal desktop navigation. Do not split these breakpoints. */}
-        <div className="hidden min-w-0 flex-1 justify-start overflow-visible min-[1180px]:flex">
+        <div className="hidden min-w-0 flex-1 justify-center overflow-visible min-[1180px]:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 

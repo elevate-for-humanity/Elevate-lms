@@ -157,7 +157,17 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
 
           <div className="mt-8 max-w-3xl">
             <h3 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">{current.question}</h3>
-            <div className="mt-6 flex gap-3">
+            {current.options ? (
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {current.options.map((option) => (
+                  <button key={option.value} type="button" onClick={() => setValues((prev) => ({ ...prev, [current.key]: option.value }))}
+                    className={`rounded-2xl border-2 p-5 text-left transition ${values[current.key] === option.value ? 'border-brand-red-600 bg-brand-red-50 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-400'}`}>
+                    <span className="block text-lg font-black text-slate-950">{option.label}</span>
+                    <span className="mt-2 block text-sm leading-6 text-slate-600">{option.description}</span>
+                  </button>
+                ))}
+              </div>
+            ) : <div className="mt-6 flex gap-3">
               <textarea
                 value={values[current.key] || ''}
                 onChange={(event) => setValues((prev) => ({ ...prev, [current.key]: event.target.value }))}
@@ -174,7 +184,7 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
               >
                 {listening ? <MicOff className="mx-auto h-5 w-5" /> : <Mic className="mx-auto h-5 w-5" />}
               </button>
-            </div>
+            </div>}
             {listening ? <p className="mt-2 text-xs font-bold text-brand-red-700">Listening…</p> : null}
           </div>
 

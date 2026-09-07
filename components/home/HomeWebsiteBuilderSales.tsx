@@ -13,7 +13,7 @@ const CAPABILITIES = [
 
 export function HomeWebsiteBuilderSales() {
   return (
-    <section className="bg-white px-4 py-14 sm:py-20" aria-labelledby="website-builder-sales-heading">
+    <section className="bg-white px-4 py-10 sm:py-12" aria-labelledby="website-builder-sales-heading">
       <div className="mx-auto grid max-w-6xl gap-9 rounded-[2rem] border border-cyan-200 bg-gradient-to-br from-cyan-50 via-white to-rose-50 p-6 shadow-xl shadow-cyan-950/5 sm:p-10 lg:grid-cols-[.92fr_1.08fr] lg:items-center">
         <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white bg-white shadow-2xl ring-1 ring-cyan-900/10">
           <Image src="/images/pages/platform-page-4.webp" alt="Business website and application being built across connected workspaces" fill className="object-cover brightness-105 contrast-105 saturate-110" sizes="(max-width: 1024px) 100vw, 45vw" />

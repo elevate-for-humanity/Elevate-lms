@@ -6,6 +6,7 @@ export type WebsiteInterviewQuestion = {
   question: string;
   placeholder: string;
   required?: boolean;
+  options?: Array<{ value: string; label: string; description: string }>;
   when?: (answers: WebsiteInterviewAnswers) => boolean;
 };
 
@@ -13,7 +14,11 @@ const mentions = (answers: WebsiteInterviewAnswers, pattern: RegExp) =>
   pattern.test(Object.values(answers).join(' '));
 
 export const WEBSITE_INTERVIEW_QUESTIONS: WebsiteInterviewQuestion[] = [
-  { key: 'businessName', label: 'Identity', question: "What's the legal or public-facing name of the business?", placeholder: 'Business or organization name', required: true },
+  { key: 'siteOwnerType', label: 'Website type', question: 'Who is this website for?', placeholder: 'Choose individual or business', required: true, options: [
+    { value: 'individual', label: 'An individual', description: 'Portfolio, personal brand, independent professional, creator, or job seeker.' },
+    { value: 'business', label: 'A business or organization', description: 'Company, nonprofit, school, employer, agency, shop, or program.' },
+  ] },
+  { key: 'businessName', label: 'Identity', question: 'What name should appear on the website?', placeholder: 'Your name, business name, or organization name', required: true },
   { key: 'industry', label: 'Industry', question: 'What industry are you in, and what makes this business different?', placeholder: 'Industry, specialty, and differentiator', required: true },
   { key: 'audience', label: 'Audience', question: 'Who are the primary customers or visitors this website must serve?', placeholder: 'Customer groups, needs, and geography', required: true },
   { key: 'goal', label: 'Goals', question: 'What business result should the website produce first?', placeholder: 'Sales, bookings, applications, leads, calls…', required: true },

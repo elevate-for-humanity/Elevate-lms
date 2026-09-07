@@ -21,7 +21,7 @@ const AUDIENCES = [
 
 export function HomeAboutElevate() {
   return (
-    <section className="border-b border-slate-200 bg-white px-4 py-10 sm:px-6 sm:py-20">
+    <section className="border-b border-slate-200 bg-white px-4 py-8 sm:px-6 sm:py-12">
       <div className="mx-auto max-w-7xl">
         <div className="max-w-4xl">
           <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">Who Elevate is</p>

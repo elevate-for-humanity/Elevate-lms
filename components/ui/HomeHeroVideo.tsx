@@ -36,7 +36,7 @@ interface HomeHeroSlide {
   focalClass: string;
 }
 
-const HOME_SLIDE_SECONDS = 5;
+const HOME_SLIDE_SECONDS = 7;
 const SALON_EDITORIAL_GRADE = 'contrast-[1.05] saturate-[1.06] sepia-[0.04]';
 const DEPLOYED_COMMIT_SHA = process.env.NEXT_PUBLIC_GIT_SHA?.trim();
 
@@ -46,7 +46,7 @@ function revisionedHeroAsset(src: string): string {
   return `${src}${separator}v=${encodeURIComponent(DEPLOYED_COMMIT_SHA)}`;
 }
 const HOME_NARRATION =
-  'Welcome to Elevate for Humanity. Ready to build a career you can be proud of? Explore hands-on training and earn-while-you-learn apprenticeship pathways connected to local professionals. You will learn by doing. You will build real confidence. And you will have a clear next step toward your future. Choose the path that fits you, and let’s get started.';
+  'Welcome to Elevate for Humanity. Registered apprenticeships connect structured instruction with supervised experience in a real workplace. You can earn while you learn, build skills by doing real work, document your progress, and move toward an industry-recognized career. Local salons, spas, nail studios, barbershops, and other employers can join as Host Shops, train future team members, and connect with qualified candidates. Employers looking to fill open jobs can partner with Elevate to reach trained talent and strengthen their workforce pipeline. Business owners can also use Elevate tools to build a website, organize customer outreach, and manage the systems behind their growth. Whether you want to begin an apprenticeship, become a Host Shop, find trained employees, or grow your business, Elevate gives you a clear next step. PARIS is here whenever you need guidance.';
 const HOME_SLIDES: HomeHeroSlide[] = [
   {
     type: 'image',
@@ -80,16 +80,6 @@ const HOME_SLIDES: HomeHeroSlide[] = [
   },
   {
     type: 'image',
-    src: '/images/partners/razors-image-storefront-2026.jpg',
-    alt: "Razor's Image Barbershop storefront in Bloomington, Indiana",
-    label: 'Find participating shops across Indiana',
-    description:
-      'Train in a polished workplace where apprentices learn service, teamwork, and professional standards.',
-    exposureClass: 'brightness-[1.11]',
-    focalClass: 'object-[center_48%]',
-  },
-  {
-    type: 'image',
     src: '/images/partners/b52s-official.webp',
     alt: "B-52's Barbershop participating apprenticeship host shop",
     label: 'Learn inside established neighborhood businesses',
@@ -107,16 +97,6 @@ const HOME_SLIDES: HomeHeroSlide[] = [
       'Develop technique, consistency, and confidence through structured training in a real salon environment.',
     exposureClass: 'brightness-[1.10]',
     focalClass: 'object-[center_42%]',
-  },
-  {
-    type: 'image',
-    src: '/images/partners/style-and-scissor-salon/contact-card.webp',
-    alt: 'Style and Scissor Salon participating cosmetology host salon',
-    label: 'Connect with a community salon',
-    description:
-      'Connect theory with supervised client service, workplace routines, and professional expectations.',
-    exposureClass: 'brightness-[1.12]',
-    focalClass: 'object-center',
   },
   {
     type: 'image',
@@ -226,8 +206,8 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
 
         <div ref={mediaRef} className="relative order-2 w-full overflow-hidden bg-[#f4f1ec]">
           <HeroVideo
-            voiceoverSrc={revisionedHeroAsset('/audio/narration/home-hero.mp3')}
             transcript={HOME_NARRATION}
+            narrateTranscript
             demoSlides={slides.map((candidate) => ({
               src: revisionedHeroAsset(candidate.src),
               alt: candidate.alt,

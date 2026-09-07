@@ -7,13 +7,14 @@ const source = fs.readFileSync(path.resolve('components/home/ScrollNarrator.tsx'
 describe('homepage scroll narration lifecycle', () => {
   it('keeps narration playing through small mobile scroll movement', () => {
     const scrollHandler = source.slice(
-      source.indexOf('const stopNarrationAfterLeavingSection'),
+      source.indexOf('const synchronizeNarrationToScroll'),
       source.indexOf('const toggle ='),
     );
-    expect(scrollHandler).toContain('mostVisiblePageSection() === current');
+    expect(scrollHandler).toContain('if (visible === current) return');
     expect(scrollHandler).toContain('lastNarrationRef.current = null');
     expect(scrollHandler).toContain('stop()');
-    expect(source).toContain("window.addEventListener('scroll', stopNarrationAfterLeavingSection");
+    expect(scrollHandler).toContain('void narrateVisibleSection()');
+    expect(source).toContain("window.addEventListener('scroll', synchronizeNarrationToScroll");
     expect(source).not.toContain("window.addEventListener('wheel'");
   });
 
@@ -26,12 +27,17 @@ describe('homepage scroll narration lifecycle', () => {
     expect(noSection).toContain('lastNarrationRef.current = null');
   });
 
-  it('warms opening narration without speaking until the visitor presses play', () => {
+  it('warms opening narration and attempts the visible section on entry', () => {
     expect(source).toContain('sections.slice(0, 3).forEach(preload)');
     expect(source).toContain('void narrateVisibleSection();');
   });
 
   it('does not rebuild scroll listeners for transient playback state', () => {
-    expect(source).toContain('}, [stop]);');
+    const scrollEffect = source.slice(
+      source.indexOf('const synchronizeNarrationToScroll'),
+      source.indexOf('const toggle ='),
+    );
+    expect(scrollEffect).not.toContain('isPlaying');
+    expect(scrollEffect).not.toContain('isLoading');
   });
 });

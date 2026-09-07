@@ -6,7 +6,7 @@ import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
 export function HomeFunding() {
   return (
-    <section className="border-t border-slate-100 bg-slate-50 px-4 py-16 sm:py-20" aria-labelledby="funding-heading">
+    <section className="border-t border-slate-100 bg-slate-50 px-4 py-10 sm:py-12" aria-labelledby="funding-heading">
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div className="relative min-h-[340px] overflow-hidden rounded-3xl sm:min-h-[400px]">
           <Image

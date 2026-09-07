@@ -20,7 +20,11 @@ export function ProgramHolderStudentCloseoutForm({ enrollments }: { enrollments:
     const result = await response.json();
     setSaving(false);
     if (!response.ok) return setMessage(result.error || 'Closeout could not be saved.');
-    setMessage('Student closeout completed and sent to Admin.');
+    setMessage(
+      result.emailSent
+        ? 'Student marked complete and ready for testing. Elevate has been emailed.'
+        : 'Student marked complete and ready for testing. Elevate was alerted in the Admin dashboard.',
+    );
     router.refresh();
   }
 
@@ -28,7 +32,8 @@ export function ProgramHolderStudentCloseoutForm({ enrollments }: { enrollments:
     <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
       <h2 className="text-xl font-black">Student graduation closeout</h2>
       <p className="mt-1 text-sm text-slate-700">
-        Complete and certify the WorkOne record for every current or previously graduated student. Program Holder funds remain blocked until all back work is complete.
+        Complete and certify the WorkOne record for every current or previously graduated student.
+        Program Holder funds remain blocked until all back work is complete.
       </p>
       <form action={submit} className="mt-5 grid gap-4 md:grid-cols-2">
         <label className="text-sm font-bold">
@@ -98,6 +103,10 @@ export function ProgramHolderStudentCloseoutForm({ enrollments }: { enrollments:
             <input name="certificate_received" value="true" type="checkbox" required /> Certificate
             received
           </label>
+          <label className="flex items-center gap-3 rounded-lg border bg-white p-3 text-sm font-bold">
+            <input name="ready_for_testing" value="true" type="checkbox" required /> Student is
+            complete and ready for testing
+          </label>
         </div>
         <label className="text-sm font-bold md:col-span-2">
           Final completion summary
@@ -116,7 +125,7 @@ export function ProgramHolderStudentCloseoutForm({ enrollments }: { enrollments:
             disabled={saving}
             className="rounded-lg bg-emerald-700 px-5 py-3 text-sm font-black text-white disabled:opacity-50"
           >
-            {saving ? 'Saving…' : 'Complete student closeout'}
+            {saving ? 'Saving…' : 'Mark complete and ready for testing'}
           </button>
           {message && (
             <p role="status" className="text-sm font-bold">

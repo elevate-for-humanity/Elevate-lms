@@ -75,7 +75,17 @@ export function DocumentUploadForm({ requirements, apiEndpoint, successRedirect 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selected = e.target.files[0];
+      const requirement = requirements.find((item) => item.document_type === documentType);
+      if (requirement && selected.size > requirement.max_file_size) {
+        setFile(null);
+        setError(
+          `That file is too large. Maximum size is ${Math.round(requirement.max_file_size / 1024 / 1024)} MB.`,
+        );
+        e.target.value = '';
+        return;
+      }
+      setFile(selected);
       setError('');
     }
   };
@@ -108,10 +118,15 @@ export function DocumentUploadForm({ requirements, apiEndpoint, successRedirect 
         body: formData,
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to upload document');
+        throw new Error(
+          data.error ||
+            (response.status === 413
+              ? 'That file is too large for the document service.'
+              : 'Failed to upload document'),
+        );
       }
 
       setSuccess(true);
@@ -185,9 +200,7 @@ export function DocumentUploadForm({ requirements, apiEndpoint, successRedirect 
           />
         )}
 
-        {prefillDone && (
-          <p className="text-sm text-slate-600 text-center">Redirecting…</p>
-        )}
+        {prefillDone && <p className="text-sm text-slate-600 text-center">Redirecting…</p>}
       </div>
     );
   }

@@ -158,6 +158,10 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-'],
     serverActions: {
+      // Host Shop compliance documents use a protected server action. Keep the
+      // transport ceiling above the enforced 10 MB document limit so multipart
+      // overhead never turns a valid upload into an opaque 413 response.
+      bodySizeLimit: '12mb',
       allowedOrigins: [
         'www.elevateforhumanity.org',
         'elevateforhumanity.org',
@@ -284,8 +288,6 @@ const nextConfig = {
       },
     ];
   },
-
-
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
     const isPreview =
@@ -370,7 +372,14 @@ const nextConfig = {
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
           { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
-          { key: 'X-Build-ID', value: process.env.BUILD_ID?.slice(0, 7) || process.env.GITHUB_SHA?.slice(0, 7) || process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
+          {
+            key: 'X-Build-ID',
+            value:
+              process.env.BUILD_ID?.slice(0, 7) ||
+              process.env.GITHUB_SHA?.slice(0, 7) ||
+              process.env.COMMIT_REF?.slice(0, 7) ||
+              'dev',
+          },
         ],
       },
       {
@@ -380,15 +389,33 @@ const nextConfig = {
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
           { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
-          { key: 'X-Build-ID', value: process.env.BUILD_ID?.slice(0, 7) || process.env.GITHUB_SHA?.slice(0, 7) || process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
+          {
+            key: 'X-Build-ID',
+            value:
+              process.env.BUILD_ID?.slice(0, 7) ||
+              process.env.GITHUB_SHA?.slice(0, 7) ||
+              process.env.COMMIT_REF?.slice(0, 7) ||
+              'dev',
+          },
         ],
       },
       {
-        source: '/(|about|about/mission|about/team|about/partners|blog|careers|contact|credentials|dmca|donate|eligibility|faq|for-employers|for-students|how-it-works|jri|news|partners|press|resources|scholarships|services|site-map|training|transparency|tuition|verify|workkeys|mobile-app|install-app|career-training-indiana|certification-testing|check-eligibility|call-now|career-assessment|career-counseling|workforce-training-indianapolis|healthcare-training-indianapolis|skilled-trades-training-indiana|it-certification-training-indianapolis|employer-workforce-partnerships-indiana|agency-referral-workforce-training-indiana|wioa-eligibility)',
+        source:
+          '/(|about|about/mission|about/team|about/partners|blog|careers|contact|credentials|dmca|donate|eligibility|faq|for-employers|for-students|how-it-works|jri|news|partners|press|resources|scholarships|services|site-map|training|transparency|tuition|verify|workkeys|mobile-app|install-app|career-training-indiana|certification-testing|check-eligibility|call-now|career-assessment|career-counseling|workforce-training-indianapolis|healthcare-training-indianapolis|skilled-trades-training-indiana|it-certification-training-indianapolis|employer-workforce-partnerships-indiana|agency-referral-workforce-training-indiana|wioa-eligibility)',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=60, stale-while-revalidate=300' },
-          { key: 'X-Build-ID', value: process.env.BUILD_ID?.slice(0, 7) || process.env.GITHUB_SHA?.slice(0, 7) || process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
-          { key: 'X-Deployment-ID', value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local' },
+          {
+            key: 'X-Build-ID',
+            value:
+              process.env.BUILD_ID?.slice(0, 7) ||
+              process.env.GITHUB_SHA?.slice(0, 7) ||
+              process.env.COMMIT_REF?.slice(0, 7) ||
+              'dev',
+          },
+          {
+            key: 'X-Deployment-ID',
+            value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local',
+          },
           ...securityHeaders,
         ],
       },
@@ -396,20 +423,41 @@ const nextConfig = {
         source: '/programs/:path*',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=60, stale-while-revalidate=300' },
-          { key: 'X-Build-ID', value: process.env.BUILD_ID?.slice(0, 7) || process.env.GITHUB_SHA?.slice(0, 7) || process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
-          { key: 'X-Deployment-ID', value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local' },
+          {
+            key: 'X-Build-ID',
+            value:
+              process.env.BUILD_ID?.slice(0, 7) ||
+              process.env.GITHUB_SHA?.slice(0, 7) ||
+              process.env.COMMIT_REF?.slice(0, 7) ||
+              'dev',
+          },
+          {
+            key: 'X-Deployment-ID',
+            value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local',
+          },
           ...securityHeaders,
         ],
       },
       {
-        source: '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|studio|programs).*)',
+        source:
+          '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|studio|programs).*)',
         headers: [
           { key: 'Cache-Control', value: 'no-store, max-age=0' },
           { key: 'Pragma', value: 'no-cache' },
           { key: 'Expires', value: '0' },
           { key: 'Surrogate-Control', value: 'no-store' },
-          { key: 'X-Build-ID', value: process.env.BUILD_ID?.slice(0, 7) || process.env.GITHUB_SHA?.slice(0, 7) || process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
-          { key: 'X-Deployment-ID', value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local' },
+          {
+            key: 'X-Build-ID',
+            value:
+              process.env.BUILD_ID?.slice(0, 7) ||
+              process.env.GITHUB_SHA?.slice(0, 7) ||
+              process.env.COMMIT_REF?.slice(0, 7) ||
+              'dev',
+          },
+          {
+            key: 'X-Deployment-ID',
+            value: process.env.BUILD_ID || process.env.DEPLOY_ID || 'local',
+          },
           ...securityHeaders,
         ],
       },

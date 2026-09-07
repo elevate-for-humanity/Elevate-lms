@@ -160,7 +160,7 @@ export default function HostShopShowcase({
       observer.disconnect();
       section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]')?.pause();
     };
-  }, [activeIndex, autoPlayVideoOnVisible]);
+  }, [activeIndex, autoPlayVideoOnVisible, narrationSrc]);
 
   useEffect(() => {
     userEnabledSoundRef.current = false;
@@ -208,10 +208,10 @@ export default function HostShopShowcase({
     <section
       ref={sectionRef}
       aria-labelledby="host-shop-showcase-heading"
-      data-scroll-narration={enableNarration ? true : undefined}
-      data-narration-src={enableNarration ? narrationSrc : undefined}
+      data-scroll-narration={enableNarration && !autoPlayVideoOnVisible ? true : undefined}
+      data-narration-src={enableNarration && !autoPlayVideoOnVisible ? narrationSrc : undefined}
       data-narration={
-        enableNarration
+        enableNarration && !autoPlayVideoOnVisible
           ? (narration ??
             'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.')
           : undefined

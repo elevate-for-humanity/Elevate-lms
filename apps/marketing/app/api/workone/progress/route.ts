@@ -6,6 +6,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { adminUrl } from '@/lib/utils/url-factory';
 import { organization } from '@/lib/config/organization';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
@@ -283,7 +284,7 @@ async function _POST(request: NextRequest) {
       <p><strong>Approval / ITA reference:</strong> ${escapeHtml(approvalReference || 'Not provided')}</p>
       <p><strong>Applicant notes:</strong> ${escapeHtml(feedback || 'None')}</p>
       <p><strong>Callback requested:</strong> ${wantsCallback ? 'Yes' : 'No'}</p>
-      <p><a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${application.id}">Open application in Admin</a></p>
+      <p><a href="${adminUrl(`/applications/review/${application.id}`)}">Open application in Admin</a></p>
     </div>`,
   });
 

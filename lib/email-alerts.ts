@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { adminUrl } from '@/lib/utils/url-factory';
 /**
  * Email alert system for admin notifications
  * Uses Resend API for reliable email delivery
@@ -53,7 +54,7 @@ export const AlertTemplates = {
       <p><strong>Email:</strong> ${data.email}</p>
       <p><strong>Program:</strong> ${data.program}</p>
       <p><strong>Application ID:</strong> ${data.id}</p>
-      <p><a href="${PLATFORM_DEFAULTS.siteUrl}/admin/applications/review/${data.id}">Review Application</a></p>
+      <p><a href="${adminUrl(`/applications/review/${data.id}`)}">Review Application</a></p>
       <hr>
       <p><small>SLA: Respond within 48 hours</small></p>
     `,

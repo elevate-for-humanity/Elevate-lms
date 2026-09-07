@@ -13,6 +13,7 @@ import { provisionAccount } from '@/lib/enrollment/provision-account';
 import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { adminUrl } from '@/lib/utils/url-factory';
 import { organization } from '@/lib/config/organization';
 import { normalizeApplicationModalityPreference } from '@/lib/applications/modality-preference';
 import { getStripe } from '@/lib/stripe/client';
@@ -835,7 +836,7 @@ async function _POST(req: Request) {
           ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
           ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ''}
           <div style="text-align:center;margin:24px 0;">
-            <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review Application -></a>
+            <a href="${adminUrl(`/applications/review/${data.id}`)}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review Application -></a>
           </div>
           <p style="font-size:12px;color:#6b7280;text-align:center;">Application ID: ${data.id}</p>
         `,

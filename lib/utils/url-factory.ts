@@ -35,7 +35,13 @@ export function url(path: string): string {
  * Admin site URL builder
  */
 export function adminUrl(path: string): string {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  // Admin is deployed at the root of admin.elevateforhumanity.org. Older
+  // callers sometimes pass a legacy `/admin/...` path; normalize it here so
+  // email and cross-service links cannot point at a route that does not exist.
+  const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
+  const cleanPath = withLeadingSlash === '/admin'
+    ? '/'
+    : withLeadingSlash.replace(/^\/admin\//, '/');
   return `${ADMIN_URL}${cleanPath}`;
 }
 

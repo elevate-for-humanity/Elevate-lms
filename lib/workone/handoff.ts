@@ -4,6 +4,7 @@ import PDFDocument from 'pdfkit';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { adminUrl } from '@/lib/utils/url-factory';
 import { organization } from '@/lib/config/organization';
 import { logger } from '@/lib/logger';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
@@ -299,7 +300,7 @@ export async function ensureWorkOneHandoffByReference(
     await sendEmail({
       to: STAFF_EMAIL,
       subject: `WorkOne program code missing — ${applicantName} — ${programName}`,
-      html: `<div style="font-family:Arial,sans-serif;line-height:1.5"><h2>WorkOne Program Code Needs Verification</h2><p><strong>Applicant:</strong> ${escapeHtml(applicantName)}</p><p><strong>Reference:</strong> ${escapeHtml(displayReference)}</p><p><strong>Program:</strong> ${escapeHtml(programName)}</p><p>The production program record does not contain an INTraining program ID. Verify the current listing before this applicant goes to WorkOne.</p><p><a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${application.id}">Open application</a></p></div>`,
+      html: `<div style="font-family:Arial,sans-serif;line-height:1.5"><h2>WorkOne Program Code Needs Verification</h2><p><strong>Applicant:</strong> ${escapeHtml(applicantName)}</p><p><strong>Reference:</strong> ${escapeHtml(displayReference)}</p><p><strong>Program:</strong> ${escapeHtml(programName)}</p><p>The production program record does not contain an INTraining program ID. Verify the current listing before this applicant goes to WorkOne.</p><p><a href="${adminUrl(`/applications/review/${application.id}`)}">Open application</a></p></div>`,
     });
   }
 

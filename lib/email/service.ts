@@ -69,7 +69,7 @@ export async function sendAdminApplicationNotification(
       <p><strong>Email:</strong> ${applicantEmail}</p>
       <p><strong>Program:</strong> ${programName}</p>
       <p><strong>Application ID:</strong> ${applicationId}</p>
-      <p><a href="${PLATFORM_DEFAULTS.siteUrl}/admin/applications/review/${applicationId}">View Application</a></p>
+      <p><a href="${adminUrl(`/applications/review/${applicationId}`)}">View Application</a></p>
     `,
     text: `New application from ${applicantName} (${applicantEmail}) for ${programName}`,
   });

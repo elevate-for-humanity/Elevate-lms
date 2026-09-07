@@ -38,7 +38,7 @@ export function PlatformHubHero() {
             <Link href="/programs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3.5 font-extrabold text-white shadow-lg transition hover:bg-brand-red-700">
               Explore Programs <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
-            <Link href="/apply" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-white/70 bg-white/10 px-6 py-3.5 font-extrabold text-white backdrop-blur transition hover:bg-white hover:text-slate-950">
+            <Link href="/apply" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-white/70 bg-slate-900/30 px-6 py-3.5 font-extrabold text-white backdrop-blur transition hover:bg-slate-100 hover:text-slate-950">
               Start Your Application
             </Link>
           </div>

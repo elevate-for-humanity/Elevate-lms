@@ -51,6 +51,9 @@ describe('homepage hero slideshow rendering', () => {
       "voiceoverSrc={revisionedHeroAsset('/audio/narration/home-hero.mp3')}",
     );
     expect(source).toContain('soundButtonVariant="prominent"');
+    expect(source).toContain('ref={mediaRef}');
+    expect(source).toContain('entry.intersectionRatio >= 0.1');
+    expect(source).not.toContain("matchMedia('(prefers-reduced-motion: reduce)')");
   });
 
   it('crossfades naturally without unmounting or exposing a blank frame', () => {

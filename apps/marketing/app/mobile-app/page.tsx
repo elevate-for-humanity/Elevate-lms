@@ -136,7 +136,7 @@ export default async function MobileAppPage() {
               </span>
               iPhone & iPad (Safari)
             </h3>
-            <ol className="space-y-4 text-black">
+            <ol className="list-none space-y-4 text-black">
               <li className="flex">
                 <span className="font-bold text-brand-blue-600 mr-3">1.</span>
                 <span>
@@ -174,7 +174,7 @@ export default async function MobileAppPage() {
               <span className="text-3xl mr-3">🤖</span>
               Android (Chrome)
             </h3>
-            <ol className="space-y-4 text-black">
+            <ol className="list-none space-y-4 text-black">
               <li className="flex">
                 <span className="font-bold text-brand-green-600 mr-3">1.</span>
                 <span>

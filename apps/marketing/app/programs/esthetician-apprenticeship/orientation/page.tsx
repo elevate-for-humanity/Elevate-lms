@@ -37,7 +37,7 @@ export default function EstheticianOrientationPage() {
             </li>
           </ul>
           <p className="text-sm text-slate-600 mt-4">
-            Federal Registered Apprenticeship status is not currently published for the esthetician occupation in Elevate’s canonical RAPIDS registry. This orientation does not represent the pathway as federally registered.
+            This pathway is the registered Esthetician occupation 2089CB under Elevate’s approved sponsor standards. Indiana licensing requirements are controlled separately by the applicable state authority.
           </p>
         </div>
       ),

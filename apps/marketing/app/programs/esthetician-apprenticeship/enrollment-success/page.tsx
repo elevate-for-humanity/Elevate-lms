@@ -125,7 +125,7 @@ export default async function EnrollmentSuccessPage() {
               <span className="font-bold text-slate-900">20 competencies + 300 RTI hours</span>
             </div>
             <div className="py-3 text-sm text-slate-600">
-              Federal Registered Apprenticeship status is not currently published for this occupation in Elevate&apos;s canonical RAPIDS registry. Licensing is controlled by the applicable Indiana authority.
+              Registered Esthetician occupation 2089CB under Elevate&apos;s approved sponsor standards. State licensing is controlled separately by the applicable Indiana authority.
             </div>
           </div>
         </div>

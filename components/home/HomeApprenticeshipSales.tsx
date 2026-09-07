@@ -37,8 +37,8 @@ export function HomeApprenticeshipSales() {
           </div>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link href="/barber-and-beauty-apprenticeships" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white hover:bg-brand-red-700">
-              Compare Apprenticeships <ArrowRight className="h-4 w-4" />
+            <Link href="/apprenticeships" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white hover:bg-brand-red-700">
+              Explore Apprenticeships <ArrowRight className="h-4 w-4" />
             </Link>
             <Link href="/apply/student" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-white bg-white px-7 py-3.5 font-black text-slate-950 hover:bg-slate-100">
               Start My Application

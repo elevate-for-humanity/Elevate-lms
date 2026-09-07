@@ -57,7 +57,7 @@ export async function generateMetadata() {
   return {
     title: 'Nail Technician Apprenticeship Program | Indiana | Elevate for Humanity',
     description:
-      'Indiana nail technician and manicurist apprenticeship pathway with 600 supervised hours, salon/spa training, related instruction, progress tracking and licensing preparation. Funding status is reviewed before enrollment.',
+      'Registered, competency-based Indiana nail technician and manicurist apprenticeship with 19 verified occupational competencies, 210 related-instruction hours, supervised host-site practice, and licensing preparation.',
     keywords: [
       'nail technician apprenticeship Indiana',
       'nail tech apprenticeship Indiana',

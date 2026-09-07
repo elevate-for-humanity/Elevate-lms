@@ -29,11 +29,25 @@ const nextConfig = {
   },
 
   images: { unoptimized: true },
-  typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
   staticPageGenerationTimeout: 300,
   skipTrailingSlashRedirect: true,
   transpilePackages: ['buffer', 'process'],
+  // Keep native/server instrumentation in Node's runtime boundary. Bundling
+  // these packages makes webpack inspect require-in-the-middle's intentional
+  // dynamic require calls and emits noisy critical-dependency warnings.
+  serverExternalPackages: [
+    '@sentry/nextjs',
+    '@sentry/node',
+    '@sentry/node-core',
+    '@sentry/core',
+    '@opentelemetry/api',
+    '@opentelemetry/sdk-node',
+    '@opentelemetry/instrumentation',
+    '@opentelemetry/exporter-trace-otlp-http',
+    '@opentelemetry/resources',
+    '@opentelemetry/semantic-conventions',
+    'require-in-the-middle',
+  ],
 
   async rewrites() {
     return {
@@ -99,9 +113,12 @@ const nextConfig = {
     cpus: 1,
   },
 
-  webpack: (config, { isServer }) => {
+  webpack: (config, { dev, isServer }) => {
     config.parallelism = 1;
-
+    // The production image is rebuilt from source in CI; disabling webpack's
+    // persistent pack cache avoids serializing large generated route strings
+    // and removes its big-string performance warning. Development keeps cache.
+    if (!dev) config.cache = false;
     if (!isServer) {
       config.resolve.fallback = {
         ...(config.resolve.fallback ?? {}),

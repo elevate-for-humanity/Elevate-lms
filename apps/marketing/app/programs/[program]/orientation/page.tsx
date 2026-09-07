@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { Clock, Users, DollarSign, FileText, Shield } from 'lucide-react';
 import { getOrientationConfig, formatCurrency } from '@/lms-data/orientationConfig';
 import { getBeautyProgram, colorClasses } from '@/lib/programs/beauty-programs';
+import { isRegisteredProgramSlug } from '@/lib/apprenticeship/registered-program-contract';
 
 export default function BeautyOrientationPage() {
   const params = useParams<{ program: string }>();
@@ -12,6 +13,7 @@ export default function BeautyOrientationPage() {
   const cfg = getBeautyProgram(params.program);
   const orientationCfg = getOrientationConfig(params.program);
   const c = colorClasses(cfg?.color ?? 'blue');
+  const isRegistered = isRegisteredProgramSlug(params.program);
 
   const [currentSection, setCurrentSection] = useState(0);
   const [acknowledged, setAcknowledged] = useState(false);
@@ -42,7 +44,9 @@ export default function BeautyOrientationPage() {
             ))}
           </ul>
           <p className="text-sm text-slate-500 mt-4">
-            This is a USDOL Registered Apprenticeship program. Your credential is nationally recognized.
+            {isRegistered
+              ? 'This occupation is covered by Elevate’s approved Registered Apprenticeship sponsor standards.'
+              : 'This is an Indiana career-training and licensing-preparation pathway; no federal Registered Apprenticeship claim is made.'}
           </p>
         </div>
       ),

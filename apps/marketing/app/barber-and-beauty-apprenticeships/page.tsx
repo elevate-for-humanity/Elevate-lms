@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Award, Scissors, ShieldCheck } from 'lucide-react';
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 
 const CANONICAL_URL = 'https://www.elevateforhumanity.org/barber-and-beauty-apprenticeships';
 
@@ -20,7 +21,7 @@ const beautyPathways = [
     href: '/programs/barber-apprenticeship',
     status: 'Registered Apprenticeship',
     description:
-      'The barber occupation is the beauty pathway currently published in Elevate’s canonical Registered Apprenticeship registry.',
+      'Registered occupation 0030CB under Elevate’s approved sponsor standards.',
   },
   {
     title: 'Cosmetology Training Pathway',
@@ -30,22 +31,25 @@ const beautyPathways = [
       'Program details are available for training and enrollment review. No federal RAPIDS claim is made on this page.',
   },
   {
-    title: 'Nail Technician Training Pathway',
+    title: 'Nail Technician Apprenticeship',
     href: '/programs/nail-technician-apprenticeship',
-    status: 'Training pathway',
+    status: 'Registered Apprenticeship',
     description:
-      'Program details are available for training and enrollment review. No federal RAPIDS claim is made on this page.',
+      'Registered Manicurist occupation 2090CB under Elevate’s approved sponsor standards.',
   },
   {
-    title: 'Esthetics Training Pathway',
+    title: 'Esthetician Apprenticeship',
     href: '/programs/esthetician-apprenticeship',
-    status: 'Training pathway',
+    status: 'Registered Apprenticeship',
     description:
-      'Program details are available for training and enrollment review. No federal RAPIDS claim is made on this page.',
+      'Registered Esthetician occupation 2089CB under Elevate’s approved sponsor standards.',
   },
 ];
 
 export default function BarberBeautyProgramsPage() {
+  const registeredPathways = beautyPathways.filter((program) =>
+    getRegisteredProgramStandard(program.href.replace('/programs/', '')),
+  );
   return (
     <main className="min-h-screen bg-white">
       <section className="overflow-hidden border-b border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-6 py-14 sm:py-20">
@@ -99,12 +103,13 @@ export default function BarberBeautyProgramsPage() {
           <div className="rounded-xl bg-slate-50 border border-slate-200 p-6">
             <div className="flex items-center gap-2">
               <Award className="w-5 h-5 text-brand-red-600" />
-              <h2 className="font-bold text-slate-900">Registered barber record</h2>
+              <h2 className="font-bold text-slate-900">Registered beauty occupations</h2>
             </div>
             <p className="text-sm text-slate-600 mt-3 leading-relaxed">
-              Sponsor of record: {RAPIDS_CONFIG.sponsorOfRecord}. Public registration details for
-              the barber occupation are derived from Elevate&apos;s registered-program contract rather
-              than duplicated marketing copy.
+              Sponsor of record: {RAPIDS_CONFIG.sponsorOfRecord}. The canonical registered-program
+              contract currently covers {registeredPathways.length} beauty occupations: Barber,
+              Esthetician, and Manicurist. Cosmetology remains a separate training pathway and is
+              not represented here as federally registered.
             </p>
           </div>
 

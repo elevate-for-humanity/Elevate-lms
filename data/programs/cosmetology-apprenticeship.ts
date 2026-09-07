@@ -167,8 +167,8 @@ export const COSMETOLOGY: ProgramSchema = {
       description: 'Apprenticeship meets Indiana 2,000-hour cosmetology training requirements.',
     },
     {
-      standard: 'DOL Registered Apprenticeship',
-      description: 'Program registered with U.S. Department of Labor.',
+      standard: 'Federal registration disclosure',
+      description: 'Cosmetology is not included in Elevate’s current canonical Registered Apprenticeship occupation standards.',
     },
     {
       standard: 'WIOA Title I — Supportive Services Only',

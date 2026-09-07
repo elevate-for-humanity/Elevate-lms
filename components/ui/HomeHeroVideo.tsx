@@ -199,7 +199,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link
-              href="/barber-and-beauty-apprenticeships"
+              href="/apprenticeships"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3.5 text-base font-extrabold text-white shadow-lg shadow-red-900/15 transition hover:-translate-y-0.5 hover:bg-brand-red-700"
             >
               Explore Apprenticeships <ArrowRight className="h-5 w-5" aria-hidden="true" />

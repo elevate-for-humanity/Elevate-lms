@@ -11,6 +11,7 @@ import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeMobileActions } from '@/components/home/HomeMobileActions';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeAboutElevate } from '@/components/home/HomeAboutElevate';
+import { HomeProgramShowcase } from '@/components/home/HomeProgramShowcase';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
@@ -98,6 +99,12 @@ export default function HomePage() {
         <PlatformHubHero />
         <HomeAboutElevate />
         <HomeHeroVideo banner={heroBanners.home} />
+        <div
+          data-scroll-narration
+          data-narration="Explore Elevate career programs in HVAC, commercial driving, business, bookkeeping, technology, healthcare, and more. Workforce funding may cover training for eligible participants after agency approval. Enrollment is open and upcoming cohorts are forming now."
+        >
+          <HomeProgramShowcase />
+        </div>
         <div
           data-scroll-narration
           data-narration="An apprenticeship lets you learn with structure while gaining supervised experience on the job. We help connect the classroom, the employer, and your progress records."

@@ -5,6 +5,7 @@ import { Sparkles, BookOpen, Clock, Phone, Shield } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getBeautyProgram, colorClasses } from '@/lib/programs/beauty-programs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { isRegisteredProgramSlug } from '@/lib/apprenticeship/registered-program-contract';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,6 +81,7 @@ export default async function BeautyEnrollmentSuccessPage({ params }: Props) {
   });
 
   const c = colorClasses(cfg.color);
+  const isRegistered = isRegisteredProgramSlug(program);
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
@@ -89,7 +91,7 @@ export default async function BeautyEnrollmentSuccessPage({ params }: Props) {
             <Sparkles className="w-12 h-12 text-white" />
           </div>
           <p className={`${c.text} font-bold text-sm uppercase tracking-widest mb-2`}>
-            USDOL Registered Apprenticeship
+            {isRegistered ? 'Registered Apprenticeship' : 'Career Training Enrollment'}
           </p>
           <h1 className="text-4xl font-black text-white mb-2">You&apos;re officially enrolled.</h1>
           <p className="text-slate-400">Welcome to the {cfg.title} program.</p>

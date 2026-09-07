@@ -114,7 +114,7 @@ export default function CosmetologyApprenticeshipClient({ program: p, enrollment
           </div>
           <div className="bg-white p-8 rounded-xl shadow-sm">
             <div className="text-3xl font-bold text-brand-red-600 mb-2">Indiana</div>
-            <div className="text-slate-600 font-medium">DOL Registered</div>
+            <div className="text-slate-600 font-medium">Indiana training pathway</div>
             <div className="text-sm text-slate-500 mt-2">WIOA supportive services eligible</div>
           </div>
         </div>

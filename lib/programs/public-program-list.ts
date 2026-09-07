@@ -38,6 +38,9 @@ const SUPPRESSED = new Set([
   'hvac-technician-program',
   'hvac-2024',
   'medical-assistant-program',
+  'nha-medical-assistant',
+  'nha-pharmacy-technician',
+  'nha-phlebotomy',
   'phlebotomy-technician',
   'phlebotomy-technician-program',
   'barber',
@@ -115,7 +118,9 @@ function fromProgramSchema(program: ProgramSchema, fallbackTuition: number | nul
     category: verified?.category ?? SECTOR_TO_CATEGORY[normalized.sector] ?? 'other',
     duration:
       verified?.duration ??
-      (normalized.durationWeeks ? `${normalized.durationWeeks} weeks` : (normalized.schedule ?? null)),
+      (normalized.durationWeeks
+        ? `${normalized.durationWeeks} ${normalized.durationWeeks === 1 ? 'week' : 'weeks'}`
+        : (normalized.schedule ?? null)),
     credential:
       verified?.credential ?? normalized.credentials?.[0]?.name ?? normalized.badge ?? null,
     ...fundingFields(verified?.slug ?? normalized.slug),

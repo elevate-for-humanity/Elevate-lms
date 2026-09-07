@@ -30,6 +30,8 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
   { path: ROUTES.home, label: 'Home', category: 'Main', changeFrequency: 'weekly', priority: 1, lastModified: changed, index: true },
   { path: ROUTES.programs, label: 'All Programs', category: 'Programs', changeFrequency: 'weekly', priority: 0.95, lastModified: changed, index: true },
   { path: ROUTES.apply, label: 'Apply', category: 'Main', changeFrequency: 'monthly', priority: 0.95, lastModified: changed, index: true },
+  { path: '/next-steps', label: 'Application Next Steps', category: 'Main', changeFrequency: 'monthly', priority: 0.8, lastModified: changed, index: true },
+  { path: '/jobs', label: 'Job Board', category: 'Main', changeFrequency: 'daily', priority: 0.9, lastModified: changed, index: true },
 
   { path: ROUTES.apprenticeships, label: 'Apprenticeships', category: 'Apprenticeships', changeFrequency: 'weekly', priority: 0.95, lastModified: changed, index: true },
   { path: ROUTES.apprenticeshipsHowItWorks, label: 'How Apprenticeships Work', category: 'Apprenticeships', changeFrequency: 'monthly', priority: 0.85, lastModified: changed, index: true },
@@ -64,7 +66,6 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
   { path: '/tuition-fees', label: 'Tuition & Fees', category: 'Funding', changeFrequency: 'weekly', priority: 0.85, lastModified: changed, index: true },
 
   { path: ROUTES.employers, label: 'Employers', category: 'Employers', changeFrequency: 'monthly', priority: 0.8, lastModified: changed, index: true },
-  { path: ROUTES.employersHireGraduates, label: 'Hire Graduates', category: 'Employers', changeFrequency: 'monthly', priority: 0.8, lastModified: changed, index: true },
   { path: ROUTES.forAgencies, label: 'For Agencies', category: 'Employers', changeFrequency: 'monthly', priority: 0.75, lastModified: changed, index: true },
 
   { path: '/platform', label: 'Platform', category: 'Platform', changeFrequency: 'weekly', priority: 0.9, lastModified: changed, index: true },
@@ -98,6 +99,8 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
   { path: '/institutional-governance', label: 'Institutional Governance', category: 'About', changeFrequency: 'monthly', priority: 0.85, lastModified: changed, index: true },
   { path: ROUTES.contact, label: 'Contact', category: 'About', changeFrequency: 'monthly', priority: 0.8, lastModified: changed, index: true },
   { path: ROUTES.blog, label: 'Blog', category: 'About', changeFrequency: 'weekly', priority: 0.7, lastModified: changed, index: true },
+  { path: '/reels', label: 'Reels', category: 'About', changeFrequency: 'weekly', priority: 0.7, lastModified: changed, index: true },
+  { path: '/mobile-app', label: 'Mobile App', category: 'Platform', changeFrequency: 'monthly', priority: 0.7, lastModified: changed, index: true },
   { path: ROUTES.faq, label: 'FAQ', category: 'About', changeFrequency: 'monthly', priority: 0.7, lastModified: changed, index: true },
   { path: '/partners', label: 'Partners', category: 'About', changeFrequency: 'monthly', priority: 0.8, lastModified: changed, index: true },
 

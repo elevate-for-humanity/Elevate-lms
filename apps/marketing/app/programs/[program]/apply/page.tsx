@@ -13,6 +13,7 @@ import { getBeautyProgram, colorClasses } from '@/lib/programs/beauty-programs';
 import { BNPL_PROVIDER_SUMMARY } from '@/lib/bnpl-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { getProgramApplicationConfig, type FundingType } from '@/lib/programs/application-config';
+import { isRegisteredProgramSlug } from '@/lib/apprenticeship/registered-program-contract';
 
 export default function BeautyApplyPage() {
   const params = useParams<{ program: string }>();
@@ -21,6 +22,7 @@ export default function BeautyApplyPage() {
   const cfg = getBeautyProgram(params.program);
   const appConfig = getProgramApplicationConfig(params.program);
   const c = colorClasses(cfg?.color ?? 'blue');
+  const isRegistered = isRegisteredProgramSlug(params.program);
 
   // Determine the default funding type from the program config
   const defaultFunding: FundingType = appConfig?.funding.available.includes('wioa')
@@ -150,7 +152,7 @@ export default function BeautyApplyPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
           <div className="mb-6">
             <span className={`text-xs font-bold ${c.text} uppercase tracking-wider`}>
-              DOL Registered Apprenticeship
+              {isRegistered ? 'Registered Apprenticeship' : 'Career Training Application'}
             </span>
             <h1 className="text-2xl font-extrabold text-slate-900 mt-1">
               {cfg.title} Application

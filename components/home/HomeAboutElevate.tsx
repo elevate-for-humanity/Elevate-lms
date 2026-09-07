@@ -21,26 +21,26 @@ const AUDIENCES = [
 
 export function HomeAboutElevate() {
   return (
-    <section className="border-b border-slate-200 bg-white px-4 py-14 sm:px-6 sm:py-20">
+    <section className="border-b border-slate-200 bg-white px-4 py-10 sm:px-6 sm:py-20">
       <div className="mx-auto max-w-7xl">
         <div className="max-w-4xl">
           <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">Who Elevate is</p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">
+          <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-950 sm:text-5xl">
             A workforce and education hub built to connect the whole journey.
           </h2>
-          <p className="mt-5 text-lg leading-8 text-slate-700">
+          <p className="mt-4 text-base leading-7 text-slate-700 sm:mt-5 sm:text-lg sm:leading-8">
             Elevate for Humanity is a career-training and workforce-development organization. We
             connect people to practical education, registered apprenticeship pathways, possible
             funding resources, industry credentials, supportive employers, and the technology used
             to manage each step.
           </p>
         </div>
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
+        <div className="mt-7 grid gap-3 sm:mt-10 sm:gap-5 md:grid-cols-3">
           {AUDIENCES.map(({ icon: Icon, title, body }) => (
-            <article key={title} className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <Icon className="h-8 w-8 text-brand-blue-700" aria-hidden="true" />
-              <h3 className="mt-4 text-xl font-black text-slate-950">{title}</h3>
-              <p className="mt-3 leading-7 text-slate-700">{body}</p>
+            <article key={title} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
+              <Icon className="h-7 w-7 text-brand-blue-700 sm:h-8 sm:w-8" aria-hidden="true" />
+              <h3 className="mt-3 text-lg font-black text-slate-950 sm:mt-4 sm:text-xl">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-700 sm:mt-3 sm:text-base sm:leading-7">{body}</p>
             </article>
           ))}
         </div>

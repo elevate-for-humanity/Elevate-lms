@@ -157,7 +157,9 @@ export default function ProgramDetailPage({
     {
       step: 'Step 5',
       title: 'Wage Outcome',
-      detail: `Target entry wages aligned to ${p.laborMarket?.salaryRange ?? 'regional labor data'}.`,
+      detail: p.laborMarket?.salaryRange?.toLowerCase().startsWith('varies')
+        ? `Career earnings ${p.laborMarket.salaryRange.toLowerCase()}.`
+        : `Target entry wages aligned to ${p.laborMarket?.salaryRange ?? 'regional labor data'}.`,
     },
   ];
 

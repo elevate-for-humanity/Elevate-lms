@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
 
 interface SurveyQuestion {
   id: string;
@@ -159,12 +160,12 @@ function WorkOneSurveyContent() {
           <p className="text-gray-600 mb-4">
             Thank you, {applicantName}! You have already submitted your response to this survey.
           </p>
-          <a
+          <Link
             href="/"
             className="inline-block bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 transition-colors"
           >
             Return to Homepage
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -179,12 +180,12 @@ function WorkOneSurveyContent() {
           <p className="text-gray-600 mb-4">
             Your response has been submitted. Your feedback helps us advocate for better support for students like you.
           </p>
-          <a
+          <Link
             href="/"
             className="inline-block bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 transition-colors"
           >
             Return to Homepage
-          </a>
+          </Link>
         </div>
       </div>
     );

@@ -33,6 +33,17 @@ export default function ReelsFeed({ reels }: { reels: Reel[] }) {
     return () => container.removeEventListener('scroll', handleScroll);
   }, []);
 
+  if (reels.length === 0) {
+    return (
+      <section className="bg-slate-950 px-4 py-20 text-center text-white">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-slate-700 bg-slate-900 p-8">
+          <h1 className="text-4xl font-black">Elevate Reels</h1>
+          <p className="mt-4 leading-7 text-slate-300">No reels are published right now. New career-training, apprenticeship, and community videos will appear here when they are released.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <div
       ref={containerRef}

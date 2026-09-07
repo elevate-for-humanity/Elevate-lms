@@ -246,8 +246,6 @@ function normalizeBanner(
   if (key === 'barber-apprenticeship') {
     const barber = PROGRAMS['barber-apprenticeship'];
     const programBanner = normalized as ProgramHeroBannerConfig;
-    const credential = programBanner.credentialLabel || barber.credential || 'Indiana Barber License';
-    const duration = programBanner.durationLabel || barber.durationRange;
     normalized = {
       ...normalized,
       microLabel: 'DOL Registered Apprenticeship',
@@ -255,7 +253,10 @@ function normalizeBanner(
       belowHeroSubheadline: `Complete the approved competency-based registered-apprenticeship standard, including ${barber.relatedInstructionHours} verified Related Technical Instruction hours. Indiana licensing requirements and approval are controlled separately by the applicable state authority.`,
       primaryCta: { label: 'Enroll Now', href: '/programs/barber-apprenticeship/apply' },
       secondaryCta: { label: 'Request Information', href: '/programs/barber-apprenticeship/request-info', variant: 'secondary' },
-      transcript: `The Barber Apprenticeship provides structured competency-based training and verified Related Technical Instruction toward the ${credential} pathway. Published duration is ${duration.toLowerCase()}; licensing and employment outcomes are not guaranteed by program completion.`,
+      // Keep the audited JSON transcript as the single content authority. This
+      // normalization layer may govern labels and CTAs, but must not silently
+      // replace the page-specific story with duplicate generic copy.
+      transcript: programBanner.transcript,
     };
   }
 

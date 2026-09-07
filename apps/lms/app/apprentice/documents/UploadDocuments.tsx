@@ -39,7 +39,20 @@ export default function UploadDocuments({ programSlug }: { programSlug: string }
         if (cancelled) return;
         const types = Array.isArray(data.documentTypes) ? data.documentTypes : [];
         setDocumentTypes(types);
-        setSelectedDocType(types[0]?.id || '');
+        const requestedType = new URLSearchParams(window.location.search).get('documentType');
+        const requestedRequirement = types.find(
+          (item: DocumentType) =>
+            item.id === requestedType || item.document_type === requestedType,
+        );
+        setSelectedDocType(requestedRequirement?.id || types[0]?.id || '');
+        if (requestedRequirement) {
+          window.requestAnimationFrame(() =>
+            document.getElementById('document-upload')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            }),
+          );
+        }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load document requirements');
       } finally {
@@ -84,7 +97,7 @@ export default function UploadDocuments({ programSlug }: { programSlug: string }
   };
 
   return (
-    <div className="space-y-4">
+    <div id="document-upload" className="scroll-mt-24 space-y-4">
       <div>
         <label htmlFor="doc-type" className="mb-2 block text-sm font-bold text-slate-800">Document type</label>
         {loadingTypes ? (

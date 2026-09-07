@@ -189,9 +189,9 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             <BadgeCheck className="h-4 w-4" aria-hidden="true" />
             Career training built around your next step
           </div>
-          <h1 className="max-w-2xl text-4xl font-black leading-[1.04] tracking-[-0.035em] text-slate-950 sm:text-5xl lg:text-6xl">
+          <h2 className="max-w-2xl text-4xl font-black leading-[1.04] tracking-[-0.035em] text-slate-950 sm:text-5xl lg:text-6xl">
             Earn while you learn—or become a Host Shop for free.
-          </h1>
+          </h2>
           <p className="mt-5 max-w-xl text-lg leading-8 text-slate-700 sm:text-xl">
             Apprentices earn wages and get hands-on training inside a participating shop. Salon,
             spa, nail studio, and barbershop owners can apply at no cost, train future staff, and

@@ -16,7 +16,7 @@ export default async function CommunicationsPage() {
   // Fetch recent communications from database
   const { data: communications } = await db
     .from('communications')
-    .select('id,user_id,type,subject,content,status,sent_at,created_at')
+    .select('id,recipient_id,type,subject,body,status,sent_at,created_at,metadata')
     .order('created_at', { ascending: false })
     .limit(50);
 
@@ -133,7 +133,7 @@ export default async function CommunicationsPage() {
                         {comm.type?.toUpperCase()}
                       </span>
                       <p className="mt-2 font-medium">{comm.subject || 'No subject'}</p>
-                      <p className="text-sm text-gray-600">{comm.status}</p>
+                      <p className="text-sm text-gray-600">{comm.status} · {String(comm.metadata?.recipient_email || comm.recipient_id || 'recipient recorded in delivery audit')}</p>
                     </div>
                     <span className="text-xs text-gray-500">
                       {new Date(comm.created_at).toLocaleDateString()}

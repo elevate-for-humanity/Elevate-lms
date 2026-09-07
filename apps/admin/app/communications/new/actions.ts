@@ -19,7 +19,7 @@ function escapeHtml(value: string) {
 }
 
 export async function sendCommunication(formData: FormData) {
-  await requireRole(['admin', 'super_admin']);
+  const auth = await requireRole(['admin', 'super_admin']);
   const rawRecipients = String(formData.get('recipients') || '');
   const recipients = [...new Set(rawRecipients.split(/[\s,;]+/).map((value) => value.trim().toLowerCase()).filter(Boolean))];
   let subject = String(formData.get('subject') || '').trim();
@@ -46,11 +46,13 @@ export async function sendCommunication(formData: FormData) {
 
   for (const recipient of recipients) {
     const { data: communication, error: queueError } = await db.from('communications').insert({
-      user_id: userIds.get(recipient) || null,
+      recipient_id: userIds.get(recipient) || null,
+      sender_id: auth.user.id,
       type: 'email',
       subject,
-      content: message,
+      body: message,
       status: 'queued',
+      metadata: { recipient_email: recipient, source: 'admin_communications' },
     }).select('id').single();
     if (queueError || !communication) {
       failed += 1;

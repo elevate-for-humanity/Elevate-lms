@@ -46,19 +46,19 @@ const ROLE_DEMOS = [
 export default function StorePage() {
   return (
     <main className="min-h-screen bg-white font-medium text-slate-950">
-      <section className="overflow-hidden border-b border-slate-200 bg-gradient-to-br from-cyan-50 via-white to-rose-50 px-4 py-8 sm:px-6 sm:py-14">
+      <section className="overflow-hidden border-b border-slate-200 bg-gradient-to-br from-cyan-50 via-white to-rose-50 px-4 py-6 sm:px-6 sm:py-14">
         <div className="mx-auto grid min-w-0 max-w-7xl items-center gap-8 lg:grid-cols-[.9fr_1.1fr] lg:gap-10">
           <div>
             <p className="text-xs font-black uppercase leading-5 tracking-[0.14em] text-brand-red-700 sm:text-sm sm:tracking-[0.2em]">Elevate Business Operating Platform</p>
-            <h1 className="mt-4 text-3xl font-black leading-tight text-slate-950 sm:text-5xl lg:text-6xl">Start with what you need. Grow in one connected workspace.</h1>
-            <p className="mt-5 max-w-xl text-lg font-semibold leading-8 text-slate-700">Website, CRM, AI assistants, education, workforce, testing, and operations—connected around one customer record.</p>
+            <h1 className="mt-3 text-2xl font-black leading-tight text-slate-950 sm:mt-4 sm:text-5xl lg:text-6xl">Start with what you need. Grow in one connected workspace.</h1>
+            <p className="mt-3 max-w-xl text-base font-semibold leading-6 text-slate-700 sm:mt-5 sm:text-lg sm:leading-8">Website, CRM, AI assistants, education, workforce, testing, and operations—connected around one customer record.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link href="/store/trial" className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-red-700 px-6 py-3 text-center font-black text-white hover:bg-brand-red-800 sm:w-auto">Start Free Trial</Link>
               <Link href="#role-demos" className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-6 py-3 text-center font-black text-slate-950 hover:border-brand-red-600 sm:w-auto">See Role Demos</Link>
             </div>
             <p className="mt-4 text-sm font-semibold text-slate-600">14 days · no card required · build new or connect an existing website</p>
           </div>
-          <div className="grid h-[340px] min-w-0 grid-cols-2 grid-rows-2 gap-2 rounded-2xl bg-white p-2 shadow-2xl ring-1 ring-slate-200 sm:h-[500px] sm:gap-3 sm:rounded-3xl sm:p-3">
+          <div className="grid h-[240px] min-w-0 grid-cols-2 grid-rows-2 gap-2 rounded-2xl bg-white p-2 shadow-xl ring-1 ring-slate-200 sm:h-[500px] sm:gap-3 sm:rounded-3xl sm:p-3 sm:shadow-2xl">
             <img src="/images/pages/platform-page-1.webp" alt="Elevate connected platform workspace" className="row-span-2 h-full w-full rounded-2xl object-cover object-left" />
             <img src="/images/pages/store-recommendations.webp" alt="Elevate guided product recommendations" className="h-full w-full rounded-2xl object-cover" />
             <img src="/images/pages/store-addons-analytics-hero.webp" alt="Elevate analytics and business insights" className="h-full w-full rounded-2xl object-cover" />

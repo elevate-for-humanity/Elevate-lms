@@ -177,7 +177,7 @@ export async function POST(
       contact_name: contactName,
       contact_email: email,
       contact_phone: application.phone || null,
-      status: 'approved',
+      status: 'active',
       approved_at: existingHolder?.approved_at || now,
       approved_by: adminUser.id,
       mou_signed: alreadySigned,
@@ -228,8 +228,52 @@ export async function POST(
     }
 
     const existingData = application.data && typeof application.data === 'object' && !Array.isArray(application.data)
-      ? application.data
+      ? application.data as Record<string, unknown>
       : {};
+    const requestedProgramSlugs = Array.isArray(existingData.requested_program_slugs)
+      ? [...new Set(existingData.requested_program_slugs.map((value) => String(value || '').trim()).filter(Boolean))]
+      : [];
+
+    if (requestedProgramSlugs.length > 0) {
+      const { data: requestedPrograms, error: programsError } = await db
+        .from('programs')
+        .select('id,slug,title,name,is_active,status')
+        .in('slug', requestedProgramSlugs);
+      if (programsError) throw programsError;
+
+      const activePrograms = (requestedPrograms ?? []).filter(
+        (program) => program.is_active !== false && !['archived', 'inactive'].includes(String(program.status || '').toLowerCase()),
+      );
+      const resolvedSlugs = new Set(activePrograms.map((program) => String(program.slug)));
+      const missingSlugs = requestedProgramSlugs.filter((slug) => !resolvedSlugs.has(slug));
+      if (missingSlugs.length > 0) {
+        return NextResponse.json(
+          { error: `Cannot approve: requested program is unavailable (${missingSlugs.join(', ')}).` },
+          { status: 409 },
+        );
+      }
+
+      const primaryProgram = activePrograms[0];
+      const assignments = activePrograms.map((program, index) => ({
+        program_holder_id: holderId,
+        program_id: program.id,
+        program_slug: program.slug,
+        role_in_program: 'owner',
+        is_primary: index === 0,
+        status: 'active',
+      }));
+      const { error: assignmentError } = await db
+        .from('program_holder_programs')
+        .upsert(assignments, { onConflict: 'program_holder_id,program_id' });
+      if (assignmentError) throw assignmentError;
+
+      const { error: holderProgramError } = await db
+        .from('program_holders')
+        .update({ primary_program_id: primaryProgram.id, status: 'active' })
+        .eq('id', holderId);
+      if (holderProgramError) throw holderProgramError;
+    }
+
     const { error: appUpdateError } = await db
       .from('program_holder_applications')
       .update({
@@ -240,6 +284,7 @@ export async function POST(
           approved_at: now,
           approved_by: adminUser.id,
           program_holder_id: holderId,
+          provisioned_program_slugs: requestedProgramSlugs,
         },
         updated_at: now,
       })

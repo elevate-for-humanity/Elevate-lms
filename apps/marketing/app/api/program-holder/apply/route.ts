@@ -4,6 +4,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { notifyApplicationSubmission } from '@/lib/applications/submission-notifications';
+import { VALID_SLUGS } from '@/lib/program-registry';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -34,11 +35,16 @@ export async function POST(request: Request) {
     const programTypes = Array.isArray(body.programTypes)
       ? body.programTypes.map((value: unknown) => clean(value, 100)).filter(Boolean).slice(0, 20)
       : [];
+    const requestedProgramSlugs = Array.isArray(body.requestedProgramSlugs)
+      ? [...new Set(body.requestedProgramSlugs.map((value: unknown) => clean(value, 100)).filter((value: string) => VALID_SLUGS.has(value)))].slice(0, 20)
+      : [];
+    const preferredTitle = clean(body.preferredTitle, 160);
+    const professionalBio = clean(body.professionalBio, 3000);
     const notes = clean(body.notes, 4000);
 
-    if (!organizationName || !contactName || !email) {
+    if (!organizationName || !contactName || !email || requestedProgramSlugs.length === 0) {
       return NextResponse.json(
-        { ok: false, error: 'Organization name, contact name, and email are required.' },
+        { ok: false, error: 'Organization name, contact name, email, and a primary program are required.' },
         { status: 400 },
       );
     }
@@ -68,6 +74,9 @@ export async function POST(request: Request) {
           phone,
           website,
           program_types: programTypes,
+          requested_program_slugs: requestedProgramSlugs,
+          preferred_title: preferredTitle,
+          professional_bio: professionalBio,
           notes,
         },
         source: 'public_form',
@@ -90,7 +99,7 @@ export async function POST(request: Request) {
     const safeName = escapeHtml(contactName);
     const safeEmail = escapeHtml(email);
     const safeRef = escapeHtml(data.id);
-    const safePrograms = programTypes.length ? programTypes.map(escapeHtml).join(', ') : 'Not specified';
+    const safePrograms = requestedProgramSlugs.map(escapeHtml).join(', ');
     const notifications = await notifyApplicationSubmission({
       db: admin,
       applicationId: data.id,
@@ -101,7 +110,7 @@ export async function POST(request: Request) {
       applicantHtml: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>Program Holder Application Received</h2><p>Hello ${safeName},</p><p>We received the Program Holder application for <strong>${safeOrganization}</strong>.</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Programs/services listed:</strong> ${safePrograms}</p><h3>What happens next</h3><ol><li>Elevate reviews organizational eligibility, program scope, required credentials, and operating documents.</li><li>If documents or an agreement are required, we will send a specific checklist.</li><li>After approval, portal access and Program Holder onboarding instructions will be issued to <strong>${safeEmail}</strong>.</li><li>Approved Program Holders can then manage authorized programs, documents, participants, and reporting from the partner portal.</li></ol><p>You do not need to submit another application. Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
       staffSubject: `[PROGRAM HOLDER APPLICATION] ${organizationName}`,
       staffHtml: `<h2>New Program Holder Application</h2><p><strong>${safeOrganization}</strong><br>${safeName}<br>${safeEmail}<br>${escapeHtml(phone || 'No phone')}</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Program types:</strong> ${safePrograms}</p><p><strong>Website:</strong> ${escapeHtml(website || 'Not provided')}</p><p>Review eligibility/documents and initiate Program Holder onboarding when approved.</p>`,
-      metadata: { organization_name: organizationName, program_types: programTypes },
+      metadata: { organization_name: organizationName, program_types: programTypes, requested_program_slugs: requestedProgramSlugs },
     });
 
     return NextResponse.json(

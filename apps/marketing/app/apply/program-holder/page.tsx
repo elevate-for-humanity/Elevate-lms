@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import ProgramHolderForm from './ProgramHolderForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { getActivePrograms } from '@/lib/program-registry';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,8 +38,19 @@ const OTHER_APPLICATION_PATHS = [
   },
 ] as const;
 
-export default async function ProgramHolderApplicationPage() {
+export default async function ProgramHolderApplicationPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const supabase = await createClient();
+  const query = await searchParams;
+  const value = (key: string) => typeof query[key] === 'string' ? String(query[key]).trim() : '';
+  const requestedProgram = value('program');
+  const programOptions = getActivePrograms().map(({ slug, name }) => ({ slug, name }));
+  const initialProgram = programOptions.some((program) => program.slug === requestedProgram)
+    ? requestedProgram
+    : '';
 
   await supabase
     .from('site_settings')
@@ -90,7 +102,12 @@ export default async function ProgramHolderApplicationPage() {
       </section>
 
       <section className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <ProgramHolderForm />
+        <ProgramHolderForm
+          programOptions={programOptions}
+          initialProgram={initialProgram}
+          initialContactName={value('contact')}
+          initialEmail={value('email')}
+        />
       </section>
     </div>
   );

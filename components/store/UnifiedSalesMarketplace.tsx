@@ -178,7 +178,7 @@ export function UnifiedSalesMarketplace() {
 
   return (
     <section
-      className="border-y border-cyan-100 bg-gradient-to-b from-white via-cyan-50/50 to-rose-50 py-16 font-medium text-slate-950"
+      className="border-y border-cyan-100 bg-gradient-to-b from-white via-cyan-50/50 to-rose-50 py-10 font-medium text-slate-950 sm:py-16"
       id="marketplace"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -186,7 +186,7 @@ export function UnifiedSalesMarketplace() {
           <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">
             One platform. Three clear buying paths.
           </p>
-          <h2 className="mt-5 text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">
+          <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-950 sm:mt-5 sm:text-5xl">
             Choose the part of Elevate you need now
           </h2>
           <p className="mt-4 text-base font-semibold leading-7 text-slate-700 sm:text-lg">
@@ -208,7 +208,7 @@ export function UnifiedSalesMarketplace() {
                 type="button"
                 aria-pressed={selected}
                 onClick={() => setFamily(key)}
-                className={`rounded-2xl border p-5 text-left transition ${selected ? 'border-brand-red-400 bg-white text-slate-950 shadow-lg' : 'border-slate-200 bg-white text-slate-950 shadow-sm hover:border-orange-300 hover:shadow-md'}`}
+                className={`rounded-xl border p-4 text-left transition sm:rounded-2xl sm:p-5 ${selected ? 'border-brand-red-400 bg-white text-slate-950 shadow-lg' : 'border-slate-200 bg-white text-slate-950 shadow-sm hover:border-orange-300 hover:shadow-md'}`}
               >
                 <span className="block text-lg font-black">{familyMeta[key].label}</span>
                 <span
@@ -268,10 +268,10 @@ export function UnifiedSalesMarketplace() {
             return (
               <article
                 key={capability.key}
-                className="flex min-h-[390px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5"
+                className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5 sm:min-h-[390px]"
               >
                 <ProductPreview capability={capability} name={capabilityName} />
-                <div className="flex flex-1 flex-col p-6">
+                <div className="flex flex-1 flex-col p-4 sm:p-6">
                   <div className="flex items-start justify-between gap-4">
                     <span className="text-xs font-black uppercase tracking-wide text-rose-700">
                       {categoryMeta[capability.category].label}

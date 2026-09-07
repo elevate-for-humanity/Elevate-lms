@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { MessageCircle, Sparkles, Volume2, VolumeX } from 'lucide-react';
+import { MessageCircle, Sparkles, Volume2, VolumeX, X } from 'lucide-react';
 import { GUIDE_STORAGE_KEYS, GuideChoice, storeGuideFlow } from '@/lib/guide/flows';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import ParisChat from '@/components/paris/ParisChat';
@@ -69,8 +69,8 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
 
   if (!open) {
     return (
-      <button type="button" onClick={openGuide} className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-rose-600 to-orange-500 px-5 py-3 font-bold text-white shadow-xl shadow-orange-900/20 transition hover:-translate-y-0.5 hover:shadow-2xl">
-        <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-black text-rose-700 shadow-inner" aria-hidden="true">P<span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></span><span><span className="block text-left text-[10px] font-black uppercase tracking-widest text-white/80">Quick interview · tap to hear</span>Let PARIS interview you</span>
+      <button type="button" onClick={openGuide} aria-label="Open PARIS Store Guide" className="fixed bottom-4 right-4 z-50 flex min-h-12 items-center gap-2 rounded-full bg-gradient-to-r from-rose-600 to-orange-500 p-2.5 font-bold text-white shadow-xl shadow-orange-900/20 transition hover:-translate-y-0.5 hover:shadow-2xl sm:bottom-6 sm:right-6 sm:px-5 sm:py-3">
+        <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-black text-rose-700 shadow-inner" aria-hidden="true">P<span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></span><span className="hidden sm:block"><span className="block text-left text-[10px] font-black uppercase tracking-widest text-white/80">Quick interview · tap to hear</span>Let PARIS interview you</span>
       </button>
     );
   }
@@ -78,13 +78,13 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
   return (
     <section
       aria-label="PARIS Store Advisor"
-      className="fixed bottom-4 right-4 z-[51] w-[calc(100%-2rem)] max-w-sm overflow-hidden rounded-3xl border border-orange-200 bg-white shadow-2xl shadow-orange-950/20 sm:bottom-6 sm:right-6"
+      className="fixed inset-x-2 bottom-2 z-[51] max-h-[calc(100dvh-1rem)] overflow-hidden rounded-2xl border border-orange-200 bg-white shadow-2xl shadow-orange-950/20 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[calc(100%-2rem)] sm:max-w-sm sm:rounded-3xl"
     >
-        <header className="flex items-center gap-3 bg-gradient-to-r from-cyan-50 via-white to-orange-50 p-4">
-          <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rose-600 to-orange-400 text-xl font-black text-white ring-4 ring-white shadow-lg" aria-label="PARIS avatar">P<span className="absolute -right-0.5 -top-0.5 h-3.5 w-3.5 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></div>
-          <div className="flex-1"><p className="text-xs font-black uppercase tracking-[0.16em] text-rose-700">PARIS · Store Guide</p><h2 className="text-lg font-black text-slate-950">PARIS</h2><p className="text-sm font-semibold text-slate-700">{speaking ? 'Explaining your best option…' : 'Tell me what you need. I’ll recommend the right product, demo, and plan.'}</p></div>
-          <button type="button" onClick={toggle} aria-label={muted ? 'Unmute natural voice' : 'Mute natural voice'}>{muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</button>
-          <button type="button" onClick={() => { stop(); setOpen(false); }} className="rounded-lg px-2 py-1 text-xs font-bold text-slate-700 hover:bg-white" aria-label="Minimize PARIS">Minimize</button>
+        <header className="flex items-center gap-2 bg-gradient-to-r from-cyan-50 via-white to-orange-50 p-3 sm:gap-3 sm:p-4">
+          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-rose-600 to-orange-400 text-lg font-black text-white ring-2 ring-white shadow-lg sm:h-14 sm:w-14 sm:text-xl sm:ring-4" aria-label="PARIS avatar">P<span className="absolute -right-0.5 -top-0.5 h-3 w-3 animate-pulse rounded-full border-2 border-white bg-emerald-500" /></div>
+          <div className="min-w-0 flex-1"><p className="text-[10px] font-black uppercase tracking-[0.12em] text-rose-700 sm:text-xs sm:tracking-[0.16em]">PARIS · Store Guide</p><h2 className="text-base font-black text-slate-950 sm:text-lg">PARIS</h2><p className="line-clamp-2 text-xs font-semibold text-slate-700 sm:text-sm">{speaking ? 'Explaining your best option…' : 'Tell me what you need. I’ll recommend the right product, demo, and plan.'}</p></div>
+          <button type="button" onClick={toggle} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-white" aria-label={muted ? 'Unmute natural voice' : 'Mute natural voice'}>{muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}</button>
+          <button type="button" onClick={() => { stop(); setOpen(false); }} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-slate-800 shadow-sm" aria-label="Close PARIS"><X className="h-5 w-5" /></button>
         </header>
         <div className="grid grid-cols-2 border-y border-slate-200 bg-white p-2">
           <button
@@ -103,7 +103,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
           </button>
         </div>
         {mode === 'chat' ? (
-          <ParisChat surface="store" showHeader={false} voiceEnabled={!muted} className="h-[52vh] min-h-[360px]" />
+          <ParisChat surface="store" showHeader={false} voiceEnabled={!muted} className="h-[44dvh] min-h-[280px] max-h-[430px] sm:h-[52vh] sm:min-h-[360px]" />
         ) : (
         <div className="max-h-[52vh] overflow-y-auto p-4 sm:p-5">
           {!confirmed ? (

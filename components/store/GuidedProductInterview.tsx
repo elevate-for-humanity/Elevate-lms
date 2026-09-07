@@ -203,23 +203,23 @@ export function GuidedProductInterview() {
   }, [goal, org, recommendations]);
 
   return (
-    <section className="bg-white py-16" id="guided-setup">
-      <div className="mx-auto max-w-6xl px-5">
+    <section className="bg-white py-10 sm:py-16" id="guided-setup">
+      <div className="mx-auto max-w-6xl px-4 sm:px-5">
         <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-brand-red-50 px-4 py-2 text-sm font-black text-brand-red-700">
             <Sparkles className="h-4 w-4" /> Zero-code guided setup
           </span>
-          <h2 className="mt-4 text-3xl font-black text-slate-950 sm:text-5xl">
+          <h2 className="mt-3 text-2xl font-black text-slate-950 sm:mt-4 sm:text-5xl">
             Tell Elevate what you want to accomplish.
           </h2>
-          <p className="mt-4 text-lg leading-8 text-slate-600">
+          <p className="mt-3 text-base leading-6 text-slate-600 sm:mt-4 sm:text-lg sm:leading-8">
             You do not need to understand product names or technical settings. Answer two questions
             and Elevate will recommend the simplest starting stack.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-2">
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 md:p-8">
+        <div className="mt-7 grid gap-5 sm:mt-10 sm:gap-8 lg:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:rounded-3xl sm:p-6 md:p-8">
             <p className="text-sm font-black uppercase tracking-wider text-slate-500">
               1. What are you trying to do?
             </p>
@@ -266,7 +266,7 @@ export function GuidedProductInterview() {
             </div>
           </div>
 
-          <div className="rounded-3xl bg-slate-950 p-6 text-white md:p-8">
+          <div className="rounded-2xl bg-slate-950 p-4 text-white sm:rounded-3xl sm:p-6 md:p-8">
             <p className="text-sm font-black uppercase tracking-wider text-brand-red-300">
               Your recommended setup
             </p>

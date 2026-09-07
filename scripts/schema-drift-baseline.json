@@ -121,6 +121,7 @@
     "apps/admin/app/workforce/page.tsx|workforce_cases|TABLE_NOT_IN_SCHEMA",
     "apps/admin/app/workforce/page.tsx|workforce_funding|TABLE_NOT_IN_SCHEMA",
     "apps/admin/app/workforce/page.tsx|workforce_participants|TABLE_NOT_IN_SCHEMA",
+    "apps/admin/app/workforce/participants/[id]/page.tsx|workforce_participants|TABLE_NOT_IN_SCHEMA",
     "apps/admin/app/workforce/participants/page.tsx|workforce_participants|TABLE_NOT_IN_SCHEMA",
     "apps/admin/app/workforce/reports/page.tsx|workforce_participants|TABLE_NOT_IN_SCHEMA",
     "apps/lms/app/api/achievements/route.ts|quiz_attempts|passed_at",

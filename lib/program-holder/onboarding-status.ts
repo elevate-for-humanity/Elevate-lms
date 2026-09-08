@@ -278,12 +278,12 @@ export async function getProgramHolderOnboardingStatus(
     ];
   } else {
     // Barber (default)
-    const hasSyllabus = approvedDocs.some((d) => d.document_type === 'syllabus');
     const hasBusinessLicense = approvedDocs.some((d) => d.document_type === 'business_license');
     const hasInsurance = approvedDocs.some((d) => d.document_type === 'insurance');
-    requiredDocsComplete = hasSyllabus && hasBusinessLicense && hasInsurance;
+    // Elevate publishes the canonical syllabus inside the portal. A program
+    // holder or instructor must never be blocked on uploading a duplicate.
+    requiredDocsComplete = hasBusinessLicense && hasInsurance;
     requiredDocsList = [
-      ...(!hasSyllabus ? ['Syllabus'] : []),
       ...(!hasBusinessLicense ? ['Business License'] : []),
       ...(!hasInsurance ? ['Insurance Certificate'] : []),
     ];

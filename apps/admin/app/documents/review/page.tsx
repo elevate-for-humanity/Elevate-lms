@@ -104,14 +104,14 @@ export default async function AdminDocumentReviewPage({
       {/* Header */}
       <section className="border-b py-8">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <h1 className="text-4xl font-bold text-black mb-2">Document Review</h1>
               <p className="text-lg text-black">Review and approve uploaded documents</p>
             </div>
             <Link
               href="/dashboard"
-              className="px-6 py-3 bg-slate-200 text-black font-semibold rounded-lg hover:bg-slate-300 transition"
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-slate-200 px-6 py-3 font-semibold text-black transition hover:bg-slate-300 sm:w-auto"
             >
               Back to Dashboard
             </Link>
@@ -198,13 +198,13 @@ export default async function AdminDocumentReviewPage({
               {pendingDocs.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+                  className="flex flex-col items-stretch gap-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex items-center gap-3 flex-1">
+                  <div className="flex min-w-0 flex-1 items-start gap-3">
                     {getStatusIcon(doc.review_status)}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-black">{doc.file_name}</h3>
-                      <p className="text-sm text-black">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="break-words font-semibold text-black">{doc.file_name}</h3>
+                      <p className="mt-1 break-words text-sm text-black">
                         {documentTypeLabel(doc.document_type)} •
                         {(doc.profiles as any)?.full_name || 'Unknown User'} (
                         {(doc.profiles as any)?.role}) • Uploaded{' '}
@@ -212,10 +212,10 @@ export default async function AdminDocumentReviewPage({
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:shrink-0">
                     <Link
                       href={`/documents/review/${doc.id}`}
-                      className="px-4 py-2 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
+                      className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-brand-blue-700 sm:w-auto"
                     >
                       <Eye className="w-4 h-4" />
                       Review
@@ -255,13 +255,13 @@ export default async function AdminDocumentReviewPage({
               {visibleDocuments.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-50 transition"
+                  className="flex flex-col items-stretch gap-4 rounded-lg border p-4 transition hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex items-center gap-3 flex-1">
+                  <div className="flex min-w-0 flex-1 items-start gap-3">
                     {getStatusIcon(doc.review_status)}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-black">{doc.file_name}</h3>
-                      <p className="text-sm text-black">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="break-words font-semibold text-black">{doc.file_name}</h3>
+                      <p className="mt-1 break-words text-sm text-black">
                         {documentTypeLabel(doc.document_type)} •
                         {(doc.profiles as any)?.full_name || 'Unknown User'} (
                         {(doc.profiles as any)?.role}) • Uploaded{' '}
@@ -274,7 +274,7 @@ export default async function AdminDocumentReviewPage({
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:shrink-0">
                     <span
                       className={`px-3 py-2 rounded-full text-xs font-semibold border ${getStatusBadge(doc.review_status)}`}
                     >
@@ -287,7 +287,7 @@ export default async function AdminDocumentReviewPage({
                     )}
                     <Link
                       href={`/documents/review/${doc.id}`}
-                      className="px-4 py-2 bg-slate-200 text-black font-semibold rounded-lg hover:bg-slate-300 transition"
+                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-lg bg-slate-200 px-4 py-2 font-semibold text-black transition hover:bg-slate-300 sm:flex-none"
                     >
                       Review
                     </Link>

@@ -1,6 +1,5 @@
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { requireRole } from '@/lib/auth/require-role';
-import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function LearnerWorkspaceLayout({ children }: { children: React.ReactNode }) {
@@ -21,7 +20,6 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
       role="student"
     >
       {children}
-      <ParisFloatingWrapper surface="learner" />
     </PlatformShell>
   );
 }

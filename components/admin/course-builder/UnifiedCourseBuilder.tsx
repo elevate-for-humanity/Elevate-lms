@@ -69,6 +69,9 @@ export default function UnifiedCourseBuilder() {
   const [blueprints, setBlueprints] = useState<BlueprintRow[]>([]);
   const [creditState, setCreditState] = useState<CreditState | null>(null);
   const [health, setHealth] = useState<HealthState | null>(null);
+  const [inventoryLoading, setInventoryLoading] = useState(true);
+  const [inventoryError, setInventoryError] = useState('');
+  const [programError, setProgramError] = useState('');
 
   const selectedCourse = useMemo(
     () => courses.find((course) => course.id === courseId) ?? null,
@@ -76,19 +79,25 @@ export default function UnifiedCourseBuilder() {
   );
 
   async function loadCourses() {
-    const res = await fetch('/api/admin/courses', { cache: 'no-store' });
-    const data = await res.json().catch(() => []);
-    const rows = Array.isArray(data) ? data : Array.isArray(data?.courses) ? data.courses : [];
-    setCourses(rows);
-    if (!courseId && rows[0]?.id) setCourseId(rows[0].id);
+    setInventoryLoading(true); setInventoryError('');
+    try {
+      const res = await fetch('/api/admin/courses', { cache: 'no-store' });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error ?? `Course inventory failed (${res.status})`);
+      const rows = Array.isArray(data) ? data : Array.isArray(data?.courses) ? data.courses : [];
+      setCourses(rows);
+      if (!courseId && rows[0]?.id) setCourseId(rows[0].id);
+    } catch (error) {
+      setInventoryError(error instanceof Error ? error.message : 'Unable to load course inventory');
+    } finally { setInventoryLoading(false); }
   }
 
   useEffect(() => {
     void loadCourses();
     fetch('/api/admin/dev-studio/programs', { cache: 'no-store' })
-      .then((response) => response.json())
+      .then(async (response) => { const data = await response.json(); if (!response.ok) throw new Error(data?.error ?? `Programs failed (${response.status})`); return data; })
       .then((data) => setPrograms(Array.isArray(data?.data) ? data.data : []))
-      .catch(() => setPrograms([]));
+      .catch((error) => setProgramError(error instanceof Error ? error.message : 'Unable to load programs'));
     fetch('/api/admin/course-builder?action=credits', { cache: 'no-store' })
       .then((response) => response.json())
       .then((data) => setCreditState(data))
@@ -114,7 +123,6 @@ export default function UnifiedCourseBuilder() {
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
               <Bot className="h-4 w-4" /> Unified Course Factory
             </div>
-            <h2 className="mt-1 text-2xl font-black text-white">Course Builder</h2>
             <p className="mt-1 max-w-3xl text-sm text-slate-400">
               Build, review, govern, publish, and maintain complete courses from one authority.
             </p>
@@ -204,6 +212,9 @@ export default function UnifiedCourseBuilder() {
           <CourseCatalog
             courses={courses}
             programs={programs}
+            loading={inventoryLoading}
+            inventoryError={inventoryError}
+            programError={programError}
             onChanged={loadCourses}
             onCreated={async (id) => {
               await loadCourses();
@@ -238,16 +249,25 @@ export default function UnifiedCourseBuilder() {
 function CourseCatalog({
   courses,
   programs,
+  loading,
+  inventoryError,
+  programError,
   onChanged,
   onCreated,
 }: {
   courses: CourseRow[];
   programs: ProgramRow[];
+  loading: boolean;
+  inventoryError: string;
+  programError: string;
   onChanged: () => void | Promise<void>;
   onCreated: (id: string) => void | Promise<void>;
 }) {
   const [busyId, setBusyId] = useState('');
   const [error, setError] = useState('');
+  const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('all');
+  const visibleCourses = courses.filter(course => (status === 'all' || (course.status ?? 'draft') === status) && course.title.toLowerCase().includes(query.toLowerCase()));
 
   async function mutate(course: CourseRow, action: 'clone' | 'publish' | 'unpublish' | 'delete') {
     if (action === 'delete' && !window.confirm(`Archive ${course.title}? You can restore it later.`)) return;
@@ -291,8 +311,11 @@ function CourseCatalog({
           Every course opens the same session, state provider, mutation layer and feature workspace.
         </p>
         {error ? <p role="alert" className="mt-3 rounded-lg bg-red-950/60 px-3 py-2 text-sm text-red-200">{error}</p> : null}
+        {inventoryError ? <div role="alert" className="mt-3 rounded-lg bg-red-950/60 px-3 py-3 text-sm text-red-100"><strong>Course inventory could not load.</strong> {inventoryError} <button onClick={() => void onChanged()} className="ml-2 underline">Retry</button></div> : null}
+        {programError ? <p role="alert" className="mt-3 rounded-lg bg-amber-950/60 px-3 py-2 text-sm text-amber-100">Program list could not load: {programError}</p> : null}
+        <div className="mt-4 flex flex-wrap gap-2"><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search courses" className="min-w-56 flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"/><select value={status} onChange={e => setStatus(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"><option value="all">All statuses</option><option value="draft">Draft</option><option value="published">Published</option></select></div>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {courses.map((course) => (
+          {visibleCourses.map((course) => (
             <article
               key={course.id}
               className="rounded-xl border border-slate-700 bg-slate-950 p-4 hover:border-cyan-500"
@@ -311,7 +334,8 @@ function CourseCatalog({
               </div>
             </article>
           ))}
-          {!courses.length && <p className="text-sm text-slate-400">No courses found.</p>}
+          {loading && <p className="text-sm text-slate-400">Loading course inventory…</p>}
+          {!loading && !inventoryError && !visibleCourses.length && <p className="text-sm text-slate-400">{courses.length ? 'No courses match these filters.' : 'No courses exist yet.'}</p>}
         </div>
       </section>
       <CreateCoursePanel programs={programs} onCreated={onCreated} />

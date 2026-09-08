@@ -383,7 +383,7 @@ export function PlatformShell({ user, role, actions = [], children }: PlatformSh
         </main>
       </div>
       <ParisFloatingWrapper
-        surface="portal"
+        surface={role === 'student' ? 'learner' : 'portal'}
         portalRole={ROLE_DISPLAY_NAMES[role]}
         autoOpenOnDashboard
       />

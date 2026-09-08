@@ -61,7 +61,7 @@ export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
   { id: 'cfd', label: 'CFD Studio', description: 'OpenFOAM project configuration and execution.', permission: 'studio.cfd.manage', route: '/studio/cfd', healthEndpoint: '/api/admin/dev-studio/cfd/health', featureFlag: 'CFD_ENABLED' },
   { id: 'memory', label: 'AI Memory', description: 'Search and manage governed organizational memory.', permission: 'studio.memory.manage', route: '/studio/memory', healthEndpoint: '/api/admin/dev-studio/memory/health' },
   { id: 'health', label: 'System Health', description: 'Capability status and configuration checks.', permission: 'studio.health.view', route: '/studio/health', healthEndpoint: '/api/admin/dev-studio/health' },
-  { id: 'plugins', label: 'Plugin Marketplace', description: 'Browse, connect and manage verified external services, OAuth identities, permissions and runtime status.', permission: 'studio.settings.manage', route: '/integrations', healthEndpoint: '/api/admin/dev-studio/health' },
+  { id: 'plugins', label: 'Plugin Marketplace', description: 'Browse, connect and manage verified external services, OAuth identities, permissions and runtime status.', permission: 'studio.settings.manage', route: '/studio/integrations', healthEndpoint: '/api/admin/dev-studio/health' },
   { id: 'settings', label: 'Settings', description: 'Providers, features and Studio permissions.', permission: 'studio.settings.manage', route: '/studio/settings', healthEndpoint: '/api/admin/dev-studio/settings/health' },
 ];
 

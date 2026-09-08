@@ -4,6 +4,7 @@ import { createClient } from '../supabase/server';
 import { publishCourse } from '../lms/course-service';
 import { logAdminAudit, AdminAction } from '../admin/audit-log';
 import { normalizeGeneratedCourseForGovernance } from '../course-factory/post-generation-governance';
+import { publicationRequirements, type PublicationRequirement } from '../course-factory/experience-contract';
 
 const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam', 'final_exam']);
 const PRACTICAL_TYPES = new Set(['practical', 'lab', 'fieldwork', 'observation', 'practicum']);
@@ -107,7 +108,11 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
     competencyMappings = 0,
     interactiveLessons = 0,
     accessibleNarrationLessons = 0,
-    validatedLessons = 0;
+    validatedLessons = 0,
+    practiceExams = 0;
+  const publicationReadiness = Object.fromEntries(
+    publicationRequirements.map((requirement) => [requirement, true]),
+  ) as Record<PublicationRequirement, boolean>;
   for (const [mi, module] of (mods as any[]).entries()) {
     if (!module.title?.trim()) blocking.push(`module ${mi + 1}: title missing`);
     if (!module.slug?.trim()) blocking.push(`module ${mi + 1}: slug missing`);
@@ -138,6 +143,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
       if (isAssessment) {
         assessments += 1;
         moduleHasAssessment = true;
+        if (type === 'exam' || type === 'final_exam') practiceExams += 1;
       }
       if (isPractical) practicals += 1;
       competencyMappings += competencies.length;
@@ -148,7 +154,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
       if (!lesson.slug?.trim()) issues.push('slug missing');
       if (!lesson.duration_minutes || Number(lesson.duration_minutes) <= 0)
         issues.push('duration missing');
-      if (objectives.length === 0) issues.push('learning objectives missing');
+      if (objectives.length === 0) { issues.push('learning objectives missing'); publicationReadiness.learning_objectives = false; }
       if (!lesson.domain_key?.trim()) issues.push('standards/domain mapping missing');
       if (!lesson.hour_category) issues.push('hour category missing');
       if (!lesson.delivery_method) issues.push('delivery method missing');
@@ -179,17 +185,20 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
           !String(lesson.rendered_html ?? '').trim() &&
           !String(lesson.video_url ?? '').trim()
         )
-          issues.push('instructional content missing');
+          { issues.push('instructional content missing'); publicationReadiness.instructional_content = false; }
         if (lesson.ai_generated === true && !isPractical) {
           if (!experience) issues.push('canonical interactive lesson experience missing');
           else {
-            if (!String(experience.narrationScript ?? '').trim())
-              issues.push('narration/transcript missing');
-            if (!String(experience.visualPrompt ?? '').trim())
-              issues.push('visual specification missing');
+            if (!String(experience.narrationScript ?? '').trim()) {
+              issues.push('narration/transcript missing'); publicationReadiness.narration = false; publicationReadiness.transcript = false;
+            }
+            if (!String(experience.visualPrompt ?? '').trim()) {
+              issues.push('visual specification missing'); publicationReadiness.demonstration = false; publicationReadiness.accessibility = false;
+            }
+            if (asArray(experience.quickClips).length < 2) { issues.push('demonstration clips missing'); publicationReadiness.demonstration = false; }
             if (asArray(experience.flashcards).length < 4) issues.push('fewer than 4 flashcards');
-            if (asArray(experience.knowledgeChecks).length < 3)
-              issues.push('fewer than 3 formative knowledge checks');
+            if (asArray(experience.knowledgeChecks).length < 3) { issues.push('fewer than 3 formative knowledge checks'); publicationReadiness.knowledge_checks = false; }
+            if (asArray(experience.exercises).length < 1) { issues.push('guided practice missing'); publicationReadiness.interactive_practice = false; }
             if (!experience.remediation || Number(experience.remediation.passingScore ?? 0) <= 0)
               issues.push('mastery remediation plan missing');
           }
@@ -199,8 +208,9 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
             lesson.video_config && typeof lesson.video_config === 'object'
               ? (lesson.video_config as Record<string, any>)
               : {};
-          if (!String(experience?.narrationScript ?? videoConfig.transcript ?? '').trim())
-            issues.push('video has no transcript/narration text for accessibility');
+          if (!String(experience?.narrationScript ?? videoConfig.transcript ?? '').trim()) {
+            issues.push('video has no transcript/captions for accessibility'); publicationReadiness.transcript = false; publicationReadiness.captions = false; publicationReadiness.accessibility = false;
+          }
         }
       }
       if (isPractical) {
@@ -215,16 +225,27 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
   }
   if (totalLessons === 0) blocking.push('course has no lessons');
   if (assessments === 0) blocking.push('course has no assessment/mastery system');
+  if (assessments === 0) publicationReadiness.module_assessments = false;
+  if (practiceExams === 0) { publicationReadiness.practice_exam = false; blocking.push('course has no certification-style practice exam'); }
   if (competencyMappings === 0) blocking.push('course has no competency graph/mappings');
+  if (competencyMappings === 0) publicationReadiness.credential_alignment = false;
   if (interactiveLessons === 0)
     blocking.push('course has no interactive self-paced lesson experiences');
-  if (mods.length > 1) {
+  if (interactiveLessons === 0) publicationReadiness.learner_preview = false;
+  for (const requirement of publicationRequirements) {
+    if (!publicationReadiness[requirement]) blocking.push(`publication requirement failed: ${requirement}`);
+  }
+  if (mods.length > 0) {
     const { count, error } = await supabase
       .from('module_completion_rules')
       .select('id', { count: 'exact', head: true })
       .eq('course_id', courseId);
     if (error) throw error;
-    if ((count ?? 0) === 0) blocking.push('multiple modules but no mastery/progression rules');
+    if ((count ?? 0) < mods.length) {
+      blocking.push('one or more modules have no mastery/progression rules');
+      publicationReadiness.progress_tracking = false;
+      publicationReadiness.resume_tracking = false;
+    }
   }
   return {
     pass: blocking.length === 0,
@@ -243,6 +264,7 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
       reviewed_at: course.reviewed_at ?? null,
       reviewMode: 'automated_quality_gate',
       gateVersion: AUTOMATED_COURSE_GATE_VERSION,
+      publicationReadiness,
     },
   };
 }
@@ -324,6 +346,7 @@ export async function publishPersistedCourseWithClient(input: {
       });
     return {
       ok: false as const,
+      state: 'quality_gate_failed' as const,
       error: 'AUTOMATED_REPAIR_EXHAUSTED',
       blocking_issues: health.blocking_issues,
       metrics: health.metrics,
@@ -375,6 +398,7 @@ export async function publishPersistedCourseWithClient(input: {
   });
   return {
     ok: true as const,
+    state: 'published' as const,
     automated_approval_id: automatedApprovalId,
     badge,
     procurement_gate: health.metrics,

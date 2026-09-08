@@ -189,3 +189,31 @@ export const CourseExperienceSchema = z
   .passthrough();
 
 export type CourseExperience = z.infer<typeof CourseExperienceSchema>;
+
+export const publicationRequirements = [
+  'credential_alignment', 'learning_objectives', 'instructional_content', 'demonstration',
+  'interactive_practice', 'knowledge_checks', 'module_assessments', 'practice_exam',
+  'narration', 'captions', 'transcript', 'accessibility', 'learner_preview',
+  'progress_tracking', 'resume_tracking',
+] as const;
+
+export type PublicationRequirement = (typeof publicationRequirements)[number];
+
+/** Canonical learner-facing contract assembled from persisted lesson fields and CourseExperience. */
+export type InteractiveLesson = {
+  title: string;
+  objectives: string[];
+  narration: string;
+  transcript: string;
+  demonstration: { visualPrompt: string; quickClips: CourseExperience['quickClips'] };
+  knowledgeChecks: CourseExperience['knowledgeChecks'];
+  guidedPractice: CourseExperience['exercises'];
+  handsOnAssignment?: CourseExperience['practicalTask'];
+  glossaryTerms: CourseExperience['glossary'];
+  references: CourseExperience['resources'];
+  completionRule: { minimumScore: number; requiredInteractions: string[]; requireMediaCompletion: boolean };
+  accessibility: { captionsRequired: true; transcriptRequired: true; keyboardReady: true; altTextRequired: true };
+};
+
+export type CompleteModule = { objectives:string[]; lessons:InteractiveLesson[]; moduleAssessment:{questionCount:number;passingScore:number}; remediationRules:Array<{objective:string;action:string}> };
+export type CompleteCourse = { credential:{governingBody:string;standardVersion:string;domains:string[]}; modules:CompleteModule[]; questionBank:Array<{question:string;domainKey:string;explanation:string}>; practiceExams:Array<{title:string;questionCount:number;passingScore:number}>; resources:CourseExperience['resources']; accessibility:{captions:boolean;transcripts:boolean;keyboardReady:boolean;altText:boolean}; learnerPreview:{renderable:boolean;checkedAt:string}; publicationReadiness:Record<PublicationRequirement,boolean> };

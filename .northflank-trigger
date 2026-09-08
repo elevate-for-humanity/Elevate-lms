@@ -1,5 +1,4 @@
-# Trigger Northflank production deployment
-# Remove repeated LMS loading flash after route transitions and document uploads
-merge_sha=2b256277691ce497ca4af74e6a7117150636a7bd
-requested_at=2026-09-04T05:33:00Z
-services=lms
+merge_sha=28a83058523d6dd593bd04d0dd074e7ee2766a1a
+services=admin
+requested_at=2026-09-08T12:02:00Z
+reason=deploy-unified-mobile-studio

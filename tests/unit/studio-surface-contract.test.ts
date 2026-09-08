@@ -159,6 +159,13 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('Active workspace');
   });
 
+  it('does not frame the full-screen Studio command workspace twice', () => {
+    const navigation = source('apps/admin/app/studio/StudioNavigation.client.tsx');
+
+    expect(navigation).toContain("usePathname");
+    expect(navigation).toContain("if (pathname === '/studio') return null");
+  });
+
   it('greets Store visitors with the PARIS product interview', () => {
     const wrapper = source('apps/marketing/app/store/StoreClientWrapper.tsx');
     const guide = source('components/store/StoreGuideChat.tsx');

@@ -51,7 +51,7 @@ function isOpenHandsStatusCommand(lower: string): boolean {
 function isEngineeringCommand(lower: string): boolean {
   if (/\bopenhands\b/.test(lower)) return true;
   const engineeringNoun =
-    /\b(code|codebase|repo|repository|github|pull request|pr\b|branch|commit|typescript|javascript|route|component|api endpoint|test file|regression test|ci\b|workflow file|source file)\b/.test(
+    /\b(code|codebase|repo|repository|github|pull request|pr\b|branch|commit|typescript|javascript|route|component|api endpoint|test file|regression test|ci\b|workflow file|source file|container|devcontainer|studio workspace)\b/.test(
       lower,
     );
   const engineeringVerb =
@@ -177,6 +177,12 @@ export function planAIToolFromCommand(
   }
   if (/\b(system|platform)\b.*\b(health|status)\b|\bhealth check\b/.test(lower)) {
     return { name: 'system.health', input: {} };
+  }
+  if (
+    /\b(container|devcontainer|studio workspace)\b/.test(lower) &&
+    /\b(scan|audit|inspect|check|diagnose|find|health|status|errors?|failures?|configuration)\b/.test(lower)
+  ) {
+    return { name: 'devstudio.health', input: {} };
   }
   if (
     /\b(create|make|generate|render)\b.*\b(commercial|promo|promotional)\b.*\bvideo\b|\bcommercial video\b/.test(

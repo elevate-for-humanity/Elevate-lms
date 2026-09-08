@@ -28,6 +28,22 @@ async function findUserByEmail(email) {
 }
 
 async function sendWelcomeEmail({ email, contactName, actionLink }) {
+  const sendgridKey = process.env.SENDGRID_API_KEY?.trim();
+  const resendKey = process.env.RESEND_API_KEY?.trim();
+  if (!sendgridKey && resendKey) {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM || 'Elevate for Humanity <info@elevateforhumanity.org>',
+        to: [email],
+        subject: 'Your CDL Academy Program Holder portal is ready',
+        html: `<p>Hello ${contactName},</p><p>The CDL Academy has been activated as a Program Holder for the CDL Training program.</p><p><a href="${actionLink}">Set your password and open the Program Holder portal</a></p><p>After setting your password, you can return to <a href="${PORTAL_URL}">${PORTAL_URL}</a>.</p><p>Elevate for Humanity</p>`,
+      }),
+    });
+    if (!response.ok) throw new Error(`Resend failed (${response.status}): ${await response.text()}`);
+    return;
+  }
   const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: {
@@ -126,7 +142,6 @@ const { error: profileError } = await db.from('profiles').upsert({
   company_name: application.organization_name,
   role: 'program_holder',
   roles: ['program_holder'],
-  portal_type: 'program_holder',
   program_holder_id: holder.id,
   status: 'active',
   enrollment_status: 'active',

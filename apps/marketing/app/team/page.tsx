@@ -5,6 +5,16 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { TEAM } from '@/data/team';
 
+function teamMemberSlug(member: { name: string }): string {
+  return member.name
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
@@ -83,7 +93,7 @@ export default async function TeamPage() {
                 <p className="text-sm text-slate-700 line-clamp-3">{member.bio}</p>
                 {member.id && (
                   <Link
-                    href={`/about/team/${member.id}`}
+                    href={`/about/team/${teamMemberSlug(member)}`}
                     className="mt-3 inline-block text-sm font-medium text-brand-red-600 hover:underline"
                   >
                     Read more →

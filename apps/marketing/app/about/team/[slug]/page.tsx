@@ -3,13 +3,31 @@ import { getTeamMembers } from '@/lib/content';
 import { buildMetadata } from '@/lib/cf-seo';
 import { siteConfig } from '@/content/cf-site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { TEAM } from '@/data/team';
 
 export const dynamic = 'force-dynamic';
 
+function teamMemberSlug(member: { name: string }): string {
+  return member.name
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+async function findTeamMember(slug: string) {
+  const databaseMembers = await getTeamMembers().catch(() => []);
+  return (
+    databaseMembers.find((member) =>
+      member.id === slug || teamMemberSlug(member) === slug,
+    ) ?? TEAM.find((member) => member.id === slug || teamMemberSlug(member) === slug)
+  );
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const teamMembers = await getTeamMembers();
-  const member = teamMembers.find((m) => m.id === slug);
+  const member = await findTeamMember(slug);
   if (!member) return {};
   return buildMetadata({
     title: member.name,
@@ -20,8 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function TeamMemberPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const teamMembers = await getTeamMembers();
-  const member = teamMembers.find((m) => m.id === slug);
+  const member = await findTeamMember(slug);
   if (!member) return notFound();
 
   return (

@@ -181,8 +181,8 @@ jobs:
         run: |
           set -euo pipefail
           for url in \
-            'https://admin.elevateforhumanity.org/dashboard' \
-            'https://admin.elevateforhumanity.org/dashboard?utm_source=homescreen&utm_medium=pwa' \
+            'https://admin.elevateforhumanity.org/studio/browser' \
+            'https://admin.elevateforhumanity.org/studio/browser?utm_source=homescreen&utm_medium=pwa' \
             'https://admin.elevateforhumanity.org/manifest-admin.json' \
             'https://admin.elevateforhumanity.org/sw-admin.js' \
             'https://admin.elevateforhumanity.org/offline.html'; do
@@ -190,6 +190,6 @@ jobs:
             case "$status" in 2*|3*) ;; *) echo "::error::$url failed HTTP $status"; exit 1;; esac
           done
           manifest=$(curl -fsSL --max-time 20 https://admin.elevateforhumanity.org/manifest-admin.json)
-          echo "$manifest" | grep -q '"start_url"[[:space:]]*:[[:space:]]*"/dashboard"' || { echo '::error::Admin manifest does not use canonical /dashboard start_url'; exit 1; }
+          echo "$manifest" | grep -q '"start_url"[[:space:]]*:[[:space:]]*"/studio/browser"' || { echo '::error::Admin manifest does not use canonical /studio/browser start_url'; exit 1; }
           worker=$(curl -fsSL --max-time 20 https://admin.elevateforhumanity.org/sw-admin.js)
           echo "$worker" | grep -q 'Service Worker — Admin Domain' || { echo '::error::Admin service worker is not the canonical worker'; exit 1; }

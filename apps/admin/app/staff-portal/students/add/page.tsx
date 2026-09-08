@@ -31,9 +31,9 @@ export default async function AddStudentPage() {
 
   const { data: rawPrograms, error } = await supabase
     .from('programs')
-    .select('id, name, slug, funding_types, price_self_pay')
+    .select('id, name, title, slug, funding_eligibility, tuition, total_cost, price')
     .eq('is_active', true)
-    .order('name');
+    .order('title');
 
   if (error) {
     console.error('[staff/add-student] failed to load programs:', error.message);
@@ -41,10 +41,10 @@ export default async function AddStudentPage() {
 
   const programs = (rawPrograms ?? []).map((program: any) => ({
     id: String(program.id),
-    name: String(program.name || program.slug || 'Program'),
+    name: String(program.title || program.name || program.slug || 'Program'),
     slug: String(program.slug || ''),
-    funding_types: Array.isArray(program.funding_types) ? program.funding_types : [],
-    price_self_pay: typeof program.price_self_pay === 'number' ? program.price_self_pay : null,
+    funding_types: Array.isArray(program.funding_eligibility) ? program.funding_eligibility : [],
+    price_self_pay: Number(program.tuition ?? program.total_cost ?? program.price) || null,
   }));
 
   return (

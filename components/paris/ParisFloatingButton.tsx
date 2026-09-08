@@ -27,6 +27,17 @@ export function ParisFloatingButton({
   const assistantLabel = learnerSurface ? 'PARIS Learning Assistant' : portalSurface ? 'PARIS Portal Assistant' : 'PARIS Career Assistant';
 
   useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') close();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [close, isOpen]);
+
+  useEffect(() => {
     const handleIssue = (event: Event) => {
       const issue = (event as CustomEvent<PortalSupportIssue>).detail;
       if (!issue?.workflow || !issue.message) return;
@@ -97,7 +108,7 @@ export function ParisFloatingButton({
 
           <div className="pointer-events-auto relative z-10 ml-auto flex h-[100dvh] min-h-0 w-full max-w-full flex-col overflow-hidden bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200 sm:h-[min(680px,calc(100dvh-8rem))] sm:w-[min(480px,calc(100vw-3rem))] sm:rounded-2xl sm:border sm:border-slate-200 sm:pb-0">
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 shrink-0 bg-white">
-              <div className="flex items-center gap-3">
+              <div className="min-w-0 flex items-center gap-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-red-600 flex items-center justify-center text-white text-sm sm:text-base font-bold shrink-0">
                   P
                 </div>
@@ -111,11 +122,14 @@ export function ParisFloatingButton({
                 </div>
               </div>
               <button
+                type="button"
                 onClick={close}
-                aria-label="Close chat"
-                className="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-lg hover:bg-slate-100"
+                aria-label="Close PARIS"
+                title="Close PARIS"
+                className="ml-2 inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-black text-slate-800 shadow-sm transition-colors hover:border-brand-red-300 hover:bg-brand-red-50 hover:text-brand-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
               >
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" aria-hidden="true" />
+                <span className="hidden min-[380px]:inline">Close</span>
               </button>
             </div>
 

@@ -7,3 +7,4 @@ export {
   SezzleInfoTooltip,
 } from './SezzlePaymentCard';
 export { default as SezzleVirtualCard } from './SezzleVirtualCard';
+export { UnifiedCheckoutButton } from './UnifiedCheckoutButton';

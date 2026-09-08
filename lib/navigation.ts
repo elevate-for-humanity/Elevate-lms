@@ -65,6 +65,11 @@ export const NAV_ITEMS: NavItem[] = [
       },
       { name: 'Web Development', href: '/programs/web-development', isSectionLink: true },
       { name: 'Data Analytics', href: '/programs/data-analytics', isSectionLink: true },
+      { name: 'Microcourses & Certifications', isHeader: true, href: '/microclasses' },
+      { name: 'All Microcourses', href: '/microclasses', isSectionLink: true },
+      { name: 'Job Ready Indy', href: ROUTES.fundingJobReadyIndy, isSectionLink: true },
+      { name: 'Certification Testing', href: '/certification-testing', isSectionLink: true },
+      { name: 'Testing Products', href: '/store/testing', isSectionLink: true },
     ],
   },
   {
@@ -139,7 +144,12 @@ export const NAV_ITEMS: NavItem[] = [
     subItems: [
       { name: 'Choose Your Portal', href: '/online-apps', isSectionLink: true },
       { name: 'Creator Studio', href: ROUTES.creatorPortal, isSectionLink: true, isAuth: true },
-      { name: 'Testing Center Operations', href: ROUTES.testingPortal, isSectionLink: true, isAuth: true },
+      {
+        name: 'Testing Center Operations',
+        href: ROUTES.testingPortal,
+        isSectionLink: true,
+        isAuth: true,
+      },
       {
         name: 'Secure Sign In',
         href: ROUTES.login,

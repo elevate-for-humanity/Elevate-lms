@@ -58,10 +58,6 @@ async function uploadHostShopDocument(formData: FormData) {
   if (!ALLOWED_TYPES.has(fileEntry.type)) {
     redirect('/host-shop/onboarding/documents?error=file_type');
   }
-  if (requirement.requires_expiration && !expirationDate) {
-    redirect('/host-shop/onboarding/documents?error=expiration_required');
-  }
-
   const fileName = safeFileName(fileEntry.name || `${documentType}.bin`);
   const storagePath = `${partner.id}/${documentType}/${Date.now()}-${fileName}`;
   const { error: uploadError } = await db.storage
@@ -151,9 +147,7 @@ export default async function HostShopDocumentsPage({
         ? 'That file is larger than 10 MB.'
         : params.error === 'file_type'
           ? 'Upload PDF, JPG, or PNG files only.'
-          : params.error === 'expiration_required'
-            ? 'This document requires an expiration date.'
-            : params.error === 'upload_failed'
+          : params.error === 'upload_failed'
               ? 'The file could not be uploaded. Your existing records are safe. Please try again.'
               : params.error === 'record_failed'
                 ? 'The file uploaded, but its dashboard record could not be saved. Please try again.'
@@ -247,13 +241,16 @@ export default async function HostShopDocumentsPage({
                       </label>
                       {requirement.requires_expiration ? (
                         <label className="font-bold">
-                          Expiration date *
+                          Expiration date (if known)
                           <input
                             type="date"
                             name="expirationDate"
-                            required
                             className="mt-2 w-full rounded-xl border border-slate-400 px-4 py-3 font-medium"
                           />
+                          <span className="mt-1 block text-xs font-medium text-slate-600">
+                            You may upload the license now and provide the expiration date during
+                            review.
+                          </span>
                         </label>
                       ) : null}
                     </div>

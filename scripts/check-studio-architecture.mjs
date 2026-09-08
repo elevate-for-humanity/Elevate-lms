@@ -113,7 +113,7 @@ for (const oversizedImage of [
 }
 
 const adminLayout = read('apps/admin/app/layout.tsx');
-const privilegedNavigationSurfaces = ['AdminNavShell', 'AdminHeader'];
+const privilegedNavigationSurfaces = ['AdminApplicationChrome', 'AdminNavShell', 'AdminHeader'];
 if (!privilegedNavigationSurfaces.some((surface) => adminLayout.includes(surface))) {
   fail(
     `Admin layout is missing a privileged navigation surface: ${privilegedNavigationSurfaces.join(' or ')}`,

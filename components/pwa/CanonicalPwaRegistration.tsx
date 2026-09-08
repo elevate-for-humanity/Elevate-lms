@@ -42,6 +42,18 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     if (process.env.NODE_ENV !== 'production' || !('serviceWorker' in navigator)) return;
     const config = PWA_APPLICATIONS[application];
     let cancelled = false;
+    let reloadingForControllerChange = false;
+
+    const activateCurrentBuild = () => {
+      if (cancelled || reloadingForControllerChange) return;
+      reloadingForControllerChange = true;
+      window.location.reload();
+    };
+
+    // Installed Android PWAs can keep the previous JavaScript bundle alive
+    // after a successful production rollout. Reload exactly once when the new
+    // worker takes control so the visible app and deployed server cannot drift.
+    navigator.serviceWorker.addEventListener('controllerchange', activateCurrentBuild);
 
     const register = async () => {
       try {
@@ -91,7 +103,10 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     };
 
     void register();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      navigator.serviceWorker.removeEventListener('controllerchange', activateCurrentBuild);
+    };
   }, [application]);
 
   return null;

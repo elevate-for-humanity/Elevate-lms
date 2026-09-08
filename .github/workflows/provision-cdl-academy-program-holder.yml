@@ -1,0 +1,36 @@
+name: Provision CDL Academy Program Holder
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/ops/provision-cdl-academy-program-holder.mjs'
+      - '.github/workflows/provision-cdl-academy-program-holder.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: provision-cdl-academy-program-holder
+  cancel-in-progress: false
+
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      SENDGRID_FROM_EMAIL: ${{ secrets.SENDGRID_FROM_EMAIL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Provision account, assign CDL Training, and email portal link
+        run: node scripts/ops/provision-cdl-academy-program-holder.mjs

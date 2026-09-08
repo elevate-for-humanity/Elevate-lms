@@ -1,7 +1,7 @@
 /**
  * Admin application root layout.
  *
- * The authenticated Admin surface owns its navigation and operational UI.
+ * The authenticated Admin surface owns its navigation and operational UI through\n * the canonical AdminApplicationChrome shared by Dashboard and Studio.
  * Public/marketing support widgets and marketing-style footers must not be
  * mounted here because they compete with the mobile admin navigation layer and
  * expose canned public actions inside a privileged workspace.

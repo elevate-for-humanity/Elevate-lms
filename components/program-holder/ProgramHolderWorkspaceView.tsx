@@ -189,6 +189,33 @@ export async function ProgramHolderWorkspaceView({
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {!data.holder?.mou_signed ? (
+        <section
+          role="alert"
+          className="rounded-2xl border-2 border-amber-400 bg-amber-50 p-5 shadow-sm sm:p-6"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">
+                Required agreement
+              </p>
+              <h2 className="mt-1 text-xl font-black text-amber-950">
+                Your Program Holder MOU is ready to review and sign
+              </h2>
+              <p className="mt-2 text-sm font-semibold leading-6 text-amber-900">
+                Read the full agreement and complete the electronic signature. The signed record
+                will be saved to your compliance file.
+              </p>
+            </div>
+            <Link
+              href="/program-holder/sign-mou"
+              className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-amber-900 px-5 py-3 text-sm font-black text-white hover:bg-amber-950"
+            >
+              Open and sign MOU
+            </Link>
+          </div>
+        </section>
+      ) : null}
       <DashboardHero
         title={data.holder?.organization_name || data.holder?.name || 'Program Holder'}
         programLabel={primaryProgramLabel}

@@ -8,6 +8,7 @@ import AITeachingPlayer, { type TeachingSlide } from '@/components/lms/AITeachin
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import LessonProgressClient from './LessonProgressClient';
 import LessonFocusShell from '@/components/lms/LessonFocusShell';
+import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/InteractiveVideoPlayer';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -98,6 +99,54 @@ function teachingSlidesFromExperience(
   return authored.length ? authored.slice(0, 12) : teachingSlides(title, html);
 }
 
+function checkpointsFromTimeline(
+  timeline: Record<string, any> | undefined,
+  experience: Record<string, any> | null,
+): Checkpoint[] {
+  const events = Array.isArray(timeline?.events) ? timeline.events : [];
+  const questions = Array.isArray(experience?.knowledgeChecks) ? experience.knowledgeChecks : [];
+  let questionIndex = 0;
+  return events.flatMap((event: any): Checkpoint[] => {
+    const timestamp = Number(event?.at);
+    if (!Number.isFinite(timestamp) || event?.required === false) return [];
+    if (event.type === 'question') {
+      const question = questions[questionIndex++];
+      if (!question || !Array.isArray(question.options)) return [];
+      return [
+        {
+          type: 'quiz',
+          timestamp,
+          question: String(question.question),
+          options: question.options.map(String),
+          answer: Number(question.correct ?? question.correctAnswer),
+          explanation: question.explanation ? String(question.explanation) : undefined,
+        },
+      ];
+    }
+    if (event.type === 'remediation')
+      return [
+        { type: 'key-concept', timestamp, concept: `Required review: ${String(event.objective)}` },
+      ];
+    if (event.type === 'diagram')
+      return [
+        {
+          type: 'key-concept',
+          timestamp,
+          concept: 'Review the required technical diagram before continuing.',
+        },
+      ];
+    if (event.type === 'pause')
+      return [
+        {
+          type: 'key-concept',
+          timestamp,
+          concept: 'Pause and confirm the demonstrated step before continuing.',
+        },
+      ];
+    return [];
+  });
+}
+
 export default async function LessonPage({
   params,
 }: {
@@ -174,6 +223,21 @@ export default async function LessonPage({
   const keyTerms = Array.isArray(lesson.key_terms) ? lesson.key_terms : [];
   const lessonHtml = htmlFromContent(lesson.content, lesson.rendered_html);
   const experience = lessonExperience(lesson.content_json, lesson.content);
+  const interactiveVideo = experience?.interactiveVideo as Record<string, any> | undefined;
+  const instructionalTimeline = experience?.instructionalTimeline as
+    | Record<string, any>
+    | undefined;
+  const authoredVideoCheckpoints = Array.isArray(interactiveVideo?.checkpoints)
+    ? (interactiveVideo.checkpoints as Checkpoint[])
+    : [];
+  const videoCheckpoints = authoredVideoCheckpoints.length
+    ? authoredVideoCheckpoints
+    : checkpointsFromTimeline(instructionalTimeline, experience);
+  const videoTranscript = Array.isArray(interactiveVideo?.transcript)
+    ? interactiveVideo.transcript
+    : Array.isArray(instructionalTimeline?.captions)
+      ? instructionalTimeline.captions
+      : [];
   const slides = teachingSlidesFromExperience(lesson.title, lessonHtml, experience);
   const videoConfig =
     lesson.video_config && typeof lesson.video_config === 'object'
@@ -258,16 +322,14 @@ export default async function LessonPage({
               Watch the produced lesson video
             </summary>
             <div className="border-t border-cyan-100 p-3">
-              <video
-                controls
-                preload="metadata"
-                playsInline
-                poster={lessonVisual?.poster_url ?? lessonVisual?.asset_url ?? undefined}
-                className="aspect-video w-full rounded-2xl bg-white"
-                src={lesson.video_url}
-              >
-                Your browser does not support HTML video.
-              </video>
+              <InteractiveVideoPlayer
+                videoUrl={lesson.video_url}
+                title={lesson.title}
+                lessonId={lesson.id}
+                courseId={course.id}
+                checkpoints={videoCheckpoints}
+                transcript={videoTranscript}
+              />
             </div>
           </details>
         ) : null}

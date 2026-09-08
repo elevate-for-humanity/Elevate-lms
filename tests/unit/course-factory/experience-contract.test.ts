@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { CourseExperienceSchema } from '@/lib/course-factory/experience-contract';
+import {
+  CourseExperienceSchema,
+  InstructionalTimelineSchema,
+} from '@/lib/course-factory/experience-contract';
 
 const completeExperience = {
   readingGuide: {
@@ -132,5 +135,38 @@ describe('CourseExperienceSchema', () => {
   it('rejects incomplete generic lesson output', () => {
     const incomplete = { ...completeExperience, flashcards: [], knowledgeChecks: [] };
     expect(CourseExperienceSchema.safeParse(incomplete).success).toBe(false);
+  });
+});
+
+describe('InstructionalTimelineSchema', () => {
+  const timeline = {
+    version: 1,
+    width: 1920,
+    height: 1080,
+    fps: 30,
+    durationSeconds: 180,
+    scenes: [
+      { id: 'intro', startTime: 0, endTime: 60, purpose: 'introduction', visualType: 'instructor', narration: 'Introduce the objective.', visualDirection: 'Instructor demonstrates the objective.', onScreenText: ['Objective'], sourceReferences: ['Approved standard'] },
+      { id: 'demo', startTime: 60, endTime: 180, purpose: 'demonstration', visualType: 'technical-diagram', narration: 'Demonstrate the procedure.', visualDirection: 'Show a labeled technical diagram.', onScreenText: ['Procedure'], sourceReferences: ['Approved manual'] },
+    ],
+    captions: [{ start: 0, end: 10, text: 'Introduce the objective.' }],
+    events: [{ type: 'question', id: 'checkpoint-1', at: 60, questionId: 'knowledge-check-1', required: true }],
+    requiredWatchPercent: 95,
+    minimumSeatTimeSeconds: 150,
+    preventSeekPastRequiredEvents: true,
+    resumeEnabled: true,
+  } as const;
+
+  it('accepts an ordered synchronized timeline', () => {
+    expect(InstructionalTimelineSchema.safeParse(timeline).success).toBe(true);
+  });
+
+  it('rejects overlapping scenes and out-of-range events', () => {
+    const invalid = {
+      ...timeline,
+      scenes: [timeline.scenes[0], { ...timeline.scenes[1], startTime: 30 }],
+      events: [{ ...timeline.events[0], at: 181 }],
+    };
+    expect(InstructionalTimelineSchema.safeParse(invalid).success).toBe(false);
   });
 });

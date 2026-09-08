@@ -39,6 +39,7 @@ type Payload = {
   visualPrompt?: string | null;
   practicalTask?: any;
   interactiveVideo?: any;
+  instructionalTimeline?: any;
   experience?: Record<string, unknown> | null;
 };
 
@@ -98,7 +99,9 @@ export default function InteractiveLessonExperience({
     !!payload?.narrationScript ||
     !!payload?.visualPrompt ||
     !!payload?.practicalTask ||
-    !!payload?.interactiveVideo;
+    !!payload?.interactiveVideo ||
+    !!payload?.instructionalTimeline;
+  const timeline = payload?.instructionalTimeline;
 
   if (loading)
     return (
@@ -120,6 +123,8 @@ export default function InteractiveLessonExperience({
           apply the skill in a realistic workplace context.
         </p>
       </div>
+
+      {timeline ? <InstructionalTimelineOverview timeline={timeline} /> : null}
 
       {payload?.narrationScript ? (
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -183,6 +188,52 @@ export default function InteractiveLessonExperience({
         />
       ) : null}
     </section>
+  );
+}
+
+function InstructionalTimelineOverview({ timeline }: { timeline: any }) {
+  const scenes = Array.isArray(timeline?.scenes) ? timeline.scenes : [];
+  const events = Array.isArray(timeline?.events) ? timeline.events : [];
+  if (!scenes.length) return null;
+  return (
+    <div className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-indigo-700">
+            Interactive timeline
+          </p>
+          <h3 className="text-lg font-extrabold">Required lesson sequence</h3>
+        </div>
+        <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-900">
+          {Number(timeline.requiredWatchPercent ?? 95)}% watch ·{' '}
+          {events.filter((event: any) => event?.required !== false).length} required checkpoints
+        </span>
+      </div>
+      <ol className="mt-4 grid gap-3 md:grid-cols-2">
+        {scenes.map((scene: any, index: number) => (
+          <li
+            key={scene.id ?? index}
+            className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+          >
+            <p className="text-xs font-black uppercase tracking-wide text-indigo-700">
+              Scene {index + 1} · {String(scene.purpose ?? 'instruction')}
+            </p>
+            <p className="mt-1 font-bold text-slate-950">
+              {String(scene.visualType ?? 'instructional media').replaceAll('-', ' ')}
+            </p>
+            <p className="mt-1 text-sm text-slate-600">
+              {Math.round(Number(scene.startTime ?? 0))}s–{Math.round(Number(scene.endTime ?? 0))}s
+            </p>
+          </li>
+        ))}
+      </ol>
+      {timeline.preventSeekPastRequiredEvents ? (
+        <p className="mt-4 text-sm font-semibold text-slate-700">
+          Required checkpoints must be completed in order; seeking cannot bypass them. Resume
+          position is saved.
+        </p>
+      ) : null}
+    </div>
   );
 }
 

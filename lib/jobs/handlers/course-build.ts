@@ -14,6 +14,26 @@ export interface CourseBuildJob {
   result?: Record<string, unknown> | null;
 }
 
+const productionStageMap: Partial<Record<FactoryStage, { worker: string; state: string }>> = {
+  init: { worker: 'orchestrator', state: 'requested' },
+  resolve: { worker: 'orchestrator', state: 'planning' },
+  blueprint: { worker: 'instructional_llm', state: 'planning' },
+  instructional_plan: { worker: 'instructional_llm', state: 'planning' },
+  technical_review: { worker: 'technical_verification', state: 'technical_review' },
+  storyboard: { worker: 'storyboard', state: 'storyboard_ready' },
+  enrich: { worker: 'instructional_llm', state: 'planning' },
+  assess: { worker: 'technical_verification', state: 'technical_review' },
+  validate: { worker: 'technical_verification', state: 'technical_review' },
+  generating_assets: { worker: 'image', state: 'generating_assets' },
+  generating_narration: { worker: 'narration', state: 'generating_narration' },
+  media: { worker: 'gpu_render', state: 'rendering' },
+  rendering: { worker: 'gpu_render', state: 'rendering' },
+  quality_review: { worker: 'quality_control', state: 'quality_review' },
+  human_review: { worker: 'publisher', state: 'human_review' },
+  publish: { worker: 'publisher', state: 'human_review' },
+  complete: { worker: 'quality_control', state: 'human_review' },
+};
+
 function resumableMediaCheckpoint(job: CourseBuildJob): string | null {
   const checkpoint = job.result;
   if (!checkpoint || checkpoint.ok !== true || typeof checkpoint.courseId !== 'string') return null;
@@ -33,6 +53,7 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
   const checkpointCourseId = resumableMediaCheckpoint(job);
 
   const progress = (stage: FactoryStage, message: string, value = 0) => {
+    const production = productionStageMap[stage];
     progressWrites.push(
       db
         .from('devstudio_jobs')
@@ -52,6 +73,28 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
             });
         }),
     );
+    if (production) {
+      progressWrites.push(
+        db
+          .rpc('record_course_production_stage', {
+            p_job_id: job.id,
+            p_course_id: job.tool_args.courseId ?? null,
+            p_worker_kind: production.worker,
+            p_run_state: production.state,
+            p_worker_status: 'running',
+            p_evidence: { message, progress: Math.max(0, Math.min(99, Math.round(value))) },
+            p_error: null,
+          })
+          .then(({ error }) => {
+            if (error)
+              logger.warn('[course-build] production-stage update failed', {
+                jobId: job.id,
+                stage,
+                error: error.message,
+              });
+          }),
+      );
+    }
   };
 
   // Long provider calls can be quiet for several minutes. Renew the lease on
@@ -116,6 +159,15 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
     courseId: result.courseId,
   });
   if (!finalization.ok) {
+    await db.rpc('record_course_production_stage', {
+      p_job_id: job.id,
+      p_course_id: result.courseId,
+      p_worker_kind: 'quality_control',
+      p_run_state: 'quality_review',
+      p_worker_status: 'blocked',
+      p_evidence: { media: finalization.media },
+      p_error: 'Required media or quality evidence is incomplete',
+    });
     const now = new Date();
     const retryAt = new Date(now.getTime() + 5 * 60_000);
     const { error: pendingError } = await db
@@ -137,6 +189,15 @@ export async function processCourseBuild(job: CourseBuildJob): Promise<void> {
     return;
   }
   const finishedAt = new Date().toISOString();
+  await db.rpc('record_course_production_stage', {
+    p_job_id: job.id,
+    p_course_id: result.courseId,
+    p_worker_kind: 'quality_control',
+    p_run_state: 'human_review',
+    p_worker_status: 'completed',
+    p_evidence: { media: finalization.media, governance },
+    p_error: null,
+  });
   const { error } = await db
     .from('devstudio_jobs')
     .update({
@@ -160,6 +221,15 @@ export async function failCourseBuild(job: CourseBuildJob, error: unknown): Prom
   const retry = job.attempts < job.max_attempts;
   const now = new Date();
   const retryAt = new Date(now.getTime() + Math.min(30, 2 ** job.attempts) * 60_000);
+  await db.rpc('record_course_production_stage', {
+    p_job_id: job.id,
+    p_course_id: job.tool_args.courseId ?? null,
+    p_worker_kind: 'orchestrator',
+    p_run_state: retry ? 'retryable_failed' : 'permanent_failed',
+    p_worker_status: retry ? 'retryable_failed' : 'permanent_failed',
+    p_evidence: { attempts: job.attempts, maxAttempts: job.max_attempts },
+    p_error: message.slice(0, 4000),
+  });
   await db
     .from('devstudio_jobs')
     .update({

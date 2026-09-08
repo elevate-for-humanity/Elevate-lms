@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
         visualPrompt: authored.visualPrompt ?? null,
         practicalTask: authored.practicalTask ?? null,
         interactiveVideo: authored.interactiveVideo ?? null,
+        instructionalTimeline: authored.instructionalTimeline ?? null,
         experience: authored,
         meta: {
           totalInteractions: interactions.length,

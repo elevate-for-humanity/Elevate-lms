@@ -20,7 +20,7 @@ export default function StudioCommandWorkspace({ workspaces }: { workspaces: Arr
   const [selectedAgent, setSelectedAgent] = useState<StudioSpecialist>('LIZZY');
   const [mode, setMode] = useState<InspectionMode>('browser');
   const [previewUrl, setPreviewUrl] = useState('https://admin.elevateforhumanity.org/dashboard');
-  const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('chat');
+  const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('tool');
 
   const openPreview = (url?: string) => {
     if (url) setPreviewUrl(url);

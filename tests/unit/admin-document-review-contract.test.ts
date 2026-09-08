@@ -5,12 +5,17 @@ const route = readFileSync(
   'utf8',
 );
 const form = readFileSync('components/admin/DocumentReviewForm.tsx', 'utf8');
+const migration = readFileSync(
+  'supabase/migrations/20260908094000_review_document_transaction.sql',
+  'utf8',
+);
 
 describe('admin document review contract', () => {
   it('maps approval to the database verification enum and records the verifier', () => {
-    expect(route).toContain("action === 'approve' ? 'verified' : 'rejected'");
-    expect(route).toContain("verified_by: action === 'approve' ? auth.id : null");
-    expect(route).not.toContain('verification_status: status');
+    expect(route).toContain("'review_document_with_audit'");
+    expect(migration).toContain("verification_status = case when p_action = 'approve' then 'verified' else 'rejected' end");
+    expect(migration).toContain('insert into public.audit_logs');
+    expect(migration).toContain("set search_path = ''");
   });
 
   it('requires a reason for rejection', () => {

@@ -28,7 +28,7 @@ export function OpenPortalPreviewButton({
       if (!response.ok || !result.preview_url) {
         throw new Error(result.error || 'Could not open the portal');
       }
-      window.open(result.preview_url, '_blank', 'noopener,noreferrer');
+      window.location.assign(result.preview_url);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not open the portal');
     } finally {

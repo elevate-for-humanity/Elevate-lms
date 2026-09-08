@@ -97,10 +97,10 @@ export default function PendingAccessPanel({ enrollments }: Props) {
 
   return (
     <div className="bg-white border border-amber-200 rounded-xl overflow-hidden">
-      <div className="bg-amber-50 border-b border-amber-200 px-6 py-4 flex items-center gap-3">
+      <div className="flex items-start gap-3 border-b border-amber-200 bg-amber-50 px-4 py-4 sm:px-6">
         <Clock className="w-5 h-5 text-amber-600 flex-shrink-0" />
         <div>
-          <h2 className="font-bold text-slate-900">Pending Access — Action Required</h2>
+          <h2 className="break-words text-lg font-bold leading-tight text-slate-900 sm:text-xl">Pending Access — Action Required</h2>
           <p className="text-sm text-slate-700">
             {pending.length} student{pending.length !== 1 ? 's' : ''} waiting for LMS access. Review
             documents then grant access.
@@ -135,7 +135,7 @@ export default function PendingAccessPanel({ enrollments }: Props) {
 
           return (
             <div key={e.id}>
-              <div className="px-6 py-4 flex items-center gap-4">
+              <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-3 px-4 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-4 sm:px-6">
                 <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0">
                   <User className="w-5 h-5 text-slate-700" />
                 </div>
@@ -159,11 +159,11 @@ export default function PendingAccessPanel({ enrollments }: Props) {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="col-span-2 grid grid-cols-2 gap-2 sm:col-span-1 sm:flex sm:shrink-0 sm:items-center">
                   <button
                     onClick={() => toggleExpand(e.id)}
                     aria-label="View documents"
-                    className="flex items-center gap-1.5 px-3 py-2 border border-slate-200 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition"
+                    className="flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
                   >
                     {isLoadingDocs ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -183,7 +183,7 @@ export default function PendingAccessPanel({ enrollments }: Props) {
                     title={
                       !onboarded ? 'Student must complete onboarding first' : 'Grant LMS access'
                     }
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-40 sm:px-4"
                   >
                     {isGranting ? (
                       <>

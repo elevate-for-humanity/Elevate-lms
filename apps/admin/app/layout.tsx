@@ -11,7 +11,7 @@ import './globals.css';
 import '../../../styles/contrast-guardrails.css';
 import '../../../styles/responsive-guardrails.css';
 import BuildVersionSync from '@/components/BuildVersionSync';
-import { AdminNavShell } from '@/components/admin/AdminNavShell';
+import { AdminApplicationChrome } from '@/components/admin/AdminApplicationChrome';
 import { DEFAULT_NAV } from '@/lib/admin/nav-config';
 import { I18nProvider } from '@/lib/i18n/context';
 import { AdminPwaRegister } from '@/components/pwa/AdminPwaRegister';
@@ -75,11 +75,8 @@ export default async function AdminGroupLayout({ children }: { children: React.R
         <AdminPwaRegister />
         <AdminUpdateNotice />
         <I18nProvider>
-          <div className="min-h-dvh min-w-0 overflow-x-clip bg-slate-50">
-            <BuildVersionSync />
-            <AdminNavShell navSections={DEFAULT_NAV} />
-            <main className="min-w-0 overflow-x-clip">{children}</main>
-          </div>
+          <BuildVersionSync />
+          <AdminApplicationChrome navSections={DEFAULT_NAV}>{children}</AdminApplicationChrome>
         </I18nProvider>
       </body>
     </html>

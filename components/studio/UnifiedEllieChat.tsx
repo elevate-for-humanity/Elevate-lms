@@ -37,6 +37,15 @@ import {
 
 type ToolCall = { tool: string; args: Record<string, unknown>; result: string };
 
+const ANSI_STYLE_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
+
+function cleanRuntimeOutput(value: string): string {
+  return value
+    .replace(ANSI_STYLE_PATTERN, '')
+    .replace(/\\x1b\[[0-9;]*m/g, '')
+    .trim();
+}
+
 interface EllieAction {
   id: string;
   type: string;
@@ -440,8 +449,7 @@ export default function UnifiedEllieChat({
   function speakAssistantResponse(text: string) {
     if (!voiceOutputEnabled || !text.trim() || !('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
-    const clean = text
-      .replace(/\u001b\[[0-9;]*m/g, '')
+    const clean = cleanRuntimeOutput(text)
       .replace(/[`*_#]/g, '')
       .trim()
       .slice(-1800);
@@ -481,7 +489,7 @@ export default function UnifiedEllieChat({
                 next[assistantIdx] = {
                   ...row,
                   provider: 'registered-tools',
-                  content: `${row.content}${row.content ? '\n' : ''}${line}`,
+              content: `${row.content}${row.content ? '\n' : ''}${cleanRuntimeOutput(line)}`,
                 };
               return next;
             });

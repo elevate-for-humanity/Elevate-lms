@@ -30,7 +30,7 @@ type BrowserEvent = {
 };
 
 export default function CloudBrowserWorkspace() {
-  const [target, setTarget] = useState('https://www.elevateforhumanity.org');
+  const [target, setTarget] = useState('https://admin.elevateforhumanity.org/dashboard');
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
   const [runtimeReady, setRuntimeReady] = useState<boolean | null>(null);
@@ -259,7 +259,7 @@ export default function CloudBrowserWorkspace() {
   }, [endpoint, session]);
 
   return (
-    <div className="flex h-full min-h-[720px] flex-col bg-slate-950 text-white">
+    <div className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
       <header className="flex flex-wrap items-center gap-2 border-b border-slate-800 bg-slate-900 p-3">
         <Globe2 className="h-5 w-5 text-cyan-300" />
         <strong className="mr-2">Cloud Browser</strong>
@@ -310,7 +310,7 @@ export default function CloudBrowserWorkspace() {
         </div>
       )}
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="relative flex min-h-[520px] items-center justify-center overflow-auto bg-slate-800 p-3">
+        <div className="relative flex min-h-0 items-center justify-center overflow-auto bg-slate-800 p-3">
           {session ? (
             <img
               ref={imageRef}
@@ -346,109 +346,4 @@ export default function CloudBrowserWorkspace() {
         <aside className="flex min-h-0 flex-col border-l border-slate-800 bg-slate-950">
           <div className="border-b border-slate-800 p-3">
             <p className="mb-1 text-xs font-black text-violet-300">Governed AI Browser Task</p>
-            <p className="mb-2 text-[10px] text-slate-500">
-              Uses the canonical Studio task ledger and isolated browser. High-impact actions pause
-              for server-recorded approval.
-            </p>
-            {activeTaskId && (
-              <a
-                href="/studio/tasks"
-                className="mb-2 block truncate rounded border border-slate-800 bg-slate-900 px-2 py-1 text-[10px] text-cyan-300 underline"
-              >
-                Task evidence: {activeTaskId}
-              </a>
-            )}
-            <textarea
-              value={agentTask}
-              onChange={(event) => setAgentTask(event.target.value)}
-              rows={3}
-              placeholder="Example: inspect every navigation link and report failures"
-              className="w-full rounded border border-slate-700 bg-slate-900 p-2 text-xs"
-            />
-            <button
-              onClick={() => runAgent()}
-              disabled={!session || !agentTask.trim() || agentRunning}
-              className="mt-2 w-full rounded bg-violet-600 px-3 py-2 text-xs font-black disabled:opacity-50"
-            >
-              {agentRunning ? 'Running approved taskâ€¦' : 'Run AI browser task'}
-            </button>
-            {approvalRequested && (
-              <button
-                onClick={approveAndResume}
-                disabled={agentRunning}
-                className="mt-2 w-full rounded bg-amber-500 px-3 py-2 text-xs font-black text-slate-950 disabled:opacity-50"
-              >
-                Approve canonical task and resume
-              </button>
-            )}
-            {agentResult && (
-              <p className="mt-2 rounded bg-slate-900 p-2 text-[10px] text-slate-300">
-                {agentResult}
-              </p>
-            )}
-          </div>
-          <div className="border-b border-slate-800 p-3">
-            <p className="mb-2 flex items-center gap-2 text-xs font-black">
-              <Keyboard className="h-4 w-4" /> Keyboard input
-            </p>
-            <div className="flex gap-2">
-              <input
-                value={typedText}
-                onChange={(event) => setTypedText(event.target.value)}
-                className="min-w-0 flex-1 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
-              />
-              <button
-                onClick={() => {
-                  void action({ type: 'type', text: typedText });
-                  setTypedText('');
-                }}
-                disabled={!session}
-                className="rounded bg-slate-700 px-2 text-xs"
-              >
-                Type
-              </button>
-            </div>
-            <div className="mt-2 flex gap-2">
-              {['Enter', 'Tab', 'Escape', 'Backspace'].map((key) => (
-                <button
-                  key={key}
-                  onClick={() => action({ type: 'keypress', key })}
-                  disabled={!session}
-                  className="rounded border border-slate-700 px-2 py-1 text-[10px]"
-                >
-                  {key}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="min-h-0 flex-1 overflow-y-auto p-3">
-            <p className="mb-2 flex items-center gap-2 text-xs font-black">
-              <MousePointer2 className="h-4 w-4" /> Browser evidence
-            </p>
-            {events.length ? (
-              events
-                .slice(-100)
-                .reverse()
-                .map((item, index) => (
-                  <div
-                    key={`${item.at}-${index}`}
-                    className="mb-2 rounded border border-slate-800 bg-slate-900 p-2 text-[10px]"
-                  >
-                    <span className="font-bold text-cyan-300">{item.type}</span>{' '}
-                    <span className="text-slate-500">{item.at}</span>
-                    <p className="mt-1 break-all text-slate-300">
-                      {item.text || item.error || `${item.status || ''} ${item.url || ''}`}
-                    </p>
-                  </div>
-                ))
-            ) : (
-              <p className="text-xs text-slate-500">
-                Console errors, failed requests, and HTTP failures will appear here.
-              </p>
-            )}
-          </div>
-        </aside>
-      </div>
-    </div>
-  );
-}
+            <p classNamµã[h‘éì¶»§q«^t€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰¡¥‘‘•¸¥Ñ•µÌµ•¹Ñ•È…À´ÄÍ´é™±•àˆÉ½±”ô‰É½ÕÀˆ…É¥„µ±…‰•°ô‰¡½½Í”$…•¹Ðˆø(€€€€€€€€€€€ì¡l11%œ°€1%iidœ°€AI%Lt…Ì½¹ÍÐ¤¹µ…À ¡…•¹Ð¤€ôø€ (€€€€€€€€€€€€€€ñ‰ÕÑÑ½¸­•äõí…•¹ÑôÑåÁ”ô‰‰ÕÑÑ½¸ˆ…É¥„µÁÉ•ÍÍ•õíÍ•±•Ñ•‘•¹Ð€ôôô…•¹Ñô½¹±¥¬õì ¤€ôøìÍ•ÑM•±•Ñ•‘•¹Ð¡…•¹Ð¤ìÍ•Ñ½¹Ù•ÉÍ…Ñ¥½¹-•ä ¡Ù…±Õ”¤€ôøÙ…±Õ”€¬€Ä¤ìõô±…ÍÍ9…µ”õíÉ½Õ¹‘•µ±œÁà´ÌÁä´ÈÑ•áÐµáÌ™½¹Ðµ‰±…¬€‘íÍ•±•Ñ•‘•¹Ð€ôôô…•¹Ð€ü€‰œµÝ¡¥Ñ”Ñ•áÐµÍ±…Ñ”´äÔÀœ€è€Ñ•áÐµÍ±…Ñ”´ÌÀÀ¡½Ù•Èé‰œµÝ¡¥Ñ”¼ÄÀõôø(€€€€€€€€€€€€€€€í…•¹ÑlÁt€¬…•¹Ð¹Í±¥” Ä¤¹Ñ½1½Ý•É…Í” ¥ô(€€€€€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€¤¥ô(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€ð½‘¥Øø(€€€€€€€€ñ¹…Ø…É¥„µ±…‰•°ô‰MÑÕ‘¥¼Ñ½½±Ìˆ±…ÍÍ9…µ”ô‰ÍÉ½±±‰…Èµ¡¥‘”™±•àµ¥¸µÜ´À¥Ñ•µÌµ•¹Ñ•È…À´Ä½Ù•É™±½Üµàµ…ÕÑ¼‰½É‘•ÈµÐ‰½É‘•ÈµÝ¡¥Ñ”¼ÄÀÁà´ÈÁä´Ä¸Ôˆø(€€€€€€€€€€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ½¹±¥¬õì ¤€ôøÍ•Ñ5½‰¥±•MÕÉ™…” ¡…Ðœ¥ô±…ÍÍ9…µ”ô‰¥¹±¥¹”µ™±•àµ¥¸µ ´äÍ¡É¥¹¬´À¥Ñ•µÌµ•¹Ñ•È…À´ÈÉ½Õ¹‘•µ±œ‰œµÝ¡¥Ñ”¼ÄÀÁà´ÌÑ•áÐµáÌ™½¹Ðµ‰½±¡½Ù•Èé‰œµÝ¡¥Ñ”¼ÄÔˆø(€€€€€€€€€€€€ñ5•ÍÍ…•MÅÕ…É”±…ÍÍ9…µ”ô‰ ´ÐÜ´Ðˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆ€¼ø¡…Ð(€€€€€€€€€€ð½‰ÕÑÑ½¸ø(€€€€€€€€€íÝ½É­ÍÁ…•Ì¹µ…À ¡Ý½É­ÍÁ…”¤€ôø€ (€€€€€€€€€€€€ñ1¥¹¬­•äõíÝ½É­ÍÁ…”¹¥‘ô¡É•˜õíÝ½É­ÍÁ…”¹É½ÕÑ•ô±…ÍÍ9…µ”ô‰¥¹±¥¹”µ™±•àµ¥¸µ ´äÍ¡É¥¹¬´À¥Ñ•µÌµ•¹Ñ•ÈÉ½Õ¹‘•µ±œÁà´ÌÑ•áÐµáÌ™½¹ÐµÍ•µ¥‰½±Ñ•áÐµÍ±…Ñ”´ÌÀÀ¡½Ù•Èé‰œµÝ¡¥Ñ”¼ÄÀ¡½Ù•ÈéÑ•áÐµÝ¡¥Ñ”ˆùíÝ½É­ÍÁ…”¹±…‰•±ôð½1¥¹¬ø(€€€€€€€€€€¤¥ô(€€€€€€€€ð½¹…Øø(€€€€€€ð½¡•…‘•Èø((€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•àµ¥¸µ ´Àµ¥¸µÜ´À™±•à´Äˆø(€€€€€€€€ñÍ•Ñ¥½¸±…ÍÍ9…µ”õí€‘íµ½‰¥±•MÕÉ™…”€ôôô€¡…Ðœ€ü€™±•àœ€è€¡¥‘‘•¸ôµ¥¸µ ´Àµ¥¸µÜ´À™±•à´Ä™±•àµ½°‰½É‘•ÈµÈ‰½É‘•ÈµÍ±…Ñ”´ÈÀÀ±œé™±•à±œé‰…Í¥ÌµlÐÈ•uôø(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰™±•àÍ¡É¥¹¬´À¥Ñ•µÌµ•¹Ñ•È…À´È‰½É‘•Èµˆ‰½É‘•ÈµÍ±…Ñ”´ÈÀÀ‰œµÍ±…Ñ”´ÔÀÁà´ÌÁä´ÈÍ´é¡¥‘‘•¸ˆø(€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰Ñ•áÐµáÌ™½¹Ðµ‰½±Ñ•áÐµÍ±…Ñ”´ÜÀÀˆù•¹ÐèíÍ•±•Ñ•‘•¹ÑlÁt€¬Í•±•Ñ•‘•¹Ð¹Í±¥” Ä¤¹Ñ½1½Ý•É…Í” ¥ôð½ÍÁ…¸ø(€€€€€€€€€€€€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ½¹±¥¬õì ¤€ôøÍ•Ñ5½‰¥±•MÕÉ™…” Ñ½½°œ¥ô±…ÍÍ9…µ”ô‰µ°µ…ÕÑ¼É½Õ¹‘•µ±œ‰œµÍ±…Ñ”´äÀÀÁà´ÌÁä´ÈÑ•áÐµáÌ™½¹Ðµ‰½±Ñ•áÐµÝ¡¥Ñ”ˆù=Á•¸Ý½É­ÍÁ…”ð½‰ÕÑÑ½¸ø(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€€€ñU¹¥™¥•‘±±¥•¡…Ð­•äõí½¹Ù•ÉÍ…Ñ¥½¹-•åôÁÉ•™•ÉÉ•‘•¹ÐõíÍ•±•Ñ•‘•¹Ñô•µ‰•‘‘•½¹=Á•¹AÉ•Ù¥•Üõì ¤€ôø½Á•¹AÉ•Ù¥•Ü ¥ô½¹AÉ•Ù¥•ÝQ…É•Ðõí½Á•¹AÉ•Ù¥•Ýô€¼ø(€€€€€€€€ð½Í•Ñ¥½¸ø((€€€€€€€€ñÍ•Ñ¥½¸±…ÍÍ9…µ”õí€‘íµ½‰¥±•MÕÉ™…”€ôôô€Ñ½½°œ€ü€™±•àœ€è€¡¥‘‘•¸ôµ¥¸µ ´Àµ¥¸µÜ´À™±•à´Ä™±•àµ½°‰œµÍ±…Ñ”´äÔÀ±œé™±•à±œé‰…Í¥ÌµlÔà•uô…É¥„µ±…‰•°ô‰MÑÕ‘¥¼Ý½É­ÍÁ…”ˆø(€€€€€€€€€€ñ¡•…‘•È±…ÍÍ9…µ”ô‰™±•àµ¥¸µ ´ÄÈÍ¡É¥¹¬´À¥Ñ•µÌµ•¹Ñ•È…À´È‰½É‘•Èµˆ‰½É‘•ÈµÍ±…Ñ”´àÀÀ‰œµÍ±…Ñ”´äÀÀÁà´ÌÑ•áÐµÝ¡¥Ñ”ˆø(€€€€€€€€€€€€ñÍÁ…¸±…ÍÍ9…µ”ô‰µÈµ…ÕÑ¼Ñ•áÐµáÌ™½¹Ðµ‰±…¬ˆùÑ¥Ù”Ý½É­ÍÁ…”ð½ÍÁ…¸ø(€€€€€€€€€€€€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ½¹±¥¬õì ¤€ôøÍ•Ñ5½‘” ÁÉ•Ù¥•Üœ¥ô±…ÍÍ9…µ”õí¥¹±¥¹”µ™±•à¥Ñ•µÌµ•¹Ñ•È…À´ÄÉ½Õ¹‘•µµÁà´ÌÁä´ÈÑ•áÐµáÌ™½¹Ðµ‰½±€‘íµ½‘”€ôôô€ÁÉ•Ù¥•Üœ€ü€‰œµå…¸´ÔÀÀÑ•áÐµÍ±…Ñ”´äÔÀœ€è€Ñ•áÐµÍ±…Ñ”´ÌÀÀ¡½Ù•Èé‰œµÍ±…Ñ”´àÀÀõôøñå”±…ÍÍ9…µ”ô‰ ´ÐÜ´Ðˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆ€¼øAÉ•Ù¥•Üð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ½¹±¥¬õì ¤€ôøÍ•Ñ5½‘” ‰É½ÝÍ•Èœ¥ô±…ÍÍ9…µ”õí¥¹±¥¹”µ™±•à¥Ñ•µÌµ•¹Ñ•È…À´ÄÉ½Õ¹‘•µµÁà´ÌÁä´ÈÑ•áÐµáÌ™½¹Ðµ‰½±€‘íµ½‘”€ôôô€‰É½ÝÍ•Èœ€ü€‰œµÙ¥½±•Ð´ÔÀÀÑ•áÐµÝ¡¥Ñ”œ€è€Ñ•áÐµÍ±…Ñ”´ÌÀÀ¡½Ù•Èé‰œµÍ±…Ñ”´àÀÀõôøñ±½‰”È±…ÍÍ9…µ”ô‰ ´ÐÜ´Ðˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆ€¼ø	É½ÝÍ•Èð½‰ÕÑÑ½¸ø(€€€€€€€€€€€€ñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ½¹±¥¬õì ¤€ôøÍ•Ñ5½‰¥±•MÕÉ™…” ¡…Ðœ¥ô±…ÍÍ9…µ”ô‰É½Õ¹‘•µµÁà´ÌÁä´ÈÑ•áÐµáÌ™½¹Ðµ‰½±Ñ•áÐµÍ±…Ñ”´ÈÀÀ¡½Ù•Èé‰œµÍ±…Ñ”´àÀÀ±œé¡¥‘‘•¸ˆù‘µ¥¸$ð½‰ÕÑÑ½¸ø(€€€€€€€€€€ð½¡•…‘•Èø(€€€€€€€€€€ñ‘¥Ø±…ÍÍ9…µ”ô‰µ¥¸µ ´À™±•à´Ä½Ù•É™±½Üµ¡¥‘‘•¸À´Èˆø(€€€€€€€€€€€íµ½‘”€ôôô€ÁÉ•Ù¥•Üœ€ü€ñI•Á½Í¥Ñ½Éå1¥Ù•AÉ•Ù¥•Ü™¥±•A…Ñ õí¹Õ±±ô½¹Ñ•¹Ðôˆˆ¥¹¥Ñ¥…±UÉ°õíÁÉ•Ù¥•ÝUÉ±ô€¼ø€è€ñ±½Õ‘	É½ÝÍ•É]½É­ÍÁ…”€¼ùô(€€€€€€€€€€ð½‘¥Øø(€€€€€€€€ð½Í•Ñ¥½¸ø(€€€€€€ð½‘¥Øø(€€€€ð½‘¥Øø(€€¤ì)ô(

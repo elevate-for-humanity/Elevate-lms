@@ -2,7 +2,7 @@
   "name": "Elevate Admin",
   "short_name": "Admin",
   "description": "Administrative dashboard for managing programs, students, and operations",
-  "start_url": "/dashboard",
+  "start_url": "/studio/browser",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
@@ -20,6 +20,7 @@
     {"src":"/icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
   ],
   "shortcuts": [
+    {"name":"Studio Browser","short_name":"Browser","url":"/studio/browser","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
     {"name":"Students","short_name":"Students","url":"/students","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
     {"name":"Applications","short_name":"Apps","url":"/applications","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
     {"name":"Reports","short_name":"Reports","url":"/reports","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]}

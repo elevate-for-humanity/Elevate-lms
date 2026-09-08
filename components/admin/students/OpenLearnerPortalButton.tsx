@@ -17,7 +17,7 @@ export function OpenLearnerPortalButton({ studentId }: { studentId: string }) {
       });
       const result = await response.json();
       if (!response.ok || !result.preview_url) throw new Error(result.error || 'Could not open learner portal');
-      window.open(result.preview_url, '_blank', 'noopener,noreferrer');
+      window.location.assign(result.preview_url);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not open learner portal');
     } finally {

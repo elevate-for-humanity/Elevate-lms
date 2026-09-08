@@ -20,7 +20,7 @@ export default async function StudioPage() {
   );
 
   return (
-    <main className="h-[calc(100dvh-56px)] w-full min-w-0 overflow-hidden bg-white text-gray-950">
+    <main className="h-full w-full min-w-0 overflow-hidden bg-white text-gray-950">
       <div className="flex h-full w-full min-w-0 flex-col">
         <section className="min-h-0 min-w-0 flex-1 overflow-hidden bg-white">
           <span className="sr-only">

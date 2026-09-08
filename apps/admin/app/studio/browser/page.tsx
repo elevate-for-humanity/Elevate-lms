@@ -8,5 +8,5 @@ const CloudBrowserWorkspace = dynamic(() => import('@/components/studio/CloudBro
 });
 
 export default function StudioBrowserPage() {
-  return <main className="h-screen min-h-[720px] p-3 lg:p-5"><div className="h-full overflow-hidden rounded-xl border border-slate-800"><CloudBrowserWorkspace /></div></main>;
+  return <main className="h-full min-h-0 overflow-hidden"><CloudBrowserWorkspace /></main>;
 }

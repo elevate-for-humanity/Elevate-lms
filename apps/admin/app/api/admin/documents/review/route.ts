@@ -5,7 +5,6 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { auditedMutation } from '@/lib/audit/transactional';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -32,39 +31,15 @@ async function _POST(request: NextRequest) {
     }
 
     const status = action === 'approve' ? 'approved' : 'rejected';
-    // `status` is the workflow state, while `verification_status` has its own
-    // database contract: pending | verified | rejected.
-    const verificationStatus = action === 'approve' ? 'verified' : 'rejected';
-    // reviewed_by references auth.users, while verified_by references profiles.
-    // A valid admin service account may not have a matching profile row.
-    const { data: reviewerProfile } = await db
-      .from('profiles')
-      .select('id')
-      .eq('id', auth.id)
-      .maybeSingle();
-
-    const { data: updatedDoc, error: updateError } = await auditedMutation({
-      table: 'documents',
-      operation: 'update',
-      rowData: {
-        status,
-        verification_status: verificationStatus,
-        verified: action === 'approve',
-        verified_by: action === 'approve' && reviewerProfile ? auth.id : null,
-        verified_at: action === 'approve' ? new Date().toISOString() : null,
-        reviewed_by: auth.id,
-        reviewed_at: new Date().toISOString(),
-        rejection_reason: action === 'reject' ? rejectionReason : null,
+    const { data: updatedDoc, error: updateError } = await db.rpc(
+      'review_document_with_audit',
+      {
+        p_document_id: documentId,
+        p_action: action,
+        p_actor_id: auth.id,
+        p_rejection_reason: action === 'reject' ? String(rejectionReason).trim() : null,
       },
-      filter: { id: documentId },
-      audit: {
-        action: 'api:post:/api/admin/documents/review',
-        actorId: auth.id,
-        targetType: 'documents',
-        targetId: documentId,
-        metadata: { decision: action },
-      },
-    });
+    );
 
     if (updateError) {
       return NextResponse.json(
@@ -96,7 +71,7 @@ async function _POST(request: NextRequest) {
     const studentUserId = document.user_id;
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
 
-    // The authoritative audit row was committed atomically by auditedMutation.
+    // The authoritative audit row was committed atomically by review_document_with_audit.
     // Legacy telemetry must never turn a successful review into a false failure.
     try {
       await logAdminAudit({

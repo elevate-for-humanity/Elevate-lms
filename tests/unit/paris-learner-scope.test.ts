@@ -13,13 +13,15 @@ describe('PARIS learner scope', () => {
     expect(button).toContain('sm:w-[min(480px,calc(100vw-3rem))]');
   });
 
-  it('correlates the dashboard assistant with the active course', () => {
+  it('mounts learner PARIS once through the canonical platform shell', () => {
+    const shell = source('components/platform/PlatformShell.tsx');
+    const workspace = source('components/lms/LearnerWorkspaceLayout.tsx');
     const dashboard = source('apps/lms/app/lms/(app)/dashboard/page.tsx');
 
-    expect(dashboard).toContain('surface="learner"');
-    expect(dashboard).toContain('courseTitle={activeCourse?.title}');
-    expect(dashboard).toContain('nextLessonTitle={nextLesson?.title}');
-    expect(dashboard).toContain('courseProgress={courseProgress}');
+    expect(shell).toContain("role === 'student' || role === 'apprentice'");
+    expect(shell).toContain('<ParisFloatingWrapper');
+    expect(workspace).not.toContain('<ParisFloatingWrapper');
+    expect(dashboard).not.toContain('<ParisFloatingWrapper');
   });
 
   it('mounts the floating PARIS experience only on the learner dashboard', () => {

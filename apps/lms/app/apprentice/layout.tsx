@@ -7,7 +7,6 @@ import { PlatformShell } from '@/components/platform/PlatformShell';
 import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
-import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
 
 export const metadata: Metadata = {
@@ -79,6 +78,11 @@ export default async function Layout({ children }: { children: React.ReactNode }
       }}
       role="apprentice"
       breadcrumbs={breadcrumbs}
+      paris={{
+        surface: 'learner',
+        courseTitle: beautyProgram ? `${beautyProgram.label} Apprenticeship` : programSlug?.replace(/[-_]/g, ' ') || 'Apprenticeship',
+        nextLessonTitle: 'Complete the required items highlighted in red on your apprentice dashboard',
+      }}
     >
       {subject.previewing && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
@@ -104,11 +108,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
         </a>
       </section>
       <div className="mt-4">{children}</div>
-      <ParisFloatingWrapper
-        surface="learner"
-        courseTitle={beautyProgram ? `${beautyProgram.label} Apprenticeship` : programSlug?.replace(/[-_]/g, ' ') || 'Apprenticeship'}
-        nextLessonTitle="Complete the required items highlighted in red on your apprentice dashboard"
-      />
     </PlatformShell>
   );
 }

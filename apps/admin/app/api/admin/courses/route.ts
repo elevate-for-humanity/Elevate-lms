@@ -20,7 +20,10 @@ export const GET = withAuth(async () => {
     const db = await requireAdminClient();
     const { data, error } = await db.from('courses').select('*').order('updated_at', { ascending: false });
     if (error) return safeDbError(error, 'Unable to load courses');
-    return NextResponse.json({ courses: data ?? [] }, { headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json(
+      { courses: data ?? [], count: data?.length ?? 0 },
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
   } catch (error) {
     return safeInternalError(error, 'Unable to load courses');
   }

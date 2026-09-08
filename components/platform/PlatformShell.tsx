@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
+import type { ParisLearnerContext } from '@/components/paris/ParisFloatingWrapper';
 import { usePathname } from 'next/navigation';
 import { Search, Menu, X, ChevronDown, LogOut, ShieldCheck, Users, Download } from 'lucide-react';
 import type {
@@ -27,6 +28,7 @@ interface PlatformShellProps {
   actions?: ActionItem[];
   notifications?: number;
   children: React.ReactNode;
+  paris?: Partial<ParisLearnerContext> | false;
 }
 
 function isActiveHref(href: string, pathname: string): boolean {
@@ -38,7 +40,7 @@ function isActiveHref(href: string, pathname: string): boolean {
   }
 }
 
-export function PlatformShell({ user, role, actions = [], children }: PlatformShellProps) {
+export function PlatformShell({ user, role, actions = [], children, paris }: PlatformShellProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -382,11 +384,15 @@ export function PlatformShell({ user, role, actions = [], children }: PlatformSh
           </div>
         </main>
       </div>
-      <ParisFloatingWrapper
-        surface={role === 'student' ? 'learner' : 'portal'}
-        portalRole={ROLE_DISPLAY_NAMES[role]}
-        autoOpenOnDashboard
-      />
+      {paris !== false ? (
+        <ParisFloatingWrapper
+          surface={paris?.surface ?? (role === 'student' || role === 'apprentice' ? 'learner' : 'portal')}
+          portalRole={paris?.portalRole ?? ROLE_DISPLAY_NAMES[role]}
+          courseTitle={paris?.courseTitle}
+          nextLessonTitle={paris?.nextLessonTitle}
+          autoOpenOnDashboard={paris?.autoOpenOnDashboard ?? true}
+        />
+      ) : null}
     </div>
   );
 }

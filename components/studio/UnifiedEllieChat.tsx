@@ -829,7 +829,7 @@ export default function UnifiedEllieChat({
               {uploadError}
             </p>
           ) : null}
-          <div className="flex w-full min-w-0 flex-wrap items-end gap-2 rounded-2xl border border-gray-300 bg-white p-2 shadow-sm focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100 sm:flex-nowrap">
+          <div className="flex w-full min-w-0 flex-wrap items-end gap-2 rounded-2xl border border-gray-300 bg-white p-2 shadow-sm focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100">
             <input
               ref={attachmentInputRef}
               type="file"
@@ -887,7 +887,7 @@ export default function UnifiedEllieChat({
               }}
               rows={2}
               placeholder="Tell Admin AI what you need done..."
-              className={`order-first min-h-[88px] min-w-0 basis-full resize-none rounded-xl border px-3 py-2 text-base outline-none sm:order-none sm:min-h-[52px] sm:flex-1 sm:basis-auto sm:text-sm ${inputClass}`}
+              className={`order-first min-h-[88px] w-full min-w-0 basis-full resize-none rounded-xl border px-3 py-2 text-base outline-none sm:min-h-[72px] sm:text-sm ${inputClass}`}
             />
             <button
               type="button"

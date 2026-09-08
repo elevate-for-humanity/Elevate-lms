@@ -80,7 +80,7 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
     });
   }
 
-  const [stripeWebhook, stripeIssuing, staleJobs, missingDocs, unresolvedFlags] = await Promise.all([
+  const [stripeWebhook, stripeIssuing, staleJobs, missingDocs, missingCertifications, unresolvedFlags] = await Promise.all([
     // Check Stripe webhook status via app_secrets or a known sentinel
     db.from('app_secrets').select('value').eq('key', 'STRIPE_WEBHOOK_SECRET').maybeSingle(),
 
@@ -101,6 +101,12 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
       .select('id', { count: 'exact', head: true })
       .eq('enrollment_state', 'active')
       .eq('docs_verified', false),
+
+    // Student credentials reported by a roster/import but still awaiting proof review.
+    db
+      .from('credential_verification')
+      .select('id', { count: 'exact', head: true })
+      .eq('verification_status', 'pending'),
 
     // Unresolved compliance flags (table may not exist — degrade gracefully)
     db.from('compliance_flags').select('id', { count: 'exact', head: true }).eq('resolved', false)
@@ -148,7 +154,7 @@ export async function getSystemHealth(db: SupabaseClient): Promise<DashboardSyst
     staleJobs: staleJobCount,
     degraded: alerts.some((a) => a.severity === 'critical'),
     missingDocuments: missingDocs.count ?? 0,
-    missingCertifications: 0,
+    missingCertifications: missingCertifications.count ?? 0,
     unresolvedFlags: unresolvedFlags.count ?? 0,
     alerts,
   };

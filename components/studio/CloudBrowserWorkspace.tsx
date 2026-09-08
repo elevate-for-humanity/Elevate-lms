@@ -316,7 +316,7 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
         </div>
       )}
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="relative flex min-h-0 items-center justify-center overflow-auto bg-slate-800 p-3">
+        <div className="relative flex min-h-0 items-center justify-center overflow-hidden bg-slate-800">
           {session ? (
             <img
               ref={imageRef}
@@ -324,7 +324,7 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
               alt="Live isolated Chromium browser"
               referrerPolicy="no-referrer"
               draggable={false}
-              className="max-h-full max-w-full cursor-crosshair select-none bg-white shadow-2xl"
+              className="h-full w-full cursor-crosshair select-none bg-white object-contain shadow-2xl"
               onClick={(event) => {
                 const rect = event.currentTarget.getBoundingClientRect();
                 void action({
@@ -349,7 +349,7 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
             </div>
           )}
         </div>
-        <aside className="flex min-h-0 flex-col border-l border-slate-800 bg-slate-950">
+        <aside className="hidden min-h-0 flex-col border-l border-slate-800 bg-slate-950 lg:flex">
           <div className="border-b border-slate-800 p-3">
             <p className="mb-1 text-xs font-black text-violet-300">Governed AI Browser Task</p>
             <p className="mb-2 text-[10px] text-slate-500">

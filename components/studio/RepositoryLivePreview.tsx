@@ -167,9 +167,9 @@ export default function RepositoryLivePreview({
         )}
       </header>
 
-      <div className="min-h-0 flex-1 overflow-auto bg-slate-800 p-3">
+      <div className="min-h-0 flex-1 overflow-auto bg-slate-800">
         <div
-          className="mx-auto h-full min-h-[480px] overflow-hidden rounded-lg bg-white shadow-2xl transition-[width]"
+          className={`mx-auto h-full min-h-[480px] overflow-hidden bg-white transition-[width] ${viewport === 'desktop' ? '' : 'rounded-lg shadow-2xl'}`}
           style={{ width: VIEWPORT_WIDTH[viewport], maxWidth: '100%' }}
         >
           {sourcePreview ? (

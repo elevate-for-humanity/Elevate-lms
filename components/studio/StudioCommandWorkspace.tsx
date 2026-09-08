@@ -21,7 +21,9 @@ export default function StudioCommandWorkspace({ workspaces }: { workspaces: Arr
   const [selectedAgent, setSelectedAgent] = useState<StudioSpecialist>('LIZZY');
   const [mode, setMode] = useState<InspectionMode>('browser');
   const [previewUrl, setPreviewUrl] = useState('https://admin.elevateforhumanity.org/dashboard');
-  const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('tool');
+  // Mobile must open on the command composer. The browser remains one tap away
+  // and receives the same active task context after submission.
+  const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('chat');
   const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
 
   const openPreview = (url?: string) => {
@@ -31,7 +33,7 @@ export default function StudioCommandWorkspace({ workspaces }: { workspaces: Arr
   };
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white">
+    <div className="flex h-[100dvh] min-h-0 min-w-0 flex-col overflow-hidden bg-white lg:h-full">
       <header className="shrink-0 border-b border-slate-200 bg-slate-950 text-white">
         <div className="flex min-h-12 min-w-0 items-center gap-2 px-3">
           <Bot className="h-5 w-5 shrink-0" aria-hidden="true" />
@@ -73,7 +75,7 @@ export default function StudioCommandWorkspace({ workspaces }: { workspaces: Arr
             <button type="button" onClick={() => setMode('browser')} className={`inline-flex items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${mode === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-300 hover:bg-slate-800'}`}><Globe2 className="h-4 w-4" aria-hidden="true" /> Browser</button>
             <button type="button" onClick={() => setMobileSurface('chat')} className="rounded-md px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800 lg:hidden">Admin AI</button>
           </header>
-          <div className="min-h-0 flex-1 overflow-hidden p-2">
+          <div className="min-h-0 flex-1 overflow-hidden lg:p-2">
             {mode === 'preview' ? <RepositoryLivePreview filePath={null} content="" initialUrl={previewUrl} /> : <CloudBrowserWorkspace unifiedTask={activeTask} />}
           </div>
         </section>

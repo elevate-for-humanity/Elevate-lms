@@ -30,7 +30,7 @@ type BrowserEvent = {
 };
 
 export default function CloudBrowserWorkspace() {
-  const [target, setTarget] = useState('https://www.elevateforhumanity.org');
+  const [target, setTarget] = useState('https://admin.elevateforhumanity.org/dashboard');
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
   const [runtimeReady, setRuntimeReady] = useState<boolean | null>(null);
@@ -259,7 +259,7 @@ export default function CloudBrowserWorkspace() {
   }, [endpoint, session]);
 
   return (
-    <div className="flex h-full min-h-[720px] flex-col bg-slate-950 text-white">
+    <div className="flex h-full min-h-0 flex-col bg-slate-950 text-white">
       <header className="flex flex-wrap items-center gap-2 border-b border-slate-800 bg-slate-900 p-3">
         <Globe2 className="h-5 w-5 text-cyan-300" />
         <strong className="mr-2">Cloud Browser</strong>
@@ -310,7 +310,7 @@ export default function CloudBrowserWorkspace() {
         </div>
       )}
       <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="relative flex min-h-[520px] items-center justify-center overflow-auto bg-slate-800 p-3">
+        <div className="relative flex min-h-0 items-center justify-center overflow-auto bg-slate-800 p-3">
           {session ? (
             <img
               ref={imageRef}

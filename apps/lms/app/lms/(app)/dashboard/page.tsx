@@ -87,17 +87,31 @@ export default async function StudentDashboard() {
 
   const [
     certificationsRes,
+    earnedCredentialsRes,
+    reportedCredentialsRes,
     workoneAppRes,
     quizAttemptsRes,
     paymentLogsRes,
     externalCoursesRes,
     externalCompletionsRes,
+    personalCourseAccessRes,
   ] = await Promise.all([
     supabase
       .from('certificates')
       .select('id, course_title, issued_at, verification_code')
       .eq('user_id', subjectId)
       .order('issued_at', { ascending: false }),
+    supabase
+      .from('learner_credentials')
+      .select('id, issued_at, verification_code, credentials(name)')
+      .eq('learner_id', subjectId)
+      .eq('status', 'active')
+      .order('issued_at', { ascending: false }),
+    supabase
+      .from('credential_verification')
+      .select('id, credential_name, issue_date, verification_status')
+      .eq('student_id', subjectId)
+      .order('issue_date', { ascending: false }),
     supabase
       .from('applications')
       .select('id, status, requested_funding_source')
@@ -131,6 +145,12 @@ export default async function StudentDashboard() {
       .from('external_course_completions')
       .select('id, external_course_id, completed_at, certificate_url, approved_at, elevate_sponsored, stripe_session_id')
       .eq('user_id', subjectId),
+    supabase
+      .from('external_course_access')
+      .select('id, provider, provider_course_id, activation_url, access_status, issued_at, notes')
+      .eq('student_id', subjectId)
+      .eq('access_status', 'active')
+      .order('issued_at', { ascending: true }),
   ]);
 
   const programEnrollments = workspace.enrollments.filter((row) => row.program_id).map((row) => ({
@@ -143,7 +163,23 @@ export default async function StudentDashboard() {
   const courseEnrollments = workspace.enrollments
     .filter((row) => row.course_id)
     .map((row) => ({ id: row.enrollment_id, status: row.status, course_id: row.course_id, created_at: row.created_at, completed_at: null })) as CourseEnrollmentRow[];
-  const certifications = certificationsRes.data ?? [];
+  const certifications = [
+    ...(certificationsRes.data ?? []),
+    ...(earnedCredentialsRes.data ?? []).map((row: any) => ({
+      id: row.id,
+      course_title: (Array.isArray(row.credentials) ? row.credentials[0] : row.credentials)?.name ?? 'Credential',
+      issued_at: row.issued_at,
+      verification_code: row.verification_code,
+    })),
+    ...(reportedCredentialsRes.data ?? []).map((row: any) => ({
+      id: row.id,
+      course_title: row.credential_name ?? 'Reported credential',
+      issued_at: row.issue_date,
+      verification_code: null,
+      verification_status: row.verification_status,
+    })),
+  ];
+  const personalCourseAccess = personalCourseAccessRes.data ?? [];
   const recentQuizAttempts = quizAttemptsRes.data ?? [];
   const recentPayments = paymentLogsRes.data ?? [];
   const workoneApp = workoneAppRes.data;
@@ -401,6 +437,28 @@ export default async function StudentDashboard() {
               </section>
             )}
 
+            {personalCourseAccess.length > 0 && (
+              <section className="overflow-hidden rounded-2xl border border-blue-200 bg-white">
+                <div className="border-b border-blue-100 bg-blue-50 px-5 py-4">
+                  <h2 className="flex items-center gap-2 font-black text-slate-950"><ExternalLink className="h-4 w-4" /> My Assigned Training</h2>
+                  <p className="mt-1 text-xs font-medium text-slate-700">These secure training links were assigned directly to your learner account.</p>
+                </div>
+                <div className="divide-y divide-slate-100">
+                  {personalCourseAccess.map((course: any, index: number) => (
+                    <div key={course.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-950">{course.notes || `HVACR assigned course ${index + 1}`}</p>
+                        <p className="mt-1 text-xs font-medium text-slate-700">{course.provider} · Course {course.provider_course_id}</p>
+                      </div>
+                      <a href={course.activation_url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-800">
+                        <ExternalLink className="h-4 w-4" /> Start Training
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
             {externalCourses.length > 0 && (
               <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
                 <div className="border-b border-slate-100 px-5 py-4">
@@ -503,6 +561,7 @@ export default async function StudentDashboard() {
                     <div key={cert.id} className="rounded-xl bg-white p-3">
                       <p className="text-sm font-bold text-slate-950">{cert.course_title ?? 'Certificate'}</p>
                       {cert.issued_at ? <p className="mt-1 text-xs font-medium text-slate-700">{new Date(cert.issued_at).toLocaleDateString()}</p> : null}
+                      {cert.verification_status ? <p className="mt-1 text-xs font-bold capitalize text-amber-800">{String(cert.verification_status).replaceAll('_', ' ')}</p> : null}
                     </div>
                   ))}
                 </div>

@@ -181,13 +181,13 @@ async function _POST(request: NextRequest) {
           user_id: profileId,
           program_id: programId,
           ...(programSlug ? { program_slug: programSlug } : {}),
-          funding_type: fundingType || 'workforce',
+          funding_source: fundingType || 'workforce',
           status: 'active',
           enrollment_state: 'active',
           lms_enrolled: true,
-          enrolled_by: user.id,
-          docs_verified: true,
-          docs_verified_at: new Date().toISOString(),
+          // Document verification is a separate evidence-backed review step.
+          // Creating an enrollment must never mark missing documents verified.
+          docs_verified: false,
           enrolled_at: new Date().toISOString(),
         })
         .select('id')
@@ -258,7 +258,7 @@ async function _POST(request: NextRequest) {
     });
   } catch (error) {
     logger.error('Staff enrollment error', error instanceof Error ? error : undefined);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Unable to complete enrollment' }, { status: 500 });
   }
 }
 

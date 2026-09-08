@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {
   AlertTriangle,
   Bot,
+  Camera,
   CheckCircle2,
   ChevronDown,
   Loader2,
@@ -16,6 +17,8 @@ import {
   Send,
   Sparkles,
   User,
+  Volume2,
+  VolumeX,
   Wrench,
   XCircle,
 } from 'lucide-react';
@@ -288,10 +291,12 @@ export default function UnifiedEllieChat({
   const recognitionRef = useRef<any>(null);
   const [listening, setListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
+  const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(true);
   const [attachment, setAttachment] = useState<{ name: string; context: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const attachmentInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   async function uploadAttachment(file: File) {
     setUploading(true);
@@ -322,6 +327,7 @@ export default function UnifiedEllieChat({
     } finally {
       setUploading(false);
       if (attachmentInputRef.current) attachmentInputRef.current.value = '';
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
     }
   }
 
@@ -431,6 +437,20 @@ export default function UnifiedEllieChat({
     recognition.start();
   }
 
+  function speakAssistantResponse(text: string) {
+    if (!voiceOutputEnabled || !text.trim() || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const clean = text
+      .replace(/\u001b\[[0-9;]*m/g, '')
+      .replace(/[`*_#]/g, '')
+      .trim()
+      .slice(-1800);
+    const utterance = new SpeechSynthesisUtterance(clean);
+    utterance.rate = 1.08;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  }
+
   async function send() {
     const text = input.trim();
     if (!text || loading) return;
@@ -443,6 +463,7 @@ export default function UnifiedEllieChat({
     const userMsg: ChatMessage = { role: 'user', content: text, route, agent };
     setMessages((prev) => [...prev, userMsg]);
     const assistantIdx = messages.length + 1;
+    let spokenText = '';
 
     try {
       {
@@ -452,6 +473,7 @@ export default function UnifiedEllieChat({
         ]);
         const command = [text, fileContext, attachment?.context].filter(Boolean).join('\n\n');
         const appendLine = (line: string) => {
+            spokenText += `${spokenText ? '\n' : ''}${line}`;
             setMessages((prev) => {
               const next = [...prev];
               const row = next[assistantIdx];
@@ -479,6 +501,7 @@ export default function UnifiedEllieChat({
               fileContext,
               documentsContext: attachment?.context,
               onToken: (token) => {
+                spokenText += token;
                 setMessages((prev) => {
                   const next = [...prev];
                   const row = next[assistantIdx];
@@ -506,6 +529,7 @@ export default function UnifiedEllieChat({
             },
           );
         }
+        speakAssistantResponse(spokenText);
       }
     } catch (error) {
       setMessages((prev) => [
@@ -732,18 +756,40 @@ export default function UnifiedEllieChat({
                 if (file) void uploadAttachment(file);
               }}
             />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              className="sr-only"
+              accept="image/*"
+              capture="environment"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) void uploadAttachment(file);
+              }}
+            />
             <button
               type="button"
               aria-label="Attach a file"
               disabled={uploading}
               onClick={() => attachmentInputRef.current?.click()}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+              className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
             >
               {uploading ? (
                 <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
               ) : (
                 <Paperclip className="h-5 w-5" aria-hidden="true" />
               )}
+              <span className="text-xs font-semibold">Files</span>
+            </button>
+            <button
+              type="button"
+              aria-label="Take a photo"
+              disabled={uploading}
+              onClick={() => cameraInputRef.current?.click()}
+              className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+            >
+              <Camera className="h-5 w-5" aria-hidden="true" />
+              <span className="text-xs font-semibold">Camera</span>
             </button>
             <textarea
               ref={inputRef}
@@ -776,6 +822,21 @@ export default function UnifiedEllieChat({
                 <Mic className="h-5 w-5" aria-hidden="true" />
               )}
               <span>{listening ? 'Stop listening' : `Talk to ${preferredAgent ?? 'Lizzy'}`}</span>
+            </button>
+            <button
+              type="button"
+              aria-label={voiceOutputEnabled ? 'Turn voice output off' : 'Turn voice output on'}
+              aria-pressed={voiceOutputEnabled}
+              onClick={() => {
+                setVoiceOutputEnabled((enabled) => {
+                  if (enabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+                  return !enabled;
+                });
+              }}
+              className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+            >
+              {voiceOutputEnabled ? <Volume2 className="h-5 w-5" aria-hidden="true" /> : <VolumeX className="h-5 w-5" aria-hidden="true" />}
+              <span>{voiceOutputEnabled ? 'Voice on' : 'Voice off'}</span>
             </button>
             <button
               type="button"

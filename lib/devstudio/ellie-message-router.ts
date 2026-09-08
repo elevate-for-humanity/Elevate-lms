@@ -25,9 +25,9 @@ const DETERMINISTIC_COMMAND_RE =
   /\b(?:deploy|run (?:the )?tests?|apply (?:all )?migrations?|rollback (?:the )?migration|git push)\b/i;
 const EXECUTION_VERB_RE =
   /\b(?:build|create|generate|fix|repair|correct|change|update|edit|improve|finish|complete|continue|deploy|publish|run|apply|rollback|push|sync|connect|reconnect|configure|execute|approve|send|issue|assign|mark|remove|add|onboard)\b/i;
-const VERIFIED_OPERATION_RE = /\b(?:audit|test|verify|check|inspect)\b/i;
+const VERIFIED_OPERATION_RE = /\b(?:scan|audit|test|verify|check|inspect|diagnose)\b/i;
 const EXECUTABLE_TARGET_RE =
-  /\b(?:quickbooks|integration|workflow|deployment|production|live site|dashboard|website|browser|repository|repo|code|route|component|schema|migration|course|lesson|student|application|enrollment|payout|certificate|email|database|rls|platform|system)\b/i;
+  /\b(?:quickbooks|integration|workflow|deployment|production|live site|dashboard|website|store|browser|container|devcontainer|studio workspace|repository|repo|code|route|component|schema|migration|course|lesson|student|application|enrollment|payout|certificate|email|database|rls|platform|system)\b/i;
 export const OUTCOME_REQUEST_PATTERNS = [
   'build (a )?course',
   'create (a )?course',

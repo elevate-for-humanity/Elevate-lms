@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { Building2, ChevronRight, CheckCircle, Clock, GraduationCap } from 'lucide-react';
 import RapidsExportClient from './RapidsExportClient';
+import RapidsEmployerImportClient from './RapidsEmployerImportClient';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'RAPIDS | Admin | Elevate For Humanity' };
@@ -79,6 +80,8 @@ export default async function RapidsPage() {
       </section>
 
       <RapidsExportClient />
+
+      <RapidsEmployerImportClient />
 
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="border-b border-slate-100 px-5 py-4"><h2 className="font-semibold text-slate-800">Recent RAPIDS submissions</h2></div>{!recentSubmissions?.length ? <p className="py-8 text-center text-sm text-slate-400">No submissions recorded yet.</p> : <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-slate-50"><tr>{['Type','Date','Records','Status'].map((h) => <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{h}</th>)}</tr></thead><tbody className="divide-y divide-slate-100">{recentSubmissions.map((s: any) => <tr key={s.id}><td className="px-4 py-3 font-medium capitalize">{s.submission_type}</td><td className="px-4 py-3 text-slate-500">{new Date(s.submission_date).toLocaleDateString()}</td><td className="px-4 py-3">{s.record_count}</td><td className="px-4 py-3">{s.status}</td></tr>)}</tbody></table></div>}</section>
     </div>

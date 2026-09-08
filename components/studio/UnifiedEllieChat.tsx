@@ -23,6 +23,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { getAdminUrl } from '@/lib/config/admin-url';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import {
   ELLIE_ROUTE_LABEL,
   fetchAiHealth,
@@ -289,6 +290,7 @@ export default function UnifiedEllieChat({
   onPreviewTarget,
   preferredAgent,
 }: UnifiedEllieChatProps) {
+  const naturalVoice = useNaturalVoice();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -447,16 +449,17 @@ export default function UnifiedEllieChat({
   }
 
   function speakAssistantResponse(text: string) {
-    if (!voiceOutputEnabled || !text.trim() || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
+    if (!voiceOutputEnabled || !text.trim()) return;
     const clean = cleanRuntimeOutput(text)
       .replace(/[`*_#]/g, '')
       .trim()
       .slice(-1800);
-    const utterance = new SpeechSynthesisUtterance(clean);
-    utterance.rate = 1.08;
-    utterance.pitch = 1;
-    window.speechSynthesis.speak(utterance);
+    void naturalVoice.play(clean, {
+      voice: 'coral',
+      style: 'assistant',
+      rate: 0.96,
+      allowBrowserFallback: false,
+    });
   }
 
   async function send() {
@@ -837,7 +840,7 @@ export default function UnifiedEllieChat({
               aria-pressed={voiceOutputEnabled}
               onClick={() => {
                 setVoiceOutputEnabled((enabled) => {
-                  if (enabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+                  if (enabled) naturalVoice.stop();
                   return !enabled;
                 });
               }}

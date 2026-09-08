@@ -37,12 +37,11 @@ function safeFileName(name: string) {
     .slice(-120);
 }
 
-async function uploadHostShopDocument(formData: FormData) {
+async function uploadHostShopDocument(documentType: string, formData: FormData) {
   'use server';
 
   const { user, db, partner } = await requireCurrentHostShopPartner();
   const board = await getHostShopBoard(user.id);
-  const documentType = String(formData.get('documentType') ?? '').trim();
   const fileEntry = formData.get('file');
   const expirationDate = String(formData.get('expirationDate') ?? '').trim();
   const requirement = board.documentStatuses.find(
@@ -224,10 +223,9 @@ export default async function HostShopDocumentsPage({
 
                 {needsUpload ? (
                   <form
-                    action={uploadHostShopDocument}
+                    action={uploadHostShopDocument.bind(null, requirement.document_type)}
                     className="mt-5 grid gap-4 border-t border-slate-200 pt-5 sm:grid-cols-[1fr_auto] sm:items-end"
                   >
-                    <input type="hidden" name="documentType" value={requirement.document_type} />
                     <div className="grid gap-4 sm:grid-cols-2">
                       <label className="font-bold">
                         File *

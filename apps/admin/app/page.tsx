@@ -4,5 +4,5 @@ import { redirect } from 'next/navigation';
 
 export default function AdminIndexPage() {
   // Desktop and installed Admin PWA share one canonical operating entry.
-  redirect('/studio/browser');
+  redirect('/studio');
 }

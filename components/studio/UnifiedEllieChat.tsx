@@ -25,7 +25,9 @@ import {
   fetchAiHealth,
   routeEllieMessage,
   selectStudioAgent,
-  streamExecuteCommand,
+  shouldOrchestrateMessage,
+  streamOrchestratedPlan,
+  streamPlatformChat,
   type EllieMessageRoute,
   type StudioSpecialist,
 } from '@/lib/devstudio/ellie-unified-handlers';
@@ -449,7 +451,7 @@ export default function UnifiedEllieChat({
           { role: 'assistant', content: '', provider: 'admin-ai', route, agent },
         ]);
         const command = [text, fileContext, attachment?.context].filter(Boolean).join('\n\n');
-        await streamExecuteCommand(command, (line) => {
+        const appendLine = (line: string) => {
             setMessages((prev) => {
               const next = [...prev];
               const row = next[assistantIdx];
@@ -461,7 +463,49 @@ export default function UnifiedEllieChat({
                 };
               return next;
             });
-        }, agent);
+        };
+
+        if (shouldOrchestrateMessage(command)) {
+          // Outcome requests use the durable Codex-style runtime: persisted
+          // plan → registered tools → evaluator → retry/approval checkpoint.
+          await streamOrchestratedPlan(command, appendLine);
+        } else {
+          // Questions retain conversation context and the unified provider
+          // fallback path instead of being forced through a stateless command.
+          await streamPlatformChat(
+            [...messages.map(({ role, content }) => ({ role, content })), userMsg],
+            {
+              agent: 'ADMIN_AI',
+              fileContext,
+              documentsContext: attachment?.context,
+              onToken: (token) => {
+                setMessages((prev) => {
+                  const next = [...prev];
+                  const row = next[assistantIdx];
+                  if (row?.role === 'assistant') {
+                    next[assistantIdx] = { ...row, provider: 'admin-ai', content: `${row.content}${token}` };
+                  }
+                  return next;
+                });
+              },
+              onDone: (meta) => {
+                setMessages((prev) => {
+                  const next = [...prev];
+                  const row = next[assistantIdx];
+                  if (row?.role === 'assistant') {
+                    next[assistantIdx] = {
+                      ...row,
+                      provider: meta.provider ?? row.provider,
+                      toolCalls: meta.toolCalls,
+                      capabilitiesUsed: meta.capabilitiesUsed,
+                    };
+                  }
+                  return next;
+                });
+              },
+            },
+          );
+        }
       }
     } catch (error) {
       setMessages((prev) => [

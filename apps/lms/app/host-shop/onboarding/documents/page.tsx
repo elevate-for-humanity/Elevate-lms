@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { AlertCircle, CheckCircle2, FileUp, Hourglass } from 'lucide-react';
 import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
 import { getHostShopBoard } from '@/lib/partner/board';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
@@ -70,7 +71,13 @@ async function uploadHostShopDocument(formData: FormData) {
       upsert: false,
     });
 
-  if (uploadError) throw new Error(`HOST_SHOP_DOCUMENT_UPLOAD_FAILED:${uploadError.message}`);
+  if (uploadError) {
+    logger.error('[host-shop-documents] Storage upload failed', uploadError, {
+      partnerId: partner.id,
+      documentType,
+    });
+    redirect('/host-shop/onboarding/documents?error=upload_failed');
+  }
 
   const { error: insertError } = await db.from('partner_documents').insert({
     partner_id: partner.id,
@@ -89,7 +96,11 @@ async function uploadHostShopDocument(formData: FormData) {
 
   if (insertError) {
     await db.storage.from('partner-documents').remove([storagePath]);
-    throw new Error(`HOST_SHOP_DOCUMENT_RECORD_FAILED:${insertError.message}`);
+    logger.error('[host-shop-documents] Document record failed', insertError, {
+      partnerId: partner.id,
+      documentType,
+    });
+    redirect('/host-shop/onboarding/documents?error=record_failed');
   }
 
   await db
@@ -142,7 +153,11 @@ export default async function HostShopDocumentsPage({
           ? 'Upload PDF, JPG, or PNG files only.'
           : params.error === 'expiration_required'
             ? 'This document requires an expiration date.'
-            : null;
+            : params.error === 'upload_failed'
+              ? 'The file could not be uploaded. Your existing records are safe. Please try again.'
+              : params.error === 'record_failed'
+                ? 'The file uploaded, but its dashboard record could not be saved. Please try again.'
+                : null;
 
   return (
     <main className="bg-slate-50 px-4 py-10 text-slate-950 sm:px-6">

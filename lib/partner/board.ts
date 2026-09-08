@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { logger } from '@/lib/logger';
 import { normalizeRole } from '@/lib/rbac/role-matrix';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
@@ -220,8 +221,15 @@ export async function getHostShopBoard(userId: string) {
         .select('shop_id, shops(id, name, city, state, active, partner_id)')
         .eq('user_id', userId),
     ]);
+  // A Host Shop must retain access to its document center when an optional
+  // reporting relation is temporarily unavailable. The partner-owned shops
+  // query is authoritative; staff links only supplement it.
   if (partnerShopError) throw new Error(`HOST_SHOP_SHOPS_QUERY_FAILED:${partnerShopError.message}`);
-  if (staffError) throw new Error(`HOST_SHOP_STAFF_QUERY_FAILED:${staffError.message}`);
+  if (staffError)
+    logger.warn('[host-shop-board] Optional staff links unavailable', {
+      partnerId: partner.id,
+      error: staffError.message,
+    });
 
   const shopMap = new Map<string, any>();
   for (const shop of partnerShops || [])
@@ -244,9 +252,12 @@ export async function getHostShopBoard(userId: string) {
         .eq('status', 'active')
     : { data: [], error: null };
   if (placementsError)
-    throw new Error(`HOST_SHOP_PLACEMENTS_QUERY_FAILED:${placementsError.message}`);
+    logger.warn('[host-shop-board] Optional apprentice placements unavailable', {
+      partnerId: partner.id,
+      error: placementsError.message,
+    });
 
-  const apprentices = (placements || []).map((placement: any) => ({
+  const apprentices = (placementsError ? [] : placements || []).map((placement: any) => ({
     id: placement.id,
     student_id: placement.student_id,
     shop_id: placement.shop_id,
@@ -283,7 +294,11 @@ export async function getHostShopBoard(userId: string) {
         'user_id, host_shop_id, program_slug, status, approval_status, accepted_hours, hours, hours_claimed',
       )
       .in('user_id', studentIds);
-    if (hourError) throw new Error(`HOST_SHOP_HOURS_QUERY_FAILED:${hourError.message}`);
+    if (hourError)
+      logger.warn('[host-shop-board] Optional hour records unavailable', {
+        partnerId: partner.id,
+        error: hourError.message,
+      });
     for (const studentId of studentIds) {
       const target = placementByStudent.get(studentId)?.tradeInfo || resolveTradeTarget(null);
       workProgress[studentId] = {
@@ -292,7 +307,7 @@ export async function getHostShopBoard(userId: string) {
         progressModel: target.progressModel,
       };
     }
-    for (const row of (hourRows || []) as HourRow[]) {
+    for (const row of (hourError ? [] : hourRows || []) as HourRow[]) {
       if (!row.user_id || !workProgress[row.user_id]) continue;
       const placement = placementByStudent.get(row.user_id);
       if (!placement || placement.tradeInfo.progressModel === 'unconfigured') continue;
@@ -370,12 +385,29 @@ export async function getHostShopBoard(userId: string) {
         .filter((v): v is string => Boolean(v)),
     ]),
   );
-  const { data: dbRequirements } = await db
+  const stateAliases = Array.from(
+    new Set(
+      [
+        partner.state || 'Indiana',
+        String(partner.state || '').toUpperCase() === 'IN' ? 'Indiana' : null,
+        'ALL',
+      ].filter((value): value is string => Boolean(value)),
+    ),
+  );
+  const { data: dbRequirements, error: requirementsError } = await db
     .from('partner_document_requirements')
     .select('*')
     .in('program_id', [...programIds, 'ALL'])
-    .in('state', [partner.state || 'Indiana', 'ALL']);
-  const requirements = mergeHostShopDocumentRequirements(dbRequirements, programType);
+    .in('state', stateAliases);
+  if (requirementsError)
+    logger.warn('[host-shop-board] Using canonical document requirements fallback', {
+      partnerId: partner.id,
+      error: requirementsError.message,
+    });
+  const requirements = mergeHostShopDocumentRequirements(
+    requirementsError ? null : dbRequirements,
+    programType,
+  );
   const { data: uploadedDocs, error: uploadedDocsError } = await db
     .from('partner_documents')
     .select(
@@ -384,10 +416,13 @@ export async function getHostShopBoard(userId: string) {
     .eq('partner_id', partner.id)
     .order('uploaded_at', { ascending: false });
   if (uploadedDocsError)
-    throw new Error(`HOST_SHOP_DOCUMENTS_QUERY_FAILED:${uploadedDocsError.message}`);
+    logger.warn('[host-shop-board] Uploaded-document status temporarily unavailable', {
+      partnerId: partner.id,
+      error: uploadedDocsError.message,
+    });
 
   const latestDocs = new Map<string, any>();
-  for (const doc of uploadedDocs || [])
+  for (const doc of uploadedDocsError ? [] : uploadedDocs || [])
     if (!latestDocs.has(doc.document_type)) latestDocs.set(doc.document_type, doc);
   const documentStatuses = requirements.map((requirement: any) => {
     const document = latestDocs.get(requirement.document_type);

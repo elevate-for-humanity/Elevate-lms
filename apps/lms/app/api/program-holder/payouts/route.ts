@@ -62,16 +62,6 @@ export async function POST(request: NextRequest) {
   const { action } = (await request.json().catch(() => ({}))) as { action?: string };
   try {
     const readiness = await getProgramHolderPaymentReadiness(ctx.db, ctx.holderId);
-    if (!readiness.ready) {
-      return NextResponse.json(
-        {
-          error:
-            'Complete all Program Holder onboarding requirements before setting up or accessing payouts.',
-          missingRequirements: readiness.missing,
-        },
-        { status: 409 },
-      );
-    }
     const accountId = await ensureProgramHolderPayoutAccount(ctx);
     await hydrateProcessEnv();
     const stripe = getStripe();
@@ -81,6 +71,15 @@ export async function POST(request: NextRequest) {
         { status: 503 },
       );
     if (action === 'dashboard') {
+      if (!readiness.ready) {
+        return NextResponse.json(
+          {
+            error: 'Complete all Program Holder requirements before accessing released funds.',
+            missingRequirements: readiness.missing,
+          },
+          { status: 409 },
+        );
+      }
       const ready = await syncProgramHolderPayoutAccount(ctx, accountId);
       if (!ready.transfersEnabled || !ready.payoutsEnabled)
         return NextResponse.json(

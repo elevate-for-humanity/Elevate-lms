@@ -111,7 +111,7 @@ export function PayoutAccessPanel() {
       ) : null}
       <div className="mt-6">
         <button
-          disabled={busy || !status.onboardingReady}
+          disabled={busy}
           onClick={() => begin(ready ? 'dashboard' : 'onboard')}
           className="min-h-11 rounded-xl bg-blue-700 px-5 py-3 font-bold text-white disabled:opacity-50"
         >

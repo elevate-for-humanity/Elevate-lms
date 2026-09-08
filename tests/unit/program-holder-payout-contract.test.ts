@@ -36,9 +36,14 @@ describe('Program Holder payout contract', () => {
     expect(panel).toContain('status.transfersEnabled && status.payoutsEnabled');
   });
 
-  it('blocks payout setup, funds access, and admin release until onboarding is complete', () => {
+  it('allows secure payout setup but blocks funds access and release until onboarding is complete', () => {
     expect(route).toContain('getProgramHolderPaymentReadiness');
     expect(route).toContain('if (!readiness.ready)');
+    expect(route.indexOf("if (action === 'dashboard')")).toBeLessThan(
+      route.indexOf('if (!readiness.ready)'),
+    );
+    expect(panel).toContain('disabled={busy}');
+    expect(panel).not.toContain('disabled={busy || !status.onboardingReady}');
     expect(paymentRoute).toContain('getProgramHolderPaymentReadiness');
     expect(paymentRoute).toContain('getStudentPaymentReadiness');
   });

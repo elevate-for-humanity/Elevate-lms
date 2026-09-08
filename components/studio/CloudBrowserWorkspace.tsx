@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Square,
 } from 'lucide-react';
+import type { OrchestratedPlanCheckpoint } from '@/lib/devstudio/ellie-unified-handlers';
 
 type Session = {
   id: string;
@@ -29,7 +30,7 @@ type BrowserEvent = {
   error?: string;
 };
 
-export default function CloudBrowserWorkspace() {
+export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedTask?: OrchestratedPlanCheckpoint | null }) {
   const [target, setTarget] = useState('https://admin.elevateforhumanity.org/dashboard');
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
@@ -302,6 +303,11 @@ export default function CloudBrowserWorkspace() {
           </>
         )}
         <span className="text-[11px] text-slate-400">{status}</span>
+        {unifiedTask ? (
+          <span className="max-w-full truncate rounded-full border border-violet-500/50 bg-violet-500/10 px-2 py-1 text-[10px] font-bold text-violet-200">
+            Unified flow · {unifiedTask.title || unifiedTask.planId}
+          </span>
+        ) : null}
       </header>
       {error && (
         <div className="flex items-center gap-2 border-b border-rose-900 bg-rose-950/60 px-3 py-2 text-xs text-rose-200">

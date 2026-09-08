@@ -16,6 +16,14 @@ export type UnifiedChatMessage = {
   action?: unknown;
 };
 
+export type OrchestratedPlanCheckpoint = {
+  planId: string;
+  taskId: string;
+  status: 'awaiting_approval' | 'running' | 'done' | 'failed';
+  title?: string;
+  reason?: string;
+};
+
 export {
   routeEllieMessage,
   shouldOrchestrateMessage,
@@ -28,11 +36,15 @@ export {
 export async function streamOrchestratedPlan(
   goal: string,
   onLine: (text: string) => void,
+  options: {
+    planId?: string;
+    onCheckpoint?: (checkpoint: OrchestratedPlanCheckpoint) => void;
+  } = {},
 ): Promise<void> {
   const res = await fetch('/api/admin/dev-studio/plan', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ goal }),
+    body: JSON.stringify({ goal, planId: options.planId }),
   });
   if (!res.ok || !res.body) {
     const data = await res.json().catch(() => ({}));
@@ -50,9 +62,14 @@ export async function streamOrchestratedPlan(
       .join('');
     if (!raw || raw === '[DONE]') return;
     try {
-      const parsed = JSON.parse(raw) as { text?: string; line?: string };
+      const parsed = JSON.parse(raw) as {
+        text?: string;
+        line?: string;
+        checkpoint?: OrchestratedPlanCheckpoint;
+      };
       const line = parsed.text ?? parsed.line;
       if (line) onLine(`${line}\n`);
+      if (parsed.checkpoint) options.onCheckpoint?.(parsed.checkpoint);
     } catch {
       onLine(`${raw}\n`);
     }

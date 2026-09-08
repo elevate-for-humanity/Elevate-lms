@@ -25,8 +25,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
-function enc(text: string) {
-  return new TextEncoder().encode(`data: ${JSON.stringify({ text })}\n\n`);
+function enc(text: string, extra: Record<string, unknown> = {}) {
+  return new TextEncoder().encode(`data: ${JSON.stringify({ text, ...extra })}\n\n`);
 }
 function done() {
   return new TextEncoder().encode('data: [DONE]\n\n');
@@ -149,9 +149,9 @@ export async function POST(req: NextRequest) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      const write = (line: string) => {
+      const write = (line: string, extra: Record<string, unknown> = {}) => {
         try {
-          controller.enqueue(enc(line));
+          controller.enqueue(enc(line, extra));
         } catch {
           /* stream closed */
         }
@@ -176,6 +176,34 @@ export async function POST(req: NextRequest) {
         } else {
           write(`\x1b[1mAI Planner — resuming checkpoint\x1b[0m`);
           write(`${DIM}Plan ID: ${plan.id}${RST}`);
+
+          // Approval executes the canonical task. Reconcile that result into the
+          // persisted plan before scheduling dependent steps.
+          for (const step of plan.steps) {
+            if (step.status !== 'awaiting_approval' || !step.task_id) continue;
+            const approvedTask = await currentTask(db, step.task_id);
+            if (!approvedTask || approvedTask.status === 'awaiting_approval') continue;
+            const approvalEvaluation = evaluateExecution({
+              tool: String(approvedTask.tool_name ?? 'advisory'),
+              result: taskEvidence(approvedTask),
+              error: approvedTask.error_message ?? null,
+              attempts: Number(approvedTask.attempts ?? 1),
+              maxAttempts: step.max_attempts ?? 2,
+              expectedOutput: step.expected_output,
+              verificationRule: step.verification_rule,
+            });
+            step.evaluation = approvalEvaluation.status;
+            step.output = JSON.stringify({
+              task_id: step.task_id,
+              tool: approvedTask.tool_name ?? null,
+              result: taskEvidence(approvedTask),
+              evaluation: approvalEvaluation,
+            });
+            step.status = approvalEvaluation.status === 'PASS' ? 'done' : 'failed';
+            if (step.status === 'done') write(`${PASS} Approved step verified: ${step.title}`);
+            else write(`${FAIL} Approved step failed verification: ${step.title}`);
+          }
+          await persistPlan(db, plan, auth.id, tenantId);
         }
 
         plan.status = 'running';
@@ -245,7 +273,15 @@ export async function POST(req: NextRequest) {
                 step.output = String(task.approval_reason ?? 'Human approval required');
                 plan.status = 'awaiting_approval';
                 awaitingApproval = true;
-                write(`${WAIT} Step ${step.order} paused for authorized human approval.`);
+                write(`${WAIT} Step ${step.order} paused for authorized human approval.`, {
+                  checkpoint: {
+                    planId: plan.id,
+                    taskId: step.task_id,
+                    status: 'awaiting_approval',
+                    title: step.title,
+                    reason: step.output,
+                  },
+                });
                 write(`${DIM}Task ID: ${step.task_id}${RST}`);
                 await persistPlan(db, plan, auth.id, tenantId);
                 break;
@@ -367,6 +403,23 @@ export async function POST(req: NextRequest) {
         if (waitingCount > 0) write(`${WAIT} Awaiting human approval: ${waitingCount}`);
         if (skippedCount > 0) write(`${DIM}Skipped: ${skippedCount}${RST}`);
         write(`${DIM}Status: ${plan.status} · Plan ID: ${plan.id}${RST}`);
+        const waitingStep = plan.steps.find((step) => step.status === 'awaiting_approval');
+        write('', {
+          checkpoint: {
+            planId: plan.id,
+            taskId: waitingStep?.task_id ?? '',
+            status:
+              plan.status === 'done'
+                ? 'done'
+                : plan.status === 'failed'
+                  ? 'failed'
+                  : plan.status === 'awaiting_approval'
+                    ? 'awaiting_approval'
+                    : 'running',
+            title: waitingStep?.title,
+            reason: waitingStep?.output,
+          },
+        });
 
         await emitEvent('planner.completed', 'ai', {
           severity: plan.status === 'failed' ? 'warning' : 'info',

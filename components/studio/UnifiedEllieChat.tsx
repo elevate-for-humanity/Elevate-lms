@@ -15,6 +15,7 @@ import {
   PanelRightOpen,
   Rocket,
   Send,
+  Shield,
   Sparkles,
   User,
   Volume2,
@@ -32,6 +33,7 @@ import {
   shouldOrchestrateMessage,
   streamOrchestratedPlan,
   streamPlatformChat,
+  type OrchestratedPlanCheckpoint,
   type EllieMessageRoute,
   type StudioSpecialist,
 } from '@/lib/devstudio/ellie-unified-handlers';
@@ -76,7 +78,10 @@ interface UnifiedEllieChatProps {
   fileContext?: string;
   onPreviewTarget?: (url: string) => void;
   preferredAgent?: StudioSpecialist;
+  onTaskCheckpoint?: (checkpoint: OrchestratedPlanCheckpoint | null) => void;
 }
+
+const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 
 function findElevatePreviewUrl(value: unknown): string | null {
   const text = typeof value === 'string' ? value : JSON.stringify(value ?? '');
@@ -289,6 +294,7 @@ export default function UnifiedEllieChat({
   fileContext,
   onPreviewTarget,
   preferredAgent,
+  onTaskCheckpoint,
 }: UnifiedEllieChatProps) {
   const naturalVoice = useNaturalVoice();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -306,6 +312,8 @@ export default function UnifiedEllieChat({
   const [attachment, setAttachment] = useState<{ name: string; context: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [planCheckpoint, setPlanCheckpoint] = useState<OrchestratedPlanCheckpoint | null>(null);
+  const [checkpointError, setCheckpointError] = useState('');
   const attachmentInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -462,6 +470,44 @@ export default function UnifiedEllieChat({
     });
   }
 
+  function receiveCheckpoint(checkpoint: OrchestratedPlanCheckpoint) {
+    const active = checkpoint.status === 'done' || checkpoint.status === 'failed' ? null : checkpoint;
+    setPlanCheckpoint(active);
+    onTaskCheckpoint?.(active);
+  }
+
+  async function approveAndResumePlan() {
+    if (!planCheckpoint?.taskId || loading) return;
+    setLoading(true);
+    setCheckpointError('');
+    try {
+      const approval = await fetch(`/api/admin/dev-studio/tasks/${planCheckpoint.taskId}/approve`, {
+        method: 'POST',
+      });
+      const approvalBody = await approval.json().catch(() => ({}));
+      if (!approval.ok) throw new Error(approvalBody.error || 'Could not approve task');
+
+      const assistantIdx = messages.length;
+      setMessages((current) => [
+        ...current,
+        { role: 'assistant', content: 'Approval recorded. Resuming the same plan…', provider: 'registered-tools' },
+      ]);
+      await streamOrchestratedPlan('', (line) => {
+        const clean = line.replace(ANSI_PATTERN, '').trimEnd();
+        setMessages((current) => {
+          const next = [...current];
+          const row = next[assistantIdx];
+          if (row?.role === 'assistant') next[assistantIdx] = { ...row, content: `${row.content}\n${clean}`.trim() };
+          return next;
+        });
+      }, { planId: planCheckpoint.planId, onCheckpoint: receiveCheckpoint });
+    } catch (error) {
+      setCheckpointError(error instanceof Error ? error.message : 'Could not resume plan');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function send() {
     const text = input.trim();
     if (!text || loading) return;
@@ -484,7 +530,8 @@ export default function UnifiedEllieChat({
         ]);
         const command = [text, fileContext, attachment?.context].filter(Boolean).join('\n\n');
         const appendLine = (line: string) => {
-            spokenText += `${spokenText ? '\n' : ''}${line}`;
+            const clean = line.replace(ANSI_PATTERN, '').trimEnd();
+            spokenText += `${spokenText ? '\n' : ''}${clean}`;
             setMessages((prev) => {
               const next = [...prev];
               const row = next[assistantIdx];
@@ -492,7 +539,7 @@ export default function UnifiedEllieChat({
                 next[assistantIdx] = {
                   ...row,
                   provider: 'registered-tools',
-              content: `${row.content}${row.content ? '\n' : ''}${cleanRuntimeOutput(line)}`,
+                  content: `${row.content}${row.content ? '\n' : ''}${clean}`,
                 };
               return next;
             });
@@ -501,7 +548,7 @@ export default function UnifiedEllieChat({
         if (shouldOrchestrateMessage(command)) {
           // Outcome requests use the durable Codex-style runtime: persisted
           // plan → registered tools → evaluator → retry/approval checkpoint.
-          await streamOrchestratedPlan(command, appendLine);
+          await streamOrchestratedPlan(command, appendLine, { onCheckpoint: receiveCheckpoint });
         } else {
           // Questions retain conversation context and the unified provider
           // fallback path instead of being forced through a stateless command.
@@ -622,6 +669,32 @@ export default function UnifiedEllieChat({
       )}
 
       <CourseBuildRuns />
+
+      {planCheckpoint?.status === 'awaiting_approval' ? (
+        <div className="shrink-0 border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3">
+            <Shield className="h-5 w-5 shrink-0" aria-hidden="true" />
+            <div className="min-w-0 flex-1">
+              <p className="font-bold">Approval needed: {planCheckpoint.title || 'Continue plan'}</p>
+              <p className="truncate text-xs text-amber-800">
+                {planCheckpoint.reason || `Task ${planCheckpoint.taskId}`}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void approveAndResumePlan()}
+              disabled={loading}
+              className="rounded-lg bg-amber-600 px-4 py-2 text-xs font-black text-white disabled:opacity-50"
+            >
+              Approve and continue this flow
+            </button>
+            <Link href={`/studio/tasks?task=${planCheckpoint.taskId}`} className="text-xs font-bold underline">
+              Evidence
+            </Link>
+          </div>
+          {checkpointError ? <p role="alert" className="mx-auto mt-2 max-w-5xl text-xs text-red-700">{checkpointError}</p> : null}
+        </div>
+      ) : null}
 
       <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 sm:px-8 sm:py-8">
         {messages.length === 0 ? (

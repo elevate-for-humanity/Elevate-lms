@@ -7,6 +7,7 @@ import { Bot, Eye, Globe2, MessageSquare, Plus } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
 import RepositoryLivePreview from './RepositoryLivePreview';
 import type { StudioSpecialist } from '@/lib/devstudio/ellie-unified-handlers';
+import type { OrchestratedPlanCheckpoint } from '@/lib/devstudio/ellie-unified-handlers';
 
 const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
   ssr: false,
@@ -21,6 +22,7 @@ export default function StudioCommandWorkspace({ workspaces }: { workspaces: Arr
   const [mode, setMode] = useState<InspectionMode>('browser');
   const [previewUrl, setPreviewUrl] = useState('https://admin.elevateforhumanity.org/dashboard');
   const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('tool');
+  const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
 
   const openPreview = (url?: string) => {
     if (url) setPreviewUrl(url);
@@ -61,7 +63,7 @@ export default function StudioCommandWorkspace({ workspaces }: { workspaces: Arr
             <span className="text-xs font-bold text-slate-700">Agent: {selectedAgent[0] + selectedAgent.slice(1).toLowerCase()}</span>
             <button type="button" onClick={() => setMobileSurface('tool')} className="ml-auto rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white">Open workspace</button>
           </div>
-          <UnifiedEllieChat key={conversationKey} preferredAgent={selectedAgent} embedded onOpenPreview={() => openPreview()} onPreviewTarget={openPreview} />
+          <UnifiedEllieChat key={conversationKey} preferredAgent={selectedAgent} embedded onOpenPreview={() => openPreview()} onPreviewTarget={openPreview} onTaskCheckpoint={setActiveTask} />
         </section>
 
         <section className={`${mobileSurface === 'tool' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col bg-slate-950 lg:flex lg:basis-[58%]`} aria-label="Studio workspace">
@@ -72,7 +74,7 @@ export default function StudioCommandWorkspace({ workspaces }: { workspaces: Arr
             <button type="button" onClick={() => setMobileSurface('chat')} className="rounded-md px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800 lg:hidden">Admin AI</button>
           </header>
           <div className="min-h-0 flex-1 overflow-hidden p-2">
-            {mode === 'preview' ? <RepositoryLivePreview filePath={null} content="" initialUrl={previewUrl} /> : <CloudBrowserWorkspace />}
+            {mode === 'preview' ? <RepositoryLivePreview filePath={null} content="" initialUrl={previewUrl} /> : <CloudBrowserWorkspace unifiedTask={activeTask} />}
           </div>
         </section>
       </div>

@@ -27,7 +27,7 @@ function signature(payload: string, key = signingKeys()[0]!): string {
   return createHmac('sha256', key).update(payload).digest('base64url');
 }
 
-export function createPortalPreviewHandoff(actorId: string, targetId: string, ttlMs = 2 * 60 * 1000): string {
+export function createPortalPreviewHandoff(actorId: string, targetId: string, ttlMs = 15 * 60 * 1000): string {
   const payload = Buffer.from(JSON.stringify({
     actorId,
     targetId,
@@ -35,6 +35,23 @@ export function createPortalPreviewHandoff(actorId: string, targetId: string, tt
     nonce: randomUUID(),
   } satisfies PreviewHandoff)).toString('base64url');
   return `${payload}.${signature(payload)}`;
+}
+
+/**
+ * Reads only the routing target from a structurally valid, unexpired handoff.
+ * This does not authenticate the token and must only be used after the request
+ * has independently established an administrator session.
+ */
+export function readPortalPreviewHandoffTarget(token: string): string | null {
+  const [payload, suppliedSignature, extra] = token.split('.');
+  if (!payload || !suppliedSignature || extra) return null;
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as PreviewHandoff;
+    if (!parsed.actorId || !parsed.targetId || !parsed.nonce || parsed.expiresAt < Date.now()) return null;
+    return parsed.targetId;
+  } catch {
+    return null;
+  }
 }
 
 export function verifyPortalPreviewHandoff(token: string): PreviewHandoff | null {

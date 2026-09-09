@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireRoles } from '@/lib/admin/guards';
 import { HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { verifyPortalPreviewHandoff } from '@/lib/admin/portal-preview-handoff';
+import {
+  readPortalPreviewHandoffTarget,
+  verifyPortalPreviewHandoff,
+} from '@/lib/admin/portal-preview-handoff';
 import { HOST_SHOP_PREVIEW_SESSION_COOKIE } from '@/lib/admin/host-shop-preview';
 
 export const dynamic = 'force-dynamic';
@@ -11,14 +14,23 @@ export const runtime = 'nodejs';
 const APP_ORIGIN = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, '');
 
 export async function GET(request: NextRequest) {
-  const handoff = verifyPortalPreviewHandoff(request.nextUrl.searchParams.get('handoff')?.trim() || '');
+  const handoffToken = request.nextUrl.searchParams.get('handoff')?.trim() || '';
+  const handoff = verifyPortalPreviewHandoff(handoffToken);
   const actor = handoff ? null : await apiRequireRoles(request, ['admin', 'super_admin', 'org_admin'], { adminOverride: true });
   if (actor?.error) return actor.error;
+
+  // Deployments can temporarily expose Admin and LMS to different signing
+  // secrets. A currently authenticated app administrator may still recover
+  // the unexpired routing target; authorization comes from their live session,
+  // not from the unverified token payload.
+  const authenticatedAdminTarget = !handoff && actor
+    ? readPortalPreviewHandoffTarget(handoffToken)
+    : null;
 
   const shopId = request.nextUrl.searchParams.get('shop_id')?.trim();
   const requestedPartnerId = request.nextUrl.searchParams.get('partner_id')?.trim();
 
-  if (!shopId && !requestedPartnerId && !handoff) {
+  if (!shopId && !requestedPartnerId && !handoff && !authenticatedAdminTarget) {
     return NextResponse.json({ error: 'shop_id or partner_id is required' }, { status: 400 });
   }
 
@@ -29,7 +41,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid Host Shop handoff' }, { status: 403 });
     }
   }
-  let partnerId = handoff?.targetId || requestedPartnerId || '';
+  let partnerId = handoff?.targetId || authenticatedAdminTarget || requestedPartnerId || '';
 
   if (shopId) {
     const { data: shop, error: shopError } = await db

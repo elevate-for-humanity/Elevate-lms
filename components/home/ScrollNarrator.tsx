@@ -35,7 +35,9 @@ function mostVisiblePageSection() {
 
 export function ScrollNarrator() {
   const pathname = usePathname();
-  const [enabled, setEnabled] = useState(true);
+  // Narration is opt-in. Starting speech while someone is actively scrolling
+  // creates late, out-of-context audio and can fight with embedded media.
+  const [enabled, setEnabled] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const lastNarrationRef = useRef<{ section: HTMLElement; text: string; source?: string } | null>(
     null,
@@ -80,9 +82,10 @@ export function ScrollNarrator() {
   useEffect(() => {
     lastNarrationRef.current = null;
     stop();
+    if (!enabled) return;
     const frame = window.requestAnimationFrame(() => void narrateVisibleSection());
     return () => window.cancelAnimationFrame(frame);
-  }, [narrateVisibleSection, pathname, stop]);
+  }, [enabled, narrateVisibleSection, pathname, stop]);
 
   useEffect(() => {
     const sections = Array.from(

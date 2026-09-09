@@ -2,7 +2,16 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Phone, Play, Volume2 } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  MapPin,
+  Pause,
+  Phone,
+  Play,
+  Volume2,
+} from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { stopAllNaturalVoicePlayback } from '@/components/voice/useNaturalVoice';
 import type {
@@ -10,7 +19,7 @@ import type {
   FeaturedHostPartnerMedia,
 } from '@/lib/apprenticeship-programs/host-partners';
 
-const ROTATION_MS = 9000;
+const ROTATION_MS = 6000;
 type ShowcaseMedia = FeaturedHostPartnerMedia & { backdropSrc?: string };
 type ShowcaseSequenceItem = { shopSlug: string; media: ShowcaseMedia };
 
@@ -48,17 +57,21 @@ export default function HostShopShowcase({
   shops,
   videoTourShopSlug,
   autoPlayVideoOnVisible = false,
+  autoPlayNarrationOnVisible = false,
   enableNarration = true,
   narration,
   narrationSrc,
   mediaOverrides,
   mediaSequence,
+  tourScripts,
 }: {
   shops: FeaturedHostPartner[];
   /** Limit video playback to the designated tour while retaining other shops as still slides. */
   videoTourShopSlug?: string;
   /** Start the designated tour, muted, when its section enters the viewport. */
   autoPlayVideoOnVisible?: boolean;
+  /** Start separate narration with the video. Off by default so page narration remains the only sound control. */
+  autoPlayNarrationOnVisible?: boolean;
   /** Disable page narration when the featured media already carries its own spoken audio. */
   enableNarration?: boolean;
   /** Page-specific natural narration used while this section is dominant. */
@@ -69,6 +82,8 @@ export default function HostShopShowcase({
   mediaOverrides?: Record<string, ShowcaseMedia>;
   /** Explicit media order for a surface that needs more than one slide per shop. */
   mediaSequence?: ShowcaseSequenceItem[];
+  /** Accessible scripts keyed by the tour video source path. */
+  tourScripts?: Record<string, string>;
 }) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
@@ -140,7 +155,7 @@ export default function HostShopShowcase({
           // The Host Shop introduction is pre-rendered audio. Start it when
           // the slideshow becomes visible, including when the active slide is
           // a still image. Never overlap narration with a playing tour video.
-          const narrationAudio = narrationAudioRef.current;
+          const narrationAudio = autoPlayNarrationOnVisible ? narrationAudioRef.current : null;
           if (narrationAudio && (!video || video.paused)) {
             void narrationAudio
               .play()
@@ -160,7 +175,7 @@ export default function HostShopShowcase({
       observer.disconnect();
       section.querySelector<HTMLVideoElement>('video[data-host-shop-tour]')?.pause();
     };
-  }, [activeIndex, autoPlayVideoOnVisible, narrationSrc]);
+  }, [activeIndex, autoPlayNarrationOnVisible, autoPlayVideoOnVisible, narrationSrc]);
 
   useEffect(() => {
     userEnabledSoundRef.current = false;
@@ -225,7 +240,7 @@ export default function HostShopShowcase({
           setInteracting(false);
       }}
     >
-      {autoPlayVideoOnVisible && narrationSrc ? (
+      {autoPlayNarrationOnVisible && narrationSrc ? (
         <audio
           ref={narrationAudioRef}
           src={narrationSrc}
@@ -294,16 +309,16 @@ export default function HostShopShowcase({
                     data-host-shop-tour
                     poster={image.backdropSrc}
                     onPlay={(event) => {
-                      event.currentTarget.defaultPlaybackRate = 0.82;
-                      event.currentTarget.playbackRate = 0.82;
+                      event.currentTarget.defaultPlaybackRate = 1;
+                      event.currentTarget.playbackRate = 1;
                       if (!event.currentTarget.muted) {
                         stopAllNaturalVoicePlayback();
                         event.currentTarget.volume = 1;
                       }
                     }}
                     onLoadedMetadata={(event) => {
-                      event.currentTarget.defaultPlaybackRate = 0.82;
-                      event.currentTarget.playbackRate = 0.82;
+                      event.currentTarget.defaultPlaybackRate = 1;
+                      event.currentTarget.playbackRate = 1;
                     }}
                     onVolumeChange={(event) => {
                       const video = event.currentTarget;
@@ -375,6 +390,16 @@ export default function HostShopShowcase({
               <p className="mt-5 text-base leading-7 text-slate-700">
                 {shop.marketingBlurb ?? shop.note}
               </p>
+              {image?.kind === 'video' && tourScripts?.[image.src] ? (
+                <details className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <summary className="cursor-pointer text-sm font-black text-brand-blue-900">
+                    Read this tour script
+                  </summary>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">
+                    {tourScripts[image.src]}
+                  </p>
+                </details>
+              ) : null}
               <p className="mt-5 flex items-start gap-2 text-sm font-semibold text-slate-800">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-brand-red-700" aria-hidden="true" />
                 <span>

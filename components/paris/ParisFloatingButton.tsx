@@ -24,7 +24,11 @@ export function ParisFloatingButton({
   const close = useCallback(() => setIsOpen(false), []);
   const learnerSurface = surface === 'learner';
   const portalSurface = surface === 'portal';
-  const assistantLabel = learnerSurface ? 'PARIS Learning Assistant' : portalSurface ? 'PARIS Portal Assistant' : 'PARIS Career Assistant';
+  const assistantLabel = learnerSurface
+    ? 'PARIS Learning Assistant'
+    : portalSurface
+      ? 'PARIS Portal Assistant'
+      : 'PARIS Career Assistant';
 
   useEffect(() => {
     if (!isOpen) return;
@@ -82,11 +86,6 @@ export function ParisFloatingButton({
     }
   }, []);
 
-  const openFromWelcome = useCallback(() => {
-    dismissWelcome();
-    setIsOpen(true);
-  }, [dismissWelcome]);
-
   // Keep the information-dense Bookkeeping hero unobstructed. PARIS remains
   // available throughout authenticated portals and on other public pages.
   if (surface === 'public' && pathname === '/programs/bookkeeping') return null;
@@ -114,10 +113,18 @@ export function ParisFloatingButton({
                 </div>
                 <div>
                   <span className="block font-bold text-slate-800 text-base sm:text-lg">
-                    {learnerSurface ? 'PARIS Learning Assistant' : portalSurface ? 'PARIS Portal Assistant' : 'PARIS Career Assistant'}
+                    {learnerSurface
+                      ? 'PARIS Learning Assistant'
+                      : portalSurface
+                        ? 'PARIS Portal Assistant'
+                        : 'PARIS Career Assistant'}
                   </span>
                   <span className="block max-w-[300px] truncate text-xs text-slate-600">
-                    {learnerSurface ? courseTitle || 'Your Elevate coursework' : portalSurface ? `${portalRole || 'Authenticated'} workspace help` : 'Admissions and career navigation'}
+                    {learnerSurface
+                      ? courseTitle || 'Your Elevate coursework'
+                      : portalSurface
+                        ? `${portalRole || 'Authenticated'} workspace help`
+                        : 'Admissions and career navigation'}
                   </span>
                 </div>
               </div>
@@ -164,16 +171,12 @@ export function ParisFloatingButton({
           </button>
           <p className="font-black text-slate-950">Hi, I’m PARIS.</p>
           <p className="mt-1 text-sm font-medium leading-6 text-slate-700">
-            I’m here if you need guidance with programs, funding, applications, documents,
-            employer opportunities, or your next step.
+            I’m here if you need guidance with programs, funding, applications, documents, employer
+            opportunities, or your next step.
           </p>
-          <button
-            type="button"
-            onClick={openFromWelcome}
-            className="mt-3 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-4 py-2 text-sm font-black text-white hover:bg-brand-red-700"
-          >
-            Ask PARIS
-          </button>
+          <p className="mt-3 text-xs font-bold text-brand-red-700">
+            Use the Ask PARIS button below whenever you are ready.
+          </p>
         </div>
       ) : null}
 
@@ -182,11 +185,23 @@ export function ParisFloatingButton({
           dismissWelcome();
           open();
         }}
-        aria-label={learnerSurface ? 'Open PARIS Learning Assistant for course help' : portalSurface ? 'Open PARIS Portal Assistant' : 'Open PARIS Career Assistant'}
+        aria-label={
+          learnerSurface
+            ? 'Open PARIS Learning Assistant for course help'
+            : portalSurface
+              ? 'Open PARIS Portal Assistant'
+              : 'Open PARIS Career Assistant'
+        }
         className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-3 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 sm:right-4 sm:px-4 md:bottom-6 md:right-6"
       >
         <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
-        <span className="hidden sm:inline">{learnerSurface ? 'Ask PARIS · Course help' : portalSurface ? 'Ask PARIS · Portal help' : 'Ask PARIS'}</span>
+        <span className="hidden sm:inline">
+          {learnerSurface
+            ? 'Ask PARIS · Course help'
+            : portalSurface
+              ? 'Ask PARIS · Portal help'
+              : 'Ask PARIS'}
+        </span>
       </button>
     </>
   );

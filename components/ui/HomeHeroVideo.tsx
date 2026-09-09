@@ -36,7 +36,7 @@ interface HomeHeroSlide {
   focalClass: string;
 }
 
-const HOME_SLIDE_SECONDS = 7;
+const HOME_SLIDE_SECONDS = 5;
 const SALON_EDITORIAL_GRADE = 'contrast-[1.05] saturate-[1.06] sepia-[0.04]';
 const DEPLOYED_COMMIT_SHA = process.env.NEXT_PUBLIC_GIT_SHA?.trim();
 
@@ -219,7 +219,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             heightClassName="h-[clamp(300px,46svh,480px)] sm:h-[clamp(380px,54svh,560px)] lg:h-[clamp(400px,62vh,680px)]"
             mediaClassName={SALON_EDITORIAL_GRADE}
             overlayMode="none"
-            showSoundControl
+            showSoundControl={false}
             soundButtonVariant="prominent"
             showTranscriptControl={false}
           />

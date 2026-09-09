@@ -98,17 +98,13 @@ export default function HomePage() {
         <div
           data-scroll-narration
           data-narration="Welcome to Elevate for Humanity. Explore hands-on career training, registered apprenticeships, employer-connected learning, and possible workforce funding pathways. Use the homepage to compare programs, meet participating Host Shops, and choose the next step that fits your goals."
-          data-narration-src="/audio/heroes/home.mp3"
+          data-narration-src="/audio/narration/home-hero.mp3"
         >
           <PlatformHubHero />
           <HomeAboutElevate />
           <HomeHeroVideo banner={heroBanners.home} />
         </div>
-        <div
-          data-scroll-narration
-          data-narration="Explore Elevate career programs built for real employment opportunities. Train for HVAC and skilled trades, commercial driving, business and entrepreneurship, bookkeeping and finance, information technology, healthcare, and other in-demand fields. Many programs may be free to participants who qualify for workforce funding. Funding is not automatic: the responsible agency must approve the participant, program, and covered costs in writing. If funding is not approved, admissions can explain available self-pay and payment options. Enrollment is open, upcoming cohorts are forming, and PARIS can guide you through program selection, funding steps, the application, required documents, and what to do next."
-          data-narration-src="/audio/heroes/home.mp3"
-        >
+        <div data-narration-disabled="true">
           <HomeProgramShowcase />
         </div>
         <div

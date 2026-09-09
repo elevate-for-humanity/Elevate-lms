@@ -8,9 +8,9 @@ interface Props {
 }
 
 const SOURCE_LABELS: Record<string, string> = {
-  stripe:           'Stripe',
-  barber:           'Barber',
-  cosmetology:      'Cosmetology',
+  stripe: 'Stripe',
+  barber: 'Barber',
+  cosmetology: 'Cosmetology',
   barber_recurring: 'Barber recurring',
 };
 
@@ -37,7 +37,7 @@ export function RecentPaymentsPanel({ payments }: Props) {
           <h2 className="font-bold text-slate-900 text-sm">Recent Payments</h2>
         </div>
         <Link
-          href="/students?payment_status=paid"
+          href="/funding"
           className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1"
         >
           View all <ArrowRight className="w-3 h-3" />
@@ -49,7 +49,10 @@ export function RecentPaymentsPanel({ payments }: Props) {
       ) : (
         <div className="divide-y divide-slate-100">
           {payments.map((p) => (
-            <div key={p.id} className="flex items-center justify-between px-4 sm:px-6 py-3 hover:bg-slate-50 transition-colors">
+            <div
+              key={p.id}
+              className="flex items-center justify-between px-4 sm:px-6 py-3 hover:bg-slate-50 transition-colors"
+            >
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-slate-900 truncate">
                   {p.email ?? slugToLabel(p.label) ?? 'Unknown payer'}

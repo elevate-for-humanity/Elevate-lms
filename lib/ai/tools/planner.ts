@@ -51,7 +51,7 @@ function isOpenHandsStatusCommand(lower: string): boolean {
 function isEngineeringCommand(lower: string): boolean {
   if (/\bopenhands\b/.test(lower)) return true;
   const engineeringNoun =
-    /\b(code|codebase|repo|repository|github|pull request|pr\b|branch|commit|typescript|javascript|route|component|api endpoint|test file|regression test|ci\b|workflow file|source file|container|devcontainer|studio workspace)\b/.test(
+    /\b(code|codebase|repo|repository|github|pull request|pr\b|branch|commit|typescript|javascript|route|component|api endpoint|test file|regression test|ci\b|workflow|workflow file|source file|container|devcontainer|studio workspace)\b/.test(
       lower,
     );
   const engineeringVerb =
@@ -180,7 +180,9 @@ export function planAIToolFromCommand(
   }
   if (
     /\b(container|devcontainer|studio workspace)\b/.test(lower) &&
-    /\b(scan|audit|inspect|check|diagnose|find|health|status|errors?|failures?|configuration)\b/.test(lower)
+    /\b(scan|audit|inspect|check|diagnose|find|health|status|errors?|failures?|configuration)\b/.test(
+      lower,
+    )
   ) {
     return { name: 'devstudio.health', input: {} };
   }
@@ -232,7 +234,8 @@ export function planAIToolFromCommand(
     ) &&
     !/\b(store demos?|demo routes?|live browser|public store|broken links?|mobile layout|console errors?|api errors?)\b/.test(
       lower,
-    )
+    ) &&
+    !/\b(fix|repair|correct|change|update|edit|rerun|re-run|retry|resume|cancel)\b/.test(lower)
   ) {
     return { name: 'workflows.inspect', input: asAIRecord(context.toolInput) };
   }

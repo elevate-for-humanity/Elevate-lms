@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { getGitHubHeaders } from '@/lib/devstudio/github-token';
+import { getGitHubHeaders, getGitHubReadHeaders } from '@/lib/devstudio/github-token';
 import { requireTypedConfirmation } from '@/lib/security/require-confirmation';
 
 export const dynamic = 'force-dynamic';
@@ -65,7 +65,7 @@ interface TreeNode {
 async function fetchTree(dirPath: string, depth: number): Promise<TreeNode[]> {
   const urlPath = dirPath ? encodePath(dirPath) : '';
   const response = await fetch(`${GH_API}/repos/${getRepo()}/contents/${urlPath}?ref=${getBranch()}`, {
-    headers: await ghHeaders(),
+    headers: await getGitHubReadHeaders(),
     cache: 'no-store',
   });
   if (!response.ok) return [];
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
     if (isBlocked(filePath)) return safeError('Path not allowed', 403);
 
     const response = await fetch(`${GH_API}/repos/${getRepo()}/contents/${encodePath(filePath)}?ref=${getBranch()}`, {
-      headers: await ghHeaders(),
+      headers: await getGitHubReadHeaders(),
       cache: 'no-store',
     });
     if (!response.ok) {

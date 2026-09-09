@@ -25,7 +25,15 @@ const RISKY_KEYWORDS = [
 export function detectRiskTags(text: string): string[] {
   const lower = text.toLowerCase();
   return RISKY_KEYWORDS.filter((keyword) => {
-    let index = lower.indexOf(keyword);
+    // Whole-word matching prevents tags such as `pay` from firing inside
+    // ordinary read-only words such as `deployment`.
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+    const keywordPattern = new RegExp(`\\b${escaped}\\b`, 'g');
+    const nextIndex = (from: number) => {
+      keywordPattern.lastIndex = from;
+      return keywordPattern.exec(lower)?.index ?? -1;
+    };
+    let index = nextIndex(0);
     while (index >= 0) {
       const clauseStart = Math.max(
         lower.lastIndexOf('.', index),
@@ -33,6 +41,17 @@ export function detectRiskTags(text: string): string[] {
         lower.lastIndexOf('\n', index),
       );
       const prefix = lower.slice(clauseStart + 1, index);
+      const suffix = lower.slice(index + keyword.length, index + keyword.length + 24);
+      // Inspecting a protected workflow is not the same as executing it.
+      // Noun phrases such as "publish flow" and "deployment status" stay read-only.
+      if (
+        /^\s*(?:flow|status|history|logs?|button|control|settings?|configuration|readiness|failure)/.test(
+          suffix,
+        )
+      ) {
+        index = nextIndex(index + keyword.length);
+        continue;
+      }
       const lastNegation = Math.max(
         prefix.lastIndexOf('do not'),
         prefix.lastIndexOf("don't"),
@@ -43,7 +62,7 @@ export function detectRiskTags(text: string): string[] {
       const afterNegation = lastNegation >= 0 ? prefix.slice(lastNegation) : '';
       const negationReset = /\b(?:but|then|instead|however)\b/.test(afterNegation);
       if (lastNegation < 0 || negationReset) return true;
-      index = lower.indexOf(keyword, index + keyword.length);
+      index = nextIndex(index + keyword.length);
     }
     return false;
   });

@@ -25,6 +25,14 @@ describe('devstudio/os/risk', () => {
     expect(requiresApproval('Do not inspect it; instead deploy to production.')).toBe(true);
   });
 
+  it('does not gate read-only inspection of protected workflow state', () => {
+    expect(
+      requiresApproval(
+        'Scan the website builder and inspect the publish flow, deployment status, and delete button. Do not publish or delete content.',
+      ),
+    ).toBe(false);
+  });
+
   it('builds approval reason', () => {
     expect(approvalReason(['deploy', 'auth'])).toContain('deploy');
   });

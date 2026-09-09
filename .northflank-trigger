@@ -1,4 +1,4 @@
-merge_sha=7dd8064a16bbd8a16d8a6503882f3f751bb397cd
-services=marketing
-requested_at=2026-09-09T17:45:00Z
-reason=deploy-kountry-kutz-homepage-media-and-narration-repair
+merge_sha=78052fc85cc958be02695f5ad20def69d2760038
+services=admin,lms
+requested_at=2026-09-09T19:30:00Z
+reason=deploy-host-shop-administrator-handoff-fix

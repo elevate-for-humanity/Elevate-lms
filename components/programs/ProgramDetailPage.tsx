@@ -202,6 +202,7 @@ export default function ProgramDetailPage({
                   <HeroPicture
                     src={heroPosterSrc}
                     alt={heroAlt}
+                    preserveAspectRatio={p.slug === 'bookkeeping'}
                     microLabel={banner.microLabel}
                     analyticsName={banner.analyticsName}
                     belowHeroHeadline={safeHeadline}

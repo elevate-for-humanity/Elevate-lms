@@ -53,25 +53,36 @@ async function persistPlan(
   tenantId?: string,
 ) {
   const content = JSON.stringify(plan);
-  await db.from('ai_memory').upsert(
-    {
-      scope: 'plan',
-      key: `plan:${plan.id}`,
-      content,
-      value: content,
-      metadata: {
-        plan_id: plan.id,
-        goal: plan.goal,
-        status: plan.status,
-        updated_by: actorId,
-      },
-      tenant_id: tenantId ?? null,
-      user_id: actorId,
-      updated_at: new Date().toISOString(),
+  const payload = {
+    scope: 'plan',
+    category: 'plan_checkpoint',
+    key: `plan:${plan.id}`,
+    content,
+    value: content,
+    metadata: {
+      plan_id: plan.id,
+      goal: plan.goal,
+      status: plan.status,
+      updated_by: actorId,
     },
-    { onConflict: 'scope,key,agent_id' },
-  );
-  if (error) throw new Error(`Could not persist plan checkpoint: ${error.message}`);
+    tenant_id: tenantId ?? null,
+    user_id: actorId,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data: existing, error: lookupError } = await db
+    .from('ai_memory')
+    .select('id')
+    .eq('scope', 'plan')
+    .eq('key', payload.key)
+    .is('agent_id', null)
+    .maybeSingle();
+  if (lookupError) throw new Error(`Could not locate plan checkpoint: ${lookupError.message}`);
+
+  const write = existing?.id
+    ? await db.from('ai_memory').update(payload).eq('id', existing.id)
+    : await db.from('ai_memory').insert(payload);
+  if (write.error) throw new Error(`Could not persist plan checkpoint: ${write.error.message}`);
 }
 
 async function loadPlan(

@@ -68,8 +68,8 @@ const VISUAL_STORY = [
     body: 'Apprentices develop barbering skills through real practice, documented competencies, and structured supervision.',
   },
   {
-    image: '/images/partners/kountry-kutz-official.webp',
-    alt: 'Licensed host barbershop supporting apprenticeship training',
+    image: '/images/pages/barber-hero-main.webp',
+    alt: 'Barber apprentice training with professional supervision',
     label: 'Host Shop Experience',
     title: 'Train in the environment where the job happens.',
     body: 'Approved host shops provide the workplace setting for supervised on-the-job learning and progress verification.',
@@ -184,7 +184,7 @@ export default async function BarberApprenticeshipPage() {
               verified during enrollment and is not implied by a public listing.
             </p>
           </div>
-          <FeaturedHostPartners programSlug="barber-apprenticeship" />
+          <FeaturedHostPartners programSlug="barber-apprenticeship" excludeSlugs={['kountry-kutz-barbershop']} />
           <div className="mt-10">
             <BarberWorkforceNetworkMap />
           </div>

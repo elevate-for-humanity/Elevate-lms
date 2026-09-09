@@ -1,115 +1,48 @@
-import { logger } from '@/lib/logger';
-
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-export const runtime = 'nodejs';
+import { getHostShopBoard } from '@/lib/partner/board';
+import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
-type ApprenticeProfile = {
-  id: string;
-  full_name: string;
-  email: string;
-  avatar_url: string | null;
-};
+function matchesProgram(value: string | null, requested: string | null) {
+  if (!requested) return true;
+  const normalize = (input: string | null) =>
+    String(input || '')
+      .toLowerCase()
+      .replace(/-apprenticeship$/, '');
+  return normalize(value) === normalize(requested);
+}
 
 async function _GET(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const programId = searchParams.get('program');
-
-    const { data: partnerUser } = await supabase
-      .from('partner_users')
-      .select('partner_id')
-      .eq('user_id', user.id)
-      .eq('status', 'active')
-      .maybeSingle();
-
-    if (!partnerUser) {
-      return NextResponse.json({ error: 'Not a partner' }, { status: 403 });
-    }
-
-    if (programId) {
-      const { data: access } = await supabase
-        .from('partner_program_access')
-        .select('id')
-        .eq('partner_id', partnerUser.partner_id)
-        .eq('program_id', programId)
-        .is('revoked_at', null)
-        .maybeSingle();
-
-      if (!access) {
-        return NextResponse.json({ error: 'No access to this program' }, { status: 403 });
-      }
-    }
-
-    let query = supabase
-      .from('apprenticeships')
-      .select(
-        `
-        id,
-        apprentice_id,
-        program_id,
-        start_date,
-        status,
-        profiles:apprentice_id(id, full_name, email, avatar_url)
-      `,
-      )
-      .eq('partner_id', partnerUser.partner_id)
-      .eq('status', 'active');
-
-    if (programId) {
-      query = query.eq('program_id', programId);
-    }
-
-    const { data: apprenticeships, error } = await query;
-
-    if (error) {
-      logger.error('Failed to fetch apprentices:', error);
-      return NextResponse.json({ error: 'Failed to fetch apprentices' }, { status: 500 });
-    }
-
-    const apprentices = await Promise.all(
-      (apprenticeships || []).map(async (a) => {
-        const { data: progressSum } = await supabase
-          .from('progress_entries')
-          .select('hours_worked')
-          .eq('apprentice_id', a.apprentice_id)
-          .eq('partner_id', partnerUser.partner_id);
-
-        const totalHours = (progressSum || []).reduce((sum, p) => sum + (p.hours_worked || 0), 0);
-        const rawProfiles = a.profiles as unknown;
-        const profile = (Array.isArray(rawProfiles) ? rawProfiles[0] : rawProfiles) as ApprenticeProfile | null | undefined;
-
-        return {
-          id: profile?.id || a.apprentice_id,
-          full_name: profile?.full_name || 'Unknown',
-          email: profile?.email || '',
-          avatar_url: profile?.avatar_url || null,
-          start_date: a.start_date,
-          total_hours: totalHours,
-        };
-      }),
-    );
-
+    const { user } = await requireCurrentHostShopPartner();
+    const board = await getHostShopBoard(user.id);
+    const requestedProgram = request.nextUrl.searchParams.get('program');
+    const apprentices = board.apprentices
+      .filter((item) => matchesProgram(item.program_slug, requestedProgram))
+      .map((item) => ({
+        id: item.student_id,
+        placement_id: item.id,
+        full_name: item.name,
+        email: item.email,
+        avatar_url: null,
+        start_date: item.start_date,
+        total_hours: item.ojt.completed,
+        competency_progress: item.competency,
+      }));
     return NextResponse.json({ apprentices });
   } catch (error) {
-    logger.error('Apprentices API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    const code = error instanceof Error ? error.message : '';
+    return NextResponse.json(
+      { error: 'No active Host Shop context' },
+      { status: code === 'HOST_SHOP_UNAUTHENTICATED' ? 401 : 403 },
+    );
   }
 }
+
 export const GET = withApiAudit('/api/partner/apprentices', _GET);

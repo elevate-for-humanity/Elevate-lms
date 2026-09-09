@@ -1,52 +1,26 @@
-import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
 
 async function _GET(request: Request) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
-
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ completed: false, error: 'Not authenticated' }, { status: 401 });
-    }
-
-    // Check if partner has completed onboarding
-    const { data: partner, error: partnerError } = await supabase
-      .from('partners')
-      .select('id, shop_name, onboarding_completed, onboarding_step, status')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (partnerError || !partner) {
-      return NextResponse.json({
-        completed: false,
-        step: 'not_started',
-        message: 'No partner profile found',
-      });
-    }
-
-    // Check if onboarding is completed
-    const isCompleted = partner.onboarding_completed === true && partner.status === 'active';
-
+    const { partner } = await requireCurrentHostShopPartner();
     return NextResponse.json({
-      completed: isCompleted,
+      completed: partner.onboarding_completed === true && partner.status === 'active',
       step: partner.onboarding_step || 'not_started',
-      shopName: partner.shop_name,
+      shopName: partner.name,
       status: partner.status,
     });
   } catch (error) {
-    logger.error('Error checking onboarding status:', error);
-    return NextResponse.json({ completed: false, error: 'Server error' }, { status: 500 });
+    const code = error instanceof Error ? error.message : '';
+    return NextResponse.json(
+      { completed: false, error: 'No active Host Shop context' },
+      { status: code === 'HOST_SHOP_UNAUTHENTICATED' ? 401 : 403 },
+    );
   }
 }
+
 export const GET = withApiAudit('/api/partner/onboarding-status', _GET);

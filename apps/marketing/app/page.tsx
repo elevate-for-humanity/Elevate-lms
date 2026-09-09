@@ -19,7 +19,6 @@ import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/hos
 
 const HOME_HOST_SHOP_ORDER = [
   'salon-saloon',
-  'kountry-kutz-barbershop',
   'cals-kutz-studio',
   'b-52s-barber-shop',
   'generations-hair-llc',
@@ -96,9 +95,15 @@ export default function HomePage() {
     <>
       <StructuredData />
       <main>
-        <PlatformHubHero />
-        <HomeAboutElevate />
-        <HomeHeroVideo banner={heroBanners.home} />
+        <div
+          data-scroll-narration
+          data-narration="Welcome to Elevate for Humanity. Explore hands-on career training, registered apprenticeships, employer-connected learning, and possible workforce funding pathways. Use the homepage to compare programs, meet participating Host Shops, and choose the next step that fits your goals."
+          data-narration-src="/audio/heroes/home.mp3"
+        >
+          <PlatformHubHero />
+          <HomeAboutElevate />
+          <HomeHeroVideo banner={heroBanners.home} />
+        </div>
         <div
           data-scroll-narration
           data-narration="Explore Elevate career programs built for real employment opportunities. Train for HVAC and skilled trades, commercial driving, business and entrepreneurship, bookkeeping and finance, information technology, healthcare, and other in-demand fields. Many programs may be free to participants who qualify for workforce funding. Funding is not automatic: the responsible agency must approve the participant, program, and covered costs in writing. If funding is not approved, admissions can explain available self-pay and payment options. Enrollment is open, upcoming cohorts are forming, and PARIS can guide you through program selection, funding steps, the application, required documents, and what to do next."
@@ -136,23 +141,6 @@ export default function HomePage() {
               },
             },
             {
-              shopSlug: 'kountry-kutz-barbershop',
-              media: {
-                src: '/images/partners/kountry-kutz-interior.webp',
-                alt: 'Interior of Kountry Kutz apprenticeship host barbershop',
-                kind: 'photo',
-              },
-            },
-            {
-              shopSlug: 'kountry-kutz-barbershop',
-              media: {
-                src: '/videos/partners/kountry-kutz-tour.mp4',
-                alt: 'Video introduction and tour of Kountry Kutz apprenticeship host barbershop',
-                kind: 'video',
-                backdropSrc: '/images/partners/kountry-kutz-official.webp',
-              },
-            },
-            {
               shopSlug: 'cals-kutz-studio',
               media: {
                 src: '/images/partners/cals-kutz-official.webp',
@@ -173,8 +161,6 @@ export default function HomePage() {
           tourScripts={{
             '/videos/partners/salon-saloon-tour.mp4':
               'Welcome to Salon Saloon in South Bend, Indiana. This participating Elevate Host Salon gives cosmetology apprentices a professional setting for supervised workplace learning. As you tour the salon, notice the service stations, client-ready environment, sanitation practices, and team workflow. Apprentices connect classroom instruction with documented on-the-job experience while learning technical skills, client service, safety, and professional expectations. Select Schedule a Host Shop Walk-Through to learn more.',
-            '/videos/partners/kountry-kutz-tour.mp4':
-              'Welcome to Kountry Kutz Barbershop in New Palestine, Indiana. This tour introduces a participating apprenticeship Host Shop where barber apprentices can build skills through structured instruction and supervised workplace experience. Notice the active service floor, professional stations, client interaction, shop routines, and safety practices. Use the shop details beside the video to explore the location or schedule a Host Shop walk-through.',
           }}
           narration="Welcome to the Salon Saloon tour in South Bend, Indiana. Salon Saloon is a participating Elevate Host Salon where cosmetology apprentices connect classroom instruction with supervised experience inside a working salon. During apprenticeship, the employer teaches professional routines, client service, safety, sanitation, technical skills, and workplace expectations while documenting the apprentice's progress. Host Shops may use hourly pay, commission, or a combination, but the apprentice's weekly earnings must equal at least the applicable required wage for every compensable hour, with a wage top-up when commission falls short. Continue through the gallery to meet other participating shops, view their locations and contact information, and schedule a Host Shop walk-through."
         />

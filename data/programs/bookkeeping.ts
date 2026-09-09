@@ -10,8 +10,8 @@ export const BOOKKEEPING: ProgramSchema = {
   category: 'Accounting & Finance',
   programType: 'workforce',
 
-  heroImage: '/images/pexels/bookkeeping.webp',
-  heroImageAlt: 'Bookkeeping and accounting training program',
+  heroImage: '/images/programs/accounting-financial-empowerment-hero.png',
+  heroImageAlt: 'Elevate Accounting and Financial Empowerment Career Pathway Program overview',
   videoSrc: '/videos/career-services-hero.mp4',
 
   deliveryMode: 'hybrid',

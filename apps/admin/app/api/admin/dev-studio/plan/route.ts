@@ -71,6 +71,7 @@ async function persistPlan(
     },
     { onConflict: 'scope,key,agent_id' },
   );
+  if (error) throw new Error(`Could not persist plan checkpoint: ${error.message}`);
 }
 
 async function loadPlan(
@@ -159,6 +160,9 @@ export async function POST(req: NextRequest) {
 
       try {
         let plan = resumePlanId ? await loadPlan(db, resumePlanId, auth.id) : null;
+        if (resumePlanId && !plan) {
+          throw new Error(`Plan checkpoint ${resumePlanId} was not found; refusing to create an unrelated replacement plan.`);
+        }
         if (!plan) {
           plan = decomposePlan(goal, params);
           const shared = await loadSharedContext({ goal, tenantId, userId: auth.id }).catch(

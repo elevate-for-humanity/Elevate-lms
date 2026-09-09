@@ -46,12 +46,13 @@ export const DEFAULT_NAV: NavSection[] = [
   },
   {
     label: 'Intelligence',
-    href: '/intelligence',
+    href: '/studio',
     items: [
-      { label: 'Risk Dashboard', href: '/intelligence' },
+      { label: 'Admin AI Intelligence', href: '/studio' },
+      { label: 'Risk Dashboard', href: '/studio?workspace=intelligence' },
       { label: 'Completion Forecast', href: '/intelligence/forecast' },
-      { label: 'Lizzy', href: '/dashboard' },
-      { label: 'Workflows', href: '/studio/workflows' },
+      { label: 'Lizzy', href: '/studio' },
+      { label: 'Workflows', href: '/studio?workspace=workflows' },
       { label: 'System Health', href: '/system-health' },
       { label: 'Snapshots', href: '/snapshots' },
     ],

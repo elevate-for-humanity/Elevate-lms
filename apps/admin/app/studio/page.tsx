@@ -6,8 +6,17 @@ import { getAvailableWorkspaces } from '@/lib/devstudio/workspace-registry';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export default async function StudioPage() {
+export default async function StudioPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ workspace?: string }>;
+}) {
   await requireRole(['super_admin', 'admin']);
+  const requestedWorkspace = (await searchParams).workspace;
+  const initialWorkspace =
+    requestedWorkspace === 'workflows' || requestedWorkspace === 'intelligence'
+      ? requestedWorkspace
+      : undefined;
 
   const workspaces = getAvailableWorkspaces().map(
     ({ id, label, description, route, healthEndpoint }) => ({
@@ -26,16 +35,13 @@ export default async function StudioPage() {
           <span className="sr-only">
             Advanced capability surfaces are available through the unified command workspace.
           </span>
-          <div
-            id="admin-ai-workspace"
-            className="h-full min-h-0 min-w-0"
-          >
+          <div id="admin-ai-workspace" className="h-full min-h-0 min-w-0">
             <StudioCommandWorkspace
               workspaces={workspaces.map(({ id, label, route }) => ({ id, label, route }))}
+              initialWorkspace={initialWorkspace}
             />
           </div>
         </section>
-
       </div>
     </main>
   );

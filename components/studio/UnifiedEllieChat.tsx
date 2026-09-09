@@ -79,13 +79,16 @@ interface UnifiedEllieChatProps {
   onPreviewTarget?: (url: string) => void;
   preferredAgent?: StudioSpecialist;
   onTaskCheckpoint?: (checkpoint: OrchestratedPlanCheckpoint | null) => void;
+  suggestedPrompt?: string;
 }
 
 const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 
 function findElevatePreviewUrl(value: unknown): string | null {
   const text = typeof value === 'string' ? value : JSON.stringify(value ?? '');
-  const match = text.match(/https:\/\/(?:www|admin|app)\.elevateforhumanity\.org(?:\/[^\s"'<>]*)?/i);
+  const match = text.match(
+    /https:\/\/(?:www|admin|app)\.elevateforhumanity\.org(?:\/[^\s"'<>]*)?/i,
+  );
   return match?.[0] ?? null;
 }
 
@@ -295,6 +298,7 @@ export default function UnifiedEllieChat({
   onPreviewTarget,
   preferredAgent,
   onTaskCheckpoint,
+  suggestedPrompt,
 }: UnifiedEllieChatProps) {
   const naturalVoice = useNaturalVoice();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -316,6 +320,12 @@ export default function UnifiedEllieChat({
   const [checkpointError, setCheckpointError] = useState('');
   const attachmentInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!suggestedPrompt?.trim()) return;
+    setInput(suggestedPrompt);
+    inputRef.current?.focus();
+  }, [suggestedPrompt]);
 
   async function uploadAttachment(file: File) {
     setUploading(true);
@@ -471,7 +481,8 @@ export default function UnifiedEllieChat({
   }
 
   function receiveCheckpoint(checkpoint: OrchestratedPlanCheckpoint) {
-    const active = checkpoint.status === 'done' || checkpoint.status === 'failed' ? null : checkpoint;
+    const active =
+      checkpoint.status === 'done' || checkpoint.status === 'failed' ? null : checkpoint;
     setPlanCheckpoint(active);
     onTaskCheckpoint?.(active);
   }
@@ -490,17 +501,26 @@ export default function UnifiedEllieChat({
       const assistantIdx = messages.length;
       setMessages((current) => [
         ...current,
-        { role: 'assistant', content: 'Approval recorded. Resuming the same plan…', provider: 'registered-tools' },
+        {
+          role: 'assistant',
+          content: 'Approval recorded. Resuming the same plan…',
+          provider: 'registered-tools',
+        },
       ]);
-      await streamOrchestratedPlan('', (line) => {
-        const clean = line.replace(ANSI_PATTERN, '').trimEnd();
-        setMessages((current) => {
-          const next = [...current];
-          const row = next[assistantIdx];
-          if (row?.role === 'assistant') next[assistantIdx] = { ...row, content: `${row.content}\n${clean}`.trim() };
-          return next;
-        });
-      }, { planId: planCheckpoint.planId, onCheckpoint: receiveCheckpoint });
+      await streamOrchestratedPlan(
+        '',
+        (line) => {
+          const clean = line.replace(ANSI_PATTERN, '').trimEnd();
+          setMessages((current) => {
+            const next = [...current];
+            const row = next[assistantIdx];
+            if (row?.role === 'assistant')
+              next[assistantIdx] = { ...row, content: `${row.content}\n${clean}`.trim() };
+            return next;
+          });
+        },
+        { planId: planCheckpoint.planId, onCheckpoint: receiveCheckpoint },
+      );
     } catch (error) {
       setCheckpointError(error instanceof Error ? error.message : 'Could not resume plan');
     } finally {
@@ -530,19 +550,19 @@ export default function UnifiedEllieChat({
         ]);
         const command = [text, fileContext, attachment?.context].filter(Boolean).join('\n\n');
         const appendLine = (line: string) => {
-            const clean = line.replace(ANSI_PATTERN, '').trimEnd();
-            spokenText += `${spokenText ? '\n' : ''}${clean}`;
-            setMessages((prev) => {
-              const next = [...prev];
-              const row = next[assistantIdx];
-              if (row?.role === 'assistant')
-                next[assistantIdx] = {
-                  ...row,
-                  provider: 'registered-tools',
-                  content: `${row.content}${row.content ? '\n' : ''}${clean}`,
-                };
-              return next;
-            });
+          const clean = line.replace(ANSI_PATTERN, '').trimEnd();
+          spokenText += `${spokenText ? '\n' : ''}${clean}`;
+          setMessages((prev) => {
+            const next = [...prev];
+            const row = next[assistantIdx];
+            if (row?.role === 'assistant')
+              next[assistantIdx] = {
+                ...row,
+                provider: 'registered-tools',
+                content: `${row.content}${row.content ? '\n' : ''}${clean}`,
+              };
+            return next;
+          });
         };
 
         if (shouldOrchestrateMessage(command)) {
@@ -564,7 +584,11 @@ export default function UnifiedEllieChat({
                   const next = [...prev];
                   const row = next[assistantIdx];
                   if (row?.role === 'assistant') {
-                    next[assistantIdx] = { ...row, provider: 'admin-ai', content: `${row.content}${token}` };
+                    next[assistantIdx] = {
+                      ...row,
+                      provider: 'admin-ai',
+                      content: `${row.content}${token}`,
+                    };
                   }
                   return next;
                 });
@@ -675,7 +699,9 @@ export default function UnifiedEllieChat({
           <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3">
             <Shield className="h-5 w-5 shrink-0" aria-hidden="true" />
             <div className="min-w-0 flex-1">
-              <p className="font-bold">Approval needed: {planCheckpoint.title || 'Continue plan'}</p>
+              <p className="font-bold">
+                Approval needed: {planCheckpoint.title || 'Continue plan'}
+              </p>
               <p className="truncate text-xs text-amber-800">
                 {planCheckpoint.reason || `Task ${planCheckpoint.taskId}`}
               </p>
@@ -688,11 +714,18 @@ export default function UnifiedEllieChat({
             >
               Approve and continue this flow
             </button>
-            <Link href={`/studio/tasks?task=${planCheckpoint.taskId}`} className="text-xs font-bold underline">
+            <Link
+              href={`/studio/tasks?task=${planCheckpoint.taskId}`}
+              className="text-xs font-bold underline"
+            >
               Evidence
             </Link>
           </div>
-          {checkpointError ? <p role="alert" className="mx-auto mt-2 max-w-5xl text-xs text-red-700">{checkpointError}</p> : null}
+          {checkpointError ? (
+            <p role="alert" className="mx-auto mt-2 max-w-5xl text-xs text-red-700">
+              {checkpointError}
+            </p>
+          ) : null}
         </div>
       ) : null}
 
@@ -919,7 +952,11 @@ export default function UnifiedEllieChat({
               }}
               className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
             >
-              {voiceOutputEnabled ? <Volume2 className="h-5 w-5" aria-hidden="true" /> : <VolumeX className="h-5 w-5" aria-hidden="true" />}
+              {voiceOutputEnabled ? (
+                <Volume2 className="h-5 w-5" aria-hidden="true" />
+              ) : (
+                <VolumeX className="h-5 w-5" aria-hidden="true" />
+              )}
               <span>{voiceOutputEnabled ? 'Voice on' : 'Voice off'}</span>
             </button>
             <button

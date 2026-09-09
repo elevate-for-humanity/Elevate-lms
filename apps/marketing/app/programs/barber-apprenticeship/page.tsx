@@ -99,68 +99,25 @@ export default async function BarberApprenticeshipPage() {
       <HeroVideo
         videoSrcDesktop="/videos/partners/kountry-kutz/shop-tour.mp4"
         videoSrcMobile="/videos/partners/kountry-kutz/shop-tour.mp4"
-        videoPlaybackRate={0.55}
+        videoPlaybackRate={0.85}
         posterImage="/images/partners/kountry-kutz/interior-empty.webp"
         mountedFrameImage="/images/partners/kountry-kutz/interior-empty.webp"
-        microLabel={heroBanner.microLabel}
+        voiceoverSrc="/audio/heroes/barber.mp3"
+        microLabel="Featured Host Shop • New Palestine, Indiana"
+        belowHeroHeadline="Train at Kountry Kutz Barbershop."
+        belowHeroSubheadline="See how barber apprentices connect structured instruction with supervised experience inside a real working barbershop."
+        ctas={[
+          { label: 'Apply for Barber Apprenticeship', href: program.cta.applyHref },
+          { label: 'Explore Kountry Kutz', href: '/host-shops/kountry-kutz-barbershop', variant: 'secondary' },
+        ]}
         transcript={heroBanner.transcript}
-        narrateTranscript
-        analyticsName="barber-apprenticeship"
-        heightClassName="h-[clamp(460px,68vh,780px)]"
-        mediaFit="contain"
+        analyticsName="barber-apprenticeship-kountry-kutz"
+        heightClassName="h-[clamp(500px,72vh,780px)]"
+        mediaFit="cover"
         mediaClassName="bg-black"
-        overlayMode="none"
+        overlayMode="soft"
         deferVideoMs={0}
       />
-
-      <section className="border-b border-slate-200 bg-slate-950 px-4 py-7 text-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
-              Featured Host Shop
-            </p>
-            <h2 className="mt-2 text-2xl font-black sm:text-3xl">Tour Kountry Kutz Barbershop</h2>
-            <p className="mt-2 leading-7 text-slate-200">
-              Kountry Kutz is a family-oriented Main Street barbershop in New Palestine, Indiana,
-              offering classic cuts, modern grooming, and supervised workplace experience for the
-              barber apprenticeship pathway.
-            </p>
-          </div>
-          <Link
-            href="/host-shops/kountry-kutz-barbershop"
-            className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
-          >
-            Explore Kountry Kutz <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-
-      <section aria-label="Kountry Kutz apprenticeship story" className="border-b border-slate-200 bg-white px-4 py-8">
-        <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-3">
-          {[
-            {
-              src: '/images/partners/kountry-kutz/interior-empty.webp',
-              alt: 'Training stations inside Kountry Kutz Barbershop in New Palestine',
-            },
-            {
-              src: '/images/partners/kountry-kutz/interior-active.webp',
-              alt: 'Barbers and clients inside Kountry Kutz Barbershop',
-            },
-            {
-              src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
-              alt: 'Kountry Kutz barber apprenticeship host-shop announcement',
-            },
-          ].map((photo) => (
-            <div key={photo.src} className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
-              <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-contain" />
-            </div>
-          ))}
-        </div>
-        <p className="mx-auto mt-5 max-w-4xl text-center text-base leading-7 text-slate-700">
-          One of Elevate's first barber apprenticeship host shops, Kountry Kutz provides a
-          real-workplace setting at 56 W Main St, Suite A, New Palestine, Indiana.
-        </p>
-      </section>
 
       <section className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12">
         <div className="mx-auto max-w-6xl">

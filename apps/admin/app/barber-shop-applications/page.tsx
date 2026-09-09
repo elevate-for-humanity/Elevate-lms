@@ -56,8 +56,21 @@ type Application = {
   status: string | null;
 };
 
+type ApplicationStatus = 'pending' | 'approved' | 'denied';
+
+function normalizeStatus(status: string | null): ApplicationStatus {
+  const normalized = status?.trim().toLowerCase();
+
+  if (normalized === 'approved') return 'approved';
+  if (normalized === 'denied' || normalized === 'rejected') return 'denied';
+
+  // Legacy intake rows use null, submitted, in_review, and other pre-decision
+  // values. Every undecided row belongs in the actionable pending queue.
+  return 'pending';
+}
+
 function StatusBadge({ status }: { status: string | null }) {
-  switch (status) {
+  switch (normalizeStatus(status)) {
     case 'approved':
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
@@ -101,9 +114,9 @@ export default async function BarberShopApplicationsPage() {
 
   const rows = (applications ?? []) as Application[];
 
-  const pending = rows.filter(r => !r.status || r.status === 'pending');
-  const approved = rows.filter(r => r.status === 'approved');
-  const denied = rows.filter(r => r.status === 'denied');
+  const pending = rows.filter(r => normalizeStatus(r.status) === 'pending');
+  const approved = rows.filter(r => normalizeStatus(r.status) === 'approved');
+  const denied = rows.filter(r => normalizeStatus(r.status) === 'denied');
 
   return (
     <div className="min-h-screen bg-white">

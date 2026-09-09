@@ -14,6 +14,16 @@ export const metadata = {
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 // Keep this list aligned with the private `partner-documents` Storage bucket.
 const ALLOWED_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png']);
+const ALLOWED_EXTENSIONS = new Set(['pdf', 'jpg', 'jpeg', 'png']);
+
+function normalizedContentType(file: File) {
+  const extension = file.name.split('.').pop()?.toLowerCase() || '';
+  if (file.type && ALLOWED_TYPES.has(file.type)) return file.type;
+  if (extension === 'pdf') return 'application/pdf';
+  if (extension === 'jpg' || extension === 'jpeg') return 'image/jpeg';
+  if (extension === 'png') return 'image/png';
+  return null;
+}
 
 async function loadContext() {
   try {
@@ -54,15 +64,19 @@ async function uploadHostShopDocument(documentType: string, formData: FormData) 
   if (fileEntry.size > MAX_FILE_SIZE) {
     redirect('/host-shop/onboarding/documents?error=file_too_large');
   }
-  if (!ALLOWED_TYPES.has(fileEntry.type)) {
+  const extension = fileEntry.name.split('.').pop()?.toLowerCase() || '';
+  const contentType = normalizedContentType(fileEntry);
+  // Android content providers sometimes send a valid PDF/photo with an empty or
+  // generic MIME type. Validate both the browser type and the actual extension.
+  if (!contentType || !ALLOWED_EXTENSIONS.has(extension)) {
     redirect('/host-shop/onboarding/documents?error=file_type');
   }
-  const fileName = safeFileName(fileEntry.name || `${documentType}.bin`);
+  const fileName = safeFileName(fileEntry.name || `${documentType}.${extension}`);
   const storagePath = `${partner.id}/${documentType}/${Date.now()}-${fileName}`;
   const { error: uploadError } = await db.storage
     .from('partner-documents')
     .upload(storagePath, fileEntry, {
-      contentType: fileEntry.type,
+      contentType,
       upsert: false,
     });
 
@@ -82,7 +96,7 @@ async function uploadHostShopDocument(documentType: string, formData: FormData) 
     display_name: requirement.document_name || documentType,
     file_name: fileEntry.name,
     file_url: storagePath,
-    file_type: fileEntry.type,
+    file_type: contentType,
     file_size: fileEntry.size,
     storage_bucket: 'partner-documents',
     status: 'pending',

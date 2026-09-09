@@ -61,6 +61,14 @@ function isEngineeringCommand(lower: string): boolean {
   return engineeringNoun && engineeringVerb;
 }
 
+function isWebsiteEngineeringCommand(lower: string): boolean {
+  const websiteTarget =
+    /\b(website|web site|homepage|home page|landing page|program page|host[- ]shop page|slideshow|slide show|hero banner|funding banner|tour|responsive layout|mobile layout|narration|voice script)\b/.test(lower);
+  const changeRequest =
+    /\b(fix|repair|implement|modify|change|update|edit|replace|remove|add|reorganize|publish|build)\b/.test(lower);
+  return websiteTarget && changeRequest;
+}
+
 function isLiveBrowserWork(lower: string): boolean {
   const browserTarget =
     /\b(live (site|website|page|dashboard)|cloud browser|browser|production (site|page|dashboard)|host shop dashboard)\b/.test(
@@ -90,6 +98,23 @@ export function planAIToolFromCommand(
   const lower = command.toLowerCase();
   const contextId = typeof context.id === 'string' ? context.id : null;
   const id = contextId ?? extractUuid(command);
+
+  // Route the primary requested capability before incidental domain words in long prompts.
+  if (isOpenHandsStatusCommand(lower)) {
+    return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
+  }
+  if (isEngineeringCommand(lower) || isWebsiteEngineeringCommand(lower)) {
+    return {
+      name: 'openhands.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
+  if (isLiveBrowserWork(lower)) {
+    return {
+      name: 'browser.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
 
   if (/\bquickbooks\b/.test(lower)) {
     if (/\b(sync|import|refresh)\b/.test(lower) && /\b(payroll|employees?)\b/.test(lower)) {

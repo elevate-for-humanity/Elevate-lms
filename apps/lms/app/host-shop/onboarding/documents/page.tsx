@@ -3,27 +3,13 @@ import { redirect } from 'next/navigation';
 import { AlertCircle, CheckCircle2, FileUp, Hourglass } from 'lucide-react';
 import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
 import { getHostShopBoard } from '@/lib/partner/board';
-import { logger } from '@/lib/logger';
+import HostShopDocumentUploadForm from './HostShopDocumentUploadForm';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Host Shop Documents | Elevate LMS',
   robots: { index: false, follow: false },
 };
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-// Keep this list aligned with the private `partner-documents` Storage bucket.
-const ALLOWED_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png']);
-const ALLOWED_EXTENSIONS = new Set(['pdf', 'jpg', 'jpeg', 'png']);
-
-function normalizedContentType(file: File) {
-  const extension = file.name.split('.').pop()?.toLowerCase() || '';
-  if (file.type && ALLOWED_TYPES.has(file.type)) return file.type;
-  if (extension === 'pdf') return 'application/pdf';
-  if (extension === 'jpg' || extension === 'jpeg') return 'image/jpeg';
-  if (extension === 'png') return 'image/png';
-  return null;
-}
 
 async function loadContext() {
   try {
@@ -38,86 +24,6 @@ async function loadContext() {
     }
     redirect('/unauthorized');
   }
-}
-
-function safeFileName(name: string) {
-  return name
-    .replace(/[^a-zA-Z0-9._-]+/g, '-')
-    .replace(/-+/g, '-')
-    .slice(-120);
-}
-
-async function uploadHostShopDocument(documentType: string, formData: FormData) {
-  'use server';
-
-  const { user, db, partner } = await requireCurrentHostShopPartner();
-  const board = await getHostShopBoard(user.id);
-  const fileEntry = formData.get('file');
-  const expirationDate = String(formData.get('expirationDate') ?? '').trim();
-  const requirement = board.documentStatuses.find(
-    (item: any) => item.document_type === documentType,
-  );
-
-  if (!requirement || !(fileEntry instanceof File) || fileEntry.size === 0) {
-    redirect('/host-shop/onboarding/documents?error=invalid_file');
-  }
-  if (fileEntry.size > MAX_FILE_SIZE) {
-    redirect('/host-shop/onboarding/documents?error=file_too_large');
-  }
-  const extension = fileEntry.name.split('.').pop()?.toLowerCase() || '';
-  const contentType = normalizedContentType(fileEntry);
-  // Android content providers sometimes send a valid PDF/photo with an empty or
-  // generic MIME type. Validate both the browser type and the actual extension.
-  if (!contentType || !ALLOWED_EXTENSIONS.has(extension)) {
-    redirect('/host-shop/onboarding/documents?error=file_type');
-  }
-  const fileName = safeFileName(fileEntry.name || `${documentType}.${extension}`);
-  const storagePath = `${partner.id}/${documentType}/${Date.now()}-${fileName}`;
-  const { error: uploadError } = await db.storage
-    .from('partner-documents')
-    .upload(storagePath, fileEntry, {
-      contentType,
-      upsert: false,
-    });
-
-  if (uploadError) {
-    logger.error('[host-shop-documents] Storage upload failed', uploadError, {
-      partnerId: partner.id,
-      documentType,
-    });
-    redirect('/host-shop/onboarding/documents?error=upload_failed');
-  }
-
-  const { error: insertError } = await db.from('partner_documents').insert({
-    partner_id: partner.id,
-    document_type: documentType,
-    program_id: board.programType,
-    state: partner.state || 'Indiana',
-    display_name: requirement.document_name || documentType,
-    file_name: fileEntry.name,
-    file_url: storagePath,
-    file_type: contentType,
-    file_size: fileEntry.size,
-    storage_bucket: 'partner-documents',
-    status: 'pending',
-    expiration_date: expirationDate || null,
-  });
-
-  if (insertError) {
-    await db.storage.from('partner-documents').remove([storagePath]);
-    logger.error('[host-shop-documents] Document record failed', insertError, {
-      partnerId: partner.id,
-      documentType,
-    });
-    redirect('/host-shop/onboarding/documents?error=record_failed');
-  }
-
-  await db
-    .from('partners')
-    .update({ onboarding_step: 'documents', updated_at: new Date().toISOString() })
-    .eq('id', partner.id);
-
-  redirect(`/host-shop/onboarding/documents?uploaded=${encodeURIComponent(documentType)}`);
 }
 
 function statusBadge(status: string) {
@@ -236,43 +142,10 @@ export default async function HostShopDocumentsPage({
                 </div>
 
                 {needsUpload ? (
-                  <form
-                    action={uploadHostShopDocument.bind(null, requirement.document_type)}
-                    className="mt-5 grid gap-4 border-t border-slate-200 pt-5 sm:grid-cols-[1fr_auto] sm:items-end"
-                  >
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <label className="font-bold">
-                        File *
-                        <input
-                          type="file"
-                          name="file"
-                          required
-                          accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                          className="mt-2 block w-full rounded-xl border border-slate-300 bg-slate-50 p-3 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:font-bold file:text-white"
-                        />
-                      </label>
-                      {requirement.requires_expiration ? (
-                        <label className="font-bold">
-                          Expiration date (if known)
-                          <input
-                            type="date"
-                            name="expirationDate"
-                            className="mt-2 w-full rounded-xl border border-slate-400 px-4 py-3 font-medium"
-                          />
-                          <span className="mt-1 block text-xs font-medium text-slate-600">
-                            You may upload the license now and provide the expiration date during
-                            review.
-                          </span>
-                        </label>
-                      ) : null}
-                    </div>
-                    <button
-                      type="submit"
-                      className="min-h-11 rounded-xl bg-blue-700 px-5 py-3 font-black text-white hover:bg-blue-800"
-                    >
-                      Upload
-                    </button>
-                  </form>
+                  <HostShopDocumentUploadForm
+                    documentType={requirement.document_type}
+                    requiresExpiration={Boolean(requirement.requires_expiration)}
+                  />
                 ) : null}
               </section>
             );

@@ -225,7 +225,7 @@ export default function ParisApplicationWorkspace({
     const latest = [...session.messages].reverse().find((message) => message.role === 'assistant');
     if (!latest || latest.id === spokenMessageId.current) return;
     spokenMessageId.current = latest.id;
-    void parisVoice.play(latest.content, { style: 'assistant', rate: 0.96 });
+    void parisVoice.play(latest.content, { style: 'assistant', rate: 0.96, allowBrowserFallback: false });
   }, [parisVoice, session?.messages, speechEnabled]);
 
   function toggleParisSpeech() {
@@ -238,7 +238,7 @@ export default function ParisApplicationWorkspace({
     const latest = session?.messages ? [...session.messages].reverse().find((message) => message.role === 'assistant') : null;
     if (latest) {
       spokenMessageId.current = latest.id;
-      void parisVoice.play(latest.content, { style: 'assistant', rate: 0.96 });
+      void parisVoice.play(latest.content, { style: 'assistant', rate: 0.96, allowBrowserFallback: false });
     }
   }
 

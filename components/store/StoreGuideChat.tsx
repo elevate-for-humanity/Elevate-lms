@@ -28,7 +28,12 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Props
   const stop = () => naturalVoice.stop();
   const speak = (text: string) => {
     if (muted || !text.trim()) return;
-    void naturalVoice.play(text, { voice: 'coral', style: 'assistant', rate: 1 });
+    void naturalVoice.play(text, {
+      voice: 'coral',
+      style: 'assistant',
+      rate: 1,
+      allowBrowserFallback: false,
+    });
   };
   function openGuide() {
     setMode('chat');

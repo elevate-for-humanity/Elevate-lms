@@ -339,7 +339,12 @@ export default function WebsiteBuilderCommercial() {
       const nextReply = data.reply || 'Done. The preview has been updated.';
       setReply(nextReply);
       if (voiceEnabled) {
-        void naturalVoice.play(nextReply, { voice: 'coral', style: 'assistant', rate: 1.03 });
+        void naturalVoice.play(nextReply, {
+          voice: 'coral',
+          style: 'assistant',
+          rate: 1.03,
+          allowBrowserFallback: false,
+        });
       }
     } catch (requestError) {
       console.error(requestError);
@@ -373,7 +378,14 @@ export default function WebsiteBuilderCommercial() {
       if (nextAnswers.length < INTERVIEW_QUESTIONS.length) {
         const nextQuestion = INTERVIEW_QUESTIONS[nextAnswers.length];
         setReply(nextQuestion);
-        if (voiceEnabled) void naturalVoice.play(nextQuestion, { voice: 'coral', style: 'assistant', rate: 1.03 });
+        if (voiceEnabled) {
+          void naturalVoice.play(nextQuestion, {
+            voice: 'coral',
+            style: 'assistant',
+            rate: 1.03,
+            allowBrowserFallback: false,
+          });
+        }
         return;
       }
 
@@ -382,7 +394,14 @@ export default function WebsiteBuilderCommercial() {
       setAwaitingBuildApproval(true);
       const summary = 'I have the business, audience, design direction, commerce requirements, pages, policies, domain, SEO, and integrations. Review those answers above. Type “Build it” when you want me to generate the draft beside you.';
       setReply(summary);
-      if (voiceEnabled) void naturalVoice.play(summary, { voice: 'coral', style: 'assistant', rate: 1.03 });
+      if (voiceEnabled) {
+        void naturalVoice.play(summary, {
+          voice: 'coral',
+          style: 'assistant',
+          rate: 1.03,
+          allowBrowserFallback: false,
+        });
+      }
       return;
     }
 

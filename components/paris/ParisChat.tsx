@@ -185,7 +185,12 @@ export default function ParisChat({
 
       setMessages((previous) => [...previous, { role: 'assistant', content: data.reply }]);
       if (autoSpeak) {
-        void voice.play(data.reply, { voice: 'coral', style: storeSurface ? 'commercial' : 'assistant', rate: 0.96 });
+        void voice.play(data.reply, {
+          voice: 'coral',
+          style: storeSurface ? 'commercial' : 'assistant',
+          rate: 0.96,
+          allowBrowserFallback: false,
+        });
       }
       onComplete?.([]);
     } catch {

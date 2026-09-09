@@ -29,7 +29,12 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
     if (!current) return;
     setError(null);
     const spoken = step === 0 ? `I'm PARIS. ${current.question}` : current.question;
-    const ok = await naturalVoice.play(spoken, { voice: 'coral', style: 'assistant', rate: 1.05 });
+    const ok = await naturalVoice.play(spoken, {
+      voice: 'coral',
+      style: 'assistant',
+      rate: 1.05,
+      allowBrowserFallback: false,
+    });
     if (!ok && naturalVoice.error) setError(naturalVoice.error);
   };
 

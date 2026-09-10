@@ -74,7 +74,7 @@ function MediaCard({ title, url, kind, busy, onUpload }: {
       <label className="mt-3 inline-flex min-h-11 max-w-full cursor-pointer items-center gap-2 rounded-lg bg-brand-blue-700 px-4 py-2 text-sm font-black text-white">
         {busy === kind ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
         {busy === kind ? 'Uploading…' : `Upload ${title.toLowerCase()}`}
-        <input type="file" accept={kind === 'video' ? 'video/mp4,video/webm,video/quicktime' : 'image/jpeg,image/png,image/webp,image/gif'} className="sr-only" disabled={busy !== null} onChange={(event) => onUpload(kind, event.target.files?.[0])} />
+        <input type="file" accept={kind === 'video' ? 'video/mp4,video/webm,video/quicktime' : 'image/jpeg,image/png,image/webp,image/gif'} className="sr-only !absolute !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0" style={{ clip: 'rect(0, 0, 0, 0)', clipPath: 'inset(50%)' }} disabled={busy !== null} onChange={(event) => onUpload(kind, event.target.files?.[0])} />
       </label>
       <p className="mt-2 text-xs text-slate-500">{kind === 'video' ? 'MP4, WEBM, or MOV · up to 100 MB' : 'JPG, PNG, WEBP, or GIF · up to 10 MB'}</p>
     </div>

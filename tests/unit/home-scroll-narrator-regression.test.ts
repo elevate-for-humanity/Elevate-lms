@@ -5,6 +5,14 @@ import { describe, expect, it } from 'vitest';
 const source = fs.readFileSync(path.resolve('components/home/ScrollNarrator.tsx'), 'utf8');
 
 describe('homepage scroll narration lifecycle', () => {
+  it('enables the guided narration by default and remembers an explicit opt-out', () => {
+    expect(source).toContain("const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration'");
+    expect(source).toContain('const [enabled, setEnabled] = useState(true)');
+    expect(source).toContain("if (preference === 'off') setEnabled(false)");
+    expect(source).toContain("window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'off')");
+    expect(source).toContain("window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'on')");
+  });
+
   it('keeps narration playing through small mobile scroll movement', () => {
     const scrollHandler = source.slice(
       source.indexOf('const synchronizeNarrationToScroll'),
@@ -30,6 +38,10 @@ describe('homepage scroll narration lifecycle', () => {
   it('warms opening narration and attempts the visible section on entry', () => {
     expect(source).toContain('sections.slice(0, 3).forEach(preload)');
     expect(source).toContain('void narrateVisibleSection();');
+  });
+
+  it('explains the one-tap browser audio requirement when autoplay is blocked', () => {
+    expect(source).toContain('Tap the speaker once to allow narration on this device.');
   });
 
   it('does not rebuild scroll listeners for transient playback state', () => {

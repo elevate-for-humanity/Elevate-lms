@@ -1,4 +1,4 @@
-// Homepage media, narration, and PARIS controls require explicit visitor action.
+// Audible playback follows the visitor's scroll after the browser grants audio permission.
 import type { Metadata } from 'next';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';

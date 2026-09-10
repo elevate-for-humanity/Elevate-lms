@@ -117,7 +117,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        <link rel="preload" as="image" href="/images/partners/salon-saloon/team-interior.webp" />
         <SupabasePublicConfigScript />
         <script
           type="application/ld+json"

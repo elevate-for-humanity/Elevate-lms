@@ -130,6 +130,7 @@ export default function ParisChat({
   const [isListening, setIsListening] = useState(false);
   const [speechInputAvailable, setSpeechInputAvailable] = useState(false);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
+  const initialGreetingSpokenRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -216,6 +217,20 @@ export default function ParisChat({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (!voiceEnabled || !autoSpeak || initialGreetingSpokenRef.current) return;
+    const greeting = messages[0]?.content?.trim();
+    if (!greeting) return;
+
+    initialGreetingSpokenRef.current = true;
+    void voice.play(greeting, {
+      voice: 'coral',
+      style: storeSurface ? 'commercial' : 'assistant',
+      rate: 1,
+      allowBrowserFallback: false,
+    });
+  }, [autoSpeak, messages, storeSurface, voice, voiceEnabled]);
 
   const sendToApi = useCallback(async (content: string) => {
     const trimmed = content.trim();

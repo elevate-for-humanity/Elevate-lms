@@ -5,6 +5,8 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
+const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration';
+
 function narrationFor(section: HTMLElement) {
   return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';
 }
@@ -35,9 +37,10 @@ function mostVisiblePageSection() {
 
 export function ScrollNarrator() {
   const pathname = usePathname();
-  // Narration is opt-in. Starting speech while someone is actively scrolling
-  // creates late, out-of-context audio and can fight with embedded media.
-  const [enabled, setEnabled] = useState(false);
+  // The public site is a guided, narrated experience by default. Browsers may
+  // still require one tap before allowing audible playback; an explicit "off"
+  // choice is persisted so accessibility and visitor preference remain authoritative.
+  const [enabled, setEnabled] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
   const lastNarrationRef = useRef<{ section: HTMLElement; text: string; source?: string } | null>(
     null,
@@ -75,9 +78,16 @@ export function ScrollNarrator() {
     });
     if (!started) {
       lastNarrationRef.current = null;
-      setNotice('Natural narration is temporarily unavailable.');
+      setNotice('Tap the speaker once to allow narration on this device.');
+    } else {
+      setNotice(null);
     }
   }, [play, stop]);
+
+  useEffect(() => {
+    const preference = window.localStorage.getItem(NARRATION_PREFERENCE_KEY);
+    if (preference === 'off') setEnabled(false);
+  }, []);
 
   useEffect(() => {
     lastNarrationRef.current = null;
@@ -158,13 +168,16 @@ export function ScrollNarrator() {
   }, [enabled, narrateVisibleSection, stop]);
 
   const toggle = () => {
-    setNotice(null);
-    if (isPlaying || isLoading) {
+    if (enabled && !notice) {
       setEnabled(false);
+      window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'off');
       stop();
       return;
     }
+
+    setNotice(null);
     setEnabled(true);
+    window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'on');
     lastNarrationRef.current = null;
     void narrateVisibleSection();
   };
@@ -209,7 +222,7 @@ export function ScrollNarrator() {
             : 'Play narration'}
         </span>
       </button>
-      {notice ? (
+      {notice && enabled ? (
         <p
           role="status"
           className="mt-2 max-w-64 rounded-lg bg-white p-2 text-xs font-bold text-red-800 shadow-lg"

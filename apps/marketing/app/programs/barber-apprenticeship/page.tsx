@@ -99,27 +99,33 @@ export default async function BarberApprenticeshipPage() {
         }}
       />
 
-      <HeroVideo
-        videoSrcDesktop="/videos/partners/kountry-kutz/shop-tour.mp4"
-        videoSrcMobile="/videos/partners/kountry-kutz/shop-tour.mp4"
-        videoPlaybackRate={0.55}
-        posterImage="/images/partners/kountry-kutz/interior-empty.webp"
-        mountedFrameImage="/images/partners/kountry-kutz/interior-empty.webp"
-        microLabel={heroBanner.microLabel}
-        transcript={KOUNTRY_KUTZ_HERO_TRANSCRIPT}
-        narrateTranscript
-        transcriptVoiceStyle="assistant"
-        transcriptVoiceRate={1}
-        preloadTranscriptVoice={false}
-        analyticsName="barber-apprenticeship"
-        heightClassName="h-[clamp(460px,68vh,780px)]"
-        mediaFit="contain"
-        mediaClassName="bg-black"
-        overlayMode="none"
-        deferVideoMs={0}
-      />
+      <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>
+        <HeroVideo
+          videoSrcDesktop="/videos/partners/kountry-kutz/shop-tour.mp4"
+          videoSrcMobile="/videos/partners/kountry-kutz/shop-tour.mp4"
+          videoPlaybackRate={0.55}
+          posterImage="/images/partners/kountry-kutz/interior-empty.webp"
+          mountedFrameImage="/images/partners/kountry-kutz/interior-empty.webp"
+          microLabel={heroBanner.microLabel}
+          transcript={KOUNTRY_KUTZ_HERO_TRANSCRIPT}
+          narrateTranscript={false}
+          transcriptVoiceStyle="assistant"
+          transcriptVoiceRate={1}
+          preloadTranscriptVoice={false}
+          analyticsName="barber-apprenticeship"
+          heightClassName="h-[clamp(460px,68vh,780px)]"
+          mediaFit="contain"
+          mediaClassName="bg-black"
+          overlayMode="none"
+          deferVideoMs={0}
+        />
+      </div>
 
-      <section className="border-b border-slate-200 bg-slate-950 px-4 py-7 text-white">
+      <section
+        data-scroll-narration
+        data-narration="Meet Kountry Kutz Barbershop, a participating Host Shop in New Palestine, Indiana. Apprentices can build supervised workplace skills here while Elevate verifies placement, instruction, and progress requirements."
+        className="border-b border-slate-200 bg-slate-950 px-4 py-7 text-white"
+      >
         <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
@@ -168,7 +174,11 @@ export default async function BarberApprenticeshipPage() {
         </p>
       </section>
 
-      <section className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12">
+      <section
+        data-scroll-narration
+        data-narration="The registered barber apprenticeship connects required technical instruction, supervised Host Shop training, documented progress, and preparation for Indiana licensing requirements."
+        className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12"
+      >
         <div className="mx-auto max-w-6xl">
           <div className="max-w-4xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
@@ -219,7 +229,11 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-gradient-to-b from-white to-sky-50 px-4 py-10 sm:py-14">
+      <section
+        data-scroll-narration
+        data-narration="Explore the barber Host Shop network. Approved shops provide the supervised work setting, while placement availability is confirmed during enrollment."
+        className="border-b border-slate-200 bg-gradient-to-b from-white to-sky-50 px-4 py-10 sm:py-14"
+      >
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
@@ -240,7 +254,11 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      <section className="px-4 py-14 sm:py-18">
+      <section
+        data-scroll-narration
+        data-narration="Here is how the pathway works. Complete the theory, train under approved supervision, record your skills and hours, and prepare for the licensing requirements connected to the program."
+        className="px-4 py-14 sm:py-18"
+      >
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[420px]">
@@ -280,6 +298,8 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       <section
+        data-scroll-narration
+        data-narration="See how related instruction, hands-on barbering practice, and workplace learning work together throughout the apprenticeship."
         className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:py-18"
         aria-labelledby="barber-visual-story-heading"
       >
@@ -330,6 +350,8 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       <section
+        data-scroll-narration
+        data-narration="Before checkout, compare available payment and funding paths. Approval terms come from the selected provider, and Elevate can help explain the next step before you enroll."
         className="border-y border-orange-200 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-4 py-14 sm:py-18"
         aria-labelledby="barber-payment-heading"
       >

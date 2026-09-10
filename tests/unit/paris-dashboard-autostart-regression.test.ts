@@ -19,6 +19,12 @@ describe('PARIS dashboard introduction', () => {
     expect(chat).toContain('Which applicant or required compliance item should we work on first?');
   });
 
+  it('speaks the opening greeting when PARIS is opened with voice enabled', () => {
+    expect(chat).toContain('initialGreetingSpokenRef');
+    expect(chat).toContain('if (!voiceEnabled || !autoSpeak || initialGreetingSpokenRef.current) return');
+    expect(chat).toContain('void voice.play(greeting');
+  });
+
   it('keeps one authoritative compliance summary on the dashboard', () => {
     expect(workspace.match(/<h2 className="font-black">Compliance Score<\/h2>/g) || []).toHaveLength(0);
     expect(workspace).toContain('Program readiness');

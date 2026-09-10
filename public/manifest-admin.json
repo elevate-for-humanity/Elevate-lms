@@ -2,7 +2,7 @@
   "name": "Elevate Admin",
   "short_name": "Admin",
   "description": "Unified Admin AI Studio for managing programs, students, content, workflows, and operations",
-  "start_url": "/studio",
+  "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",

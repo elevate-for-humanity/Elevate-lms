@@ -2,6 +2,10 @@
 
 import { useEffect } from 'react';
 import { PWA_APPLICATIONS, type PwaApplication } from '@/lib/pwa/registry';
+import {
+  capturePwaInstallPrompt,
+  clearPwaInstallPrompt,
+} from '@/lib/pwa/install-prompt';
 
 async function removeStaleWorkers(workerPath: string, cachePrefix: string) {
   const registrations = await navigator.serviceWorker.getRegistrations();
@@ -53,6 +57,8 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     };
 
     navigator.serviceWorker.addEventListener('controllerchange', announceControllerChange);
+    window.addEventListener('beforeinstallprompt', capturePwaInstallPrompt);
+    window.addEventListener('appinstalled', clearPwaInstallPrompt);
 
     const register = async () => {
       try {
@@ -105,6 +111,8 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     return () => {
       cancelled = true;
       navigator.serviceWorker.removeEventListener('controllerchange', announceControllerChange);
+      window.removeEventListener('beforeinstallprompt', capturePwaInstallPrompt);
+      window.removeEventListener('appinstalled', clearPwaInstallPrompt);
     };
   }, [application]);
 

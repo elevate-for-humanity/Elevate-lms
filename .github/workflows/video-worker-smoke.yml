@@ -41,7 +41,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          status=$(curl -sS --max-time 45 -o /tmp/video-worker.json -w '%{http_code}' \
+          # The Admin worker intentionally keeps this request attached while a
+          # render is running (up to its 30-minute maxDuration). Keep the
+          # scheduler's client timeout inside the 35-minute job timeout so the
+          # runner does not abandon a valid lease and cause a costly retry.
+          status=$(curl -sS --connect-timeout 30 --max-time 1800 \
+            -o /tmp/video-worker.json -w '%{http_code}' \
             -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H 'Content-Type: application/json' \

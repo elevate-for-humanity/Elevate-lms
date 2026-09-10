@@ -9,6 +9,7 @@ import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { siteUrls } from '@/lib/utils/site-urls';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
+import { isQaE2EIdentity } from '@/lib/qa/is-qa-e2e-identity';
 
 const APPRENTICE_ROLES = new Set([
   'student',
@@ -24,6 +25,19 @@ type SignInApiResponse = {
   message?: string;
   user?: { id?: string; email?: string };
 };
+
+async function waitForQaSessionReadiness() {
+  const supabase = createClient();
+  const deadline = Date.now() + 5_000;
+
+  while (Date.now() < deadline) {
+    const { data, error } = await supabase.auth.getUser();
+    if (!error && data.user) return;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+  }
+
+  throw new Error('The disposable QA session was not ready for portal routing.');
+}
 
 async function serverSignIn(email: string, password: string): Promise<string> {
   const response = await fetch('/api/auth/signin', {
@@ -94,6 +108,15 @@ export default function LoginPage() {
       // between app, admin, and www subdomains. The API also applies the auth
       // rate limiter and request validation.
       const userId = await serverSignIn(email, password);
+
+      // Disposable production canaries return before customer notification
+      // work. Wait until their shared-domain cookie is readable before the
+      // browser performs RLS-protected profile queries. Real users retain the
+      // existing path and timing.
+      if (isQaE2EIdentity(email)) {
+        await waitForQaSessionReadiness();
+      }
+
       const supabase = createClient();
 
       // Resolve the user's authoritative role before evaluating any requested

@@ -42,7 +42,7 @@ describe('Admin UI route consolidation', () => {
     expect(existsSync(path.join(root, 'apps/admin/app/course-builder/page.tsx'))).toBe(true);
   });
 
-  it('keeps legacy CourseBuilderClient operations wired into the canonical builder', () => {
+  it('keeps course operations wired into the canonical builder', () => {
     const canonical = readFileSync(
       path.join(root, 'components/admin/course-builder/UnifiedCourseBuilder.tsx'),
       'utf8',
@@ -55,6 +55,8 @@ describe('Admin UI route consolidation', () => {
     expect(canonical).toContain("JSON.stringify({ status: 'draft', is_published: false })");
     expect(canonical).toContain('runCourseFactoryPipeline');
     expect(canonical).toContain('CourseInstructorMediaPanel');
+    expect(canonical).toContain('overflow-x-clip');
+    expect(canonical).toContain('xl:grid-cols-[minmax(0,1fr)_minmax(20rem,26.25rem)]');
   });
 
   it('does not expose retired /admin UI links or redirects from executable source', () => {

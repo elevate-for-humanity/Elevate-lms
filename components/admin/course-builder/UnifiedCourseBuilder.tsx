@@ -116,10 +116,10 @@ export default function UnifiedCourseBuilder() {
   }, [tab, blueprints.length]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen min-w-0 w-full overflow-x-clip bg-slate-950 text-slate-100">
       <div className="border-b border-slate-800 bg-slate-900 px-5 py-4">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
               <Bot className="h-4 w-4" /> Unified Course Factory
             </div>
@@ -134,7 +134,7 @@ export default function UnifiedCourseBuilder() {
               </p>
             ) : null}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => void loadCourses()}
@@ -145,7 +145,7 @@ export default function UnifiedCourseBuilder() {
             {selectedCourse ? (
               <Link
                 href={`/studio/courses/${selectedCourse.id}`}
-                className="rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-slate-950 hover:bg-cyan-400"
+                className="max-w-full truncate rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-slate-950 hover:bg-cyan-400"
               >
                 Open {selectedCourse.title}
               </Link>
@@ -169,14 +169,14 @@ export default function UnifiedCourseBuilder() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-[1600px] p-4">
+      <main className="mx-auto min-w-0 max-w-[1600px] p-3 sm:p-4">
         {health ? (
           <section
             aria-label="Course Builder health"
             className={`mb-4 rounded-xl border p-4 ${health.status === 'healthy' ? 'border-emerald-700 bg-emerald-950/40' : 'border-amber-700 bg-amber-950/40'}`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="font-bold text-white">Course Builder health: {health.status}</h2>
+            <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+              <h2 className="min-w-0 break-words font-bold text-white">Course Builder health: {health.status}</h2>
               <span className="text-xs text-slate-400">Checked {new Date(health.checkedAt).toLocaleString()}</span>
             </div>
             <ul className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
@@ -304,8 +304,8 @@ function CourseCatalog({
   }
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[1fr_420px]">
-      <section className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+    <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,26.25rem)]">
+      <section className="min-w-0 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
         <h2 className="text-lg font-bold">Course applications</h2>
         <p className="mt-1 text-sm text-slate-400">
           Every course opens the same session, state provider, mutation layer and feature workspace.
@@ -313,14 +313,14 @@ function CourseCatalog({
         {error ? <p role="alert" className="mt-3 rounded-lg bg-red-950/60 px-3 py-2 text-sm text-red-200">{error}</p> : null}
         {inventoryError ? <div role="alert" className="mt-3 rounded-lg bg-red-950/60 px-3 py-3 text-sm text-red-100"><strong>Course inventory could not load.</strong> {inventoryError} <button onClick={() => void onChanged()} className="ml-2 underline">Retry</button></div> : null}
         {programError ? <p role="alert" className="mt-3 rounded-lg bg-amber-950/60 px-3 py-2 text-sm text-amber-100">Program list could not load: {programError}</p> : null}
-        <div className="mt-4 flex flex-wrap gap-2"><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search courses" className="min-w-56 flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"/><select value={status} onChange={e => setStatus(e.target.value)} className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"><option value="all">All statuses</option><option value="draft">Draft</option><option value="published">Published</option></select></div>
+        <div className="mt-4 flex min-w-0 flex-wrap gap-2"><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search courses" className="min-w-0 w-full flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm sm:min-w-56"/><select value={status} onChange={e => setStatus(e.target.value)} className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm sm:w-auto"><option value="all">All statuses</option><option value="draft">Draft</option><option value="published">Published</option></select></div>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {visibleCourses.map((course) => (
             <article
               key={course.id}
-              className="rounded-xl border border-slate-700 bg-slate-950 p-4 hover:border-cyan-500"
+              className="min-w-0 rounded-xl border border-slate-700 bg-slate-950 p-4 hover:border-cyan-500"
             >
-              <Link href={`/studio/courses/${course.id}`} className="font-bold text-white hover:text-cyan-300">{course.title}</Link>
+              <Link href={`/studio/courses/${course.id}`} className="break-words font-bold text-white hover:text-cyan-300">{course.title}</Link>
               <div className="mt-1 text-xs text-slate-400">
                 {course.status ?? 'draft'} · {course.duration_hours ?? '—'} hours
               </div>
@@ -384,7 +384,7 @@ function CreateCoursePanel({
   return (
     <form
       onSubmit={submit}
-      className="mx-auto max-w-3xl space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+      className="mx-auto min-w-0 max-w-3xl space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-6"
     >
       <h2 className="text-xl font-bold">Create course</h2>
       <input
@@ -511,11 +511,11 @@ function BlueprintPanel({
       )}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {blueprints.map((blueprint) => (
-          <div key={blueprint.id} className="rounded-xl border border-slate-800 bg-slate-900 p-5">
+          <div key={blueprint.id} className="min-w-0 rounded-xl border border-slate-800 bg-slate-900 p-5">
             <div className="text-xs font-bold uppercase tracking-wide text-cyan-400">
               {blueprint.state ?? 'General'}
             </div>
-            <h3 className="mt-1 font-bold text-white">{blueprint.title}</h3>
+            <h3 className="mt-1 break-words font-bold text-white">{blueprint.title}</h3>
             <p className="mt-2 text-sm text-slate-400">
               {blueprint.modules} modules · {blueprint.lessons} lessons
             </p>

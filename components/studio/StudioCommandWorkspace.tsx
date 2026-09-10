@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useState } from 'react';
-import { Bot, Eye, Globe2, MessageSquare, Plus } from 'lucide-react';
+import { Bot, Eye, Globe2, Menu, MessageSquare, PanelRightOpen, Plus, X } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
 import RepositoryLivePreview from './RepositoryLivePreview';
 import type { StudioSpecialist } from '@/lib/devstudio/ellie-unified-handlers';
@@ -49,6 +49,7 @@ export default function StudioCommandWorkspace({
     initialWorkspace ?? null,
   );
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const openPreview = (url?: string) => {
     if (url) setPreviewUrl(url);
@@ -70,25 +71,44 @@ export default function StudioCommandWorkspace({
 
   return (
     <div className="flex h-[100dvh] min-h-0 min-w-0 flex-col overflow-hidden bg-white lg:h-full">
-      <header className="shrink-0 border-b border-slate-200 bg-slate-950 text-white">
-        <div className="flex min-h-12 min-w-0 items-center gap-2 px-3">
+      <header className="relative z-30 shrink-0 border-b border-slate-200 bg-white text-slate-950">
+        <div className="flex h-14 min-w-0 items-center gap-2 px-3 sm:px-4">
           <Bot className="h-5 w-5 shrink-0" aria-hidden="true" />
-          <span className="shrink-0 text-sm font-black">Admin AI Studio</span>
+          <span className="min-w-0 truncate text-sm font-bold">Admin AI</span>
+          <span className="hidden rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-600 sm:inline">
+            {selectedAgent[0] + selectedAgent.slice(1).toLowerCase()}
+          </span>
           <button
             type="button"
             onClick={() => {
               setConversationKey((value) => value + 1);
               setMobileSurface('chat');
+              setMobileMenuOpen(false);
             }}
-            className="ml-auto inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-white/20 px-3 text-xs font-bold hover:bg-white/10"
+            className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold hover:bg-slate-100"
           >
-            <Plus className="h-4 w-4" aria-hidden="true" /> New task
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden min-[380px]:inline">New task</span>
           </button>
-          <div
-            className="hidden items-center gap-1 sm:flex"
-            role="group"
-            aria-label="Choose AI agent"
+          <button
+            type="button"
+            onClick={() => setMobileSurface((surface) => (surface === 'chat' ? 'tool' : 'chat'))}
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold hover:bg-slate-100 lg:hidden"
+            aria-label={mobileSurface === 'chat' ? 'Open workspace' : 'Open chat'}
           >
+            {mobileSurface === 'chat' ? <PanelRightOpen className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
+            <span className="hidden min-[430px]:inline">{mobileSurface === 'chat' ? 'Workspace' : 'Chat'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 lg:hidden"
+            aria-expanded={mobileMenuOpen}
+            aria-label="Studio tools"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+          <div className="hidden items-center gap-1 lg:flex" role="group" aria-label="Choose AI agent">
             {(['ELLIE', 'LIZZY', 'PARIS'] as const).map((agent) => (
               <button
                 key={agent}
@@ -98,63 +118,61 @@ export default function StudioCommandWorkspace({
                   setSelectedAgent(agent);
                   setConversationKey((value) => value + 1);
                 }}
-                className={`rounded-lg px-3 py-2 text-xs font-black ${selectedAgent === agent ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-white/10'}`}
+                className={`rounded-lg px-3 py-2 text-xs font-bold ${selectedAgent === agent ? 'bg-slate-950 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
               >
                 {agent[0] + agent.slice(1).toLowerCase()}
               </button>
             ))}
           </div>
         </div>
-        <nav
-          aria-label="Studio tools"
-          className="scrollbar-hide flex min-w-0 items-center gap-1 overflow-x-auto border-t border-white/10 px-2 py-1.5"
-        >
-          <button
-            type="button"
-            onClick={() => setMobileSurface('chat')}
-            className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-white/10 px-3 text-xs font-bold hover:bg-white/15"
-          >
+        <nav aria-label="Studio tools" className="hidden min-w-0 items-center gap-1 overflow-x-auto border-t border-slate-100 px-3 py-1.5 lg:flex">
+          <button type="button" onClick={() => setMobileSurface('chat')} className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-slate-100 px-3 text-xs font-bold">
             <MessageSquare className="h-4 w-4" aria-hidden="true" /> Chat
           </button>
           {workspaces.map((workspace) =>
             isEmbeddedCapability(workspace.id) ? (
-              <button
-                key={workspace.id}
-                type="button"
-                onClick={() => openCapability(workspace.id)}
-                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white"
-              >
+              <button key={workspace.id} type="button" onClick={() => openCapability(workspace.id)} className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-600 hover:bg-slate-100">
                 {workspace.label}
               </button>
             ) : (
-              <Link
-                key={workspace.id}
-                href={workspace.route}
-                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white"
-              >
+              <Link key={workspace.id} href={workspace.route} className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-600 hover:bg-slate-100">
                 {workspace.label}
               </Link>
             ),
           )}
         </nav>
+        {mobileMenuOpen ? (
+          <div className="absolute inset-x-3 top-14 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl lg:hidden">
+            <p className="px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">Agents</p>
+            <div className="grid grid-cols-3 gap-1">
+              {(['ELLIE', 'LIZZY', 'PARIS'] as const).map((agent) => (
+                <button key={agent} type="button" onClick={() => { setSelectedAgent(agent); setConversationKey((value) => value + 1); setMobileMenuOpen(false); }} className={`rounded-lg px-3 py-2 text-xs font-bold ${selectedAgent === agent ? 'bg-slate-950 text-white' : 'hover:bg-slate-100'}`}>
+                  {agent[0] + agent.slice(1).toLowerCase()}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">Tools</p>
+            <div className="grid gap-1">
+              {workspaces.map((workspace) =>
+                isEmbeddedCapability(workspace.id) ? (
+                  <button key={workspace.id} type="button" onClick={() => { openCapability(workspace.id); setMobileMenuOpen(false); }} className="rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-slate-100">
+                    {workspace.label}
+                  </button>
+                ) : (
+                  <Link key={workspace.id} href={workspace.route} onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-slate-100">
+                    {workspace.label}
+                  </Link>
+                ),
+              )}
+            </div>
+          </div>
+        ) : null}
       </header>
 
       <div className="flex min-h-0 min-w-0 flex-1">
         <section
           className={`${mobileSurface === 'chat' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col border-r border-slate-200 lg:flex lg:basis-[42%]`}
         >
-          <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 sm:hidden">
-            <span className="text-xs font-bold text-slate-700">
-              Agent: {selectedAgent[0] + selectedAgent.slice(1).toLowerCase()}
-            </span>
-            <button
-              type="button"
-              onClick={() => setMobileSurface('tool')}
-              className="ml-auto rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white"
-            >
-              Open workspace
-            </button>
-          </div>
           <UnifiedEllieChat
             key={conversationKey}
             preferredAgent={selectedAgent}

@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { useState } from 'react';
 import { Bot, Eye, Globe2, Menu, MessageSquare, PanelRightOpen, Plus, X } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
@@ -45,9 +44,7 @@ export default function StudioCommandWorkspace({
   // and receives the same active task context after submission.
   const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('chat');
   const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
-  const [activeCapability, setActiveCapability] = useState<EmbeddedCapability | null>(
-    initialWorkspace ?? null,
-  );
+  const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -64,10 +61,13 @@ export default function StudioCommandWorkspace({
   };
 
   const openCapability = (id: string) => {
-    if (!isEmbeddedCapability(id)) return;
     setActiveCapability(id);
     setMobileSurface('tool');
   };
+
+  const activeWorkspace = activeCapability
+    ? workspaces.find((workspace) => workspace.id === activeCapability) ?? null
+    : null;
 
   return (
     <div className="flex h-[100dvh] min-h-0 min-w-0 flex-col overflow-hidden bg-white lg:h-full">
@@ -129,17 +129,17 @@ export default function StudioCommandWorkspace({
           <button type="button" onClick={() => setMobileSurface('chat')} className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-slate-100 px-3 text-xs font-bold">
             <MessageSquare className="h-4 w-4" aria-hidden="true" /> Chat
           </button>
-          {workspaces.map((workspace) =>
-            isEmbeddedCapability(workspace.id) ? (
-              <button key={workspace.id} type="button" onClick={() => openCapability(workspace.id)} className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-600 hover:bg-slate-100">
-                {workspace.label}
-              </button>
-            ) : (
-              <Link key={workspace.id} href={workspace.route} className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-600 hover:bg-slate-100">
-                {workspace.label}
-              </Link>
-            ),
-          )}
+          {workspaces.map((workspace) => (
+            <button
+              key={workspace.id}
+              type="button"
+              onClick={() => openCapability(workspace.id)}
+              aria-pressed={activeCapability === workspace.id}
+              className={`inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold ${activeCapability === workspace.id ? 'bg-slate-950 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            >
+              {workspace.label}
+            </button>
+          ))}
         </nav>
         {mobileMenuOpen ? (
           <div className="absolute inset-x-3 top-14 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl lg:hidden">
@@ -153,17 +153,16 @@ export default function StudioCommandWorkspace({
             </div>
             <p className="mt-2 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">Tools</p>
             <div className="grid gap-1">
-              {workspaces.map((workspace) =>
-                isEmbeddedCapability(workspace.id) ? (
-                  <button key={workspace.id} type="button" onClick={() => { openCapability(workspace.id); setMobileMenuOpen(false); }} className="rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-slate-100">
-                    {workspace.label}
-                  </button>
-                ) : (
-                  <Link key={workspace.id} href={workspace.route} onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-slate-100">
-                    {workspace.label}
-                  </Link>
-                ),
-              )}
+              {workspaces.map((workspace) => (
+                <button
+                  key={workspace.id}
+                  type="button"
+                  onClick={() => { openCapability(workspace.id); setMobileMenuOpen(false); }}
+                  className="rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-slate-100"
+                >
+                  {workspace.label}
+                </button>
+              ))}
             </div>
           </div>
         ) : null}
@@ -194,7 +193,7 @@ export default function StudioCommandWorkspace({
                 ? 'Workflow Designer'
                 : activeCapability === 'intelligence'
                   ? 'Intelligence'
-                  : 'Active workspace'}
+                  : activeWorkspace?.label || 'Active workspace'}
             </span>
             <button
               type="button"
@@ -229,6 +228,13 @@ export default function StudioCommandWorkspace({
               <WorkflowsWorkspace embedded />
             ) : activeCapability === 'intelligence' ? (
               <IntelligenceWorkspace onAskAI={askAdminAI} />
+            ) : activeWorkspace ? (
+              <iframe
+                key={activeWorkspace.id}
+                title={activeWorkspace.label}
+                src={`${activeWorkspace.route}${activeWorkspace.route.includes('?') ? '&' : '?'}embedded=1`}
+                className="h-full w-full border-0 bg-white"
+              />
             ) : mode === 'preview' ? (
               <RepositoryLivePreview filePath={null} content="" initialUrl={previewUrl} />
             ) : (

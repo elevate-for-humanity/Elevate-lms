@@ -1,12 +1,17 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { requireRole } from '@/lib/auth/require-role';
 
-export async function generateEnrollmentReport(dateRange: string = '30') {
-  const supabase = await createClient();
+async function requireReportAccess() {
+  await requireRole(['admin', 'super_admin']);
   const db = await requireAdminClient();
   if (!db) throw new Error('Admin client failed to initialize');
+  return db;
+}
+
+export async function generateEnrollmentReport(dateRange: string = '30') {
+  const db = await requireReportAccess();
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -51,9 +56,7 @@ export async function generateEnrollmentReport(dateRange: string = '30') {
 }
 
 export async function generateLeadReport(dateRange: string = '30') {
-  const supabase = await createClient();
-  const db = await requireAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  const db = await requireReportAccess();
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -101,9 +104,7 @@ export async function generateLeadReport(dateRange: string = '30') {
 }
 
 export async function generateFinancialReport(dateRange: string = '30') {
-  const supabase = await createClient();
-  const db = await requireAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  const db = await requireReportAccess();
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -139,9 +140,7 @@ export async function generateFinancialReport(dateRange: string = '30') {
 }
 
 export async function generateUserActivityReport(dateRange: string = '30') {
-  const supabase = await createClient();
-  const db = await requireAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  const db = await requireReportAccess();
   
   const daysAgo = parseInt(dateRange);
   const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
@@ -183,13 +182,11 @@ export async function generateUserActivityReport(dateRange: string = '30') {
 }
 
 export async function exportEnrollmentCSV(): Promise<string> {
-  const supabase = await createClient();
-  const db = await requireAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  const db = await requireReportAccess();
 
   const { data: enrollments } = await db
-    .from('training_enrollments')
-    .select('*, course:training_courses(title), student:profiles(full_name, email)')
+    .from('program_enrollments')
+    .select('*, course:courses!fk_program_enrollments_course(title), student:profiles!program_enrollments_user_id_profiles_fkey(full_name, email)')
     .order('enrolled_at', { ascending: false })
     .limit(500);
 
@@ -201,16 +198,14 @@ export async function exportEnrollmentCSV(): Promise<string> {
     const name = (student?.full_name || 'Unknown').replace(/,/g, ' ');
     const email = (student?.email || '').replace(/,/g, ' ');
     const courseName = (course?.title || 'N/A').replace(/,/g, ' ');
-    csv += `${date},${name},${email},${courseName},${e.status},${e.progress}%\n`;
+    csv += `${date},${name},${email},${courseName},${e.status},${e.progress_percentage ?? e.progress_percent ?? 0}%\n`;
   });
 
   return csv;
 }
 
 export async function exportLeadsCSV(): Promise<string> {
-  const supabase = await createClient();
-  const db = await requireAdminClient();
-  if (!db) throw new Error('Admin client failed to initialize');
+  const db = await requireReportAccess();
 
   const { data: leads } = await db
     .from('leads')

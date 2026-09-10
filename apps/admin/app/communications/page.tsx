@@ -28,9 +28,10 @@ export default async function CommunicationsPage() {
 
   // Fetch scheduled messages
   const { data: scheduled } = await db
-    .from('scheduled_messages')
-    .select('id,recipient,message,channel,scheduled_at,status')
-    .order('scheduled_at', { ascending: true })
+    .from('email_queue')
+    .select('id,recipient:recipient_email,message:body,channel:related_type,scheduled_at:scheduled_for,status')
+    .not('scheduled_for', 'is', null)
+    .order('scheduled_for', { ascending: true })
     .limit(20);
 
   return (

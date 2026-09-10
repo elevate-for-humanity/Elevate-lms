@@ -17,7 +17,7 @@ export default async function OpportunitiesPage() {
   const supabase = await createClient();
 
   const { data: opportunities } = await supabase
-    .from('job_opportunities')
+    .from('job_postings')
     .select('*')
     .eq('employer_id', user.id)
     .order('created_at', { ascending: false })

@@ -1,4 +1,3 @@
-// PUBLIC ROUTE: apprentice email alert subscription
 import { createClient } from '@/lib/supabase/server';
 
 import { NextResponse } from 'next/server';
@@ -9,7 +8,13 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
+function isAuthorized(request: Request): boolean {
+  const secret = process.env.CRON_SECRET;
+  return Boolean(secret) && request.headers.get('authorization') === `Bearer ${secret}`;
+}
+
 async function _POST(request: Request) {
+  if (!isAuthorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
@@ -17,12 +22,12 @@ async function _POST(request: Request) {
   const { type, apprenticeshipId, data } = await request.json();
 
   const { data: apprenticeship } = await supabase
-    .from('apprenticeship_enrollments')
+    .from('program_enrollments')
     .select(
       `
       *,
-      student:profiles!apprenticeship_enrollments_student_id_fkey(email, full_name),
-      employer:profiles!apprenticeship_enrollments_employer_contact_id_fkey(email, full_name)
+      student:profiles!program_enrollments_student_id_profiles_fkey(email, full_name),
+      employer:employers!program_enrollments_employer_id_fkey(owner_user_id, contact_email, contact_name)
     `,
     )
     .eq('id', apprenticeshipId)
@@ -112,6 +117,7 @@ async function _POST(request: Request) {
 
 // Cron endpoint to check for missed check-ins
 async function _GET(request: Request) {
+  if (!isAuthorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const supabase = await createClient();
@@ -125,14 +131,16 @@ async function _GET(request: Request) {
 
   // Find apprentices who haven't checked in today
   const { data: apprenticeships } = await supabase
-    .from('apprenticeship_enrollments')
+    .from('program_enrollments')
     .select(
       `
       *,
-      student:profiles!apprenticeship_enrollments_student_id_fkey(email, full_name)
+      student:profiles!program_enrollments_student_id_profiles_fkey(email, full_name),
+      employer:employers!program_enrollments_employer_id_fkey(owner_user_id)
     `,
     )
-    .eq('status', 'active');
+    .eq('status', 'active')
+    .eq('enrollment_type', 'apprentice');
 
   let alertsSent = 0;
 
@@ -144,11 +152,11 @@ async function _GET(request: Request) {
       .eq('work_date', today)
       .maybeSingle();
 
-    if (!todayLog && apprenticeship.employer_contact_id) {
+    if (!todayLog && apprenticeship.employer?.owner_user_id) {
       // Send alert
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/apprentice/email-alerts`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', authorization: `Bearer ${process.env.CRON_SECRET}` },
         body: JSON.stringify({
           type: 'missed_checkin',
           apprenticeshipId: apprenticeship.id,

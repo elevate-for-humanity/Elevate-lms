@@ -24,24 +24,17 @@ async function _GET(request: NextRequest) {
 
   const supabase = await createClient();
 
-  const [
-    { count: totalProgramEnrollments },
-    { count: totalLegacyEnrollments },
-  ] = await Promise.all([
-    supabase.from('program_enrollments').select('*', { count: 'exact', head: true }),
-    // training_enrollments is the legacy table — was incorrectly querying
-    // program_enrollments again, producing a duplicate count
-    supabase.from('training_enrollments').select('*', { count: 'exact', head: true }),
-  ]);
+  const { count: totalProgramEnrollments } = await supabase
+    .from('program_enrollments')
+    .select('*', { count: 'exact', head: true });
 
   return NextResponse.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     tables: {
       program_enrollments: totalProgramEnrollments ?? 0,
-      training_enrollments: totalLegacyEnrollments ?? 0,
     },
-    note: 'Canonical authority: program_enrollments. Others are legacy.',
+    note: 'Canonical enrollment authority: program_enrollments.',
   });
 }
 

@@ -30,11 +30,11 @@ export default async function EnrollmentReportPage() {
     { data: courses },
   ] = await Promise.all([
     supabase
-      .from('training_enrollments')
-      .select('*, course:training_courses(title), student:profiles(full_name, email)')
+      .from('program_enrollments')
+      .select('*, course:courses!fk_program_enrollments_course(title), student:profiles!program_enrollments_user_id_profiles_fkey(full_name, email)')
       .order('enrolled_at', { ascending: false })
       .limit(50),
-    supabase.from('training_enrollments').select('*', { count: 'exact', head: true }),
+    supabase.from('program_enrollments').select('*', { count: 'exact', head: true }),
     supabase.from('courses').select('id, title'),
   ]);
 

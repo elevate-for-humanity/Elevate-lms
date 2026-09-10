@@ -41,8 +41,11 @@ export async function getTenantContext(): Promise<TenantContext> {
   // Try JWT claims first (preferred)
   // Note: In Supabase, custom claims can be added via auth hooks
   // For now, we use user_metadata as the source
-  const tenantId = user.user_metadata?.tenant_id;
-  const role = user.user_metadata?.role || 'user';
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles').select('tenant_id, role').eq('id', user.id).maybeSingle();
+  if (profileError) throw new TenantContextError('Unable to resolve tenant context.', 500);
+  const tenantId = profile?.tenant_id;
+  const role = profile?.role || 'user';
 
   if (!tenantId) {
     logger.warn('Tenant context missing', { userId: user.id });
@@ -84,7 +87,9 @@ export async function validateTenantAccess(userId: string, tenantId: string): Pr
     return false;
   }
 
-  return user.user_metadata?.tenant_id === tenantId;
+  const { data: profile, error } = await supabase
+    .from('profiles').select('tenant_id').eq('id', user.id).maybeSingle();
+  return !error && profile?.tenant_id === tenantId;
 }
 
 /**

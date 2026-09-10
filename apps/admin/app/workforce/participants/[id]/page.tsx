@@ -10,7 +10,7 @@ export default async function WorkforceParticipantPage({ params }: { params: Pro
   await requireRole(['admin', 'super_admin', 'staff']);
   const { id } = await params;
   const db = await requireAdminClient();
-  const { data: participant } = await db.from('workforce_participants').select('id,user_id,name,email,program_id,status,enrollment_date,case_worker_id,created_at,updated_at').eq('id', id).maybeSingle();
+  const { data: participant } = await db.from('participants').select('id,user_id,name,email,program_id,status,enrollment_date,case_worker_id,created_at,updated_at').eq('id', id).maybeSingle();
   if (!participant) notFound();
   const [{ data: program }, { data: caseWorker }] = await Promise.all([
     participant.program_id ? db.from('programs').select('id,title').eq('id', participant.program_id).maybeSingle() : Promise.resolve({ data: null }),

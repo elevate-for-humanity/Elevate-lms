@@ -27,22 +27,22 @@ async function _GET(request: NextRequest) {
       .select(
         `
         *,
-        apprenticeship:apprenticeship_enrollments(
+        apprenticeship:program_enrollments!apprentice_notifications_apprenticeship_id_fkey(
           id,
           student_id,
           employer_id,
           program_id,
-          student:profiles!apprenticeship_enrollments_student_id_fkey(
+          student:profiles!program_enrollments_student_id_profiles_fkey(
             id,
             email,
             full_name
           ),
-          employer:profiles!apprenticeship_enrollments_employer_id_fkey(
+          employer:employers!program_enrollments_employer_id_fkey(
             id,
-            email,
-            full_name
+            contact_email,
+            contact_name
           ),
-          program:programs(
+          program:programs!fk_program_enrollments_program(
             id,
             name
           )
@@ -74,7 +74,7 @@ async function _GET(request: NextRequest) {
               studentName: apprenticeship.student.full_name,
               studentEmail: apprenticeship.student.email,
               programName: apprenticeship.program?.name,
-              employerName: apprenticeship.employer?.full_name,
+              employerName: apprenticeship.employer?.contact_name,
             },
           }),
         },

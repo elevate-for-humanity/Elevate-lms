@@ -14,7 +14,7 @@ export default async function CasesPage() {
   const db = await createClient();
 
   const { data: cases } = await db
-    .from('workforce_cases')
+    .from('workforce_board_cases')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(50);

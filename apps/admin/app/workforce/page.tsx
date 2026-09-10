@@ -15,21 +15,21 @@ export default async function WorkforcePage() {
 
   // Fetch workforce participants
   const { data: participants } = await db
-    .from('workforce_participants')
+    .from('participants')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(100);
 
   // Fetch workforce cases
   const { data: cases } = await db
-    .from('workforce_cases')
+    .from('workforce_board_cases')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(50);
 
   // Fetch funding sources
   const { data: funding } = await db
-    .from('workforce_funding')
+    .from('program_funding')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(20);

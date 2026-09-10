@@ -34,7 +34,7 @@ export default async function DocumentsPage() {
 
   const [documentsRes, employerRes, enrollmentRes] = await Promise.all([
     supabase.from('documents').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
-    supabase.from('employer_documents').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
+    supabase.from('documents').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
     supabase.from('enrollment_documents').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(20),
   ]);
 

@@ -24,30 +24,31 @@ async function _GET(request: NextRequest) {
 
     // Get all active apprenticeships
     const { data: apprenticeships, error } = await supabase
-      .from('apprenticeship_enrollments')
+      .from('program_enrollments')
       .select(
         `
         id,
         student_id,
         employer_id,
         program_id,
-        student:profiles!apprenticeship_enrollments_student_id_fkey(
+        student:profiles!program_enrollments_student_id_profiles_fkey(
           id,
           email,
           full_name
         ),
-        employer:profiles!apprenticeship_enrollments_employer_id_fkey(
+        employer:employers!program_enrollments_employer_id_fkey(
           id,
-          email,
-          full_name
+          contact_email,
+          contact_name
         ),
-        program:programs(
+        program:programs!fk_program_enrollments_program(
           id,
           name
         )
       `,
       )
-      .eq('status', 'active');
+      .eq('status', 'active')
+      .eq('enrollment_type', 'apprentice');
 
     if (error) throw error;
 
@@ -72,7 +73,7 @@ async function _GET(request: NextRequest) {
       const employer = apprenticeship.employer as any;
       const program = apprenticeship.program as any;
 
-      if (!todayLog && employer?.email) {
+      if (!todayLog && employer?.contact_email) {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_SITE_URL}/api/apprentice/email-alerts`,
           {
@@ -83,8 +84,8 @@ async function _GET(request: NextRequest) {
               apprenticeshipId: apprenticeship.id,
               data: {
                 studentName: student?.full_name,
-                employerEmail: employer.email,
-                employerName: employer.full_name,
+                employerEmail: employer.contact_email,
+                employerName: employer.contact_name,
                 programName: program?.name,
                 date: today,
               },
@@ -94,7 +95,7 @@ async function _GET(request: NextRequest) {
 
         results.push({
           student: student?.full_name,
-          employer: employer.full_name,
+          employer: employer.contact_name,
           status: response.ok ? 'alert_sent' : 'failed',
         });
       }

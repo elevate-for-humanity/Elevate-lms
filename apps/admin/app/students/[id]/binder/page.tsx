@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function StudentBinderPage({ params }: PageProps) {
   const { id } = await params;
-  await requireRole(['admin', 'super_admin', 'staff', 'instructor']);
+  await requireRole(['admin', 'super_admin', 'staff']);
   const db = await createClient();
 
   // Fetch student info
@@ -35,7 +35,7 @@ export default async function StudentBinderPage({ params }: PageProps) {
 
   // Fetch all documents for this student
   const { data: documents } = await db
-    .from('student_documents')
+    .from('student_binder_documents')
     .select('*')
     .eq('student_id', id)
     .order('created_at', { ascending: false });

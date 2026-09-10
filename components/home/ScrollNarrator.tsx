@@ -88,6 +88,9 @@ export function ScrollNarrator() {
   }, [enabled, narrateVisibleSection, pathname, stop]);
 
   useEffect(() => {
+    // Do not fetch narration audio until the visitor explicitly enables it.
+    if (!enabled) return;
+
     const sections = Array.from(
       document.querySelectorAll<HTMLElement>('main [data-scroll-narration]'),
     ).filter((section) => section.dataset.narrationDisabled !== 'true');
@@ -126,7 +129,7 @@ export function ScrollNarrator() {
 
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, [pathname, prepare]);
+  }, [enabled, pathname, prepare]);
 
   useEffect(() => {
     let frame = 0;

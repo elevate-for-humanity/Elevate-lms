@@ -123,31 +123,33 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
   }
 }
 
-async function certify(page: Page, testInfo: any, role: string, credentials: readonly string[], loginBase: string, paths: string[]) {
+async function certify(page: Page, testInfo: any, role: string, credentials: readonly string[], loginBase: string, paths: string[], manifestPath: string) {
   await login(page, loginBase, credentials[0], credentials[1]);
   for (const path of paths) await test.step(`${testInfo.project.name}: ${path}`, async () => assertResponsivePage(page, path));
+  const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
+  expect(manifestHref, `${role} loaded the wrong PWA manifest`).toBe(manifestPath);
   await page.screenshot({ path: testInfo.outputPath(`${role}-${testInfo.project.name}.png`), fullPage: false });
 }
 
-function roleSuite(name: string, key: keyof typeof creds, loginBase: string, paths: string[]) {
+function roleSuite(name: string, key: keyof typeof creds, loginBase: string, paths: string[], manifestPath: string) {
   test.describe(name, () => {
     const credentials = creds[key];
     test.skip(!credentials[0] || !credentials[1], `Disposable ${name} identity is required`);
     test(`critical ${name} surfaces fit the active device viewport`, async ({ page }, testInfo) => {
       test.setTimeout(240_000);
-      await certify(page, testInfo, key, credentials, loginBase, paths);
+      await certify(page, testInfo, key, credentials, loginBase, paths, manifestPath);
     });
   });
 }
 
 test.describe('Authenticated portal responsive design certification', () => {
-  roleSuite('Apprentice', 'apprentice', BASE, ['/apprentice','/apprentice/hours','/apprentice/rti','/apprentice/competencies','/apprentice/documents','/apprentice/attendance','/apprentice/profile','/apprentice/handbook']);
-  roleSuite('Host Shop', 'hostShop', BASE, ['/host-shop/dashboard','/host-shop/dashboard/apprentices','/host-shop/dashboard/hours/pending','/host-shop/dashboard/documents','/host-shop/dashboard/competencies','/host-shop/dashboard/attendance/record','/host-shop/dashboard/wages','/host-shop/dashboard/reports','/host-shop/dashboard/profile']);
-  roleSuite('Learner', 'learner', BASE, ['/lms/dashboard','/lms/courses','/lms/certificates','/lms/calendar','/lms/messages','/lms/support','/lms/apply/status']);
-  roleSuite('Program Holder', 'programHolder', BASE, ['/program-holder/dashboard','/program-holder/students','/program-holder/portal/students','/program-holder/portal/reports','/program-holder/rights-responsibilities']);
-  roleSuite('Employer', 'employer', BASE, ['/employer/dashboard']);
-  roleSuite('Instructor', 'instructor', ADMIN_BASE, [`${ADMIN_BASE}/instructor/dashboard`]);
-  roleSuite('Staff', 'staff', ADMIN_BASE, [`${ADMIN_BASE}/staff-portal/dashboard`]);
-  roleSuite('Case Manager', 'caseManager', MARKETING_BASE, [`${MARKETING_BASE}/case-manager/dashboard`]);
-  roleSuite('Admin', 'admin', ADMIN_BASE, [`${ADMIN_BASE}/dashboard`]);
+  roleSuite('Apprentice', 'apprentice', BASE, ['/apprentice','/apprentice/hours','/apprentice/rti','/apprentice/competencies','/apprentice/documents','/apprentice/attendance','/apprentice/profile','/apprentice/handbook'], '/manifest-apprentice.json');
+  roleSuite('Host Shop', 'hostShop', BASE, ['/host-shop/dashboard','/host-shop/dashboard/apprentices','/host-shop/dashboard/hours/pending','/host-shop/dashboard/documents','/host-shop/dashboard/competencies','/host-shop/dashboard/attendance/record','/host-shop/dashboard/wages','/host-shop/dashboard/reports','/host-shop/dashboard/profile'], '/manifest-shop-owner.json');
+  roleSuite('Learner', 'learner', BASE, ['/lms/dashboard','/lms/courses','/lms/certificates','/lms/calendar','/lms/messages','/lms/support','/lms/apply/status'], '/manifest-student.json');
+  roleSuite('Program Holder', 'programHolder', BASE, ['/program-holder/dashboard','/program-holder/students','/program-holder/portal/students','/program-holder/portal/reports','/program-holder/rights-responsibilities','/program-holder/settings'], '/manifest-program-holder.json');
+  roleSuite('Employer', 'employer', BASE, ['/employer/dashboard'], '/manifest-employer.json');
+  roleSuite('Instructor', 'instructor', ADMIN_BASE, [`${ADMIN_BASE}/instructor/dashboard`], '/manifest-admin.json');
+  roleSuite('Staff', 'staff', ADMIN_BASE, [`${ADMIN_BASE}/staff-portal/dashboard`], '/manifest-admin.json');
+  roleSuite('Case Manager', 'caseManager', MARKETING_BASE, [`${MARKETING_BASE}/case-manager/dashboard`], '/manifest-marketing.json');
+  roleSuite('Admin', 'admin', ADMIN_BASE, [`${ADMIN_BASE}/dashboard`], '/manifest-admin.json');
 });

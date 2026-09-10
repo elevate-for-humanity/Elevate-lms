@@ -10,6 +10,19 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+const MAX_BYTES = 10 * 1024 * 1024;
+const ALLOWED_MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp']);
+const EMPLOYER_DOCUMENT_TYPES = new Set([
+  'coi_general_liability',
+  'coi_workers_comp',
+  'business_license',
+  'ein_verification',
+  'employer_mou',
+  'supervisor_designation',
+  'worksite_verification',
+]);
+const EMPLOYER_ROLES = new Set(['employer', 'admin', 'super_admin', 'org_admin']);
+
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
@@ -25,11 +38,32 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
 
   const formData = await request.formData();
   const file = formData.get('file') as File;
-  const rawDocumentType = formData.get('documentType') as string;
+  const rawDocumentType = String(
+    formData.get('documentType') || formData.get('document_type') || '',
+  ).trim();
   const metadata = formData.get('metadata') as string;
 
   if (!file || !rawDocumentType) {
     throw APIErrors.badRequest('File and document type are required');
+  }
+
+  if (
+    !(file instanceof File) ||
+    file.size <= 0 ||
+    file.size > MAX_BYTES ||
+    !ALLOWED_MIME_TYPES.has(file.type)
+  ) {
+    throw APIErrors.badRequest('Upload a PDF, JPG, PNG, or WebP file up to 10 MB');
+  }
+
+  const { data: actorProfile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+  if (!actorProfile?.role) throw APIErrors.forbidden();
+  if (EMPLOYER_DOCUMENT_TYPES.has(rawDocumentType) && !EMPLOYER_ROLES.has(actorProfile.role)) {
+    throw APIErrors.forbidden('Employer portal access is required');
   }
 
   const docTypeMap: Record<string, string> = {
@@ -96,6 +130,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       file_path: fileName,
       mime_type: file.type,
       status: 'pending_review',
+      verification_status: 'pending',
+      verified: false,
+      file_size_bytes: file.size,
+      storage_path: fileName,
       uploaded_by: user.id,
       metadata: { ...parsedMetadata, original_type: rawDocumentType },
     })
@@ -137,7 +175,10 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       if (ocrRes.ok) {
         const ocrData = await ocrRes.json();
         try {
-          await db.from('documents').update({ ocr_text: ocrData.rawText || null }).eq('id', document.id);
+          await db
+            .from('documents')
+            .update({ ocr_text: ocrData.rawText || null })
+            .eq('id', document.id);
         } catch {
           // OCR persistence is non-fatal.
         }

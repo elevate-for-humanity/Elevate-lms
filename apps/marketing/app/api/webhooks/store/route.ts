@@ -13,17 +13,16 @@ export const dynamic = 'force-dynamic';
 let webhookSecret = '';
 
 function getStoreWebhookSecrets(): string[] {
-  const explicit = [
-    process.env.STRIPE_WEBHOOK_SECRET_STORE,
-    process.env.STRIPE_WEBHOOK_SECRET,
-  ];
+  const explicit = [process.env.STRIPE_WEBHOOK_SECRET_STORE, process.env.STRIPE_WEBHOOK_SECRET];
 
   // Support rotated/alternate store webhook secret names without code changes.
   const rotated = Object.entries(process.env)
     .filter(([key, value]) => key.startsWith('STRIPE_WEBHOOK_SECRET_STORE_') && Boolean(value))
     .map(([, value]) => value as string);
 
-  return Array.from(new Set([...explicit, ...rotated].map((s) => s?.trim()).filter(Boolean))) as string[];
+  return Array.from(
+    new Set([...explicit, ...rotated].map((s) => s?.trim()).filter(Boolean)),
+  ) as string[];
 }
 
 function constructStripeEventWithAnySecret(
@@ -90,7 +89,11 @@ async function grantLmsAccess(
   );
 
   if (error) {
-    logger.error('grantLmsAccess: enrollment upsert failed', undefined, { error, userId, courseSlugOrId });
+    logger.error('grantLmsAccess: enrollment upsert failed', undefined, {
+      error,
+      userId,
+      courseSlugOrId,
+    });
     return false;
   }
 
@@ -256,7 +259,9 @@ async function _POST(req: NextRequest) {
         let currentPeriodEnd: string | undefined;
         if (typeof session.subscription === 'string' && stripe) {
           try {
-            const sub = await stripe.subscriptions.retrieve(session.subscription) as Stripe.Subscription;
+            const sub = (await stripe.subscriptions.retrieve(
+              session.subscription,
+            )) as Stripe.Subscription;
             currentPeriodEnd = new Date(sub.billing_cycle_anchor * 1000).toISOString();
           } catch (e) {
             logger.warn('platform_saas: could not load subscription period', e as Error);
@@ -320,30 +325,33 @@ async function _POST(req: NextRequest) {
         if (idemErr.code === '23505') {
           logger.info('Store refund already processed, skipping', { eventId: event.id });
           try {
-            await dbIdem
-              .from('webhook_retry_log')
-              .insert({
-                provider: 'stripe',
-                event_id: event.id,
-                event_type: event.type,
-                outcome: 'duplicate_skipped',
-                metadata: { source: 'store_webhook' },
-              });
-          } catch (_) { logger.error('Error:', _); }
-          return NextResponse.json({ received: true, duplicate: true });
-        }
-        logger.error('FAIL-CLOSED: Cannot record store refund event, skipping mutations', idemErr instanceof Error ? idemErr : new Error(String(idemErr)));
-        try {
-          await dbIdem
-            .from('webhook_retry_log')
-            .insert({
+            await dbIdem.from('webhook_retry_log').insert({
               provider: 'stripe',
               event_id: event.id,
               event_type: event.type,
-              outcome: 'record_failed',
+              outcome: 'duplicate_skipped',
               metadata: { source: 'store_webhook' },
             });
-        } catch (_) { logger.error('Error:', _); }
+          } catch (_) {
+            logger.error('Error:', _ instanceof Error ? _ : new Error(String(_)));
+          }
+          return NextResponse.json({ received: true, duplicate: true });
+        }
+        logger.error(
+          'FAIL-CLOSED: Cannot record store refund event, skipping mutations',
+          idemErr instanceof Error ? idemErr : new Error(String(idemErr)),
+        );
+        try {
+          await dbIdem.from('webhook_retry_log').insert({
+            provider: 'stripe',
+            event_id: event.id,
+            event_type: event.type,
+            outcome: 'record_failed',
+            metadata: { source: 'store_webhook' },
+          });
+        } catch (_) {
+          logger.error('Error:', _ instanceof Error ? _ : new Error(String(_)));
+        }
         return NextResponse.json({ received: true, skipped: true, reason: 'event_record_failed' });
       }
     } catch (idemCatchErr) {
@@ -352,16 +360,16 @@ async function _POST(req: NextRequest) {
       try {
         const fallbackDb = await requireAdminClient();
         if (fallbackDb)
-          await fallbackDb
-            .from('webhook_retry_log')
-            .insert({
-              provider: 'stripe',
-              event_id: event.id,
-              event_type: event.type,
-              outcome: 'idempotency_failed',
-              metadata: { source: 'store_webhook' },
-            });
-      } catch (_) { logger.error('Error:', _); }
+          await fallbackDb.from('webhook_retry_log').insert({
+            provider: 'stripe',
+            event_id: event.id,
+            event_type: event.type,
+            outcome: 'idempotency_failed',
+            metadata: { source: 'store_webhook' },
+          });
+      } catch (_) {
+        logger.error('Error:', _ instanceof Error ? _ : new Error(String(_)));
+      }
       return NextResponse.json({
         received: true,
         skipped: true,
@@ -383,7 +391,9 @@ async function _POST(req: NextRequest) {
         .eq('stripe_payment_id', paymentIntentId);
 
       if (entitlementError) {
-        logger.error('Error revoking entitlements on refund', undefined, { error: entitlementError });
+        logger.error('Error revoking entitlements on refund', undefined, {
+          error: entitlementError,
+        });
       }
 
       // Update purchase record

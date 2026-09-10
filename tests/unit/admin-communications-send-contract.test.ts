@@ -25,8 +25,12 @@ describe('Admin communications send contract', () => {
   });
 
   it('uses canonical communications and scheduled-message fields', () => {
-    expect(hub).toContain("select('id,recipient_id,type,subject,body,status,sent_at,created_at,metadata')");
-    expect(hub).toContain("select('id,recipient,message,channel,scheduled_at,status')");
+    expect(hub).toContain(
+      "select('id,recipient_id,type,subject,body,status,sent_at,created_at,metadata')",
+    );
+    expect(hub).toContain(
+      "select('id,recipient:recipient_email,message:body,channel:related_type,scheduled_at:scheduled_for,status')",
+    );
     expect(hub).not.toContain('comm.recipient}');
     expect(hub).not.toContain('msg.send_at');
     expect(hub).not.toContain('tmpl.name');

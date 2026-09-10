@@ -27,7 +27,9 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(nextConfig).not.toContain("source: '/admin'");
     expect(nextConfig).not.toContain("source: '/admin/");
     expect(nextConfig).not.toContain("source: '/dev-studio/:path*'");
-    expect(middleware).toContain("const legacyStudioPrefixes = ['/admin/studio', '/admin/dev-studio', '/dev-studio']");
+    expect(middleware).toContain(
+      "const legacyStudioPrefixes = ['/admin/studio', '/admin/dev-studio', '/dev-studio']",
+    );
     expect(middleware).toContain("pathname === '/admin/dashboard'");
     expect(middleware).toContain("pathname === '/admin' || pathname.startsWith('/admin/')");
   });
@@ -99,12 +101,16 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(builds).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
     expect(builds).toContain("return safeError('Northflank is not configured.");
     expect(services).toContain("requireTypedConfirmation(body.confirmation, 'deploy_autopilot')");
-    expect(environment).toContain("requireTypedConfirmation(req.headers.get('x-confirmation'), 'delete_secret')");
+    expect(environment).toContain(
+      "requireTypedConfirmation(req.headers.get('x-confirmation'), 'delete_secret')",
+    );
   });
 
   it('preflights the isolated browser runtime before enabling Chromium', () => {
     const workspace = source('components/studio/CloudBrowserWorkspace.tsx');
-    expect(workspace).toContain("fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store' })");
+    expect(workspace).toContain(
+      "fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store' })",
+    );
     expect(workspace).toContain('disabled={runtimeReady !== true}');
     expect(workspace).toContain('STUDIO_BROWSER_PUBLIC_URL');
   });
@@ -128,7 +134,9 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(health).toContain('const githubToken = await getGitHubToken()');
     expect(health).toContain('repositoryWritesReady: githubTokenValid');
     expect(health).toContain('ready: true');
-    expect(panel).toContain("['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable']");
+    expect(panel).toContain(
+      "['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable']",
+    );
     expect(panel).toContain("['Repository writes'");
     expect(panel).toContain('connected GitHub plugin is separate');
   });
@@ -162,14 +170,17 @@ describe('Admin Dashboard and Studio surface contract', () => {
   it('does not frame the full-screen Studio command workspace twice', () => {
     const navigation = source('apps/admin/app/studio/StudioNavigation.client.tsx');
 
-    expect(navigation).toContain("usePathname");
-    expect(navigation).toContain("pathname === '/studio' || searchParams.get('embedded') === '1'");
+    expect(navigation).toContain('usePathname');
+    expect(navigation).toContain("pathname === '/studio'");
+    expect(navigation).not.toContain('useSearchParams');
   });
 
   it('greets Store visitors with the PARIS product interview', () => {
     const wrapper = source('apps/marketing/app/store/StoreClientWrapper.tsx');
     const guide = source('components/store/StoreGuideChat.tsx');
-    expect(wrapper).toContain("forceOpen={pathname === '/store' || pathname === '/store/apps/website-builder'}");
+    expect(wrapper).toContain(
+      "forceOpen={pathname === '/store' || pathname === '/store/apps/website-builder'}",
+    );
     expect(guide).toContain("I'll start with a quick interview");
     expect(guide).toContain('Let PARIS interview you');
     expect(guide).toContain("useState<'recommend' | 'chat'>('chat')");

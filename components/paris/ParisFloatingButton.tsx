@@ -13,6 +13,7 @@ export function ParisFloatingButton({
   nextLessonTitle,
   courseProgress,
   portalRole,
+  autoOpenOnDashboard = false,
 }: ParisLearnerContext) {
   const [isOpen, setIsOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -28,6 +29,10 @@ export function ParisFloatingButton({
     : portalSurface
       ? 'PARIS Portal Assistant'
       : 'PARIS Career Assistant';
+
+  useEffect(() => {
+    if (autoOpenOnDashboard && pathname.endsWith('/dashboard')) setIsOpen(true);
+  }, [autoOpenOnDashboard, pathname]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -56,7 +61,6 @@ export function ParisFloatingButton({
     window.addEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
     return () => window.removeEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
   }, []);
-
 
   useEffect(() => {
     if (surface !== 'public' || pathname !== '/') {

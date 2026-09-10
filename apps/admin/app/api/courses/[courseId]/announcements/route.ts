@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -24,7 +25,11 @@ async function _GET(_req: NextRequest, { params }: { params: Promise<{ courseId:
     .order('created_at', { ascending: false });
 
   if (error) {
-    logger.error('announcements GET error', error);
+    logger.error(
+      'announcements GET error',
+      normalizeError(error, 'Announcements GET error'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
@@ -61,7 +66,11 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ courseId:
     return NextResponse.json({ error: 'Course not found' }, { status: 404 });
   }
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
   const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
   if (!isAdmin && course.instructor_id !== user.id) {
     return NextResponse.json(

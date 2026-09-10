@@ -7,6 +7,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { getMinimumDepositCents } from '@/lib/programs/deposit-policy';
 import { resolveProgramPromotion } from '@/lib/payments/program-promotion';
+import { getStripeMethodsForAmount } from '@/lib/bnpl-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,6 +17,27 @@ function moneyToCents(value?: string | null): number {
   if (!value) return 0;
   const dollars = Number(value.replace(/[^0-9.]/g, ''));
   return Number.isFinite(dollars) && dollars > 0 ? Math.round(dollars * 100) : 0;
+}
+
+function safeReturnUrl(value: string | undefined, fallback: string): string {
+  if (!value) return fallback;
+  try {
+    const candidate = new URL(value);
+    const allowedOrigins = [
+      process.env.NEXT_PUBLIC_SITE_URL,
+      process.env.NEXT_PUBLIC_MARKETING_URL,
+      process.env.NEXT_PUBLIC_LMS_URL,
+      process.env.NEXT_PUBLIC_ADMIN_URL,
+      'https://www.elevateforhumanity.org',
+      'https://lms.elevateforhumanity.org',
+      'https://admin.elevateforhumanity.org',
+    ]
+      .filter(Boolean)
+      .map((origin) => new URL(origin as string).origin);
+    return allowedOrigins.includes(candidate.origin) ? candidate.toString() : fallback;
+  } catch {
+    return fallback;
+  }
 }
 
 async function resolvePricing(slug: string) {
@@ -62,10 +84,15 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const stripe = getStripe();
-  if (!stripe) return NextResponse.json({ error: 'Payment system not configured.' }, { status: 503 });
+  if (!stripe)
+    return NextResponse.json({ error: 'Payment system not configured.' }, { status: 503 });
 
   const admin = await getAdminClient();
-  if (!admin) return NextResponse.json({ error: 'Enrollment system temporarily unavailable.' }, { status: 503 });
+  if (!admin)
+    return NextResponse.json(
+      { error: 'Enrollment system temporarily unavailable.' },
+      { status: 503 },
+    );
 
   let body: {
     slug?: string;
@@ -86,6 +113,65 @@ export async function POST(request: NextRequest) {
   if (!slug) return NextResponse.json({ error: 'Program slug is required.' }, { status: 400 });
 
   const applicationReference = body.applicationReference?.trim() || null;
+
+  // Partner-distributed courses previously had a second checkout authority in
+  // LMS. They now share this endpoint while retaining their price/payment-link
+  // contract. Application-linked workforce programs continue below.
+  if (!applicationReference) {
+    const { data: partnerCourse } = await admin
+      .from('partner_courses')
+      .select('id, title, stripe_price_id, payment_link, retail_price_cents, partner_key')
+      .eq('course_key', slug)
+      .maybeSingle();
+
+    if (partnerCourse?.payment_link) {
+      return NextResponse.json({ url: partnerCourse.payment_link });
+    }
+
+    if (partnerCourse) {
+      let priceId = partnerCourse.stripe_price_id as string | null;
+      const amountCents = Number(partnerCourse.retail_price_cents || 0);
+      if (!priceId) {
+        if (amountCents <= 0) {
+          return NextResponse.json(
+            { error: 'This partner course does not have a self-pay price configured.' },
+            { status: 422 },
+          );
+        }
+        const price = await stripe.prices.create({
+          unit_amount: amountCents,
+          currency: 'usd',
+          product_data: {
+            name: partnerCourse.title,
+            metadata: { program_slug: slug, partner_key: partnerCourse.partner_key || '' },
+          },
+        });
+        priceId = price.id;
+      }
+
+      const fallbackSuccess = `${request.nextUrl.origin}/programs/${encodeURIComponent(slug)}/enrollment-success?session_id={CHECKOUT_SESSION_ID}`;
+      const fallbackCancel = `${request.nextUrl.origin}/programs/${encodeURIComponent(slug)}`;
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        line_items: [{ price: priceId, quantity: 1 }],
+        payment_method_types: getStripeMethodsForAmount(amountCents / 100) as any,
+        success_url: safeReturnUrl(body.successUrl, fallbackSuccess),
+        cancel_url: safeReturnUrl(body.cancelUrl, fallbackCancel),
+        metadata: {
+          kind: 'partner_course',
+          program_slug: slug,
+          partner_key: partnerCourse.partner_key || '',
+          source: request.headers.get('x-elevate-adapter-origin') ? 'lms_adapter' : 'marketing',
+        },
+        automatic_tax: { enabled: false },
+      });
+      if (!session.url) {
+        return NextResponse.json({ error: 'Failed to create checkout session.' }, { status: 500 });
+      }
+      return NextResponse.json({ url: session.url, sessionId: session.id });
+    }
+  }
+
   let applicationId: string | null = null;
   let applicantUserId: string | null = null;
   let applicantEmail: string | null = null;
@@ -97,19 +183,30 @@ export async function POST(request: NextRequest) {
       .select('id, user_id, email, first_name, last_name, phone, program_interest, funding_type')
       .eq('reference_number', applicationReference)
       .maybeSingle();
-    if (!application || application.program_interest !== slug || !String(application.funding_type || '').startsWith('self_pay')) {
-      return NextResponse.json({ error: 'This payment link does not match the submitted application.' }, { status: 400 });
+    if (
+      !application ||
+      application.program_interest !== slug ||
+      !String(application.funding_type || '').startsWith('self_pay')
+    ) {
+      return NextResponse.json(
+        { error: 'This payment link does not match the submitted application.' },
+        { status: 400 },
+      );
     }
     applicationId = application.id;
     applicantUserId = application.user_id;
     applicantEmail = application.email;
-    applicantName = [application.first_name, application.last_name].filter(Boolean).join(' ') || null;
+    applicantName =
+      [application.first_name, application.last_name].filter(Boolean).join(' ') || null;
     applicantPhone = application.phone;
   }
 
   const pricing = await resolvePricing(slug);
   if (!pricing) {
-    return NextResponse.json({ error: 'This program does not have a self-pay price configured.' }, { status: 422 });
+    return NextResponse.json(
+      { error: 'This program does not have a self-pay price configured.' },
+      { status: 422 },
+    );
   }
 
   const { data: programRow, error: programError } = await admin
@@ -142,12 +239,11 @@ export async function POST(request: NextRequest) {
   }
 
   const origin = request.nextUrl.origin;
-  const successUrl = body.successUrl?.startsWith(origin)
-    ? body.successUrl
-    : `${origin}/programs/${encodeURIComponent(slug)}/enrollment-success?session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = body.cancelUrl?.startsWith(origin)
-    ? body.cancelUrl
-    : `${origin}/programs/${encodeURIComponent(slug)}`;
+  const successUrl = safeReturnUrl(
+    body.successUrl,
+    `${origin}/programs/${encodeURIComponent(slug)}/enrollment-success?session_id={CHECKOUT_SESSION_ID}`,
+  );
+  const cancelUrl = safeReturnUrl(body.cancelUrl, `${origin}/programs/${encodeURIComponent(slug)}`);
 
   // Create an orphan-safe pending enrollment before Stripe checkout. The canonical
   // webhook updates this exact row after payment, then account onboarding can link
@@ -172,7 +268,11 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (pendingError || !pendingEnrollment?.id) {
-    logger.error('[program-checkout] Pending enrollment insert failed', pendingError?.message ?? 'unknown', { slug });
+    logger.error(
+      '[program-checkout] Pending enrollment insert failed',
+      pendingError?.message ?? 'unknown',
+      { slug },
+    );
     return NextResponse.json({ error: 'Unable to prepare enrollment checkout.' }, { status: 500 });
   }
 
@@ -194,7 +294,11 @@ export async function POST(request: NextRequest) {
         amountCents: chargeCents,
       });
       if ('error' in promotionResult) {
-        await admin.from('program_enrollments').delete().eq('id', pendingEnrollment.id).eq('status', 'checkout_pending');
+        await admin
+          .from('program_enrollments')
+          .delete()
+          .eq('id', pendingEnrollment.id)
+          .eq('status', 'checkout_pending');
         return NextResponse.json({ error: promotionResult.error }, { status: 400 });
       }
       promotionCodeId = promotionResult.stripePromotionCodeId;
@@ -267,14 +371,25 @@ export async function POST(request: NextRequest) {
       .update({ stripe_checkout_session_id: session.id, updated_at: new Date().toISOString() })
       .eq('id', pendingEnrollment.id);
 
-    return NextResponse.json({ url: session.url, sessionId: session.id, enrollmentId: pendingEnrollment.id });
+    return NextResponse.json({
+      url: session.url,
+      sessionId: session.id,
+      enrollmentId: pendingEnrollment.id,
+    });
   } catch (error) {
-    await admin.from('program_enrollments').delete().eq('id', pendingEnrollment.id).eq('status', 'checkout_pending');
+    await admin
+      .from('program_enrollments')
+      .delete()
+      .eq('id', pendingEnrollment.id)
+      .eq('status', 'checkout_pending');
     logger.error(
       '[program-checkout] Stripe checkout session creation failed',
       error instanceof Error ? error : new Error(String(error)),
       { slug, checkoutMode, chargeCents },
     );
-    return NextResponse.json({ error: 'Unable to start checkout. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Unable to start checkout. Please try again.' },
+      { status: 500 },
+    );
   }
 }

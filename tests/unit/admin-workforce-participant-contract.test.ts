@@ -18,7 +18,8 @@ describe('Admin workforce participant contract', () => {
     expect(create).toContain('action={createWorkforceParticipant}');
     expect(create).toContain("from('programs')");
     const action = readFileSync('apps/admin/app/workforce/participants/actions.ts', 'utf8');
-    expect(action).toContain("table: 'workforce_participants'");
+    expect(action).toContain("table: 'participants'");
+    expect(action).toContain("targetType: 'participants'");
     expect(action).toContain("eq('is_active', true)");
     expect(action).toContain("['admin', 'staff', 'advisor']");
     expect(existsSync('apps/admin/app/workforce/participants/[id]/page.tsx')).toBe(true);

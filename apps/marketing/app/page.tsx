@@ -1,3 +1,4 @@
+// Homepage media and narration require explicit visitor action.
 import type { Metadata } from 'next';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';

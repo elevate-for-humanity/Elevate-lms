@@ -169,10 +169,24 @@ describe('Admin Dashboard and Studio surface contract', () => {
 
   it('does not frame the full-screen Studio command workspace twice', () => {
     const navigation = source('apps/admin/app/studio/StudioNavigation.client.tsx');
+    const chrome = source('components/admin/AdminApplicationChrome.tsx');
+    const globalStyles = source('apps/admin/app/globals.css');
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+    const page = source('apps/admin/app/studio/page.tsx');
+    const layout = source('apps/admin/app/studio/layout.tsx');
 
     expect(navigation).toContain('usePathname');
     expect(navigation).toContain("pathname === '/studio'");
     expect(navigation).not.toContain('useSearchParams');
+    expect(chrome).toContain('admin-studio-viewport h-full');
+    expect(globalStyles).toContain('.admin-studio-viewport section');
+    expect(globalStyles).toContain('padding: 0 !important');
+    expect(workspace).toContain('className="flex h-full min-h-0');
+    expect(workspace).not.toContain('h-[100dvh]');
+    expect(page).toContain('className="h-full w-full');
+    expect(page).not.toContain('h-[100dvh]');
+    expect(layout).toContain('className="flex h-full');
+    expect(layout).not.toContain('h-dvh');
   });
 
   it('greets Store visitors with the PARIS product interview', () => {

@@ -142,6 +142,47 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
     }).slice(0, 10).map((element) => ({ tag: element.tagName, text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '').trim().slice(0, 80) })));
     expect(tinyCritical, `${target} has undersized mobile controls`).toEqual([]);
   }
+
+  if (new URL(target).pathname === '/studio') {
+    const studioGeometry = await page.evaluate(() => {
+      const workspace = document.querySelector<HTMLElement>('#admin-ai-workspace');
+      const composer = document.querySelector<HTMLTextAreaElement>(
+        'textarea[placeholder="Tell Admin AI what you need done..."]',
+      );
+      const send = document.querySelector<HTMLElement>('[aria-label="Send request"]');
+      const rect = (element: HTMLElement | null) => {
+        const box = element?.getBoundingClientRect();
+        return box
+          ? {
+              left: box.left,
+              top: box.top,
+              right: box.right,
+              bottom: box.bottom,
+              width: box.width,
+              height: box.height,
+            }
+          : null;
+      };
+      return {
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        workspace: rect(workspace),
+        composer: rect(composer),
+        send: rect(send),
+      };
+    });
+    expect(studioGeometry.workspace, 'Studio workspace is missing').not.toBeNull();
+    expect(studioGeometry.composer, 'Studio composer is missing').not.toBeNull();
+    expect(studioGeometry.send, 'Studio send control is missing').not.toBeNull();
+    expect(studioGeometry.workspace!.left).toBeLessThanOrEqual(2);
+    expect(studioGeometry.workspace!.width).toBeGreaterThanOrEqual(
+      studioGeometry.viewport.width - 2,
+    );
+    expect(studioGeometry.workspace!.height).toBeGreaterThanOrEqual(
+      studioGeometry.viewport.height - 2,
+    );
+    expect(studioGeometry.composer!.bottom).toBeLessThanOrEqual(studioGeometry.viewport.height + 2);
+    expect(studioGeometry.send!.bottom).toBeLessThanOrEqual(studioGeometry.viewport.height + 2);
+  }
 }
 
 async function certify(page: Page, testInfo: any, role: string, credentials: readonly string[], loginBase: string, paths: string[], manifestPath: string) {
@@ -172,5 +213,11 @@ test.describe('Authenticated portal responsive design certification', () => {
   roleSuite('Instructor', 'instructor', ADMIN_BASE, [`${ADMIN_BASE}/instructor/dashboard`], '/manifest-admin.json');
   roleSuite('Staff', 'staff', ADMIN_BASE, [`${ADMIN_BASE}/staff-portal/dashboard`], '/manifest-admin.json');
   roleSuite('Case Manager', 'caseManager', MARKETING_BASE, [`${MARKETING_BASE}/case-manager/dashboard`], '/manifest-marketing.json');
-  roleSuite('Admin', 'admin', ADMIN_BASE, [`${ADMIN_BASE}/dashboard`], '/manifest-admin.json');
+  roleSuite(
+    'Admin',
+    'admin',
+    ADMIN_BASE,
+    [`${ADMIN_BASE}/dashboard`, `${ADMIN_BASE}/studio`],
+    '/manifest-admin.json',
+  );
 });

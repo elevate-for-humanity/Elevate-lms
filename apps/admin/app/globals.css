@@ -1607,6 +1607,33 @@ footer {
   }
 }
 
+/*
+ * Admin Studio is an application viewport, not an editorial page.
+ * The legacy Admin stylesheet applies vertical rhythm and mobile gutters to
+ * every semantic <section>. Studio nests several sections, so those generic
+ * rules compound and shrink the chat into a fixed-height card. Keep the
+ * exception scoped to the canonical /studio chrome so dashboard pages retain
+ * their existing spacing.
+ */
+.admin-studio-viewport,
+.admin-studio-viewport > section,
+.admin-studio-viewport main,
+.admin-studio-viewport section {
+  padding: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .admin-studio-viewport .max-w-5xl {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .admin-studio-viewport .flex-col > button,
+  .admin-studio-viewport .flex-col > .btn {
+    width: auto;
+  }
+}
+
 /* ============================================================================
    COLOR & CONTRAST ENHANCEMENT (WCAG AA Compliant)
    Scoped to content areas - header/nav use component styles

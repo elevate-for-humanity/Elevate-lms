@@ -23,7 +23,13 @@ export function AdminApplicationChrome({
       }
     >
       {!studioOwnsViewport ? <AdminNavShell navSections={navSections} /> : null}
-      <main className={studioOwnsViewport ? 'h-full min-w-0 overflow-hidden' : 'min-w-0 overflow-x-clip'}>
+      <main
+        className={
+          studioOwnsViewport
+            ? 'admin-studio-viewport h-full min-w-0 overflow-hidden'
+            : 'min-w-0 overflow-x-clip'
+        }
+      >
         {children}
       </main>
     </div>

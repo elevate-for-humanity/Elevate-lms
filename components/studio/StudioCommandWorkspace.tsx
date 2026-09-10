@@ -69,7 +69,7 @@ export default function StudioCommandWorkspace({
   };
 
   return (
-    <div className="flex h-[100dvh] min-h-0 min-w-0 flex-col overflow-hidden bg-white lg:h-full">
+    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white">
       <header className="shrink-0 border-b border-slate-200 bg-slate-950 text-white">
         <div className="flex min-h-12 min-w-0 items-center gap-2 px-3">
           <Bot className="h-5 w-5 shrink-0" aria-hidden="true" />

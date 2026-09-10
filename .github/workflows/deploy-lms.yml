@@ -39,6 +39,7 @@ on:
       - 'components/auth/**'
       - 'components/career/**'
       - 'components/pwa/**'
+      - 'components/paris/**'
       - 'components/SocialLearningCommunity.tsx'
       - 'components/careers/**'
       - 'packages/shared-utils/**'

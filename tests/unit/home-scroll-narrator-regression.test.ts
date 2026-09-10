@@ -40,8 +40,10 @@ describe('homepage scroll narration lifecycle', () => {
     expect(source).toContain('void narrateVisibleSection();');
   });
 
-  it('explains the one-tap browser audio requirement when autoplay is blocked', () => {
-    expect(source).toContain('Tap the speaker once to allow narration on this device.');
+  it('uses the next ordinary page interaction when mobile autoplay is blocked', () => {
+    expect(source).toContain('Narration will begin with your first touch.');
+    expect(source).toContain("window.addEventListener('pointerdown', beginFromNaturalInteraction");
+    expect(source).toContain("window.addEventListener('keydown', beginFromNaturalInteraction");
   });
 
   it('does not rebuild scroll listeners for transient playback state', () => {

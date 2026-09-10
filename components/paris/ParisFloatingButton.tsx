@@ -155,24 +155,38 @@ export function ParisFloatingButton({
       {showWelcome && !isOpen ? (
         <div
           role="status"
-          className="fixed bottom-[calc(9.25rem+env(safe-area-inset-bottom))] right-3 z-50 w-[min(22rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-4 pr-11 text-slate-900 shadow-2xl md:bottom-24 md:right-6"
+          className="fixed bottom-[calc(9.25rem+env(safe-area-inset-bottom))] right-3 z-50 w-[min(22rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-4 text-slate-900 shadow-2xl md:bottom-24 md:right-6"
         >
-          <button
-            type="button"
-            onClick={dismissWelcome}
-            aria-label="Dismiss PARIS introduction"
-            className="absolute right-2 top-2 inline-flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-          >
-            <X className="h-4 w-4" aria-hidden="true" />
-          </button>
-          <p className="font-black text-slate-950">Hi, I’m PARIS.</p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="font-black text-slate-950">Hi, I’m PARIS.</p>
+            <button
+              type="button"
+              onClick={dismissWelcome}
+              aria-label="Close PARIS introduction"
+              className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-black text-slate-800 hover:bg-slate-100"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+              Close
+            </button>
+          </div>
           <p className="mt-1 text-sm font-medium leading-6 text-slate-700">
             I’m here if you need guidance with programs, funding, applications, documents, employer
             opportunities, or your next step.
           </p>
           <p className="mt-3 text-xs font-bold text-brand-red-700">
-            Use the Ask PARIS button below whenever you are ready.
+            Ask a question by typing or using the microphone.
           </p>
+          <button
+            type="button"
+            onClick={() => {
+              dismissWelcome();
+              open();
+            }}
+            className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-4 py-3 font-black text-white shadow-md hover:bg-brand-red-700"
+          >
+            <MessageCircle className="h-5 w-5" aria-hidden="true" />
+            Open PARIS
+          </button>
         </div>
       ) : null}
 

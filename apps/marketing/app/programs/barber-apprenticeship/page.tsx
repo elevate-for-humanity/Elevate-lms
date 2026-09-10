@@ -107,6 +107,9 @@ export default async function BarberApprenticeshipPage() {
         microLabel={heroBanner.microLabel}
         transcript={KOUNTRY_KUTZ_HERO_TRANSCRIPT}
         narrateTranscript
+        transcriptVoiceStyle="assistant"
+        transcriptVoiceRate={1}
+        preloadTranscriptVoice={false}
         analyticsName="barber-apprenticeship"
         heightClassName="h-[clamp(460px,68vh,780px)]"
         mediaFit="contain"

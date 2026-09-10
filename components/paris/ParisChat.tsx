@@ -188,7 +188,7 @@ export default function ParisChat({
         void voice.play(data.reply, {
           voice: 'coral',
           style: storeSurface ? 'commercial' : 'assistant',
-          rate: 0.96,
+          rate: 1,
           allowBrowserFallback: false,
         });
       }

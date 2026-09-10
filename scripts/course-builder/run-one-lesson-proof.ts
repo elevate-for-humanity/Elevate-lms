@@ -1,6 +1,7 @@
 #!/usr/bin/env npx tsx
 
-import { queueCourseMedia } from '../../lib/course-builder/orchestrator';
+import { generateLessonContent } from '../../lib/course-factory/content-generator';
+import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { requireAdminClient } from '../../lib/supabase/admin';
 
 const args = process.argv.slice(2);
@@ -14,6 +15,18 @@ async function main() {
   const lessonSlug = valueAfter('--lesson');
   if (!courseSlug || !lessonSlug) {
     throw new Error('--course <course-slug> and --lesson <lesson-slug> are required');
+  }
+
+  const blueprint = await getBlueprintBySlug(courseSlug);
+  if (!blueprint) throw new Error(`Registered blueprint not found: ${courseSlug}`);
+  const blueprintModule = blueprint.modules.find((courseModule) =>
+    (courseModule.lessons ?? []).some((candidate) => candidate.slug === lessonSlug),
+  );
+  const blueprintLesson = blueprintModule?.lessons?.find(
+    (candidate) => candidate.slug === lessonSlug,
+  );
+  if (!blueprintModule || !blueprintLesson) {
+    throw new Error(`Blueprint lesson not found: ${lessonSlug}`);
   }
 
   const db = await requireAdminClient();
@@ -40,15 +53,55 @@ async function main() {
     if (unpauseError) throw unpauseError;
   }
 
-  let result;
   try {
-    result = await queueCourseMedia({
+    const generated = await generateLessonContent({
+      lesson: blueprintLesson,
+      moduleTitle: blueprintModule.title,
+      courseTitle: blueprint.title,
       courseId: course.id,
-      lessonId: lesson.id,
-      onlyMissing: false,
-      force: true,
-      limit: 1,
+      state: blueprint.state,
+      checkpointNamespace: `${blueprint.id}:${blueprint.version}`,
+      standardsBlock: [
+        `Required domain: ${blueprintLesson.domainKey ?? blueprintModule.domainKey ?? blueprintModule.slug}`,
+        `Required module competencies: ${(blueprintModule.competencies ?? []).map((competency) => competency.competencyKey).join(', ') || 'Apply the module objective'}`,
+        `Blueprint lesson identity: ${blueprintLesson.slug} — ${blueprintLesson.title}`,
+      ].join('\n'),
     });
+
+    const { data: persisted, error: persistedError } = await db
+      .from('course_lessons')
+      .select('video_config,generation_status')
+      .eq('id', lesson.id)
+      .single();
+    if (persistedError) throw persistedError;
+    const videoConfig = persisted.video_config as Record<string, unknown> | null;
+    if (!videoConfig?.source_fingerprint || persisted.generation_status !== 'generating') {
+      throw new Error('Generated lesson did not persist its locked media contract');
+    }
+
+    const { data: mediaJobs, error: mediaError } = await db
+      .from('video_jobs')
+      .select('id,status,asset_kind')
+      .eq('course_id', course.id)
+      .eq('lesson_id', lesson.id)
+      .eq('asset_kind', 'lesson');
+    if (mediaError) throw mediaError;
+    if (mediaJobs?.length !== 1) {
+      throw new Error(`Expected one canonical lesson media job; found ${mediaJobs?.length ?? 0}`);
+    }
+
+    console.log(JSON.stringify({
+      courseId: course.id,
+      courseSlug,
+      lessonId: lesson.id,
+      lessonSlug,
+      lessonTitle: lesson.title,
+      generatedWords: generated.content.trim().split(/\s+/).length,
+      assessmentQuestions: generated.quiz_questions.length,
+      mediaJobId: mediaJobs[0].id,
+      mediaStatus: mediaJobs[0].status,
+      generationPausedRestored: originalGenerationPaused,
+    }, null, 2));
   } finally {
     if (originalGenerationPaused) {
       const { error: restoreError } = await db
@@ -59,19 +112,6 @@ async function main() {
     }
   }
 
-  if (result.queued !== 1 || result.failed !== 0) {
-    throw new Error(`Expected exactly one queued lesson; queued=${result.queued} failed=${result.failed}`);
-  }
-
-  console.log(JSON.stringify({
-    courseId: course.id,
-    courseSlug,
-    lessonId: lesson.id,
-    lessonSlug,
-    lessonTitle: lesson.title,
-    queued: result.queued,
-    failed: result.failed,
-  }, null, 2));
 }
 
 main().catch((error) => {

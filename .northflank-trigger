@@ -1,4 +1,4 @@
-merge_sha=28a83058523d6dd593bd04d0dd074e7ee2766a1a
-services=admin
-requested_at=2026-09-08T12:02:00Z
-reason=deploy-unified-mobile-studio
+merge_sha=c7dcd82379e6543377dfe3ad2732cefb90040285
+services=marketing
+requested_at=2026-09-10T12:43:25Z
+reason=deploy-homepage-performance-and-explicit-media-controls

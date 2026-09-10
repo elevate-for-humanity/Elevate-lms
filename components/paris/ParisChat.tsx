@@ -7,6 +7,8 @@ import {
   FileCheck,
   GraduationCap,
   Loader2,
+  Mic,
+  MicOff,
   Scissors,
   Send,
   Stethoscope,
@@ -21,6 +23,26 @@ import type { PortalSupportIssue } from '@/lib/paris/portal-support';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+}
+
+interface BrowserSpeechRecognition {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: { results: ArrayLike<{ 0: { transcript: string } }> }) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+}
+
+type BrowserSpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
+
+declare global {
+  interface Window {
+    SpeechRecognition?: BrowserSpeechRecognitionConstructor;
+    webkitSpeechRecognition?: BrowserSpeechRecognitionConstructor;
+  }
 }
 
 const STORAGE_PREFIX = 'elevate:paris:conversation:';
@@ -105,6 +127,9 @@ export default function ParisChat({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(voiceEnabled);
+  const [isListening, setIsListening] = useState(false);
+  const [speechInputAvailable, setSpeechInputAvailable] = useState(false);
+  const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -119,6 +144,53 @@ export default function ParisChat({
       }];
     });
   }, [portalIssue]);
+
+  useEffect(() => {
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    setSpeechInputAvailable(Boolean(Recognition));
+    if (!Recognition) return;
+
+    const recognition = new Recognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    recognition.onresult = (event) => {
+      const transcript = event.results[0]?.[0]?.transcript?.trim();
+      if (transcript) setInput((current) => `${current} ${transcript}`.trim().slice(0, 2000));
+      setIsListening(false);
+      window.setTimeout(() => inputRef.current?.focus(), 0);
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+    recognitionRef.current = recognition;
+
+    return () => {
+      recognition.onresult = null;
+      recognition.onerror = null;
+      recognition.onend = null;
+      recognition.stop();
+      recognitionRef.current = null;
+    };
+  }, []);
+
+  const toggleListening = useCallback(() => {
+    const recognition = recognitionRef.current;
+    if (!recognition) {
+      inputRef.current?.focus();
+      return;
+    }
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+      return;
+    }
+    try {
+      recognition.start();
+      setIsListening(true);
+    } catch {
+      setIsListening(false);
+    }
+  }, [isListening]);
 
   useEffect(() => {
     try {
@@ -353,6 +425,21 @@ export default function ParisChat({
             className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100"
           >
             {autoSpeak ? <Volume2 className="h-5 w-5" aria-hidden="true" /> : <VolumeX className="h-5 w-5" aria-hidden="true" />}
+          </button>
+          <button
+            type="button"
+            aria-label={isListening ? 'Stop listening' : 'Talk to PARIS'}
+            aria-pressed={isListening}
+            title={speechInputAvailable ? (isListening ? 'Stop listening' : 'Talk to PARIS') : 'Voice typing is unavailable in this browser'}
+            onClick={toggleListening}
+            style={{ width: 44, minWidth: 44, maxWidth: 44, flexBasis: 44 }}
+            className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition ${
+              isListening
+                ? 'border-brand-red-600 bg-brand-red-600 text-white'
+                : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
+            }`}
+          >
+            {isListening ? <MicOff className="h-5 w-5" aria-hidden="true" /> : <Mic className="h-5 w-5" aria-hidden="true" />}
           </button>
           <textarea
             id="paris-chat-input"

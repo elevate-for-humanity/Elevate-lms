@@ -278,6 +278,7 @@ export async function queueCourseMedia(input: {
   onlyMissing?: boolean;
   force?: boolean;
   limit?: number | null;
+  validateOnly?: boolean;
 }) {
   return queueCourseLessonVideos(input);
 }

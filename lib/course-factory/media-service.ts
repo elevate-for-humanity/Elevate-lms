@@ -18,6 +18,8 @@ export interface QueueCourseLessonVideosInput {
   onlyMissing?: boolean;
   limit?: number | null;
   force?: boolean;
+  /** Validate the exact production scope without writing jobs or invoking providers. */
+  validateOnly?: boolean;
 }
 
 export interface QueueCourseLessonVideosResult {
@@ -29,6 +31,11 @@ export interface QueueCourseLessonVideosResult {
   failed: number;
   /** Primary lesson-video jobs accepted by the renderer queue or already valid. */
   lessonVideosReady: number;
+  /** Jobs that a subsequent non-validation request would create or deliberately restart. */
+  wouldQueue: number;
+  /** Existing queued/rendering jobs left untouched by validation and repeated requests. */
+  alreadyActive: number;
+  validateOnly: boolean;
 }
 
 function readQuickClips(contentJson: unknown): Array<Record<string, any>> {
@@ -209,6 +216,8 @@ export async function queueCourseLessonVideos(
   let microclipsQueued = 0;
   let failed = 0;
   let lessonVideosReady = 0;
+  let wouldQueue = 0;
+  let alreadyActive = 0;
 
   async function ensureQueued(
     _existing: VideoJob | undefined,
@@ -301,7 +310,18 @@ export async function queueCourseLessonVideos(
         existingLessonJob?.status === 'draft' ||
         (!mainInFlight && (!onlyMissing || !mainComplete));
 
+      if (!force && mainInFlight && existingLessonJob && !sourceChanged) {
+        alreadyActive += 1;
+      }
+
       if (shouldQueueMain) {
+        if (input.validateOnly) {
+          // Validation is intentionally side-effect free. Existing active jobs
+          // are reported, not refreshed or restarted, and no provider work is invoked.
+          if (!mainInFlight || force || sourceChanged) wouldQueue += 1;
+          if (mainComplete || mainInFlight) lessonVideosReady += 1;
+          continue;
+        }
         const job = await ensureQueued(
           existingLessonJob,
           () =>
@@ -349,6 +369,15 @@ export async function queueCourseLessonVideos(
         const existingClipJob = existingByAsset.get(clipKey);
         if (!force && hasRenderedClip && existingClipJob?.status === 'complete') continue;
 
+        if (input.validateOnly) {
+          if (existingClipJob?.status === 'queued' || existingClipJob?.status === 'rendering') {
+            alreadyActive += 1;
+          } else {
+            wouldQueue += 1;
+          }
+          continue;
+        }
+
         const job = await ensureQueued(existingClipJob, () =>
           createJob({
             lesson_id: lesson.id,
@@ -387,5 +416,8 @@ export async function queueCourseLessonVideos(
     skipped: Math.max(rows.length - candidates.length, 0),
     failed,
     lessonVideosReady,
+    wouldQueue,
+    alreadyActive,
+    validateOnly: input.validateOnly === true,
   };
 }

@@ -115,6 +115,7 @@ async function reserveCredits(input: {
     operation: input.operation,
     metadata: {
       course_id: input.body.courseId ?? null,
+      lesson_id: input.body.lessonId ?? null,
       program_id: input.body.programId ?? null,
       blueprint_id: input.body.blueprintId ?? null,
     },
@@ -283,21 +284,57 @@ export async function POST(req: NextRequest) {
   if (action === 'queue-media') {
     if (!body.courseId)
       return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
+    const lessonId =
+      typeof body.lessonId === 'string' && body.lessonId.trim() ? body.lessonId.trim() : null;
+    const validateOnly = body.validateOnly === true;
+    if (!lessonId && !(body.scope === 'course' && body.confirmCourseBatch === true)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            'lessonId is required. Whole-course media generation requires scope="course" and confirmCourseBatch=true.',
+        },
+        { status: 400 },
+      );
+    }
     let reservation: CreditReservation | null = null;
     try {
+      const course = await loadCourse(body.courseId);
+      if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+      const validation = await queueCourseMedia({
+        courseId: body.courseId,
+        lessonId,
+        onlyMissing: body.onlyMissing !== false,
+        force: body.force === true,
+        limit: typeof body.limit === 'number' ? body.limit : null,
+        validateOnly: true,
+      });
+      if (validation.failed > 0 || validation.attempted === 0) {
+        return NextResponse.json(
+          { ok: false, error: 'Lesson media validation failed', course, result: validation },
+          { status: 422 },
+        );
+      }
+      if (validateOnly || validation.wouldQueue === 0) {
+        return NextResponse.json({
+          ok: true,
+          status: validateOnly ? 'validated' : 'already_active',
+          charged: false,
+          course,
+          instructor: getInstructorForCourse(course.title),
+          result: validation,
+        });
+      }
       reservation = await reserveCredits({
         req,
-        body,
+        body: { ...body, lessonId },
         userId: auth.id,
         effectiveRoles: auth.effectiveRoles,
         operation: 'queue-media',
       });
-      const course = await loadCourse(body.courseId);
-      if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
       const result = await queueCourseMedia({
         courseId: body.courseId,
-        lessonId:
-          typeof body.lessonId === 'string' && body.lessonId.trim() ? body.lessonId.trim() : null,
+        lessonId,
         onlyMissing: body.onlyMissing !== false,
         force: body.force === true,
         limit: typeof body.limit === 'number' ? body.limit : null,

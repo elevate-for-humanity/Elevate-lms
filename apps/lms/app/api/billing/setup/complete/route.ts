@@ -7,6 +7,7 @@ import {
   apprenticeshipIdempotencyKey,
   findExistingApprenticeshipSubscription,
 } from '@/lib/stripe/subscription-guard';
+import { ensureCanonicalStripePrice } from '@/lib/stripe/resolve-canonical-price';
 
 const PROGRAM_CONFIG = {
   'barber-apprenticeship': {
@@ -111,16 +112,19 @@ export async function GET(req: NextRequest) {
     checkoutSessionId: session.id,
   });
   if (!subscription) {
-    const price = await stripe.prices.create(
-      {
-        currency: 'usd',
-        unit_amount: weeklyCents,
-        recurring: { interval: 'week' },
-        product_data: { name: config.product },
-        metadata: { program_slug: programSlug, installment_count: String(installmentCount) },
+    const price = await ensureCanonicalStripePrice(stripe, {
+      lookupKey: `apprenticeship_${programSlug}_${enrollment.id}_weekly`,
+      productLookupKey: `apprenticeship_${programSlug}_weekly_tuition`,
+      productName: config.product,
+      unitAmount: weeklyCents,
+      recurringInterval: 'week',
+      productMetadata: { program_slug: programSlug, kind: 'apprenticeship_weekly_tuition' },
+      priceMetadata: {
+        program_slug: programSlug,
+        enrollment_id: enrollment.id,
+        installment_count: String(installmentCount),
       },
-      { idempotencyKey: apprenticeshipIdempotencyKey('price', enrollment.id) },
-    );
+    });
     subscription = await stripe.subscriptions.create(
       {
         customer: customerId,

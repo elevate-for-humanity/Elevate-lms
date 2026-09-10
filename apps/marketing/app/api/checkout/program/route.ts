@@ -8,6 +8,7 @@ import { logger } from '@/lib/logger';
 import { getMinimumDepositCents } from '@/lib/programs/deposit-policy';
 import { resolveProgramPromotion } from '@/lib/payments/program-promotion';
 import { getStripeMethodsForAmount } from '@/lib/bnpl-config';
+import { ensureCanonicalStripePrice } from '@/lib/stripe/resolve-canonical-price';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -138,13 +139,17 @@ export async function POST(request: NextRequest) {
             { status: 422 },
           );
         }
-        const price = await stripe.prices.create({
-          unit_amount: amountCents,
-          currency: 'usd',
-          product_data: {
-            name: partnerCourse.title,
-            metadata: { program_slug: slug, partner_key: partnerCourse.partner_key || '' },
+        const price = await ensureCanonicalStripePrice(stripe, {
+          lookupKey: `partner_course_${partnerCourse.id}_${amountCents}_usd`,
+          productLookupKey: `partner_course_${partnerCourse.id}`,
+          productName: partnerCourse.title,
+          unitAmount: amountCents,
+          productMetadata: {
+            program_slug: slug,
+            partner_key: partnerCourse.partner_key || '',
+            kind: 'partner_course',
           },
+          priceMetadata: { program_slug: slug, partner_key: partnerCourse.partner_key || '' },
         });
         priceId = price.id;
       }

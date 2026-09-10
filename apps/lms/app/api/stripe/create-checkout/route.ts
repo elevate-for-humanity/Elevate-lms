@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { paymentRateLimit } from '@/lib/rate-limit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { ensureCanonicalStripePrice } from '@/lib/stripe/resolve-canonical-price';
 
 import { withRuntime } from '@/lib/api/withRuntime';
 
@@ -62,13 +63,14 @@ async function handler(req: Request) {
     let stripePriceId = priceId;
 
     if (!stripePriceId && course.price > 0) {
-      // Create a new price in Stripe
-      const price = await stripe.prices.create({
-        unit_amount: Math.round(course.price * 100), // Convert to cents
-        currency: 'usd',
-        product_data: {
-          name: course.title,
-        },
+      const unitAmount = Math.round(course.price * 100);
+      const price = await ensureCanonicalStripePrice(stripe, {
+        lookupKey: `lms_course_${course.id}_${unitAmount}_usd`,
+        productLookupKey: `lms_course_${course.id}`,
+        productName: course.title,
+        unitAmount,
+        productMetadata: { course_id: String(course.id), kind: 'lms_course' },
+        priceMetadata: { course_id: String(course.id) },
       });
       stripePriceId = price.id;
     }

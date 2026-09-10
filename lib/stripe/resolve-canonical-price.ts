@@ -9,9 +9,43 @@ export interface CanonicalPriceExpectation {
 
 export interface CanonicalPriceProvisioning extends CanonicalPriceExpectation {
   productName: string;
+  productLookupKey?: string;
   productMetadata?: Record<string, string>;
   priceMetadata?: Record<string, string>;
   nickname?: string;
+}
+
+function stripeSearchLiteral(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+async function ensureCanonicalProduct(
+  stripe: Stripe,
+  provisioning: CanonicalPriceProvisioning,
+): Promise<string> {
+  const productLookupKey = provisioning.productLookupKey ?? provisioning.lookupKey;
+  const products = await stripe.products.search({
+    query: `metadata['catalog_lookup_key']:'${stripeSearchLiteral(productLookupKey)}'`,
+    limit: 2,
+  });
+  if (products.data.length > 1) {
+    throw new Error(
+      `Stripe catalog misconfigured for product ${productLookupKey}: found ${products.data.length} products`,
+    );
+  }
+  if (products.data.length === 1) return products.data[0].id;
+
+  const product = await stripe.products.create(
+    {
+      name: provisioning.productName,
+      metadata: {
+        ...provisioning.productMetadata,
+        catalog_lookup_key: productLookupKey,
+      },
+    },
+    { idempotencyKey: `catalog-product-${productLookupKey}` },
+  );
+  return product.id;
 }
 
 function verifyCanonicalStripePrice(
@@ -95,20 +129,21 @@ export async function ensureCanonicalStripePrice(
   }
 
   try {
-    const created = await stripe.prices.create({
-      currency: provisioning.currency ?? 'usd',
-      unit_amount: provisioning.unitAmount,
-      lookup_key: provisioning.lookupKey,
-      nickname: provisioning.nickname,
-      recurring: provisioning.recurringInterval
-        ? { interval: provisioning.recurringInterval }
-        : undefined,
-      metadata: provisioning.priceMetadata,
-      product_data: {
-        name: provisioning.productName,
-        metadata: provisioning.productMetadata,
+    const product = await ensureCanonicalProduct(stripe, provisioning);
+    const created = await stripe.prices.create(
+      {
+        currency: provisioning.currency ?? 'usd',
+        unit_amount: provisioning.unitAmount,
+        lookup_key: provisioning.lookupKey,
+        nickname: provisioning.nickname,
+        recurring: provisioning.recurringInterval
+          ? { interval: provisioning.recurringInterval }
+          : undefined,
+        metadata: provisioning.priceMetadata,
+        product,
       },
-    });
+      { idempotencyKey: `catalog-price-${provisioning.lookupKey}` },
+    );
     return verifyCanonicalStripePrice(created, provisioning);
   } catch (error) {
     // Concurrent checkout may have created the lookup key first. Re-resolve

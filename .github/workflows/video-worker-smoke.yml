@@ -6,6 +6,10 @@ name: Video Worker Scheduler
 # A main-branch workflow update also performs an immediate bounded queue check.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/video-worker-smoke.yml'
 
 permissions:
   contents: read
@@ -22,7 +26,7 @@ jobs:
   process-next-video:
     name: Process next canonical video job
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 35
     steps:
       - name: Require scheduler credentials
         shell: bash
@@ -40,7 +44,8 @@ jobs:
           status=$(curl -sS --max-time 45 -o /tmp/video-worker.json -w '%{http_code}' \
             -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
             -H "Authorization: Bearer $CRON_SECRET" \
-            -H 'Content-Type: application/json' || true)
+            -H 'Content-Type: application/json' \
+            --data '{"courseId":"3fb5ce19-1cde-434c-a8c6-f138d7d7aa17","jobId":"4ba64728-c520-4570-800a-0d5546ce229a","maxJobs":1,"queueOneDraft":true}' || true)
           cat /tmp/video-worker.json 2>/dev/null || true
           case "$status" in
             200|202) ;;

@@ -88,6 +88,9 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       NEXT_PUBLIC_GIT_SHA: ${{ github.sha }}
+      # Northflank previously returned a correctly labelled image containing stale browser assets.
+      # Fresh builds are required until artifact provenance is content-addressed upstream.
+      FORCE_FRESH_BUILD: 'true'
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
@@ -221,6 +224,20 @@ jobs:
           cat /tmp/lms-health.json 2>/dev/null || true
           cat /tmp/lms-version.json 2>/dev/null || true
           exit 1
+
+      - name: Verify deployed browser bundle provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_SHA="${{ github.sha }}"
+          EXPECTED_CACHE="elevate-lms-${EXPECTED_SHA:0:12}"
+          curl -fsS --max-time 20 "https://app.elevateforhumanity.org/sw-lms.js?deploy=${EXPECTED_SHA}" -o /tmp/lms-sw.js
+          grep -Fq "const CACHE_VERSION = '${EXPECTED_CACHE}';" /tmp/lms-sw.js || {
+            echo "::error::Runtime reports ${EXPECTED_SHA}, but the deployed browser assets are not from that commit."
+            sed -n '1,4p' /tmp/lms-sw.js
+            exit 1
+          }
+          echo "Browser bundle provenance verified: ${EXPECTED_CACHE}"
 
       - name: Smoke canonical learner route
         run: |

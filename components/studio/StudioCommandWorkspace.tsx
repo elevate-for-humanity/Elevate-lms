@@ -25,6 +25,13 @@ const IntelligenceWorkspace = dynamic(() => import('./StudioIntelligencePanel'),
 type InspectionMode = 'preview' | 'browser';
 type EmbeddedCapability = 'workflows' | 'intelligence';
 
+const WORKSPACE_GROUPS = [
+  { label: 'Create', ids: ['courses', 'content', 'media', 'canvas'] },
+  { label: 'Operate', ids: ['workflows', 'tasks', 'agents', 'collaboration', 'memory'] },
+  { label: 'Engineer', ids: ['repository', 'browser', 'builds', 'logs', 'deployments', 'containers'] },
+  { label: 'Govern', ids: ['intelligence', 'evaluations', 'claims', 'health', 'plugins', 'settings', 'cfd'] },
+] as const;
+
 function isEmbeddedCapability(id: string): id is EmbeddedCapability {
   return id === 'workflows' || id === 'intelligence';
 }
@@ -68,6 +75,12 @@ export default function StudioCommandWorkspace({
   const activeWorkspace = activeCapability
     ? workspaces.find((workspace) => workspace.id === activeCapability) ?? null
     : null;
+  const groupedWorkspaces = WORKSPACE_GROUPS.map((group) => ({
+    ...group,
+    workspaces: group.ids
+      .map((id) => workspaces.find((workspace) => workspace.id === id))
+      .filter((workspace): workspace is (typeof workspaces)[number] => Boolean(workspace)),
+  })).filter((group) => group.workspaces.length > 0);
 
   return (
     <div className="flex h-[100dvh] min-h-0 min-w-0 flex-col overflow-hidden bg-white lg:h-full">
@@ -125,24 +138,52 @@ export default function StudioCommandWorkspace({
             ))}
           </div>
         </div>
-        <nav aria-label="Studio tools" className="hidden min-w-0 items-center gap-1 overflow-x-auto border-t border-slate-100 px-3 py-1.5 lg:flex">
-          <button type="button" onClick={() => setMobileSurface('chat')} className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-slate-100 px-3 text-xs font-bold">
+        <nav
+          aria-label="Studio tools"
+          className="hidden min-w-0 items-center gap-2 border-t border-slate-100 px-3 py-1.5 lg:flex"
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setActiveCapability(null);
+              setMobileSurface('chat');
+            }}
+            aria-pressed={!activeCapability}
+            className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-slate-100 px-3 text-xs font-bold"
+          >
             <MessageSquare className="h-4 w-4" aria-hidden="true" /> Chat
           </button>
-          {workspaces.map((workspace) => (
-            <button
-              key={workspace.id}
-              type="button"
-              onClick={() => openCapability(workspace.id)}
-              aria-pressed={activeCapability === workspace.id}
-              className={`inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold ${activeCapability === workspace.id ? 'bg-slate-950 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+          <label className="flex min-w-0 items-center gap-2 text-xs font-bold text-slate-600">
+            <span className="shrink-0">Workspace</span>
+            <select
+              value={activeCapability ?? ''}
+              onChange={(event) => {
+                const id = event.target.value;
+                if (id) openCapability(id);
+              }}
+              className="h-9 min-w-0 max-w-sm rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900"
+              aria-label="Open Studio workspace"
             >
-              {workspace.label}
-            </button>
-          ))}
+              <option value="">Choose a tool</option>
+              {groupedWorkspaces.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.workspaces.map((workspace) => (
+                    <option key={workspace.id} value={workspace.id}>
+                      {workspace.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </label>
+          {activeWorkspace ? (
+            <span className="min-w-0 truncate text-xs text-slate-500">
+              {activeWorkspace.label}
+            </span>
+          ) : null}
         </nav>
         {mobileMenuOpen ? (
-          <div className="absolute inset-x-3 top-14 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl lg:hidden">
+          <div className="absolute inset-x-3 top-14 max-h-[calc(100dvh-4.5rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl lg:hidden">
             <p className="px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">Agents</p>
             <div className="grid grid-cols-3 gap-1">
               {(['ELLIE', 'LIZZY', 'PARIS'] as const).map((agent) => (
@@ -152,16 +193,33 @@ export default function StudioCommandWorkspace({
               ))}
             </div>
             <p className="mt-2 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">Tools</p>
-            <div className="grid gap-1">
-              {workspaces.map((workspace) => (
-                <button
-                  key={workspace.id}
-                  type="button"
-                  onClick={() => { openCapability(workspace.id); setMobileMenuOpen(false); }}
-                  className="rounded-lg px-3 py-2 text-left text-sm font-semibold hover:bg-slate-100"
-                >
-                  {workspace.label}
-                </button>
+            <div className="grid gap-3">
+              {groupedWorkspaces.map((group) => (
+                <section key={group.label} aria-label={group.label}>
+                  <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    {group.label}
+                  </p>
+                  <div className="grid gap-1">
+                    {group.workspaces.map((workspace) => (
+                      <button
+                        key={workspace.id}
+                        type="button"
+                        onClick={() => {
+                          openCapability(workspace.id);
+                          setMobileMenuOpen(false);
+                        }}
+                        aria-pressed={activeCapability === workspace.id}
+                        className={`rounded-lg px-3 py-2 text-left text-sm font-semibold ${
+                          activeCapability === workspace.id
+                            ? 'bg-slate-950 text-white'
+                            : 'hover:bg-slate-100'
+                        }`}
+                      >
+                        {workspace.label}
+                      </button>
+                    ))}
+                  </div>
+                </section>
               ))}
             </div>
           </div>

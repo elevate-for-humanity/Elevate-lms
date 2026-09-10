@@ -353,6 +353,7 @@ export default function ParisChat({
           >
             {autoSpeak ? <Volume2 className="h-5 w-5" aria-hidden="true" /> : <VolumeX className="h-5 w-5" aria-hidden="true" />}
           </button>
+          {/* Inline width overrides the platform mobile form rule so this flex item shares space with voice/send controls. */}
           <textarea
             id="paris-chat-input"
             ref={inputRef}

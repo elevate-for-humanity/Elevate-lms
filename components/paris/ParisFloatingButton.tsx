@@ -13,7 +13,6 @@ export function ParisFloatingButton({
   nextLessonTitle,
   courseProgress,
   portalRole,
-  autoOpenOnDashboard = false,
 }: ParisLearnerContext) {
   const [isOpen, setIsOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -58,10 +57,6 @@ export function ParisFloatingButton({
     return () => window.removeEventListener(PARIS_PORTAL_ISSUE_EVENT, handleIssue);
   }, []);
 
-  useEffect(() => {
-    if (!autoOpenOnDashboard || surface !== 'portal') return;
-    if (pathname === '/dashboard' || pathname.endsWith('/dashboard')) setIsOpen(true);
-  }, [autoOpenOnDashboard, pathname, surface]);
 
   useEffect(() => {
     if (surface !== 'public' || pathname !== '/') {
@@ -97,7 +92,7 @@ export function ParisFloatingButton({
           role="dialog"
           aria-modal="true"
           aria-label={assistantLabel}
-          className="fixed inset-0 z-[9999] flex h-[100dvh] items-stretch overscroll-contain sm:pointer-events-none sm:items-end sm:justify-end sm:p-6 sm:pb-24"
+          className="fixed inset-0 z-[9999] flex h-[100dvh] w-screen max-w-[100vw] items-stretch overflow-x-hidden overscroll-contain sm:pointer-events-none sm:items-end sm:justify-end sm:p-6 sm:pb-24"
         >
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm sm:hidden"
@@ -105,8 +100,8 @@ export function ParisFloatingButton({
             aria-hidden="true"
           />
 
-          <div className="pointer-events-auto relative z-10 ml-auto flex h-[100dvh] min-h-0 w-full max-w-full flex-col overflow-hidden bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200 sm:h-[min(680px,calc(100dvh-8rem))] sm:w-[min(480px,calc(100vw-3rem))] sm:rounded-2xl sm:border sm:border-slate-200 sm:pb-0">
-            <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 shrink-0 bg-white">
+          <div className="pointer-events-auto relative z-10 ml-auto flex h-[100dvh] min-h-0 min-w-0 w-full max-w-[100vw] flex-col overflow-hidden bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200 sm:h-[min(680px,calc(100dvh-8rem))] sm:w-[min(480px,calc(100vw-3rem))] sm:rounded-2xl sm:border sm:border-slate-200 sm:pb-0">
+            <div className="flex min-w-0 max-w-full items-center justify-between overflow-hidden px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 shrink-0 bg-white">
               <div className="min-w-0 flex items-center gap-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-red-600 flex items-center justify-center text-white text-sm sm:text-base font-bold shrink-0">
                   P
@@ -133,6 +128,7 @@ export function ParisFloatingButton({
                 onClick={close}
                 aria-label="Close PARIS"
                 title="Close PARIS"
+                style={{ width: 'auto', maxWidth: '45%' }}
                 className="ml-2 inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-black text-slate-800 shadow-sm transition-colors hover:border-brand-red-300 hover:bg-brand-red-50 hover:text-brand-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
@@ -140,7 +136,7 @@ export function ParisFloatingButton({
               </button>
             </div>
 
-            <div className="flex-1 overflow-hidden min-h-0">
+            <div className="min-h-0 min-w-0 max-w-full flex-1 overflow-hidden">
               <ParisChat
                 showHeader={false}
                 surface={surface}

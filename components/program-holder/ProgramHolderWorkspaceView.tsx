@@ -185,7 +185,14 @@ export async function ProgramHolderWorkspaceView({
     );
   if (section === 'payouts')
     return <Payouts schedules={data.payoutSchedules} panel={payoutPanel} />;
-  if (section === 'settings') return <Settings holder={data.holder} />;
+  if (section === 'settings')
+    return (
+      <Settings
+        holder={data.holder}
+        notificationPreferences={data.notificationPreferences}
+        phone={data.profile?.phone || data.holder?.contact_phone || ''}
+      />
+    );
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -1393,7 +1400,15 @@ function Payouts({ schedules, panel }: { schedules: any[]; panel?: React.ReactNo
     </div>
   );
 }
-function Settings({ holder }: { holder: any }) {
+function Settings({
+  holder,
+  notificationPreferences,
+  phone,
+}: {
+  holder: any;
+  notificationPreferences: any;
+  phone: string;
+}) {
   return (
     <div className="space-y-6">
       <Hero
@@ -1428,6 +1443,10 @@ function Settings({ holder }: { holder: any }) {
           </span>
         </div>
       </section>
+      <ProgramHolderNotificationPreferences
+        initial={notificationPreferences}
+        phone={phone}
+      />
     </div>
   );
 }

@@ -36,6 +36,12 @@ export interface HeroVideoProps {
   transcript?: string;
   /** Read the approved transcript aloud when the video has no narration track. */
   narrateTranscript?: boolean;
+  /** Voice delivery used for generated transcript narration. */
+  transcriptVoiceStyle?: 'default' | 'assistant' | 'instructor' | 'commercial';
+  /** Narration speed. Existing heroes retain the current 0.96 default. */
+  transcriptVoiceRate?: number;
+  /** Pre-generate narration on mount. Disable on performance-sensitive heroes. */
+  preloadTranscriptVoice?: boolean;
   analyticsName?: string;
   className?: string;
   children?: React.ReactNode;
@@ -71,6 +77,9 @@ export default function HeroVideo({
   trustIndicators,
   transcript,
   narrateTranscript = false,
+  transcriptVoiceStyle = 'commercial',
+  transcriptVoiceRate = 0.96,
+  preloadTranscriptVoice = true,
   analyticsName,
   className = '',
   children,
@@ -138,9 +147,19 @@ export default function HeroVideo({
   );
 
   useEffect(() => {
-    if (!narrateTranscript || !transcript) return;
-    void prepareTranscriptVoice(transcript, { style: 'commercial', rate: 0.96 });
-  }, [narrateTranscript, prepareTranscriptVoice, transcript]);
+    if (!preloadTranscriptVoice || !narrateTranscript || !transcript) return;
+    void prepareTranscriptVoice(transcript, {
+      style: transcriptVoiceStyle,
+      rate: transcriptVoiceRate,
+    });
+  }, [
+    narrateTranscript,
+    preloadTranscriptVoice,
+    prepareTranscriptVoice,
+    transcript,
+    transcriptVoiceRate,
+    transcriptVoiceStyle,
+  ]);
 
   useEffect(() => {
     if (!voiceoverSrc || audioFailed) return;
@@ -219,8 +238,8 @@ export default function HeroVideo({
           if (video.paused) await video.play();
         }
         const started = await transcriptVoice.play(transcript, {
-          style: 'commercial',
-          rate: 0.96,
+          style: transcriptVoiceStyle,
+          rate: transcriptVoiceRate,
           onEnded: () => {
             soundRequestedRef.current = false;
             setMuted(true);

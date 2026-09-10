@@ -44,7 +44,9 @@ describe('admin DEFAULT_NAV coverage', () => {
       }
     }
 
-    const missing = [...navHrefs].filter((href) => !staticRoutes.has(href)).sort();
+    const missing = [...navHrefs]
+      .filter((href) => !staticRoutes.has(href.split(/[?#]/, 1)[0]))
+      .sort();
 
     expect(staticRoutes.size).toBeGreaterThan(350);
     expect(missing).toEqual([]);

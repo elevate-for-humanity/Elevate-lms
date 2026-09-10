@@ -1,23 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { EMERGENCY_HEALTH_SAFETY } from '@/data/programs/emergency-health-safety';
-import { HVAC_TECHNICIAN } from '@/data/programs/hvac-technician';
+import { CDL_TRAINING } from '@/data/programs/cdl-training';
 import { COSMETOLOGY } from '@/data/programs/cosmetology-apprenticeship';
 import { CPR_FIRST_AID } from '@/data/programs/cpr-first-aid';
 import { resolveProgramFundingStatus } from '@/lib/programs/funding-visibility';
 
 describe('resolveProgramFundingStatus', () => {
-  it('marks ETPL emergency health program as workforce-fundable with ICC process', () => {
-    const status = resolveProgramFundingStatus(EMERGENCY_HEALTH_SAFETY);
+  it('marks only the evidenced CDL record as workforce-fundable', () => {
+    const status = resolveProgramFundingStatus(CDL_TRAINING);
     expect(status.isEtplListed).toBe(true);
-    expect(status.isWioaFundable).toBe(true);
+    expect(status.isWioaFundable).toBe(false);
+    expect(status.isWrgFundable).toBe(true);
     expect(status.showWorkforceFundingProcess).toBe(true);
     expect(status.fundingSourceLabels).toContain('Indiana ETPL');
-  });
-
-  it('marks HVAC technician as workforce-fundable', () => {
-    const status = resolveProgramFundingStatus(HVAC_TECHNICIAN);
-    expect(status.showWorkforceFundingProcess).toBe(true);
-    expect(status.isWioaFundable).toBe(true);
   });
 
   it('does not show WIOA process for cosmetology (not ETPL)', () => {

@@ -6,7 +6,7 @@ describe('Studio plugins, uploads and execution routing', () => {
   it('shows the existing integration manager in the Studio tool navigation', () => {
     const registry = readFileSync('lib/devstudio/workspace-registry.ts', 'utf8');
     expect(registry).toContain("label: 'Plugin Marketplace'");
-    expect(registry).toContain("route: '/integrations'");
+    expect(registry).toContain("route: '/studio/integrations'");
   });
 
   it('provides separate camera and file controls', () => {
@@ -18,7 +18,7 @@ describe('Studio plugins, uploads and execution routing', () => {
 
   it('speaks completed AI responses with a visible voice toggle', () => {
     const chat = readFileSync('components/studio/UnifiedEllieChat.tsx', 'utf8');
-    expect(chat).toContain('speechSynthesis.speak(utterance)');
+    expect(chat).toContain('naturalVoice.play(clean');
     expect(chat).toContain('Voice on');
     expect(chat).toContain('Turn voice output off');
   });

@@ -15,8 +15,8 @@ describe('homepage platform introduction', () => {
   });
 
   it('describes Elevate as the connected hub for the complete workforce journey', () => {
-    expect(hero).toContain('One connected education and workforce hub');
-    expect(hero).toContain('training, apprenticeships, funding guidance');
+    expect(hero).toContain('Elevate for Humanity career training and apprenticeships');
+    expect(hero).toContain('priority');
     expect(about).toContain('Who Elevate is');
     expect(about).toContain('learners');
     expect(about).toContain('employers and Host Shops');

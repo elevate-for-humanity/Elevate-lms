@@ -29,7 +29,7 @@ describe('routeEllieMessage', () => {
   it('routes read-only course lookup to unified platform tools', () => {
     expect(routeEllieMessage('Show me the cosmetology course')).toBe('platform');
     expect(routeEllieMessage('Open the Indiana Cosmetology License course')).toBe('platform');
-    expect(selectStudioAgent('Show me the cosmetology course')).toBe('ADMIN_AI');
+    expect(selectStudioAgent('Show me the cosmetology course')).toBe('LIZZY');
   });
 
   it('routes website creation and publishing to the tool orchestrator', () => {
@@ -79,10 +79,10 @@ describe('durable orchestration planning', () => {
 
 describe('selectStudioAgent', () => {
   it.each([
-    ['Build an adaptive CNA course', 'ADMIN_AI'],
-    ['Audit RLS policies and verified claims', 'ADMIN_AI'],
-    ['Interview a business owner and build their website', 'ADMIN_AI'],
-    ['Inspect the failed deployment workflow', 'ADMIN_AI'],
+    ['Build an adaptive CNA course', 'LIZZY'],
+    ['Audit RLS policies and verified claims', 'LIZZY'],
+    ['Interview a business owner and build their website', 'LIZZY'],
+    ['Inspect the failed deployment workflow', 'LIZZY'],
   ])('routes %s to %s', (message, agent) => {
     expect(selectStudioAgent(message)).toBe(agent);
   });

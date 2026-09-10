@@ -33,35 +33,18 @@ function read(relPath: string): string {
 describe('requireRole — missing profile row', () => {
   const src = read('lib/auth/require-role.ts');
 
-  it('redirects to /onboarding/learner when profile is null', () => {
-    expect(src).toContain('/onboarding/learner?reason=profile_missing');
+  it('fails closed when the authenticated user has no governed profile', () => {
+    expect(src).toContain("if (!profile) redirect('/unauthorized')");
   });
 
-  it('does not redirect to /unauthorized when profile is null for non-admin', () => {
-    // The old code had a single `if (!profile || !allowed)` block that always
-    // went to /unauthorized. The fix splits this into two separate checks.
-    // Verify the null-profile branch does NOT unconditionally go to /unauthorized.
-    const nullProfileBlock = src.slice(
-      src.indexOf('Profile row missing'),
-      src.indexOf('Load secondary roles'),
-    );
-    expect(nullProfileBlock).toContain('/onboarding/learner');
-    expect(nullProfileBlock).not.toMatch(/redirect\(['"`]\/unauthorized/);
+  it('does not auto-provision identity or roles inside an authorization guard', () => {
+    expect(src).not.toContain('/onboarding/learner?reason=profile_missing');
+    expect(src).not.toMatch(/from\('profiles'\)\.insert/);
   });
 
-  it('still redirects admin service role to /unauthorized when profile is null', () => {
-    const nullProfileBlock = src.slice(
-      src.indexOf('Profile row missing'),
-      src.indexOf('Load secondary roles'),
-    );
-    expect(nullProfileBlock).toContain("SERVICE_ROLE === 'admin'");
-    expect(nullProfileBlock).toContain('/unauthorized');
-  });
-
-  it('still redirects to /unauthorized when profile exists but role is wrong', () => {
-    // The role-mismatch redirect must still exist after the profile-null split.
-    const afterNullCheck = src.slice(src.indexOf('Load secondary roles'));
-    expect(afterNullCheck).toContain('/unauthorized');
+  it('denies a profile whose effective roles do not satisfy the boundary', () => {
+    expect(src).toContain('hasAnyRole(effectiveRoles, allowedRoles');
+    expect(src).toContain("redirect('/unauthorized')");
   });
 });
 
@@ -97,54 +80,18 @@ describe('enrollment state contract', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Fix 3: access_granted_at auto-set on enrollment completion
-// ---------------------------------------------------------------------------
+describe('canonical enforced enrollment route', () => {
+  const src = read('apps/lms/app/api/enrollments/create-enforced/route.ts');
 
-describe('submit-documents route — auto-grants LMS access', () => {
-  const src = read('app/api/enrollment/submit-documents/route.ts');
-
-  it('sets access_granted_at in the enrollment update', () => {
-    expect(src).toContain('access_granted_at: now');
+  it('requires authenticated intake and funding validation before activation', () => {
+    expect(src).toContain('validateEnrollmentEligibility');
+    expect(src).toContain(".eq('status', 'completed')");
+    expect(src).toContain("status: 'active', payment_status: 'paid'");
   });
 
-  it('sets enrollment_state to active', () => {
-    expect(src).toContain("enrollment_state: 'active'");
-  });
-
-  it('no longer looks for removed documents_complete state', () => {
-    expect(src).not.toContain("'documents_complete'");
-  });
-
-  it('no longer looks for removed confirmed state', () => {
-    expect(src).not.toContain("'confirmed'");
-  });
-
-  it('uses canonical PRE_DOCUMENTS_STATES from enrollment-flow', () => {
-    expect(src).toContain('PRE_DOCUMENTS_STATES');
-    expect(src).not.toContain("'orientation_complete'");
-  });
-});
-
-describe('documents/complete route — auto-grants LMS access', () => {
-  const src = read('app/api/enrollment/documents/complete/route.ts');
-
-  it('sets access_granted_at in the enrollment update', () => {
-    expect(src).toContain('access_granted_at: now');
-  });
-
-  it('sets enrollment_state to active', () => {
-    expect(src).toContain("enrollment_state: 'active'");
-  });
-
-  it('no longer treats documents_complete as an already-submitted state', () => {
-    // Old code: if (enrollment_state === 'documents_complete' || 'active') -> already submitted
-    // Fixed: only 'active' means already submitted
-    const alreadySubmittedBlock = src.slice(
-      src.indexOf('Documents already submitted'),
-      src.indexOf('Documents already submitted') + 200,
-    );
-    expect(alreadySubmittedBlock).not.toContain('documents_complete');
+  it('does not restore the retired document-completion enrollment endpoints', () => {
+    expect(fs.existsSync(path.resolve('app/api/enrollment/submit-documents/route.ts'))).toBe(false);
+    expect(fs.existsSync(path.resolve('app/api/enrollment/documents/complete/route.ts'))).toBe(false);
   });
 });
 

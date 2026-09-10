@@ -8,25 +8,20 @@ import {
 } from '@/lib/programs/funding-registry';
 import { sanitizePublicFundingText } from '@/lib/programs/public-funding-copy';
 
-const EXPECTED = [
-  'business',
-  'cdl-training',
-  'financial-literacy',
-  'hvac-technician',
-];
+const EXPECTED = ['cdl-training'];
 
 describe('public funding registry', () => {
-  it('contains exactly the four confirmed workforce-fundable programs', () => {
+  it('contains only programs backed by current program-level evidence', () => {
     expect(VERIFIED_WORKFORCE_FUNDED_PROGRAMS.map((program) => program.slug).sort()).toEqual(
       EXPECTED,
     );
   });
 
-  it('canonicalizes the legacy business-administration alias and excludes Peer Recovery', () => {
-    expect(getVerifiedProgramFunding('business')?.slug).toBe('business');
-    expect(getVerifiedProgramFunding('business-administration')?.slug).toBe('business');
-    expect(getProgramFundingTier('business')).toBe('workforce-funded');
-    expect(getProgramFundingTier('business-administration')).toBe('workforce-funded');
+  it('does not infer funding for business aliases or Peer Recovery', () => {
+    expect(getVerifiedProgramFunding('business')).toBeNull();
+    expect(getVerifiedProgramFunding('business-administration')).toBeNull();
+    expect(getProgramFundingTier('business')).toBe('self-pay');
+    expect(getProgramFundingTier('business-administration')).toBe('self-pay');
     expect(getProgramFundingTier('peer-recovery-specialist')).toBe('self-pay');
   });
 
@@ -42,12 +37,12 @@ describe('public funding registry', () => {
     }
   });
 
-  it('keeps WRG copy limited to CDL and HVAC', () => {
+  it('keeps WRG copy limited to the evidenced CDL record', () => {
     expect(getStaticProgram('business-administration')?.fundingStatement).not.toMatch(
       /Workforce Ready Grant|WRG/,
     );
     expect(getStaticProgram('cdl-training')?.fundingStatement).toMatch(/Workforce Ready Grant/);
-    expect(getStaticProgram('hvac-technician')?.fundingStatement).toMatch(/Workforce Ready Grant/);
+    expect(getStaticProgram('hvac-technician')?.fundingStatement).not.toMatch(/Workforce Ready Grant|WRG/);
   });
 
   it('removes unsupported public funding guarantees', () => {

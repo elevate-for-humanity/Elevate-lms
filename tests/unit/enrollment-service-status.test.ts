@@ -4,6 +4,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/lib/logger', () => ({
   logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn() },
 }));
+vi.mock('@/lib/enrollment/ensure-digital-binder', () => ({
+  ensureDigitalBinder: vi.fn().mockResolvedValue({ binderId: 'binder-1' }),
+}));
 
 // Shared mock state so tests can control Supabase responses
 let mockExistingRow: { id: string; status: string } | null = null;
@@ -18,7 +21,9 @@ const mockUpsertSelect = vi.fn(() => ({ single: vi.fn(() => Promise.resolve(mock
 const mockUpsert = vi.fn(() => ({ select: mockUpsertSelect }));
 const mockEq = vi.fn(() => ({ eq: mockEq, maybeSingle: mockMaybeSingle, single: mockSingle }));
 const mockSelect = vi.fn(() => ({ eq: mockEq }));
-const mockFrom = vi.fn(() => ({ select: mockSelect, upsert: mockUpsert }));
+const mockUpdateEq = vi.fn(() => ({ eq: mockUpdateEq, then: (resolve: (value: unknown) => unknown) => resolve({ error: null }) }));
+const mockUpdate = vi.fn(() => ({ eq: mockUpdateEq }));
+const mockFrom = vi.fn(() => ({ select: mockSelect, upsert: mockUpsert, update: mockUpdate }));
 
 const mockSupabase = { from: mockFrom } as any;
 
@@ -27,7 +32,7 @@ describe('createOrUpdateEnrollment — status values', () => {
     vi.clearAllMocks();
     mockExistingRow = null;
     mockUpsertResult = { data: { id: 'new-enrollment-id' }, error: null };
-    mockFrom.mockReturnValue({ select: mockSelect, upsert: mockUpsert });
+    mockFrom.mockReturnValue({ select: mockSelect, upsert: mockUpsert, update: mockUpdate });
     mockSelect.mockReturnValue({ eq: mockEq });
     mockEq.mockReturnValue({ eq: mockEq, maybeSingle: mockMaybeSingle, single: mockSingle });
     mockMaybeSingle.mockResolvedValue({ data: mockExistingRow, error: null });
@@ -39,7 +44,7 @@ describe('createOrUpdateEnrollment — status values', () => {
     const { createOrUpdateEnrollment } = await import('@/lib/enrollment-service');
 
     await createOrUpdateEnrollment(mockSupabase, {
-      studentId: 'student-1',
+      userId: 'student-1', programId: 'program-1',
       programSlug: 'hvac-technician',
       fundingSource: 'WIOA',
     });
@@ -52,7 +57,7 @@ describe('createOrUpdateEnrollment — status values', () => {
     const { createOrUpdateEnrollment } = await import('@/lib/enrollment-service');
 
     await createOrUpdateEnrollment(mockSupabase, {
-      studentId: 'student-1',
+      userId: 'student-1', programId: 'program-1',
       programSlug: 'hvac-technician',
       fundingSource: 'self_pay',
       isDeposit: true,
@@ -66,7 +71,7 @@ describe('createOrUpdateEnrollment — status values', () => {
     const { createOrUpdateEnrollment } = await import('@/lib/enrollment-service');
 
     await createOrUpdateEnrollment(mockSupabase, {
-      studentId: 'student-1',
+      userId: 'student-1', programId: 'program-1',
       programSlug: 'hvac-technician',
       fundingSource: 'self_pay',
       amountPaidCents: 50000,
@@ -80,7 +85,7 @@ describe('createOrUpdateEnrollment — status values', () => {
     const { createOrUpdateEnrollment } = await import('@/lib/enrollment-service');
 
     await createOrUpdateEnrollment(mockSupabase, {
-      studentId: 'student-1',
+      userId: 'student-1', programId: 'program-1',
       programSlug: 'hvac-technician',
       fundingSource: 'WIOA',
       amountPaidCents: 0,
@@ -97,7 +102,7 @@ describe('createOrUpdateEnrollment — status values', () => {
     const { createOrUpdateEnrollment } = await import('@/lib/enrollment-service');
 
     const result = await createOrUpdateEnrollment(mockSupabase, {
-      studentId: 'student-1',
+      userId: 'student-1', programId: 'program-1',
       programSlug: 'hvac-technician',
       fundingSource: 'WIOA',
     });
@@ -114,7 +119,7 @@ describe('createOrUpdateEnrollment — status values', () => {
     const { createOrUpdateEnrollment } = await import('@/lib/enrollment-service');
 
     const result = await createOrUpdateEnrollment(mockSupabase, {
-      studentId: 'student-1',
+      userId: 'student-1', programId: 'program-1',
       programSlug: 'hvac-technician',
       fundingSource: 'WIOA',
     });
@@ -130,7 +135,7 @@ describe('createOrUpdateEnrollment — status values', () => {
     const { createOrUpdateEnrollment } = await import('@/lib/enrollment-service');
 
     const result = await createOrUpdateEnrollment(mockSupabase, {
-      studentId: 'student-1',
+      userId: 'student-1', programId: 'program-1',
       programSlug: 'hvac-technician',
       fundingSource: 'WIOA',
     });

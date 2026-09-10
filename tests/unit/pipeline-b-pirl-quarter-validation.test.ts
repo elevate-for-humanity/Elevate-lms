@@ -39,15 +39,15 @@ function fiscalYearFromQuarter(q: string): number {
 // ── Extracted: currentQuarter + quarterOptions from PirlExportPanel ──────────
 
 function currentQuarter(now = new Date()): string {
-  const q = Math.ceil((now.getMonth() + 1) / 3);
-  return `${now.getFullYear()}Q${q}`;
+  const q = Math.ceil((now.getUTCMonth() + 1) / 3);
+  return `${now.getUTCFullYear()}Q${q}`;
 }
 
 function quarterOptions(now = new Date()): string[] {
   const opts: string[] = [];
-  for (let y = now.getFullYear(); y >= now.getFullYear() - 2; y--) {
+  for (let y = now.getUTCFullYear(); y >= now.getUTCFullYear() - 2; y--) {
     for (let q = 4; q >= 1; q--) {
-      if (y === now.getFullYear() && q > Math.ceil((now.getMonth() + 1) / 3)) continue;
+      if (y === now.getUTCFullYear() && q > Math.ceil((now.getUTCMonth() + 1) / 3)) continue;
       opts.push(`${y}Q${q}`);
     }
   }

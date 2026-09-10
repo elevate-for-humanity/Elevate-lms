@@ -124,7 +124,7 @@ function WorkOneChecklist() {
 
       <div className="mt-4 grid gap-3">
         <CheckRow
-          label="I submitted the {PLATFORM_DEFAULTS.orgName} Inquiry Form"
+          label={`I submitted the ${PLATFORM_DEFAULTS.orgName} Inquiry Form`}
           checked={state.inquirySubmitted}
           onChange={(v) => save({ ...state, inquirySubmitted: v })}
         />
@@ -150,7 +150,7 @@ function WorkOneChecklist() {
             />
           </label>
           <CheckRow
-            label="I told WorkOne I'm there for {PLATFORM_DEFAULTS.orgName}"
+            label={`I told WorkOne I'm there for ${PLATFORM_DEFAULTS.orgName}`}
             checked={state.toldAdvisorEFH}
             onChange={(v) => save({ ...state, toldAdvisorEFH: v })}
           />

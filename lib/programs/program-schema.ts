@@ -19,6 +19,7 @@
  */
 
 import { getVerifiedProgramFunding } from './funding-registry';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export interface ProgramCredential {
   name: string;
@@ -418,4 +419,17 @@ export function getTotalHoursFromBreakdown(p: ProgramSchema): number {
     p.hoursBreakdown.examPrep +
     p.hoursBreakdown.careerPlacement
   );
+}
+
+/** Canonical public disclosure for who delivers a program. */
+export function formatDeliveryDisclosure(
+  deliveredBy: ProgramSchema['deliveredBy'],
+  org = PLATFORM_DEFAULTS.orgName,
+): string | null {
+  if (!deliveredBy) return null;
+  if (deliveredBy === 'Elevate') {
+    return `Delivered directly by ${org}.`;
+  }
+  if (deliveredBy === 'Partner') return 'Delivered by an approved training partner.';
+  return `Delivered by ${org} or an approved training partner.`;
 }

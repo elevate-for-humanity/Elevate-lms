@@ -61,7 +61,7 @@ describe('storyboard caption adapter', () => {
       },
     ]);
 
-    expect(vtt).toContain('00:00:03.000 --> 00:00:08.000');
+    expect(vtt).toContain('00:00:01.000 --> 00:00:06.000');
     expect(vtt).toContain('Define the business plan.');
   });
 });

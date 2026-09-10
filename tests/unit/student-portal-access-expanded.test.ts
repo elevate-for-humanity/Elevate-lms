@@ -228,20 +228,19 @@ describe('full student LMS access path contract', () => {
     expect(enrollmentSrc).toMatch(/LMS_ACCESS_STATES.*=.*\['active'\]/);
   });
 
-  it('LMS layout uses hasLmsAccess for access determination', () => {
-    const layoutSrc = read('app/lms/(app)/layout.tsx');
-    expect(layoutSrc).toContain('hasLmsAccess');
+  it('LMS layout delegates access to the canonical learner boundary', () => {
+    const layoutSrc = read('apps/lms/app/lms/(app)/layout.tsx');
+    expect(layoutSrc).toContain('CanonicalLearnerWorkspaceLayout');
+    expect(layoutSrc).not.toContain('autoProvision');
   });
 
   it('hasLmsAccess passes enrolled state without access_granted_at', () => {
     expect(hasLmsAccess(makeEnrollment({ enrollmentState: 'enrolled' }))).toBe(true);
   });
 
-  it('submit-documents sets access_granted_at so hasLmsAccess passes via primary gate', () => {
-    const submitSrc = read('app/api/enrollment/submit-documents/route.ts');
-    expect(submitSrc).toContain('access_granted_at: now');
-    // After this fix, new enrollments will have access_granted_at set,
-    // so the fallback state check is only needed for pre-fix rows.
-    expect(hasLmsAccess(makeEnrollment({ accessGrantedAt: new Date().toISOString() }))).toBe(true);
+  it('enforced enrollment validates eligibility before creating access records', () => {
+    const routeSrc = read('apps/lms/app/api/enrollments/create-enforced/route.ts');
+    expect(routeSrc).toContain('validateEnrollmentEligibility');
+    expect(routeSrc).toContain(".eq('status', 'completed')");
   });
 });

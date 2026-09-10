@@ -46,6 +46,7 @@ import {
 import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
 import { ICC_URL, ICC_INSTRUCTION } from '@/lib/page-design-tokens';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { formatDeliveryDisclosure } from '@/lib/programs/program-schema';
 import {
   sanitizePublicFundingList,
   sanitizePublicFundingText,
@@ -331,13 +332,9 @@ export default function ProgramDetailPage({
                 </div>
 
                 {/* Delivery disclosure */}
-                {p.deliveredBy && (
+                {formatDeliveryDisclosure(p.deliveredBy) && (
                   <p className="mt-4 text-xs text-slate-500">
-                    {p.deliveredBy === 'Elevate'
-                      ? `Delivered directly by ${PLATFORM_DEFAULTS.orgName}.`
-                      : p.deliveredBy === 'Partner'
-                        ? 'Delivered by an approved training partner.'
-                        : `Delivered by ${PLATFORM_DEFAULTS.orgName} or an approved training partner.`}
+                    {formatDeliveryDisclosure(p.deliveredBy)}
                   </p>
                 )}
               </div>

@@ -6,8 +6,9 @@ import {
 } from '@/lib/portal/apprentice-access';
 
 describe('apprentice portal access', () => {
-  it('treats barber portal as apprenticeship field portal', () => {
-    expect(isApprenticeFieldPortalPath('/portal/barber')).toBe(true);
+  it('treats the canonical apprentice runtime as the field portal', () => {
+    expect(isApprenticeFieldPortalPath('/apprentice')).toBe(true);
+    expect(isApprenticeFieldPortalPath('/portal/barber')).toBe(false);
     expect(isApprenticeFieldPortalPath('/portal/healthcare')).toBe(false);
   });
 

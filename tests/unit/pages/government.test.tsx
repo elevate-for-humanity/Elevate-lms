@@ -13,14 +13,14 @@ describe('GovernmentPage', () => {
   describe('page configuration', () => {
     it('should have correct page metadata structure', async () => {
       // Import the page module to check exports
-      const pageModule = await import('@/app/government/page');
+      const pageModule = await import('@/apps/marketing/app/government/page');
 
       // Check that the page exports a default function
       expect(typeof pageModule.default).toBe('function');
     });
 
     it('should export metadata', async () => {
-      const pageModule = await import('@/app/government/page');
+      const pageModule = await import('@/apps/marketing/app/government/page');
 
       // Check metadata exists
       expect(pageModule.metadata).toBeDefined();

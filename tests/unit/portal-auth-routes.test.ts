@@ -55,10 +55,11 @@ describe('deployed portal middleware auth coverage', () => {
     expect(lms).not.toContain('hasSupabaseSession || protectedPath');
   });
 
-  it('renders the marketing homepage before loading the optional database hero', () => {
+  it('renders the marketing homepage from the governed static hero contract', () => {
     expect(marketingHome).not.toContain('getApprovedHomeHeroAsset');
     expect(marketingHome).toContain('<HomeHeroVideo banner={heroBanners.home} />');
-    expect(homeHero).toContain("fetch('/api/public/home-hero'");
+    expect(homeHero).toContain('HOME_SLIDES');
+    expect(homeHero).not.toContain("fetch('/api/public/home-hero'");
   });
 
   it('validates the Supabase user before protected Marketing portal rendering', () => {

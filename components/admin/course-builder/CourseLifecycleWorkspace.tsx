@@ -256,7 +256,7 @@ export default function CourseLifecycleWorkspace() {
             <section className="grid gap-4 lg:grid-cols-2">
               <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
                 <div className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-cyan-400" /><h2 className="text-lg font-bold">Review state</h2></div>
-                <div className="mt-4 grid grid-cols-3 gap-3"><Metric label="Status" value={course.status ?? 'draft'} /><Metric label="Review" value={course.review_status ?? 'draft'} /><Metric label="Version" value={course.version ?? '—'} /></div>
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3"><Metric label="Status" value={course.status ?? 'draft'} /><Metric label="Review" value={course.review_status ?? 'draft'} /><Metric label="Version" value={course.version ?? '—'} /></div>
                 <div className="mt-5 flex flex-wrap gap-2">
                   <ActionButton label="Submit for review" icon={<Send className="h-4 w-4" />} busy={busy === 'submit'} disabled={!!busy} onClick={() => review('submit')} />
                   <ActionButton label="Approve" icon={<CheckCircle2 className="h-4 w-4" />} busy={busy === 'approve'} disabled={!!busy} onClick={() => review('approve')} />

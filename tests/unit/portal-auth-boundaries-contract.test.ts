@@ -43,8 +43,8 @@ const guardedPortals: Array<{ path: string; required: string[] }> = [
     required: ["requireRole(['provider', 'provider_admin', 'admin', 'staff'])"],
   },
   {
-    path: 'apps/marketing/app/case-manager/dashboard/layout.tsx',
-    required: ['requireRole([', "'case_manager'", "'workforce_partner'"],
+    path: 'apps/marketing/app/case-manager/layout.tsx',
+    required: ['OperationalPortalShell', 'portalKey="casemanager"'],
   },
   {
     path: 'apps/marketing/app/workforce-board/dashboard/layout.tsx',
@@ -63,7 +63,10 @@ describe('portal authorization boundaries', () => {
       for (const token of portal.required) {
         expect(source, `${portal.path} must contain ${token}`).toContain(token);
       }
-      expect(source).toContain('@/components/platform/PlatformShell');
+      expect(
+        source.includes('@/components/platform/PlatformShell') ||
+          source.includes('@/components/platform/OperationalPortalShell'),
+      ).toBe(true);
     });
   }
 

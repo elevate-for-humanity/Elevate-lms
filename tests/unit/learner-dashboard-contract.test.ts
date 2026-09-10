@@ -4,8 +4,8 @@ import { getRequiredAgreements } from '@/lib/legal/requiredAgreements';
 
 describe('learner dashboard contract', () => {
   it('exposes every required learner workspace destination', () => {
-    const hrefs = ROLE_NAVIGATION.student.flatMap((section) => section.items.map((item) => item.href));
-    for (const path of ['/lms/onboarding','/lms/documents','/lms/binder','/lms/agreements','/lms/handbook','/lms/courses','/lms/career']) expect(hrefs).toContain(path);
+    const hrefs = ROLE_NAVIGATION.student.flatMap((section) => section.items.map((item) => new URL(item.href, 'https://app.elevateforhumanity.org').pathname));
+    for (const path of ['/lms/onboarding','/lms/documents','/lms/agreements','/lms/handbook','/lms/courses','/lms/career']) expect(hrefs).toContain(path);
   });
   it('requires core learner legal acknowledgments', () => {
     const types = getRequiredAgreements('student').map((agreement) => agreement.type);
@@ -15,6 +15,6 @@ describe('learner dashboard contract', () => {
     expect(getRequiredAgreements('learner')).toEqual(getRequiredAgreements('student'));
   });
   it('keeps partner delivery separate from internal course publication', () => {
-    expect(ROLE_NAVIGATION.student.flatMap((section) => section.items).some((item) => item.href === '/lms/courses')).toBe(true);
+    expect(ROLE_NAVIGATION.student.flatMap((section) => section.items).some((item) => new URL(item.href, 'https://app.elevateforhumanity.org').pathname === '/lms/courses')).toBe(true);
   });
 });

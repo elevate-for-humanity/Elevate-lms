@@ -49,9 +49,10 @@ describe('Admin UI route consolidation', () => {
     );
     expect(existsSync(path.join(root, 'apps/admin/app/admin/course-builder/CourseBuilderClient.tsx'))).toBe(false);
     expect(canonical).toContain('/api/admin/courses/${course.id}/clone');
-    expect(canonical).toContain('/api/admin/lms/courses/${course.id}/publish');
+    expect(canonical).toContain("? '/api/admin/course-builder'");
+    expect(canonical).toContain("action: 'publish-persisted', courseId: course.id");
     expect(canonical).toContain("method: action === 'delete' ? 'DELETE'");
-    expect(canonical).toContain("JSON.stringify({ status: 'draft' })");
+    expect(canonical).toContain("JSON.stringify({ status: 'draft', is_published: false })");
     expect(canonical).toContain('runCourseFactoryPipeline');
     expect(canonical).toContain('CourseInstructorMediaPanel');
   });

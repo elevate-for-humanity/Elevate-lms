@@ -48,6 +48,6 @@ describe('Upcoming Calendar', () => {
   it('exists for dashboard summaries', () => {
     expect(fs.existsSync(upcomingPath)).toBe(true);
     const src = fs.readFileSync(upcomingPath, 'utf-8');
-    expect(src).toContain('export default');
+    expect(src).toContain('export function UpcomingCalendar');
   });
 });

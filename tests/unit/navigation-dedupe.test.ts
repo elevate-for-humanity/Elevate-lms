@@ -12,23 +12,20 @@ describe('NAV_ITEMS structure', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('reports duplicate leaf hrefs for developer awareness', () => {
-    const dupes = findDuplicateNavHrefs();
-    // Known issue: program links appear in both Programs and Apprenticeships sections
-    // This is by design - program pages can be accessed from multiple nav sections
-    expect(Array.isArray(dupes)).toBe(true);
-    // Document duplicates for review
+  it('has no duplicate leaf hrefs across top-level sections', () => {
+    const dupes = findDuplicateNavHrefs(NAV_ITEMS);
     if (dupes.length > 0) {
-      console.log('Duplicate nav hrefs (expected):', dupes);
+      console.log('Duplicate nav hrefs:', dupes);
     }
+    expect(dupes).toEqual([]);
   });
 
   it('groups program subItems into category columns', () => {
     const programs = NAV_ITEMS.find((i) => i.id === 'programs');
     expect(programs?.subItems?.length).toBeGreaterThan(5);
-    const columns = groupNavSubItemsByHeader(programs!.subItems!);
+    const columns = Object.values(groupNavSubItemsByHeader(programs!.subItems!));
     expect(columns.length).toBeGreaterThan(3);
-    expect(getNavCategoryLabel(columns[0])).toMatch(/Healthcare/i);
+    expect(columns.map(getNavCategoryLabel)).toContain('Healthcare');
   });
 
   it('includes core main menu sections', () => {
@@ -36,18 +33,15 @@ describe('NAV_ITEMS structure', () => {
     expect(names).toContain('Programs');
     expect(names).toContain('Apprenticeships');
     expect(names).toContain('Funding');
-    expect(names).toContain('Partners');
-    expect(names).toContain('Apply');
-    expect(names).toContain('Support');
+    expect(names).toContain('Employers');
+    expect(names).toContain('Resources');
+    expect(names).toContain('Portals');
     expect(names).toContain('About');
   });
 
-  it('includes support hub and student support in Support dropdown', () => {
-    const support = NAV_ITEMS.find((i) => i.id === 'support');
-    expect(support?.href).toBe('/support');
-    const hrefs = (support?.subItems ?? []).filter((s) => !s.isHeader).map((s) => s.href);
-    expect(hrefs).toContain('/support/chat');
-    expect(hrefs).toContain('/student-support');
+  it('includes support resources in the Resources dropdown', () => {
+    const resources = NAV_ITEMS.find((i) => i.id === 'resources');
+    const hrefs = (resources?.subItems ?? []).filter((s) => !s.isHeader).map((s) => s.href);
     expect(hrefs).toContain('/faq');
   });
 });

@@ -91,6 +91,35 @@ export function planAIToolFromCommand(
   const contextId = typeof context.id === 'string' ? context.id : null;
   const id = contextId ?? extractUuid(command);
 
+  // Route the primary requested capability before incidental domain words in long prompts.
+  if (isOpenHandsStatusCommand(lower)) {
+    return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
+  }
+  // Explicit browser work owns the whole request even when the prompt also
+  // mentions repository changes. The isolated browser runtime can inspect the
+  // live surface and hand grounded findings to engineering; OpenHands cannot
+  // safely substitute source inspection for a requested live verification.
+  if (isLiveBrowserWork(lower)) {
+    return {
+      name: 'browser.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
+  // Read-only workflow inspection must never enter a mutation-capable coding
+  // runtime. Route it to the registered inspector before generic engineering.
+  if (
+    /\b(workflow|pipeline|job)\b/.test(lower) &&
+    /\b(inspect|check|status|progress|current step|failures?)\b/.test(lower) &&
+    /\b(read[- ]?only|do not (?:deploy|restart|cancel|modify|create))\b/.test(lower)
+  ) {
+    return { name: 'workflows.inspect', input: {} };
+  }
+  if (isEngineeringCommand(lower)) {
+    return {
+      name: 'openhands.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
   if (/\bquickbooks\b/.test(lower)) {
     if (/\b(sync|import|refresh)\b/.test(lower) && /\b(payroll|employees?)\b/.test(lower)) {
       return {

@@ -65,6 +65,15 @@ export function isTestOrSuspiciousPayment(fields: {
   return false;
 }
 
+/** Central demo-record guard used before operational dashboard aggregation. */
+export function isLikelyTestOrDemoRecord(name?: string | null, email?: string | null): boolean {
+  const normalizedName = (name ?? '').trim().toLowerCase();
+  const normalizedEmail = (email ?? (name?.includes('@') ? name : '') ?? '').trim().toLowerCase();
+  if (['marcus johnson', 'sarah chen'].includes(normalizedName)) return true;
+  if (/\b(sample|test|demo|placeholder)\b/.test(normalizedName)) return true;
+  return /@(example\.com|test\.elevate\.edu)$/.test(normalizedEmail);
+}
+
 export function capCheckoutDollarsToCents(dollars: unknown): number {
   const d = Number(dollars ?? 0);
   if (!Number.isFinite(d) || d <= 0) return 0;

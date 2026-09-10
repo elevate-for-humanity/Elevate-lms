@@ -8,7 +8,6 @@ export const PUBLIC_REVALIDATE_PATHS = [
   '/programs',
   '/programs/catalog',
   '/programs/healthcare',
-  '/programs/skilled-trades',
   '/programs/technology',
   '/education',
   '/career-training',

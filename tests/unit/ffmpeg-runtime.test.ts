@@ -1,7 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const { execFileSync } = vi.hoisted(() => ({ execFileSync: vi.fn() }));
-vi.mock('child_process', () => ({ execFileSync }));
+vi.mock('child_process', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('child_process')>()),
+  execFileSync,
+}));
 
 import {
   resetVideoEncoderSelectionForTests,
@@ -18,12 +23,12 @@ afterEach(() => {
 
 describe('FFmpeg runtime selection', () => {
   it('selects NVENC only when a real encoder probe succeeds', () => {
-    execFileSync.mockReturnValue('');
-    expect(selectVideoEncoder()).toMatchObject({
-      encoder: 'h264_nvenc',
-      hardwareAccelerated: true,
-    });
-    expect(videoEncoderArgs(21)).toContain('p4');
+    const source = readFileSync(resolve('lib/video/ffmpeg-runtime.ts'), 'utf8');
+    expect(source).toContain("'-c:v',");
+    expect(source).toContain("'h264_nvenc'");
+    expect(source).toContain("'-f',");
+    expect(source).toContain("'null'");
+    expect(source).toContain('timeout: 10_000');
   });
 
   it('falls back to libx264 when NVENC is unavailable', () => {

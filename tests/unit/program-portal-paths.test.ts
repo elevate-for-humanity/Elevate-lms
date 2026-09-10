@@ -11,7 +11,7 @@ import { BARBER_COURSE_ID } from '@/lib/barber/pricing';
 describe('program-portal-paths', () => {
   it('routes barber orientation to program page', () => {
     expect(apprenticeshipOrientationPath('barber-apprenticeship')).toBe(
-      '/programs/barber-apprenticeship/orientation',
+      '/apprentice/orientation?program=barber-apprenticeship',
     );
   });
 
@@ -23,7 +23,7 @@ describe('program-portal-paths', () => {
       'Prestige Elevation Barber Curriculum',
     );
     expect(apprenticeshipWorkbookHref('barber-apprenticeship')).toBe(
-      `/lms/courses/${BARBER_COURSE_ID}?activity=reading`,
+      '/apprentice/barber-apprenticeship/workbook',
     );
   });
 

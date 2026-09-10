@@ -50,7 +50,7 @@ export function EnrollmentFunnel({ data }: Props) {
       </div>
 
       {/* Funnel steps */}
-      <div className="p-4 grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 gap-2 p-4 sm:grid-cols-4">
         {steps.map((step, i) => (
           <Link key={step.label} href={step.href} className={`flex flex-col items-center p-3 rounded-lg border ${step.bg} hover:opacity-80 transition-opacity`}>
             <span className={`text-2xl font-bold ${step.color}`}>{step.value.toLocaleString()}</span>

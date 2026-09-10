@@ -71,7 +71,7 @@ export default function StudioIntelligencePanel({
           {error}
         </p>
       ) : null}
-      <div className="mt-5 grid grid-cols-3 gap-3">
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
         {[
           ['At-risk learners', snapshot?.counts.atRisk ?? 0],
           ['Failed AI tasks', snapshot?.counts.failedTasks ?? 0],

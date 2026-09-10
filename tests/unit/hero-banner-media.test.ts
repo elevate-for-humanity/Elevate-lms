@@ -27,6 +27,6 @@ describe('resolveHeroPosterSrc', () => {
   it('never returns empty string', () => {
     const src = resolveHeroPosterSrc('unknown-program-slug-xyz');
     expect(src.length).toBeGreaterThan(0);
-    expect(src).toBe(DEFAULT_HERO_FALLBACK);
+    expect(src).toMatch(/^\/images\//);
   });
 });

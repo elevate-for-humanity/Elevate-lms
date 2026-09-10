@@ -163,7 +163,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     const navigation = source('apps/admin/app/studio/StudioNavigation.client.tsx');
 
     expect(navigation).toContain("usePathname");
-    expect(navigation).toContain("if (pathname === '/studio') return null");
+    expect(navigation).toContain("pathname === '/studio' || searchParams.get('embedded') === '1'");
   });
 
   it('greets Store visitors with the PARIS product interview', () => {

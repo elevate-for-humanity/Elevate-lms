@@ -39,9 +39,7 @@ export default function BuildsClient() {
 
   async function triggerBuild(service: string) {
     if (!northflankConfigured) return;
-    // The Deploy button is the deliberate UI action. The server still enforces
-    // the governed typed deployment confirmation included below, so no blocking
-    // native dialog is needed (native dialogs deadlock browser automation).
+    if (!window.confirm(`Deploy ${service} to production?`)) return;
     setTriggering(true);
     try {
       const response = await fetch('/api/admin/dev-studio/builds', {

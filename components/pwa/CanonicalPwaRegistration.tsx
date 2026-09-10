@@ -42,17 +42,18 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     if (process.env.NODE_ENV !== 'production' || !('serviceWorker' in navigator)) return;
     const config = PWA_APPLICATIONS[application];
     let cancelled = false;
-    const announceCurrentBuild = () => {
-      if (cancelled) return;
+    let reloadingForControllerChange = false;
 
-      // Never reload automatically when a worker takes control. A controller
-      // change can happen during login, upload, signing, or a long form and a
-      // forced navigation would discard that work. The shell can offer a safe,
-      // user-controlled refresh after the current action completes.
-      window.dispatchEvent(new CustomEvent('elevate-pwa-controller-ready'));
+    const activateCurrentBuild = () => {
+      if (cancelled || reloadingForControllerChange) return;
+      reloadingForControllerChange = true;
+      window.location.reload();
     };
 
-    navigator.serviceWorker.addEventListener('controllerchange', announceCurrentBuild);
+    // Installed Android PWAs can keep the previous JavaScript bundle alive
+    // after a successful production rollout. Reload exactly once when the new
+    // worker takes control so the visible app and deployed server cannot drift.
+    navigator.serviceWorker.addEventListener('controllerchange', activateCurrentBuild);
 
     const register = async () => {
       try {
@@ -104,7 +105,7 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     void register();
     return () => {
       cancelled = true;
-      navigator.serviceWorker.removeEventListener('controllerchange', announceCurrentBuild);
+      navigator.serviceWorker.removeEventListener('controllerchange', activateCurrentBuild);
     };
   }, [application]);
 

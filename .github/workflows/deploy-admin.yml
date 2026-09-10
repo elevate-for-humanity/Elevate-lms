@@ -49,10 +49,11 @@ permissions:
 
 concurrency:
   group: northflank-admin-deploy
-  # A newer Admin commit supersedes an older build so urgent production fixes
-  # do not remain blocked behind stale releases. Northflank deployment scripts
-  # still verify the exact build SHA before promoting it to production.
-  cancel-in-progress: true
+  # Northflank images take several minutes to build. Cancelling an active run
+  # on every shared-library commit can leave production pinned to an old image
+  # indefinitely when commits arrive faster than builds complete. Finish the
+  # active deployment; GitHub will retain only the newest pending run.
+  cancel-in-progress: false
 
 jobs:
   deploy-admin:

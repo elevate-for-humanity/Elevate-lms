@@ -1,23 +1,19 @@
-import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Building2, GraduationCap, UsersRound } from 'lucide-react';
 
 const AUDIENCES = [
   {
-    image: '/images/pages/about-career-training.webp',
-    alt: 'Learners completing practical career training',
+    icon: GraduationCap,
     title: 'For learners',
     body: 'Explore a career path, apply, complete training, track progress, and prepare for recognized credentials.',
   },
   {
-    image: '/images/pages/about-employer-partners.webp',
-    alt: 'Employer partners supporting workplace learning',
+    icon: Building2,
     title: 'For employers and Host Shops',
     body: 'Connect with apprentices, manage workplace training, complete required documents, and verify progress.',
   },
   {
-    image: '/images/pages/about-career-pathways.webp',
-    alt: 'Workforce partners coordinating career pathways',
+    icon: UsersRound,
     title: 'For workforce partners',
     body: 'Coordinate referrals, eligibility, training records, outcomes, and participant support in one place.',
   },
@@ -33,21 +29,18 @@ export function HomeAboutElevate() {
             A workforce and education hub built to connect the whole journey.
           </h2>
           <p className="mt-4 text-base leading-7 text-slate-700 sm:mt-5 sm:text-lg sm:leading-8">
-            Elevate for Humanity connects people to practical education, registered apprenticeship
-            pathways, possible funding resources, industry credentials, supportive employers, and
-            the technology used to manage each step.
+            Elevate for Humanity is a career-training and workforce-development organization. We
+            connect people to practical education, registered apprenticeship pathways, possible
+            funding resources, industry credentials, supportive employers, and the technology used
+            to manage each step.
           </p>
         </div>
-        <div className="mt-7 grid gap-4 sm:mt-10 md:grid-cols-3">
-          {AUDIENCES.map(({ image, alt, title, body }) => (
-            <article key={title} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="relative aspect-[16/10] bg-slate-100">
-                <Image src={image} alt={alt} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
-              </div>
-              <div className="p-5 sm:p-6">
-                <h3 className="text-lg font-black text-slate-950 sm:text-xl">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-700 sm:text-base sm:leading-7">{body}</p>
-              </div>
+        <div className="mt-7 grid gap-3 sm:mt-10 sm:gap-5 md:grid-cols-3">
+          {AUDIENCES.map(({ icon: Icon, title, body }) => (
+            <article key={title} className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-6">
+              <Icon className="h-7 w-7 text-brand-blue-700 sm:h-8 sm:w-8" aria-hidden="true" />
+              <h3 className="mt-3 text-lg font-black text-slate-950 sm:mt-4 sm:text-xl">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-700 sm:mt-3 sm:text-base sm:leading-7">{body}</p>
             </article>
           ))}
         </div>

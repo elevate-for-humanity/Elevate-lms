@@ -13,21 +13,19 @@ export function AdminApplicationChrome({
 }) {
   const pathname = usePathname();
   const studioOwnsViewport = pathname === '/studio' || pathname.startsWith('/studio/');
-  const authOwnsViewport = pathname === '/login' || pathname.startsWith('/login/');
-  const pageOwnsViewport = studioOwnsViewport || authOwnsViewport;
 
   return (
     <div
       className={
-        pageOwnsViewport
-          ? `h-dvh min-w-0 overflow-${studioOwnsViewport ? 'hidden bg-slate-950' : 'auto bg-slate-950'}`
+        studioOwnsViewport
+          ? 'h-dvh min-w-0 overflow-hidden bg-slate-950'
           : 'min-h-dvh min-w-0 overflow-x-clip bg-slate-50'
       }
     >
-      {!pageOwnsViewport ? <AdminNavShell navSections={navSections} /> : null}
-      <div className={studioOwnsViewport ? 'h-full min-w-0 overflow-hidden' : 'min-w-0 overflow-x-clip'}>
+      {!studioOwnsViewport ? <AdminNavShell navSections={navSections} /> : null}
+      <main className={studioOwnsViewport ? 'h-full min-w-0 overflow-hidden' : 'min-w-0 overflow-x-clip'}>
         {children}
-      </div>
+      </main>
     </div>
   );
 }

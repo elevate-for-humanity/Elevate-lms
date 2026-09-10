@@ -75,14 +75,6 @@ const adminConfig = {
   async headers() {
     return [
       {
-        source: '/studio/:path*',
-        headers: [
-          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-          { key: 'Cross-Origin-Embedder-Policy', value: 'credentialless' },
-          { key: 'Origin-Agent-Cluster', value: '?1' },
-        ],
-      },
-      {
         source: '/sw-admin.js',
         headers: [
           { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' },

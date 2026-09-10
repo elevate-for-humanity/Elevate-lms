@@ -10,7 +10,6 @@
  *
  * Each app can style it differently via className — the logic is shared.
  */
-import { useState } from 'react';
 import { usePwaInstall } from '@/hooks/usePwaInstall';
 
 interface PwaInstallButtonProps {
@@ -33,11 +32,8 @@ export function PwaInstallButton({
   showOnlyInstallable = false,
 }: PwaInstallButtonProps) {
   const { canInstall, isInstalled, promptInstall, platform } = usePwaInstall();
-  const [showHelp, setShowHelp] = useState(false);
 
-  if (platform === 'ios') {
-    return <p className="text-sm font-semibold text-slate-700">On iPhone or iPad, open this page in Safari, tap Share, then tap Add to Home Screen.</p>;
-  }
+  if (platform === 'ios') return null;
   if (showOnlyInstallable && !canInstall && !isInstalled) return null;
 
   if (isInstalled) {
@@ -56,22 +52,16 @@ export function PwaInstallButton({
   }
 
   return (
-    <div>
-      <button
-        type="button"
-        onClick={() => canInstall ? void promptInstall() : setShowHelp((value) => !value)}
-        className={className}
-        aria-label={label}
-        aria-expanded={!canInstall ? showHelp : undefined}
-        title={canInstall ? label : 'Show app installation steps'}
-      >
-        {canInstall ? label : 'How to Install Elevate'}
-      </button>
-      {!canInstall && showHelp ? (
-        <div role="status" className="mt-3 max-w-xl rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm font-semibold leading-6 text-blue-950">
-          On Android, open the browser menu (three dots) and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>. If Elevate is already installed, open it from your home screen. If neither option appears, refresh this page in Chrome.
-        </div>
-      ) : null}
-    </div>
+    <button
+      type="button"
+      onClick={() => void promptInstall()}
+      disabled={!canInstall}
+      className={`${className} ${!canInstall ? 'opacity-60 cursor-not-allowed' : ''}`.trim()}
+      aria-label={label}
+      aria-disabled={!canInstall}
+      title={canInstall ? label : 'Install becomes available when this browser confirms the app is installable.'}
+    >
+      {label}
+    </button>
   );
 }

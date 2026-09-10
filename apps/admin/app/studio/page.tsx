@@ -1,10 +1,7 @@
 // Admin-owned AI operating surface. Studio capabilities run through one stateful, conversation-first tool orchestrator.
 import StudioCommandWorkspace from '@/components/studio/StudioCommandWorkspace';
 import { requireRole } from '@/lib/auth/require-role';
-import {
-  getAvailableWorkspaces,
-  type StudioWorkspaceId,
-} from '@/lib/devstudio/workspace-registry';
+import { getAvailableWorkspaces } from '@/lib/devstudio/workspace-registry';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -16,14 +13,12 @@ export default async function StudioPage({
 }) {
   await requireRole(['super_admin', 'admin']);
   const requestedWorkspace = (await searchParams).workspace;
-  const availableWorkspaces = getAvailableWorkspaces();
-  const initialWorkspace = availableWorkspaces.some(
-    (workspace) => workspace.id === requestedWorkspace,
-  )
-    ? (requestedWorkspace as StudioWorkspaceId)
-    : undefined;
+  const initialWorkspace =
+    requestedWorkspace === 'workflows' || requestedWorkspace === 'intelligence'
+      ? requestedWorkspace
+      : undefined;
 
-  const workspaces = availableWorkspaces.map(
+  const workspaces = getAvailableWorkspaces().map(
     ({ id, label, description, route, healthEndpoint }) => ({
       id,
       label,

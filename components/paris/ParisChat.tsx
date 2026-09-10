@@ -353,7 +353,6 @@ export default function ParisChat({
           >
             {autoSpeak ? <Volume2 className="h-5 w-5" aria-hidden="true" /> : <VolumeX className="h-5 w-5" aria-hidden="true" />}
           </button>
-          {/* Explicit zero basis overrides the platform mobile form rule and keeps the composer inside its voice/send controls. */}
           <textarea
             id="paris-chat-input"
             ref={inputRef}
@@ -362,7 +361,6 @@ export default function ParisChat({
             onKeyDown={handleKeyDown}
             placeholder={learnerSurface ? 'Ask about your course or next lesson…' : storeSurface ? 'Tell PARIS about your business or ask a platform question…' : 'Ask about a program, funding, testing, or apprenticeship…'}
             className="min-h-11 max-h-28 min-w-0 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-3 py-2.5 text-base text-slate-950 focus:border-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-200 sm:min-h-[52px] sm:max-h-40 sm:px-4 sm:py-3 sm:text-sm"
-            style={{ width: 0, minWidth: 0, maxWidth: '100%', flex: '1 1 0%' }}
             rows={1}
             disabled={isLoading}
             maxLength={2000}

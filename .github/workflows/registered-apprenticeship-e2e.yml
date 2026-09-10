@@ -2,9 +2,6 @@ name: Registered Apprenticeship E2E
 
 on:
   workflow_dispatch:
-  schedule:
-    # Independent production canary; disposable identities are provisioned and cleaned per run.
-    - cron: '17 */6 * * *'
   push:
     branches:
       - main

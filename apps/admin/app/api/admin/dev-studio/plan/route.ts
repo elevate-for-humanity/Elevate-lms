@@ -53,36 +53,24 @@ async function persistPlan(
   tenantId?: string,
 ) {
   const content = JSON.stringify(plan);
-  const payload = {
-    scope: 'plan',
-    category: 'plan_checkpoint',
-    key: `plan:${plan.id}`,
-    content,
-    value: content,
-    metadata: {
-      plan_id: plan.id,
-      goal: plan.goal,
-      status: plan.status,
-      updated_by: actorId,
+  await db.from('ai_memory').upsert(
+    {
+      scope: 'plan',
+      key: `plan:${plan.id}`,
+      content,
+      value: content,
+      metadata: {
+        plan_id: plan.id,
+        goal: plan.goal,
+        status: plan.status,
+        updated_by: actorId,
+      },
+      tenant_id: tenantId ?? null,
+      user_id: actorId,
+      updated_at: new Date().toISOString(),
     },
-    tenant_id: tenantId ?? null,
-    user_id: actorId,
-    updated_at: new Date().toISOString(),
-  };
-
-  const { data: existing, error: lookupError } = await db
-    .from('ai_memory')
-    .select('id')
-    .eq('scope', 'plan')
-    .eq('key', payload.key)
-    .is('agent_id', null)
-    .maybeSingle();
-  if (lookupError) throw new Error(`Could not locate plan checkpoint: ${lookupError.message}`);
-
-  const write = existing?.id
-    ? await db.from('ai_memory').update(payload).eq('id', existing.id)
-    : await db.from('ai_memory').insert(payload);
-  if (write.error) throw new Error(`Could not persist plan checkpoint: ${write.error.message}`);
+    { onConflict: 'scope,key,agent_id' },
+  );
 }
 
 async function loadPlan(
@@ -171,9 +159,6 @@ export async function POST(req: NextRequest) {
 
       try {
         let plan = resumePlanId ? await loadPlan(db, resumePlanId, auth.id) : null;
-        if (resumePlanId && !plan) {
-          throw new Error(`Plan checkpoint ${resumePlanId} was not found; refusing to create an unrelated replacement plan.`);
-        }
         if (!plan) {
           plan = decomposePlan(goal, params);
           const shared = await loadSharedContext({ goal, tenantId, userId: auth.id }).catch(

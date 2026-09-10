@@ -49,16 +49,6 @@ export async function getGitHubToken(): Promise<string | null> {
   return null;
 }
 
-export async function getGitHubReadHeaders(): Promise<HeadersInit> {
-  const token = await getGitHubToken();
-  return {
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    Accept: 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'Content-Type': 'application/json',
-  };
-}
-
 export async function getGitHubHeaders(): Promise<HeadersInit> {
   const token = await getGitHubToken();
   if (!token) {

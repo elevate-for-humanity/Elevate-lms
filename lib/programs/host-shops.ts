@@ -54,7 +54,6 @@ const PROGRAM_ALIASES: Record<string, string> = {
   nail: PROGRAM_SLUGS.nail,
   nails: PROGRAM_SLUGS.nail,
   'nail-technician': PROGRAM_SLUGS.nail,
-  nail_technician: PROGRAM_SLUGS.nail,
   ...Object.fromEntries(Object.values(PROGRAM_SLUGS).map((slug) => [slug, slug])),
 };
 
@@ -146,15 +145,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     return [];
   }
 
-  const [{ data: canonicalRows }, { data: barberRows }, { data: hostRows }, { data: publicRows }] = await Promise.all([
-    db
-      .from('partners')
-      .select('id, name, dba, shop_name, address_line1, address_line2, city, state, zip, phone, contact_email, supervisor_name, programs, program_type, public_slug, description, website_url, google_maps_url, logo_url, flyer_url, video_url, media_gallery')
-      .eq('approval_status', 'approved')
-      .eq('status', 'active')
-      .eq('is_active', true)
-      .not('public_slug', 'is', null)
-      .order('name'),
+  const [{ data: barberRows }, { data: hostRows }, { data: publicRows }] = await Promise.all([
     db
       .from('barbershop_partner_applications')
       .select('id, shop_legal_name, shop_dba_name, shop_address_line1, shop_city, shop_state, shop_zip, contact_phone, contact_email, supervisor_name')
@@ -170,38 +161,6 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .from('public_host_shops')
       .select('public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, city, state, zip, media_gallery, video_url, source_url'),
   ]);
-
-  const canonicalShops: HostShop[] = (canonicalRows ?? []).map((shop) => {
-    const rawPrograms: unknown[] = Array.isArray(shop.programs)
-      ? shop.programs
-      : shop.program_type
-        ? [shop.program_type]
-        : [];
-    const programs = rawPrograms
-      .map(normalizeProgram)
-      .filter((value): value is string => typeof value === 'string');
-    return {
-      id: shop.id,
-      name: shop.dba || shop.shop_name || shop.name,
-      address: [shop.address_line1, shop.address_line2].filter(Boolean).join(', '),
-      city: shop.city ?? '',
-      state: shop.state ?? 'IN',
-      zip: shop.zip ?? '',
-      phone: shop.phone ?? '',
-      email: shop.contact_email ?? '',
-      supervisor: shop.supervisor_name ?? '',
-      programs: programs.length ? [...new Set(programs)] : [PROGRAM_SLUGS.cosmetology],
-      badge: 'partner',
-      publicSlug: shop.public_slug ?? undefined,
-      description: shop.description ?? undefined,
-      website: shop.website_url ?? undefined,
-      googleMapsUrl: shop.google_maps_url ?? undefined,
-      logoUrl: shop.logo_url ?? undefined,
-      flyerUrl: shop.flyer_url ?? undefined,
-      videoUrl: shop.video_url ?? undefined,
-      mediaGallery: parseMedia(shop.media_gallery),
-    };
-  });
 
   const barberShops: HostShop[] = (barberRows ?? []).map((shop) => ({
     id: shop.id,
@@ -239,18 +198,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     if (match) barberShop.programs = [...new Set([...barberShop.programs, ...match.programs])];
   });
 
-  const legacyShops = [...barberShops, ...hostShops.filter((shop) => !barberNameMap.has(businessKey(shop.name)))];
-  const canonicalKeys = new Set(canonicalShops.map((shop) => businessKey(shop.name)));
-  const canonicalEmails = new Set(canonicalShops.map((shop) => shop.email.toLowerCase()).filter(Boolean));
-  const canonicalPhones = new Set(canonicalShops.map((shop) => digits(shop.phone)).filter(Boolean));
-  const all = [
-    ...canonicalShops,
-    ...legacyShops.filter((shop) =>
-      !canonicalKeys.has(businessKey(shop.name)) &&
-      !canonicalEmails.has(shop.email.toLowerCase()) &&
-      !canonicalPhones.has(digits(shop.phone)),
-    ),
-  ]
+  const all = [...barberShops, ...hostShops.filter((shop) => !barberNameMap.has(businessKey(shop.name)))]
     .filter(isPubliclyListedHostShop)
     .map((shop) => {
       const profile = (publicRows ?? []).find((row) => {

@@ -22,20 +22,16 @@ function phoneHref(phone: string) {
 export default function FeaturedHostPartners({
   programSlug,
   showDirectory = true,
-  excludeSlugs = [],
 }: {
   programSlug?: string;
   showDirectory?: boolean;
-  excludeSlugs?: string[];
 }) {
   // Program enrollment is the source of truth. Some verified partners operate
   // combined salon/barber businesses, so businessType must not hide a host that
   // is explicitly approved for this pathway.
-  const excluded = new Set(excludeSlugs);
-  const matchingShops = (programSlug
+  const matchingShops = programSlug
     ? FEATURED_BEAUTY_HOST_PARTNERS.filter((shop) => shop.programs.includes(programSlug))
-    : FEATURED_BEAUTY_HOST_PARTNERS
-  ).filter((shop) => !excluded.has(shop.slug));
+    : FEATURED_BEAUTY_HOST_PARTNERS;
   const shops =
     programSlug === 'barber-apprenticeship'
       ? [...matchingShops].sort((left, right) => {

@@ -1,8 +1,9 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useState } from 'react';
-import { Bot, Eye, Globe2, Menu, MessageSquare, PanelRightOpen, Plus, X } from 'lucide-react';
+import { Bot, Eye, Globe2, MessageSquare, Plus } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
 import RepositoryLivePreview from './RepositoryLivePreview';
 import type { StudioSpecialist } from '@/lib/devstudio/ellie-unified-handlers';
@@ -25,13 +26,6 @@ const IntelligenceWorkspace = dynamic(() => import('./StudioIntelligencePanel'),
 type InspectionMode = 'preview' | 'browser';
 type EmbeddedCapability = 'workflows' | 'intelligence';
 
-const WORKSPACE_GROUPS = [
-  { label: 'Create', ids: ['courses', 'content', 'media', 'canvas'] },
-  { label: 'Operate', ids: ['workflows', 'tasks', 'agents', 'collaboration', 'memory'] },
-  { label: 'Engineer', ids: ['repository', 'browser', 'builds', 'logs', 'deployments', 'containers'] },
-  { label: 'Govern', ids: ['intelligence', 'evaluations', 'claims', 'health', 'plugins', 'settings', 'cfd'] },
-] as const;
-
 function isEmbeddedCapability(id: string): id is EmbeddedCapability {
   return id === 'workflows' || id === 'intelligence';
 }
@@ -41,7 +35,7 @@ export default function StudioCommandWorkspace({
   initialWorkspace,
 }: {
   workspaces: Array<{ id: string; label: string; route: string }>;
-  initialWorkspace?: string;
+  initialWorkspace?: 'workflows' | 'intelligence';
 }) {
   const [conversationKey, setConversationKey] = useState(0);
   const [selectedAgent, setSelectedAgent] = useState<StudioSpecialist>('LIZZY');
@@ -51,9 +45,10 @@ export default function StudioCommandWorkspace({
   // and receives the same active task context after submission.
   const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('chat');
   const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
-  const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
+  const [activeCapability, setActiveCapability] = useState<EmbeddedCapability | null>(
+    initialWorkspace ?? null,
+  );
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const openPreview = (url?: string) => {
     if (url) setPreviewUrl(url);
@@ -68,60 +63,32 @@ export default function StudioCommandWorkspace({
   };
 
   const openCapability = (id: string) => {
+    if (!isEmbeddedCapability(id)) return;
     setActiveCapability(id);
     setMobileSurface('tool');
   };
 
-  const activeWorkspace = activeCapability
-    ? workspaces.find((workspace) => workspace.id === activeCapability) ?? null
-    : null;
-  const groupedWorkspaces = WORKSPACE_GROUPS.map((group) => ({
-    ...group,
-    workspaces: group.ids
-      .map((id) => workspaces.find((workspace) => workspace.id === id))
-      .filter((workspace): workspace is (typeof workspaces)[number] => Boolean(workspace)),
-  })).filter((group) => group.workspaces.length > 0);
-
   return (
     <div className="flex h-[100dvh] min-h-0 min-w-0 flex-col overflow-hidden bg-white lg:h-full">
-      <header className="relative z-30 shrink-0 border-b border-slate-200 bg-white text-slate-950">
-        <div className="flex h-14 min-w-0 items-center gap-2 px-3 sm:px-4">
+      <header className="shrink-0 border-b border-slate-200 bg-slate-950 text-white">
+        <div className="flex min-h-12 min-w-0 items-center gap-2 px-3">
           <Bot className="h-5 w-5 shrink-0" aria-hidden="true" />
-          <span className="min-w-0 truncate text-sm font-bold">Admin AI</span>
-          <span className="hidden rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-600 sm:inline">
-            {selectedAgent[0] + selectedAgent.slice(1).toLowerCase()}
-          </span>
+          <span className="shrink-0 text-sm font-black">Admin AI Studio</span>
           <button
             type="button"
             onClick={() => {
               setConversationKey((value) => value + 1);
               setMobileSurface('chat');
-              setMobileMenuOpen(false);
             }}
-            className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold hover:bg-slate-100"
+            className="ml-auto inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-white/20 px-3 text-xs font-bold hover:bg-white/10"
           >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            <span className="hidden min-[380px]:inline">New task</span>
+            <Plus className="h-4 w-4" aria-hidden="true" /> New task
           </button>
-          <button
-            type="button"
-            onClick={() => setMobileSurface((surface) => (surface === 'chat' ? 'tool' : 'chat'))}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold hover:bg-slate-100 lg:hidden"
-            aria-label={mobileSurface === 'chat' ? 'Open workspace' : 'Open chat'}
+          <div
+            className="hidden items-center gap-1 sm:flex"
+            role="group"
+            aria-label="Choose AI agent"
           >
-            {mobileSurface === 'chat' ? <PanelRightOpen className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
-            <span className="hidden min-[430px]:inline">{mobileSurface === 'chat' ? 'Workspace' : 'Chat'}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-slate-100 lg:hidden"
-            aria-expanded={mobileMenuOpen}
-            aria-label="Studio tools"
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-          <div className="hidden items-center gap-1 lg:flex" role="group" aria-label="Choose AI agent">
             {(['ELLIE', 'LIZZY', 'PARIS'] as const).map((agent) => (
               <button
                 key={agent}
@@ -131,7 +98,7 @@ export default function StudioCommandWorkspace({
                   setSelectedAgent(agent);
                   setConversationKey((value) => value + 1);
                 }}
-                className={`rounded-lg px-3 py-2 text-xs font-bold ${selectedAgent === agent ? 'bg-slate-950 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+                className={`rounded-lg px-3 py-2 text-xs font-black ${selectedAgent === agent ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-white/10'}`}
               >
                 {agent[0] + agent.slice(1).toLowerCase()}
               </button>
@@ -140,96 +107,54 @@ export default function StudioCommandWorkspace({
         </div>
         <nav
           aria-label="Studio tools"
-          className="hidden min-w-0 items-center gap-2 border-t border-slate-100 px-3 py-1.5 lg:flex"
+          className="scrollbar-hide flex min-w-0 items-center gap-1 overflow-x-auto border-t border-white/10 px-2 py-1.5"
         >
           <button
             type="button"
-            onClick={() => {
-              setActiveCapability(null);
-              setMobileSurface('chat');
-            }}
-            aria-pressed={!activeCapability}
-            className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-slate-100 px-3 text-xs font-bold"
+            onClick={() => setMobileSurface('chat')}
+            className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-white/10 px-3 text-xs font-bold hover:bg-white/15"
           >
             <MessageSquare className="h-4 w-4" aria-hidden="true" /> Chat
           </button>
-          <label className="flex min-w-0 items-center gap-2 text-xs font-bold text-slate-600">
-            <span className="shrink-0">Workspace</span>
-            <select
-              value={activeCapability ?? ''}
-              onChange={(event) => {
-                const id = event.target.value;
-                if (id) openCapability(id);
-              }}
-              className="h-9 min-w-0 max-w-sm rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-900"
-              aria-label="Open Studio workspace"
-            >
-              <option value="">Choose a tool</option>
-              {groupedWorkspaces.map((group) => (
-                <optgroup key={group.label} label={group.label}>
-                  {group.workspaces.map((workspace) => (
-                    <option key={workspace.id} value={workspace.id}>
-                      {workspace.label}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-          </label>
-          {activeWorkspace ? (
-            <span className="min-w-0 truncate text-xs text-slate-500">
-              {activeWorkspace.label}
-            </span>
-          ) : null}
+          {workspaces.map((workspace) =>
+            isEmbeddedCapability(workspace.id) ? (
+              <button
+                key={workspace.id}
+                type="button"
+                onClick={() => openCapability(workspace.id)}
+                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white"
+              >
+                {workspace.label}
+              </button>
+            ) : (
+              <Link
+                key={workspace.id}
+                href={workspace.route}
+                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white"
+              >
+                {workspace.label}
+              </Link>
+            ),
+          )}
         </nav>
-        {mobileMenuOpen ? (
-          <div className="absolute inset-x-3 top-14 max-h-[calc(100dvh-4.5rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl lg:hidden">
-            <p className="px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">Agents</p>
-            <div className="grid grid-cols-3 gap-1">
-              {(['ELLIE', 'LIZZY', 'PARIS'] as const).map((agent) => (
-                <button key={agent} type="button" onClick={() => { setSelectedAgent(agent); setConversationKey((value) => value + 1); setMobileMenuOpen(false); }} className={`rounded-lg px-3 py-2 text-xs font-bold ${selectedAgent === agent ? 'bg-slate-950 text-white' : 'hover:bg-slate-100'}`}>
-                  {agent[0] + agent.slice(1).toLowerCase()}
-                </button>
-              ))}
-            </div>
-            <p className="mt-2 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-slate-500">Tools</p>
-            <div className="grid gap-3">
-              {groupedWorkspaces.map((group) => (
-                <section key={group.label} aria-label={group.label}>
-                  <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                    {group.label}
-                  </p>
-                  <div className="grid gap-1">
-                    {group.workspaces.map((workspace) => (
-                      <button
-                        key={workspace.id}
-                        type="button"
-                        onClick={() => {
-                          openCapability(workspace.id);
-                          setMobileMenuOpen(false);
-                        }}
-                        aria-pressed={activeCapability === workspace.id}
-                        className={`rounded-lg px-3 py-2 text-left text-sm font-semibold ${
-                          activeCapability === workspace.id
-                            ? 'bg-slate-950 text-white'
-                            : 'hover:bg-slate-100'
-                        }`}
-                      >
-                        {workspace.label}
-                      </button>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          </div>
-        ) : null}
       </header>
 
       <div className="flex min-h-0 min-w-0 flex-1">
         <section
           className={`${mobileSurface === 'chat' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col border-r border-slate-200 lg:flex lg:basis-[42%]`}
         >
+          <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 sm:hidden">
+            <span className="text-xs font-bold text-slate-700">
+              Agent: {selectedAgent[0] + selectedAgent.slice(1).toLowerCase()}
+            </span>
+            <button
+              type="button"
+              onClick={() => setMobileSurface('tool')}
+              className="ml-auto rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white"
+            >
+              Open workspace
+            </button>
+          </div>
           <UnifiedEllieChat
             key={conversationKey}
             preferredAgent={selectedAgent}
@@ -251,7 +176,7 @@ export default function StudioCommandWorkspace({
                 ? 'Workflow Designer'
                 : activeCapability === 'intelligence'
                   ? 'Intelligence'
-                  : activeWorkspace?.label || 'Active workspace'}
+                  : 'Active workspace'}
             </span>
             <button
               type="button"
@@ -286,13 +211,6 @@ export default function StudioCommandWorkspace({
               <WorkflowsWorkspace embedded />
             ) : activeCapability === 'intelligence' ? (
               <IntelligenceWorkspace onAskAI={askAdminAI} />
-            ) : activeWorkspace ? (
-              <iframe
-                key={activeWorkspace.id}
-                title={activeWorkspace.label}
-                src={`${activeWorkspace.route}${activeWorkspace.route.includes('?') ? '&' : '?'}embedded=1`}
-                className="h-full w-full border-0 bg-white"
-              />
             ) : mode === 'preview' ? (
               <RepositoryLivePreview filePath={null} content="" initialUrl={previewUrl} />
             ) : (

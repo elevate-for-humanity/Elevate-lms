@@ -354,12 +354,7 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
   const g = goal.toLowerCase();
   let steps: PlanStep[];
 
-  const quickbooksIsExcluded =
-    /\b(?:skip|exclude|unrelated|avoid|without|do not|don't|dont|never)\b[^.\n;]{0,60}\bquickbooks\b/.test(
-      g,
-    );
-
-  if (g.includes('quickbooks') && !quickbooksIsExcluded) {
+  if (g.includes('quickbooks')) {
     steps = /\b(fix|repair|connect|reconnect|configure)\b/.test(g)
       ? GOAL_TEMPLATES.quickbooks_repair!({})
       : GOAL_TEMPLATES.quickbooks_connection!({});

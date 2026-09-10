@@ -1,7 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// Production canary: verifies disposable-role login persistence without touching real users.
-
 const BASE = process.env.PLAYWRIGHT_BASE_URL || 'https://app.elevateforhumanity.org';
 const APPRENTICE_EMAIL = process.env.E2E_APPRENTICE_EMAIL || process.env.TEST_STUDENT_EMAIL || '';
 const APPRENTICE_PASSWORD =

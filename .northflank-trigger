@@ -1,4 +1,4 @@
-merge_sha=78052fc85cc958be02695f5ad20def69d2760038
-services=admin,lms
-requested_at=2026-09-09T19:30:00Z
-reason=deploy-host-shop-administrator-handoff-fix
+merge_sha=28a83058523d6dd593bd04d0dd074e7ee2766a1a
+services=admin
+requested_at=2026-09-08T12:02:00Z
+reason=deploy-unified-mobile-studio

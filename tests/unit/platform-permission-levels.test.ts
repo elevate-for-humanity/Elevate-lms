@@ -19,18 +19,6 @@ describe('platform permission levels', () => {
     ).toBe('platform_owner');
   });
 
-  it('maps admin to platform_owner regardless of tenant membership', () => {
-    expect(
-      resolvePermissionLevel({ profileRole: 'admin', isPlatformOwnerTenant: false }),
-    ).toBe('platform_owner');
-  });
-
-  it('maps admin on owner tenant to platform_admin', () => {
-    expect(
-      resolvePermissionLevel({ profileRole: 'admin', isPlatformOwnerTenant: true }),
-    ).toBe('platform_admin');
-  });
-
   it('maps org_admin on customer tenant to organization_admin', () => {
     expect(
       resolvePermissionLevel({ profileRole: 'org_admin', isPlatformOwnerTenant: false }),

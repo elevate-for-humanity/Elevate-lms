@@ -34,7 +34,7 @@ export default function StudioCommandWorkspace({
   initialWorkspace,
 }: {
   workspaces: Array<{ id: string; label: string; route: string }>;
-  initialWorkspace?: 'workflows' | 'intelligence';
+  initialWorkspace?: string;
 }) {
   const [conversationKey, setConversationKey] = useState(0);
   const [selectedAgent, setSelectedAgent] = useState<StudioSpecialist>('LIZZY');

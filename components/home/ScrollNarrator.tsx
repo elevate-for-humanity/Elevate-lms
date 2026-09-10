@@ -78,7 +78,7 @@ export function ScrollNarrator() {
     });
     if (!started) {
       lastNarrationRef.current = null;
-      setNotice('Tap the speaker once to allow narration on this device.');
+      setNotice('Narration will begin with your first touch.');
     } else {
       setNotice(null);
     }
@@ -167,6 +167,39 @@ export function ScrollNarrator() {
     };
   }, [enabled, narrateVisibleSection, stop]);
 
+  useEffect(() => {
+    if (!enabled || !notice) return;
+
+    // Mobile browsers require a user gesture before audible media can start.
+    // Treat the visitor's next ordinary interaction anywhere on the page as
+    // that gesture, then keep narration synchronized to scrolling. Visitors
+    // should never have to hunt for or repeatedly tap the speaker control.
+    let retrying = false;
+    const beginFromNaturalInteraction = () => {
+      if (retrying) return;
+      retrying = true;
+      setNotice(null);
+      lastNarrationRef.current = null;
+      void narrateVisibleSection().finally(() => {
+        retrying = false;
+      });
+    };
+
+    window.addEventListener('pointerdown', beginFromNaturalInteraction, {
+      capture: true,
+      once: true,
+    });
+    window.addEventListener('keydown', beginFromNaturalInteraction, {
+      capture: true,
+      once: true,
+    });
+
+    return () => {
+      window.removeEventListener('pointerdown', beginFromNaturalInteraction, true);
+      window.removeEventListener('keydown', beginFromNaturalInteraction, true);
+    };
+  }, [enabled, narrateVisibleSection, notice]);
+
   const toggle = () => {
     if (enabled && !notice) {
       setEnabled(false);
@@ -225,11 +258,3 @@ export function ScrollNarrator() {
       {notice && enabled ? (
         <p
           role="status"
-          className="mt-2 max-w-64 rounded-lg bg-white p-2 text-xs font-bold text-red-800 shadow-lg"
-        >
-          {notice}
-        </p>
-      ) : null}
-    </div>
-  );
-}

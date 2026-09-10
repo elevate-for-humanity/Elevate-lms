@@ -42,27 +42,17 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     if (process.env.NODE_ENV !== 'production' || !('serviceWorker' in navigator)) return;
     const config = PWA_APPLICATIONS[application];
     let cancelled = false;
-    let reloadingForControllerChange = false;
-    const hadControllerAtMount = Boolean(navigator.serviceWorker.controller);
+    const announceCurrentBuild = () => {
+      if (cancelled) return;
 
-    const activateCurrentBuild = () => {
-      if (cancelled || reloadingForControllerChange) return;
-
-      // The first worker installation on a fresh browser also emits
-      // controllerchange. Reloading in that case can abort an in-flight login,
-      // upload, or signature request. Only refresh when this page was already
-      // controlled at mount and a newer worker replaces the active build.
-      if (!hadControllerAtMount) return;
-
-      reloadingForControllerChange = true;
-      window.location.reload();
+      // Never reload automatically when a worker takes control. A controller
+      // change can happen during login, upload, signing, or a long form and a
+      // forced navigation would discard that work. The shell can offer a safe,
+      // user-controlled refresh after the current action completes.
+      window.dispatchEvent(new CustomEvent('elevate-pwa-controller-ready'));
     };
 
-    // Installed Android PWAs can keep the previous JavaScript bundle alive
-    // after a successful production rollout. Reload exactly once when a newer
-    // worker replaces an existing controller so the visible app and deployed
-    // server cannot drift.
-    navigator.serviceWorker.addEventListener('controllerchange', activateCurrentBuild);
+    navigator.serviceWorker.addEventListener('controllerchange', announceCurrentBuild);
 
     const register = async () => {
       try {
@@ -114,7 +104,7 @@ export function CanonicalPwaRegistration({ application }: { application: PwaAppl
     void register();
     return () => {
       cancelled = true;
-      navigator.serviceWorker.removeEventListener('controllerchange', activateCurrentBuild);
+      navigator.serviceWorker.removeEventListener('controllerchange', announceCurrentBuild);
     };
   }, [application]);
 

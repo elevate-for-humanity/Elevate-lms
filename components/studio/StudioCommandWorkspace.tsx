@@ -122,7 +122,7 @@ export default function StudioCommandWorkspace({
                 key={workspace.id}
                 type="button"
                 onClick={() => openCapability(workspace.id)}
-                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white"
+                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white"
               >
                 {workspace.label}
               </button>
@@ -130,7 +130,7 @@ export default function StudioCommandWorkspace({
               <Link
                 key={workspace.id}
                 href={workspace.route}
-                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-white/10 hover:text-white"
+                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white"
               >
                 {workspace.label}
               </Link>

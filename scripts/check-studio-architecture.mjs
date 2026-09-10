@@ -188,7 +188,8 @@ if (/id:\s*'ai'/.test(registry) || /route:\s*'\/studio\/ai'/.test(registry))
   fail('workspace registry reintroduced a second AI/chat workspace');
 const routes = [...registry.matchAll(/route:\s*'([^']+)'/g)].map((match) => match[1]);
 for (const route of routes) {
-  const relative = route.replace(/^\/studio\/?/, '');
+  const pathname = route.split(/[?#]/, 1)[0];
+  const relative = pathname.replace(/^\/studio\/?/, '');
   const page = relative
     ? `apps/admin/app/studio/${relative}/page.tsx`
     : 'apps/admin/app/studio/page.tsx';

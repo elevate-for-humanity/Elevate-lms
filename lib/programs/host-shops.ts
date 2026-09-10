@@ -58,12 +58,17 @@ const PROGRAM_ALIASES: Record<string, string> = {
 };
 
 function normalizeProgram(value: unknown): string | null {
-  const normalized = String(value ?? '').trim().toLowerCase();
+  const normalized = String(value ?? '')
+    .trim()
+    .toLowerCase();
   return PROGRAM_ALIASES[normalized] ?? null;
 }
 
 function parseAddress(raw: string): { address: string; city: string; state: string; zip: string } {
-  const parts = raw.split(',').map((part) => part.trim()).filter(Boolean);
+  const parts = raw
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
   if (parts.length < 2) return { address: raw.trim(), city: '', state: 'IN', zip: '' };
   const stateZipPart = parts.at(-1) ?? '';
   const stateZipMatch = stateZipPart.match(/^([A-Za-z]{2})(?:\s+(\d{5}(?:-\d{4})?))?$/);
@@ -90,10 +95,11 @@ function businessKey(value: string | null | undefined) {
 }
 
 function publicSlug(name: string, id: string) {
-  const base = name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '') || 'host-shop';
+  const base =
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'host-shop';
   return `${base}-${id.replace(/-/g, '').slice(0, 8)}`;
 }
 
@@ -127,7 +133,9 @@ function approvedAddress(shop: HostShop) {
 
 function approvedMapsUrl(shop: HostShop) {
   const value = approvedAddress(shop);
-  return value ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${shop.name} ${value}`)}` : undefined;
+  return value
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${shop.name} ${value}`)}`
+    : undefined;
 }
 
 function approvedDescription(shop: HostShop) {
@@ -148,7 +156,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   const [{ data: barberRows }, { data: hostRows }, { data: publicRows }] = await Promise.all([
     db
       .from('barbershop_partner_applications')
-      .select('id, shop_legal_name, shop_dba_name, shop_address_line1, shop_city, shop_state, shop_zip, contact_phone, contact_email, supervisor_name')
+      .select(
+        'id, shop_legal_name, shop_dba_name, shop_address_line1, shop_city, shop_state, shop_zip, contact_phone, contact_email, supervisor_name',
+      )
       .eq('status', 'approved')
       .order('shop_legal_name'),
     db
@@ -159,7 +169,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .order('shop_name'),
     db
       .from('public_host_shops')
-      .select('public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, city, state, zip, media_gallery, video_url, source_url'),
+      .select(
+        'id, public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, address_line2, city, state, zip, programs, media_gallery, video_url, source_url',
+      ),
   ]);
 
   const barberShops: HostShop[] = (barberRows ?? []).map((shop) => ({
@@ -179,7 +191,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   const hostShops: HostShop[] = (hostRows ?? []).map((shop) => {
     const parsed = parseAddress(shop.address ?? '');
     const rawPrograms: unknown[] = Array.isArray(shop.intake?.programs) ? shop.intake.programs : [];
-    const programs = rawPrograms.map(normalizeProgram).filter((value): value is string => typeof value === 'string');
+    const programs = rawPrograms
+      .map(normalizeProgram)
+      .filter((value): value is string => typeof value === 'string');
     return {
       id: shop.id,
       name: shop.shop_name,
@@ -194,23 +208,33 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
 
   const barberNameMap = new Map(barberShops.map((shop) => [businessKey(shop.name), shop]));
   barberShops.forEach((barberShop) => {
-    const match = hostShops.find((hostShop) => businessKey(hostShop.name) === businessKey(barberShop.name));
+    const match = hostShops.find(
+      (hostShop) => businessKey(hostShop.name) === businessKey(barberShop.name),
+    );
     if (match) barberShop.programs = [...new Set([...barberShop.programs, ...match.programs])];
   });
 
-  const all = [...barberShops, ...hostShops.filter((shop) => !barberNameMap.has(businessKey(shop.name)))]
+  const applicationBacked = [
+    ...barberShops,
+    ...hostShops.filter((shop) => !barberNameMap.has(businessKey(shop.name))),
+  ]
     .filter(isPubliclyListedHostShop)
     .map((shop) => {
       const profile = (publicRows ?? []).find((row) => {
         const phoneMatch = digits(shop.phone) && digits(shop.phone) === digits(row.phone);
-        const addressMatch = businessKey(shop.address) && businessKey(shop.address) === businessKey(row.address_line1) && businessKey(shop.city) === businessKey(row.city);
-        const nameMatch = businessKey(shop.name) && businessKey(shop.name) === businessKey(row.display_name);
+        const addressMatch =
+          businessKey(shop.address) &&
+          businessKey(shop.address) === businessKey(row.address_line1) &&
+          businessKey(shop.city) === businessKey(row.city);
+        const nameMatch =
+          businessKey(shop.name) && businessKey(shop.name) === businessKey(row.display_name);
         return Boolean(phoneMatch || addressMatch || nameMatch);
       });
 
-      const sourceVerifiedPublicPhone = profile?.phone && (profile.source_url || profile.website_url || profile.website)
-        ? profile.phone
-        : shop.phone;
+      const sourceVerifiedPublicPhone =
+        profile?.phone && (profile.source_url || profile.website_url || profile.website)
+          ? profile.phone
+          : shop.phone;
       const enriched: HostShop = {
         ...shop,
         phone: sourceVerifiedPublicPhone || shop.phone,
@@ -227,6 +251,58 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       };
       return enriched;
     });
+
+  // The approved partner directory is also an operational approval source.
+  // Include approved public profiles that predate the newer application tables
+  // instead of returning a 404 for an otherwise active Host Shop.
+  const matchedProfileIds = new Set(
+    applicationBacked
+      .map((shop) => (publicRows ?? []).find((row) => row.public_slug === shop.publicSlug)?.id)
+      .filter(Boolean),
+  );
+  const directoryBacked: HostShop[] = (publicRows ?? [])
+    .filter((row) => !matchedProfileIds.has(row.id))
+    .map((row) => {
+      const programs = (Array.isArray(row.programs) ? row.programs : [])
+        .map(normalizeProgram)
+        .filter((value): value is string => typeof value === 'string');
+      return {
+        id: row.id,
+        name: row.display_name,
+        address: row.address_line1 ?? '',
+        city: row.city ?? '',
+        state: row.state ?? 'IN',
+        zip: row.zip ?? '',
+        phone: row.phone ?? '',
+        email: '',
+        supervisor: '',
+        programs: programs.length ? [...new Set(programs)] : [PROGRAM_SLUGS.barber],
+        badge: 'partner',
+        publicSlug: row.public_slug,
+        description: row.description ?? undefined,
+        website: row.website_url || row.website || undefined,
+        googleMapsUrl: approvedMapsUrl({
+          id: row.id,
+          name: row.display_name,
+          address: row.address_line1 ?? '',
+          city: row.city ?? '',
+          state: row.state ?? 'IN',
+          zip: row.zip ?? '',
+          phone: row.phone ?? '',
+          email: '',
+          supervisor: '',
+          programs,
+          badge: 'partner',
+        }),
+        logoUrl: row.logo_url ?? undefined,
+        flyerUrl: row.flyer_url ?? undefined,
+        videoUrl: row.video_url ?? undefined,
+        mediaGallery: parseMedia(row.media_gallery),
+      };
+    })
+    .filter(isPubliclyListedHostShop);
+
+  const all = [...applicationBacked, ...directoryBacked];
 
   if (program) {
     const slug = PROGRAM_SLUGS[program];

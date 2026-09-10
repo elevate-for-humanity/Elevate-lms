@@ -134,6 +134,8 @@ export async function normalizeGeneratedCourseForGovernance(
           ),
           assessment: isAssessment,
           practical: isPractical,
+          critical: derivedCompetencies.some((competency: any) => competency.isCritical === true),
+          criticalMasteryThreshold: 100,
         });
       }
       const duration = deriveLessonDurationMinutes({

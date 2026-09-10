@@ -16,7 +16,10 @@ export const generatedLessonContentSchema = z
     content: z.string().trim().min(500),
     learning_points: z.array(z.string().trim().min(1)).min(3).max(5),
     scenario: z.string().trim().min(80),
-    quiz_questions: z.array(quizQuestionSchema).min(3),
+    // Keep generation and publication on one contract. The Course Builder
+    // rejects assessed lessons with fewer than five questions, so accepting a
+    // three-question AI response here only creates a delayed publish failure.
+    quiz_questions: z.array(quizQuestionSchema).min(5),
     experience: CourseExperienceSchema,
   })
   .strict();

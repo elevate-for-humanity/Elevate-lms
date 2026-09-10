@@ -29,7 +29,7 @@ describe('Course Factory learning intelligence', () => {
     ]);
   });
 
-  it('routes practical evidence to a human expert instead of auto-approving it', () => {
+  it('routes practical evidence to automated review without auto-approving it', () => {
     const intelligence = compileLearningIntelligence({
       lessonSlug: 'chemical-service-practical',
       lessonTitle: 'Chemical Service Practical',
@@ -39,11 +39,39 @@ describe('Course Factory learning intelligence', () => {
       practical: true,
     });
 
-    expect(intelligence.collaboration.expertReviewRequired).toBe(true);
+    expect(intelligence.collaboration.expertReviewRequired).toBe(false);
+    expect(intelligence.collaboration.automatedEvidenceReview).toBe(true);
     expect(intelligence.automations).toContainEqual(expect.objectContaining({
       trigger: 'practical_submitted',
-      actions: [{ type: 'request_expert_review', target: 'chemical-service-practical' }],
+      actions: [{ type: 'request_automated_review', target: 'chemical-service-practical' }],
     }));
     expect(JSON.stringify(intelligence)).not.toContain('issue_completion');
+  });
+
+  it('requires 100 percent runtime mastery for critical competencies', () => {
+    const intelligence = compileLearningIntelligence({
+      lessonSlug: 'electrical-safety-checkpoint',
+      lessonTitle: 'Electrical Safety Checkpoint',
+      domainKey: 'hvac-safety',
+      competencyKeys: ['hvac.lockout-tagout'],
+      objectives: ['Apply lockout and tagout before electrical testing.'],
+      masteryThreshold: 80,
+      critical: true,
+      criticalMasteryThreshold: 100,
+      assessment: true,
+      practical: false,
+    });
+
+    expect(intelligence.adaptivePath.masteryThreshold).toBe(100);
+    expect(intelligence.automations[0].onlyIf).toMatchObject({
+      metric: 'score',
+      operator: 'gte',
+      value: 100,
+    });
+    expect(intelligence.automations[1].onlyIf).toMatchObject({
+      metric: 'score',
+      operator: 'lt',
+      value: 100,
+    });
   });
 });

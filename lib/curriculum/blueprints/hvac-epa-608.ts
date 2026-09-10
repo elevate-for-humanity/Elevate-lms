@@ -42,13 +42,26 @@ const HVAC_VIDEO_CONFIG: BlueprintVideoConfig = {
   requireNarrationVisualAlignment: true,
   requireSafetySceneWhenApplicable: true,
   requireWorkedExample: true,
+  requireValidatedStoryboardBeforeRender: true,
+  requireSceneLevelObjectiveMapping: true,
+  requireCaptionsAndTranscript: true,
+  allowSceneLevelRepair: true,
+  criticalProcedureMedia: ['original_capture', 'licensed_demonstration'],
+  stockFootageContextOnly: true,
+  requireFullDemonstration: true,
+  requireStepMicrovideos: true,
+  // Course media review is AI-automated. Human escalation is an exception for
+  // unresolved validation failures, not a routine generation bottleneck.
+  requireHumanTechnicalReview: false,
+  requireAutomatedTechnicalReview: true,
+  humanReviewOnlyOnValidationFailure: true,
   width: 1280,
   height: 720,
 };
 
 export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
   id: 'hvac-epa608-v2',
-  version: '2.1.0',
+  version: '2.2.0',
   credentialSlug: 'epa-608',
   credentialTitle: 'EPA Section 608 Technician Certification',
   state: 'federal',
@@ -103,6 +116,14 @@ export const HVAC_EPA608_BLUEPRINT: CredentialBlueprint = {
     authoritativeSourceRequired: true,
     prohibitProtectedExamQuestions: true,
     requireCredentialVersionLabel: true,
+    masteryThreshold: 80,
+    criticalMasteryThreshold: 100,
+    requireDiagnosticPreassessment: true,
+    requirePrerequisiteGates: true,
+    requireObjectiveLevelRemediation: true,
+    requirePracticalEvidence: true,
+    requireInstructorSignoffForCriticalSkills: true,
+    preventAverageScoreCriticalBypass: true,
   },
 
   modules: [

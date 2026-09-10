@@ -129,17 +129,24 @@ export function synchronizeLessonExperience(
   const moduleCompetencyKeys = (courseModule.competencies ?? [])
     .map((competency) => competency.competencyKey)
     .filter(Boolean);
+  const selectedCompetencyKeys = Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
+    ? lesson.competencyKeys
+    : moduleCompetencyKeys;
+  const critical = (courseModule.competencies ?? []).some(
+    (competency) =>
+      competency.isCritical && selectedCompetencyKeys.includes(competency.competencyKey),
+  );
   content.experience.intelligence = compileLearningIntelligence({
     lessonSlug: String(lesson.slug),
     lessonTitle: String(lesson.title),
     domainKey: String(lesson.domainKey || courseModule.domainKey || courseModule.slug),
-    competencyKeys: Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
-      ? lesson.competencyKeys
-      : moduleCompetencyKeys,
+    competencyKeys: selectedCompetencyKeys,
     objectives,
     masteryThreshold: lesson.passingScore ?? content.experience.remediation.passingScore,
     assessment: isAssessmentStep(stepType),
     practical: ['lab', 'assignment'].includes(stepType) || Boolean(lesson.practicalRequired),
+    critical,
+    criticalMasteryThreshold: 100,
   });
   lesson.content = JSON.stringify(content);
 }

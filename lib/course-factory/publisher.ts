@@ -177,6 +177,10 @@ export function buildAtomicPayload(
                 Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
                   ? lesson.competencyKeys
                   : (courseModule.competencies ?? []).map((competency) => competency.competencyKey);
+              const critical = (courseModule.competencies ?? []).some(
+                (competency) =>
+                  competency.isCritical && competencyKeys.includes(competency.competencyKey),
+              );
               experience.intelligence = compileLearningIntelligence({
                 lessonSlug: lesson.slug,
                 lessonTitle: lesson.title,
@@ -186,6 +190,8 @@ export function buildAtomicPayload(
                 masteryThreshold: lesson.passingScore,
                 assessment: ['checkpoint', 'quiz', 'exam'].includes(stepType),
                 practical: governedPractical,
+                critical,
+                criticalMasteryThreshold: 100,
               });
             }
             const practicalTask =

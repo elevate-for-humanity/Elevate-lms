@@ -18,6 +18,7 @@ export interface CourseCompletionStatus {
   quizzesPassed: boolean;
   seatTimeSatisfied: boolean;
   examSatisfied: boolean;
+  criticalCompetenciesSatisfied: boolean;
   totalInternalLessons: number;
   completedInternalLessons: number;
   totalExternalModules: number;
@@ -52,12 +53,13 @@ export async function checkCourseCompletion(
   if (!course) throw new Error('Course not found');
 
   const requirements = getCourseRequirements(course.slug || '');
-  const [internal, external, assessments, seatTime, exam] = await Promise.all([
+  const [internal, external, assessments, seatTime, exam, criticalCompetencies] = await Promise.all([
     checkInternalLessons(userId, courseId),
     checkExternalModules(userId, courseId),
     checkRequiredAssessments(userId, courseId),
     checkSeatTime(userId, courseId, requirements.minimumSeatTimeHours),
     checkRequiredExam(userId, course.slug || '', requirements.examRequirement),
+    checkCriticalCompetencies(userId, courseId),
   ]);
 
   const missingRequirements: string[] = [];
@@ -86,6 +88,11 @@ export async function checkCourseCompletion(
       `Proctored ${requirements.examRequirement.examName} exam has not been verified as passed`,
     );
   }
+  if (!criticalCompetencies.satisfied) {
+    missingRequirements.push(
+      `Critical competencies not mastered: ${criticalCompetencies.missingKeys.join(', ')}`,
+    );
+  }
 
   return {
     isComplete:
@@ -93,12 +100,14 @@ export async function checkCourseCompletion(
       external.complete &&
       assessments.allPassed &&
       seatTime.satisfied &&
-      exam.satisfied,
+      exam.satisfied &&
+      criticalCompetencies.satisfied,
     internalLessonsComplete: internal.complete,
     externalModulesComplete: external.complete,
     quizzesPassed: assessments.allPassed,
     seatTimeSatisfied: seatTime.satisfied,
     examSatisfied: exam.satisfied,
+    criticalCompetenciesSatisfied: criticalCompetencies.satisfied,
     totalInternalLessons: internal.total,
     completedInternalLessons: internal.completed,
     totalExternalModules: external.total,
@@ -111,6 +120,46 @@ export async function checkCourseCompletion(
     examSession: exam.session,
     missingRequirements,
   };
+}
+
+export function evaluateCriticalCompetencyStatus(
+  requiredKeys: string[],
+  results: Array<{ competency_key: string; status: string | null }>,
+): { satisfied: boolean; missingKeys: string[] } {
+  const achieved = new Set(
+    results.filter((row) => row.status === 'achieved').map((row) => row.competency_key),
+  );
+  const missingKeys = [...new Set(requiredKeys)].filter((key) => !achieved.has(key));
+  return { satisfied: missingKeys.length === 0, missingKeys };
+}
+
+async function checkCriticalCompetencies(userId: string, courseId: string) {
+  const db = await requireAdminClient();
+  const { data: lessons, error: lessonError } = await db
+    .from('course_lessons')
+    .select('competency_checks')
+    .eq('course_id', courseId)
+    .eq('is_required', true)
+    .eq('is_published', true);
+  if (lessonError) throw lessonError;
+
+  const requiredKeys = (lessons ?? []).flatMap((lesson) =>
+    Array.isArray(lesson.competency_checks)
+      ? lesson.competency_checks
+          .filter((check: any) => check?.isCritical === true && typeof check?.key === 'string')
+          .map((check: any) => check.key as string)
+      : [],
+  );
+  if (!requiredKeys.length) return { satisfied: true, missingKeys: [] as string[] };
+
+  const { data: results, error: resultError } = await db
+    .from('competency_results')
+    .select('competency_key,status')
+    .eq('user_id', userId)
+    .eq('course_id', courseId)
+    .in('competency_key', [...new Set(requiredKeys)]);
+  if (resultError) throw resultError;
+  return evaluateCriticalCompetencyStatus(requiredKeys, results ?? []);
 }
 
 async function checkInternalLessons(userId: string, courseId: string) {

@@ -150,6 +150,16 @@ export type BlueprintGenerationRules = {
   allowedLessonTypes?: string[];
   /** Enforces the complete AI-generated learning sequence before publication. */
   learningExperienceProfile?: LearningExperienceProfile;
+  /** Normal knowledge threshold; critical safety rules may override it. */
+  masteryThreshold?: number;
+  /** Required score for knowledge explicitly marked safety-critical. */
+  criticalMasteryThreshold?: number;
+  requireDiagnosticPreassessment?: boolean;
+  requirePrerequisiteGates?: boolean;
+  requireObjectiveLevelRemediation?: boolean;
+  requirePracticalEvidence?: boolean;
+  requireInstructorSignoffForCriticalSkills?: boolean;
+  preventAverageScoreCriticalBypass?: boolean;
   [key: string]: unknown;
 };
 
@@ -192,6 +202,16 @@ export type BlueprintVideoConfig = {
   requireFullDemonstration?: boolean;
   requireStepMicrovideos?: boolean;
   requireHumanTechnicalReview?: boolean;
+  requireAutomatedTechnicalReview?: boolean;
+  humanReviewOnlyOnValidationFailure?: boolean;
+  requireValidatedStoryboardBeforeRender?: boolean;
+  requireSceneLevelObjectiveMapping?: boolean;
+  requireNarrationVisualAlignment?: boolean;
+  requireSafetySceneWhenApplicable?: boolean;
+  requireInstructionalEvidence?: boolean;
+  requireWorkedExample?: boolean;
+  requireCaptionsAndTranscript?: boolean;
+  allowSceneLevelRepair?: boolean;
   [key: string]: unknown;
 };
 

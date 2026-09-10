@@ -137,6 +137,7 @@ export function runGovernmentProcurementGate(template: ProgramBuilderTemplate): 
 
       if (isAssessment) {
         if (!lesson.quizQuestions?.length) add('error', 'QUESTIONS_REQUIRED', `${path}.quizQuestions`, 'Assessment has no questions.');
+        else if (lesson.quizQuestions.length < 5) add('error', 'ASSESSMENT_DEPTH_REQUIRED', `${path}.quizQuestions`, 'Assessment requires at least five objective-mapped questions.');
         if (lesson.passingScore == null) add('error', 'PASSING_SCORE_REQUIRED', `${path}.passingScore`, 'Assessment must define a passing/mastery threshold.');
         for (const [qi, question] of (lesson.quizQuestions ?? []).entries()) {
           if (!question.explanation?.trim()) add('error', 'RATIONALE_REQUIRED', `${path}.quizQuestions[${qi}].explanation`, 'Every scored question must provide a rationale for self-paced remediation.');

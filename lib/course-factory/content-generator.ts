@@ -179,7 +179,7 @@ Return ONLY valid JSON with exactly this shape:
   "content": "HTML formatted instructional lesson content of at least 700 words, with headings, examples, worked application steps, a short recap, and accessibility-friendly plain language",
   "quiz_questions": [
     {
-      "question": "Formative question text",
+    "question": "Five or more formative questions, each mapped to the objective",
       "options": ["Option A", "Option B", "Option C", "Option D"],
       "correct": 0,
       "explanation": "Why this answer is correct and why the distractors are weaker"
@@ -246,7 +246,7 @@ Return ONLY valid JSON with exactly this shape:
 }
 
 Quality requirements:
-- 3 to 5 formative quiz_questions with rationales.
+- At least 5 formative quiz_questions with rationales. Never return fewer than five.
 - At least 6 lesson-specific flashcards.
 - At least 2 distinct short concept clips, each 1 to 5 minutes.
 - At least 3 experience knowledge checks.
@@ -277,7 +277,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
             content:
               attempt === 1
                 ? prompt
-                : `${prompt}\n\nYour previous response failed the strict contract with this exact validation error:\n${lastError instanceof Error ? lastError.message : String(lastError)}\n\nCorrect every named defect. Return the complete JSON object with every required field, exactly 4 substantive options for every quiz question and knowledge check, at least 6 flashcards, 2 quickClips, 3 knowledgeChecks, 1 exercise, 2 resources, 4 glossary terms, readiness and targeted remediation. No markdown.`,
+                : `${prompt}\n\nYour previous response failed the strict contract with this exact validation error:\n${lastError instanceof Error ? lastError.message : String(lastError)}\n\nCorrect every named defect. Return the complete JSON object with every required field, at least 5 quiz_questions, exactly 4 substantive options for every quiz question and knowledge check, at least 6 flashcards, 2 quickClips, 3 knowledgeChecks, 1 exercise, 2 resources, 4 glossary terms, readiness and targeted remediation. No markdown.`,
           },
         ],
         temperature: attempt === 1 ? 0.65 : 0.35,

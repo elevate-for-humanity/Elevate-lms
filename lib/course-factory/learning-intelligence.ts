@@ -4,7 +4,7 @@ const IntelligenceActionSchema = z.object({
   type: z.enum([
     'unlock_next',
     'assign_remediation',
-    'request_expert_review',
+    'request_automated_review',
     'record_mastery',
     'issue_completion',
   ]),
@@ -29,6 +29,7 @@ export const LearningIntelligenceSchema = z.object({
     reflectionPrompt: z.string().trim().min(20),
     expertFeedbackPrompt: z.string().trim().min(20),
     expertReviewRequired: z.boolean(),
+    automatedEvidenceReview: z.boolean(),
   }),
   automations: z.array(z.object({
     trigger: z.enum([
@@ -72,6 +73,8 @@ export function compileLearningIntelligence(input: {
   competencyKeys?: string[];
   objectives?: string[];
   masteryThreshold?: number;
+  critical?: boolean;
+  criticalMasteryThreshold?: number;
   assessment: boolean;
   practical: boolean;
 }): LearningIntelligence {
@@ -92,7 +95,10 @@ export function compileLearningIntelligence(input: {
           source: 'domain' as const,
           required: true,
         }];
-  const masteryThreshold = Math.max(1, Math.min(100, Math.round(input.masteryThreshold ?? 80)));
+  const configuredThreshold = input.critical
+    ? (input.criticalMasteryThreshold ?? 100)
+    : (input.masteryThreshold ?? 80);
+  const masteryThreshold = Math.max(1, Math.min(100, Math.round(configuredThreshold)));
   const remediationTargets = objectives.length ? objectives.slice(0, 5) : skills.map((skill) => skill.label);
 
   const automations: LearningIntelligence['automations'] = [
@@ -123,7 +129,7 @@ export function compileLearningIntelligence(input: {
     automations.push({
       trigger: 'practical_submitted',
       onlyIf: { metric: 'evidence_status', operator: 'eq', value: 'submitted' },
-      actions: [{ type: 'request_expert_review', target: input.lessonSlug }],
+      actions: [{ type: 'request_automated_review', target: input.lessonSlug }],
     });
   }
 
@@ -139,7 +145,8 @@ export function compileLearningIntelligence(input: {
     collaboration: {
       reflectionPrompt: `Explain how you would apply ${input.lessonTitle} during real work and identify one area where you need more practice.`,
       expertFeedbackPrompt: `Review the learner's evidence for ${input.lessonTitle} and give specific feedback tied to the required skills.`,
-      expertReviewRequired: input.practical,
+      expertReviewRequired: false,
+      automatedEvidenceReview: input.practical,
     },
     automations,
   });

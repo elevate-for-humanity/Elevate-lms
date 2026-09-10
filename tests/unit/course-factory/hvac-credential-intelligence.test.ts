@@ -4,7 +4,7 @@ import { HVAC_EPA608_BLUEPRINT } from '@/lib/curriculum/blueprints/hvac-epa-608'
 
 describe('HVAC credential intelligence', () => {
   it('uses original, source-grounded EPA 608 material and the instructional renderer', () => {
-    expect(HVAC_EPA608_BLUEPRINT.version).toBe('2.1.0');
+    expect(HVAC_EPA608_BLUEPRINT.version).toBe('2.2.0');
     expect(HVAC_EPA608_BLUEPRINT.sourceAuthority).toBe('U.S. Environmental Protection Agency');
     expect(HVAC_EPA608_BLUEPRINT.sourceReference).toContain('40 CFR Part 82, Subpart F');
     expect(HVAC_EPA608_BLUEPRINT.generationRules.originalContentRequired).toBe(true);
@@ -15,6 +15,35 @@ describe('HVAC credential intelligence', () => {
     expect(HVAC_EPA608_BLUEPRINT.videoConfig?.surfaceMode).toBe('bright');
     expect(HVAC_EPA608_BLUEPRINT.videoConfig?.backgroundColor).toBe('#f8fafc');
     expect(HVAC_EPA608_BLUEPRINT.videoConfig?.generateDalleImage).toBe(false);
+    expect(HVAC_EPA608_BLUEPRINT.videoConfig?.requireValidatedStoryboardBeforeRender).toBe(true);
+    expect(HVAC_EPA608_BLUEPRINT.videoConfig?.requireSceneLevelObjectiveMapping).toBe(true);
+    expect(HVAC_EPA608_BLUEPRINT.videoConfig?.requireCaptionsAndTranscript).toBe(true);
+    expect(HVAC_EPA608_BLUEPRINT.videoConfig?.requireHumanTechnicalReview).toBe(false);
+    expect(HVAC_EPA608_BLUEPRINT.videoConfig?.requireAutomatedTechnicalReview).toBe(true);
+    expect(HVAC_EPA608_BLUEPRINT.videoConfig?.humanReviewOnlyOnValidationFailure).toBe(true);
+    expect(HVAC_EPA608_BLUEPRINT.videoConfig?.criticalProcedureMedia).toEqual([
+      'original_capture',
+      'licensed_demonstration',
+    ]);
+  });
+
+  it('blocks completion shortcuts around safety and practical mastery', () => {
+    expect(HVAC_EPA608_BLUEPRINT.generationRules.masteryThreshold).toBe(80);
+    expect(HVAC_EPA608_BLUEPRINT.generationRules.criticalMasteryThreshold).toBe(100);
+    expect(HVAC_EPA608_BLUEPRINT.generationRules.requireDiagnosticPreassessment).toBe(true);
+    expect(HVAC_EPA608_BLUEPRINT.generationRules.requirePrerequisiteGates).toBe(true);
+    expect(HVAC_EPA608_BLUEPRINT.generationRules.requirePracticalEvidence).toBe(true);
+    expect(HVAC_EPA608_BLUEPRINT.generationRules.requireInstructorSignoffForCriticalSkills).toBe(true);
+    expect(HVAC_EPA608_BLUEPRINT.generationRules.preventAverageScoreCriticalBypass).toBe(true);
+  });
+
+  it('uses the same five-question minimum at generation and publication', () => {
+    const contracts = readFileSync('lib/course-factory/ai-contracts.ts', 'utf8');
+    const generator = readFileSync('lib/course-factory/content-generator.ts', 'utf8');
+    const validator = readFileSync('lib/course-builder/validate.ts', 'utf8');
+    expect(contracts).toContain('quizQuestionSchema).min(5)');
+    expect(generator).toContain('At least 5 formative quiz_questions');
+    expect(validator).toContain('requires ≥5 quiz questions');
   });
 
   it('prevents cross-trade prompts and stale queued media payloads', () => {

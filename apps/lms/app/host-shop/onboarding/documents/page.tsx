@@ -67,10 +67,10 @@ export default async function HostShopDocumentsPage({
         : params.error === 'file_type'
           ? 'Upload PDF, JPG, or PNG files only.'
           : params.error === 'upload_failed'
-              ? 'The file could not be uploaded. Your existing records are safe. Please try again.'
-              : params.error === 'record_failed'
-                ? 'The file uploaded, but its dashboard record could not be saved. Please try again.'
-                : null;
+            ? 'The file could not be uploaded. Your existing records are safe. Please try again.'
+            : params.error === 'record_failed'
+              ? 'The file uploaded, but its dashboard record could not be saved. Please try again.'
+              : null;
 
   return (
     <main className="bg-slate-50 px-4 py-10 text-slate-950 sm:px-6">
@@ -119,7 +119,9 @@ export default async function HostShopDocumentsPage({
             return (
               <section
                 key={requirement.document_type}
-                className="rounded-2xl border border-slate-200 bg-white p-6"
+                className={`rounded-2xl border p-6 ${
+                  needsUpload ? 'border-red-300 bg-red-50' : 'border-slate-200 bg-white'
+                }`}
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>

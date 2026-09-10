@@ -89,21 +89,28 @@ export default function HostShopDocumentsClient({ requirements }: Props) {
           const document = requirement.document || null;
           const status = String(document?.status || requirement.status || 'missing').toLowerCase();
           const working = workingType === requirement.document_type;
+          const needsAction = status !== 'accepted' && status !== 'pending';
 
           return (
             <article
               key={requirement.document_type}
-              className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+              className={`rounded-2xl border p-5 shadow-sm ${
+                needsAction ? 'border-red-300 bg-red-50' : 'border-slate-200 bg-white'
+              }`}
             >
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div className="flex gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+                  <div
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${needsAction ? 'bg-red-100' : 'bg-slate-100'}`}
+                  >
                     {status === 'accepted' ? (
                       <CheckCircle2 className="h-5 w-5 text-green-600" />
                     ) : status === 'rejected' || status === 'expired' ? (
                       <XCircle className="h-5 w-5 text-red-600" />
                     ) : (
-                      <FileText className="h-5 w-5 text-slate-700" />
+                      <FileText
+                        className={`h-5 w-5 ${needsAction ? 'text-red-700' : 'text-slate-700'}`}
+                      />
                     )}
                   </div>
                   <div>

@@ -1,6 +1,8 @@
 name: Dev Studio Course Builder Control Plane
 
 on:
+  issues:
+    types: [opened]
   workflow_dispatch:
     inputs:
       program:

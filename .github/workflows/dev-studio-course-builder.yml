@@ -137,6 +137,11 @@ jobs:
         shell: bash
         run: rm -f .github/COURSE_MEDIA_PAUSED
 
+      - name: Authorize isolated HVAC one-lesson proof
+        if: github.event_name == 'issues' && github.event.issue.title == 'RUN HVAC ONE LESSON PROOF'
+        shell: bash
+        run: rm -f .github/COURSE_MEDIA_PAUSED
+
       - name: Build through canonical Dev Studio controlled Course Builder
         env:
           NODE_OPTIONS: --conditions=react-server

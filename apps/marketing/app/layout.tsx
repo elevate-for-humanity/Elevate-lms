@@ -1,5 +1,5 @@
 /**
- * Production recovery deploy marker: 2026-08-13.
+ * Production release marker: PARIS mobile controls, 2026-09-10.
  * IMPORTANT: client-polyfills MUST be the first import in this file.
  */
 import './client-polyfills';

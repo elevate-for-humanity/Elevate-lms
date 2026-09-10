@@ -19,7 +19,7 @@ async function main() {
   const db = await requireAdminClient();
   const { data: lesson, error } = await db
     .from('course_lessons')
-    .select('id,title,course_modules!inner(courses!inner(id,slug,is_active,status))')
+    .select('id,title,course_modules!inner(courses!inner(id,slug,is_active,status,generation_paused))')
     .eq('slug', lessonSlug)
     .eq('course_modules.courses.slug', courseSlug)
     .single();
@@ -31,13 +31,33 @@ async function main() {
     throw new Error('One-lesson proof is restricted to an inactive draft course');
   }
 
-  const result = await queueCourseMedia({
-    courseId: course.id,
-    lessonId: lesson.id,
-    onlyMissing: false,
-    force: true,
-    limit: 1,
-  });
+  const originalGenerationPaused = course.generation_paused === true;
+  if (originalGenerationPaused) {
+    const { error: unpauseError } = await db
+      .from('courses')
+      .update({ generation_paused: false })
+      .eq('id', course.id);
+    if (unpauseError) throw unpauseError;
+  }
+
+  let result;
+  try {
+    result = await queueCourseMedia({
+      courseId: course.id,
+      lessonId: lesson.id,
+      onlyMissing: false,
+      force: true,
+      limit: 1,
+    });
+  } finally {
+    if (originalGenerationPaused) {
+      const { error: restoreError } = await db
+        .from('courses')
+        .update({ generation_paused: true })
+        .eq('id', course.id);
+      if (restoreError) throw restoreError;
+    }
+  }
 
   if (result.queued !== 1 || result.failed !== 0) {
     throw new Error(`Expected exactly one queued lesson; queued=${result.queued} failed=${result.failed}`);

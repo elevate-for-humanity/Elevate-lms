@@ -102,7 +102,7 @@ export function buildAtomicPayload(
   const instructor = getInstructorForBlueprint(courseTitle, videoConfig);
   return [...modules]
     .sort((a, b) => a.orderIndex - b.orderIndex)
-    .map((courseModule, modulePosition) => {
+    .map((courseModule) => {
       const moduleExtra = courseModule as typeof courseModule & Record<string, any>;
       return {
         slug: courseModule.slug,
@@ -114,7 +114,7 @@ export function buildAtomicPayload(
         is_required: moduleExtra.isRequired ?? true,
         lessons: [...(courseModule.lessons ?? [])]
           .sort((a, b) => a.order - b.order)
-          .map((lesson, lessonPosition) => {
+          .map((lesson) => {
             const extra = lesson as typeof lesson & Record<string, any>;
             const stepType = normalizeLessonType(extra, lesson.slug);
             const content = normalizeLessonContent(lesson.content, lesson.objective);
@@ -224,14 +224,14 @@ export function buildAtomicPayload(
             const instructorNotes = Array.isArray(lesson.instructorNotes)
               ? lesson.instructorNotes.join('\n\n')
               : (lesson.instructorNotes ?? null);
+            const canonicalLessonOrder = courseModule.orderIndex * 1000 + lesson.order;
             return {
               slug: lesson.slug,
               title: lesson.title,
               lesson_type: stepType,
-              // The live schema enforces UNIQUE(course_id, order_index). Blueprint
-              // order fields are descriptive and may be duplicated or zero-based, so
-              // derive the persisted global index from normalized array positions.
-              order_index: (modulePosition + 1) * 1000 + (lessonPosition + 1),
+              // Module and lesson order are canonicalized before publication. Their
+              // composite keeps lesson ordering unique across the complete course.
+              order_index: canonicalLessonOrder,
               objective: lesson.objective ?? null,
               content,
               content_json: {

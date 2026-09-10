@@ -34,6 +34,14 @@ const validLesson = {
       ...validQuestion,
       question: 'When should the learner report an exception?',
     },
+    {
+      ...validQuestion,
+      question: 'Which record proves the procedure was completed?',
+    },
+    {
+      ...validQuestion,
+      question: 'Who receives an unresolved exception report?',
+    },
   ],
   experience: {
     readingGuide: {

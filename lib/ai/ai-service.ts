@@ -47,16 +47,7 @@ const imageProviders: Record<string, () => AIImageProvider> = {
 // first AI_PROVIDER_ORDER entry remains a migration-compatible way to select
 // that same single authority. Course generation must repair a failed provider,
 // never produce divergent artifacts through a silent provider substitution.
-const PROVIDER_DISCOVERY_ORDER = [
-  'elevate',
-  'cloudflare',
-  'groq',
-  'gemini',
-  'google',
-  'anthropic',
-  'azure',
-  'openai',
-];
+const PROVIDER_DISCOVERY_ORDER = ['elevate', 'cloudflare', 'groq', 'gemini', 'google', 'anthropic', 'azure', 'openai'];
 let discoveredProviderName: string | null = null;
 
 function configuredProviderName(): string {

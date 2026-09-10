@@ -42,7 +42,6 @@ jobs:
       github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE' ||
       github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE' ||
       github.event.issue.title == 'RUN HVAC COURSE BUILDER ACCEPTANCE' ||
-      github.event.issue.title == 'RUN HVAC ONE LESSON PROOF' ||
       github.event.issue.title == 'RUN BARBER COURSE BUILDER ACCEPTANCE' ||
       github.event.issue.title == 'RUN COSMETOLOGY COURSE BUILDER ACCEPTANCE' ||
       github.event.issue.title == 'RUN COSMETOLOGY UNIFIED COURSE REBUILD'
@@ -123,7 +122,7 @@ jobs:
           elif [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN ESB COURSE BUILDER ACCEPTANCE" ]; then
             target="esb"
           fi
-          if [ "${{ github.event_name }}" = "issues" ] && { [ "${{ github.event.issue.title }}" = "RUN HVAC COURSE BUILDER ACCEPTANCE" ] || [ "${{ github.event.issue.title }}" = "RUN HVAC ONE LESSON PROOF" ]; }; then
+          if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN HVAC COURSE BUILDER ACCEPTANCE" ]; then
             target="hvac-technician"
           elif [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN BARBER COURSE BUILDER ACCEPTANCE" ]; then
             target="barber-apprenticeship"
@@ -137,11 +136,6 @@ jobs:
         shell: bash
         run: rm -f .github/COURSE_MEDIA_PAUSED
 
-      - name: Authorize isolated HVAC one-lesson proof
-        if: github.event_name == 'issues' && github.event.issue.title == 'RUN HVAC ONE LESSON PROOF'
-        shell: bash
-        run: rm -f .github/COURSE_MEDIA_PAUSED
-
       - name: Build through canonical Dev Studio controlled Course Builder
         env:
           NODE_OPTIONS: --conditions=react-server
@@ -150,15 +144,11 @@ jobs:
           if [ "${{ steps.target.outputs.program }}" = "esb" ]; then
             pnpm tsx scripts/course-factory/build-esb-acceptance.ts
           elif [ "${{ steps.target.outputs.program }}" = "hvac-technician" ]; then
-            if [ "${{ github.event.issue.title }}" = "RUN HVAC ONE LESSON PROOF" ]; then
-              pnpm tsx scripts/course-builder/run-one-lesson-proof.ts --course hvac-technician --lesson hvac-lesson-7
-            else
-              # Rebuild the canonical authored source first so Course Builder never
-              # republishes stale refrigerant classifications or static penalty data.
-              pnpm tsx scripts/backfill-hvac-script-text.ts --force
-              pnpm tsx scripts/course-builder/run.ts --course hvac-technician --mode refresh
-              pnpm tsx scripts/check-hvac-content.ts
-            fi
+            # Rebuild the canonical authored source first so Course Builder never
+            # republishes stale refrigerant classifications or static penalty data.
+            pnpm tsx scripts/backfill-hvac-script-text.ts --force
+            pnpm tsx scripts/course-builder/run.ts --course hvac-technician --mode refresh
+            pnpm tsx scripts/check-hvac-content.ts
           elif [ "${{ steps.target.outputs.program }}" = "business-administration" ]; then
             pnpm tsx scripts/course-factory/build-business-program.ts
           else

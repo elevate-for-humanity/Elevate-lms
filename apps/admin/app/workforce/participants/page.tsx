@@ -14,7 +14,7 @@ export default async function ParticipantsPage() {
   const db = await requireAdminClient();
 
   const { data: participants } = await db
-    .from('workforce_participants')
+    .from('participants')
     .select('id,name,email,program_id,status,enrollment_date,created_at')
     .order('created_at', { ascending: false })
     .limit(100);

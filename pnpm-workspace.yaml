@@ -50,16 +50,17 @@ overrides:
   '@opentelemetry/exporter-metrics-otlp-http': ^0.220.0
   fast-uri: 3.1.6
   browserslist: 4.28.8
-  sharp: 0.35.1
+  sharp: 0.35.4
+  '@xmldom/xmldom@>=0.7.0 <0.9.0': 0.8.15
   'brace-expansion@1': 1.1.18
   'brace-expansion@2': 2.1.4
   'brace-expansion@5': 5.0.9
   ip-address: ^10.3.1
   nanoid: ^3.3.18
-  'js-yaml@3': 4.3.1
-  'js-yaml@>=4.0.0 <4.3.1': 4.3.1
+  'js-yaml@3': 4.3.2
+  'js-yaml@>=4.0.0 <5.0.0': 4.3.2
 
 catalog:
-  next: "15.5.23"
+  next: "15.5.25"
   react: "19.2.7"
   react-dom: "19.2.7"

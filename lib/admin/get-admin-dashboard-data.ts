@@ -16,6 +16,7 @@ import {
 } from '@/lib/admin/priority-score';
 import { getSystemHealth } from './dashboard/get-system-health';
 import { isTestOrSuspiciousPayment } from './dashboard/format-metrics';
+import { requireRole } from '@/lib/auth/require-role';
 
 function n(value: unknown): number {
   const parsed = Number(value ?? 0);
@@ -49,6 +50,7 @@ function safeRows<T>(
 }
 
 export async function getAdminDashboardData(): Promise<AdminDashboardData> {
+  await requireRole(['admin', 'super_admin']);
   const supabase = await createClient();
   const db = await requireAdminClient();
   const degradedSections: DegradedSection[] = [];
@@ -138,7 +140,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       .eq('status', 'pending')
       .ilike('document_type', '%wioa%'),
     db
-      .from('lesson_submissions')
+      .from('step_submissions')
       .select('id,user_id,course_lesson_id,step_type,status,created_at')
       .eq('status', 'pending')
       .limit(100),

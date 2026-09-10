@@ -21,44 +21,28 @@ export default async function StaffSettingsPage() {
   if (!user) redirect('/login?redirect=/staff/settings');
 
   const { data: staffUser } = await supabase
-    .from('staff_users')
-    .select('staff_id')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (!staffUser) redirect('/unauthorized');
-
-  const orgId = staffUser?.staff_id ?? null;
-
-  const { data: org } = orgId
-    ? await supabase
-        .from('staffs')
-        .select(
-          'name, city, state, address, contact_name, contact_email, contact_phone, notification_preferences',
-        )
-        .eq('id', orgId)
-        .maybeSingle()
-    : { data: null };
-
-  const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, email')
+    .select('id, role, company_name, address, city, state, full_name, email, phone, notification_preferences')
     .eq('id', user.id)
     .maybeSingle();
 
+  if (!staffUser || !['staff', 'admin', 'super_admin'].includes(staffUser.role ?? '')) redirect('/unauthorized');
+
+  const orgId = staffUser.id;
+
   const initialData = {
     orgId,
-    orgName: org?.name ?? '',
-    address: org?.address ?? '',
-    city: org?.city ?? '',
-    state: org?.state ?? '',
-    contactName: org?.contact_name ?? profile?.full_name ?? '',
-    contactEmail: org?.contact_email ?? profile?.email ?? user.email ?? '',
-    contactPhone: org?.contact_phone ?? '',
-    emailNotifications: org?.notification_preferences?.email ?? true,
-    weeklyDigest: org?.notification_preferences?.weekly_digest ?? true,
-    outcomeAlerts: org?.notification_preferences?.outcome_alerts ?? true,
-    referralConfirmations: org?.notification_preferences?.referral_confirmations ?? true,
+    orgName: staffUser.company_name ?? '',
+    address: staffUser.address ?? '',
+    city: staffUser.city ?? '',
+    state: staffUser.state ?? '',
+    contactName: staffUser.full_name ?? '',
+    contactEmail: staffUser.email ?? user.email ?? '',
+    contactPhone: staffUser.phone ?? '',
+    emailNotifications: (staffUser.notification_preferences as any)?.email ?? true,
+    weeklyDigest: (staffUser.notification_preferences as any)?.weekly_digest ?? true,
+    outcomeAlerts: (staffUser.notification_preferences as any)?.outcome_alerts ?? true,
+    referralConfirmations: (staffUser.notification_preferences as any)?.referral_confirmations ?? true,
   };
 
   return (

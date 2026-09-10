@@ -28,7 +28,7 @@ export default async function InstructorCoursesPage() {
   try {
     const { data, error: queryError } = await supabase
       .from('lms_courses')
-      .select('*, training_enrollments(count)')
+      .select('*')
       .eq('instructor_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -36,7 +36,18 @@ export default async function InstructorCoursesPage() {
       console.error('[instructor/courses] query failed', queryError);
       error = 'Courses could not be loaded.';
     } else {
-      courses = data ?? [];
+      const courseIds = (data ?? []).map((course: any) => course.id);
+      const { data: enrollmentRows } = courseIds.length
+        ? await supabase.from('program_enrollments').select('course_id').in('course_id', courseIds)
+        : { data: [] };
+      const counts = new Map<string, number>();
+      for (const row of enrollmentRows ?? []) {
+        if (row.course_id) counts.set(row.course_id, (counts.get(row.course_id) ?? 0) + 1);
+      }
+      courses = (data ?? []).map((course: any) => ({
+        ...course,
+        enrollment_count: counts.get(course.id) ?? 0,
+      }));
     }
   } catch (cause) {
     console.error('[instructor/courses] unexpected failure', cause);
@@ -89,7 +100,7 @@ export default async function InstructorCoursesPage() {
                 <h3 className="mb-2 text-xl font-semibold">{course.course_name || course.title}</h3>
                 <p className="mb-4 line-clamp-2 text-sm text-black">{course.description}</p>
                 <div className="text-sm text-slate-500">
-                  Students: {course.training_enrollments?.[0]?.count || 0}
+                  Students: {course.enrollment_count || 0}
                 </div>
               </Link>
             ))}

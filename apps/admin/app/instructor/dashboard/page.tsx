@@ -25,18 +25,6 @@ export default async function InstructorDashboard() {
     .eq('instructor_id', user.id);
   const courseIds = (myCourses || []).map((c: any) => c.id);
 
-  const { data: legacyStudents } =
-    courseIds.length > 0
-      ? await supabase
-          .from('training_enrollments')
-          .select(
-            'id, status, enrolled_at, started_at, created_at, course_id, profiles (id, full_name, email), programs:training_courses (title, training_hours)',
-          )
-          .in('course_id', courseIds)
-          .order('enrolled_at', { ascending: false })
-          .limit(50)
-      : { data: [] };
-
   let assignedProgramIds: string[] = [];
   if (!isAdmin) {
     const { data: assignedPrograms } = await supabase
@@ -75,18 +63,8 @@ export default async function InstructorDashboard() {
     program_id?: string | null;
     profiles: { id: string; full_name: string | null; email: string | null } | null;
     programs: { title: string | null; training_hours?: number | null } | null;
-    source: 'legacy' | 'current';
+    source: 'current';
   };
-
-  const legacyNorm: StudentRow[] = (legacyStudents || []).map((e: any) => ({
-    id: e.id,
-    status: e.status,
-    started_at: e.started_at || e.enrolled_at || e.created_at,
-    created_at: e.created_at,
-    profiles: e.profiles,
-    programs: e.programs,
-    source: 'legacy',
-  }));
 
   const currentNorm: StudentRow[] = currentStudents.map((e: any) => ({
     id: e.id,
@@ -102,7 +80,7 @@ export default async function InstructorDashboard() {
 
   const seenProfileIds = new Set<string>();
   const students: StudentRow[] = [];
-  for (const row of [...currentNorm, ...legacyNorm]) {
+  for (const row of currentNorm) {
     const pid = row.profiles?.id;
     if (pid && seenProfileIds.has(pid)) continue;
     if (pid) seenProfileIds.add(pid);

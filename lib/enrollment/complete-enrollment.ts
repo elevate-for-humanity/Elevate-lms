@@ -25,15 +25,27 @@ export interface EnrollmentResult {
   courseAccessUrl?: string;
 }
 
+async function authorizeEnrollmentAccess(targetUserId: string) {
+  const sessionDb = await createClient();
+  const { data: { user } } = await sessionDb.auth.getUser();
+  if (!user) throw new Error('Authentication required');
+  if (user.id === targetUserId) return;
+  const { data: profile } = await sessionDb.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  if (!['admin', 'super_admin', 'staff'].includes(profile?.role ?? '')) {
+    throw new Error('Enrollment authorization required');
+  }
+}
+
 /**
  * Canonical enrollment flow.
  *
  * Reads from:  courses (canonical), program_enrollments (canonical)
  * Writes to:   program_enrollments (canonical)
  *
- * Does NOT touch training_courses, training_enrollments, or course_progress.
+ * Does not touch retired enrollment aliases or course progress.
  */
 export async function completeEnrollment(data: EnrollmentData): Promise<EnrollmentResult> {
+  await authorizeEnrollmentAccess(data.userId);
   const admin = await requireAdminClient();
   const supabase = admin || (await createClient());
 
@@ -168,6 +180,7 @@ export async function completeEnrollment(data: EnrollmentData): Promise<Enrollme
  * Verify course access — reads program_enrollments (canonical).
  */
 export async function verifyCourseAccess(userId: string, courseId: string): Promise<boolean> {
+  await authorizeEnrollmentAccess(userId);
   const admin = await requireAdminClient();
   const supabase = admin || (await createClient());
 

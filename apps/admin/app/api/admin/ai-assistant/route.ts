@@ -194,7 +194,7 @@ async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
     db.from('program_enrollments').select('amount_paid_cents').eq('payment_status', 'paid').gte('created_at', monthStart),
     db.from('program_enrollments').select('amount_paid_cents').eq('payment_status', 'paid'),
     db.from('program_completion_certificates').select('id', { count: 'exact', head: true }),
-    db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active').or(`last_activity_at.lt.${cutoff7d},last_activity_at.is.null`),
+    db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('status', 'active').or(`last_accessed.lt.${cutoff7d},last_accessed.is.null`),
     db.from('compliance_alerts').select('id', { count: 'exact', head: true }).neq('status', 'resolved'),
     db.from('wioa_documents').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     db.from('document_signatures').select('id', { count: 'exact', head: true }).is('signed_at', null),
@@ -209,8 +209,8 @@ async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
     db.from('exam_bookings').select('id', { count: 'exact', head: true }).in('status', ['pending', 'submitted']),
     db.from('exam_bookings').select('id', { count: 'exact', head: true }).eq('payment_status', 'paid'),
     // Program holders & employers
-    db.from('program_holder_profiles').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-    db.from('program_holder_profiles').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    db.from('program_holders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+    db.from('program_holders').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     db.from('employer_profiles').select('id', { count: 'exact', head: true }).eq('status', 'active'),
     // Delivery logs
     db.from('delivery_logs').select('id', { count: 'exact', head: true }).eq('channel', 'email').eq('status', 'sent').gte('created_at', today.toISOString()),
@@ -219,11 +219,11 @@ async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
     db.from('crm_leads').select('id', { count: 'exact', head: true }).eq('status', 'hot'),
     db.from('crm_leads').select('id', { count: 'exact', head: true }).gte('created_at', today.toISOString()),
     // At-risk names
-    db.from('program_enrollments').select('profiles(full_name), programs(name), last_activity_at').eq('status', 'active').or(`last_activity_at.lt.${cutoff7d},last_activity_at.is.null`).limit(5),
+    db.from('program_enrollments').select('profiles!program_enrollments_user_id_profiles_fkey(full_name), programs!fk_program_enrollments_program(name), last_accessed').eq('status', 'active').or(`last_accessed.lt.${cutoff7d},last_accessed.is.null`).limit(5),
     // Placements
     db.from('job_placements').select('id', { count: 'exact', head: true }).eq('status', 'placed'),
     // SNAP E&T / FSSA
-    db.from('snap_participants').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    db.from('wioa_participants').select('id', { count: 'exact', head: true }).eq('receives_snap', true).eq('status', 'active'),
   ]);
 
   const sum = (rows: Record<string, unknown>[]) =>
@@ -241,7 +241,7 @@ async function getLiveDataSnapshot(db: SupabaseClient): Promise<string> {
     .map(([name, count]) => `  ${name}: ${count} active`).join('\n') || '  (none)';
 
   const atRiskNames = (atRiskDetail.data ?? []).slice(0, 5).map((r: any) =>
-    `  ${(r.profiles as any)?.full_name ?? 'Unknown'} — ${(r.programs as any)?.name ?? 'Unknown'} (last active: ${r.last_activity_at ? new Date(r.last_activity_at).toLocaleDateString() : 'never'})`
+    `  ${(r.profiles as any)?.full_name ?? 'Unknown'} — ${(r.programs as any)?.name ?? 'Unknown'} (last active: ${r.last_accessed ? new Date(r.last_accessed).toLocaleDateString() : 'never'})`
   ).join('\n') || '  None';
 
   return `LIVE DATA (${now.toLocaleString('en-US', { timeZone: 'America/Indiana/Indianapolis' })} ET):
@@ -472,20 +472,20 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
   // Program holders
   if (lower.includes('program holder') || lower.includes('partner') || lower.includes('franchise') || lower.includes('mou')) {
     const { data } = await db
-      .from('program_holder_profiles')
-      .select('id, org_name, contact_name, email, status, created_at')
+      .from('program_holders')
+      .select('id, organization_name, contact_name, contact_email, status, created_at')
       .order('created_at', { ascending: false })
       .limit(20);
     if (data?.length) {
       const pending = data.filter((p: any) => p.status === 'pending');
       return {
         text: `PROGRAM HOLDERS (${data.length}):\n${data.map((p: any) =>
-          `• ${p.org_name} — ${p.contact_name} (${p.email}) — status: ${p.status}`
+          `• ${p.organization_name} — ${p.contact_name} (${p.contact_email}) — status: ${p.status}`
         ).join('\n')}`,
         actionHint: pending.length ? {
           type: 'approve_program_holder' as EllieActionType,
-          label: `Approve ${pending[0].org_name}`,
-          params: { programHolderId: pending[0].id, orgName: pending[0].org_name },
+          label: `Approve ${pending[0].organization_name}`,
+          params: { programHolderId: pending[0].id, orgName: pending[0].organization_name },
           targetCount: 1,
         } : undefined,
       };
@@ -515,11 +515,11 @@ async function resolveIntent(message: string, db: SupabaseClient): Promise<Inten
     const [{ data: wioa }, { data: grants }, { data: snap }] = await Promise.all([
       db.from('wioa_documents').select('participant_name, status, program_name, created_at').order('created_at', { ascending: false }).limit(15),
       db.from('grants').select('title, status, amount_requested, deadline, created_at').order('created_at', { ascending: false }).limit(10),
-      db.from('snap_participants').select('full_name, status, program_name, created_at').order('created_at', { ascending: false }).limit(10),
+      db.from('wioa_participants').select('participant_name, status, program, created_at').eq('receives_snap', true).order('created_at', { ascending: false }).limit(10),
     ]);
     const parts: string[] = [];
     if (wioa?.length) parts.push(`WIOA DOCUMENTS (${wioa.length}):\n${wioa.map((w: any) => `• ${w.participant_name} — ${w.program_name ?? 'Unknown'} — ${w.status}`).join('\n')}`);
-    if (snap?.length) parts.push(`SNAP E&T PARTICIPANTS (${snap.length}):\n${snap.map((s: any) => `• ${s.full_name} — ${s.program_name ?? 'Unknown'} — ${s.status}`).join('\n')}`);
+    if (snap?.length) parts.push(`SNAP E&T PARTICIPANTS (${snap.length}):\n${snap.map((s: any) => `• ${s.participant_name} — ${s.program ?? 'Unknown'} — ${s.status}`).join('\n')}`);
     if (grants?.length) parts.push(`GRANTS (${grants.length}):\n${grants.map((g: any) => `• ${g.title} — ${g.status} — $${((g.amount_requested ?? 0) / 100).toLocaleString()} — deadline: ${g.deadline ?? 'none'}`).join('\n')}`);
     if (parts.length) return { text: parts.join('\n\n') };
     return { text: 'No WIOA, SNAP, or grant records found.' };

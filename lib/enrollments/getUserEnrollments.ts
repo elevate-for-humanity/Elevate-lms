@@ -4,7 +4,7 @@
  * Program access is sourced from program_enrollments. Direct course assignments
  * are sourced from course_enrollments and de-duplicated by course id.
  * Partner LMS access remains separate because it is a different delivery concern.
- * Legacy training_enrollments / student_enrollments aliases are intentionally not
+ * Retired enrollment aliases are intentionally not
  * queried here; compatibility surfaces must never become a second authority.
  */
 
@@ -63,6 +63,8 @@ type CourseRow = {
 export async function getUserEnrollments(userId: string): Promise<EnrollmentQueryResult> {
   const supabase = await createClient();
   if (!supabase) return { enrollments: [], error: 'Database not configured' };
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || user.id !== userId) return { enrollments: [], error: 'Unauthorized' };
 
   const results: NormalizedEnrollment[] = [];
 

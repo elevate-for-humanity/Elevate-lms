@@ -29,7 +29,7 @@ export async function createWorkforceParticipant(formData: FormData) {
   if (caseWorkerId && !caseWorker) redirect('/workforce/participants/new?error=invalid-case-worker');
 
   const { error } = await auditedMutation({
-    table: 'workforce_participants',
+    table: 'participants',
     operation: 'insert',
     rowData: {
       name,
@@ -42,7 +42,7 @@ export async function createWorkforceParticipant(formData: FormData) {
     audit: {
       action: 'admin:workforce-participant:create',
       actorId: auth.user.id,
-      targetType: 'workforce_participants',
+      targetType: 'participants',
       metadata: { program_id: programId, case_worker_id: caseWorkerId || null },
     },
   });

@@ -13,6 +13,11 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { logAuditEvent } from '@/lib/audit';
 import { logger } from '@/lib/logger';
+import { requireRole } from '@/lib/auth/require-role';
+
+async function requireEnrollmentOperator() {
+  await requireRole(['admin', 'super_admin', 'staff']);
+}
 
 async function getDb() {
   return requireAdminClient();
@@ -67,6 +72,7 @@ export interface UpdateFundingAmountsInput {
 // CREATE ENROLLMENT
 // ============================================================================
 export async function createEnrollment(input: CreateEnrollmentInput) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     // 1. Verify student exists
@@ -191,6 +197,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
 // ADD TRANSFER HOURS
 // ============================================================================
 export async function addTransferHours(input: AddTransferHoursInput) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     // 1. Verify enrollment exists
@@ -247,6 +254,7 @@ export async function addTransferHours(input: AddTransferHoursInput) {
 // APPROVE TRANSFER HOURS
 // ============================================================================
 export async function approveTransferHours(input: ApproveTransferHoursInput) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     // 1. Get transfer hours record
@@ -296,7 +304,7 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
       // Error: $1
       throw new Error(`Failed to approve transfer hours: ${updateError.message}`);
     }
-    // 4. If this is an apprenticeship, update apprenticeship_enrollments
+    // 4. If this is an apprenticeship, update the canonical enrollment row.
     if (transferHours.enrollment?.program?.is_apprenticeship) {
       // Calculate total transferred hours for this enrollment
       const { data: allTransfers } = await db
@@ -344,6 +352,7 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
 // REJECT TRANSFER HOURS
 // ============================================================================
 export async function rejectTransferHours(transfer_hours_id: string, reason: string) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     const { error } = await db
@@ -374,6 +383,7 @@ export async function rejectTransferHours(transfer_hours_id: string, reason: str
 // UPDATE FUNDING AMOUNTS
 // ============================================================================
 export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     // 1. Verify enrollment exists
@@ -420,6 +430,7 @@ export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
 // GET ENROLLMENT WITH FULL DETAILS
 // ============================================================================
 export async function getEnrollmentDetails(enrollment_id: string) {
+  await requireEnrollmentOperator();
   try {
     const db = await getDb();
     const { data, error }: any = await db
@@ -440,8 +451,7 @@ export async function getEnrollmentDetails(enrollment_id: string) {
             *,
             scorm_packages(*)
           )
-        ),
-        apprenticeship:apprenticeship_enrollments(*)
+        )
       `,
       )
       .eq('id', enrollment_id)

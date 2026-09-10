@@ -12,6 +12,8 @@ export const dynamic = 'force-dynamic';
 async function _GET(_req: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {
   const rateLimited = await applyRateLimit(_req, 'api');
   if (rateLimited) return rateLimited;
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const supabase = await createClient();
   const { courseId } = await params;
 
@@ -48,7 +50,6 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ courseId:
     return NextResponse.json({ error: 'title and message are required' }, { status: 400 });
   }
 
-  // Optional: verify user is instructor for this course
   const { data: course, error: courseError } = await supabase
     .from('courses')
     .select('instructor_id')
@@ -60,7 +61,9 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ courseId:
     return NextResponse.json({ error: 'Course not found' }, { status: 404 });
   }
 
-  if (course.instructor_id && course.instructor_id !== user.id) {
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+  if (!isAdmin && course.instructor_id !== user.id) {
     return NextResponse.json(
       { error: 'Only the instructor can post announcements' },
       { status: 403 },
@@ -80,7 +83,7 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ courseId:
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
-  // Notify enrolled students — training_enrollments is the canonical course enrollment table
+  // Notify enrolled students from the canonical enrollment authority.
   const { data: enrollments } = await supabase
     .from('program_enrollments')
     .select('user_id')

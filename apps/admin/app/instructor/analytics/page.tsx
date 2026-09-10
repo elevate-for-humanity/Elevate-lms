@@ -34,14 +34,14 @@ export default async function InstructorAnalyticsPage() {
   const { count: totalStudents } =
     courseIds.length > 0
       ? await supabase
-          .from('training_enrollments')
+          .from('program_enrollments')
           .select('*', { count: 'exact', head: true })
           .in('course_id', courseIds)
       : { count: 0 };
   const { count: completedEnrollments } =
     courseIds.length > 0
       ? await supabase
-          .from('training_enrollments')
+          .from('program_enrollments')
           .select('*', { count: 'exact', head: true })
           .in('course_id', courseIds)
           .eq('status', 'completed')

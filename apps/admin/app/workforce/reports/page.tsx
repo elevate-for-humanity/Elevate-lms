@@ -14,7 +14,7 @@ export default async function ReportsPage() {
   const db = await createClient();
 
   const { data: participants } = await db
-    .from('workforce_participants')
+    .from('participants')
     .select('*');
 
   return (

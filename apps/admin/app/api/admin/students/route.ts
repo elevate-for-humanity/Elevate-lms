@@ -65,13 +65,13 @@ async function _GET(request: Request) {
       const studentIds = filteredStudents.map((s) => s.id);
       if (studentIds.length > 0) {
         let enrollQuery = db
-          .from('training_enrollments')
-          .select('id, user_id, status, program_id, cohort_id, hours_completed')
+          .from('program_enrollments')
+          .select('id, user_id, student_id, status, program_id, cohort_id, total_hours_completed')
           .in('user_id', studentIds);
         if (status) enrollQuery = enrollQuery.eq('status', status) as typeof enrollQuery;
         if (programId) enrollQuery = enrollQuery.eq('program_id', programId) as typeof enrollQuery;
         const { data: enrollments } = await enrollQuery;
-        const matchedIds = new Set((enrollments || []).map((e: any) => e.user_id));
+        const matchedIds = new Set((enrollments || []).map((e: any) => e.user_id ?? e.student_id));
         filteredStudents = filteredStudents.filter((s) => matchedIds.has(s.id));
       }
     }

@@ -44,9 +44,9 @@ function constructStripeEventWithAnySecret(
 }
 
 /**
- * Grant LMS course access to user via training_enrollments.
+ * Grant direct LMS course access through course_enrollments.
  * Accepts either a course slug or a course UUID.
- * Uses training_enrollments (not program_enrollments — that requires program_id NOT NULL).
+ * Program enrollment remains separate because it requires a program workflow.
  */
 async function grantLmsAccess(
   userId: string,
@@ -75,22 +75,16 @@ async function grantLmsAccess(
     return false;
   }
 
-  // Upsert into training_enrollments — the correct table for self-serve course purchases
-  const { error } = await adminDb.from('program_enrollments').upsert(
+  // Direct course purchases belong to the course-access authority.
+  const { error } = await adminDb.from('course_enrollments').upsert(
     {
-      user_id: userId,
+      student_id: userId,
       course_id: course.id,
       status: 'active',
-      enrolled_at: new Date().toISOString(),
-      payment_method: 'self_pay',
-      payment_option: 'full',
-      funding_source: 'self_pay',
-      stripe_checkout_session_id: stripeSessionId || null,
-      amount_paid: amountPaidCents ? amountPaidCents / 100 : null,
-      program_slug: course.slug || null,
+      progress_percentage: 0,
     },
     {
-      onConflict: 'user_id,course_id',
+      onConflict: 'student_id,course_id',
       ignoreDuplicates: false,
     },
   );

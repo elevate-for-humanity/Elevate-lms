@@ -1,17 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Bot, ChevronLeft, Sparkles } from 'lucide-react';
 
 export default function StudioNavigation() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   // The command workspace owns its full-screen header and horizontal tool
   // navigation. Mounting this section header above /studio frames the Studio
   // twice and removes usable height. Nested capability routes keep this
   // breadcrumb header because they do not render the command workspace.
-  if (pathname === '/studio') return null;
+  if (pathname === '/studio' || searchParams.get('embedded') === '1') return null;
 
   return (
     <div className="border-b border-slate-200 bg-white">

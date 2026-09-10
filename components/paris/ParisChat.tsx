@@ -226,7 +226,7 @@ export default function ParisChat({
   }
 
   return (
-    <div className={`flex h-full flex-col ${className}`}>
+    <div className={`flex h-full min-w-0 max-w-full flex-col overflow-hidden ${className}`}>
       {showHeader && (
         <div className="shrink-0 bg-slate-950 px-6 py-4 text-white">
           <div className="flex items-center gap-3">
@@ -338,9 +338,9 @@ export default function ParisChat({
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
+      <form onSubmit={handleSubmit} className="min-w-0 max-w-full shrink-0 overflow-hidden border-t border-slate-200 bg-white px-3 py-4 sm:px-6">
         <label htmlFor="paris-chat-input" className="sr-only">Ask PARIS a question</label>
-        <div className="flex items-end gap-2 sm:gap-3">
+        <div className="flex w-full min-w-0 max-w-full items-end gap-2 sm:gap-3">
           <button
             type="button"
             aria-label={autoSpeak ? 'Mute PARIS voice' : 'Turn on PARIS voice'}
@@ -349,6 +349,7 @@ export default function ParisChat({
               if (autoSpeak) voice.stop();
               setAutoSpeak((enabled) => !enabled);
             }}
+            style={{ width: 44, minWidth: 44, maxWidth: 44, flexBasis: 44 }}
             className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100"
           >
             {autoSpeak ? <Volume2 className="h-5 w-5" aria-hidden="true" /> : <VolumeX className="h-5 w-5" aria-hidden="true" />}
@@ -360,6 +361,7 @@ export default function ParisChat({
             onChange={(event) => setInput(event.target.value.slice(0, 2000))}
             onKeyDown={handleKeyDown}
             placeholder={learnerSurface ? 'Ask about your course or next lesson…' : storeSurface ? 'Tell PARIS about your business or ask a platform question…' : 'Ask about a program, funding, testing, or apprenticeship…'}
+            style={{ width: 0, minWidth: 0, maxWidth: '100%', flex: '1 1 0%' }}
             className="min-h-11 max-h-28 min-w-0 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-3 py-2.5 text-base text-slate-950 focus:border-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-200 sm:min-h-[52px] sm:max-h-40 sm:px-4 sm:py-3 sm:text-sm"
             rows={1}
             disabled={isLoading}
@@ -369,6 +371,7 @@ export default function ParisChat({
             type="submit"
             aria-label="Send message"
             disabled={!input.trim() || isLoading}
+            style={{ width: 44, minWidth: 44, maxWidth: 44, flexBasis: 44 }}
             className="inline-flex h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-brand-blue-700 p-0 font-semibold text-white transition hover:bg-brand-blue-800 disabled:cursor-not-allowed disabled:opacity-50 sm:h-auto sm:min-h-12 sm:w-auto sm:rounded-2xl sm:px-5 sm:py-3"
           >
             <Send className="h-4 w-4" aria-hidden="true" />

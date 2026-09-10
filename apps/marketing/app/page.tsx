@@ -116,7 +116,6 @@ export default function HomePage() {
         <HostShopShowcase
           shops={HOME_HOST_SHOPS}
           videoTourShopSlug="salon-saloon"
-          autoPlayVideoOnVisible
           mediaSequence={[
             {
               shopSlug: 'salon-saloon',

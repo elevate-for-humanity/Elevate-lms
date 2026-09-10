@@ -4,6 +4,8 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { getHostShopBoard } from '@/lib/partner/board';
 import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
 
+// pre-auth-registry: exempt - requireCurrentHostShopPartner authenticates and authorizes the Host Shop before hour_entries writes.
+
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 

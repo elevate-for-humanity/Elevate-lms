@@ -102,10 +102,31 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
       text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '').trim().slice(0, 80),
       href: element.getAttribute('href'),
     }));
-    return { viewportWidth, scrollWidth, mainWidth: mainRect?.width || 0, mainHeight: mainRect?.height || 0, clippedCritical };
+    const overflowingElements = Array.from(document.querySelectorAll('body *'))
+      .filter(isRendered)
+      .map((element) => {
+        const el = element as HTMLElement;
+        const rect = el.getBoundingClientRect();
+        const style = window.getComputedStyle(el);
+        return {
+          tag: element.tagName,
+          id: el.id,
+          className: typeof el.className === 'string' ? el.className.slice(0, 180) : '',
+          text: (el.innerText || '').trim().replace(/\s+/g, ' ').slice(0, 100),
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+          minWidth: style.minWidth,
+          overflowX: style.overflowX,
+        };
+      })
+      .filter((entry) => entry.right > viewportWidth + 2 || entry.left < -2 || entry.width > viewportWidth + 2)
+      .sort((a, b) => Math.max(b.right - viewportWidth, b.width - viewportWidth) - Math.max(a.right - viewportWidth, a.width - viewportWidth))
+      .slice(0, 12);
+    return { viewportWidth, scrollWidth, mainWidth: mainRect?.width || 0, mainHeight: mainRect?.height || 0, clippedCritical, overflowingElements };
   });
 
-  expect(geometry.scrollWidth, `${target} has page-level horizontal overflow`).toBeLessThanOrEqual(geometry.viewportWidth + 2);
+  expect(geometry.scrollWidth, `${target} has page-level horizontal overflow: ${JSON.stringify(geometry.overflowingElements)}`).toBeLessThanOrEqual(geometry.viewportWidth + 2);
   expect(geometry.mainWidth, `${target} primary content has zero width`).toBeGreaterThan(0);
   expect(geometry.mainHeight, `${target} primary content has zero height`).toBeGreaterThan(0);
   expect(geometry.clippedCritical, `${target} has clipped critical controls`).toEqual([]);

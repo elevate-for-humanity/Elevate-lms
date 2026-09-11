@@ -56,7 +56,7 @@ type RecognitionLike = {
   continuous: boolean;
   interimResults: boolean;
   onresult: ((event: { results: RecognitionResultListLike }) => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event: { error?: string }) => void) | null;
   onend: (() => void) | null;
   start: () => void;
   stop: () => void;
@@ -414,7 +414,7 @@ export default function WebsiteBuilderCommercial() {
       return;
     }
 
-    const speechWindow = window as Window & {
+    const speechWindow = window as unknown as {
       SpeechRecognition?: RecognitionConstructor;
       webkitSpeechRecognition?: RecognitionConstructor;
     };

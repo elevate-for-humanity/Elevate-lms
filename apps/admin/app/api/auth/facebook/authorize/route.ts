@@ -2,6 +2,7 @@ import { randomBytes } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -30,10 +31,12 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
+  await hydrateProcessEnv();
   const clientId = process.env.FACEBOOK_CLIENT_ID?.trim();
   const clientSecret = process.env.FACEBOOK_CLIENT_SECRET?.trim();
-  const pageId = process.env.FACEBOOK_PAGE_ID?.trim();
-  if (!clientId || !clientSecret || !pageId) {
+  // A page ID is optional here. Meta returns the pages authorized by the user,
+  // and the callback selects the sole page or validates a configured page.
+  if (!clientId || !clientSecret) {
     return NextResponse.redirect(new URL('/settings/social-media?error=meta_runtime_not_ready', getPublicAdminOrigin(request)));
   }
 

@@ -221,7 +221,7 @@ export default function ParisChat({
       voice: 'coral',
       style: storeSurface ? 'commercial' : 'assistant',
       rate: 1,
-      allowBrowserFallback: true,
+      allowBrowserFallback: false,
     });
   }, [autoSpeak, messages, storeSurface, voice, voiceEnabled]);
 
@@ -269,7 +269,7 @@ export default function ParisChat({
           voice: 'coral',
           style: storeSurface ? 'commercial' : 'assistant',
           rate: 1,
-          allowBrowserFallback: true,
+          allowBrowserFallback: false,
         });
       }
       onComplete?.([]);
@@ -347,7 +347,7 @@ export default function ParisChat({
                       voice: 'coral',
                       style: storeSurface ? 'commercial' : 'assistant',
                       rate: 1,
-                      allowBrowserFallback: true,
+                      allowBrowserFallback: false,
                     });
                   }}
                   className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-black text-slate-800 hover:bg-slate-100"
@@ -447,10 +447,9 @@ export default function ParisChat({
               if (autoSpeak) voice.stop();
               setAutoSpeak((enabled) => !enabled);
             }}
-            style={{ width: 44, minWidth: 44, maxWidth: 44, flexBasis: 44 }}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100"
+            className="inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100"
           >
-            {autoSpeak ? <Volume2 className="h-5 w-5" aria-hidden="true" /> : <VolumeX className="h-5 w-5" aria-hidden="true" />}
+            {autoSpeak ? <Volume2 className="h-5 w-5 shrink-0" aria-hidden="true" /> : <VolumeX className="h-5 w-5 shrink-0" aria-hidden="true" />}
           </button>
           <button
             type="button"
@@ -458,14 +457,13 @@ export default function ParisChat({
             aria-pressed={isListening}
             title={speechInputAvailable ? (isListening ? 'Stop listening' : 'Talk to PARIS') : 'Voice typing is unavailable in this browser'}
             onClick={toggleListening}
-            style={{ width: 44, minWidth: 44, maxWidth: 44, flexBasis: 44 }}
-            className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition ${
+            className={`inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center rounded-full border transition ${
               isListening
                 ? 'border-brand-red-600 bg-brand-red-600 text-white'
                 : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
             }`}
           >
-            {isListening ? <MicOff className="h-5 w-5" aria-hidden="true" /> : <Mic className="h-5 w-5" aria-hidden="true" />}
+            {isListening ? <MicOff className="h-5 w-5 shrink-0" aria-hidden="true" /> : <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />}
           </button>
           <textarea
             id="paris-chat-input"
@@ -484,10 +482,9 @@ export default function ParisChat({
             type="submit"
             aria-label="Send message"
             disabled={!input.trim() || isLoading}
-            style={{ width: 44, minWidth: 44, maxWidth: 44, flexBasis: 44 }}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-full bg-brand-blue-700 p-0 font-semibold text-white transition hover:bg-brand-blue-800 disabled:cursor-not-allowed disabled:opacity-50 sm:h-auto sm:min-h-12 sm:w-auto sm:rounded-2xl sm:px-5 sm:py-3"
+            className="inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center gap-2 rounded-full bg-brand-blue-700 p-0 font-semibold text-white transition hover:bg-brand-blue-800 disabled:cursor-not-allowed disabled:opacity-50 sm:h-auto sm:min-h-12 sm:w-auto sm:min-w-fit sm:rounded-2xl sm:px-5 sm:py-3"
           >
-            <Send className="h-4 w-4" aria-hidden="true" />
+            <Send className="h-4 w-4 shrink-0" aria-hidden="true" />
             <span className="hidden sm:inline">Send</span>
           </button>
         </div>

@@ -182,7 +182,6 @@ export default function HomePage() {
               },
             },
           ]}
-          narrationSrc="/audio/narration/host-shop.mp3"
           tourScripts={{
             '/videos/partners/salon-saloon-tour.mp4':
               'Are you a licensed salon, spa, nail studio, esthetics business, or barbershop in Indiana? Elevate is looking for Host Shops like Salon Saloon. Becoming a Host Shop is free. You can grow your team, mentor an apprentice, keep normal service revenue, and receive support with instruction, records, progress tracking, and apprenticeship compliance. Apply now to join the Barber and Beauty Host Shop Network.',

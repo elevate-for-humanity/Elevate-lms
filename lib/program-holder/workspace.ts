@@ -77,7 +77,19 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         'id,user_id,full_name,email,phone,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified',
       )
       .eq('program_holder_id', holderId)
-      .in('status', ['active', 'enrolled', 'completed', 'graduated'])
+      .in('status', [
+        'active',
+        'enrolled',
+        'in_progress',
+        'pending',
+        'applied',
+        'approved',
+        'scheduled',
+        'ready',
+        'funded',
+        'completed',
+        'graduated',
+      ])
       .order('enrolled_at', { ascending: false }),
     db
       .from('program_enrollments')
@@ -89,7 +101,9 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .order('training_start_date', { ascending: true, nullsFirst: false }),
     db
       .from('program_holder_students')
-      .select('id,applicant_name,applicant_email,applicant_phone,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome')
+      .select(
+        'id,applicant_name,applicant_email,applicant_phone,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome',
+      )
       .eq('program_holder_id', holderId)
       .in('status', ['applied', 'pending'])
       .order('created_at', { ascending: false }),

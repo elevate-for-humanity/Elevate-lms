@@ -33,6 +33,7 @@ import { compileLearningIntelligence } from './learning-intelligence';
 import { CourseExperienceSchema } from './experience-contract';
 import { inferStepType, validateBlueprint } from './validator';
 import type { FactoryInput, FactoryOutput, FactoryStage, ProgressCallback } from './types';
+import { getCredentialStandardByRegistryKey } from '@/lib/course-builder/credential-engine/registry-loader';
 
 class ProgressTracker {
   private callbacks: ProgressCallback[] = [];
@@ -129,9 +130,10 @@ export function synchronizeLessonExperience(
   const moduleCompetencyKeys = (courseModule.competencies ?? [])
     .map((competency) => competency.competencyKey)
     .filter(Boolean);
-  const selectedCompetencyKeys = Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
-    ? lesson.competencyKeys
-    : moduleCompetencyKeys;
+  const selectedCompetencyKeys =
+    Array.isArray(lesson.competencyKeys) && lesson.competencyKeys.length
+      ? lesson.competencyKeys
+      : moduleCompetencyKeys;
   const critical = (courseModule.competencies ?? []).some(
     (competency) =>
       competency.isCritical && selectedCompetencyKeys.includes(competency.competencyKey),
@@ -275,14 +277,14 @@ export function hasGovernedBlueprintLessonFallback(lesson: {
   content?: unknown;
   quizQuestions?: unknown;
 }): boolean {
-  const raw = typeof lesson.content === 'string'
-    ? lesson.content
-    : lesson.content && typeof lesson.content === 'object'
-      ? JSON.stringify(lesson.content)
-      : '';
-  const instructionalWords = raw
-    .replace(/<[^>]+>/g, ' ')
-    .match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g)?.length ?? 0;
+  const raw =
+    typeof lesson.content === 'string'
+      ? lesson.content
+      : lesson.content && typeof lesson.content === 'object'
+        ? JSON.stringify(lesson.content)
+        : '';
+  const instructionalWords =
+    raw.replace(/<[^>]+>/g, ' ').match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g)?.length ?? 0;
   let hasCompleteExperience = false;
   try {
     const parsed = JSON.parse(raw) as Record<string, unknown>;
@@ -290,10 +292,12 @@ export function hasGovernedBlueprintLessonFallback(lesson: {
   } catch {
     hasCompleteExperience = false;
   }
-  return instructionalWords >= 180 &&
+  return (
+    instructionalWords >= 180 &&
     Array.isArray(lesson.quizQuestions) &&
     lesson.quizQuestions.length >= 3 &&
-    hasCompleteExperience;
+    hasCompleteExperience
+  );
 }
 
 async function enrichBlueprint(
@@ -430,14 +434,12 @@ async function enrichBlueprint(
                   'Learner applying a structured evidence-based assessment strategy at a computer.',
               },
             ],
-            knowledgeChecks: finalExam.questions
-              .slice(0, 3)
-              .map((question) => ({
-                question: question.question,
-                options: question.options,
-                correct: question.correct,
-                explanation: question.explanation,
-              })),
+            knowledgeChecks: finalExam.questions.slice(0, 3).map((question) => ({
+              question: question.question,
+              options: question.options,
+              correct: question.correct,
+              explanation: question.explanation,
+            })),
             scenario: {
               title: 'Readiness decision',
               context:
@@ -672,14 +674,12 @@ async function enrichBlueprint(
                   'Learner following a targeted remediation checklist after a missed checkpoint objective.',
               },
             ],
-            knowledgeChecks: assessment.questions
-              .slice(0, 3)
-              .map((question) => ({
-                question: question.question,
-                options: question.options,
-                correct: question.correct,
-                explanation: question.explanation,
-              })),
+            knowledgeChecks: assessment.questions.slice(0, 3).map((question) => ({
+              question: question.question,
+              options: question.options,
+              correct: question.correct,
+              explanation: question.explanation,
+            })),
             scenario: {
               title: 'Progression decision',
               context:
@@ -831,9 +831,8 @@ async function enrichBlueprint(
         if (!hasGovernedBlueprintLessonFallback(lesson)) throw generationError;
         logger.warn('[course-factory] AI enrichment failed; preserving governed blueprint lesson', {
           lessonSlug: lesson.slug,
-          error: generationError instanceof Error
-            ? generationError.message
-            : String(generationError),
+          error:
+            generationError instanceof Error ? generationError.message : String(generationError),
         });
         synchronizeLessonExperience(lesson as unknown as Record<string, any>, courseModule);
         continue;
@@ -881,6 +880,30 @@ export async function courseFactory(
   try {
     tracker.emit('init', 'Initializing canonical Course Factory.', 1);
     const programSlug = await resolveProgramSlug(input);
+    const selectedStandard = input.credentialRegistryKey
+      ? getCredentialStandardByRegistryKey(input.credentialRegistryKey)
+      : undefined;
+    const standardRequirements = selectedStandard
+      ? [
+          `Registered standard: ${selectedStandard.name} (${selectedStandard.authority?.registryKey}).`,
+          `Authority source: ${selectedStandard.authority?.sourceUrl}.`,
+          ...(selectedStandard.objectives ?? []).map(
+            (objective) =>
+              `Objective ${objective.id}: ${objective.title}; weight ${objective.weightMin}-${objective.weightMax}%; skills: ${objective.skills.join(', ')}${objective.requiresLab ? '; practical verification required' : ''}.`,
+          ),
+        ].join('\n')
+      : input.credentialRegistryKey
+        ? `Standards-development gap: registry key ${input.credentialRegistryKey} is not currently loaded. Build the draft without claiming external approval and flag every proposed objective for authority review.`
+        : '';
+    const effectiveInput: FactoryInput = standardRequirements
+      ? {
+          ...input,
+          credential: selectedStandard?.name ?? input.credential,
+          additionalRequirements: [input.additionalRequirements, standardRequirements]
+            .filter(Boolean)
+            .join('\n'),
+        }
+      : input;
 
     tracker.emit('resolve', 'Resolving program and curriculum source.', 3);
     let blueprint = input.blueprint ? cloneBlueprint(input.blueprint) : null;
@@ -903,9 +926,27 @@ export async function courseFactory(
         );
       }
       tracker.emit('blueprint', `Generating a new blueprint for ${programSlug}.`, 5);
-      blueprint = await generateFreeFormBlueprint(input, programSlug);
+      blueprint = await generateFreeFormBlueprint(effectiveInput, programSlug);
     } else {
       tracker.emit('blueprint', `Blueprint ready: ${blueprint.credentialTitle}`, 5);
+    }
+
+    // Authoring size is a user choice even when the source blueprint contains a larger program.
+    // The registry remains the evidence source; this only scopes the generated draft.
+    if (input.buildScope === 'lesson') {
+      const firstModule = blueprint.modules[0];
+      if (!firstModule?.lessons?.length)
+        throw new Error('The selected blueprint has no lesson to build.');
+      blueprint.modules = [{ ...firstModule, lessons: [firstModule.lessons[0]] }];
+    } else if (input.moduleCount || input.lessonsPerModule) {
+      const moduleLimit = input.moduleCount ?? blueprint.modules.length;
+      const lessonLimit = input.lessonsPerModule;
+      blueprint.modules = blueprint.modules.slice(0, moduleLimit).map((courseModule) => ({
+        ...courseModule,
+        lessons: lessonLimit
+          ? (courseModule.lessons ?? []).slice(0, lessonLimit)
+          : courseModule.lessons,
+      }));
     }
 
     if (!program && input.programId) {
@@ -922,8 +963,16 @@ export async function courseFactory(
     const evidence = await buildCourseEvidenceContext({
       programSlug,
       blueprint,
-      state: input.state,
+      state: effectiveInput.state,
     });
+    if (standardRequirements) {
+      evidence.standardsBlock = `${evidence.standardsBlock}\n${standardRequirements}`;
+      evidence.sources.push(
+        selectedStandard ? 'standards-registry' : 'standards-development-workspace',
+      );
+      if (!selectedStandard)
+        evidence.warnings.push('Selected standards registry key is not loaded');
+    }
     tracker.emit(
       'resolve',
       `Evidence ready from ${evidence.sources.join(', ') || 'registered blueprint'}.`,

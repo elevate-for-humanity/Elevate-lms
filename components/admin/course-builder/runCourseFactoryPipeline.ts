@@ -22,6 +22,8 @@ export type CourseFactoryPipelineResult = {
   videosQueued: number;
   errors: string[];
   dryRun: boolean;
+  governance?: unknown;
+  completionState?: 'content_only' | 'media_pending' | 'ready_for_review';
 };
 
 export type CourseFactoryPipelineEvent = {
@@ -39,12 +41,14 @@ export type CourseFactoryPipelineInput = {
   audience?: string;
   state?: string;
   credential?: string;
+  credentialRegistryKey?: string;
   hours?: number;
   deliveryFormat?: string;
   additionalRequirements?: string;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
   moduleCount?: number;
   lessonsPerModule?: number;
+  buildScope?: 'lesson' | 'course';
   includeVideos?: boolean;
   dryRun?: boolean;
 };

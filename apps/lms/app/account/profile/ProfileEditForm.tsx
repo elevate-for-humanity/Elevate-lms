@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
-import { Save, Loader2, Camera, User as UserIcon } from 'lucide-react';
-import Image from 'next/image';
+import { Save, Loader2 } from 'lucide-react';
+import { UniversalProfilePhotoEditor } from '@/components/profile/UniversalProfilePhotoEditor';
 
 interface ProfileEditFormProps {
   user: User;
@@ -71,37 +71,10 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Avatar Section */}
-      <div className="bg-white rounded-xl shadow-sm border p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">Profile Photo</h2>
-        <div className="flex items-center gap-6">
-          <div className="relative">
-            <div className="w-24 h-24 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden">
-              {profile?.avatar_url ? (
-                <Image sizes="100vw"
-                  src={profile.avatar_url}
-                  alt={`${profile.full_name || 'User'} profile photo`}
-                  width={96}
-                  height={96}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <UserIcon className="w-12 h-12 text-slate-700" />
-              )}
-            </div>
-            <button
-              type="button"
-              className="absolute bottom-0 right-0 p-2 bg-brand-blue-600 text-white rounded-full hover:bg-brand-blue-700"
-            >
-              <Camera className="w-4 h-4" />
-            </button>
-          </div>
-          <div>
-            <p className="text-sm text-slate-700">Upload a new photo</p>
-            <p className="text-xs text-slate-500 mt-1">JPG, PNG. Max 2MB</p>
-          </div>
-        </div>
-      </div>
+      <UniversalProfilePhotoEditor
+        currentUrl={profile?.avatar_url}
+        name={profile?.full_name || user.user_metadata?.full_name || 'User'}
+      />
 
       {/* Basic Info */}
       <div className="bg-white rounded-xl shadow-sm border p-6">

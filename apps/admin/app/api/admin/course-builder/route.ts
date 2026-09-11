@@ -44,6 +44,10 @@ import {
   reserveCourseBuilderRequestCredits,
   type CreditReservation,
 } from '@/lib/course-builder/request-metering';
+import {
+  loadCredentialConfigs,
+  validateCredentialAuthority,
+} from '@/lib/course-builder/credential-engine/registry-loader';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -186,6 +190,50 @@ export async function GET(req: NextRequest) {
         operator: false,
         metered: true,
         credits: await getCourseBuilderCreditBalance(db, owner.tenantId),
+      });
+    }
+
+    if (action === 'authoring-options') {
+      const db = await requireAdminClient();
+      const [{ data: programs, error: programsError }, { data: workforceCredentials }] =
+        await Promise.all([
+          db.from('programs').select('id,title,slug,status,is_active').order('title'),
+          db
+            .from('credential_registry')
+            .select('id,name,credential_code,issuing_authority,status')
+            .order('name'),
+        ]);
+      if (programsError) throw programsError;
+      const standards = loadCredentialConfigs().map((credential) => {
+        const gaps = validateCredentialAuthority(credential);
+        return {
+          id: credential.id,
+          slug: credential.slug,
+          name: credential.name,
+          provider: credential.provider,
+          category: credential.category,
+          type: credential.type,
+          states: credential.states ?? [],
+          registryKey: credential.authority?.registryKey ?? null,
+          sourceUrl: credential.authority?.sourceUrl ?? null,
+          version: credential.authority?.version ?? null,
+          effectiveDate: credential.authority?.effectiveDate ?? null,
+          standardStatus: credential.authority?.status ?? 'draft',
+          checkedAt: credential.authority?.checkedAt ?? null,
+          objectiveCount: credential.objectives?.length ?? 0,
+          claimReady: gaps.length === 0,
+          gaps,
+        };
+      });
+      return NextResponse.json({
+        programs: programs ?? [],
+        standards,
+        workforceCredentials: workforceCredentials ?? [],
+        policy: {
+          drafting: 'allowed',
+          externalClaims: 'verified-evidence-required',
+          unsupportedStandardAction: 'create-standards-development-record',
+        },
       });
     }
 
@@ -577,6 +625,8 @@ export async function POST(req: NextRequest) {
             moduleCount: body.moduleCount,
             lessonsPerModule: body.lessonsPerModule,
             credential: body.credential,
+            credentialRegistryKey: body.credentialRegistryKey,
+            buildScope: body.buildScope === 'lesson' ? 'lesson' : 'course',
             state: body.state,
             audience: body.audience,
             hours: body.hours,
@@ -613,6 +663,7 @@ export async function POST(req: NextRequest) {
             lessonsGenerated: result.lessonCount ?? 0,
             lessonsWithQuizzes: result.assessmentsGenerated ?? 0,
             videosQueued: result.videosQueued ?? 0,
+            completionState: result.completionState,
             governance,
             errors: result.errors ?? [],
             dryRun: Boolean(result.dryRun),

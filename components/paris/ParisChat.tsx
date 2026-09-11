@@ -18,6 +18,7 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import { usePathname, useRouter } from 'next/navigation';
 import type { PortalSupportIssue } from '@/lib/paris/portal-support';
 import {
   createBrowserSpeechRecognition,
@@ -50,6 +51,95 @@ const PATHWAYS = [
   { id: 'beauty', label: 'Barber & Beauty', icon: Scissors },
   { id: 'testing', label: 'Testing & Credentials', icon: FileCheck },
 ] as const;
+
+function resolvePortalNavigation(command: string, pathname: string) {
+  const text = command.toLowerCase();
+  if (!/\b(open|show|go to|take me|manage|change|update|view|send)\b/.test(text)) return null;
+  if (/\b(card|payment method)\b/.test(text)) {
+    return { href: '/account/payment-methods', label: 'secure payment methods' };
+  }
+
+  const prefix = pathname.startsWith('/program-holder')
+    ? '/program-holder'
+    : pathname.startsWith('/host-shop')
+      ? '/host-shop/dashboard'
+      : pathname.startsWith('/employer')
+        ? '/employer'
+        : pathname.startsWith('/apprentice')
+          ? '/apprentice'
+          : pathname.startsWith('/workforce')
+            ? '/workforce'
+            : pathname.startsWith('/creator')
+              ? '/creator'
+              : '/account';
+
+  const routeMap: Record<string, Record<string, string>> = {
+    '/program-holder': {
+      settings: '/settings',
+      profile: '/settings',
+      students: '/students',
+      programs: '/programs',
+      documents: '/documents',
+      reports: '/reports',
+      hours: '/hours',
+      payouts: '/payouts',
+      dashboard: '/dashboard',
+    },
+    '/host-shop/dashboard': {
+      settings: '/settings',
+      profile: '/profile',
+      students: '/students',
+      programs: '/programs',
+      documents: '/documents',
+      reports: '/reports',
+      hours: '/hours',
+      dashboard: '',
+    },
+    '/employer': {
+      settings: '/settings',
+      profile: '/company',
+      students: '/apprentices',
+      programs: '/programs',
+      documents: '/documents',
+      reports: '/reports',
+      hours: '/hours',
+      dashboard: '/dashboard',
+    },
+    '/apprentice': {
+      profile: '/profile',
+      programs: '/rti',
+      documents: '/documents',
+      hours: '/hours',
+      dashboard: '/dashboard',
+    },
+    '/workforce': { students: '/participants', reports: '/dashboard', dashboard: '/dashboard' },
+    '/creator': { programs: '/products', dashboard: '' },
+    '/account': { settings: '/settings', profile: '/profile', dashboard: '' },
+  };
+  const destinations = [
+    {
+      key: 'settings',
+      words: ['notification', 'alert', 'preference', 'setting'],
+      label: 'notification settings',
+    },
+    { key: 'profile', words: ['profile', 'picture', 'photo'], label: 'your profile' },
+    {
+      key: 'students',
+      words: ['student', 'learner', 'email', 'message', 'text'],
+      label: 'student communications',
+    },
+    { key: 'programs', words: ['program', 'course'], label: 'your assigned programs' },
+    { key: 'documents', words: ['document', 'upload'], label: 'documents' },
+    { key: 'reports', words: ['report'], label: 'reports' },
+    { key: 'hours', words: ['hour', 'attendance', 'time'], label: 'training hours' },
+    { key: 'payouts', words: ['payment', 'payout', 'bank'], label: 'payouts' },
+    { key: 'dashboard', words: ['dashboard', 'home'], label: 'your dashboard' },
+  ];
+  const destination = destinations.find(({ words }) => words.some((word) => text.includes(word)));
+  const suffix = destination ? routeMap[prefix]?.[destination.key] : undefined;
+  if (!destination || suffix === undefined) return null;
+  return { href: `${prefix}${suffix}`, label: destination.label };
+}
 
 const PUBLIC_GREETING: Message = {
   role: 'assistant',
@@ -105,8 +195,16 @@ export default function ParisChat({
   const portalSurface = surface === 'portal';
   const storeSurface = surface === 'store';
   const voice = useNaturalVoice();
+  const router = useRouter();
+  const pathname = usePathname();
   const [messages, setMessages] = useState<Message[]>([
-    learnerSurface ? learnerGreeting(courseTitle, nextLessonTitle) : portalSurface ? portalGreeting(portalRole) : storeSurface ? STORE_GREETING : PUBLIC_GREETING,
+    learnerSurface
+      ? learnerGreeting(courseTitle, nextLessonTitle)
+      : portalSurface
+        ? portalGreeting(portalRole)
+        : storeSurface
+          ? STORE_GREETING
+          : PUBLIC_GREETING,
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -124,10 +222,13 @@ export default function ParisChat({
     setMessages((previous) => {
       const marker = `I noticed a problem with ${portalIssue.workflow.replaceAll('_', ' ')}`;
       if (previous.some((message) => message.content.includes(marker))) return previous;
-      return [...previous, {
-        role: 'assistant',
-        content: `${marker}. I’m here to help. The issue has been securely reported to the workflow repair queue. Tell me what you were trying to do, and I’ll guide you while the system checks the problem.`,
-      }];
+      return [
+        ...previous,
+        {
+          role: 'assistant',
+          content: `${marker}. I’m here to help. The issue has been securely reported to the workflow repair queue. Tell me what you were trying to do, and I’ll guide you while the system checks the problem.`,
+        },
+      ];
     });
   }, [portalIssue]);
 
@@ -182,7 +283,9 @@ export default function ParisChat({
       setIsListening(true);
     } catch {
       setIsListening(false);
-      setSpeechInputError('PARIS could not start the microphone. Check this site’s microphone permission and try again.');
+      setSpeechInputError(
+        'PARIS could not start the microphone. Check this site’s microphone permission and try again.',
+      );
     }
   }, [isListening]);
 
@@ -191,7 +294,10 @@ export default function ParisChat({
       const saved = window.sessionStorage.getItem(`${STORAGE_PREFIX}${surface}`);
       if (!saved) return;
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.every((item) => item?.role && typeof item?.content === 'string')) {
+      if (
+        Array.isArray(parsed) &&
+        parsed.every((item) => item?.role && typeof item?.content === 'string')
+      ) {
         setMessages(parsed.slice(-20));
       }
     } catch {
@@ -201,7 +307,10 @@ export default function ParisChat({
 
   useEffect(() => {
     try {
-      window.sessionStorage.setItem(`${STORAGE_PREFIX}${surface}`, JSON.stringify(messages.slice(-20)));
+      window.sessionStorage.setItem(
+        `${STORAGE_PREFIX}${surface}`,
+        JSON.stringify(messages.slice(-20)),
+      );
     } catch {
       // Keep the conversation in component memory when storage is unavailable.
     }
@@ -225,73 +334,111 @@ export default function ParisChat({
     });
   }, [autoSpeak, messages, storeSurface, voice, voiceEnabled]);
 
-  const sendToApi = useCallback(async (content: string) => {
-    const trimmed = content.trim();
-    if (!trimmed || isLoading) return;
+  const sendToApi = useCallback(
+    async (content: string) => {
+      const trimmed = content.trim();
+      if (!trimmed || isLoading) return;
 
-    const userMessage: Message = { role: 'user', content: trimmed };
-    const requestMessages = [...messages, userMessage].slice(-20);
-    setMessages(requestMessages);
-    setInput('');
-    setIsLoading(true);
+      const userMessage: Message = { role: 'user', content: trimmed };
+      const requestMessages = [...messages, userMessage].slice(-20);
+      setMessages(requestMessages);
+      setInput('');
+      setIsLoading(true);
 
-    try {
-      const response = await fetch('/api/ai-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        cache: 'no-store',
-        body: JSON.stringify({
-          messages: requestMessages,
-          context: {
-            surface,
-            courseTitle: courseTitle || null,
-            nextLessonTitle: nextLessonTitle || null,
-            courseProgress: typeof courseProgress === 'number' ? courseProgress : null,
-            portalRole: portalRole || null,
-            page: window.location.pathname,
-            portalIssue: portalIssue ? {
-              workflow: portalIssue.workflow,
-              status: portalIssue.status || null,
-            } : null,
-          },
-        }),
-      });
-
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || typeof data.reply !== 'string') {
-        throw new Error('PARIS unavailable');
-      }
-
-      setMessages((previous) => [...previous, { role: 'assistant', content: data.reply }]);
-      if (autoSpeak) {
-        void voice.play(data.reply, {
-          voice: 'coral',
-          style: storeSurface ? 'commercial' : 'assistant',
-          rate: 1,
-          allowBrowserFallback: false,
+      try {
+        if (portalSurface) {
+          const command = resolvePortalNavigation(trimmed, pathname);
+          if (command) {
+            const reply = `Opening ${command.label}.`;
+            setMessages((previous) => [...previous, { role: 'assistant', content: reply }]);
+            if (autoSpeak)
+              void voice.play(reply, {
+                voice: 'coral',
+                style: 'assistant',
+                rate: 1,
+                allowBrowserFallback: false,
+              });
+            router.push(command.href);
+            return;
+          }
+        }
+        const response = await fetch('/api/ai-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          cache: 'no-store',
+          body: JSON.stringify({
+            messages: requestMessages,
+            context: {
+              surface,
+              courseTitle: courseTitle || null,
+              nextLessonTitle: nextLessonTitle || null,
+              courseProgress: typeof courseProgress === 'number' ? courseProgress : null,
+              portalRole: portalRole || null,
+              page: window.location.pathname,
+              portalIssue: portalIssue
+                ? {
+                    workflow: portalIssue.workflow,
+                    status: portalIssue.status || null,
+                  }
+                : null,
+            },
+          }),
         });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || typeof data.reply !== 'string') {
+          throw new Error('PARIS unavailable');
+        }
+
+        setMessages((previous) => [...previous, { role: 'assistant', content: data.reply }]);
+        if (autoSpeak) {
+          void voice.play(data.reply, {
+            voice: 'coral',
+            style: storeSurface ? 'commercial' : 'assistant',
+            rate: 1,
+            allowBrowserFallback: false,
+          });
+        }
+        onComplete?.([]);
+      } catch {
+        setMessages((previous) => [
+          ...previous,
+          {
+            role: 'assistant',
+            content: portalSurface
+              ? 'I cannot reach live portal guidance right now. Use the red to-do list and student records on this dashboard, or contact an administrator. I will not submit official records without your review.'
+              : learnerSurface
+                ? 'I cannot retrieve your course guidance right now. Please continue from your learner dashboard or contact your instructor. I will not guess about your progress or graded work.'
+                : storeSurface
+                  ? 'I cannot reach the live advisor right now. You can still compare current plans at /store/plans or explore the interactive demos at /store/demos.'
+                  : 'I cannot retrieve a verified answer right now. Please use the Program Directory at https://www.elevateforhumanity.org/programs or contact Admissions at https://www.elevateforhumanity.org/contact.',
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+        inputRef.current?.focus();
       }
-      onComplete?.([]);
-    } catch {
-      setMessages((previous) => [
-        ...previous,
-        {
-          role: 'assistant',
-          content: portalSurface
-            ? 'I cannot reach live portal guidance right now. Use the red to-do list and student records on this dashboard, or contact an administrator. I will not submit official records without your review.'
-            : learnerSurface
-            ? 'I cannot retrieve your course guidance right now. Please continue from your learner dashboard or contact your instructor. I will not guess about your progress or graded work.'
-            : storeSurface
-              ? 'I cannot reach the live advisor right now. You can still compare current plans at /store/plans or explore the interactive demos at /store/demos.'
-              : 'I cannot retrieve a verified answer right now. Please use the Program Directory at https://www.elevateforhumanity.org/programs or contact Admissions at https://www.elevateforhumanity.org/contact.',
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-      inputRef.current?.focus();
-    }
-  }, [autoSpeak, courseProgress, courseTitle, isLoading, learnerSurface, messages, nextLessonTitle, onComplete, portalIssue, storeSurface, portalSurface, portalRole, surface, voice]);
+    },
+    [
+      autoSpeak,
+      courseProgress,
+      courseTitle,
+      isLoading,
+      learnerSurface,
+      messages,
+      nextLessonTitle,
+      onComplete,
+      pathname,
+      portalIssue,
+      portalSurface,
+      portalRole,
+      router,
+      storeSurface,
+      surface,
+      voice,
+    ],
+  );
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -314,22 +461,44 @@ export default function ParisChat({
               <GraduationCap className="h-6 w-6" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-lg font-bold">{learnerSurface ? 'PARIS Learning Assistant' : storeSurface ? 'PARIS Platform Advisor' : 'PARIS'}</h2>
-              <p className="text-sm text-slate-200">{learnerSurface ? courseTitle || 'Course guidance and study support' : storeSurface ? 'Interview, recommendation, demos and answers' : 'Admissions & career navigation'}</p>
+              <h2 className="text-lg font-bold">
+                {learnerSurface
+                  ? 'PARIS Learning Assistant'
+                  : storeSurface
+                    ? 'PARIS Platform Advisor'
+                    : 'PARIS'}
+              </h2>
+              <p className="text-sm text-slate-200">
+                {learnerSurface
+                  ? courseTitle || 'Course guidance and study support'
+                  : storeSurface
+                    ? 'Interview, recommendation, demos and answers'
+                    : 'Admissions & career navigation'}
+              </p>
             </div>
           </div>
         </div>
       )}
 
-      <div className="flex-1 space-y-4 overflow-y-auto bg-slate-50 px-4 py-4 sm:px-6" aria-live="polite">
+      <div
+        className="flex-1 space-y-4 overflow-y-auto bg-slate-50 px-4 py-4 sm:px-6"
+        aria-live="polite"
+      >
         {messages.map((message, index) => (
-          <div key={`${message.role}-${index}`} className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
+          <div
+            key={`${message.role}-${index}`}
+            className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+          >
             <div
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
                 message.role === 'user' ? 'bg-brand-blue-700 text-white' : 'bg-slate-950 text-white'
               }`}
             >
-              {message.role === 'user' ? <User className="h-4 w-4" aria-hidden="true" /> : <Bot className="h-4 w-4" aria-hidden="true" />}
+              {message.role === 'user' ? (
+                <User className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Bot className="h-4 w-4" aria-hidden="true" />
+              )}
             </div>
             <div
               className={`max-w-[82%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed ${
@@ -378,7 +547,9 @@ export default function ParisChat({
         {!isLoading && messages.length === 1 && learnerSurface && (
           <div className="grid gap-2">
             {[
-              nextLessonTitle ? `What should I know before I start ${nextLessonTitle}?` : 'What should I do next in my course?',
+              nextLessonTitle
+                ? `What should I know before I start ${nextLessonTitle}?`
+                : 'What should I do next in my course?',
               'Help me make a study plan from my current progress.',
               'Explain a course concept without giving me graded answers.',
             ].map((prompt) => (
@@ -423,7 +594,11 @@ export default function ParisChat({
               <button
                 type="button"
                 key={id}
-                onClick={() => void sendToApi(`I'm interested in ${label}. Show me the current options and the page I should review.`)}
+                onClick={() =>
+                  void sendToApi(
+                    `I'm interested in ${label}. Show me the current options and the page I should review.`,
+                  )
+                }
                 className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 font-semibold text-slate-950 shadow-sm transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-700"
               >
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
@@ -436,8 +611,13 @@ export default function ParisChat({
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="min-w-0 max-w-full shrink-0 overflow-hidden border-t border-slate-200 bg-white px-3 py-4 sm:px-6">
-        <label htmlFor="paris-chat-input" className="sr-only">Ask PARIS a question</label>
+      <form
+        onSubmit={handleSubmit}
+        className="min-w-0 max-w-full shrink-0 overflow-hidden border-t border-slate-200 bg-white px-3 py-4 sm:px-6"
+      >
+        <label htmlFor="paris-chat-input" className="sr-only">
+          Ask PARIS a question
+        </label>
         <div className="flex w-full min-w-0 max-w-full items-end gap-2 sm:gap-3">
           <button
             type="button"
@@ -449,13 +629,23 @@ export default function ParisChat({
             }}
             className="inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100"
           >
-            {autoSpeak ? <Volume2 className="h-5 w-5 shrink-0" aria-hidden="true" /> : <VolumeX className="h-5 w-5 shrink-0" aria-hidden="true" />}
+            {autoSpeak ? (
+              <Volume2 className="h-5 w-5 shrink-0" aria-hidden="true" />
+            ) : (
+              <VolumeX className="h-5 w-5 shrink-0" aria-hidden="true" />
+            )}
           </button>
           <button
             type="button"
             aria-label={isListening ? 'Stop listening' : 'Talk to PARIS'}
             aria-pressed={isListening}
-            title={speechInputAvailable ? (isListening ? 'Stop listening' : 'Talk to PARIS') : 'Voice typing is unavailable in this browser'}
+            title={
+              speechInputAvailable
+                ? isListening
+                  ? 'Stop listening'
+                  : 'Talk to PARIS'
+                : 'Voice typing is unavailable in this browser'
+            }
             onClick={toggleListening}
             className={`inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center rounded-full border transition ${
               isListening
@@ -463,7 +653,11 @@ export default function ParisChat({
                 : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
             }`}
           >
-            {isListening ? <MicOff className="h-5 w-5 shrink-0" aria-hidden="true" /> : <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />}
+            {isListening ? (
+              <MicOff className="h-5 w-5 shrink-0" aria-hidden="true" />
+            ) : (
+              <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />
+            )}
           </button>
           <textarea
             id="paris-chat-input"
@@ -471,7 +665,13 @@ export default function ParisChat({
             value={input}
             onChange={(event) => setInput(event.target.value.slice(0, 2000))}
             onKeyDown={handleKeyDown}
-            placeholder={learnerSurface ? 'Ask about your course or next lesson…' : storeSurface ? 'Tell PARIS about your business or ask a platform question…' : 'Ask about a program, funding, testing, or apprenticeship…'}
+            placeholder={
+              learnerSurface
+                ? 'Ask about your course or next lesson…'
+                : storeSurface
+                  ? 'Tell PARIS about your business or ask a platform question…'
+                  : 'Ask about a program, funding, testing, or apprenticeship…'
+            }
             style={{ width: 0, minWidth: 0, maxWidth: '100%', flex: '1 1 0%' }}
             className="min-h-11 max-h-28 min-w-0 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-3 py-2.5 text-base text-slate-950 focus:border-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-200 sm:min-h-[52px] sm:max-h-40 sm:px-4 sm:py-3 sm:text-sm"
             rows={1}
@@ -500,7 +700,8 @@ export default function ParisChat({
         ) : null}
         {!speechInputAvailable ? (
           <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">
-            Voice input is unavailable in this browser. You can still type to PARIS, and spoken replies remain available.
+            Voice input is unavailable in this browser. You can still type to PARIS, and spoken
+            replies remain available.
           </p>
         ) : null}
       </form>

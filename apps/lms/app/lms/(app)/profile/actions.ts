@@ -5,7 +5,9 @@ import { revalidatePath } from 'next/cache';
 
 export async function updateProfile(formData: FormData): Promise<void> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return;
 
   const payload = {
@@ -19,28 +21,4 @@ export async function updateProfile(formData: FormData): Promise<void> {
   await supabase.from('profiles').update(payload).eq('id', user.id);
   revalidatePath('/lms/profile');
   revalidatePath('/lms/settings/profile');
-}
-
-export async function uploadAvatar(file: File) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: 'Not authenticated' };
-
-  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
-    return { error: 'Choose a JPG, PNG, or WebP image no larger than 5 MB.' };
-  }
-  const fileExt = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-  const fileName = `${user.id}/profile-${Date.now()}.${fileExt}`;
-  const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file, { contentType: file.type, upsert: false });
-  if (uploadError) return { error: uploadError.message };
-
-  const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(fileName);
-  const { error: profileError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
-  if (profileError) {
-    await supabase.storage.from('avatars').remove([fileName]);
-    return { error: 'The photo uploaded, but your learner profile could not be updated. Please try again.' };
-  }
-  revalidatePath('/lms/profile');
-  revalidatePath('/lms/settings/profile');
-  return { success: true, url: publicUrl };
 }

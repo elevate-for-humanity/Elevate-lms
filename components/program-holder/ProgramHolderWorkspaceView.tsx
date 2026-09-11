@@ -19,6 +19,7 @@ import { WorkOneOutreachButton } from './WorkOneOutreachButton';
 import { StudentCommunicationActions } from './StudentCommunicationActions';
 import { AlumniCareerOutreachButton } from './AlumniCareerOutreachButton';
 import { getProgramCardImage } from '@/lib/images/programImages';
+import { UniversalProfilePhotoEditor } from '@/components/profile/UniversalProfilePhotoEditor';
 
 const PROGRAM_HOLDER_PORTRAITS: Record<string, string> = {
   '34876b7d-bce0-44fb-9550-5dc5fff00791': '/images/carlina-wilkes.jpg',
@@ -189,6 +190,7 @@ export async function ProgramHolderWorkspaceView({
     return (
       <Settings
         holder={data.holder}
+        profile={data.profile}
         notificationPreferences={data.notificationPreferences}
         phone={data.profile?.phone || data.holder?.contact_phone || ''}
       />
@@ -1402,10 +1404,12 @@ function Payouts({ schedules, panel }: { schedules: any[]; panel?: React.ReactNo
 }
 function Settings({
   holder,
+  profile,
   notificationPreferences,
   phone,
 }: {
   holder: any;
+  profile: any;
   notificationPreferences: any;
   phone: string;
 }) {
@@ -1433,20 +1437,21 @@ function Settings({
           </dl>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-black">QuickBooks accounting parallel</h2>
+          <h2 className="text-xl font-black">QuickBooks accounting</h2>
           <p className="mt-3 text-sm leading-6 text-slate-600">
-            The portal is ready for payout and revenue reconciliation. QuickBooks must be connected
-            before accounting balances or sync status can be shown.
+            Elevate manages QuickBooks centrally for authorized payout, expense, and revenue
+            reconciliation. Program Holders do not need to connect a separate accounting account.
           </p>
-          <span className="mt-5 inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-900">
-            Connection required
+          <span className="mt-5 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-900">
+            Managed by Elevate
           </span>
         </div>
       </section>
-      <ProgramHolderNotificationPreferences
-        initial={notificationPreferences}
-        phone={phone}
+      <UniversalProfilePhotoEditor
+        currentUrl={profile?.avatar_url}
+        name={profile?.full_name || holder?.organization_name || holder?.name || 'Program Holder'}
       />
+      <ProgramHolderNotificationPreferences initial={notificationPreferences} phone={phone} />
     </div>
   );
 }

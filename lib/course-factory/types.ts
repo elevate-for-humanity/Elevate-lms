@@ -27,12 +27,15 @@ export interface FactoryInput {
   audience?: string;
   state?: string;
   credential?: string;
+  /** Versioned standards-registry identity. Drafting remains allowed when absent. */
+  credentialRegistryKey?: string;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
   hours?: number;
   deliveryFormat?: string;
   additionalRequirements?: string;
   moduleCount?: number;
   lessonsPerModule?: number;
+  buildScope?: 'lesson' | 'course';
   mode?: BuildMode;
   contentSource?: ContentSource;
   videoMode?: VideoMode;

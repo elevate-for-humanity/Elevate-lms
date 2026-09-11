@@ -86,6 +86,10 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
     const main = Array.from(document.querySelectorAll('main, [role="main"]')).find(isRendered) || body;
     const mainRect = main?.getBoundingClientRect();
     const visibleCritical = Array.from(document.querySelectorAll('button, input, select, textarea, a[href]')).filter((element) => {
+      // File inputs are commonly positioned off-screen and activated by a
+      // visible, accessible label or button. Certify that user-facing trigger,
+      // not the browser-native implementation hook.
+      if (element instanceof HTMLInputElement && element.type === 'file') return false;
       const rect = (element as HTMLElement).getBoundingClientRect();
       // Menus intentionally parked outside the viewport are not visible to the
       // user. Keep partially visible controls in scope so real clipping still

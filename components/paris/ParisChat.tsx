@@ -19,30 +19,14 @@ import {
 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import type { PortalSupportIssue } from '@/lib/paris/portal-support';
+import {
+  createBrowserSpeechRecognition,
+  type BrowserSpeechRecognition,
+} from '@/lib/browser/speech-recognition';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-}
-
-interface BrowserSpeechRecognition {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start: () => void;
-  stop: () => void;
-  onresult: ((event: { results: ArrayLike<{ 0: { transcript: string } }> }) => void) | null;
-  onerror: ((event: { error?: string }) => void) | null;
-  onend: (() => void) | null;
-}
-
-type BrowserSpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
-
-declare global {
-  interface Window {
-    SpeechRecognition?: BrowserSpeechRecognitionConstructor;
-    webkitSpeechRecognition?: BrowserSpeechRecognitionConstructor;
-  }
 }
 
 const STORAGE_PREFIX = 'elevate:paris:conversation:';
@@ -148,11 +132,9 @@ export default function ParisChat({
   }, [portalIssue]);
 
   useEffect(() => {
-    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    setSpeechInputAvailable(Boolean(Recognition));
-    if (!Recognition) return;
-
-    const recognition = new Recognition();
+    const recognition = createBrowserSpeechRecognition();
+    setSpeechInputAvailable(Boolean(recognition));
+    if (!recognition) return;
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.lang = 'en-US';

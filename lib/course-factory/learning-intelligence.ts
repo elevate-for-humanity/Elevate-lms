@@ -5,6 +5,7 @@ const IntelligenceActionSchema = z.object({
     'unlock_next',
     'assign_remediation',
     'request_automated_review',
+    'request_expert_review',
     'record_mastery',
     'issue_completion',
   ]),
@@ -13,12 +14,16 @@ const IntelligenceActionSchema = z.object({
 
 export const LearningIntelligenceSchema = z.object({
   version: z.literal(1),
-  skills: z.array(z.object({
-    key: z.string().trim().min(1),
-    label: z.string().trim().min(1),
-    source: z.enum(['blueprint', 'objective', 'domain']),
-    required: z.boolean(),
-  })).min(1),
+  skills: z
+    .array(
+      z.object({
+        key: z.string().trim().min(1),
+        label: z.string().trim().min(1),
+        source: z.enum(['blueprint', 'objective', 'domain']),
+        required: z.boolean(),
+      }),
+    )
+    .min(1),
   adaptivePath: z.object({
     masteryThreshold: z.number().int().min(1).max(100),
     remediationTargets: z.array(z.string().trim().min(1)).min(1),
@@ -31,20 +36,24 @@ export const LearningIntelligenceSchema = z.object({
     expertReviewRequired: z.boolean(),
     automatedEvidenceReview: z.boolean(),
   }),
-  automations: z.array(z.object({
-    trigger: z.enum([
-      'lesson_completed',
-      'assessment_passed',
-      'assessment_failed',
-      'practical_submitted',
-    ]),
-    onlyIf: z.object({
-      metric: z.enum(['completion', 'score', 'evidence_status']),
-      operator: z.enum(['eq', 'gte', 'lt']),
-      value: z.union([z.string(), z.number()]),
-    }),
-    actions: z.array(IntelligenceActionSchema).min(1),
-  })).min(2),
+  automations: z
+    .array(
+      z.object({
+        trigger: z.enum([
+          'lesson_completed',
+          'assessment_passed',
+          'assessment_failed',
+          'practical_submitted',
+        ]),
+        onlyIf: z.object({
+          metric: z.enum(['completion', 'score', 'evidence_status']),
+          operator: z.enum(['eq', 'gte', 'lt']),
+          value: z.union([z.string(), z.number()]),
+        }),
+        actions: z.array(IntelligenceActionSchema).min(1),
+      }),
+    )
+    .min(2),
 });
 
 export type LearningIntelligence = z.infer<typeof LearningIntelligenceSchema>;
@@ -81,7 +90,12 @@ export function compileLearningIntelligence(input: {
   const competencyKeys = unique(input.competencyKeys ?? []);
   const objectives = unique(input.objectives ?? []);
   const skills = competencyKeys.length
-    ? competencyKeys.map((key) => ({ key, label: readableLabel(key), source: 'blueprint' as const, required: true }))
+    ? competencyKeys.map((key) => ({
+        key,
+        label: readableLabel(key),
+        source: 'blueprint' as const,
+        required: true,
+      }))
     : objectives.length
       ? objectives.slice(0, 5).map((objective, index) => ({
           key: `${input.domainKey}:${input.lessonSlug}:objective-${index + 1}`,
@@ -89,17 +103,21 @@ export function compileLearningIntelligence(input: {
           source: 'objective' as const,
           required: true,
         }))
-      : [{
-          key: `${input.domainKey}:${input.lessonSlug}`,
-          label: input.lessonTitle,
-          source: 'domain' as const,
-          required: true,
-        }];
+      : [
+          {
+            key: `${input.domainKey}:${input.lessonSlug}`,
+            label: input.lessonTitle,
+            source: 'domain' as const,
+            required: true,
+          },
+        ];
   const configuredThreshold = input.critical
     ? (input.criticalMasteryThreshold ?? 100)
     : (input.masteryThreshold ?? 80);
   const masteryThreshold = Math.max(1, Math.min(100, Math.round(configuredThreshold)));
-  const remediationTargets = objectives.length ? objectives.slice(0, 5) : skills.map((skill) => skill.label);
+  const remediationTargets = objectives.length
+    ? objectives.slice(0, 5)
+    : skills.map((skill) => skill.label);
 
   const automations: LearningIntelligence['automations'] = [
     {
@@ -129,7 +147,10 @@ export function compileLearningIntelligence(input: {
     automations.push({
       trigger: 'practical_submitted',
       onlyIf: { metric: 'evidence_status', operator: 'eq', value: 'submitted' },
-      actions: [{ type: 'request_automated_review', target: input.lessonSlug }],
+      actions: [
+        { type: 'request_automated_review', target: input.lessonSlug },
+        { type: 'request_expert_review', target: input.lessonSlug },
+      ],
     });
   }
 
@@ -145,7 +166,7 @@ export function compileLearningIntelligence(input: {
     collaboration: {
       reflectionPrompt: `Explain how you would apply ${input.lessonTitle} during real work and identify one area where you need more practice.`,
       expertFeedbackPrompt: `Review the learner's evidence for ${input.lessonTitle} and give specific feedback tied to the required skills.`,
-      expertReviewRequired: false,
+      expertReviewRequired: input.practical,
       automatedEvidenceReview: input.practical,
     },
     automations,

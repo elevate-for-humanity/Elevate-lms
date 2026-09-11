@@ -94,9 +94,22 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
         && rect.bottom > 0 && rect.top < window.innerHeight;
       return isRendered(element) && intersectsViewport;
     });
+    const isInsideHorizontalScroller = (element: Element) => {
+      let parent = element.parentElement;
+      while (parent && parent !== document.body) {
+        const style = window.getComputedStyle(parent);
+        if (
+          (style.overflowX === 'auto' || style.overflowX === 'scroll')
+          && parent.scrollWidth > parent.clientWidth + 2
+        ) return true;
+        parent = parent.parentElement;
+      }
+      return false;
+    };
     const clippedCritical = visibleCritical.filter((element) => {
       const rect = (element as HTMLElement).getBoundingClientRect();
-      return rect.right > viewportWidth + 2 || rect.left < -2;
+      const clipped = rect.right > viewportWidth + 2 || rect.left < -2;
+      return clipped && !isInsideHorizontalScroller(element);
     }).slice(0, 10).map((element) => ({
       tag: element.tagName,
       text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '').trim().slice(0, 80),

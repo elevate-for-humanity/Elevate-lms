@@ -43,7 +43,9 @@ export async function GET(request: NextRequest) {
   const clientSecret = field('FACEBOOK_CLIENT_SECRET');
   const pageId = field('FACEBOOK_PAGE_ID');
   const origin = adminOrigin(request);
-  const ready = clientId.configured && clientSecret.configured && pageId.configured;
+  // Meta can discover the authorized page during OAuth. A configured page ID
+  // is only required when the user manages more than one eligible page.
+  const ready = clientId.configured && clientSecret.configured;
 
   return NextResponse.json({
     provider: 'meta',

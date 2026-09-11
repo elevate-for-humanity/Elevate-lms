@@ -53,6 +53,16 @@ export const metadata: Metadata = {
     'hands-on career training',
     'career credentials',
     'employer workforce development',
+    'become a barber apprenticeship host shop',
+    'free host shop application Indiana',
+    'Indiana barber network',
+    'barbershop apprenticeship partner Indiana',
+    'cosmetology apprenticeship host salon',
+    'nail salon apprenticeship host site',
+    'esthetician apprenticeship host spa',
+    'beauty salon apprentices Indiana',
+    'barber apprentices looking for host shops',
+    'host shops Indianapolis Fort Wayne Evansville South Bend',
     'Power Up Indiana training',
     'Indiana employer training reimbursement',
     PLATFORM_DEFAULTS.orgName,
@@ -141,8 +151,8 @@ export default function HomePage() {
             {
               shopSlug: 'kountry-kutz-barbershop',
               media: {
-                src: '/images/partners/kountry-kutz-interior.webp',
-                alt: 'Interior of Kountry Kutz apprenticeship host barbershop',
+                src: '/images/partners/kountry-kutz/interior-active.webp',
+                alt: 'Barbers and clients inside approved Indiana apprenticeship Host Shop Kountry Kutz',
                 kind: 'photo',
               },
             },
@@ -156,18 +166,18 @@ export default function HomePage() {
               },
             },
             {
-              shopSlug: 'cals-kutz-studio',
+              shopSlug: 'generations-hair-llc',
               media: {
-                src: '/images/partners/cals-kutz-official.webp',
-                alt: 'Cals Kutz Studio apprenticeship host barbershop',
+                src: '/images/partners/generations-hair/stylist-at-work.webp',
+                alt: 'Licensed salon professional working with a guest at an Indiana apprenticeship Host Shop',
                 kind: 'photo',
               },
             },
             {
-              shopSlug: 'b-52s-barber-shop',
+              shopSlug: 'generations-hair-llc',
               media: {
-                src: '/images/partners/b52s-official.webp',
-                alt: "B-52's Barbershop in New Castle",
+                src: '/images/partners/generations-hair/salon-service.webp',
+                alt: 'Professional salon service inside an Indiana apprenticeship Host Shop',
                 kind: 'photo',
               },
             },
@@ -175,11 +185,11 @@ export default function HomePage() {
           narrationSrc="/audio/narration/host-shop.mp3"
           tourScripts={{
             '/videos/partners/salon-saloon-tour.mp4':
-              'Welcome to Salon Saloon in South Bend, Indiana. This participating Elevate Host Salon gives cosmetology apprentices a professional setting for supervised workplace learning. As you tour the salon, notice the service stations, client-ready environment, sanitation practices, and team workflow. Apprentices connect classroom instruction with documented on-the-job experience while learning technical skills, client service, safety, and professional expectations. Select Schedule a Host Shop Walk-Through to learn more.',
+              'Are you a licensed salon, spa, nail studio, esthetics business, or barbershop in Indiana? Elevate is looking for Host Shops like Salon Saloon. Becoming a Host Shop is free. You can grow your team, mentor an apprentice, keep normal service revenue, and receive support with instruction, records, progress tracking, and apprenticeship compliance. Apply now to join the Barber and Beauty Host Shop Network.',
             '/videos/partners/kountry-kutz-tour.mp4':
-              'Welcome to Kountry Kutz Barbershop in New Palestine, Indiana. This tour introduces a participating apprenticeship Host Shop where barber apprentices can build skills through structured instruction and supervised workplace experience. Notice the active service floor, professional stations, client interaction, shop routines, and safety practices. Use the shop details beside the video to explore the location or schedule a Host Shop walk-through.',
+              'Indiana barbershops: we have apprentices looking for professional places to train. Join Kountry Kutz and other participating businesses in the Elevate Barber Network. There is no Host Shop application or placement fee. Your shop provides employment, licensed supervision, and hands-on experience; Elevate supports related instruction, documentation, progress tracking, and program compliance. Select Apply Free to Become a Host Shop.',
           }}
-          narration="Welcome to the Salon Saloon tour in South Bend, Indiana. Salon Saloon is a participating Elevate Host Salon where cosmetology apprentices connect classroom instruction with supervised experience inside a working salon. During apprenticeship, the employer teaches professional routines, client service, safety, sanitation, technical skills, and workplace expectations while documenting the apprentice's progress. Host Shops may use hourly pay, commission, or a combination, but the apprentice's weekly earnings must equal at least the applicable required wage for every compensable hour, with a wage top-up when commission falls short. Continue through the gallery to meet other participating shops, view their locations and contact information, and schedule a Host Shop walk-through."
+          narration="Elevate is recruiting licensed barbershops, beauty salons, nail studios, spas, and esthetics businesses across Indiana. We have apprentices looking for Host Shops in Indianapolis, Fort Wayne, Evansville, South Bend, Gary, Bloomington, Lafayette, Terre Haute, and communities statewide. Becoming an Elevate Host Shop is free. Grow your team, mentor future professionals, keep your normal service revenue, and receive support with instruction, attendance, progress records, and apprenticeship compliance. The shop employs, pays, and supervises the apprentice in a safe professional workplace. Apply today to join the Indiana Barber and Beauty Host Shop Network."
         />
         <div
           data-scroll-narration

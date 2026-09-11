@@ -39,12 +39,17 @@ describe('Course Factory learning intelligence', () => {
       practical: true,
     });
 
-    expect(intelligence.collaboration.expertReviewRequired).toBe(false);
+    expect(intelligence.collaboration.expertReviewRequired).toBe(true);
     expect(intelligence.collaboration.automatedEvidenceReview).toBe(true);
-    expect(intelligence.automations).toContainEqual(expect.objectContaining({
-      trigger: 'practical_submitted',
-      actions: [{ type: 'request_automated_review', target: 'chemical-service-practical' }],
-    }));
+    expect(intelligence.automations).toContainEqual(
+      expect.objectContaining({
+        trigger: 'practical_submitted',
+        actions: [
+          { type: 'request_automated_review', target: 'chemical-service-practical' },
+          { type: 'request_expert_review', target: 'chemical-service-practical' },
+        ],
+      }),
+    );
     expect(JSON.stringify(intelligence)).not.toContain('issue_completion');
   });
 

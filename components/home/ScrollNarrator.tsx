@@ -258,3 +258,11 @@ export function ScrollNarrator() {
       {notice && enabled ? (
         <p
           role="status"
+          className="mt-2 max-w-64 rounded-lg bg-white p-2 text-xs font-bold text-red-800 shadow-lg"
+        >
+          {notice}
+        </p>
+      ) : null}
+    </div>
+  );
+}

@@ -2,8 +2,18 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Sparkles, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
+import {
+  Loader2,
+  Sparkles,
+  CheckCircle,
+  AlertCircle,
+  ExternalLink,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
 import { runCourseFactoryPipeline } from '@/components/admin/course-builder/runCourseFactoryPipeline';
+import VoiceDictationButton from '@/components/voice/VoiceDictationButton';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 interface GenerateResult {
   ok: boolean;
@@ -73,6 +83,7 @@ const US_STATES = [
 
 export default function AutomaticCourseBuilder() {
   const router = useRouter();
+  const naturalVoice = useNaturalVoice();
 
   const [title, setTitle] = useState('');
   const [audience, setAudience] = useState('');
@@ -86,6 +97,40 @@ export default function AutomaticCourseBuilder() {
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState<GenerateResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(true);
+
+  const speak = (message: string) => {
+    if (!voiceOutputEnabled) return;
+    void naturalVoice.play(message, {
+      voice: 'coral',
+      style: 'assistant',
+      rate: 0.96,
+    });
+  };
+
+  const append = (current: string, transcript: string) =>
+    `${current.trim()}${current.trim() ? ' ' : ''}${transcript.trim()}`;
+
+  const requestGeneration = () => {
+    const validationError = !title.trim()
+      ? 'Course title is required.'
+      : !audience.trim()
+        ? 'Target audience is required.'
+        : !programId.trim()
+          ? 'Select or enter the canonical program ID so the course can use registered standards and workforce evidence.'
+          : null;
+    if (validationError) {
+      setError(validationError);
+      speak(validationError);
+      return;
+    }
+    setError(null);
+    setConfirming(true);
+    speak(
+      'Your course request is ready for review. Confirm generation when the details are correct.',
+    );
+  };
 
   const generate = async () => {
     if (!title.trim()) {
@@ -97,11 +142,14 @@ export default function AutomaticCourseBuilder() {
       return;
     }
     if (!programId.trim()) {
-      setError('Select or enter the canonical program ID so the course can use registered standards and workforce evidence.');
+      setError(
+        'Select or enter the canonical program ID so the course can use registered standards and workforce evidence.',
+      );
       return;
     }
     setError(null);
     setResult(null);
+    setConfirming(false);
     setGenerating(true);
 
     try {
@@ -134,8 +182,13 @@ export default function AutomaticCourseBuilder() {
         compliance_status: 'validated',
         generation_attempt: 1,
       });
+      speak(
+        `Course published successfully. ${published.modulesGenerated} modules and ${published.lessonsGenerated} lessons were created for human review.`,
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Request failed');
+      const message = err instanceof Error ? err.message : 'Request failed';
+      setError(message);
+      speak(`Course generation failed. ${message}`);
     } finally {
       setGenerating(false);
     }
@@ -144,10 +197,29 @@ export default function AutomaticCourseBuilder() {
   return (
     <div className="max-w-2xl">
       <div className="mb-6">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-brand-blue-600" />
-          AI Course Generator
-        </h2>
+        <div className="flex items-center gap-3">
+          <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+            <Sparkles className="h-5 w-5 text-brand-blue-600" />
+            AI Course Generator
+          </h2>
+          <button
+            type="button"
+            aria-label={
+              voiceOutputEnabled ? 'Turn spoken responses off' : 'Turn spoken responses on'
+            }
+            aria-pressed={voiceOutputEnabled}
+            onClick={() => {
+              setVoiceOutputEnabled((enabled) => {
+                if (enabled) naturalVoice.stop();
+                return !enabled;
+              });
+            }}
+            className="ml-auto inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-2.5 text-xs font-semibold text-slate-700"
+          >
+            {voiceOutputEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            {voiceOutputEnabled ? 'Voice on' : 'Voice off'}
+          </button>
+        </div>
         <p className="text-sm text-slate-700 mt-1">
           Runs the canonical Course Factory end to end: grounded curriculum, complete lessons,
           interactive checks, assessments, narration, visual direction, durable publication, and
@@ -157,9 +229,16 @@ export default function AutomaticCourseBuilder() {
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">
-            Course Title <span className="text-red-500">*</span>
-          </label>
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <label className="text-sm font-medium text-slate-900">
+              Course Title <span className="text-red-500">*</span>
+            </label>
+            <VoiceDictationButton
+              label="course title"
+              onTranscript={setTitle}
+              disabled={generating}
+            />
+          </div>
           <input
             type="text"
             value={title}
@@ -170,9 +249,16 @@ export default function AutomaticCourseBuilder() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">
-            Target Audience <span className="text-red-500">*</span>
-          </label>
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <label className="text-sm font-medium text-slate-900">
+              Target Audience <span className="text-red-500">*</span>
+            </label>
+            <VoiceDictationButton
+              label="target audience"
+              onTranscript={setAudience}
+              disabled={generating}
+            />
+          </div>
           <input
             type="text"
             value={audience}
@@ -184,7 +270,14 @@ export default function AutomaticCourseBuilder() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-900 mb-1">Total Hours</label>
+            <div className="mb-1 flex items-center justify-between gap-2">
+              <label className="text-sm font-medium text-slate-900">Total Hours</label>
+              <VoiceDictationButton
+                label="total hours"
+                onTranscript={(value) => setHours(value.replace(/[^0-9]/g, ''))}
+                disabled={generating}
+              />
+            </div>
             <input
               type="number"
               value={hours}
@@ -195,7 +288,23 @@ export default function AutomaticCourseBuilder() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-900 mb-1">State</label>
+            <div className="mb-1 flex items-center justify-between gap-2">
+              <label className="text-sm font-medium text-slate-900">State</label>
+              <VoiceDictationButton
+                label="state"
+                onTranscript={(value) => {
+                  const match = US_STATES.find(
+                    (candidate) => candidate.toLowerCase() === value.trim().toLowerCase(),
+                  );
+                  if (match) setState(match);
+                  else {
+                    setError(`I could not match “${value}” to a state.`);
+                    speak(`I could not match ${value} to a state.`);
+                  }
+                }}
+                disabled={generating}
+              />
+            </div>
             <select
               value={state}
               onChange={(e) => setState(e.target.value)}
@@ -212,9 +321,14 @@ export default function AutomaticCourseBuilder() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">
-            Credential or Exam
-          </label>
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <label className="text-sm font-medium text-slate-900">Credential or Exam</label>
+            <VoiceDictationButton
+              label="credential or exam"
+              onTranscript={setCredential}
+              disabled={generating}
+            />
+          </div>
           <input
             type="text"
             value={credential}
@@ -225,7 +339,14 @@ export default function AutomaticCourseBuilder() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">Delivery Format</label>
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <label className="text-sm font-medium text-slate-900">Delivery Format</label>
+            <VoiceDictationButton
+              label="delivery format"
+              onTranscript={setDeliveryFormat}
+              disabled={generating}
+            />
+          </div>
           <input
             type="text"
             value={deliveryFormat}
@@ -236,9 +357,14 @@ export default function AutomaticCourseBuilder() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">
-            Additional Instructions
-          </label>
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <label className="text-sm font-medium text-slate-900">Additional Instructions</label>
+            <VoiceDictationButton
+              label="additional instructions"
+              onTranscript={(value) => setPrompt((current) => append(current, value))}
+              disabled={generating}
+            />
+          </div>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
@@ -249,9 +375,16 @@ export default function AutomaticCourseBuilder() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">
-            Canonical Program ID <span className="text-red-500">*</span>
-          </label>
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <label className="text-sm font-medium text-slate-900">
+              Canonical Program ID <span className="text-red-500">*</span>
+            </label>
+            <VoiceDictationButton
+              label="canonical program ID"
+              onTranscript={(value) => setProgramId(value.replace(/\s+/g, ''))}
+              disabled={generating}
+            />
+          </div>
           <input
             type="text"
             value={programId}
@@ -268,8 +401,57 @@ export default function AutomaticCourseBuilder() {
           </div>
         )}
 
+        {confirming ? (
+          <div className="rounded-lg border border-amber-300 bg-amber-50 p-4" role="status">
+            <p className="font-bold text-amber-950">Review before using generation credits</p>
+            <p className="mt-1 text-sm text-amber-900">
+              Build “{title}” for {audience} under program {programId}, with narration and lesson
+              videos queued.
+            </p>
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => void generate()}
+                className="rounded-lg bg-brand-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-700"
+              >
+                Confirm &amp; generate
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirming(false)}
+                className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800"
+              >
+                Keep editing
+              </button>
+            </div>
+            <div className="mt-3 flex items-center justify-between gap-3 border-t border-amber-200 pt-3">
+              <span className="text-xs font-medium text-amber-900">
+                Say “confirm generation” or “keep editing.”
+              </span>
+              <VoiceDictationButton
+                label="generation confirmation"
+                onTranscript={(value) => {
+                  const command = value.toLowerCase();
+                  if (command.includes('confirm') || command.includes('generate')) {
+                    speak('Generation confirmed. Starting the Course Factory.');
+                    void generate();
+                  } else if (command.includes('edit') || command.includes('cancel')) {
+                    setConfirming(false);
+                    speak('Generation cancelled. You can keep editing the request.');
+                  } else {
+                    setError('Say “confirm generation” or “keep editing.”');
+                    speak('I did not run the course. Say confirm generation or keep editing.');
+                  }
+                }}
+                disabled={generating}
+              />
+            </div>
+          </div>
+        ) : null}
+
         <button
-          onClick={generate}
+          type="button"
+          onClick={requestGeneration}
           disabled={generating}
           className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-colors"
         >
@@ -281,7 +463,7 @@ export default function AutomaticCourseBuilder() {
           ) : (
             <>
               <Sparkles className="w-4 h-4" />
-              Generate &amp; Publish Course
+              Review Course Request
             </>
           )}
         </button>
@@ -295,7 +477,9 @@ export default function AutomaticCourseBuilder() {
             <>
               <div className="flex items-center gap-2 mb-3">
                 <CheckCircle className="w-5 h-5 text-brand-green-600" />
-                <span className="font-bold text-brand-green-800">Course published successfully</span>
+                <span className="font-bold text-brand-green-800">
+                  Course published successfully
+                </span>
               </div>
               <dl className="text-sm space-y-1 text-brand-green-900">
                 <div className="flex justify-between">

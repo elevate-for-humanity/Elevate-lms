@@ -89,8 +89,10 @@ const organizationJsonLd = {
   telephone: '+1-317-314-3757',
   address: {
     '@type': 'PostalAddress',
+    streetAddress: '120 East Market Street, Suite 930',
     addressLocality: 'Indianapolis',
     addressRegion: 'IN',
+    postalCode: '46204',
     addressCountry: 'US',
   },
   description:

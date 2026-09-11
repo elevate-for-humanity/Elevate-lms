@@ -64,6 +64,7 @@ export default function HostShopShowcase({
   mediaOverrides,
   mediaSequence,
   tourScripts,
+  asHero = false,
 }: {
   shops: FeaturedHostPartner[];
   /** Limit video playback to the designated tour while retaining other shops as still slides. */
@@ -84,6 +85,8 @@ export default function HostShopShowcase({
   mediaSequence?: ShowcaseSequenceItem[];
   /** Accessible scripts keyed by the tour video source path. */
   tourScripts?: Record<string, string>;
+  /** Render the lead heading as the page's primary heading. */
+  asHero?: boolean;
 }) {
   // Shops without verified media remain in the directory below, but do not
   // become empty decorative slides in the rotating gallery.
@@ -196,6 +199,7 @@ export default function HostShopShowcase({
   if (!slides.length) return null;
 
   const { shop, media: image } = slides[activeIndex];
+  const Heading = asHero ? 'h1' : 'h2';
   const externalLinks = [
     shop.websiteUrl
       ? { href: shop.websiteUrl, label: shop.websiteLabel ?? `Visit ${shop.dba ?? shop.name}` }
@@ -256,12 +260,12 @@ export default function HostShopShowcase({
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-red-700">
               Indiana shops: we’re looking for you
             </p>
-            <h2
+            <Heading
               id="host-shop-showcase-heading"
               className="mt-2 max-w-4xl text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl"
             >
               Become a Host Shop for free. Grow your team through apprenticeship.
-            </h2>
+            </Heading>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">
               Elevate has apprentices ready to train, and we need licensed barbershops, beauty salons,
               nail studios, spas, and esthetics businesses across Indiana. Join the Barber & Beauty

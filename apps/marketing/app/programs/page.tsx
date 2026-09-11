@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import type { Metadata } from 'next';
 import { ArrowRight, BriefcaseBusiness } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -9,6 +8,7 @@ import {
 } from '@/lib/programs/public-programs-page';
 import { WORKONE_INDY_INTAKE_URL } from '@/lib/programs/funding-registry';
 import { ProgramsExplorer } from './ProgramsExplorer';
+import { HomeProgramShowcase } from '@/components/home/HomeProgramShowcase';
 
 // Cache the public catalog briefly so every visit does not block on a fresh database query.\n// Published changes still reach the page within one minute.\nexport const revalidate = 60;
 
@@ -23,20 +23,15 @@ export default async function ProgramsPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <section className="overflow-hidden bg-white">
-        <div className="relative min-h-[360px] bg-slate-100">
-          <Image src="/images/programs-hero-vibrant.webp" alt="Elevate career training programs" fill priority className="object-cover" sizes="100vw" />
-        </div>
-        <div className="mx-auto max-w-6xl px-6 py-10">
-          <div className="max-w-3xl">
-            <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-brand-red-700">Career Training</p>
-            <h1 className="mt-3 text-4xl font-black leading-tight sm:text-6xl">Find the right program without sorting through a wall of choices.</h1>
-            <p className="mt-5 text-lg leading-relaxed text-slate-700 sm:text-xl">Search by career or credential, filter by category and duration, and review workforce-funding pathways separately from regular self-pay programs.</p>
-          </div>
-        </div>
-      </section>
+      <div
+        data-scroll-narration
+        data-narration="Explore Elevate career programs built for real employment opportunities. Train for HVAC and skilled trades, commercial driving, business and entrepreneurship, bookkeeping and finance, information technology, healthcare, and other in-demand fields. Many programs may be free to participants who qualify for workforce funding. Funding is not automatic: the responsible agency must approve the participant, program, and covered costs in writing. If funding is not approved, admissions can explain available self-pay and payment options. Enrollment is open, upcoming cohorts are forming, and PARIS can guide you through program selection, funding steps, the application, required documents, and what to do next."
+        data-narration-src="/audio/heroes/home.mp3"
+      >
+        <HomeProgramShowcase asHero />
+      </div>
 
-      <section className="border-b border-emerald-200 bg-emerald-50 py-12 sm:py-16">
+      <section id="program-catalog" className="scroll-mt-24 border-b border-emerald-200 bg-emerald-50 py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>

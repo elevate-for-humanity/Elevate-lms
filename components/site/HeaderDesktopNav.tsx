@@ -54,7 +54,7 @@ function MoreDropdown({ items }: { items: NavItem[] }) {
   return (
     <div className="grid w-[min(92vw,42rem)] grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-2xl sm:grid-cols-3">
       {items.map((item) => (
-        <section key={item.id ?? item.name} className="min-w-0">
+        <div key={item.id ?? item.name} className="min-w-0">
           {item.href ? (
             <Link href={item.href} prefetch={false} className="block rounded-md px-2 py-2 text-sm font-extrabold text-slate-950 hover:bg-slate-50 hover:text-brand-blue-700">
               {item.name}
@@ -63,7 +63,7 @@ function MoreDropdown({ items }: { items: NavItem[] }) {
             <p className="px-2 py-2 text-sm font-extrabold text-slate-950">{item.name}</p>
           )}
           {item.subItems?.length ? <DropdownContent subItems={item.subItems} embedded /> : null}
-        </section>
+        </div>
       ))}
     </div>
   );

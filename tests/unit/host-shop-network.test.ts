@@ -17,6 +17,29 @@ describe('host shop network architecture', () => {
     expect(profile).toContain('ApprovedHostShopProfile');
   });
 
+  it('keeps the narrated Host Shop showcase on its dedicated page instead of the homepage', () => {
+    const home = readFileSync('apps/marketing/app/page.tsx', 'utf8');
+    const hostShops = readFileSync('apps/marketing/app/partners/host-shops/page.tsx', 'utf8');
+    expect(home).not.toContain('<HostShopShowcase');
+    expect(hostShops).toContain('<HostShopShowcase');
+    expect(hostShops).toContain('salon-saloon-tour.mp4');
+    expect(hostShops).toContain('tourScripts=');
+  });
+
+  it('moves the narrated program showcase from the homepage to the All Programs hero', () => {
+    const home = readFileSync('apps/marketing/app/page.tsx', 'utf8');
+    const programs = readFileSync('apps/marketing/app/programs/page.tsx', 'utf8');
+    expect(home).not.toContain('<HomeProgramShowcase');
+    expect(programs).toContain('<HomeProgramShowcase asHero />');
+    expect(programs).toContain('data-narration-src="/audio/heroes/home.mp3"');
+  });
+
+  it('keeps the More menu compact by avoiding globally padded section wrappers', () => {
+    const desktopNav = readFileSync('components/site/HeaderDesktopNav.tsx', 'utf8');
+    expect(desktopNav).not.toContain('<section key={item.id ?? item.name}');
+    expect(desktopNav).toContain('<div key={item.id ?? item.name} className="min-w-0">');
+  });
+
   it('supports network media and a privacy-safe personalized email campaign', () => {
     const dashboard = readFileSync('apps/lms/app/host-shop/dashboard/HostShopDashboardView.tsx', 'utf8');
     const upload = readFileSync('apps/lms/app/api/host-shop/profile-media/route.ts', 'utf8');

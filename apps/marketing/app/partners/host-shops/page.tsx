@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
-import { ROUTES } from '@/lib/navigation/routes';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
+import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
+import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +25,19 @@ export const metadata: Metadata = {
 };
 
 const HOST_SITE_APPLY_HREF = '/host-shop/apply';
+
+const HOST_SHOP_HERO_ORDER = [
+  'salon-saloon',
+  'kountry-kutz-barbershop',
+  'cals-kutz-studio',
+  'b-52s-barber-shop',
+  'generations-hair-llc',
+] as const;
+
+const HOST_SHOP_HERO_SHOPS = HOST_SHOP_HERO_ORDER.flatMap((slug) => {
+  const shop = FEATURED_BEAUTY_HOST_PARTNERS.find((candidate) => candidate.slug === slug);
+  return shop ? [shop] : [];
+});
 
 const REQUIREMENTS = [
   'Current business or establishment license appropriate to the occupation.',
@@ -61,29 +75,25 @@ export default async function HostShopsPage() {
 
   return (
     <main className="min-h-screen bg-white text-slate-950">
-      <section className="overflow-hidden border-b border-slate-200 bg-white px-4 py-8 sm:py-12">
-        <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[.92fr_1.08fr]">
-          <div className="py-4">
-            <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">Free Indiana Host Shop Application</p>
-            <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-6xl">Indiana shops: we have apprentices looking for you.</h1>
-            <p className="mt-5 max-w-xl text-lg leading-8 text-slate-700">Join the Elevate Barber & Beauty Host Shop Network at no cost. Grow your team by employing and mentoring an apprentice while Elevate supports instruction, records, progress tracking, and apprenticeship compliance.</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={HOST_SITE_APPLY_HREF} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Apply Free — Become a Host Shop</Link>
-              <a href={ROUTES.hostShopPortal} className="rounded-xl border-2 border-slate-300 bg-white px-6 py-3 font-black text-slate-900 hover:border-brand-red-600">Host Site Portal</a>
-            </div>
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-slate-700">
-              <span>✓ No-cost Host Site application</span>
-              <span>✓ Licensed supervision</span>
-              <span>✓ Elevate-managed compliance</span>
-            </div>
-          </div>
-          <div className="grid h-[430px] grid-cols-2 grid-rows-2 gap-3 overflow-hidden rounded-3xl bg-slate-100 p-3 shadow-xl">
-            <img src="/images/partners/kountry-kutz-interior.webp" alt="Interior of an approved apprenticeship Host Shop" className="row-span-2 h-full w-full rounded-2xl object-cover" />
-            <img src="/images/partners/cals-kutz-official.webp" alt="Apprenticeship training at Cal’s Kutz" className="h-full w-full rounded-2xl object-cover" />
-            <img src="/images/partners/generations-hair/color-transformation.webp" alt="Hair color work at Generations Hair" className="h-full w-full rounded-2xl object-cover" />
-          </div>
-        </div>
-      </section>
+      <HostShopShowcase
+        shops={HOST_SHOP_HERO_SHOPS}
+        asHero
+        videoTourShopSlug="salon-saloon"
+        autoPlayVideoOnVisible
+        mediaSequence={[
+          { shopSlug: 'salon-saloon', media: { src: '/videos/partners/salon-saloon-tour.mp4', alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon', kind: 'video', backdropSrc: '/images/partners/salon-saloon/team-sign.webp' } },
+          { shopSlug: 'salon-saloon', media: { src: '/images/partners/salon-saloon/team-sign.webp', alt: 'Salon Saloon team at an Elevate participating Host Salon', kind: 'photo' } },
+          { shopSlug: 'kountry-kutz-barbershop', media: { src: '/images/partners/kountry-kutz/interior-active.webp', alt: 'Barbers and clients inside approved Indiana apprenticeship Host Shop Kountry Kutz', kind: 'photo' } },
+          { shopSlug: 'kountry-kutz-barbershop', media: { src: '/videos/partners/kountry-kutz-tour.mp4', alt: 'Video introduction and tour of Kountry Kutz apprenticeship host barbershop', kind: 'video', backdropSrc: '/images/partners/kountry-kutz-official.webp' } },
+          { shopSlug: 'generations-hair-llc', media: { src: '/images/partners/generations-hair/stylist-at-work.webp', alt: 'Licensed salon professional working with a guest at an Indiana apprenticeship Host Shop', kind: 'photo' } },
+          { shopSlug: 'generations-hair-llc', media: { src: '/images/partners/generations-hair/salon-service.webp', alt: 'Professional salon service inside an Indiana apprenticeship Host Shop', kind: 'photo' } },
+        ]}
+        tourScripts={{
+          '/videos/partners/salon-saloon-tour.mp4': 'Are you a licensed salon, spa, nail studio, esthetics business, or barbershop in Indiana? Elevate is looking for Host Shops like Salon Saloon. Becoming a Host Shop is free. You can grow your team, mentor an apprentice, keep normal service revenue, and receive support with instruction, records, progress tracking, and apprenticeship compliance. Apply now to join the Barber and Beauty Host Shop Network.',
+          '/videos/partners/kountry-kutz-tour.mp4': 'Indiana barbershops: we have apprentices looking for professional places to train. Join Kountry Kutz and other participating businesses in the Elevate Barber Network. There is no Host Shop application or placement fee. Your shop provides employment, licensed supervision, and hands-on experience; Elevate supports related instruction, documentation, progress tracking, and program compliance. Select Apply Free to Become a Host Shop.',
+        }}
+        narration="Elevate is recruiting licensed barbershops, beauty salons, nail studios, spas, and esthetics businesses across Indiana. We have apprentices looking for Host Shops in Indianapolis, Fort Wayne, Evansville, South Bend, Gary, Bloomington, Lafayette, Terre Haute, and communities statewide. Becoming an Elevate Host Shop is free. Grow your team, mentor future professionals, keep your normal service revenue, and receive support with instruction, attendance, progress records, and apprenticeship compliance. The shop employs, pays, and supervises the apprentice in a safe professional workplace. Apply today to join the Indiana Barber and Beauty Host Shop Network."
+      />
 
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-14">
         <div className="mx-auto max-w-6xl">

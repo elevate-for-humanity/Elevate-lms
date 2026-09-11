@@ -36,7 +36,7 @@ export function HomePowerUpIndiana() {
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
                 href="/contact?topic=power-up-indiana"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-6 py-3 font-black text-slate-950 hover:bg-amber-300"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-6 py-3 font-black !text-slate-950 hover:bg-amber-300"
               >
                 Plan Employer Training <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </Link>

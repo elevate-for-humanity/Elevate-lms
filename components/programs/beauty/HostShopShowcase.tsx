@@ -254,18 +254,19 @@ export default function HostShopShowcase({
         <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-brand-red-700">
-              Meet the host-shop network
+              Indiana shops: we’re looking for you
             </p>
             <h2
               id="host-shop-showcase-heading"
               className="mt-2 max-w-4xl text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl"
             >
-              Tour real shops and see how apprenticeship works inside the business.
+              Become a Host Shop for free. Grow your team through apprenticeship.
             </h2>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">
-              Meet participating Host Shops, explore their workplace environments, and schedule a
-              walk-through to learn how a salon, spa, nail studio, or barbershop can become a Host
-              Shop.
+              Elevate has apprentices ready to train, and we need licensed barbershops, beauty salons,
+              nail studios, spas, and esthetics businesses across Indiana. Join the Barber & Beauty
+              Host Shop Network at no cost, develop future professionals, and gain a permanent
+              business profile that helps apprentices and customers discover your shop.
             </p>
           </div>
           {narrationBlocked ? (
@@ -379,7 +380,7 @@ export default function HostShopShowcase({
               aria-live="polite"
             >
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
-                Host Shop gallery image {activeIndex + 1} of {slides.length}
+                Indiana Host Shop Network • Example {activeIndex + 1} of {slides.length}
               </p>
               <h3 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">
                 {shop.dba ?? shop.name}
@@ -418,10 +419,10 @@ export default function HostShopShowcase({
 
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link
-                  href="/schedule-consultation?type=host-shop-tour"
+                  href="/host-shop/apply"
                   className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-brand-red-700"
                 >
-                  Schedule a Host Shop Walk-Through
+                  Apply Free to Become a Host Shop
                 </Link>
                 <Link
                   href={`/host-shops/${shop.slug}`}

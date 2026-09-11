@@ -7,6 +7,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth/requireAuth';
 import { createClient } from '@/lib/supabase/server';
+import {
+  resolveLessonMasteryPolicy,
+  resolveStoredLessonExperience,
+} from '@/lib/course-factory/mastery-policy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -45,12 +49,7 @@ export async function GET(request: NextRequest) {
       lesson.content_json && typeof lesson.content_json === 'object'
         ? (lesson.content_json as Record<string, any>)
         : {};
-    const contentRecord = normalizeContent(lesson.content);
-    const storedExperience = contentJson.experience ?? contentRecord.experience;
-    const authored =
-      storedExperience && typeof storedExperience === 'object'
-        ? (storedExperience as Record<string, any>)
-        : null;
+    const authored = resolveStoredLessonExperience(contentJson, lesson.content);
     // Interaction-specific persistence is optional; lesson completion remains canonical.
     // Do not fail the entire lesson when the optional interaction_progress table is absent.
     let progressRows: Array<Record<string, any>> = [];
@@ -77,6 +76,7 @@ export async function GET(request: NextRequest) {
         interactiveVideo: authored.interactiveVideo ?? null,
         instructionalTimeline: authored.instructionalTimeline ?? null,
         experience: authored,
+        masteryPolicy: resolveLessonMasteryPolicy(authored),
         meta: {
           totalInteractions: interactions.length,
           completedInteractions: interactions.filter((i) => i.completed).length,
@@ -124,12 +124,7 @@ export async function POST(request: NextRequest) {
       lesson.content_json && typeof lesson.content_json === 'object'
         ? (lesson.content_json as Record<string, any>)
         : {};
-    const contentRecord = normalizeContent(lesson.content);
-    const storedExperience = contentJson.experience ?? contentRecord.experience;
-    const experience =
-      storedExperience && typeof storedExperience === 'object'
-        ? (storedExperience as Record<string, any>)
-        : null;
+    const experience = resolveStoredLessonExperience(contentJson, lesson.content);
     if (!experience) {
       return NextResponse.json(
         { error: 'This lesson has not passed the interactive Course Builder gate' },
@@ -197,19 +192,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function normalizeContent(value: unknown): Record<string, any> {
-  if (value && typeof value === 'object' && !Array.isArray(value))
-    return value as Record<string, any>;
-  if (typeof value !== 'string' || !value.trim()) return {};
-  try {
-    const parsed = JSON.parse(value);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
-  } catch {
-    return { html: value };
-  }
-  return { html: value };
-}
-
 function scoreAttempt(
   type: z.infer<typeof AttemptSchema>['interactionType'],
   responses: number[],
@@ -231,7 +213,7 @@ function scoreAttempt(
     });
     const correctCount = questions.length - missed.length;
     const score = Math.round((correctCount / questions.length) * 100);
-    const passingScore = Number(experience.remediation?.passingScore ?? 80);
+    const passingScore = resolveLessonMasteryPolicy(experience).threshold;
     const objectiveMap = Array.isArray(experience.remediation?.objectiveMap)
       ? experience.remediation.objectiveMap
       : [];

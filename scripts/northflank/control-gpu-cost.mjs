@@ -26,7 +26,19 @@ async function request(path, init = {}) {
 }
 
 async function scale(serviceId, instances) {
-  const currentRaw = await request(`/services/${serviceId}`);
+  let currentRaw;
+  try {
+    currentRaw = await request(`/services/${serviceId}`);
+  } catch (error) {
+    // A service that has already been removed is equivalent to zero capacity.
+    // Keep wake requests strict so queued video work can never be reported as
+    // serviced when the canonical GPU worker is absent.
+    if (instances === 0 && String(error).startsWith('Error: 404 ')) {
+      console.log(JSON.stringify({ serviceId, instances: 0, changed: false, absent: true }));
+      return;
+    }
+    throw error;
+  }
   const current = currentRaw.data ?? currentRaw;
   const existing = Number(current.deployment?.instances ?? current.deployment?.spec?.instances ?? 0);
   if (existing === instances) {

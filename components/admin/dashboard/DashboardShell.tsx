@@ -30,6 +30,7 @@ import {
   PublishWebsitePanelLazy,
 } from './DashboardDeferredPanels';
 import { DashboardPanelErrorBoundary } from './DashboardPanelErrorBoundary';
+import { DashboardVoiceAssistant } from './DashboardVoiceAssistant';
 
 function dashboardFirstName(profile: AdminDashboardData['profile']): string {
   const raw = profile?.full_name;
@@ -293,6 +294,7 @@ export function AdminDashboardContent({
                 Open Admin AI <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
+            <DashboardVoiceAssistant />
           </div>
         </section>
       )}

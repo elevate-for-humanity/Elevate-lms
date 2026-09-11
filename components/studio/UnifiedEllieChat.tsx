@@ -26,6 +26,10 @@ import {
 import { getAdminUrl } from '@/lib/config/admin-url';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import {
+  createBrowserSpeechRecognition,
+  type BrowserSpeechRecognition,
+} from '@/lib/browser/speech-recognition';
+import {
   ELLIE_ROUTE_LABEL,
   fetchAiHealth,
   routeEllieMessage,
@@ -309,7 +313,7 @@ export default function UnifiedEllieChat({
   const [lastRoute, setLastRoute] = useState<EllieMessageRoute | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const [listening, setListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(true);
@@ -431,27 +435,25 @@ export default function UnifiedEllieChat({
       return;
     }
 
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
+    const recognition = createBrowserSpeechRecognition();
+    if (!recognition) {
       setSpeechError('Voice input is not supported by this browser.');
       return;
     }
 
-    const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event) => {
       let transcript = '';
-      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+      for (let index = event.resultIndex ?? 0; index < event.results.length; index += 1) {
         transcript += event.results[index][0]?.transcript ?? '';
       }
       if (transcript.trim()) {
         setInput((current) => `${current}${current.trim() ? ' ' : ''}${transcript.trim()}`);
       }
     };
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event) => {
       setSpeechError(
         event.error === 'not-allowed'
           ? 'Microphone access is blocked. Allow microphone access for admin.elevateforhumanity.org in your browser site settings, reload this page, then press the microphone again. You can continue typing while voice input is unavailable.'

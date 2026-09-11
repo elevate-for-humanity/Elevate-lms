@@ -1,13 +1,18 @@
 export type BrowserSpeechRecognitionResultList = {
   length: number;
-  [index: number]: { [index: number]: { transcript: string } };
+  [index: number]: {
+    isFinal?: boolean;
+    [index: number]: { transcript: string };
+  };
 };
 
 export type BrowserSpeechRecognition = {
   lang: string;
   continuous: boolean;
   interimResults: boolean;
-  onresult: ((event: { results: BrowserSpeechRecognitionResultList }) => void) | null;
+  onresult:
+    | ((event: { resultIndex?: number; results: BrowserSpeechRecognitionResultList }) => void)
+    | null;
   onerror: ((event: { error?: string }) => void) | null;
   onend: (() => void) | null;
   start: () => void;

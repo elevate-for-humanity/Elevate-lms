@@ -20,6 +20,10 @@ import {
   Star,
 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import {
+  createBrowserSpeechRecognition,
+  type BrowserSpeechRecognition,
+} from '@/lib/browser/speech-recognition';
 
 type BuilderState = {
   generated: boolean;
@@ -45,24 +49,6 @@ type ParisResponse = {
   reply?: string;
   actions?: Partial<BuilderState>;
 };
-
-type RecognitionResultListLike = {
-  length: number;
-  [index: number]: { [index: number]: { transcript: string } };
-};
-
-type RecognitionLike = {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  onresult: ((event: { results: RecognitionResultListLike }) => void) | null;
-  onerror: (() => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-};
-
-type RecognitionConstructor = new () => RecognitionLike;
 
 const INITIAL_SITE: BuilderState = {
   generated: false,
@@ -266,7 +252,7 @@ function SitePreview({ site }: { site: BuilderState }) {
 
 export default function WebsiteBuilderCommercial() {
   const commercialAudioRef = useRef<HTMLAudioElement | null>(null);
-  const recognitionRef = useRef<RecognitionLike | null>(null);
+  const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const naturalVoice = useNaturalVoice();
   const [site, setSite] = useState<BuilderState>(INITIAL_SITE);
   const [command, setCommand] = useState('');
@@ -414,17 +400,11 @@ export default function WebsiteBuilderCommercial() {
       return;
     }
 
-    const speechWindow = window as Window & {
-      SpeechRecognition?: RecognitionConstructor;
-      webkitSpeechRecognition?: RecognitionConstructor;
-    };
-    const Recognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
-    if (!Recognition) {
+    const recognition = createBrowserSpeechRecognition();
+    if (!recognition) {
       setError('Voice input is not supported by this browser. Type the same instruction instead.');
       return;
     }
-
-    const recognition = new Recognition();
     recognition.lang = 'en-US';
     recognition.continuous = false;
     recognition.interimResults = false;

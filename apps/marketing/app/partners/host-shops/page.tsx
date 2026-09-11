@@ -9,14 +9,14 @@ import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Indiana Barber & Cosmetology Apprenticeship Host Shops',
-  description: 'Find approved Indiana barber and cosmetology apprenticeship Host Shops, view business profiles and portfolios, contact shops, and apply for apprenticeship opportunities.',
-  keywords: ['Indiana barber shops', 'Indiana hair salons', 'barber apprenticeship host shop', 'cosmetology apprenticeship salon', 'apprenticeship near me'],
+  title: 'Become a Free Apprenticeship Host Shop in Indiana | Barber & Beauty Network',
+  description: 'Apply free to become an apprenticeship Host Shop in Indiana. Elevate is recruiting licensed barbershops, salons, nail studios, spas, and esthetics businesses statewide to train apprentices and grow their teams.',
+  keywords: ['become a host shop Indiana', 'free host shop application', 'Indiana barber network', 'barber apprenticeship host shop', 'cosmetology apprenticeship host salon', 'nail technician apprenticeship host shop', 'esthetician apprenticeship spa', 'barber apprentices looking for shops', 'Indianapolis host shops', 'Fort Wayne host shops', 'Evansville host shops', 'South Bend host shops', 'Gary host shops', 'Bloomington host shops', 'Lafayette host shops', 'Terre Haute host shops'],
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/host-shops' },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
   openGraph: {
-    title: 'Indiana Barber & Cosmetology Apprenticeship Host Shops',
-    description: 'Explore approved Host Shops, portfolios, contact details, and apprenticeship opportunities across Indiana.',
+    title: 'Join the Indiana Barber & Beauty Host Shop Network for Free',
+    description: 'Licensed barbershops, salons, nail studios, spas, and esthetics businesses can apply free to train apprentices and grow their teams across Indiana.',
     url: 'https://www.elevateforhumanity.org/partners/host-shops',
     type: 'website',
     images: [{ url: '/images/partners/kountry-kutz-interior.webp', alt: 'Elevate apprenticeship Host Shop network' }],
@@ -64,11 +64,11 @@ export default async function HostShopsPage() {
       <section className="overflow-hidden border-b border-slate-200 bg-white px-4 py-8 sm:py-12">
         <div className="mx-auto grid max-w-6xl items-center gap-8 lg:grid-cols-[.92fr_1.08fr]">
           <div className="py-4">
-            <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">Apprenticeship Host Site Network</p>
-            <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-6xl">Real businesses. Real training. Real careers.</h1>
-            <p className="mt-5 max-w-xl text-lg leading-8 text-slate-700">Meet the approved shops where apprentices earn, learn, and build experience with licensed professionals.</p>
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">Free Indiana Host Shop Application</p>
+            <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-6xl">Indiana shops: we have apprentices looking for you.</h1>
+            <p className="mt-5 max-w-xl text-lg leading-8 text-slate-700">Join the Elevate Barber & Beauty Host Shop Network at no cost. Grow your team by employing and mentoring an apprentice while Elevate supports instruction, records, progress tracking, and apprenticeship compliance.</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={HOST_SITE_APPLY_HREF} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Become a Host Site</Link>
+              <Link href={HOST_SITE_APPLY_HREF} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Apply Free — Become a Host Shop</Link>
               <a href={ROUTES.hostShopPortal} className="rounded-xl border-2 border-slate-300 bg-white px-6 py-3 font-black text-slate-900 hover:border-brand-red-600">Host Site Portal</a>
             </div>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-bold text-slate-700">
@@ -87,9 +87,9 @@ export default async function HostShopsPage() {
 
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-14">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Regional Host Site support</p>
-          <h2 className="mt-2 text-3xl font-black">Build an apprenticeship pathway in your Indiana market</h2>
-          <p className="mt-4 max-w-3xl leading-7 text-slate-700">Review the Host Site process, employer responsibilities, conditional workforce support, and local apprenticeship pathway for your region.</p>
+          <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Statewide Indiana recruitment</p>
+          <h2 className="mt-2 text-3xl font-black">We’re recruiting Host Shops in cities and communities across Indiana</h2>
+          <p className="mt-4 max-w-3xl leading-7 text-slate-700">Elevate is looking for licensed barbershops, beauty salons, nail studios, spas, and esthetics businesses in every Indiana region. Choose your nearest market to see local information and start the free application.</p>
           <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{HOST_SHOP_REGIONS.map((region) => <Link key={region.slug} href={`/partners/host-shops/indiana/${region.slug}`} className="rounded-2xl border border-slate-200 bg-white p-5 font-black shadow-sm hover:border-brand-red-400">{region.city} Host Shops <span aria-hidden="true">→</span></Link>)}</div>
         </div>
       </section>

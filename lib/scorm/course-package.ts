@@ -3,10 +3,47 @@ import type { CoursePackage, CoursePackageLesson } from '@/lib/course-package/co
 
 export type ScormFormat = '1.2' | '2004';
 
+export type PortablePackageValidation = {
+  valid: boolean;
+  format: ScormFormat;
+  lessonCount: number;
+  errors: string[];
+};
+
+export function validatePortableCoursePackage(
+  course: CoursePackage,
+  format: ScormFormat,
+): PortablePackageValidation {
+  const lessons = course.modules.flatMap((module) => module.lessons);
+  const errors: string[] = [];
+  if (!course.id?.trim()) errors.push('course id is required');
+  if (!course.title?.trim()) errors.push('course title is required');
+  if (!lessons.length) errors.push('at least one lesson is required');
+  const ids = new Set<string>();
+  for (const lesson of lessons) {
+    if (!lesson.id?.trim()) errors.push('every lesson requires an id');
+    else if (ids.has(lesson.id)) errors.push(`duplicate lesson id: ${lesson.id}`);
+    else ids.add(lesson.id);
+    if (!lesson.title?.trim()) errors.push(`lesson ${lesson.id || '(unknown)'} requires a title`);
+    if (!lesson.html?.trim())
+      errors.push(`lesson ${lesson.id || '(unknown)'} requires portable HTML`);
+    if (lesson.questions.some((question) => !question.correctAnswers.length)) {
+      errors.push(`lesson ${lesson.id || '(unknown)'} contains an unscorable question`);
+    }
+  }
+  if (!['1.2', '2004'].includes(format)) errors.push(`unsupported SCORM format: ${format}`);
+  return { valid: errors.length === 0, format, lessonCount: lessons.length, errors };
+}
+
 type ZipEntry = { name: string; data: Buffer };
 
 function xml(value: string): string {
-  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 }
 
 function html(value: string): string {
@@ -14,7 +51,12 @@ function html(value: string): string {
 }
 
 function slug(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'course';
+  return (
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'course'
+  );
 }
 
 function crc32(data: Buffer): number {
@@ -102,30 +144,71 @@ function safeJson(value: unknown): string {
 }
 
 function lessonPage(courseTitle: string, lesson: CoursePackageLesson): string {
-  const video = lesson.videoUrl ? `<video id="lesson-video" controls preload="metadata"><source src="${html(lesson.videoUrl)}" type="video/mp4"></video>` : '';
-  const transcript = String(lesson.experience?.transcript ?? lesson.experience?.narrationScript ?? '');
-  const payload = safeJson({ timeline: lesson.timeline, questions: lesson.questions, completion: lesson.completion });
+  const video = lesson.videoUrl
+    ? `<video id="lesson-video" controls preload="metadata"><source src="${html(lesson.videoUrl)}" type="video/mp4"></video>`
+    : '';
+  const transcript = String(
+    lesson.experience?.transcript ?? lesson.experience?.narrationScript ?? '',
+  );
+  const payload = safeJson({
+    timeline: lesson.timeline,
+    questions: lesson.questions,
+    completion: lesson.completion,
+  });
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${html(lesson.title)}</title><script src="../shared/scorm-api.js"></script><style>body{font-family:system-ui;max-width:900px;margin:auto;padding:24px;line-height:1.6;color:#172033}video{width:100%}.panel{border:1px solid #ccd5df;border-radius:10px;padding:16px;margin:16px 0}button{padding:12px 18px;background:#075985;color:white;border:0;border-radius:8px}button:disabled{opacity:.5}.feedback{font-weight:600}</style></head><body><p>${html(courseTitle)}</p><h1>${html(lesson.title)}</h1>${video}<main>${lesson.html}</main>${transcript ? `<details class="panel"><summary>Transcript</summary><p>${html(transcript)}</p></details>` : ''}<section id="checks" aria-label="Knowledge checks"></section><button id="complete" disabled>Complete lesson</button><script>const lesson=${payload};const video=document.getElementById('lesson-video');const done=document.getElementById('complete');let watched=video?0:100;let answered=0;function ready(){done.disabled=watched<lesson.completion.requiredWatchPercent||answered<lesson.questions.length}if(video){video.addEventListener('loadedmetadata',()=>{const saved=Number(getValue('cmi.core.lesson_location','cmi.location'));if(saved>0&&saved<video.duration)video.currentTime=saved});video.addEventListener('timeupdate',()=>{watched=Math.max(watched,Math.round(video.currentTime/video.duration*100));saveLocation(video.currentTime,watched/100);ready()})}const host=document.getElementById('checks');lesson.questions.forEach((q,i)=>{const box=document.createElement('fieldset');box.className='panel';const legend=document.createElement('legend');legend.textContent=q.prompt;box.appendChild(legend);q.options.forEach((option,j)=>{const label=document.createElement('label');label.style.display='block';label.innerHTML='<input type="radio" name="q'+i+'" value="'+j+'"> '+option;box.appendChild(label)});const button=document.createElement('button');button.type='button';button.textContent='Check answer';const feedback=document.createElement('p');feedback.className='feedback';button.onclick=()=>{const selected=box.querySelector('input:checked');if(!selected)return;const expected=String(q.correctAnswers[0]);const correct=selected.value===expected||q.options[Number(selected.value)]===expected;feedback.textContent=(correct?'Correct. ':'Review this concept. ')+q.explanation;if(!box.dataset.answered){box.dataset.answered='1';answered++;ready()}saveScore(Math.round(answered/lesson.questions.length*100),correct)};box.append(button,feedback);host.appendChild(box)});done.onclick=()=>{complete();done.textContent='Completed';done.disabled=true};ready()</script></body></html>`;
 }
 
-function manifest(identifier: string, title: string, lessons: CoursePackageLesson[], format: ScormFormat): string {
-  const items = lessons.map((lesson, index) => `<item identifier="item-${index + 1}" identifierref="res-${index + 1}"><title>${xml(lesson.title)}</title></item>`).join('');
-  const resources = lessons.map((lesson, index) => `<resource identifier="res-${index + 1}" type="webcontent" ${format === '2004' ? 'adlcp:scormType' : 'adlcp:scormtype'}="sco" href="lessons/lesson-${index + 1}.html"><file href="lessons/lesson-${index + 1}.html"/><dependency identifierref="shared"/></resource>`).join('');
-  const ns = format === '2004'
-    ? 'xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"'
-    : 'xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"';
+function manifest(
+  identifier: string,
+  title: string,
+  lessons: CoursePackageLesson[],
+  format: ScormFormat,
+): string {
+  const items = lessons
+    .map(
+      (lesson, index) =>
+        `<item identifier="item-${index + 1}" identifierref="res-${index + 1}"><title>${xml(lesson.title)}</title></item>`,
+    )
+    .join('');
+  const resources = lessons
+    .map(
+      (lesson, index) =>
+        `<resource identifier="res-${index + 1}" type="webcontent" ${format === '2004' ? 'adlcp:scormType' : 'adlcp:scormtype'}="sco" href="lessons/lesson-${index + 1}.html"><file href="lessons/lesson-${index + 1}.html"/><dependency identifierref="shared"/></resource>`,
+    )
+    .join('');
+  const ns =
+    format === '2004'
+      ? 'xmlns="http://www.imsglobal.org/xsd/imscp_v1p1" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"'
+      : 'xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"';
   return `<?xml version="1.0" encoding="UTF-8"?><manifest identifier="${xml(identifier)}" version="1.0" ${ns}><metadata><schema>ADL SCORM</schema><schemaversion>${format === '2004' ? '2004 4th Edition' : '1.2'}</schemaversion></metadata><organizations default="org"><organization identifier="org"><title>${xml(title)}</title>${items}</organization></organizations><resources><resource identifier="shared" type="webcontent" href="shared/scorm-api.js"><file href="shared/scorm-api.js"/></resource>${resources}</resources></manifest>`;
 }
 
-export function generateScormPackage(input: { course: CoursePackage; format: ScormFormat }): { filename: string; data: Buffer } {
-  const ordered = input.course.modules.flatMap((module) => [...module.lessons].sort((a, b) => a.order - b.order));
+export function generateScormPackage(input: { course: CoursePackage; format: ScormFormat }): {
+  filename: string;
+  data: Buffer;
+} {
+  const validation = validatePortableCoursePackage(input.course, input.format);
+  if (!validation.valid)
+    throw new Error(`Portable package validation failed: ${validation.errors.join('; ')}`);
+  const ordered = input.course.modules.flatMap((module) =>
+    [...module.lessons].sort((a, b) => a.order - b.order),
+  );
   if (!ordered.length) throw new Error('Course has no lessons to export');
   const identifier = `elevate-${slug(input.course.title)}-${input.course.id.slice(0, 8)}`;
   const entries: ZipEntry[] = [
-    { name: 'imsmanifest.xml', data: Buffer.from(manifest(identifier, input.course.title, ordered, input.format)) },
+    {
+      name: 'imsmanifest.xml',
+      data: Buffer.from(manifest(identifier, input.course.title, ordered, input.format)),
+    },
     { name: 'shared/scorm-api.js', data: Buffer.from(runtime) },
     { name: 'course-package.json', data: Buffer.from(JSON.stringify(input.course, null, 2)) },
-    ...ordered.map((lesson, index) => ({ name: `lessons/lesson-${index + 1}.html`, data: Buffer.from(lessonPage(input.course.title, lesson)) })),
+    ...ordered.map((lesson, index) => ({
+      name: `lessons/lesson-${index + 1}.html`,
+      data: Buffer.from(lessonPage(input.course.title, lesson)),
+    })),
   ];
-  return { filename: `${slug(input.course.title)}-SCORM${input.format.replace('.', '')}.zip`, data: zip(entries) };
+  return {
+    filename: `${slug(input.course.title)}-SCORM${input.format.replace('.', '')}.zip`,
+    data: zip(entries),
+  };
 }

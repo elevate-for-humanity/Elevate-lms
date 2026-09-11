@@ -23,8 +23,8 @@ jobs:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           if [ -z "$ADMIN_URL" ] || [ -z "$CRON_SECRET" ]; then
-            echo "Required ADMIN_URL or CRON_SECRET secret is missing"
-            exit 1
+            echo "::notice::Blog/social automation is not connected. Skipping without publishing."
+            exit 0
           fi
           endpoint="${ADMIN_URL%/}/api/internal/social-media/process"
           response_file="$(mktemp)"

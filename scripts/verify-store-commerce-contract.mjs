@@ -48,8 +48,8 @@ requireText(courseCatalogMigration, "'course-creation-learning-platform'", 'Unif
 
 // Public checkout and plan selection must not bypass hidden-product governance
 // or sell a feature that the selected base plan already includes.
-requireText(checkout, 'addon?.hiddenFromMarketplace', 'Checkout must reject hidden legacy or managed add-ons');
-requireText(checkout, 'const redundantAddons = addons.filter(', 'Checkout must detect add-ons already included in the selected base plan');
+requireText(checkout, 'addon.hiddenFromMarketplace', 'Checkout must reject hidden legacy or managed add-ons');
+requireText(checkout, 'const redundant = addons.filter(', 'Checkout must detect add-ons already included in the selected base plan');
 requireText(checkout, 'addon.features.every((feature) => plan.features.includes(feature))', 'Checkout redundancy detection must compare canonical feature sets');
 requireText(plansClient, '!addon.hiddenFromMarketplace', 'Plan query-string preselection must ignore hidden legacy add-ons');
 requireText(marketplace, '!addon.hiddenFromMarketplace', 'Public subscription marketplace must filter hidden legacy add-ons');

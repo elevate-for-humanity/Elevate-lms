@@ -54,19 +54,20 @@ requireText(affirmCapture, "'enrollment_review_required'", 'Post-capture enrollm
 requireText(enrollmentActivator, "payment_status: 'paid'", 'Canonical payment enrollment must persist paid status');
 requireText(enrollmentActivator, 'payment_provider: paymentProvider', 'Canonical payment enrollment must persist payment provider');
 
-// Platform Stripe checkout: authenticated workspace billing, canonical prices,
-// no duplicate active subscription, lifecycle synchronization, and traceability.
+// Platform checkout: authenticated workspace billing, canonical catalog pricing,
+// QuickBooks invoice + recurring schedule creation, and duplicate-billing protection.
 requireText(platformCheckout, 'await supabase.auth.getUser()', 'Platform checkout must require a real authenticated user');
 requireText(platformCheckout, 'resolveBillingOrganizationId', 'Platform checkout must bind billing to the canonical organization');
-requireText(platformCheckout, 'resolveCanonicalStripePrice', 'Platform checkout must resolve canonical plan pricing');
-requireText(platformCheckout, 'ensureCanonicalStripePrice', 'Platform checkout must resolve canonical add-on pricing');
+requireText(platformCheckout, 'getBasePlan(planId)', 'Platform checkout must resolve canonical plan pricing');
+requireText(platformCheckout, 'addonSlugs.map(getAddOn)', 'Platform checkout must resolve canonical add-on pricing');
 requireText(platformCheckout, "['active', 'trialing'].includes(existing.status || '')", 'Platform checkout must detect an existing active/trial subscription');
-requireText(platformCheckout, 'await stripe.subscriptions.update(current.id', 'Plan changes must update the existing Stripe subscription instead of duplicating it');
-requireText(platformCheckout, 'await syncPlatformSubscriptionLifecycle(admin, updated)', 'Plan changes must immediately sync canonical subscription state');
-requireText(platformCheckout, "checkout_type: 'platform_saas'", 'Stripe checkout metadata must identify the canonical SaaS family');
-requireText(platformCheckout, "mode: 'subscription'", 'Platform checkout must create a recurring Stripe Checkout session');
-requireText(platformCheckout, 'addon?.hiddenFromMarketplace', 'Platform checkout must block hidden legacy add-ons from new purchase');
-requireText(platformCheckout, 'legacy add-ons are no longer available for new purchase', 'Legacy add-on checkout rejection must remain explicit');
+requireText(platformCheckout, 'existing?.stripe_subscription_id', 'Platform checkout must detect an active legacy Stripe subscription');
+requireText(platformCheckout, 'preventing duplicate billing', 'Provider cutover must block duplicate billing');
+requireText(platformCheckout, 'createQuickBooksBillingProvider(admin).createManualInvoice({', 'Platform checkout must create the canonical QuickBooks invoice');
+requireText(platformCheckout, ".from('billing_schedules').upsert(", 'Platform checkout must persist the recurring billing schedule');
+requireText(platformCheckout, "provider: 'quickbooks'", 'Platform checkout must identify QuickBooks as the billing provider');
+requireText(platformCheckout, 'addon.hiddenFromMarketplace', 'Platform checkout must block hidden legacy add-ons from new purchase');
+requireText(platformCheckout, "error: 'One or more add-ons are unavailable'", 'Legacy add-on checkout rejection must remain explicit');
 
 // Unified Course Creation & Learning Platform must resolve through one canonical
 // commercial code and grant the complete builder/factory/LMS/certificate bundle.
@@ -121,4 +122,4 @@ if (failures.length) {
 }
 
 console.log('[payment-lifecycle-contract] PASS');
-console.log('Affirm capture/enrollment + Stripe checkout/webhook/subscription/billing contracts are canonical');
+console.log('Affirm capture/enrollment + QuickBooks platform checkout + Stripe legacy webhook/subscription contracts are canonical');

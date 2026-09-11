@@ -44,7 +44,7 @@ export function HomePowerUpIndiana() {
                 href={POWER_UP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-white/50 px-6 py-3 font-black text-white hover:border-white hover:bg-white/10"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-white/50 px-6 py-3 font-black text-white hover:border-white hover:bg-slate-800"
               >
                 Review Official DWD Information
               </a>

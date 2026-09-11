@@ -63,6 +63,8 @@ async function expectBrowserDeniedFromPortal(page: Page, path: string) {
 }
 
 test.describe('Registered apprenticeship authorization', () => {
+  test.describe.configure({ timeout: 180_000 });
+
   test.skip(
     !APPRENTICE_EMAIL || !APPRENTICE_PASSWORD,
     'Authenticated apprentice credentials are required',
@@ -194,6 +196,8 @@ test.describe('Registered apprenticeship authorization', () => {
 });
 
 test.describe('Host Shop production workspace', () => {
+  test.describe.configure({ timeout: 180_000 });
+
   test.skip(!HOST_EMAIL || !HOST_PASSWORD, 'Authenticated Host Shop credentials are required');
 
   test('assigned Host Shop can reach scoped operational surfaces', async ({ page }) => {

@@ -80,7 +80,7 @@ async function grantLmsAccess(
       student_id: userId,
       course_id: course.id,
       status: 'active',
-      progress_percentage: 0,
+      progress: '0',
     },
     {
       onConflict: 'student_id,course_id',

@@ -330,7 +330,7 @@ export default function ParisChat({
       voice: 'coral',
       style: storeSurface ? 'commercial' : 'assistant',
       rate: 1,
-      allowBrowserFallback: false,
+      allowBrowserFallback: true,
     });
   }, [autoSpeak, messages, storeSurface, voice, voiceEnabled]);
 
@@ -356,7 +356,7 @@ export default function ParisChat({
                 voice: 'coral',
                 style: 'assistant',
                 rate: 1,
-                allowBrowserFallback: false,
+                allowBrowserFallback: true,
               });
             router.push(command.href);
             return;
@@ -397,7 +397,7 @@ export default function ParisChat({
             voice: 'coral',
             style: storeSurface ? 'commercial' : 'assistant',
             rate: 1,
-            allowBrowserFallback: false,
+            allowBrowserFallback: true,
           });
         }
         onComplete?.([]);
@@ -508,24 +508,6 @@ export default function ParisChat({
               }`}
             >
               <p>{message.content}</p>
-              {message.role === 'assistant' && voiceEnabled ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    void voice.play(message.content, {
-                      voice: 'coral',
-                      style: storeSurface ? 'commercial' : 'assistant',
-                      rate: 1,
-                      allowBrowserFallback: false,
-                    });
-                  }}
-                  className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-black text-slate-800 hover:bg-slate-100"
-                  aria-label="Play PARIS response aloud"
-                >
-                  <Volume2 className="h-4 w-4" aria-hidden="true" />
-                  Hear PARIS
-                </button>
-              ) : null}
             </div>
           </div>
         ))}
@@ -621,18 +603,40 @@ export default function ParisChat({
         <div className="flex w-full min-w-0 max-w-full items-end gap-2 sm:gap-3">
           <button
             type="button"
-            aria-label={autoSpeak ? 'Mute PARIS voice' : 'Turn on PARIS voice'}
-            aria-pressed={autoSpeak}
+            aria-label={voice.isPlaying || voice.isLoading ? 'Stop PARIS voice' : 'Hear PARIS'}
+            aria-pressed={voice.isPlaying || voice.isLoading}
             onClick={() => {
-              if (autoSpeak) voice.stop();
-              setAutoSpeak((enabled) => !enabled);
+              if (voice.isPlaying || voice.isLoading) {
+                voice.stop();
+                setAutoSpeak(false);
+                return;
+              }
+
+              const latestReply = [...messages]
+                .reverse()
+                .find((message) => message.role === 'assistant')?.content;
+              if (!latestReply) return;
+
+              setAutoSpeak(true);
+              void voice.play(latestReply, {
+                voice: 'coral',
+                style: storeSurface ? 'commercial' : 'assistant',
+                rate: 1,
+                allowBrowserFallback: true,
+              });
             }}
-            className="inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100"
+            className={`inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center rounded-full border transition ${
+              voice.isPlaying || voice.isLoading
+                ? 'border-brand-blue-700 bg-brand-blue-700 text-white'
+                : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
+            }`}
           >
-            {autoSpeak ? (
-              <Volume2 className="h-5 w-5 shrink-0" aria-hidden="true" />
-            ) : (
+            {voice.isLoading ? (
+              <Loader2 className="h-5 w-5 shrink-0 animate-spin" aria-hidden="true" />
+            ) : voice.isPlaying ? (
               <VolumeX className="h-5 w-5 shrink-0" aria-hidden="true" />
+            ) : (
+              <Volume2 className="h-5 w-5 shrink-0" aria-hidden="true" />
             )}
           </button>
           <button
@@ -696,6 +700,11 @@ export default function ParisChat({
         {speechInputError ? (
           <p className="mt-2 text-sm font-semibold leading-5 text-red-700" role="alert">
             {speechInputError}
+          </p>
+        ) : null}
+        {voice.error ? (
+          <p className="mt-2 text-sm font-semibold leading-5 text-red-700" role="alert">
+            {voice.error} Check your device media volume, then tap the speaker again.
           </p>
         ) : null}
         {!speechInputAvailable ? (

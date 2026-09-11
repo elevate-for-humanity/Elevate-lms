@@ -8,6 +8,7 @@ import { HomeApprenticeshipSales } from '@/components/home/HomeApprenticeshipSal
 import { HomeWebsiteBuilderSales } from '@/components/home/HomeWebsiteBuilderSales';
 import { HomeSocialAppCTA } from '@/components/home/HomeSocialAppCTA';
 import { HomeFunding } from '@/components/home/HomeFunding';
+import { HomePowerUpIndiana } from '@/components/home/HomePowerUpIndiana';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeMobileActions } from '@/components/home/HomeMobileActions';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
@@ -52,6 +53,8 @@ export const metadata: Metadata = {
     'hands-on career training',
     'career credentials',
     'employer workforce development',
+    'Power Up Indiana training',
+    'Indiana employer training reimbursement',
     PLATFORM_DEFAULTS.orgName,
   ],
   alternates: { canonical: 'https://www.elevateforhumanity.org' },
@@ -193,6 +196,12 @@ export default function HomePage() {
           <HomeWebsiteBuilderSales />
         </div>
         <HomeSocialAppCTA />
+        <div
+          data-scroll-narration
+          data-narration="Indiana employers can explore Power Up Indiana for employer-led training, employee advancement, and possible training reimbursement. Eligibility and reimbursement are determined by the Indiana Department of Workforce Development. Elevate can help employers identify relevant training and organize their next steps."
+        >
+          <HomePowerUpIndiana />
+        </div>
         <div
           data-scroll-narration
           data-narration="Cost should be clear before you enroll. We help you review possible funding and payment paths, then verify what you qualify for."

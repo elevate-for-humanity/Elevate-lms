@@ -32,7 +32,7 @@ interface BrowserSpeechRecognition {
   start: () => void;
   stop: () => void;
   onresult: ((event: { results: ArrayLike<{ 0: { transcript: string } }> }) => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event: { error?: string }) => void) | null;
   onend: (() => void) | null;
 }
 
@@ -129,6 +129,7 @@ export default function ParisChat({
   const [autoSpeak, setAutoSpeak] = useState(voiceEnabled);
   const [isListening, setIsListening] = useState(false);
   const [speechInputAvailable, setSpeechInputAvailable] = useState(false);
+  const [speechInputError, setSpeechInputError] = useState<string | null>(null);
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const initialGreetingSpokenRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -158,10 +159,18 @@ export default function ParisChat({
     recognition.onresult = (event) => {
       const transcript = event.results[0]?.[0]?.transcript?.trim();
       if (transcript) setInput((current) => `${current} ${transcript}`.trim().slice(0, 2000));
+      setSpeechInputError(null);
       setIsListening(false);
       window.setTimeout(() => inputRef.current?.focus(), 0);
     };
-    recognition.onerror = () => setIsListening(false);
+    recognition.onerror = (event) => {
+      setIsListening(false);
+      setSpeechInputError(
+        event.error === 'not-allowed' || event.error === 'service-not-allowed'
+          ? 'Microphone access is blocked. Allow microphone access for this site, then tap the microphone again.'
+          : 'PARIS could not hear you. Tap the microphone and try again, or type your question.',
+      );
+    };
     recognition.onend = () => setIsListening(false);
     recognitionRef.current = recognition;
 
@@ -186,10 +195,12 @@ export default function ParisChat({
       return;
     }
     try {
+      setSpeechInputError(null);
       recognition.start();
       setIsListening(true);
     } catch {
       setIsListening(false);
+      setSpeechInputError('PARIS could not start the microphone. Check this site’s microphone permission and try again.');
     }
   }, [isListening]);
 
@@ -228,7 +239,7 @@ export default function ParisChat({
       voice: 'coral',
       style: storeSurface ? 'commercial' : 'assistant',
       rate: 1,
-      allowBrowserFallback: false,
+      allowBrowserFallback: true,
     });
   }, [autoSpeak, messages, storeSurface, voice, voiceEnabled]);
 
@@ -276,7 +287,7 @@ export default function ParisChat({
           voice: 'coral',
           style: storeSurface ? 'commercial' : 'assistant',
           rate: 1,
-          allowBrowserFallback: false,
+          allowBrowserFallback: true,
         });
       }
       onComplete?.([]);
@@ -345,7 +356,25 @@ export default function ParisChat({
                   : 'rounded-tl-sm border border-slate-200 bg-white text-slate-900 shadow-sm'
               }`}
             >
-              {message.content}
+              <p>{message.content}</p>
+              {message.role === 'assistant' && voiceEnabled ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    void voice.play(message.content, {
+                      voice: 'coral',
+                      style: storeSurface ? 'commercial' : 'assistant',
+                      rate: 1,
+                      allowBrowserFallback: true,
+                    });
+                  }}
+                  className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-xs font-black text-slate-800 hover:bg-slate-100"
+                  aria-label="Play PARIS response aloud"
+                >
+                  <Volume2 className="h-4 w-4" aria-hidden="true" />
+                  Hear PARIS
+                </button>
+              ) : null}
             </div>
           </div>
         ))}
@@ -480,6 +509,21 @@ export default function ParisChat({
             <span className="hidden sm:inline">Send</span>
           </button>
         </div>
+        {isListening ? (
+          <p className="mt-2 text-sm font-bold text-brand-red-700" role="status">
+            Listening… speak now.
+          </p>
+        ) : null}
+        {speechInputError ? (
+          <p className="mt-2 text-sm font-semibold leading-5 text-red-700" role="alert">
+            {speechInputError}
+          </p>
+        ) : null}
+        {!speechInputAvailable ? (
+          <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">
+            Voice input is unavailable in this browser. You can still type to PARIS, and spoken replies remain available.
+          </p>
+        ) : null}
       </form>
     </div>
   );

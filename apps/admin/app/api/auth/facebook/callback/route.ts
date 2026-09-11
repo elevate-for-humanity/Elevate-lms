@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -52,6 +53,7 @@ export async function GET(request: NextRequest) {
   if (!returnedState || !storedState || returnedState !== storedState) return settingsRedirect(request, 'error', 'invalid_state');
   if (request.nextUrl.searchParams.get('error')) return settingsRedirect(request, 'error', 'authorization_declined');
 
+  await hydrateProcessEnv();
   const code = request.nextUrl.searchParams.get('code');
   const clientId = process.env.FACEBOOK_CLIENT_ID?.trim();
   const clientSecret = process.env.FACEBOOK_CLIENT_SECRET?.trim();

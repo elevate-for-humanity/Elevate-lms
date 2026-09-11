@@ -177,7 +177,14 @@ export default function InteractiveLessonExperience({
         if (interaction.type === 'drag-drop' || interaction.type === 'matching')
           return <MatchingActivity key={interaction.id} interaction={interaction} />;
         if (interaction.type === 'practical' || interaction.type === 'simulation')
-          return <PracticalActivity key={interaction.id} interaction={interaction} />;
+          return (
+            <PracticalActivity
+              key={interaction.id}
+              interaction={interaction}
+              courseId={courseId}
+              lessonId={lessonId}
+            />
+          );
         if (interaction.type === 'interactive-video')
           return <InteractiveVideo key={interaction.id} interaction={interaction} />;
         return null;
@@ -185,6 +192,8 @@ export default function InteractiveLessonExperience({
 
       {payload?.practicalTask && !interactions.some((i) => i.type === 'practical') ? (
         <PracticalActivity
+          courseId={courseId}
+          lessonId={lessonId}
           interaction={{
             id: `${lessonSlug}-practical`,
             type: 'practical',
@@ -716,7 +725,15 @@ function MatchingActivity({ interaction }: { interaction: Interaction }) {
   );
 }
 
-function PracticalActivity({ interaction }: { interaction: Interaction }) {
+function PracticalActivity({
+  interaction,
+  courseId,
+  lessonId,
+}: {
+  interaction: Interaction;
+  courseId: string;
+  lessonId: string;
+}) {
   const data = interaction.data ?? {};
   const steps = Array.isArray(data.instructions)
     ? data.instructions
@@ -724,6 +741,28 @@ function PracticalActivity({ interaction }: { interaction: Interaction }) {
       ? data.steps
       : [];
   const [done, setDone] = useState<Set<number>>(new Set());
+  const [evidence, setEvidence] = useState('');
+  const [attested, setAttested] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'saving' | 'submitted' | 'error'>('idle');
+  const competencyKeys = Array.isArray(data.competencyKeys)
+    ? data.competencyKeys.map(String)
+    : [String(data.competencyKey ?? interaction.id)];
+  async function submitEvidence() {
+    setStatus('saving');
+    const response = await fetch('/api/learner/practical-submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        courseId,
+        lessonId,
+        interactionId: interaction.id,
+        competencyKeys,
+        evidence: [{ type: 'text', value: evidence }],
+        learnerAttestation: attested,
+      }),
+    });
+    setStatus(response.ok ? 'submitted' : 'error');
+  }
   return (
     <div className="rounded-2xl border border-teal-300 bg-teal-50 p-5">
       <div className="flex items-center gap-2 text-teal-950">
@@ -774,8 +813,56 @@ function PracticalActivity({ interaction }: { interaction: Interaction }) {
           <p className="mt-1 text-sm font-semibold text-slate-800">{data.evidence}</p>
         </div>
       ) : null}
+      <div className="mt-4 space-y-3 rounded-lg border border-teal-200 bg-white p-3">
+        <label
+          className="block text-xs font-bold uppercase text-teal-700"
+          htmlFor={`${interaction.id}-evidence`}
+        >
+          Submit verification evidence
+        </label>
+        <textarea
+          id={`${interaction.id}-evidence`}
+          value={evidence}
+          onChange={(event) => setEvidence(event.target.value)}
+          placeholder="Describe the work and paste an evidence link or file reference."
+          className="min-h-24 w-full rounded-lg border border-slate-300 p-3 text-sm"
+        />
+        <label className="flex items-start gap-2 text-sm font-semibold text-slate-800">
+          <input
+            type="checkbox"
+            checked={attested}
+            onChange={(event) => setAttested(event.target.checked)}
+            className="mt-1"
+          />
+          I attest this evidence is my work and may be reviewed by an authorized instructor or
+          supervisor.
+        </label>
+        <button
+          type="button"
+          onClick={submitEvidence}
+          disabled={
+            done.size < steps.length ||
+            !evidence.trim() ||
+            !attested ||
+            status === 'saving' ||
+            status === 'submitted'
+          }
+          className="rounded-lg bg-teal-800 px-4 py-2 font-bold text-white disabled:opacity-40"
+        >
+          {status === 'saving'
+            ? 'Submitting…'
+            : status === 'submitted'
+              ? 'Submitted for expert review'
+              : 'Submit evidence'}
+        </button>
+        {status === 'error' ? (
+          <p className="text-sm font-semibold text-red-700">
+            Evidence could not be submitted. Check the required fields and retry.
+          </p>
+        ) : null}
+      </div>
       <p className="mt-3 text-xs font-semibold text-teal-900">
-        Instructor or supervisor verification may be required before competency is credited.
+        Competency is not credited until an authorized reviewer approves the submitted evidence.
       </p>
     </div>
   );

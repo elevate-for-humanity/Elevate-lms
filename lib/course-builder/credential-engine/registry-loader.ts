@@ -62,6 +62,22 @@ export interface CredentialConfig {
   blueprint?: BlueprintConfig;
   instructorAvatar?: string;
   instructorVoice?: string;
+  authority?: {
+    registryKey: string;
+    sourceUrl: string;
+    version: string;
+    effectiveDate: string;
+    status: 'active' | 'retired' | 'superseded' | 'draft';
+    checkedAt: string;
+  };
+  objectives?: Array<{
+    id: string;
+    title: string;
+    weightMin: number;
+    weightMax: number;
+    skills: string[];
+    requiresLab?: boolean;
+  }>;
 }
 
 export interface ExamSectionConfig {
@@ -93,15 +109,48 @@ function isCredentialConfig(value: unknown): value is CredentialConfig {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const candidate = value as Partial<CredentialConfig>;
   return Boolean(
-    candidate.id &&
-      candidate.slug &&
-      candidate.name &&
-      candidate.provider &&
-      candidate.category &&
-      candidate.type &&
-      candidate.description &&
-      typeof candidate.passingScore === 'number',
+    candidate.slug &&
+    candidate.name &&
+    candidate.provider &&
+    candidate.category &&
+    candidate.type &&
+    candidate.description &&
+    typeof candidate.passingScore === 'number',
   );
+}
+
+function normalizeCredentialConfig(value: unknown): CredentialConfig | null {
+  if (!isCredentialConfig(value)) return null;
+  return { ...value, id: value.id || value.slug };
+}
+
+export function validateCredentialAuthority(config: CredentialConfig): string[] {
+  const errors: string[] = [];
+  if (!config.authority) return ['authority metadata is required'];
+  if (!/^https:\/\//.test(config.authority.sourceUrl))
+    errors.push('authority.sourceUrl must use HTTPS');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(config.authority.effectiveDate))
+    errors.push('authority.effectiveDate must be YYYY-MM-DD');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(config.authority.checkedAt))
+    errors.push('authority.checkedAt must be YYYY-MM-DD');
+  if (!config.authority.registryKey.trim()) errors.push('authority.registryKey is required');
+  if (!config.authority.version.trim()) errors.push('authority.version is required');
+  if (config.authority.status !== 'active')
+    errors.push(`credential standard is ${config.authority.status}`);
+  if (!config.objectives?.length) errors.push('at least one objective domain is required');
+  for (const objective of config.objectives ?? []) {
+    if (!objective.id.trim() || !objective.title.trim())
+      errors.push('objective id and title are required');
+    if (
+      objective.weightMin < 0 ||
+      objective.weightMax > 100 ||
+      objective.weightMin > objective.weightMax
+    ) {
+      errors.push(`objective ${objective.id} has an invalid weight range`);
+    }
+    if (!objective.skills.length) errors.push(`objective ${objective.id} requires measured skills`);
+  }
+  return errors;
 }
 
 export function loadCredentialConfigs(): CredentialConfig[] {
@@ -113,9 +162,9 @@ export function loadCredentialConfigs(): CredentialConfig[] {
     return [];
   }
 
-  const files = fs.readdirSync(configDir).filter(
-    (file) => file.endsWith('.yaml') || file.endsWith('.yml') || file.endsWith('.json'),
-  );
+  const files = fs
+    .readdirSync(configDir)
+    .filter((file) => file.endsWith('.yaml') || file.endsWith('.yml') || file.endsWith('.json'));
 
   const credentials: CredentialConfig[] = [];
 
@@ -126,9 +175,14 @@ export function loadCredentialConfigs(): CredentialConfig[] {
     try {
       const parsed: unknown = file.endsWith('.json') ? JSON.parse(content) : loadYaml(content);
       if (Array.isArray(parsed)) {
-        credentials.push(...parsed.filter(isCredentialConfig));
-      } else if (isCredentialConfig(parsed)) {
-        credentials.push(parsed);
+        credentials.push(
+          ...parsed
+            .map(normalizeCredentialConfig)
+            .filter((item): item is CredentialConfig => item !== null),
+        );
+      } else {
+        const credential = normalizeCredentialConfig(parsed);
+        if (credential) credentials.push(credential);
       }
     } catch (error) {
       console.error(`Error loading ${file}:`, error);
@@ -140,6 +194,14 @@ export function loadCredentialConfigs(): CredentialConfig[] {
 
 export function getCredentialFromConfig(slug: string): CredentialConfig | undefined {
   return loadCredentialConfigs().find((credential) => credential.slug === slug);
+}
+
+export function getCredentialStandardByRegistryKey(
+  registryKey: string,
+): CredentialConfig | undefined {
+  return loadCredentialConfigs().find(
+    (credential) => credential.authority?.registryKey === registryKey,
+  );
 }
 
 export function searchCredentialsInConfig(query: string): CredentialConfig[] {

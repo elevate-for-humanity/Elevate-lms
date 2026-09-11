@@ -15,6 +15,8 @@ const BARBER_COURSE_ID_SCHEMA = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
 export type CredentialTarget =
   | 'INTERNAL'
   | 'STATE_BOARD'
+  | 'FEDERAL'
+  | 'MICROSOFT'
   | 'IC&RC'
   | 'NAADAC'
   | 'CUSTOM'
@@ -184,6 +186,16 @@ export interface RegulatoryMetadata {
   governingBody?: string | null;
   governingRegion?: string | null;
   governingStandardVersion?: string | null;
+  /** Canonical public source used to establish the standard or exam objectives. */
+  standardSourceUrl?: string | null;
+  /** Date the source says this version became effective (YYYY-MM-DD). */
+  standardEffectiveDate?: string | null;
+  /** Prevents generation/publication against retired or superseded standards. */
+  standardStatus?: 'active' | 'retired' | 'superseded' | 'draft' | null;
+  /** Registry identifier such as microsoft:az-900:2026-07-20. */
+  standardRegistryKey?: string | null;
+  /** Immutable content fingerprint captured when alignment was approved. */
+  standardFingerprint?: string | null;
   retentionPolicyDays?: number | null;
   auditNotes?: string | null;
 }

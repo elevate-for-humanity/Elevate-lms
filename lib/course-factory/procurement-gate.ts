@@ -1,5 +1,7 @@
 import type { ProgramBuilderTemplate, BuilderLesson } from '@/lib/course-builder/schema';
 import { LearningIntelligenceSchema } from './learning-intelligence';
+import { getCredentialStandardByRegistryKey } from '@/lib/course-builder/credential-engine/registry-loader';
+import { buildObjectiveCoverageReport } from '@/lib/course-builder/standards-registry';
 
 export type ProcurementIssue = {
   severity: 'error' | 'warning';
@@ -204,6 +206,54 @@ export function runGovernmentProcurementGate(
         'regulatory.governingStandardVersion',
         'External/regulated courses must identify the governing standard/test-plan version.',
       );
+    }
+    if (!template.regulatory?.standardSourceUrl?.startsWith('https://')) {
+      add(
+        'error',
+        'STANDARD_SOURCE_REQUIRED',
+        'regulatory.standardSourceUrl',
+        'External/regulated courses must cite the authoritative HTTPS source.',
+      );
+    }
+    if (!template.regulatory?.standardEffectiveDate?.trim()) {
+      add(
+        'error',
+        'STANDARD_EFFECTIVE_DATE_REQUIRED',
+        'regulatory.standardEffectiveDate',
+        'External/regulated courses must record the standard effective date.',
+      );
+    }
+    if (template.regulatory?.standardStatus !== 'active') {
+      add(
+        'error',
+        'STANDARD_NOT_ACTIVE',
+        'regulatory.standardStatus',
+        'Publication is blocked unless the selected standard is active.',
+      );
+    }
+    const registryKey = template.regulatory?.standardRegistryKey?.trim();
+    if (!registryKey) {
+      add(
+        'error',
+        'STANDARD_REGISTRY_KEY_REQUIRED',
+        'regulatory.standardRegistryKey',
+        'External/regulated courses must select a versioned standards-registry record.',
+      );
+    } else {
+      const standard = getCredentialStandardByRegistryKey(registryKey);
+      if (!standard) {
+        add(
+          'error',
+          'STANDARD_REGISTRY_RECORD_MISSING',
+          'regulatory.standardRegistryKey',
+          `No standards-registry record exists for ${registryKey}.`,
+        );
+      } else {
+        const coverage = buildObjectiveCoverageReport(template, standard);
+        for (const message of coverage.errors) {
+          add('error', 'OBJECTIVE_ALIGNMENT_BLOCKED', 'regulatory.standardRegistryKey', message);
+        }
+      }
     }
   }
 

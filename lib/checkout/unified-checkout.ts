@@ -72,7 +72,9 @@ export const CheckoutFlowSchema = z.discriminatedUnion('flow', [
   z.object({
     flow: z.literal('tenant_offer'),
     offerId: z.string().uuid(),
-    email: z.string().email().optional(),
+    email: z.string().email(),
+    customerName: z.string().trim().min(1).max(160),
+    checkoutAttemptId: z.string().uuid(),
     successUrl: z.string().url().optional(),
     cancelUrl: z.string().url().optional(),
   }),

@@ -3,9 +3,6 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 interface Program {
   id: string;
@@ -74,35 +71,26 @@ export default function ProgramEnrollment({
         return;
       }
 
-      // For paid programs, redirect to Stripe Checkout
-      const response = await fetch('/api/checkout/create-session', {
+      const response = await fetch('/api/programs/enroll/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          programId: program.id,
-          programName: program.name,
-          userId,
-          paymentPlan: selectedPaymentPlan,
-          amount: selectedPaymentPlan === 'full' ? fullPrice : installmentPrice,
-          installments: selectedPaymentPlan === 'installments' ? installmentCount : 1,
+          program_id: program.id,
+          funding_source: 'self_pay',
+          payment_plan: selectedPaymentPlan,
         }),
       });
 
-      const { sessionId, error: sessionError } = await response.json();
+      const { url, checkoutUrl, error: sessionError } = await response.json();
 
       if (sessionError) {
         throw new Error(sessionError);
       }
 
-      // Redirect to Stripe Checkout
-      const stripe = await stripePromise;
-      if (!stripe) throw new Error('Stripe failed to load');
-
-      const { error: stripeError } = await stripe.redirectToCheckout({ sessionId });
-
-      if (stripeError) {
-        throw new Error(stripeError.message);
-      }
+      const destination = checkoutUrl || url;
+      if (!response.ok || !destination)
+        throw new Error(sessionError || 'QuickBooks invoice checkout is unavailable.');
+      window.location.assign(destination);
     } catch (data: any) {
       setError('Enrollment failed. Please try again.');
       setLoading(false);
@@ -378,7 +366,7 @@ export default function ProgramEnrollment({
               clipRule="evenodd"
             />
           </svg>
-          <span>Secure payment powered by Stripe</span>
+          <span>Secure invoice payment through QuickBooks</span>
         </div>
       )}
 

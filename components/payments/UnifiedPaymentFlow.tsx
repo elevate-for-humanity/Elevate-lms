@@ -135,16 +135,15 @@ export default function UnifiedPaymentFlow({
     setError('');
 
     try {
-      const response = await fetch('/api/stripe/checkout', {
+      const response = await fetch('/api/programs/enroll/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          programId,
-          paymentType,
-          preferredMethod: selectedMethod,
-          couponCode: appliedCoupon?.code,
+          program_id: programId,
+          funding_source: 'self_pay',
+          payment_plan: paymentType === 'plan' ? 'installments' : 'full',
         }),
       });
 
@@ -154,9 +153,8 @@ export default function UnifiedPaymentFlow({
         throw new Error(data.error || 'Failed to create checkout session');
       }
 
-      if (data.url) {
-        // Redirect to Stripe Checkout
-        window.location.href = data.url;
+      if (data.url || data.checkoutUrl) {
+        window.location.href = data.checkoutUrl || data.url;
       } else {
         throw new Error('No checkout URL received');
       }

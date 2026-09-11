@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getStripe } from '@/lib/stripe/client';
-import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
+import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -37,7 +36,6 @@ function productUnitAmountCents(product: CartProduct): number {
 }
 
 export async function POST(request: NextRequest) {
-  await hydrateProcessEnv();
   const sessionClient = await createClient();
   const {
     data: { user },
@@ -51,14 +49,31 @@ export async function POST(request: NextRequest) {
   try {
     db = await requireAdminClient();
   } catch {
-    return NextResponse.json({ error: 'Checkout service is temporarily unavailable.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Checkout service is temporarily unavailable.' },
+      { status: 503 },
+    );
   }
 
   const requestBody = await request.json().catch(() => ({}));
+  const checkoutAttemptId =
+    typeof requestBody?.checkoutAttemptId === 'string' &&
+    /^[0-9a-f-]{36}$/i.test(requestBody.checkoutAttemptId)
+      ? requestBody.checkoutAttemptId
+      : null;
+  if (!checkoutAttemptId)
+    return NextResponse.json(
+      { error: 'A valid checkout attempt ID is required.' },
+      { status: 400 },
+    );
   const requestedItems = Array.isArray(requestBody?.items)
     ? requestBody.items
         .filter((item: unknown): item is { slug: string; quantity?: number } =>
-          Boolean(item && typeof item === 'object' && typeof (item as { slug?: unknown }).slug === 'string'),
+          Boolean(
+            item &&
+            typeof item === 'object' &&
+            typeof (item as { slug?: unknown }).slug === 'string',
+          ),
         )
         .map((item: { slug: string; quantity?: number }) => ({
           slug: item.slug.trim().toLowerCase(),
@@ -97,7 +112,10 @@ export async function POST(request: NextRequest) {
           !item.slug || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 10,
       )
     ) {
-      return NextResponse.json({ error: 'Cart contains an invalid item or quantity.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Cart contains an invalid item or quantity.' },
+        { status: 400 },
+      );
     }
 
     const requestedSlugs = [...new Set(requestedItems.map((item: { slug: string }) => item.slug))];
@@ -109,11 +127,17 @@ export async function POST(request: NextRequest) {
       .in('slug', requestedSlugs);
 
     if (productError) {
-      return NextResponse.json({ error: 'Unable to validate the selected products.' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Unable to validate the selected products.' },
+        { status: 500 },
+      );
     }
 
     const bySlug = new Map(
-      ((resolvedProducts ?? []) as CartProduct[]).map((product) => [product.slug.toLowerCase(), product]),
+      ((resolvedProducts ?? []) as CartProduct[]).map((product) => [
+        product.slug.toLowerCase(),
+        product,
+      ]),
     );
     const unresolved = requestedSlugs.filter((slug: string) => !bySlug.has(slug));
     if (unresolved.length) {
@@ -138,7 +162,10 @@ export async function POST(request: NextRequest) {
     const product = row.product;
     const quantity = Number(row.quantity || 0);
     if (!product?.id || product.is_active === false) {
-      return NextResponse.json({ error: 'One or more products are no longer available.' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'One or more products are no longer available.' },
+        { status: 409 },
+      );
     }
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 10) {
       return NextResponse.json({ error: `Invalid quantity for ${product.name}.` }, { status: 400 });
@@ -148,10 +175,16 @@ export async function POST(request: NextRequest) {
       product.inventory_quantity !== null &&
       quantity > Number(product.inventory_quantity)
     ) {
-      return NextResponse.json({ error: `${product.name} does not have enough inventory.` }, { status: 409 });
+      return NextResponse.json(
+        { error: `${product.name} does not have enough inventory.` },
+        { status: 409 },
+      );
     }
     if (productUnitAmountCents(product) < 1) {
-      return NextResponse.json({ error: `${product.name} does not have a valid price.` }, { status: 409 });
+      return NextResponse.json(
+        { error: `${product.name} does not have a valid price.` },
+        { status: 409 },
+      );
     }
   }
 
@@ -173,22 +206,44 @@ export async function POST(request: NextRequest) {
       track_inventory: Boolean(item.track_inventory),
     };
   });
-  const totalCents = snapshot.reduce(
-    (sum, item) => sum + item.unit_price_cents * item.quantity,
-    0,
-  );
+  const totalCents = snapshot.reduce((sum, item) => sum + item.unit_price_cents * item.quantity, 0);
 
-  const { data: pendingOrder, error: orderError } = await db
+  const priorOrder = await db
     .from('store_orders')
-    .insert({
-      user_id: user.id,
-      status: 'pending',
-      total_cents: totalCents,
-      items: snapshot,
-      notes: 'Server cart snapshot created before Stripe Checkout',
-    })
-    .select('id')
-    .single();
+    .select('id,user_id,total_cents')
+    .eq('checkout_attempt_id', checkoutAttemptId)
+    .maybeSingle();
+  if (priorOrder.error)
+    return NextResponse.json({ error: 'Unable to verify this checkout attempt.' }, { status: 500 });
+  if (
+    priorOrder.data &&
+    (priorOrder.data.user_id !== user.id || Number(priorOrder.data.total_cents) !== totalCents)
+  )
+    return NextResponse.json(
+      { error: 'This checkout attempt belongs to a different cart.' },
+      { status: 409 },
+    );
+  const orderResult = priorOrder.data
+    ? { data: { id: priorOrder.data.id }, error: null }
+    : await db
+        .from('store_orders')
+        .insert({
+          user_id: user.id,
+          status: 'pending',
+          total_cents: totalCents,
+          items: snapshot,
+          checkout_attempt_id: checkoutAttemptId,
+          notes: 'Server cart snapshot created before QuickBooks invoice',
+        })
+        .select('id')
+        .single();
+  const { data: pendingOrder, error: orderError } = orderResult;
+  if (priorOrder.data)
+    await db
+      .from('store_orders')
+      .update({ status: 'pending', updated_at: new Date().toISOString() })
+      .eq('id', priorOrder.data.id)
+      .eq('status', 'failed');
 
   if (orderError || !pendingOrder?.id) {
     logger.error('[store/cart-checkout] pending order insert failed', orderError ?? undefined, {
@@ -197,81 +252,113 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unable to prepare your order.' }, { status: 500 });
   }
 
-  const stripe = getStripe();
-  if (!stripe) {
-    await db.from('store_orders').delete().eq('id', pendingOrder.id).eq('status', 'pending');
-    return NextResponse.json({ error: 'Payment system is temporarily unavailable.' }, { status: 503 });
-  }
-
   const lineItems = cart.map(({ product, quantity }) => {
     const item = product as CartProduct;
     return {
-      price_data: {
-        currency: (item.currency || 'usd').toLowerCase(),
-        product_data: {
-          name: item.name,
-          description: (item.description || '').slice(0, 500) || undefined,
-          metadata: { store_product_id: item.id, store_product_slug: item.slug },
-        },
-        unit_amount: productUnitAmountCents(item),
-      },
+      canonicalKey: `store-${item.slug}`,
+      name: item.name,
+      description: (item.description || '').slice(0, 500) || undefined,
+      unitAmountCents: productUnitAmountCents(item),
       quantity,
     };
   });
 
-  const origin = request.nextUrl.origin;
   try {
-    const checkout = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      line_items: lineItems,
-      customer_email: user.email,
-      client_reference_id: user.id,
-      metadata: {
-        kind: 'store_purchase',
-        checkout_type: 'store_cart',
-        store_order_id: pendingOrder.id,
-        user_id: user.id,
-        item_count: String(snapshot.length),
-        has_physical_items: physicalProductIds.length ? 'true' : 'false',
+    const { data: profile } = await db
+      .from('profiles')
+      .select('full_name,address,city,state,zip_code')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (
+      physicalProductIds.length &&
+      (!profile?.address || !profile?.city || !profile?.state || !profile?.zip_code)
+    ) {
+      await db
+        .from('store_orders')
+        .update({ status: 'failed', updated_at: new Date().toISOString() })
+        .eq('id', pendingOrder.id)
+        .eq('status', 'pending');
+      return NextResponse.json(
+        {
+          error:
+            'Add a complete shipping address to your profile before purchasing physical products.',
+        },
+        { status: 422 },
+      );
+    }
+    const invoice = await createQuickBooksBillingProvider(db).createManualInvoice({
+      idempotencyKey: `store-order:${pendingOrder.id}`,
+      customer: {
+        externalKey: `user:${user.id}`,
+        displayName: profile?.full_name || user.email,
+        email: user.email,
       },
-      allow_promotion_codes: true,
-      shipping_address_collection: physicalProductIds.length
-        ? { allowed_countries: ['US'] }
-        : undefined,
-      success_url: `${origin}/store/cart-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/store/cart?checkout=cancelled`,
+      lines: lineItems,
+      dueDate: new Date().toISOString().slice(0, 10),
+      memo: `Elevate store order ${pendingOrder.id}`,
+      fulfillment: {
+        type: 'store_order',
+        payload: {
+          store_order_id: pendingOrder.id,
+          user_id: user.id,
+          amount_cents: totalCents,
+          shipping_address: physicalProductIds.length
+            ? {
+                address: profile?.address,
+                city: profile?.city,
+                state: profile?.state,
+                zip_code: profile?.zip_code,
+              }
+            : null,
+        },
+      },
     });
-
-    if (!checkout.url) throw new Error('Stripe did not return a checkout URL.');
+    if (!invoice.paymentUrl)
+      throw new Error('QuickBooks created the invoice but online payment links are not enabled.');
 
     const { error: sessionUpdateError } = await db
       .from('store_orders')
-      .update({ stripe_session_id: checkout.id, updated_at: new Date().toISOString() })
+      .update({
+        billing_provider: 'quickbooks',
+        provider_invoice_id: invoice.providerInvoiceId,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', pendingOrder.id)
       .eq('status', 'pending');
     if (sessionUpdateError) {
-      logger.error('[store/cart-checkout] failed to persist Stripe session ID', sessionUpdateError, {
-        orderId: pendingOrder.id,
-        stripeSessionId: checkout.id,
-      });
+      logger.error(
+        '[store/cart-checkout] failed to persist QuickBooks invoice ID',
+        sessionUpdateError,
+        {
+          orderId: pendingOrder.id,
+          providerInvoiceId: invoice.providerInvoiceId,
+        },
+      );
     }
 
     const acceptsJson = request.headers.get('accept')?.includes('application/json');
     if (acceptsJson) {
       return NextResponse.json({
-        checkoutUrl: checkout.url,
+        checkoutUrl: invoice.paymentUrl,
         orderId: pendingOrder.id,
-        sessionId: checkout.id,
+        invoiceId: invoice.providerInvoiceId,
       });
     }
-    return NextResponse.redirect(checkout.url, 303);
+    return NextResponse.redirect(invoice.paymentUrl, 303);
   } catch (error) {
-    await db.from('store_orders').delete().eq('id', pendingOrder.id).eq('status', 'pending');
+    await db
+      .from('store_orders')
+      .update({ status: 'failed', updated_at: new Date().toISOString() })
+      .eq('id', pendingOrder.id)
+      .in('status', ['pending', 'failed']);
     logger.error(
-      '[store/cart-checkout] Stripe session creation failed',
+      '[store/cart-checkout] QuickBooks invoice creation failed',
       error instanceof Error ? error : new Error(String(error)),
       { orderId: pendingOrder.id, userId: user.id },
     );
-    return NextResponse.json({ error: 'Unable to start secure checkout. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Unable to start secure checkout. Please try again.' },
+      { status: 500 },
+    );
   }
 }

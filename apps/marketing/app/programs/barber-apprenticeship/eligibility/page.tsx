@@ -46,8 +46,8 @@ export default function BarberEligibilityPage() {
             applyHref="/programs/barber-apprenticeship/apply"
             selfPayCost="$4,980"
             depositAmount="$1,743"
-            depositHref="https://buy.stripe.com/8x2bJ21986rletw0dN8EN0o"
-            fullPayHref="https://buy.stripe.com/6oUdRa4lkaHB7141hR8EN0b"
+            depositHref="/programs/barber-apprenticeship/apply"
+            fullPayHref="/programs/barber-apprenticeship/apply"
           />
         </div>
       </section>

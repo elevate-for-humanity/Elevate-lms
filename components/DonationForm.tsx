@@ -3,10 +3,7 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
 import { Loader2 } from 'lucide-react';
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
 const DONATION_AMOUNTS = [25, 50, 100, 250, 500, 1000];
 
@@ -15,6 +12,9 @@ export default function DonationForm() {
   const [customAmount, setCustomAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [donorName, setDonorName] = useState('');
+  const [donorEmail, setDonorEmail] = useState('');
+  const [attemptId] = useState(() => crypto.randomUUID());
 
   const handleDonate = async () => {
     const amount = customAmount ? parseFloat(customAmount) : selectedAmount;
@@ -28,29 +28,27 @@ export default function DonationForm() {
     setError('');
 
     try {
-      // Create Stripe checkout session
       const response = await fetch('/api/donate/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({
+          amount,
+          donor_name: donorName,
+          donor_email: donorEmail,
+          checkoutAttemptId: attemptId,
+        }),
       });
 
-      const { sessionId, error: apiError } = await response.json();
+      const { checkoutUrl, url, error: apiError } = await response.json();
 
       if (apiError) {
         throw new Error(apiError);
       }
 
-      // Redirect to Stripe Checkout
-      const stripe = await stripePromise;
-      if (stripe) {
-        const { error: stripeError } = await stripe.redirectToCheckout({
-          sessionId,
-        });
-        if (stripeError) {
-          throw stripeError;
-        }
-      }
+      const destination = checkoutUrl || url;
+      if (!response.ok || !destination)
+        throw new Error(apiError || 'Invoice checkout is unavailable.');
+      window.location.assign(destination);
     } catch (data: any) {
       // Error: $1
       setError('Failed to process donation. Please try again.');
@@ -64,6 +62,21 @@ export default function DonationForm() {
       <h3 className="text-2xl font-bold text-black mb-6">Choose Your Donation Amount</h3>
 
       {/* Preset Amounts */}
+      <div className="mb-6 grid gap-3 sm:grid-cols-2">
+        <input
+          value={donorName}
+          onChange={(e) => setDonorName(e.target.value)}
+          placeholder="Your name"
+          className="rounded-lg border-2 border-slate-300 p-3"
+        />
+        <input
+          type="email"
+          value={donorEmail}
+          onChange={(e) => setDonorEmail(e.target.value)}
+          placeholder="Email for receipt"
+          className="rounded-lg border-2 border-slate-300 p-3"
+        />
+      </div>
       <div className="grid grid-cols-3 gap-4 mb-6">
         {DONATION_AMOUNTS.map((amount) => (
           <button
@@ -115,7 +128,9 @@ export default function DonationForm() {
       {/* Donate Button */}
       <button
         onClick={handleDonate}
-        disabled={loading || (!selectedAmount && !customAmount)}
+        disabled={
+          loading || !donorName.trim() || !donorEmail.trim() || (!selectedAmount && !customAmount)
+        }
         className="w-full bg-brand-blue-700 hover: hover: text-white py-4 rounded-lg font-bold text-lg transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {loading ? (
@@ -130,7 +145,7 @@ export default function DonationForm() {
 
       {/* Security Note */}
       <p className="text-xs text-slate-500 text-center mt-4">
-        🔒 Secure payment powered by Stripe. Your donation is tax-deductible.
+        🔒 Secure card or bank payment through QuickBooks. Your donation is tax-deductible.
       </p>
     </div>
   );

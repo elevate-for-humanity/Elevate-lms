@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { Check, CreditCard, Loader2, ShieldCheck } from 'lucide-react';
 import {
@@ -14,17 +14,33 @@ type PaymentChoice = 'deposit' | 'full';
 export function StandaloneBuildPackages({ compact = false }: { compact?: boolean }) {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [buyerName, setBuyerName] = useState('');
+  const [buyerEmail, setBuyerEmail] = useState('');
+  const checkoutAttempts = useRef(new Map<string, string>());
 
   async function checkout(packageId: ImplementationPackageId, paymentChoice: PaymentChoice) {
     const requestKey = `${packageId}:${paymentChoice}`;
     setLoading(requestKey);
     setError(null);
+    if (!buyerName.trim() || !buyerEmail.trim()) {
+      setError('Enter your name and email so QuickBooks can create the invoice.');
+      setLoading(null);
+      return;
+    }
 
     try {
+      const checkoutAttemptId = checkoutAttempts.current.get(requestKey) || crypto.randomUUID();
+      checkoutAttempts.current.set(requestKey, checkoutAttemptId);
       const response = await fetch('/api/store/implementation-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ packageId, paymentChoice }),
+        body: JSON.stringify({
+          packageId,
+          paymentChoice,
+          buyerName: buyerName.trim(),
+          buyerEmail: buyerEmail.trim(),
+          checkoutAttemptId,
+        }),
       });
       const result = (await response.json()) as { checkoutUrl?: string; error?: string };
       if (!response.ok || !result.checkoutUrl) {
@@ -71,6 +87,22 @@ export function StandaloneBuildPackages({ compact = false }: { compact?: boolean
             {error}
           </p>
         ) : null}
+
+        <div className="mx-auto mt-7 grid max-w-2xl gap-3 sm:grid-cols-2">
+          <input
+            value={buyerName}
+            onChange={(event) => setBuyerName(event.target.value)}
+            placeholder="Your name or business name"
+            className="rounded-xl border border-slate-300 px-4 py-3"
+          />
+          <input
+            type="email"
+            value={buyerEmail}
+            onChange={(event) => setBuyerEmail(event.target.value)}
+            placeholder="Email for invoice"
+            className="rounded-xl border border-slate-300 px-4 py-3"
+          />
+        </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {packages.map((item) => {

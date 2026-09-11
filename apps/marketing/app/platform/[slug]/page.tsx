@@ -157,18 +157,8 @@ export default async function ProductDetailPage({
                   </div>
                 </div>
 
-                <form action="/api/stripe/checkout" method="POST">
-                  <input type="hidden" name="productId" value={product.slug} />
-                  <button
-                    type="submit"
-                    className="w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors mb-4"
-                  >
-                    Purchase License
-                  </button>
-                  <p className="text-sm text-black text-center">
-                    Secure checkout powered by Stripe. Instant access after payment.
-                  </p>
-                </form>
+                <Link href={`/store/cart?add=${encodeURIComponent(product.slug)}`} className="mb-4 block w-full rounded-lg bg-brand-orange-600 px-6 py-4 text-center font-semibold text-white transition-colors hover:bg-brand-orange-700">Purchase License</Link>
+                <p className="text-center text-sm text-black">Secure QuickBooks invoice checkout. Access begins after confirmed payment.</p>
 
                 <div className="mt-6 pt-6 border-t border-slate-200">
                   <Link

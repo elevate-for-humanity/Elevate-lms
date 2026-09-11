@@ -26,32 +26,7 @@ export default function ProgramPaymentOptions({
   const bnplPayment = Math.ceil(price / 4); // Pay in 4 with BNPL providers
 
   const handlePayment = async (method: string) => {
-    try {
-      const response = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          programSlug,
-          programName,
-          price,
-          paymentMethod: method,
-        }),
-      });
-
-      const { sessionId } = await response.json();
-
-      if (sessionId) {
-        const stripe = await import('@stripe/stripe-js').then((m) =>
-          m.loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''),
-        );
-        const stripeInstance = await stripe;
-        if (stripeInstance) {
-          await stripeInstance.redirectToCheckout({ sessionId });
-        }
-      }
-    } catch (error) {
-      alert('Payment failed. Please call support center for assistance.');
-    }
+    window.location.assign(`/programs/${encodeURIComponent(programSlug)}/apply?funding=self_pay&payment=${encodeURIComponent(method)}`);
   };
 
   return (

@@ -1,12 +1,12 @@
 // PUBLIC ROUTE: server-authoritative testing checkout.
 import { NextRequest, NextResponse } from 'next/server';
-import { getStripeWriteClient } from '@/lib/stripe/client';
 import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
-import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { MINIMUM_BOOKING_NOTICE_HOURS } from '@/lib/testing/booking-validation';
+import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
+import type { BillingLineInput } from '@/lib/billing/contracts';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -42,12 +42,6 @@ export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'payment');
   if (rateLimited) return rateLimited;
 
-  await hydrateProcessEnv();
-  const stripe = getStripeWriteClient();
-  if (!stripe) {
-    return NextResponse.json({ error: 'Payment system not configured.' }, { status: 503 });
-  }
-
   let body: {
     examType?: string;
     examName?: string;
@@ -75,6 +69,14 @@ export async function POST(request: NextRequest) {
   }
 
   const examName = body.examName?.trim() || '';
+  const customerEmail = body.email?.trim().toLowerCase() || '';
+  const customerName = body.name?.trim() || '';
+  if (!customerEmail || !customerName) {
+    return NextResponse.json(
+      { error: 'Name and email are required for the QuickBooks invoice and receipt.' },
+      { status: 400 },
+    );
+  }
   const pricing = exactExamAmount(providerKey, examName);
   if (!pricing) {
     return NextResponse.json(
@@ -125,67 +127,68 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const lineItems: any[] = [
+  const lineItems: BillingLineInput[] = [
     {
+      canonicalKey: `testing-${providerKey}-${pricing.displayName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')}`,
+      name: `${provider.name} — ${pricing.displayName}`,
       quantity: participantCount,
-      price_data: {
-        currency: 'usd',
-        unit_amount: pricing.amountCents,
-        product_data: {
-          name: `${provider.name} — ${pricing.displayName}`,
-          metadata: { provider: providerKey, exam_name: pricing.displayName },
-        },
-      },
+      unitAmountCents: pricing.amountCents,
     },
   ];
 
   if (addOnSelected && provider.addOn) {
     lineItems.push({
+      canonicalKey: `testing-${providerKey}-addon`,
+      name: provider.addOn.label,
+      description: provider.addOn.description,
       quantity: 1,
-      price_data: {
-        currency: 'usd',
-        unit_amount: provider.addOn.amountCents,
-        product_data: {
-          name: provider.addOn.label,
-          description: provider.addOn.description,
-          metadata: { provider: providerKey, add_on: 'true' },
-        },
-      },
+      unitAmountCents: provider.addOn.amountCents,
     });
   }
 
-  const origin = request.nextUrl.origin;
   try {
-    const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      line_items: lineItems,
-      success_url: `${origin}/testing/book?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/testing/checkout?provider=${encodeURIComponent(providerKey)}&exam=${encodeURIComponent(pricing.displayName)}`,
-      allow_promotion_codes: true,
-      billing_address_collection: 'auto',
-      customer_email: body.email?.trim() || undefined,
-      metadata: {
-        payment_type: 'testing_fee',
-        exam_type: providerKey,
-        exam_name: pricing.displayName,
-        booking_type: bookingType,
-        participant_count: String(participantCount),
-        add_on: addOnSelected ? 'true' : 'false',
-        slot_id: slot.id,
+    const invoice = await createQuickBooksBillingProvider(admin).createManualInvoice({
+      idempotencyKey: `testing:${slot.id}:${customerEmail}:${crypto.randomUUID()}`,
+      customer: {
+        externalKey: `email:${customerEmail}`,
+        displayName: customerName,
+        email: customerEmail,
+      },
+      lines: lineItems,
+      dueDate: new Date().toISOString().slice(0, 10),
+      memo: `Testing appointment ${slot.id}`,
+      fulfillment: {
+        type: 'testing_booking',
+        payload: {
+          exam_type: providerKey,
+          exam_name: pricing.displayName,
+          booking_type: bookingType,
+          participant_count: participantCount,
+          add_on: addOnSelected,
+          slot_id: slot.id,
+          customer_email: customerEmail,
+          customer_name: customerName,
+          amount_cents:
+            pricing.amountCents * participantCount +
+            (addOnSelected ? provider.addOn?.amountCents || 0 : 0),
+        },
       },
     });
-
-    if (!session.url) throw new Error('Stripe did not return a Checkout URL.');
+    if (!invoice.paymentUrl)
+      throw new Error('QuickBooks created the invoice but online payment links are not enabled.');
 
     return NextResponse.json({
-      url: session.url,
-      sessionId: session.id,
+      url: invoice.paymentUrl,
+      invoiceId: invoice.providerInvoiceId,
       examAmountCents: pricing.amountCents,
-      addOnAmountCents: addOnSelected ? provider.addOn?.amountCents ?? 0 : 0,
+      addOnAmountCents: addOnSelected ? (provider.addOn?.amountCents ?? 0) : 0,
     });
   } catch (error) {
     logger.error(
-      '[testing-checkout] Stripe session creation failed',
+      '[testing-checkout] QuickBooks invoice creation failed',
       error instanceof Error ? error : new Error(String(error)),
       { providerKey, examName: pricing.displayName },
     );

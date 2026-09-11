@@ -23,21 +23,7 @@ export default function Storefront() {
   async function checkout() {
     setLoading(true);
     setError('');
-    try {
-      const response = await fetch('/api/meri-gold-round/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ quantity, email: email.trim() || undefined }),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.checkoutUrl) {
-        throw new Error(data.error || 'Unable to start checkout.');
-      }
-      window.location.assign(data.checkoutUrl);
-    } catch (checkoutError) {
-      setError(checkoutError instanceof Error ? checkoutError.message : 'Unable to start checkout.');
-      setLoading(false);
-    }
+    window.location.assign(`/contact?topic=meri-gold-round&quantity=${quantity}&email=${encodeURIComponent(email.trim())}`);
   }
 
   return (
@@ -127,7 +113,7 @@ export default function Storefront() {
             {loading ? 'Opening secure checkout…' : `Buy now — $${(PRICE * quantity).toFixed(2)}`}
           </button>
           {error && <p className={styles.error} role="alert">{error}</p>}
-          <p className={styles.secure}>Secure payment powered by Stripe · Shipping address collected at checkout</p>
+          <p className={styles.secure}>Elevate will send a secure QuickBooks invoice and confirm shipping.</p>
           <ul className={styles.buyReasons}>
             <li>One portable formula replaces multiple single-purpose oils.</li>
             <li>Roller application helps keep daily care simple and mess-free.</li>

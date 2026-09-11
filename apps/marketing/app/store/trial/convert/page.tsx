@@ -91,32 +91,7 @@ export default function TrialConvertPage() {
     setConverting(true);
     setError(null);
 
-    try {
-      const res = await fetch('/api/stripe/trial-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          trialId: trial.id,
-          plan: selectedPlan,
-          interval,
-          email: trial.email,
-          organizationName: trial.organization_name,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to start conversion');
-      }
-
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      }
-    } catch (err: any) {
-      setError(err.message);
-      setConverting(false);
-    }
+    window.location.assign(`/store/plans?plan=${encodeURIComponent(selectedPlan)}&interval=${encodeURIComponent(interval)}`);
   };
 
   if (loading) {

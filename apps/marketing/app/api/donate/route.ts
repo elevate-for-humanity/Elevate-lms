@@ -1,104 +1,91 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getStripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { LEGAL_PARTNER_LINE } from '@/lib/config/legal-entity';
+import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
-// PUBLIC ROUTE: donation endpoint — no auth required, rate-limited
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-
-export async function POST(req: NextRequest) {
-  const rateLimited = await applyRateLimit(req, 'payment');
-  if (rateLimited) return rateLimited;
-
-  const stripe = getStripe();
-  if (!stripe) {
-    return safeError('Donations are temporarily unavailable.', 503);
-  }
-
-  let body: {
-    amount: number;
-    recurring: boolean;
-    donor_name?: string;
-    donor_email?: string;
-    dedication?: string;
-    in_honor_of?: string;
+export async function POST(request: NextRequest) {
+  const limited = await applyRateLimit(request, 'payment');
+  if (limited) return limited;
+  const body = await request.json().catch(() => ({}));
+  const amount = Number(body.amount);
+  const recurring = Boolean(body.recurring);
+  const name = String(body.donor_name || '').trim();
+  const email = String(body.donor_email || '')
+    .trim()
+    .toLowerCase();
+  const attempt = String(body.checkoutAttemptId || '');
+  if (!Number.isFinite(amount) || amount < 1 || amount > 100000)
+    return NextResponse.json({ error: 'Invalid donation amount.' }, { status: 400 });
+  if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !attempt.match(/^[0-9a-f-]{36}$/i))
+    return NextResponse.json(
+      { error: 'Name, invoice email, and checkout attempt ID are required.' },
+      { status: 400 },
+    );
+  const cents = Math.round(amount * 100);
+  const db = await requireAdminClient();
+  const fulfillment = {
+    type: 'donation_receipt',
+    payload: {
+      donor_name: name,
+      donor_email: email,
+      amount_cents: cents,
+      recurring,
+      dedication: body.dedication,
+      in_honor_of: body.in_honor_of,
+    },
   };
-
   try {
-    body = await req.json();
-  } catch {
-    return safeError('Invalid request body.', 400);
-  }
-
-  const { amount, recurring, donor_name, donor_email, dedication, in_honor_of } = body;
-
-  if (!amount || typeof amount !== 'number' || amount < 1 || amount > 100000) {
-    return safeError('Invalid donation amount.', 400);
-  }
-
-  const siteUrl = ((process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl);
-  const amountCents = Math.round(amount * 100);
-
-  const metadata: Record<string, string> = {
-    type: 'charitable_donation',
-    organization: LEGAL_PARTNER_LINE,
-    site_partner: PLATFORM_DEFAULTS.orgName,
-    designation: 'general_charitable_support',
-    ...(donor_name && { donor_name }),
-    ...(donor_email && { donor_email }),
-    ...(dedication && { dedication }),
-    ...(in_honor_of && { in_honor_of }),
-  };
-
-  const productName = recurring
-    ? `Monthly Donation — ${LEGAL_PARTNER_LINE}`
-    : `Donation — ${LEGAL_PARTNER_LINE}`;
-  const productDescription =
-    'General charitable support for community and wraparound activities, subject to the nonprofit organization’s governing documents, available resources, and applicable law. A donation does not guarantee a benefit, scholarship, credential, training enrollment, funding award, job placement, or other participant outcome.';
-
-  try {
-    const common = {
-      payment_method_types: ['card'] as Array<'card'>,
-      line_items: [
+    const invoice = await createQuickBooksBillingProvider(db).createManualInvoice({
+      idempotencyKey: `donation:${attempt}`,
+      customer: { externalKey: `donor:${email}`, displayName: name, email },
+      lines: [
         {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: productName,
-              description: productDescription,
-              images: [`${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`],
-            },
-            unit_amount: amountCents,
-            ...(recurring ? { recurring: { interval: 'month' as const } } : {}),
-          },
+          canonicalKey: recurring ? 'monthly-donation' : 'one-time-donation',
+          name: recurring ? 'Monthly Donation' : 'Donation',
           quantity: 1,
+          unitAmountCents: cents,
         },
       ],
-      customer_email: donor_email || undefined,
-      metadata,
-      cancel_url: `${siteUrl}/donate?cancelled=true`,
-    };
-
-    if (recurring) {
-      const session = await stripe.checkout.sessions.create({
-        ...common,
-        mode: 'subscription',
-        success_url: `${siteUrl}/donate/thank-you?session_id={CHECKOUT_SESSION_ID}&recurring=true`,
-      });
-      return NextResponse.json({ url: session.url });
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      ...common,
-      mode: 'payment',
-      submit_type: 'donate',
-      success_url: `${siteUrl}/donate/thank-you?session_id={CHECKOUT_SESSION_ID}`,
+      dueDate: new Date().toISOString().slice(0, 10),
+      memo: 'Elevate charitable donation',
+      fulfillment,
     });
-    return NextResponse.json({ url: session.url });
-  } catch (err) {
-    return safeInternalError(err, 'Failed to create donation session.');
+    if (!invoice.paymentUrl) throw new Error('QuickBooks online payment link is unavailable.');
+    if (recurring) {
+      const next = new Date();
+      next.setUTCMonth(next.getUTCMonth() + 1);
+      const saved = await db
+        .from('billing_schedules')
+        .upsert(
+          {
+            customer_external_key: `donor:${email}`,
+            customer_name: name,
+            customer_email: email,
+            canonical_product_key: `monthly-donation-${cents}`,
+            product_name: 'Monthly Donation',
+            provider: 'quickbooks',
+            amount_cents: cents,
+            cadence: 'monthly',
+            next_invoice_date: next.toISOString().slice(0, 10),
+            status: 'active',
+            fulfillment_type: fulfillment.type,
+            fulfillment_payload: fulfillment.payload,
+          },
+          { onConflict: 'provider,customer_external_key,canonical_product_key' },
+        );
+      if (saved.error) throw new Error(saved.error.message);
+    }
+    return NextResponse.json({
+      url: invoice.paymentUrl,
+      checkoutUrl: invoice.paymentUrl,
+      invoiceId: invoice.providerInvoiceId,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Donation invoice could not be created.' },
+      { status: 502 },
+    );
   }
 }

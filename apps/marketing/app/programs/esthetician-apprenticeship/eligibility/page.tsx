@@ -45,8 +45,8 @@ export default function EstheticianEligibilityPage() {
             applyHref="/programs/esthetician-apprenticeship/apply"
             selfPayCost="$6,000"
             depositAmount="$2,100"
-            depositHref="https://buy.stripe.com/fZu4gzbrq2IK5S32F3gIo08"
-            fullPayHref="https://buy.stripe.com/6oUbJ16762IK1BN1AZgIo07"
+            depositHref="/programs/esthetician-apprenticeship/apply"
+            fullPayHref="/programs/esthetician-apprenticeship/apply"
           />
         </div>
       </section>

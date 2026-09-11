@@ -55,7 +55,7 @@ const ALL_KNOWN_TIERS = new Set([
   ...TIERS_ALLOWING_PERPETUAL,
 ]);
 
-export type BillingAuthority = 'database' | 'stripe';
+export type BillingAuthority = 'database' | 'stripe' | 'quickbooks';
 
 export interface License {
   id?: string;
@@ -65,6 +65,8 @@ export interface License {
   current_period_end: string | Date | null;
   stripe_subscription_id: string | null;
   stripe_customer_id?: string | null;
+  billing_provider?: 'stripe' | 'quickbooks' | null;
+  provider_subscription_id?: string | null;
   // Lifecycle fields - if set, license should be denied
   canceled_at?: string | Date | null;
   suspended_at?: string | Date | null;
@@ -115,8 +117,11 @@ export function isDbAuthoritativeTier(tier: string | null | undefined): boolean 
 /**
  * Get billing authority for a tier
  */
-export function getBillingAuthority(tier: string | null | undefined): BillingAuthority {
-  return isSubscriptionTier(tier) ? 'stripe' : 'database';
+export function getBillingAuthority(
+  tier: string | null | undefined,
+  provider?: License['billing_provider'],
+): BillingAuthority {
+  return isSubscriptionTier(tier) ? provider || 'stripe' : 'database';
 }
 
 /**
@@ -159,7 +164,7 @@ export function isLicenseActiveNow(
     return {
       ok: false,
       reason: 'license_canceled',
-      authority: getBillingAuthority(license.tier),
+      authority: getBillingAuthority(license.tier, license.billing_provider),
       expiresAt: null,
     };
   }
@@ -169,7 +174,7 @@ export function isLicenseActiveNow(
     return {
       ok: false,
       reason: 'license_suspended',
-      authority: getBillingAuthority(license.tier),
+      authority: getBillingAuthority(license.tier, license.billing_provider),
       expiresAt: null,
     };
   }
@@ -179,13 +184,13 @@ export function isLicenseActiveNow(
     return {
       ok: false,
       reason: `status_${license.status || 'null'}`,
-      authority: getBillingAuthority(license.tier),
+      authority: getBillingAuthority(license.tier, license.billing_provider),
       expiresAt: null,
     };
   }
 
   const tier = license.tier ?? '';
-  const authority = getBillingAuthority(tier);
+  const authority = getBillingAuthority(tier, license.billing_provider);
 
   // Rule 4: Unknown tier = DENY (fail closed)
   if (!isKnownTier(tier)) {
@@ -204,15 +209,16 @@ export function isLicenseActiveNow(
   // Rule 5: Subscription tiers (Stripe-authoritative)
   if (isSubscriptionTier(tier)) {
     // MUST have stripe_subscription_id
-    if (!license.stripe_subscription_id) {
-      logger.error('[billing-authority] Subscription tier missing stripe_subscription_id', undefined, {
+    const subscriptionId = license.provider_subscription_id || license.stripe_subscription_id;
+    if (!subscriptionId) {
+      logger.error('[billing-authority] Subscription tier missing provider subscription id', undefined, {
         tier,
         licenseId: license.id,
       });
       return {
         ok: false,
         reason: 'missing_subscription_id',
-        authority: 'stripe',
+        authority,
         expiresAt: null,
       };
     }
@@ -227,7 +233,7 @@ export function isLicenseActiveNow(
       return {
         ok: false,
         reason: 'missing_current_period_end',
-        authority: 'stripe',
+        authority,
         expiresAt: null,
       };
     }
@@ -237,7 +243,7 @@ export function isLicenseActiveNow(
       return {
         ok: false,
         reason: 'subscription_expired',
-        authority: 'stripe',
+        authority,
         expiresAt: cpe,
       };
     }
@@ -245,7 +251,7 @@ export function isLicenseActiveNow(
     return {
       ok: true,
       reason: 'subscription_active',
-      authority: 'stripe',
+      authority,
       expiresAt: cpe,
     };
   }
@@ -295,8 +301,8 @@ export function validateLicenseIntegrity(license: License): string[] {
   const tier = license.tier ?? '';
 
   if (isSubscriptionTier(tier)) {
-    if (!license.stripe_subscription_id) {
-      warnings.push(`Subscription tier "${tier}" missing stripe_subscription_id`);
+    if (!license.provider_subscription_id && !license.stripe_subscription_id) {
+      warnings.push(`Subscription tier "${tier}" missing provider subscription id`);
     }
     if (!license.current_period_end) {
       warnings.push(`Subscription tier "${tier}" missing current_period_end`);
@@ -331,8 +337,8 @@ export function getDaysRemaining(license: License, now: Date = new Date()): numb
 export function assertSubscriptionData(license: License): void {
   if (!isSubscriptionTier(license.tier)) return;
 
-  if (!license.stripe_subscription_id) {
-    throw new Error(`Subscription tier "${license.tier}" requires stripe_subscription_id`);
+  if (!license.provider_subscription_id && !license.stripe_subscription_id) {
+    throw new Error(`Subscription tier "${license.tier}" requires a provider subscription id`);
   }
   if (!license.current_period_end) {
     throw new Error(`Subscription tier "${license.tier}" requires current_period_end`);

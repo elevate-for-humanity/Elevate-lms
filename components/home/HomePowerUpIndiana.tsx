@@ -6,7 +6,7 @@ const POWER_UP_URL = 'https://www.in.gov/dwd/power-up/';
 export function HomePowerUpIndiana() {
   return (
     <section
-      className="border-y border-blue-900 bg-slate-950 px-4 py-12 text-white sm:py-16"
+      className="border-y border-blue-900 bg-slate-950 px-4 py-12 sm:py-16"
       aria-labelledby="power-up-indiana-heading"
     >
       <div className="mx-auto max-w-6xl">

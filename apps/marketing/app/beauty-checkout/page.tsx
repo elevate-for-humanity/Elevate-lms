@@ -1,2 +1,8 @@
 import { redirect } from 'next/navigation';
-export default function RetiredCheckoutPage(){redirect('/programs/cosmetology-apprenticeship/apply');}
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+export default function RetiredCheckoutPage() {
+  redirect('/programs/cosmetology-apprenticeship/apply');
+}

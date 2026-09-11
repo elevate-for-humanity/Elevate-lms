@@ -35,9 +35,7 @@ const PERSISTENCE_REQUIRED_ROUTES = [
 ];
 
 // Auth routes that should redirect on error
-const AUTH_ROUTES = [
-  'api/auth/signout/route.ts',
-];
+const AUTH_ROUTES = ['api/auth/signout/route.ts'];
 
 const BANNED_IN_PERSISTENCE_ROUTES = [
   {
@@ -72,8 +70,15 @@ for (const relPath of PERSISTENCE_REQUIRED_ROUTES) {
 
   const isIntentionalDegradation = relPath.includes('schedule');
   if (!isIntentionalDegradation) {
-    // Accept requireDbWrite, throw, failure(), or proper try/catch with error responses
-    const hasHardFailure = /requireDbWrite\(|throw new Error|return failure\(/.test(content);
+    // An explicitly retired checkout is also fail-closed: the shared helper
+    // always returns HTTP 410 and never performs a persistence write.
+    const hasRetiredHardFailure =
+      /import\s*\{\s*retiredStripeCheckout\s*\}/.test(content) &&
+      /return\s+retiredStripeCheckout\s*\(/.test(content);
+    // Accept requireDbWrite, throw, failure(), a retired 410 response, or
+    // proper try/catch with error responses.
+    const hasHardFailure =
+      /requireDbWrite\(|throw new Error|return failure\(/.test(content) || hasRetiredHardFailure;
     const hasTryCatch = /try\s*\{[\s\S]*?catch\s*\(/.test(content);
     if (!hasHardFailure && !hasTryCatch) {
       findings.push(

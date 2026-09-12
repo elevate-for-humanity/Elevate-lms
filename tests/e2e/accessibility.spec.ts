@@ -39,7 +39,10 @@ test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
 
   test('homepage supports keyboard navigation and skip navigation', async ({ page }, testInfo) => {
     await page.goto('/');
-    await page.waitForLoadState('domcontentloaded');
+    // Wait for hydration to finish before focusing the client-rendered link.
+    // Focusing during hydration can target the pre-hydration anchor, which is
+    // immediately replaced and reports as inactive on touch emulation.
+    await page.waitForLoadState('load');
 
     const skipLink = page.locator('.skip-to-main');
     await skipLink.waitFor({ state: 'attached' });

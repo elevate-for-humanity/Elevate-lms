@@ -31,7 +31,7 @@ type BrowserEvent = {
 };
 
 export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedTask?: OrchestratedPlanCheckpoint | null }) {
-  const [target, setTarget] = useState('https://admin.elevateforhumanity.org/dashboard');
+  const [target, setTarget] = useState('');
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
   const [runtimeReady, setRuntimeReady] = useState<boolean | null>(null);
@@ -44,9 +44,34 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
   const [approvalRequested, setApprovalRequested] = useState(false);
   const [activeTaskId, setActiveTaskId] = useState('');
   const imageRef = useRef<HTMLImageElement>(null);
+  const targetEditedRef = useRef(false);
 
   const endpoint = session ? `${session.publicUrl}/sessions/${session.id}` : '';
   const authHeaders = session ? { Authorization: `Bearer ${session.token}` } : {};
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetch('/api/admin/dev-studio/config', { cache: 'no-store' })
+      .then(async (response) => {
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(payload.error || `Config failed (HTTP ${response.status})`);
+        return payload;
+      })
+      .then((payload) => {
+        if (cancelled || targetEditedRef.current) return;
+        const configuredTarget =
+          typeof payload.defaultPreviewUrl === 'string' ? payload.defaultPreviewUrl.trim() : '';
+        setTarget(configuredTarget || `${window.location.origin}/dashboard`);
+      })
+      .catch(() => {
+        if (!cancelled && !targetEditedRef.current) {
+          setTarget(`${window.location.origin}/dashboard`);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -266,14 +291,17 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
         <strong className="mr-2">Cloud Browser</strong>
         <input
           value={target}
-          onChange={(event) => setTarget(event.target.value)}
+          onChange={(event) => {
+            targetEditedRef.current = true;
+            setTarget(event.target.value);
+          }}
           className="min-w-[260px] flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs"
           aria-label="Browser URL"
         />
         {!session ? (
           <button
             onClick={start}
-            disabled={runtimeReady !== true}
+            disabled={runtimeReady !== true || !target.trim()}
             className="rounded-lg bg-cyan-500 px-4 py-2 text-xs font-black text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Start Chromium

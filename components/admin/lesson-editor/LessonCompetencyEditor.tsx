@@ -12,7 +12,6 @@ import { createClient } from '@/lib/supabase/client';
 interface CourseCompetency {
   code: string;
   label: string;
-  description: string;
 }
 
 interface Props {
@@ -32,17 +31,46 @@ export default function LessonCompetencyEditor({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function load() {
+      setLoading(true);
       const supabase = createClient();
-      const { data } = await supabase
-        .from('course_competencies')
-        .select('code, label, description')
-        .eq('course_id', courseId)
-        .order('code');
-      setAvailable(data ?? []);
+      const { data: course, error: courseError } = await supabase
+        .from('courses')
+        .select('program_id')
+        .eq('id', courseId)
+        .maybeSingle();
+
+      if (cancelled) return;
+      if (courseError || !course?.program_id) {
+        setAvailable([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data: competencies, error: competencyError } = await supabase
+        .from('competencies')
+        .select('id, competency_key, name')
+        .eq('program_id', course.program_id)
+        .order('name');
+
+      if (cancelled) return;
+      setAvailable(
+        competencyError
+          ? []
+          : (competencies ?? []).map((competency) => ({
+              code: competency.competency_key || competency.id,
+              label: competency.name,
+            })),
+      );
       setLoading(false);
     }
-    load();
+
+    void load();
+    return () => {
+      cancelled = true;
+    };
   }, [courseId]);
 
   const toggle = (code: string) => {
@@ -101,9 +129,6 @@ export default function LessonCompetencyEditor({
                   </span>
                   <span className="text-sm font-semibold text-slate-800">{comp.label}</span>
                 </div>
-                {comp.description && (
-                  <p className="text-xs text-slate-500 mt-0.5">{comp.description}</p>
-                )}
               </div>
             </label>
           );

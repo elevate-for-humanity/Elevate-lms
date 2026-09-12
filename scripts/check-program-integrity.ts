@@ -29,7 +29,11 @@ const REQUIRED = [
 ] as const;
 
 async function main() {
-  const { data: programs, error } = await db.from('programs').select('id, slug, title').eq('published', true).order('title');
+  const { data: programs, error } = await db
+    .from('programs')
+    .select('id, slug, title, has_lms_course')
+    .eq('published', true)
+    .order('title');
   if (error) throw new Error(`Failed to fetch programs: ${error.message}`);
   if (!programs?.length) {
     console.error('No published programs found; integrity coverage is invalid.');
@@ -45,7 +49,12 @@ async function main() {
 
   const items = [] as Array<{slug:string;title:string;missing:string[]}>;
   for (const program of programs) {
-    const missing = REQUIRED.filter((check) => !(membership.get(check.label)?.has(program.id) ?? false)).map((check) => check.label);
+    const requiredForProgram = REQUIRED.filter(
+      (check) => check.label !== 'modules' || program.has_lms_course === true,
+    );
+    const missing = requiredForProgram
+      .filter((check) => !(membership.get(check.label)?.has(program.id) ?? false))
+      .map((check) => check.label);
     if (missing.length) {
       console.log(`❌ ${program.slug} — missing: ${missing.join(', ')}`);
       items.push({ slug: program.slug, title: program.title ?? '', missing });

@@ -228,8 +228,14 @@ if (unauthorizedBrowserSpeech.length) {
 }
 
 const naturalRoute = fs.readFileSync(path.join(rootDir, 'lib/ai/natural-voice-route.ts'), 'utf8');
-if (!naturalRoute.includes("model: 'gpt-4o-mini-tts'")) fail('Natural voice handler is not using the configured natural TTS model');
-else pass('Shared natural AI voice handler is configured');
+const cloudflareVoice = fs.readFileSync(path.join(rootDir, 'lib/ai/cloudflare-natural-voice.ts'), 'utf8');
+if (!naturalRoute.includes('generateCloudflareNaturalVoice')) {
+  fail('Natural voice handler is not using the shared Cloudflare natural-voice provider');
+} else if (!cloudflareVoice.includes("const DEFAULT_CLOUDFLARE_TTS_MODEL = '@cf/")) {
+  fail('Cloudflare natural-voice provider has no production model default');
+} else {
+  pass('Shared natural AI voice handler is configured with the Cloudflare provider');
+}
 
 console.log('\n────────────────────────────');
 if (failures) {

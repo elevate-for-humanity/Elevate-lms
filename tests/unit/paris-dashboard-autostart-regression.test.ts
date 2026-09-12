@@ -32,8 +32,23 @@ describe('PARIS dashboard introduction', () => {
     expect(chat).toContain(
       'if (!voiceEnabled || !autoSpeak || initialGreetingSpokenRef.current) return',
     );
-    expect(chat).toContain('void voice.play(greeting');
+    expect(chat).toContain('void voice.play(plainTextForSpeech(greeting)');
     expect(chat).toContain('allowBrowserFallback: true');
+  });
+
+  it('renders assistant Markdown as compact, mobile-safe content', () => {
+    expect(chat).toContain("import ReactMarkdown from 'react-markdown'");
+    expect(chat).toContain('linkifyParisRoutes');
+    expect(chat).toContain('!text-[15px] !leading-6');
+    expect(chat).toContain('plainTextForSpeech');
+    expect(chat).not.toContain('Check your device media volume');
+  });
+
+  it('routes live PARIS narration through Cloudflare rather than OpenAI', () => {
+    const route = fs.readFileSync(path.resolve('lib/ai/natural-voice-route.ts'), 'utf8');
+    expect(route).toContain('generateCloudflareNaturalVoice');
+    expect(route).not.toContain('gpt-4o-mini-tts');
+    expect(route).not.toContain('getOpenAIClient');
   });
 
   it('uses one shared speaker control instead of a second control on every response', () => {

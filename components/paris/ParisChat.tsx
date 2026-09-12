@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   ArrowRight,
   Bot,
@@ -31,6 +32,21 @@ interface Message {
 }
 
 const STORAGE_PREFIX = 'elevate:paris:conversation:';
+
+function linkifyParisRoutes(content: string): string {
+  return content
+    .replace(/\*\*(\/[a-z0-9/_-]+)\*\*/gi, '[$1]($1)')
+    .replace(/(^|[\s(])(https?:\/\/[^\s)<>]+)/gi, '$1[$2]($2)');
+}
+
+function plainTextForSpeech(content: string): string {
+  return content
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/[*_`#>~-]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 interface ParisChatProps {
   onComplete?: (recommendations: string[]) => void;
@@ -326,7 +342,7 @@ export default function ParisChat({
     if (!greeting) return;
 
     initialGreetingSpokenRef.current = true;
-    void voice.play(greeting, {
+    void voice.play(plainTextForSpeech(greeting), {
       voice: 'coral',
       style: storeSurface ? 'commercial' : 'assistant',
       rate: 1,
@@ -352,7 +368,7 @@ export default function ParisChat({
             const reply = `Opening ${command.label}.`;
             setMessages((previous) => [...previous, { role: 'assistant', content: reply }]);
             if (autoSpeak)
-              void voice.play(reply, {
+              void voice.play(plainTextForSpeech(reply), {
                 voice: 'coral',
                 style: 'assistant',
                 rate: 1,
@@ -393,7 +409,7 @@ export default function ParisChat({
 
         setMessages((previous) => [...previous, { role: 'assistant', content: data.reply }]);
         if (autoSpeak) {
-          void voice.play(data.reply, {
+          void voice.play(plainTextForSpeech(data.reply), {
             voice: 'coral',
             style: storeSurface ? 'commercial' : 'assistant',
             rate: 1,
@@ -501,13 +517,39 @@ export default function ParisChat({
               )}
             </div>
             <div
-              className={`max-w-[82%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+              className={`max-w-[82%] rounded-2xl px-4 py-3 !text-[15px] !leading-6 ${
                 message.role === 'user'
                   ? 'rounded-tr-sm bg-brand-blue-700 text-white'
                   : 'rounded-tl-sm border border-slate-200 bg-white text-slate-900 shadow-sm'
               }`}
             >
-              <p>{message.content}</p>
+              {message.role === 'assistant' ? (
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
+                    a: ({ children, href }) => (
+                      <a
+                        href={href}
+                        className="font-semibold text-brand-blue-700 underline underline-offset-2"
+                      >
+                        {children}
+                      </a>
+                    ),
+                    strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                    ul: ({ children }) => (
+                      <ul className="mb-3 list-disc space-y-1 pl-5 last:mb-0">{children}</ul>
+                    ),
+                    ol: ({ children }) => (
+                      <ol className="mb-3 list-decimal space-y-1 pl-5 last:mb-0">{children}</ol>
+                    ),
+                    li: ({ children }) => <li>{children}</li>,
+                  }}
+                >
+                  {linkifyParisRoutes(message.content)}
+                </ReactMarkdown>
+              ) : (
+                <p className="whitespace-pre-wrap">{message.content}</p>
+              )}
             </div>
           </div>
         ))}
@@ -618,7 +660,7 @@ export default function ParisChat({
               if (!latestReply) return;
 
               setAutoSpeak(true);
-              void voice.play(latestReply, {
+              void voice.play(plainTextForSpeech(latestReply), {
                 voice: 'coral',
                 style: storeSurface ? 'commercial' : 'assistant',
                 rate: 1,
@@ -704,7 +746,7 @@ export default function ParisChat({
         ) : null}
         {voice.error ? (
           <p className="mt-2 text-sm font-semibold leading-5 text-red-700" role="alert">
-            {voice.error} Check your device media volume, then tap the speaker again.
+            {voice.error} Tap the speaker to retry, or continue reading the response.
           </p>
         ) : null}
         {!speechInputAvailable ? (

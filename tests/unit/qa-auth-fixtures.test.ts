@@ -26,12 +26,11 @@ describe('QA Supabase Auth fixtures', () => {
       app_metadata: { qa_e2e: true, qa_run_id: '1' },
       user_metadata: {},
     };
-    let listAttempt = 0;
     const db = {
       auth: {
         admin: {
           listUsers: vi.fn(async () => ({
-            data: { users: listAttempt++ === 0 ? [] : [createdUser] },
+            data: { users: [createdUser] },
             error: null,
           })),
           createUser: vi.fn(async () => ({ data: { user: null }, error: { status: 503, message: '{}' } })),
@@ -57,6 +56,48 @@ describe('QA Supabase Auth fixtures', () => {
     expect(db.auth.admin.updateUserById).toHaveBeenCalledTimes(1);
   });
 
+  it('reconciles a failed create beyond the former 5,000-user ceiling', async () => {
+    const createdUser = {
+      id: 'qa-user-after-5000',
+      email: 'qa-e2e-large-directory@qa.invalid',
+      app_metadata: { qa_e2e: true, qa_run_id: 'large' },
+      user_metadata: {},
+    };
+    const fullPage = Array.from({ length: 1_000 }, (_, index) => ({
+      id: `existing-${index}`,
+      email: `existing-${index}@qa.invalid`,
+    }));
+    const db = {
+      auth: {
+        admin: {
+          createUser: vi.fn(async () => ({
+            data: { user: null },
+            error: { status: 422, message: 'User already registered' },
+          })),
+          listUsers: vi.fn(async ({ page }: { page: number }) => ({
+            data: { users: page <= 5 ? fullPage : [createdUser] },
+            error: null,
+          })),
+          updateUserById: vi.fn(async () => ({ data: { user: createdUser }, error: null })),
+        },
+      },
+    };
+
+    const user = await createQaAuthUser({
+      db,
+      email: createdUser.email,
+      password: 'Qa!safe-password7z',
+      role: 'host_shop',
+      fullName: 'QA Host',
+      runId: 'large',
+      label: 'create host auth user',
+      sleepFn: async () => {},
+    });
+
+    expect(user.id).toBe(createdUser.id);
+    expect(db.auth.admin.listUsers).toHaveBeenCalledTimes(6);
+  });
+
   it('fails closed instead of reusing a non-QA identity', async () => {
     const db = {
       auth: {
@@ -65,7 +106,10 @@ describe('QA Supabase Auth fixtures', () => {
             data: { users: [{ id: 'real-user', email: 'collision@example.com', app_metadata: {} }] },
             error: null,
           })),
-          createUser: vi.fn(),
+          createUser: vi.fn(async () => ({
+            data: { user: null },
+            error: { status: 422, message: 'User already registered' },
+          })),
           updateUserById: vi.fn(),
         },
       },

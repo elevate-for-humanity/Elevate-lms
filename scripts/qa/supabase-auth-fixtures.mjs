@@ -56,8 +56,8 @@ export function isRetryableSupabaseAuthError(error) {
 }
 
 async function findAuthUserByEmail(db, email) {
-  const perPage = 200;
-  for (let page = 1; page <= 25; page += 1) {
+  const perPage = 1_000;
+  for (let page = 1; ; page += 1) {
     const { data, error } = await db.auth.admin.listUsers({ page, perPage });
     if (error) throw error;
     const users = data?.users || [];
@@ -65,7 +65,6 @@ async function findAuthUserByEmail(db, email) {
     if (match) return match;
     if (users.length < perPage) return null;
   }
-  throw new Error(`QA Auth lookup exceeded 5,000 users while resolving ${email}`);
 }
 
 /**
@@ -89,22 +88,6 @@ export async function createQaAuthUser({
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      const existing = await findAuthUserByEmail(db, email);
-      if (existing) {
-        if (existing.app_metadata?.qa_e2e !== true || String(existing.app_metadata?.qa_run_id) !== String(runId)) {
-          throw new Error(`Refusing to reuse non-QA Auth identity ${email}`);
-        }
-        const { data, error } = await db.auth.admin.updateUserById(existing.id, {
-          password,
-          email_confirm: true,
-          app_metadata: { ...existing.app_metadata, qa_e2e: true, qa_run_id: String(runId), role },
-          user_metadata: { ...existing.user_metadata, qa_e2e: true, qa_run_id: String(runId), full_name: fullName },
-        });
-        if (error) throw error;
-        if (!data?.user) throw new Error('Supabase Auth update returned no user');
-        return data.user;
-      }
-
       const { data, error } = await db.auth.admin.createUser({
         email,
         password,
@@ -112,7 +95,43 @@ export async function createQaAuthUser({
         app_metadata: { qa_e2e: true, qa_run_id: String(runId), role },
         user_metadata: { qa_e2e: true, qa_run_id: String(runId), full_name: fullName },
       });
-      if (error) throw error;
+      if (error) {
+        // A timed-out request can still create the user server-side. Duplicate
+        // responses also need collision verification before the identity can
+        // safely be adopted, so only failed creates pay the pagination cost.
+        const existing = await findAuthUserByEmail(db, email);
+        if (existing) {
+          if (
+            existing.app_metadata?.qa_e2e !== true ||
+            String(existing.app_metadata?.qa_run_id) !== String(runId)
+          ) {
+            throw new Error(`Refusing to reuse non-QA Auth identity ${email}`);
+          }
+          const { data: updated, error: updateError } = await db.auth.admin.updateUserById(
+            existing.id,
+            {
+              password,
+              email_confirm: true,
+              app_metadata: {
+                ...existing.app_metadata,
+                qa_e2e: true,
+                qa_run_id: String(runId),
+                role,
+              },
+              user_metadata: {
+                ...existing.user_metadata,
+                qa_e2e: true,
+                qa_run_id: String(runId),
+                full_name: fullName,
+              },
+            },
+          );
+          if (updateError) throw updateError;
+          if (!updated?.user) throw new Error('Supabase Auth update returned no user');
+          return updated.user;
+        }
+        throw error;
+      }
       if (!data?.user) throw new Error('Supabase Auth create returned no user');
       return data.user;
     } catch (error) {

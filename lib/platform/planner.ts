@@ -353,6 +353,11 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
 export function decomposePlan(goal: string, params: Record<string, string> = {}): Plan {
   const g = goal.toLowerCase();
   let steps: PlanStep[];
+  const compoundEngineeringExecution =
+    /\b(code|codebase|repo|repository|commit|source|files? changed|regression tests?|typecheck|build)\b/.test(
+      g,
+    ) &&
+    /\b(fix|repair|correct|implement|modify|change|update|edit|refactor|add|remove)\b/.test(g);
 
   if (g.includes('quickbooks')) {
     steps = /\b(fix|repair|connect|reconnect|configure)\b/.test(g)
@@ -360,6 +365,20 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
       : GOAL_TEMPLATES.quickbooks_connection!({});
   } else if (g.includes('enrollment') || g.includes('enroll')) {
     steps = GOAL_TEMPLATES.fix_enrollment_failures!({});
+  } else if (compoundEngineeringExecution) {
+    steps = [
+      {
+        id: 's1',
+        order: 1,
+        title: 'Execute engineering outcome',
+        command: goal,
+        status: 'pending',
+        expected_output: 'Repository changes and verification evidence',
+        verification_rule:
+          'The engineering runtime must return concrete file, test, commit, and deployment evidence requested by the goal.',
+        max_attempts: 1,
+      },
+    ];
   } else if (/\bdeploy\b/.test(g)) {
     steps = GOAL_TEMPLATES.pre_deployment_check!({ goal });
   } else if (/\b(?:platform|system)\b.*\bhealth\b|\bhealth check\b/.test(g)) {

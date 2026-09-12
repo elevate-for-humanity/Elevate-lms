@@ -10,12 +10,19 @@ describe('OpenHands engineering delegation', () => {
     expect(planned?.input.task).toContain('Fix the broken TypeScript route');
   });
 
-  it('routes explicit live-browser work to the isolated browser runtime', () => {
+  it('routes compound browser and repository repair to OpenHands', () => {
     const command =
       'Fix every public Store demo in the live browser and repository, including claims that do not match the real workflow';
     const planned = planAIToolFromCommand(command);
-    expect(planned?.name).toBe('browser.execute');
+    expect(planned?.name).toBe('openhands.execute');
     expect(planned?.input.task).toContain('Store demo');
+  });
+
+  it('routes browser-only inspection to the isolated browser runtime', () => {
+    const planned = planAIToolFromCommand(
+      'Inspect the live production homepage for broken links and rendering problems; make no changes',
+    );
+    expect(planned?.name).toBe('browser.execute');
   });
 
   it('routes browser audits to browser execution instead of OpenHands', () => {
@@ -61,7 +68,7 @@ describe('OpenHands engineering delegation', () => {
   });
 
   it('resumes a complete existing course through the same agentic Course Builder', () => {
-    const courseId = '9ca9fb50-7119-46ea-ab81-9b0193c29c31';
+    const courseId = '00000000-0000-4000-8000-000000000001';
     const command = `Finish the cosmetology course ${courseId}`;
     const planned = planAIToolFromCommand(command);
 
@@ -72,7 +79,7 @@ describe('OpenHands engineering delegation', () => {
   });
 
   it('routes selective course-video repair to Course Builder instead of OpenHands', () => {
-    const courseId = '9ca9fb50-7119-46ea-ab81-9b0193c29c31';
+    const courseId = '00000000-0000-4000-8000-000000000001';
     const command = `Repair failed course videos for ${courseId}, publish replacements to every dashboard endpoint, and do not rebuild the course`;
     const planned = planAIToolFromCommand(command);
     expect(planned).toEqual({
@@ -100,7 +107,7 @@ describe('OpenHands engineering delegation', () => {
   });
 
   it('routes an AI counselor assignment to the governed student-success tool', () => {
-    const userId = '9f5f71a6-1f75-4c40-8de4-4e091ade32fb';
+    const userId = '00000000-0000-4000-8000-000000000002';
     const planned = planAIToolFromCommand(`Assign AI counselor to learner ${userId}`);
     expect(planned).toEqual({ name: 'risk.assignCounselor', input: { userId } });
   });

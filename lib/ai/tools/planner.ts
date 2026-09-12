@@ -61,9 +61,21 @@ function isEngineeringCommand(lower: string): boolean {
   return engineeringNoun && engineeringVerb;
 }
 
+function isEngineeringExecutionCommand(lower: string): boolean {
+  return (
+    isEngineeringCommand(lower) &&
+    /\b(implement|modify|change|update|edit|refactor|write|add|remove|fix|repair|correct)\b/.test(
+      lower,
+    ) &&
+    /\b(commit|files? changed|regression tests?|typecheck|build|deploy|repository|codebase|source)\b/.test(
+      lower,
+    )
+  );
+}
+
 function isLiveBrowserWork(lower: string): boolean {
   const browserTarget =
-    /\b(live (site|website|page|dashboard)|cloud browser|browser|production (site|page|dashboard)|host shop dashboard)\b/.test(
+    /\b(live (site|website|page|homepage|dashboard)|cloud browser|browser|production (site|website|page|homepage|dashboard)|host shop dashboard)\b/.test(
       lower,
     );
   const action =
@@ -95,10 +107,18 @@ export function planAIToolFromCommand(
   if (isOpenHandsStatusCommand(lower)) {
     return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
   }
-  // Explicit browser work owns the whole request even when the prompt also
-  // mentions repository changes. The isolated browser runtime can inspect the
-  // live surface and hand grounded findings to engineering; OpenHands cannot
-  // safely substitute source inspection for a requested live verification.
+  // A compound repair request may require live-browser evidence, but the
+  // browser runtime cannot edit, test, commit, or deploy repository changes.
+  // Route explicit engineering execution to the coding runtime; that worker
+  // can use the requested browser verification as an acceptance criterion.
+  if (isEngineeringExecutionCommand(lower)) {
+    return {
+      name: 'openhands.execute',
+      input: { ...asAIRecord(context.toolInput), task: command },
+    };
+  }
+  // Browser-only work stays in the isolated browser runtime. Compound repair
+  // requests were already routed to engineering above.
   if (isLiveBrowserWork(lower)) {
     return {
       name: 'browser.execute',

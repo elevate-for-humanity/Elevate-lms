@@ -75,6 +75,17 @@ describe('durable orchestration planning', () => {
     const deploy = decomposePlan('Deploy the approved Admin build');
     expect(deploy.steps.at(-1)?.command).toBe('Deploy the approved Admin build');
   });
+
+  it('does not bury compound engineering repair behind a generic pre-deploy audit', () => {
+    const goal =
+      'Fix the repository workflow, add regression tests, commit the changed files, deploy, and verify production';
+    const plan = decomposePlan(goal);
+    expect(plan.steps).toHaveLength(1);
+    expect(plan.steps[0]).toMatchObject({
+      title: 'Execute engineering outcome',
+      command: goal,
+    });
+  });
 });
 
 describe('selectStudioAgent', () => {

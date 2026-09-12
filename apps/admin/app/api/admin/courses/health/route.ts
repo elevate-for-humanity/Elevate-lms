@@ -22,6 +22,7 @@ interface CapabilityHealth {
     passed: boolean;
     message: string;
     issues?: IntegrityIssue[];
+    state?: 'ready' | 'paused' | 'attention';
   }>;
   checkedAt: string;
 }
@@ -104,10 +105,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const generationPaused = await isCourseBuilderGenerationPaused(supabase);
   checks.push({
     name: 'Course Factory Generation',
-    passed: !generationPaused,
-    message: generationPaused ? 'Paused by the canonical generation control' : 'Enabled',
+    passed: true,
+    state: generationPaused ? 'paused' : 'ready',
+    message: generationPaused
+      ? 'Paused by the canonical generation control'
+      : 'Enabled',
   });
-  if (generationPaused) status = 'degraded';
 
   const aiAvailable = isAIAvailable();
   const provider = getActiveProviderName();

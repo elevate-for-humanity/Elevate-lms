@@ -49,6 +49,7 @@ type HealthState = {
     passed: boolean;
     message: string;
     issues?: Array<{ courseId: string; title: string; slug: string; issues: string[] }>;
+    state?: 'ready' | 'paused' | 'attention';
   }>;
   checkedAt: string;
 };
@@ -182,8 +183,21 @@ export default function UnifiedCourseBuilder() {
             <ul className="mt-3 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
               {health.checks.map((check) => (
                 <li key={check.name} className="rounded-lg bg-slate-950/60 p-3 text-sm">
-                  <div className={check.passed ? 'font-bold text-emerald-300' : 'font-bold text-amber-300'}>
-                    {check.passed ? 'Ready' : 'Needs attention'} · {check.name}
+                  <div
+                    className={
+                      check.state === 'paused'
+                        ? 'font-bold text-amber-300'
+                        : check.passed
+                          ? 'font-bold text-emerald-300'
+                          : 'font-bold text-amber-300'
+                    }
+                  >
+                    {check.state === 'paused'
+                      ? 'Paused'
+                      : check.passed
+                        ? 'Ready'
+                        : 'Needs attention'}{' '}
+                    · {check.name}
                   </div>
                   <p className="mt-1 text-slate-300">{check.message}</p>
                   {check.issues?.length ? (

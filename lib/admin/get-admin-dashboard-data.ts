@@ -14,9 +14,63 @@ import {
   sortPriorityItems,
   type PriorityItem,
 } from '@/lib/admin/priority-score';
-import { getSystemHealth } from './dashboard/get-system-health';
+import { getSystemHealth, type DashboardSystemHealth } from './dashboard/get-system-health';
 import { isTestOrSuspiciousPayment } from './dashboard/format-metrics';
 import { requireRole } from '@/lib/auth/require-role';
+
+const DASHBOARD_SOURCE_TIMEOUT_MS = 8_000;
+
+function timeboxDashboardQuery<T>(source: PromiseLike<T>, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<T>((resolve) => {
+    timer = setTimeout(
+      () =>
+        resolve({
+          data: null,
+          error: new Error(`Dashboard source timed out: ${label}`),
+        } as T),
+      DASHBOARD_SOURCE_TIMEOUT_MS,
+    );
+  });
+
+  return Promise.race([
+    Promise.resolve(source).catch(
+      (error) => ({ data: null, error } as T),
+    ),
+    timeout,
+  ]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
+}
+
+function timeboxDashboardHealth(
+  source: Promise<DashboardSystemHealth>,
+): Promise<DashboardSystemHealth> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const fallback: DashboardSystemHealth = {
+    stripeWebhookOk: false,
+    stripeIssuingOk: false,
+    buildEnvOk: false,
+    staleJobs: 0,
+    degraded: true,
+    missingDocuments: 0,
+    missingCertifications: 0,
+    unresolvedFlags: 0,
+    alerts: [
+      {
+        code: 'dashboard_health_timeout',
+        severity: 'warning',
+        message: 'System health checks timed out; the rest of the dashboard remains available.',
+      },
+    ],
+  };
+  const timeout = new Promise<DashboardSystemHealth>((resolve) => {
+    timer = setTimeout(() => resolve(fallback), DASHBOARD_SOURCE_TIMEOUT_MS);
+  });
+  return Promise.race([source.catch(() => fallback), timeout]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
+}
 
 function n(value: unknown): number {
   const parsed = Number(value ?? 0);
@@ -83,100 +137,160 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     revenueThisMonthRes,
     systemHealth,
   ] = await Promise.all([
-    userId
+    timeboxDashboardQuery(
+      userId
       ? db.from('profiles').select('full_name,role').eq('id', userId).maybeSingle()
       : Promise.resolve({ data: null, error: null }),
-    db
+      'profile',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('applications')
       .select(
         'id,first_name,last_name,full_name,email,status,program_interest,program_slug,created_at,submitted_at',
       )
       .order('created_at', { ascending: false })
       .limit(300),
-    db
+      'applications',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('program_enrollments')
       .select(
         'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at,updated_at,amount_paid_cents,your_revenue_cents,funding_source,access_granted_at,revoked_at',
       )
       .order('created_at', { ascending: false })
       .limit(1000),
-    db
+      'enrollments',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('profiles')
       .select('id', { count: 'exact', head: true })
       .eq('role', 'student')
       .like('email', '%@%')
       .not('email', 'ilike', '%@qa.invalid')
       .not('full_name', 'ilike', '[QA%'),
-    db.from('certificates').select('id', { count: 'exact', head: true }),
-    db
+      'student count',
+    ),
+    timeboxDashboardQuery(
+      db.from('certificates').select('id', { count: 'exact', head: true }),
+      'certificate count',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('program_holder_applications')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'pending'),
-    db
+      'program-holder applications',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('program_holder_documents')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'pending'),
-    db
+      'program-holder documents',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('program_enrollments')
       .select(
         'id,user_id,full_name,email,status,enrollment_state,program_id,program_slug,enrolled_at,created_at',
       )
       .order('created_at', { ascending: false })
       .limit(25),
-    db
+      'recent enrollments',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('admin_alerts')
       .select('id,alert_type,severity,message,created_at,resolved')
       .eq('resolved', false)
       .order('created_at', { ascending: false })
       .limit(50),
-    db
+      'compliance alerts',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('crm_leads')
       .select('id,full_name,email,status,updated_at')
       .order('updated_at', { ascending: true })
       .limit(100),
-    db
+      'CRM leads',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('documents')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'pending')
       .ilike('document_type', '%wioa%'),
-    db
+      'WIOA documents',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('step_submissions')
       .select('id,user_id,course_lesson_id,step_type,status,created_at')
       .eq('status', 'pending')
       .limit(100),
-    db
+      'step submissions',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('programs')
       .select('id,title,slug,status,is_active,updated_at')
       .order('title')
       .limit(300),
-    db
+      'programs',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('stripe_sessions_staging')
       .select('session_id,email,amount,program_slug,kind,payment_status,created_at')
       .in('payment_status', ['paid', 'completed'])
       .order('created_at', { ascending: false })
       .limit(100),
-    db
+      'historical payment sessions',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('barber_subscriptions')
       .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
       .gt('amount_paid_at_checkout', 0)
       .order('created_at', { ascending: false })
       .limit(100),
-    db
+      'barber subscriptions',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('cosmetology_subscriptions')
       .select('id,customer_email,customer_name,amount_paid_at_checkout,created_at')
       .gt('amount_paid_at_checkout', 0)
       .order('created_at', { ascending: false })
       .limit(100),
-    db
+      'cosmetology subscriptions',
+    ),
+    timeboxDashboardQuery(
+      db
       .from('barber_payments')
       .select('id,amount_paid,payment_date,created_at')
       .gt('amount_paid', 0)
       .order('created_at', { ascending: false })
       .limit(100),
-    db.from('ita_vouchers').select('payments_to_date').gt('payments_to_date', 0),
-    db.rpc('get_revenue_all_time'),
-    db.rpc('get_revenue_this_month'),
-    getSystemHealth(db),
+      'barber payments',
+    ),
+    timeboxDashboardQuery(
+      db.from('ita_vouchers').select('payments_to_date').gt('payments_to_date', 0),
+      'ITA vouchers',
+    ),
+    timeboxDashboardQuery(
+      db.rpc('get_revenue_all_time'),
+      'all-time revenue',
+    ),
+    timeboxDashboardQuery(
+      db.rpc('get_revenue_this_month'),
+      'monthly revenue',
+    ),
+    timeboxDashboardHealth(getSystemHealth(db))
   ]);
 
   const applications = safeRows(applicationsRes, degradedSections, 'dashboard_data').filter(

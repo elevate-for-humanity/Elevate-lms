@@ -200,7 +200,7 @@ export async function GET(req: NextRequest) {
           db.from('programs').select('id,title,slug,status,is_active').order('title'),
           db
             .from('credential_registry')
-            .select('id,name,credential_code,issuing_authority,status')
+            .select('id,name,abbreviation,issuing_authority,is_active')
             .order('name'),
         ]);
       if (programsError) throw programsError;
@@ -228,7 +228,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({
         programs: programs ?? [],
         standards,
-        workforceCredentials: workforceCredentials ?? [],
+        workforceCredentials: (workforceCredentials ?? []).map((credential) => ({
+          id: credential.id,
+          name: credential.name,
+          credential_code: credential.abbreviation,
+          issuing_authority: credential.issuing_authority,
+          status: credential.is_active ? 'active' : 'inactive',
+        })),
         policy: {
           drafting: 'allowed',
           externalClaims: 'verified-evidence-required',

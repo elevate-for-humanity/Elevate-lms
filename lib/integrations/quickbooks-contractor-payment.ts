@@ -12,7 +12,7 @@ type ContractorPayment = {
   contractorEmail?: string | null;
   amountCents: number;
   enrollmentId: string;
-  stripeTransferId: string;
+  providerTransferId: string;
   memo: string;
 };
 
@@ -143,7 +143,7 @@ export async function recordContractorPaymentInQuickBooks(db: Database, input: C
         PaymentType: 'Check',
         AccountRef: { value: bankAccountId },
         EntityRef: { value: vendor.Id, type: 'Vendor' },
-        PrivateNote: `${input.memo} | Stripe transfer ${input.stripeTransferId}`,
+        PrivateNote: `${input.memo} | Provider transfer ${input.providerTransferId}`,
         Line: [
           {
             Amount: amount,

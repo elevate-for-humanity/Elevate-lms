@@ -1,8 +1,6 @@
 import 'server-only';
 
-import { hydrateProcessEnv } from '@/lib/secrets';
-import { getStripe, stripeCall } from '@/lib/stripe/client';
-import { recordContractorPaymentInQuickBooks } from '@/lib/integrations/quickbooks-contractor-payment';
+import { createPayPalPayout, isPayPalPayoutConfigured } from '@/lib/payments/paypal-payouts';
 import {
   getProgramHolderPaymentReadiness,
   getStudentPaymentReadiness,
@@ -14,7 +12,7 @@ export type ReleaseResult = {
   released: boolean;
   alreadyReleased?: boolean;
   transactionId?: string;
-  stripeTransferId?: string;
+  providerTransferId?: string;
   quickBooksPaymentId?: string;
   quickBooksSynced?: boolean;
   missing?: string[];
@@ -71,20 +69,22 @@ export async function releaseProgramHolderPayment(
 
   const { data: payoutAccount } = await db
     .from('program_holder_payouts')
-    .select('stripe_account_id,transfers_enabled,payouts_enabled,verification_status')
+    .select('payout_provider,provider_recipient_id,transfers_enabled,payouts_enabled,verification_status')
     .eq('user_id', holder.user_id)
     .maybeSingle();
   if (
-    !payoutAccount?.stripe_account_id ||
+    !payoutAccount?.payout_provider || !payoutAccount?.provider_recipient_id ||
     !payoutAccount.transfers_enabled ||
     !payoutAccount.payouts_enabled ||
     payoutAccount.verification_status !== 'active'
   ) {
     return {
       released: false,
-      error: 'The Program Holder must finish Stripe payout verification first.',
+      error: 'The Program Holder must finish payout-provider verification first.',
     };
   }
+  if(payoutAccount.payout_provider!=='paypal')return{released:false,error:'Branch payouts are awaiting direct provider activation.'};
+  if(!(await isPayPalPayoutConfigured()))return{released:false,error:'PayPal payouts are not configured.'};
 
   const amountCents = Number(schedule.increment_1_cents || schedule.total_payout_cents || 0);
   if (!Number.isInteger(amountCents) || amountCents <= 0) {
@@ -102,13 +102,13 @@ export async function releaseProgramHolderPayment(
       status: 'processing',
       approved_by: actorId,
     })
-    .select('id,stripe_transfer_id,status')
+    .select('id,provider_transfer_id,status')
     .maybeSingle();
 
   if (claimError || !transaction) {
     const { data: existing } = await db
       .from('program_holder_payout_transactions')
-      .select('id,stripe_transfer_id,status,quickbooks_payment_id')
+      .select('id,provider_transfer_id,status,quickbooks_payment_id')
       .eq('payout_schedule_id', schedule.id)
       .eq('installment', 1)
       .maybeSingle();
@@ -117,7 +117,7 @@ export async function releaseProgramHolderPayment(
         released: true,
         alreadyReleased: true,
         transactionId: existing.id,
-        stripeTransferId: existing.stripe_transfer_id,
+        providerTransferId: existing.provider_transfer_id,
         quickBooksPaymentId: existing.quickbooks_payment_id,
       };
     }
@@ -128,77 +128,35 @@ export async function releaseProgramHolderPayment(
   }
 
   try {
-    await hydrateProcessEnv();
-    const stripe = getStripe();
-    if (!stripe) throw new Error('Stripe payout processing is not configured.');
-    const transfer = await stripeCall(() =>
-      stripe.transfers.create(
-        {
-          amount: amountCents,
-          currency: 'usd',
-          destination: payoutAccount.stripe_account_id,
-          transfer_group: `program_holder_${schedule.id}`,
-          description: `Program Holder payment for ${enrollment.full_name || enrollmentId}`,
-          metadata: {
-            payout_transaction_id: transaction.id,
-            payout_schedule_id: schedule.id,
-            enrollment_id: enrollmentId,
-            program_holder_id: holder.id,
-          },
-        },
-        { idempotencyKey: `program-holder-payout-${schedule.id}-1` },
-      ),
-    );
+    const transfer=await createPayPalPayout({recipientEmail:payoutAccount.provider_recipient_id,amountCents,transactionId:transaction.id,note:`Program Holder payment for ${enrollment.full_name||enrollmentId}`});
 
     const paidAt = new Date().toISOString();
     await Promise.all([
       db
         .from('program_holder_payout_transactions')
         .update({
-          status: 'paid',
-          stripe_transfer_id: transfer.id,
-          paid_at: paidAt,
+          provider:'paypal',provider_transfer_id:transfer.id,provider_status:transfer.status,status:'processing',
           updated_at: paidAt,
         })
         .eq('id', transaction.id),
       db
         .from('payout_schedules')
-        .update({ increment_1_status: 'paid', increment_1_paid_at: paidAt, updated_at: paidAt })
+        .update({ increment_1_status: 'released', updated_at: paidAt })
         .eq('id', schedule.id),
       db
         .from('program_enrollments')
-        .update({ payout_status: 'paid', payout_paid_date: paidAt, payout_paid_by: actorId })
+        .update({ payout_status: 'pending', payout_paid_by: actorId })
         .eq('id', enrollmentId),
     ]);
-
-    const contractorName = holder.organization_name || holder.name || 'Program Holder';
-    const quickBooks = await recordContractorPaymentInQuickBooks(db, {
-      contractorName,
-      contractorEmail: holder.contact_email,
-      amountCents,
-      enrollmentId,
-      stripeTransferId: transfer.id,
-      memo: `Program training payment — ${enrollment.full_name || enrollmentId}`,
-    });
-    await db
-      .from('program_holder_payout_transactions')
-      .update({
-        quickbooks_status: quickBooks.synced ? 'synced' : 'pending',
-        quickbooks_payment_id: quickBooks.synced ? quickBooks.paymentId : null,
-        quickbooks_error: quickBooks.synced ? null : quickBooks.reason,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', transaction.id);
 
     return {
       released: true,
       transactionId: transaction.id,
-      stripeTransferId: transfer.id,
-      quickBooksSynced: quickBooks.synced,
-      quickBooksPaymentId: quickBooks.synced ? quickBooks.paymentId : undefined,
+      providerTransferId: transfer.id,
+      quickBooksSynced: false,
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Stripe transfer failed.';
+    const message = error instanceof Error ? error.message : 'Payout transfer failed.';
     await db
       .from('program_holder_payout_transactions')
       .update({ status: 'failed', failure_reason: message, updated_at: new Date().toISOString() })

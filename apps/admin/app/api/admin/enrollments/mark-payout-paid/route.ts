@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     released: true,
-    stripe_transfer_recorded: Boolean(release.stripeTransferId),
+    provider_transfer_recorded: Boolean(release.providerTransferId),
     audit_log: auditLog ?? [],
     quickbooks: {
       synced: Boolean(release.quickBooksSynced),

@@ -34,7 +34,7 @@ function retryableSecretRead(error: { code?: string; message?: string } | null |
 async function readRuntimeSecrets(
   client: SupabaseClient,
   table: 'app_secrets' | 'platform_secrets',
-  columns: 'key,value' | 'key,value_enc,scope',
+  columns: 'key,value' | 'key,value_enc,scope' | 'key,scope',
 ) {
   let lastResult: any = null;
   for (let attempt = 1; attempt <= SECRETS_READ_ATTEMPTS; attempt += 1) {
@@ -92,12 +92,25 @@ async function loadSecrets(): Promise<Record<string, string>> {
     logger.error('Failed to load legacy app_secrets', error instanceof Error ? error : undefined);
   }
 
-  // Canonical source. Scope is enforced in the database and here at hydration.
+  // Canonical source. Never hydrate value_enc directly: it is encrypted at rest.
+  // Resolve each runtime key through the restricted database function so only
+  // decrypted values reach process.env.
   try {
-    const result = await readRuntimeSecrets(client, 'platform_secrets', 'key,value_enc,scope');
+    const result = await readRuntimeSecrets(client, 'platform_secrets', 'key,scope');
     if (!result.error) {
-      canonicalReadSucceeded = true;
-      for (const row of result.data ?? []) acceptSecret(secrets, row.key, row.value_enc);
+      let allDecryptionsSucceeded = true;
+      const decryptedRows = await Promise.all(
+        (result.data ?? []).map(async (row) => {
+          const decrypted = await client.rpc('get_platform_secret', { p_key: row.key });
+          if (decrypted.error) {
+            allDecryptionsSucceeded = false;
+            logger.error(`Failed to decrypt platform secret ${row.key}`, decrypted.error);
+          }
+          return { key: row.key, value: decrypted.data };
+        }),
+      );
+      for (const row of decryptedRows) acceptSecret(secrets, row.key, row.value);
+      canonicalReadSucceeded = allDecryptionsSucceeded;
     } else {
       logger.error('Failed to load platform_secrets', result.error);
     }

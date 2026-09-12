@@ -10,7 +10,7 @@ type EditableLesson = {
   id: string;
   course_id: string;
   title: string;
-  content: string | null;
+  content: unknown;
   video_url: string | null;
   order_index: number;
   duration_minutes: number | null;
@@ -26,8 +26,30 @@ type FormState = {
 
 const EMPTY_FORM: FormState = { title: '', content: '', video_url: '', duration_minutes: '' };
 
+function contentToEditorText(content: unknown): string {
+  if (content == null) return '';
+  if (typeof content === 'string') return content;
+  try {
+    return JSON.stringify(content, null, 2);
+  } catch {
+    return '';
+  }
+}
+
+function contentFromEditorText(content: string, original: unknown): unknown {
+  const trimmed = content.trim();
+  if (!trimmed) return null;
+  if (original == null || typeof original === 'string') return content;
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    throw new Error('Structured lesson content must be valid JSON before it can be saved.');
+  }
+}
+
 function toEditable(value: StudioLesson): EditableLesson {
-  const lesson = value as StudioLesson & { content?: string | null };
+  const lesson = value as StudioLesson & { content?: unknown };
   return {
     id: lesson.id,
     course_id: lesson.course_id,
@@ -87,7 +109,7 @@ export function CurriculumPanel() {
     setEditing(lesson);
     setForm({
       title: lesson.title,
-      content: lesson.content ?? '',
+      content: contentToEditorText(lesson.content),
       video_url: lesson.video_url ?? '',
       duration_minutes: lesson.duration_minutes?.toString() ?? '',
     });
@@ -103,7 +125,7 @@ export function CurriculumPanel() {
       const payload = {
         course_id: course.id,
         title: form.title.trim(),
-        content: form.content || null,
+        content: contentFromEditorText(form.content, editing?.content),
         video_url: form.video_url || null,
         duration_minutes: form.duration_minutes ? Number.parseInt(form.duration_minutes, 10) : null,
         order_index: editing?.order_index ?? editableLessons.length,

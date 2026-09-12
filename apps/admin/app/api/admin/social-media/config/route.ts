@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { requireAdminClient } from '@/lib/supabase/admin';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { getDecryptedPlatformSecret, hydrateProcessEnv } from '@/lib/secrets';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -22,12 +21,10 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
 
   await hydrateProcessEnv();
-  const db = await requireAdminClient();
-  const { data } = await db
-    .from('platform_secrets')
-    .select('key,value_enc')
-    .in('key', [...META_KEYS]);
-  const canonical = new Map((data ?? []).map((row) => [row.key, row.value_enc?.trim() || '']));
+  const canonicalEntries = await Promise.all(
+    META_KEYS.map(async (key) => [key, (await getDecryptedPlatformSecret(key))?.trim() || ''] as const),
+  );
+  const canonical = new Map(canonicalEntries);
 
   const field = (key: typeof META_KEYS[number]) => {
     const runtimeValue = process.env[key]?.trim() || '';

@@ -9,7 +9,8 @@ export async function POST(request: Request) {
   if (ctx.mode !== 'holder')
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   const body = await request.json().catch(() => ({}));
-  const types = ['handbook', 'rights', 'non_compete'].filter((type) => body[type] === true);
+  const allowedTypes = ['handbook', 'rights', 'non_compete', 'enchanted_hearts_referral_terms'];
+  const types = allowedTypes.filter((type) => body[type] === true);
   if (!types.length)
     return NextResponse.json({ error: 'Select at least one agreement to sign.' }, { status: 400 });
   const requestHeaders = await headers();

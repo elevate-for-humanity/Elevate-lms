@@ -38,7 +38,10 @@ interface Props {
 
 function fmt(cents: number) {
   return new Intl.NumberFormat('en-US', {
-    style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0,
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(cents / 100);
 }
 
@@ -106,11 +109,20 @@ export default function PaymentPlanCalculator({ programSlug, successUrl }: Props
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center gap-2 py-10 text-slate-500 text-base"><Loader2 className="w-5 h-5 animate-spin" /> Loading payment options…</div>;
+    return (
+      <div className="flex items-center justify-center gap-2 py-10 text-slate-500 text-base">
+        <Loader2 className="w-5 h-5 animate-spin" /> Loading payment options…
+      </div>
+    );
   }
 
   if (error && !pricing) {
-    return <div className="flex items-center gap-2 text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-4 text-base"><AlertCircle className="w-5 h-5 flex-shrink-0" />{error}</div>;
+    return (
+      <div className="flex items-center gap-2 text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-4 text-base">
+        <AlertCircle className="w-5 h-5 flex-shrink-0" />
+        {error}
+      </div>
+    );
   }
 
   if (!pricing) return null;
@@ -131,14 +143,23 @@ export default function PaymentPlanCalculator({ programSlug, successUrl }: Props
     }
   }
 
-  const frequencyLabel = pricing.payment_frequency === 'weekly' ? 'Weekly' : pricing.payment_frequency === 'biweekly' ? 'Biweekly' : 'Monthly';
+  const frequencyLabel =
+    pricing.payment_frequency === 'weekly'
+      ? 'Weekly'
+      : pricing.payment_frequency === 'biweekly'
+        ? 'Biweekly'
+        : 'Monthly';
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
       <div className="bg-slate-900 px-5 py-5">
-        <p className="text-xs font-bold uppercase tracking-widest text-slate-300 mb-1">Payment Calculator</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-300 mb-1">
+          Payment Calculator
+        </p>
         <p className="text-white font-extrabold text-xl">{pricing.program_name}</p>
-        <p className="text-slate-300 text-sm mt-1">Published self-pay tuition: {fmt(pricing.tuition_cents)}</p>
+        <p className="text-slate-300 text-sm mt-1">
+          Published self-pay tuition: {fmt(pricing.tuition_cents)}
+        </p>
       </div>
 
       <div className="p-5 sm:p-6 space-y-6">
@@ -147,37 +168,97 @@ export default function PaymentPlanCalculator({ programSlug, successUrl }: Props
             <label className="text-base font-bold text-slate-800">Choose a deposit</label>
             <span className="text-xl font-extrabold text-slate-950">{fmt(depositCents)}</span>
           </div>
-          <input aria-label="Deposit amount" type="range" min={minDeposit} max={maxDeposit} step={100} value={depositCents} onChange={(e) => setDepositCents(Number(e.target.value))} className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-slate-900" />
-          <div className="flex justify-between text-sm text-slate-500 mt-2"><span>Minimum {fmt(minDeposit)}</span><span>Full tuition {fmt(pricing.tuition_cents)}</span></div>
+          <input
+            aria-label="Deposit amount"
+            type="range"
+            min={minDeposit}
+            max={maxDeposit}
+            step={100}
+            value={depositCents}
+            onChange={(e) => setDepositCents(Number(e.target.value))}
+            className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-slate-900"
+          />
+          <div className="flex justify-between text-sm text-slate-500 mt-2">
+            <span>Minimum {fmt(minDeposit)}</span>
+            <span>Full tuition {fmt(pricing.tuition_cents)}</span>
+          </div>
         </div>
 
         {payingInFull ? (
           <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-5 text-center">
-            <p className="text-brand-green-900 font-extrabold text-xl">Pay in full — {fmt(pricing.tuition_cents)}</p>
-            <p className="text-brand-green-800 text-base mt-1">No remaining program balance after this payment.</p>
+            <p className="text-brand-green-900 font-extrabold text-xl">
+              Pay in full — {fmt(pricing.tuition_cents)}
+            </p>
+            <p className="text-brand-green-800 text-base mt-1">
+              No remaining program balance after this payment.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
-            <div className="bg-slate-50 rounded-xl p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Deposit</p><p className="text-2xl font-extrabold text-slate-950 mt-1">{fmt(depositCents)}</p><p className="text-sm text-slate-500">today</p></div>
-            <div className="bg-brand-red-50 rounded-xl p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">{frequencyLabel}</p><p className="text-2xl font-extrabold text-slate-950 mt-1">{fmt(payment)}</p><p className="text-sm text-slate-500">estimated</p></div>
-            <div className="bg-slate-50 rounded-xl p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Payments</p><p className="text-2xl font-extrabold text-slate-950 mt-1">{schedule.length}</p><p className="text-sm text-slate-500">estimated</p></div>
+            <div className="bg-slate-50 rounded-xl p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Deposit</p>
+              <p className="text-2xl font-extrabold text-slate-950 mt-1">{fmt(depositCents)}</p>
+              <p className="text-sm text-slate-500">today</p>
+            </div>
+            <div className="bg-brand-red-50 rounded-xl p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                {frequencyLabel}
+              </p>
+              <p className="text-2xl font-extrabold text-slate-950 mt-1">{fmt(payment)}</p>
+              <p className="text-sm text-slate-500">estimated</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Payments</p>
+              <p className="text-2xl font-extrabold text-slate-950 mt-1">{schedule.length}</p>
+              <p className="text-sm text-slate-500">estimated</p>
+            </div>
           </div>
         )}
 
         {!payingInFull && schedule.length > 0 && (
           <div>
-            <button type="button" onClick={() => setShowSchedule(!showSchedule)} className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-950">
-              {showSchedule ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}{showSchedule ? 'Hide' : 'Show'} estimated schedule
+            <button
+              type="button"
+              onClick={() => setShowSchedule(!showSchedule)}
+              className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-950"
+            >
+              {showSchedule ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+              {showSchedule ? 'Hide' : 'Show'} estimated schedule
             </button>
             {showSchedule && (
               <div className="mt-3 max-h-56 overflow-y-auto rounded-xl border border-slate-200">
                 <table className="w-full text-sm">
-                  <thead className="bg-slate-50 sticky top-0"><tr><th className="text-left px-3 py-2">Payment</th><th className="text-right px-3 py-2">Amount</th><th className="text-right px-3 py-2">Balance</th></tr></thead>
+                  <thead className="bg-slate-50 sticky top-0">
+                    <tr>
+                      <th className="text-left px-3 py-2">Payment</th>
+                      <th className="text-right px-3 py-2">Amount</th>
+                      <th className="text-right px-3 py-2">Balance</th>
+                    </tr>
+                  </thead>
                   <tbody>
-                    <tr className="border-t bg-slate-50"><td className="px-3 py-2 font-semibold">Deposit</td><td className="px-3 py-2 text-right font-semibold">{fmt(depositCents)}</td><td className="px-3 py-2 text-right">{fmt(remaining)}</td></tr>
+                    <tr className="border-t bg-slate-50">
+                      <td className="px-3 py-2 font-semibold">Deposit</td>
+                      <td className="px-3 py-2 text-right font-semibold">{fmt(depositCents)}</td>
+                      <td className="px-3 py-2 text-right">{fmt(remaining)}</td>
+                    </tr>
                     {schedule.map((row, i) => {
-                      const balanceAfter = remaining - schedule.slice(0, i + 1).reduce((sum, r) => sum + r.amount, 0);
-                      return <tr key={row.period} className="border-t"><td className="px-3 py-2">{frequencyLabel} {row.period}</td><td className="px-3 py-2 text-right">{fmt(row.amount)}</td><td className="px-3 py-2 text-right text-slate-500">{fmt(Math.max(0, balanceAfter))}</td></tr>;
+                      const balanceAfter =
+                        remaining - schedule.slice(0, i + 1).reduce((sum, r) => sum + r.amount, 0);
+                      return (
+                        <tr key={row.period} className="border-t">
+                          <td className="px-3 py-2">
+                            {frequencyLabel} {row.period}
+                          </td>
+                          <td className="px-3 py-2 text-right">{fmt(row.amount)}</td>
+                          <td className="px-3 py-2 text-right text-slate-500">
+                            {fmt(Math.max(0, balanceAfter))}
+                          </td>
+                        </tr>
+                      );
                     })}
                   </tbody>
                 </table>
@@ -187,7 +268,10 @@ export default function PaymentPlanCalculator({ programSlug, successUrl }: Props
         )}
 
         <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-          <label htmlFor={`coupon-${programSlug}`} className="flex items-center gap-2 font-bold text-blue-950">
+          <label
+            htmlFor={`coupon-${programSlug}`}
+            className="flex items-center gap-2 font-bold text-blue-950"
+          >
             <Tag className="w-5 h-5 text-blue-700" />
             Coupon or promotion code
           </label>
@@ -212,24 +296,57 @@ export default function PaymentPlanCalculator({ programSlug, successUrl }: Props
             )}
           </div>
           <p className="text-sm leading-relaxed text-blue-800 mt-2">
-            The code is securely validated when checkout starts. Only active promotion codes configured in Elevate&apos;s Stripe account are accepted.
+            The code is securely validated when checkout starts. Only active promotion codes
+            configured by Elevate are accepted.
           </p>
         </div>
 
         <div className="space-y-3 pt-2 border-t border-slate-100">
           {!payingInFull && (
-            <button type="button" onClick={() => startCheckout('deposit')} disabled={checkoutLoading !== null} className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-slate-950 text-white text-base font-extrabold hover:bg-slate-800 disabled:opacity-60">
-              {checkoutLoading === 'deposit' ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5" />} Pay {fmt(depositCents)} Deposit
+            <button
+              type="button"
+              onClick={() => startCheckout('deposit')}
+              disabled={checkoutLoading !== null}
+              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-slate-950 text-white text-base font-extrabold hover:bg-slate-800 disabled:opacity-60"
+            >
+              {checkoutLoading === 'deposit' ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <CreditCard className="w-5 h-5" />
+              )}{' '}
+              Pay {fmt(depositCents)} Deposit
             </button>
           )}
-          <button type="button" onClick={() => startCheckout('full')} disabled={checkoutLoading !== null} className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-brand-red-600 text-white text-base font-extrabold hover:bg-brand-red-700 disabled:opacity-60">
-            {checkoutLoading === 'full' ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5" />} Pay {fmt(pricing.tuition_cents)} in Full
+          <button
+            type="button"
+            onClick={() => startCheckout('full')}
+            disabled={checkoutLoading !== null}
+            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-brand-red-600 text-white text-base font-extrabold hover:bg-brand-red-700 disabled:opacity-60"
+          >
+            {checkoutLoading === 'full' ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <CreditCard className="w-5 h-5" />
+            )}{' '}
+            Pay {fmt(pricing.tuition_cents)} in Full
           </button>
-          <p className="text-sm text-slate-600 text-center">{BNPL_PROVIDER_NAMES} may appear when the transaction is eligible and enabled in Stripe.</p>
-          <p className="text-xs leading-relaxed text-slate-500 text-center">Calculator amounts are estimates for planning. Third-party BNPL approval, installment amount, fees, eligibility, and repayment terms are determined by the payment provider at checkout.</p>
+          <p className="text-sm text-slate-600 text-center">
+            {BNPL_PROVIDER_NAMES} may appear when the transaction is eligible and enabled by the
+            payment provider.
+          </p>
+          <p className="text-xs leading-relaxed text-slate-500 text-center">
+            Calculator amounts are estimates for planning. Third-party BNPL approval, installment
+            amount, fees, eligibility, and repayment terms are determined by the payment provider at
+            checkout.
+          </p>
         </div>
 
-        {error && <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />{error}</div>}
+        {error && (
+          <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+            {error}
+          </div>
+        )}
         {pricing.notes && <p className="text-xs leading-relaxed text-slate-500">{pricing.notes}</p>}
       </div>
     </div>

@@ -1,7 +1,12 @@
 'use client';
 import { useState } from 'react';
+import { ENCHANTED_HEARTS, formatUsd } from '@/lib/partners/enchanted-hearts';
 
-export function ProgramHolderAcknowledgements() {
+export function ProgramHolderAcknowledgements({
+  requiresEnchantedHeartsTerms = false,
+}: {
+  requiresEnchantedHeartsTerms?: boolean;
+}) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   async function submit(formData: FormData) {
@@ -14,6 +19,7 @@ export function ProgramHolderAcknowledgements() {
         handbook: formData.get('handbook') === 'yes',
         rights: formData.get('rights') === 'yes',
         non_compete: formData.get('non_compete') === 'yes',
+        enchanted_hearts_referral_terms: formData.get('enchanted_hearts_referral_terms') === 'yes',
       }),
     });
     const result = await response.json();
@@ -63,6 +69,65 @@ export function ProgramHolderAcknowledgements() {
           <input name="non_compete" value="yes" type="checkbox" required className="mt-1" /> I
           reviewed and agree to the Program Holder non-compete and non-solicitation terms.
         </label>
+        {requiresEnchantedHeartsTerms ? (
+          <div className="rounded-xl border-2 border-fuchsia-200 bg-fuchsia-50 p-4 text-sm text-slate-800">
+            <h3 className="font-black text-slate-950">
+              Enchanted Hearts referral, pricing, and payment terms
+            </h3>
+            <ul className="mt-3 list-disc space-y-2 pl-5 leading-6">
+              <li>All Elevate-referred students must be contacted and served through Elevate.</li>
+              <li>
+                Do not solicit, divert, enroll, invoice, or accept payment from an Elevate-referred
+                student outside Elevate's authorized workflow.
+              </li>
+              <li>
+                Student contact details may be used only for authorized follow-up in this portal;
+                they may not be exported, reused, or shared.
+              </li>
+              <li>
+                Elevate collects the student-facing price. The provider receives the listed share,
+                and Elevate retains the difference for administration and coordination. The margin
+                varies by offering and is not a flat markup.
+              </li>
+              <li>
+                Provider payments require cleared student funds, approved onboarding documents, a
+                verified payout destination, completed service milestones, and adjustment for
+                refunds or chargebacks.
+              </li>
+            </ul>
+            <div className="mt-4 overflow-x-auto rounded-lg border border-fuchsia-200 bg-white">
+              <table className="min-w-full text-left text-xs">
+                <thead className="bg-fuchsia-100 text-slate-950">
+                  <tr>
+                    <th className="p-2">Program</th>
+                    <th className="p-2">Provider share</th>
+                    <th className="p-2">Elevate price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ENCHANTED_HEARTS.programs.map((program) => (
+                    <tr key={program.slug} className="border-t border-fuchsia-100">
+                      <td className="p-2 font-semibold">{program.title}</td>
+                      <td className="p-2">{formatUsd(program.providerShareCents)}</td>
+                      <td className="p-2 font-black">{formatUsd(program.retailPriceCents)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <label className="mt-4 flex items-start gap-3 rounded-lg border border-fuchsia-300 bg-white p-3 font-semibold">
+              <input
+                name="enchanted_hearts_referral_terms"
+                value="yes"
+                type="checkbox"
+                required
+                className="mt-1"
+              />
+              I accept the Enchanted Hearts referral, student-contact, pricing, checkout, and
+              provider-payment terms above.
+            </label>
+          </div>
+        ) : null}
       </div>
       <button
         disabled={busy}

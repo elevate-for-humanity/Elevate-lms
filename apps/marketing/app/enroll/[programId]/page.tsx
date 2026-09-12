@@ -1,10 +1,9 @@
 'use client';
 
-
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useParams, useRouter } from 'next/navigation';
-import { BookOpen, Key, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import { BookOpen, Key, CheckCircle, AlertCircle, ArrowRight, Tag } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
 
@@ -41,6 +40,7 @@ export default function EnrollPage() {
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
   const [message, setMessage] = useState('');
+  const [couponCode, setCouponCode] = useState('');
   const [eligibility, setEligibility] = useState<any>(null);
   const supabase = createClient();
 
@@ -143,6 +143,8 @@ export default function EnrollPage() {
           body: JSON.stringify({
             program_id: program?.id || programId,
             funding_source: 'self_pay',
+            coupon_code: couponCode.trim() || undefined,
+            partner_key: new URLSearchParams(window.location.search).get('partner') || undefined,
           }),
         });
 
@@ -379,6 +381,31 @@ export default function EnrollPage() {
                   </li>
                 </ul>
               </div>
+
+              {!program.is_free && (program.price || program.total_cost) ? (
+                <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 sm:mb-6">
+                  <label
+                    htmlFor="enrollment-coupon"
+                    className="flex items-center gap-2 text-sm font-black text-blue-950"
+                  >
+                    <Tag className="h-5 w-5 text-blue-700" /> Coupon or promotion code
+                  </label>
+                  <input
+                    id="enrollment-coupon"
+                    type="text"
+                    value={couponCode}
+                    onChange={(event) => setCouponCode(event.target.value.toUpperCase())}
+                    placeholder="Enter coupon code"
+                    autoComplete="off"
+                    className="mt-3 block w-full rounded-lg border border-blue-300 bg-white px-3 py-3 font-semibold uppercase tracking-wide text-slate-950 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  />
+                  <p className="mt-2 text-xs leading-5 text-blue-800">
+                    Active Elevate codes are validated securely before the QuickBooks invoice is
+                    created. For partner programs, a coupon can reduce only Elevate&apos;s portion;
+                    the training provider&apos;s approved share remains protected.
+                  </p>
+                </div>
+              ) : null}
 
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <button

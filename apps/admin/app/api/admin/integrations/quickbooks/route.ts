@@ -25,7 +25,7 @@ import { createQuickBooksOAuthState } from '@/lib/integrations/quickbooks-oauth-
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const QB_BASE      = 'https://quickbooks.api.intuit.com/v3/company';
+const QB_BASE = 'https://quickbooks.api.intuit.com/v3/company';
 const QB_AUTH_BASE = 'https://appcenter.intuit.com/connect/oauth2';
 const QB_TOKEN_URL = 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer';
 
@@ -81,7 +81,7 @@ async function refreshAccessToken(
         Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
       },
       body: new URLSearchParams({
-        grant_type:    'refresh_token',
+        grant_type: 'refresh_token',
         refresh_token: refreshToken,
       }),
     });
@@ -89,8 +89,24 @@ async function refreshAccessToken(
     const d = await res.json();
     const db = await requireAdminClient();
     await Promise.all([
-      db.from('app_settings').upsert({ key: 'QB_ACCESS_TOKEN', value: d.access_token, updated_at: new Date().toISOString() }, { onConflict: 'key' }),
-      d.refresh_token ? db.from('app_settings').upsert({ key: 'QB_REFRESH_TOKEN', value: d.refresh_token, updated_at: new Date().toISOString() }, { onConflict: 'key' }) : Promise.resolve(),
+      db
+        .from('app_settings')
+        .upsert(
+          { key: 'QB_ACCESS_TOKEN', value: d.access_token, updated_at: new Date().toISOString() },
+          { onConflict: 'key' },
+        ),
+      d.refresh_token
+        ? db
+            .from('app_settings')
+            .upsert(
+              {
+                key: 'QB_REFRESH_TOKEN',
+                value: d.refresh_token,
+                updated_at: new Date().toISOString(),
+              },
+              { onConflict: 'key' },
+            )
+        : Promise.resolve(),
     ]);
     return d.access_token ?? null;
   } catch {
@@ -108,7 +124,8 @@ async function qbFetch(path: string, token: string, realmId: string) {
       Accept: 'application/json',
     },
   });
-  if (!res.ok) throw new Error(`QB API ${res.status}: ${await res.text().then(t => t.slice(0, 120))}`);
+  if (!res.ok)
+    throw new Error(`QB API ${res.status}: ${await res.text().then((t) => t.slice(0, 120))}`);
   return res.json();
 }
 
@@ -133,12 +150,12 @@ export async function GET(request: NextRequest) {
     // Self-contained, signed state supports concurrent authorization attempts
     // across the admin and public callback domains without a shared mutable nonce.
     const state = createQuickBooksOAuthState(clientSecret);
-    const url   = new URL(QB_AUTH_BASE);
-    url.searchParams.set('client_id',     clientId);
-    url.searchParams.set('redirect_uri',  redirectUri);
+    const url = new URL(QB_AUTH_BASE);
+    url.searchParams.set('client_id', clientId);
+    url.searchParams.set('redirect_uri', redirectUri);
     url.searchParams.set('response_type', 'code');
-    url.searchParams.set('scope',         SCOPES);
-    url.searchParams.set('state',         state);
+    url.searchParams.set('scope', SCOPES);
+    url.searchParams.set('state', state);
 
     return NextResponse.json({ auth_url: url.toString() });
   }
@@ -149,20 +166,25 @@ export async function GET(request: NextRequest) {
   if (!connected) {
     return NextResponse.json({
       connected: false,
+      credentials_configured: !!(config.clientId && config.clientSecret),
       realm_id: null,
       last_sync: null,
-      message: 'QuickBooks not connected. Use auth_url to connect.',
+      message:
+        config.clientId && config.clientSecret
+          ? 'QuickBooks application credentials are configured. Complete Intuit authorization.'
+          : 'QuickBooks application credentials are missing.',
     });
   }
 
   try {
-    const token   = config.accessToken;
+    const token = config.accessToken;
     const realmId = config.realmId;
     // Fetch company info to verify connection
     const info = await qbFetch('companyinfo/' + realmId, token, realmId);
     return NextResponse.json({
       connected: true,
-      realm_id:  realmId,
+      credentials_configured: true,
+      realm_id: realmId,
       company_name: info.CompanyInfo?.CompanyName ?? 'Unknown',
       last_sync: null,
       message: 'Connected',
@@ -175,13 +197,26 @@ export async function GET(request: NextRequest) {
       config.clientSecret,
     );
     if (!newToken) {
-      return NextResponse.json({ connected: false, error: 'Token expired — reconnect via auth_url' });
+      return NextResponse.json({
+        connected: false,
+        credentials_configured: !!(config.clientId && config.clientSecret),
+        error: 'Token expired — reconnect through Intuit authorization.',
+      });
     }
     try {
       const info = await qbFetch('companyinfo/' + config.realmId, newToken, config.realmId);
-      return NextResponse.json({ connected: true, realm_id: config.realmId, company_name: info.CompanyInfo?.CompanyName ?? 'Unknown', message: 'Connected (token refreshed)' });
+      return NextResponse.json({
+        connected: true,
+        realm_id: config.realmId,
+        company_name: info.CompanyInfo?.CompanyName ?? 'Unknown',
+        message: 'Connected (token refreshed)',
+      });
     } catch {
-      return NextResponse.json({ connected: false, error: 'QuickBooks authorization could not be verified — reconnect' });
+      return NextResponse.json({
+        connected: false,
+        credentials_configured: !!(config.clientId && config.clientSecret),
+        error: 'QuickBooks authorization could not be verified — reconnect.',
+      });
     }
   }
 }
@@ -195,7 +230,7 @@ export async function POST(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  const body   = await request.json().catch(() => ({}));
+  const body = await request.json().catch(() => ({}));
   const action = body.action as string;
 
   const config = await getQuickBooksConfig();
@@ -203,25 +238,35 @@ export async function POST(request: NextRequest) {
     return safeError('QuickBooks not connected', 503);
   }
 
-  const token   = config.accessToken;
+  const token = config.accessToken;
   const realmId = config.realmId;
 
   try {
     if (action === 'sync_payroll') {
       // Fetch employees from QB
-      const data = await qbFetch('query?query=SELECT * FROM Employee MAXRESULTS 100', token, realmId);
+      const data = await qbFetch(
+        'query?query=SELECT * FROM Employee MAXRESULTS 100',
+        token,
+        realmId,
+      );
       const employees = data.QueryResponse?.Employee ?? [];
 
-      logger.info(`[QB] Verified ${employees.length} employee records through QuickBooks Online Accounting`);
+      logger.info(
+        `[QB] Verified ${employees.length} employee records through QuickBooks Online Accounting`,
+      );
 
       // Record sync in DB
       const db = await requireAdminClient();
-      await db.from('integration_sync_log').insert({
-        provider: 'quickbooks',
-        action:   'sync_payroll',
-        records:  employees.length,
-        status:   'success',
-      }).select().maybeSingle();
+      await db
+        .from('integration_sync_log')
+        .insert({
+          provider: 'quickbooks',
+          action: 'sync_payroll',
+          records: employees.length,
+          status: 'success',
+        })
+        .select()
+        .maybeSingle();
 
       return NextResponse.json({
         ok: true,
@@ -233,7 +278,8 @@ export async function POST(request: NextRequest) {
     if (action === 'sync_expenses') {
       const data = await qbFetch(
         `query?query=SELECT * FROM Purchase WHERE TxnDate >= '${new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString().slice(0, 10)}' MAXRESULTS 100`,
-        token, realmId,
+        token,
+        realmId,
       );
       const purchases = data.QueryResponse?.Purchase ?? [];
       logger.info(`[QB] Synced ${purchases.length} expense(s)`);
@@ -247,9 +293,16 @@ export async function POST(request: NextRequest) {
 
     if (action === 'disconnect') {
       const db = await requireAdminClient();
-      await db.from('app_settings').delete().in('key', ['QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID', 'QB_TOKEN_EXPIRES']);
+      await db
+        .from('app_settings')
+        .delete()
+        .in('key', ['QB_ACCESS_TOKEN', 'QB_REFRESH_TOKEN', 'QB_REALM_ID', 'QB_TOKEN_EXPIRES']);
       logger.info('[QB] Stored QuickBooks credentials removed');
-      return NextResponse.json({ ok: true, message: 'Stored QuickBooks connection removed. Remove any QB_* environment secrets separately.' });
+      return NextResponse.json({
+        ok: true,
+        message:
+          'Stored QuickBooks connection removed. Remove any QB_* environment secrets separately.',
+      });
     }
 
     return safeError(`Unknown action: ${action}`, 400);

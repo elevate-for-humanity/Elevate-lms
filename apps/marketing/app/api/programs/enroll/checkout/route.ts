@@ -24,6 +24,8 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createQuickBooksBillingProvider } from '@/lib/billing/providers/quickbooks';
+import { ENCHANTED_HEARTS, getEnchantedHeartsProgram } from '@/lib/partners/enchanted-hearts';
+import { resolveQuickBooksProgramPromotion } from '@/lib/payments/quickbooks-program-promotion';
 
 type FundingSource = 'self_pay' | 'workone' | 'wioa' | 'grant' | 'employer';
 
@@ -31,6 +33,8 @@ interface CheckoutRequest {
   program_id: string;
   funding_source?: FundingSource;
   payment_plan?: 'full' | 'installments';
+  coupon_code?: string;
+  partner_key?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -49,7 +53,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CheckoutRequest = await request.json();
-    const { program_id, funding_source = 'self_pay', payment_plan = 'full' } = body;
+    const {
+      program_id,
+      funding_source = 'self_pay',
+      payment_plan = 'full',
+      coupon_code = '',
+      partner_key,
+    } = body;
 
     if (!program_id) {
       return NextResponse.json({ error: 'program_id is required' }, { status: 400 });
@@ -110,7 +120,30 @@ export async function POST(request: NextRequest) {
       amountToCharge = 0;
     }
 
-    const fullAmountCents = Math.round(amountToCharge * 100);
+    const admin = await requireAdminClient();
+    const partnerProgram =
+      partner_key === 'enchanted-hearts' ? getEnchantedHeartsProgram(program.slug) : null;
+    if (partner_key === 'enchanted-hearts' && !partnerProgram) {
+      return NextResponse.json(
+        { error: 'This program is not assigned to that partner.' },
+        { status: 400 },
+      );
+    }
+    let fullAmountCents = Math.round(amountToCharge * 100);
+    let appliedCoupon: { code: string; discountAmountCents: number } | null = null;
+    if (coupon_code.trim() && funding_source === 'self_pay') {
+      const result = await resolveQuickBooksProgramPromotion({
+        admin,
+        code: coupon_code,
+        amountCents: fullAmountCents,
+        maximumDiscountCents: partnerProgram
+          ? partnerProgram.retailPriceCents - partnerProgram.providerShareCents
+          : undefined,
+      });
+      if ('error' in result) return NextResponse.json({ error: result.error }, { status: 400 });
+      appliedCoupon = result.promotion;
+      fullAmountCents -= appliedCoupon.discountAmountCents;
+    }
     const amountCents =
       funding_source === 'self_pay' && payment_plan === 'installments'
         ? Math.ceil(fullAmountCents / 4)
@@ -131,7 +164,22 @@ export async function POST(request: NextRequest) {
       'https://app.elevateforhumanity.org'
     ).replace(/\/$/, '');
 
-    const admin = await requireAdminClient();
+    const partnerHolderId = partnerProgram ? ENCHANTED_HEARTS.programHolderId : null;
+    if (partnerHolderId) {
+      const { data: assignment } = await admin
+        .from('program_holder_programs')
+        .select('id')
+        .eq('program_holder_id', partnerHolderId)
+        .eq('program_id', program.id)
+        .eq('status', 'active')
+        .maybeSingle();
+      if (!assignment) {
+        return NextResponse.json(
+          { error: 'Partner assignment is not active yet.' },
+          { status: 409 },
+        );
+      }
+    }
     const pending =
       existingEnrollment?.status === 'checkout_pending'
         ? { data: { id: existingEnrollment.id }, error: null }
@@ -151,6 +199,7 @@ export async function POST(request: NextRequest) {
               next_required_action: amountCents > 0 ? 'PAYMENT' : 'ONBOARDING',
               amount_paid_cents: 0,
               billing_provider: amountCents > 0 ? 'quickbooks' : null,
+              program_holder_id: partnerHolderId,
             })
             .select('id')
             .single();
@@ -177,7 +226,9 @@ export async function POST(request: NextRequest) {
         {
           canonicalKey: `program-${program.slug}`,
           name: program.title,
-          description: `Enrollment in ${program.title}`,
+          description: appliedCoupon
+            ? `Enrollment in ${program.title} · coupon ${appliedCoupon.code}`
+            : `Enrollment in ${program.title}`,
           quantity: 1,
           unitAmountCents: amountCents,
         },
@@ -191,39 +242,63 @@ export async function POST(request: NextRequest) {
           amount_cents: amountCents,
           program_id: program.id,
           student_id: user.id,
+          program_holder_id: partnerHolderId,
+          coupon_code: appliedCoupon?.code || null,
+          discount_amount_cents: appliedCoupon?.discountAmountCents || 0,
         },
       },
     });
     if (!invoice.paymentUrl)
       throw new Error('QuickBooks created the invoice but online payment links are not enabled.');
+    if (partnerProgram && partnerHolderId) {
+      const { data: existingPayout } = await admin
+        .from('payout_schedules')
+        .select('id')
+        .eq('enrollment_id', pending.data.id)
+        .maybeSingle();
+      if (!existingPayout) {
+        const payout = await admin.from('payout_schedules').insert({
+          enrollment_id: pending.data.id,
+          user_id: user.id,
+          program_id: program.id,
+          program_holder_id: partnerHolderId,
+          total_payout_cents: partnerProgram.providerShareCents,
+          increment_1_cents: partnerProgram.providerShareCents,
+          increment_2_cents: 0,
+          increment_1_status: 'pending',
+          increment_2_status: 'not_required',
+          notes: `Provider share for ${program.title}; release requires cleared payment and approval.`,
+        });
+        if (payout.error)
+          throw new Error(`Partner payout schedule failed: ${payout.error.message}`);
+      }
+    }
     if (payment_plan === 'installments') {
       const next = new Date();
       next.setUTCMonth(next.getUTCMonth() + 1);
-      const schedule = await admin
-        .from('billing_schedules')
-        .upsert(
-          {
-            customer_external_key: `user:${user.id}`,
-            customer_name: profile?.full_name || customerEmail,
-            customer_email: customerEmail,
-            canonical_product_key: `program-installments-${program.id}`,
-            product_name: `${program.title} installment`,
-            provider: 'quickbooks',
+      const schedule = await admin.from('billing_schedules').upsert(
+        {
+          customer_external_key: `user:${user.id}`,
+          customer_name: profile?.full_name || customerEmail,
+          customer_email: customerEmail,
+          canonical_product_key: `program-installments-${program.id}`,
+          product_name: `${program.title} installment`,
+          provider: 'quickbooks',
+          amount_cents: amountCents,
+          cadence: 'monthly',
+          next_invoice_date: next.toISOString().slice(0, 10),
+          remaining_invoices: 3,
+          status: 'active',
+          fulfillment_type: 'program_enrollment',
+          fulfillment_payload: {
+            enrollment_id: pending.data.id,
             amount_cents: amountCents,
-            cadence: 'monthly',
-            next_invoice_date: next.toISOString().slice(0, 10),
-            remaining_invoices: 3,
-            status: 'active',
-            fulfillment_type: 'program_enrollment',
-            fulfillment_payload: {
-              enrollment_id: pending.data.id,
-              amount_cents: amountCents,
-              program_id: program.id,
-              student_id: user.id,
-            },
+            program_id: program.id,
+            student_id: user.id,
           },
-          { onConflict: 'provider,customer_external_key,canonical_product_key' },
-        );
+        },
+        { onConflict: 'provider,customer_external_key,canonical_product_key' },
+      );
       if (schedule.error)
         throw new Error(
           `Initial invoice created but installment schedule failed: ${schedule.error.message}`,
@@ -243,6 +318,7 @@ export async function POST(request: NextRequest) {
       success: true,
       url: invoice.paymentUrl,
       invoice_id: invoice.providerInvoiceId,
+      coupon: appliedCoupon,
     });
   } catch (error) {
     logger.error(

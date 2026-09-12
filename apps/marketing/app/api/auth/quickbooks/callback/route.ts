@@ -22,18 +22,18 @@ export async function GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const { searchParams } = request.nextUrl;
-  const code          = searchParams.get('code');
-  const realmId       = searchParams.get('realmId');
-  const error         = searchParams.get('error');
-  const state         = searchParams.get('state');
+  const code = searchParams.get('code');
+  const realmId = searchParams.get('realmId');
+  const error = searchParams.get('error');
+  const state = searchParams.get('state');
 
-  const base    = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+  const base = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   const adminBase = base.replace('www.', 'admin.');
-  const redirect  = (msg: string) =>
+  const redirect = (msg: string) =>
     NextResponse.redirect(`${adminBase}/integrations/quickbooks?${msg}`);
 
-  if (error)  return redirect(`error=${error}`);
-  if (!code)  return redirect('error=no_code');
+  if (error) return redirect(`error=${error}`);
+  if (!code) return redirect('error=no_code');
   if (!state) return redirect('error=invalid_state');
 
   let stored: Record<string, string> = {};
@@ -56,9 +56,7 @@ export async function GET(request: NextRequest) {
   const clientId = process.env.QB_CLIENT_ID || stored.QB_CLIENT_ID;
   const clientSecret = process.env.QB_CLIENT_SECRET || stored.QB_CLIENT_SECRET;
   const redirectUri =
-    process.env.QB_REDIRECT_URI ||
-    stored.QB_REDIRECT_URI ||
-    `${base}/api/auth/quickbooks/callback`;
+    process.env.QB_REDIRECT_URI || stored.QB_REDIRECT_URI || `${base}/api/auth/quickbooks/callback`;
 
   if (!clientId || !clientSecret) return redirect('error=not_configured');
   if (!verifyQuickBooksOAuthState(state, clientSecret)) {
@@ -74,8 +72,8 @@ export async function GET(request: NextRequest) {
         Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
       },
       body: new URLSearchParams({
-        grant_type:   'authorization_code',
-        code:         code,
+        grant_type: 'authorization_code',
+        code: code,
         redirect_uri: redirectUri,
       }),
     });
@@ -93,11 +91,12 @@ export async function GET(request: NextRequest) {
 
     const expiresAt = new Date(Date.now() + (expires_in ?? 3600) * 1000).toISOString();
     const realm = realmId ?? process.env.QB_REALM_ID ?? '';
+    if (!realm) return redirect('error=no_company');
 
     await persistToSupabase({
-      QB_ACCESS_TOKEN:  access_token,
+      QB_ACCESS_TOKEN: access_token,
       QB_REFRESH_TOKEN: refresh_token,
-      QB_REALM_ID:      realm,
+      QB_REALM_ID: realm,
       QB_TOKEN_EXPIRES: expiresAt,
     });
 
@@ -111,20 +110,13 @@ export async function GET(request: NextRequest) {
 }
 
 async function persistToSupabase(params: Record<string, string>) {
-  try {
-    const { getAdminClient } = await import('@/lib/supabase/admin');
-    const supabase = await getAdminClient();
-    if (!supabase) return;
+  const { getAdminClient } = await import('@/lib/supabase/admin');
+  const supabase = await getAdminClient();
+  if (!supabase) throw new Error('Admin database connection is unavailable.');
 
-    // Upsert each key into app_settings (key/value store)
-    await Promise.allSettled(
-      Object.entries(params).map(([key, value]) =>
-        supabase
-          .from('app_settings')
-          .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' }),
-      ),
-    );
-  } catch (err) {
-    logger.error('[QB callback] Supabase persist failed:', err);
-  }
+  const rows = Object.entries(params)
+    .filter(([, value]) => Boolean(value))
+    .map(([key, value]) => ({ key, value, updated_at: new Date().toISOString() }));
+  const { error } = await supabase.from('app_settings').upsert(rows, { onConflict: 'key' });
+  if (error) throw new Error(`QuickBooks token storage failed: ${error.message}`);
 }

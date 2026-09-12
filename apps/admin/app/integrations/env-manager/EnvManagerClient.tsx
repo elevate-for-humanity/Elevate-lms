@@ -102,11 +102,7 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     // GROQ_API_KEY is the primary (free tier available). GEMINI_API_KEY is the fallback.
     // At least one must be set for natural-language commands to work.
     label: 'AI Providers (required for AI features)',
-    keys: [
-      'GROQ_API_KEY',
-      'GEMINI_API_KEY',
-      'AI_PROVIDER',
-    ],
+    keys: ['GROQ_API_KEY', 'GEMINI_API_KEY', 'AI_PROVIDER'],
   },
   {
     label: 'OpenAI',
@@ -308,6 +304,19 @@ const SERVICE_GROUPS: ServiceGroup[] = [
       'AFFIRM_ENVIRONMENT',
       'AFFIRM_WEBHOOK_SECRET',
       'NEXT_PUBLIC_AFFIRM_PUBLIC_KEY',
+    ],
+  },
+  {
+    label: 'QuickBooks Online',
+    keys: [
+      'QB_CLIENT_ID',
+      'QB_CLIENT_SECRET',
+      'QB_REDIRECT_URI',
+      'QB_ACCESS_TOKEN',
+      'QB_REFRESH_TOKEN',
+      'QB_REALM_ID',
+      'QB_TOKEN_EXPIRES',
+      'QUICKBOOKS_WEBHOOK_VERIFIER_TOKEN',
     ],
   },
   {

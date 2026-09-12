@@ -20,6 +20,7 @@ import { StudentCommunicationActions } from './StudentCommunicationActions';
 import { AlumniCareerOutreachButton } from './AlumniCareerOutreachButton';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import { UniversalProfilePhotoEditor } from '@/components/profile/UniversalProfilePhotoEditor';
+import { ENCHANTED_HEARTS, formatUsd } from '@/lib/partners/enchanted-hearts';
 
 const PROGRAM_HOLDER_PORTRAITS: Record<string, string> = {
   '34876b7d-bce0-44fb-9550-5dc5fff00791': '/images/carlina-wilkes.jpg',
@@ -124,6 +125,16 @@ export async function ProgramHolderWorkspaceView({
       label: 'Non-compete agreement',
       complete: data.acknowledgements.some((item) => item.document_type === 'non_compete'),
     },
+    ...(data.requiresEnchantedHeartsTerms
+      ? [
+          {
+            label: 'Enchanted Hearts referral and pricing agreement',
+            complete: data.acknowledgements.some(
+              (item) => item.document_type === 'enchanted_hearts_referral_terms',
+            ),
+          },
+        ]
+      : []),
     {
       label: 'Approved ID, business registration, insurance, and W-9',
       complete: requiredDocumentTypes.every((type) => approvedDocumentTypes.has(type)),
@@ -167,13 +178,27 @@ export async function ProgramHolderWorkspaceView({
 
   if (section === 'students')
     return <Students title="Enrolled Students" rows={data.enrollments} programs={data.programs} />;
-  if (section === 'pending') return <Applicants rows={data.applicants} programs={data.programs} />;
+  if (section === 'pending')
+    return (
+      <Applicants
+        rows={data.applicants}
+        programs={data.programs}
+        contactAccessGranted={data.contactAccessGranted}
+      />
+    );
   if (section === 'programs') return <Programs data={data} />;
   if (section === 'hours')
     return <Hours rows={data.hours} programs={data.programs} enrollments={data.enrollments} />;
   if (section === 'compliance')
     return <Compliance score={complianceScore} items={complianceItems} atRisk={atRisk.length} />;
-  if (section === 'documents') return <Documents rows={data.documents} isHvac={isHvac} />;
+  if (section === 'documents')
+    return (
+      <Documents
+        rows={data.documents}
+        isHvac={isHvac}
+        requiresEnchantedHeartsTerms={data.requiresEnchantedHeartsTerms}
+      />
+    );
   if (section === 'reports')
     return (
       <Reports
@@ -233,6 +258,64 @@ export async function ProgramHolderWorkspaceView({
         heroImage={dashboardHero.src}
         isPortrait={dashboardHero.isPortrait}
       />
+      {data.requiresEnchantedHeartsTerms ? (
+        <section className="rounded-2xl border border-fuchsia-200 bg-white p-4 shadow-sm sm:p-6">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-fuchsia-700">
+            Enchanted Hearts pricing and payout
+          </p>
+          <h2 className="mt-1 text-xl font-black text-slate-950">
+            Approved student prices and provider shares
+          </h2>
+          <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600">
+            Students enroll and pay through Elevate using a student-specific QuickBooks invoice.
+            Enchanted Hearts receives the provider share shown below after payment clears and all
+            agreement, tax, payout-account, and delivery requirements are approved. Any coupon can
+            reduce only Elevate&apos;s portion; it cannot reduce the provider share.
+          </p>
+          <div className="mt-5 overflow-x-auto rounded-xl border border-slate-200">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-slate-950 text-white">
+                <tr>
+                  <th className="px-4 py-3 font-black">Program</th>
+                  <th className="px-4 py-3 text-right font-black">Provider share</th>
+                  <th className="px-4 py-3 text-right font-black">Elevate portion</th>
+                  <th className="px-4 py-3 text-right font-black">Student price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ENCHANTED_HEARTS.programs.map((program) => (
+                  <tr key={program.slug} className="border-t border-slate-200">
+                    <td className="px-4 py-3 font-bold text-slate-900">{program.title}</td>
+                    <td className="px-4 py-3 text-right text-slate-700">
+                      {formatUsd(program.providerShareCents)}
+                    </td>
+                    <td className="px-4 py-3 text-right text-slate-700">
+                      {formatUsd(program.retailPriceCents - program.providerShareCents)}
+                    </td>
+                    <td className="px-4 py-3 text-right font-black text-slate-950">
+                      {formatUsd(program.retailPriceCents)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <Link
+              href="/program-holder/documents"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-fuchsia-700 px-4 py-2 text-sm font-black text-white"
+            >
+              Review and sign agreement
+            </Link>
+            <Link
+              href="/program-holder/payouts"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-fuchsia-300 px-4 py-2 text-sm font-black text-fuchsia-900"
+            >
+              Complete payout setup
+            </Link>
+          </div>
+        </section>
+      ) : null}
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Metric
           label="Enrolled Students"
@@ -1002,7 +1085,15 @@ function Students({ title, rows, programs }: { title: string; rows: any[]; progr
     </div>
   );
 }
-function Applicants({ rows, programs }: { rows: any[]; programs: any[] }) {
+function Applicants({
+  rows,
+  programs,
+  contactAccessGranted,
+}: {
+  rows: any[];
+  programs: any[];
+  contactAccessGranted: boolean;
+}) {
   return (
     <div className="space-y-6">
       <Hero
@@ -1016,6 +1107,22 @@ function Applicants({ rows, programs }: { rows: any[]; programs: any[] }) {
           Review eligibility and enrollment requirements in Admin before activating a student.
         </p>
       </section>
+      {!contactAccessGranted ? (
+        <section role="alert" className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
+          <p className="font-black text-blue-950">Student contact details are protected</p>
+          <p className="mt-1 text-sm leading-6 text-blue-900">
+            Names and program matches are available for planning. Phone numbers and email addresses
+            are released only after the required non-solicitation and partner pricing
+            acknowledgements are signed.
+          </p>
+          <Link
+            href="/program-holder/documents"
+            className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-blue-800 px-4 py-2 text-sm font-black text-white"
+          >
+            Review and sign agreements
+          </Link>
+        </section>
+      ) : null}
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
@@ -1264,7 +1371,15 @@ function Compliance({
     </div>
   );
 }
-function Documents({ rows, isHvac }: { rows: any[]; isHvac: boolean }) {
+function Documents({
+  rows,
+  isHvac,
+  requiresEnchantedHeartsTerms,
+}: {
+  rows: any[];
+  isHvac: boolean;
+  requiresEnchantedHeartsTerms: boolean;
+}) {
   return (
     <div className="space-y-6">
       <Hero
@@ -1273,7 +1388,7 @@ function Documents({ rows, isHvac }: { rows: any[]; isHvac: boolean }) {
         description="Upload and track protected Program Holder onboarding records for program delivery and payment readiness."
       />
       <ProgramHolderDocumentUpload isHvac={isHvac} />
-      <ProgramHolderAcknowledgements />
+      <ProgramHolderAcknowledgements requiresEnchantedHeartsTerms={requiresEnchantedHeartsTerms} />
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-black">Document register</h2>
         <div className="mt-4 space-y-3">

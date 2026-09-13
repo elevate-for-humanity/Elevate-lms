@@ -246,6 +246,11 @@ function ApprovedHostShopProfile({ shop }: { shop: HostShop }) {
 }
 
 function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
+  const isBarberShop =
+    shop.businessType === 'BarberShop' ||
+    shop.programs.some((program) => program.toLowerCase().includes('barber'));
+  const hostLabel = isBarberShop ? 'Elevate Host Shop' : 'Elevate Host Salon';
+  const trainingSetting = isBarberShop ? 'barbershop' : 'salon';
   const address = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
   const imageItems = (shop.media ?? [])
     .filter((media) => media.kind !== 'video')
@@ -302,20 +307,22 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
             controls
             preload="metadata"
             className="absolute inset-0 h-full w-full object-contain"
-            aria-label={`${shop.dba ?? shop.name} Host Salon video`}
+            aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`}
           />
           <div className="pointer-events-none absolute inset-0 bg-black/45" aria-hidden="true" />
           <div className="relative mx-auto flex h-full max-w-6xl items-end px-4 pb-8 pt-20 text-white sm:px-6 sm:pb-12">
             <div className="max-w-3xl">
-              <p className="text-sm font-black uppercase tracking-[0.2em] text-white">Elevate Host Salon</p>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-white">{hostLabel}</p>
               <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">{shop.dba ?? shop.name}</h1>
-              <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white sm:text-lg">One of Elevate&apos;s participating host salons supporting apprenticeship training in a real salon environment.</p>
+              <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white sm:text-lg">
+                One of Elevate&apos;s participating {isBarberShop ? 'host shops' : 'host salons'} supporting apprenticeship training in a real {trainingSetting} environment.
+              </p>
             </div>
           </div>
         </section>
       ) : null}
 
-      <section className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-50">
+      <section className="border-b border-slate-200 bg-slate-50">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-12 lg:py-16">
           <div className="min-w-0">
             <p className="inline-flex rounded-full bg-brand-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-brand-blue-800">Elevate apprenticeship Host Shop partner</p>

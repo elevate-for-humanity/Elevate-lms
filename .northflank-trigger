@@ -1,4 +1,4 @@
-merge_sha=c7dcd82379e6543377dfe3ad2732cefb90040285
-services=marketing
-requested_at=2026-09-10T12:43:25Z
-reason=deploy-homepage-performance-and-explicit-media-controls
+merge_sha=45caca1825d0c95e9562082285e5596406c94f89
+services=admin
+requested_at=2026-09-13T15:28:00Z
+reason=deploy-social-operations-and-meta-oauth-runtime-fix

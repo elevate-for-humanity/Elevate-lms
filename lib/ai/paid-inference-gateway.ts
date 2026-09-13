@@ -4,8 +4,20 @@ import type { SupabaseClient } from '@/lib/supabase';
 
 export type PaidInferenceDecision = 'approved'|'approval_required'|'budget_exceeded'|'duplicate'|'cache_hit'|'paused'|'retry_exhausted'|'provider_unavailable'|'insufficient_balance'|'invalid_request';
 
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, nested]) => [key, canonicalize(nested)]),
+    );
+  }
+  return value;
+}
+
 export function paidArtifactFingerprint(input: Record<string, unknown>): string {
-  const stable = JSON.stringify(input, Object.keys(input).sort());
+  const stable = JSON.stringify(canonicalize(input));
   return crypto.createHash('sha256').update(stable).digest('hex');
 }
 

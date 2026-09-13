@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { aiChat } from '@/lib/ai/ai-service';
 import { getSocialTokens } from '@/lib/social/token-resolver';
 
 const SocialPackageSchema = z.object({
@@ -26,9 +25,28 @@ export type BlogSocialSource = {
   social_post_caption?: string | null;
 };
 
-function parseJsonObject(value: string): unknown {
-  const cleaned = value.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
-  return JSON.parse(cleaned);
+function plainText(value: string | null | undefined): string {
+  return (value ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function deterministicBlogPackage(blog: BlogSocialSource): SocialPackage {
+  const title = plainText(blog.title);
+  const excerpt = plainText(blog.social_post_caption || blog.excerpt || blog.content).slice(0, 720);
+  const canonicalUrl = `https://www.elevateforhumanity.org/blog/${blog.slug}`;
+  const caption = `${title}\n\n${excerpt || 'Read the latest update from Elevate for Humanity.'}\n\n${canonicalUrl}`.slice(0, 1800);
+  const hook = title.slice(0, 180);
+  return SocialPackageSchema.parse({
+    caption,
+    hook: hook.length >= 8 ? hook : 'Elevate for Humanity update',
+    voiceover: `${title}. ${excerpt || 'Visit Elevate for Humanity for the complete update.'}`.slice(0, 1400),
+    scenes: [
+      { seconds: 4, visual: 'Use the approved article hero image.', overlay: title.slice(0, 120) || 'Elevate update' },
+      { seconds: 5, visual: 'Show the relevant approved program, event, or service image.', overlay: 'Career training and workforce support' },
+      { seconds: 4, visual: 'Show the Elevate for Humanity website and approved contact information.', overlay: 'Learn more at elevateforhumanity.org' },
+    ],
+    hashtags: ['#ElevateForHumanity', '#CareerTraining', '#Indianapolis'],
+    cta: `Read the complete update at ${canonicalUrl}`.slice(0, 180),
+  });
 }
 
 export async function generateBlogSocialPackage(blog: BlogSocialSource): Promise<{
@@ -36,35 +54,41 @@ export async function generateBlogSocialPackage(blog: BlogSocialSource): Promise
   provider: string;
   model: string;
 }> {
-  const result = await aiChat({
-    messages: [
-      {
-        role: 'system',
-        content: 'You create accurate, original workforce-development social content. Return only valid JSON. Never invent funding eligibility, licensing approval, guaranteed outcomes, wages, or credentials.',
-      },
-      {
-        role: 'user',
-        content: `Convert this Elevate for Humanity blog into one Facebook caption and a 25-45 second vertical Reel production plan. Keep all claims supported by the supplied article. The call to action must point readers to https://www.elevateforhumanity.org/blog/${blog.slug}.\n\nTitle: ${blog.title}\nExcerpt: ${blog.excerpt ?? ''}\nArticle: ${(blog.content ?? '').slice(0, 12000)}\nPreferred caption: ${blog.social_post_caption ?? ''}\n\nReturn JSON exactly as {"caption":"...","hook":"...","voiceover":"...","scenes":[{"seconds":4,"visual":"...","overlay":"..."}],"hashtags":["#ElevateForHumanity"],"cta":"..."}.`,
-      },
-    ],
-    temperature: 0.35,
-    maxTokens: 2200,
-  });
-
   return {
-    package: SocialPackageSchema.parse(parseJsonObject(result.content)),
-    provider: result.provider ?? 'configured',
-    model: result.model,
+    package: deterministicBlogPackage(blog),
+    provider: 'elevate-deterministic',
+    model: 'blog-social-v1',
   };
 }
 
 const graphVersion = () => process.env.META_GRAPH_API_VERSION?.trim() || 'v26.0';
+
+function assertExternalWriteEnabled(platform: string, dryRun: boolean): void {
+  if (dryRun) {
+    throw new Error(`${platform.toUpperCase()}_DRY_RUN: Read-only verification is required before external publishing is enabled.`);
+  }
+}
 
 async function graphRequest(path: string, body: URLSearchParams): Promise<Record<string, unknown>> {
   const response = await fetch(`https://graph.facebook.com/${graphVersion()}/${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body,
+  });
+  const payload = await response.json().catch(() => ({})) as Record<string, unknown>;
+  if (!response.ok || payload.error) {
+    const providerMessage = typeof payload.error === 'object' && payload.error
+      ? String((payload.error as Record<string, unknown>).message ?? 'Meta rejected the request')
+      : 'Meta rejected the request';
+    throw new Error(`META_PUBLISH_FAILED: ${providerMessage}`);
+  }
+  return payload;
+}
+
+async function graphGet(path: string, query: URLSearchParams): Promise<Record<string, unknown>> {
+  const response = await fetch(`https://graph.facebook.com/${graphVersion()}/${path}?${query.toString()}`, {
+    method: 'GET',
+    cache: 'no-store',
   });
   const payload = await response.json().catch(() => ({})) as Record<string, unknown>;
   if (!response.ok || payload.error) {
@@ -85,6 +109,7 @@ export async function publishFacebookPageLink(input: {
   if (!tokens?.access_token || !pageId) {
     throw new Error('META_PAGE_NOT_CONNECTED: Connect the Elevate Facebook Page in Admin settings.');
   }
+  assertExternalWriteEnabled('facebook', tokens.dry_run);
 
   const payload = await graphRequest(`${encodeURIComponent(pageId)}/feed`, new URLSearchParams({
     message: input.message,
@@ -105,6 +130,7 @@ export async function publishFacebookPageReel(input: {
   if (!tokens?.access_token || !pageId) {
     throw new Error('META_PAGE_NOT_CONNECTED: Connect the Elevate Facebook Page in Admin settings.');
   }
+  assertExternalWriteEnabled('facebook', tokens.dry_run);
 
   const start = await graphRequest(`${encodeURIComponent(pageId)}/video_reels`, new URLSearchParams({
     upload_phase: 'start',
@@ -127,6 +153,90 @@ export async function publishFacebookPageReel(input: {
   }));
 
   return { postId: videoId, publishedUrl: `https://www.facebook.com/reel/${videoId}` };
+}
+
+export async function publishInstagramImage(input: {
+  caption: string;
+  imageUrl: string;
+}): Promise<{ postId: string; publishedUrl: string }> {
+  const tokens = await getSocialTokens('instagram');
+  const accountId = tokens?.organization_id?.trim();
+  if (!tokens?.access_token || !accountId) {
+    throw new Error('INSTAGRAM_NOT_CONNECTED: Connect the Elevate Instagram Business account in Admin settings.');
+  }
+  assertExternalWriteEnabled('instagram', tokens.dry_run);
+  const container = await graphRequest(`${encodeURIComponent(accountId)}/media`, new URLSearchParams({
+    image_url: input.imageUrl,
+    caption: input.caption,
+    access_token: tokens.access_token,
+  }));
+  const creationId = String(container.id ?? '');
+  if (!creationId) throw new Error('META_INVALID_RESPONSE: Instagram returned no creation ID.');
+  const published = await graphRequest(`${encodeURIComponent(accountId)}/media_publish`, new URLSearchParams({
+    creation_id: creationId,
+    access_token: tokens.access_token,
+  }));
+  const postId = String(published.id ?? '');
+  if (!postId) throw new Error('META_INVALID_RESPONSE: Instagram returned no post ID.');
+  const media = await graphGet(encodeURIComponent(postId), new URLSearchParams({
+    fields: 'permalink', access_token: tokens.access_token,
+  }));
+  const publishedUrl = String(media.permalink ?? '');
+  if (!publishedUrl.startsWith('https://www.instagram.com/')) {
+    throw new Error('META_INVALID_RESPONSE: Instagram returned no verified permalink.');
+  }
+  return { postId, publishedUrl };
+}
+
+async function waitForInstagramContainer(creationId: string, accessToken: string): Promise<void> {
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const status = await graphGet(encodeURIComponent(creationId), new URLSearchParams({
+      fields: 'status_code,status',
+      access_token: accessToken,
+    }));
+    if (status.status_code === 'FINISHED') return;
+    if (status.status_code === 'ERROR' || status.status_code === 'EXPIRED') {
+      throw new Error(`INSTAGRAM_CONTAINER_${String(status.status_code)}: ${String(status.status ?? 'Media processing failed.')}`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 5_000));
+  }
+  throw new Error('INSTAGRAM_CONTAINER_TIMEOUT: Media was not ready within 60 seconds.');
+}
+
+export async function publishInstagramReel(input: {
+  caption: string;
+  videoUrl: string;
+}): Promise<{ postId: string; publishedUrl: string }> {
+  const tokens = await getSocialTokens('instagram');
+  const accountId = tokens?.organization_id?.trim();
+  if (!tokens?.access_token || !accountId) {
+    throw new Error('INSTAGRAM_NOT_CONNECTED: Connect the Elevate Instagram Business account in Admin settings.');
+  }
+  assertExternalWriteEnabled('instagram', tokens.dry_run);
+  const container = await graphRequest(`${encodeURIComponent(accountId)}/media`, new URLSearchParams({
+    media_type: 'REELS',
+    video_url: input.videoUrl,
+    caption: input.caption,
+    share_to_feed: 'true',
+    access_token: tokens.access_token,
+  }));
+  const creationId = String(container.id ?? '');
+  if (!creationId) throw new Error('META_INVALID_RESPONSE: Instagram returned no creation ID.');
+  await waitForInstagramContainer(creationId, tokens.access_token);
+  const published = await graphRequest(`${encodeURIComponent(accountId)}/media_publish`, new URLSearchParams({
+    creation_id: creationId,
+    access_token: tokens.access_token,
+  }));
+  const postId = String(published.id ?? '');
+  if (!postId) throw new Error('META_INVALID_RESPONSE: Instagram returned no post ID.');
+  const media = await graphGet(encodeURIComponent(postId), new URLSearchParams({
+    fields: 'permalink', access_token: tokens.access_token,
+  }));
+  const publishedUrl = String(media.permalink ?? '');
+  if (!publishedUrl.startsWith('https://www.instagram.com/')) {
+    throw new Error('META_INVALID_RESPONSE: Instagram returned no verified permalink.');
+  }
+  return { postId, publishedUrl };
 }
 
 export function nextRetryAt(attempt: number): string {

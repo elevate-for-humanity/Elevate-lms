@@ -158,7 +158,7 @@ if (homeWrapper === null) {
   console.error('FAIL HomeHeroVideo wrapper is missing');
   failures += 1;
 } else {
-  const expectedDesktopHeight = 'h-[clamp(400px,62vh,680px)]';
+  const expectedDesktopHeight = 'h-[clamp(520px,72svh,860px)]';
   if (!homeWrapper.includes(expectedDesktopHeight)) {
     console.error('FAIL homepage hero desktop proportions drifted from the production contract');
     failures += 1;
@@ -167,7 +167,7 @@ if (homeWrapper === null) {
 
 const criticalRouteChecks = [
   { file: 'apps/marketing/app/call-now/page.tsx', description: 'Get Started', acceptedMarkers: ["@/components/marketing/HeroPicture", "@/components/marketing/HeroVideo"] },
-  { file: 'apps/marketing/app/page.tsx', description: 'Homepage', acceptedMarkers: ['HomeHeroVideo', "@/components/marketing/HeroVideo"] },
+  { file: 'apps/marketing/app/page.tsx', description: 'Homepage', acceptedMarkers: ['HomeHeroVideo', 'PlatformHubHero', "@/components/marketing/HeroVideo"] },
   { file: 'apps/marketing/app/programs/[program]/page.tsx', description: 'Program detail renderer', acceptedMarkers: ['ProgramDetailPage', 'HeroPicture', 'HeroVideo'] },
 ];
 for (const check of criticalRouteChecks) {

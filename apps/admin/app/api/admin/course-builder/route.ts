@@ -48,6 +48,11 @@ import {
   loadCredentialConfigs,
   validateCredentialAuthority,
 } from '@/lib/course-builder/credential-engine/registry-loader';
+import {
+  executePaidInference,
+  paidArtifactFingerprint,
+  reservePaidInference,
+} from '@/lib/ai/paid-inference-gateway';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -600,6 +605,106 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const requestedModuleCount = body.buildScope === 'lesson' ? 1 : Number(body.moduleCount ?? 1);
+  const requestedLessonsPerModule =
+    body.buildScope === 'lesson' ? 1 : Number(body.lessonsPerModule ?? 1);
+  const requestedLessonCount = requestedModuleCount * requestedLessonsPerModule;
+  const paidProvider = process.env.AI_PROVIDER?.trim() || 'configured';
+  const paidModel = process.env.AI_MODEL?.trim() || 'course-factory-router';
+  const projectedCostMicros = Math.max(
+    0,
+    Number(
+      process.env.COURSE_BUILDER_PROJECTED_COST_MICROS ??
+        String(Math.max(250_000, requestedLessonCount * 250_000)),
+    ),
+  );
+  const artifactFingerprint = paidArtifactFingerprint({
+    operation: 'course-builder-generate',
+    title,
+    topic,
+    programId,
+    moduleCount: requestedModuleCount,
+    lessonsPerModule: requestedLessonsPerModule,
+    buildScope: body.buildScope === 'lesson' ? 'lesson' : 'course',
+    difficulty: body.difficulty ?? 'intermediate',
+    credentialRegistryKey: body.credentialRegistryKey ?? null,
+    state: body.state ?? null,
+    audience: body.audience ?? null,
+    hours: body.hours ?? null,
+    deliveryFormat: body.deliveryFormat ?? null,
+    additionalRequirements: body.additionalRequirements ?? null,
+  });
+  const db = await requireAdminClient();
+  const creditOwner = await getCourseBuilderCreditOwner({
+    db,
+    userId: auth.id,
+    effectiveRoles: auth.effectiveRoles,
+  });
+  const tenantId = creditOwner.tenantId ?? null;
+  const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
+
+  if (body.dryRun === true) {
+    const { data: cachedArtifact } = await db
+      .from('paid_inference_artifacts')
+      .select('id')
+      .eq('scope_key', scopeKey)
+      .eq('artifact_fingerprint', artifactFingerprint)
+      .eq('validation_status', 'valid')
+      .maybeSingle();
+    return NextResponse.json({
+      ok: true,
+      status: 'preflight',
+      dryRun: true,
+      paidProviderCalls: 0,
+      provider: paidProvider,
+      model: paidModel,
+      requestedModuleCount,
+      requestedLessonCount,
+      buildScope: body.buildScope === 'lesson' ? 'lesson' : 'course',
+      targetDurationMinutes:
+        body.targetDurationMinutes != null
+          ? Number(body.targetDurationMinutes)
+          : body.hours != null
+            ? Number(body.hours) * 60
+            : 0,
+      estimatedSceneCount: Number(body.estimatedSceneCount ?? requestedLessonCount * 6),
+      cacheHits: cachedArtifact ? 1 : 0,
+      artifactFingerprint,
+      projectedCostMicros,
+      requiresExplicitApproval: projectedCostMicros > 0,
+      videosWillQueue: false,
+    });
+  }
+
+  const paidAuthorization = await reservePaidInference(db, {
+    scopeKey,
+    tenantId,
+    actorId: auth.id,
+    artifactFingerprint,
+    idempotencyKey: `course-builder-generate:${artifactFingerprint}`,
+    provider: paidProvider,
+    model: paidModel,
+    operation: 'course-builder-generate',
+    projectedCostMicros,
+  });
+  if (paidAuthorization.decision !== 'approved' || !paidAuthorization.requestId) {
+    return NextResponse.json(
+      {
+        ok: false,
+        status: paidAuthorization.decision,
+        requestId: paidAuthorization.requestId,
+        projectedCostMicros,
+        provider: paidProvider,
+        model: paidModel,
+        message:
+          paidAuthorization.decision === 'approval_required'
+            ? 'Explicit approval is required before this paid generation can run.'
+            : 'Paid course generation is not authorized.',
+      },
+      { status: paidAuthorization.decision === 'budget_exceeded' ? 402 : 409 },
+    );
+  }
+
   let generationReservation: CreditReservation | null = null;
   try {
     generationReservation = await reserveCredits({
@@ -621,8 +726,11 @@ export async function POST(req: NextRequest) {
       const write = (data: object) =>
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
       try {
-        const result = await courseFactory(
-          {
+        const paidExecution = await executePaidInference({
+          db,
+          authorize: async () => paidAuthorization,
+          dispatch: () => courseFactory(
+            {
             title,
             topic,
             difficulty: body.difficulty ?? 'intermediate',
@@ -640,11 +748,17 @@ export async function POST(req: NextRequest) {
             additionalRequirements: body.additionalRequirements,
             contentSource: 'ai',
             mode: 'refresh',
-            videoMode: body.includeVideos === false ? 'off' : 'queue',
-            dryRun: Boolean(body.dryRun),
-          },
-          (stage, message, progress) => write({ stage: toPipelineStage(stage), message, progress }),
-        );
+              // Media has its own approval, metering, and artifact lifecycle.
+              // Never turn a course-drafting approval into an implicit render approval.
+              videoMode: 'off',
+              dryRun: false,
+            },
+            (stage, message, progress) =>
+              write({ stage: toPipelineStage(stage), message, progress }),
+          ),
+        });
+        if (!paidExecution.value) throw new Error('Paid generation completed without a result');
+        const result = paidExecution.value;
 
         let governance: Awaited<ReturnType<typeof normalizeGeneratedCourseForGovernance>> | null =
           null;

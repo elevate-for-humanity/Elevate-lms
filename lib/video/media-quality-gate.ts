@@ -256,7 +256,7 @@ export async function enforceMediaQuality(input: {
     );
     const { stderr: sceneOutput } = await execFileAsync(
       'ffmpeg',
-      ['-hide_banner', '-i', videoPath, '-filter:v', "select='gt(scene,0.12)',showinfo", '-f', 'null', '-'],
+      ['-hide_banner', '-i', videoPath, '-filter:v', "select='gt(scene,0.12)',showinfo", '-an', '-f', 'null', '-'],
       { timeout: analysisTimeoutMs, maxBuffer: 64_000_000 },
     );
     const { stderr: freezeOutput } = await execFileAsync(

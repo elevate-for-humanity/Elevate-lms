@@ -33,6 +33,7 @@ type MetaPage = {
 };
 
 type MetaIdentity = { id?: string; name?: string };
+type MetaPermission = { permission?: string; status?: string };
 
 async function metaFetch(url: URL) {
   return fetch(url, { signal: AbortSignal.timeout(15_000), cache: 'no-store' });
@@ -107,6 +108,22 @@ export async function GET(request: NextRequest) {
   const identity = await identityResponse.json().catch(() => ({})) as MetaIdentity;
   if (!identityResponse.ok || !identity.id) return settingsRedirect(request, 'error', 'identity_lookup_failed');
 
+  const permissionsUrl = new URL(`https://graph.facebook.com/${version}/me/permissions`);
+  permissionsUrl.searchParams.set('access_token', tokenPayload.access_token);
+  let permissionsResponse: Response;
+  try {
+    permissionsResponse = await metaFetch(permissionsUrl);
+  } catch {
+    return settingsRedirect(request, 'error', 'meta_permissions_timeout');
+  }
+  const permissionsPayload = await permissionsResponse.json().catch(() => ({})) as { data?: MetaPermission[] };
+  if (!permissionsResponse.ok || !Array.isArray(permissionsPayload.data)) {
+    return settingsRedirect(request, 'error', 'permission_lookup_failed');
+  }
+  const grantedPermissions = permissionsPayload.data
+    .filter((permission) => permission.status === 'granted' && permission.permission)
+    .map((permission) => permission.permission!);
+
   const pagesUrl = new URL(`https://graph.facebook.com/${version}/me/accounts`);
   pagesUrl.searchParams.set('fields', 'id,name,access_token,instagram_business_account{id,name,username}');
   pagesUrl.searchParams.set('access_token', tokenPayload.access_token);
@@ -139,6 +156,10 @@ export async function GET(request: NextRequest) {
     updated_by: string;
     updated_at: string;
     enabled: boolean;
+    granted_scopes: string[];
+    connection_status: string;
+    last_verified_at: string;
+    dry_run: boolean;
   }> = [{
     platform: 'facebook', access_token: page.access_token, expires_at: expiresAt,
     organization_id: page.id,
@@ -148,6 +169,8 @@ export async function GET(request: NextRequest) {
       publishes_to: { id: page.id, name: page.name, type: 'facebook_page' },
     },
     updated_by: auth.id, updated_at: now, enabled: true,
+    granted_scopes: grantedPermissions.filter((scope) => scope.startsWith('pages_')),
+    connection_status: 'verified_read_only', last_verified_at: now, dry_run: true,
   }];
   if (page.instagram_business_account?.id) {
     settings.push({
@@ -160,10 +183,21 @@ export async function GET(request: NextRequest) {
         connected_via: { id: page.id, name: page.name, type: 'facebook_page' },
       },
       updated_by: auth.id, updated_at: now, enabled: true,
+      granted_scopes: grantedPermissions.filter((scope) => scope.startsWith('instagram_')),
+      connection_status: 'verified_read_only', last_verified_at: now, dry_run: true,
     });
   }
-  const { error } = await db.from('social_media_settings').upsert(settings, { onConflict: 'platform' });
-  if (error) return settingsRedirect(request, 'error', 'connection_save_failed');
+  for (const setting of settings) {
+    const { error } = await db.rpc('store_social_credentials', {
+      p_platform: setting.platform, p_access_token: setting.access_token, p_refresh_token: null,
+      p_expires_at: setting.expires_at, p_organization_id: setting.organization_id,
+      p_organizations: [], p_profile_data: setting.profile_data, p_updated_by: setting.updated_by,
+      p_enabled: setting.enabled, p_granted_scopes: setting.granted_scopes,
+      p_connection_status: setting.connection_status, p_last_verified_at: setting.last_verified_at,
+      p_dry_run: setting.dry_run,
+    });
+    if (error) return settingsRedirect(request, 'error', 'connection_save_failed');
+  }
 
   const response = settingsRedirect(request, 'success', 'facebook_connected');
   response.cookies.set('oauth_state_facebook', '', { maxAge: 0, path: '/' });

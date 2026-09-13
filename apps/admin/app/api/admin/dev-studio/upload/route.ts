@@ -165,8 +165,10 @@ export async function POST(request: NextRequest) {
         ext,
         signed_url: signedUrl,
         signed_url_expires_at: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+        extracted_text: contentPreview || null,
+        extraction_status: contentPreview ? 'complete' : 'unavailable',
       })
-      .select('id, name, s3_key, size_bytes, content_type, created_at')
+      .select('id, name, s3_key, size_bytes, content_type, extraction_status, created_at')
       .single();
 
     if (dbErr) {

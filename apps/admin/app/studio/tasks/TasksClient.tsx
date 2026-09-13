@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 import { ListTodo, RefreshCw, CheckCircle, XCircle, Clock, ShieldAlert } from 'lucide-react';
 
 interface Task {
@@ -23,15 +22,24 @@ interface Task {
   result_json?: Record<string, unknown> | null;
 }
 
-export default function TasksClient() {
+export default function TasksClient({
+  embedded = false,
+  conversationId,
+}: {
+  embedded?: boolean;
+  conversationId?: string | null;
+}) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function fetchTasks() {
+  const fetchTasks = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/dev-studio/tasks');
+      const query = conversationId
+        ? `?conversationId=${encodeURIComponent(conversationId)}`
+        : '';
+      const res = await fetch(`/api/admin/dev-studio/tasks${query}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(await res.text());
       const json = await res.json();
       setTasks(json.tasks ?? []);
@@ -41,7 +49,7 @@ export default function TasksClient() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [conversationId]);
 
   async function approveTask(id: string) {
     const task = tasks.find((candidate) => candidate.id === id);
@@ -63,8 +71,17 @@ export default function TasksClient() {
   }
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    let active = true;
+    const refresh = async () => {
+      if (active) await fetchTasks();
+    };
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 2500);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [fetchTasks]);
 
   const STATUS_STYLES: Record<string, { icon: typeof Clock; color: string; bg: string }> = {
     pending: { icon: Clock, color: 'text-slate-500', bg: 'bg-slate-100' },
@@ -79,40 +96,36 @@ export default function TasksClient() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`${embedded ? 'h-full overflow-y-auto' : 'min-h-screen'} bg-white`}>
       {/* Hero Section */}
-      <div className="relative h-[280px] w-full overflow-hidden">
-        <Image
-          src="/images/pages/admin-ai-console-hero.webp"
-          alt="AI Tasks"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/80 to-fuchsia-900/60" />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-5xl mx-auto px-6 w-full">
-            <div className="flex items-center gap-3 mb-3">
-              <ListTodo className="h-8 w-8 text-white/90" />
-              <span className="text-xs font-semibold tracking-widest uppercase bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-white">
-                Task Runner
-              </span>
+      {!embedded ? (
+        <div className="relative h-[220px] w-full overflow-hidden bg-slate-950">
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-violet-950 to-slate-900" />
+          <div className="absolute inset-0 flex items-center">
+            <div className="max-w-5xl mx-auto px-6 w-full">
+              <div className="flex items-center gap-3 mb-3">
+                <ListTodo className="h-8 w-8 text-white/90" />
+                <span className="text-xs font-semibold tracking-widest uppercase bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-white">
+                  Task Runner
+                </span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+                AI Tasks
+              </h1>
+              <p className="text-purple-100 text-lg mt-2 max-w-2xl">
+                LIZZY execution history, progress, evidence, and verified results.
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
-              AI Tasks
-            </h1>
-            <p className="text-purple-100 text-lg mt-2 max-w-2xl">
-              Autonomous task execution with approval gating for risky operations.
-            </p>
           </div>
         </div>
-      </div>
+      ) : null}
 
       {/* Content Section */}
-      <div className="max-w-5xl mx-auto px-6 py-10">
+      <div className={`mx-auto max-w-5xl px-6 ${embedded ? 'py-5' : 'py-10'}`}>
         <div className="flex items-center justify-between mb-8">
-          <p className="text-sm text-slate-500">{tasks.length} tasks — sorted newest first</p>
+          <p className="text-sm text-slate-500">
+            {tasks.length} {conversationId ? 'conversation' : 'Studio'} tasks — live activity
+          </p>
           <button
             onClick={fetchTasks}
             className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm"
@@ -165,7 +178,7 @@ export default function TasksClient() {
                           {task.error_message}
                         </p>
                       )}
-                        <p className="mt-2 break-words font-mono text-[10px] text-slate-500">
+                      <p className="mt-2 break-words font-mono text-[10px] text-slate-500">
                         {task.tool_name || 'advisory'} · Task ID: {task.id}
                         {task.trace_id && task.trace_id !== task.id
                           ? ` · Trace ID: ${task.trace_id}`

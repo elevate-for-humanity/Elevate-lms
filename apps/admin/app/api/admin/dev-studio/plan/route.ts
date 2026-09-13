@@ -153,12 +153,49 @@ export async function POST(req: NextRequest) {
     body.params && typeof body.params === 'object' ? (body.params as Record<string, string>) : {};
   const tenantId = typeof body.tenantId === 'string' ? body.tenantId : undefined;
   const resumePlanId = typeof body.planId === 'string' ? body.planId.trim() : '';
+  const documentIds = Array.isArray(body.documentIds)
+    ? body.documentIds
+        .filter((value: unknown): value is string => typeof value === 'string')
+        .slice(0, 10)
+    : [];
+  const conversationId =
+    typeof body.conversationId === 'string' && body.conversationId.trim()
+      ? body.conversationId.trim()
+      : undefined;
 
   if (!goal && !resumePlanId) {
     return new Response('data: [DONE]\n\n', { headers: { 'Content-Type': 'text/event-stream' } });
   }
 
   const db = await requireAdminClient();
+  let durableDocumentContext = '';
+  if (documentIds.length) {
+    const { data: documents, error: documentError } = await db
+      .from('devstudio_documents')
+      .select('id,name,original_name,content_type,size_bytes,extracted_text,extraction_status')
+      .in('id', documentIds)
+      .eq('user_id', auth.id);
+    if (documentError) throw documentError;
+    const found = new Set((documents ?? []).map((document) => String(document.id)));
+    const missing = documentIds.filter((id: string) => !found.has(id));
+    if (missing.length) throw new Error('One or more attached Studio documents are unavailable.');
+    durableDocumentContext = (documents ?? [])
+      .map((document) =>
+        [
+          `Studio document ID: ${document.id}`,
+          `Name: ${document.name || document.original_name}`,
+          `Content type: ${document.content_type || 'unknown'}`,
+          `Extraction status: ${document.extraction_status || 'unknown'}`,
+          document.extracted_text
+            ? `Extracted content:\n${document.extracted_text}`
+            : 'Extracted content unavailable.',
+        ].join('\n'),
+      )
+      .join('\n\n');
+  }
+  const effectiveGoal = [goal, durableDocumentContext]
+    .filter(Boolean)
+    .join('\n\nATTACHED STUDIO DOCUMENTS\n');
   const adminOrigin = getAdminUrl();
   const appOrigin = req.nextUrl.origin;
 
@@ -175,10 +212,12 @@ export async function POST(req: NextRequest) {
       try {
         let plan = resumePlanId ? await loadPlan(db, resumePlanId, auth.id) : null;
         if (!plan) {
-          plan = decomposePlan(goal, params);
-          const shared = await loadSharedContext({ goal, tenantId, userId: auth.id }).catch(
-            () => null,
-          );
+          plan = decomposePlan(effectiveGoal, params);
+          const shared = await loadSharedContext({
+            goal: effectiveGoal,
+            tenantId,
+            userId: auth.id,
+          }).catch(() => null);
           await persistPlan(db, plan, auth.id, tenantId);
           write(`\x1b[1mAI Planner — governed execution\x1b[0m`);
           write(`${DIM}Goal: ${plan.goal}${RST}`);
@@ -268,6 +307,7 @@ export async function POST(req: NextRequest) {
                   command: step.command,
                   requestedBy: auth.id,
                   traceId: `${plan.id}:${step.id}`,
+                  conversationId,
                 },
                 {
                   actorRoles: auth.effectiveRoles,

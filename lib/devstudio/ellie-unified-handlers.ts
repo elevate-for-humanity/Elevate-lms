@@ -38,13 +38,20 @@ export async function streamOrchestratedPlan(
   onLine: (text: string) => void,
   options: {
     planId?: string;
+    documentIds?: string[];
+    conversationId?: string;
     onCheckpoint?: (checkpoint: OrchestratedPlanCheckpoint) => void;
   } = {},
 ): Promise<void> {
   const res = await fetch('/api/admin/dev-studio/plan', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ goal, planId: options.planId }),
+    body: JSON.stringify({
+      goal,
+      planId: options.planId,
+      documentIds: options.documentIds ?? [],
+      conversationId: options.conversationId,
+    }),
   });
   if (!res.ok || !res.body) {
     const data = await res.json().catch(() => ({}));

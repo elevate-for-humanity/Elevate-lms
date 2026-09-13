@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { useState } from 'react';
 import { Bot, Eye, Globe2, MessageSquare, Plus } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
@@ -22,12 +21,15 @@ const WorkflowsWorkspace = dynamic(
   { ssr: false },
 );
 const IntelligenceWorkspace = dynamic(() => import('./StudioIntelligencePanel'), { ssr: false });
+const TasksWorkspace = dynamic(() => import('@/apps/admin/app/studio/tasks/TasksClient'), {
+  ssr: false,
+});
 
 type InspectionMode = 'preview' | 'browser';
-type EmbeddedCapability = 'workflows' | 'intelligence';
+type EmbeddedCapability = 'workflows' | 'intelligence' | 'tasks';
 
 function isEmbeddedCapability(id: string): id is EmbeddedCapability {
-  return id === 'workflows' || id === 'intelligence';
+  return id === 'workflows' || id === 'intelligence' || id === 'tasks';
 }
 
 export default function StudioCommandWorkspace({
@@ -35,7 +37,7 @@ export default function StudioCommandWorkspace({
   initialWorkspace,
 }: {
   workspaces: Array<{ id: string; label: string; route: string }>;
-  initialWorkspace?: 'workflows' | 'intelligence';
+  initialWorkspace?: EmbeddedCapability;
 }) {
   const [conversationKey, setConversationKey] = useState(0);
   const [selectedAgent, setSelectedAgent] = useState<StudioSpecialist>('LIZZY');
@@ -49,6 +51,7 @@ export default function StudioCommandWorkspace({
     initialWorkspace ?? null,
   );
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
   const openPreview = (url?: string) => {
     if (url) setPreviewUrl(url);
@@ -127,13 +130,14 @@ export default function StudioCommandWorkspace({
                 {workspace.label}
               </button>
             ) : (
-              <Link
+              <button
                 key={workspace.id}
-                href={workspace.route}
+                type="button"
+                onClick={() => openPreview(`${window.location.origin}${workspace.route}`)}
                 className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white"
               >
                 {workspace.label}
-              </Link>
+              </button>
             ),
           )}
         </nav>
@@ -162,7 +166,10 @@ export default function StudioCommandWorkspace({
             onOpenPreview={() => openPreview()}
             onPreviewTarget={openPreview}
             onTaskCheckpoint={setActiveTask}
+            onOpenTasks={() => openCapability('tasks')}
             suggestedPrompt={suggestedPrompt}
+            restoreLatest={conversationKey === 0}
+            onConversationChange={setActiveConversationId}
           />
         </section>
 
@@ -176,7 +183,9 @@ export default function StudioCommandWorkspace({
                 ? 'Workflow Designer'
                 : activeCapability === 'intelligence'
                   ? 'Intelligence'
-                  : 'Active workspace'}
+                  : activeCapability === 'tasks'
+                    ? 'Task activity'
+                    : 'Active workspace'}
             </span>
             <button
               type="button"
@@ -211,8 +220,18 @@ export default function StudioCommandWorkspace({
               <WorkflowsWorkspace embedded />
             ) : activeCapability === 'intelligence' ? (
               <IntelligenceWorkspace onAskAI={askAdminAI} />
+            ) : activeCapability === 'tasks' ? (
+              <TasksWorkspace embedded conversationId={activeConversationId} />
             ) : mode === 'preview' ? (
-              <RepositoryLivePreview filePath={null} content="" initialUrl={previewUrl} />
+              <RepositoryLivePreview
+                filePath={null}
+                content=""
+                initialUrl={previewUrl}
+                trustedInteractive={
+                  previewUrl.startsWith('https://admin.elevateforhumanity.org') ||
+                  previewUrl.startsWith(window.location.origin)
+                }
+              />
             ) : (
               <CloudBrowserWorkspace unifiedTask={activeTask} />
             )}

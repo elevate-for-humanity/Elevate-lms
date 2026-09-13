@@ -14,7 +14,9 @@ export default async function StudioPage({
   await requireRole(['super_admin', 'admin']);
   const requestedWorkspace = (await searchParams).workspace;
   const initialWorkspace =
-    requestedWorkspace === 'workflows' || requestedWorkspace === 'intelligence'
+    requestedWorkspace === 'workflows' ||
+    requestedWorkspace === 'intelligence' ||
+    requestedWorkspace === 'tasks'
       ? requestedWorkspace
       : undefined;
 

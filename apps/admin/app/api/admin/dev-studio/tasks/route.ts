@@ -19,18 +19,20 @@ export async function GET(request: NextRequest) {
 
   const limit = Math.min(parseInt(request.nextUrl.searchParams.get('limit') ?? '30', 10), 100);
   const status = request.nextUrl.searchParams.get('status');
+  const conversationId = request.nextUrl.searchParams.get('conversationId')?.trim() || null;
 
   try {
     const db = await requireAdminClient();
     let query = db
       .from('ai_tasks')
       .select(
-        'id, title, description, status, priority, agent_id, agent_type, trace_id, tool_name, requires_approval, approval_status, approval_reason, risk_tags, result_json, tool_output, error_message, created_at, updated_at, completed_at',
+        'id, title, description, status, priority, agent_id, agent_type, trace_id, tool_name, requires_approval, approval_status, approval_reason, risk_tags, result_json, tool_output, error_message, conversation_id, created_at, updated_at, completed_at',
       )
       .order('created_at', { ascending: false })
       .limit(limit);
 
     if (status) query = query.eq('status', status);
+    if (conversationId) query = query.eq('conversation_id', conversationId);
 
     const [{ data, error }, { data: agenticRuns, error: agenticError }] = await Promise.all([
       query,
@@ -64,7 +66,7 @@ export async function GET(request: NextRequest) {
         project && (project.user_id === auth.id || auth.effectiveRoles.includes('super_admin'))
       );
     });
-    const normalizedAgenticTasks = visibleRuns.map((run) => {
+    const normalizedAgenticTasks = (conversationId ? [] : visibleRuns).map((run) => {
       const project = projectById.get(run.project_id)!;
       return {
         id: run.id,
@@ -122,6 +124,7 @@ export async function POST(request: NextRequest) {
         requestedBy: auth.id,
         priority: typeof body.priority === 'number' ? body.priority : undefined,
         traceId: body.traceId ? String(body.traceId) : undefined,
+        conversationId: body.conversationId ? String(body.conversationId) : undefined,
       },
       {
         actorRoles: auth.effectiveRoles,

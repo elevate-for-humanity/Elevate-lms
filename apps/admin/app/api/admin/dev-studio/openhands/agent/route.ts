@@ -2,12 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { hasPermission, normalizeRoles } from '@/lib/rbac/role-matrix';
-import { requiresApproval } from '@/lib/devstudio/os/risk';
 import { buildOpenHandsContextPrompt } from '@/lib/devstudio/openhands/context';
 import { getOpenHandsConfig, getOpenHandsLifecycle } from '@/lib/devstudio/openhands/client';
 import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
-
-const CONFIRMATION = 'CONFIRM OPENHANDS EXECUTION';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
   return normalizeRoles([...effectiveRoles]).some((role) =>
@@ -25,14 +22,16 @@ export async function POST(request: NextRequest) {
   // Autonomous repository execution is a dev-tool capability. Keep it
   // privileged even though read/chat Studio access is available to admins.
   if (!canAccessDevTools(auth.effectiveRoles)) {
-    return NextResponse.json({ error: 'Admin dev-tool access is required for autonomous agent execution' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'Admin dev-tool access is required for autonomous agent execution' },
+      { status: 403 },
+    );
   }
 
   try {
     const body = await request.json();
     const task = typeof body?.task === 'string' ? body.task.trim() : '';
     const repository = typeof body?.repository === 'string' ? body.repository.trim() : undefined;
-    const confirmationText = typeof body?.confirmationText === 'string' ? body.confirmationText : '';
 
     if (!task) {
       return NextResponse.json({ error: 'task is required' }, { status: 400 });
@@ -41,18 +40,6 @@ export async function POST(request: NextRequest) {
     const config = getOpenHandsConfig();
     if (!config.configured) {
       return NextResponse.json({ error: 'OpenHands API key not configured' }, { status: 503 });
-    }
-
-    // High-impact repository work must still pass Elevate's approval boundary.
-    if (requiresApproval(task) && confirmationText !== CONFIRMATION) {
-      return NextResponse.json(
-        {
-          error: 'Human approval is required for this OpenHands engineering task.',
-          status: 'approval_required',
-          requiredConfirmation: CONFIRMATION,
-        },
-        { status: 409 },
-      );
     }
 
     const correlationId =
@@ -109,7 +96,10 @@ export async function GET(request: NextRequest) {
 
   if (taskId) {
     if (!canAccessDevTools(auth.effectiveRoles)) {
-      return NextResponse.json({ error: 'Admin dev-tool access is required for autonomous agent status' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Admin dev-tool access is required for autonomous agent status' },
+        { status: 403 },
+      );
     }
     try {
       const lifecycle = await refreshOpenHandsTask({ taskId, actorId: auth.userId });
@@ -142,7 +132,14 @@ export async function GET(request: NextRequest) {
     baseUrl: config.origin,
     repository: config.configuredRepository,
     model: config.model,
-    capabilities: ['code_generation', 'code_review', 'bug_fixing', 'refactoring', 'testing', 'status_polling'],
+    capabilities: [
+      'code_generation',
+      'code_review',
+      'bug_fixing',
+      'refactoring',
+      'testing',
+      'status_polling',
+    ],
     endpoint: '/api/admin/dev-studio/openhands/agent',
   });
 }

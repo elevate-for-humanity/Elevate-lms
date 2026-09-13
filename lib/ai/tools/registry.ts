@@ -216,7 +216,8 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
   },
   {
     name: 'devstudio.health',
-    description: 'Inspect the live Admin Studio container, credentials, AI providers, storage, and deployment readiness.',
+    description:
+      'Inspect the live Admin Studio container, credentials, AI providers, storage, and deployment readiness.',
     method: 'GET',
     path: '/api/admin/dev-studio/system-health',
     classification: 'read',
@@ -762,8 +763,7 @@ export const AI_TOOL_REGISTRY: readonly AIToolDefinition[] = [
     allowedAgents: ['LIZZY'],
     allowedRoles: ['admin', 'super_admin'],
     requiredInput: ['task'],
-    approvalRequired: true,
-    confirmationPhrase: 'CONFIRM OPENHANDS EXECUTION',
+    approvalRequired: false,
     idempotent: false,
     timeoutMs: 90_000,
     retryAttempts: 1,

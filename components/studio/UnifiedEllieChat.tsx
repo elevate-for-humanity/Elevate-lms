@@ -83,7 +83,10 @@ interface UnifiedEllieChatProps {
   onPreviewTarget?: (url: string) => void;
   preferredAgent?: StudioSpecialist;
   onTaskCheckpoint?: (checkpoint: OrchestratedPlanCheckpoint | null) => void;
+  onOpenTasks?: () => void;
   suggestedPrompt?: string;
+  restoreLatest?: boolean;
+  onConversationChange?: (conversationId: string | null) => void;
 }
 
 const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
@@ -302,10 +305,14 @@ export default function UnifiedEllieChat({
   onPreviewTarget,
   preferredAgent,
   onTaskCheckpoint,
+  onOpenTasks,
   suggestedPrompt,
+  restoreLatest = true,
+  onConversationChange,
 }: UnifiedEllieChatProps) {
   const naturalVoice = useNaturalVoice();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [health, setHealth] = useState('checking…');
@@ -317,7 +324,11 @@ export default function UnifiedEllieChat({
   const [listening, setListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [voiceOutputEnabled, setVoiceOutputEnabled] = useState(true);
-  const [attachment, setAttachment] = useState<{ name: string; context: string } | null>(null);
+  const [attachment, setAttachment] = useState<{
+    id: string;
+    name: string;
+    context: string;
+  } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [planCheckpoint, setPlanCheckpoint] = useState<OrchestratedPlanCheckpoint | null>(null);
@@ -331,6 +342,79 @@ export default function UnifiedEllieChat({
     inputRef.current?.focus();
   }, [suggestedPrompt]);
 
+  useEffect(() => {
+    if (!restoreLatest) {
+      setConversationId(null);
+      setMessages([]);
+      onConversationChange?.(null);
+      return;
+    }
+    let cancelled = false;
+    void fetch('/api/admin/dev-studio/conversations', { cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        const payload = await response.json();
+        return Array.isArray(payload.conversations) ? payload.conversations[0] : null;
+      })
+      .then((conversation) => {
+        if (cancelled || !conversation?.id) return;
+        const restoredId = String(conversation.id);
+        setConversationId(restoredId);
+        onConversationChange?.(restoredId);
+        if (Array.isArray(conversation.messages)) {
+          setMessages(
+            conversation.messages.filter(
+              (message: ChatMessage) =>
+                message &&
+                (message.role === 'user' || message.role === 'assistant') &&
+                typeof message.content === 'string',
+            ),
+          );
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [onConversationChange, restoreLatest]);
+
+  async function ensureConversation(nextMessages: ChatMessage[]): Promise<string> {
+    if (conversationId) return conversationId;
+    const response = await fetch('/api/admin/dev-studio/conversations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title:
+          nextMessages.find((message) => message.role === 'user')?.content.slice(0, 100) ||
+          'Studio conversation',
+        messages: nextMessages,
+        config: { agent: preferredAgent ?? 'LIZZY', surface: 'unified-studio' },
+      }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || !payload.conversation?.id) {
+      throw new Error(payload.error || 'Could not create the Studio conversation.');
+    }
+    const id = String(payload.conversation.id);
+    setConversationId(id);
+    onConversationChange?.(id);
+    return id;
+  }
+
+  async function persistConversation(id: string, nextMessages: ChatMessage[]) {
+    const firstUser = nextMessages.find((message) => message.role === 'user');
+    const response = await fetch('/api/admin/dev-studio/conversations', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+        title: firstUser?.content.slice(0, 100) || 'Studio conversation',
+        messages: nextMessages,
+      }),
+    });
+    if (!response.ok) throw new Error('Could not save Studio conversation history.');
+  }
+
   async function uploadAttachment(file: File) {
     setUploading(true);
     setUploadError(null);
@@ -343,18 +427,22 @@ export default function UnifiedEllieChat({
       if (!response.ok) throw new Error(result.error ?? `Upload failed (HTTP ${response.status})`);
       const preview =
         typeof result.content_preview === 'string' ? result.content_preview.trim() : '';
+      const documentId = typeof result.id === 'string' ? result.id : '';
+      if (!documentId || documentId.startsWith('temp-')) {
+        throw new Error('The file was stored but no durable Studio document record was created.');
+      }
       const context = [
         `Attached file: ${file.name}`,
+        `Studio document ID: ${documentId}`,
         `Content type: ${file.type || 'application/octet-stream'}`,
         `Size: ${file.size} bytes`,
-        result.url ? `Authorized source URL: ${result.url}` : '',
         preview
           ? `Extracted content:\n${preview}`
           : 'No text could be extracted; use the authorized source URL when visual inspection is required.',
       ]
         .filter(Boolean)
         .join('\n');
-      setAttachment({ name: file.name, context });
+      setAttachment({ id: documentId, name: file.name, context });
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : 'Upload failed');
     } finally {
@@ -443,11 +531,16 @@ export default function UnifiedEllieChat({
 
     recognition.lang = 'en-US';
     recognition.continuous = true;
-    recognition.interimResults = true;
+    // Chrome re-emits interim hypotheses as they improve. Appending those
+    // hypotheses duplicates the same spoken phrase many times, so only consume
+    // finalized recognition results.
+    recognition.interimResults = false;
     recognition.onresult = (event) => {
       let transcript = '';
       for (let index = event.resultIndex ?? 0; index < event.results.length; index += 1) {
-        transcript += event.results[index][0]?.transcript ?? '';
+        if (event.results[index].isFinal !== false) {
+          transcript += event.results[index][0]?.transcript ?? '';
+        }
       }
       if (transcript.trim()) {
         setInput((current) => `${current}${current.trim() ? ' ' : ''}${transcript.trim()}`);
@@ -521,7 +614,11 @@ export default function UnifiedEllieChat({
             return next;
           });
         },
-        { planId: planCheckpoint.planId, onCheckpoint: receiveCheckpoint },
+        {
+          planId: planCheckpoint.planId,
+          conversationId: conversationId ?? undefined,
+          onCheckpoint: receiveCheckpoint,
+        },
       );
     } catch (error) {
       setCheckpointError(error instanceof Error ? error.message : 'Could not resume plan');
@@ -545,6 +642,7 @@ export default function UnifiedEllieChat({
     let spokenText = '';
 
     try {
+      const canonicalConversationId = await ensureConversation([...messages, userMsg]);
       {
         setMessages((prev) => [
           ...prev,
@@ -570,7 +668,11 @@ export default function UnifiedEllieChat({
         if (shouldOrchestrateMessage(command)) {
           // Outcome requests use the durable Codex-style runtime: persisted
           // plan → registered tools → evaluator → retry/approval checkpoint.
-          await streamOrchestratedPlan(command, appendLine, { onCheckpoint: receiveCheckpoint });
+          await streamOrchestratedPlan(command, appendLine, {
+            documentIds: attachment ? [attachment.id] : [],
+            conversationId: canonicalConversationId,
+            onCheckpoint: receiveCheckpoint,
+          });
         } else {
           // Questions retain conversation context and the unified provider
           // fallback path instead of being forced through a stateless command.
@@ -614,6 +716,11 @@ export default function UnifiedEllieChat({
           );
         }
         speakAssistantResponse(spokenText);
+        await persistConversation(canonicalConversationId, [
+          ...messages,
+          userMsg,
+          { role: 'assistant', content: spokenText, provider: 'admin-ai', route, agent },
+        ]);
       }
     } catch (error) {
       setMessages((prev) => [
@@ -716,12 +823,9 @@ export default function UnifiedEllieChat({
             >
               Approve and continue this flow
             </button>
-            <Link
-              href={`/studio/tasks?task=${planCheckpoint.taskId}`}
-              className="text-xs font-bold underline"
-            >
+            <button type="button" onClick={onOpenTasks} className="text-xs font-bold underline">
               Evidence
-            </Link>
+            </button>
           </div>
           {checkpointError ? (
             <p role="alert" className="mx-auto mt-2 max-w-5xl text-xs text-red-700">
@@ -744,7 +848,9 @@ export default function UnifiedEllieChat({
               Ask in plain language. Admin AI routes the request to the correct internal tool,
               database contract, workflow, builder, or deployment capability.
             </p>
-            <p className="mt-1 text-xs text-gray-500">AI provider status: {health}</p>
+            <p className="mt-1 text-xs text-gray-500">
+              LIZZY runtime: {aiOk ? 'connected' : 'configuration required'}
+            </p>
 
             <div className="mt-5 grid w-full min-w-0 grid-cols-1 gap-2 sm:mt-7 sm:grid-cols-2">
               {QUICK.map((quick) => (
@@ -780,10 +886,9 @@ export default function UnifiedEllieChat({
                       message.role === 'user' ? 'bg-gray-900 text-white' : assistantClass
                     }`}
                   >
-                    {message.provider && message.role === 'assistant' && (
+                    {message.role === 'assistant' && (
                       <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-                        {message.provider}
-                        {message.agent ? ` · ${message.agent}` : ''}
+                        {message.agent ?? preferredAgent ?? 'LIZZY'}
                         {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
                       </p>
                     )}

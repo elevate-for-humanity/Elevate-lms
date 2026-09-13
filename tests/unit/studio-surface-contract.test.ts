@@ -129,7 +129,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain(
       "fetch('/api/admin/dev-studio/browser/session', { cache: 'no-store' })",
     );
-    expect(workspace).toContain('disabled={runtimeReady !== true}');
+    expect(workspace).toContain('disabled={runtimeReady !== true || !target.trim()}');
     expect(workspace).toContain('STUDIO_BROWSER_PUBLIC_URL');
   });
 
@@ -183,6 +183,40 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('<RepositoryLivePreview');
     expect(workspace).toContain('<CloudBrowserWorkspace');
     expect(workspace).toContain('Active workspace');
+  });
+
+  it('keeps task evidence, tool surfaces, and durable files in the unified Studio', () => {
+    const workspace = source('components/studio/StudioCommandWorkspace.tsx');
+    const chat = source('components/studio/UnifiedEllieChat.tsx');
+    const upload = source('apps/admin/app/api/admin/dev-studio/upload/route.ts');
+    const plan = source('apps/admin/app/api/admin/dev-studio/plan/route.ts');
+
+    expect(workspace).toContain("type EmbeddedCapability = 'workflows' | 'intelligence' | 'tasks'");
+    expect(workspace).toContain("onOpenTasks={() => openCapability('tasks')}");
+    expect(workspace).not.toContain('href={workspace.route}');
+    expect(chat).toContain('Studio document ID: ${documentId}');
+    expect(chat).not.toContain('Authorized source URL: ${result.url}');
+    expect(upload).toContain('extracted_text: contentPreview || null');
+    expect(plan).toContain(
+      ".select('id,name,original_name,content_type,size_bytes,extracted_text,extraction_status')",
+    );
+    expect(plan).toContain('conversationId');
+    expect(source('apps/admin/app/api/admin/dev-studio/tasks/route.ts')).toContain(
+      "query = query.eq('conversation_id', conversationId)",
+    );
+    expect(source('apps/admin/app/studio/tasks/TasksClient.tsx')).toContain(
+      'window.setInterval',
+    );
+    expect(source('apps/admin/app/studio/tasks/page.tsx')).toContain(
+      "redirect('/studio?workspace=tasks')",
+    );
+    expect(workspace).toContain('onConversationChange={setActiveConversationId}');
+  });
+
+  it('commits only finalized browser speech results to the composer', () => {
+    const chat = source('components/studio/UnifiedEllieChat.tsx');
+    expect(chat).toContain('recognition.interimResults = false');
+    expect(chat).toContain('event.results[index].isFinal !== false');
   });
 
   it('does not frame the full-screen Studio command workspace twice', () => {

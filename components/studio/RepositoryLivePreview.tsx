@@ -28,7 +28,11 @@ function cleanRouteSegments(path: string) {
 
 function inferTarget(filePath: string): PreviewTarget | null {
   const definitions = [
-    { prefix: 'apps/marketing/app/', origin: 'https://www.elevateforhumanity.org', label: 'Marketing' },
+    {
+      prefix: 'apps/marketing/app/',
+      origin: 'https://www.elevateforhumanity.org',
+      label: 'Marketing',
+    },
     { prefix: 'apps/admin/app/', origin: 'https://admin.elevateforhumanity.org', label: 'Admin' },
     { prefix: 'apps/lms/app/', origin: 'https://app.elevateforhumanity.org', label: 'LMS' },
   ];
@@ -76,10 +80,12 @@ export default function RepositoryLivePreview({
   filePath,
   content,
   initialUrl = '',
+  trustedInteractive = false,
 }: {
   filePath: string | null;
   content: string;
   initialUrl?: string;
+  trustedInteractive?: boolean;
 }) {
   const target = useMemo(() => inferTarget(filePath ?? ''), [filePath]);
   const defaultOrigin = target?.origin ?? 'https://www.elevateforhumanity.org';
@@ -162,7 +168,8 @@ export default function RepositoryLivePreview({
           </div>
         ) : (
           <p className="mt-2 rounded-lg border border-emerald-900 bg-emerald-950/40 px-2 py-1.5 text-[10px] text-emerald-200">
-            HTML/SVG changes render directly from the unsaved editor buffer. They do not need a commit or deployment.
+            HTML/SVG changes render directly from the unsaved editor buffer. They do not need a
+            commit or deployment.
           </p>
         )}
       </header>
@@ -186,14 +193,19 @@ export default function RepositoryLivePreview({
               key={`${previewUrl}-${refreshKey}`}
               title="Deployed route preview"
               src={previewUrl}
-              sandbox=""
+              sandbox={
+                trustedInteractive
+                  ? 'allow-forms allow-modals allow-same-origin allow-scripts allow-downloads'
+                  : ''
+              }
               referrerPolicy="no-referrer"
               allow="autoplay 'none'; camera 'none'; geolocation 'none'; microphone 'none'"
               className="h-full min-h-[480px] w-full border-0 bg-white"
             />
           ) : (
             <div className="flex h-full min-h-[480px] items-center justify-center p-8 text-center text-sm text-slate-500">
-              Select an HTML/SVG file for immediate source preview, select a Next page to infer its deployed route, or enter a URL above.
+              Select an HTML/SVG file for immediate source preview, select a Next page to infer its
+              deployed route, or enter a URL above.
             </div>
           )}
         </div>
@@ -201,7 +213,9 @@ export default function RepositoryLivePreview({
 
       {!sourcePreview && target ? (
         <footer className="shrink-0 border-t border-slate-800 bg-slate-900 px-3 py-2 text-[10px] text-slate-400">
-          React/Next preview is the deployed route. Unsaved TSX cannot be executed safely without mounting the full dependency graph; use Runtime + Terminal to execute code before committing.
+          React/Next preview is the deployed route. Unsaved TSX cannot be executed safely without
+          mounting the full dependency graph; use Runtime + Terminal to execute code before
+          committing.
         </footer>
       ) : null}
     </section>

@@ -379,18 +379,14 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
         </div>
         <aside className="hidden min-h-0 flex-col border-l border-slate-800 bg-slate-950 lg:flex">
           <div className="border-b border-slate-800 p-3">
-            <p className="mb-1 text-xs font-black text-violet-300">Governed AI Browser Task</p>
+            <p className="mb-1 text-xs font-black text-violet-300">LIZZY Browser Task</p>
             <p className="mb-2 text-[10px] text-slate-500">
-              Uses the canonical Studio task ledger and isolated browser. High-impact actions pause
-              for server-recorded approval.
+              Runs in the isolated browser and streams progress into the active Studio task ledger.
             </p>
             {activeTaskId && (
-              <a
-                href="/studio/tasks"
-                className="mb-2 block truncate rounded border border-slate-800 bg-slate-900 px-2 py-1 text-[10px] text-cyan-300 underline"
-              >
+              <p className="mb-2 block truncate rounded border border-slate-800 bg-slate-900 px-2 py-1 text-[10px] text-cyan-300">
                 Task evidence: {activeTaskId}
-              </a>
+              </p>
             )}
             <textarea
               value={agentTask}

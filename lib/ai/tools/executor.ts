@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { NextRequest } from 'next/server';
+
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { emitPlatformEvent } from '@/lib/platform/orchestration/events';
 import { logger } from '@/lib/logger';
@@ -62,6 +64,24 @@ function toolUrl(tool: AIToolDefinition, input: Record<string, unknown>, context
     ? context.adminOrigin
     : context.appOrigin ?? context.adminOrigin;
   return `${origin.replace(/\/$/, '')}${path}`;
+}
+
+async function dispatchToolRequest(
+  tool: AIToolDefinition,
+  url: string,
+  init: RequestInit,
+): Promise<Response> {
+  // Course Factory is part of the Admin process. Dispatching it through an HTTP
+  // self-call creates a false dependency on ingress, DNS, and loopback routing.
+  // Invoke the canonical route in-process while preserving its auth, rate-limit,
+  // validation, approval, audit, and response contract.
+  if (tool.name === 'courses.generate') {
+    const { POST } = await import(
+      '@/apps/admin/app/api/admin/dev-studio/course-agent/route'
+    );
+    return POST(new NextRequest(url, init));
+  }
+  return fetch(url, init);
 }
 
 async function writeToolRun(
@@ -302,7 +322,7 @@ export async function executeRegisteredAITool(
             : input,
         );
       }
-      const response = await fetch(url, init);
+      const response = await dispatchToolRequest(tool, url, init);
       const contentType = response.headers.get('content-type') ?? '';
       const payload = contentType.includes('application/json')
         ? await response.json().catch(() => ({ error: `HTTP ${response.status}` }))

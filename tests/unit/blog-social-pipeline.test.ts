@@ -1,19 +1,27 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+const tokenResolverMock = vi.hoisted(() => vi.fn());
+
 vi.mock('@/lib/social/token-resolver', () => ({
-  getSocialTokens: vi.fn(async () => ({
-    access_token: 'test-page-token',
-    organization_id: 'page-123',
-  })),
+  getSocialTokens: tokenResolverMock,
 }));
 
-import { nextRetryAt, publishFacebookPageLink, publishFacebookPageReel } from '@/lib/social/blog-social-pipeline';
+import {
+  generateBlogSocialPackage,
+  nextRetryAt,
+  publishFacebookPageLink,
+  publishFacebookPageReel,
+  publishInstagramImage,
+} from '@/lib/social/blog-social-pipeline';
 
 describe('canonical blog social pipeline', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-08-29T12:00:00.000Z'));
     process.env.META_GRAPH_API_VERSION = 'v26.0';
+    tokenResolverMock.mockResolvedValue({
+      access_token: 'test-page-token', organization_id: 'page-123', dry_run: false,
+    });
   });
 
   afterEach(() => {
@@ -60,5 +68,48 @@ describe('canonical blog social pipeline', () => {
     })));
     await expect(publishFacebookPageLink({ message: 'Post', link: 'https://www.elevateforhumanity.org/blog/example' }))
       .rejects.toThrow('META_PUBLISH_FAILED: Invalid token');
+  });
+
+  it('builds Elevate-specific content deterministically without a provider call', async () => {
+    const first = await generateBlogSocialPackage({
+      id: 'blog-1', title: 'Fall HVAC Orientation', slug: 'fall-hvac-orientation',
+      excerpt: '<p>Orientation is October 4 at the Elevate training center.</p>',
+    });
+    const second = await generateBlogSocialPackage({
+      id: 'blog-1', title: 'Fall HVAC Orientation', slug: 'fall-hvac-orientation',
+      excerpt: '<p>Orientation is October 4 at the Elevate training center.</p>',
+    });
+    expect(first).toEqual(second);
+    expect(first.provider).toBe('elevate-deterministic');
+    expect(first.package.caption).toContain('https://www.elevateforhumanity.org/blog/fall-hvac-orientation');
+  });
+
+  it('blocks Meta writes while the verified connection remains in dry-run', async () => {
+    tokenResolverMock.mockResolvedValueOnce({
+      access_token: 'test-page-token', organization_id: 'page-123', dry_run: true,
+    });
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(publishFacebookPageLink({ message: 'Approved post', link: 'https://www.elevateforhumanity.org' }))
+      .rejects.toThrow('FACEBOOK_DRY_RUN');
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('publishes an Instagram image and verifies the provider permalink', async () => {
+    tokenResolverMock.mockResolvedValueOnce({
+      access_token: 'test-instagram-token', organization_id: 'ig-123', dry_run: false,
+    });
+    const responses = [
+      { id: 'container-123' },
+      { id: 'media-456' },
+      { permalink: 'https://www.instagram.com/p/verified-shortcode/' },
+    ];
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify(responses.shift()), {
+      status: 200, headers: { 'Content-Type': 'application/json' },
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(publishInstagramImage({ caption: 'Elevate update', imageUrl: 'https://cdn.example.com/update.jpg' }))
+      .resolves.toEqual({ postId: 'media-456', publishedUrl: 'https://www.instagram.com/p/verified-shortcode/' });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 });

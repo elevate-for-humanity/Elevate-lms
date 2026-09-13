@@ -6,6 +6,7 @@ const source = (relativePath: string) =>
   readFileSync(path.resolve(relativePath), 'utf8');
 
 describe('program payment application handoff contract', () => {
+  // This source contract guards the public, server-side redirect chain before browser hydration.
   it('starts payment choices at the canonical PARIS student application', () => {
     const programPage = source('components/programs/ProgramDetailPage.tsx');
 

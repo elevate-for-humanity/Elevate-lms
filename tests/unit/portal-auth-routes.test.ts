@@ -11,7 +11,7 @@ describe('deployed portal middleware auth coverage', () => {
   const admin = readFileSync(resolve(process.cwd(), 'apps/admin/middleware.ts'), 'utf8');
   const marketing = readFileSync(resolve(process.cwd(), 'apps/marketing/middleware.ts'), 'utf8');
   const marketingHome = readFileSync(resolve(process.cwd(), 'apps/marketing/app/page.tsx'), 'utf8');
-  const homeHero = readFileSync(resolve(process.cwd(), 'components/ui/HomeHeroVideo.tsx'), 'utf8');
+  const homeHero = readFileSync(resolve(process.cwd(), 'components/home/PlatformHubHero.tsx'), 'utf8');
 
   const lmsProtectedPrefixes = [
     '/learner',
@@ -55,10 +55,12 @@ describe('deployed portal middleware auth coverage', () => {
     expect(lms).not.toContain('hasSupabaseSession || protectedPath');
   });
 
-  it('renders the marketing homepage from the governed static hero contract', () => {
+  it('renders the marketing homepage from the conversion-focused static hero', () => {
     expect(marketingHome).not.toContain('getApprovedHomeHeroAsset');
-    expect(marketingHome).toContain('<HomeHeroVideo banner={heroBanners.home} />');
-    expect(homeHero).toContain('HOME_SLIDES');
+    expect(marketingHome).toContain('<PlatformHubHero />');
+    expect(marketingHome).not.toContain('<HomeHeroVideo');
+    expect(homeHero).toContain('Build skills that move your career forward.');
+    expect(homeHero).toContain('href="/programs"');
     expect(homeHero).not.toContain("fetch('/api/public/home-hero'");
   });
 

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowRight, BadgeDollarSign, CalendarDays } from 'lucide-react';
 
 const PROGRAMS = [
@@ -15,11 +15,6 @@ const PROGRAMS = [
 
 export function HomeProgramShowcase({ asHero = false }: { asHero?: boolean }) {
   const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setActive((index) => (index + 1) % PROGRAMS.length), 5500);
-    return () => window.clearInterval(timer);
-  }, []);
 
   const program = PROGRAMS[active];
   const Heading = asHero ? 'h1' : 'h2';

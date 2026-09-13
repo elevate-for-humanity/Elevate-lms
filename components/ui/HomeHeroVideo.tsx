@@ -216,7 +216,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             }))}
             demoActiveSlideIndex={activeSlide}
             analyticsName={`${banner.analyticsName}-${activeSlide + 1}`}
-            heightClassName="h-[clamp(300px,46svh,480px)] sm:h-[clamp(380px,54svh,560px)] lg:h-[clamp(400px,62vh,680px)]"
+            heightClassName="h-[clamp(300px,46svh,480px)] lg:h-[38vh] lg:min-h-[360px] lg:max-h-[520px]"
             mediaClassName={SALON_EDITORIAL_GRADE}
             overlayMode="none"
             showSoundControl={false}

@@ -13,7 +13,7 @@ import WebsiteBuilderCommercial from '@/components/store/WebsiteBuilderCommercia
 import { StandaloneBuildPackages } from '@/components/store/StandaloneBuildPackages';
 
 export const metadata: Metadata = {
-  title: 'Elevate Store | AI Business, Workforce & Education Platform',
+  title: 'Store | AI Business, Workforce & Education Platform',
   description:
     'Start with Elevate and add the tools your organization needs: AI website builder, CRM, virtual assistants, LMS, course builder, testing, workforce, apprenticeship, compliance and business apps.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/store' },
@@ -46,7 +46,7 @@ const ROLE_DEMOS = [
 export default function StorePage() {
   return (
     <main className="min-h-screen bg-white font-medium text-slate-950">
-      <section className="overflow-hidden border-b border-slate-200 bg-gradient-to-br from-cyan-50 via-white to-rose-50 px-4 py-6 sm:px-6 sm:py-14">
+      <section className="overflow-hidden border-b border-slate-200 bg-slate-50 px-4 py-6 sm:px-6 sm:py-14">
         <div className="mx-auto grid min-w-0 max-w-7xl items-center gap-8 lg:grid-cols-[.9fr_1.1fr] lg:gap-10">
           <div>
             <p className="text-xs font-black uppercase leading-5 tracking-[0.14em] text-brand-red-700 sm:text-sm sm:tracking-[0.2em]">Elevate Business Operating Platform</p>
@@ -108,7 +108,7 @@ export default function StorePage() {
 
       <section
         id="role-demos"
-        className="border-y border-cyan-100 bg-gradient-to-br from-cyan-50 via-white to-rose-50 py-16 text-slate-950"
+        className="border-y border-slate-200 bg-slate-50 py-16 text-slate-950"
       >
         <div className="mx-auto max-w-6xl px-5">
           <div className="mx-auto max-w-3xl text-center">

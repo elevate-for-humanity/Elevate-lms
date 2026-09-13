@@ -85,7 +85,7 @@ export default function HeroVideo({
   children,
   mediaFit = 'cover',
   mediaClassName = '',
-  heightClassName = 'h-[clamp(500px,72svh,820px)]',
+  heightClassName = 'h-[38vh] min-h-[260px] max-h-[520px]',
   overlayMode = 'default',
   soundButtonVariant = 'pill',
   showSoundControl = true,
@@ -352,27 +352,9 @@ export default function HeroVideo({
         ) : null}
 
         {overlayMode === 'default' ? (
-          <>
-            <div
-              className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/90 via-slate-950/62 to-slate-950/20"
-              aria-hidden="true"
-            />
-            <div
-              className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/65 via-transparent to-slate-950/10"
-              aria-hidden="true"
-            />
-          </>
+          <div className="absolute inset-0 z-20 bg-slate-950/55" aria-hidden="true" />
         ) : overlayMode === 'soft' ? (
-          <>
-            <div
-              className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/58 via-slate-950/24 to-transparent"
-              aria-hidden="true"
-            />
-            <div
-              className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/38 via-transparent to-transparent"
-              aria-hidden="true"
-            />
-          </>
+          <div className="absolute inset-0 z-20 bg-slate-950/25" aria-hidden="true" />
         ) : null}
 
         {voiceoverSrc ? (

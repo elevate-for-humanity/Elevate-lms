@@ -130,6 +130,9 @@ export default function ProgramDetailPage({
   const heroAlt = getProgramImageAlt(p.slug, p.heroImageAlt || p.title);
   const requestInfoHref =
     p.cta?.requestInfoHref || `/contact?program=${encodeURIComponent(p.slug)}`;
+  const applicationHref = p.cta.applyHref || `/apply?program=${encodeURIComponent(p.slug)}`;
+  const paymentSelectionHref = (mode: 'full' | 'plan' | 'bnpl') =>
+    `${applicationHref}${applicationHref.includes('?') ? '&' : '?'}payment=${mode}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const isTaxPreparationProgram = p.slug === 'tax-preparation';
   const pathwaySteps = [
@@ -406,7 +409,7 @@ export default function ProgramDetailPage({
       ) : null}
 
       {/* DECISION PANEL — answers the questions visitors need before applying */}
-      <section className="border-b border-slate-200 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-4 py-12 sm:py-16">
+      <section className="border-b border-slate-200 bg-slate-50 px-4 py-12 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.05fr_.95fr]">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
@@ -450,8 +453,7 @@ export default function ProgramDetailPage({
             </p>
             <div className="mt-2 text-4xl font-black">{p.selfPayCost}</div>
             <p className="mt-3 text-sm font-bold leading-6 text-white">
-              Can’t afford to pay {p.selfPayCost} in full? See if you qualify for available BNPL or
-              installment options.
+              Choose the payment path that fits your budget after your application is reviewed.
             </p>
             {bnplDepositStart && (
               <p className="mt-2 text-sm font-semibold text-slate-200">
@@ -465,24 +467,46 @@ export default function ProgramDetailPage({
                 approval.
               </p>
             )}
-            <div className="mt-6 grid gap-3">
+            <div className="mt-6 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
               <Link
-                href={p.cta.applyHref || `/apply?program=${p.slug}`}
+                href={paymentSelectionHref('full')}
+                className="rounded-xl border border-white/25 bg-slate-900 p-4 transition hover:border-white/60"
+              >
+                <span className="block text-xs font-black uppercase tracking-wider text-orange-300">Pay in full</span>
+                <span className="mt-1 block text-xl font-black text-white">{p.selfPayCost}</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-300">One payment after application approval</span>
+              </Link>
+              <Link
+                href={paymentSelectionHref('plan')}
+                className="rounded-xl border border-white/25 bg-slate-900 p-4 transition hover:border-white/60"
+              >
+                <span className="block text-xs font-black uppercase tracking-wider text-orange-300">Payment plan</span>
+                <span className="mt-1 block text-xl font-black text-white">
+                  {bnplDepositStart ? `From $${bnplDepositStart.toLocaleString()} down` : 'See available terms'}
+                </span>
+                <span className="mt-1 block text-xs leading-5 text-slate-300">Deposit and installment options</span>
+              </Link>
+              <Link
+                href={paymentSelectionHref('bnpl')}
+                className="rounded-xl border border-white/25 bg-white p-4 text-slate-950 transition hover:bg-slate-100"
+              >
+                <span className="block text-xs font-black uppercase tracking-wider text-brand-red-700">Buy now, pay later</span>
+                <span className="mt-1 block text-xl font-black">Check eligibility</span>
+                <span className="mt-1 block text-xs leading-5 text-slate-600">Provider approval and terms apply</span>
+              </Link>
+            </div>
+            <div className="mt-4 grid gap-3">
+              <Link
+                href={applicationHref}
                 className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
               >
                 Apply to This Program
               </Link>
               <Link
-                href={`/programs/${p.slug}/payment/bnpl`}
-                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100"
-              >
-                See If You Qualify · BNPL Options
-              </Link>
-              <Link
-                href={requestInfoHref}
+                href="#curriculum"
                 className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-6 py-3 font-black text-white hover:bg-slate-800"
               >
-                Get Program Information
+                See What You Will Learn
               </Link>
             </div>
           </aside>

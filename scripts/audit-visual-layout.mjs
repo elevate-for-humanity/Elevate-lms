@@ -198,6 +198,7 @@ const oversizedHero = [];
 const imagePerf = [];
 const layoutText = [];
 const marketingPagesNoCanonical = [];
+const marketingPageDesign = [];
 
 for (const full of files) {
   const rel = path.relative(ROOT, full).replaceAll('\\', '/');
@@ -215,6 +216,50 @@ for (const full of files) {
     !usesCanonicalHero(content)
   ) {
     marketingPagesNoCanonical.push(rel);
+  }
+
+  if (
+    rel.startsWith('apps/marketing/app/') &&
+    rel.endsWith('/page.tsx') &&
+    !rel.includes('/api/')
+  ) {
+    const count = (re) => (content.match(re) || []).length;
+    const textBlocks = [...content.matchAll(/<(?:p|li)[^>]*>([\s\S]*?)<\/(?:p|li)>/g)]
+      .map((match) => match[1].replace(/<[^>]+>|\{[^}]+\}/g, ' ').replace(/\s+/g, ' ').trim())
+      .filter(Boolean);
+    const longestTextWords = textBlocks.reduce(
+      (max, value) => Math.max(max, value.split(/\s+/).length),
+      0,
+    );
+    const images = count(/<(?:Image|img)\b/g);
+    const actions = count(/<(?:Link|a|button)\b/g);
+    const h1s = count(/<h1\b/g);
+    const hasMetadata = /export\s+(?:const\s+metadata|async\s+function\s+generateMetadata|function\s+generateMetadata)/.test(content);
+    const sharedTemplate =
+      ['ProgramDetailPage', 'PublicProgramPage', 'HeroVideo', 'HeroPicture', 'PageVideoHero']
+        .find((marker) => content.includes(marker));
+    const isRedirect = /\b(?:redirect|permanentRedirect)\s*\(/.test(content);
+    const template = isRedirect ? 'redirect' : sharedTemplate || 'custom';
+    const ownsVisualLayout = template === 'custom';
+    const risks = [];
+    if (!hasMetadata && !isRedirect) risks.push('metadata-review');
+    if (ownsVisualLayout && h1s === 0) risks.push('no-local-h1');
+    if (ownsVisualLayout && h1s > 1) risks.push('multiple-local-h1');
+    if (ownsVisualLayout && images === 0 && textBlocks.length >= 4) risks.push('text-only');
+    if (longestTextWords > 55) risks.push('long-copy-block');
+    if (ownsVisualLayout && actions === 0 && textBlocks.length >= 4) risks.push('no-next-action');
+    if (ownsVisualLayout && pageHasHeroIntent(content) && !usesCanonicalHero(content)) risks.push('noncanonical-hero');
+    marketingPageDesign.push({
+      file: rel,
+      template,
+      metadata: hasMetadata,
+      h1s,
+      images,
+      actions,
+      textBlocks: textBlocks.length,
+      longestTextWords,
+      risks,
+    });
   }
 }
 
@@ -256,11 +301,14 @@ const report = {
     imagePerfTotal: imagePerf.length,
     layoutTextTotal: layoutText.length,
     marketingPagesWithHeroButNotCanonical: marketingPagesNoCanonical.length,
+    marketingPagesAudited: marketingPageDesign.length,
+    marketingPagesWithDesignRisks: marketingPageDesign.filter((page) => page.risks.length).length,
   },
   topOversizedHeroFiles: groupByFile(oversizedHero).slice(0, 60),
   topImagePerfFiles: groupByFile(imagePerf).slice(0, 50),
   topLayoutTextFiles: groupByFile(layoutText).slice(0, 60),
   marketingPagesNoCanonical: marketingPagesNoCanonical.slice(0, 300),
+  marketingPageDesign,
   criticalHits: [...oversizedHero, ...imagePerf, ...layoutText].filter(
     (hit) => hit.severity === 'critical',
   ),

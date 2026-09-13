@@ -11,7 +11,7 @@ const PATHWAYS = [
     slug: 'business',
     title: 'Business & Entrepreneurship',
     description:
-      'Learn how to start, organize, market, and grow a business while building practical career and office skills you can use right away.',
+      'Build practical skills to start, organize, market, and grow a business.',
     image: '/images/pages/business-meeting.webp',
     imageAlt: 'Business and entrepreneurship team collaborating in a modern office',
     ctaHref: '/programs/business',
@@ -22,7 +22,7 @@ const PATHWAYS = [
     slug: 'hvac-technician',
     title: 'HVAC Technician Training',
     description:
-      'Train for hands-on work with heating and cooling systems, safety, diagnostics, installation, maintenance, and service calls.',
+      'Train in heating, cooling, safety, diagnostics, installation, and service.',
     image: '/images/hvac-hero.webp',
     imageAlt: 'HVAC technician inspecting a residential air-conditioning system',
     ctaHref: '/programs/hvac-technician',
@@ -33,7 +33,7 @@ const PATHWAYS = [
     slug: 'cdl-training',
     title: 'CDL Training',
     description:
-      'Prepare for commercial driving with permit preparation, safety instruction, and coordinated behind-the-wheel training.',
+      'Prepare for commercial driving with permit, safety, and road training.',
     image: '/images/pages/cdl-loading-dock.webp',
     imageAlt: 'Commercial truck positioned at a loading dock for driver training',
     ctaHref: '/programs/cdl-training',
@@ -44,7 +44,7 @@ const PATHWAYS = [
     slug: 'barber-apprenticeship',
     title: 'Barber Apprenticeship',
     description:
-      'Learn in a real barbershop, build your skills with experienced professionals, and earn wages while completing your apprenticeship pathway.',
+      'Train with professionals in a working barbershop while earning wages.',
     image: '/images/pages/barber-hero-main.webp',
     imageAlt: 'Barber apprentice serving a client in a working barbershop',
     ctaHref: '/programs/barber-apprenticeship',
@@ -55,7 +55,7 @@ const PATHWAYS = [
     slug: 'beauty-apprenticeships',
     title: 'Beauty Apprenticeships',
     description:
-      'Turn your interest in hair, skin, nails, and client service into supervised workplace training in the beauty industry.',
+      'Turn hair, skin, nail, and client-service skills into a career pathway.',
     image: '/images/pages/cosmetology-apprenticeship-hero.webp',
     imageAlt: 'Beauty professional working with a client in a salon',
     ctaHref: '/barber-and-beauty-apprenticeships',
@@ -66,7 +66,7 @@ const PATHWAYS = [
     slug: 'host-shop',
     title: 'Host an Apprentice — Sign Up Free',
     description:
-      'Grow your salon, barbershop, spa, or nail business with an apprentice while Elevate supports onboarding, training records, and program administration. There is no cost for a business to apply or enroll as a Host Shop.',
+      'Train future talent while Elevate supports onboarding, records, and compliance.',
     image: '/images/partners/salon-saloon/team-sign.webp',
     imageAlt: 'Salon Saloon team at an Elevate participating Host Salon',
     ctaHref: '/partners/host-shops',
@@ -90,19 +90,17 @@ export function HomeCareerPathways() {
             Choose where you want to go next.
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-700">
-            Elevate connects career training, apprenticeships, funding guidance, and employer-based
-            learning. Pick a pathway below to see what the experience looks like and how to get
-            started.
+            Choose a pathway to see the training, requirements, costs, and next steps.
           </p>
         </div>
 
-        <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {PATHWAYS.map((p) => (
             <article
               key={p.slug}
-              className="group h-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md ring-1 ring-black/[0.02] transition hover:-translate-y-1 hover:shadow-2xl"
+              className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md ring-1 ring-black/[0.02] transition hover:-translate-y-1 hover:shadow-2xl"
             >
-              <Link href={p.ctaHref} className="flex h-full flex-col">
+              <Link href={p.ctaHref} className="block">
                 <div className="relative aspect-[4/3] overflow-hidden bg-white">
                   <Image
                     src={p.image}
@@ -118,18 +116,10 @@ export function HomeCareerPathways() {
                     </div>
                   )}
                 </div>
-                <div className="flex flex-1 flex-col p-6 sm:p-7">
+                <div className="p-6 sm:p-7">
                   <h3 className="text-2xl font-black leading-tight text-slate-950">{p.title}</h3>
                   <p className="mt-3 text-base leading-7 text-slate-700">{p.description}</p>
-                  {p.slug === 'host-shop' && (
-                    <ul className="mt-4 space-y-2 text-sm font-semibold leading-6 text-slate-800">
-                      <li>• Build and train your future workforce</li>
-                      <li>• Earn revenue from supervised client services</li>
-                      <li>• Get help with apprenticeship records and compliance</li>
-                      <li>• Explore available workforce rebates and tax-credit eligibility</li>
-                    </ul>
-                  )}
-                  <span className="mt-auto inline-flex items-center gap-2 pt-5 text-base font-extrabold text-brand-red-700">
+                  <span className="mt-5 inline-flex items-center gap-2 text-base font-extrabold text-brand-red-700">
                     {p.cta}{' '}
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>

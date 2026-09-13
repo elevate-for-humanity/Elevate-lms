@@ -1,18 +1,10 @@
 // Audible playback follows the visitor's scroll after the browser grants audio permission.
 import type { Metadata } from 'next';
-import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
-import heroBanners from '@/content/heroBanners';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
-import { HomeApprenticeshipSales } from '@/components/home/HomeApprenticeshipSales';
-import { HomeWebsiteBuilderSales } from '@/components/home/HomeWebsiteBuilderSales';
-import { HomeSocialAppCTA } from '@/components/home/HomeSocialAppCTA';
 import { HomeFunding } from '@/components/home/HomeFunding';
-import { HomePowerUpIndiana } from '@/components/home/HomePowerUpIndiana';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
-import { HomeMobileActions } from '@/components/home/HomeMobileActions';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
-import { HomeAboutElevate } from '@/components/home/HomeAboutElevate';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 
@@ -95,35 +87,12 @@ export default function HomePage() {
       <StructuredData />
       <main>
         <PlatformHubHero />
-        <HomeAboutElevate />
-        <HomeHeroVideo banner={heroBanners.home} />
-        <div
-          data-scroll-narration
-          data-narration="An apprenticeship lets you learn with structure while gaining supervised experience on the job. We help connect the classroom, the employer, and your progress records."
-          data-narration-src="/audio/narration/apprenticeship.mp3"
-        >
-          <HomeApprenticeshipSales />
-        </div>
         <div
           data-scroll-narration
           data-narration="You do not have to have your whole career figured out today. Start by exploring the field that fits your interests, schedule, and goals."
           data-narration-src="/audio/narration/career-pathways.mp3"
         >
           <HomeCareerPathways />
-        </div>
-        <div
-          data-scroll-narration
-          data-narration="If you run a business or training program, Elevate can also help you build your website and manage the tools behind it from one connected place."
-          data-narration-src="/audio/narration/website-builder.mp3"
-        >
-          <HomeWebsiteBuilderSales />
-        </div>
-        <HomeSocialAppCTA />
-        <div
-          data-scroll-narration
-          data-narration="Indiana employers can explore Power Up Indiana for employer-led training, employee advancement, and possible training reimbursement. Eligibility and reimbursement are determined by the Indiana Department of Workforce Development. Elevate can help employers identify relevant training and organize their next steps."
-        >
-          <HomePowerUpIndiana />
         </div>
         <div
           data-scroll-narration
@@ -142,7 +111,6 @@ export default function HomePage() {
         <div data-narration-disabled="true">
           <HomeTrustBar />
         </div>
-        <HomeMobileActions />
       </main>
     </>
   );

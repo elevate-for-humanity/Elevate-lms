@@ -1,11 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Award, Clock, DollarSign, Search, ShieldCheck, Star } from 'lucide-react';
 import type { ProgramsPageRow } from '@/lib/programs/public-programs-page';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import ProgramCardImage from './ProgramCardImage';
+
+const INITIAL_VISIBLE_PROGRAMS = 12;
 
 function durationWeeks(value: string | null | undefined): number | null {
   if (!value) return null;
@@ -21,8 +23,7 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
   const image = getProgramCardImage(program.slug);
   return (
     <article className="group min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-      <Link href={`/programs/${program.slug}`} className="block">
-        <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+      <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
           <ProgramCardImage
             src={image}
             alt={`${program.title} training program`}
@@ -45,16 +46,13 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
               </span>
             ) : null}
           </div>
-        </div>
-      </Link>
+      </div>
       <div className="p-5 sm:p-6">
         <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-slate-500">
           {program.category}
         </p>
-        <h3 className="line-clamp-2 min-h-[3.5rem] text-xl font-extrabold leading-tight text-slate-950">
-          <Link href={`/programs/${program.slug}`} className="break-words hover:text-brand-red-700">
-            {program.title}
-          </Link>
+        <h3 className="line-clamp-2 min-h-[3.5rem] break-words text-xl font-extrabold leading-tight text-slate-950">
+          {program.title}
         </h3>
         {program.description ? (
           <p className="mt-3 line-clamp-3 text-base leading-relaxed text-slate-600">
@@ -98,6 +96,7 @@ export function ProgramsExplorer({ programs }: { programs: ProgramsPageRow[] }) 
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [duration, setDuration] = useState('all');
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_PROGRAMS);
   const categories = useMemo(
     () => [...new Set(programs.map((program) => program.category))].sort(),
     [programs],
@@ -117,6 +116,10 @@ export function ProgramsExplorer({ programs }: { programs: ProgramsPageRow[] }) 
       }),
     [programs, query, category, duration],
   );
+
+  useEffect(() => {
+    setVisibleCount(INITIAL_VISIBLE_PROGRAMS);
+  }, [query, category, duration]);
 
   return (
     <div className="mt-8">
@@ -161,13 +164,13 @@ export function ProgramsExplorer({ programs }: { programs: ProgramsPageRow[] }) 
             </select>
           </label>
         </div>
-        <p className="mt-3 text-sm font-semibold text-slate-600">
-          Showing {filtered.length} of {programs.length} programs
+        <p className="mt-3 text-sm font-semibold text-slate-600" aria-live="polite">
+          Showing {Math.min(filtered.length, visibleCount)} of {filtered.length} matching programs
         </p>
       </div>
       {filtered.length ? (
         <div className="mt-6 grid items-start gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((program) => (
+          {filtered.slice(0, visibleCount).map((program) => (
             <ProgramCard key={program.slug} program={program} />
           ))}
         </div>
@@ -176,6 +179,17 @@ export function ProgramsExplorer({ programs }: { programs: ProgramsPageRow[] }) 
           No programs match these filters. Clear a filter or search another career or credential.
         </div>
       )}
+      {filtered.length > visibleCount ? (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setVisibleCount((count) => count + INITIAL_VISIBLE_PROGRAMS)}
+            className="min-h-12 rounded-xl border-2 border-slate-900 bg-white px-7 py-3 font-black text-slate-950 hover:bg-slate-50"
+          >
+            Show 12 more programs
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

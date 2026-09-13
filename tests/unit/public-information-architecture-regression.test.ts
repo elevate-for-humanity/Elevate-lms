@@ -27,13 +27,15 @@ describe('public information architecture regressions', () => {
     expect(read('components/home/HomeApprenticeshipSales.tsx')).toContain('href="/apprenticeships"');
   });
 
-  it('keeps a separate automatic program and funding showcase on the homepage', () => {
+  it('keeps program selection visitor-controlled and avoids duplicating it on the homepage', () => {
     const showcase = read('components/home/HomeProgramShowcase.tsx');
-    expect(showcase).toContain('window.setInterval');
+    expect(showcase).not.toContain('window.setInterval');
     expect(showcase).toContain("'/programs/hvac-technician'");
     expect(showcase).toContain("'/programs/cdl-training'");
     expect(showcase).toContain('Funding is limited and is never guaranteed');
-    expect(read('apps/marketing/app/page.tsx')).toContain('<HomeProgramShowcase />');
+    expect(read('apps/marketing/app/page.tsx')).not.toContain('<HomeProgramShowcase />');
+    expect(read('apps/marketing/app/page.tsx')).toContain('<HomeCareerPathways />');
+    expect(read('apps/marketing/app/page.tsx')).toContain('<HomeFunding />');
   });
 
   it('limits registered claims to the approved sponsor standards', () => {

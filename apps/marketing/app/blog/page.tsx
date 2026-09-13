@@ -9,7 +9,7 @@ import { STATIC_POSTS, type BlogPost } from '@/content/blog/posts';
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: 'Blog | Elevate For Humanity',
+  title: 'Blog',
   description:
     'Workforce development insights, funding guides, credential explainers, and career training tips from Elevate for Humanity.',
   alternates: {
@@ -70,7 +70,7 @@ export default async function BlogPage() {
   const [featured, ...rest] = posts;
 
   return (
-    <div className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Blog' }]} />
@@ -202,6 +202,6 @@ export default async function BlogPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

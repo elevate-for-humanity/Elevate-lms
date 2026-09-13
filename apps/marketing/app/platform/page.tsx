@@ -9,7 +9,7 @@ import heroBanners from '@/content/heroBanners';
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'Workforce Infrastructure Platform | Elevate for Humanity',
+  title: 'Workforce Infrastructure Platform',
   description:
     'Multi-role workforce infrastructure for training, apprenticeship, employer, agency, credential, reporting, and compliance-evidence workflows.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/platform' },
@@ -66,7 +66,7 @@ export default function PlatformPage() {
   const hero = heroBanners.platform;
 
   return (
-    <div className="bg-white">
+    <main className="bg-white">
       <div className="border-b bg-white">
         <div className="mx-auto max-w-6xl px-4 py-3"><Breadcrumbs items={[{ label: 'Platform' }]} /></div>
       </div>
@@ -144,6 +144,6 @@ export default function PlatformPage() {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

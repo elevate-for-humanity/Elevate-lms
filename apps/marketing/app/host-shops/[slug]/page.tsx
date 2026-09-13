@@ -304,7 +304,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
             className="absolute inset-0 h-full w-full object-contain"
             aria-label={`${shop.dba ?? shop.name} Host Salon video`}
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-black/30" />
+          <div className="pointer-events-none absolute inset-0 bg-black/45" aria-hidden="true" />
           <div className="relative mx-auto flex h-full max-w-6xl items-end px-4 pb-8 pt-20 text-white sm:px-6 sm:pb-12">
             <div className="max-w-3xl">
               <p className="text-sm font-black uppercase tracking-[0.2em] text-white">Elevate Host Salon</p>

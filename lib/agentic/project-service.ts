@@ -156,6 +156,7 @@ export async function updateAgenticProjectMetadata(input: {
   locale?: string;
   targetId?: string | null;
   status?: AgenticProjectRecord['status'];
+  lifecycleStatus?: AgenticProjectLifecycleStatus;
 }): Promise<AgenticProjectRecord> {
   const db = await requireAdminClient();
   const merged = { ...(input.project.metadata ?? {}), ...input.metadata };
@@ -166,6 +167,7 @@ export async function updateAgenticProjectMetadata(input: {
   if (input.locale) patch.locale = input.locale;
   if (input.targetId !== undefined) patch.target_id = input.targetId;
   if (input.status) patch.status = input.status;
+  if (input.lifecycleStatus) patch.lifecycle_status = input.lifecycleStatus;
 
   const { data, error } = await db
     .from('agentic_build_projects')

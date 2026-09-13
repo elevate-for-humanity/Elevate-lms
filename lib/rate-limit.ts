@@ -77,8 +77,8 @@ export function getRedisClient(): RedisClientCompat | null {
 
   redisCompat = {
     async set(key, value, options) {
-      const client = backend.client;
       if (backend.kind === 'upstash') {
+        const client = backend.client;
         if (options?.nx && options?.ex) {
           return client.set(key, value, { nx: true, ex: options.ex });
         }
@@ -90,6 +90,7 @@ export function getRedisClient(): RedisClientCompat | null {
         }
         return client.set(key, value);
       }
+      const client = backend.client;
       if (options?.nx && options?.ex) {
         return client.set(key, value, 'EX', options.ex, 'NX');
       }

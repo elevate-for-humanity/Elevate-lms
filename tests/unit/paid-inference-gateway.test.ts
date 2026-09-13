@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
-import { executePaidInference, paidArtifactFingerprint } from '@/lib/ai/paid-inference-gateway';
+import { approvePaidInference, executePaidInference, paidArtifactFingerprint } from '@/lib/ai/paid-inference-gateway';
 
 function lifecycleDb() {
-  const eq = vi.fn(async () => ({ error: null }));
-  const update = vi.fn(() => ({ eq }));
-  return { db: { from: vi.fn(() => ({ update })) }, update };
+  const rpc = vi.fn(async (name: string) => ({
+    data: name === 'claim_paid_inference_dispatch_v1' || name === 'finish_paid_inference_v1',
+    error: null,
+  }));
+  return { db: { rpc }, rpc };
 }
 
 describe('paid inference gateway', () => {
@@ -25,7 +27,7 @@ describe('paid inference gateway', () => {
     'makes zero provider calls for %s',
     async (decision) => {
       const dispatch = vi.fn();
-      const { db, update } = lifecycleDb();
+      const { db, rpc } = lifecycleDb();
       expect(
         (
           await executePaidInference({
@@ -36,13 +38,13 @@ describe('paid inference gateway', () => {
         ).decision,
       ).toBe(decision);
       expect(dispatch).not.toHaveBeenCalled();
-      expect(update).not.toHaveBeenCalled();
+      expect(rpc).not.toHaveBeenCalled();
     },
   );
 
   it('records dispatch and completion around one approved provider call', async () => {
     const dispatch = vi.fn(async () => 'ok');
-    const { db, update } = lifecycleDb();
+    const { db, rpc } = lifecycleDb();
     const result = await executePaidInference({
       db: db as never,
       authorize: async () => ({ decision: 'approved', requestId: 'request-1' }),
@@ -52,11 +54,13 @@ describe('paid inference gateway', () => {
     expect(result.requestId).toBe('request-1');
     expect(dispatch).toHaveBeenCalledTimes(1);
     expect(dispatch).toHaveBeenCalledWith('request-1');
-    expect(update).toHaveBeenCalledTimes(2);
+    expect(rpc).toHaveBeenCalledTimes(2);
+    expect(rpc.mock.calls[0]?.[0]).toBe('claim_paid_inference_dispatch_v1');
+    expect(rpc.mock.calls[1]?.[0]).toBe('finish_paid_inference_v1');
   });
 
   it('records a terminal failure when provider dispatch throws', async () => {
-    const { db, update } = lifecycleDb();
+    const { db, rpc } = lifecycleDb();
     await expect(
       executePaidInference({
         db: db as never,
@@ -66,6 +70,15 @@ describe('paid inference gateway', () => {
         },
       }),
     ).rejects.toThrow('provider unavailable');
-    expect(update).toHaveBeenCalledTimes(2);
+    expect(rpc).toHaveBeenCalledTimes(2);
+  });
+
+  it('approves exactly one durable request without dispatching it', async () => {
+    const { db, rpc } = lifecycleDb();
+    await expect(approvePaidInference(db as never, 'request-1', 'admin-1')).resolves.toBe(true);
+    expect(rpc).toHaveBeenCalledWith('approve_paid_inference_v1', {
+      p_request_id: 'request-1',
+      p_approved_by: 'admin-1',
+    });
   });
 });

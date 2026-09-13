@@ -40,27 +40,74 @@ export async function reservePaidInference(db: SupabaseClient, input: {
   const row = Array.isArray(data) ? data[0] : data;
   if (!row || typeof row !== 'object') throw new Error('Paid inference authorization unavailable');
   const result = row as {decision: PaidInferenceDecision; request_id: string|null};
+  if (result.decision === 'duplicate' && result.request_id) {
+    const { data: existing, error: existingError } = await db
+      .from('paid_inference_requests')
+      .select('status')
+      .eq('id', result.request_id)
+      .eq('scope_key', input.scopeKey)
+      .maybeSingle();
+    if (existingError) {
+      throw new Error(`Paid inference authorization reconciliation failed: ${existingError.message}`);
+    }
+    if ((existing as { status?: string } | null)?.status === 'approved') {
+      return { decision: 'approved', requestId: result.request_id };
+    }
+  }
   return { decision: result.decision, requestId: result.request_id };
 }
 
-async function transitionPaidInference(
+export async function approvePaidInference(
   db: SupabaseClient,
   requestId: string,
-  status: 'dispatched' | 'completed' | 'failed',
-  patch: Record<string, unknown> = {},
+  approvedBy: string,
+): Promise<boolean> {
+  const { data, error } = await db.rpc('approve_paid_inference_v1' as never, {
+    p_request_id: requestId,
+    p_approved_by: approvedBy,
+  } as never);
+  if (error) throw new Error(`Paid inference approval failed: ${error.message}`);
+  return data === true;
+}
+
+async function claimPaidInferenceDispatch(
+  db: SupabaseClient,
+  requestId: string,
 ): Promise<void> {
-  const now = new Date().toISOString();
-  const { error } = await db
-    .from('paid_inference_requests')
-    .update({
-      status,
-      updated_at: now,
-      ...(status === 'dispatched' ? { dispatched_at: now } : {}),
-      ...(status === 'completed' ? { completed_at: now } : {}),
-      ...patch,
-    } as never)
-    .eq('id', requestId);
-  if (error) throw new Error(`Paid inference lifecycle update failed: ${error.message}`);
+  const { data, error } = await db.rpc('claim_paid_inference_dispatch_v1' as never, {
+    p_request_id: requestId,
+  } as never);
+  if (error || data !== true) {
+    throw new Error(`Paid inference dispatch claim failed${error ? `: ${error.message}` : ''}`);
+  }
+}
+
+async function finishPaidInference(
+  db: SupabaseClient,
+  requestId: string,
+  status: 'completed' | 'failed' | 'uncertain',
+  latencyMs: number,
+  details: {
+    actualCostMicros?: number | null;
+    providerRequestId?: string | null;
+    errorCategory?: string | null;
+    errorMessage?: string | null;
+    resultLocation?: string | null;
+  } = {},
+): Promise<void> {
+  const { data, error } = await db.rpc('finish_paid_inference_v1' as never, {
+    p_request_id: requestId,
+    p_status: status,
+    p_latency_ms: Math.max(0, Math.round(latencyMs)),
+    p_actual_cost_micros: details.actualCostMicros ?? null,
+    p_provider_request_id: details.providerRequestId ?? null,
+    p_error_category: details.errorCategory ?? null,
+    p_error_message: details.errorMessage ?? null,
+    p_result_location: details.resultLocation ?? null,
+  } as never);
+  if (error || data !== true) {
+    throw new Error(`Paid inference completion reconciliation failed${error ? `: ${error.message}` : ''}`);
+  }
 }
 
 export async function executePaidInference<T>(input: {
@@ -74,23 +121,17 @@ export async function executePaidInference<T>(input: {
   }
 
   const requestId = authorization.requestId;
-  await transitionPaidInference(input.db, requestId, 'dispatched');
+  await claimPaidInferenceDispatch(input.db, requestId);
   const startedAt = Date.now();
   try {
     const value = await input.dispatch(requestId);
-    await transitionPaidInference(input.db, requestId, 'completed', {
-      actual_cost_micros: null,
-      error_category: null,
-      error_message: null,
-    });
+    await finishPaidInference(input.db, requestId, 'completed', Date.now() - startedAt);
     return {decision: 'approved', requestId, value};
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : String(cause);
-    await transitionPaidInference(input.db, requestId, 'failed', {
-      error_category: 'provider',
-      error_message: message.slice(0, 2000),
-      completed_at: new Date().toISOString(),
-      result_location: null,
+    await finishPaidInference(input.db, requestId, 'failed', Date.now() - startedAt, {
+      errorCategory: 'provider',
+      errorMessage: message,
     }).catch(() => undefined);
     throw new Error(
       `Paid inference dispatch failed after ${Date.now() - startedAt}ms: ${message}`,

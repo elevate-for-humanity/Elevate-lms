@@ -25,8 +25,11 @@ WAN_GIT_URL = os.getenv("WAN_GIT_URL", "https://github.com/Wan-Video/Wan2.2.git"
 WAN_GIT_REF = os.getenv("WAN_GIT_REF", "42bf4cfaa384bc21833865abc2f9e6c0e67233dc")
 WAN_MODEL_ID = os.getenv("WAN_MODEL_ID", "Wan-AI/Wan2.2-TI2V-5B")
 STATUS = Path(os.getenv("MODEL_BOOTSTRAP_STATUS_FILE", "/models/bootstrap-status.json"))
-EXTRA_RUNTIME_REQUIREMENTS = ("einops",)
-RUNTIME_SMOKE_MODULES = ("einops", "cv2", "diffusers", "transformers", "accelerate", "imageio", "easydict", "ftfy")
+EXTRA_RUNTIME_REQUIREMENTS = ("einops", "decord", "peft", "librosa")
+RUNTIME_SMOKE_MODULES = (
+    "einops", "cv2", "diffusers", "transformers", "accelerate",
+    "imageio", "easydict", "ftfy", "decord", "peft", "librosa", "wan",
+)
 
 
 def status(state: str, detail: str = "") -> None:
@@ -88,7 +91,7 @@ def ensure_venv() -> None:
     # revision-only marker: verify the complete runtime contract on every boot.
     if python.exists() and marker.exists() and marker.read_text() == marker_value:
         try:
-            run([str(python), "-c", smoke], capture=True)
+            run([str(python), "-c", smoke], cwd=WAN_REPO, capture=True)
             return
         except subprocess.CalledProcessError:
             marker.unlink(missing_ok=True)
@@ -109,7 +112,7 @@ def ensure_venv() -> None:
     ]
     filtered.write_text("\n".join(lines) + "\n")
     run([pip, "install", "-r", str(filtered), *EXTRA_RUNTIME_REQUIREMENTS])
-    run([str(python), "-c", smoke], capture=True)
+    run([str(python), "-c", smoke], cwd=WAN_REPO, capture=True)
     marker.write_text(marker_value)
 
 

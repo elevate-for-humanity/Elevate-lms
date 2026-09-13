@@ -2,12 +2,12 @@ name: Gemini Provider Smoke
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/gemini-provider-smoke.yml'
-  issues:
-    types: [opened]
+    inputs:
+      approve_paid_probe:
+        description: 'I approve one paid Gemini provider probe'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ env:
 
 jobs:
   smoke:
-    if: github.event_name != 'issues' || startsWith(github.event.issue.title, '[GEMINI SMOKE]')
+    if: inputs.approve_paid_probe == true
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -58,7 +58,7 @@ jobs:
           script: |
             const fs=require('fs');
             const body=fs.existsSync('/tmp/gemini-smoke.txt')?fs.readFileSync('/tmp/gemini-smoke.txt','utf8'):'No probe output';
-            const issueNumber=context.eventName==='issues' ? context.issue.number : 763;
+            const issueNumber=763;
             await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:issueNumber,body:`Gemini provider smoke: **${process.env.OK==='true'?'PASS':'FAIL'}**\n\n\`\`\`text\n${body}\n\`\`\``});
 
       - name: Require usable Gemini model

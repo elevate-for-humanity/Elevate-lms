@@ -165,7 +165,7 @@ jobs:
           curl -sf -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
-            --max-time 30 || echo "::warning::video-render-queue failed"
+            --max-time 1800 || echo "::warning::video-render-queue failed"
 
   # ── Daily 8 AM: follow-ups, reminders, compliance ─────────────────────────
   daily-morning:

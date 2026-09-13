@@ -1,4 +1,4 @@
-merge_sha=5481a8b8d31de015546d9923b8a404890e418c8c
-services=marketing,admin,lms
-requested_at=2026-09-13T15:57:59Z
-reason=deploy-staff-conversion-and-marketing-layout-repairs
+merge_sha=ada0082588c793d0510ab379ca92a2ff2112d319
+services=admin
+requested_at=2026-09-13T16:05:00Z
+reason=deploy-safe-resumable-course-builder-media

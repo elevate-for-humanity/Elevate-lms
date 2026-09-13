@@ -60,6 +60,12 @@ describe('canonical Course Factory media architecture', () => {
     expect(worker).not.toContain('resetCanonicalMediaJob');
     expect(worker).not.toContain('retried403');
     expect(worker).not.toContain('Unexpected server response: 403');
+    const boundedLease = read(
+      'supabase/migrations/20260913112500_bound_expired_video_lease_retries.sql',
+    );
+    expect(boundedLease).toContain("coalesce(v.retry_count, 0) < 3");
+    expect(boundedLease).toContain("failure_class = coalesce(v.failure_class, 'retry_exhausted')");
+    expect(boundedLease).toContain('dead_lettered_at = coalesce(v.dead_lettered_at, now())');
   });
 
   it('preserves microclip asset_key during retry', () => {
@@ -90,6 +96,7 @@ describe('canonical Course Factory media architecture', () => {
     const scheduler = read('.github/workflows/cron-scheduler.yml');
     expect(scheduler).toContain('$ADMIN_URL/api/internal/videos/process-queue');
     expect(scheduler).not.toContain('$APP_URL/api/internal/videos/process-queue');
+    expect(scheduler).toContain('--max-time 1800');
   });
 
   it('keeps long course builds alive and resumes completed builds at media finalization', () => {

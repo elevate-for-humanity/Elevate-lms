@@ -220,6 +220,7 @@ export async function POST(request: NextRequest) {
       .eq('id', jobId)
       .eq('course_id', courseId)
       .eq('status', 'queued')
+      .lt('retry_count', 3)
       .is('dead_lettered_at', null)
       .select('*')
       .maybeSingle();

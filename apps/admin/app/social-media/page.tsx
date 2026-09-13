@@ -14,7 +14,7 @@ export default async function SocialMediaPage() {
     db.from('social_media_posts').select('id', { count: 'exact', head: true }).in('status', ['queued', 'scheduled']),
     db.from('social_media_posts').select('id', { count: 'exact', head: true }).eq('status', 'published'),
     db.from('social_campaigns').select('id', { count: 'exact', head: true }),
-    db.from('social_media_settings').select('platform,profile_data,enabled,access_token,expires_at'),
+    db.from('social_media_settings').select('platform,profile_data,enabled,expires_at,organization_id,granted_scopes,connection_status,last_verified_at,dry_run'),
     db
       .from('blog_posts')
       .select('id', { count: 'exact', head: true })
@@ -22,7 +22,7 @@ export default async function SocialMediaPage() {
       .eq('share_to_social', true),
   ]);
 
-  const supportedPlatforms = ['facebook', 'instagram', 'linkedin', 'youtube'] as const;
+  const supportedPlatforms = ['facebook', 'instagram', 'google_business', 'linkedin', 'youtube'] as const;
   const rawAccounts = accountsRes.data ?? [];
   const accountByPlatform = new Map(
     rawAccounts
@@ -34,7 +34,7 @@ export default async function SocialMediaPage() {
     account: accountByPlatform.get(platform),
   }));
   const connected = accounts.filter((account) =>
-    account.account?.enabled !== false && Boolean(account.account?.access_token) &&
+    account.account?.enabled === true && account.account?.connection_status === 'verified_read_only' &&
     (!account.account?.expires_at || new Date(account.account.expires_at) > new Date()),
   );
 
@@ -87,7 +87,7 @@ export default async function SocialMediaPage() {
             </p>
             <div className="mt-5 divide-y divide-slate-100">
               {accounts.map(({ platform, account }) => {
-                  const isConnected = account?.enabled !== false && Boolean(account?.access_token) &&
+                  const isConnected = account?.enabled === true && account?.connection_status === 'verified_read_only' &&
                     (!account?.expires_at || new Date(account.expires_at) > new Date());
                   const profile = account?.profile_data && typeof account.profile_data === 'object'
                     ? account.profile_data as Record<string, unknown>
@@ -97,17 +97,29 @@ export default async function SocialMediaPage() {
                     : typeof profile?.username === 'string'
                       ? profile.username
                       : null;
+                  const destination = profile?.publishes_to && typeof profile.publishes_to === 'object'
+                    ? profile.publishes_to as Record<string, unknown>
+                    : null;
+                  const destinationName = typeof destination?.name === 'string' ? destination.name : account?.organization_id;
+                  const platformName = platform === 'youtube' ? 'YouTube'
+                    : platform === 'google_business' ? 'Google Business Profile'
+                      : platform.charAt(0).toUpperCase() + platform.slice(1);
                   return (
                     <div key={platform} className="grid gap-3 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4">
                       <div className="min-w-0">
-                        <p className="font-bold text-slate-900">{platform === 'youtube' ? 'YouTube' : platform.charAt(0).toUpperCase() + platform.slice(1)}</p>
+                        <p className="font-bold text-slate-900">{platformName}</p>
                         <p className="truncate text-sm text-slate-500">{accountName ?? (isConnected ? 'Connected account' : 'No account connected')}</p>
+                        {destinationName ? <p className="truncate text-xs text-slate-500">Publishes to: {String(destinationName)}</p> : null}
+                        {account?.last_verified_at ? <p className="text-xs text-slate-500">Last verified: {new Date(account.last_verified_at).toLocaleString()}</p> : null}
                       </div>
                       <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${isConnected ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-700'}`}>
                           {isConnected ? <CheckCircle2 className="h-3.5 w-3.5" /> : <XCircle className="h-3.5 w-3.5" />}
                           {isConnected ? 'Connected' : 'Needs connection'}
                         </span>
+                        {isConnected && account?.dry_run !== false ? (
+                          <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">Dry-run · writes blocked</span>
+                        ) : null}
                       </div>
                     </div>
                   );

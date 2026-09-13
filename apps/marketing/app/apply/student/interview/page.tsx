@@ -52,12 +52,26 @@ async function loadApplicationPrograms() {
 export default async function ParisStudentApplicationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ program?: string; intent?: string; session_id?: string }>;
+  searchParams: Promise<{
+    program?: string;
+    intent?: string;
+    payment?: string;
+    funding?: string;
+    session_id?: string;
+  }>;
 }) {
   const params = await searchParams;
   const initialProgram = resolveSlug(params?.program || '') || '';
   const applicationIntent = params?.intent === 'enrollment' ? 'enrollment' : 'inquiry';
   const paymentSessionId = params?.session_id || '';
+  const paymentPreference = ['full', 'plan', 'bnpl'].includes(params?.payment || '')
+    ? (params.payment as 'full' | 'plan' | 'bnpl')
+    : undefined;
+  const fundingPreference = ['self_pay', 'workone', 'wioa', 'grant', 'employer'].includes(
+    params?.funding || '',
+  )
+    ? params.funding
+    : undefined;
   const programs = await loadApplicationPrograms();
 
   return (
@@ -95,6 +109,8 @@ export default async function ParisStudentApplicationPage({
               href={`/apply/student/form?${new URLSearchParams({
                 ...(initialProgram ? { program: initialProgram } : {}),
                 intent: applicationIntent,
+                ...(paymentPreference ? { payment: paymentPreference } : {}),
+                ...(fundingPreference ? { funding: fundingPreference } : {}),
                 ...(paymentSessionId ? { session_id: paymentSessionId } : {}),
               }).toString()}`}
               className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 hover:border-slate-400 hover:bg-slate-50"
@@ -125,6 +141,7 @@ export default async function ParisStudentApplicationPage({
               </div>
               <PaymentPlanCalculator
                 programSlug={initialProgram}
+                initialPaymentMode={paymentPreference}
                 successUrl={`/apply/student/interview?program=${encodeURIComponent(initialProgram)}&intent=enrollment`}
               />
             </section>

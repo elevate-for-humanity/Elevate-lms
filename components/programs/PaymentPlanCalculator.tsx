@@ -34,6 +34,7 @@ interface Props {
   stripeDepositUrl?: string;
   stripeFullUrl?: string;
   successUrl?: string;
+  initialPaymentMode?: 'full' | 'plan' | 'bnpl';
 }
 
 function fmt(cents: number) {
@@ -45,7 +46,11 @@ function fmt(cents: number) {
   }).format(cents / 100);
 }
 
-export default function PaymentPlanCalculator({ programSlug, successUrl }: Props) {
+export default function PaymentPlanCalculator({
+  programSlug,
+  successUrl,
+  initialPaymentMode,
+}: Props) {
   const searchParams = useSearchParams();
   const applicationReference = searchParams.get('ref') || undefined;
   const [pricing, setPricing] = useState<ProgramPricing | null>(null);
@@ -67,11 +72,13 @@ export default function PaymentPlanCalculator({ programSlug, successUrl }: Props
       })
       .then((data) => {
         setPricing(data);
-        setDepositCents(data.deposit_default_cents);
+        setDepositCents(
+          initialPaymentMode === 'full' ? data.tuition_cents : data.deposit_default_cents,
+        );
       })
       .catch((e) => setError(e instanceof Error ? e.message : 'Could not load pricing'))
       .finally(() => setLoading(false));
-  }, [programSlug]);
+  }, [initialPaymentMode, programSlug]);
 
   const periodicPayment = useCallback(() => {
     if (!pricing) return 0;
@@ -163,6 +170,16 @@ export default function PaymentPlanCalculator({ programSlug, successUrl }: Props
       </div>
 
       <div className="p-5 sm:p-6 space-y-6">
+        {initialPaymentMode ? (
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+            <strong className="text-slate-950">Your selected path:</strong>{' '}
+            {initialPaymentMode === 'full'
+              ? 'Pay the published tuition in full.'
+              : initialPaymentMode === 'plan'
+                ? 'Review the deposit and estimated installment schedule.'
+                : 'Review available payment options; BNPL appears only when an enabled provider determines the transaction is eligible.'}
+          </div>
+        ) : null}
         <div>
           <div className="flex items-center justify-between gap-3 mb-2">
             <label className="text-base font-bold text-slate-800">Choose a deposit</label>

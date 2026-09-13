@@ -33,6 +33,7 @@ type MetaPage = {
 };
 
 type MetaIdentity = { id?: string; name?: string };
+type MetaPermission = { permission?: string; status?: string };
 
 async function metaFetch(url: URL) {
   return fetch(url, { signal: AbortSignal.timeout(15_000), cache: 'no-store' });
@@ -107,6 +108,22 @@ export async function GET(request: NextRequest) {
   const identity = await identityResponse.json().catch(() => ({})) as MetaIdentity;
   if (!identityResponse.ok || !identity.id) return settingsRedirect(request, 'error', 'identity_lookup_failed');
 
+  const permissionsUrl = new URL(`https://graph.facebook.com/${version}/me/permissions`);
+  permissionsUrl.searchParams.set('access_token', tokenPayload.access_token);
+  let permissionsResponse: Response;
+  try {
+    permissionsResponse = await metaFetch(permissionsUrl);
+  } catch {
+    return settingsRedirect(request, 'error', 'meta_permissions_timeout');
+  }
+  const permissionsPayload = await permissionsResponse.json().catch(() => ({})) as { data?: MetaPermission[] };
+  if (!permissionsResponse.ok || !Array.isArray(permissionsPayload.data)) {
+    return settingsRedirect(request, 'error', 'permission_lookup_failed');
+  }
+  const grantedPermissions = permissionsPayload.data
+    .filter((permission) => permission.status === 'granted' && permission.permission)
+    .map((permission) => permission.permission!);
+
   const pagesUrl = new URL(`https://graph.facebook.com/${version}/me/accounts`);
   pagesUrl.searchParams.set('fields', 'id,name,access_token,instagram_business_account{id,name,username}');
   pagesUrl.searchParams.set('access_token', tokenPayload.access_token);
@@ -130,40 +147,33 @@ export async function GET(request: NextRequest) {
     ? new Date(Date.now() + tokenPayload.expires_in * 1000).toISOString()
     : null;
   const now = new Date().toISOString();
-  const settings: Array<{
-    platform: string;
-    access_token: string;
-    expires_at: string | null;
-    organization_id: string;
-    profile_data: Record<string, unknown>;
-    updated_by: string;
-    updated_at: string;
-    enabled: boolean;
-  }> = [{
-    platform: 'facebook', access_token: page.access_token, expires_at: expiresAt,
-    organization_id: page.id,
-    profile_data: {
+  const storeCredential = async (platform: 'facebook' | 'instagram', destinationId: string,
+    profileData: Record<string, unknown>, grantedScopes: string[]) => db.rpc('store_social_credentials', {
+    p_platform: platform, p_access_token: page.access_token!, p_refresh_token: null,
+    p_expires_at: expiresAt, p_organization_id: destinationId, p_organizations: [],
+    p_profile_data: profileData, p_updated_by: auth.id, p_enabled: true,
+    p_granted_scopes: grantedScopes, p_connection_status: 'verified_read_only',
+    p_last_verified_at: now, p_dry_run: true,
+  });
+
+  const facebookProfile = {
       id: page.id, name: page.name,
       authorized_by: { id: identity.id, name: identity.name },
       publishes_to: { id: page.id, name: page.name, type: 'facebook_page' },
-    },
-    updated_by: auth.id, updated_at: now, enabled: true,
-  }];
+  };
+  const facebookStored = await storeCredential('facebook', page.id, facebookProfile,
+    grantedPermissions.filter((scope) => scope.startsWith('pages_')));
+  if (facebookStored.error) return settingsRedirect(request, 'error', 'connection_save_failed');
+
   if (page.instagram_business_account?.id) {
-    settings.push({
-      platform: 'instagram', access_token: page.access_token, expires_at: expiresAt,
-      organization_id: page.instagram_business_account.id,
-      profile_data: {
+    const instagramStored = await storeCredential('instagram', page.instagram_business_account.id, {
         ...page.instagram_business_account,
         authorized_by: { id: identity.id, name: identity.name },
         publishes_to: { ...page.instagram_business_account, type: 'instagram_business_account' },
         connected_via: { id: page.id, name: page.name, type: 'facebook_page' },
-      },
-      updated_by: auth.id, updated_at: now, enabled: true,
-    });
+      }, grantedPermissions.filter((scope) => scope.startsWith('instagram_')));
+    if (instagramStored.error) return settingsRedirect(request, 'error', 'connection_save_failed');
   }
-  const { error } = await db.from('social_media_settings').upsert(settings, { onConflict: 'platform' });
-  if (error) return settingsRedirect(request, 'error', 'connection_save_failed');
 
   const response = settingsRedirect(request, 'success', 'facebook_connected');
   response.cookies.set('oauth_state_facebook', '', { maxAge: 0, path: '/' });

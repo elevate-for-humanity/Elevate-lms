@@ -2,11 +2,11 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 export default function SEO({
-  title = 'Elevate for Humanity - 106+ Workforce Certifications',
-  description = 'Indianapolis-based ETPL provider offering 106+ industry-recognized certification programs with 92% job placement rate. 100% FREE through WIOA funding.',
-  keywords = 'workforce development, online learning, career training, professional development, LMS, certifications, Indianapolis, WIOA, free training',
-  image = 'https://elevateforhumanity.pages.dev/og-image.svg',
-  url = 'https://elevateforhumanity.pages.dev',
+  title = 'Elevate for Humanity Career & Technical Institute',
+  description = 'Career training, registered apprenticeship support, testing, and workforce services in Indianapolis, Indiana.',
+  keywords = 'workforce development, career training, apprenticeships, testing, Indianapolis',
+  image = 'https://www.elevateforhumanity.org/og-image.svg',
+  url = 'https://www.elevateforhumanity.org',
   type = 'website',
 }) {
   const fullTitle = title.includes('Elevate for Humanity')
@@ -39,43 +39,31 @@ export default function SEO({
         {JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'EducationalOrganization',
-          name: 'Elevate for Humanity',
-          alternateName: 'EFH Workforce Development',
-          description:
-            'Indianapolis-based ETPL provider offering 106+ industry-recognized certification programs with 92% job placement rate. FREE workforce development through WIOA funding.',
-          url: 'https://elevateforhumanity.pages.dev',
-          logo: 'https://elevateforhumanity.pages.dev/logo.jpg',
-          image: 'https://elevateforhumanity.pages.dev/og-image.svg',
+          name: 'Elevate for Humanity Career & Technical Institute',
+          alternateName: 'Elevate for Humanity',
+          description,
+          url: 'https://www.elevateforhumanity.org',
+          logo: 'https://www.elevateforhumanity.org/logo.jpg',
+          image: 'https://www.elevateforhumanity.org/og-image.svg',
           address: {
             '@type': 'PostalAddress',
-            streetAddress: '8888 Keystone Crossing, Suite 1300',
+            streetAddress: '120 E Market St, Suite 930',
             addressLocality: 'Indianapolis',
             addressRegion: 'IN',
-            postalCode: '46240',
+            postalCode: '46204',
             addressCountry: 'US',
           },
           contactPoint: {
             '@type': 'ContactPoint',
             telephone: '+1-317-314-3757',
             contactType: 'customer service',
-            email: 'elizabethpowell6262@gmail.com',
+            email: 'info@elevateforhumanity.org',
             availableLanguage: ['English'],
           },
           sameAs: [
             'https://www.facebook.com/elevateforhumanity',
             'https://www.linkedin.com/company/elevate-for-humanity',
           ],
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: '4.8',
-            reviewCount: '247',
-            bestRating: '5',
-            worstRating: '1',
-          },
-          numberOfEmployees: {
-            '@type': 'QuantitativeValue',
-            value: '15',
-          },
           foundingDate: '2020',
           slogan: 'Empowering People. Elevating Communities.',
           knowsAbout: [
@@ -95,29 +83,24 @@ export default function SEO({
         {JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'LocalBusiness',
-          name: 'Elevate for Humanity',
-          image: 'https://elevateforhumanity.pages.dev/og-image.svg',
+          name: 'Elevate for Humanity Career & Technical Institute',
+          image: 'https://www.elevateforhumanity.org/og-image.svg',
           address: {
             '@type': 'PostalAddress',
-            streetAddress: '8888 Keystone Crossing, Suite 1300',
+            streetAddress: '120 E Market St, Suite 930',
             addressLocality: 'Indianapolis',
             addressRegion: 'IN',
-            postalCode: '46240',
+            postalCode: '46204',
             addressCountry: 'US',
           },
           telephone: '+1-317-314-3757',
-          url: 'https://elevateforhumanity.pages.dev',
-          priceRange: 'FREE',
+          url: 'https://www.elevateforhumanity.org',
+          email: 'info@elevateforhumanity.org',
           openingHoursSpecification: {
             '@type': 'OpeningHoursSpecification',
             dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
             opens: '08:00',
             closes: '18:00',
-          },
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: '4.8',
-            reviewCount: '247',
           },
         })}
       </script>
@@ -129,18 +112,18 @@ export default function SEO({
           mainEntity: [
             {
               '@type': 'Question',
-              name: 'Are the training programs really free?',
+              name: 'Can workforce funding help pay for training?',
               acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'Yes, 100% FREE through WIOA (Workforce Innovation and Opportunity Act) funding. Students pay nothing for tuition, materials, or certification exams.',
+                text: 'Some applicants may qualify for workforce funding. Eligibility and authorization are determined by the responsible funding agency after reviewing the applicant and program.',
               },
             },
             {
               '@type': 'Question',
-              name: 'What is the job placement rate?',
+              name: 'Does Elevate guarantee employment after training?',
               acceptedAnswer: {
                 '@type': 'Answer',
-                text: 'We maintain a 92% job placement rate across all programs. Most students are employed within 30-60 days of program completion.',
+                text: 'No. Elevate provides career services and employer connections, but training completion does not guarantee employment, wages, or placement.',
               },
             },
             {

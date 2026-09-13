@@ -1082,7 +1082,10 @@ export async function courseFactory(
           );
 
     tracker.emit('validate', 'Validating the complete generated course package.', 80);
-    const packageAudit = validateBlueprint(enriched.blueprint, { requireGeneratedContent: true });
+    const packageAudit = validateBlueprint(enriched.blueprint, {
+      requireGeneratedContent: true,
+      preserveAuthoredAssessmentGaps: input.contentSource === 'blueprint',
+    });
     if (!packageAudit.valid) {
       return {
         ok: false,

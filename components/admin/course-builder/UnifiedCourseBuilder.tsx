@@ -531,7 +531,11 @@ function BlueprintPanel({
       });
       const result = await res.json();
       if (!res.ok || !result.courseId)
-        throw new Error(result.error || 'Authored blueprint restoration failed');
+        throw new Error(
+          result.error ||
+            (Array.isArray(result.errors) ? result.errors.join('; ') : '') ||
+            'Authored blueprint restoration failed',
+        );
       await onGenerated(result.courseId);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Authored blueprint restoration failed');

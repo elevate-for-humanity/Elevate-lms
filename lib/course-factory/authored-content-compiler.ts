@@ -6,6 +6,7 @@ import type {
   CredentialBlueprint,
 } from '@/lib/curriculum/blueprints/types';
 import { CourseExperienceSchema, type CourseExperience } from './experience-contract';
+import { compileLearningIntelligence } from './learning-intelligence';
 import { inferStepType } from './validator';
 
 const GENERIC_MARKERS = [
@@ -449,17 +450,36 @@ function compileBlueprintLesson(
       { cause: error },
     );
   }
+  const stepType = inferStepType(lesson.slug);
+  const domainKey = clean(lesson.domainKey ?? courseModule.domainKey) || courseModule.slug;
+  const practical =
+    stepType === 'lab' ||
+    Boolean(courseModule.practicalRequired) ||
+    Boolean(lesson.practicalRequired) ||
+    Boolean(lesson.requiresVerification);
+  const intelligence = compileLearningIntelligence({
+    lessonSlug: lesson.slug,
+    lessonTitle: lesson.title,
+    domainKey,
+    competencyKeys: lesson.competencyKeys,
+    objectives: compiled.objectives,
+    masteryThreshold: 80,
+    critical: Boolean(courseModule.isCritical),
+    criticalMasteryThreshold: 100,
+    assessment: ['checkpoint', 'quiz', 'exam'].includes(stepType),
+    practical,
+  });
   const objective = lesson.objective ?? compiled.objectives[0];
   return {
     ...lesson,
-    stepType: inferStepType(lesson.slug),
+    stepType,
     ...(objective ? { objective } : {}),
     learningObjectives: compiled.objectives,
     content: JSON.stringify({
       ...content,
       html,
       learning_points: compiled.learningPoints,
-      experience: compiled.experience,
+      experience: { ...compiled.experience, intelligence },
     }),
     quizQuestions: compiled.questions.map((question, index) => ({
       id: question.id ?? `${lesson.slug}-q${index + 1}`,

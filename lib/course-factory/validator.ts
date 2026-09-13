@@ -77,6 +77,7 @@ function validateLesson(
     passingScore?: number;
   },
   moduleSlug: string,
+  options: BlueprintValidationOptions,
 ): ValidationError[] {
   const errors: ValidationError[] = [];
   const warnings: ValidationError[] = [];
@@ -136,7 +137,15 @@ function validateLesson(
     errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'quizQuestions', message: 'Assessment questions are required' });
   }
   if (stepType === 'checkpoint' && questionCount > 0 && questionCount < 10) {
-    errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'quizQuestions', message: 'Domain checkpoint requires at least 10 questions' });
+    const issue: ValidationError = {
+      type: options.preserveAuthoredAssessmentGaps ? 'warning' : 'error',
+      module: moduleSlug,
+      lesson: lesson.slug,
+      field: 'quizQuestions',
+      message: 'Domain checkpoint requires at least 10 questions',
+    };
+    if (issue.type === 'warning') warnings.push(issue);
+    else errors.push(issue);
   }
   if (stepType === 'exam' && lowerSlug.includes('practice') && questionCount > 0 && questionCount < 25) {
     errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'quizQuestions', message: 'Practice/readiness exam requires at least 25 questions' });
@@ -152,6 +161,8 @@ function validateLesson(
 
 export interface BlueprintValidationOptions {
   requireGeneratedContent?: boolean;
+  /** Preserve a registered authored draft without representing undersized banks as generated-ready. */
+  preserveAuthoredAssessmentGaps?: boolean;
 }
 
 export function validateBlueprint(
@@ -180,7 +191,7 @@ export function validateBlueprint(
   if (generatedPackage) {
     for (const courseModule of blueprint.modules ?? []) {
       for (const lesson of courseModule.lessons ?? []) {
-        for (const issue of validateLesson(lesson, courseModule.slug)) {
+        for (const issue of validateLesson(lesson, courseModule.slug, options)) {
           if (issue.type === 'error') allErrors.push(issue);
           else allWarnings.push(issue);
         }

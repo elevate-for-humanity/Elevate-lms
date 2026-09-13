@@ -4,6 +4,7 @@ import {
   compileAuthoredLessonExperience,
 } from '@/lib/course-factory/authored-content-compiler';
 import { barberApprenticeshipBlueprint } from '@/lib/curriculum/blueprints/barber';
+import { validateBlueprint } from '@/lib/course-factory/validator';
 
 const questions = [
   {
@@ -73,6 +74,18 @@ describe('authored content compiler', () => {
       expect(content.experience.knowledgeChecks).toHaveLength(3);
       expect(content.experience.narrationScript.length).toBeGreaterThan(200);
     }
+
+    const audit = validateBlueprint(result, {
+      requireGeneratedContent: true,
+      preserveAuthoredAssessmentGaps: true,
+    });
+    expect(audit.errors).toEqual([]);
+    expect(audit.warnings).toHaveLength(7);
+    expect(audit.warnings.every((warning) => warning.field === 'quizQuestions')).toBe(true);
+
+    const generatedAudit = validateBlueprint(result, { requireGeneratedContent: true });
+    expect(generatedAudit.errors).toHaveLength(7);
+    expect(generatedAudit.errors.every((error) => error.field === 'quizQuestions')).toBe(true);
   });
 
   it('builds the complete interactive contract from substantive authored lesson evidence', () => {

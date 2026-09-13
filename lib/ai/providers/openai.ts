@@ -8,6 +8,7 @@ import type {
   GeneratedImage,
 } from '../types';
 import { normalizeStructuredOutput, requestsJson } from './structured-output';
+import { requirePaidInferenceContext } from '../paid-inference-context';
 
 /**
  * OpenAI provider — GPT models for chat, DALL-E for images.
@@ -19,6 +20,7 @@ export class OpenAIProvider implements AIProvider, AIImageProvider {
   private static readonly PLACEHOLDER_KEYS = ['placeholder-build-key', 'sk-placeholder-build-key'];
 
   private getClient(): OpenAI {
+    requirePaidInferenceContext('openai');
     if (this.client) return this.client;
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey || OpenAIProvider.PLACEHOLDER_KEYS.includes(apiKey)) {

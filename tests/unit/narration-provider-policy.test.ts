@@ -18,6 +18,7 @@ import {
   DEFAULT_GEMINI_TTS_MODEL,
   generateEdgeTTS,
 } from '@/lib/video/edge-tts';
+import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
 
 describe('publication narration provider policy', () => {
   afterEach(() => {
@@ -38,9 +39,11 @@ describe('publication narration provider policy', () => {
       }),
     );
 
-    await expect(generateEdgeTTS('A production narration test.')).resolves.toEqual(
-      Buffer.from('test-mp3'),
-    );
+    await expect(
+      runWithPaidInferenceContext('approved-test-request', () =>
+        generateEdgeTTS('A production narration test.'),
+      ),
+    ).resolves.toEqual(Buffer.from('test-mp3'));
 
     expect(DEFAULT_CLOUDFLARE_TTS_MODEL).toBe('@cf/deepgram/aura-1');
     expect(fetchMock).toHaveBeenCalledWith(
@@ -62,9 +65,11 @@ describe('publication narration provider policy', () => {
       new Response('{"error":"unavailable"}', { status: 503 }),
     );
 
-    await expect(generateEdgeTTS('A production narration test.')).rejects.toThrow(
-      /route "cloudflare" failed; no provider bypass was attempted.*503/,
-    );
+    await expect(
+      runWithPaidInferenceContext('approved-test-request', () =>
+        generateEdgeTTS('A production narration test.'),
+      ),
+    ).rejects.toThrow(/route "cloudflare" failed; no provider bypass was attempted.*503/);
     expect(edgeTts).not.toHaveBeenCalled();
   });
 

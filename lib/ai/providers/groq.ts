@@ -5,6 +5,7 @@ import type {
   ChatCompletionResult,
 } from '../types';
 import { normalizeStructuredOutput, requestsJson } from './structured-output';
+import { requirePaidInferenceContext } from '../paid-inference-context';
 
 /**
  * Groq provider — fast fallback inference for Elevate.
@@ -20,6 +21,7 @@ export class GroqProvider implements AIProvider {
   private static readonly PLACEHOLDER_KEYS = ['placeholder-build-key', 'sk-placeholder-build-key'];
 
   private getClient(): Groq {
+    requirePaidInferenceContext('groq');
     if (this.client) return this.client;
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey || GroqProvider.PLACEHOLDER_KEYS.includes(apiKey)) {

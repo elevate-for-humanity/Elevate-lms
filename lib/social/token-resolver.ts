@@ -19,7 +19,11 @@ export async function getSocialTokens(platform: string): Promise<SocialTokens | 
     const { requireAdminClient } = await import('@/lib/supabase/admin');
     const db = await requireAdminClient();
 
-    const { data, error } = await db.rpc('resolve_social_credentials', { p_platform: platform }).maybeSingle();
+    const { data: rawData, error } = await db
+      .rpc('resolve_social_credentials', { p_platform: platform })
+      .maybeSingle();
+    const data =
+      rawData && typeof rawData === 'object' ? (rawData as Partial<SocialTokens>) : null;
 
     if (error || !data?.access_token) return null;
 

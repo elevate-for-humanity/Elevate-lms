@@ -163,6 +163,16 @@ async function finishPaidInference(
   }
 }
 
+function isUncertainProviderOutcome(cause: unknown): boolean {
+  if (cause && typeof cause === 'object') {
+    const record = cause as Record<string, unknown>;
+    const code = typeof record.code === 'string' ? record.code.toLowerCase() : '';
+    if (['etimedout', 'econnreset', 'econnaborted', 'abort_err'].includes(code)) return true;
+  }
+  const message = cause instanceof Error ? cause.message : String(cause);
+  return /timed?\s*out|timeout|connection reset|socket hang up|aborted/i.test(message);
+}
+
 export async function executePaidInference<T>(input: {
   db: SupabaseClient;
   authorize: () => Promise<{ decision: PaidInferenceDecision; requestId: string | null }>;
@@ -182,10 +192,17 @@ export async function executePaidInference<T>(input: {
     return { decision: 'approved', requestId, value };
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : String(cause);
-    await finishPaidInference(input.db, requestId, 'failed', Date.now() - startedAt, {
-      errorCategory: 'provider',
+    const uncertain = isUncertainProviderOutcome(cause);
+    await finishPaidInference(
+      input.db,
+      requestId,
+      uncertain ? 'uncertain' : 'failed',
+      Date.now() - startedAt,
+      {
+      errorCategory: uncertain ? 'reconciliation_required' : 'provider',
       errorMessage: message,
-    }).catch(() => undefined);
+      },
+    ).catch(() => undefined);
     throw new Error(
       `Paid inference dispatch failed after ${Date.now() - startedAt}ms: ${message}`,
       { cause },

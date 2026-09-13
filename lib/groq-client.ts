@@ -12,10 +12,12 @@ import Groq from 'groq-sdk';
 import { geminiJSON, isGeminiConfigured } from '@/lib/gemini-client';
 import { anthropicJSON, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
 import { logger } from '@/lib/logger';
+import { requirePaidInferenceContext } from '@/lib/ai/paid-inference-context';
 
 let _client: Groq | null = null;
 
 export function getGroqClient(): Groq {
+  requirePaidInferenceContext('groq');
   if (!_client) {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) throw new Error('GROQ_API_KEY is not set');

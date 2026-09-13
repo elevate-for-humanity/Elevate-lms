@@ -98,6 +98,64 @@ export interface MediaDirectorInput {
 export const MAX_LESSON_VIDEO_SCENES = 12;
 const DEFAULT_SCRIPT_SCENES = 8;
 
+/** Preserve all ordered narration while converting legacy sentence-per-scene
+ * storyboards into bounded instructional segments. */
+export function compactLegacySceneData(
+  sceneData: Record<string, unknown>,
+  maximumScenes = MAX_LESSON_VIDEO_SCENES,
+): { sceneData: Record<string, unknown>; compacted: boolean; originalSceneCount: number } {
+  const scenes = Array.isArray(sceneData.scenes)
+    ? sceneData.scenes.filter(
+        (scene): scene is Record<string, unknown> => Boolean(scene && typeof scene === 'object'),
+      )
+    : [];
+  if (scenes.length <= maximumScenes) {
+    return { sceneData, compacted: false, originalSceneCount: scenes.length };
+  }
+  if (!Number.isInteger(maximumScenes) || maximumScenes < 1) {
+    throw new Error('MEDIA_SCENE_LIMIT_INVALID');
+  }
+
+  const compactedScenes = Array.from({ length: maximumScenes }, (_, index) => {
+    const start = Math.floor((index * scenes.length) / maximumScenes);
+    const end = Math.floor(((index + 1) * scenes.length) / maximumScenes);
+    const group = scenes.slice(start, Math.max(start + 1, end));
+    const first = group[0] ?? {};
+    const joined = (keys: string[]) =>
+      group
+        .flatMap((scene) => keys.map((key) => scene[key]))
+        .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+        .map((value) => value.trim())
+        .join(' ');
+    const narration = joined(['dialogue', 'narration']);
+    const action = joined(['action', 'visual_prompt']);
+    const evidence = joined(['required_visual_evidence']);
+    return {
+      ...first,
+      id: `segment-${index + 1}`,
+      action: action || narration,
+      dialogue: narration || action,
+      required_visual_evidence: evidence || action || narration,
+      duration_seconds: undefined,
+      legacy_scene_range: { start: start + 1, end, count: group.length },
+    };
+  });
+
+  return {
+    sceneData: {
+      ...sceneData,
+      scenes: compactedScenes,
+      segmentation: {
+        strategy: 'ordered-contiguous-compaction',
+        original_scene_count: scenes.length,
+        segment_count: compactedScenes.length,
+      },
+    },
+    compacted: true,
+    originalSceneCount: scenes.length,
+  };
+}
+
 function stringValue(value: unknown, fallback = ''): string {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }

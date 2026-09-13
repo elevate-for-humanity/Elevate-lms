@@ -83,6 +83,28 @@ describe('paid inference gateway', () => {
     expect(rpc).toHaveBeenCalledTimes(2);
   });
 
+  it('marks a timed-out dispatch uncertain so it must be reconciled before repurchase', async () => {
+    const rpc = vi.fn(async (name: string, args?: Record<string, unknown>) => ({
+      data: name === 'claim_paid_inference_dispatch_v1' || name === 'finish_paid_inference_v1',
+      error: null,
+      args,
+    }));
+    await expect(
+      executePaidInference({
+        db: { rpc } as never,
+        authorize: async () => ({ decision: 'approved', requestId: 'request-timeout' }),
+        dispatch: async () => {
+          throw Object.assign(new Error('Provider request timed out'), { code: 'ETIMEDOUT' });
+        },
+      }),
+    ).rejects.toThrow('timed out');
+    expect(rpc.mock.calls[1]?.[1]).toMatchObject({
+      p_request_id: 'request-timeout',
+      p_status: 'uncertain',
+      p_error_category: 'reconciliation_required',
+    });
+  });
+
   it('approves exactly one durable request without dispatching it', async () => {
     const { db, rpc } = lifecycleDb();
     await expect(approvePaidInference(db as never, 'request-1', 'admin-1')).resolves.toBe(true);

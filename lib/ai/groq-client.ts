@@ -5,10 +5,12 @@
  * External callers should use aiChat() from ai-service.ts instead.
  */
 import Groq from 'groq-sdk';
+import { requirePaidInferenceContext } from './paid-inference-context';
 
 let _client: Groq | null = null;
 
 export function getGroqClient(): Groq {
+  requirePaidInferenceContext('groq');
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error('GROQ_API_KEY is not configured');
   if (!_client) _client = new Groq({ apiKey });

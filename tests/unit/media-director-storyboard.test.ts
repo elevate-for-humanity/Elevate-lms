@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
-import { directMedia, MAX_LESSON_VIDEO_SCENES } from '@/lib/video/media-director';
+import {
+  compactLegacySceneData,
+  directMedia,
+  MAX_LESSON_VIDEO_SCENES,
+} from '@/lib/video/media-director';
 import { buildStoryboardWebVtt } from '@/lib/video/remotion-render';
 
 describe('canonical media storyboard compatibility', () => {
@@ -46,6 +50,26 @@ describe('canonical media storyboard compatibility', () => {
 });
 
 describe('lesson media production bounds', () => {
+  it('compacts all legacy scenes into ordered bounded segments without losing narration', () => {
+    const scenes = Array.from({ length: 77 }, (_, index) => ({
+      id: `legacy-${index + 1}`,
+      dialogue: `Narration sentence ${index + 1}.`,
+      action: `Demonstration ${index + 1}.`,
+      required_visual_evidence: `Evidence ${index + 1}.`,
+    }));
+    const result = compactLegacySceneData({ scenes, source_contract: { fingerprint: 'source-1' } });
+    expect(result.compacted).toBe(true);
+    expect(result.originalSceneCount).toBe(77);
+    expect(result.sceneData.source_contract).toEqual({ fingerprint: 'source-1' });
+    const compacted = result.sceneData.scenes as Array<Record<string, unknown>>;
+    expect(compacted).toHaveLength(MAX_LESSON_VIDEO_SCENES);
+    expect(compacted.map((scene) => String(scene.dialogue)).join(' ')).toContain(
+      'Narration sentence 77.',
+    );
+    expect(compacted[0]?.legacy_scene_range).toEqual({ start: 1, end: 6, count: 6 });
+    expect(compacted.at(-1)?.legacy_scene_range).toEqual({ start: 71, end: 77, count: 7 });
+  });
+
   it('coalesces long scripts into eight narration-preserving scenes', () => {
     const script = Array.from({ length: 77 }, (_, i) => `Sentence ${i + 1} teaches required detail.`).join(' ');
     const storyboard = directMedia({ title: 'Bounded lesson', script });

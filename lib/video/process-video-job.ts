@@ -26,7 +26,12 @@ import {
 import { enforceMediaQuality } from './media-quality-gate';
 import { enforceInstructionalQuality } from './instructional-quality-gate';
 import { repairInstructionalScript } from './instructional-script-repair';
-import { directMedia, scenePrompt, type MediaCharacterReference } from './media-director';
+import {
+  compactLegacySceneData,
+  directMedia,
+  scenePrompt,
+  type MediaCharacterReference,
+} from './media-director';
 import { recordMediaProvenance } from './media-provenance';
 import { renderStoryboardVideo } from './remotion-render';
 import { uploadLessonMediaBuffer } from './upload-lesson-media';
@@ -258,10 +263,36 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
     }
     const bulletPoints = Array.isArray(job.bullet_points) ? job.bullet_points : [];
-    const persistedSceneData =
+    const rawPersistedSceneData =
       job.scene_data && typeof job.scene_data === 'object'
         ? (job.scene_data as Record<string, unknown>)
         : {};
+    const legacyCompaction = compactLegacySceneData(rawPersistedSceneData);
+    const persistedSceneData = legacyCompaction.sceneData;
+    if (legacyCompaction.compacted) {
+      const { error: compactionError } = await db
+        .from('video_jobs')
+        .update({
+          scene_data: persistedSceneData,
+          scene_count: Array.isArray(persistedSceneData.scenes)
+            ? persistedSceneData.scenes.length
+            : null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', job.id)
+        .eq('status', 'rendering')
+        .eq('retry_count', job.retry_count);
+      if (compactionError) {
+        throw new Error(`MEDIA_LEGACY_SEGMENTATION_PERSIST_FAILED:${compactionError.message}`);
+      }
+      logger.info('[video-worker] Compacted legacy storyboard into bounded segments', {
+        jobId: job.id,
+        originalSceneCount: legacyCompaction.originalSceneCount,
+        segmentCount: Array.isArray(persistedSceneData.scenes)
+          ? persistedSceneData.scenes.length
+          : 0,
+      });
+    }
     const { data: lesson } = await db
       .from('course_lessons')
       .select(
@@ -717,6 +748,10 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
     }
     const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
+    const normalizedSceneData =
+      job.scene_data && typeof job.scene_data === 'object'
+        ? compactLegacySceneData(job.scene_data as Record<string, unknown>).sceneData
+        : job.scene_data;
     const fingerprint = paidArtifactFingerprint({
       operation: 'lesson-video',
       courseId: job.course_id,
@@ -725,15 +760,15 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       assetKey: job.asset_key,
       script: job.script,
       bulletPoints: job.bullet_points,
-      sceneData: job.scene_data,
+      sceneData: normalizedSceneData,
     });
     const estimatedScenes = Math.max(
       1,
       job.scene_count ??
-        (job.scene_data &&
-        typeof job.scene_data === 'object' &&
-        Array.isArray((job.scene_data as Record<string, unknown>).scenes)
-          ? ((job.scene_data as Record<string, unknown>).scenes as unknown[]).length
+        (normalizedSceneData &&
+        typeof normalizedSceneData === 'object' &&
+        Array.isArray((normalizedSceneData as Record<string, unknown>).scenes)
+          ? ((normalizedSceneData as Record<string, unknown>).scenes as unknown[]).length
           : Math.ceil((job.script?.split(/\s+/).filter(Boolean).length ?? 1) / 45)),
     );
     const projectedCostMicros = Math.max(
@@ -756,6 +791,41 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       operation: 'lesson-video',
       projectedCostMicros,
     });
+    if (authorization.decision === 'cache_hit') {
+      const { data: cached, error: cachedError } = await db
+        .from('paid_inference_artifacts')
+        .select('storage_location,metadata')
+        .eq('scope_key', scopeKey)
+        .eq('artifact_fingerprint', fingerprint)
+        .eq('asset_type', 'lesson-video')
+        .eq('validation_status', 'valid')
+        .maybeSingle();
+      if (cachedError || !cached?.storage_location) {
+        await markFailed(job.id, 'Validated media cache record is unavailable', {
+          provider: 'paid-inference-gateway',
+        });
+        return;
+      }
+      const metadata =
+        cached.metadata && typeof cached.metadata === 'object'
+          ? (cached.metadata as Record<string, unknown>)
+          : {};
+      await markComplete(job.id, {
+        video_url: cached.storage_location,
+        ...(typeof metadata.audio_url === 'string' ? { audio_url: metadata.audio_url } : {}),
+        ...(typeof metadata.duration_seconds === 'number'
+          ? { duration_seconds: metadata.duration_seconds }
+          : {}),
+        ...(typeof metadata.scene_count === 'number' ? { scene_count: metadata.scene_count } : {}),
+        ...(metadata.scene_data ? { scene_data: metadata.scene_data } : {}),
+        provider: 'artifact-cache',
+        provider_model: 'validated-reuse',
+        ...(metadata.quality_evidence && typeof metadata.quality_evidence === 'object'
+          ? { quality_evidence: metadata.quality_evidence as never }
+          : {}),
+      });
+      return;
+    }
     if (authorization.decision !== 'approved' || !authorization.requestId) {
       if (authorization.decision === 'approval_required') {
         await markAwaitingPaidApproval(job);
@@ -766,11 +836,44 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       });
       return;
     }
-    await executePaidInference({
+    const paidExecution = await executePaidInference({
       db,
       authorize: async () => authorization,
       dispatch: () => runClaimedVideoJob(job),
     });
+    if (paidExecution.decision === 'approved' && paidExecution.requestId) {
+      const { data: completedJob, error: completedJobError } = await db
+        .from('video_jobs')
+        .select('status,video_url,audio_url,duration_seconds,scene_count,scene_data,quality_evidence')
+        .eq('id', job.id)
+        .maybeSingle();
+      if (completedJobError) throw completedJobError;
+      if (completedJob?.status === 'complete' && completedJob.video_url) {
+        const { error: artifactError } = await db.from('paid_inference_artifacts').upsert(
+          {
+            scope_key: scopeKey,
+            tenant_id: tenantId,
+            artifact_fingerprint: fingerprint,
+            asset_type: 'lesson-video',
+            storage_location: completedJob.video_url,
+            validation_status: 'valid',
+            source_request_id: paidExecution.requestId,
+            validated_at: new Date().toISOString(),
+            metadata: {
+              audio_url: completedJob.audio_url,
+              duration_seconds: completedJob.duration_seconds,
+              scene_count: completedJob.scene_count,
+              scene_data: completedJob.scene_data,
+              quality_evidence: completedJob.quality_evidence,
+            },
+          },
+          { onConflict: 'scope_key,artifact_fingerprint,asset_type' },
+        );
+        if (artifactError) {
+          throw new Error(`MEDIA_ARTIFACT_CACHE_PERSIST_FAILED:${artifactError.message}`);
+        }
+      }
+    }
   } catch (error) {
     logger.error('[video-worker] Paid media orchestration failed', error, { jobId: job.id });
   }

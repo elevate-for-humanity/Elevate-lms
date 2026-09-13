@@ -1,30 +1,33 @@
-name: Video Worker Scheduler
+name: Controlled Video Acceptance
 
-# Queue checkpoint: restart stalled barber instructional candidate after worker recovery
-
-# Canonical Course Builder render-queue trigger. Keep this workflow thin: the Admin runtime owns rendering.
-# A main-branch workflow update also performs an immediate bounded queue check.
+# Paid production acceptance runner. It cannot run from a repository push and
+# is pinned to Elevate's designated non-canonical acceptance records.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/video-worker-smoke.yml'
+    inputs:
+      approve_paid_render:
+        description: 'I approve one paid render of the controlled acceptance job'
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: canonical-video-worker-scheduler
+  group: controlled-video-acceptance
   cancel-in-progress: false
 
 env:
   ADMIN_URL: ${{ secrets.ADMIN_URL }}
   CRON_SECRET: ${{ secrets.CRON_SECRET }}
+  COURSE_ID: 'a436e60a-6247-4ae3-a529-670eb37feeb8'
+  JOB_ID: '0f5919f0-c9ef-4551-a1fe-26b0979f924c'
 
 jobs:
-  process-next-video:
-    name: Process next canonical video job
+  process-controlled-video:
+    if: inputs.approve_paid_render == true
+    name: Process the controlled video job once
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -37,20 +40,11 @@ jobs:
             echo 'ADMIN_URL=https://admin.elevateforhumanity.org' >> "$GITHUB_ENV"
           fi
 
-      - name: Call Admin-owned video queue worker
+      - name: Call Admin-owned video queue worker once
         shell: bash
         run: |
           set -euo pipefail
-          # The Admin worker intentionally keeps this request attached while a
-          # render is running (up to its 30-minute maxDuration). Keep the
-          # scheduler's client timeout inside the 35-minute job timeout so the
-          # runner does not abandon a valid lease and cause a costly retry.
-          status=$(curl -sS --connect-timeout 30 --max-time 1800 \
-            -o /tmp/video-worker.json -w '%{http_code}' \
-            -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H 'Content-Type: application/json' \
-            --data '{"courseId":"3fb5ce19-1cde-434c-a8c6-f138d7d7aa17","jobId":"4ba64728-c520-4570-800a-0d5546ce229a","maxJobs":1,"queueOneDraft":true}' || true)
+          status=$(curl -sS --connect-timeout 30 --max-time 1800             -o /tmp/video-worker.json -w '%{http_code}'             -X POST "$ADMIN_URL/api/internal/videos/process-queue"             -H "Authorization: Bearer $CRON_SECRET"             -H 'Content-Type: application/json'             --data '{"courseId":"a436e60a-6247-4ae3-a529-670eb37feeb8","jobId":"0f5919f0-c9ef-4551-a1fe-26b0979f924c","maxJobs":1,"queueOneDraft":true}' || true)
           cat /tmp/video-worker.json 2>/dev/null || true
           case "$status" in
             200|202) ;;

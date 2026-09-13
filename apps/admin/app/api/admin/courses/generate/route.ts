@@ -156,7 +156,8 @@ async function _POST(req: NextRequest) {
     const tenantId =
       typeof profile.tenant_id === 'string' && profile.tenant_id
         ? profile.tenant_id
-        : '6ba71334-58f4-4104-9b2a-5114f2a7614c';
+        : null;
+    const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
     const artifactFingerprint = paidArtifactFingerprint({
       operation: 'course-draft',
       model: 'gpt-4.1',

@@ -53,24 +53,39 @@ async function persistPlan(
   tenantId?: string,
 ) {
   const content = JSON.stringify(plan);
-  await db.from('ai_memory').upsert(
-    {
-      scope: 'plan',
-      key: `plan:${plan.id}`,
-      content,
-      value: content,
-      metadata: {
-        plan_id: plan.id,
-        goal: plan.goal,
-        status: plan.status,
-        updated_by: actorId,
-      },
-      tenant_id: tenantId ?? null,
-      user_id: actorId,
-      updated_at: new Date().toISOString(),
+  const key = `plan:${plan.id}`;
+  const payload = {
+    scope: 'plan',
+    key,
+    content,
+    value: content,
+    metadata: {
+      plan_id: plan.id,
+      goal: plan.goal,
+      status: plan.status,
+      updated_by: actorId,
     },
-    { onConflict: 'scope,key,agent_id' },
-  );
+    tenant_id: tenantId ?? null,
+    user_id: actorId,
+    updated_at: new Date().toISOString(),
+  };
+
+  // The live uniqueness rule uses COALESCE(agent_id, nil_uuid), which cannot be
+  // targeted by PostgREST's column-list onConflict option. Resolve then write
+  // explicitly so approval checkpoints are never silently lost.
+  const { data: existing, error: lookupError } = await db
+    .from('ai_memory')
+    .select('id')
+    .eq('scope', 'plan')
+    .eq('key', key)
+    .is('agent_id', null)
+    .maybeSingle();
+  if (lookupError) throw lookupError;
+
+  const writeResult = existing?.id
+    ? await db.from('ai_memory').update(payload).eq('id', existing.id)
+    : await db.from('ai_memory').insert(payload);
+  if (writeResult.error) throw writeResult.error;
 }
 
 async function loadPlan(

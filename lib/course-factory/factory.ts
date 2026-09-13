@@ -1039,6 +1039,10 @@ export async function courseFactory(
     }
 
     const courseTitle = input.title || blueprint.title || blueprint.credentialTitle;
+    // A controlled single-lesson production proof is a standalone governed
+    // draft. It retains registered-program evidence in the blueprint, but it
+    // must not claim the program's one canonical apprenticeship course slot.
+    const persistenceProgramId = input.buildScope === 'lesson' ? null : input.programId;
     if (!isAIAvailable() && input.contentSource !== 'blueprint') {
       throw new Error('AI service is required to generate complete lesson and assessment content.');
     }
@@ -1049,7 +1053,7 @@ export async function courseFactory(
       const scaffold = await publishCourse({
         blueprint,
         courseTitle,
-        programId: input.programId,
+        programId: persistenceProgramId,
         contentSource: 'blueprint',
         mode: 'missing-only',
         evidence,
@@ -1123,7 +1127,7 @@ export async function courseFactory(
     const published = await publishCourse({
       blueprint: enriched.blueprint,
       courseTitle,
-      programId: input.programId,
+      programId: persistenceProgramId,
       contentSource: input.contentSource ?? 'ai',
       mode: input.mode ?? 'refresh',
       evidence,

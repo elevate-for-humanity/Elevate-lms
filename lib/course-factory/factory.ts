@@ -947,6 +947,8 @@ export async function courseFactory(
       blueprint = {
         ...blueprint,
         id: `${blueprint.id}-lesson-draft`,
+        programSlug: `${blueprint.programSlug}-${slugify(input.title || firstLesson.title)}-draft`,
+        credentialSlug: `${blueprint.credentialSlug}-lesson-draft`,
         title: input.title || blueprint.title,
         expectedModuleCount: 1,
         expectedLessonCount: 1,

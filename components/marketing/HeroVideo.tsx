@@ -85,7 +85,7 @@ export default function HeroVideo({
   children,
   mediaFit = 'cover',
   mediaClassName = '',
-  heightClassName = 'h-[38vh] min-h-[260px] max-h-[520px]',
+  heightClassName = 'h-[clamp(500px,72svh,820px)]',
   overlayMode = 'default',
   soundButtonVariant = 'pill',
   showSoundControl = true,

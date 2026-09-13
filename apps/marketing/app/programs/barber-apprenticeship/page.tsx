@@ -113,7 +113,7 @@ export default async function BarberApprenticeshipPage() {
           transcriptVoiceRate={1}
           preloadTranscriptVoice={false}
           analyticsName="barber-apprenticeship"
-          heightClassName="h-[clamp(460px,68vh,780px)]"
+          heightClassName="h-[clamp(520px,72svh,860px)]"
           mediaFit="contain"
           mediaClassName="bg-black"
           overlayMode="none"

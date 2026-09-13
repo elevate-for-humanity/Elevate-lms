@@ -49,8 +49,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
 
       {/* Hero — clean full-bleed image, no overlay or text on top */}
       <section
-        className="relative w-full overflow-hidden"
-        style={{ height: 'clamp(320px, 38vw, 520px)' }}
+        className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden"
         aria-label={`${config.hero.title} hero image`}
       >
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}

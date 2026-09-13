@@ -142,7 +142,6 @@
       "function": "Platform development and operations workspace",
       "canonical": { "app": "admin", "path": "/studio" },
       "informational": [
-        { "app": "marketing", "path": "/store/dev-studio", "purpose": "Public Store description that launches Admin Studio" }
       ]
     },
     "authentication": {

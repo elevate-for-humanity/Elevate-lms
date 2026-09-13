@@ -29,7 +29,7 @@ export function HeroSection({
 }: HeroSectionProps) {
   return (
     <section className="overflow-hidden bg-white">
-      <div className="relative h-[clamp(220px,42vw,520px)] w-full overflow-hidden bg-slate-100">
+      <div className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden bg-slate-100">
         {heroVideo ? (
           <SafeHeroVideo
             src={heroVideo}

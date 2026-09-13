@@ -62,7 +62,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
       </section>
 
       {/* HERO */}
-      <section className="relative h-[32vh] min-h-[200px] max-h-[400px] w-full overflow-hidden">
+      <section className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden">
         <Image
           src="/images/pages/comp-layout-hero.webp"
           alt={title}

@@ -94,13 +94,13 @@ export function HomeCareerPathways() {
           </p>
         </div>
 
-        <div className="grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {PATHWAYS.map((p) => (
             <article
               key={p.slug}
-              className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md ring-1 ring-black/[0.02] transition hover:-translate-y-1 hover:shadow-2xl"
+              className="group h-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-md ring-1 ring-black/[0.02] transition hover:-translate-y-1 hover:shadow-2xl"
             >
-              <Link href={p.ctaHref} className="block">
+              <Link href={p.ctaHref} className="flex h-full flex-col">
                 <div className="relative aspect-[4/3] overflow-hidden bg-white">
                   <Image
                     src={p.image}
@@ -116,10 +116,10 @@ export function HomeCareerPathways() {
                     </div>
                   )}
                 </div>
-                <div className="p-6 sm:p-7">
+                <div className="flex flex-1 flex-col p-6 sm:p-7">
                   <h3 className="text-2xl font-black leading-tight text-slate-950">{p.title}</h3>
                   <p className="mt-3 text-base leading-7 text-slate-700">{p.description}</p>
-                  <span className="mt-5 inline-flex items-center gap-2 text-base font-extrabold text-brand-red-700">
+                  <span className="mt-auto inline-flex items-center gap-2 pt-5 text-base font-extrabold text-brand-red-700">
                     {p.cta}{' '}
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>

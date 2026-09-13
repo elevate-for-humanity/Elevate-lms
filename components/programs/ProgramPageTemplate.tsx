@@ -51,7 +51,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       </div>
 
       {/* Hero Image - Compact */}
-      <section className="relative h-[35vh] min-h-[250px] lg:h-[40vh] lg:min-h-[300px] bg-slate-100">
+      <section className="relative h-[clamp(520px,72svh,860px)] bg-slate-100">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
           src={program.image}

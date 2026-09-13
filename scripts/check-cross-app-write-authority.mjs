@@ -52,8 +52,11 @@ const canonicalRequirements = [
   ['apps/marketing/app/api/webhooks/store/route.ts', 'webhook_events_processed'],
   ['apps/marketing/app/api/webhooks/jotform/route.ts', 'safeSecretEqual'],
   ['apps/marketing/app/api/webhooks/partners/[partner]/route.ts', 'safeSecretEqual'],
-  ['apps/marketing/app/api/stripe/trial-checkout/route.ts', 'trial_signups'],
-  ['apps/marketing/app/api/checkout/program/route.ts', "kind: 'partner_course'"],
+  // QuickBooks is now the billing authority. These historical Stripe URLs must
+  // stay present only as fail-closed canonical retirement responses so an old
+  // client cannot silently recreate a second payment-write path.
+  ['apps/marketing/app/api/stripe/trial-checkout/route.ts', "destination: '/store/plans'"],
+  ['apps/marketing/app/api/checkout/program/route.ts', "destination: '/programs'"],
   ['apps/admin/app/api/courses/[courseId]/announcements/route.ts', 'course_announcements'],
   ['apps/admin/app/api/documents/upload/route.ts', 'ALLOWED_MIME_TYPES'],
 ];

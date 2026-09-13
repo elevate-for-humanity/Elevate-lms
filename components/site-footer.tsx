@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { siteConfig } from '@/content/site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { LEGAL_ENTITY_OPERATING_LINE } from '@/lib/config/legal-entity';
-import { CREATOR_LINKS, PARTNER_LINKS } from '@/config/social-links';
+import { PARTNER_LINKS } from '@/config/social-links';
 import { ROUTES } from '@/lib/navigation/routes';
 import { Mail, Phone, MapPin, Facebook, Linkedin, Instagram, ExternalLink } from 'lucide-react';
 
@@ -52,17 +52,6 @@ export function SiteFooter() {
             >
               Learn about Rise Forward Foundation
             </Link>
-            <div className="mt-3 text-sm leading-6 text-slate-700">
-              <p className="font-black text-slate-950">Partner network</p>
-              <a
-                href={PARTNER_LINKS.curvatureBodySculpting}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-bold text-fuchsia-800 hover:underline"
-              >
-                Curvature Body Sculpting <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-              </a>
-            </div>
             <div className="mt-5 flex gap-3">
               <a
                 href="https://www.facebook.com/61578240192934/"
@@ -92,15 +81,6 @@ export function SiteFooter() {
                 <Instagram className="h-5 w-5" />
               </a>
             </div>
-            <a
-              href={CREATOR_LINKS.elizabethGreeneFacebook}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-flex items-center gap-1 text-sm font-black text-blue-800 hover:underline"
-            >
-              Connect with Elizabeth on Facebook
-              <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-            </a>
           </div>
 
           <FooterGroup title="Programs">

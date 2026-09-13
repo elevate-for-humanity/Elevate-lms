@@ -51,6 +51,20 @@ if (/href=["']\/legal["'][^>]*>Terms of Service</.test(footer)) {
   fail('Terms of Service is mislabeled to /legal instead of /terms-of-service.');
 }
 
+// The shared institutional footer is rendered on every public page. Keep
+// unrelated businesses and personal-profile promotions on their own pages so
+// they cannot inflate or confuse the universal Elevate navigation surface.
+for (const unrelatedPromotion of [
+  'curvatureBodySculpting',
+  'Curvature Body Sculpting',
+  'elizabethGreeneFacebook',
+  'Connect with Elizabeth on Facebook',
+]) {
+  if (footer.includes(unrelatedPromotion)) {
+    fail(`Unrelated promotion leaked into the universal footer: ${unrelatedPromotion}`);
+  }
+}
+
 // These public destinations are deliberate buyer-facing/footer contracts.
 for (const route of [
   '/programs',

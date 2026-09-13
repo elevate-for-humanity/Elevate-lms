@@ -79,7 +79,16 @@ export function getRedisClient(): RedisClientCompat | null {
     async set(key, value, options) {
       const client = backend.client;
       if (backend.kind === 'upstash') {
-        return client.set(key, value, options) as Promise<string | null>;
+        if (options?.nx && options?.ex) {
+          return client.set(key, value, { nx: true, ex: options.ex });
+        }
+        if (options?.nx) {
+          return client.set(key, value, { nx: true });
+        }
+        if (options?.ex) {
+          return client.set(key, value, { ex: options.ex });
+        }
+        return client.set(key, value);
       }
       if (options?.nx && options?.ex) {
         return client.set(key, value, 'EX', options.ex, 'NX');

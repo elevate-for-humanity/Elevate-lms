@@ -32,13 +32,13 @@ export default function OnlineAppsPage() {
               Explore programs and platform tools without an account. Sign in when you are ready to open your assigned dashboard, manage your account or continue authorized work.
             </p>
           </div>
-          <div className="relative min-h-[260px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
+          <div className="relative min-h-[320px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
             <Image
               src="/images/certificates-hero.webp"
               alt="Elevate online dashboards and workspaces"
               fill
               priority
-              className="object-cover"
+              className="object-contain p-4"
               sizes="(max-width: 1024px) 100vw, 42vw"
             />
           </div>

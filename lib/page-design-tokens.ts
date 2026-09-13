@@ -26,7 +26,7 @@ export const layout = {
 } as const;
 
 export const hero = {
-  imageWrap: 'relative h-[38vh] min-h-[260px] max-h-[520px] w-full overflow-hidden',
+  imageWrap: 'relative h-[72svh] min-h-[520px] max-h-[860px] w-full overflow-hidden',
   contentPanel: 'bg-white border-b border-slate-100',
 } as const;
 

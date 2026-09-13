@@ -37,7 +37,7 @@ async function generateChunk(text: string): Promise<Uint8Array> {
 
   const model = process.env.CLOUDFLARE_TTS_MODEL?.trim() || DEFAULT_CLOUDFLARE_TTS_MODEL;
   if (!model.startsWith('@cf/')) throw new Error('Invalid Cloudflare TTS model');
-  const speaker = process.env.CLOUDFLARE_TTS_SPEAKER?.trim() || 'orion';
+  const speaker = process.env.CLOUDFLARE_TTS_SPEAKER?.trim() || 'luna';
   const gatewayId = process.env.AI_GATEWAY_ID?.trim() || 'default';
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,

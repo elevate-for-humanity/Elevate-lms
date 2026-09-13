@@ -59,7 +59,7 @@ export default function HeroPicture({
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
-  const canonicalHeight = 'h-[clamp(420px,58vh,720px)]';
+  const canonicalHeight = 'h-[clamp(520px,72svh,860px)]';
 
   return (
     <div className={`w-full ${className}`}>

@@ -31,8 +31,8 @@ export default function DevStudioPage() {
       </div>
 
       <PictureFirstPageHero
-        image="/images/location-1.webp"
-        alt="Administrative development and operations workspace"
+        image="/images/pages/admin-ai-studio-hero.webp"
+        alt="Developer working in a multi-screen software workspace"
         eyebrow="Dev Studio"
         title="Build and Operate from One Admin Workspace"
         description="Dev Studio is owned by the Admin platform. This page now points to the real workspace instead of showing a synthetic gradient hero, fake terminal output, or fabricated workflow metrics."

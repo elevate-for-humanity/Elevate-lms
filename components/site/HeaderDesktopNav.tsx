@@ -52,7 +52,7 @@ function DropdownContent({ subItems, embedded = false }: { subItems: NavSubItem[
 
 function MoreDropdown({ items }: { items: NavItem[] }) {
   return (
-    <div className="grid w-[min(92vw,42rem)] grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-2xl sm:grid-cols-3">
+    <div className="w-[min(92vw,20rem)] space-y-1 rounded-xl border border-slate-200 bg-white p-3 shadow-2xl">
       {items.map((item) => (
         <div key={item.id ?? item.name} className="min-w-0">
           {item.href ? (

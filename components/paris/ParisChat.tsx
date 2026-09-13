@@ -346,7 +346,7 @@ export default function ParisChat({
       voice: 'coral',
       style: storeSurface ? 'commercial' : 'assistant',
       rate: 1,
-      allowBrowserFallback: true,
+      allowBrowserFallback: false,
     });
   }, [autoSpeak, messages, storeSurface, voice, voiceEnabled]);
 
@@ -372,7 +372,7 @@ export default function ParisChat({
                 voice: 'coral',
                 style: 'assistant',
                 rate: 1,
-                allowBrowserFallback: true,
+                allowBrowserFallback: false,
               });
             router.push(command.href);
             return;
@@ -413,7 +413,7 @@ export default function ParisChat({
             voice: 'coral',
             style: storeSurface ? 'commercial' : 'assistant',
             rate: 1,
-            allowBrowserFallback: true,
+            allowBrowserFallback: false,
           });
         }
         onComplete?.([]);
@@ -664,7 +664,7 @@ export default function ParisChat({
                 voice: 'coral',
                 style: storeSurface ? 'commercial' : 'assistant',
                 rate: 1,
-                allowBrowserFallback: true,
+                allowBrowserFallback: false,
               });
             }}
             className={`inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center rounded-full border transition ${

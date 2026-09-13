@@ -292,7 +292,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c') }} />
       {videoUrl ? (
-        <section className="relative isolate h-[clamp(380px,58vh,600px)] overflow-hidden bg-black">
+        <section className="relative isolate h-[clamp(500px,72svh,820px)] overflow-hidden bg-black">
           <video
             src={videoUrl}
             autoPlay

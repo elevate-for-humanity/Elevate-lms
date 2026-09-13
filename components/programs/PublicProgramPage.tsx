@@ -222,7 +222,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
       </div>
 
       {/* Hero Image — clean, no text overlay */}
-      <section className="relative h-[clamp(420px,58vh,720px)] overflow-hidden">
+      <section className="relative h-[clamp(520px,72svh,860px)] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
           src={config.heroImage.src}

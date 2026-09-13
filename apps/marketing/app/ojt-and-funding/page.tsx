@@ -56,7 +56,7 @@ export default function OjtAndFundingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Video hero */}
-      <section className="relative h-[clamp(420px,58vh,720px)] overflow-hidden">
+      <section className="relative h-[clamp(520px,72svh,860px)] overflow-hidden">
         <LazyVideo
           src="/videos/training-providers-hero.mp4"
           poster="/images/pages/ojt-and-funding-page-1.webp"

@@ -8,6 +8,7 @@ volume and verify the pinned revision before reporting readiness.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import subprocess
@@ -24,6 +25,8 @@ WAN_GIT_URL = os.getenv("WAN_GIT_URL", "https://github.com/Wan-Video/Wan2.2.git"
 WAN_GIT_REF = os.getenv("WAN_GIT_REF", "42bf4cfaa384bc21833865abc2f9e6c0e67233dc")
 WAN_MODEL_ID = os.getenv("WAN_MODEL_ID", "Wan-AI/Wan2.2-TI2V-5B")
 STATUS = Path(os.getenv("MODEL_BOOTSTRAP_STATUS_FILE", "/models/bootstrap-status.json"))
+EXTRA_RUNTIME_REQUIREMENTS = ("einops",)
+RUNTIME_SMOKE_MODULES = ("einops", "cv2", "diffusers", "transformers", "accelerate", "imageio", "easydict", "ftfy")
 
 
 def status(state: str, detail: str = "") -> None:
@@ -74,9 +77,21 @@ def ensure_repo() -> None:
 def ensure_venv() -> None:
     python = WAN_VENV / "bin" / "python"
     marker = WAN_VENV / ".elevate-ready"
-    marker_value = f"{WAN_GIT_REF}\n"
+    requirements = WAN_REPO / "requirements.txt"
+    dependency_fingerprint = hashlib.sha256(
+        requirements.read_bytes() + "\n".join(EXTRA_RUNTIME_REQUIREMENTS).encode()
+    ).hexdigest()
+    marker_value = f"{WAN_GIT_REF}:{dependency_fingerprint}\n"
+    smoke = "import " + ", ".join(RUNTIME_SMOKE_MODULES)
+
+    # The persistent volume can outlive the container image. Never trust a
+    # revision-only marker: verify the complete runtime contract on every boot.
     if python.exists() and marker.exists() and marker.read_text() == marker_value:
-        return
+        try:
+            run([str(python), "-c", smoke], capture=True)
+            return
+        except subprocess.CalledProcessError:
+            marker.unlink(missing_ok=True)
 
     if WAN_VENV.exists():
         import shutil
@@ -85,7 +100,6 @@ def ensure_venv() -> None:
     pip = str(WAN_VENV / "bin" / "pip")
     run([pip, "install", "--upgrade", "pip", "setuptools", "wheel"])
 
-    requirements = WAN_REPO / "requirements.txt"
     filtered = ROOT / "wan-requirements.txt"
     excluded = ("flash_attn", "torch>", "torch=", "torchvision", "torchaudio")
     lines = [
@@ -94,7 +108,8 @@ def ensure_venv() -> None:
         if line.strip() and not any(token in line.lower().replace(" ", "") for token in excluded)
     ]
     filtered.write_text("\n".join(lines) + "\n")
-    run([pip, "install", "-r", str(filtered)])
+    run([pip, "install", "-r", str(filtered), *EXTRA_RUNTIME_REQUIREMENTS])
+    run([str(python), "-c", smoke], capture=True)
     marker.write_text(marker_value)
 
 

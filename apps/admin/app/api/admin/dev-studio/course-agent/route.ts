@@ -56,6 +56,25 @@ async function resolveCanonicalCourseFromGoal(goal: string) {
   return ranked[0].course;
 }
 
+async function resolveCanonicalProgramFromGoal(goal: string) {
+  const words = searchableWords(goal);
+  if (!words.length) return null;
+  const db = await requireAdminClient();
+  const { data, error } = await db.from('programs').select('id,title,name,slug').limit(500);
+  if (error) throw error;
+  const normalizedGoal = goal.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const ranked = (data ?? []).map((program) => {
+    const labels = [program.title, program.name, program.slug]
+      .filter((value): value is string => typeof value === 'string' && Boolean(value.trim()))
+      .map((value) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim());
+    const phrase = Math.max(0, ...labels.filter((label) => label.length >= 4 && normalizedGoal.includes(label)).map((label) => label.length));
+    const haystack = labels.join(' ');
+    return { program, score: phrase * 100 + words.filter((word) => haystack.includes(word)).length };
+  }).filter((entry) => entry.score > 0).sort((a, b) => b.score - a.score);
+  if (!ranked.length || (ranked[1] && ranked[1].score === ranked[0].score)) return null;
+  return ranked[0].program;
+}
+
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
@@ -112,46 +131,41 @@ export async function POST(req: NextRequest) {
       .eq('status', 'waiting_review');
     if (taskError) throw taskError;
 
-    for (const task of waitingTasks ?? []) {
-      if (task.worker !== 'compliance-qa') continue;
-      const { error } = await db
-        .from('agentic_build_tasks')
-        .update({
-          status: 'completed',
-          output: {
-            procurement: health.metrics,
-            blocking_issues: [],
-            automated_checklist_verified: true,
-          },
-          error: null,
-          completed_at: new Date().toISOString(),
-        })
-        .eq('id', task.id)
-        .eq('run_id', run.id);
-      if (error) throw error;
+    const pendingHumanReviews = (waitingTasks ?? []).filter(
+      (task) => task.worker === 'compliance-qa',
+    );
+    if (pendingHumanReviews.length > 0) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Qualified human compliance review is still required.',
+          pending_review_task_ids: pendingHumanReviews.map((task) => task.id),
+          procurement: health.metrics,
+        },
+        { status: 409 },
+      );
     }
 
     await updateAgenticProjectMetadata({
       project,
       metadata: {
-        publication_approved: true,
-        publication_approved_by: 'course-builder-ai',
-        publication_approved_at: new Date().toISOString(),
-        publication_approval_basis: 'all_required_acceptance_checks_passed',
+        publication_ready: true,
+        publication_ready_at: new Date().toISOString(),
+        publication_approved: false,
+        publication_readiness_basis: 'automated_checks_passed_and_review_tasks_completed',
       },
-      status: 'active',
+      status: 'waiting_review',
     });
 
     await db.from('agentic_build_events').insert({
       project_id: project.id,
       run_id: run.id,
-      event_type: 'agentic.course.publication_approved',
-      summary: 'Course Builder AI verified every required checklist; agentic publication may resume.',
+      event_type: 'agentic.course.publication_ready',
+      summary: 'Automated checks passed; explicit qualified-human publication approval is still required.',
       payload: {
         course_id: project.target_id,
         actor_id: auth.id,
-        approver: 'course-builder-ai',
-        approval_basis: 'all_required_acceptance_checks_passed',
+        approval_required: true,
         procurement: health.metrics,
       },
     });
@@ -162,7 +176,8 @@ export async function POST(req: NextRequest) {
       runId: run.id,
       courseId: project.target_id,
       procurement: health.metrics,
-      publicationApproved: true,
+      readyForHumanApproval: true,
+      publicationApproved: false,
     });
   }
 
@@ -195,6 +210,13 @@ export async function POST(req: NextRequest) {
       courseId = text(selectedCourse.id);
       programId = text(selectedCourse.program_id);
       programSlug = text(selectedCourse.slug);
+    }
+  }
+  if (!programId && !programSlug && !courseId) {
+    const selectedProgram = await resolveCanonicalProgramFromGoal(goal);
+    if (selectedProgram) {
+      programId = text(selectedProgram.id);
+      programSlug = text(selectedProgram.slug);
     }
   }
   if (!programId && !programSlug && !/#\d{6,}/.test(goal) && !courseId) {

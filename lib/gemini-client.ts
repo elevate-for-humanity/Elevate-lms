@@ -8,8 +8,14 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { extractJSON } from '@/lib/extract-json';
+import { requirePaidInferenceContext } from '@/lib/ai/paid-inference-context';
 
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-flash'];
+const GEMINI_MODELS = [
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
+  'gemini-1.5-flash',
+];
 
 let _client: GoogleGenerativeAI | null = null;
 
@@ -31,6 +37,7 @@ export function isGeminiConfigured(): boolean {
  * Uses gemini-1.5-flash — fast, free, reliable JSON output.
  */
 export async function geminiJSON<T = unknown>(prompt: string): Promise<T> {
+  requirePaidInferenceContext('gemini');
   const genAI = getGeminiClient();
   let lastError: unknown = null;
 

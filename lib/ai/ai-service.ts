@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { requirePaidInferenceContext } from './paid-inference-context';
 import { withResilience, breakers, CircuitBreaker, CircuitOpenError } from '@/lib/resilience';
 import type {
   AIProvider,
@@ -47,7 +48,16 @@ const imageProviders: Record<string, () => AIImageProvider> = {
 // first AI_PROVIDER_ORDER entry remains a migration-compatible way to select
 // that same single authority. Course generation must repair a failed provider,
 // never produce divergent artifacts through a silent provider substitution.
-const PROVIDER_DISCOVERY_ORDER = ['elevate', 'cloudflare', 'groq', 'gemini', 'google', 'anthropic', 'azure', 'openai'];
+const PROVIDER_DISCOVERY_ORDER = [
+  'elevate',
+  'cloudflare',
+  'groq',
+  'gemini',
+  'google',
+  'anthropic',
+  'azure',
+  'openai',
+];
 let discoveredProviderName: string | null = null;
 
 function configuredProviderName(): string {
@@ -161,6 +171,7 @@ function resolveImageProvider(): AIImageProvider {
 }
 
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
+  requirePaidInferenceContext('ai-chat');
   let provider = resolveConfiguredChatProvider(options);
   const allowCircuitRecoveryWait = process.env.AI_CIRCUIT_RECOVERY_WAIT === '1';
   const passes = allowCircuitRecoveryWait ? 2 : 1;

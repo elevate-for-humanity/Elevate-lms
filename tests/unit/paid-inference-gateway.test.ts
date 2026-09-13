@@ -1,9 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
-import { approvePaidInference, executePaidInference, paidArtifactFingerprint } from '@/lib/ai/paid-inference-gateway';
+import {
+  approvePaidInference,
+  executePaidInference,
+  paidArtifactFingerprint,
+} from '@/lib/ai/paid-inference-gateway';
+import { requirePaidInferenceContext } from '@/lib/ai/paid-inference-context';
 
 function lifecycleDb() {
   const rpc = vi.fn(async (name: string) => ({
-    data: name === 'claim_paid_inference_dispatch_v1' || name === 'finish_paid_inference_v1',
+    data:
+      name === 'approve_paid_inference_v1' ||
+      name === 'claim_paid_inference_dispatch_v1' ||
+      name === 'finish_paid_inference_v1',
     error: null,
   }));
   return { db: { rpc }, rpc };
@@ -11,16 +19,12 @@ function lifecycleDb() {
 
 describe('paid inference gateway', () => {
   it('canonicalizes nested fingerprints without collapsing distinct prompts', () => {
-    expect(
-      paidArtifactFingerprint({ request: { script: 'same', voice: { id: 'one' } } }),
-    ).toBe(
+    expect(paidArtifactFingerprint({ request: { script: 'same', voice: { id: 'one' } } })).toBe(
       paidArtifactFingerprint({ request: { voice: { id: 'one' }, script: 'same' } }),
     );
     expect(
       paidArtifactFingerprint({ request: { script: 'first', voice: { id: 'one' } } }),
-    ).not.toBe(
-      paidArtifactFingerprint({ request: { script: 'second', voice: { id: 'one' } } }),
-    );
+    ).not.toBe(paidArtifactFingerprint({ request: { script: 'second', voice: { id: 'one' } } }));
   });
 
   it.each(['cache_hit', 'duplicate', 'paused', 'budget_exceeded', 'approval_required'] as const)(
@@ -43,20 +47,26 @@ describe('paid inference gateway', () => {
   );
 
   it('records dispatch and completion around one approved provider call', async () => {
-    const dispatch = vi.fn(async () => 'ok');
+    const dispatch = vi.fn(async () => requirePaidInferenceContext('test-provider'));
     const { db, rpc } = lifecycleDb();
     const result = await executePaidInference({
       db: db as never,
       authorize: async () => ({ decision: 'approved', requestId: 'request-1' }),
       dispatch,
     });
-    expect(result.value).toBe('ok');
+    expect(result.value).toBe('request-1');
     expect(result.requestId).toBe('request-1');
     expect(dispatch).toHaveBeenCalledTimes(1);
     expect(dispatch).toHaveBeenCalledWith('request-1');
     expect(rpc).toHaveBeenCalledTimes(2);
     expect(rpc.mock.calls[0]?.[0]).toBe('claim_paid_inference_dispatch_v1');
     expect(rpc.mock.calls[1]?.[0]).toBe('finish_paid_inference_v1');
+  });
+
+  it('fails closed when a provider is called outside an approved request', () => {
+    expect(() => requirePaidInferenceContext('test-provider')).toThrow(
+      'PAID_INFERENCE_AUTHORIZATION_REQUIRED:test-provider',
+    );
   });
 
   it('records a terminal failure when provider dispatch throws', async () => {

@@ -5,12 +5,24 @@ import { logger } from '@/lib/logger';
 import { recordPlatformUsage } from '@/lib/platform/usage-metering';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
+  executePaidInference,
+  paidArtifactFingerprint,
+  reservePaidInference,
+} from '@/lib/ai/paid-inference-gateway';
+import {
   deleteGpuVideoAsset,
   downloadGpuVideoAsset,
   generateGpuVideo,
   gpuVideoAvailable,
 } from './gpu-video-client';
-import { heartbeatJob, markCandidate, markComplete, markFailed, type VideoJob } from './job-queue';
+import {
+  heartbeatJob,
+  markAwaitingPaidApproval,
+  markCandidate,
+  markComplete,
+  markFailed,
+  type VideoJob,
+} from './job-queue';
 import { enforceMediaQuality } from './media-quality-gate';
 import { enforceInstructionalQuality } from './instructional-quality-gate';
 import { repairInstructionalScript } from './instructional-script-repair';
@@ -198,7 +210,7 @@ function persistedInstructionalScript(input: {
 /** Render one already-claimed canonical video job. GPU generation is an optional
  * rendering mechanic for microclips; Remotion is the common fallback. Both
  * report terminal state through the same video_jobs identity. */
-export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
+async function runClaimedVideoJob(job: VideoJob): Promise<void> {
   // Start lease renewal before secret hydration, scene generation, and quality
   // planning. Those pre-render stages can call external providers and must not
   // leave an actively-owned job looking stale.
@@ -619,7 +631,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         provider: REMOTION_PROVIDER,
         provider_model: REMOTION_MODEL,
       });
-      return;
+      throw new Error(result.error ?? 'Render returned no playable video URL');
     }
     const completedStoryboard = {
       ...(result.sceneData ?? storyboard),
@@ -644,20 +656,21 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       expectedScript: script,
       instructionalQuality,
     });
-    const sourceContract = persistedSceneData.source_contract && typeof persistedSceneData.source_contract === 'object'
-      ? persistedSceneData.source_contract as Record<string, unknown>
-      : {};
-    const expectedFingerprint = typeof sourceContract.fingerprint === 'string'
-      ? sourceContract.fingerprint
-      : '';
+    const sourceContract =
+      persistedSceneData.source_contract && typeof persistedSceneData.source_contract === 'object'
+        ? (persistedSceneData.source_contract as Record<string, unknown>)
+        : {};
+    const expectedFingerprint =
+      typeof sourceContract.fingerprint === 'string' ? sourceContract.fingerprint : '';
     const { data: currentLessonSource, error: currentLessonSourceError } = await db
       .from('course_lessons')
       .select('video_config')
       .eq('id', job.lesson_id)
       .maybeSingle();
-    const currentVideoConfig = currentLessonSource?.video_config && typeof currentLessonSource.video_config === 'object'
-      ? currentLessonSource.video_config as Record<string, unknown>
-      : {};
+    const currentVideoConfig =
+      currentLessonSource?.video_config && typeof currentLessonSource.video_config === 'object'
+        ? (currentLessonSource.video_config as Record<string, unknown>)
+        : {};
     if (
       currentLessonSourceError ||
       !expectedFingerprint ||
@@ -680,7 +693,85 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     const message = error instanceof Error ? error.message : String(error);
     logger.error('[video-worker] Render failed', error, { jobId: job.id });
     await markFailed(job.id, message, { provider: 'video-worker' });
+    throw error;
   } finally {
     if (heartbeatTimer) clearInterval(heartbeatTimer);
+  }
+}
+
+export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
+  const db = createAdminClient();
+  try {
+    const { data: course } = await db
+      .from('courses')
+      .select('org_id')
+      .eq('id', job.course_id)
+      .maybeSingle();
+    let tenantId: string | null = null;
+    if (course?.org_id) {
+      const { data: organization } = await db
+        .from('organizations')
+        .select('tenant_id')
+        .eq('id', course.org_id)
+        .maybeSingle();
+      tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
+    }
+    const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
+    const fingerprint = paidArtifactFingerprint({
+      operation: 'lesson-video',
+      courseId: job.course_id,
+      lessonId: job.lesson_id,
+      assetKind: job.asset_kind,
+      assetKey: job.asset_key,
+      script: job.script,
+      bulletPoints: job.bullet_points,
+      sceneData: job.scene_data,
+    });
+    const estimatedScenes = Math.max(
+      1,
+      job.scene_count ??
+        (job.scene_data &&
+        typeof job.scene_data === 'object' &&
+        Array.isArray((job.scene_data as Record<string, unknown>).scenes)
+          ? ((job.scene_data as Record<string, unknown>).scenes as unknown[]).length
+          : Math.ceil((job.script?.split(/\s+/).filter(Boolean).length ?? 1) / 45)),
+    );
+    const projectedCostMicros = Math.max(
+      0,
+      Number(
+        process.env.LESSON_VIDEO_PROJECTED_COST_MICROS ??
+          String(Math.max(500_000, estimatedScenes * 150_000)),
+      ),
+    );
+    const authorization = await reservePaidInference(db, {
+      scopeKey,
+      tenantId,
+      courseId: job.course_id,
+      lessonId: job.lesson_id,
+      jobId: job.id,
+      artifactFingerprint: fingerprint,
+      idempotencyKey: `lesson-video:${job.id}:${fingerprint}`,
+      provider: 'media-pipeline',
+      model: process.env.GPU_VIDEO_PROVIDER?.trim() || REMOTION_MODEL,
+      operation: 'lesson-video',
+      projectedCostMicros,
+    });
+    if (authorization.decision !== 'approved' || !authorization.requestId) {
+      if (authorization.decision === 'approval_required') {
+        await markAwaitingPaidApproval(job);
+        return;
+      }
+      await markFailed(job.id, `Paid media authorization blocked: ${authorization.decision}`, {
+        provider: 'paid-inference-gateway',
+      });
+      return;
+    }
+    await executePaidInference({
+      db,
+      authorize: async () => authorization,
+      dispatch: () => runClaimedVideoJob(job),
+    });
+  } catch (error) {
+    logger.error('[video-worker] Paid media orchestration failed', error, { jobId: job.id });
   }
 }

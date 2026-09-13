@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { getSecret } from '@/lib/secrets';
+import { requirePaidInferenceContext } from '@/lib/ai/paid-inference-context';
 import type { MediaOperation } from './media-director';
 
 export type GpuVideoProvider = 'wan' | 'ltx';
@@ -38,7 +39,8 @@ async function config(): Promise<GpuConfig | null> {
   ).replace(/\/$/, '');
   const secret = process.env.GPU_WORKER_SECRET || (await getSecret('GPU_WORKER_SECRET')) || '';
   if (!baseUrl || !secret) return null;
-  if (!/^https?:\/\//i.test(baseUrl)) throw new Error('GPU_VIDEO_WORKER_URL must be an http(s) URL');
+  if (!/^https?:\/\//i.test(baseUrl))
+    throw new Error('GPU_VIDEO_WORKER_URL must be an http(s) URL');
   return { baseUrl, secret };
 }
 
@@ -47,7 +49,8 @@ function authorizedHeaders(cfg: GpuConfig): Record<string, string> {
 }
 
 function assetUrl(cfg: GpuConfig, result: GpuVideoResult): string {
-  if (!result.assetPath.startsWith('/v1/video/')) throw new Error('GPU worker returned an invalid asset path');
+  if (!result.assetPath.startsWith('/v1/video/'))
+    throw new Error('GPU worker returned an invalid asset path');
   return `${cfg.baseUrl}${result.assetPath}`;
 }
 
@@ -69,6 +72,7 @@ export async function gpuVideoAvailable(): Promise<boolean> {
 }
 
 export async function generateGpuVideo(input: GpuVideoRequest): Promise<GpuVideoResult | null> {
+  requirePaidInferenceContext('gpu-video');
   const cfg = await config();
   if (!cfg) return null;
   const response = await fetch(`${cfg.baseUrl}/v1/video/generate`, {
@@ -77,7 +81,9 @@ export async function generateGpuVideo(input: GpuVideoRequest): Promise<GpuVideo
     body: JSON.stringify({
       prompt: input.prompt,
       provider: input.provider || (process.env.GPU_VIDEO_PROVIDER as GpuVideoProvider) || 'wan',
-      operation: input.operation || (input.sourceVideoUrl ? 'videoToVideo' : input.imageUrl ? 'imageToVideo' : 'textToVideo'),
+      operation:
+        input.operation ||
+        (input.sourceVideoUrl ? 'videoToVideo' : input.imageUrl ? 'imageToVideo' : 'textToVideo'),
       width: input.width ?? 1280,
       height: input.height ?? 704,
       duration_seconds: input.durationSeconds ?? 5,
@@ -90,10 +96,13 @@ export async function generateGpuVideo(input: GpuVideoRequest): Promise<GpuVideo
     signal: AbortSignal.timeout(Number(process.env.GPU_VIDEO_REQUEST_TIMEOUT_MS || 1_800_000)),
   });
   if (!response.ok) {
-    throw new Error(`GPU video worker returned ${response.status}: ${(await response.text()).slice(0, 500)}`);
+    throw new Error(
+      `GPU video worker returned ${response.status}: ${(await response.text()).slice(0, 500)}`,
+    );
   }
   const result = (await response.json()) as GpuVideoResult;
-  if (!result.ok || !result.jobId || !result.assetPath) throw new Error('GPU worker returned an incomplete generation result');
+  if (!result.ok || !result.jobId || !result.assetPath)
+    throw new Error('GPU worker returned an incomplete generation result');
   return result;
 }
 
@@ -113,7 +122,8 @@ export async function downloadGpuVideoAsset(result: GpuVideoResult): Promise<Buf
   const bytes = Buffer.from(await response.arrayBuffer());
   const maxBytes = Number(process.env.GPU_VIDEO_MAX_BYTES || 150 * 1024 * 1024);
   if (!bytes.length) throw new Error('GPU asset download was empty');
-  if (bytes.length > maxBytes) throw new Error(`GPU asset exceeded maximum size (${bytes.length} > ${maxBytes})`);
+  if (bytes.length > maxBytes)
+    throw new Error(`GPU asset exceeded maximum size (${bytes.length} > ${maxBytes})`);
   return bytes;
 }
 

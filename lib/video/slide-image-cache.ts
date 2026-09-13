@@ -11,6 +11,7 @@ import os from 'os';
 import path from 'path';
 import { pipeline } from 'stream/promises';
 import { lessonMediaPublicUrl, uploadCourseVideosObject } from './upload-lesson-media';
+import { requirePaidInferenceContext } from '@/lib/ai/paid-inference-context';
 
 function slideCacheStoragePath(cacheKey: string): string {
   return `slide-cache/${cacheKey}.jpg`;
@@ -82,6 +83,7 @@ async function fetchSlideImageBytes(prompt: string): Promise<Buffer | null> {
 
   const openaiKey = process.env.OPENAI_API_KEY;
   if (openaiKey) {
+    requirePaidInferenceContext('slide-image');
     try {
       const res = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',

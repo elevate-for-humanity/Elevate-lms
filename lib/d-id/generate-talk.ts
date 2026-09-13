@@ -13,6 +13,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { requirePaidInferenceContext } from '@/lib/ai/paid-inference-context';
 
 const DID_API_BASE = 'https://api.d-id.com';
 
@@ -53,6 +54,7 @@ const ALLOWED_AUDIO_EXTENSIONS = ['.mp3', '.wav', '.m4a', '.ogg', '.aac', '.flac
  * Rejects video URLs — D-ID Talks requires an audio track, not a video file.
  */
 export async function createTalk(params: CreateTalkParams): Promise<TalkResponse> {
+  requirePaidInferenceContext('avatar-video');
   const audioPath = new URL(params.audioUrl).pathname.toLowerCase();
   const hasValidExt = ALLOWED_AUDIO_EXTENSIONS.some((ext) => audioPath.endsWith(ext));
   if (!hasValidExt) {

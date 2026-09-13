@@ -7,6 +7,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { extractJSON } from '@/lib/extract-json';
+import { requirePaidInferenceContext } from './paid-inference-context';
 
 let _client: Anthropic | null = null;
 
@@ -28,6 +29,7 @@ export function isAnthropicConfigured(): boolean {
  * Uses claude-3-5-haiku for speed and cost efficiency.
  */
 export async function anthropicJSON<T = unknown>(prompt: string): Promise<T> {
+  requirePaidInferenceContext('anthropic');
   const client = getAnthropicClient();
 
   const message = await client.messages.create({

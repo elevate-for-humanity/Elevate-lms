@@ -67,10 +67,12 @@ export function classifyVideoFailure(message: string): VideoFailureClass {
   if (/unauthorized|forbidden|invalid api key|401|403/.test(text)) return 'authorization';
   if (/not configured|missing .*key|missing .*url|configuration/.test(text)) return 'configuration';
   if (/lesson not found|course not found|not found/.test(text)) return 'not_found';
-  if (/quality|frozen|black frame|visual change|narration coverage|caption/.test(text)) return 'quality';
+  if (/quality|frozen|black frame|visual change|narration coverage|caption/.test(text))
+    return 'quality';
   if (/storyboard|script|scene|content/.test(text)) return 'content';
   if (/render|ffmpeg|remotion|chromium|gpu|cuda|codec/.test(text)) return 'renderer';
-  if (/timeout|timed out|rate limit|429|502|503|504|network|connection|econn/.test(text)) return 'transient';
+  if (/timeout|timed out|rate limit|429|502|503|504|network|connection|econn/.test(text))
+    return 'transient';
   return 'unknown';
 }
 
@@ -83,6 +85,32 @@ export async function heartbeatJob(job: Pick<VideoJob, 'id' | 'lease_token'>): P
   });
   if (error) throw error;
   return data === true;
+}
+
+export async function markAwaitingPaidApproval(
+  job: Pick<VideoJob, 'id' | 'lesson_id'>,
+): Promise<void> {
+  const supabase = db();
+  const now = new Date().toISOString();
+  const message = 'Awaiting explicit paid inference approval';
+  const { error } = await supabase
+    .from('video_jobs')
+    .update({
+      status: 'draft',
+      started_at: null,
+      lease_token: null,
+      lease_expires_at: null,
+      heartbeat_at: null,
+      error_message: message,
+      updated_at: now,
+    })
+    .eq('id', job.id)
+    .eq('status', 'rendering');
+  if (error) throw error;
+  await supabase
+    .from('course_lessons')
+    .update({ video_status: 'draft', video_error: message, updated_at: now })
+    .eq('id', job.lesson_id);
 }
 
 export interface CreateJobInput {
@@ -117,10 +145,7 @@ async function findCanonicalJob(
   return data as VideoJob | null;
 }
 
-async function syncLessonJobLink(
-  supabase: ReturnType<typeof db>,
-  job: VideoJob,
-): Promise<void> {
+async function syncLessonJobLink(supabase: ReturnType<typeof db>, job: VideoJob): Promise<void> {
   if (job.asset_kind !== 'lesson') return;
   await supabase
     .from('course_lessons')
@@ -255,9 +280,10 @@ async function updateMicroclipExperience(
         ? (lesson.content as Record<string, any>)
         : {};
   const contentJson = structuredClone(source);
-  const experience = contentJson.experience && typeof contentJson.experience === 'object'
-    ? contentJson.experience as Record<string, any>
-    : {};
+  const experience =
+    contentJson.experience && typeof contentJson.experience === 'object'
+      ? (contentJson.experience as Record<string, any>)
+      : {};
   const clips = Array.isArray(experience.quickClips) ? experience.quickClips : [];
   experience.quickClips = clips.map((clip: Record<string, any>) =>
     String(clip.id) === assetKey ? { ...clip, ...patch } : clip,
@@ -276,16 +302,24 @@ export async function markRendering(jobId: string): Promise<void> {
   const now = new Date().toISOString();
   const { data: job } = await supabase
     .from('video_jobs')
-    .update({ status: 'rendering', started_at: now, completed_at: null, error_message: null, updated_at: now })
+    .update({
+      status: 'rendering',
+      started_at: now,
+      completed_at: null,
+      error_message: null,
+      updated_at: now,
+    })
     .eq('id', jobId)
     .select('lesson_id, asset_kind, asset_key')
     .single();
 
   if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
-    await updateMicroclipExperience(job.lesson_id, job.asset_key, { status: 'rendering', error: null });
+    await updateMicroclipExperience(job.lesson_id, job.asset_key, {
+      status: 'rendering',
+      error: null,
+    });
   }
 }
-
 
 export async function markCandidate(
   jobId: string,
@@ -376,8 +410,15 @@ export async function markComplete(
     .single();
 
   if (job?.lesson_id && job.asset_kind === 'lesson') {
-    const { data: lesson } = await supabase.from('course_lessons').select('video_url').eq('id', job.lesson_id).maybeSingle();
-    await supabase.from('video_jobs').update({ previous_video_url: lesson?.video_url ?? null }).eq('id', jobId);
+    const { data: lesson } = await supabase
+      .from('course_lessons')
+      .select('video_url')
+      .eq('id', job.lesson_id)
+      .maybeSingle();
+    await supabase
+      .from('video_jobs')
+      .update({ previous_video_url: lesson?.video_url ?? null })
+      .eq('id', jobId);
     const candidateVersion = {
       course_id: job.course_id,
       lesson_id: job.lesson_id,
@@ -388,39 +429,50 @@ export async function markComplete(
       quality_evidence: result.quality_evidence ?? {},
       procedure_schema: result.scene_data ?? {},
       transcript: job.script ?? null,
-      caption_url: result.scene_data && typeof result.scene_data === 'object'
-        ? (result.scene_data as Record<string, unknown>).captionUrl ?? null
-        : null,
-      transcript_url: result.scene_data && typeof result.scene_data === 'object'
-        ? (result.scene_data as Record<string, unknown>).transcriptUrl ?? null
-        : null,
+      caption_url:
+        result.scene_data && typeof result.scene_data === 'object'
+          ? ((result.scene_data as Record<string, unknown>).captionUrl ?? null)
+          : null,
+      transcript_url:
+        result.scene_data && typeof result.scene_data === 'object'
+          ? ((result.scene_data as Record<string, unknown>).transcriptUrl ?? null)
+          : null,
       // lesson_video_versions uses active as the promoted learner-facing state.
       status: 'active',
       approved_at: now,
     };
     const { data: existingVersion } = await supabase
-      .from('lesson_video_versions').select('id').eq('video_job_id', jobId).maybeSingle();
+      .from('lesson_video_versions')
+      .select('id')
+      .eq('video_job_id', jobId)
+      .maybeSingle();
     const versionResult = existingVersion?.id
-      ? await supabase.from('lesson_video_versions').update(candidateVersion).eq('id', existingVersion.id)
+      ? await supabase
+          .from('lesson_video_versions')
+          .update(candidateVersion)
+          .eq('id', existingVersion.id)
       : await supabase.from('lesson_video_versions').insert(candidateVersion);
     if (versionResult.error) throw versionResult.error;
-    const { error: lessonPromotionError } = await supabase.from('course_lessons').update({
-      video_url: result.video_url,
-      video_status: 'complete',
-      video_error: null,
-      video_generated_at: now,
-      media_origin: 'generated',
-      media_quality_status: 'approved',
-      media_quality_evidence: result.quality_evidence ?? {},
-      media_verified_at: now,
-      // This is the only transition that completes a unified lesson build.
-      // The video has already passed narration, visual, caption, and media
-      // quality gates and still matches the locked source fingerprint.
-      generation_status: 'generated',
-      scene_data: result.scene_data ?? null,
-      duration_seconds: result.duration_seconds ?? null,
-      updated_at: now,
-    }).eq('id', job.lesson_id);
+    const { error: lessonPromotionError } = await supabase
+      .from('course_lessons')
+      .update({
+        video_url: result.video_url,
+        video_status: 'complete',
+        video_error: null,
+        video_generated_at: now,
+        media_origin: 'generated',
+        media_quality_status: 'approved',
+        media_quality_evidence: result.quality_evidence ?? {},
+        media_verified_at: now,
+        // This is the only transition that completes a unified lesson build.
+        // The video has already passed narration, visual, caption, and media
+        // quality gates and still matches the locked source fingerprint.
+        generation_status: 'generated',
+        scene_data: result.scene_data ?? null,
+        duration_seconds: result.duration_seconds ?? null,
+        updated_at: now,
+      })
+      .eq('id', job.lesson_id);
     if (lessonPromotionError) throw lessonPromotionError;
   } else if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, {
@@ -455,7 +507,7 @@ export async function markFailed(
     ['configuration', 'authorization', 'not_found', 'content'].includes(failureClass);
   const nextRetryAt = terminalFailure
     ? null
-    : new Date(Date.now() + Math.min(60_000 * (2 ** retryCount), 15 * 60_000)).toISOString();
+    : new Date(Date.now() + Math.min(60_000 * 2 ** retryCount, 15 * 60_000)).toISOString();
   const { data: job } = await supabase
     .from('video_jobs')
     .update({
@@ -478,7 +530,10 @@ export async function markFailed(
     .single();
 
   if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
-    await updateMicroclipExperience(job.lesson_id, job.asset_key, { status: 'failed', error: errorMessage });
+    await updateMicroclipExperience(job.lesson_id, job.asset_key, {
+      status: 'failed',
+      error: errorMessage,
+    });
   }
 
   logger.error('[VideoJob] Failed: ' + jobId + ' — ' + errorMessage);

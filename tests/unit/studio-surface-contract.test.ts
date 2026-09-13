@@ -207,9 +207,10 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(source('apps/admin/app/studio/tasks/TasksClient.tsx')).toContain(
       'window.setInterval',
     );
-    expect(source('apps/admin/app/studio/tasks/page.tsx')).toContain(
-      "redirect('/studio?workspace=tasks')",
-    );
+    const tasksPage = source('apps/admin/app/studio/tasks/page.tsx');
+    expect(tasksPage).toContain('StudioCommandWorkspace');
+    expect(tasksPage).toContain('initialWorkspace="tasks"');
+    expect(tasksPage).not.toContain('redirect(');
     expect(workspace).toContain('onConversationChange={setActiveConversationId}');
   });
 

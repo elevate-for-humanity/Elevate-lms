@@ -2,12 +2,26 @@ name: Daily Content Generation
 
 on:
   workflow_dispatch:
+    inputs:
+      approve_paid_generation:
+        description: 'I approve one paid content-generation run'
+        required: true
+        type: boolean
+        default: false
   schedule:
     - cron: '17 9 * * *'
 
+concurrency:
+  group: paid-daily-content-generation
+  cancel-in-progress: false
+
 jobs:
   generate:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.approve_paid_generation == true) ||
+      (github.event_name == 'schedule' && vars.PAID_CONTENT_GENERATION_ENABLED == 'true')
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -17,17 +31,16 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --no-frozen-lockfile
-      - name: Run available content generation checks
+      - run: pnpm install --frozen-lockfile
+      - name: Run one authorized content generation operation
         run: |
           if [ -f scripts/generate-daily-blog.mjs ]; then
             node scripts/generate-daily-blog.mjs
           elif [ -f scripts/generate-daily-content.mjs ]; then
             node scripts/generate-daily-content.mjs
-          elif [ -f scripts/activate-all-autopilots.sh ]; then
-            bash scripts/activate-all-autopilots.sh --content-only || true
           else
-            echo "No content generation script is currently present; workflow remains as the documented scheduler hook."
+            echo "::error::No governed content generation entrypoint is present."
+            exit 1
           fi
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

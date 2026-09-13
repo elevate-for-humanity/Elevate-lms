@@ -14,6 +14,13 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import {
+  executePaidInference,
+  paidArtifactFingerprint,
+  reservePaidInference,
+} from '@/lib/ai/paid-inference-gateway';
+import { aiChat } from '@/lib/ai/ai-service';
 
 // ── Request shape ─────────────────────────────────────────────────────────────
 
@@ -27,6 +34,7 @@ interface GenerateCourseRequest {
   includeFinalExam?: boolean; // default true
   complianceTopics?: string[]; // injected into prompt
   programSlug?: string; // programs.slug to link to
+  dryRun?: boolean;
 }
 
 // ── System prompt ─────────────────────────────────────────────────────────────
@@ -213,44 +221,88 @@ export async function POST(request: NextRequest) {
     return safeError('courseName is required', 400);
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return safeError('OPENAI_API_KEY not configured', 503);
-  }
-
   logger.info('[generate-course] Starting generation', {
     courseName: body.courseName,
     userId: auth.id,
   });
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1',
-        temperature: 0.3, // low temp = consistent structure
-        max_tokens: 16000,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: buildSystemPrompt() },
-          { role: 'user', content: buildUserPrompt(body) },
-        ],
-      }),
+    const db = await requireAdminClient();
+    const { data: profile, error: profileError } = await db
+      .from('profiles')
+      .select('tenant_id')
+      .eq('id', auth.id)
+      .maybeSingle();
+    if (profileError) throw profileError;
+    const tenantId =
+      typeof profile?.tenant_id === 'string' && profile.tenant_id ? profile.tenant_id : null;
+    const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
+    const systemPrompt = buildSystemPrompt();
+    const userPrompt = buildUserPrompt(body);
+    const model = process.env.COURSE_BLUEPRINT_MODEL?.trim() || 'gpt-4.1';
+    const projectedCostMicros = Math.max(
+      0,
+      Number(process.env.COURSE_BLUEPRINT_MAX_COST_MICROS ?? '4000000'),
+    );
+    const artifactFingerprint = paidArtifactFingerprint({
+      operation: 'course-blueprint',
+      model,
+      systemPrompt,
+      userPrompt,
     });
 
-    if (!response.ok) {
-      const err = await response.text();
-      logger.error('[generate-course] OpenAI error', undefined, { status: response.status, err });
-      return safeError('AI generation failed', 502);
+    if (body.dryRun === true) {
+      return NextResponse.json({
+        dryRun: true,
+        provider: process.env.AI_PROVIDER?.trim() || 'configured',
+        model,
+        moduleCount: body.moduleCount ?? 6,
+        lessonsPerModule: body.lessonsPerModule ?? 5,
+        artifactFingerprint,
+        projectedCostMicros,
+        approvalRequired: true,
+      });
     }
 
-    const data = await response.json();
-    const raw = data.choices?.[0]?.message?.content;
+    const paidResult = await executePaidInference({
+      db,
+      authorize: () =>
+        reservePaidInference(db, {
+          scopeKey,
+          tenantId,
+          actorId: auth.id,
+          artifactFingerprint,
+          idempotencyKey: `course-blueprint:${artifactFingerprint}`,
+          provider: process.env.AI_PROVIDER?.trim() || 'configured',
+          model,
+          operation: 'course-blueprint',
+          projectedCostMicros,
+        }),
+      dispatch: () =>
+        aiChat({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature: 0.3,
+          maxTokens: 16000,
+        }),
+    });
+    if (paidResult.decision !== 'approved' || !paidResult.value) {
+      return NextResponse.json(
+        {
+          error: 'Paid course blueprint generation is not authorized.',
+          decision: paidResult.decision,
+          requestId: paidResult.requestId ?? null,
+          projectedCostMicros,
+        },
+        { status: paidResult.decision === 'budget_exceeded' ? 402 : 409 },
+      );
+    }
 
+    const data = paidResult.value;
+    const raw = data.content;
     if (!raw) {
       return safeError('Empty response from AI', 502);
     }
@@ -259,7 +311,9 @@ export async function POST(request: NextRequest) {
     try {
       blueprint = JSON.parse(raw);
     } catch {
-      logger.error('[generate-course] Failed to parse AI JSON', undefined, { raw: raw.slice(0, 500) });
+      logger.error('[generate-course] Failed to parse AI JSON', undefined, {
+        raw: raw.slice(0, 500),
+      });
       return safeError('AI returned invalid JSON', 502);
     }
 
@@ -283,8 +337,8 @@ export async function POST(request: NextRequest) {
       meta: {
         courseName: body.courseName,
         generatedAt: new Date().toISOString(),
-        model: 'gpt-4.1',
-        tokensUsed: data.usage?.total_tokens ?? null,
+        model,
+        tokensUsed: data.usage?.totalTokens ?? null,
         nextStep: `Save as lib/curriculum/blueprints/${blueprint.id}.ts then run: pnpm tsx scripts/seed-course-from-blueprint.ts --blueprint ${blueprint.id}`,
       },
     });

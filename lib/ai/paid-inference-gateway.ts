@@ -180,7 +180,10 @@ export async function executePaidInference<T>(input: {
 }): Promise<{ decision: PaidInferenceDecision; requestId?: string; value?: T }> {
   const authorization = await input.authorize();
   if (authorization.decision !== 'approved' || !authorization.requestId) {
-    return { decision: authorization.decision };
+    return {
+      decision: authorization.decision,
+      requestId: authorization.requestId ?? undefined,
+    };
   }
 
   const requestId = authorization.requestId;
@@ -199,8 +202,8 @@ export async function executePaidInference<T>(input: {
       uncertain ? 'uncertain' : 'failed',
       Date.now() - startedAt,
       {
-      errorCategory: uncertain ? 'reconciliation_required' : 'provider',
-      errorMessage: message,
+        errorCategory: uncertain ? 'reconciliation_required' : 'provider',
+        errorMessage: message,
       },
     ).catch(() => undefined);
     throw new Error(

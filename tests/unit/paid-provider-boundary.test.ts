@@ -15,7 +15,9 @@ describe('paid provider boundary', () => {
   it.each(providerSdkModules)('%s fails closed outside the paid inference gateway', (file) => {
     const source = readFileSync(file, 'utf8');
     expect(source).toContain('requirePaidInferenceContext');
-    expect(source).toMatch(/requirePaidInferenceContext\(['"](?:openai|groq|anthropic|gemini)['"]\)/);
+    expect(source).toMatch(
+      /requirePaidInferenceContext\(['"](?:openai|groq|anthropic|gemini)['"]\)/,
+    );
   });
 
   it('keeps every Course Builder generation and media dispatch inside the gateway', () => {
@@ -24,8 +26,12 @@ describe('paid provider boundary', () => {
       'apps/admin/app/api/admin/courses/generate/route.ts',
       'utf8',
     );
+    const blueprintGeneration = readFileSync(
+      'apps/admin/app/api/admin/generate-course/route.ts',
+      'utf8',
+    );
     const media = readFileSync('lib/video/process-video-job.ts', 'utf8');
-    for (const source of [generation, canonicalGeneration, media]) {
+    for (const source of [generation, canonicalGeneration, blueprintGeneration, media]) {
       expect(source).toContain('reservePaidInference');
       expect(source).toContain('executePaidInference');
     }

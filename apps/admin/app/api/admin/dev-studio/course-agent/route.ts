@@ -154,7 +154,8 @@ export async function POST(req: NextRequest) {
         publication_approved: false,
         publication_readiness_basis: 'automated_checks_passed_and_review_tasks_completed',
       },
-      status: 'waiting_review',
+      status: 'active',
+      lifecycleStatus: 'awaiting_approval',
     });
 
     await db.from('agentic_build_events').insert({

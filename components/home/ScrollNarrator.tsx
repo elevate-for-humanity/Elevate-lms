@@ -74,7 +74,7 @@ export function ScrollNarrator() {
       voice: 'coral',
       style: 'assistant',
       rate: 0.98,
-      allowBrowserFallback: false,
+      allowBrowserFallback: true,
     });
     if (!started) {
       lastNarrationRef.current = null;
@@ -113,7 +113,7 @@ export function ScrollNarrator() {
           voice: 'coral',
           style: 'assistant',
           rate: 0.98,
-          allowBrowserFallback: false,
+          allowBrowserFallback: true,
         });
     };
 
@@ -201,7 +201,7 @@ export function ScrollNarrator() {
   }, [enabled, narrateVisibleSection, notice]);
 
   const toggle = () => {
-    if (enabled && !notice) {
+    if (enabled && (isPlaying || isLoading)) {
       setEnabled(false);
       window.localStorage.setItem(NARRATION_PREFERENCE_KEY, 'off');
       stop();

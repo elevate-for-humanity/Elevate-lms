@@ -5,6 +5,7 @@ import { ParisFloatingButton } from './ParisFloatingButton';
 export type ParisLearnerContext = {
   surface?: 'public' | 'learner' | 'portal';
   portalRole?: string | null;
+  personName?: string | null;
   courseTitle?: string | null;
   nextLessonTitle?: string | null;
   courseProgress?: number | null;

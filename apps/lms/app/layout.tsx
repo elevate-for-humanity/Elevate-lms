@@ -8,7 +8,6 @@ import { LmsPwaRegistration } from '@/components/pwa/LmsPwaRegistration';
 import { PwaInstallBanner } from '@/components/pwa/PwaInstallBanner';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
-import { UniversalDashboardParis } from '@/components/paris/UniversalDashboardParis';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +42,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SupabaseConfigBootstrap />
         <LmsPwaRegistration />
         {children}
-        <UniversalDashboardParis />
         <PwaInstallBanner
           message="Install the Elevate dashboard for faster access to courses, hours, documents, and progress."
           storageKey="lms-pwa-install-banner-dismissed"

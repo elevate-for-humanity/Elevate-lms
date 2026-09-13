@@ -58,6 +58,7 @@ interface ParisChatProps {
   courseProgress?: number | null;
   voiceEnabled?: boolean;
   portalRole?: string | null;
+  personName?: string | null;
   portalIssue?: PortalSupportIssue | null;
 }
 
@@ -173,14 +174,15 @@ const STORE_GREETING: Message = {
 I'll ask a few focused questions, recommend the smallest setup that fits, explain useful add-ons, and walk you through the relevant demos. What are you trying to accomplish first?`,
 };
 
-function portalGreeting(portalRole?: string | null): Message {
+function portalGreeting(portalRole?: string | null, personName?: string | null): Message {
   const role = portalRole?.replaceAll('_', ' ') || 'authenticated portal';
+  const firstName = personName?.trim().split(/\s+/)[0];
   const ownerPrompt = /program holder|host shop/i.test(role)
     ? '\n\nI can also help you interview new applicants and organize the follow-up call. Which applicant or required compliance item should we work on first?'
     : '\n\nWhat would you like to complete first?';
   return {
     role: 'assistant',
-    content: `Hi — I'm PARIS, your authenticated portal assistant for the ${role} workspace.
+    content: `Hi${firstName ? ` ${firstName}` : ''} — I'm PARIS, your authenticated portal assistant for the ${role} workspace.
 
 I can help you understand red to-dos, interview applicants, draft student notes and outreach, organize onboarding, and explain where to upload documents or record progress. I can prefill drafts, but you must review and submit official hours, milestones, compliance records, agreements, and messages.${ownerPrompt}`,
   };
@@ -205,6 +207,7 @@ export default function ParisChat({
   courseProgress,
   voiceEnabled = false,
   portalRole,
+  personName,
   portalIssue,
 }: ParisChatProps) {
   const learnerSurface = surface === 'learner';
@@ -217,7 +220,7 @@ export default function ParisChat({
     learnerSurface
       ? learnerGreeting(courseTitle, nextLessonTitle)
       : portalSurface
-        ? portalGreeting(portalRole)
+        ? portalGreeting(portalRole, personName)
         : storeSurface
           ? STORE_GREETING
           : PUBLIC_GREETING,

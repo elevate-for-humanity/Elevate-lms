@@ -15,11 +15,13 @@ describe('PARIS learner scope', () => {
 
   it('mounts learner PARIS once through the canonical platform shell', () => {
     const shell = source('components/platform/PlatformShell.tsx');
+    const rootLayout = source('apps/lms/app/layout.tsx');
     const workspace = source('components/lms/LearnerWorkspaceLayout.tsx');
     const dashboard = source('apps/lms/app/lms/(app)/dashboard/page.tsx');
 
     expect(shell).toContain("role === 'student' || role === 'apprentice'");
     expect(shell).toContain('<ParisFloatingWrapper');
+    expect(rootLayout).not.toContain('UniversalDashboardParis');
     expect(workspace).not.toContain('<ParisFloatingWrapper');
     expect(dashboard).not.toContain('<ParisFloatingWrapper');
   });

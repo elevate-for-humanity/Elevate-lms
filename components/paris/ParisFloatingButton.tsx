@@ -13,6 +13,7 @@ export function ParisFloatingButton({
   nextLessonTitle,
   courseProgress,
   portalRole,
+  personName,
   autoOpenOnDashboard = false,
 }: ParisLearnerContext) {
   const [isOpen, setIsOpen] = useState(false);
@@ -148,6 +149,7 @@ export function ParisFloatingButton({
                 nextLessonTitle={nextLessonTitle}
                 courseProgress={courseProgress}
                 portalRole={portalRole}
+                personName={personName}
                 portalIssue={portalIssue}
                 voiceEnabled
               />

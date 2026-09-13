@@ -4,11 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 const button = fs.readFileSync(path.resolve('components/paris/ParisFloatingButton.tsx'), 'utf8');
 const chat = fs.readFileSync(path.resolve('components/paris/ParisChat.tsx'), 'utf8');
-const lmsLayout = fs.readFileSync(path.resolve('apps/lms/app/layout.tsx'), 'utf8');
-const universalParis = fs.readFileSync(
-  path.resolve('components/paris/UniversalDashboardParis.tsx'),
-  'utf8',
-);
+const platformShell = fs.readFileSync(path.resolve('components/platform/PlatformShell.tsx'), 'utf8');
 const workspace = fs.readFileSync(
   path.resolve('components/program-holder/ProgramHolderWorkspaceView.tsx'),
   'utf8',
@@ -16,10 +12,14 @@ const workspace = fs.readFileSync(
 
 describe('PARIS dashboard introduction', () => {
   it('mounts and opens PARIS on the Program Holder dashboard', () => {
-    expect(lmsLayout).toContain('UniversalDashboardParis');
-    expect(universalParis).toContain("prefix: '/program-holder'");
-    expect(universalParis).toContain('autoOpenOnDashboard');
+    expect(platformShell).toContain('<ParisFloatingWrapper');
+    expect(platformShell).toContain('autoOpenOnDashboard={paris?.autoOpenOnDashboard ?? true}');
     expect(button).toContain("pathname.endsWith('/dashboard')");
+  });
+
+  it('greets the authenticated program holder by name', () => {
+    expect(platformShell).toContain('personName={user.full_name || user.first_name || null}');
+    expect(chat).toContain("Hi${firstName ? ` ${firstName}` : ''} — I'm PARIS");
   });
 
   it('introduces applicant interviewing and asks a first question', () => {
@@ -33,7 +33,7 @@ describe('PARIS dashboard introduction', () => {
       'if (!voiceEnabled || !autoSpeak || initialGreetingSpokenRef.current) return',
     );
     expect(chat).toContain('void voice.play(plainTextForSpeech(greeting)');
-    expect(chat).toContain('allowBrowserFallback: true');
+    expect(chat).toContain('allowBrowserFallback: false');
   });
 
   it('renders assistant Markdown as compact, mobile-safe content', () => {

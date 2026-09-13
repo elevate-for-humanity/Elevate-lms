@@ -63,7 +63,7 @@ describe('canonical Course Factory media architecture', () => {
     const boundedLease = read(
       'supabase/migrations/20260913112500_bound_expired_video_lease_retries.sql',
     );
-    expect(boundedLease).toContain("coalesce(v.retry_count, 0) < 3");
+    expect(boundedLease).toContain('coalesce(v.retry_count, 0) < 3');
     expect(boundedLease).toContain("failure_class = coalesce(v.failure_class, 'retry_exhausted')");
     expect(boundedLease).toContain('dead_lettered_at = coalesce(v.dead_lettered_at, now())');
     const retryClass = read(
@@ -82,7 +82,7 @@ describe('canonical Course Factory media architecture', () => {
   it('preserves microclip asset_key during retry', () => {
     const manager = read('lib/course-factory/media-manager.ts');
     expect(manager).toContain('assetKey: row.asset_key');
-    expect(manager).toContain("String(clip.id) === identity.assetKey");
+    expect(manager).toContain('String(clip.id) === identity.assetKey');
   });
 
   it('resets retry evidence without violating the production NOT NULL contract', () => {
@@ -121,7 +121,9 @@ describe('canonical Course Factory media architecture', () => {
     expect(handler).toContain('Resuming completed build at media finalization');
     expect(handler).toContain("generation_status: 'generating'");
     expect(handler).toContain('generation_progress: 95');
-    expect(read('lib/course-builder/build-lifecycle.ts')).toContain("generation_status: 'completed'");
+    expect(read('lib/course-builder/build-lifecycle.ts')).toContain(
+      "generation_status: 'completed'",
+    );
   });
 
   it('claims work atomically and renews an expiring database lease', () => {
@@ -146,7 +148,10 @@ describe('canonical Course Factory media architecture', () => {
 
   it('keeps render capacity global during course-scoped runs', () => {
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
-    const activeBlock = worker.slice(worker.indexOf('activeCount'), worker.indexOf('availableSlots'));
+    const activeBlock = worker.slice(
+      worker.indexOf('activeCount'),
+      worker.indexOf('availableSlots'),
+    );
     expect(activeBlock).not.toContain("eq('course_id', courseId)");
   });
 
@@ -156,6 +161,17 @@ describe('canonical Course Factory media architecture', () => {
     expect(renderer).toContain('markComplete(job.id');
     expect(renderer).toContain('markFailed(job.id');
     expect(renderer).not.toMatch(/createJob\s*\(/);
+  });
+
+  it('bounds every final storyboard and its projected cost before rendering', () => {
+    const renderer = read('lib/video/process-video-job.ts');
+    const directMediaIndex = renderer.indexOf('let storyboard = directMedia');
+    const finalBoundaryIndex = renderer.indexOf('const finalCompaction = compactLegacySceneData');
+    const renderIndex = renderer.indexOf('const result = await renderStoryboardVideo');
+    expect(directMediaIndex).toBeGreaterThan(-1);
+    expect(finalBoundaryIndex).toBeGreaterThan(directMediaIndex);
+    expect(renderIndex).toBeGreaterThan(finalBoundaryIndex);
+    expect(renderer).toContain('Math.min(\n      MAX_LESSON_VIDEO_SCENES');
   });
 
   it('records renderer provider evidence on terminal state', () => {
@@ -183,7 +199,9 @@ describe('canonical Course Factory media architecture', () => {
     const lifecycle = read('lib/course-builder/build-lifecycle.ts');
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
     expect(factory).toContain('Creating the canonical draft shell for unified lesson builds.');
-    expect(factory).toContain("completionState: input.videoMode === 'off' ? 'content_only' : 'media_pending'");
+    expect(factory).toContain(
+      "completionState: input.videoMode === 'off' ? 'content_only' : 'media_pending'",
+    );
     expect(lifecycle).toContain('finalizeUnifiedCourseBuildWithClient');
     expect(lifecycle).toContain("state: 'ready_for_review'");
     expect(lifecycle).not.toContain('publishPersistedCourseWithClient');
@@ -194,7 +212,9 @@ describe('canonical Course Factory media architecture', () => {
   it('starts the primary video after each locked lesson narration', () => {
     const checkpoints = read('lib/course-factory/generation-checkpoints.ts');
     const media = read('lib/course-factory/media-service.ts');
-    expect(checkpoints).toContain('Its primary video can render while the next lesson is generated.');
+    expect(checkpoints).toContain(
+      'Its primary video can render while the next lesson is generated.',
+    );
     expect(checkpoints).toContain('lessonId: target.id');
     expect(media).toContain('sourceChanged');
     expect(media).toContain('Canonical lesson narration changed during unified course rebuild');
@@ -247,7 +267,7 @@ describe('canonical Course Factory media architecture', () => {
   it('uses bounded course-scoped recovery for Business acceptance without replacing completed assets', () => {
     const acceptance = read('scripts/course-factory/build-business-program.ts');
     expect(acceptance).toContain('recoverCourseMediaJobs({ courseId })');
-    expect(acceptance).not.toContain("recoverCourseMediaJobs({ courseId, force: true })");
+    expect(acceptance).not.toContain('recoverCourseMediaJobs({ courseId, force: true })');
     expect(acceptance).toContain('Authorized media recovery left blocked jobs');
     expect(acceptance).toContain('EXPECTED_MAIN_VIDEOS = 35');
     expect(acceptance).toContain('EXPECTED_MICROCLIPS = 70');
@@ -297,7 +317,7 @@ describe('canonical Course Factory media architecture', () => {
     expect(acceptance).toContain("mode: 'refresh'");
     expect(acceptance).toContain("contentSource: 'ai'");
     expect(acceptance).not.toContain("mode: 'replace'");
-    expect(acceptance).toContain("build.courseId !== COURSE_ID");
+    expect(acceptance).toContain('build.courseId !== COURSE_ID');
   });
 
   it('uses the same Course Factory media state in Studio and ESB acceptance', () => {

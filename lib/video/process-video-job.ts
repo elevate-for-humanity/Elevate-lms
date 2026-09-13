@@ -29,6 +29,7 @@ import { repairInstructionalScript } from './instructional-script-repair';
 import {
   compactLegacySceneData,
   directMedia,
+  MAX_LESSON_VIDEO_SCENES,
   scenePrompt,
   type MediaCharacterReference,
 } from './media-director';
@@ -446,7 +447,7 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     // the learner-facing lesson URL.
     const renderId = `${job.lesson_id}-${safeAssetKey(job.asset_key ?? job.id)}-${job.id}`;
     const characters = mediaCharacters(sceneData);
-    const storyboard = directMedia({
+    let storyboard = directMedia({
       title: job.lesson_title,
       objective: bulletPoints[0] ?? job.lesson_title,
       script,
@@ -454,6 +455,21 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       characters,
       defaultDurationSeconds: 5,
     });
+    // Scene plans can be supplied, AI-enriched, or deterministically derived
+    // from narration. Enforce the same hard boundary after all three paths so
+    // a legacy scene_count or a newly generated sentence-per-scene plan cannot
+    // recreate an oversized render.
+    const finalCompaction = compactLegacySceneData(
+      storyboard as unknown as Record<string, unknown>,
+    );
+    if (finalCompaction.compacted) {
+      storyboard = finalCompaction.sceneData as unknown as typeof storyboard;
+      logger.info('[video-worker] Bounded final storyboard before rendering', {
+        jobId: job.id,
+        originalSceneCount: finalCompaction.originalSceneCount,
+        segmentCount: storyboard.scenes.length,
+      });
+    }
     const instructionalQuality = enforceInstructionalQuality({
       courseTitle,
       lessonTitle: job.lesson_title,
@@ -762,14 +778,17 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       bulletPoints: job.bullet_points,
       sceneData: normalizedSceneData,
     });
-    const estimatedScenes = Math.max(
-      1,
-      job.scene_count ??
-        (normalizedSceneData &&
-        typeof normalizedSceneData === 'object' &&
-        Array.isArray((normalizedSceneData as Record<string, unknown>).scenes)
-          ? ((normalizedSceneData as Record<string, unknown>).scenes as unknown[]).length
-          : Math.ceil((job.script?.split(/\s+/).filter(Boolean).length ?? 1) / 45)),
+    const estimatedScenes = Math.min(
+      MAX_LESSON_VIDEO_SCENES,
+      Math.max(
+        1,
+        job.scene_count ??
+          (normalizedSceneData &&
+          typeof normalizedSceneData === 'object' &&
+          Array.isArray((normalizedSceneData as Record<string, unknown>).scenes)
+            ? ((normalizedSceneData as Record<string, unknown>).scenes as unknown[]).length
+            : Math.ceil((job.script?.split(/\s+/).filter(Boolean).length ?? 1) / 45)),
+      ),
     );
     const projectedCostMicros = Math.max(
       0,
@@ -844,7 +863,9 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     if (paidExecution.decision === 'approved' && paidExecution.requestId) {
       const { data: completedJob, error: completedJobError } = await db
         .from('video_jobs')
-        .select('status,video_url,audio_url,duration_seconds,scene_count,scene_data,quality_evidence')
+        .select(
+          'status,video_url,audio_url,duration_seconds,scene_count,scene_data,quality_evidence',
+        )
         .eq('id', job.id)
         .maybeSingle();
       if (completedJobError) throw completedJobError;

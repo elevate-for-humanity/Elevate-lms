@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { getDecryptedPlatformSecret, hydrateProcessEnv } from '@/lib/secrets';
+import { getDecryptedPlatformSecret } from '@/lib/secrets';
+import { getMetaOAuthConfig } from '@/lib/social/meta-oauth-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-const META_KEYS = ['FACEBOOK_CLIENT_ID', 'FACEBOOK_CLIENT_SECRET', 'FACEBOOK_PAGE_ID'] as const;
 
 function adminOrigin(request: NextRequest) {
   const configured = process.env.ADMIN_APP_URL?.trim() || process.env.NEXT_PUBLIC_ADMIN_URL?.trim();
@@ -20,25 +19,22 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  await hydrateProcessEnv();
-  const canonicalEntries = await Promise.all(
-    META_KEYS.map(async (key) => [key, (await getDecryptedPlatformSecret(key))?.trim() || ''] as const),
-  );
-  const canonical = new Map(canonicalEntries);
-
-  const field = (key: typeof META_KEYS[number]) => {
-    const runtimeValue = process.env[key]?.trim() || '';
-    const canonicalValue = canonical.get(key) || '';
+  const metaConfig = await getMetaOAuthConfig();
+  const field = async (resolved: { key: string | null; value: string }) => {
+    const canonicalValue = resolved.key ? (await getDecryptedPlatformSecret(resolved.key))?.trim() || '' : '';
     return {
-      configured: Boolean(runtimeValue),
+      configured: Boolean(resolved.value),
       canonicalConfigured: Boolean(canonicalValue),
-      runtimeMatchesCanonical: Boolean(runtimeValue && canonicalValue && runtimeValue === canonicalValue),
+      runtimeMatchesCanonical: Boolean(resolved.value && canonicalValue && resolved.value === canonicalValue),
+      source: resolved.key,
     };
   };
 
-  const clientId = field('FACEBOOK_CLIENT_ID');
-  const clientSecret = field('FACEBOOK_CLIENT_SECRET');
-  const pageId = field('FACEBOOK_PAGE_ID');
+  const [clientId, clientSecret, pageId] = await Promise.all([
+    field(metaConfig.clientId),
+    field(metaConfig.clientSecret),
+    field(metaConfig.pageId),
+  ]);
   const origin = adminOrigin(request);
   // Meta can discover the authorized page during OAuth. A configured page ID
   // is only required when the user manages more than one eligible page.

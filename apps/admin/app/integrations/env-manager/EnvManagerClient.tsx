@@ -219,6 +219,8 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     label: 'Social Media',
     keys: [
       'FACEBOOK_ACCESS_TOKEN',
+      'FACEBOOK_APP_ID',
+      'FACEBOOK_APP_SECRET',
       'FACEBOOK_CLIENT_ID',
       'FACEBOOK_CLIENT_SECRET',
       'FACEBOOK_PAGE_ID',

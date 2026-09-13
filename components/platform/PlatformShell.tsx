@@ -385,6 +385,7 @@ export function PlatformShell({ user, role, actions = [], children, paris }: Pla
         </main>
       </div>
       {paris !== false ? (
+        /* PlatformShell is the single PARIS owner for authenticated dashboards. */
         <ParisFloatingWrapper
           surface={paris?.surface ?? (role === 'student' || role === 'apprentice' ? 'learner' : 'portal')}
           portalRole={paris?.portalRole ?? ROLE_DISPLAY_NAMES[role]}

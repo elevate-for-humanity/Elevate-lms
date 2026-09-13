@@ -81,4 +81,43 @@ describe('Course Factory publisher objectives', () => {
       requireHumanTechnicalReview: true,
     });
   });
+
+  it('turns a generated practical task into governed observation evidence', () => {
+    const modules = buildAtomicPayload(
+      [
+        {
+          slug: 'infection-control',
+          title: 'Infection Control',
+          orderIndex: 1,
+          domainKey: 'infection-control',
+          competencies: [],
+          lessons: [
+            {
+              slug: 'safe-work-practices',
+              title: 'Safe Work Practices',
+              order: 1,
+              lessonType: 'lesson',
+              content: JSON.stringify({
+                experience: {
+                  practicalTask: {
+                    title: 'Demonstrate disinfection',
+                    evidence: 'Qualified evaluator observation',
+                    instructions: ['Perform the complete disinfection procedure.'],
+                  },
+                },
+              }),
+            },
+          ],
+        },
+      ] as any,
+      'Indiana Barber Apprenticeship',
+    );
+
+    expect(modules[0].lessons[0]).toMatchObject({
+      practical_required: true,
+      evidence_type: 'observation',
+      requires_instructor_signoff: true,
+      required_artifacts: ['Qualified evaluator observation'],
+    });
+  });
 });

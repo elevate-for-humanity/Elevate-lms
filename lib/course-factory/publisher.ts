@@ -124,7 +124,10 @@ export function buildAtomicPayload(
               !Array.isArray(content.experience)
                 ? (content.experience as Record<string, any>)
                 : null;
-            const governedPractical = extra.practicalRequired ?? stepType === 'lab';
+            const governedPractical =
+              extra.practicalRequired ??
+              (Boolean(experience?.practicalTask || experience?.practical_task) ||
+                stepType === 'lab');
             // This is the final shared persistence boundary for every Course
             // Builder entry point. Generate the universal experience here so
             // dedicated, AI, blueprint, recovery, and Admin builds cannot
@@ -290,10 +293,10 @@ export function buildAtomicPayload(
               hour_category:
                 extra.hourCategory ??
                 (stepType === 'lab' ? 'practical' : stepType === 'exam' ? 'exam' : 'didactic'),
-              evidence_type: extra.evidenceType ?? (stepType === 'lab' ? 'observation' : null),
+              evidence_type: extra.evidenceType ?? (governedPractical ? 'observation' : null),
               delivery_method: extra.deliveryMethod ?? 'online_async',
               requires_instructor_signoff:
-                extra.requiresInstructorSignoff ?? Boolean(governedPractical && stepType === 'lab'),
+                extra.requiresInstructorSignoff ?? governedPractical,
               instructor_requirement: extra.instructorRequirement ?? null,
               minimum_seat_time_minutes:
                 extra.minimumSeatTimeMinutes ?? lesson.durationMinutes ?? null,

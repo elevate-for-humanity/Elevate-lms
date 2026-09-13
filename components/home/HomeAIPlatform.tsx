@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Bot, Brain, BookOpen, Award, Video, Zap, Sparkles, ArrowRight } from 'lucide-react';
+import { Bot, Brain, BookOpen, Award, Video, Sparkles, ArrowRight } from 'lucide-react';
 
 const AI_PRODUCTS = [
   { 
@@ -31,13 +31,6 @@ const AI_PRODUCTS = [
     icon: Sparkles,
     desc: '24/7 personalized tutoring',
     color: 'from-violet-500 to-purple-500'
-  },
-  { 
-    name: 'Dev Studio', 
-    href: '/ai/dev-studio',
-    icon: Zap,
-    desc: 'Enterprise development platform',
-    color: 'from-blue-500 to-cyan-500'
   },
   { 
     name: 'Media Studio', 

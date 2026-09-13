@@ -83,7 +83,6 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
   { path: '/store/apps/grants', label: 'Grants App', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
   { path: '/store/ai-assistants', label: 'AI Assistants', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
   { path: '/store/course-builder', label: 'Course Builder', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
-  { path: '/store/dev-studio', label: 'Dev Studio', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
   { path: '/store/ai-studio', label: 'AI Studio', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
   { path: '/store/testing', label: 'Testing App', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
   { path: '/store/practice-tests', label: 'Practice Tests', category: 'Store', changeFrequency: 'weekly', priority: 0.82, lastModified: changed, index: true },

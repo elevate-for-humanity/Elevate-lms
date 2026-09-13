@@ -20,16 +20,6 @@ const aiProducts = [
     href: '/ai/paris',
   },
   {
-    slug: 'dev-studio',
-    name: 'Dev Studio',
-    tagline: 'AI-Powered Development Environment',
-    description: 'Build, test, and deploy applications with AI assistance. Integrated terminal, code editor, and container management.',
-    icon: '⚡',
-    features: ['AI code completion', 'Container management', 'Git integration', 'One-click deployments'],
-    color: 'from-blue-600 to-cyan-600',
-    href: '/ai/dev-studio',
-  },
-  {
     slug: 'website-builder',
     name: 'AI Website Builder',
     tagline: 'Create Sites in Minutes',

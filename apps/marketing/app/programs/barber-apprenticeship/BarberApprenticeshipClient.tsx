@@ -76,7 +76,7 @@ export default function BarberApprenticeshipClient({
         />
       ) : (
         <>
-          <section className="relative h-[clamp(260px,42vw,520px)] overflow-hidden bg-slate-100">
+          <section className="relative h-[clamp(520px,72svh,860px)] overflow-hidden bg-slate-100">
             <Image src={canonicalHero} alt={canonicalHeroAlt} fill priority sizes="100vw" className="object-cover" />
           </section>
           <section className="border-b border-slate-200 bg-white px-4 py-10 sm:px-6">

@@ -58,6 +58,7 @@ export type VideoFailureClass =
   | 'quality'
   | 'content'
   | 'not_found'
+  | 'retry_exhausted'
   | 'unknown';
 
 export function classifyVideoFailure(message: string): VideoFailureClass {

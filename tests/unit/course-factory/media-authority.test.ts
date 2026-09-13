@@ -66,6 +66,17 @@ describe('canonical Course Factory media architecture', () => {
     expect(boundedLease).toContain("coalesce(v.retry_count, 0) < 3");
     expect(boundedLease).toContain("failure_class = coalesce(v.failure_class, 'retry_exhausted')");
     expect(boundedLease).toContain('dead_lettered_at = coalesce(v.dead_lettered_at, now())');
+    const retryClass = read(
+      'supabase/migrations/20260913120000_allow_retry_exhausted_video_failure.sql',
+    );
+    expect(retryClass).toContain("'retry_exhausted'::text");
+    expect(read('lib/video/job-queue.ts')).toContain("| 'retry_exhausted'");
+    const lessonSync = read(
+      'supabase/migrations/20260913121500_sync_retry_exhaustion_to_lesson.sql',
+    );
+    expect(lessonSync).toContain('l.video_job_id = v.id');
+    expect(lessonSync).toContain("v.asset_kind = 'lesson'");
+    expect(lessonSync).toContain("video_status = 'failed'");
   });
 
   it('preserves microclip asset_key during retry', () => {

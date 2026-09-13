@@ -232,7 +232,7 @@ export default function ProgramDetailPage({
             }
             // Fallback: plain image hero for programs without a banner entry
             return (
-              <div className="relative h-[clamp(420px,58vh,720px)] w-full overflow-hidden">
+              <div className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden">
                 {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
                 <Image
                   src={heroPosterSrc}

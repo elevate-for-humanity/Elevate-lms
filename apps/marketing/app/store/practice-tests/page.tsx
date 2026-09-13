@@ -95,7 +95,7 @@ export default async function PracticeTestsPage() {
       </div>
 
       {/* Hero - Bright & Clean */}
-      <section className="relative h-[clamp(420px,58vh,720px)] flex items-end overflow-hidden bg-slate-100">
+      <section className="relative h-[clamp(520px,72svh,860px)] flex items-end overflow-hidden bg-slate-100">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image

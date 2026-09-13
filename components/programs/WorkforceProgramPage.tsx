@@ -183,7 +183,7 @@ export function WorkforceProgramPage({ program }: { program: WorkforceProgramDat
       </div>
 
       {/* Hero */}
-      <section className="relative h-[clamp(420px,58vh,720px)]">
+      <section className="relative h-[clamp(520px,72svh,860px)]">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
           src={program.heroImage}

@@ -41,7 +41,7 @@ export function ProgramPageVisual({ program }: Props) {
   return (
     <div className="min-h-screen bg-white">
       {/* HERO - Full width, visual-first */}
-      <section className="relative h-[clamp(420px,58vh,720px)] flex items-end">
+      <section className="relative h-[clamp(520px,72svh,860px)] flex items-end">
         {program.heroVideo ? (
           <UltraVideoPlayer
             src={program.heroVideo}

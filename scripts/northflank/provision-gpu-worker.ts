@@ -445,7 +445,7 @@ async function acceptanceGenerate(publicUrl: string, secret: string) {
       }),
       signal: controller.signal,
     });
-    if (!response.ok) throw new Error(`Wan acceptance generation failed (${response.status}): ${(await response.text()).slice(0, 1000)}`);
+    if (!response.ok) throw new Error(`Wan acceptance generation failed (${response.status}): ${(await response.text()).slice(-4000)}`);
     const generated = await response.json() as R;
     if (!generated.jobId || !generated.assetPath) throw new Error('Wan acceptance returned no asset');
     const asset = await fetch(`${publicUrl}${generated.assetPath}`, {

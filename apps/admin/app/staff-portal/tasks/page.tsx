@@ -41,40 +41,38 @@ export default async function StaffTasksPage() {
   const { user, profile } = await requireRole(['staff', 'admin', 'super_admin']);
   const supabase = await createClient();
 
-  // For demo, show placeholder tasks
-  // In production, this would query tasks table
-  const tasks: Task[] = [
-    {
-      id: '1',
-      title: 'Review new student applications',
-      description: '3 new applications need review',
-      status: 'pending',
-      priority: 'high',
-      due_date: new Date(Date.now() + 86400000).toISOString(),
-      assigned_to: profile?.full_name || 'Staff',
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      title: 'Update enrollment records',
-      description: 'Verify 5 enrollment completions',
-      status: 'in_progress',
-      priority: 'medium',
-      due_date: new Date(Date.now() + 172800000).toISOString(),
-      assigned_to: profile?.full_name || 'Staff',
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: '3',
-      title: 'Schedule student orientations',
-      description: '2 students pending orientation',
-      status: 'completed',
-      priority: 'low',
-      due_date: null,
-      assigned_to: profile?.full_name || 'Staff',
-      created_at: new Date().toISOString(),
-    },
-  ];
+  const { data: onboardingTasks } = await supabase
+    .from('staff_onboarding_tasks')
+    .select('id,title,status,due_at,created_at')
+    .eq('staff_user_id', user.id)
+    .order('created_at');
+  const { count: queueCount } = await supabase
+    .from('applications')
+    .select('id', { count: 'exact', head: true })
+    .eq('advisor_assigned', user.id);
+
+  const tasks: Task[] = (onboardingTasks || []).map((task: any) => ({
+    id: task.id,
+    title: task.title,
+    description: task.title.includes('MOU')
+      ? 'Required before commissions can become payable.'
+      : 'Complete this onboarding gate in your staff workspace.',
+    status: task.status === 'complete' ? 'completed' : task.status,
+    priority: task.title.includes('MOU') || task.title.includes('payout') ? 'high' : 'medium',
+    due_date: task.due_at,
+    assigned_to: profile?.full_name || 'Staff',
+    created_at: task.created_at,
+  }));
+  if ((queueCount || 0) > 0) tasks.unshift({
+    id: 'assigned-applicant-queue',
+    title: 'Work assigned applicant queue',
+    description: `${queueCount} applicant${queueCount === 1 ? '' : 's'} currently assigned. Document contact and follow-up before enrollment.`,
+    status: 'pending',
+    priority: 'high',
+    due_date: null,
+    assigned_to: profile?.full_name || 'Staff',
+    created_at: new Date().toISOString(),
+  });
 
   const pendingCount = tasks.filter(t => t.status === 'pending').length;
   const inProgressCount = tasks.filter(t => t.status === 'in_progress').length;

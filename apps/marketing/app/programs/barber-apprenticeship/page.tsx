@@ -10,7 +10,6 @@ import {
   Scissors,
   ShieldCheck,
 } from 'lucide-react';
-import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
@@ -19,7 +18,6 @@ import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
-import heroBanners from '@/content/heroBanners';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -28,9 +26,6 @@ export const fetchCache = 'force-no-store';
 const BARBER_HERO_IMAGE =
   'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-hero-new.webp';
 const BARBER_RTI_HOURS = 260;
-// Approved, conversational hero narration for the featured Kountry Kutz host shop.
-const KOUNTRY_KUTZ_HERO_TRANSCRIPT =
-  "Welcome to Kountry Kutz Barbershop in New Palestine, Indiana. Kountry Kutz is a participating barber-apprenticeship Host Shop where apprentices can connect structured technical instruction with supervised experience in a working barbershop. The shop provides a professional environment for learning sanitation, client service, haircutting, grooming, workplace safety, and daily shop routines. Apprenticeship placement and final approval are confirmed separately through Elevate's enrollment and compliance process.";
 
 const FLOW = [
   {
@@ -84,7 +79,6 @@ export default async function BarberApprenticeshipPage() {
   if (!loaded) return notFound();
 
   const program = loaded.program;
-  const heroBanner = heroBanners['barber-apprenticeship'];
   const structuredData = buildBeautyProgramStructuredData({
     ...program,
     heroImage: BARBER_HERO_IMAGE,
@@ -99,79 +93,15 @@ export default async function BarberApprenticeshipPage() {
         }}
       />
 
-      <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>
-        <HeroVideo
-          videoSrcDesktop="/videos/partners/kountry-kutz/shop-tour.mp4"
-          videoSrcMobile="/videos/partners/kountry-kutz/shop-tour.mp4"
-          videoPlaybackRate={0.55}
-          posterImage="/images/partners/kountry-kutz/interior-empty.webp"
-          mountedFrameImage="/images/partners/kountry-kutz/interior-empty.webp"
-          microLabel={heroBanner.microLabel}
-          transcript={KOUNTRY_KUTZ_HERO_TRANSCRIPT}
-          narrateTranscript={false}
-          transcriptVoiceStyle="assistant"
-          transcriptVoiceRate={1}
-          preloadTranscriptVoice={false}
-          analyticsName="barber-apprenticeship"
-          heightClassName="h-[clamp(520px,72svh,860px)]"
-          mediaFit="contain"
-          mediaClassName="bg-black"
-          overlayMode="none"
-          deferVideoMs={0}
+      <section className="relative h-[clamp(280px,46vw,620px)] overflow-hidden bg-slate-100" aria-label="Barber apprenticeship training">
+        <Image
+          src={BARBER_HERO_IMAGE}
+          alt="Barber apprentice receiving supervised hands-on training in a licensed barbershop"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
         />
-      </div>
-
-      <section
-        data-scroll-narration
-        data-narration="Meet Kountry Kutz Barbershop, a participating Host Shop in New Palestine, Indiana. Apprentices can build supervised workplace skills here while Elevate verifies placement, instruction, and progress requirements."
-        className="border-b border-slate-200 bg-slate-950 px-4 py-7 text-white"
-      >
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
-              Featured Host Shop
-            </p>
-            <h2 className="mt-2 text-2xl font-black sm:text-3xl">Tour Kountry Kutz Barbershop</h2>
-            <p className="mt-2 leading-7 text-slate-200">
-              Kountry Kutz is a family-oriented Main Street barbershop in New Palestine, Indiana,
-              offering classic cuts, modern grooming, and supervised workplace experience for the
-              barber apprenticeship pathway.
-            </p>
-          </div>
-          <Link
-            href="/host-shops/kountry-kutz-barbershop"
-            className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
-          >
-            Explore Kountry Kutz <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-
-      <section aria-label="Kountry Kutz apprenticeship story" className="border-b border-slate-200 bg-white px-4 py-8">
-        <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-3">
-          {[
-            {
-              src: '/images/partners/kountry-kutz/interior-empty.webp',
-              alt: 'Training stations inside Kountry Kutz Barbershop in New Palestine',
-            },
-            {
-              src: '/images/partners/kountry-kutz/interior-active.webp',
-              alt: 'Barbers and clients inside Kountry Kutz Barbershop',
-            },
-            {
-              src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
-              alt: 'Kountry Kutz barber apprenticeship host-shop announcement',
-            },
-          ].map((photo) => (
-            <div key={photo.src} className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-100">
-              <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-contain" />
-            </div>
-          ))}
-        </div>
-        <p className="mx-auto mt-5 max-w-4xl text-center text-base leading-7 text-slate-700">
-          One of Elevate's first barber apprenticeship host shops, Kountry Kutz provides a
-          real-workplace setting at 56 W Main St, Suite A, New Palestine, Indiana.
-        </p>
       </section>
 
       <section
@@ -232,7 +162,7 @@ export default async function BarberApprenticeshipPage() {
       <section
         data-scroll-narration
         data-narration="Explore the barber Host Shop network. Approved shops provide the supervised work setting, while placement availability is confirmed during enrollment."
-        className="border-b border-slate-200 bg-gradient-to-b from-white to-sky-50 px-4 py-10 sm:py-14"
+        className="border-b border-slate-200 bg-sky-50 px-4 py-10 sm:py-14"
       >
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 max-w-3xl">
@@ -352,7 +282,7 @@ export default async function BarberApprenticeshipPage() {
       <section
         data-scroll-narration
         data-narration="Before checkout, compare available payment and funding paths. Approval terms come from the selected provider, and Elevate can help explain the next step before you enroll."
-        className="border-y border-orange-200 bg-gradient-to-br from-orange-50 via-white to-sky-50 px-4 py-14 sm:py-18"
+        className="border-y border-orange-200 bg-orange-50 px-4 py-14 sm:py-18"
         aria-labelledby="barber-payment-heading"
       >
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
@@ -396,7 +326,7 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      <section className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-14 text-slate-950">
+      <section className="border-y border-sky-200 bg-sky-50 px-4 py-14 text-slate-950">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">
@@ -430,7 +360,7 @@ export default async function BarberApprenticeshipPage() {
       <BeautyTheoryDailyPolicy programTitle="Barber Apprenticeship" />
       <BeautyApprenticeshipAuthority program={program} />
 
-      <section className="border-t border-sky-200 bg-gradient-to-r from-brand-blue-50 via-white to-orange-50 px-4 py-14 text-slate-950">
+      <section className="border-t border-sky-200 bg-white px-4 py-14 text-slate-950">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-black sm:text-4xl">
             Ready to start the barber apprenticeship?

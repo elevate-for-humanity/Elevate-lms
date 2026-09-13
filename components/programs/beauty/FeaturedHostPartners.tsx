@@ -96,9 +96,9 @@ export default function FeaturedHostPartners({
 
   return (
     <>
-      <HostShopShowcase
+      {programSlug !== 'barber-apprenticeship' ? <HostShopShowcase
         shops={shops}
-        enableNarration={programSlug !== 'barber-apprenticeship'}
+        enableNarration
         mediaOverrides={{
           'generations-hair-llc': {
             src: '/images/partners/generations-hair/highlighted-curls-home.webp',
@@ -106,7 +106,7 @@ export default function FeaturedHostPartners({
             kind: 'photo',
           },
         }}
-      />
+      /> : null}
 
       {showDirectory ? (
         <section

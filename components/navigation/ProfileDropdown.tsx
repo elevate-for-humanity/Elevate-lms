@@ -97,9 +97,24 @@ export function ProfileDropdown({ className }: Props) {
           .single();
 
         if (profileData) {
+          const { data: assignedRoles } = await supabase
+            .from('user_roles')
+            .select('role, roles(name)')
+            .eq('user_id', user.id);
+          const secondaryRoles = (assignedRoles || []).flatMap((assignment: any) => {
+            const relational = Array.isArray(assignment.roles)
+              ? assignment.roles.map((item: any) => item?.name)
+              : [assignment.roles?.name];
+            return [assignment.role, ...relational].filter(Boolean);
+          });
           setProfile({
             ...profileData,
             email: profileData.email || user.email || '',
+            roles: Array.from(new Set([
+              profileData.role,
+              ...(Array.isArray(profileData.roles) ? profileData.roles : []),
+              ...secondaryRoles,
+            ].filter(Boolean))),
           });
         } else {
           // Create basic profile from auth user
@@ -216,7 +231,10 @@ export function ProfileDropdown({ className }: Props) {
   const isAdmin = ADMIN_ROLES.includes(profile?.role ?? '') ||
     profile?.roles?.some((r) => ADMIN_ROLES.includes(r));
 
-  const portalLink = profile?.role ? ROLE_PORTAL[profile.role] : null;
+  const portalLinks = Array.from(new Set([profile?.role, ...(profile?.roles || [])].filter(Boolean)))
+    .map((role) => ROLE_PORTAL[role as string])
+    .filter(Boolean)
+    .filter((portal, index, links) => links.findIndex((candidate) => candidate.href === portal.href) === index);
 
   if (loading) {
     return (
@@ -404,19 +422,22 @@ export function ProfileDropdown({ className }: Props) {
           </div>
 
           {/* Role portal link — visible to every role that has a portal */}
-          {portalLink && (
+          {portalLinks.length > 0 && (
             <div className="border-t border-slate-100 py-2">
-              <Link
-                href={portalLink.href}
-                className={`flex items-center justify-between px-4 py-2.5 text-sm hover:bg-purple-50 ${isAdmin ? 'text-purple-700' : 'text-brand-blue-700'}`}
-                onClick={() => setIsOpen(false)}
-              >
-                <span className="flex items-center gap-3">
-                  {isAdmin ? <Shield className="h-4 w-4" /> : <LayoutDashboard className="h-4 w-4" />}
-                  {portalLink.label}
-                </span>
-                <ChevronRight className={`h-4 w-4 ${isAdmin ? 'text-purple-300' : 'text-brand-blue-300'}`} />
-              </Link>
+              {portalLinks.map((portalLink) => (
+                <Link
+                  key={portalLink.href}
+                  href={portalLink.href}
+                  className={`flex items-center justify-between px-4 py-2.5 text-sm hover:bg-purple-50 ${isAdmin ? 'text-purple-700' : 'text-brand-blue-700'}`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <span className="flex items-center gap-3">
+                    {isAdmin ? <Shield className="h-4 w-4" /> : <LayoutDashboard className="h-4 w-4" />}
+                    {portalLink.label}
+                  </span>
+                  <ChevronRight className={`h-4 w-4 ${isAdmin ? 'text-purple-300' : 'text-brand-blue-300'}`} />
+                </Link>
+              ))}
             </div>
           )}
 

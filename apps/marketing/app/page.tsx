@@ -5,6 +5,7 @@ import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
+import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 
@@ -87,6 +88,7 @@ export default function HomePage() {
       <StructuredData />
       <main>
         <PlatformHubHero />
+        <HomeFeaturedHostShop />
         <div
           data-scroll-narration
           data-narration="You do not have to have your whole career figured out today. Start by exploring the field that fits your interests, schedule, and goals."

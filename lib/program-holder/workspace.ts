@@ -8,6 +8,7 @@ export type ProgramHolderWorkspace = {
   enrollments: any[];
   upcomingEnrollments: any[];
   applicants: any[];
+  convertedStudents: any[];
   hours: any[];
   documents: any[];
   reports: any[];
@@ -32,6 +33,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       enrollments: [],
       upcomingEnrollments: [],
       applicants: [],
+      convertedStudents: [],
       hours: [],
       documents: [],
       reports: [],
@@ -75,6 +77,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     enrollmentsRes,
     upcomingRes,
     applicantsRes,
+    convertedStudentsRes,
     hoursRes,
     documentsRes,
     reportsRes,
@@ -121,11 +124,19 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('program_holder_students')
       .select(
-        `id,applicant_name,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome${applicantContactColumns}`,
+        `id,applicant_name,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome,next_follow_up,work_start_date,work_site${applicantContactColumns}`,
       )
       .eq('program_holder_id', holderId)
       .in('status', ['applied', 'pending'])
       .order('created_at', { ascending: false }),
+    db
+      .from('program_holder_students')
+      .select(
+        `id,user_id,applicant_name,status,program_id,call_notes,call_date,call_outcome,work_start_date,work_site,updated_at${applicantContactColumns}`,
+      )
+      .eq('program_holder_id', holderId)
+      .eq('status', 'enrolled')
+      .order('updated_at', { ascending: false }),
     db
       .from('hour_entries')
       .select(
@@ -180,6 +191,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     enrollments: enrollmentsRes.data ?? [],
     upcomingEnrollments: upcomingRes.data ?? [],
     applicants: applicantsRes.data ?? [],
+    convertedStudents: convertedStudentsRes.data ?? [],
     hours: hoursRes.data ?? [],
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],

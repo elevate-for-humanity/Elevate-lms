@@ -13,6 +13,10 @@ interface PlatformStatus {
   profile_data?: Record<string, unknown>;
   expires_at?: string;
   expired?: boolean;
+  dry_run?: boolean;
+  connection_status?: string;
+  last_verified_at?: string;
+  granted_scopes?: string[];
 }
 
 interface MetaConfigStatus {
@@ -26,6 +30,16 @@ interface MetaConfigStatus {
 }
 
 const PLATFORMS = [
+  {
+    id: 'google_business',
+    label: 'Google Business Profile',
+    Icon: Globe,
+    color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-200',
+    authorizeUrl: '/api/auth/google-business/authorize',
+    connectBg: 'bg-blue-700 hover:bg-blue-800',
+    capabilities: ['Location discovery', 'Profile audit', 'Posts', 'Reviews'],
+    available: true,
+  },
   {
     id: 'facebook',
     label: 'Facebook',
@@ -239,6 +253,11 @@ export default function SocialMediaSettingsClient() {
                         <CheckCircle2 className="w-3 h-3" /> Connected
                       </span>
                     )}
+                    {connected && status?.dry_run !== false && (
+                      <span className="flex items-center gap-1 text-xs font-medium text-amber-700">
+                        <AlertTriangle className="h-3 w-3" /> Read-only; external writes blocked
+                      </span>
+                    )}
                     {connected && expired && (
                       <span className="flex items-center gap-1 text-xs text-amber-600 font-medium">
                         <AlertTriangle className="w-3 h-3" /> Token expired
@@ -247,6 +266,9 @@ export default function SocialMediaSettingsClient() {
                   </div>
                   {connected && profileName && (
                     <p className="mt-0.5 truncate text-xs text-gray-500">{profileName}</p>
+                  )}
+                  {status?.last_verified_at && (
+                    <p className="mt-0.5 text-xs text-gray-500">Verified {new Date(status.last_verified_at).toLocaleString()}</p>
                   )}
                   {(id === 'facebook' || id === 'instagram') && (
                     <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
@@ -273,12 +295,12 @@ export default function SocialMediaSettingsClient() {
                   <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
                 ) : connected && !expired ? (
                   <>
-                    <a
+                    {status?.dry_run === false ? <a
                       href={`/social-media/campaigns/new?platform=${id}`}
                       className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                     >
                       <Send className="w-3 h-3" /> Post
-                    </a>
+                    </a> : null}
                     <button
                       onClick={() => disconnect(id)}
                       disabled={disconnecting === id}

@@ -1,0 +1,31 @@
+name: Apply verified social release
+
+on:
+  push:
+    branches:
+      - elevateforhumanity-patch-1
+    paths:
+      - .github/workflows/apply-social-release.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: elevateforhumanity-patch-1
+          fetch-depth: 0
+      - name: Apply verified release patch
+        run: |
+          git apply --check devstudio-uploads/elevate-social-final.patch
+          git apply devstudio-uploads/elevate-social-final.patch
+          git rm devstudio-uploads/elevate-social-final.patch
+          git rm .github/workflows/apply-social-release.yml
+          git config user.name "elevateforhumanity"
+          git config user.email "info@elevateforhumanity.org"
+          git add -A
+          git commit -m "Deploy Elevate social newsroom automation"
+          git push origin HEAD:elevateforhumanity-patch-1

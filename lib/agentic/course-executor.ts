@@ -82,8 +82,8 @@ function positiveGoalInteger(goal: string, pattern: RegExp): number | undefined 
 
 function deriveCourseBuildIntent(goal: string): CourseBuildIntent {
   const oneLesson =
-    /\\b(?:one|1)\\s+(?:complete\\s+|controlled\\s+|production\\s+)*lesson\\b/i.test(goal) ||
-    /build scope\\s*:\\s*(?:one|1)\\s+(?:complete\\s+)?lesson/i.test(goal);
+    /\b(?:one|1)\s+(?:complete\s+|controlled\s+|production\s+)*lesson\b/i.test(goal) ||
+    /build scope\s*:\s*(?:one|1)\s+(?:complete\s+)?lesson/i.test(goal);
   const difficultyValue = labeledGoalValue(goal, 'Difficulty')?.toLowerCase();
   const difficulty =
     difficultyValue === 'beginner' ||
@@ -93,15 +93,15 @@ function deriveCourseBuildIntent(goal: string): CourseBuildIntent {
       : undefined;
   const lessonTitle = labeledGoalValue(goal, 'Lesson title');
   const hoursMatch = goal.match(
-    /(?:total instructional time|duration)\\s*:\\s*(\\d+(?:\\.\\d+)?)\\s*hours?/i,
+    /(?:total instructional time|duration)\s*:\s*(\d+(?:\.\d+)?)\s*hours?/i,
   );
   const hours = hoursMatch ? Number.parseFloat(hoursMatch[1]) : undefined;
   const moduleCount = oneLesson
     ? 1
-    : positiveGoalInteger(goal, /(?:module count|modules?)\\s*:\\s*(\\d+)/i);
+    : positiveGoalInteger(goal, /(?:module count|modules?)\s*:\s*(\d+)/i);
   const lessonsPerModule = oneLesson
     ? 1
-    : positiveGoalInteger(goal, /(?:lessons? per module|lesson count|lessons?)\\s*:\\s*(\\d+)/i);
+    : positiveGoalInteger(goal, /(?:lessons? per module|lesson count|lessons?)\s*:\s*(\d+)/i);
 
   return {
     buildScope: oneLesson ? 'lesson' : 'course',

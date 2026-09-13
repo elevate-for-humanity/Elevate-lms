@@ -86,6 +86,7 @@ describe('canonical Course Factory media architecture', () => {
     expect(worker).toContain('maxJobs ?? maxConcurrent');
     expect(worker).toContain("db.rpc('claim_video_jobs'");
     expect(worker).toContain('p_course_id: courseId');
+    expect(worker).toContain(".lt('retry_count', 3)");
     expect(worker).toContain('processClaimedVideoJob(job)');
     expect(worker).toContain('await Promise.allSettled');
     expect(worker).not.toContain('after(async');

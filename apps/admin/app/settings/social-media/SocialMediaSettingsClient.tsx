@@ -105,17 +105,19 @@ export default function SocialMediaSettingsClient() {
   const loadStatuses = useCallback(async () => {
     setLoading(true);
     try {
-      const [res, configRes] = await Promise.all([
-        fetch('/api/admin/social-media/status', { cache: 'no-store' }),
-        fetch('/api/admin/social-media/config', { cache: 'no-store' }),
+      const [statusResult, configResult] = await Promise.allSettled([
+        fetch('/api/admin/social-media/status', { cache: 'no-store', signal: AbortSignal.timeout(12_000) }),
+        fetch('/api/admin/social-media/config', { cache: 'no-store', signal: AbortSignal.timeout(12_000) }),
       ]);
-      if (res.ok) {
-        const data = await res.json();
+      if (statusResult.status === 'fulfilled' && statusResult.value.ok) {
+        const data = await statusResult.value.json();
         const map: Record<string, PlatformStatus> = {};
         for (const s of data.statuses ?? []) map[s.platform] = s;
         setStatuses(map);
       }
-      if (configRes.ok) setMetaConfig(await configRes.json());
+      if (configResult.status === 'fulfilled' && configResult.value.ok) {
+        setMetaConfig(await configResult.value.json());
+      }
     } finally {
       setLoading(false);
     }

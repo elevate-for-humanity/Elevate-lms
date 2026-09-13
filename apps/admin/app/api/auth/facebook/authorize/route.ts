@@ -2,7 +2,7 @@ import { randomBytes } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { getMetaOAuthConfig } from '@/lib/social/meta-oauth-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -31,9 +31,9 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  await hydrateProcessEnv();
-  const clientId = process.env.FACEBOOK_CLIENT_ID?.trim();
-  const clientSecret = process.env.FACEBOOK_CLIENT_SECRET?.trim();
+  const metaConfig = await getMetaOAuthConfig();
+  const clientId = metaConfig.clientId.value;
+  const clientSecret = metaConfig.clientSecret.value;
   // A page ID is optional here. Meta returns the pages authorized by the user,
   // and the callback selects the sole page or validates a configured page.
   if (!clientId || !clientSecret) {

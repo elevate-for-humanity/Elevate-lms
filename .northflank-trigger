@@ -1,4 +1,4 @@
-merge_sha=45caca1825d0c95e9562082285e5596406c94f89
-services=admin
-requested_at=2026-09-13T15:28:00Z
-reason=deploy-social-operations-and-meta-oauth-runtime-fix
+merge_sha=5481a8b8d31de015546d9923b8a404890e418c8c
+services=marketing,admin,lms
+requested_at=2026-09-13T15:57:59Z
+reason=deploy-staff-conversion-and-marketing-layout-repairs

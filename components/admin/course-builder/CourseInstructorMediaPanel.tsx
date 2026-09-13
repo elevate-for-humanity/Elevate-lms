@@ -51,7 +51,13 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
       const response = await fetch('/api/admin/course-builder', {
         method: 'POST',
         headers: courseBuilderJsonHeaders('queue-media'),
-        body: JSON.stringify({ action: 'queue-media', courseId, onlyMissing: true }),
+        body: JSON.stringify({
+          action: 'queue-media',
+          courseId,
+          onlyMissing: true,
+          scope: 'course',
+          confirmCourseBatch: true,
+        }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Unable to queue videos');
@@ -89,6 +95,8 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
           courseId,
           onlyMissing: false,
           force: true,
+          scope: 'course',
+          confirmCourseBatch: true,
         }),
       });
       const queueData = await queueResponse.json();

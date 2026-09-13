@@ -935,9 +935,48 @@ export async function courseFactory(
     // The registry remains the evidence source; this only scopes the generated draft.
     if (input.buildScope === 'lesson') {
       const firstModule = blueprint.modules[0];
-      if (!firstModule?.lessons?.length)
+      const firstLesson = firstModule?.lessons?.[0];
+      if (!firstModule || !firstLesson)
         throw new Error('The selected blueprint has no lesson to build.');
-      blueprint.modules = [{ ...firstModule, lessons: [firstModule.lessons[0]] }];
+      const scopedLesson = {
+        ...firstLesson,
+        title: input.title || firstLesson.title,
+        slug: input.title ? slugify(input.title) : firstLesson.slug,
+        durationMinutes: input.hours ? Math.round(input.hours * 60) : firstLesson.durationMinutes,
+      };
+      blueprint = {
+        ...blueprint,
+        id: `${blueprint.id}-lesson-draft`,
+        title: input.title || blueprint.title,
+        expectedModuleCount: 1,
+        expectedLessonCount: 1,
+        modules: [
+          {
+            ...firstModule,
+            title: input.title || firstModule.title,
+            minLessons: 1,
+            maxLessons: 1,
+            quizRequired: false,
+            requiredLessonTypes: [{ lessonType: 'lesson', requiredCount: 1 }],
+            lessons: [scopedLesson],
+          },
+        ],
+        assessmentRules: (blueprint.assessmentRules ?? []).filter(
+          (rule) => rule.assessmentType !== 'final' && rule.assessmentType !== 'universal_review',
+        ),
+        generationRules: {
+          ...(blueprint.generationRules ?? {}),
+          requiresFinalExam: false,
+          requireFinalExam: false,
+          requiresUniversalReview: false,
+          minModules: 1,
+          maxModules: 1,
+          minLessonsPerModule: 1,
+          maxLessonsPerModule: 1,
+          maxTotalLessons: 1,
+          requireCheckpointPerModule: false,
+        },
+      };
     } else if (input.moduleCount || input.lessonsPerModule) {
       const moduleLimit = input.moduleCount ?? blueprint.modules.length;
       const lessonLimit = input.lessonsPerModule;

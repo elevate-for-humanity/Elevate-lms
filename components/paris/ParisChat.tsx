@@ -670,7 +670,7 @@ export default function ParisChat({
                 allowBrowserFallback: false,
               });
             }}
-            className={`inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center rounded-full border transition ${
+            className={`inline-flex !h-11 !w-11 !min-w-11 !max-w-11 flex-none items-center justify-center rounded-full border !p-0 transition ${
               voice.isPlaying || voice.isLoading
                 ? 'border-brand-blue-700 bg-brand-blue-700 text-white'
                 : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
@@ -696,7 +696,7 @@ export default function ParisChat({
                 : 'Voice typing is unavailable in this browser'
             }
             onClick={toggleListening}
-            className={`inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center rounded-full border transition ${
+            className={`inline-flex !h-11 !w-11 !min-w-11 !max-w-11 flex-none items-center justify-center rounded-full border !p-0 transition ${
               isListening
                 ? 'border-brand-red-600 bg-brand-red-600 text-white'
                 : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
@@ -731,7 +731,7 @@ export default function ParisChat({
             type="submit"
             aria-label="Send message"
             disabled={!input.trim() || isLoading}
-            className="inline-flex h-11 w-11 min-w-11 flex-none items-center justify-center gap-2 rounded-full bg-brand-blue-700 p-0 font-semibold text-white transition hover:bg-brand-blue-800 disabled:cursor-not-allowed disabled:opacity-50 sm:h-auto sm:min-h-12 sm:w-auto sm:min-w-fit sm:rounded-2xl sm:px-5 sm:py-3"
+            className="inline-flex !h-11 !w-11 !min-w-11 !max-w-11 flex-none items-center justify-center gap-2 rounded-full bg-brand-blue-700 !p-0 font-semibold text-white transition hover:bg-brand-blue-800 disabled:cursor-not-allowed disabled:opacity-50 sm:!h-auto sm:!min-h-12 sm:!w-auto sm:!min-w-fit sm:!max-w-none sm:rounded-2xl sm:!px-5 sm:!py-3"
           >
             <Send className="h-4 w-4 shrink-0" aria-hidden="true" />
             <span className="hidden sm:inline">Send</span>

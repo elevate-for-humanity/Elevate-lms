@@ -10,9 +10,14 @@ const PROOF = [
 
 export function PlatformHubHero() {
   return (
-    <section className="border-b border-slate-200 bg-white" aria-labelledby="home-hero-heading">
+    <section
+      className="border-b border-slate-200 bg-white"
+      aria-labelledby="home-hero-heading"
+      data-scroll-narration
+      data-narration="Welcome to Elevate for Humanity. Explore practical career training, registered apprenticeships, and employer-connected pathways in Indiana. Choose a program, review possible funding, and take your next step online."
+    >
       <div className="mx-auto grid max-w-[1440px] lg:min-h-[calc(100svh-60px)] lg:grid-cols-[0.92fr_1.08fr]">
-        <div className="flex items-center px-5 py-10 sm:px-8 sm:py-14 lg:px-14">
+        <div className="order-2 flex items-center px-5 py-10 sm:px-8 sm:py-14 lg:order-1 lg:px-14">
           <div className="max-w-2xl">
             <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">
               Career training in Indiana
@@ -42,7 +47,7 @@ export function PlatformHubHero() {
             </div>
           </div>
         </div>
-        <div className="relative min-h-[560px] overflow-hidden bg-slate-100 lg:min-h-[calc(100svh-60px)]">
+        <div className="relative order-1 min-h-[clamp(320px,58svh,560px)] overflow-hidden bg-slate-100 lg:order-2 lg:min-h-[calc(100svh-60px)]">
           <Image
             src="/images/beauty/program-beauty-training.webp"
             alt="Learners receiving hands-on career training in a professional classroom"

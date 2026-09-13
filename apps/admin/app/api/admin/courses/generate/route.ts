@@ -169,6 +169,7 @@ async function _POST(req: NextRequest) {
       Number(process.env.COURSE_DRAFT_MAX_COST_MICROS ?? '2000000'),
     );
     const paidResult = await executePaidInference({
+      db,
       authorize: () =>
         reservePaidInference(db, {
           tenantId,

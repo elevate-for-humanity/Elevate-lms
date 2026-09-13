@@ -6,7 +6,6 @@ import { aiChat } from '@/lib/ai/ai-service';
 import { getAITool, getAIToolCatalogForPrompt, listAIToolsForAgent, type AIAgentId } from '@/lib/ai/tools/registry';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
 import { executeRegisteredAITool } from '@/lib/ai/tools/executor';
-import { getAdminUrl } from '@/lib/utils/siteUrl';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -229,7 +228,7 @@ export async function POST(request: NextRequest) {
             correlationId,
             confirmationText,
             requestHeaders: request.headers,
-            adminOrigin: getAdminUrl(),
+            adminOrigin: request.nextUrl.origin,
             appOrigin: request.nextUrl.origin,
             idempotencyKey: typeof body.idempotencyKey === 'string' ? body.idempotencyKey : null,
           });

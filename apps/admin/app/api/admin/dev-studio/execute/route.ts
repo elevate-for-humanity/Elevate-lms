@@ -19,6 +19,13 @@ type PlannedCommand = {
   answer?: string;
 };
 
+function internalAdminOrigin(): string {
+  const configured = process.env.ADMIN_INTERNAL_ORIGIN?.trim();
+  if (configured) return configured.replace(/\/$/, '');
+  const port = process.env.PORT?.trim() || '3000';
+  return `http://127.0.0.1:${port}`;
+}
+
 function sseLine(text: string): Uint8Array {
   return new TextEncoder().encode(`data: ${JSON.stringify({ line: text })}\n\n`);
 }
@@ -228,7 +235,7 @@ export async function POST(request: NextRequest) {
             correlationId,
             confirmationText,
             requestHeaders: request.headers,
-            adminOrigin: request.nextUrl.origin,
+            adminOrigin: internalAdminOrigin(),
             appOrigin: request.nextUrl.origin,
             idempotencyKey: typeof body.idempotencyKey === 'string' ? body.idempotencyKey : null,
           });

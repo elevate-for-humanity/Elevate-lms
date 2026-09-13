@@ -257,17 +257,17 @@ export async function enforceMediaQuality(input: {
     const { stderr: sceneOutput } = await execFileAsync(
       'ffmpeg',
       ['-hide_banner', '-i', videoPath, '-filter:v', "select='gt(scene,0.12)',showinfo", '-f', 'null', '-'],
-      { timeout: analysisTimeoutMs, maxBuffer: 8_000_000 },
+      { timeout: analysisTimeoutMs, maxBuffer: 64_000_000 },
     );
     const { stderr: freezeOutput } = await execFileAsync(
       'ffmpeg',
       ['-hide_banner', '-i', videoPath, '-vf', 'freezedetect=n=-45dB:d=2', '-an', '-f', 'null', '-'],
-      { timeout: analysisTimeoutMs, maxBuffer: 8_000_000 },
+      { timeout: analysisTimeoutMs, maxBuffer: 64_000_000 },
     );
     const { stderr: blackOutput } = await execFileAsync(
       'ffmpeg',
       ['-hide_banner', '-i', videoPath, '-vf', 'blackdetect=d=0.3:pix_th=0.10', '-an', '-f', 'null', '-'],
-      { timeout: analysisTimeoutMs, maxBuffer: 8_000_000 },
+      { timeout: analysisTimeoutMs, maxBuffer: 64_000_000 },
     );
 
     const evidence: MediaQualityEvidence = {

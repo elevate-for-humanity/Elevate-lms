@@ -5,6 +5,25 @@ import { resolveInstructionalDomainProfile } from './domain-profiles';
 import type { LessonRenderPlanDraft } from './types';
 
 const MAX_ATTEMPTS = 3;
+const SCENE_ATTEMPT_TIMEOUT_MS = 45_000;
+
+async function withSceneAttemptTimeout<T>(promise: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error(`Scene generation timed out after ${SCENE_ATTEMPT_TIMEOUT_MS}ms`)),
+          SCENE_ATTEMPT_TIMEOUT_MS,
+        );
+        timer.unref?.();
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
 
 function stripHtml(html: string): string {
   return (html || '')
@@ -65,14 +84,26 @@ export async function generateLessonScenes(opts: {
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const res = await aiChat({
-      messages: [
-        { role: 'system', content: SCENE_GENERATION_SYSTEM_PROMPT },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.7,
-      maxTokens: 4000,
-    });
+    let res;
+    try {
+      res = await withSceneAttemptTimeout(
+        aiChat({
+          messages: [
+            { role: 'system', content: SCENE_GENERATION_SYSTEM_PROMPT },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature: 0.7,
+          maxTokens: 4000,
+        }),
+      );
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.warn(`  ⚠ Attempt ${attempt + 1} provider error: ${lastError.message}`);
+      // A timeout is an availability failure, not a content-quality retry. Let
+      // the caller use its deterministic storyboard immediately.
+      if (lastError.message.includes('timed out')) break;
+      continue;
+    }
 
     const raw = res.content ?? '';
     const cleaned = raw

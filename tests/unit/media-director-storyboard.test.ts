@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
 
-import { directMedia } from '@/lib/video/media-director';
+import { directMedia, MAX_LESSON_VIDEO_SCENES } from '@/lib/video/media-director';
 import { buildStoryboardWebVtt } from '@/lib/video/remotion-render';
 
 describe('canonical media storyboard compatibility', () => {
@@ -42,6 +42,24 @@ describe('canonical media storyboard compatibility', () => {
     expect(storyboard.scenes).toHaveLength(1);
     expect(storyboard.scenes[0].subject).toBe('Nine-section Lean Canvas');
     expect(storyboard.scenes[0].environment).toBe('Exact animated instructional diagram');
+  });
+});
+
+describe('lesson media production bounds', () => {
+  it('coalesces long scripts into eight narration-preserving scenes', () => {
+    const script = Array.from({ length: 77 }, (_, i) => `Sentence ${i + 1} teaches required detail.`).join(' ');
+    const storyboard = directMedia({ title: 'Bounded lesson', script });
+    expect(storyboard.scenes).toHaveLength(8);
+    expect(storyboard.scenes.map((scene) => scene.dialogue).join(' ')).toContain('Sentence 77');
+  });
+
+  it('rejects oversized persisted storyboards before narration or rendering', () => {
+    const scenes = Array.from({ length: MAX_LESSON_VIDEO_SCENES + 1 }, (_, i) => ({
+      id: `scene-${i + 1}`,
+      action: `Action ${i + 1}`,
+    }));
+    expect(() => directMedia({ title: 'Oversized', script: 'Script.', sceneData: { scenes } }))
+      .toThrow(`MEDIA_SCENE_LIMIT_EXCEEDED:${MAX_LESSON_VIDEO_SCENES + 1}:${MAX_LESSON_VIDEO_SCENES}`);
   });
 });
 

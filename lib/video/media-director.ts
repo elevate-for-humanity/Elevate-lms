@@ -95,6 +95,9 @@ export interface MediaDirectorInput {
   defaultDurationSeconds?: number;
 }
 
+export const MAX_LESSON_VIDEO_SCENES = 12;
+const DEFAULT_SCRIPT_SCENES = 8;
+
 function stringValue(value: unknown, fallback = ''): string {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
@@ -156,12 +159,18 @@ function scriptScenes(script: string, title: string): Record<string, unknown>[] 
     .split(/(?<=[.!?])\s+/)
     .map((value) => value.trim())
     .filter(Boolean);
-  return sentences.map((action, index) => {
-    const phase = procedurePhase(action, index, sentences.length);
+  const sceneCount = Math.min(DEFAULT_SCRIPT_SCENES, Math.max(1, sentences.length));
+  const groups = Array.from({ length: sceneCount }, (_, index) => {
+    const start = Math.floor((index * sentences.length) / sceneCount);
+    const end = Math.floor(((index + 1) * sentences.length) / sceneCount);
+    return sentences.slice(start, Math.max(start + 1, end)).join(' ');
+  });
+  return groups.map((action, index) => {
+    const phase = procedurePhase(action, index, groups.length);
     const detail = /angle|position|blade|guard|hand|finger|line|section|tool/i.test(action);
     return {
       action,
-      scene_type: sceneTypeValue(undefined, index, sentences.length),
+      scene_type: sceneTypeValue(undefined, index, groups.length),
       subject: title,
       dialogue: action,
       procedure_phase: phase,
@@ -182,6 +191,11 @@ function scriptScenes(script: string, title: string): Record<string, unknown>[] 
 export function directMedia(input: MediaDirectorInput): MediaStoryboard {
   const raw = input.sceneData ?? {};
   const rawScenes = Array.isArray(raw.scenes) ? raw.scenes : [];
+  if (rawScenes.length > MAX_LESSON_VIDEO_SCENES) {
+    throw new Error(
+      `MEDIA_SCENE_LIMIT_EXCEEDED:${rawScenes.length}:${MAX_LESSON_VIDEO_SCENES}`,
+    );
+  }
   const characters = Array.isArray(input.characters) ? input.characters : [];
   const defaultDuration = numberValue(
     raw.duration_seconds ?? raw.target_duration_seconds,

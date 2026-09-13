@@ -1,512 +1,417 @@
 'use client';
 
-import toast from 'react-hot-toast';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
-import React from 'react';
-
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-
+import toast from 'react-hot-toast';
 import {
   ArrowLeft,
+  CalendarClock,
+  Check,
+  ChevronRight,
+  FileText,
+  Image as ImageIcon,
+  Instagram,
+  Loader2,
   Save,
-  Play,
-  Globe,
-  Share2,
-  MessageCircle,
-  Sparkles,
+  ShieldCheck,
   Video,
-  ExternalLink,
 } from 'lucide-react';
 
-interface Program { id: string; title: string; slug: string }
+interface Program {
+  id: string;
+  title: string;
+  slug: string;
+}
+interface BlogSource {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  featured_image: string | null;
+}
+interface GeneratedPost {
+  blogId: string;
+  caption: string;
+  reel: {
+    hook: string;
+    voiceover: string;
+    scenes: Array<{ seconds: number; visual: string; overlay: string }>;
+    hashtags: string[];
+    cta: string;
+  };
+}
 
-export default function NewSocialCampaignPage({ programs = [] }: { programs?: Program[] }) {
+const destinations = [
+  {
+    id: 'facebook',
+    name: 'Facebook Page',
+    detail: 'Article link, approved image or Reel',
+    icon: FileText,
+  },
+  {
+    id: 'instagram',
+    name: 'Instagram Business',
+    detail: 'Approved image, carousel or Reel',
+    icon: Instagram,
+  },
+] as const;
+
+export default function NewSocialCampaignClient({
+  programs = [],
+  blogs = [],
+}: {
+  programs?: Program[];
+  blogs?: BlogSource[];
+}) {
   const router = useRouter();
-
-  const [campaign, setCampaign] = useState({
-    name: '',
-    contentSource: 'blog' as 'blog' | 'ai' | 'manual',
-    platforms: [] as string[],
-    frequency: '3x-daily' as '3x-daily' | 'daily' | 'weekly',
-    times: ['09:00', '13:00', '17:00'],
-    program: 'all',
-    duration: '30',
-  });
-
-  const [generatedPosts, setGeneratedPosts] = useState<string[]>([]);
+  const [name, setName] = useState('Elevate weekly career update');
+  const [program, setProgram] = useState('all');
+  const [platforms, setPlatforms] = useState<string[]>(['facebook', 'instagram']);
+  const [frequency, setFrequency] = useState<'daily' | 'weekly'>('weekly');
+  const [duration, setDuration] = useState('30');
+  const [generatedPosts, setGeneratedPosts] = useState<GeneratedPost[]>([]);
+  const [selectedPreview, setSelectedPreview] = useState(0);
   const [generating, setGenerating] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const plannedCount = useMemo(() => {
+    const days = Math.max(1, Number(duration) || 1);
+    return frequency === 'daily' ? Math.min(days, 90) : Math.min(Math.ceil(days / 7), 13);
+  }, [duration, frequency]);
 
   const togglePlatform = (platform: string) => {
-    setCampaign({
-      ...campaign,
-      platforms: campaign.platforms.includes(platform)
-        ? campaign.platforms.filter((p) => p !== platform)
-        : [...campaign.platforms, platform],
-    });
+    setPlatforms((current) =>
+      current.includes(platform)
+        ? current.filter((item) => item !== platform)
+        : [...current, platform],
+    );
   };
 
-  const generatePosts = async () => {
+  const generateDrafts = async () => {
+    if (!name.trim() || platforms.length === 0) return;
     setGenerating(true);
     try {
       const response = await fetch('/api/social-media/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          program: campaign.program,
-          count: parseInt(campaign.duration) * (campaign.frequency === '3x-daily' ? 3 : 1),
-          contentSource: campaign.contentSource,
-        }),
+        body: JSON.stringify({ program, count: plannedCount, contentSource: 'blog' }),
       });
-
       const result = await response.json();
-      if (result.success) {
-        setGeneratedPosts(result.posts);
-      }
+      if (!response.ok || !result.success)
+        throw new Error(result.error || 'Draft generation failed');
+      setGeneratedPosts(result.posts ?? []);
+      setSelectedPreview(0);
+      toast.success(`${result.posts?.length ?? 0} approval-ready packages created`);
     } catch (error) {
-      /* Error handled silently */
-      // Error handled
+      toast.error(error instanceof Error ? error.message : 'Draft generation failed');
     } finally {
       setGenerating(false);
     }
   };
 
-  const saveCampaign = async () => {
-    const response = await fetch('/api/social-media/campaigns', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...campaign, status: 'draft' }),
-    });
-    if (response.ok) {
-      toast.success('Campaign saved as draft!');
+  const saveDraft = async () => {
+    setSaving(true);
+    try {
+      const response = await fetch('/api/social-media/campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          contentSource: 'blog',
+          platforms,
+          frequency,
+          times: ['09:00'],
+          program,
+          duration,
+          status: 'draft',
+          sourceBlogIds: generatedPosts.map((post) => post.blogId),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Campaign could not be saved');
+      toast.success('Campaign saved as a draft');
       router.push('/social-media');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Campaign could not be saved');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const activateCampaign = async () => {
-    if (!confirm('Activate this campaign? Posts will start going out immediately.')) return;
-
-    const response = await fetch('/api/social-media/campaigns', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...campaign, status: 'active' }),
-    });
-    if (response.ok) {
-      toast.success('Campaign activated! Posts will go out 3x daily.');
-      router.push('/social-media');
-    }
-  };
+  const preview = generatedPosts[selectedPreview];
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'New' }]} />
-      </div>
-      {/* Hero Section */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
-        <Image
-          src="/images/hvac-hero.webp"
-          alt="New"
-          fill
-          className="object-cover"
-          quality={90}
-          priority
-          sizes="100vw"
-        />
+    <main className="min-h-screen bg-slate-950 text-white">
+      <section className="border-b border-white/10 bg-[radial-gradient(circle_at_top_right,_rgba(37,99,235,.35),_transparent_35%),linear-gradient(135deg,#020617,#0f172a)]">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <Link
+            href="/social-media"
+            className="inline-flex items-center gap-2 text-sm font-bold text-blue-200 hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" /> Social operations
+          </Link>
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1.35fr_.65fr] lg:items-end">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[.25em] text-blue-300">
+                Elevate editorial studio
+              </p>
+              <h1 className="mt-3 max-w-3xl text-4xl font-black tracking-tight sm:text-5xl">
+                Turn real Elevate stories into platform-ready content.
+              </h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
+                Use published articles and approved media to create captions, Reel scripts, scene
+                directions and calls to action. Every external post stays in review until an
+                administrator approves it.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
+              <div className="flex items-center gap-3 text-emerald-200">
+                <ShieldCheck className="h-5 w-5" />
+                <span className="font-bold">Safe production defaults</span>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                Deterministic generation only. No GPU, paid AI, automatic activation or unapproved
+                public publishing.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => router.push('/social-media')}
-                className="p-2 hover:bg-slate-100 rounded-lg"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(360px,.9fr)] lg:px-8">
+        <div className="space-y-6">
+          <section className="rounded-3xl bg-white p-6 text-slate-950 shadow-2xl shadow-black/20">
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-black">Create Social Media Campaign</h1>
-                <p className="text-sm text-black">Au to social media 3x daily</p>
+                <p className="text-xs font-black uppercase tracking-[.2em] text-blue-700">
+                  1 · Campaign brief
+                </p>
+                <h2 className="mt-2 text-2xl font-black">Choose the story and cadence</h2>
               </div>
+              <FileText className="h-8 w-8 text-blue-700" />
             </div>
-
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={saveCampaign}
-                className="flex items-center space-x-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50"
-              >
-                <Save className="w-4 h-4" />
-                <span>Save Draft</span>
-              </button>
-              <button
-                onClick={activateCampaign}
-                disabled={generatedPosts.length === 0}
-                className="flex items-center space-x-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Play className="w-4 h-4" />
-                <span>Activate Campaign</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Configuration */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Campaign Details */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Campaign Details</h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Campaign Name</label>
-                  <input
-                    type="text"
-                    value={campaign.name}
-                    onChange={(
-                      e: React.ChangeEvent<
-                        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-                      >,
-                    ) => setCampaign({ ...campaign, name: e.target.value })}
-                    placeholder="e.g., Barber Program Promotion"
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">
-                    Content Source
-                  </label>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    <button
-                      onClick={() => setCampaign({ ...campaign, contentSource: 'blog' })}
-                      className={`p-4 border-2 rounded-lg text-left transition-colors ${
-                        campaign.contentSource === 'blog'
-                          ? 'border-brand-blue-600 bg-brand-blue-50'
-                          : 'border-slate-200 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="font-medium text-black">Blog Posts</div>
-                      <div className="text-sm text-black mt-1">From your blog</div>
-                    </button>
-                    <button
-                      onClick={() => setCampaign({ ...campaign, contentSource: 'ai' })}
-                      className={`p-4 border-2 rounded-lg text-left transition-colors ${
-                        campaign.contentSource === 'ai'
-                          ? 'border-brand-blue-600 bg-brand-blue-50'
-                          : 'border-slate-200 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="font-medium text-black flex items-center">
-                        <Sparkles className="w-4 h-4 mr-1" />
-                        AI Generated
-                      </div>
-                      <div className="text-sm text-black mt-1">GPT-4 powered</div>
-                    </button>
-                    <button
-                      onClick={() => setCampaign({ ...campaign, contentSource: 'manual' })}
-                      className={`p-4 border-2 rounded-lg text-left transition-colors ${
-                        campaign.contentSource === 'manual'
-                          ? 'border-brand-blue-600 bg-brand-blue-50'
-                          : 'border-slate-200 hover:border-slate-300'
-                      }`}
-                    >
-                      <div className="font-medium text-black">Manual</div>
-                      <div className="text-sm text-black mt-1">Write your own</div>
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Program Focus</label>
-                  <select
-                    value={campaign.program}
-                    onChange={(
-                      e: React.ChangeEvent<
-                        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-                      >,
-                    ) => setCampaign({ ...campaign, program: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  >
-                    <option value="all">All Programs</option>
-                    {programs.map((p) => (
-                      <option key={p.id} value={p.slug}>{p.title}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Platform Selection */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Select Platforms</h2>
-
-              <div className="grid grid-cols-2 gap-4">
-                <PlatformButton
-                  name="Facebook"
-                  icon={Globe}
-                  selected={campaign.platforms.includes('facebook')}
-                  onClick={() => togglePlatform('facebook')}
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <label className="sm:col-span-2">
+                <span className="text-sm font-bold">Campaign name</span>
+                <input
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                 />
-                <a
-                  href="https://studio.youtube.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-colors group"
+              </label>
+              <label>
+                <span className="text-sm font-bold">Program focus</span>
+                <select
+                  value={program}
+                  onChange={(event) => setProgram(event.target.value)}
+                  className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3"
                 >
-                  <div className="flex items-center gap-2">
-                    <Video className="w-5 h-5 text-red-500" />
-                    <span className="text-sm font-medium text-gray-700">YouTube</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-gray-400 group-hover:text-red-500">
-                    <ExternalLink className="w-3 h-3" />
-                    Studio
-                  </div>
-                </a>
-                <PlatformButton
-                  name="LinkedIn"
-                  icon={Share2}
-                  selected={campaign.platforms.includes('linkedin')}
-                  onClick={() => togglePlatform('linkedin')}
-                />
-                <PlatformButton
-                  name="Instagram"
-                  icon={MessageCircle}
-                  selected={campaign.platforms.includes('instagram')}
-                  onClick={() => togglePlatform('instagram')}
-                />
-              </div>
-            </div>
-
-            {/* Schedule */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Posting Schedule</h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Frequency</label>
-                  <select
-                    value={campaign.frequency}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                      setCampaign({
-                        ...campaign,
-                        frequency: e.target.value as '3x-daily' | 'daily' | 'weekly',
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  >
-                    <option value="3x-daily">3x Daily (9 AM, 1 PM, 5 PM EST)</option>
-                    <option value="daily">Once Daily</option>
-                    <option value="weekly">Weekly</option>
-                  </select>
-                </div>
-
-                {campaign.frequency === '3x-daily' && (
-                  <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
-                    <h3 className="font-medium text-brand-blue-900 mb-2">
-                      Daily Posting Times (EST)
-                    </h3>
-                    <ul className="space-y-1 text-sm text-brand-blue-800">
-                      <li>• Morning: 9:00 AM</li>
-                      <li>• Afternoon: 1:00 PM</li>
-                      <li>• Evening: 5:00 PM</li>
-                    </ul>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">
-                    Campaign Duration (Days)
-                  </label>
+                  <option value="all">All Elevate programs</option>
+                  {programs.map((item) => (
+                    <option key={item.id} value={item.slug}>
+                      {item.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span className="text-sm font-bold">Cadence</span>
+                <select
+                  value={frequency}
+                  onChange={(event) => setFrequency(event.target.value as 'daily' | 'weekly')}
+                  className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3"
+                >
+                  <option value="weekly">Weekly editorial post</option>
+                  <option value="daily">Daily editorial post</option>
+                </select>
+              </label>
+              <label>
+                <span className="text-sm font-bold">Campaign length</span>
+                <div className="relative mt-2">
                   <input
                     type="number"
-                    value={campaign.duration}
-                    onChange={(
-                      e: React.ChangeEvent<
-                        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-                      >,
-                    ) => setCampaign({ ...campaign, duration: e.target.value })}
-                    min="1"
-                    max="365"
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
+                    min="7"
+                    max="90"
+                    value={duration}
+                    onChange={(event) => setDuration(event.target.value)}
+                    className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-16"
                   />
-                  <p className="text-sm text-black mt-1">
-                    Total posts:{' '}
-                    {parseInt(campaign.duration) * (campaign.frequency === '3x-daily' ? 3 : 1)}
-                  </p>
+                  <span className="absolute right-4 top-3 text-sm text-slate-500">days</span>
                 </div>
+              </label>
+              <div className="rounded-xl bg-slate-100 p-4">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                  Available source library
+                </p>
+                <p className="mt-1 text-2xl font-black">{blogs.length}</p>
+                <p className="text-sm text-slate-600">published, social-enabled articles</p>
               </div>
             </div>
+          </section>
 
-            {/* Generate Posts */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">Generated Posts</h2>
-                <button
-                  onClick={generatePosts}
-                  disabled={generating || !campaign.name || campaign.platforms.length === 0}
-                  className="flex items-center space-x-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>{generating ? 'Generating...' : 'Generate Posts'}</span>
-                </button>
-              </div>
-
-              {generatedPosts.length > 0 ? (
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {generatedPosts.map((post, index) => (
-                    <div key={index} className="p-4 border border-slate-200 rounded-lg">
-                      <div className="flex items-start justify-between mb-2">
-                        <span className="text-xs font-medium text-black">Post {index + 1}</span>
-                        <span className="text-xs text-black">
-                          Day {Math.floor(index / 3) + 1} -{' '}
-                          {['Morning', 'Afternoon', 'Evening'][index % 3]}
+          <section className="rounded-3xl bg-white p-6 text-slate-950">
+            <p className="text-xs font-black uppercase tracking-[.2em] text-blue-700">
+              2 · Destinations
+            </p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {destinations.map(({ id, name: destinationName, detail, icon: Icon }) => {
+                const selected = platforms.includes(id);
+                return (
+                  <button
+                    type="button"
+                    key={id}
+                    onClick={() => togglePlatform(id)}
+                    className={`rounded-2xl border-2 p-4 text-left transition ${selected ? 'border-blue-600 bg-blue-50' : 'border-slate-200 hover:border-slate-400'}`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <Icon
+                        className={`h-6 w-6 ${selected ? 'text-blue-700' : 'text-slate-400'}`}
+                      />
+                      {selected && (
+                        <span className="rounded-full bg-blue-700 p-1 text-white">
+                          <Check className="h-3 w-3" />
                         </span>
-                      </div>
-                      <p className="text-sm text-black">{post}</p>
+                      )}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 text-black">
-                  <Sparkles className="w-12 h-12 mx-auto mb-3 text-black" />
-                  <p>Click "Generate Posts" to create content</p>
-                </div>
-              )}
+                    <p className="mt-4 font-black">{destinationName}</p>
+                    <p className="mt-1 text-sm leading-5 text-slate-600">{detail}</p>
+                  </button>
+                );
+              })}
             </div>
-          </div>
+          </section>
 
-          {/* Preview */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6 sticky top-8">
-              <h3 className="font-semibold text-black mb-4">Campaign Summary</h3>
-
-              <div className="space-y-4">
-                <div>
-                  <div className="text-xs text-black mb-1">Campaign Name</div>
-                  <div className="text-sm font-medium text-black">
-                    {campaign.name || 'Untitled Campaign'}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-black mb-1">Platforms</div>
-                  <div className="flex flex-wrap gap-2">
-                    {campaign.platforms.length > 0 ? (
-                      campaign.platforms.map((platform) => (
-                        <span
-                          key={platform}
-                          className="inline-flex items-center px-2 py-2 rounded-md text-xs font-medium bg-brand-blue-100 text-brand-blue-800"
-                        >
-                          {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-sm text-black">No platforms selected</span>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-black mb-1">Frequency</div>
-                  <div className="text-sm text-black">
-                    {campaign.frequency === '3x-daily' ? '3x Daily' : campaign.frequency}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-black mb-1">Duration</div>
-                  <div className="text-sm text-black">{campaign.duration} days</div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-black mb-1">Total Posts</div>
-                  <div className="text-sm font-medium text-black">
-                    {parseInt(campaign.duration) * (campaign.frequency === '3x-daily' ? 3 : 1)}{' '}
-                    posts
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-black mb-1">Content Source</div>
-                  <div className="text-sm text-black">
-                    {campaign.contentSource === 'blog'
-                      ? 'Blog Posts'
-                      : campaign.contentSource === 'ai'
-                        ? 'AI Generated'
-                        : 'Manual'}
-                  </div>
-                </div>
-
-                {generatedPosts.length > 0 && (
-                  <div className="pt-4 border-t border-slate-200">
-                    <div className="text-xs text-black mb-1">Status</div>
-                    <div className="text-sm font-medium text-brand-green-600">
-                      • {generatedPosts.length} posts ready
-                    </div>
-                  </div>
+          <section className="rounded-3xl border border-white/10 bg-slate-900 p-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[.2em] text-blue-300">
+                  3 · Draft packages
+                </p>
+                <h2 className="mt-2 text-2xl font-black">Captions + Reel storyboards</h2>
+              </div>
+              <button
+                onClick={generateDrafts}
+                disabled={generating || !name.trim() || platforms.length === 0}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-black hover:bg-blue-500 disabled:opacity-50"
+              >
+                {generating ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Video className="h-4 w-4" />
                 )}
-              </div>
+                {generating ? 'Building packages…' : `Build ${plannedCount} packages`}
+              </button>
             </div>
-          </div>
+            {generatedPosts.length ? (
+              <div className="mt-6 space-y-2">
+                {generatedPosts.map((post, index) => (
+                  <button
+                    key={`${post.blogId}-${index}`}
+                    onClick={() => setSelectedPreview(index)}
+                    className={`flex w-full items-center justify-between rounded-xl border p-4 text-left ${selectedPreview === index ? 'border-blue-400 bg-blue-400/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-bold">{post.reel.hook}</p>
+                      <p className="mt-1 text-xs text-slate-400">
+                        {post.reel.scenes.length} scenes · deterministic Elevate template
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 shrink-0" />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-10 text-center">
+                <Video className="mx-auto h-9 w-9 text-slate-500" />
+                <p className="mt-3 font-bold">No drafts built yet</p>
+                <p className="mt-1 text-sm text-slate-400">
+                  Packages use the newest approved articles from the Elevate blog.
+                </p>
+              </div>
+            )}
+          </section>
         </div>
 
-        {/* CTA Section */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6">Create Social Campaign</h2>
-              <p className="text-base md:text-lg mb-8 text-brand-blue-100">
-                Plan and schedule posts across social media platforms.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/social-media/campaigns/new"
-                  className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-slate-50 text-lg shadow-2xl transition-all"
-                >
-                  View Campaigns
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
-                >
-                  View Dashboard
-                </Link>
+        <aside className="space-y-6">
+          <section className="sticky top-6 rounded-3xl border border-white/10 bg-white p-6 text-slate-950 shadow-2xl">
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl bg-violet-100 p-2.5">
+                <ImageIcon className="h-5 w-5 text-violet-700" />
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[.18em] text-violet-700">
+                  Editorial preview
+                </p>
+                <h2 className="font-black">
+                  {preview ? preview.reel.hook : 'Select a draft package'}
+                </h2>
               </div>
             </div>
-          </div>
-        </section>
+            {preview ? (
+              <div className="mt-6 space-y-5">
+                <div className="rounded-2xl bg-slate-950 p-5 text-white">
+                  <p className="whitespace-pre-line text-sm leading-6">{preview.caption}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                    Voiceover
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-slate-700">{preview.reel.voiceover}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-black uppercase tracking-wide text-slate-500">
+                    Reel scenes
+                  </p>
+                  <ol className="mt-3 space-y-3">
+                    {preview.reel.scenes.map((scene, index) => (
+                      <li
+                        key={`${scene.overlay}-${index}`}
+                        className="grid grid-cols-[42px_1fr] gap-3"
+                      >
+                        <span className="rounded-lg bg-blue-100 px-2 py-2 text-center text-xs font-black text-blue-800">
+                          {scene.seconds}s
+                        </span>
+                        <div>
+                          <p className="text-sm font-bold">{scene.overlay}</p>
+                          <p className="text-xs leading-5 text-slate-500">{scene.visual}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-6 rounded-2xl bg-slate-100 p-8 text-center text-sm text-slate-500">
+                Build packages to preview the exact caption, voiceover and scene plan before
+                approval.
+              </div>
+            )}
+            <div className="mt-6 border-t border-slate-200 pt-5">
+              <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                <CalendarClock className="h-4 w-4 text-blue-700" />
+                {plannedCount} planned packages over {duration || 0} days
+              </div>
+              <p className="mt-2 text-xs leading-5 text-slate-500">
+                Saving creates a campaign record only. Publishing remains blocked until each
+                destination is connected and each post is approved.
+              </p>
+              <button
+                onClick={saveDraft}
+                disabled={saving || !name.trim() || platforms.length === 0}
+                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                Save campaign draft
+              </button>
+            </div>
+          </section>
+        </aside>
       </div>
-    </div>
-  );
-}
-
-interface PlatformButtonProps {
-  name: string;
-  icon: React.ComponentType<{ className?: string }>;
-  selected: boolean;
-  onClick: () => void;
-}
-
-function PlatformButton({ name, icon: Icon, selected, onClick }: PlatformButtonProps) {
-  return (
-    <button
-      onClick={onClick}
-      className={`p-4 border-2 rounded-lg transition-colors ${
-        selected
-          ? 'border-brand-blue-600 bg-brand-blue-50'
-          : 'border-slate-200 hover:border-slate-300'
-      }`}
-    >
-      <Icon className={`w-8 h-8 mb-2 ${selected ? 'text-brand-blue-600' : 'text-black'}`} />
-      <div className="font-medium text-black">{name}</div>
-    </button>
+    </main>
   );
 }

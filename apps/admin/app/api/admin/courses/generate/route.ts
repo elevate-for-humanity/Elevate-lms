@@ -172,6 +172,7 @@ async function _POST(req: NextRequest) {
       db,
       authorize: () =>
         reservePaidInference(db, {
+          scopeKey,
           tenantId,
           actorId: user.id,
           artifactFingerprint,

@@ -22,13 +22,13 @@ export function paidArtifactFingerprint(input: Record<string, unknown>): string 
 }
 
 export async function reservePaidInference(db: SupabaseClient, input: {
-  tenantId: string; actorId?: string|null; courseId?: string|null; lessonId?: string|null;
+  scopeKey: string; tenantId?: string|null; actorId?: string|null; courseId?: string|null; lessonId?: string|null;
   runId?: string|null; jobId?: string|null; artifactFingerprint: string;
   idempotencyKey: string; provider: string; model: string; operation: string;
   projectedCostMicros: number;
 }): Promise<{decision: PaidInferenceDecision; requestId: string|null}> {
   const { data, error } = await db.rpc('reserve_paid_inference_v1' as never, {
-    p_tenant_id: input.tenantId, p_actor_id: input.actorId ?? null,
+    p_scope_key: input.scopeKey, p_tenant_id: input.tenantId ?? null, p_actor_id: input.actorId ?? null,
     p_course_id: input.courseId ?? null, p_lesson_id: input.lessonId ?? null,
     p_run_id: input.runId ?? null, p_job_id: input.jobId ?? null,
     p_artifact_fingerprint: input.artifactFingerprint,

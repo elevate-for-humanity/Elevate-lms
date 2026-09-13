@@ -68,6 +68,17 @@ describe('single Course Builder authority', () => {
     expect(lifecycle).toContain('media.completePackage');
   });
 
+  it('projects every generated lesson into canonical objective and assessment records', () => {
+    const governance = read('lib/course-factory/post-generation-governance.ts');
+    expect(governance).toContain(".from('lesson_objectives')");
+    expect(governance).toContain("onConflict: 'lesson_id,position'");
+    expect(governance).toContain(".from('assessment_questions')");
+    expect(governance).toContain("onConflict: 'lesson_id,sort_order'");
+    expect(governance).not.toContain(
+      'if (isAssessment) {\n        const { error: removeQuestionsError }',
+    );
+  });
+
   it('enforces lesson and course media completion in the database', () => {
     const migration = read(
       'supabase/migrations/20260905120000_enforce_unified_course_completion.sql',

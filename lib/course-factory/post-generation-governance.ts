@@ -28,6 +28,7 @@ function asArray(value: unknown): any[] {
 
 export type GovernanceNormalizationResult = {
   lessonsNormalized: number;
+  lessonObjectivesSynced: number;
   assessmentQuestionsSynced: number;
   flashcardsSynced: number;
   progressionRulesSynced: number;
@@ -57,6 +58,7 @@ export async function normalizeGeneratedCourseForGovernance(
   if (moduleError) throw moduleError;
 
   let lessonsNormalized = 0;
+  let lessonObjectivesSynced = 0;
   let assessmentQuestionsSynced = 0;
   let flashcardsSynced = 0;
   let progressionRulesSynced = 0;
@@ -189,40 +191,47 @@ export async function normalizeGeneratedCourseForGovernance(
       if (updateError) warnings.push(`${lesson.slug || lesson.id}: ${updateError.message}`);
       else lessonsNormalized += 1;
 
-      if (isAssessment) {
-        const { error: removeQuestionsError } = await db
-          .from('assessment_questions')
-          .delete()
-          .eq('lesson_id', lesson.id);
-        if (removeQuestionsError) {
-          warnings.push(
-            `${lesson.slug || lesson.id} assessment cleanup: ${removeQuestionsError.message}`,
-          );
-        } else if (questions.length) {
-          const assessmentRows = questions
-            .map((question: any, index: number) => ({
-              lesson_id: lesson.id,
-              question_type: 'multiple_choice',
-              prompt: String(question.question ?? question.prompt ?? '').trim(),
-              choices: asArray(question.options),
-              correct_answer: question.correctAnswer ?? question.correct ?? null,
-              explanation: String(question.explanation ?? '').trim() || null,
-              competency_key: asArray(question.competencyKeys)[0] ?? null,
-              difficulty: String(question.difficulty ?? 'medium'),
-              domain_key: String(question.domainKey ?? domainKey ?? '').trim() || null,
-              sort_order: index,
-            }))
-            .filter((row: any) => row.prompt);
-          if (assessmentRows.length) {
-            const { error: assessmentError } = await db
-              .from('assessment_questions')
-              .insert(assessmentRows);
-            if (assessmentError)
-              warnings.push(
-                `${lesson.slug || lesson.id} assessment bank: ${assessmentError.message}`,
-              );
-            else assessmentQuestionsSynced += assessmentRows.length;
-          }
+      if (objectives.length) {
+        const objectiveRows = objectives.map((text, position) => ({
+          lesson_id: lesson.id,
+          position,
+          text,
+        }));
+        const { error: objectiveError } = await db
+          .from('lesson_objectives')
+          .upsert(objectiveRows, { onConflict: 'lesson_id,position' });
+        if (objectiveError)
+          warnings.push(`${lesson.slug || lesson.id} objectives: ${objectiveError.message}`);
+        else lessonObjectivesSynced += objectiveRows.length;
+      }
+
+      // Knowledge checks on instructional lessons are assessable evidence too.
+      // Keep the normalized relational bank aligned for every lesson, rather
+      // than syncing only rows whose lesson_type happens to be "assessment".
+      if (questions.length) {
+        const assessmentRows = questions
+          .map((question: any, index: number) => ({
+            lesson_id: lesson.id,
+            question_type: 'multiple_choice',
+            prompt: String(question.question ?? question.prompt ?? '').trim(),
+            choices: asArray(question.options),
+            correct_answer: question.correctAnswer ?? question.correct ?? null,
+            explanation: String(question.explanation ?? '').trim() || null,
+            competency_key: asArray(question.competencyKeys)[0] ?? null,
+            difficulty: String(question.difficulty ?? 'medium'),
+            domain_key: String(question.domainKey ?? domainKey ?? '').trim() || null,
+            sort_order: index,
+          }))
+          .filter((row: any) => row.prompt);
+        if (assessmentRows.length) {
+          const { error: assessmentError } = await db
+            .from('assessment_questions')
+            .upsert(assessmentRows, { onConflict: 'lesson_id,sort_order' });
+          if (assessmentError)
+            warnings.push(
+              `${lesson.slug || lesson.id} assessment bank: ${assessmentError.message}`,
+            );
+          else assessmentQuestionsSynced += assessmentRows.length;
         }
       }
 
@@ -294,6 +303,7 @@ export async function normalizeGeneratedCourseForGovernance(
 
   return {
     lessonsNormalized,
+    lessonObjectivesSynced,
     assessmentQuestionsSynced,
     flashcardsSynced,
     progressionRulesSynced,

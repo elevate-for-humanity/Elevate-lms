@@ -34,6 +34,7 @@ export default async function StudentApplicationPage({
 }) {
   const params = await searchParams;
   const program = resolveSlug(params?.program || '') || '';
+  // Keep the shopper's validated enrollment choices intact across the canonical PARIS redirect.
   const query = new URLSearchParams();
   if (program) query.set('program', program);
   if (params?.intent === 'enrollment') query.set('intent', 'enrollment');

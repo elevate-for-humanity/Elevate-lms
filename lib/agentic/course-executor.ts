@@ -55,6 +55,69 @@ function metadataValue(metadata: Record<string, unknown> | null, ...keys: string
   return null;
 }
 
+interface CourseBuildIntent {
+  buildScope?: 'lesson' | 'course';
+  moduleCount?: number;
+  lessonsPerModule?: number;
+  title?: string;
+  topic?: string;
+  audience?: string;
+  state?: string;
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  hours?: number;
+  additionalRequirements?: string;
+  videoQueueLimit?: number;
+}
+
+function labeledGoalValue(goal: string, label: string): string | null {
+  const match = goal.match(new RegExp(label + '\\s*:\\s*([^\\n.]+)', 'i'));
+  return stringValue(match?.[1]);
+}
+
+function positiveGoalInteger(goal: string, pattern: RegExp): number | undefined {
+  const match = goal.match(pattern);
+  const value = Number.parseInt(match?.[1] ?? '', 10);
+  return Number.isFinite(value) && value > 0 ? value : undefined;
+}
+
+function deriveCourseBuildIntent(goal: string): CourseBuildIntent {
+  const oneLesson =
+    /\\b(?:one|1)\\s+(?:complete\\s+|controlled\\s+|production\\s+)*lesson\\b/i.test(goal) ||
+    /build scope\\s*:\\s*(?:one|1)\\s+(?:complete\\s+)?lesson/i.test(goal);
+  const difficultyValue = labeledGoalValue(goal, 'Difficulty')?.toLowerCase();
+  const difficulty =
+    difficultyValue === 'beginner' ||
+    difficultyValue === 'intermediate' ||
+    difficultyValue === 'advanced'
+      ? difficultyValue
+      : undefined;
+  const lessonTitle = labeledGoalValue(goal, 'Lesson title');
+  const hoursMatch = goal.match(
+    /(?:total instructional time|duration)\\s*:\\s*(\\d+(?:\\.\\d+)?)\\s*hours?/i,
+  );
+  const hours = hoursMatch ? Number.parseFloat(hoursMatch[1]) : undefined;
+  const moduleCount = oneLesson
+    ? 1
+    : positiveGoalInteger(goal, /(?:module count|modules?)\\s*:\\s*(\\d+)/i);
+  const lessonsPerModule = oneLesson
+    ? 1
+    : positiveGoalInteger(goal, /(?:lessons? per module|lesson count|lessons?)\\s*:\\s*(\\d+)/i);
+
+  return {
+    buildScope: oneLesson ? 'lesson' : 'course',
+    moduleCount,
+    lessonsPerModule,
+    title: lessonTitle ?? undefined,
+    topic: lessonTitle ?? undefined,
+    audience: labeledGoalValue(goal, 'Audience') ?? undefined,
+    state: labeledGoalValue(goal, 'State') ?? undefined,
+    difficulty,
+    hours: Number.isFinite(hours) && (hours ?? 0) > 0 ? hours : undefined,
+    additionalRequirements: goal,
+    videoQueueLimit: oneLesson ? 1 : undefined,
+  };
+}
+
 async function resolveCourseTarget(
   project: AgenticProjectRow,
   run: AgenticRunRow,
@@ -149,6 +212,7 @@ export async function processCourseAgenticTask(input: {
   const { task, run, project } = input;
   const db = await requireAdminClient();
   const target = await resolveCourseTarget(project, run);
+  const buildIntent = deriveCourseBuildIntent(run.prompt);
 
   if (task.worker === 'course-architect') {
     if (!target.programId && !target.programSlug) {
@@ -162,7 +226,19 @@ export async function processCourseAgenticTask(input: {
     });
     if (!loaded)
       throw new Error('No registered Course Builder blueprint is linked to the selected program.');
-    const modules = loaded.blueprint.modules ?? [];
+    const registeredModules = loaded.blueprint.modules ?? [];
+    const modules =
+      buildIntent.buildScope === 'lesson'
+        ? registeredModules.slice(0, 1).map((module) => ({
+            ...module,
+            lessons: (module.lessons ?? []).slice(0, 1),
+          }))
+        : registeredModules.slice(0, buildIntent.moduleCount ?? registeredModules.length).map((module) => ({
+            ...module,
+            lessons: buildIntent.lessonsPerModule
+              ? (module.lessons ?? []).slice(0, buildIntent.lessonsPerModule)
+              : module.lessons,
+          }));
     const lessonCount = modules.reduce((sum, module) => sum + (module.lessons?.length ?? 0), 0);
     await updateTask(
       task,
@@ -255,6 +331,7 @@ export async function processCourseAgenticTask(input: {
       mode: target.courseId ? 'missing-only' : 'replace',
       contentSource: 'ai',
       videoMode: 'off',
+      ...buildIntent,
     });
     if (!result.ok || !result.courseId) {
       throw new Error(

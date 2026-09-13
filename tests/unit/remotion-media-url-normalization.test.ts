@@ -23,6 +23,12 @@ describe('normalizeRemotionMediaUrl', () => {
     expect(normalizeRemotionMediaUrl('[object Object]')).toBeNull();
     expect(normalizeRemotionMediaUrl('javascript:alert(1)')).toBeNull();
   });
+
+  it('rejects nested provider image objects before Remotion receives them', () => {
+    expect(
+      normalizeRemotionMediaUrl({ src: { large2x: 'https://cdn.example.com/scene.jpg' } }),
+    ).toBeNull();
+  });
 });
 
 describe('normalizeSlideLessonScenes', () => {

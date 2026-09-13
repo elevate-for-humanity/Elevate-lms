@@ -693,23 +693,43 @@ export async function renderStoryboardVideo(
     const bundleUrl = await getBundleUrl();
     const { renderMedia, selectComposition } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
-    const selected = await selectComposition({
-      serveUrl: bundleUrl,
-      ...(browserExecutable ? { browserExecutable } : {}),
-      id: 'SlideLesson',
-      inputProps: props,
-    });
-    const composition = { ...selected, durationInFrames: totalFrames };
-    await renderMedia({
-      composition,
-      serveUrl: bundleUrl,
-      ...(browserExecutable ? { browserExecutable } : {}),
-      codec: 'h264',
-      outputLocation: paths.videoPath,
-      inputProps: props,
-      concurrency: Math.max(1, (os.cpus().length ?? 2) - 1),
-      crf: 20,
-    });
+    const renderSlideLesson = async (inputProps: SlideLessonProps & Record<string, unknown>) => {
+      const selected = await selectComposition({
+        serveUrl: bundleUrl,
+        ...(browserExecutable ? { browserExecutable } : {}),
+        id: 'SlideLesson',
+        inputProps,
+      });
+      const composition = { ...selected, durationInFrames: totalFrames };
+      await renderMedia({
+        composition,
+        serveUrl: bundleUrl,
+        ...(browserExecutable ? { browserExecutable } : {}),
+        codec: 'h264',
+        outputLocation: paths.videoPath,
+        inputProps,
+        concurrency: Math.max(1, (os.cpus().length ?? 2) - 1),
+        crf: 20,
+      });
+    };
+
+    try {
+      await renderSlideLesson(props);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (!message.includes('Failed to load image with src [object Object]')) throw error;
+
+      logger.warn(
+        '[RemotionRender] Provider visual was not serializable; retrying on the branded instructional canvas',
+        { lessonId: input.lessonId },
+      );
+      const canvasScenes = normalizedScenes.map((scene) => ({
+        ...scene,
+        clipUrl: null,
+        imageUrl: null,
+      }));
+      await renderSlideLesson({ ...props, scenes: canvasScenes });
+    }
     const captionUrl = await uploadCourseVideosObject(
       Buffer.from(buildStoryboardWebVtt(scenes), 'utf8'),
       `generated-lessons/lesson-${input.lessonId}.vtt`,

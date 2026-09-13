@@ -14,7 +14,7 @@ export default async function SocialMediaPage() {
     db.from('social_media_posts').select('id', { count: 'exact', head: true }).in('status', ['queued', 'scheduled']),
     db.from('social_media_posts').select('id', { count: 'exact', head: true }).eq('status', 'published'),
     db.from('social_campaigns').select('id', { count: 'exact', head: true }),
-    db.from('social_media_settings').select('platform,profile_data,enabled,access_token,expires_at,organization_id,granted_scopes,connection_status,last_verified_at,dry_run'),
+    db.from('social_media_settings').select('platform,profile_data,enabled,expires_at,organization_id,granted_scopes,connection_status,last_verified_at,dry_run'),
     db
       .from('blog_posts')
       .select('id', { count: 'exact', head: true })
@@ -34,7 +34,7 @@ export default async function SocialMediaPage() {
     account: accountByPlatform.get(platform),
   }));
   const connected = accounts.filter((account) =>
-    account.account?.enabled !== false && Boolean(account.account?.access_token) &&
+    account.account?.enabled === true && account.account?.connection_status === 'verified_read_only' &&
     (!account.account?.expires_at || new Date(account.account.expires_at) > new Date()),
   );
 
@@ -87,7 +87,7 @@ export default async function SocialMediaPage() {
             </p>
             <div className="mt-5 divide-y divide-slate-100">
               {accounts.map(({ platform, account }) => {
-                  const isConnected = account?.enabled !== false && Boolean(account?.access_token) &&
+                  const isConnected = account?.enabled === true && account?.connection_status === 'verified_read_only' &&
                     (!account?.expires_at || new Date(account.expires_at) > new Date());
                   const profile = account?.profile_data && typeof account.profile_data === 'object'
                     ? account.profile_data as Record<string, unknown>

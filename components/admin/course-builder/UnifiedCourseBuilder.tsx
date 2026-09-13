@@ -509,6 +509,36 @@ function BlueprintPanel({
       setBusy('');
     }
   }
+  async function restoreAuthoredBlueprint(blueprint: BlueprintRow) {
+    if (!selectedCourse?.program_id) {
+      setError('Select a course linked to a canonical program before restoring its authored blueprint.');
+      return;
+    }
+    setBusy(`restore:${blueprint.id}`);
+    setError('');
+    try {
+      const res = await fetch('/api/admin/course-builder', {
+        method: 'POST',
+        headers: courseBuilderJsonHeaders('restore-authored-blueprint'),
+        body: JSON.stringify({
+          action: 'generate-from-blueprint',
+          blueprintId: blueprint.id,
+          programId: selectedCourse.program_id,
+          mode: 'replace',
+          contentSource: 'blueprint',
+          videoMode: 'off',
+        }),
+      });
+      const result = await res.json();
+      if (!res.ok || !result.courseId)
+        throw new Error(result.error || 'Authored blueprint restoration failed');
+      await onGenerated(result.courseId);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Authored blueprint restoration failed');
+    } finally {
+      setBusy('');
+    }
+  }
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
@@ -545,6 +575,17 @@ function BlueprintPanel({
                 <Sparkles className="h-4 w-4" />
               )}
               Generate governed course
+            </button>
+            <button
+              type="button"
+              onClick={() => void restoreAuthoredBlueprint(blueprint)}
+              disabled={busy === `restore:${blueprint.id}` || !selectedCourse?.program_id}
+              className="ml-2 mt-4 inline-flex items-center gap-2 rounded-lg border border-amber-400 px-3 py-2 text-sm font-bold text-amber-200 disabled:opacity-40"
+            >
+              {busy === `restore:${blueprint.id}` ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : null}
+              Restore authored blueprint
             </button>
           </div>
         ))}

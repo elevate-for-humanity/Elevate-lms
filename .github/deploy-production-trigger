@@ -4,3 +4,4 @@ Triggered 2026-08-27 to deploy the pnpm authority repair and executable contract
 Triggered 2026-08-27 to validate the repaired UTF-8 pnpm lockfile on current main.
 Triggered 2026-09-04 to merge verified QuickBooks OAuth credentials into Northflank and deploy all services.
 Triggered 2026-09-12 to synchronize the canonical QuickBooks OAuth credentials across Marketing, LMS, and Admin and eliminate the split deployment state.
+Triggered 2026-09-13 to synchronize Course Builder safeguards, canonical lesson projections, billing authority, and dashboard voice controls across all production services.

@@ -654,7 +654,11 @@ export async function renderStoryboardVideo(
         ...(resolvedModel ? { resolvedModel } : {}),
       };
       const narrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60) + 1;
-      const durationSeconds = Math.max(scene.durationSeconds, narrationSeconds, 4);
+      // A lesson's instructional seat time includes reading, practice, checks,
+      // and review; it must not become one continuous hour-long MP4. Time each
+      // visual to its spoken narration so malformed blueprint durations cannot
+      // keep Chromium encoding indefinitely.
+      const durationSeconds = Math.min(180, Math.max(narrationSeconds, 4));
       const bullets = narration
         .split(/(?<=[.!?])\s+/)
         .map((value) => value.trim())

@@ -897,6 +897,21 @@ function voucherStatus(row: any) {
   return verified ? 'Voucher verified' : 'Voucher pending';
 }
 
+function expectedPaymentStatus(row: any) {
+  const cents = Number(row.expected_payout_cents || 0);
+  if (cents <= 0) return 'Not projected';
+
+  const amount = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(cents / 100);
+  const status =
+    row.expected_payout_status === 'pending_voucher_payment'
+      ? 'pending voucher/payment'
+      : String(row.expected_payout_status || 'projected').replaceAll('_', ' ');
+  return `${amount} — ${status}`;
+}
+
 function completionStatus(row: any) {
   const state = String(row.enrollment_state || row.status || '').toLowerCase();
   if (
@@ -951,6 +966,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   value={programTitle(programs, row.program_id, row.program_slug)}
                 />
                 <Row label="Voucher" value={voucherStatus(row)} />
+                <Row label="Expected payment" value={expectedPaymentStatus(row)} />
                 <Row label="Completion" value={completionStatus(row)} />
                 <Row
                   label="Training"
@@ -996,6 +1012,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
               <th className="px-3 py-3">Student</th>
               <th className="px-3 py-3">Program</th>
               <th className="px-3 py-3">Voucher</th>
+              <th className="px-3 py-3">Expected payment</th>
               <th className="px-3 py-3">Completion</th>
               <th className="px-3 py-3">Progress</th>
               <th className="px-3 py-3">WorkOne hours</th>
@@ -1016,6 +1033,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                     {programTitle(programs, row.program_id, row.program_slug)}
                   </td>
                   <td className="px-3 py-4 font-bold">{voucherStatus(row)}</td>
+                  <td className="px-3 py-4 font-bold">{expectedPaymentStatus(row)}</td>
                   <td className="px-3 py-4 font-bold">{completionStatus(row)}</td>
                   <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
                   <td className="px-3 py-4 font-bold">
@@ -1045,7 +1063,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
               ))
             ) : (
               <tr>
-                <td colSpan={9} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={10} className="px-3 py-8 text-center text-slate-500">
                   No confirmed student enrollments are linked.
                 </td>
               </tr>

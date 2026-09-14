@@ -26,7 +26,22 @@ export default async function OrientationPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) redirect('/login');
-    await supabase.from('profiles').update({ orientation_completed: true }).eq('id', user.id);
+    const completedAt = new Date().toISOString();
+    const { error: profileError } = await supabase.from('profiles').update({ orientation_completed: true }).eq('id', user.id);
+    if (profileError) throw profileError;
+    const { error: progressError } = await supabase.from('onboarding_progress').upsert({
+      user_id: user.id,
+      status: 'completed',
+      step: 'orientation',
+      completed_at: completedAt,
+      updated_at: completedAt,
+    }, { onConflict: 'user_id' });
+    if (progressError) throw progressError;
+    const { error: enrollmentError } = await supabase.from('program_enrollments')
+      .update({ onboarding_status: 'completed', orientation_completed_at: completedAt })
+      .or(`user_id.eq.${user.id},student_id.eq.${user.id}`);
+    if (enrollmentError) throw enrollmentError;
+    redirect('/lms/dashboard');
   }
 
   return (

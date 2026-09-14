@@ -9,6 +9,7 @@ import { getInstructorForCourse } from '@/lib/ai-instructors';
 import LessonProgressClient from './LessonProgressClient';
 import LessonFocusShell from '@/components/lms/LessonFocusShell';
 import InteractiveVideoPlayer, { type Checkpoint } from '@/components/lms/InteractiveVideoPlayer';
+import { resolveCoursePreview } from '@/lib/admin/course-preview';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -162,45 +163,47 @@ export default async function LessonPage({
     redirect(
       `/login?redirect=${encodeURIComponent(`/lms/courses/${courseId}/lessons/${lessonId}`)}`,
     );
+  const preview = await resolveCoursePreview(courseId);
+  const db = preview.active ? preview.db : supabase;
 
-  let courseQuery = supabase
+  let courseQuery = db
     .from('courses')
-    .select('id,title,slug,is_active')
-    .eq('is_active', true);
+    .select('id,title,slug,is_active');
+  if (!preview.active) courseQuery = courseQuery.eq('is_active', true);
   courseQuery = isUuid(courseId)
     ? courseQuery.eq('id', courseId)
     : courseQuery.eq('slug', courseId);
   const { data: course } = await courseQuery.maybeSingle();
   if (!course) notFound();
 
-  const { data: lesson } = await supabase
+  let lessonQuery = db
     .from('course_lessons')
     .select(
       'id,module_id,title,slug,content,content_json,rendered_html,video_url,video_config,duration_minutes,lesson_type,learning_objectives,quiz_questions,key_terms,passing_score,is_published,order_index',
     )
     .eq('id', lessonId)
-    .eq('course_id', course.id)
-    .eq('is_published', true)
-    .maybeSingle();
+    .eq('course_id', course.id);
+  if (!preview.active) lessonQuery = lessonQuery.eq('is_published', true);
+  const { data: lesson } = await lessonQuery.maybeSingle();
   if (!lesson) notFound();
 
   const [{ data: orderedLessons }, { data: moduleRow }, { data: lessonVisual }] = await Promise.all(
     [
-      supabase
+      db
         .from('course_lessons')
         .select('id,title,order_index')
         .eq('course_id', course.id)
-        .eq('is_published', true)
+        .match(preview.active ? {} : { is_published: true })
         .order('order_index'),
       lesson.module_id
-        ? supabase
+        ? db
             .from('course_modules')
             .select('order_index')
             .eq('id', lesson.module_id)
             .eq('course_id', course.id)
             .maybeSingle()
         : Promise.resolve({ data: null }),
-      supabase
+      db
         .from('course_visual_assets')
         .select('asset_url,poster_url,alt_text,caption,media_type,metadata')
         .eq('course_id', course.id)
@@ -292,6 +295,7 @@ export default async function LessonPage({
   return (
     <LessonFocusShell header={lessonHeader}>
       <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
+        {preview.active ? <div className="rounded-xl border border-amber-400 bg-amber-100 p-4 text-sm font-black text-amber-950">Admin draft preview · Completion, assessment, and progress writes are disabled.</div> : null}
         {lessonVisual?.media_type === 'image' ? (
           <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
             <img
@@ -380,7 +384,7 @@ export default async function LessonPage({
           </section>
         ) : null}
 
-        <InteractiveLessonExperience
+        {!preview.active ? <><InteractiveLessonExperience
           courseId={course.id}
           lessonSlug={lesson.slug}
           lessonId={lesson.id}
@@ -392,7 +396,7 @@ export default async function LessonPage({
           moduleOrder={moduleOrder}
           passingScore={passingScore}
           questions={questions as any[]}
-        />
+        /></> : null}
 
         <nav className="flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
           {previous ? (

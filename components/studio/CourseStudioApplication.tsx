@@ -21,6 +21,7 @@ import {
   Clock,
   Menu,
   X,
+  Eye,
 } from 'lucide-react';
 import { useCourse, type StudioPanel } from './CourseProvider';
 
@@ -68,6 +69,7 @@ function StudioTopbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
       <AutosaveIndicator />
       {state.warnings.length > 0 && <span className="hidden sm:flex items-center gap-1 text-xs text-amber-600"><AlertCircle className="w-3.5 h-3.5" />{state.warnings.length} warning{state.warnings.length > 1 ? 's' : ''}</span>}
       <button onClick={() => void save()} disabled={!state.autosave.isDirty} className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"><Save className="w-3.5 h-3.5" />Save</button>
+      <a href={`/api/admin/course-builder/preview?courseId=${encodeURIComponent(course.id)}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"><Eye className="h-3.5 w-3.5" /><span className="hidden sm:inline">Preview course</span></a>
       <button onClick={() => setPanel('publish')} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition shrink-0 ${publishState.isPublished ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'}`}><Rocket className="w-3.5 h-3.5" /><span className="hidden sm:inline">{publishState.isPublished ? 'Published' : 'Publish'}</span></button>
     </header>
   );

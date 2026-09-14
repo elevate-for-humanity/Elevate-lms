@@ -235,6 +235,25 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
   for (const requirement of publicationRequirements) {
     if (!publicationReadiness[requirement]) blocking.push(`publication requirement failed: ${requirement}`);
   }
+  const { data: lessonVideoJobs, error: videoJobError } = await supabase
+    .from('video_jobs')
+    .select('id,status,review_status,video_url')
+    .eq('course_id', courseId)
+    .eq('asset_kind', 'lesson');
+  if (videoJobError) throw videoJobError;
+  const videoJobs = lessonVideoJobs ?? [];
+  const unfinishedVideoJobs = videoJobs.filter((job: any) =>
+    ['draft', 'queued', 'rendering', 'processing'].includes(String(job.status ?? '')),
+  );
+  const failedVideoJobs = videoJobs.filter((job: any) =>
+    ['failed', 'dead_lettered'].includes(String(job.status ?? '')),
+  );
+  const unapprovedVideoJobs = videoJobs.filter((job: any) =>
+    job.status === 'complete' && (!job.video_url || job.review_status !== 'approved'),
+  );
+  if (unfinishedVideoJobs.length) blocking.push(`${unfinishedVideoJobs.length} lesson video job(s) are not finished`);
+  if (failedVideoJobs.length) blocking.push(`${failedVideoJobs.length} lesson video job(s) failed`);
+  if (unapprovedVideoJobs.length) blocking.push(`${unapprovedVideoJobs.length} completed lesson video(s) are missing approval or output`);
   if (mods.length > 0) {
     const { count, error } = await supabase
       .from('module_completion_rules')
@@ -259,6 +278,10 @@ export async function runPersistedCourseProcurementHealthCheckWithClient(
       interactiveLessons,
       accessibleNarrationLessons,
       validatedLessons,
+      lessonVideoJobs: videoJobs.length,
+      unfinishedVideoJobs: unfinishedVideoJobs.length,
+      failedVideoJobs: failedVideoJobs.length,
+      unapprovedVideoJobs: unapprovedVideoJobs.length,
       review_status: course.review_status ?? null,
       reviewed_by: course.reviewed_by ?? null,
       reviewed_at: course.reviewed_at ?? null,

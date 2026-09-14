@@ -9,6 +9,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import {
   resolveDeliveryMode,
   getContinueLearningUrl,
@@ -71,7 +72,7 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   const { data: programEnrollments, error: programEnrollmentError } = await supabase
     .from('program_enrollments')
     .select(
-      'id,user_id,student_id,course_id,program_id,program_slug,title,description,status,progress_percent,created_at,updated_at',
+      'id,user_id,student_id,course_id,program_id,program_holder_id,program_slug,title,description,status,progress_percent,created_at,updated_at',
     )
     .or(`user_id.eq.${userId},student_id.eq.${userId}`);
 
@@ -85,8 +86,9 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   const courseIds = [
     ...new Set((programEnrollments ?? []).map((row) => row.course_id).filter(Boolean)),
   ] as string[];
+  const programHolderIds = [...new Set((programEnrollments ?? []).map((row) => row.program_holder_id).filter(Boolean))] as string[];
 
-  const [programResult, courseResult] = await Promise.all([
+  const [programResult, courseResult, holderResult] = await Promise.all([
     programIds.length
       ? supabase
           .from('programs')
@@ -99,6 +101,9 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
           .select('id,title,course_name,description,short_description,duration_hours')
           .in('id', courseIds)
       : Promise.resolve({ data: [] as CourseRow[], error: null }),
+    programHolderIds.length
+      ? (await requireAdminClient()).from('program_holders').select('id,name,organization_name').in('id', programHolderIds)
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   if (programResult.error) {
@@ -114,10 +119,12 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
   const coursesById = new Map<string, CourseRow>(
     ((courseResult.data ?? []) as CourseRow[]).map((course) => [course.id, course]),
   );
+  const holdersById = new Map<string, any>((holderResult.data ?? []).map((holder: any) => [holder.id, holder]));
 
   for (const row of programEnrollments ?? []) {
     const program = row.program_id ? programsById.get(row.program_id) ?? null : null;
     const course = row.course_id ? coursesById.get(row.course_id) ?? null : null;
+    const holder = row.program_holder_id ? holdersById.get(row.program_holder_id) ?? null : null;
     const { mode, inferred } = resolveDeliveryMode('program_enrollments', program);
     const userKey = row.user_id || row.student_id;
     if (!userKey) continue;
@@ -134,8 +141,8 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
       course_title: course?.title ?? course?.course_name ?? null,
       course_description: course?.description ?? course?.short_description ?? row.description ?? null,
       duration_hours: course?.duration_hours ?? null,
-      provider_id: null,
-      provider_name: null,
+      provider_id: row.program_holder_id ?? null,
+      provider_name: holder?.organization_name ?? holder?.name ?? null,
       status: row.status || 'active',
       progress: Number(row.progress_percent ?? 0),
       delivery_mode: mode,

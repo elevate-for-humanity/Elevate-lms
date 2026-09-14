@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { authorizedVideoJobIds, eligibleAuthorizedVideoJobs } from './gpu-demand.mjs';
+import {
+  authorizedVideoJobIds,
+  eligibleAuthorizedVideoJobs,
+  generationIsPaused,
+} from './gpu-demand.mjs';
 
 const now = Date.parse('2026-09-14T04:00:00.000Z');
 
@@ -77,6 +81,19 @@ test('dead-lettered jobs cannot keep GPU awake', () => {
   const jobs = eligibleAuthorizedVideoJobs(
     [{ id: 'dead', status: 'rendering', dead_lettered_at: '2026-09-14T03:00:00.000Z' }],
     ids,
+  );
+  assert.equal(jobs.length, 0);
+});
+
+test('global and per-course generation controls fail closed', () => {
+  assert.equal(generationIsPaused(true), true);
+  assert.equal(generationIsPaused({ paused: true }), true);
+  assert.equal(generationIsPaused(false), false);
+
+  const jobs = eligibleAuthorizedVideoJobs(
+    [{ id: 'approved', course_id: 'paused-course', status: 'queued', dead_lettered_at: null }],
+    new Set(['approved']),
+    new Set(['different-enabled-course']),
   );
   assert.equal(jobs.length, 0);
 });

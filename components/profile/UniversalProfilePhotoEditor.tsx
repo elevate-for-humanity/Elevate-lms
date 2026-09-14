@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Camera, FileSignature, RotateCcw, ShieldCheck, Upload } from 'lucide-react';
 import {
   getImageReleaseStatus,
-  IMAGE_RELEASE_TEXT,
   revokeImageRelease,
   signImageRelease,
   uploadProfileAvatar,
 } from '@/lib/profile/avatar-actions';
+import { IMAGE_RELEASE_TEXT } from '@/lib/profile/image-release-constants';
 
 type ReleaseStatus = {
   id: string;

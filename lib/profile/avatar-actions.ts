@@ -3,13 +3,13 @@
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
+import {
+  IMAGE_RELEASE_TEXT,
+  IMAGE_RELEASE_VERSION,
+} from '@/lib/profile/image-release-constants';
 
 const ALLOWED_AVATAR_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
-export const IMAGE_RELEASE_VERSION = '2026-09-14';
-
-export const IMAGE_RELEASE_TEXT =
-  'I authorize Elevate for Humanity Career and Training Institute and its program partners to use photographs or images of the participant named below in educational materials, program reporting, websites, social media, and promotional materials. I understand that no compensation is promised. This authorization is voluntary and may be revoked for future uses by updating my dashboard; revocation does not affect uses completed before revocation. A profile photo remains private to authenticated operations unless public-use consent is active.';
 
 function revalidateProfilePaths() {
   revalidatePath('/account/profile');

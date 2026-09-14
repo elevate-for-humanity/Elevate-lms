@@ -10,7 +10,7 @@ on:
         default: auto
         options: [auto, sleep, wake-video]
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/5 * * * *'
 
 permissions:
   contents: read

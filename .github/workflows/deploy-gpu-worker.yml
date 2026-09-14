@@ -45,6 +45,7 @@ jobs:
       GPU_VIDEO_PROVIDER: wan
       GPU_MAX_CONCURRENCY: '1'
       WAN_MIN_VRAM_GB: '22'
+      GPU_RUN_ACCEPTANCE: 'false'
       GITHUB_SHA: ${{ github.sha }}
       BUILD_SHA: ${{ github.sha }}
 
@@ -133,8 +134,12 @@ jobs:
           const expected=['services/media-gpu-worker/**','scripts/northflank/provision-gpu-worker.ts'];
           console.log(JSON.stringify({id:s.id||s.name,instances,disabledCI:s.disabledCI,isAllowList:s.buildConfiguration?.isAllowList,pathIgnoreRules:rules,buildStatus:s.status?.build?.status||null,deploymentStatus:s.status?.deployment?.status||null},null,2));
           if ((s.id||s.name)!=='elevate-gpu-worker') throw new Error('Canonical GPU service missing');
-          if (instances!==1) throw new Error(`Expected 1 GPU instance; got ${instances}`);
+          if (![0,1].includes(instances)) throw new Error(`Invalid GPU instance count: ${instances}`);
           if (s.disabledCI!==false) throw new Error('GPU CI is disabled');
           if (s.buildConfiguration?.isAllowList!==true) throw new Error('GPU rules are not allow-list mode');
           if (!expected.every(r=>rules.includes(r))) throw new Error('GPU path rules are incomplete');
           NODE
+
+      - name: Enforce zero-instance idle state
+        if: always()
+        run: node scripts/northflank/control-gpu-cost.mjs sleep

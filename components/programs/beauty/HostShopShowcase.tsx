@@ -115,6 +115,7 @@ export default function HostShopShowcase({
   const [interacting, setInteracting] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
+  const [failedVideos, setFailedVideos] = useState<Set<string>>(() => new Set());
   const sectionRef = useRef<HTMLElement | null>(null);
   const narrationAudioRef = useRef<HTMLAudioElement | null>(null);
   const userEnabledSoundRef = useRef(false);
@@ -267,10 +268,10 @@ export default function HostShopShowcase({
               Become a Host Shop for free. Grow your team through apprenticeship.
             </Heading>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">
-              Elevate has apprentices ready to train, and we need licensed barbershops, beauty salons,
-              nail studios, spas, and esthetics businesses across Indiana. Join the Barber & Beauty
-              Host Shop Network at no cost, develop future professionals, and gain a permanent
-              business profile that helps apprentices and customers discover your shop.
+              Elevate has apprentices ready to train, and we need licensed barbershops, beauty
+              salons, nail studios, spas, and esthetics businesses across Indiana. Join the Barber &
+              Beauty Host Shop Network at no cost, develop future professionals, and gain a
+              permanent business profile that helps apprentices and customers discover your shop.
             </p>
           </div>
           {narrationBlocked ? (
@@ -303,8 +304,18 @@ export default function HostShopShowcase({
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
           <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
             <div className="relative aspect-[4/3] min-h-0 overflow-hidden bg-slate-100 sm:aspect-[16/10] lg:aspect-auto lg:min-h-[390px]">
-              {image?.kind === 'video' ? (
+              {image?.kind === 'video' && !failedVideos.has(image.src) ? (
                 <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
+                  {image.backdropSrc ? (
+                    <Image
+                      src={image.backdropSrc}
+                      alt=""
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 58vw"
+                      className="object-cover opacity-90"
+                      aria-hidden="true"
+                    />
+                  ) : null}
                   <video
                     key={image.src}
                     src={image.src}
@@ -335,9 +346,26 @@ export default function HostShopShowcase({
                       // reset, or advanced automatically.
                       event.currentTarget.pause();
                     }}
+                    onError={() =>
+                      setFailedVideos((current) => {
+                        const next = new Set(current);
+                        next.add(image.src);
+                        return next;
+                      })
+                    }
                     preload="metadata"
-                    className="aspect-[9/16] h-full max-h-[640px] w-auto max-w-full object-contain shadow-2xl"
+                    className="relative z-10 aspect-[9/16] h-full max-h-[640px] w-auto max-w-full object-contain shadow-2xl"
                     aria-label={image.alt}
+                  />
+                </div>
+              ) : image?.kind === 'video' && image.backdropSrc ? (
+                <div className="absolute inset-0 isolate flex items-center justify-center overflow-hidden bg-slate-950">
+                  <Image
+                    src={image.backdropSrc}
+                    alt={image.alt}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 58vw"
+                    className="object-contain"
                   />
                 </div>
               ) : image && !failedImages.has(image.src) ? (
@@ -395,13 +423,13 @@ export default function HostShopShowcase({
               <p className="mt-5 text-base leading-7 text-slate-700">
                 {shop.marketingBlurb ?? shop.note}
               </p>
-              {image?.kind === 'video' && tourScripts?.[image.src] ? (
+              {image?.kind === 'video' && (image.script || tourScripts?.[image.src]) ? (
                 <details className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <summary className="cursor-pointer text-sm font-black text-brand-blue-900">
                     Read this tour script
                   </summary>
                   <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">
-                    {tourScripts[image.src]}
+                    {image.script ?? tourScripts?.[image.src]}
                   </p>
                 </details>
               ) : null}

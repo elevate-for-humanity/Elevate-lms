@@ -194,7 +194,7 @@ export default function BarberOrientationClient({ payment }: { payment: BarberPa
           <div className="relative bg-black rounded-2xl overflow-hidden aspect-video shadow-2xl">
             <video
               ref={videoRef}
-              src="/videos/barber-lessons/barber-apprenticeship-intro.mp4"
+              src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4"
               poster="/images/pages/about-career-training.webp"
               controls
               playsInline

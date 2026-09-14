@@ -51,11 +51,9 @@ export function ScrollNarrator() {
   const narrateVisibleSection = useCallback(async () => {
     const section = mostVisiblePageSection();
     if (!section) {
-      // A section owns its narration only while it is visibly dominant. Stop
-      // at section boundaries so speech from one area can never overlap the
-      // next area or continue after the visitor has scrolled away.
-      lastNarrationRef.current = null;
-      stop();
+      // Mobile layouts frequently have spacing between narrated sections.
+      // Keep the active script playing through that gap instead of cutting a
+      // sentence off merely because the visitor continued scrolling.
       return;
     }
 
@@ -83,7 +81,7 @@ export function ScrollNarrator() {
     } else {
       setNotice(null);
     }
-  }, [play, stop]);
+  }, [play]);
 
   useEffect(() => {
     const preference = window.localStorage.getItem(NARRATION_PREFERENCE_KEY);
@@ -155,11 +153,7 @@ export function ScrollNarrator() {
         const current = lastNarrationRef.current?.section;
         const visible = mostVisiblePageSection();
         if (visible === current) return;
-        if (!visible) {
-          lastNarrationRef.current = null;
-          stop();
-          return;
-        }
+        if (!visible) return;
         void narrateVisibleSection();
       });
     };
@@ -170,7 +164,7 @@ export function ScrollNarrator() {
       window.removeEventListener('scroll', synchronizeNarrationToScroll);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [enabled, narrateVisibleSection, stop]);
+  }, [enabled, narrateVisibleSection]);
 
   useEffect(() => {
     if (!enabled || !notice) return;

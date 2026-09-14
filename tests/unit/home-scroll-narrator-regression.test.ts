@@ -16,23 +16,24 @@ describe('homepage scroll narration lifecycle', () => {
   it('keeps narration playing through small mobile scroll movement', () => {
     const scrollHandler = source.slice(
       source.indexOf('const synchronizeNarrationToScroll'),
-      source.indexOf('const toggle ='),
+      source.indexOf("window.addEventListener('scroll'"),
     );
     expect(scrollHandler).toContain('if (visible === current) return');
-    expect(scrollHandler).toContain('lastNarrationRef.current = null');
-    expect(scrollHandler).toContain('stop()');
+    expect(scrollHandler).toContain('if (!visible) return');
+    expect(scrollHandler).not.toContain('lastNarrationRef.current = null');
+    expect(scrollHandler).not.toContain('stop()');
     expect(scrollHandler).toContain('void narrateVisibleSection()');
     expect(source).toContain("window.addEventListener('scroll', synchronizeNarrationToScroll");
     expect(source).not.toContain("window.addEventListener('wheel'");
   });
 
-  it('releases narration when no page section owns the viewport', () => {
+  it('does not cut off narration in the gap between page sections', () => {
     const noSection = source.slice(
       source.indexOf('if (!section)'),
       source.indexOf('const text = narrationFor(section)'),
     );
-    expect(noSection).toContain('stop()');
-    expect(noSection).toContain('lastNarrationRef.current = null');
+    expect(noSection).not.toContain('stop()');
+    expect(noSection).not.toContain('lastNarrationRef.current = null');
   });
 
   it('warms opening narration and attempts the visible section on entry', () => {

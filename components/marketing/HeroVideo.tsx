@@ -168,17 +168,11 @@ export default function HeroVideo({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry?.isIntersecting || entry.intersectionRatio < 0.2) {
-          const audio = audioRef.current;
-          if (audio && !audio.paused) {
-            audio.pause();
-            audio.currentTime = 0;
-          }
-          transcriptVoice.stop();
-          soundRequestedRef.current = false;
-          setMuted(true);
-          return;
-        }
+        // Leaving the hero must not interrupt narration the visitor already
+        // started. Stop media only when the component unmounts or the visitor
+        // uses the sound control. This lets program narration continue while
+        // the visitor reads the rest of the page.
+        if (!entry?.isIntersecting || entry.intersectionRatio < 0.2) return;
         if (entry.intersectionRatio < 0.55 || scrollNarrationAttemptedRef.current) return;
         scrollNarrationAttemptedRef.current = true;
         const audio = audioRef.current;
@@ -291,9 +285,7 @@ export default function HeroVideo({
               sizes="100vw"
               aria-hidden={index !== demoActiveSlideIndex}
               className={`absolute inset-0 z-0 h-full w-full ${mediaClass} transform-gpu object-center transition-[opacity,transform] duration-1000 ease-in-out motion-reduce:transition-none ${mediaClassName} ${slide.className || ''} ${
-                index === demoActiveSlideIndex
-                  ? 'scale-100 opacity-100'
-                  : 'scale-[1.015] opacity-0'
+                index === demoActiveSlideIndex ? 'scale-100 opacity-100' : 'scale-[1.015] opacity-0'
               }`}
             />
           ))

@@ -22,15 +22,29 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
+const MARKETING_APP = path.join(ROOT, 'apps/marketing/app');
 const FIX_MODE = process.argv.includes('--fix');
 
 // ── Load canonical routes ────────────────────────────────────────────────────
 
 const canonicalRoutesPath = path.join(ROOT, 'lib/routes/canonical-routes.json');
 const canonicalConfig = JSON.parse(fs.readFileSync(canonicalRoutesPath, 'utf8'));
-const redirectSources = new Set(
-  (canonicalConfig.legacyAliases || []).map((a) => a.source),
-);
+const redirectSources = new Set((canonicalConfig.legacyAliases || []).map((a) => a.source));
+
+const programRedirectsPath = path.join(ROOT, 'lib/routes/program-slug-redirects.json');
+if (fs.existsSync(programRedirectsPath)) {
+  for (const redirect of JSON.parse(fs.readFileSync(programRedirectsPath, 'utf8'))) {
+    if (redirect?.source) redirectSources.add(redirect.source);
+  }
+}
+
+const marketingNextConfigPath = path.join(ROOT, 'apps/marketing/next.config.mjs');
+if (fs.existsSync(marketingNextConfigPath)) {
+  const nextConfig = fs.readFileSync(marketingNextConfigPath, 'utf8');
+  for (const match of nextConfig.matchAll(/source:\s*['"`]([^'"`]+)['"`]/g)) {
+    redirectSources.add(match[1]);
+  }
+}
 
 // ── Discover all /programs/* routes that have a page.tsx ────────────────────
 
@@ -55,10 +69,11 @@ function discoverAppRoutes(dir, prefix = '') {
   return routes;
 }
 
-const programAppRoutes = discoverAppRoutes(path.join(ROOT, 'app/programs'), '/programs');
-// Dynamic catch-all: app/programs/[program]/page.tsx serves any static/registry slug
+const programAppRoutes = discoverAppRoutes(path.join(MARKETING_APP, 'programs'), '/programs');
+// Dynamic catch-all: apps/marketing/app/programs/[program]/page.tsx serves any
+// static/registry slug in the production marketing application.
 const hasDynamicProgramRoute = fs.existsSync(
-  path.join(ROOT, 'app/programs/[program]/page.tsx'),
+  path.join(MARKETING_APP, 'programs/[program]/page.tsx'),
 );
 
 /** Static ProgramSchema slugs from data/programs/index.ts */
@@ -109,7 +124,7 @@ function isServedByDynamicRoute(slug) {
 
 // ── Scan codebase for /programs/* hrefs ─────────────────────────────────────
 
-const SCAN_DIRS = ['app', 'components', 'content', 'lib'];
+const SCAN_DIRS = ['apps/marketing/app', 'components', 'content', 'lib'];
 const HREF_RE = /href[=:]\s*['"`]\/programs\/([a-z0-9-]+(?:\/[a-z0-9-]+)*)/g;
 
 function scanForProgramLinks(dir) {
@@ -121,6 +136,7 @@ function scanForProgramLinks(dir) {
       const full = path.join(d, entry.name);
       if (entry.isDirectory()) {
         if (['node_modules', '.next', '.git'].includes(entry.name)) continue;
+        if (full === path.join(ROOT, 'lib/admin')) continue;
         walk(full);
       } else if (entry.isFile() && /\.(tsx?|jsx?|mjs)$/.test(entry.name)) {
         const content = fs.readFileSync(full, 'utf8');
@@ -200,7 +216,9 @@ for (const [href, refs] of [...allLinks.entries()].sort()) {
 
   if (!hasPage && !hasDynamic && !hasRedirect) {
     console.log(`❌ MISSING ROUTE: ${appRoute}`);
-    console.log(`   Referenced in: ${refs.slice(0, 3).join(', ')}${refs.length > 3 ? ` (+${refs.length - 3} more)` : ''}`);
+    console.log(
+      `   Referenced in: ${refs.slice(0, 3).join(', ')}${refs.length > 3 ? ` (+${refs.length - 3} more)` : ''}`,
+    );
     if (!hasBanner) console.log(`   ⚠️  Also missing from hero-banners.json`);
     issues++;
     toAdd.push(appRoute);
@@ -225,9 +243,14 @@ const programSlugsWithPages = [...programAppRoutes]
   .map((r) => r.replace('/programs/', ''))
   .filter((s) => !s.includes('/'));
 
-const missingBanners = programSlugsWithPages.filter(
-  (s) => !heroBanners[s] && s !== '[slug]' && s !== 'admin' && s !== 'catalog',
-);
+const missingBanners = programSlugsWithPages.filter((s) => {
+  if (heroBanners[s] || s === '[slug]' || s === 'admin' || s === 'catalog') return false;
+  const page = path.join(MARKETING_APP, 'programs', s, 'page.tsx');
+  const source = fs.existsSync(page) ? fs.readFileSync(page, 'utf8') : '';
+  // Dedicated pages may own their hero directly, while alias pages redirect
+  // before rendering. Neither needs a hero-banners.json entry.
+  return !source.includes('<Image') && !source.includes('Redirect(');
+});
 if (missingBanners.length > 0) {
   console.log(`\n⚠️  PROGRAM PAGES WITH NO HERO BANNER (${missingBanners.length}):`);
   for (const s of missingBanners) console.log(`   /programs/${s}`);

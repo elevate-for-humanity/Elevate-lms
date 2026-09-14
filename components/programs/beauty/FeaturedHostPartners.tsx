@@ -2,7 +2,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ExternalLink, MapPin, Navigation, Phone } from 'lucide-react';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
-import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
+import {
+  FEATURED_BEAUTY_HOST_PARTNERS,
+  type FeaturedHostPartnerMedia,
+} from '@/lib/apprenticeship-programs/host-partners';
 
 function programLabel(program: string) {
   return program
@@ -96,17 +99,19 @@ export default function FeaturedHostPartners({
 
   return (
     <>
-      {programSlug !== 'barber-apprenticeship' ? <HostShopShowcase
-        shops={shops}
-        enableNarration
-        mediaOverrides={{
-          'generations-hair-llc': {
-            src: '/images/partners/generations-hair/highlighted-curls-home.webp',
-            alt: 'Highlighted dimensional curls created by Generations Hair LLC in Martinsville, Indiana',
-            kind: 'photo',
-          },
-        }}
-      /> : null}
+      {programSlug !== 'barber-apprenticeship' ? (
+        <HostShopShowcase
+          shops={shops}
+          enableNarration
+          mediaOverrides={{
+            'generations-hair-llc': {
+              src: '/images/partners/generations-hair/highlighted-curls-home.webp',
+              alt: 'Highlighted dimensional curls created by Generations Hair LLC in Martinsville, Indiana',
+              kind: 'photo',
+            },
+          }}
+        />
+      ) : null}
 
       {showDirectory ? (
         <section
@@ -150,7 +155,7 @@ export default function FeaturedHostPartners({
                         alt: "Razor's Image Barbershop storefront in Bloomington, Indiana",
                       }
                     : undefined;
-                const video =
+                const video: FeaturedHostPartnerMedia | undefined =
                   programSlug === 'barber-apprenticeship'
                     ? undefined
                     : shop.slug === 'razors-image-barbershop'
@@ -175,14 +180,24 @@ export default function FeaturedHostPartners({
                               : ''
                           }
                         >
-                          <div className="mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
+                          <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
+                            {image ? (
+                              <Image
+                                src={image.src}
+                                alt=""
+                                fill
+                                sizes="(max-width: 640px) 100vw, 36vw"
+                                className="object-cover opacity-90"
+                                aria-hidden="true"
+                              />
+                            ) : null}
                             <video
                               controls
                               playsInline
                               preload="metadata"
                               poster={image?.src}
                               aria-label={video.alt}
-                              className="aspect-[9/16] max-h-[680px] w-full bg-black object-contain"
+                              className="relative z-10 aspect-[9/16] max-h-[680px] w-full bg-transparent object-contain"
                             >
                               <source src={video.src} type="video/mp4" />
                               Your browser does not support embedded video.
@@ -225,6 +240,16 @@ export default function FeaturedHostPartners({
                             applicable program, employer, and state requirements.
                           </p>
                         </div>
+                        {video.script ? (
+                          <details className="mx-auto mt-4 max-w-xl rounded-xl border border-white/20 bg-slate-950/30 p-4 text-white">
+                            <summary className="cursor-pointer text-sm font-black">
+                              Read the Salon Saloon video script
+                            </summary>
+                            <p className="mt-3 text-sm font-medium leading-6 text-slate-100">
+                              {video.script}
+                            </p>
+                          </details>
+                        ) : null}
                       </div>
                     ) : image ? (
                       <div className={secondaryImage ? 'grid bg-white sm:grid-cols-2' : 'bg-white'}>

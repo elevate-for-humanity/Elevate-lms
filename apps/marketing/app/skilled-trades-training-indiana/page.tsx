@@ -122,7 +122,7 @@ export default function SkilledTradesTrainingIndianaPage() {
         pathwaysHeading="Current Trade Pathways"
         pathways={[
           { name: 'HVAC Technician', description: 'Heating, cooling, refrigeration, safety, diagnostics, installation, maintenance, and applicable credential preparation.', href: '/programs/hvac-technician' },
-          { name: 'CDL Training', description: 'Commercial driver training with a documented Indiana Workforce Ready Grant program-location approval.', href: '/programs/cdl' },
+          { name: 'CDL Training', description: 'Commercial driver training with a documented Indiana Workforce Ready Grant program-location approval.', href: '/programs/cdl-training' },
           { name: 'Registered Apprenticeships', description: 'Occupation-specific apprenticeship administration using applicable sponsor standards, OJL/RTI records, worksite relationships, and verification controls.', href: '/apprenticeships' },
           { name: 'All Active Programs', description: 'Use the current catalog to confirm whether a trade, safety, construction, or other occupational program is presently active.', href: '/programs' },
         ]}
@@ -145,7 +145,7 @@ export default function SkilledTradesTrainingIndianaPage() {
         relatedLinks={[
           { label: 'All Programs', href: '/programs' },
           { label: 'HVAC Technician', href: '/programs/hvac-technician' },
-          { label: 'CDL Training', href: '/programs/cdl' },
+          { label: 'CDL Training', href: '/programs/cdl-training' },
           { label: 'Apprenticeships', href: '/apprenticeships' },
           { label: 'Funding', href: '/funding' },
           { label: 'Employers', href: '/employers' },

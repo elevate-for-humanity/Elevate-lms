@@ -196,30 +196,32 @@ export function ParisFloatingButton({
         </div>
       ) : null}
 
-      <button
-        onClick={() => {
-          dismissWelcome();
-          open();
-        }}
-        aria-label={
-          learnerSurface
-            ? 'Open PARIS Learning Assistant for course help'
-            : portalSurface
-              ? 'Open PARIS Portal Assistant'
-              : 'Open PARIS Career Assistant'
-        }
-        className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-3 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 sm:right-4 sm:px-4 md:bottom-6 md:right-6"
-      >
-        <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
-        <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />
-        <span className="hidden sm:inline">
-          {learnerSurface
-            ? 'Ask PARIS · Course help'
-            : portalSurface
-              ? 'Ask PARIS · Portal help'
-              : 'Ask PARIS'}
-        </span>
-      </button>
+      {!showWelcome && !isOpen ? (
+        <button
+          onClick={() => {
+            dismissWelcome();
+            open();
+          }}
+          aria-label={
+            learnerSurface
+              ? 'Open PARIS Learning Assistant for course help'
+              : portalSurface
+                ? 'Open PARIS Portal Assistant'
+                : 'Open PARIS Career Assistant'
+          }
+          className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-3 z-50 inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-red-600 px-3 py-3 font-bold text-white shadow-xl transition-all hover:bg-brand-red-700 active:scale-95 sm:right-4 sm:px-4 md:bottom-6 md:right-6"
+        >
+          <MessageCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <Mic className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <span className="hidden sm:inline">
+            {learnerSurface
+              ? 'Ask PARIS · Course help'
+              : portalSurface
+                ? 'Ask PARIS · Portal help'
+                : 'Ask PARIS'}
+          </span>
+        </button>
+      ) : null}
     </>
   );
 }

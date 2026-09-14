@@ -6,6 +6,7 @@ export type FeaturedHostPartnerMedia = {
   src: string;
   alt: string;
   kind?: 'photo' | 'flyer' | 'video';
+  script?: string;
 };
 
 export type FeaturedHostPartner = {
@@ -355,6 +356,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         src: '/videos/partners/salon-saloon-tour.mp4',
         alt: 'Salon Saloon team and salon tour',
         kind: 'video',
+        script:
+          'Welcome to Salon Saloon in South Bend, Indiana, a participating Cosmetology Apprenticeship Host Salon. Apprenticeship candidates can learn about supervised salon training, client service, sanitation, hair care, and professional workplace routines. Placement, employment, supervision, and enrollment approval are confirmed through Elevate before training begins.',
       },
     ],
     websiteUrl: 'https://tory-103460.square.site/',

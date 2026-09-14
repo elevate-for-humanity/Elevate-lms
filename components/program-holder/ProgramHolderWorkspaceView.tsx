@@ -23,21 +23,11 @@ import { UniversalProfilePhotoEditor } from '@/components/profile/UniversalProfi
 import { ENCHANTED_HEARTS, formatUsd } from '@/lib/partners/enchanted-hearts';
 import { CallListPanel } from './CallListPanel';
 
-const PROGRAM_HOLDER_PORTRAITS: Record<string, string> = {
-  '34876b7d-bce0-44fb-9550-5dc5fff00791': '/images/carlina-wilkes.jpg',
-  '4bc589d3-bd39-4a50-a724-73e50506c1f1': '/images/jozanna-george.jpg',
-  '01a77939-a012-42a2-8673-db4b264f4259': '/images/ameco-martin.jpg',
-};
-
 function resolveDashboardHero(
-  holderId: string | undefined,
   avatarUrl: string | null | undefined,
   programSlug: string | undefined,
 ) {
   if (avatarUrl?.trim()) return { src: avatarUrl.trim(), isPortrait: true };
-  if (holderId && PROGRAM_HOLDER_PORTRAITS[holderId]) {
-    return { src: PROGRAM_HOLDER_PORTRAITS[holderId], isPortrait: true };
-  }
   return {
     src: getProgramCardImage(programSlug || 'business-administration'),
     isPortrait: false,
@@ -172,7 +162,6 @@ export async function ProgramHolderWorkspaceView({
     data.payoutProfile?.verification_status === 'active',
   );
   const dashboardHero = resolveDashboardHero(
-    data.holder?.id,
     data.profile?.avatar_url,
     data.programs[0]?.slug,
   );

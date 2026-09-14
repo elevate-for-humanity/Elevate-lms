@@ -18,6 +18,14 @@ describe('OpenHands engineering delegation', () => {
     expect(planned?.input.task).toContain('Store demo');
   });
 
+  it('does not confuse Store engineering evidence with an OpenHands status query', () => {
+    const command =
+      'Audit the live Elevate Store page end to end on desktop and mobile using the existing repository and production deployment. Check responsive layout, accessibility, navigation, Store-owned links, guided setup, marketplace filters, ROI labels, console errors, failed API requests, and checkout entry points without making a purchase. Fix only independently repairable defects through the governed OpenHands engineering workflow, preserve unrelated changes, add regression tests, and return commit, test, deployment, and live verification evidence.';
+    const planned = planAIToolFromCommand(command);
+    expect(planned?.name).toBe('openhands.execute');
+    expect(planned?.input.task).toBe(command);
+  });
+
   it('routes browser-only inspection to the isolated browser runtime', () => {
     const planned = planAIToolFromCommand(
       'Inspect the live production homepage for broken links and rendering problems; make no changes',

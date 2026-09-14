@@ -42,9 +42,28 @@ function wioaFollowupInput(
 }
 
 function isOpenHandsStatusCommand(lower: string): boolean {
+  if (!/\bopenhands\b/.test(lower)) return false;
+
+  // Status routing must describe the OpenHands run itself. A compound
+  // engineering request often contains incidental words such as "check",
+  // "result", or "running" while asking OpenHands to change the repository.
+  // Treating any one of those words anywhere in the prompt as a status query
+  // silently converts mutation-capable work into a no-op status lookup.
+  if (
+    /\b(implement|modify|change|update|edit|refactor|write|add|remove|fix|repair|correct|commit|deploy)\b/.test(
+      lower,
+    )
+  ) {
+    return false;
+  }
+
   return (
-    /\bopenhands\b/.test(lower) &&
-    /\b(status|progress|state|check|result|finished|running)\b/.test(lower)
+    /\bopenhands(?:\s+(?:task|run|job))?(?:\s+\w+){0,2}\s+(?:status|progress|state|result|finished|running)\b/.test(
+      lower,
+    ) ||
+    /\b(?:check|show|get|refresh|monitor)\s+(?:the\s+)?openhands(?:\s+(?:task|run|job))?(?:\s+(?:status|progress|state|result))?\b/.test(
+      lower,
+    )
   );
 }
 

@@ -36,10 +36,15 @@ export function authorizedVideoJobIds(rows, options = {}) {
   );
 }
 
-export function eligibleAuthorizedVideoJobs(jobs, authorizedIds) {
+export function generationIsPaused(value) {
+  return value === true || (value && typeof value === 'object' && value.paused === true);
+}
+
+export function eligibleAuthorizedVideoJobs(jobs, authorizedIds, enabledCourseIds = null) {
   return jobs.filter(
     (job) =>
       authorizedIds.has(job.id) &&
+      (!enabledCourseIds || enabledCourseIds.has(job.course_id)) &&
       (job.status === 'queued' || job.status === 'rendering') &&
       !job.dead_lettered_at,
   );

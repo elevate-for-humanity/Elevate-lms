@@ -885,6 +885,43 @@ function Metric({
   );
 }
 
+function voucherStatus(row: any) {
+  const paid =
+    Boolean(row.voucher_paid_date) ||
+    Number(row.amount_paid_cents || 0) > 0 ||
+    ['paid', 'completed', 'succeeded'].includes(String(row.payment_status || '').toLowerCase());
+  if (paid) return 'Paid';
+
+  const verified = Boolean(row.voucher_issued_date) || row.funding_verified === true;
+  return verified ? 'Voucher verified' : 'Voucher pending';
+}
+
+function completionStatus(row: any) {
+  const state = String(row.enrollment_state || row.status || '').toLowerCase();
+  if (
+    Boolean(row.completed_at) ||
+    ['completed', 'graduated'].includes(state) ||
+    String(row.work_progress || '').toLowerCase() === 'completed'
+  ) {
+    return 'Complete';
+  }
+
+  if (
+    Number(row.progress_percent || 0) > 0 ||
+    Number(row.total_hours_completed || 0) > 0 ||
+    (row.training_start_date && row.training_start_date <= new Date().toISOString().slice(0, 10))
+  ) {
+    return 'In progress';
+  }
+
+  return 'Not started';
+}
+
+function applicantPipelineStatus(row: any) {
+  const status = String(row.application_status || row.status || 'pending').toLowerCase();
+  return status === 'approved' ? 'Voucher pending' : status.replaceAll('_', ' ');
+}
+
 function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
   return (
     <div className="mt-5 min-w-0">
@@ -912,13 +949,8 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   label="Program"
                   value={programTitle(programs, row.program_id, row.program_slug)}
                 />
-                <Row
-                  label="Enrollment"
-                  value={String(row.enrollment_state || row.status || 'enrolled').replaceAll(
-                    '_',
-                    ' ',
-                  )}
-                />
+                <Row label="Voucher" value={voucherStatus(row)} />
+                <Row label="Completion" value={completionStatus(row)} />
                 <Row
                   label="Training"
                   value={`${row.training_start_date || 'Start missing'} — ${row.training_end_date || 'End missing'}`}
@@ -957,7 +989,8 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
             <tr>
               <th className="px-3 py-3">Student</th>
               <th className="px-3 py-3">Program</th>
-              <th className="px-3 py-3">Enrollment</th>
+              <th className="px-3 py-3">Voucher</th>
+              <th className="px-3 py-3">Completion</th>
               <th className="px-3 py-3">Progress</th>
               <th className="px-3 py-3">WorkOne hours</th>
               <th className="px-3 py-3">Training dates</th>
@@ -976,9 +1009,8 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   <td className="px-3 py-4">
                     {programTitle(programs, row.program_id, row.program_slug)}
                   </td>
-                  <td className="px-3 py-4 capitalize">
-                    {String(row.enrollment_state || row.status || 'enrolled').replaceAll('_', ' ')}
-                  </td>
+                  <td className="px-3 py-4 font-bold">{voucherStatus(row)}</td>
+                  <td className="px-3 py-4 font-bold">{completionStatus(row)}</td>
                   <td className="px-3 py-4 font-bold">{Number(row.progress_percent || 0)}%</td>
                   <td className="px-3 py-4 font-bold">
                     {Math.min(48, Number(row.total_hours_completed || 0))} / 48
@@ -1000,7 +1032,7 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={9} className="px-3 py-8 text-center text-slate-500">
                   No confirmed student enrollments are linked.
                 </td>
               </tr>
@@ -1137,7 +1169,7 @@ function Applicants({
                   </td>
                   <td className="p-3">{programTitle(programs, row.program_id)}</td>
                   <td className="p-3 capitalize">
-                    {row.application_status || row.status || 'pending'}
+                    {applicantPipelineStatus(row)}
                   </td>
                   <td className="p-3">
                     <p className="font-medium">{row.applicant_phone || 'No phone on file'}</p>

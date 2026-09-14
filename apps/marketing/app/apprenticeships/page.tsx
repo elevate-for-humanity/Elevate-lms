@@ -7,6 +7,7 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
 import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
+const APPRENTICESHIP_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4';
 
 export const metadata: Metadata = {
   title: 'Apprenticeship Programs',
@@ -68,10 +69,12 @@ export default function ApprenticeshipsPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950">
       <HeroVideo
-        videoSrcDesktop={hero.videoSrcDesktop}
-        videoSrcMobile={hero.videoSrcMobile}
+        videoSrcDesktop={hero.videoSrcDesktop || APPRENTICESHIP_VIDEO}
+        videoSrcMobile={hero.videoSrcMobile || APPRENTICESHIP_VIDEO}
         posterImage="/images/pages/apprenticeship-sponsor-page-1.webp"
         voiceoverSrc={hero.voiceoverSrc}
+        narrateTranscript={false}
+        showSoundControl={false}
         microLabel="Earn while you learn"
         belowHeroHeadline="Apprenticeship puts training where the work happens."
         belowHeroSubheadline="Build real skills through supervised work-based learning, structured instruction, progress tracking, and a clear path toward occupation-specific requirements."
@@ -98,8 +101,6 @@ export default function ApprenticeshipsPage() {
           ))}
         </div>
       </section>
-
-      <HostShopShowcase shops={FEATURED_BEAUTY_HOST_PARTNERS} />
 
       <section id="programs" className="px-4 py-14 sm:py-20">
         <div className="mx-auto max-w-6xl">
@@ -159,6 +160,8 @@ export default function ApprenticeshipsPage() {
           </div>
         </div>
       </section>
+
+      <HostShopShowcase shops={FEATURED_BEAUTY_HOST_PARTNERS} />
 
       <section className="bg-slate-50 px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-6xl">

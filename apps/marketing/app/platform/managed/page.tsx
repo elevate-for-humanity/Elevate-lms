@@ -91,7 +91,7 @@ export default async function ManagedPlatformPage() {
             <Link href="/store/licenses/managed-platform" className="px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors">
               Get Started
             </Link>
-            <Link href="/store/demo" className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition-colors">
+            <Link href="/store/demos" className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition-colors">
               See Platform Tour
             </Link>
           </div>

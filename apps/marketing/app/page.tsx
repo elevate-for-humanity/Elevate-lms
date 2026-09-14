@@ -6,6 +6,8 @@ import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
+import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
+import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import StructuredData from '@/components/StructuredData';
 
@@ -13,10 +15,10 @@ export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: {
-    absolute: `${PLATFORM_DEFAULTS.orgName} | Career Training & Apprenticeships in Indianapolis`,
+    absolute: `${PLATFORM_DEFAULTS.orgName} | Workforce Training & Apprenticeship Platform`,
   },
   description:
-    'Explore career training, registered apprenticeships, workforce funding pathways, testing, credentials, and employer-connected programs in Indianapolis and across Indiana. Funding eligibility is determined by the responsible agency.',
+    'One connected workforce platform for career training, registered apprenticeships, employer coordination, credentials, compliance, and participant progress.',
   keywords: [
     'career training Indianapolis',
     'job training Indianapolis',
@@ -88,7 +90,8 @@ export default function HomePage() {
       <StructuredData />
       <main>
         <PlatformHubHero />
-        <HomeFeaturedHostShop />
+        <div data-narration-disabled="true"><HomeTrustBar /></div>
+        <div data-narration-disabled="true"><HomePlatformOverview /></div>
         <div
           data-scroll-narration
           data-narration="You do not have to have your whole career figured out today. Start by exploring the field that fits your interests, schedule, and goals."
@@ -103,15 +106,14 @@ export default function HomePage() {
         >
           <HomeFunding />
         </div>
+        <div data-narration-disabled="true"><HomeEmployerStrip /></div>
+        <div data-narration-disabled="true"><HomeFeaturedHostShop /></div>
         <div
           data-scroll-narration
           data-narration="When you are ready, choose the next step that fits you: explore a program, apply for training, or connect with our team."
           data-narration-src="/audio/narration/final.mp3"
         >
           <HomeFinalCTA />
-        </div>
-        <div data-narration-disabled="true">
-          <HomeTrustBar />
         </div>
       </main>
     </>

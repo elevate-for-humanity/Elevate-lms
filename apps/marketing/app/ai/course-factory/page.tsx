@@ -110,7 +110,7 @@ export default function CourseFactoryPage() {
                 Open Course Builder
               </a>
               <Link
-                href="/store/demo"
+                href="/store/demos"
                 className="rounded-lg border border-white/30 bg-white/10 px-8 py-4 font-bold text-white transition hover:bg-white/20"
               >
                 Request Platform Demo

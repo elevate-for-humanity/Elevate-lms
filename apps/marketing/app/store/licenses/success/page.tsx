@@ -51,7 +51,7 @@ const NEXT_STEPS = [
     icon: Play,
     title: 'Explore Demo Center',
     description: 'See platform features in action.',
-    href: '/store/demo',
+    href: '/store/demos',
     cta: 'View Demos',
   },
   {

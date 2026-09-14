@@ -41,6 +41,7 @@ export function ScrollNarrator() {
   // still require one tap before allowing audible playback; an explicit "off"
   // choice is persisted so accessibility and visitor preference remain authoritative.
   const [enabled, setEnabled] = useState(true);
+  const [hasNarration, setHasNarration] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const lastNarrationRef = useRef<{ section: HTMLElement; text: string; source?: string } | null>(
     null,
@@ -92,6 +93,10 @@ export function ScrollNarrator() {
   useEffect(() => {
     lastNarrationRef.current = null;
     stop();
+    const narrationSections = document.querySelectorAll(
+      'main [data-scroll-narration]:not([data-narration-disabled="true"])',
+    );
+    setHasNarration(narrationSections.length > 0);
     if (!enabled) return;
     const frame = window.requestAnimationFrame(() => void narrateVisibleSection());
     return () => window.cancelAnimationFrame(frame);
@@ -217,7 +222,7 @@ export function ScrollNarrator() {
 
   // The Bookkeeping hero is a dense, full-width informational graphic. Keep
   // the floating narrator from covering its instructor, benefits, or pathway copy.
-  if (pathname === '/programs/bookkeeping') return null;
+  if (pathname === '/programs/bookkeeping' || !hasNarration) return null;
 
   return (
     <div className="fixed bottom-24 left-4 z-[80] sm:bottom-6 sm:left-6">

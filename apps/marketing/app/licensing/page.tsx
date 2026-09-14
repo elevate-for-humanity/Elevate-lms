@@ -186,7 +186,7 @@ export default function LicensingPage() {
               Start License Setup
             </Link>
             <Link
-              href="/store/demo"
+              href="/store/demos"
               className="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-zinc-900 bg-white border-2 border-zinc-900 rounded-lg hover:bg-zinc-50 transition-colors"
             >
               Watch Demo First

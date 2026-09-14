@@ -75,7 +75,7 @@ const DEMO_SCRIPT: DemoStep[] = [
   {
     id: 'demo-hub',
     message: "Now let's see the platform in action. I'll show you the learner experience first.",
-    route: '/store/demo',
+    route: '/store/demos',
     delay: 3000,
   },
   {

@@ -1,6 +1,7 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, BriefcaseBusiness, GraduationCap } from 'lucide-react';
+import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
+const HOME_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
 
 const PROOF = [
   { icon: GraduationCap, label: 'Hands-on training' },
@@ -14,20 +15,21 @@ export function PlatformHubHero() {
       className="border-b border-slate-200 bg-white"
       aria-labelledby="home-hero-heading"
       data-scroll-narration
+      data-narration-src="/audio/narration/home-hero.mp3"
       data-narration="Welcome to Elevate for Humanity. Explore practical career training, registered apprenticeships, and employer-connected pathways in Indiana. Choose a program, review possible funding, and take your next step online."
     >
-      <div className="mx-auto grid max-w-[1440px] lg:min-h-[calc(100svh-60px)] lg:grid-cols-[0.92fr_1.08fr]">
-        <div className="order-2 flex items-center px-5 py-10 sm:px-8 sm:py-14 lg:order-1 lg:px-14">
+      <div className="mx-auto grid max-w-[1440px] lg:min-h-[720px] lg:grid-cols-[0.92fr_1.08fr]">
+        <div className="order-2 flex items-center px-5 py-10 sm:px-8 sm:py-14 lg:order-1 lg:px-14 lg:py-16">
           <div className="max-w-2xl">
             <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">
               Career training in Indiana
             </p>
             <h1 id="home-hero-heading" className="mt-4 text-4xl font-black leading-[1.03] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
-              Build skills that move your career forward.
+              One platform for training, apprenticeships, and workforce operations.
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-8 text-slate-700">
-              Explore practical training, registered apprenticeships, and employer-connected
-              pathways. Choose a direction and see the cost, schedule, and next step online.
+              Learn, operate programs, coordinate employers, document compliance, and move people
+              from application to credential in one connected system.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link href="/programs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800">
@@ -47,15 +49,14 @@ export function PlatformHubHero() {
             </div>
           </div>
         </div>
-        <div className="relative order-1 min-h-[clamp(320px,58svh,560px)] overflow-hidden bg-slate-100 lg:order-2 lg:min-h-[calc(100svh-60px)]">
-          <Image
-            src="/images/beauty/program-beauty-training.webp"
-            alt="Learners receiving hands-on career training in a professional classroom"
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 55vw"
-            className="object-cover object-center"
+        <div className="relative order-1 min-h-[clamp(340px,58svh,560px)] overflow-hidden bg-slate-950 lg:order-2 lg:min-h-[720px]">
+          <SafeHeroVideo
+            src={HOME_VIDEO}
+            poster="/images/beauty/program-beauty-training.webp"
+            ariaLabel="Elevate career training and workforce platform in action"
+            className="absolute inset-0 h-full w-full object-cover object-center"
           />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-24 bg-gradient-to-t from-slate-950/35 to-transparent" aria-hidden="true" />
         </div>
       </div>
     </section>

@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import TestingCart, { AddExamToCartButton } from '@/components/testing/TestingCart';
+import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
+const TESTING_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4';
 import { TESTING_CENTER } from '@/lib/testing/testing-config';
 import {
   ACTIVE_PROVIDERS,
@@ -21,7 +23,7 @@ import {
 } from '@/lib/testing/proctoring-capabilities';
 
 export const metadata: Metadata = {
-  title: 'Testing & Credential Exams | Elevate for Humanity',
+  title: 'Testing & Credential Exams',
   description:
     'Workforce credential exams and proctor-supervised certification testing. Choose an available exam, review the configured retail price, and continue to checkout.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing' },
@@ -81,14 +83,7 @@ export default function TestingPage() {
       </div>
 
       <section className="relative min-h-[340px] overflow-hidden bg-slate-100 sm:min-h-[430px]">
-        <Image
-          src="/images/pages/testing-page-1.webp"
-          alt="Credential testing and career readiness"
-          fill
-          sizes="100vw"
-          className="object-cover object-center"
-          priority
-        />
+        <SafeHeroVideo src={TESTING_VIDEO} poster="/images/pages/testing-page-1.webp" ariaLabel="Credential testing and career readiness" className="absolute inset-0 h-full w-full object-cover object-center" />
       </section>
 
       <section className="border-b border-slate-100 bg-white py-10">
@@ -100,17 +95,16 @@ export default function TestingPage() {
             Choose the credential exam. See the price. Check out securely.
           </h1>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-slate-600">
-            This is the canonical public testing catalog. Exams with a configured retail amount can
-            be selected and purchased online. The server re-resolves the exam and amount before
-            creating Stripe Checkout.
+            Compare available credential exams, delivery options, and published prices. Select the
+            exact exam you need before continuing to secure checkout.
           </p>
 
           <div className="mt-7 grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <ShieldCheck className="h-5 w-5 text-emerald-600" />
-              <p className="mt-2 font-bold text-slate-900">Server-authoritative pricing</p>
+              <p className="mt-2 font-bold text-slate-900">Verified checkout pricing</p>
               <p className="mt-1 text-sm text-slate-600">
-                Checkout never accepts a price supplied by the browser.
+                The selected exam and published amount are verified again before payment.
               </p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">

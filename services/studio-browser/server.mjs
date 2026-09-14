@@ -11,6 +11,14 @@ const adminOrigin =
   process.env.STUDIO_BROWSER_ADMIN_ORIGIN || 'https://admin.elevateforhumanity.org';
 const sessionTtlMs = Number(process.env.STUDIO_BROWSER_SESSION_TTL_MS || 15 * 60_000);
 const maxSessions = Number(process.env.STUDIO_BROWSER_MAX_SESSIONS || 4);
+const heartbeatIntervalMs = Math.max(
+  5_000,
+  Number(process.env.STUDIO_BROWSER_HEARTBEAT_INTERVAL_MS || 30_000),
+);
+const heartbeatTimeoutMs = Math.max(
+  1_000,
+  Number(process.env.STUDIO_BROWSER_HEARTBEAT_TIMEOUT_MS || 5_000),
+);
 const frameIntervalMs = Math.min(
   1000,
   Math.max(100, Number(process.env.STUDIO_BROWSER_FRAME_INTERVAL_MS || 160)),
@@ -24,7 +32,181 @@ const allowedDomains = (process.env.STUDIO_BROWSER_ALLOWED_DOMAINS || 'elevatefo
   .map((value) => value.trim().toLowerCase())
   .filter(Boolean);
 const sessions = new Map();
-let browserPromise;
+let shuttingDown = false;
+
+export class BrowserServiceError extends Error {
+  constructor(code, status, options = {}) {
+    super(code, options);
+    this.name = 'BrowserServiceError';
+    this.code = code;
+    this.status = status;
+  }
+}
+
+function sanitizeReason(error) {
+  const text = error instanceof Error ? error.message : String(error || 'unknown failure');
+  return text
+    .replace(/https?:\/\/[^\s]+/gi, '[url]')
+    .replace(/(token|secret|cookie|authorization)\s*[=:]\s*[^\s,;]+/gi, '$1=[redacted]')
+    .replace(/[\r\n]+/g, ' ')
+    .slice(0, 240);
+}
+
+function isInfrastructureFailure(error) {
+  const text = error instanceof Error ? error.message : String(error);
+  return /browser.*(closed|disconnect|unavailable)|target.*closed|has been closed/i.test(text);
+}
+
+async function withTimeout(promise, timeoutMs, code = 'browser_unavailable') {
+  let timer;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new BrowserServiceError(code, 503)), timeoutMs);
+        timer.unref?.();
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export function createBrowserLifecycleManager({ launch = (options) => chromium.launch(options), onUnavailable = async () => {} } = {}) {
+  const lifecycle = {
+    state: 'cold',
+    generation: 0,
+    launchTimestamp: null,
+    lastSuccessfulHeartbeat: null,
+    lastFailureTimestamp: null,
+    lastFailureReason: null,
+    consecutiveFailures: 0,
+    restartCount: 0,
+  };
+  let browser;
+  let launchInFlight;
+  let recycleInFlight;
+  let heartbeatInFlight;
+  let intentionalClose = false;
+
+  const connected = () => Boolean(browser?.isConnected?.());
+  const fail = (error) => {
+    lifecycle.state = 'failed';
+    lifecycle.lastFailureTimestamp = new Date().toISOString();
+    lifecycle.lastFailureReason = sanitizeReason(error);
+    lifecycle.consecutiveFailures += 1;
+  };
+  const verify = async (candidate) => {
+    const context = await candidate.newContext();
+    try {
+      const page = await context.newPage();
+      await page.close();
+    } finally {
+      await context.close().catch(() => undefined);
+    }
+  };
+  const launchBrowser = async () => {
+    if (shuttingDown || lifecycle.state === 'shutting_down')
+      throw new BrowserServiceError('browser_unavailable', 503);
+    if (connected()) return browser;
+    if (launchInFlight) return launchInFlight;
+    lifecycle.state = 'starting';
+    launchInFlight = (async () => {
+      try {
+        const candidate = await launch({
+          headless: true,
+          args: [
+            '--disable-background-networking',
+            '--disable-component-update',
+            '--disable-dev-shm-usage',
+            '--disable-renderer-backgrounding',
+            '--no-first-run',
+            '--no-sandbox',
+          ],
+        });
+        await withTimeout(verify(candidate), heartbeatTimeoutMs);
+        browser = candidate;
+        lifecycle.generation += 1;
+        lifecycle.launchTimestamp = new Date().toISOString();
+        lifecycle.lastSuccessfulHeartbeat = lifecycle.launchTimestamp;
+        lifecycle.consecutiveFailures = 0;
+        lifecycle.lastFailureReason = null;
+        lifecycle.state = 'ready';
+        candidate.on('disconnected', () => {
+          if (candidate !== browser || intentionalClose || shuttingDown) return;
+          browser = undefined;
+          fail(new Error('Chromium disconnected'));
+          void onUnavailable('browser_disconnected');
+          void recycleBrowser('browser_disconnected');
+        });
+        return candidate;
+      } catch (error) {
+        fail(error);
+        throw new BrowserServiceError('browser_unavailable', 503, { cause: error });
+      } finally {
+        launchInFlight = undefined;
+      }
+    })();
+    return launchInFlight;
+  };
+  const recycleBrowser = async (reason = 'administrative_recycle') => {
+    if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
+    if (recycleInFlight) return recycleInFlight;
+    lifecycle.state = 'recycling';
+    recycleInFlight = (async () => {
+      const old = browser;
+      browser = undefined;
+      await onUnavailable(reason);
+      intentionalClose = true;
+      await old?.close?.().catch(() => undefined);
+      intentionalClose = false;
+      lifecycle.restartCount += 1;
+      return launchBrowser();
+    })().finally(() => {
+      recycleInFlight = undefined;
+    });
+    return recycleInFlight;
+  };
+  const heartbeat = async () => {
+    if (heartbeatInFlight || recycleInFlight || lifecycle.state !== 'ready') return false;
+    heartbeatInFlight = (async () => {
+      try {
+        if (!connected()) throw new Error('Chromium disconnected');
+        await withTimeout(verify(browser), heartbeatTimeoutMs);
+        lifecycle.lastSuccessfulHeartbeat = new Date().toISOString();
+        lifecycle.consecutiveFailures = 0;
+        return true;
+      } catch (error) {
+        fail(error);
+        await recycleBrowser('heartbeat_failed').catch(() => undefined);
+        return false;
+      } finally {
+        heartbeatInFlight = undefined;
+      }
+    })();
+    return heartbeatInFlight;
+  };
+  const health = () => ({
+    browserState: lifecycle.state,
+    browserConnected: connected(),
+    browserGeneration: lifecycle.generation,
+    browserLaunchTimestamp: lifecycle.launchTimestamp,
+    lastSuccessfulHeartbeat: lifecycle.lastSuccessfulHeartbeat,
+    restartCount: lifecycle.restartCount,
+    consecutiveFailures: lifecycle.consecutiveFailures,
+    lastFailureTimestamp: lifecycle.lastFailureTimestamp,
+    lastFailureReason: lifecycle.lastFailureReason,
+    recycling: Boolean(recycleInFlight),
+  });
+  const shutdown = async () => {
+    lifecycle.state = 'shutting_down';
+    intentionalClose = true;
+    const old = browser;
+    browser = undefined;
+    await old?.close?.().catch(() => undefined);
+  };
+  return { getBrowser: launchBrowser, recycleBrowser, heartbeat, health, shutdown };
+}
 
 function json(res, status, body) {
   res.writeHead(status, { 'content-type': 'application/json', ...corsHeaders() });
@@ -73,49 +255,33 @@ export function isPrivateAddress(address) {
 }
 
 async function validateTarget(input) {
-  const url = new URL(input);
+  let url;
+  try { url = new URL(input); } catch { throw new BrowserServiceError('invalid_target', 400); }
   if (!['http:', 'https:'].includes(url.protocol))
-    throw new Error('Only HTTP and HTTPS targets are allowed');
-  if (url.username || url.password) throw new Error('Target credentials are not allowed');
+    throw new BrowserServiceError('invalid_target', 400);
+  if (url.username || url.password) throw new BrowserServiceError('invalid_target', 400);
   if (url.port && !['80', '443'].includes(url.port))
-    throw new Error('Only standard HTTP and HTTPS ports are allowed');
+    throw new BrowserServiceError('invalid_target', 400);
   const host = url.hostname.toLowerCase();
   if (
     allowedDomains.length &&
     !allowedDomains.some((domain) => host === domain || host.endsWith(`.${domain}`))
   ) {
-    throw new Error('Target domain is not in the Studio browser allowlist');
+    throw new BrowserServiceError('invalid_target', 400);
   }
   const records = await dns.lookup(host, { all: true });
   if (!records.length || records.some((record) => isPrivateAddress(record.address)))
-    throw new Error('Private network targets are blocked');
+    throw new BrowserServiceError('invalid_target', 400);
   return url.toString();
 }
 
 function authorized(req, session, requestUrl) {
   const token =
     req.headers.authorization?.replace(/^Bearer\s+/i, '') || requestUrl.searchParams.get('token');
-  return !!token && crypto.timingSafeEqual(Buffer.from(token), Buffer.from(session.token));
-}
-
-async function getBrowser() {
-  browserPromise ||= chromium
-    .launch({
-      headless: true,
-      args: [
-        '--disable-background-networking',
-        '--disable-component-update',
-        '--disable-dev-shm-usage',
-        '--disable-renderer-backgrounding',
-        '--no-first-run',
-        '--no-sandbox',
-      ],
-    })
-    .catch((error) => {
-      browserPromise = undefined;
-      throw error;
-    });
-  return browserPromise;
+  if (!token) return false;
+  const supplied = Buffer.from(token);
+  const expected = Buffer.from(session.token);
+  return supplied.length === expected.length && crypto.timingSafeEqual(supplied, expected);
 }
 
 async function destroySession(id) {
@@ -127,14 +293,17 @@ async function destroySession(id) {
   await session.context.close().catch(() => undefined);
 }
 
+const browserManager = createBrowserLifecycleManager({
+  onUnavailable: async () => {
+    await Promise.all([...sessions.keys()].map(destroySession));
+  },
+});
+
 async function createSession(target, viewport, authCookies = []) {
-  if (sessions.size >= maxSessions) throw new Error('Studio browser session capacity reached');
-  const browser = await getBrowser();
-  const context = await browser.newContext({
-    viewport,
-    ignoreHTTPSErrors: false,
-    acceptDownloads: false,
-  });
+  if (shuttingDown) throw new BrowserServiceError('browser_unavailable', 503);
+  const state = browserManager.health().browserState;
+  if (state === 'recycling') throw new BrowserServiceError('browser_recycling', 503);
+  if (sessions.size >= maxSessions) throw new BrowserServiceError('session_capacity_reached', 429);
   const targetUrl = new URL(target);
   const safeAuthCookies = Array.isArray(authCookies)
     ? authCookies
@@ -159,17 +328,23 @@ async function createSession(target, viewport, authCookies = []) {
           sameSite: 'Lax',
         }))
     : [];
-  if (
-    safeAuthCookies.length &&
-    (targetUrl.hostname === 'elevateforhumanity.org' ||
-      targetUrl.hostname.endsWith('.elevateforhumanity.org'))
-  ) {
-    await context.addCookies(safeAuthCookies);
-  }
-  const page = await context.newPage();
-  const id = crypto.randomUUID();
-  const token = crypto.randomBytes(32).toString('base64url');
-  const session = {
+  let attempt = 0;
+  while (attempt < 2) {
+    let context;
+    let page;
+    try {
+      const browser = await browserManager.getBrowser();
+      context = await browser.newContext({ viewport, ignoreHTTPSErrors: false, acceptDownloads: false });
+      if (
+        safeAuthCookies.length &&
+        (targetUrl.hostname === 'elevateforhumanity.org' ||
+          targetUrl.hostname.endsWith('.elevateforhumanity.org'))
+      ) await context.addCookies(safeAuthCookies);
+      page = await context.newPage();
+      await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      const id = crypto.randomUUID();
+      const token = crypto.randomBytes(32).toString('base64url');
+      const session = {
     id,
     token,
     context,
@@ -183,12 +358,12 @@ async function createSession(target, viewport, authCookies = []) {
     framesSent: 0,
     framesDropped: 0,
     events: [],
-  };
-  const record = (type, data) => {
+      };
+      const record = (type, data) => {
     session.events.push({ type, at: new Date().toISOString(), ...data });
     if (session.events.length > 500) session.events.shift();
-  };
-  page.on('console', (message) =>
+      };
+      page.on('console', (message) =>
     record('console', { level: message.type(), text: message.text().slice(0, 2000) }),
   );
   page.on('pageerror', (error) => record('pageerror', { text: error.message.slice(0, 2000) }));
@@ -202,9 +377,22 @@ async function createSession(target, viewport, authCookies = []) {
     if (response.status() >= 400)
       record('response', { url: response.url(), status: response.status() });
   });
-  sessions.set(id, session);
-  await page.goto(target, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-  return session;
+      sessions.set(id, session);
+      return session;
+    } catch (error) {
+      await page?.close?.().catch(() => undefined);
+      await context?.close?.().catch(() => undefined);
+      if (attempt === 0 && isInfrastructureFailure(error)) {
+        attempt += 1;
+        await browserManager.recycleBrowser('session_creation_failed');
+        continue;
+      }
+      if (error?.name === 'TimeoutError')
+        throw new BrowserServiceError('navigation_timeout', 504, { cause: error });
+      if (error instanceof BrowserServiceError) throw error;
+      throw new BrowserServiceError('browser_unavailable', 503, { cause: error });
+    }
+  }
 }
 
 async function runAction(session, action) {
@@ -494,19 +682,34 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.method === 'OPTIONS') return json(res, 204, {});
     const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
-    if (req.method === 'GET' && url.pathname === '/health')
-      return json(res, 200, {
-        ok: true,
+    if (req.method === 'GET' && url.pathname === '/health') {
+      const lifecycle = browserManager.health();
+      const ready = lifecycle.browserState === 'ready' && lifecycle.browserConnected && sessions.size < maxSessions;
+      return json(res, ready ? 200 : 503, {
+        ok: ready,
         service: 'studio-browser',
         engine: 'playwright-chromium',
         commit: process.env.GIT_SHA || 'MISSING',
-        sessions: sessions.size,
-        browserWarm: Boolean(browserPromise),
-        frameIntervalMs,
+        ...lifecycle,
+        activeSessions: sessions.size,
+        maxSessions,
+        ready,
       });
+    }
+    if (req.method === 'POST' && url.pathname === '/admin/recycle') {
+      if (!sharedSecret || req.headers['x-studio-browser-secret'] !== sharedSecret)
+        return json(res, 401, { error: 'unauthorized' });
+      const before = browserManager.health();
+      if (before.recycling)
+        return json(res, 202, { status: 'running', browserGeneration: before.browserGeneration });
+      const body = await readBody(req);
+      const correlationId = String(body.correlationId || crypto.randomUUID()).slice(0, 100);
+      void browserManager.recycleBrowser(String(body.reason || 'administrative_recycle').slice(0, 120));
+      return json(res, 202, { status: 'queued', correlationId, browserGeneration: before.browserGeneration });
+    }
     if (req.method === 'POST' && url.pathname === '/sessions') {
       if (!sharedSecret || req.headers['x-studio-browser-secret'] !== sharedSecret)
-        return json(res, 401, { error: 'Unauthorized' });
+        return json(res, 401, { error: 'unauthorized' });
       const body = await readBody(req);
       const target = await validateTarget(String(body.url || 'https://www.elevateforhumanity.org'));
       const width = Math.min(1920, Math.max(320, Number(body.width || 1440)));
@@ -525,8 +728,8 @@ const server = http.createServer(async (req, res) => {
     );
     if (!match) return json(res, 404, { error: 'Not found' });
     const session = sessions.get(match[1]);
-    if (!session || !authorized(req, session, url))
-      return json(res, 401, { error: 'Invalid or expired browser session' });
+    if (!session) return json(res, 410, { error: 'session_expired' });
+    if (!authorized(req, session, url)) return json(res, 401, { error: 'unauthorized' });
     if (req.method === 'GET' && match[2] === 'stream') return streamFrames(req, res, session);
     if (req.method === 'GET' && match[2] === 'screenshot') {
       const quality = Math.min(80, Math.max(35, Number(url.searchParams.get('quality') || 65)));
@@ -558,26 +761,40 @@ const server = http.createServer(async (req, res) => {
     }
     return json(res, 405, { error: 'Method not allowed' });
   } catch (error) {
-    json(res, 400, { error: error instanceof Error ? error.message : 'Browser request failed' });
+    const status = error instanceof BrowserServiceError ? error.status : 500;
+    const code = error instanceof BrowserServiceError ? error.code : 'worker_failure';
+    json(res, status, { error: code, retryable: status === 429 || status === 503 });
   }
 });
 
-setInterval(() => {
+const cleanupTimer = setInterval(() => {
   const cutoff = Date.now() - sessionTtlMs;
   for (const [id, session] of sessions) if (session.lastSeen < cutoff) void destroySession(id);
 }, 30_000).unref();
 
+const heartbeatTimer = setInterval(() => {
+  void browserManager.heartbeat();
+}, heartbeatIntervalMs);
+heartbeatTimer.unref();
+
 async function shutdown() {
-  await Promise.all([...sessions.keys()].map(destroySession));
-  if (browserPromise) await (await browserPromise).close().catch(() => undefined);
+  if (shuttingDown) return;
+  shuttingDown = true;
+  clearInterval(cleanupTimer);
+  clearInterval(heartbeatTimer);
+  await withTimeout(
+    Promise.all([...sessions.keys()].map(destroySession)).then(() => browserManager.shutdown()),
+    10_000,
+  ).catch(() => undefined);
   server.close(() => process.exit(0));
+  setTimeout(() => process.exit(0), 2_000).unref();
 }
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   server.listen(port, '0.0.0.0', () => {
     console.info(`Studio browser listening on ${port}`);
-    void getBrowser().catch((error) =>
+    void browserManager.getBrowser().catch((error) =>
       console.error(
         'Studio browser pre-warm failed',
         error instanceof Error ? error.message : error,

@@ -45,11 +45,7 @@ async function appendLog(
 
 async function findDeveloperAgentId(): Promise<string | null> {
   const db = await requireAdminClient();
-  const { data } = await db
-    .from('ai_agents')
-    .select('id')
-    .eq('slug', 'ai-developer')
-    .maybeSingle();
+  const { data } = await db.from('ai_agents').select('id').eq('slug', 'ai-developer').maybeSingle();
   return data?.id ?? null;
 }
 
@@ -153,7 +149,8 @@ export async function dispatchOpenHandsTask(
       })
       .select('id')
       .single();
-    if (error || !created?.id) throw new Error(error?.message ?? 'Unable to create canonical OpenHands task');
+    if (error || !created?.id)
+      throw new Error(error?.message ?? 'Unable to create canonical OpenHands task');
     taskId = created.id;
 
     await db.from('ai_task_steps').insert(
@@ -189,7 +186,9 @@ export async function dispatchOpenHandsTask(
   };
 }
 
-function lifecycleTaskStatus(lifecycle: OpenHandsLifecycle): 'failed' | 'awaiting_approval' | 'running' {
+function lifecycleTaskStatus(
+  lifecycle: OpenHandsLifecycle,
+): 'failed' | 'awaiting_approval' | 'running' {
   if (lifecycle.status === 'failed') return 'failed';
   if (lifecycle.status === 'approval_required') return 'awaiting_approval';
   return 'running';
@@ -202,7 +201,9 @@ function failingChecks(evidence: OpenHandsGitHubEvidence): string[] {
       failures.add(`PR #${pr.number} combined status is ${pr.combinedStatus}`);
     }
     for (const check of pr.checkRuns) {
-      if (['failure', 'cancelled', 'timed_out', 'action_required'].includes(check.conclusion ?? '')) {
+      if (
+        ['failure', 'cancelled', 'timed_out', 'action_required'].includes(check.conclusion ?? '')
+      ) {
         failures.add(`PR #${pr.number} check ${check.name} concluded ${check.conclusion}`);
       }
     }
@@ -215,7 +216,8 @@ function pendingChecks(evidence: OpenHandsGitHubEvidence): string[] {
   for (const pr of evidence.pullRequests) {
     if (pr.combinedStatus === 'pending') pending.add(`PR #${pr.number} combined status is pending`);
     for (const check of pr.checkRuns) {
-      if (check.status !== 'completed') pending.add(`PR #${pr.number} check ${check.name} is ${check.status}`);
+      if (check.status !== 'completed')
+        pending.add(`PR #${pr.number} check ${check.name} is ${check.status}`);
     }
   }
   return [...pending];
@@ -286,8 +288,10 @@ function evaluateOpenHandsCompletion(
     result: github,
     attempts,
     maxAttempts,
-    expectedOutput: 'A completed OpenHands engineering run with independently verifiable repository evidence.',
-    verificationRule: 'At least one reported branch or pull request must exist in GitHub and reported CI must not be failing.',
+    expectedOutput:
+      'A completed OpenHands engineering run with independently verifiable repository evidence.',
+    verificationRule:
+      'At least one reported branch or pull request must exist in GitHub and reported CI must not be failing.',
   });
 }
 
@@ -297,20 +301,29 @@ async function retryOpenHandsTask(input: {
   attempt: number;
 }): Promise<void> {
   const db = await requireAdminClient();
-  const taskInput = input.task.tool_input && typeof input.task.tool_input === 'object'
-    ? input.task.tool_input as Record<string, unknown>
-    : {};
-  const previous = input.task.tool_output && typeof input.task.tool_output === 'object'
-    ? input.task.tool_output as Record<string, unknown>
-    : {};
-  const originalTask = typeof taskInput.task === 'string'
-    ? taskInput.task
-    : String(input.task.command ?? input.task.description ?? input.task.title ?? 'Repair the verified engineering failure.');
-  const repository = typeof taskInput.repository === 'string'
-    ? taskInput.repository
-    : typeof previous.repository === 'string'
-      ? previous.repository
-      : null;
+  const taskInput =
+    input.task.tool_input && typeof input.task.tool_input === 'object'
+      ? (input.task.tool_input as Record<string, unknown>)
+      : {};
+  const previous =
+    input.task.tool_output && typeof input.task.tool_output === 'object'
+      ? (input.task.tool_output as Record<string, unknown>)
+      : {};
+  const originalTask =
+    typeof taskInput.task === 'string'
+      ? taskInput.task
+      : String(
+          input.task.command ??
+            input.task.description ??
+            input.task.title ??
+            'Repair the verified engineering failure.',
+        );
+  const repository =
+    typeof taskInput.repository === 'string'
+      ? taskInput.repository
+      : typeof previous.repository === 'string'
+        ? previous.repository
+        : null;
   const attempt = input.attempt;
   const retryMessage = `${originalTask}\n\nPrevious verification failed. Repair the implementation and rerun the relevant checks. Do not merely explain the failure. Verified evidence:\n- ${input.reasons.join('\n- ')}`;
   const start = await startOpenHandsTask({
@@ -334,12 +347,7 @@ async function retryOpenHandsTask(input: {
       updated_at: new Date().toISOString(),
     })
     .eq('id', input.task.id);
-  await attachStartTask(
-    input.task.id,
-    start,
-    input.task.tenant_id,
-    input.task.user_id,
-  );
+  await attachStartTask(input.task.id, start, input.task.tenant_id, input.task.user_id);
   await appendLog(
     input.task.id,
     `Verification repair attempt ${attempt}/${Number(input.task.max_attempts ?? 3)} dispatched.`,
@@ -349,7 +357,10 @@ async function retryOpenHandsTask(input: {
   );
 }
 
-export async function reconcileOpenHandsTasks(limit = 10): Promise<{
+export async function reconcileOpenHandsTasks(
+  limit = 10,
+  taskId?: string,
+): Promise<{
   checked: number;
   completed: number;
   running: number;
@@ -358,23 +369,36 @@ export async function reconcileOpenHandsTasks(limit = 10): Promise<{
   errors: string[];
 }> {
   const db = await requireAdminClient();
-  const { data, error } = await db
+  let query = db
     .from('ai_tasks')
     .select('*')
     .eq('tool_name', 'openhands.execute')
-    .in('status', ['running', 'failed'])
+    .in('status', ['running', 'failed']);
+  if (taskId) query = query.eq('id', taskId);
+  const { data, error } = await query
     .order('updated_at', { ascending: true })
-    .limit(Math.max(1, Math.min(limit, 50)));
+    .limit(taskId ? 1 : Math.max(1, Math.min(limit, 50)));
   if (error) throw new Error(`Unable to load OpenHands reconciliation queue: ${error.message}`);
 
-  const result = { checked: 0, completed: 0, running: 0, retried: 0, failed: 0, errors: [] as string[] };
+  const result = {
+    checked: 0,
+    completed: 0,
+    running: 0,
+    retried: 0,
+    failed: 0,
+    errors: [] as string[],
+  };
   for (const candidate of data ?? []) {
     result.checked += 1;
     try {
       if (candidate.status === 'running') {
         await refreshOpenHandsTask({ taskId: candidate.id, actorId: candidate.user_id });
       }
-      const { data: refreshed } = await db.from('ai_tasks').select('*').eq('id', candidate.id).single();
+      const { data: refreshed } = await db
+        .from('ai_tasks')
+        .select('*')
+        .eq('id', candidate.id)
+        .single();
       if (!refreshed) continue;
       if (refreshed.status === 'completed') {
         result.completed += 1;
@@ -446,9 +470,9 @@ export async function refreshOpenHandsTask(input: {
     .single();
   if (error || !task) throw new Error(error?.message ?? 'Canonical OpenHands task not found');
 
-  const external = (task.tool_output && typeof task.tool_output === 'object'
-    ? task.tool_output
-    : {}) as Record<string, unknown>;
+  const external = (
+    task.tool_output && typeof task.tool_output === 'object' ? task.tool_output : {}
+  ) as Record<string, unknown>;
   const lifecycle = await getOpenHandsLifecycle({
     startTaskId: typeof external.start_task_id === 'string' ? external.start_task_id : null,
     conversationId: typeof external.conversation_id === 'string' ? external.conversation_id : null,
@@ -467,7 +491,11 @@ export async function refreshOpenHandsTask(input: {
         verified: false,
         repository: lifecycle.repository || 'elevate-for-humanity/Elevate-lms',
         pullRequests: [],
-        reasons: [verificationError instanceof Error ? verificationError.message : String(verificationError)],
+        reasons: [
+          verificationError instanceof Error
+            ? verificationError.message
+            : String(verificationError),
+        ],
       };
     }
   }
@@ -522,7 +550,10 @@ export async function refreshOpenHandsTask(input: {
         external_run: mergedExternal,
         evaluation,
       },
-      result: evaluation.status === 'PASS' ? { provider: 'openhands', lifecycle, githubEvidence, evaluation } : task.result,
+      result:
+        evaluation.status === 'PASS'
+          ? { provider: 'openhands', lifecycle, githubEvidence, evaluation }
+          : task.result,
       error_message: evaluation.status === 'FAIL_BLOCKING' ? evaluation.reasons.join(' ') : null,
       requires_approval: needsHumanApproval,
       approval_status: needsHumanApproval ? 'pending' : task.approval_status,
@@ -537,17 +568,29 @@ export async function refreshOpenHandsTask(input: {
     .select('id, action_type, action')
     .eq('task_id', task.id)
     .order('step_order', { ascending: true });
-  const executeStep = (steps ?? []).find((step: any) => step.action_type === 'execute' || step.action === 'execute');
-  const verifyStep = (steps ?? []).find((step: any) => step.action_type === 'record' || step.action === 'record');
+  const executeStep = (steps ?? []).find(
+    (step: any) => step.action_type === 'execute' || step.action === 'execute',
+  );
+  const verifyStep = (steps ?? []).find(
+    (step: any) => step.action_type === 'record' || step.action === 'record',
+  );
 
   if (executeStep) {
     await db
       .from('ai_task_steps')
       .update({
-        status: lifecycle.status === 'completed' ? 'completed' : lifecycle.status === 'failed' ? 'failed' : lifecycle.status === 'approval_required' ? 'awaiting_approval' : 'running',
+        status:
+          lifecycle.status === 'completed'
+            ? 'completed'
+            : lifecycle.status === 'failed'
+              ? 'failed'
+              : lifecycle.status === 'approval_required'
+                ? 'awaiting_approval'
+                : 'running',
         output: `OpenHands status: ${lifecycle.status}`,
         output_json: { lifecycle },
-        error_message: lifecycle.status === 'failed' ? lifecycle.error || 'OpenHands execution failed' : null,
+        error_message:
+          lifecycle.status === 'failed' ? lifecycle.error || 'OpenHands execution failed' : null,
         completed_at: ['completed', 'failed'].includes(lifecycle.status) ? now : null,
       })
       .eq('id', executeStep.id);
@@ -557,7 +600,14 @@ export async function refreshOpenHandsTask(input: {
     await db
       .from('ai_task_steps')
       .update({
-        status: evaluation.status === 'PASS' ? 'completed' : needsHumanApproval ? 'awaiting_approval' : evaluation.status === 'FAIL_BLOCKING' || evaluation.status === 'FAIL_RETRYABLE' ? 'failed' : 'pending',
+        status:
+          evaluation.status === 'PASS'
+            ? 'completed'
+            : needsHumanApproval
+              ? 'awaiting_approval'
+              : evaluation.status === 'FAIL_BLOCKING' || evaluation.status === 'FAIL_RETRYABLE'
+                ? 'failed'
+                : 'pending',
         output: evaluation.reasons.join(' '),
         output_json: { evaluation, github: githubEvidence },
         completed_at: evaluation.status === 'PASS' ? now : null,
@@ -566,7 +616,12 @@ export async function refreshOpenHandsTask(input: {
   }
 
   if (needsHumanApproval) {
-    await createPendingApprovalForVerification(task.id, input.actorId ?? task.user_id, evaluation.reasons, task.tenant_id);
+    await createPendingApprovalForVerification(
+      task.id,
+      input.actorId ?? task.user_id,
+      evaluation.reasons,
+      task.tenant_id,
+    );
   }
 
   if (evaluation.status === 'PASS') {
@@ -592,7 +647,11 @@ export async function refreshOpenHandsTask(input: {
   await appendLog(
     task.id,
     `OpenHands lifecycle refreshed: ${lifecycle.status}; evaluation: ${evaluation.status}.`,
-    evaluation.status === 'FAIL_BLOCKING' ? 'error' : evaluation.status === 'REQUIRES_HUMAN_REVIEW' ? 'warn' : 'info',
+    evaluation.status === 'FAIL_BLOCKING'
+      ? 'error'
+      : evaluation.status === 'REQUIRES_HUMAN_REVIEW'
+        ? 'warn'
+        : 'info',
     task.tenant_id,
     input.actorId ?? task.user_id,
   );

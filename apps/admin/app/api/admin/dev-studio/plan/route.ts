@@ -257,6 +257,43 @@ export async function POST(req: NextRequest) {
             if (step.status === 'done') write(`${PASS} Approved step verified: ${step.title}`);
             else write(`${FAIL} Approved step failed verification: ${step.title}`);
           }
+
+          // External engineering work is asynchronous. Reconcile the durable
+          // task state into the plan without dispatching the mutation-capable
+          // tool again. The OpenHands reconciler owns provider polling and
+          // changes the canonical task only after repository evidence exists.
+          for (const step of plan.steps) {
+            if (step.status !== 'running' || !step.task_id) continue;
+            const runningTask = await currentTask(db, step.task_id);
+            if (!runningTask || runningTask.status === 'running') continue;
+
+            if (runningTask.status === 'awaiting_approval') {
+              step.status = 'awaiting_approval';
+              step.evaluation = 'REQUIRES_HUMAN_REVIEW';
+              step.output = String(runningTask.approval_reason ?? 'Human approval required');
+              continue;
+            }
+
+            const runningEvaluation = evaluateExecution({
+              tool: String(runningTask.tool_name ?? 'advisory'),
+              result: taskEvidence(runningTask),
+              error: runningTask.error_message ?? null,
+              attempts: Number(runningTask.attempts ?? 1),
+              maxAttempts: step.max_attempts ?? 2,
+              expectedOutput: step.expected_output,
+              verificationRule: step.verification_rule,
+            });
+            step.evaluation = runningEvaluation.status;
+            step.output = JSON.stringify({
+              task_id: step.task_id,
+              tool: runningTask.tool_name ?? null,
+              result: taskEvidence(runningTask),
+              evaluation: runningEvaluation,
+            });
+            step.status = runningEvaluation.status === 'PASS' ? 'done' : 'failed';
+            if (step.status === 'done') write(`${PASS} Running step verified: ${step.title}`);
+            else write(`${FAIL} Running step failed verification: ${step.title}`);
+          }
           await persistPlan(db, plan, auth.id, tenantId);
         }
 
@@ -340,6 +377,27 @@ export async function POST(req: NextRequest) {
                 write(`${DIM}Task ID: ${step.task_id}${RST}`);
                 await persistPlan(db, plan, auth.id, tenantId);
                 break;
+              }
+
+              if (task.status === 'running') {
+                step.status = 'running';
+                step.output = JSON.stringify({
+                  task_id: step.task_id,
+                  tool: task.tool_name ?? null,
+                  status: 'running',
+                });
+                plan.status = 'running';
+                write(`${RUN} External engineering task accepted and still running.`, {
+                  checkpoint: {
+                    planId: plan.id,
+                    taskId: step.task_id,
+                    status: 'running',
+                    title: step.title,
+                  },
+                });
+                write(`${DIM}Task ID: ${step.task_id}${RST}`);
+                await persistPlan(db, plan, auth.id, tenantId);
+                continue;
               }
 
               let evaluation = evaluateExecution({

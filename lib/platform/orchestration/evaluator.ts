@@ -77,6 +77,23 @@ export function evaluateExecution(input: EvaluationInput): EvaluationResult {
     };
   }
 
+  const requiresEngineeringEvidence =
+    input.verificationRule?.toLowerCase().includes('engineering runtime') ?? false;
+  if (requiresEngineeringEvidence && input.tool !== 'openhands.execute') {
+    reasons.push(
+      `Engineering verification requires openhands.execute evidence; received ${input.tool}.`,
+    );
+    return {
+      status: 'FAIL_BLOCKING',
+      reasons,
+      evidence: {
+        tool: input.tool,
+        expected_tool: 'openhands.execute',
+        verification_rule: input.verificationRule ?? null,
+      },
+    };
+  }
+
   reasons.push('Execution returned a non-empty result with no reported error.');
   if (input.verificationRule) reasons.push(`Verification rule: ${input.verificationRule}`);
 

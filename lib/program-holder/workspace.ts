@@ -193,6 +193,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     applicants: applicantsRes.data ?? [],
     convertedStudents: (convertedStudentsRes.data ?? []).map((row: any) => ({
       ...row,
+      roster_source: 'holder_student',
       full_name: row.applicant_name || 'Student',
       enrollment_state: row.status,
       program_slug: null,

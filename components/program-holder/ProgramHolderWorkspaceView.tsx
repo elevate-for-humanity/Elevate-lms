@@ -22,6 +22,7 @@ import { getProgramCardImage } from '@/lib/images/programImages';
 import { UniversalProfilePhotoEditor } from '@/components/profile/UniversalProfilePhotoEditor';
 import { ENCHANTED_HEARTS, formatUsd } from '@/lib/partners/enchanted-hearts';
 import { CallListPanel } from './CallListPanel';
+import { StudentReadyForTestingButton } from './StudentReadyForTestingButton';
 
 function resolveDashboardHero(
   avatarUrl: string | null | undefined,
@@ -974,6 +975,11 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   hasEmail={Boolean(row.email)}
                   hasPhone={Boolean(row.phone)}
                 />
+                <StudentReadyForTestingButton
+                  studentId={row.id}
+                  studentName={row.full_name || 'Student'}
+                  source={row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'}
+                />
               </div>
             </article>
           ))
@@ -1021,12 +1027,19 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   </td>
                   <td className="px-3 py-4">{row.next_required_action || 'Continue training'}</td>
                   <td className="px-3 py-4">
+<div className="flex flex-col items-start gap-2">
                     <StudentCommunicationActions
                       enrollmentId={row.id}
                       studentName={row.full_name || 'Student'}
                       hasEmail={Boolean(row.email)}
                       hasPhone={Boolean(row.phone)}
                     />
+                    <StudentReadyForTestingButton
+                      studentId={row.id}
+                      studentName={row.full_name || 'Student'}
+                      source={row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'}
+                    />
+                  </div>
                   </td>
                 </tr>
               ))

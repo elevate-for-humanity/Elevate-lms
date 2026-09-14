@@ -1,4 +1,8 @@
-import { authorizedVideoJobIds, eligibleAuthorizedVideoJobs } from './lib/gpu-demand.mjs';
+import {
+  authorizedVideoJobIds,
+  eligibleAuthorizedVideoJobs,
+  generationIsPaused,
+} from './lib/gpu-demand.mjs';
 
 const token = process.env.NORTHFLANK_API_TOKEN?.trim();
 const team = process.env.NORTHFLANK_TEAM_ID?.trim() || 'elevates-team';
@@ -70,6 +74,16 @@ async function eligibleVideoWork() {
     throw new Error('GPU_AUTHORIZATION_TTL_MINUTES must be between 15 and 180');
   }
 
+  const pauseResponse = await fetch(
+    `${supabaseUrl}/rest/v1/system_settings?select=value&key=eq.course_builder_generation_paused&limit=1`,
+    { headers },
+  );
+  if (!pauseResponse.ok) {
+    throw new Error(`Unable to inspect Course Builder generation control: ${pauseResponse.status}`);
+  }
+  const pauseRows = await pauseResponse.json();
+  if (generationIsPaused(pauseRows[0]?.value)) return 0;
+
   const authorizationResponse = await fetch(
     `${supabaseUrl}/rest/v1/paid_inference_requests?select=job_id,operation,status,approved_at,dispatched_at,updated_at&operation=eq.lesson-video&job_id=not.is.null&status=in.(approved,dispatched,acknowledged,processing)&order=updated_at.desc&limit=500`,
     { headers },
@@ -87,13 +101,23 @@ async function eligibleVideoWork() {
 
   const ids = [...authorizedIds].join(',');
   const jobsResponse = await fetch(
-    `${supabaseUrl}/rest/v1/video_jobs?select=id,status,dead_lettered_at&id=in.(${encodeURIComponent(ids)})&status=in.(queued,rendering)`,
+    `${supabaseUrl}/rest/v1/video_jobs?select=id,course_id,status,dead_lettered_at&id=in.(${encodeURIComponent(ids)})&status=in.(queued,rendering)`,
     { headers },
   );
   if (!jobsResponse.ok)
     throw new Error(`Unable to inspect authorized video queue: ${jobsResponse.status}`);
   const jobs = await jobsResponse.json();
-  return eligibleAuthorizedVideoJobs(jobs, authorizedIds).length;
+  const courseIds = [...new Set(jobs.map((job) => job.course_id).filter(Boolean))];
+  if (courseIds.length === 0) return 0;
+  const courseResponse = await fetch(
+    `${supabaseUrl}/rest/v1/courses?select=id&id=in.(${encodeURIComponent(courseIds.join(','))})&generation_paused=eq.false`,
+    { headers },
+  );
+  if (!courseResponse.ok) {
+    throw new Error(`Unable to inspect authorized course state: ${courseResponse.status}`);
+  }
+  const enabledCourseIds = new Set((await courseResponse.json()).map((course) => course.id));
+  return eligibleAuthorizedVideoJobs(jobs, authorizedIds, enabledCourseIds).length;
 }
 
 if (action === 'sleep') {

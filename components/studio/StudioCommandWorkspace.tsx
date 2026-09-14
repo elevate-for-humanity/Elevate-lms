@@ -2,7 +2,15 @@
 
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
-import { Bot, Eye, Globe2, MessageSquare, Plus } from 'lucide-react';
+import {
+  Bot,
+  Eye,
+  Globe2,
+  MessageSquare,
+  PanelRightClose,
+  PanelRightOpen,
+  Plus,
+} from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
 import RepositoryLivePreview from './RepositoryLivePreview';
 import type { StudioSpecialist } from '@/lib/devstudio/ellie-unified-handlers';
@@ -52,36 +60,48 @@ export default function StudioCommandWorkspace({
   );
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [workspaceVisible, setWorkspaceVisible] = useState(false);
 
   const openPreview = (url?: string) => {
     if (url) setPreviewUrl(url);
     setMode('preview');
     setMobileSurface('tool');
+    setWorkspaceVisible(true);
     setActiveCapability(null);
   };
 
   const askAdminAI = (prompt: string) => {
     setSuggestedPrompt(prompt);
     setMobileSurface('chat');
+    setWorkspaceVisible(false);
   };
 
   const openCapability = (id: string) => {
     if (!isEmbeddedCapability(id)) return;
     setActiveCapability(id);
     setMobileSurface('tool');
+    setWorkspaceVisible(true);
   };
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white">
-      <header className="shrink-0 border-b border-slate-200 bg-slate-950 text-white">
-        <div className="flex min-h-12 min-w-0 items-center gap-2 px-3">
-          <Bot className="h-5 w-5 shrink-0" aria-hidden="true" />
-          <span className="shrink-0 text-sm font-black">Admin AI Studio</span>
+      <header className="shrink-0 border-b-4 border-brand-red-600 bg-brand-blue-700 text-white shadow-sm">
+        <div className="flex min-h-14 min-w-0 items-center gap-2 px-3 sm:px-5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25">
+            <Bot className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 shrink-0">
+            <span className="block text-sm font-black tracking-tight">Elevate Studio</span>
+            <span className="hidden text-[10px] font-semibold text-blue-100 sm:block">
+              Build, inspect, and operate
+            </span>
+          </div>
           <button
             type="button"
             onClick={() => {
               setConversationKey((value) => value + 1);
               setMobileSurface('chat');
+              setWorkspaceVisible(false);
             }}
             className="ml-auto inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-white/20 px-3 text-xs font-bold hover:bg-white/10"
           >
@@ -114,10 +134,30 @@ export default function StudioCommandWorkspace({
         >
           <button
             type="button"
-            onClick={() => setMobileSurface('chat')}
-            className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-white/10 px-3 text-xs font-bold hover:bg-white/15"
+            onClick={() => {
+              setMobileSurface('chat');
+              setWorkspaceVisible(false);
+            }}
+            aria-pressed={!workspaceVisible}
+            className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${!workspaceVisible ? 'bg-white text-brand-blue-800' : 'bg-white/10 text-white hover:bg-white/15'}`}
           >
             <MessageSquare className="h-4 w-4" aria-hidden="true" /> Chat
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setWorkspaceVisible((visible) => !visible);
+              setMobileSurface(workspaceVisible ? 'chat' : 'tool');
+            }}
+            aria-pressed={workspaceVisible}
+            className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-white/10 px-3 text-xs font-bold text-white hover:bg-white/15"
+          >
+            {workspaceVisible ? (
+              <PanelRightClose className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <PanelRightOpen className="h-4 w-4" aria-hidden="true" />
+            )}
+            {workspaceVisible ? 'Close workspace' : 'Open workspace'}
           </button>
           {workspaces.map((workspace) =>
             isEmbeddedCapability(workspace.id) ? (
@@ -145,7 +185,8 @@ export default function StudioCommandWorkspace({
 
       <div className="flex min-h-0 min-w-0 flex-1">
         <section
-          className={`${mobileSurface === 'chat' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col border-r border-slate-200 lg:flex lg:basis-[42%]`}
+          className={`${mobileSurface === 'chat' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col border-r border-slate-200 ${workspaceVisible ? 'lg:flex lg:basis-[48%]' : 'lg:flex lg:basis-full'}`}
+          aria-label="Elevate Studio conversation"
         >
           <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 sm:hidden">
             <span className="text-xs font-bold text-slate-700">
@@ -153,8 +194,11 @@ export default function StudioCommandWorkspace({
             </span>
             <button
               type="button"
-              onClick={() => setMobileSurface('tool')}
-              className="ml-auto rounded-lg bg-slate-900 px-3 py-2 text-xs font-bold text-white"
+              onClick={() => {
+                setMobileSurface('tool');
+                setWorkspaceVisible(true);
+              }}
+              className="ml-auto rounded-lg bg-brand-blue-700 px-3 py-2 text-xs font-bold text-white"
             >
               Open workspace
             </button>
@@ -174,7 +218,7 @@ export default function StudioCommandWorkspace({
         </section>
 
         <section
-          className={`${mobileSurface === 'tool' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col bg-slate-950 lg:flex lg:basis-[58%]`}
+          className={`${mobileSurface === 'tool' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col bg-slate-950 ${workspaceVisible ? 'lg:flex lg:basis-[52%]' : 'lg:hidden'}`}
           aria-label="Studio workspace"
         >
           <header className="flex min-h-12 shrink-0 items-center gap-2 border-b border-slate-800 bg-slate-900 px-3 text-white">
@@ -209,7 +253,10 @@ export default function StudioCommandWorkspace({
             </button>
             <button
               type="button"
-              onClick={() => setMobileSurface('chat')}
+              onClick={() => {
+                setMobileSurface('chat');
+                setWorkspaceVisible(false);
+              }}
               className="rounded-md px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800 lg:hidden"
             >
               Admin AI

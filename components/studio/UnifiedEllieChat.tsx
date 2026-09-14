@@ -738,7 +738,7 @@ export default function UnifiedEllieChat({
   const shellClass = embedded ? 'bg-white text-gray-950' : 'bg-gray-950 text-gray-100';
   const headerClass = embedded ? 'border-gray-200 bg-white' : 'border-gray-800 bg-gray-900';
   const assistantClass = embedded
-    ? 'border border-gray-200 bg-gray-50 text-gray-900'
+    ? 'border border-brand-blue-100 bg-brand-blue-50/70 text-slate-950 shadow-sm'
     : 'border border-gray-800 bg-gray-900 text-gray-100';
   const mutedTextClass = embedded ? 'text-gray-500' : 'text-gray-400';
   const inputAreaClass = embedded ? 'border-gray-200 bg-white' : 'border-gray-800 bg-gray-900';
@@ -835,14 +835,14 @@ export default function UnifiedEllieChat({
         </div>
       ) : null}
 
-      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 sm:px-8 sm:py-8">
+      <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-gradient-to-b from-white via-white to-brand-blue-50/30 px-3 py-4 sm:px-8 sm:py-8">
         {messages.length === 0 ? (
           <div className="mx-auto flex w-full min-w-0 max-w-5xl flex-col items-center py-8 text-center sm:py-20">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-200 bg-gray-50 shadow-sm">
-              <Bot className="h-7 w-7 text-gray-800" aria-hidden="true" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-blue-700 shadow-lg shadow-brand-blue-700/20 ring-4 ring-brand-blue-100">
+              <Bot className="h-8 w-8 text-white" aria-hidden="true" />
             </div>
             <h2 className="mt-5 text-xl font-semibold tracking-tight text-gray-950">
-              What do you need done?
+              What are we building today?
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
               Ask in plain language. Admin AI routes the request to the correct internal tool,
@@ -861,7 +861,7 @@ export default function UnifiedEllieChat({
                     setInput(quick.text);
                     inputRef.current?.focus();
                   }}
-                  className="w-full min-w-0 rounded-xl border border-gray-200 bg-white px-4 py-3 text-left text-sm font-medium text-gray-800 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2"
+                  className="w-full min-w-0 rounded-2xl border border-brand-blue-100 bg-white px-4 py-4 text-left text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-blue-300 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-600 focus-visible:ring-offset-2"
                 >
                   {quick.label}
                 </button>
@@ -883,7 +883,9 @@ export default function UnifiedEllieChat({
                 <div className="max-w-[min(100%,44rem)]">
                   <div
                     className={`rounded-2xl px-4 py-3 text-sm leading-6 ${
-                      message.role === 'user' ? 'bg-gray-900 text-white' : assistantClass
+                      message.role === 'user'
+                        ? 'bg-brand-blue-700 text-white shadow-sm'
+                        : assistantClass
                     }`}
                   >
                     {message.role === 'assistant' && (
@@ -969,7 +971,7 @@ export default function UnifiedEllieChat({
               {uploadError}
             </p>
           ) : null}
-          <div className="flex w-full min-w-0 flex-wrap items-end gap-2 rounded-2xl border border-gray-300 bg-white p-2 shadow-sm focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100">
+          <div className="flex w-full min-w-0 flex-wrap items-end gap-2 rounded-2xl border border-brand-blue-200 bg-white p-2 shadow-lg shadow-slate-900/5 focus-within:border-brand-blue-500 focus-within:ring-2 focus-within:ring-brand-blue-100">
             <input
               ref={attachmentInputRef}
               type="file"
@@ -1071,7 +1073,7 @@ export default function UnifiedEllieChat({
               aria-label="Send request"
               disabled={!input.trim() || loading}
               onClick={() => void send()}
-              className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-gray-900 px-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-4 text-sm font-bold text-white transition hover:bg-brand-red-800 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />

@@ -31,7 +31,17 @@ describe('paid provider boundary', () => {
       'utf8',
     );
     const media = readFileSync('lib/video/process-video-job.ts', 'utf8');
-    for (const source of [generation, canonicalGeneration, blueprintGeneration, media]) {
+    const studioBrowser = readFileSync(
+      'apps/admin/app/api/admin/dev-studio/browser/agent/route.ts',
+      'utf8',
+    );
+    for (const source of [
+      generation,
+      canonicalGeneration,
+      blueprintGeneration,
+      media,
+      studioBrowser,
+    ]) {
       expect(source).toContain('reservePaidInference');
       expect(source).toContain('executePaidInference');
     }

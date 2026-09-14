@@ -5,6 +5,10 @@ import test from 'node:test';
 const globalCssUrl = new URL('../apps/lms/app/globals.css', import.meta.url);
 const platformShellUrl = new URL('../components/platform/PlatformShell.tsx', import.meta.url);
 const navigationConfigUrl = new URL('../lib/navigation/navigation-config.ts', import.meta.url);
+const programHolderWorkspaceUrl = new URL(
+  '../components/program-holder/ProgramHolderWorkspaceView.tsx',
+  import.meta.url,
+);
 
 test('mobile styles do not make every button in a flex column full width', async () => {
   const css = await readFile(globalCssUrl, 'utf8');
@@ -30,4 +34,12 @@ test('Program Holder navigation is not hardcoded to an unrelated program', async
   assert.ok(programHolderNavigation, 'Program Holder navigation must exist');
   assert.match(programHolderNavigation, /label: 'My Programs'/);
   assert.doesNotMatch(programHolderNavigation, /label: '(?:CDL|HVAC)[^']*'/i);
+});
+
+test('Program Holder identity and portraits are loaded from profile data', async () => {
+  const workspace = await readFile(programHolderWorkspaceUrl, 'utf8');
+
+  assert.doesNotMatch(workspace, /PROGRAM_HOLDER_PORTRAITS/);
+  assert.doesNotMatch(workspace, /4bc589d3-bd39-4a50-a724-73e50506c1f1/);
+  assert.match(workspace, /resolveDashboardHero\(\s*data\.profile\?\.avatar_url/);
 });

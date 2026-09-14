@@ -114,6 +114,7 @@ export default function HomePage() {
         >
           <HomeFinalCTA />
         </div>
+        {/* Keep verification and credential relationships after the conversion journey. */}
         <div data-narration-disabled="true"><HomeTrustBar /></div>
       </main>
     </>

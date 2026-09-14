@@ -26,7 +26,7 @@ WAN_GIT_REF = os.getenv("WAN_GIT_REF", "42bf4cfaa384bc21833865abc2f9e6c0e67233dc
 WAN_MODEL_ID = os.getenv("WAN_MODEL_ID", "Wan-AI/Wan2.2-TI2V-5B")
 STATUS = Path(os.getenv("MODEL_BOOTSTRAP_STATUS_FILE", "/models/bootstrap-status.json"))
 EXTRA_RUNTIME_REQUIREMENTS = ("einops", "decord", "peft", "librosa")
-FLASH_ATTN_REQUIREMENT = os.getenv("WAN_FLASH_ATTN_REQUIREMENT", "flash-attn==2.6.3")
+FLASH_ATTN_REQUIREMENT = os.getenv("WAN_FLASH_ATTN_REQUIREMENT", "https://github.com/Dao-AILab/flash-attention/releases/download/v2.6.3/flash_attn-2.6.3+cu123torch2.4cxx11abiFALSE-cp310-cp310-linux_x86_64.whl")
 RUNTIME_SMOKE_MODULES = (
     "einops", "cv2", "diffusers", "transformers", "accelerate",
     "imageio", "easydict", "ftfy", "decord", "peft", "librosa", "flash_attn", "wan",
@@ -115,7 +115,7 @@ def ensure_venv() -> None:
     filtered.write_text("\n".join(lines) + "\n")
     run([pip, "install", "-r", str(filtered), *EXTRA_RUNTIME_REQUIREMENTS])
     # Wan attention asserts FlashAttention 2 at the first denoising block.
-    # Prefer its matching prebuilt wheel; the runtime image has no CUDA compiler.
+    # Use the pinned upstream cp310/Torch 2.4/CUDA 12 prebuilt wheel; the runtime\n    # image intentionally has no CUDA compiler.
     run([pip, "install", "--no-build-isolation", FLASH_ATTN_REQUIREMENT])
     run([str(python), "-c", smoke], cwd=WAN_REPO, capture=True)
     marker.write_text(marker_value)

@@ -88,11 +88,10 @@ export function getOpenHandsConfig() {
 
 function headers(apiKey: string): HeadersInit {
   return {
-    // The Cloud guide documents Bearer auth while the generated V1 reference
-    // documents X-Access-Token. Supplying both keeps the client compatible
-    // with the documented Cloud gateway without exposing either to browsers.
+    // OpenHands Cloud API keys use Bearer authentication. Do not also send
+    // X-Access-Token: that legacy credential channel can take precedence at
+    // the gateway and reject an otherwise valid Cloud API key.
     Authorization: `Bearer ${apiKey}`,
-    'X-Access-Token': apiKey,
     'Content-Type': 'application/json',
     Accept: 'application/json',
   };

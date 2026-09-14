@@ -432,8 +432,16 @@ export default function ParisApplicationWorkspace({
   const answers = session.state.answers;
   const claimed = transferHours(answers.transferHours);
   const showTransferUpload = isApprenticeship(answers.program) && claimed > 0;
-  const programOptions = question?.field === 'program' ? programs.map((program) => ({ value: program.slug, label: program.title })) : null;
-  const options = programOptions || question?.options || [];
+  // Confirmation is the authoritative state after a critical answer. A
+  // program confirmation keeps question.field as "program", so the program
+  // picker must not override the Confirm/Change actions.
+  const programOptions =
+    !session.state.pendingConfirmation && question?.field === 'program'
+      ? programs.map((program) => ({ value: program.slug, label: program.title }))
+      : null;
+  const options = session.state.pendingConfirmation
+    ? question?.options ?? []
+    : programOptions ?? question?.options ?? [];
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
   const sessionId = String(body.sessionId || '');
   const sessionToken = String(body.sessionToken || '');
   const requestedTaskId = String(body.taskId || '');
+  const conversationId = String(body.conversationId || '').trim();
   if (!command || !sessionId || !sessionToken) {
     return NextResponse.json({ error: 'Task and browser session are required' }, { status: 400 });
   }
@@ -75,6 +76,7 @@ export async function POST(req: NextRequest) {
         toolName: 'browser.execute',
         toolInput: { task: command, sessionId },
         executionMode: 'interactive',
+        conversationId: conversationId || undefined,
       },
       {
         actorRoles: auth.effectiveRoles,

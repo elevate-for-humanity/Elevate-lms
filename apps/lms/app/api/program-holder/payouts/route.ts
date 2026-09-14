@@ -1,9 +1,79 @@
-import {NextRequest,NextResponse}from'next/server';
-import{applyRateLimit}from'@/lib/api/withRateLimit';
-import{requireProgramHolder}from'@/lib/auth/require-program-holder';
-import{configureProgramHolderPayoutAccount,getProgramHolderPayoutAccount,payoutProviderUrl,type PayoutProvider}from'@/lib/program-holder/payout-account';
-import{getProgramHolderPaymentReadiness}from'@/lib/program-holder/onboarding-readiness';
-export const dynamic='force-dynamic';
-async function context(){const c=await requireProgramHolder();return c.mode==='holder'?c:null}
-export async function GET(){const c=await context();if(!c)return NextResponse.json({error:'Program Holder session required.'},{status:403});const[account,onboarding]=await Promise.all([getProgramHolderPayoutAccount(c),getProgramHolderPaymentReadiness(c.db,c.holderId)]);return NextResponse.json({...account,onboardingReady:onboarding.ready,missingRequirements:onboarding.missing})}
-export async function POST(r:NextRequest){const limited=await applyRateLimit(r,'payment');if(limited)return limited;const c=await context();if(!c)return NextResponse.json({error:'Program Holder session required.'},{status:403});const body=await r.json().catch(()=>({}))as{action?:string;provider?:PayoutProvider;paypalEmail?:string};try{if(body.action==='configure'){if(body.provider!=='paypal'&&body.provider!=='branch')return NextResponse.json({error:'Choose PayPal or Branch.'},{status:400});return NextResponse.json(await configureProgramHolderPayoutAccount(c,body.provider,body.paypalEmail))}if(body.action!=='onboard'&&body.action!=='dashboard')return NextResponse.json({error:'Unsupported payout action.'},{status:400});const account=await getProgramHolderPayoutAccount(c);if(!account.provider)return NextResponse.json({error:'Choose a payout provider first.'},{status:409});const url=await payoutProviderUrl(account.provider,body.action);if(!url)return NextResponse.json({error:`${account.provider==='branch'?'Branch':'PayPal'} provider activation is pending.`},{status:503});return NextResponse.json({url})}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Unable to configure payouts.'},{status:500})}}
+import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import {
+  configureProgramHolderPayoutAccount,
+  getProgramHolderPayoutAccount,
+  payoutProviderUrl,
+} from '@/lib/program-holder/payout-account';
+import { getProgramHolderPaymentReadiness } from '@/lib/program-holder/onboarding-readiness';
+
+export const dynamic = 'force-dynamic';
+
+async function context() {
+  const ctx = await requireProgramHolder();
+  return ctx.mode === 'holder' ? ctx : null;
+}
+
+export async function GET() {
+  const ctx = await context();
+  if (!ctx) {
+    return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
+  }
+
+  const [account, onboarding] = await Promise.all([
+    getProgramHolderPayoutAccount(ctx),
+    getProgramHolderPaymentReadiness(ctx.db, ctx.holderId),
+  ]);
+
+  return NextResponse.json({
+    ...account,
+    onboardingReady: onboarding.ready,
+    missingRequirements: onboarding.missing,
+  });
+}
+
+export async function POST(request: NextRequest) {
+  const limited = await applyRateLimit(request, 'payment');
+  if (limited) return limited;
+
+  const ctx = await context();
+  if (!ctx) {
+    return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
+  }
+
+  const body = (await request.json().catch(() => ({}))) as { action?: string };
+
+  try {
+    if (body.action === 'configure') {
+      return NextResponse.json(await configureProgramHolderPayoutAccount(ctx));
+    }
+
+    if (body.action !== 'onboard' && body.action !== 'dashboard') {
+      return NextResponse.json({ error: 'Unsupported payout action.' }, { status: 400 });
+    }
+
+    let account = await getProgramHolderPayoutAccount(ctx);
+    if (!account.provider) {
+      account = await configureProgramHolderPayoutAccount(ctx);
+    }
+
+    const url = await payoutProviderUrl(body.action);
+    if (!url) {
+      return NextResponse.json(
+        {
+          error:
+            'Your QuickBooks banking invitation is being prepared. Elevate will send the secure setup link.',
+        },
+        { status: 503 },
+      );
+    }
+
+    return NextResponse.json({ url });
+  } catch (cause) {
+    return NextResponse.json(
+      { error: cause instanceof Error ? cause.message : 'Unable to configure QuickBooks payouts.' },
+      { status: 500 },
+    );
+  }
+}

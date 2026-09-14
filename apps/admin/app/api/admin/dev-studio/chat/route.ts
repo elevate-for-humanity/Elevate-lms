@@ -1757,7 +1757,9 @@ async function _POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            'AI Assistant is not configured. Add GROQ_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY, or GEMINI_API_KEY in Admin → Integrations.',
+            canonicalProvider === 'none'
+              ? 'LIZZY has no active AI provider. Configure the canonical Elevate, Cloudflare, Groq, Gemini, Anthropic, Azure, or OpenAI provider in Admin → Integrations.'
+              : `LIZZY could not reach the configured ${canonicalProvider} provider. Check that provider connection in Admin → Integrations.`,
           debug: {
             hasGroq: isGroqConfigured(),
             hasOpenAI: isOpenAIConfigured(),

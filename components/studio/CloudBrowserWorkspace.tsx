@@ -30,7 +30,13 @@ type BrowserEvent = {
   error?: string;
 };
 
-export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedTask?: OrchestratedPlanCheckpoint | null }) {
+export default function CloudBrowserWorkspace({
+  unifiedTask = null,
+  conversationId = null,
+}: {
+  unifiedTask?: OrchestratedPlanCheckpoint | null;
+  conversationId?: string | null;
+}) {
   const [target, setTarget] = useState('');
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
@@ -43,6 +49,7 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
   const [agentRunning, setAgentRunning] = useState(false);
   const [approvalRequested, setApprovalRequested] = useState(false);
   const [activeTaskId, setActiveTaskId] = useState('');
+  const [approvedTaskId, setApprovedTaskId] = useState('');
   const imageRef = useRef<HTMLImageElement>(null);
   const targetEditedRef = useRef(false);
 
@@ -54,7 +61,8 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
     void fetch('/api/admin/dev-studio/config', { cache: 'no-store' })
       .then(async (response) => {
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.error || `Config failed (HTTP ${response.status})`);
+        if (!response.ok)
+          throw new Error(payload.error || `Config failed (HTTP ${response.status})`);
         return payload;
       })
       .then((payload) => {
@@ -184,6 +192,7 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
           sessionId: session.id,
           sessionToken: session.token,
           taskId: taskId || undefined,
+          conversationId: conversationId || undefined,
         }),
       });
       if (!response.ok || !response.body) {
@@ -254,6 +263,23 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
     setAgentRunning(false);
     await runAgent(activeTaskId);
   }
+
+  useEffect(() => {
+    const receiveApproval = (event: Event) => {
+      const taskId = (event as CustomEvent<{ taskId?: string }>).detail?.taskId;
+      if (taskId && taskId === activeTaskId) setApprovedTaskId(taskId);
+    };
+    window.addEventListener('studio:task-approved', receiveApproval);
+    return () => window.removeEventListener('studio:task-approved', receiveApproval);
+  }, [activeTaskId]);
+
+  useEffect(() => {
+    if (!approvedTaskId || approvedTaskId !== activeTaskId || !approvalRequested) return;
+    setApprovedTaskId('');
+    void runAgent(activeTaskId);
+    // runAgent intentionally resumes the exact persisted task after the inline approval event.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [approvedTaskId]);
 
   useEffect(() => {
     if (!session) return;
@@ -333,7 +359,7 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
         <span className="text-[11px] text-slate-400">{status}</span>
         {unifiedTask ? (
           <span className="max-w-full truncate rounded-full border border-violet-500/50 bg-violet-500/10 px-2 py-1 text-[10px] font-bold text-violet-200">
-            Unified flow · {unifiedTask.title || unifiedTask.planId}
+            LIZZY conversation · {unifiedTask.title || unifiedTask.planId}
           </span>
         ) : null}
       </header>
@@ -381,7 +407,8 @@ export default function CloudBrowserWorkspace({ unifiedTask = null }: { unifiedT
           <div className="border-b border-slate-800 p-3">
             <p className="mb-1 text-xs font-black text-violet-300">LIZZY Browser Task</p>
             <p className="mb-2 text-[10px] text-slate-500">
-              Runs in the isolated browser and streams progress into the active Studio task ledger.
+              Runs as a tool in this LIZZY conversation. Progress, approvals, evidence, and results
+              appear in the conversation timeline.
             </p>
             {activeTaskId && (
               <p className="mb-2 block truncate rounded border border-slate-800 bg-slate-900 px-2 py-1 text-[10px] text-cyan-300">

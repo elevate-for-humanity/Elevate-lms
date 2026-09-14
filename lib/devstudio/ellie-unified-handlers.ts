@@ -102,14 +102,17 @@ export async function fetchAiHealth(): Promise<{
     const res = await fetch('/api/admin/dev-studio/health');
     const data = await res.json().catch(() => ({}));
     const providers = {
+      elevate: Boolean(data.hasElevate || data.availableProviders?.elevate),
+      cloudflare: Boolean(data.hasCloudflare || data.availableProviders?.cloudflare),
       groq: Boolean(data.hasGroq),
       openai: Boolean(data.hasOpenAI),
       anthropic: Boolean(data.hasAnthropic),
       gemini: Boolean(data.hasGemini),
     };
-    const ok =
-      res.ok && (providers.groq || providers.openai || providers.anthropic || providers.gemini);
+    const ok = res.ok && Boolean(data.aiConfigured);
     const label = [
+      providers.elevate && 'Elevate AI',
+      providers.cloudflare && 'Cloudflare AI',
       providers.groq && 'Groq',
       providers.openai && 'OpenAI',
       providers.anthropic && 'Claude',

@@ -157,7 +157,7 @@ export default function StudioCommandWorkspace({
             ) : (
               <PanelRightOpen className="h-4 w-4" aria-hidden="true" />
             )}
-            {workspaceVisible ? 'Close workspace' : 'Open workspace'}
+            {workspaceVisible ? 'Close tools' : 'Open tools'}
           </button>
           {workspaces.map((workspace) =>
             isEmbeddedCapability(workspace.id) ? (
@@ -200,7 +200,7 @@ export default function StudioCommandWorkspace({
               }}
               className="ml-auto rounded-lg bg-brand-blue-700 px-3 py-2 text-xs font-bold text-white"
             >
-              Open workspace
+              Open tools
             </button>
           </div>
           <UnifiedEllieChat
@@ -228,8 +228,8 @@ export default function StudioCommandWorkspace({
                 : activeCapability === 'intelligence'
                   ? 'Intelligence'
                   : activeCapability === 'tasks'
-                    ? 'Task activity'
-                    : 'Active workspace'}
+                    ? 'Conversation activity'
+                    : 'Conversation tools'}
             </span>
             <button
               type="button"
@@ -263,13 +263,19 @@ export default function StudioCommandWorkspace({
             </button>
           </header>
           <div className="min-h-0 flex-1 overflow-hidden lg:p-2">
-            {activeCapability === 'workflows' ? (
+            <div className={activeCapability === 'workflows' ? 'h-full' : 'hidden'}>
               <WorkflowsWorkspace embedded />
-            ) : activeCapability === 'intelligence' ? (
+            </div>
+            <div className={activeCapability === 'intelligence' ? 'h-full' : 'hidden'}>
               <IntelligenceWorkspace onAskAI={askAdminAI} />
-            ) : activeCapability === 'tasks' ? (
+            </div>
+            <div className={activeCapability === 'tasks' ? 'h-full' : 'hidden'}>
               <TasksWorkspace embedded conversationId={activeConversationId} />
-            ) : mode === 'preview' ? (
+            </div>
+            <div
+              className={!activeCapability && mode === 'preview' ? 'h-full' : 'hidden'}
+              aria-hidden={Boolean(activeCapability) || mode !== 'preview'}
+            >
               <RepositoryLivePreview
                 filePath={null}
                 content=""
@@ -279,9 +285,16 @@ export default function StudioCommandWorkspace({
                   previewUrl.startsWith(window.location.origin)
                 }
               />
-            ) : (
-              <CloudBrowserWorkspace unifiedTask={activeTask} />
-            )}
+            </div>
+            <div
+              className={!activeCapability && mode === 'browser' ? 'h-full' : 'hidden'}
+              aria-hidden={Boolean(activeCapability) || mode !== 'browser'}
+            >
+              <CloudBrowserWorkspace
+                unifiedTask={activeTask}
+                conversationId={activeConversationId}
+              />
+            </div>
           </div>
         </section>
       </div>

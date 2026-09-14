@@ -12,11 +12,10 @@ import {
   getNorthflankServices,
   isNorthflankReady,
 } from '@/lib/northflank/runtime';
-import {
-  getDecryptedPlatformSecret,
-  hydrateNorthflankEnv,
-} from '@/lib/secrets';
+import { getDecryptedPlatformSecret, hydrateNorthflankEnv } from '@/lib/secrets';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
+import { getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 /**
  * Canonical Admin-owned Dev Studio health implementation.
@@ -28,6 +27,8 @@ import { getGitHubToken } from '@/lib/devstudio/github-token';
 export async function handleDevStudioHealth(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
+
+  await hydrateProcessEnv().catch(() => undefined);
 
   const requestedKeys = [
     'GROQ_API_KEY',
@@ -65,16 +66,17 @@ export async function handleDevStudioHealth(req: NextRequest) {
       githubTokenValid = false;
     }
   }
-  const aiConfigured = hasGroq || hasGemini || hasOpenAI || hasAnthropic;
+  const activeProvider = getActiveProviderName();
+  const hasElevate = activeProvider === 'elevate';
+  const hasCloudflare = activeProvider === 'cloudflare';
+  const aiConfigured = isAIAvailable();
   const northflankServices = getNorthflankServices().map((service) => ({
     key: service.key,
     id: service.id,
     configured: Boolean(service.id),
   }));
   const northflankTokenPresent = Boolean(
-    process.env.NORTHFLANK_API_TOKEN ||
-      process.env.NORTHFLANK_API_KEY ||
-      process.env.NF_API_TOKEN,
+    process.env.NORTHFLANK_API_TOKEN || process.env.NORTHFLANK_API_KEY || process.env.NF_API_TOKEN,
   );
   const northflankProjectIdPresent = Boolean(getNorthflankProjectId());
 
@@ -90,16 +92,19 @@ export async function handleDevStudioHealth(req: NextRequest) {
     hasGemini,
     hasOpenAI,
     hasAnthropic,
+    hasElevate,
+    hasCloudflare,
+    activeProvider,
     hasGitHub,
     githubTokenValid,
     aiConfigured,
-    supabaseUrlPresent: Boolean(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
-    ),
+    supabaseUrlPresent: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL),
     supabaseServiceKeyPresent: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
     nodeVersion: process.version,
     nextVersion,
     availableProviders: {
+      elevate: hasElevate,
+      cloudflare: hasCloudflare,
       groq: hasGroq,
       gemini: hasGemini,
       openai: hasOpenAI,
@@ -107,9 +112,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
     },
     git: {
       endpoint: '/api/admin/dev-studio/git',
-      remoteUrlPresent: Boolean(
-        process.env.GITHUB_REMOTE_URL || process.env.GITHUB_REPO,
-      ),
+      remoteUrlPresent: Boolean(process.env.GITHUB_REMOTE_URL || process.env.GITHUB_REPO),
       tokenPresent: hasGitHub,
       tokenValid: githubTokenValid,
       pushScript: 'pnpm run git:push-main',

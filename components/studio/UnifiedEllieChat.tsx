@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   AlertTriangle,
@@ -109,6 +109,130 @@ interface StudioJob {
   attempts?: number;
   max_attempts?: number;
   tool_name?: string | null;
+}
+
+interface ConversationTask {
+  id: string;
+  title: string;
+  status: string;
+  tool_name?: string | null;
+  approval_status?: string | null;
+  approval_reason?: string | null;
+  error_message?: string | null;
+  result_json?: Record<string, unknown> | null;
+  tool_output?: unknown;
+  updated_at?: string | null;
+}
+
+function taskResultText(task: ConversationTask): string {
+  const value = task.tool_output ?? task.result_json?.output ?? task.result_json?.summary;
+  if (typeof value === 'string') return value;
+  if (value == null) return '';
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+/** The task ledger is rendered inside the conversation; tool panels never own the result. */
+function ConversationActivity({ conversationId }: { conversationId: string | null }) {
+  const [tasks, setTasks] = useState<ConversationTask[]>([]);
+  const [actionError, setActionError] = useState('');
+
+  const refresh = useCallback(async () => {
+    if (!conversationId) {
+      setTasks([]);
+      return;
+    }
+    const response = await fetch(
+      `/api/admin/dev-studio/tasks?conversationId=${encodeURIComponent(conversationId)}&limit=20`,
+      { cache: 'no-store' },
+    );
+    if (!response.ok) return;
+    const payload = await response.json().catch(() => ({ tasks: [] }));
+    setTasks(Array.isArray(payload.tasks) ? payload.tasks : []);
+  }, [conversationId]);
+
+  useEffect(() => {
+    void refresh();
+    if (!conversationId) return;
+    const timer = window.setInterval(() => void refresh(), 1500);
+    return () => window.clearInterval(timer);
+  }, [conversationId, refresh]);
+
+  async function approve(taskId: string) {
+    setActionError('');
+    const response = await fetch(`/api/admin/dev-studio/tasks/${taskId}/approve`, {
+      method: 'POST',
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      setActionError(payload.error || 'Could not approve this task.');
+      return;
+    }
+    window.dispatchEvent(new CustomEvent('studio:task-approved', { detail: { taskId } }));
+    await refresh();
+  }
+
+  if (!conversationId || !tasks.length) return null;
+
+  return (
+    <div className="shrink-0 border-b border-blue-100 bg-blue-50/70 px-4 py-3" aria-live="polite">
+      <div className="mx-auto max-w-5xl space-y-2">
+        <p className="text-xs font-black uppercase tracking-wide text-brand-blue-800">
+          This conversation’s live work
+        </p>
+        {tasks.slice(0, 4).map((task) => {
+          const result = taskResultText(task);
+          const waiting = task.status === 'awaiting_approval';
+          return (
+            <div
+              key={task.id}
+              className="rounded-xl border border-blue-100 bg-white px-3 py-2 shadow-sm"
+            >
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                {task.status === 'completed' ? (
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                ) : task.status === 'failed' ? (
+                  <XCircle className="h-4 w-4 text-red-600" />
+                ) : (
+                  <Loader2 className={`h-4 w-4 text-blue-600 ${waiting ? '' : 'animate-spin'}`} />
+                )}
+                <span className="min-w-0 flex-1 font-bold text-slate-900">{task.title}</span>
+                <span className="rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-600">
+                  {task.status.replaceAll('_', ' ')}
+                </span>
+                {waiting ? (
+                  <button
+                    type="button"
+                    onClick={() => void approve(task.id)}
+                    className="rounded-lg bg-amber-600 px-3 py-1.5 font-black text-white"
+                  >
+                    Approve this action
+                  </button>
+                ) : null}
+              </div>
+              {task.approval_reason ? (
+                <p className="mt-2 text-xs text-amber-800">{task.approval_reason}</p>
+              ) : null}
+              {task.error_message ? (
+                <p className="mt-2 text-xs text-red-700">{task.error_message}</p>
+              ) : result ? (
+                <p className="mt-2 line-clamp-3 whitespace-pre-wrap text-xs text-slate-600">
+                  {result.slice(0, 1200)}
+                </p>
+              ) : null}
+              <p className="mt-1 text-[10px] text-slate-400">
+                {task.tool_name || 'Studio tool'} · evidence {task.id}
+              </p>
+            </div>
+          );
+        })}
+        {actionError ? <p className="text-xs font-semibold text-red-700">{actionError}</p> : null}
+      </div>
+    </div>
+  );
 }
 
 function CourseBuildRuns() {
@@ -802,6 +926,8 @@ export default function UnifiedEllieChat({
       )}
 
       <CourseBuildRuns />
+
+      <ConversationActivity conversationId={conversationId} />
 
       {planCheckpoint?.status === 'awaiting_approval' ? (
         <div className="shrink-0 border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">

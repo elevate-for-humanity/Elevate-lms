@@ -163,7 +163,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     const workspace = source('components/studio/StudioCommandWorkspace.tsx');
     const tasks = source('apps/admin/app/studio/tasks/TasksClient.tsx');
     expect(workspace).toContain("setMode('browser')");
-    expect(workspace).toContain('Active workspace');
+    expect(workspace).toContain('Conversation tools');
     expect(tasks).toContain('flex min-w-0 flex-col gap-4 sm:flex-row');
     expect(tasks).toContain('w-full min-w-0 flex-1 overflow-hidden');
   });
@@ -182,7 +182,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('<UnifiedEllieChat');
     expect(workspace).toContain('<RepositoryLivePreview');
     expect(workspace).toContain('<CloudBrowserWorkspace');
-    expect(workspace).toContain('Active workspace');
+    expect(workspace).toContain('Conversation tools');
   });
 
   it('keeps task evidence, tool surfaces, and durable files in the unified Studio', () => {
@@ -204,14 +204,18 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(source('apps/admin/app/api/admin/dev-studio/tasks/route.ts')).toContain(
       "query = query.eq('conversation_id', conversationId)",
     );
-    expect(source('apps/admin/app/studio/tasks/TasksClient.tsx')).toContain(
-      'window.setInterval',
-    );
+    expect(source('apps/admin/app/studio/tasks/TasksClient.tsx')).toContain('window.setInterval');
     const tasksPage = source('apps/admin/app/studio/tasks/page.tsx');
     expect(tasksPage).toContain('StudioCommandWorkspace');
     expect(tasksPage).toContain('initialWorkspace="tasks"');
     expect(tasksPage).not.toContain('redirect(');
     expect(workspace).toContain('onConversationChange={setActiveConversationId}');
+    expect(workspace).toContain('conversationId={activeConversationId}');
+    expect(chat).toContain('This conversation’s live work');
+    expect(chat).toContain("window.dispatchEvent(new CustomEvent('studio:task-approved'");
+    expect(source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts')).toContain(
+      'conversationId: conversationId || undefined',
+    );
   });
 
   it('commits only finalized browser speech results to the composer', () => {

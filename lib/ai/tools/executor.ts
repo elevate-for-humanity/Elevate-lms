@@ -81,6 +81,17 @@ async function dispatchToolRequest(
     );
     return POST(new NextRequest(url, init));
   }
+  // OpenHands is also an Admin control-plane route. Calling the public Admin
+  // hostname from the Admin container makes runner dispatch depend on the
+  // platform's own ingress and DNS. Keep the route boundary (auth, rate limit,
+  // secret hydration, validation, and audit) while invoking it in-process.
+  if (tool.name === 'openhands.execute' || tool.name === 'openhands.status') {
+    const route = await import(
+      '@/apps/admin/app/api/admin/dev-studio/openhands/agent/route'
+    );
+    const request = new NextRequest(url, init);
+    return tool.method === 'GET' ? route.GET(request) : route.POST(request);
+  }
   return fetch(url, init);
 }
 

@@ -3,7 +3,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { hasPermission, normalizeRoles } from '@/lib/rbac/role-matrix';
 import { buildOpenHandsContextPrompt } from '@/lib/devstudio/openhands/context';
-import { getOpenHandsConfig, getOpenHandsLifecycle } from '@/lib/devstudio/openhands/client';
+import {
+  getHydratedOpenHandsConfig,
+  getOpenHandsLifecycle,
+} from '@/lib/devstudio/openhands/client';
 import { dispatchOpenHandsTask, refreshOpenHandsTask } from '@/lib/devstudio/openhands/runtime';
 
 function canAccessDevTools(effectiveRoles: readonly string[]): boolean {
@@ -37,7 +40,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'task is required' }, { status: 400 });
     }
 
-    const config = getOpenHandsConfig();
+    const config = await getHydratedOpenHandsConfig();
     if (!config.configured) {
       return NextResponse.json({ error: 'OpenHands API key not configured' }, { status: 503 });
     }
@@ -88,7 +91,7 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
-  const config = getOpenHandsConfig();
+  const config = await getHydratedOpenHandsConfig();
   const url = new URL(request.url);
   const taskId = url.searchParams.get('taskId');
   const startTaskId = url.searchParams.get('startTaskId');

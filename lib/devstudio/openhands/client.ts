@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { hydrateProcessEnv } from '@/lib/secrets';
+
 export type OpenHandsLifecycleStatus =
   | 'queued'
   | 'running'
@@ -86,6 +88,16 @@ export function getOpenHandsConfig() {
   };
 }
 
+/**
+ * Resolve the live OpenHands configuration after loading canonical runtime
+ * secrets. Studio stores provider credentials in platform_secrets, so routes
+ * must not inspect process.env until hydration has completed.
+ */
+export async function getHydratedOpenHandsConfig() {
+  await hydrateProcessEnv();
+  return getOpenHandsConfig();
+}
+
 function headers(apiKey: string): HeadersInit {
   return {
     // OpenHands Cloud API keys use Bearer authentication. Do not also send
@@ -109,7 +121,7 @@ async function requestJson(
   path: string,
   init: RequestInit = {},
 ): Promise<unknown> {
-  const config = getOpenHandsConfig();
+  const config = await getHydratedOpenHandsConfig();
   if (!config.apiKey) throw new Error('OpenHands API key is not configured');
 
   const response = await fetch(`${config.origin}${path}`, {
@@ -175,6 +187,7 @@ export function validateOpenHandsConversationId(conversationId: string): string 
 export async function startOpenHandsTask(
   input: StartOpenHandsTaskInput,
 ): Promise<OpenHandsStartTask> {
+  await hydrateProcessEnv();
   const message = normalizeMessage(input.message);
   const repository = validateRepository(input.repository);
   const { model } = getOpenHandsConfig();

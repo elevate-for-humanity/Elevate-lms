@@ -29,6 +29,7 @@ import {
 } from '@/lib/barber/student-app';
 import { BarberStudentAppDownload } from '@/components/portal/BarberStudentAppDownload';
 import { ApprenticeClockInStatus } from '@/components/portal/ApprenticeClockInStatus';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 import {
   apprenticeshipDocumentsPath,
   apprenticeshipLmsCoursePath,
@@ -262,7 +263,7 @@ export function ApprenticePortalShell({
       ? [{ id: 'course', label: rtiCourseLabelShort, href: continueCourseHref }]
       : []),
     { id: 'hours', label: 'Hours', href: '/apprentice/hours' },
-    { id: 'timeclock', label: 'Timeclock', href: '/apprentice/timeclock' },
+    { id: 'timeclock', label: 'Timeclock', href: APPRENTICE_TIMECLOCK_URL },
     { id: 'competencies', label: 'Competencies', href: '/apprentice/competencies' },
     { id: 'documents', label: 'Documents', href: documentsHref },
     { id: 'billing', label: 'Billing', href: '/apprentice/billing' },
@@ -532,7 +533,7 @@ export function ApprenticePortalShell({
           <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5">
             <h2 className="text-sm font-semibold text-slate-900 mb-3">Quick Actions</h2>
             <div className="grid sm:grid-cols-2 gap-2">
-              <Link href="/apprentice/timeclock" className={`flex items-center gap-3 p-3 rounded-lg ${config.accentBg} text-white hover:opacity-90 transition`}>
+              <Link href={APPRENTICE_TIMECLOCK_URL} className={`flex items-center gap-3 p-3 rounded-lg ${config.accentBg} text-white hover:opacity-90 transition`}>
                 <Clock className="w-5 h-5" />
                 <div>
                   <p className="font-semibold text-sm">Clock In / Out</p>

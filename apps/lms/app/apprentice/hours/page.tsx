@@ -9,6 +9,10 @@ import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import {
+  APPRENTICE_TIMECLOCK_HISTORY_URL,
+  APPRENTICE_TIMECLOCK_URL,
+} from '@/lib/portal/apprenticeship-portal-paths';
 
 export const metadata: Metadata = {
   title: 'Apprentice Hours',
@@ -99,14 +103,14 @@ export default async function ApprenticeHoursPage() {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_URL}
               className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-300 text-slate-900 rounded-lg hover:bg-slate-50 text-sm"
             >
               <Clock className="w-4 h-4" />
               Timeclock
             </Link>
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_HISTORY_URL}
               className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-slate-300 text-slate-900 rounded-lg hover:bg-slate-50 text-sm"
             >
               Shift Log
@@ -118,7 +122,7 @@ export default async function ApprenticeHoursPage() {
               Competency Log
             </Link>
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_URL}
               className="inline-flex items-center gap-1.5 px-3 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-sm"
             >
               <Plus className="w-4 h-4" />
@@ -251,7 +255,7 @@ export default async function ApprenticeHoursPage() {
             <h2 className="text-xl font-semibold text-slate-900 mb-2">No hours logged yet</h2>
             <p className="text-slate-700 mb-6">Start tracking your apprenticeship hours.</p>
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_URL}
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Plus className="w-4 h-4" />

@@ -1,7 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
 import { APPRENTICESHIP_PORTAL_ENROLLMENT_STATES } from '@/lib/enrollment/enrollment-flow';
-import { ACTIVE_ENROLLMENT_STATES, portalPathForProgramSlug } from '@/lib/portal/apprenticeship-portal-paths';
+import {
+  ACTIVE_ENROLLMENT_STATES,
+  APPRENTICE_TIMECLOCK_HISTORY_URL,
+  APPRENTICE_TIMECLOCK_URL,
+  portalPathForProgramSlug,
+} from '@/lib/portal/apprenticeship-portal-paths';
 
 describe('portal routing', () => {
   it('maps beauty apprenticeship slugs to industry portals', () => {
@@ -21,5 +26,14 @@ describe('portal routing', () => {
     expect(getRoleDestination('partner_admin')).toBe('/lms/dashboard');
     expect(getRoleDestination('sponsor')).toBe('/employer/dashboard');
     expect(getRoleDestination('program_holder')).toBe('/program-holder/dashboard');
+  });
+
+  it('keeps timeclock navigation on the canonical LMS host', () => {
+    expect(APPRENTICE_TIMECLOCK_URL).toBe(
+      'https://app.elevateforhumanity.org/apprentice/timeclock',
+    );
+    expect(APPRENTICE_TIMECLOCK_HISTORY_URL).toBe(
+      'https://app.elevateforhumanity.org/apprentice/timeclock/history',
+    );
   });
 });

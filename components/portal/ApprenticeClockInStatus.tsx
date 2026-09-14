@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Clock, Loader2, MapPin } from 'lucide-react';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 
 type TimeclockContext = {
   programName?: string;
@@ -55,7 +56,7 @@ export function ApprenticeClockInStatus() {
   if (error || !ctx) {
     return (
       <p className="text-sm text-slate-600">
-        <Link href="/apprentice/timeclock" className="text-brand-blue-600 font-medium hover:underline">
+        <Link href={APPRENTICE_TIMECLOCK_URL} className="text-brand-blue-600 font-medium hover:underline">
           Open timeclock
         </Link>{' '}
         to clock in at your work site.
@@ -83,7 +84,7 @@ export function ApprenticeClockInStatus() {
           </div>
         </div>
         <Link
-          href="/apprentice/timeclock"
+          href={APPRENTICE_TIMECLOCK_URL}
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-green-800 hover:underline"
         >
           <Clock className="w-4 h-4" />
@@ -103,7 +104,7 @@ export function ApprenticeClockInStatus() {
         </span>
       </div>
       <Link
-        href="/apprentice/timeclock"
+        href={APPRENTICE_TIMECLOCK_URL}
         className="inline-flex items-center gap-1.5 rounded-lg bg-brand-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-green-700"
       >
         <Clock className="w-4 h-4" />

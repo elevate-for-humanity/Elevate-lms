@@ -1,5 +1,9 @@
 import { LMS_HOST } from '@/lib/routing/portal-map';
 
+/** Host-qualified so shared and admin-preview surfaces cannot inherit the Admin host. */
+export const APPRENTICE_TIMECLOCK_URL = `${LMS_HOST}/apprentice/timeclock`;
+export const APPRENTICE_TIMECLOCK_HISTORY_URL = `${APPRENTICE_TIMECLOCK_URL}/history`;
+
 /**
  * Apprenticeship program slugs all resolve to the single operational
  * /apprentice dashboard. Program context is retained as a query parameter;

@@ -10,6 +10,7 @@ import { sendEmail } from '@/lib/email/service';
 import { emitEvent } from '@/lib/events/emit';
 import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-entries';
 import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 
 const MAX_ACCURACY_M = 50;
 const LUNCH_DURATION_MINUTES = 60;
@@ -124,8 +125,8 @@ async function notifyClockIn(
       title: 'Clock-in recorded',
       message: `Your clock-in was recorded${params.siteName ? ` at ${params.siteName}` : ''}.`,
       action_label: 'View timeclock',
-      action_url: '/apprentice/timeclock',
-      link: '/apprentice/timeclock',
+      action_url: APPRENTICE_TIMECLOCK_URL,
+      link: APPRENTICE_TIMECLOCK_URL,
       read: false,
       metadata: {
         progress_entry_id: params.entryId,

@@ -14,6 +14,7 @@ import {
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/client';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 
 type Skill = {
   id: string;
@@ -238,7 +239,7 @@ function LogCompetencyForm() {
           </Link>
           <div className="flex items-center gap-2 text-xs">
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_URL}
               className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg transition"
             >
               <Clock className="w-3.5 h-3.5" /> Timeclock

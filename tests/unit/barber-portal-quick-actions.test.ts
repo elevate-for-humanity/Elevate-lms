@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BARBER_COURSE_ID } from '@/lib/barber/pricing';
 import { BARBER_STUDENT_APP_HOME } from '@/lib/barber/student-app';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 import {
   apprenticeshipDocumentsPath,
   apprenticeshipLmsCoursePath,
@@ -13,7 +14,7 @@ const SLUG = 'barber-apprenticeship';
 
 /** Canonical hrefs for the authenticated barber apprentice workspace. */
 export const BARBER_PORTAL_QUICK_ACTION_HREFS = {
-  clockIn: '/apprentice/timeclock',
+  clockIn: APPRENTICE_TIMECLOCK_URL,
   rtiCourse: `/lms/courses/${BARBER_COURSE_ID}`,
   logHours: '/apprentice/hours/log',
   logService: '/apprentice/competencies/log',

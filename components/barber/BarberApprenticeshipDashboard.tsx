@@ -25,11 +25,12 @@ import {
 } from 'lucide-react';
 import type { BarberDashboardData } from '@/lib/barber/load-barber-dashboard';
 import { PRESTIGE_BARBER_BRAND } from '@/lib/barber/branding';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 
 const NAV_TABS = [
   { id: 'dashboard', label: 'Dashboard', href: '/apprentice?program=barber-apprenticeship' },
   { id: 'hours', label: 'Hours', href: '/apprentice/hours' },
-  { id: 'timeclock', label: 'Timeclock', href: '/apprentice/timeclock' },
+  { id: 'timeclock', label: 'Timeclock', href: APPRENTICE_TIMECLOCK_URL },
   { id: 'competencies', label: 'Competencies', href: '/apprentice/competencies' },
   { id: 'documents', label: 'Documents', href: '/apprentice/documents' },
   { id: 'billing', label: 'Billing', href: '/apprentice/billing' },
@@ -366,7 +367,7 @@ export function BarberApprenticeshipDashboard({
         {/* Quick actions */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
-            { href: '/apprentice/timeclock', label: 'Clock in / out', sub: 'GPS timeclock', icon: Clock, primary: true },
+            { href: APPRENTICE_TIMECLOCK_URL, label: 'Clock in / out', sub: 'GPS timeclock', icon: Clock, primary: true },
             { href: '/apprentice/hours/log', label: 'Log hours', sub: 'Manual OJL / RTI', icon: CalendarDays },
             { href: '/apprentice/competencies/log', label: 'Log service', sub: 'WPS competency', icon: Award },
             { href: '/apprentice/documents', label: 'Documents', sub: 'Upload & status', icon: FileText },

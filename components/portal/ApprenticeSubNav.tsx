@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 import {
   apprenticeshipDocumentsPath,
   apprenticeshipLmsCoursePath,
@@ -41,7 +42,7 @@ export function ApprenticeSubNav({
     { id: 'orientation', label: 'Orientation', href: orientationHref },
     ...(lmsCourseHref ? [{ id: 'course', label: rtiCourseLabelShort, href: lmsCourseHref }] : []),
     { id: 'hours', label: 'Hours', href: '/apprentice/hours' },
-    { id: 'timeclock', label: 'Timeclock', href: '/apprentice/timeclock' },
+    { id: 'timeclock', label: 'Timeclock', href: APPRENTICE_TIMECLOCK_URL },
     { id: 'competencies', label: 'Competencies', href: '/apprentice/competencies' },
     { id: 'documents', label: 'Documents', href: documentsHref },
     { id: 'billing', label: 'Billing', href: '/apprentice/billing' },

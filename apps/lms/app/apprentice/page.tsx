@@ -29,6 +29,7 @@ import { resolveApplicableWage } from '@/lib/apprenticeship/registered-program-c
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -508,7 +509,7 @@ export default async function ApprenticePortalPage() {
     {
       title: 'Clock work hours',
       text: 'Record geofenced supervised work time for Host Shop review. OJL hours remain evidence; competency verification controls competency-based progression.',
-      href: '/apprentice/timeclock',
+      href: APPRENTICE_TIMECLOCK_URL,
       image: '/images/pages/apprenticeship-structure.webp',
     },
     {

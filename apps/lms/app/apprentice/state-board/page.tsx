@@ -21,6 +21,7 @@ import {
 } from '@/lib/compliance/apprenticeship';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
+import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 
 export const dynamic = 'force-dynamic';
 
@@ -338,7 +339,7 @@ export default async function StateBoardExamPage() {
               Complete all requirements above to unlock.
             </p>
             <Link
-              href="/apprentice/timeclock"
+              href={APPRENTICE_TIMECLOCK_URL}
               className="inline-flex items-center gap-2 bg-purple-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-purple-700 transition-colors"
             >
               Log hours <ArrowRight className="w-4 h-4" />

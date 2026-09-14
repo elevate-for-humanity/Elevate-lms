@@ -30,7 +30,6 @@ const PUBLIC_PATHS = [
   // It must bypass session middleware or cron/local worker calls are redirected
   // to /login before bearer authentication can run.
   '/api/internal/videos/process-queue',
-  '/api/cron/process-course-builder-jobs',
   '/auth/confirm',
   '/auth/reset-password',
   '/install',
@@ -45,6 +44,11 @@ function isPublicPath(pathname: string): boolean {
     pathname.startsWith('/favicon') ||
     /[a-z0-9]+\.[a-z]+$/i.test(pathname)
   );
+}
+
+function hasCronBearer(req: NextRequest): boolean {
+  const cronSecret = process.env.CRON_SECRET;
+  return Boolean(cronSecret && req.headers.get('authorization') === `Bearer ${cronSecret}`);
 }
 
 function requiredRoles(pathname: string): readonly UserRole[] {
@@ -127,13 +131,15 @@ export async function middleware(req: NextRequest) {
 
   if (isPublicPath(pathname)) return NextResponse.next();
 
+  // Scheduled jobs have no browser session. Admit every cron route only when
+  // the shared scheduler credential matches; each route verifies it again.
+  if (pathname.startsWith('/api/cron/') && hasCronBearer(req)) {
+    return NextResponse.next();
+  }
+
   // Scheduled social publishing has no browser session. Admit only the exact
   // route with the scheduler secret; the route handler verifies it again.
-  if (
-    pathname === '/api/internal/social-media/process' &&
-    process.env.CRON_SECRET &&
-    req.headers.get('authorization') === `Bearer ${process.env.CRON_SECRET}`
-  ) {
+  if (pathname === '/api/internal/social-media/process' && hasCronBearer(req)) {
     return NextResponse.next();
   }
 

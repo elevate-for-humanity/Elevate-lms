@@ -16,6 +16,7 @@ export function AdminApplicationChrome({
 
   return (
     <div
+      data-elevate-dashboard-shell={studioOwnsViewport ? 'studio' : 'admin'}
       className={
         studioOwnsViewport
           ? 'h-dvh min-w-0 overflow-hidden bg-slate-950'
@@ -24,6 +25,7 @@ export function AdminApplicationChrome({
     >
       {!studioOwnsViewport ? <AdminNavShell navSections={navSections} /> : null}
       <main
+        data-elevate-dashboard-content
         className={
           studioOwnsViewport
             ? 'admin-studio-viewport h-full min-w-0 overflow-hidden'

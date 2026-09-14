@@ -92,7 +92,7 @@ export default async function StaffDashboard() {
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
       <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+        <div className="w-full max-w-none px-4 py-3">
           <Breadcrumbs
             items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'Dashboard' }]}
           />
@@ -101,14 +101,14 @@ export default async function StaffDashboard() {
 
       {/* Header */}
       <section className="border-b border-slate-200 py-6">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="w-full max-w-none px-4">
           <h1 className="text-3xl font-bold text-black">Staff Dashboard</h1>
           <p className="text-black mt-2">Welcome back, {profile.full_name || profile.email}</p>
         </div>
       </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="w-full max-w-none px-4 py-8">
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
@@ -361,7 +361,8 @@ export default async function StaffDashboard() {
             >
               Customer Service
             </Link>
-            <Link href="/staff-portal/processes"
+            <Link
+              href="/staff-portal/processes"
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
@@ -485,7 +486,8 @@ export default async function StaffDashboard() {
               </Link>
 
               {/* Onboarding */}
-              <Link href="/staff-portal"
+              <Link
+                href="/staff-portal"
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">

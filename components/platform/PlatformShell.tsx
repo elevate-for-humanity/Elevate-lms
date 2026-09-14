@@ -5,7 +5,18 @@ import Link from 'next/link';
 import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 import type { ParisLearnerContext } from '@/components/paris/ParisFloatingWrapper';
 import { usePathname } from 'next/navigation';
-import { Search, Menu, X, ChevronDown, LogOut, ShieldCheck, Users, Download, CalendarDays, Mail } from 'lucide-react';
+import {
+  Search,
+  Menu,
+  X,
+  ChevronDown,
+  LogOut,
+  ShieldCheck,
+  Users,
+  Download,
+  CalendarDays,
+  Mail,
+} from 'lucide-react';
 import type {
   UserRole,
   NavSection,
@@ -72,7 +83,12 @@ export function PlatformShell({ user, role, actions = [], children, paris }: Pla
               href: '/program-holder/rights-responsibilities',
               icon: ShieldCheck,
             },
-            { id: 'meetings', label: 'Meetings', href: '/program-holder/meetings', icon: CalendarDays },
+            {
+              id: 'meetings',
+              label: 'Meetings',
+              href: '/program-holder/meetings',
+              icon: CalendarDays,
+            },
             { id: 'office-mail', label: 'Office Mail', href: '/program-holder/inbox', icon: Mail },
             { id: 'install-app', label: 'Install App', href: '/install', icon: Download },
           ],
@@ -141,7 +157,10 @@ export function PlatformShell({ user, role, actions = [], children, paris }: Pla
     (user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : 'User');
 
   return (
-    <div className="min-h-dvh w-full overflow-x-clip bg-slate-50">
+    <div
+      data-elevate-dashboard-shell={role}
+      className="min-h-dvh w-full overflow-x-clip bg-slate-50"
+    >
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
         <div className="flex min-h-16 items-center justify-between gap-2 px-3 sm:px-4 lg:px-6">
           <div className="flex min-w-0 items-center gap-2 sm:gap-4">
@@ -354,7 +373,7 @@ export function PlatformShell({ user, role, actions = [], children, paris }: Pla
           </div>
         </aside>
 
-        <main className="min-w-0 w-full flex-1 overflow-x-clip">
+        <main data-elevate-dashboard-content className="min-w-0 w-full flex-1 overflow-x-clip">
           {actions.length > 0 && (
             <div className="max-w-full overflow-x-auto whitespace-nowrap border-b border-slate-200 bg-white px-3 py-2 lg:hidden">
               <div className="inline-flex gap-2">
@@ -381,7 +400,7 @@ export function PlatformShell({ user, role, actions = [], children, paris }: Pla
               </div>
             </div>
           )}
-          <div className="min-w-0 max-w-full overflow-x-auto break-words p-3 sm:p-4 lg:p-6">
+          <div className="min-w-0 w-full max-w-none overflow-x-auto break-words p-3 sm:p-4 lg:p-6">
             {children}
           </div>
         </main>
@@ -389,7 +408,9 @@ export function PlatformShell({ user, role, actions = [], children, paris }: Pla
       {paris !== false ? (
         /* PlatformShell is the single PARIS owner for authenticated dashboards. */
         <ParisFloatingWrapper
-          surface={paris?.surface ?? (role === 'student' || role === 'apprentice' ? 'learner' : 'portal')}
+          surface={
+            paris?.surface ?? (role === 'student' || role === 'apprentice' ? 'learner' : 'portal')
+          }
           portalRole={paris?.portalRole ?? ROLE_DISPLAY_NAMES[role]}
           personName={user.full_name || user.first_name || null}
           courseTitle={paris?.courseTitle}

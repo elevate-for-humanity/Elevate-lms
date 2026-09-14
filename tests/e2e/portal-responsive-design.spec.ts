@@ -8,16 +8,25 @@ const creds = {
   apprentice: [process.env.E2E_APPRENTICE_EMAIL || '', process.env.E2E_APPRENTICE_PASSWORD || ''],
   hostShop: [process.env.E2E_HOST_SHOP_EMAIL || '', process.env.E2E_HOST_SHOP_PASSWORD || ''],
   learner: [process.env.E2E_LEARNER_EMAIL || '', process.env.E2E_LEARNER_PASSWORD || ''],
-  programHolder: [process.env.E2E_PROGRAM_HOLDER_EMAIL || '', process.env.E2E_PROGRAM_HOLDER_PASSWORD || ''],
+  programHolder: [
+    process.env.E2E_PROGRAM_HOLDER_EMAIL || '',
+    process.env.E2E_PROGRAM_HOLDER_PASSWORD || '',
+  ],
   employer: [process.env.E2E_EMPLOYER_EMAIL || '', process.env.E2E_EMPLOYER_PASSWORD || ''],
   instructor: [process.env.E2E_INSTRUCTOR_EMAIL || '', process.env.E2E_INSTRUCTOR_PASSWORD || ''],
   staff: [process.env.E2E_STAFF_EMAIL || '', process.env.E2E_STAFF_PASSWORD || ''],
-  caseManager: [process.env.E2E_CASE_MANAGER_EMAIL || '', process.env.E2E_CASE_MANAGER_PASSWORD || ''],
+  caseManager: [
+    process.env.E2E_CASE_MANAGER_EMAIL || '',
+    process.env.E2E_CASE_MANAGER_PASSWORD || '',
+  ],
   admin: [process.env.E2E_ADMIN_EMAIL || '', process.env.E2E_ADMIN_PASSWORD || ''],
 } as const;
 
 async function login(page: Page, loginBase: string, email: string, password: string) {
-  const response = await page.goto(`${loginBase}/login`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  const response = await page.goto(`${loginBase}/login`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 30_000,
+  });
   expect(response?.status() ?? 200, `${loginBase}/login returned a server error`).toBeLessThan(500);
 
   const emailInput = page.locator('input[type="email"], input[name="email"]').first();
@@ -36,10 +45,12 @@ async function login(page: Page, loginBase: string, email: string, password: str
   // after the browser reaches the authenticated destination. Polling the actual
   // location verifies the user-visible result without coupling auth to the
   // navigation transport.
-  await expect.poll(() => new URL(page.url()).pathname, {
-    message: `${loginBase} did not leave the login route`,
-    timeout: 60_000,
-  }).not.toMatch(/\/login(?:\/|$)/);
+  await expect
+    .poll(() => new URL(page.url()).pathname, {
+      message: `${loginBase} did not leave the login route`,
+      timeout: 60_000,
+    })
+    .not.toMatch(/\/login(?:\/|$)/);
   await page.waitForLoadState('domcontentloaded').catch(() => undefined);
 }
 
@@ -76,16 +87,21 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
       const el = element as HTMLElement;
       const style = window.getComputedStyle(el);
       const rect = el.getBoundingClientRect();
-      return style.display !== 'none'
-        && style.visibility !== 'hidden'
-        && Number(style.opacity) !== 0
-        && !el.closest('[aria-hidden="true"], [inert]')
-        && rect.width > 0
-        && rect.height > 0;
+      return (
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        Number(style.opacity) !== 0 &&
+        !el.closest('[aria-hidden="true"], [inert]') &&
+        rect.width > 0 &&
+        rect.height > 0
+      );
     };
-    const main = Array.from(document.querySelectorAll('main, [role="main"]')).find(isRendered) || body;
+    const main =
+      Array.from(document.querySelectorAll('main, [role="main"]')).find(isRendered) || body;
     const mainRect = main?.getBoundingClientRect();
-    const visibleCritical = Array.from(document.querySelectorAll('button, input, select, textarea, a[href]')).filter((element) => {
+    const visibleCritical = Array.from(
+      document.querySelectorAll('button, input, select, textarea, a[href]'),
+    ).filter((element) => {
       // File inputs are commonly positioned off-screen and activated by a
       // visible, accessible label or button. Certify that user-facing trigger,
       // not the browser-native implementation hook.
@@ -94,8 +110,11 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
       // Menus intentionally parked outside the viewport are not visible to the
       // user. Keep partially visible controls in scope so real clipping still
       // fails certification.
-      const intersectsViewport = rect.right > 0 && rect.left < viewportWidth
-        && rect.bottom > 0 && rect.top < window.innerHeight;
+      const intersectsViewport =
+        rect.right > 0 &&
+        rect.left < viewportWidth &&
+        rect.bottom > 0 &&
+        rect.top < window.innerHeight;
       return isRendered(element) && intersectsViewport;
     });
     const isInsideHorizontalScroller = (element: Element) => {
@@ -103,22 +122,28 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
       while (parent && parent !== document.body) {
         const style = window.getComputedStyle(parent);
         if (
-          (style.overflowX === 'auto' || style.overflowX === 'scroll')
-          && parent.scrollWidth > parent.clientWidth + 2
-        ) return true;
+          (style.overflowX === 'auto' || style.overflowX === 'scroll') &&
+          parent.scrollWidth > parent.clientWidth + 2
+        )
+          return true;
         parent = parent.parentElement;
       }
       return false;
     };
-    const clippedCritical = visibleCritical.filter((element) => {
-      const rect = (element as HTMLElement).getBoundingClientRect();
-      const clipped = rect.right > viewportWidth + 2 || rect.left < -2;
-      return clipped && !isInsideHorizontalScroller(element);
-    }).slice(0, 10).map((element) => ({
-      tag: element.tagName,
-      text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '').trim().slice(0, 80),
-      href: element.getAttribute('href'),
-    }));
+    const clippedCritical = visibleCritical
+      .filter((element) => {
+        const rect = (element as HTMLElement).getBoundingClientRect();
+        const clipped = rect.right > viewportWidth + 2 || rect.left < -2;
+        return clipped && !isInsideHorizontalScroller(element);
+      })
+      .slice(0, 10)
+      .map((element) => ({
+        tag: element.tagName,
+        text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '')
+          .trim()
+          .slice(0, 80),
+        href: element.getAttribute('href'),
+      }));
     const overflowingElements = Array.from(document.querySelectorAll('body *'))
       .filter(isRendered)
       .map((element) => {
@@ -137,26 +162,93 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
           overflowX: style.overflowX,
         };
       })
-      .filter((entry) => entry.right > viewportWidth + 2 || entry.left < -2 || entry.width > viewportWidth + 2)
-      .sort((a, b) => Math.max(b.right - viewportWidth, b.width - viewportWidth) - Math.max(a.right - viewportWidth, a.width - viewportWidth))
+      .filter(
+        (entry) =>
+          entry.right > viewportWidth + 2 || entry.left < -2 || entry.width > viewportWidth + 2,
+      )
+      .sort(
+        (a, b) =>
+          Math.max(b.right - viewportWidth, b.width - viewportWidth) -
+          Math.max(a.right - viewportWidth, a.width - viewportWidth),
+      )
       .slice(0, 12);
-    return { viewportWidth, scrollWidth, mainWidth: mainRect?.width || 0, mainHeight: mainRect?.height || 0, clippedCritical, overflowingElements };
+    return {
+      viewportWidth,
+      scrollWidth,
+      mainWidth: mainRect?.width || 0,
+      mainHeight: mainRect?.height || 0,
+      clippedCritical,
+      overflowingElements,
+    };
   });
 
-  expect(geometry.scrollWidth, `${target} has page-level horizontal overflow: ${JSON.stringify(geometry.overflowingElements)}`).toBeLessThanOrEqual(geometry.viewportWidth + 2);
+  expect(
+    geometry.scrollWidth,
+    `${target} has page-level horizontal overflow: ${JSON.stringify(geometry.overflowingElements)}`,
+  ).toBeLessThanOrEqual(geometry.viewportWidth + 2);
   expect(geometry.mainWidth, `${target} primary content has zero width`).toBeGreaterThan(0);
   expect(geometry.mainHeight, `${target} primary content has zero height`).toBeGreaterThan(0);
   expect(geometry.clippedCritical, `${target} has clipped critical controls`).toEqual([]);
 
+  const shellGeometry = await page.evaluate(() => {
+    const visible = (element: Element) => {
+      const rect = element.getBoundingClientRect();
+      const style = window.getComputedStyle(element);
+      return (
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        rect.width > 0 &&
+        rect.height > 0
+      );
+    };
+    const shells = Array.from(document.querySelectorAll('[data-elevate-dashboard-shell]')).filter(
+      visible,
+    );
+    const content = document.querySelector<HTMLElement>('[data-elevate-dashboard-content]');
+    const rect = content?.getBoundingClientRect();
+    return {
+      shellCount: shells.length,
+      content: rect ? { left: rect.left, right: rect.right, width: rect.width } : null,
+      viewportWidth: window.innerWidth,
+    };
+  });
+  expect(shellGeometry.shellCount, `${target} rendered duplicate dashboard shells`).toBe(1);
+  expect(
+    shellGeometry.content,
+    `${target} is missing the canonical dashboard content frame`,
+  ).not.toBeNull();
+  if (shellGeometry.viewportWidth >= 1024 && new URL(target).pathname !== '/studio') {
+    expect(
+      shellGeometry.content!.right,
+      `${target} does not use the right edge of the available dashboard canvas`,
+    ).toBeGreaterThanOrEqual(shellGeometry.viewportWidth - 2);
+  }
+
   if (geometry.viewportWidth < 768) {
-    const tinyCritical = await page.evaluate(() => Array.from(document.querySelectorAll('button, input, select, textarea')).filter((element) => {
-      const el = element as HTMLElement;
-      const rect = el.getBoundingClientRect();
-      const style = window.getComputedStyle(el);
-      if (style.display === 'none' || style.visibility === 'hidden' || rect.width === 0 || rect.height === 0) return false;
-      if (el.classList.contains('sr-only') || el.closest('[aria-hidden="true"]')) return false;
-      return rect.height < 32 || rect.width < 32;
-    }).slice(0, 10).map((element) => ({ tag: element.tagName, text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '').trim().slice(0, 80) })));
+    const tinyCritical = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('button, input, select, textarea'))
+        .filter((element) => {
+          const el = element as HTMLElement;
+          const rect = el.getBoundingClientRect();
+          const style = window.getComputedStyle(el);
+          if (
+            style.display === 'none' ||
+            style.visibility === 'hidden' ||
+            rect.width === 0 ||
+            rect.height === 0
+          )
+            return false;
+          if (el.classList.contains('sr-only') || el.closest('[aria-hidden="true"]')) return false;
+          return rect.height < 32 || rect.width < 32;
+        })
+        .slice(0, 10)
+        .map((element) => ({
+          tag: element.tagName,
+          text: ((element as HTMLElement).innerText || element.getAttribute('aria-label') || '')
+            .trim()
+            .slice(0, 80),
+        })),
+    );
     expect(tinyCritical, `${target} has undersized mobile controls`).toEqual([]);
   }
 
@@ -202,15 +294,34 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
   }
 }
 
-async function certify(page: Page, testInfo: any, role: string, credentials: readonly string[], loginBase: string, paths: string[], manifestPath: string) {
+async function certify(
+  page: Page,
+  testInfo: any,
+  role: string,
+  credentials: readonly string[],
+  loginBase: string,
+  paths: string[],
+  manifestPath: string,
+) {
   await login(page, loginBase, credentials[0], credentials[1]);
-  for (const path of paths) await test.step(`${testInfo.project.name}: ${path}`, async () => assertResponsivePage(page, path));
+  for (const path of paths)
+    await test.step(`${testInfo.project.name}: ${path}`, async () =>
+      assertResponsivePage(page, path));
   const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
   expect(manifestHref, `${role} loaded the wrong PWA manifest`).toBe(manifestPath);
-  await page.screenshot({ path: testInfo.outputPath(`${role}-${testInfo.project.name}.png`), fullPage: false });
+  await page.screenshot({
+    path: testInfo.outputPath(`${role}-${testInfo.project.name}.png`),
+    fullPage: false,
+  });
 }
 
-function roleSuite(name: string, key: keyof typeof creds, loginBase: string, paths: string[], manifestPath: string) {
+function roleSuite(
+  name: string,
+  key: keyof typeof creds,
+  loginBase: string,
+  paths: string[],
+  manifestPath: string,
+) {
   test.describe(name, () => {
     const credentials = creds[key];
     test.skip(!credentials[0] || !credentials[1], `Disposable ${name} identity is required`);
@@ -222,14 +333,90 @@ function roleSuite(name: string, key: keyof typeof creds, loginBase: string, pat
 }
 
 test.describe('Authenticated portal responsive design certification', () => {
-  roleSuite('Apprentice', 'apprentice', BASE, ['/apprentice','/apprentice/hours','/apprentice/rti','/apprentice/competencies','/apprentice/documents','/apprentice/attendance','/apprentice/profile','/apprentice/handbook'], '/manifest-apprentice.json');
-  roleSuite('Host Shop', 'hostShop', BASE, ['/host-shop/dashboard','/host-shop/dashboard/apprentices','/host-shop/dashboard/hours/pending','/host-shop/dashboard/documents','/host-shop/dashboard/competencies','/host-shop/dashboard/attendance/record','/host-shop/dashboard/wages','/host-shop/dashboard/reports','/host-shop/dashboard/profile'], '/manifest-shop-owner.json');
-  roleSuite('Learner', 'learner', BASE, ['/lms/dashboard','/lms/courses','/lms/certificates','/lms/calendar','/lms/messages','/lms/support','/lms/apply/status'], '/manifest-student.json');
-  roleSuite('Program Holder', 'programHolder', BASE, ['/program-holder/dashboard','/program-holder/students','/program-holder/portal/students','/program-holder/portal/reports','/program-holder/rights-responsibilities','/program-holder/settings'], '/manifest-program-holder.json');
+  roleSuite(
+    'Apprentice',
+    'apprentice',
+    BASE,
+    [
+      '/apprentice',
+      '/apprentice/hours',
+      '/apprentice/rti',
+      '/apprentice/competencies',
+      '/apprentice/documents',
+      '/apprentice/attendance',
+      '/apprentice/profile',
+      '/apprentice/handbook',
+    ],
+    '/manifest-apprentice.json',
+  );
+  roleSuite(
+    'Host Shop',
+    'hostShop',
+    BASE,
+    [
+      '/host-shop/dashboard',
+      '/host-shop/dashboard/apprentices',
+      '/host-shop/dashboard/hours/pending',
+      '/host-shop/dashboard/documents',
+      '/host-shop/dashboard/competencies',
+      '/host-shop/dashboard/attendance/record',
+      '/host-shop/dashboard/wages',
+      '/host-shop/dashboard/reports',
+      '/host-shop/dashboard/profile',
+    ],
+    '/manifest-shop-owner.json',
+  );
+  roleSuite(
+    'Learner',
+    'learner',
+    BASE,
+    [
+      '/lms/dashboard',
+      '/lms/courses',
+      '/lms/certificates',
+      '/lms/calendar',
+      '/lms/messages',
+      '/lms/support',
+      '/lms/apply/status',
+    ],
+    '/manifest-student.json',
+  );
+  roleSuite(
+    'Program Holder',
+    'programHolder',
+    BASE,
+    [
+      '/program-holder/dashboard',
+      '/program-holder/students',
+      '/program-holder/portal/students',
+      '/program-holder/portal/reports',
+      '/program-holder/rights-responsibilities',
+      '/program-holder/settings',
+    ],
+    '/manifest-program-holder.json',
+  );
   roleSuite('Employer', 'employer', BASE, ['/employer/dashboard'], '/manifest-employer.json');
-  roleSuite('Instructor', 'instructor', ADMIN_BASE, [`${ADMIN_BASE}/instructor/dashboard`], '/manifest-admin.json');
-  roleSuite('Staff', 'staff', ADMIN_BASE, [`${ADMIN_BASE}/staff-portal/dashboard`], '/manifest-admin.json');
-  roleSuite('Case Manager', 'caseManager', MARKETING_BASE, [`${MARKETING_BASE}/case-manager/dashboard`], '/manifest-marketing.json');
+  roleSuite(
+    'Instructor',
+    'instructor',
+    ADMIN_BASE,
+    [`${ADMIN_BASE}/instructor/dashboard`],
+    '/manifest-admin.json',
+  );
+  roleSuite(
+    'Staff',
+    'staff',
+    ADMIN_BASE,
+    [`${ADMIN_BASE}/staff-portal/dashboard`],
+    '/manifest-admin.json',
+  );
+  roleSuite(
+    'Case Manager',
+    'caseManager',
+    MARKETING_BASE,
+    [`${MARKETING_BASE}/case-manager/dashboard`],
+    '/manifest-marketing.json',
+  );
   roleSuite(
     'Admin',
     'admin',

@@ -47,6 +47,7 @@ export function PortalShell({
   children,
   nav,
   portalName,
+  role,
   userEmail,
   userName,
   logoHref = '/',
@@ -59,7 +60,10 @@ export function PortalShell({
     pathname === href || (href !== '/' && pathname.startsWith(href));
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/40">
+    <div
+      data-elevate-dashboard-shell={role || portalName}
+      className="flex min-h-screen w-full overflow-x-clip bg-gradient-to-br from-slate-50 via-white to-blue-50/40"
+    >
       {/* Sidebar */}
       <aside
         className={cn(
@@ -150,7 +154,12 @@ export function PortalShell({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto bg-transparent">{children}</main>
+        <main
+          data-elevate-dashboard-content
+          className="min-w-0 w-full flex-1 overflow-y-auto bg-transparent"
+        >
+          {children}
+        </main>
       </div>
     </div>
   );

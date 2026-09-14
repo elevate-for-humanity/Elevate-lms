@@ -60,7 +60,13 @@ describe('canonical portal shell mobile contract', () => {
     expect(shell).toContain('overflow-x-clip');
     expect(shell).toContain('w-[min(20rem,calc(100vw-2.5rem))]');
     expect(shell).toContain('overflow-x-auto whitespace-nowrap');
-    expect(shell).toContain('max-w-full overflow-x-auto break-words');
+    expect(shell).toContain('w-full max-w-none overflow-x-auto break-words');
+  });
+
+  it('marks one canonical shell and gives dashboard content the full available canvas', () => {
+    expect(shell).toContain('data-elevate-dashboard-shell={role}');
+    expect(shell).toContain('data-elevate-dashboard-content');
+    expect(shell).toContain('w-full max-w-none');
   });
 
   it('enforces touch-sized navigation controls and links', () => {

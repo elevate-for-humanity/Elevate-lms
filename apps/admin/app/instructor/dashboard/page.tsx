@@ -217,7 +217,7 @@ export default async function InstructorDashboard() {
         />
       </section>
       <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+        <div className="w-full max-w-none px-4 py-3">
           <Breadcrumbs
             items={[{ label: 'Instructor', href: '/instructor' }, { label: 'Dashboard' }]}
           />
@@ -225,7 +225,7 @@ export default async function InstructorDashboard() {
       </div>
 
       <div className="bg-white border-b border-slate-200">
-        <div className="mx-auto max-w-7xl px-6 py-6">
+        <div className="w-full max-w-none px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-black">Instructor Dashboard</h1>
@@ -241,7 +241,7 @@ export default async function InstructorDashboard() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="w-full max-w-none px-6 py-8">
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <div className="flex items-center gap-3">

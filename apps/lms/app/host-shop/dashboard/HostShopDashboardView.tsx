@@ -358,7 +358,7 @@ export default async function HostShopDashboardView() {
     : '/images/pages/workforce-board-page-7.webp';
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+    <main className="w-full max-w-none px-4 py-8 sm:px-6">
       <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="font-black text-slate-950">Host Shop app</p>

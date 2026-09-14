@@ -247,7 +247,7 @@ export function AdminDashboardContent({
     day: 'numeric',
   });
   return (
-    <div className="mx-auto w-full max-w-[1600px] min-w-0 px-3 pb-16 pt-4 sm:px-5 lg:px-6">
+    <div className="w-full max-w-none min-w-0 px-3 pb-16 pt-4 sm:px-5 lg:px-6">
       <section className="mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="p-5 sm:p-8">
           <div className="flex flex-wrap items-center gap-2">

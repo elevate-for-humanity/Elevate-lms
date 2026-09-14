@@ -20,11 +20,19 @@ const guardedPortals: Array<{ path: string; required: string[] }> = [
   },
   {
     path: 'apps/lms/app/apprentice/layout.tsx',
-    required: ['supabase.auth.getUser()', 'resolveApprenticeProgramSlug', 'if (!privileged && !programSlug)'],
+    required: [
+      'supabase.auth.getUser()',
+      'resolveApprenticeProgramSlug',
+      'if (!privileged && !programSlug)',
+    ],
   },
   {
     path: 'apps/lms/app/host-shop/dashboard/layout.tsx',
-    required: ['getMyPartnerContext()', "partner.status !== 'active'", "partner.approval_status !== 'approved'"],
+    required: [
+      'getMyPartnerContext()',
+      "partner.status !== 'active'",
+      "partner.approval_status !== 'approved'",
+    ],
   },
   {
     path: 'apps/lms/app/program-holder/dashboard/layout.tsx',
@@ -39,16 +47,16 @@ const guardedPortals: Array<{ path: string; required: string[] }> = [
     required: ["requireRole(['employer', 'sponsor', 'admin', 'staff'])"],
   },
   {
-    path: 'apps/marketing/app/provider/dashboard/layout.tsx',
-    required: ["requireRole(['provider', 'provider_admin', 'admin', 'staff'])"],
+    path: 'apps/marketing/app/provider/layout.tsx',
+    required: ['OperationalPortalShell', 'portalKey="provider"'],
   },
   {
     path: 'apps/marketing/app/case-manager/layout.tsx',
     required: ['OperationalPortalShell', 'portalKey="casemanager"'],
   },
   {
-    path: 'apps/marketing/app/workforce-board/dashboard/layout.tsx',
-    required: ['requireRole([', "'workforce_board'", "'government'"],
+    path: 'apps/marketing/app/workforce-board/layout.tsx',
+    required: ['OperationalPortalShell', 'portalKey="workforceboard"'],
   },
   {
     path: 'apps/marketing/app/workforce/layout.tsx',

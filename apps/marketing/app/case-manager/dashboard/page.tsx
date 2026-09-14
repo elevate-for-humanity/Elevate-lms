@@ -98,7 +98,9 @@ export default async function CaseManagerDashboardPage() {
   if (learnerIds.length > 0) {
     const { data: rawCmEnrollments } = await db
       .from('program_enrollments')
-      .select('id, user_id, status, enrolled_at, funding_source, program:programs!program_id(id, title)')
+      .select(
+        'id, user_id, status, enrolled_at, funding_source, program:programs!program_id(id, title)',
+      )
       .in('user_id', learnerIds)
       .order('enrolled_at', { ascending: false })
       .limit(10);
@@ -121,24 +123,41 @@ export default async function CaseManagerDashboardPage() {
     { label: 'Active Enrollments', value: activeEnrollments, icon: Clock, color: 'brand-orange' },
     { label: 'Completions', value: completedEnrollments, icon: CheckCircle, color: 'brand-green' },
     { label: 'Credentials Earned', value: credentialsEarned, icon: Award, color: 'brand-blue' },
-    { label: 'Verified Placements', value: placementsVerified, icon: Briefcase, color: 'brand-green' },
-    { label: 'Placements Pending', value: placementsPending, icon: AlertCircle, color: 'brand-red' },
+    {
+      label: 'Verified Placements',
+      value: placementsVerified,
+      icon: Briefcase,
+      color: 'brand-green',
+    },
+    {
+      label: 'Placements Pending',
+      value: placementsPending,
+      icon: AlertCircle,
+      color: 'brand-red',
+    },
   ];
 
   return (
     <div className="min-h-screen bg-white">
       <div className="bg-brand-blue-700 text-white px-6 py-8">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">Workforce Hub</p>
+        <div className="w-full max-w-none">
+          <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-1">
+            Workforce Hub
+          </p>
           <h1 className="text-2xl font-extrabold mb-1">Case Manager Dashboard</h1>
-          <p className="text-blue-50 text-sm">Participant outcomes, enrollment status, and placement verification</p>
+          <p className="text-blue-50 text-sm">
+            Participant outcomes, enrollment status, and placement verification
+          </p>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+      <div className="w-full max-w-none px-6 py-8 space-y-8">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {stats.map((stat) => (
-            <div key={stat.label} className="bg-white rounded-xl border border-slate-200 p-4 text-center">
+            <div
+              key={stat.label}
+              className="bg-white rounded-xl border border-slate-200 p-4 text-center"
+            >
               <stat.icon
                 className={`w-5 h-5 mx-auto mb-2 ${
                   stat.color === 'brand-red'
@@ -162,7 +181,9 @@ export default async function CaseManagerDashboardPage() {
             <span className="text-xs text-slate-500">{totalAssigned} total</span>
           </div>
           {scopedParticipants.length === 0 ? (
-            <div className="px-5 py-10 text-center text-slate-500 text-sm">No participants assigned yet.</div>
+            <div className="px-5 py-10 text-center text-slate-500 text-sm">
+              No participants assigned yet.
+            </div>
           ) : (
             <ul className="divide-y divide-slate-100">
               {scopedParticipants.slice(0, 50).map(({ application, learnerProfile }) => (
@@ -173,9 +194,13 @@ export default async function CaseManagerDashboardPage() {
                   >
                     <div>
                       <p className="font-medium text-slate-900 text-sm">
-                        {learnerProfile?.full_name || `${application.first_name ?? ''} ${application.last_name ?? ''}`.trim() || 'Unknown'}
+                        {learnerProfile?.full_name ||
+                          `${application.first_name ?? ''} ${application.last_name ?? ''}`.trim() ||
+                          'Unknown'}
                       </p>
-                      <p className="text-xs text-slate-500">{application.email ?? learnerProfile?.email ?? '—'}</p>
+                      <p className="text-xs text-slate-500">
+                        {application.email ?? learnerProfile?.email ?? '—'}
+                      </p>
                     </div>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
                   </Link>
@@ -190,13 +215,17 @@ export default async function CaseManagerDashboardPage() {
             <h2 className="font-bold text-slate-900">Recent Enrollments</h2>
           </div>
           {recentEnrollments.length === 0 ? (
-            <div className="px-5 py-10 text-center text-slate-500 text-sm">No recent enrollments.</div>
+            <div className="px-5 py-10 text-center text-slate-500 text-sm">
+              No recent enrollments.
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-white border-b border-slate-100">
-                    <th className="text-left px-5 py-3 font-semibold text-slate-600">Participant</th>
+                    <th className="text-left px-5 py-3 font-semibold text-slate-600">
+                      Participant
+                    </th>
                     <th className="text-left px-5 py-3 font-semibold text-slate-600">Program</th>
                     <th className="text-left px-5 py-3 font-semibold text-slate-600">Funding</th>
                     <th className="text-left px-5 py-3 font-semibold text-slate-600">Status</th>
@@ -215,11 +244,17 @@ export default async function CaseManagerDashboardPage() {
                             {enrollment.user?.full_name ?? '—'}
                           </Link>
                         ) : (
-                          <span className="font-medium text-slate-700">{enrollment.user?.full_name ?? '—'}</span>
+                          <span className="font-medium text-slate-700">
+                            {enrollment.user?.full_name ?? '—'}
+                          </span>
                         )}
                       </td>
-                      <td className="px-5 py-3 text-slate-700">{enrollment.program?.title ?? '—'}</td>
-                      <td className="px-5 py-3 text-slate-500 text-xs">{enrollment.funding_source ?? '—'}</td>
+                      <td className="px-5 py-3 text-slate-700">
+                        {enrollment.program?.title ?? '—'}
+                      </td>
+                      <td className="px-5 py-3 text-slate-500 text-xs">
+                        {enrollment.funding_source ?? '—'}
+                      </td>
                       <td className="px-5 py-3">
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
@@ -234,7 +269,9 @@ export default async function CaseManagerDashboardPage() {
                         </span>
                       </td>
                       <td className="px-5 py-3 text-slate-500 text-xs">
-                        {enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString() : '—'}
+                        {enrollment.enrolled_at
+                          ? new Date(enrollment.enrolled_at).toLocaleDateString()
+                          : '—'}
                       </td>
                     </tr>
                   ))}
@@ -248,9 +285,24 @@ export default async function CaseManagerDashboardPage() {
 
         <div className="grid sm:grid-cols-3 gap-4">
           {[
-            { label: 'Pending Placements', href: '/case-manager/placements?status=pending', icon: AlertCircle, desc: 'Verify employment outcomes' },
-            { label: 'WIOA Reporting', href: '/case-manager/reports/wioa', icon: TrendingUp, desc: 'Participant outcome exports' },
-            { label: 'All Participants', href: '/case-manager/participants', icon: Users, desc: 'Full participant list' },
+            {
+              label: 'Pending Placements',
+              href: '/case-manager/placements?status=pending',
+              icon: AlertCircle,
+              desc: 'Verify employment outcomes',
+            },
+            {
+              label: 'WIOA Reporting',
+              href: '/case-manager/reports/wioa',
+              icon: TrendingUp,
+              desc: 'Participant outcome exports',
+            },
+            {
+              label: 'All Participants',
+              href: '/case-manager/participants',
+              icon: Users,
+              desc: 'Full participant list',
+            },
           ].map((link) => (
             <Link
               key={link.label}

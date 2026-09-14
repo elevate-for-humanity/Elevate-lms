@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import type { AgentMessage, ConversationSession, AgentConfig } from '@/lib/studio/agent';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
 
     const { data, error } = await supabase
       .from('studio_conversations')
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
 
     const body = await request.json();
     const { title, messages, config } = body;
@@ -89,7 +89,7 @@ export async function PUT(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
 
     const body = await request.json();
     const { id, title, messages } = body;
@@ -126,7 +126,7 @@ export async function DELETE(request: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const supabase = await createClient();
+    const supabase = await requireAdminClient();
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');

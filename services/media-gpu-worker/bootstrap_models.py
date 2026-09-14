@@ -25,7 +25,8 @@ WAN_GIT_URL = os.getenv("WAN_GIT_URL", "https://github.com/Wan-Video/Wan2.2.git"
 WAN_GIT_REF = os.getenv("WAN_GIT_REF", "42bf4cfaa384bc21833865abc2f9e6c0e67233dc")
 WAN_MODEL_ID = os.getenv("WAN_MODEL_ID", "Wan-AI/Wan2.2-TI2V-5B")
 STATUS = Path(os.getenv("MODEL_BOOTSTRAP_STATUS_FILE", "/models/bootstrap-status.json"))
-EXTRA_RUNTIME_REQUIREMENTS = ("einops", "decord", "peft", "librosa")\nFLASH_ATTN_REQUIREMENT = os.getenv("WAN_FLASH_ATTN_REQUIREMENT", "flash-attn==2.6.3")
+EXTRA_RUNTIME_REQUIREMENTS = ("einops", "decord", "peft", "librosa")
+FLASH_ATTN_REQUIREMENT = os.getenv("WAN_FLASH_ATTN_REQUIREMENT", "flash-attn==2.6.3")
 RUNTIME_SMOKE_MODULES = (
     "einops", "cv2", "diffusers", "transformers", "accelerate",
     "imageio", "easydict", "ftfy", "decord", "peft", "librosa", "flash_attn", "wan",
@@ -82,7 +83,8 @@ def ensure_venv() -> None:
     marker = WAN_VENV / ".elevate-ready"
     requirements = WAN_REPO / "requirements.txt"
     dependency_fingerprint = hashlib.sha256(
-        requirements.read_bytes() + "\n".join(EXTRA_RUNTIME_REQUIREMENTS).encode()
+        requirements.read_bytes()
+        + "\n".join((*EXTRA_RUNTIME_REQUIREMENTS, FLASH_ATTN_REQUIREMENT)).encode()
     ).hexdigest()
     marker_value = f"{WAN_GIT_REF}:{dependency_fingerprint}\n"
     smoke = "import " + ", ".join(RUNTIME_SMOKE_MODULES)
@@ -112,6 +114,9 @@ def ensure_venv() -> None:
     ]
     filtered.write_text("\n".join(lines) + "\n")
     run([pip, "install", "-r", str(filtered), *EXTRA_RUNTIME_REQUIREMENTS])
+    # Wan attention asserts FlashAttention 2 at the first denoising block.
+    # Prefer its matching prebuilt wheel; the runtime image has no CUDA compiler.
+    run([pip, "install", "--no-build-isolation", FLASH_ATTN_REQUIREMENT])
     run([str(python), "-c", smoke], cwd=WAN_REPO, capture=True)
     marker.write_text(marker_value)
 

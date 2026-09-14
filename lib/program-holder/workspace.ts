@@ -96,7 +96,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('program_enrollments')
       .select(
-        `id,user_id,full_name,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified${enrollmentContactColumns}`,
+        `id,user_id,full_name,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,funding_verified,voucher_issued_date,voucher_paid_date,payment_status,amount_paid_cents,completed_at,completion_date${enrollmentContactColumns}`,
       )
       .eq('program_holder_id', holderId)
       .in('status', [
@@ -132,10 +132,10 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('program_holder_students')
       .select(
-        `id,user_id,applicant_name,status,program_id,call_notes,call_date,call_outcome,work_start_date,work_site,updated_at${applicantContactColumns}`,
+        `id,user_id,applicant_name,status,application_status,program_id,label,call_notes,call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,updated_at${applicantContactColumns}`,
       )
       .eq('program_holder_id', holderId)
-      .eq('status', 'enrolled')
+      .in('status', ['active', 'enrolled'])
       .order('updated_at', { ascending: false }),
     db
       .from('hour_entries')
@@ -191,7 +191,28 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     enrollments: enrollmentsRes.data ?? [],
     upcomingEnrollments: upcomingRes.data ?? [],
     applicants: applicantsRes.data ?? [],
-    convertedStudents: convertedStudentsRes.data ?? [],
+    convertedStudents: (convertedStudentsRes.data ?? []).map((row: any) => ({
+      ...row,
+      full_name: row.applicant_name || 'Student',
+      enrollment_state: row.status,
+      program_slug: null,
+      training_start_date: row.work_start_date,
+      training_end_date: row.completion_date,
+      total_hours_completed: Number(row.hours_taught || 0),
+      progress_percent:
+        Number(row.hours_required || 0) > 0
+          ? Math.min(100, Math.round((Number(row.hours_taught || 0) / Number(row.hours_required)) * 100))
+          : 0,
+      next_required_action:
+        row.work_progress && row.work_progress !== 'Not started'
+          ? row.work_progress
+          : 'Record training progress',
+      funding_verified: false,
+      voucher_issued_date: null,
+      voucher_paid_date: null,
+      payment_status: null,
+      amount_paid_cents: 0,
+    })),
     hours: hoursRes.data ?? [],
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],

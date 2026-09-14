@@ -80,11 +80,19 @@ describe('durable orchestration planning', () => {
     const goal =
       'Fix the repository workflow, add regression tests, commit the changed files, deploy, and verify production';
     const plan = decomposePlan(goal);
-    expect(plan.steps).toHaveLength(1);
+    expect(plan.steps.map((step) => step.title)).toEqual([
+      'Implement repository outcome',
+      'Run authoritative CI validation',
+      'Deploy the verified build',
+      'Verify production',
+    ]);
     expect(plan.steps[0]).toMatchObject({
-      title: 'Execute engineering outcome',
+      title: 'Implement repository outcome',
       command: goal,
     });
+    expect(plan.steps[1]?.depends_on).toEqual(['s1']);
+    expect(plan.steps[2]?.depends_on).toEqual(['s2']);
+    expect(plan.steps[3]?.depends_on).toEqual(['s3']);
   });
 });
 

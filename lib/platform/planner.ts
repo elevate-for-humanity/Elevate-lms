@@ -9,6 +9,8 @@
  *   Goal → decompose() → PlanStep[] → ai_tasks runtime → verify → report
  */
 
+import { buildUnifiedEngineeringStages } from '@/lib/devstudio/engineering-runner/plan';
+
 export type StepStatus =
   | 'pending'
   | 'running'
@@ -22,6 +24,7 @@ export interface PlanStep {
   order: number;
   title: string;
   command: string;
+  runner?: string;
   depends_on?: string[];
   verify?: string;
   expected_output?: string;
@@ -366,19 +369,20 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
   } else if (g.includes('enrollment') || g.includes('enroll')) {
     steps = GOAL_TEMPLATES.fix_enrollment_failures!({});
   } else if (compoundEngineeringExecution) {
-    steps = [
-      {
-        id: 's1',
-        order: 1,
-        title: 'Execute engineering outcome',
-        command: goal,
-        status: 'pending',
-        expected_output: 'Repository changes and verification evidence',
-        verification_rule:
-          'The engineering runtime must return concrete file, test, commit, and deployment evidence requested by the goal.',
-        max_attempts: 1,
-      },
-    ];
+    const unifiedStages = buildUnifiedEngineeringStages(goal);
+    const stepId = new Map(unifiedStages.map((stage, index) => [stage.id, `s${index + 1}`]));
+    steps = unifiedStages.map((stage, index) => ({
+      id: `s${index + 1}`,
+      order: index + 1,
+      title: stage.title,
+      command: stage.command,
+      runner: stage.runner,
+      status: 'pending',
+      depends_on: stage.dependsOn?.map((dependency) => stepId.get(dependency)!).filter(Boolean),
+      expected_output: stage.expectedOutput,
+      verification_rule: stage.verificationRule,
+      max_attempts: stage.maxAttempts,
+    }));
   } else if (/\bdeploy\b/.test(g)) {
     steps = GOAL_TEMPLATES.pre_deployment_check!({ goal });
   } else if (/\b(?:platform|system)\b.*\bhealth\b|\bhealth check\b/.test(g)) {

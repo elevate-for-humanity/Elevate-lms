@@ -333,6 +333,7 @@ export async function POST(req: NextRequest) {
             await persistPlan(db, plan, auth.id, tenantId);
 
             write(`${RUN} Step ${step.order}/${plan.steps.length}: ${step.title}`);
+            if (step.runner) write(`${DIM}Runner: ${step.runner}${RST}`);
             write(`${DIM}${step.command}${RST}`);
 
             try {

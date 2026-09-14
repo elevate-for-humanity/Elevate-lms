@@ -4,6 +4,8 @@ import {
   ENGINEERING_RUNNER_CAPABILITIES,
 } from '@/lib/devstudio/engineering-runner/plan';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 describe('unified engineering runner planning', () => {
   it('uses only repository work and authoritative CI for a backend repair', () => {
@@ -50,5 +52,14 @@ describe('unified engineering runner planning', () => {
       'deployments.autopilot',
       'browser.execute',
     ]);
+  });
+
+  it('dispatches OpenHands control-plane calls in-process', () => {
+    const executor = readFileSync(resolve('lib/ai/tools/executor.ts'), 'utf8');
+    expect(executor).toContain("tool.name === 'openhands.execute'");
+    expect(executor).toContain("tool.name === 'openhands.status'");
+    expect(executor).toContain(
+      "@/apps/admin/app/api/admin/dev-studio/openhands/agent/route",
+    );
   });
 });

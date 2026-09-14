@@ -90,7 +90,6 @@ export default function HomePage() {
       <StructuredData />
       <main>
         <PlatformHubHero />
-        <div data-narration-disabled="true"><HomeTrustBar /></div>
         <div data-narration-disabled="true"><HomePlatformOverview /></div>
         <div
           data-scroll-narration
@@ -115,6 +114,7 @@ export default function HomePage() {
         >
           <HomeFinalCTA />
         </div>
+        <div data-narration-disabled="true"><HomeTrustBar /></div>
       </main>
     </>
   );

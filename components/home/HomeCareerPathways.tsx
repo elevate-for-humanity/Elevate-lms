@@ -8,15 +8,26 @@ import { ArrowRight } from 'lucide-react';
 
 const PATHWAYS = [
   {
-    slug: 'business',
-    title: 'Business & Entrepreneurship',
+    slug: 'barber-apprenticeship',
+    title: 'Barber Apprenticeship',
     description:
-      'Build practical skills to start, organize, market, and grow a business.',
-    image: '/images/pages/business-meeting.webp',
-    imageAlt: 'Business and entrepreneurship team collaborating in a modern office',
-    ctaHref: '/programs/business',
-    badge: 'Business',
-    cta: 'Explore Business Training',
+      'Train with professionals in a working barbershop while earning wages.',
+    image: '/images/partners/kountry-kutz/interior-active.webp',
+    imageAlt: 'Barbers and clients inside Kountry Kutz apprenticeship host shop',
+    ctaHref: '/programs/barber-apprenticeship',
+    badge: 'Featured Apprenticeship',
+    cta: 'Explore Barber Apprenticeship',
+  },
+  {
+    slug: 'beauty-apprenticeships',
+    title: 'Cosmetology Apprenticeship',
+    description:
+      'Develop professional salon skills through structured instruction and supervised work.',
+    image: '/images/partners/salon-saloon/team-studio.webp',
+    imageAlt: 'Salon Saloon team in the cosmetology apprenticeship service area',
+    ctaHref: '/programs/cosmetology-apprenticeship',
+    badge: 'Featured Apprenticeship',
+    cta: 'Explore Cosmetology Apprenticeship',
   },
   {
     slug: 'hvac-technician',
@@ -41,26 +52,15 @@ const PATHWAYS = [
     cta: 'Explore CDL Training',
   },
   {
-    slug: 'barber-apprenticeship',
-    title: 'Barber Apprenticeship',
+    slug: 'business',
+    title: 'Business & Entrepreneurship',
     description:
-      'Train with professionals in a working barbershop while earning wages.',
-    image: '/images/pages/barber-hero-main.webp',
-    imageAlt: 'Barber apprentice serving a client in a working barbershop',
-    ctaHref: '/programs/barber-apprenticeship',
-    badge: 'Earn While You Learn',
-    cta: 'Explore Barber Apprenticeship',
-  },
-  {
-    slug: 'beauty-apprenticeships',
-    title: 'Beauty Apprenticeships',
-    description:
-      'Turn hair, skin, nail, and client-service skills into a career pathway.',
-    image: '/images/pages/cosmetology-apprenticeship-hero.webp',
-    imageAlt: 'Beauty professional working with a client in a salon',
-    ctaHref: '/barber-and-beauty-apprenticeships',
-    badge: 'Beauty Industry',
-    cta: 'Explore Beauty Apprenticeships',
+      'Build practical skills to start, organize, market, and grow a business.',
+    image: '/images/pages/business-meeting.webp',
+    imageAlt: 'Business and entrepreneurship team collaborating in a modern office',
+    ctaHref: '/programs/business',
+    badge: 'Business',
+    cta: 'Explore Business Training',
   },
   {
     slug: 'host-shop',
@@ -81,16 +81,16 @@ export function HomeCareerPathways() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 max-w-3xl">
           <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
-            Start With a Career Path
+            Apprenticeships first, then career training
           </p>
           <h2
             id="featured-pathways-heading"
             className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
           >
-            Choose where you want to go next.
+            Start with paid, work-based learning—or choose a skilled trade.
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-700">
-            Choose a pathway to see the training, requirements, costs, and next steps.
+            Featured apprenticeship pathways appear first, followed by skilled trades and other career programs.
           </p>
         </div>
 

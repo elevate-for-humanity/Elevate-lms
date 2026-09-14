@@ -241,7 +241,7 @@ jobs:
 
             html_ok=false
             if grep -qi '<html' /tmp/www-home.html \
-              && grep -q 'Build skills that move your career forward.' /tmp/www-home.html \
+              && grep -q 'One platform for training, apprenticeships, and workforce operations.' /tmp/www-home.html \
               && grep -q 'Barber Apprenticeship' /tmp/www-barber.html \
               && grep -q 'Esthetician Apprenticeship Pathway' /tmp/www-esthetics.html \
               && grep -q '300 related-instruction hours' /tmp/www-esthetics.html \

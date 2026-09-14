@@ -298,11 +298,11 @@ export function PlatformShell({ user, role, actions = [], children, paris }: Pla
         >
           <div className="flex h-full min-h-0 flex-col pt-[env(safe-area-inset-top)] lg:pt-0">
             <div className="flex min-h-16 items-center justify-between gap-3 border-b border-slate-800 p-4">
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <h2 className="truncate text-xs font-black uppercase tracking-wider text-slate-300">
                   {ROLE_DISPLAY_NAMES[role]}
                 </h2>
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 max-w-full whitespace-normal break-normal text-xs leading-5 text-slate-400 [overflow-wrap:normal]">
                   Use this menu to move through your workspace.
                 </p>
               </div>
@@ -313,7 +313,7 @@ export function PlatformShell({ user, role, actions = [], children, paris }: Pla
                   setSidebarOpen(false);
                   menuButtonRef.current?.focus();
                 }}
-                className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-slate-200 hover:bg-slate-800 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white lg:hidden"
+                className="inline-flex !h-11 !min-h-11 !w-11 !min-w-11 !max-w-11 shrink-0 items-center justify-center rounded-lg text-slate-200 hover:bg-slate-800 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white lg:hidden"
                 aria-label="Close portal navigation"
               >
                 <X className="h-6 w-6" />

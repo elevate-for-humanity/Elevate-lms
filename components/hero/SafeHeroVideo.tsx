@@ -7,6 +7,8 @@ interface SafeHeroVideoProps {
   poster: string;
   className?: string;
   ariaLabel?: string;
+  /** Keep false when a poster would create a visible image-to-video flash. */
+  showPosterBeforePlayback?: boolean;
 }
 
 type NetworkInformationLike = {
@@ -44,6 +46,7 @@ export function SafeHeroVideo({
   poster,
   className = '',
   ariaLabel = 'Hero video',
+  showPosterBeforePlayback = true,
 }: SafeHeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -87,14 +90,16 @@ export function SafeHeroVideo({
 
   return (
     <>
-      <img
-        src={poster}
-        alt=""
-        aria-hidden="true"
-        className={`${className} z-0`}
-        decoding="async"
-        fetchPriority="high"
-      />
+      {showPosterBeforePlayback || hasFailed || avoidAutoplay ? (
+        <img
+          src={poster}
+          alt=""
+          aria-hidden="true"
+          className={`${className} z-0`}
+          decoding="async"
+          fetchPriority={showPosterBeforePlayback ? 'high' : 'auto'}
+        />
+      ) : null}
       {!hasFailed && !avoidAutoplay ? (
         <video
           ref={videoRef}
@@ -102,7 +107,7 @@ export function SafeHeroVideo({
           muted
           playsInline
           preload="metadata"
-          poster={poster}
+          poster={showPosterBeforePlayback ? poster : undefined}
           aria-label={ariaLabel}
           onCanPlay={() => {
             void videoRef.current?.play().catch(() => {

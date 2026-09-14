@@ -4,7 +4,7 @@
   "description": "Workforce education and career development programs",
   "start_url": "/",
   "scope": "/",
-  "display": "standalone",
+  "display": "browser",
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",

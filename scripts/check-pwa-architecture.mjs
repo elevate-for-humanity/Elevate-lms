@@ -62,7 +62,10 @@ for (const worker of ['public/sw-admin.js', 'public/sw-lms.js', 'public/sw-marke
 
 for (const manifest of required.filter((file) => file.includes('/manifest-'))) {
   const data = JSON.parse(read(manifest));
-  if (!data.name || !data.start_url || !data.scope || data.display !== 'standalone') failures.push(`${manifest} is not installable`);
+  const expectedDisplay = manifest.endsWith('manifest-marketing.json') ? 'browser' : 'standalone';
+  if (!data.name || !data.start_url || !data.scope || data.display !== expectedDisplay) {
+    failures.push(`${manifest} must use ${expectedDisplay} display mode`);
+  }
 }
 
 const neutralAdminPreviews = [

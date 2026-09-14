@@ -29,6 +29,7 @@ import { resolveApplicableWage } from '@/lib/apprenticeship/registered-program-c
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { getBeautyApprenticeshipConfig } from '@/lib/apprenticeship/beauty-program-config';
 import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
+// Keep shared and preview navigation on the canonical LMS host.
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 
 export const metadata: Metadata = {

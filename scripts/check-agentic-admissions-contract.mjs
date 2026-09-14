@@ -50,6 +50,8 @@ requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspac
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "setDraftInputMode('voice')", 'voice transcription review mode');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', 'Do not persist speech automatically', 'voice must be reviewed before persistence');
 requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', 'sendAnswer(input, draftInputMode)', 'reviewed transcript keeps input origin');
+requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "!session.state.pendingConfirmation && question?.field === 'program'", 'program picker cannot override critical confirmation');
+requireText('apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx', "session.state.pendingConfirmation\n    ? question?.options ?? []", 'pending confirmation actions remain authoritative');
 
 requireText('apps/marketing/app/api/paris/application-interview/route.ts', 'paris_application_resume', 'persistent resume cookie');
 requireText('apps/marketing/app/api/paris/application-interview/route.ts', "inputMode: z.enum(['text', 'voice'])", 'shared voice/text state authority');

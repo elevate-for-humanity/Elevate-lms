@@ -5,7 +5,7 @@
  * Stores the file in Supabase Storage (documents bucket) under
  * devstudio/{userId}/{timestamp}-{filename}.
  *
- * Falls back to R2 only when R2_ENDPOINT and R2_BUCKET are explicitly set.
+ * Uses the private Supabase documents bucket and returns a short-lived signed URL.
  * Never writes to /tmp — files there are lost on container restart.
  *
  * Returns: { id, key, url, name, size, type, created_at }
@@ -19,8 +19,6 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -60,24 +58,6 @@ async function extractAttachmentPreview(bytes: Uint8Array, contentType: string):
   return '';
 }
 
-function hasR2Config(): boolean {
-  return Boolean(process.env.R2_ENDPOINT && process.env.R2_ACCESS_KEY && process.env.R2_BUCKET);
-}
-
-function getS3(): S3Client {
-  return new S3Client({
-    endpoint: process.env.R2_ENDPOINT!,
-    region: process.env.R2_REGION || 'auto',
-    credentials: {
-      accessKeyId: process.env.R2_ACCESS_KEY!,
-      secretAccessKey: process.env.R2_SECRET_KEY!,
-    },
-    forcePathStyle: true,
-  });
-}
-
-const R2_BUCKET = process.env.R2_BUCKET || '';
-
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
@@ -114,44 +94,26 @@ export async function POST(request: NextRequest) {
 
     const bytes = new Uint8Array(await file.arrayBuffer());
     const contentPreview = await extractAttachmentPreview(bytes, contentType);
-    let signedUrl = '';
-    let storageBucket = SUPABASE_BUCKET;
+    const db = await requireAdminClient();
+    const storagePath = `devstudio/${user.id}/${timestamp}-${safeName}`;
+    const { error: uploadErr } = await db.storage
+      .from(SUPABASE_BUCKET)
+      .upload(storagePath, bytes, { contentType, upsert: false });
 
-    if (hasR2Config()) {
-      const s3 = getS3();
-      await s3.send(
-        new PutObjectCommand({
-          Bucket: R2_BUCKET,
-          Key: key,
-          Body: bytes,
-          ContentType: contentType,
-          Metadata: { 'uploaded-by': user.id, 'original-name': file.name, label },
-        }),
-      );
-      signedUrl = await getSignedUrl(s3, new GetObjectCommand({ Bucket: R2_BUCKET, Key: key }), {
-        expiresIn: 7 * 24 * 3600,
-      });
-      storageBucket = R2_BUCKET;
-    } else {
-      const db = await requireAdminClient();
-      const storagePath = `devstudio/${user.id}/${timestamp}-${safeName}`;
-      const { error: uploadErr } = await db.storage
-        .from(SUPABASE_BUCKET)
-        .upload(storagePath, bytes, { contentType, upsert: false });
+    if (uploadErr) return safeError('Storage upload failed', 500);
 
-      if (uploadErr) return safeError('Storage upload failed', 500);
+    const { data: signed, error: signedUrlError } = await db.storage
+      .from(SUPABASE_BUCKET)
+      .createSignedUrl(storagePath, 7 * 24 * 3600);
 
-      const { data: urlData } = db.storage.from(SUPABASE_BUCKET).getPublicUrl(storagePath);
-
-      const { data: signed } = await db.storage
-        .from(SUPABASE_BUCKET)
-        .createSignedUrl(storagePath, 7 * 24 * 3600);
-
-      signedUrl = signed?.signedUrl ?? urlData?.publicUrl ?? '';
-      key = storagePath;
+    if (signedUrlError || !signed?.signedUrl) {
+      await db.storage.from(SUPABASE_BUCKET).remove([storagePath]);
+      return safeError('File stored but a secure document URL could not be created', 500);
     }
 
-    const db = await requireAdminClient();
+    const signedUrl = signed.signedUrl;
+    const storageBucket = SUPABASE_BUCKET;
+    key = storagePath;
     const { data: doc, error: dbErr } = await db
       .from('devstudio_documents')
       .insert({

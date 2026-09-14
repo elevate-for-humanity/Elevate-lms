@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 const source = (file: string) => readFileSync(path.join(process.cwd(), file), 'utf8');
 
+// Release guard: production repair must never broaden an exact-task retry.
 describe('exact OpenHands reconciliation contract', () => {
   it('scopes the provider queue query to one requested task', () => {
     const runtime = source('lib/devstudio/openhands/runtime.ts');

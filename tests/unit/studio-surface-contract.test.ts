@@ -191,7 +191,15 @@ describe('Admin Dashboard and Studio surface contract', () => {
     const upload = source('apps/admin/app/api/admin/dev-studio/upload/route.ts');
     const plan = source('apps/admin/app/api/admin/dev-studio/plan/route.ts');
 
-    expect(workspace).toContain("type EmbeddedCapability = 'workflows' | 'intelligence' | 'tasks'");
+    expect(workspace).toContain(
+      "type NativeCapability = 'workflows' | 'intelligence' | 'tasks' | 'browser'",
+    );
+    expect(workspace).toContain('buildConversationWorkspaceUrl');
+    expect(workspace).toContain("url.searchParams.set('studioConversationId', conversationId)");
+    expect(workspace).toContain("url.searchParams.set('studioTaskId', taskId)");
+    expect(workspace).toContain('workspaces.map((workspace) => (');
+    expect(workspace).not.toContain('Choose AI agent');
+    expect(workspace).not.toContain("(['ELLIE', 'LIZZY', 'PARIS'] as const)");
     expect(workspace).toContain("onOpenTasks={() => openCapability('tasks')}");
     expect(workspace).not.toContain('href={workspace.route}');
     expect(chat).toContain('Studio document ID: ${documentId}');
@@ -216,6 +224,12 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts')).toContain(
       'conversationId: conversationId || undefined',
     );
+    expect(source('apps/admin/app/api/admin/dev-studio/browser/session/route.ts')).toContain(
+      'conversationId:',
+    );
+    expect(source('components/studio/CloudBrowserWorkspace.tsx')).toContain(
+      'conversationId: conversationId || undefined',
+    );
   });
 
   it('commits only finalized browser speech results to the composer', () => {
@@ -233,8 +247,9 @@ describe('Admin Dashboard and Studio surface contract', () => {
     const layout = source('apps/admin/app/studio/layout.tsx');
 
     expect(navigation).toContain('usePathname');
+    expect(navigation).toContain('useSearchParams');
     expect(navigation).toContain("pathname === '/studio'");
-    expect(navigation).not.toContain('useSearchParams');
+    expect(navigation).toContain("searchParams.get('embedded') === 'studio'");
     expect(chrome).toContain('admin-studio-viewport h-full');
     expect(globalStyles).toContain('.admin-studio-viewport section');
     expect(globalStyles).toContain('padding: 0 !important');

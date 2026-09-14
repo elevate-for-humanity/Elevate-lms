@@ -1,17 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Bot, ChevronLeft, Sparkles } from 'lucide-react';
 
 export default function StudioNavigation() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const embeddedInConversation = searchParams.get('embedded') === 'studio';
 
   // The command workspace owns its full-screen header and horizontal tool
   // navigation. Mounting this section header above /studio frames the Studio
   // twice and removes usable height. Nested capability routes keep this
   // breadcrumb header because they do not render the command workspace.
-  if (pathname === '/studio') return null;
+  if (pathname === '/studio' || embeddedInConversation) return null;
 
   return (
     <div className="border-b border-slate-200 bg-white">
@@ -22,7 +24,9 @@ export default function StudioNavigation() {
               <Bot className="h-5 w-5" aria-hidden="true" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-black text-slate-950 sm:text-base">Admin AI Studio</p>
+              <p className="truncate text-sm font-black text-slate-950 sm:text-base">
+                Admin AI Studio
+              </p>
               <p className="hidden items-center gap-1 truncate text-xs font-medium text-slate-600 min-[390px]:flex">
                 <Sparkles className="h-3 w-3" aria-hidden="true" />
                 One orchestrator / all platform capabilities

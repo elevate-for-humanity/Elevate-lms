@@ -26,6 +26,10 @@ import {
 import { getAdminUrl } from '@/lib/config/admin-url';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 import {
+  studioUserFacingError,
+  studioUserFacingToolName,
+} from '@/lib/devstudio/user-facing-status';
+import {
   createBrowserSpeechRecognition,
   type BrowserSpeechRecognition,
 } from '@/lib/browser/speech-recognition';
@@ -217,14 +221,16 @@ function ConversationActivity({ conversationId }: { conversationId: string | nul
                 <p className="mt-2 text-xs text-amber-800">{task.approval_reason}</p>
               ) : null}
               {task.error_message ? (
-                <p className="mt-2 text-xs text-red-700">{task.error_message}</p>
+                <p className="mt-2 text-xs text-red-700">
+                  {studioUserFacingError(task.error_message)}
+                </p>
               ) : result ? (
                 <p className="mt-2 line-clamp-3 whitespace-pre-wrap text-xs text-slate-600">
                   {result.slice(0, 1200)}
                 </p>
               ) : null}
               <p className="mt-1 text-[10px] text-slate-400">
-                {task.tool_name || 'Studio tool'} · evidence {task.id}
+                {studioUserFacingToolName(task.tool_name)} · evidence {task.id}
               </p>
             </div>
           );
@@ -851,7 +857,7 @@ export default function UnifiedEllieChat({
         ...prev,
         {
           role: 'assistant',
-          content: `Request failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          content: `Request failed: ${studioUserFacingError(error)}`,
         },
       ]);
     } finally {

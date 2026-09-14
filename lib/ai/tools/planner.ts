@@ -126,6 +126,16 @@ export function planAIToolFromCommand(
   if (isOpenHandsStatusCommand(lower)) {
     return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
   }
+  // Read-only workflow inspection outranks generic engineering keywords.
+  // Negated phrases such as "do not modify" describe a safety boundary, not
+  // authorization to dispatch a mutation-capable coding provider.
+  if (
+    /\b(workflow|pipeline|job)\b/.test(lower) &&
+    /\b(inspect|check|status|progress|current step|failures?)\b/.test(lower) &&
+    /\b(read[- ]?only|do not (?:deploy|restart|cancel|modify|create))\b/.test(lower)
+  ) {
+    return { name: 'workflows.inspect', input: {} };
+  }
   // A compound repair request may require live-browser evidence, but the
   // browser runtime cannot edit, test, commit, or deploy repository changes.
   // Route explicit engineering execution to the coding runtime; that worker
@@ -143,15 +153,6 @@ export function planAIToolFromCommand(
       name: 'browser.execute',
       input: { ...asAIRecord(context.toolInput), task: command },
     };
-  }
-  // Read-only workflow inspection must never enter a mutation-capable coding
-  // runtime. Route it to the registered inspector before generic engineering.
-  if (
-    /\b(workflow|pipeline|job)\b/.test(lower) &&
-    /\b(inspect|check|status|progress|current step|failures?)\b/.test(lower) &&
-    /\b(read[- ]?only|do not (?:deploy|restart|cancel|modify|create))\b/.test(lower)
-  ) {
-    return { name: 'workflows.inspect', input: {} };
   }
   if (isEngineeringCommand(lower)) {
     return {

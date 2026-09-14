@@ -13,13 +13,6 @@ export default async function StudioPage({
 }) {
   await requireRole(['super_admin', 'admin']);
   const requestedWorkspace = (await searchParams).workspace;
-  const initialWorkspace =
-    requestedWorkspace === 'workflows' ||
-    requestedWorkspace === 'intelligence' ||
-    requestedWorkspace === 'tasks'
-      ? requestedWorkspace
-      : undefined;
-
   const workspaces = getAvailableWorkspaces().map(
     ({ id, label, description, route, healthEndpoint }) => ({
       id,
@@ -29,6 +22,9 @@ export default async function StudioPage({
       healthEndpoint,
     }),
   );
+  const initialWorkspace = workspaces.some(({ id }) => id === requestedWorkspace)
+    ? requestedWorkspace
+    : undefined;
 
   return (
     <main className="h-full w-full min-w-0 overflow-hidden bg-white text-gray-950">

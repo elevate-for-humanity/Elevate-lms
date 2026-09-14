@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Bot,
   Eye,
@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
 import RepositoryLivePreview from './RepositoryLivePreview';
-import type { StudioSpecialist } from '@/lib/devstudio/ellie-unified-handlers';
 import type { OrchestratedPlanCheckpoint } from '@/lib/devstudio/ellie-unified-handlers';
 
 const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
@@ -34,10 +33,29 @@ const TasksWorkspace = dynamic(() => import('@/apps/admin/app/studio/tasks/Tasks
 });
 
 type InspectionMode = 'preview' | 'browser';
-type EmbeddedCapability = 'workflows' | 'intelligence' | 'tasks';
+type NativeCapability = 'workflows' | 'intelligence' | 'tasks' | 'browser';
 
-function isEmbeddedCapability(id: string): id is EmbeddedCapability {
-  return id === 'workflows' || id === 'intelligence' || id === 'tasks';
+function isNativeCapability(id: string): id is NativeCapability {
+  return id === 'workflows' || id === 'intelligence' || id === 'tasks' || id === 'browser';
+}
+
+/**
+ * Every advanced Studio surface receives the identity of the conversation and
+ * task that opened it. The destination may use those values immediately or
+ * preserve them while the capability is progressively migrated to a native
+ * panel. They are UI context only; server routes still authorize every read
+ * and mutation independently.
+ */
+export function buildConversationWorkspaceUrl(
+  route: string,
+  conversationId: string | null,
+  taskId: string | null,
+) {
+  const url = new URL(route, 'https://admin.elevateforhumanity.org');
+  url.searchParams.set('embedded', 'studio');
+  if (conversationId) url.searchParams.set('studioConversationId', conversationId);
+  if (taskId) url.searchParams.set('studioTaskId', taskId);
+  return `${url.pathname}${url.search}${url.hash}`;
 }
 
 export default function StudioCommandWorkspace({
@@ -45,19 +63,16 @@ export default function StudioCommandWorkspace({
   initialWorkspace,
 }: {
   workspaces: Array<{ id: string; label: string; route: string }>;
-  initialWorkspace?: EmbeddedCapability;
+  initialWorkspace?: string;
 }) {
   const [conversationKey, setConversationKey] = useState(0);
-  const [selectedAgent, setSelectedAgent] = useState<StudioSpecialist>('LIZZY');
   const [mode, setMode] = useState<InspectionMode>('browser');
   const [previewUrl, setPreviewUrl] = useState('https://admin.elevateforhumanity.org/dashboard');
   // Mobile must open on the command composer. The browser remains one tap away
   // and receives the same active task context after submission.
   const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('chat');
   const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
-  const [activeCapability, setActiveCapability] = useState<EmbeddedCapability | null>(
-    initialWorkspace ?? null,
-  );
+  const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [workspaceVisible, setWorkspaceVisible] = useState(false);
@@ -76,8 +91,21 @@ export default function StudioCommandWorkspace({
     setWorkspaceVisible(false);
   };
 
+  const activeWorkspace = useMemo(
+    () => workspaces.find((workspace) => workspace.id === activeCapability) ?? null,
+    [activeCapability, workspaces],
+  );
+  const mountedWorkspaceUrl = useMemo(() => {
+    if (!activeWorkspace || isNativeCapability(activeWorkspace.id)) return null;
+    return buildConversationWorkspaceUrl(
+      activeWorkspace.route,
+      activeConversationId,
+      activeTask?.taskId ?? null,
+    );
+  }, [activeConversationId, activeTask?.taskId, activeWorkspace]);
+
   const openCapability = (id: string) => {
-    if (!isEmbeddedCapability(id)) return;
+    if (!workspaces.some((workspace) => workspace.id === id)) return;
     setActiveCapability(id);
     setMobileSurface('tool');
     setWorkspaceVisible(true);
@@ -100,6 +128,8 @@ export default function StudioCommandWorkspace({
             type="button"
             onClick={() => {
               setConversationKey((value) => value + 1);
+              setActiveConversationId(null);
+              setActiveTask(null);
               setMobileSurface('chat');
               setWorkspaceVisible(false);
             }}
@@ -107,25 +137,8 @@ export default function StudioCommandWorkspace({
           >
             <Plus className="h-4 w-4" aria-hidden="true" /> New task
           </button>
-          <div
-            className="hidden items-center gap-1 sm:flex"
-            role="group"
-            aria-label="Choose AI agent"
-          >
-            {(['ELLIE', 'LIZZY', 'PARIS'] as const).map((agent) => (
-              <button
-                key={agent}
-                type="button"
-                aria-pressed={selectedAgent === agent}
-                onClick={() => {
-                  setSelectedAgent(agent);
-                  setConversationKey((value) => value + 1);
-                }}
-                className={`rounded-lg px-3 py-2 text-xs font-black ${selectedAgent === agent ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-white/10'}`}
-              >
-                {agent[0] + agent.slice(1).toLowerCase()}
-              </button>
-            ))}
+          <div className="hidden rounded-lg bg-white px-3 py-2 text-xs font-black text-slate-950 sm:block">
+            LIZZY
           </div>
         </div>
         <nav
@@ -159,27 +172,17 @@ export default function StudioCommandWorkspace({
             )}
             {workspaceVisible ? 'Close tools' : 'Open tools'}
           </button>
-          {workspaces.map((workspace) =>
-            isEmbeddedCapability(workspace.id) ? (
-              <button
-                key={workspace.id}
-                type="button"
-                onClick={() => openCapability(workspace.id)}
-                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white"
-              >
-                {workspace.label}
-              </button>
-            ) : (
-              <button
-                key={workspace.id}
-                type="button"
-                onClick={() => openPreview(`${window.location.origin}${workspace.route}`)}
-                className="inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 hover:text-white"
-              >
-                {workspace.label}
-              </button>
-            ),
-          )}
+          {workspaces.map((workspace) => (
+            <button
+              key={workspace.id}
+              type="button"
+              onClick={() => openCapability(workspace.id)}
+              aria-pressed={workspaceVisible && activeCapability === workspace.id}
+              className={`inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold ${workspaceVisible && activeCapability === workspace.id ? 'bg-white text-brand-blue-800' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
+            >
+              {workspace.label}
+            </button>
+          ))}
         </nav>
       </header>
 
@@ -189,9 +192,7 @@ export default function StudioCommandWorkspace({
           aria-label="Elevate Studio conversation"
         >
           <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 sm:hidden">
-            <span className="text-xs font-bold text-slate-700">
-              Agent: {selectedAgent[0] + selectedAgent.slice(1).toLowerCase()}
-            </span>
+            <span className="text-xs font-bold text-slate-700">Assistant: LIZZY</span>
             <button
               type="button"
               onClick={() => {
@@ -205,7 +206,7 @@ export default function StudioCommandWorkspace({
           </div>
           <UnifiedEllieChat
             key={conversationKey}
-            preferredAgent={selectedAgent}
+            preferredAgent="LIZZY"
             embedded
             onOpenPreview={() => openPreview()}
             onPreviewTarget={openPreview}
@@ -223,13 +224,7 @@ export default function StudioCommandWorkspace({
         >
           <header className="flex min-h-12 shrink-0 items-center gap-2 border-b border-slate-800 bg-slate-900 px-3 text-white">
             <span className="mr-auto text-xs font-black">
-              {activeCapability === 'workflows'
-                ? 'Workflow Designer'
-                : activeCapability === 'intelligence'
-                  ? 'Intelligence'
-                  : activeCapability === 'tasks'
-                    ? 'Conversation activity'
-                    : 'Conversation tools'}
+              {activeWorkspace?.label ?? 'Conversation tools'}
             </span>
             <button
               type="button"
@@ -271,6 +266,25 @@ export default function StudioCommandWorkspace({
             </div>
             <div className={activeCapability === 'tasks' ? 'h-full' : 'hidden'}>
               <TasksWorkspace embedded conversationId={activeConversationId} />
+            </div>
+            <div className={activeCapability === 'browser' ? 'h-full' : 'hidden'}>
+              <CloudBrowserWorkspace
+                unifiedTask={activeTask}
+                conversationId={activeConversationId}
+              />
+            </div>
+            <div
+              className={activeCapability && mountedWorkspaceUrl ? 'h-full' : 'hidden'}
+              aria-hidden={!activeCapability || !mountedWorkspaceUrl}
+            >
+              {mountedWorkspaceUrl ? (
+                <RepositoryLivePreview
+                  filePath={null}
+                  content=""
+                  initialUrl={`${window.location.origin}${mountedWorkspaceUrl}`}
+                  trustedInteractive
+                />
+              ) : null}
             </div>
             <div
               className={!activeCapability && mode === 'preview' ? 'h-full' : 'hidden'}

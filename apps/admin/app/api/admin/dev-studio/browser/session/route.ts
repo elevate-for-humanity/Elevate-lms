@@ -89,7 +89,18 @@ export async function POST(req: NextRequest) {
         { status: response.status >= 400 && response.status < 600 ? response.status : 502 },
       );
     }
-    return NextResponse.json({ ...payload, publicUrl: config.publicUrl });
+    return NextResponse.json({
+      ...payload,
+      publicUrl: config.publicUrl,
+      // The browser service remains provider-neutral. Canonical Studio context
+      // is returned by Admin so the mounted panel can prove it did not detach
+      // from the conversation that created the session.
+      conversationId:
+        typeof body.conversationId === 'string' && body.conversationId.trim()
+          ? body.conversationId.trim()
+          : null,
+      taskId: typeof body.taskId === 'string' && body.taskId.trim() ? body.taskId.trim() : null,
+    });
   } catch (error) {
     logger.warn('[studio-browser] Session creation failed', {
       error: error instanceof Error ? error.message : String(error),

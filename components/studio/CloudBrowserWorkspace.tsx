@@ -19,6 +19,8 @@ type Session = {
   url: string;
   viewport: { width: number; height: number };
   expiresAt: string;
+  conversationId?: string | null;
+  taskId?: string | null;
 };
 type BrowserEvent = {
   type: string;
@@ -138,7 +140,13 @@ export default function CloudBrowserWorkspace({
     const response = await fetch('/api/admin/dev-studio/browser/session', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ url: target, width: 1440, height: 900 }),
+      body: JSON.stringify({
+        url: target,
+        width: 1440,
+        height: 900,
+        conversationId: conversationId || undefined,
+        taskId: unifiedTask?.taskId || undefined,
+      }),
     });
     const payload = await response.json();
     if (!response.ok) {
@@ -147,6 +155,12 @@ export default function CloudBrowserWorkspace({
       return;
     }
     setSession(payload);
+    if (conversationId && payload.conversationId && payload.conversationId !== conversationId) {
+      setSession(null);
+      setError('Browser session context did not match the active LIZZY conversation.');
+      setStatus('Unavailable');
+      return;
+    }
     setStatus('Connected');
   }
 

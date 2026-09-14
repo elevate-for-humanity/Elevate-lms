@@ -25,10 +25,10 @@ WAN_GIT_URL = os.getenv("WAN_GIT_URL", "https://github.com/Wan-Video/Wan2.2.git"
 WAN_GIT_REF = os.getenv("WAN_GIT_REF", "42bf4cfaa384bc21833865abc2f9e6c0e67233dc")
 WAN_MODEL_ID = os.getenv("WAN_MODEL_ID", "Wan-AI/Wan2.2-TI2V-5B")
 STATUS = Path(os.getenv("MODEL_BOOTSTRAP_STATUS_FILE", "/models/bootstrap-status.json"))
-EXTRA_RUNTIME_REQUIREMENTS = ("einops", "decord", "peft", "librosa")
+EXTRA_RUNTIME_REQUIREMENTS = ("einops", "decord", "peft", "librosa")\nFLASH_ATTN_REQUIREMENT = os.getenv("WAN_FLASH_ATTN_REQUIREMENT", "flash-attn==2.6.3")
 RUNTIME_SMOKE_MODULES = (
     "einops", "cv2", "diffusers", "transformers", "accelerate",
-    "imageio", "easydict", "ftfy", "decord", "peft", "librosa", "wan",
+    "imageio", "easydict", "ftfy", "decord", "peft", "librosa", "flash_attn", "wan",
 )
 
 

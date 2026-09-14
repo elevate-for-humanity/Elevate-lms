@@ -53,9 +53,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unsupported payout action.' }, { status: 400 });
     }
 
-    let account = await getProgramHolderPayoutAccount(ctx);
+    const account = await getProgramHolderPayoutAccount(ctx);
     if (!account.provider) {
-      account = await configureProgramHolderPayoutAccount(ctx);
+      await configureProgramHolderPayoutAccount(ctx);
     }
 
     const url = await payoutProviderUrl(body.action);

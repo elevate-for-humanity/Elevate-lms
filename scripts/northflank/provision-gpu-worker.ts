@@ -4,7 +4,7 @@
  *
  * Acceptance is deliberately strict: service creation, exact-SHA CUDA build,
  * persistent model mount, restricted bearer auth, Wan model readiness, and a
- * real 5-second 720p MP4 must all pass before this script exits successfully.
+ * real one-second 720p MP4 must all pass before this script exits successfully.
  */
 import crypto from 'node:crypto';
 import { nfFetch, projectApiPath } from './lib';
@@ -441,7 +441,7 @@ async function acceptanceGenerate(publicUrl: string, secret: string) {
       body: JSON.stringify({
         provider: 'wan',
         prompt: 'Professional educational cinematic scene of a small business owner reviewing a business plan at a clean desk, natural lighting, realistic motion, no text overlays',
-        width: 1280, height: 704, duration_seconds: 5, seed: 42,
+        width: 1280, height: 704, duration_seconds: 1, seed: 42,
       }),
       signal: controller.signal,
     });

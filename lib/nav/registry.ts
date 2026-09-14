@@ -81,16 +81,16 @@ export const NAV: NavItem[] = [
   {
     group: 'Programs',
     label: 'Tax & Entrepreneurship',
-    href: '/programs/tax-entrepreneurship',
+    href: '/programs/business',
     showInHeader: true,
   },
 
   // WIOA Programs
   { group: 'Programs', label: 'WIOA Programs', href: '/programs/wioa', showInHeader: false },
-  { group: 'Programs', label: 'WRG Programs', href: '/programs/wrg', showInHeader: false },
+  { group: 'Programs', label: 'WRG Programs', href: '/funding', showInHeader: false },
   { group: 'Programs', label: 'JRI Programs', href: '/partners/jri', showInHeader: true },
-  { group: 'Programs', label: 'NRF Programs', href: '/programs/nrf', showInHeader: false },
-  { group: 'Programs', label: 'CareerSafe', href: '/programs/careersafe', showInHeader: false },
+  { group: 'Programs', label: 'NRF Programs', href: '/programs', showInHeader: false },
+  { group: 'Programs', label: 'CareerSafe', href: '/programs', showInHeader: false },
 
   // Employers
   {

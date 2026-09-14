@@ -72,7 +72,7 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'Apprenticeships',
-        href: '/programs/apprenticeships',
+        href: '/apprenticeships',
         description: 'Earn while you learn programs',
       },
       {
@@ -582,7 +582,7 @@ export const footerNavigation = {
     links: [
       { label: 'NRF', href: '/courses/nrf' },
       { label: 'CNA Certification', href: '/programs/cna' },
-      { label: 'Micro Programs', href: '/programs/micro-programs' },
+      { label: 'Micro Programs', href: '/microclasses' },
       { label: 'Web Development', href: '/programs/web-development' },
     ],
   },

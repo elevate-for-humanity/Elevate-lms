@@ -18,14 +18,14 @@ const FEATURES = [
   {
     title: 'Verify Geofenced Attendance',
     body: 'Authenticated apprentice timeclock actions are checked against the assigned host-site GPS radius. Accepted clock-in and clock-out events retain location evidence; out-of-radius actions are blocked and recorded as compliance events.',
-    image: '/images/pages/for-employers-page-1.webp',
-    href: '/apprenticeships',
+    image: '/images/pages/apprenticeship-structure.webp',
+    href: 'https://app.elevateforhumanity.org/apprentice/timeclock',
   },
   {
     title: 'Manage Workforce Operations',
     body: 'Applications, participants, employers, funding workflows, compliance records, and administrative tools across one platform.',
     image: '/images/pages/workforce-training.webp',
-    href: '/platform',
+    href: '/platform/workforce-boards',
   },
 ] as const;
 

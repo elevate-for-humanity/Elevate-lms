@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 };
 
 const COMPLIANCE = [
-  { label: 'DOL Registered Apprenticeship Sponsor', href: '/programs/apprenticeships' },
+  { label: 'DOL Registered Apprenticeship Sponsor', href: '/apprenticeships' },
   { label: 'Program-Specific ETPL Listings', href: '/funding/how-it-works' },
   { label: 'Program and Participant Funding Eligibility Varies', href: '/funding/how-it-works#wioa' },
   { label: 'WorkOne Referral Coordination', href: '/apply' },

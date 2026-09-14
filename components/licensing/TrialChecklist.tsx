@@ -20,7 +20,7 @@ const TRIAL_STEPS: TrialStep[] = [
   { id: 'add_admin', phase: 1, label: 'Add an admin user', description: 'Invite at least one additional administrator', href: '/staff/invite', icon: Shield, forSchools: true, forOrgs: true },
   { id: 'add_user', phase: 1, label: 'Add a test user', description: 'Create a learner account to test the experience', href: '/staff/invite', icon: Users, forSchools: true, forOrgs: true },
   { id: 'verify_roles', phase: 1, label: 'Verify role separation', description: 'Confirm admin vs learner permissions work correctly', href: '/staff', icon: Shield, forSchools: true, forOrgs: true },
-  { id: 'create_program', phase: 2, label: 'Create a program', description: 'Set up your first training program with title and outcomes', href: '/programs/new', icon: BookOpen, forSchools: true, forOrgs: false },
+  { id: 'create_program', phase: 2, label: 'Create a program', description: 'Set up your first training program with title and outcomes', href: '/create-course', icon: BookOpen, forSchools: true, forOrgs: false },
   { id: 'add_course', phase: 2, label: 'Add a course', description: 'Create a course with lessons, video, text, or files', href: '/course-builder', icon: BookOpen, forSchools: true, forOrgs: false },
   { id: 'publish_course', phase: 2, label: 'Publish your course', description: 'Make your course available to learners', href: '/course-builder', icon: Sparkles, forSchools: true, forOrgs: false },
   { id: 'enroll_learner', phase: 2, label: 'Enroll a learner', description: 'Assign your test user to the course', href: '/enrollments', icon: GraduationCap, forSchools: true, forOrgs: false },

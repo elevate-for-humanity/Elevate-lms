@@ -150,7 +150,7 @@ export function ApprenticeshipSpotlight() {
               Apply for Barbering Apprenticeship
             </Button>
           </Link>
-          <Link href="/programs/barbering-apprenticeship">
+          <Link href="/programs/barber-apprenticeship">
             <Button variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white/10 font-semibold px-8 py-4">
               View Full Program Details
               <ArrowRight className="w-4 h-4 ml-2" />

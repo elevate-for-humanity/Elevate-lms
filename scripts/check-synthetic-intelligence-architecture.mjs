@@ -76,7 +76,7 @@ requireText('lib/devstudio/openhands/client.ts', '/api/v1/app-conversations', 'c
 requireText('lib/devstudio/openhands/client.ts', 'start-tasks?ids=', 'OpenHands startup polling');
 requireText('lib/devstudio/openhands/client.ts', 'execution_status', 'OpenHands execution polling');
 requireText('lib/devstudio/openhands/client.ts', '/send-message', 'OpenHands V1 conversation continuation');
-requireText('lib/devstudio/openhands/client.ts', "'X-Access-Token'", 'OpenHands V1 access-token authentication');
+requireText('lib/devstudio/openhands/client.ts', 'Authorization', 'OpenHands Cloud Bearer authentication');
 requireText('lib/devstudio/openhands/client.ts', 'llm_model', 'OpenHands configured model selection');
 requireText('lib/devstudio/openhands/client.ts', 'OPENHANDS_API_KEY', 'server-side OpenHands API key');
 requireText('lib/devstudio/openhands/client.ts', 'configured allowlist', 'OpenHands repository allowlist');

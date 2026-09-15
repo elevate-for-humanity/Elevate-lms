@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-type Provider = 'quickbooks';
+type Provider = 'paypal' | 'branch';
 
 type Status = {
   provider: Provider | null;
@@ -47,7 +47,7 @@ export function PayoutAccessPanel() {
     void load();
   }, []);
 
-  async function openQuickBooks(action: 'onboard' | 'dashboard') {
+  async function openPayoutProvider(action: 'onboard' | 'dashboard') {
     setBusy(true);
     setError('');
 
@@ -55,7 +55,7 @@ export function PayoutAccessPanel() {
       const response = await fetch('/api/program-holder/payouts', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action, provider: status.provider || 'branch' }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Unable to continue.');
@@ -79,18 +79,22 @@ export function PayoutAccessPanel() {
         Secure contractor payouts
       </p>
       <h2 className="mt-2 text-2xl font-black">
-        {ready ? 'Funds access is ready' : 'Finish QuickBooks payment setup'}
+        {ready ? 'Funds access is ready' : 'Finish secure payment setup'}
       </h2>
       <p className="mt-2 text-sm text-slate-600">
-        QuickBooks securely collects your bank-account or eligible debit-card details. Elevate
-        never receives or stores the full account number.
+        Your payment provider securely collects your banking details. Elevate never receives or
+        stores the full account or debit-card number. QuickBooks records completed payments but does
+        not hold your payout credentials.
       </p>
 
       <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
-        <p className="font-bold text-blue-950">QuickBooks</p>
+        <p className="font-bold text-blue-950">
+          {status.provider === 'paypal' ? 'PayPal' : 'Direct deposit (ACH)'}
+        </p>
         <p className="mt-1 text-sm text-blue-900">
-          Add your banking information to receive contractor payments. Instant transfer is shown
-          only when QuickBooks confirms eligibility.
+          {status.provider === 'paypal'
+            ? 'Connect PayPal only if you want payments delivered to PayPal.'
+            : 'Add banking information through the secure ACH provider to receive direct deposits. Availability and speed are confirmed by the provider.'}
         </p>
       </div>
 
@@ -106,10 +110,10 @@ export function PayoutAccessPanel() {
 
       <button
         disabled={busy}
-        onClick={() => openQuickBooks(ready ? 'dashboard' : 'onboard')}
+        onClick={() => openPayoutProvider(ready ? 'dashboard' : 'onboard')}
         className="mt-5 rounded-xl bg-blue-700 px-5 py-3 font-bold text-white disabled:opacity-50"
       >
-        {busy ? 'Checking…' : ready ? 'Open QuickBooks payments' : 'Add banking information'}
+        {busy ? 'Checking…' : ready ? 'Open payout settings' : 'Add banking information'}
       </button>
     </section>
   );

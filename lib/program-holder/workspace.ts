@@ -165,7 +165,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('program_holder_payouts')
       .select(
-        'stripe_account_id,external_account_last4,bank_name,account_type,payouts_enabled,charges_enabled,transfers_enabled,verification_status,quickbooks_sync_status,last_stripe_sync_at',
+        'payout_provider,provider_recipient_id,payouts_enabled,transfers_enabled,instant_payouts_enabled,verification_status,quickbooks_sync_status,last_provider_sync_at',
       )
       .eq('user_id', profile.id)
       .maybeSingle(),
@@ -202,7 +202,10 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       total_hours_completed: Number(row.hours_taught || 0),
       progress_percent:
         Number(row.hours_required || 0) > 0
-          ? Math.min(100, Math.round((Number(row.hours_taught || 0) / Number(row.hours_required)) * 100))
+          ? Math.min(
+              100,
+              Math.round((Number(row.hours_taught || 0) / Number(row.hours_required)) * 100),
+            )
           : 0,
       next_required_action:
         row.work_progress && row.work_progress !== 'Not started'

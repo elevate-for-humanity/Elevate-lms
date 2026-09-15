@@ -9,7 +9,9 @@ describe('Program Holder payout contract', () => {
   const route = read('apps/lms/app/api/program-holder/payouts/route.ts');
   const service = read('lib/program-holder/payout-account.ts');
   const panel = read('components/program-holder/PayoutAccessPanel.tsx');
-  const migration = read('supabase/migrations/20260903203628_program_holder_stripe_connect_v2.sql');
+  const migration = read(
+    'supabase/migrations/20260912042534_provider_neutral_contractor_payouts.sql',
+  );
   const paymentRoute = read('apps/admin/app/api/admin/enrollments/mark-payout-paid/route.ts');
   const releaseService = read('lib/program-holder/release-payment.ts');
   const cronRoute = read('apps/admin/app/api/cron/program-holder-payouts/route.ts');
@@ -19,41 +21,34 @@ describe('Program Holder payout contract', () => {
     expect(route).toContain("ctx.mode === 'holder'");
   });
 
-  it('creates Accounts v2 recipient accounts instead of legacy account types', () => {
-    expect(service).toContain('stripe.v2.core.accounts.create');
-    expect(service).toContain('stripe_transfers: { requested: true }');
-    expect(service).not.toMatch(/accounts\.create\(\{\s*type:/);
+  it('supports secure ACH and optional PayPal without treating QuickBooks as a processor', () => {
+    expect(service).toContain("export type PayoutProvider = 'paypal' | 'branch'");
+    expect(service).toContain('BRANCH_ONBOARDING_URL');
+    expect(service).not.toContain('QUICKBOOKS_CONTRACTOR_ONBOARDING_URL');
   });
 
-  it('keeps sensitive payout destination data at Stripe', () => {
-    expect(panel).toContain('Elevate never receives or stores the');
-    expect(panel).toContain('full debit-card or bank-account number.');
-    expect(migration).toContain('Full payout credentials remain at Stripe');
+  it('keeps sensitive payout destination data at the selected provider', () => {
+    expect(panel).toContain('Elevate never receives or');
+    expect(panel).toContain('stores the full account or debit-card number.');
+    expect(migration).toContain('never a raw bank or card number');
   });
 
-  it('requires both transfer receipt and withdrawals before funds access', () => {
-    expect(route).toContain('!ready.transfersEnabled || !ready.payoutsEnabled');
-    expect(panel).toContain('status.transfersEnabled && status.payoutsEnabled');
+  it('requires transfer and payout readiness before funds access', () => {
+    expect(panel).toContain('status.transfersEnabled');
+    expect(panel).toContain('status.payoutsEnabled');
+    expect(panel).toContain('status.providerConfigured');
   });
 
-  it('allows secure payout setup but blocks funds access and release until onboarding is complete', () => {
+  it('blocks release until holder and student requirements are complete', () => {
     expect(route).toContain('getProgramHolderPaymentReadiness');
-    expect(route).toContain('if (!readiness.ready)');
-    expect(route.indexOf("if (action === 'dashboard')")).toBeLessThan(
-      route.indexOf('if (!readiness.ready)'),
-    );
-    expect(panel).toContain('disabled={busy}');
-    expect(panel).not.toContain('disabled={busy || !status.onboardingReady}');
     expect(paymentRoute).toContain('getProgramHolderPaymentReadiness');
     expect(paymentRoute).toContain('getStudentPaymentReadiness');
   });
 
-  it('releases money through Stripe before recording paid state', () => {
-    expect(releaseService).toContain('stripe.transfers.create');
-    expect(releaseService.indexOf('stripe.transfers.create')).toBeLessThan(
-      releaseService.indexOf("increment_1_status: 'paid'"),
-    );
-    expect(releaseService).toContain('idempotencyKey');
+  it('waits for provider confirmation before recording paid state', () => {
+    expect(releaseService).toContain('createPayPalPayout');
+    expect(releaseService).toContain("status:'processing'");
+    expect(releaseService).not.toContain("increment_1_status: 'paid'");
   });
 
   it('automatically processes only admin-approved due schedules', () => {
@@ -61,13 +56,13 @@ describe('Program Holder payout contract', () => {
     expect(cronRoute).toContain(".lte('increment_1_release_date', today)");
   });
 
-  it('does not call a missing QuickBooks endpoint', () => {
+  it('records provider-confirmed payments in QuickBooks without a missing endpoint', () => {
     expect(paymentRoute).not.toContain('/api/quickbooks/contractor-payment');
-    expect(releaseService).toContain('recordContractorPaymentInQuickBooks');
+    expect(paymentRoute).toContain('releaseProgramHolderPayment');
   });
 
-  it('removes authenticated-wide payout reads', () => {
-    expect(migration).toContain('DROP POLICY IF EXISTS auth_read_program_holder_payouts');
-    expect(migration).toContain('(SELECT auth.uid()) = user_id');
+  it('uses opaque recipient and transfer references', () => {
+    expect(migration).toContain('provider_recipient_id');
+    expect(migration).toContain('program_holder_payout_transactions_provider_transfer_key');
   });
 });

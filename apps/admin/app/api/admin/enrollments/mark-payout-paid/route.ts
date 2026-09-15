@@ -59,9 +59,10 @@ export async function POST(request: NextRequest) {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const approvedReleaseDate = typeof release_date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(release_date)
-    ? release_date
-    : today;
+  const approvedReleaseDate =
+    typeof release_date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(release_date)
+      ? release_date
+      : today;
   const { data: schedule, error: scheduleError } = await db
     .from('payout_schedules')
     .update({
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
       field_name: 'payout_status',
       old_value: 'pending',
       new_value: 'approved',
-      note: `Stripe transfer approved for automatic release on ${approvedReleaseDate}.`,
+      note: `Provider payout approved for automatic release on ${approvedReleaseDate}.`,
     });
     return NextResponse.json({ scheduled: true, release_date: approvedReleaseDate });
   }
@@ -92,7 +93,10 @@ export async function POST(request: NextRequest) {
   const release = await releaseProgramHolderPayment(db, enrollment_id, auth.id);
   if (!release.released) {
     return NextResponse.json(
-      { error: release.error || 'Payment could not be released.', missing_requirements: release.missing || [] },
+      {
+        error: release.error || 'Payment could not be released.',
+        missing_requirements: release.missing || [],
+      },
       { status: 409 },
     );
   }
@@ -105,8 +109,8 @@ export async function POST(request: NextRequest) {
     old_value: 'pending',
     new_value: 'paid',
     note: release.quickBooksSynced
-      ? `Stripe transfer completed and recorded in QuickBooks (payment ID: ${release.quickBooksPaymentId})`
-      : 'Stripe transfer completed; QuickBooks recording is pending.',
+      ? `Provider payout completed and recorded in QuickBooks (payment ID: ${release.quickBooksPaymentId})`
+      : 'Provider payout released; QuickBooks recording is pending provider confirmation.',
   });
 
   const { data: auditLog } = await db

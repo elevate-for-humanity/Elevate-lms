@@ -63,7 +63,6 @@ export default async function PayoutQueuePage({
     data: { user },
   } = await supabase.auth.getUser();
 
-
   // Guard against null user
   if (!user) redirect('/login');
   const db = await requireAdminClient();
@@ -120,9 +119,14 @@ export default async function PayoutQueuePage({
   const payoutProfileMap = Object.fromEntries((payoutProfiles ?? []).map((p: any) => [p.id, p]));
 
   // Hydrate program_holders (program_holder_id → program_holders)
-  const holderIds = [...new Set((rawRows ?? []).map((r: any) => r.program_holder_id).filter(Boolean))];
+  const holderIds = [
+    ...new Set((rawRows ?? []).map((r: any) => r.program_holder_id).filter(Boolean)),
+  ];
   const { data: holderRows } = holderIds.length
-    ? await db.from('program_holders').select('id, name, contact_name, contact_email').in('id', holderIds)
+    ? await db
+        .from('program_holders')
+        .select('id, name, contact_name, contact_email')
+        .in('id', holderIds)
     : { data: [] };
   const holderMap = Object.fromEntries((holderRows ?? []).map((h: any) => [h.id, h]));
 
@@ -171,7 +175,8 @@ export default async function PayoutQueuePage({
         {!qbConnected && (
           <div className="mb-4 flex items-center justify-between gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-sm">
             <span className="text-amber-800">
-              <strong>QuickBooks not connected</strong> — Stripe transfers can run, but accounting records will remain pending.
+              <strong>QuickBooks not connected</strong> — provider payouts can run, but accounting
+              records will remain pending.
             </span>
             <Link
               href="/integrations/quickbooks"
@@ -184,7 +189,10 @@ export default async function PayoutQueuePage({
         {qbConnected && (
           <div className="mb-4 flex items-center gap-2 px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-700">
             <CheckCircle className="w-4 h-4" />
-            <span><strong>QuickBooks connected</strong> — Stripe-confirmed transfers will be recorded automatically.</span>
+            <span>
+              <strong>QuickBooks connected</strong> — provider-confirmed payouts will be recorded
+              automatically.
+            </span>
           </div>
         )}
 
@@ -356,8 +364,14 @@ export default async function PayoutQueuePage({
                               <ApprovePayButton
                                 enrollmentId={row.id}
                                 amount={row.payout_amount ?? 0}
-                                holderName={(Array.isArray(row.profiles) ? row.profiles[0] : row.profiles)?.full_name}
-                                holderEmail={(Array.isArray(row.profiles) ? row.profiles[0] : row.profiles)?.email}
+                                holderName={
+                                  (Array.isArray(row.profiles) ? row.profiles[0] : row.profiles)
+                                    ?.full_name
+                                }
+                                holderEmail={
+                                  (Array.isArray(row.profiles) ? row.profiles[0] : row.profiles)
+                                    ?.email
+                                }
                                 qbConnected={qbConnected}
                               />
                             ) : (

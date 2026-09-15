@@ -12,14 +12,23 @@ interface Props {
 }
 
 export default function ApprovePayButton({
-  enrollmentId, amount, holderName, holderEmail, qbConnected,
+  enrollmentId,
+  amount,
+  holderName,
+  holderEmail,
+  qbConnected,
 }: Props) {
   const [state, setState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const [qbPaymentId, setQbPaymentId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   async function handlePay() {
-    if (!confirm(`Approve and release ${holderName ?? 'this program holder'}${amount ? ` — $${amount.toLocaleString()}` : ''} through Stripe now?\n\n${qbConnected ? 'After Stripe confirms the transfer, it will be recorded in QuickBooks.' : 'QuickBooks is not connected, so the accounting record will remain pending.'}`)) return;
+    if (
+      !confirm(
+        `Approve and release ${holderName ?? 'this program holder'}${amount ? ` — $${amount.toLocaleString()}` : ''} through their verified payout method now?\n\n${qbConnected ? 'After the payout provider confirms delivery, it will be recorded in QuickBooks.' : 'QuickBooks is not connected, so the accounting record will remain pending.'}`,
+      )
+    )
+      return;
 
     setState('loading');
     setErrorMsg(null);
@@ -29,7 +38,7 @@ export default function ApprovePayButton({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          enrollment_id:       enrollmentId,
+          enrollment_id: enrollmentId,
         }),
       });
 
@@ -71,7 +80,9 @@ export default function ApprovePayButton({
     return (
       <div className="flex flex-col gap-1">
         <span className="text-xs text-red-600">{errorMsg}</span>
-        <button onClick={() => setState('idle')} className="text-xs text-slate-500 underline">Retry</button>
+        <button onClick={() => setState('idle')} className="text-xs text-slate-500 underline">
+          Retry
+        </button>
       </div>
     );
   }

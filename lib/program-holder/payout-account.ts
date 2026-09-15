@@ -9,7 +9,7 @@ type HolderContext = {
   db: any;
 };
 
-export type PayoutProvider = 'quickbooks';
+export type PayoutProvider = 'paypal' | 'branch';
 
 export type PayoutReadiness = {
   provider: PayoutProvider | null;
@@ -24,17 +24,15 @@ export type PayoutReadiness = {
 const masked = (value?: string | null) =>
   value ? value.replace(/^(.{2}).*(@.*|.{2})$/, '$1••••$2') : null;
 
-export async function payoutProviderConfigured() {
+export async function payoutProviderConfigured(provider: PayoutProvider) {
   await hydrateProcessEnv();
-  return Boolean(
-    process.env.QUICKBOOKS_CONTRACTOR_ONBOARDING_URL ||
-      process.env.QUICKBOOKS_CONTRACTOR_DASHBOARD_URL,
-  );
+  if (provider === 'paypal') {
+    return Boolean(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
+  }
+  return Boolean(process.env.BRANCH_ONBOARDING_URL);
 }
 
-export async function getProgramHolderPayoutAccount(
-  ctx: HolderContext,
-): Promise<PayoutReadiness> {
+export async function getProgramHolderPayoutAccount(ctx: HolderContext): Promise<PayoutReadiness> {
   const { data } = await ctx.db
     .from('program_holder_payouts')
     .select(
@@ -43,7 +41,10 @@ export async function getProgramHolderPayoutAccount(
     .eq('user_id', ctx.user.id)
     .maybeSingle();
 
-  const provider = data?.payout_provider === 'quickbooks' ? 'quickbooks' : null;
+  const provider =
+    data?.payout_provider === 'paypal' || data?.payout_provider === 'branch'
+      ? data.payout_provider
+      : null;
 
   return {
     provider,
@@ -51,12 +52,15 @@ export async function getProgramHolderPayoutAccount(
     destination: masked(data?.provider_recipient_id),
     transfersEnabled: Boolean(data?.transfers_enabled),
     payoutsEnabled: Boolean(data?.payouts_enabled),
-    providerConfigured: provider ? await payoutProviderConfigured() : false,
+    providerConfigured: provider ? await payoutProviderConfigured(provider) : false,
     verificationStatus: data?.verification_status || 'not_started',
   };
 }
 
-export async function configureProgramHolderPayoutAccount(ctx: HolderContext) {
+export async function configureProgramHolderPayoutAccount(
+  ctx: HolderContext,
+  provider: PayoutProvider = 'branch',
+) {
   const { data: existing } = await ctx.db
     .from('program_holder_payouts')
     .select('user_id')
@@ -64,37 +68,37 @@ export async function configureProgramHolderPayoutAccount(ctx: HolderContext) {
     .maybeSingle();
 
   if (!existing) {
-    throw new Error('QuickBooks recipient setup must be provisioned by Elevate first.');
+    throw new Error('A payout recipient must be provisioned by Elevate first.');
   }
 
   const { error } = await ctx.db
     .from('program_holder_payouts')
     .update({
-      payout_provider: 'quickbooks',
+      payout_provider: provider,
       transfers_enabled: false,
       payouts_enabled: false,
       charges_enabled: false,
       instant_payouts_enabled: false,
       verification_status: 'banking_required',
-      quickbooks_sync_status: 'recipient_setup_required',
+      quickbooks_sync_status: 'pending',
       updated_at: new Date().toISOString(),
     })
     .eq('user_id', ctx.user.id);
 
-  if (error) throw new Error('Unable to save the QuickBooks payout account.');
+  if (error) throw new Error('Unable to save the payout account.');
 
   await ctx.db
     .from('program_holders')
-    .update({ payout_status: 'quickbooks_banking_required' })
+    .update({ payout_status: `${provider}_setup_required` })
     .eq('id', ctx.holderId);
 
   return getProgramHolderPayoutAccount(ctx);
 }
 
-export async function payoutProviderUrl(action: 'onboard' | 'dashboard') {
+export async function payoutProviderUrl(provider: PayoutProvider, action: 'onboard' | 'dashboard') {
   await hydrateProcessEnv();
+  if (provider === 'paypal') return process.env.PAYPAL_PAYOUT_SETTINGS_URL || null;
   return action === 'dashboard'
-    ? process.env.QUICKBOOKS_CONTRACTOR_DASHBOARD_URL ||
-        process.env.QUICKBOOKS_CONTRACTOR_ONBOARDING_URL
-    : process.env.QUICKBOOKS_CONTRACTOR_ONBOARDING_URL;
+    ? process.env.BRANCH_DASHBOARD_URL || process.env.BRANCH_ONBOARDING_URL
+    : process.env.BRANCH_ONBOARDING_URL;
 }

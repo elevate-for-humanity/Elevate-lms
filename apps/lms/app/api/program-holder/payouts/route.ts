@@ -42,11 +42,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Program Holder session required.' }, { status: 403 });
   }
 
-  const body = (await request.json().catch(() => ({}))) as { action?: string };
+  const body = (await request.json().catch(() => ({}))) as {
+    action?: string;
+    provider?: 'paypal' | 'branch';
+  };
 
   try {
     if (body.action === 'configure') {
-      return NextResponse.json(await configureProgramHolderPayoutAccount(ctx));
+      return NextResponse.json(
+        await configureProgramHolderPayoutAccount(ctx, body.provider || 'branch'),
+      );
     }
 
     if (body.action !== 'onboard' && body.action !== 'dashboard') {
@@ -54,16 +59,17 @@ export async function POST(request: NextRequest) {
     }
 
     const account = await getProgramHolderPayoutAccount(ctx);
-    if (!account.provider) {
-      await configureProgramHolderPayoutAccount(ctx);
-    }
+    const provider = account.provider || body.provider || 'branch';
+    if (!account.provider) await configureProgramHolderPayoutAccount(ctx, provider);
 
-    const url = await payoutProviderUrl(body.action);
+    const url = await payoutProviderUrl(provider, body.action);
     if (!url) {
       return NextResponse.json(
         {
           error:
-            'Your QuickBooks banking invitation is being prepared. Elevate will send the secure setup link.',
+            provider === 'branch'
+              ? 'Your secure ACH banking invitation is being prepared. Elevate will send the setup link.'
+              : 'PayPal payout setup is not available yet.',
         },
         { status: 503 },
       );
@@ -72,7 +78,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url });
   } catch (cause) {
     return NextResponse.json(
-      { error: cause instanceof Error ? cause.message : 'Unable to configure QuickBooks payouts.' },
+      { error: cause instanceof Error ? cause.message : 'Unable to configure payouts.' },
       { status: 500 },
     );
   }

@@ -94,6 +94,19 @@ describe('durable orchestration planning', () => {
     expect(plan.steps[2]?.depends_on).toEqual(['s2']);
     expect(plan.steps[3]?.depends_on).toEqual(['s3']);
   });
+
+  it('does not turn a read-only request with a deployment prohibition into a deployment plan', () => {
+    const goal =
+      'Inspect provider health. Read only. Do not deploy, create snapshots, or modify production.';
+    const plan = decomposePlan(goal);
+
+    expect(plan.steps).toHaveLength(1);
+    expect(plan.steps[0]).toMatchObject({
+      title: 'Execute requested outcome',
+      command: goal,
+    });
+    expect(plan.steps.some((step) => step.title === 'Create snapshot')).toBe(false);
+  });
 });
 
 describe('selectStudioAgent', () => {

@@ -28,22 +28,20 @@ export async function GET(request: NextRequest) {
   // Hydrate — this is what the devstudio and ai-assistant routes do
   await hydrateProcessEnv();
 
-  const groq   = process.env.GROQ_API_KEY;
+  const groq = process.env.GROQ_API_KEY;
   const gemini = process.env.GEMINI_API_KEY;
   const openai = process.env.OPENAI_API_KEY;
+  const openhands = process.env.OPENHANDS_API_KEY;
 
-  const activeProvider =
-    groq   ? 'groq'   :
-    gemini ? 'gemini' :
-    openai ? 'openai' :
-    null;
+  const activeProvider = groq ? 'groq' : gemini ? 'gemini' : openai ? 'openai' : null;
 
   return NextResponse.json({
     activeProvider,
     keys: {
-      GROQ_API_KEY:   { set: Boolean(groq),   masked: maskKey(groq) },
+      GROQ_API_KEY: { set: Boolean(groq), masked: maskKey(groq) },
       GEMINI_API_KEY: { set: Boolean(gemini), masked: maskKey(gemini) },
       OPENAI_API_KEY: { set: Boolean(openai), masked: maskKey(openai) },
+      OPENHANDS_API_KEY: { set: Boolean(openhands), masked: maskKey(openhands) },
     },
     note: 'Values are loaded from platform_secrets → app_secrets → process.env (in that order)',
   });

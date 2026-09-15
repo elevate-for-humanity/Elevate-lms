@@ -355,12 +355,14 @@ export const GOAL_TEMPLATES: Record<string, (params: Record<string, string>) => 
 
 export function decomposePlan(goal: string, params: Record<string, string> = {}): Plan {
   const g = goal.toLowerCase();
+  const affirmativeDeployment =
+    /\bdeploy(?:ment|ing|ed)?\b/.test(g) &&
+    !/\b(?:do not|don't|dont|never|without)\s+(?:\w+\s+){0,3}deploy(?:ment|ing|ed)?\b/.test(g);
   let steps: PlanStep[];
   const compoundEngineeringExecution =
     /\b(code|codebase|repo|repository|commit|source|files? changed|regression tests?|typecheck|build)\b/.test(
       g,
-    ) &&
-    /\b(fix|repair|correct|implement|modify|change|update|edit|refactor|add|remove)\b/.test(g);
+    ) && /\b(fix|repair|correct|implement|modify|change|update|edit|refactor|add|remove)\b/.test(g);
 
   if (g.includes('quickbooks')) {
     steps = /\b(fix|repair|connect|reconnect|configure)\b/.test(g)
@@ -383,7 +385,7 @@ export function decomposePlan(goal: string, params: Record<string, string> = {})
       verification_rule: stage.verificationRule,
       max_attempts: stage.maxAttempts,
     }));
-  } else if (/\bdeploy\b/.test(g)) {
+  } else if (affirmativeDeployment) {
     steps = GOAL_TEMPLATES.pre_deployment_check!({ goal });
   } else if (/\b(?:platform|system)\b.*\bhealth\b|\bhealth check\b/.test(g)) {
     steps = GOAL_TEMPLATES.platform_health_check!({});

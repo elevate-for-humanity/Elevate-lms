@@ -26,11 +26,31 @@ function maskValue(value: string) {
 }
 
 function inferCategory(key: string): string {
-  if (/^(GROQ|OPENAI|ANTHROPIC|GEMINI|AZURE_OPENAI|ELEVENLABS|HEYGEN|DID_|STABILITY|RUNWAY|SUNO)/.test(key)) return 'ai';
-  if (/^(NORTHFLANK|CLOUDFLARE|R2_|REDIS|UPSTASH|SUPABASE|DATABASE|POSTGRES|VAPID|SSN_|SESSION|NEXTAUTH|CRON|AUDIT|INTERNAL|STUDIO_SHELL)/.test(key)) return 'infra';
+  if (
+    /^(GROQ|OPENAI|OPENHANDS|ANTHROPIC|GEMINI|AZURE_OPENAI|ELEVENLABS|HEYGEN|DID_|STABILITY|RUNWAY|SUNO)/.test(
+      key,
+    )
+  )
+    return 'ai';
+  if (
+    /^(NORTHFLANK|CLOUDFLARE|R2_|REDIS|UPSTASH|SUPABASE|DATABASE|POSTGRES|VAPID|SSN_|SESSION|NEXTAUTH|CRON|AUDIT|INTERNAL|STUDIO_SHELL)/.test(
+      key,
+    )
+  )
+    return 'infra';
   if (/^(STRIPE|AFFIRM|SEZZLE|QB_)/.test(key)) return 'payments';
-  if (/^(SMTP|SENDGRID|RESEND|EMAIL|MAIL|REPLY_TO|ALERT_EMAIL|ADMIN_ALERT|SPONSOR_FINANCE|MOU_ARCHIVE|NOTIFY|LEAD_NOTIFICATION|LICENSE_NOTIFICATION|SECURITY_EMAIL)/.test(key)) return 'email';
-  if (/^(GITHUB|GOOGLE|LINKEDIN|FACEBOOK|TWITTER|INSTAGRAM|YOUTUBE|SLACK|TWILIO|HUBSPOT|SALESFORCE|ZAPIER|CALENDLY|JOTFORM|SENTRY|DURABLE|WORKOS|ZOOM|TEAMS)/.test(key)) return 'integrations';
+  if (
+    /^(SMTP|SENDGRID|RESEND|EMAIL|MAIL|REPLY_TO|ALERT_EMAIL|ADMIN_ALERT|SPONSOR_FINANCE|MOU_ARCHIVE|NOTIFY|LEAD_NOTIFICATION|LICENSE_NOTIFICATION|SECURITY_EMAIL)/.test(
+      key,
+    )
+  )
+    return 'email';
+  if (
+    /^(GITHUB|GOOGLE|LINKEDIN|FACEBOOK|TWITTER|INSTAGRAM|YOUTUBE|SLACK|TWILIO|HUBSPOT|SALESFORCE|ZAPIER|CALENDLY|JOTFORM|SENTRY|DURABLE|WORKOS|ZOOM|TEAMS)/.test(
+      key,
+    )
+  )
+    return 'integrations';
   return 'general';
 }
 
@@ -75,19 +95,24 @@ export async function POST(req: NextRequest) {
   if (auth.error) return auth.error;
 
   const body = await req.json().catch(() => null);
-  const entries = body?.entries as Array<{
-    key: string;
-    value: string;
-    scope?: string;
-    description?: string;
-  }> | undefined;
+  const entries = body?.entries as
+    | Array<{
+        key: string;
+        value: string;
+        scope?: string;
+        description?: string;
+      }>
+    | undefined;
 
-  if (!Array.isArray(entries) || entries.length === 0) return safeError('entries array is required', 400);
+  if (!Array.isArray(entries) || entries.length === 0)
+    return safeError('entries array is required', 400);
   if (entries.length > 50) return safeError('Maximum 50 entries per request', 400);
 
   try {
     const rows = entries.map((entry) => {
-      const key = String(entry.key ?? '').trim().toUpperCase();
+      const key = String(entry.key ?? '')
+        .trim()
+        .toUpperCase();
       if (!isValidKey(key)) throw new Error(`Invalid key format: ${key || 'empty'}`);
       if (typeof entry.value !== 'string' || entry.value.length === 0) {
         throw new Error(`Missing value for key: ${key}`);
@@ -139,7 +164,13 @@ export async function DELETE(req: NextRequest) {
   if (!isValidKey(key)) return safeError('Valid key query param is required', 400);
   const confirmation = requireTypedConfirmation(req.headers.get('x-confirmation'), 'delete_secret');
   if (!confirmation.ok) {
-    return NextResponse.json({ error: 'Deleting a canonical secret requires typed confirmation.', requiredConfirmation: confirmation.required }, { status: 409 });
+    return NextResponse.json(
+      {
+        error: 'Deleting a canonical secret requires typed confirmation.',
+        requiredConfirmation: confirmation.required,
+      },
+      { status: 409 },
+    );
   }
 
   try {

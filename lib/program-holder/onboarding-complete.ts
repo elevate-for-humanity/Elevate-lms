@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { sendEmail } from '@/lib/email/sendgrid';
 import { getProgramHolderPaymentReadiness } from './onboarding-readiness';
 
 /**
@@ -60,7 +61,11 @@ export async function checkAndSendOnboardingCompleteEmail(
   const firstName = profile.full_name?.split(' ')[0] || 'Program Holder';
   const organizationName = holder.organization_name || 'your organization';
 
-  await sendWelcomeEmail({ email: profile.email, firstName, organizationName });
+  const delivery = await sendWelcomeEmail({ email: profile.email, firstName, organizationName });
+  if (!delivery.success) {
+    logger.error('[onboarding-complete] Welcome email was not accepted', new Error(delivery.error || 'Unknown email error'));
+    return { sent: false, reason: delivery.error || 'email_not_accepted' };
+  }
 
   const { data: existingNotice } = await admin
     .from('staff_notifications')
@@ -98,12 +103,6 @@ async function sendWelcomeEmail(opts: {
   firstName: string;
   organizationName: string;
 }) {
-  const sgKey = process.env.SENDGRID_API_KEY;
-  if (!sgKey) {
-    logger.warn('[onboarding-complete] SENDGRID_API_KEY not set — skipping welcome email');
-    return;
-  }
-
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   const logoUrl = `${siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`;
   const dashboardUrl = `${siteUrl}/program-holder/dashboard`;
@@ -162,20 +161,11 @@ async function sendWelcomeEmail(opts: {
   </table>
 </body></html>`;
 
-  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${sgKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: { email: PLATFORM_DEFAULTS.emailFromAddress, name: PLATFORM_DEFAULTS.orgName },
-      reply_to: { email: 'elevate4humanityedu@gmail.com', name: PLATFORM_DEFAULTS.orgName },
-      personalizations: [{ to: [{ email: opts.email, name: opts.firstName }] }],
-      subject: 'Welcome — Your Program Holder Portal is Ready',
-      content: [{ type: 'text/html', value: html }],
-    }),
+  return sendEmail({
+    to: opts.email,
+    from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
+    replyTo: 'elevate4humanityedu@gmail.com',
+    subject: 'Welcome — Your Program Holder Portal is Ready',
+    html,
   });
-
-  if (!res.ok) {
-    const body = await res.text();
-    logger.error('[onboarding-complete] Welcome email failed', new Error(body));
-  }
 }

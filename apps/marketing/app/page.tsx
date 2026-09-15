@@ -91,27 +91,15 @@ export default function HomePage() {
       <main>
         <PlatformHubHero />
         <div data-narration-disabled="true"><HomePlatformOverview /></div>
-        <div
-          data-scroll-narration
-          data-narration="You do not have to have your whole career figured out today. Start by exploring the field that fits your interests, schedule, and goals."
-          data-narration-src="/audio/narration/career-pathways.mp3"
-        >
+        <div data-narration-disabled="true">
           <HomeCareerPathways />
         </div>
-        <div
-          data-scroll-narration
-          data-narration="Cost should be clear before you enroll. We help you review possible funding and payment paths, then verify what you qualify for."
-          data-narration-src="/audio/narration/funding.mp3"
-        >
+        <div data-narration-disabled="true">
           <HomeFunding />
         </div>
         <div data-narration-disabled="true"><HomeEmployerStrip /></div>
         <div data-narration-disabled="true"><HomeFeaturedHostShop /></div>
-        <div
-          data-scroll-narration
-          data-narration="When you are ready, choose the next step that fits you: explore a program, apply for training, or connect with our team."
-          data-narration-src="/audio/narration/final.mp3"
-        >
+        <div data-narration-disabled="true">
           <HomeFinalCTA />
         </div>
         {/* Keep verification and credential relationships after the conversion journey. */}

@@ -27,7 +27,7 @@ describe('canonical media storyboard compatibility', () => {
         scene.environment.includes('Cinematic small-business owner'),
       ),
     ).toBe(true);
-    expect(storyboard.scenes.every((scene) => scene.durationSeconds === 15)).toBe(true);
+    expect(storyboard.scenes.every((scene) => scene.durationSeconds === 90)).toBe(true);
   });
 
   it('keeps explicit structured scenes authoritative', () => {

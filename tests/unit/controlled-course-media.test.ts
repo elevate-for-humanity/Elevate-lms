@@ -22,6 +22,7 @@ describe('controlled course media architecture', () => {
       id: `scene-${index + 1}`,
       narration: `Narration for controlled scene ${index + 1}.`,
       action: `Show evidence ${index + 1}`,
+      duration_seconds: 30,
       required_visual_evidence: `Visible evidence ${index + 1}`,
       scene_type: index === 7 ? 'knowledge_check' : index === 0 ? 'problem_hook' : 'worked_example',
       media_source: index < 5 ? 'pexels' : 'elevate-motion',

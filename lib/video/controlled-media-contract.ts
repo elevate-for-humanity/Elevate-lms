@@ -24,6 +24,9 @@ export function reviewControlledStoryboard(storyboard: MediaStoryboard): Control
   )
     issues.push(`Video must contain ${MIN_LESSON_VIDEO_SCENES}-${MAX_LESSON_VIDEO_SCENES} scenes.`);
   if (!storyboard.objective.trim()) issues.push('Objective is required.');
+  const totalDuration = storyboard.scenes.reduce((sum, scene) => sum + scene.durationSeconds, 0);
+  if (totalDuration < 180 || totalDuration > 420)
+    issues.push('Controlled lesson video must run between 3 and 7 minutes.');
   if (!storyboard.scenes.some((scene) => scene.sceneType === 'knowledge_check'))
     issues.push('A knowledge-check scene is required.');
   const maxStock = Math.ceil(storyboard.scenes.length * 0.6);

@@ -334,7 +334,7 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
     raw.duration_seconds ?? raw.target_duration_seconds,
     input.defaultDurationSeconds ?? 5,
     1,
-    15,
+    90,
   );
 
   const sourceScenes: Record<string, unknown>[] = rawScenes.length
@@ -402,7 +402,7 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
       return {
         id,
         order: index + 1,
-        durationSeconds: numberValue(scene.duration_seconds, defaultDuration, 1, 15),
+        durationSeconds: numberValue(scene.duration_seconds, defaultDuration, 1, 90),
         operation: operationValue(
           scene.operation,
           Boolean(referenceImageUrl),

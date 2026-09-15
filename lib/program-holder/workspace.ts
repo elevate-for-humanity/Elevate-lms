@@ -178,7 +178,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .order('created_at', { ascending: false }),
     db
       .from('notification_preferences')
-      .select('email_course_updates,sms_urgent,sms_phone')
+      .select('email_course_updates,sms_urgent,sms_phone,email_delivery_updates,sms_delivery_updates,paris_orientation_completed_at')
       .eq('user_id', profile.id)
       .maybeSingle(),
   ]);

@@ -69,7 +69,7 @@ export default async function HostShopsPage() {
   const networkShops = await getHostShopNetwork();
 
   return (
-    <main className="min-h-screen bg-white text-slate-950">
+    <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">
       <HostShopShowcase
         shops={HOST_SHOP_HERO_SHOPS}
         asHero

@@ -214,6 +214,21 @@ export async function ProgramHolderWorkspaceView({
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      <section className="rounded-2xl border border-violet-200 bg-violet-50 p-5 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-700">New here?</p>
+            <h2 className="mt-1 text-xl font-black text-slate-950">Start with Elizabeth and Paris</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Review Elizabeth Greene&apos;s expectations, take the Paris dashboard walkthrough,
+              and learn what is required for payment.
+            </p>
+          </div>
+          <Link href="/program-holder/how-to-use" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-black text-white">
+            Start orientation
+          </Link>
+        </div>
+      </section>
       {!data.holder?.mou_signed ? (
         <section
           role="alert"

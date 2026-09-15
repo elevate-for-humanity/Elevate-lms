@@ -88,7 +88,7 @@ export default function HomePage() {
   return (
     <>
       <StructuredData />
-      <main>
+      <main className="[&_a]:no-underline [&_a:hover]:no-underline">
         <PlatformHubHero />
         <div data-narration-disabled="true"><HomePlatformOverview /></div>
         <div data-narration-disabled="true">

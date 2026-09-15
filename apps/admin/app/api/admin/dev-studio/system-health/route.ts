@@ -12,10 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import {
-  getDecryptedPlatformSecret,
-  hydrateNorthflankEnv,
-} from '@/lib/secrets';
+import { getDecryptedPlatformSecret, hydrateNorthflankEnv } from '@/lib/secrets';
 import { isGroqConfigured } from '@/lib/groq-client';
 import { isGeminiConfigured } from '@/lib/gemini-client';
 
@@ -37,19 +34,29 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
 
-  const mode        = (process.env.DEVSTUDIO_DEVCONTAINER_MODE ?? 'auto').toLowerCase();
-  const hasGitHub   = Boolean(process.env.GITHUB_TOKEN);
-  const hasOpenAI   = Boolean(process.env.OPENAI_API_KEY);
+  const mode = (process.env.DEVSTUDIO_DEVCONTAINER_MODE ?? 'auto').toLowerCase();
+  const hasGitHub = Boolean(process.env.GITHUB_TOKEN);
+  const hasOpenAI = Boolean(process.env.OPENAI_API_KEY);
   const hasAnthropic = Boolean(process.env.ANTHROPIC_API_KEY);
-  const keys = ['GROQ_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GITHUB_TOKEN'] as const;
+  const keys = [
+    'GROQ_API_KEY',
+    'GEMINI_API_KEY',
+    'OPENAI_API_KEY',
+    'OPENHANDS_API_KEY',
+    'ANTHROPIC_API_KEY',
+    'GITHUB_TOKEN',
+  ] as const;
   const selectedSecrets = Object.fromEntries(
-    await Promise.all(keys.map(async (key) => [key, await getDecryptedPlatformSecret(key).catch(() => undefined)])),
+    await Promise.all(
+      keys.map(async (key) => [key, await getDecryptedPlatformSecret(key).catch(() => undefined)]),
+    ),
   ) as Record<(typeof keys)[number], string | undefined>;
   await hydrateNorthflankEnv().catch(() => undefined);
 
   const hasGroq = isGroqConfigured() || Boolean(selectedSecrets.GROQ_API_KEY);
   const hasGemini = isGeminiConfigured() || Boolean(selectedSecrets.GEMINI_API_KEY);
   const dbOpenAI = Boolean(selectedSecrets.OPENAI_API_KEY);
+  const hasOpenHands = Boolean(selectedSecrets.OPENHANDS_API_KEY || process.env.OPENHANDS_API_KEY);
   const dbAnthropic = Boolean(selectedSecrets.ANTHROPIC_API_KEY);
   const dbGitHub = Boolean(selectedSecrets.GITHUB_TOKEN);
 
@@ -60,13 +67,29 @@ export async function GET(request: NextRequest) {
 
   // ── Devcontainer mode ──────────────────────────────────────────────────────
   if (mode === 'github-only' && !githubOk) {
-    checks.push({ name: 'Devcontainer', status: 'fail', detail: 'github-only mode but GITHUB_TOKEN is missing' });
+    checks.push({
+      name: 'Devcontainer',
+      status: 'fail',
+      detail: 'github-only mode but GITHUB_TOKEN is missing',
+    });
   } else if (mode === 'github-only') {
-    checks.push({ name: 'Devcontainer', status: 'ok', detail: 'mode: github-only — GitHub writes enabled' });
+    checks.push({
+      name: 'Devcontainer',
+      status: 'ok',
+      detail: 'mode: github-only — GitHub writes enabled',
+    });
   } else if (mode === 'local-only') {
-    checks.push({ name: 'Devcontainer', status: 'warn', detail: 'mode: local-only — changes not committed to GitHub' });
+    checks.push({
+      name: 'Devcontainer',
+      status: 'warn',
+      detail: 'mode: local-only — changes not committed to GitHub',
+    });
   } else {
-    checks.push({ name: 'Devcontainer', status: 'ok', detail: `mode: auto — ${githubOk ? 'GitHub writes enabled' : 'local fallback (no GITHUB_TOKEN)'}` });
+    checks.push({
+      name: 'Devcontainer',
+      status: 'ok',
+      detail: `mode: auto — ${githubOk ? 'GitHub writes enabled' : 'local fallback (no GITHUB_TOKEN)'}`,
+    });
   }
 
   // ── GitHub token ───────────────────────────────────────────────────────────
@@ -80,11 +103,13 @@ export async function GET(request: NextRequest) {
 
   // ── AI providers ───────────────────────────────────────────────────────────
   const aiProviders = [
-    hasGroq                        && 'Groq',
-    hasGemini                      && 'Gemini',
-    (hasOpenAI    || dbOpenAI)     && 'OpenAI',
-    (hasAnthropic || dbAnthropic)  && 'Anthropic',
-  ].filter(Boolean).join(', ');
+    hasGroq && 'Groq',
+    hasGemini && 'Gemini',
+    (hasOpenAI || dbOpenAI) && 'OpenAI',
+    (hasAnthropic || dbAnthropic) && 'Anthropic',
+  ]
+    .filter(Boolean)
+    .join(', ');
 
   checks.push({
     name: 'AI Providers',
@@ -94,8 +119,18 @@ export async function GET(request: NextRequest) {
       : 'no AI provider keys configured — chat and code AI will not work',
   });
 
+  checks.push({
+    name: 'OpenHands Engineering',
+    status: hasOpenHands ? 'ok' : 'warn',
+    detail: hasOpenHands
+      ? 'authorized credential configured — governed engineering execution available'
+      : 'authorization missing — governed engineering execution unavailable',
+  });
+
   // ── Upload storage ─────────────────────────────────────────────────────────
-  const hasR2 = Boolean(process.env.R2_ENDPOINT && process.env.R2_ACCESS_KEY && process.env.R2_BUCKET);
+  const hasR2 = Boolean(
+    process.env.R2_ENDPOINT && process.env.R2_ACCESS_KEY && process.env.R2_BUCKET,
+  );
   checks.push({
     name: 'Upload Storage',
     status: 'ok',
@@ -103,7 +138,9 @@ export async function GET(request: NextRequest) {
   });
 
   // ── Deploy identity ────────────────────────────────────────────────────────
-  const hasNorthflank = Boolean(process.env.NORTHFLANK_API_TOKEN && process.env.NORTHFLANK_PROJECT_ID);
+  const hasNorthflank = Boolean(
+    process.env.NORTHFLANK_API_TOKEN && process.env.NORTHFLANK_PROJECT_ID,
+  );
   const deployReady = hasNorthflank || githubOk;
 
   checks.push({
@@ -118,7 +155,7 @@ export async function GET(request: NextRequest) {
 
   const failCount = checks.filter((c) => c.status === 'fail').length;
   const warnCount = checks.filter((c) => c.status === 'warn').length;
-  const okCount   = checks.filter((c) => c.status === 'ok').length;
+  const okCount = checks.filter((c) => c.status === 'ok').length;
 
   return NextResponse.json({
     ok: failCount === 0,

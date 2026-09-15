@@ -123,6 +123,14 @@ export function planAIToolFromCommand(
   const id = contextId ?? extractUuid(command);
 
   // Route the primary requested capability before incidental domain words in long prompts.
+  if (
+    /\b(?:provider|credential|integration)\s+(?:health|status|availability|configuration)\b/.test(
+      lower,
+    ) ||
+    /\b(?:health|status)\b.*\b(?:provider|credential|integration)s?\b/.test(lower)
+  ) {
+    return { name: 'devstudio.health', input: {} };
+  }
   if (isOpenHandsStatusCommand(lower)) {
     return { name: 'openhands.status', input: asAIRecord(context.toolInput) };
   }

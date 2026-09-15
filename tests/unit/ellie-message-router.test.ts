@@ -68,6 +68,14 @@ describe('durable orchestration planning', () => {
     });
   });
 
+  it('routes provider credential health to read-only Studio health', () => {
+    expect(
+      planAIToolFromCommand(
+        'Inspect current provider health. Report whether the existing OpenHands engineering credential is configured. Read only.',
+      ),
+    ).toEqual({ name: 'devstudio.health', input: {} });
+  });
+
   it('preserves the requested operational outcome in the durable plan', () => {
     const audit = decomposePlan('Audit the live admin dashboard');
     expect(audit.steps[0]?.command).toBe('Audit the live admin dashboard');

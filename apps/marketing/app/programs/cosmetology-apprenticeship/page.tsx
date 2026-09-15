@@ -14,7 +14,24 @@ export default async function CosmetologyApprenticeshipPage() {
   const loaded = await loadProgramForPage('cosmetology-apprenticeship');
   const program = loaded?.program ?? getStaticProgram('cosmetology-apprenticeship');
   if (!program) return notFound();
-  const banner = heroBanners['cosmetology-apprenticeship'] ?? null;
+  const baseBanner = heroBanners['cosmetology-apprenticeship'] ?? null;
+  const banner = baseBanner
+    ? {
+        ...baseBanner,
+        voiceoverSrc: undefined,
+        belowHeroHeadline: 'Build your cosmetology career through supervised salon training.',
+        belowHeroSubheadline:
+          'Learn in a licensed Host Salon, complete required instruction, document your hours and skills, and prepare for the applicable Indiana licensing process.',
+        trustIndicators: [
+          'Supervised salon training',
+          'Related Technical Instruction',
+          'Hours and competency tracking',
+          'Licensing preparation',
+        ],
+        transcript:
+          'Cosmetology Apprenticeship — Program Page Guide. Start by applying to Elevate and reviewing the program requirements. Elevate confirms enrollment, instruction, records, and the available payment or funding path. An approved Host Salon employs and supervises the apprentice during hands-on training. The apprentice completes Related Technical Instruction, records attendance and hours, demonstrates required competencies, and follows the applicable Indiana testing and licensing process. Self-pay students may pay in full or review an available buy now, pay later option. Buy now, pay later is offered by an outside provider, requires separate approval, and is subject to that provider’s payment schedule, fees, and agreement.',
+      }
+    : null;
   const structuredData = buildBeautyProgramStructuredData(program);
 
   return (

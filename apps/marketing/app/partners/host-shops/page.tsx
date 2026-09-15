@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import HostShopNetworkDirectory from '@/components/partners/HostShopNetworkDirectory';
 import { getHostShopNetwork } from '@/lib/programs/host-shop-network';
-import { BARBER_PRICING } from '@/lib/programs/pricing';
 import { HOST_SHOP_REGIONS } from '@/lib/marketing/host-shop-regions';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
 import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
@@ -65,10 +64,6 @@ const CALLER_CHECKLIST = [
   'Before hiring, ask the local WorkOne office to screen the candidate and employer for OJT reimbursement eligibility and obtain written authorization.',
 ] as const;
 
-const barberWeeklyEstimate = Math.ceil(
-  ((BARBER_PRICING.fullPrice - BARBER_PRICING.minDownPayment) * 100) /
-    BARBER_PRICING.paymentTermWeeks,
-) / 100;
 
 export default async function HostShopsPage() {
   const networkShops = await getHostShopNetwork();
@@ -121,10 +116,10 @@ export default async function HostShopsPage() {
               </p>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <p className="text-sm font-black uppercase tracking-wider text-brand-red-700">Barber apprentice tuition</p>
-              <h3 className="mt-2 text-3xl font-black">{`${BARBER_PRICING.fullPrice.toLocaleString('en-US')}`}</h3>
+              <p className="text-sm font-black uppercase tracking-wider text-brand-red-700">Apprentice enrollment</p>
+              <h3 className="mt-2 text-2xl font-black">Elevate handles tuition and payment setup</h3>
               <p className="mt-3 text-sm leading-6 text-slate-700">
-                Self-pay starts with {`${BARBER_PRICING.minDownPayment.toLocaleString('en-US')}`} down, then about {`${barberWeeklyEstimate.toFixed(2)}`} weekly for {BARBER_PRICING.paymentTermWeeks} weeks. Eligible funding may help. Tuition is paid to Elevate.
+                Apprentices review program-specific tuition, funding, full-payment, and available BNPL options on their program page. The Host Site does not collect tuition or approve financing.
               </p>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-slate-50 p-6">

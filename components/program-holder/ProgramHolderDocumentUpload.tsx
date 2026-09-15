@@ -8,6 +8,7 @@ const commonOptions = [
   ['w9', 'IRS Form W-9'],
   ['training_plan', 'Program syllabus and training plan'],
   ['profile_photo', 'Program Holder profile picture'],
+  ['company_logo', 'Program Holder company logo'],
   ['student_photo', 'Student training photo'],
   ['student_video', 'Student training video'],
 ] as const;

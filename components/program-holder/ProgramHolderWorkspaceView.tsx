@@ -138,6 +138,27 @@ export async function ProgramHolderWorkspaceView({
         data.documents.some((row) => row.document_type === 'profile_photo'),
     },
     {
+      label: 'Signed image release',
+      complete: Boolean(data.imageReleaseConsent?.signed_at),
+    },
+    {
+      label: 'Company logo upload',
+      complete: data.documents.some((row) => row.document_type === 'company_logo'),
+    },
+    {
+      label: 'QuickBooks payment-record connection',
+      complete: ['active', 'connected', 'synced', 'complete'].includes(
+        String(data.payoutProfile?.quickbooks_sync_status || '').toLowerCase(),
+      ),
+    },
+    {
+      label: 'PayPal payout connection',
+      complete:
+        data.payoutProfile?.payout_provider === 'paypal' &&
+        Boolean(data.payoutProfile?.payouts_enabled) &&
+        Boolean(data.payoutProfile?.transfers_enabled),
+    },
+    {
       label: 'Student photos and training videos',
       complete: data.documents.some((row) =>
         ['student_photo', 'student_video'].includes(row.document_type),

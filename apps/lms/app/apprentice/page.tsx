@@ -204,7 +204,7 @@ export default async function ApprenticePortalPage() {
     (db as any)
       .from('apprenticeship_theory_schedules')
       .select(
-        'id,course_id,timezone,days_of_week,start_time,end_time,weekly_target_minutes,weekly_max_minutes,active',
+        'id,course_id,timezone,days_of_week,start_time,end_time,starts_on,weekly_target_minutes,weekly_max_minutes,active',
       )
       .eq('user_id', subject.userId)
       .eq('program_slug', programSlug)
@@ -977,6 +977,11 @@ function TheorySchedulePanel({
           <p className="mt-2 font-bold text-slate-800">
             {time(schedule.start_time)}–{time(schedule.end_time)} · {schedule.timezone}
           </p>
+          {schedule.starts_on ? (
+            <p className="mt-2 text-sm font-black text-fuchsia-950">
+              Theory/RTI begins Monday, September 21, 2026.
+            </p>
+          ) : null}
           <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
             Complete <strong>{schedule.weekly_target_minutes / 60} theory hours each week</strong>.
             Do not exceed{' '}

@@ -17,6 +17,7 @@ export type ProgramHolderWorkspace = {
   payoutSchedules: any[];
   notificationPreferences: any | null;
   acknowledgements: any[];
+  imageReleaseConsent: any | null;
   contactAccessGranted: boolean;
   requiresEnchantedHeartsTerms: boolean;
 };
@@ -42,13 +43,14 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       payoutSchedules: [],
       notificationPreferences: null,
       acknowledgements: [],
+      imageReleaseConsent: null,
       contactAccessGranted: false,
       requiresEnchantedHeartsTerms: false,
     };
   }
 
   const { db, holderId, programIds, profile } = ctx;
-  const [holderRes, acknowledgementsRes] = await Promise.all([
+  const [holderRes, acknowledgementsRes, imageReleaseRes] = await Promise.all([
     db
       .from('program_holders')
       .select(
@@ -60,6 +62,13 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .from('program_holder_acknowledgements')
       .select('document_type,acknowledged_at')
       .eq('user_id', profile.id),
+    db
+      .from('image_release_consents')
+      .select('id,signed_at,granted,revoked_at')
+      .eq('user_id', profile.id)
+      .eq('granted', true)
+      .is('revoked_at', null)
+      .maybeSingle(),
   ]);
   const acknowledgements = acknowledgementsRes.data ?? [];
   const holderName = `${holderRes.data?.organization_name || ''} ${holderRes.data?.name || ''}`;
@@ -225,6 +234,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     payoutSchedules: schedulesRes.data ?? [],
     notificationPreferences: notificationRes.data ?? null,
     acknowledgements,
+    imageReleaseConsent: imageReleaseRes.data ?? null,
     contactAccessGranted,
     requiresEnchantedHeartsTerms,
   };

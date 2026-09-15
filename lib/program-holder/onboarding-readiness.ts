@@ -79,6 +79,8 @@ export async function getProgramHolderPaymentReadiness(
     { data: documents },
     { data: graduated },
     { data: assignments },
+    { data: imageRelease },
+    { data: payoutProfile },
   ] = await Promise.all([
     db
       .from('program_holder_acknowledgements')
@@ -100,6 +102,18 @@ export async function getProgramHolderPaymentReadiness(
       .select('programs(slug)')
       .eq('program_holder_id', holderId)
       .eq('status', 'active'),
+    db
+      .from('image_release_consents')
+      .select('id')
+      .eq('user_id', holder.user_id)
+      .eq('granted', true)
+      .is('revoked_at', null)
+      .maybeSingle(),
+    db
+      .from('program_holder_payouts')
+      .select('payout_provider,payouts_enabled,transfers_enabled,quickbooks_sync_status')
+      .eq('user_id', holder.user_id)
+      .maybeSingle(),
   ]);
 
   const approvedTypes = new Set(
@@ -134,6 +148,20 @@ export async function getProgramHolderPaymentReadiness(
     ...(!handbookAcknowledged ? ['Program Holder handbook acknowledgement'] : []),
     ...(!rightsAcknowledged ? ['Rights and responsibilities acknowledgement'] : []),
     ...required.filter((item) => !approvedTypes.has(item.type)).map((item) => item.label),
+    ...(!imageRelease ? ['Signed image release'] : []),
+    ...(!approvedTypes.has('company_logo') ? ['Program Holder company logo'] : []),
+    ...(!['active', 'connected', 'synced', 'complete'].includes(
+      String(payoutProfile?.quickbooks_sync_status || '').toLowerCase(),
+    )
+      ? ['QuickBooks payment-record connection']
+      : []),
+    ...(!(
+      payoutProfile?.payout_provider === 'paypal' &&
+      payoutProfile?.payouts_enabled === true &&
+      payoutProfile?.transfers_enabled === true
+    )
+      ? ['PayPal payout connection']
+      : []),
     ...incompleteBackWork,
   ];
 

@@ -250,7 +250,7 @@ async function _POST(request: NextRequest) {
 
     const { data: site, error: siteError } = await db
       .from('apprentice_sites')
-      .select('id, latitude, longitude, radius_meters, name, shop_id')
+      .select('id, latitude, longitude, radius_meters, name, shop_id, partner_id')
       .eq('id', site_id)
       .maybeSingle();
     if (siteError || !site) return NextResponse.json({ error: 'Site not found' }, { status: 404 });
@@ -326,15 +326,38 @@ async function _POST(request: NextRequest) {
         );
       }
 
+      let resolvedPartnerId = apprentice.employer_id || site.partner_id || null;
+      if (!resolvedPartnerId && site.shop_id) {
+        const { data: shop } = await db
+          .from('shops')
+          .select('partner_id')
+          .eq('id', site.shop_id)
+          .maybeSingle();
+        resolvedPartnerId = shop?.partner_id ?? null;
+      }
+      if (!resolvedPartnerId) {
+        logger.error('[Timeclock] no partner configured for apprentice site', {
+          apprentice_id: apprentice.id,
+          site_id,
+          shop_id: site.shop_id,
+        });
+        return NextResponse.json(
+          { error: 'This training site is not connected to a program partner. Contact support.' },
+          { status: 409 },
+        );
+      }
+
       const { data: newEntry, error: insertError } = await db
         .from('progress_entries')
         .insert({
           apprentice_id: apprentice.id,
-          partner_id: apprentice.employer_id,
+          partner_id: resolvedPartnerId,
           program_id: resolvedProgramId,
+          submitted_by: user.id,
           site_id,
           work_date: serverDate,
           week_ending: weekEnding,
+          hours_worked: 0,
           clock_in_at: serverNow,
           clock_in_lat: lat,
           clock_in_lng: lng,

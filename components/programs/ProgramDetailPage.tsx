@@ -11,6 +11,7 @@ import { logger } from '@/lib/logger';
 
 import EnrollmentPipeline from '@/components/programs/EnrollmentPipeline';
 import ProgramCohortFlyer from '@/components/programs/ProgramCohortFlyer';
+import ProgramExperienceGuide from '@/components/programs/ProgramExperienceGuide';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -412,6 +413,8 @@ export default function ProgramDetailPage({
       {p.slug !== 'business-administration' ? (
         <ProgramCohortFlyer programSlug={p.slug} programTitle={p.title} />
       ) : null}
+
+      <ProgramExperienceGuide program={p} />
 
       {/* DECISION PANEL — answers the questions visitors need before applying */}
       <section className="border-b border-slate-200 bg-slate-50 px-4 py-12 sm:py-16">

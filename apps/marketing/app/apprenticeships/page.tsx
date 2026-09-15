@@ -67,7 +67,7 @@ const EXPERIENCE = [
 export default function ApprenticeshipsPage() {
   const hero = heroBanners.apprenticeships;
   return (
-    <main className="min-h-screen bg-white text-slate-950">
+    <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">
       <HeroVideo
         videoSrcDesktop={hero.videoSrcDesktop || APPRENTICESHIP_VIDEO}
         videoSrcMobile={hero.videoSrcMobile || APPRENTICESHIP_VIDEO}

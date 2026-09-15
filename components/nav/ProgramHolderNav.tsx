@@ -4,7 +4,7 @@ import React from 'react';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, FileText, Shield, Settings, AlertCircle } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Shield, Settings, AlertCircle, HelpCircle } from 'lucide-react';
 
 /**
  * PROGRAM HOLDER NAVIGATION
@@ -44,6 +44,11 @@ const navigation: NavItem[] = [
     name: 'Documents',
     href: '/program-holder/documents',
     icon: FileText,
+  },
+  {
+    name: 'Start Here',
+    href: '/program-holder/how-to-use',
+    icon: HelpCircle,
   },
   {
     name: 'Settings',

@@ -111,10 +111,13 @@ describe('single Course Builder authority', () => {
     }
   });
 
-  it('allows only an exact one-job proof while the global pause remains closed', () => {
+  it('allows only the configured proof course while the global pause remains closed', () => {
     const worker = read('apps/admin/app/api/internal/videos/process-queue/route.ts');
     expect(worker).toContain("'course_builder_proof_course_id'");
     expect(worker).toContain('queueOneDraft && courseId && maxJobs === 1');
+    expect(worker).toContain('!courseId && !jobId && !queueOneDraft && proofCourseId');
+    expect(worker).toContain('courseId = proofCourseId');
+    expect(worker).toContain('maxJobs = 1');
     expect(worker).toContain('globallyPaused && !authorizedProof');
   });
 });

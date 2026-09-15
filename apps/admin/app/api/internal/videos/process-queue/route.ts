@@ -50,7 +50,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { courseId, jobId, maxJobs, queueOneDraft } = await requestedOptions(request);
+  const options = await requestedOptions(request);
+  let { courseId, maxJobs } = options;
+  const { jobId, queueOneDraft } = options;
   if (queueOneDraft && (!courseId || maxJobs !== 1)) {
     return NextResponse.json(
       { error: 'queueOneDraft requires an exact courseId and maxJobs=1' },
@@ -66,13 +68,25 @@ export async function POST(request: NextRequest) {
   const db = await requireAdminClient();
   const globallyPaused = await isCourseBuilderGenerationPaused(db);
   let authorizedProof = false;
-  if (globallyPaused && queueOneDraft && courseId && maxJobs === 1) {
+  if (globallyPaused) {
     const { data: proofSetting } = await db
       .from('system_settings')
       .select('value')
       .eq('key', 'course_builder_proof_course_id')
       .maybeSingle();
-    authorizedProof = proofSetting?.value === courseId;
+    const proofCourseId = typeof proofSetting?.value === 'string' ? proofSetting.value.trim() : '';
+
+    if (queueOneDraft && courseId && maxJobs === 1) {
+      authorizedProof = proofCourseId === courseId;
+    } else if (!courseId && !jobId && !queueOneDraft && proofCourseId) {
+      // Scheduled queue calls intentionally carry no course identifier. While
+      // the global gate is closed, scope that generic call to the one approved
+      // proof course and one render slot. This preserves the global pause while
+      // allowing the durable scheduler to finish the controlled acceptance job.
+      courseId = proofCourseId;
+      maxJobs = 1;
+      authorizedProof = true;
+    }
   }
   if (globallyPaused && !authorizedProof) {
     return NextResponse.json({
@@ -226,7 +240,10 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
     if (claimError) {
       logger.error('[video-worker] Exact queue claim failed', claimError, { courseId, jobId });
-      return NextResponse.json({ error: 'Unable to claim the requested video job' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Unable to claim the requested video job' },
+        { status: 500 },
+      );
     }
     if (claimed) claimedRows = [claimed as VideoJob];
   } else if (courseId) {

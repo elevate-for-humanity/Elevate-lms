@@ -38,7 +38,7 @@ export default async function OrientationPage() {
     }, { onConflict: 'user_id' });
     if (progressError) throw progressError;
     const { error: enrollmentError } = await supabase.from('program_enrollments')
-      .update({ onboarding_status: 'completed', orientation_completed_at: completedAt })
+      .update({ orientation_completed_at: completedAt })
       .or(`user_id.eq.${user.id},student_id.eq.${user.id}`);
     if (enrollmentError) throw enrollmentError;
     redirect('/lms/dashboard');

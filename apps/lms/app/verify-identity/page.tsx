@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { IDVerificationForm } from '@/components/verification/IDVerificationForm';
+import { SecureIdentityVerificationForm } from '@/components/verification/SecureIdentityVerificationForm';
 import { Shield } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -137,7 +137,7 @@ export default async function VerifyIdentityPage() {
 
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h3 className="text-xl font-bold mb-4">Submit New Verification</h3>
-            <IDVerificationForm />
+            <SecureIdentityVerificationForm />
           </div>
         </div>
       </div>
@@ -187,7 +187,7 @@ export default async function VerifyIdentityPage() {
         {/* Verification Form */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h2 className="text-2xl font-bold mb-6">Complete Verification</h2>
-          <IDVerificationForm />
+          <SecureIdentityVerificationForm />
         </div>
       </div>
     </div>

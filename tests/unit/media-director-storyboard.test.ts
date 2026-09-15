@@ -22,7 +22,11 @@ describe('canonical media storyboard compatibility', () => {
     });
 
     expect(storyboard.scenes).toHaveLength(3);
-    expect(storyboard.scenes.every((scene) => scene.environment.includes('Cinematic small-business owner'))).toBe(true);
+    expect(
+      storyboard.scenes.every((scene) =>
+        scene.environment.includes('Cinematic small-business owner'),
+      ),
+    ).toBe(true);
     expect(storyboard.scenes.every((scene) => scene.durationSeconds === 15)).toBe(true);
   });
 
@@ -66,12 +70,15 @@ describe('lesson media production bounds', () => {
     expect(compacted.map((scene) => String(scene.dialogue)).join(' ')).toContain(
       'Narration sentence 77.',
     );
-    expect(compacted[0]?.legacy_scene_range).toEqual({ start: 1, end: 6, count: 6 });
-    expect(compacted.at(-1)?.legacy_scene_range).toEqual({ start: 71, end: 77, count: 7 });
+    expect(compacted[0]?.legacy_scene_range).toEqual({ start: 1, end: 7, count: 7 });
+    expect(compacted.at(-1)?.legacy_scene_range).toEqual({ start: 70, end: 77, count: 8 });
   });
 
   it('coalesces long scripts into eight narration-preserving scenes', () => {
-    const script = Array.from({ length: 77 }, (_, i) => `Sentence ${i + 1} teaches required detail.`).join(' ');
+    const script = Array.from(
+      { length: 77 },
+      (_, i) => `Sentence ${i + 1} teaches required detail.`,
+    ).join(' ');
     const storyboard = directMedia({ title: 'Bounded lesson', script });
     expect(storyboard.scenes).toHaveLength(8);
     expect(storyboard.scenes.map((scene) => scene.dialogue).join(' ')).toContain('Sentence 77');
@@ -82,8 +89,11 @@ describe('lesson media production bounds', () => {
       id: `scene-${i + 1}`,
       action: `Action ${i + 1}`,
     }));
-    expect(() => directMedia({ title: 'Oversized', script: 'Script.', sceneData: { scenes } }))
-      .toThrow(`MEDIA_SCENE_LIMIT_EXCEEDED:${MAX_LESSON_VIDEO_SCENES + 1}:${MAX_LESSON_VIDEO_SCENES}`);
+    expect(() =>
+      directMedia({ title: 'Oversized', script: 'Script.', sceneData: { scenes } }),
+    ).toThrow(
+      `MEDIA_SCENE_LIMIT_EXCEEDED:${MAX_LESSON_VIDEO_SCENES + 1}:${MAX_LESSON_VIDEO_SCENES}`,
+    );
   });
 });
 

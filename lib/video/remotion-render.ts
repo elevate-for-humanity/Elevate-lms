@@ -37,6 +37,10 @@ import type { SceneData, SlideLessonProps } from '@/remotion-src/compositions/Sl
 import { instructionalLayoutForScene } from '@/remotion-src/instructional-layout';
 import { deriveInstructionalVisualIntent } from '@/server/video-generator/visual-intelligence';
 
+export function cpuOnlyCourseMedia(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.COURSE_MEDIA_RENDER_MODE !== 'legacy-gpu-opt-in';
+}
+
 // Remotion's inputProps requires Record<string, unknown> — this cast is safe
 // because ElevateLessonProps is a plain serialisable object.
 type RemotionProps = ElevateLessonProps & Record<string, unknown>;
@@ -464,7 +468,9 @@ export async function renderStoryboardVideo(
     // enhancement is an explicit deployment choice until it has a bounded,
     // asynchronous per-scene contract.
     const canGenerateMotion =
-      enabled(process.env.ENABLE_GPU_LESSON_SCENES) && (await gpuVideoAvailable());
+      !cpuOnlyCourseMedia() &&
+      enabled(process.env.ENABLE_GPU_LESSON_SCENES) &&
+      (await gpuVideoAvailable());
     const resolvedStoryboard: MediaStoryboard = structuredClone(input.storyboard);
 
     for (const [index, scene] of input.storyboard.scenes.entries()) {
@@ -483,13 +489,14 @@ export async function renderStoryboardVideo(
         sceneType: scene.sceneType,
       });
       const query = visualIntent.query;
-      const instructionalLayout = visualIntent.deterministicDiagram
-        ? instructionalLayoutForScene({
-            title: scene.subject,
-            action: scene.action,
-            sceneType: scene.sceneType,
-          })
-        : null;
+      const instructionalLayout =
+        scene.mediaSource === 'elevate-motion' || visualIntent.deterministicDiagram
+          ? instructionalLayoutForScene({
+              title: scene.subject,
+              action: scene.action,
+              sceneType: scene.sceneType,
+            })
+          : null;
       let clipUrl = instructionalLayout ? null : normalizeRemotionMediaUrl(scene.sourceVideoUrl);
       let lipSyncedInstructor = false;
 
@@ -541,7 +548,13 @@ export async function renderStoryboardVideo(
         : instructionalLayout
           ? null
           : normalizeRemotionMediaUrl(scene.referenceImageUrl) ||
-            normalizeRemotionMediaUrl(await getPexelsImage('default', { query }));
+            normalizeRemotionMediaUrl(
+              await getPexelsImage('default', {
+                query,
+                deterministicKey: scene.contentHash,
+                allowGeneratedFallback: false,
+              }),
+            );
       // Pollinations can take longer than Chromium's delayRender window. Fetch
       // the generated image once on the server and persist it beside the lesson
       // media before Remotion starts. The composition then reads a stable CDN

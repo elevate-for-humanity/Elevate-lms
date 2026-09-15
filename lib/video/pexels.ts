@@ -40,12 +40,15 @@ export async function getPexelsImage(
     orientation?: 'landscape' | 'portrait' | 'square';
     perPage?: number;
     query?: string;
+    deterministicKey?: string;
+    allowGeneratedFallback?: boolean;
   } = {},
 ): Promise<string | null> {
   const apiKey = process.env.PEXELS_API_KEY;
+  const allowGeneratedFallback = options.allowGeneratedFallback !== false;
   if (!apiKey) {
     logger.warn('[pexels] PEXELS_API_KEY not set — falling back to Pollinations');
-    return getPollinationsImage(domainKey, options.query);
+    return allowGeneratedFallback ? getPollinationsImage(domainKey, options.query) : null;
   }
 
   const query = options.query?.trim() || TOPIC_QUERIES[domainKey] || DEFAULT_TOPIC_QUERY;
@@ -65,18 +68,23 @@ export async function getPexelsImage(
 
     if (!res.ok) {
       logger.warn('[pexels] API error', { status: res.status });
-      return getPollinationsImage(domainKey, options.query);
+      return allowGeneratedFallback ? getPollinationsImage(domainKey, options.query) : null;
     }
 
     const data: PexelsResponse = await res.json();
-    if (!data.photos?.length) return getPollinationsImage(domainKey, options.query);
+    if (!data.photos?.length)
+      return allowGeneratedFallback ? getPollinationsImage(domainKey, options.query) : null;
 
-    const photo = data.photos[Math.floor(Math.random() * data.photos.length)];
-    if (!photo) return getPollinationsImage(domainKey, options.query);
+    const seed = options.deterministicKey
+      ? [...options.deterministicKey].reduce((sum, char) => sum + char.charCodeAt(0), 0)
+      : 0;
+    const photo = data.photos[seed % data.photos.length];
+    if (!photo)
+      return allowGeneratedFallback ? getPollinationsImage(domainKey, options.query) : null;
     return photo.src.large2x ?? photo.src.landscape;
   } catch (err) {
     logger.warn('[pexels] fetch error', { err });
-    return getPollinationsImage(domainKey, options.query);
+    return allowGeneratedFallback ? getPollinationsImage(domainKey, options.query) : null;
   }
 }
 

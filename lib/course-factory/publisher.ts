@@ -12,6 +12,7 @@ import { buildLearningExperience } from '@/lib/curriculum/learning-experience';
 import type { BlueprintModule, BuildMode, ValidationResult } from './types';
 import { compileLearningIntelligence, LearningIntelligenceSchema } from './learning-intelligence';
 import { inferStepType } from './validator';
+import { buildLessonLearningObjects } from './learning-objects';
 
 export interface PublishInput {
   programId?: string | null;
@@ -228,6 +229,12 @@ export function buildAtomicPayload(
               ? lesson.instructorNotes.join('\n\n')
               : (lesson.instructorNotes ?? null);
             const canonicalLessonOrder = courseModule.orderIndex * 1000 + lesson.order;
+            const learningObjects = buildLessonLearningObjects({
+              slug: lesson.slug,
+              videoUrl: extra.videoUrl ?? lesson.videoFile ?? null,
+              quizQuestions: lesson.quizQuestions ?? [],
+              experience,
+            });
             return {
               slug: lesson.slug,
               title: lesson.title,
@@ -240,6 +247,7 @@ export function buildAtomicPayload(
               content_json: {
                 ...(experience ? { experience } : {}),
                 ...(learningExperience ? { learning_experience: learningExperience } : {}),
+                learning_objects: learningObjects,
               },
               rendered_html: renderedHtml,
               quiz_questions:
@@ -295,8 +303,7 @@ export function buildAtomicPayload(
                 (stepType === 'lab' ? 'practical' : stepType === 'exam' ? 'exam' : 'didactic'),
               evidence_type: extra.evidenceType ?? (governedPractical ? 'observation' : null),
               delivery_method: extra.deliveryMethod ?? 'online_async',
-              requires_instructor_signoff:
-                extra.requiresInstructorSignoff ?? governedPractical,
+              requires_instructor_signoff: extra.requiresInstructorSignoff ?? governedPractical,
               instructor_requirement: extra.instructorRequirement ?? null,
               minimum_seat_time_minutes:
                 extra.minimumSeatTimeMinutes ?? lesson.durationMinutes ?? null,

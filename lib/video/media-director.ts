@@ -25,12 +25,25 @@ export type CameraMove =
   | 'handheld'
   | 'crane';
 
-export type ShotSize = 'extreme-wide' | 'wide' | 'medium' | 'medium-close' | 'close-up' | 'extreme-close-up';
+export type ShotSize =
+  | 'extreme-wide'
+  | 'wide'
+  | 'medium'
+  | 'medium-close'
+  | 'close-up'
+  | 'extreme-close-up';
 export type Transition = 'cut' | 'crossfade' | 'dip-black' | 'match-cut' | 'whip' | 'none';
 export type InstructionalSceneType =
-  | 'problem_hook' | 'mental_model' | 'system_diagram' | 'equipment_closeup'
-  | 'worked_example' | 'field_scenario' | 'common_mistake' | 'safety_warning'
-  | 'memory_recap' | 'knowledge_check';
+  | 'problem_hook'
+  | 'mental_model'
+  | 'system_diagram'
+  | 'equipment_closeup'
+  | 'worked_example'
+  | 'field_scenario'
+  | 'common_mistake'
+  | 'safety_warning'
+  | 'memory_recap'
+  | 'knowledge_check';
 
 export interface MediaCharacterReference {
   id: string;
@@ -69,6 +82,10 @@ export interface MediaScene {
   requiredVisualEvidence?: string;
   sceneType?: InstructionalSceneType;
   memoryAnchor?: string;
+  mediaSource: 'pexels' | 'elevate-owned' | 'elevate-motion';
+  overlayTemplate: string;
+  contentHash: string;
+  reviewStatus: 'draft' | 'approved' | 'rejected';
 }
 
 export interface MediaStoryboard {
@@ -95,7 +112,8 @@ export interface MediaDirectorInput {
   defaultDurationSeconds?: number;
 }
 
-export const MAX_LESSON_VIDEO_SCENES = 12;
+export const MIN_LESSON_VIDEO_SCENES = 6;
+export const MAX_LESSON_VIDEO_SCENES = 10;
 const DEFAULT_SCRIPT_SCENES = 8;
 
 /** Preserve all ordered narration while converting legacy sentence-per-scene
@@ -105,8 +123,8 @@ export function compactLegacySceneData(
   maximumScenes = MAX_LESSON_VIDEO_SCENES,
 ): { sceneData: Record<string, unknown>; compacted: boolean; originalSceneCount: number } {
   const scenes = Array.isArray(sceneData.scenes)
-    ? sceneData.scenes.filter(
-        (scene): scene is Record<string, unknown> => Boolean(scene && typeof scene === 'object'),
+    ? sceneData.scenes.filter((scene): scene is Record<string, unknown> =>
+        Boolean(scene && typeof scene === 'object'),
       )
     : [];
   if (scenes.length <= maximumScenes) {
@@ -167,33 +185,92 @@ function numberValue(value: unknown, fallback: number, min: number, max: number)
 }
 
 function operationValue(value: unknown, hasImage: boolean, hasVideo: boolean): MediaOperation {
-  const allowed: MediaOperation[] = ['textToVideo', 'imageToVideo', 'videoToVideo', 'extend', 'remix', 'loop', 'interpolate'];
-  if (typeof value === 'string' && allowed.includes(value as MediaOperation)) return value as MediaOperation;
+  const allowed: MediaOperation[] = [
+    'textToVideo',
+    'imageToVideo',
+    'videoToVideo',
+    'extend',
+    'remix',
+    'loop',
+    'interpolate',
+  ];
+  if (typeof value === 'string' && allowed.includes(value as MediaOperation))
+    return value as MediaOperation;
   if (hasVideo) return 'videoToVideo';
   if (hasImage) return 'imageToVideo';
   return 'textToVideo';
 }
 
 function shotSizeValue(value: unknown): ShotSize {
-  const allowed: ShotSize[] = ['extreme-wide', 'wide', 'medium', 'medium-close', 'close-up', 'extreme-close-up'];
-  return typeof value === 'string' && allowed.includes(value as ShotSize) ? (value as ShotSize) : 'medium';
+  const allowed: ShotSize[] = [
+    'extreme-wide',
+    'wide',
+    'medium',
+    'medium-close',
+    'close-up',
+    'extreme-close-up',
+  ];
+  return typeof value === 'string' && allowed.includes(value as ShotSize)
+    ? (value as ShotSize)
+    : 'medium';
 }
 
 function cameraValue(value: unknown): CameraMove {
-  const allowed: CameraMove[] = ['locked','pan-left','pan-right','tilt-up','tilt-down','dolly-in','dolly-out','truck-left','truck-right','orbit','handheld','crane'];
-  return typeof value === 'string' && allowed.includes(value as CameraMove) ? (value as CameraMove) : 'dolly-in';
+  const allowed: CameraMove[] = [
+    'locked',
+    'pan-left',
+    'pan-right',
+    'tilt-up',
+    'tilt-down',
+    'dolly-in',
+    'dolly-out',
+    'truck-left',
+    'truck-right',
+    'orbit',
+    'handheld',
+    'crane',
+  ];
+  return typeof value === 'string' && allowed.includes(value as CameraMove)
+    ? (value as CameraMove)
+    : 'dolly-in';
 }
 
 function transitionValue(value: unknown): Transition {
-  const allowed: Transition[] = ['cut','crossfade','dip-black','match-cut','whip','none'];
-  return typeof value === 'string' && allowed.includes(value as Transition) ? (value as Transition) : 'cut';
+  const allowed: Transition[] = ['cut', 'crossfade', 'dip-black', 'match-cut', 'whip', 'none'];
+  return typeof value === 'string' && allowed.includes(value as Transition)
+    ? (value as Transition)
+    : 'cut';
 }
 
 function sceneTypeValue(value: unknown, index: number, total: number): InstructionalSceneType {
-  const allowed: InstructionalSceneType[] = ['problem_hook','mental_model','system_diagram','equipment_closeup','worked_example','field_scenario','common_mistake','safety_warning','memory_recap','knowledge_check'];
-  if (typeof value === 'string' && allowed.includes(value as InstructionalSceneType)) return value as InstructionalSceneType;
-  const arc: InstructionalSceneType[] = ['problem_hook','mental_model','system_diagram','equipment_closeup','worked_example','common_mistake','memory_recap','knowledge_check'];
-  return arc[Math.min(arc.length - 1, Math.floor(index * arc.length / Math.max(1, total)))] ?? 'worked_example';
+  const allowed: InstructionalSceneType[] = [
+    'problem_hook',
+    'mental_model',
+    'system_diagram',
+    'equipment_closeup',
+    'worked_example',
+    'field_scenario',
+    'common_mistake',
+    'safety_warning',
+    'memory_recap',
+    'knowledge_check',
+  ];
+  if (typeof value === 'string' && allowed.includes(value as InstructionalSceneType))
+    return value as InstructionalSceneType;
+  const arc: InstructionalSceneType[] = [
+    'problem_hook',
+    'mental_model',
+    'system_diagram',
+    'equipment_closeup',
+    'worked_example',
+    'common_mistake',
+    'memory_recap',
+    'knowledge_check',
+  ];
+  return (
+    arc[Math.min(arc.length - 1, Math.floor((index * arc.length) / Math.max(1, total)))] ??
+    'worked_example'
+  );
 }
 
 function promptHash(input: unknown): string {
@@ -250,9 +327,7 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
   const raw = input.sceneData ?? {};
   const rawScenes = Array.isArray(raw.scenes) ? raw.scenes : [];
   if (rawScenes.length > MAX_LESSON_VIDEO_SCENES) {
-    throw new Error(
-      `MEDIA_SCENE_LIMIT_EXCEEDED:${rawScenes.length}:${MAX_LESSON_VIDEO_SCENES}`,
-    );
+    throw new Error(`MEDIA_SCENE_LIMIT_EXCEEDED:${rawScenes.length}:${MAX_LESSON_VIDEO_SCENES}`);
   }
   const characters = Array.isArray(input.characters) ? input.characters : [];
   const defaultDuration = numberValue(
@@ -263,7 +338,9 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
   );
 
   const sourceScenes: Record<string, unknown>[] = rawScenes.length
-    ? rawScenes.filter((scene): scene is Record<string, unknown> => Boolean(scene && typeof scene === 'object'))
+    ? rawScenes.filter((scene): scene is Record<string, unknown> =>
+        Boolean(scene && typeof scene === 'object'),
+      )
     : scriptScenes(input.script, input.title);
 
   const fallbackScene: Record<string, unknown> = {
@@ -271,59 +348,107 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
     subject: input.title,
   };
 
-  const scenes = (sourceScenes.length ? sourceScenes : [fallbackScene]).map((scene, index): MediaScene => {
-    const referenceImageUrl = stringValue(scene.reference_image_url, stringValue(raw.reference_image_url)) || undefined;
-    const sourceVideoUrl = stringValue(scene.source_video_url, stringValue(raw.source_video_url)) || undefined;
-    const action = stringValue(
-      scene.action,
-      stringValue(scene.visual_prompt, stringValue(raw.visual_prompt, input.script)),
-    );
-    const subject = stringValue(scene.subject, input.title);
-    const environment = stringValue(
-      scene.environment,
-      stringValue(
-        scene.visual_prompt,
-        stringValue(raw.visual_prompt, stringValue(raw.environment, 'professional real-world environment')),
-      ),
-    );
-    const visualStyle = stringValue(scene.visual_style, stringValue(raw.visual_style, 'cinematic photorealistic educational film'));
-    const lighting = stringValue(scene.lighting, stringValue(raw.lighting, 'natural motivated lighting'));
-    const characterIds = Array.isArray(scene.character_ids)
-      ? scene.character_ids.filter((id): id is string => typeof id === 'string')
-      : characters.map((character) => character.id);
+  const scenes = (sourceScenes.length ? sourceScenes : [fallbackScene]).map(
+    (scene, index): MediaScene => {
+      const referenceImageUrl =
+        stringValue(scene.reference_image_url, stringValue(raw.reference_image_url)) || undefined;
+      const sourceVideoUrl =
+        stringValue(scene.source_video_url, stringValue(raw.source_video_url)) || undefined;
+      const action = stringValue(
+        scene.action,
+        stringValue(scene.visual_prompt, stringValue(raw.visual_prompt, input.script)),
+      );
+      const subject = stringValue(scene.subject, input.title);
+      const environment = stringValue(
+        scene.environment,
+        stringValue(
+          scene.visual_prompt,
+          stringValue(
+            raw.visual_prompt,
+            stringValue(raw.environment, 'professional real-world environment'),
+          ),
+        ),
+      );
+      const visualStyle = stringValue(
+        scene.visual_style,
+        stringValue(
+          raw.visual_style,
+          'branded educational motion graphics with licensed documentary footage',
+        ),
+      );
+      const lighting = stringValue(
+        scene.lighting,
+        stringValue(raw.lighting, 'natural motivated lighting'),
+      );
+      const characterIds = Array.isArray(scene.character_ids)
+        ? scene.character_ids.filter((id): id is string => typeof id === 'string')
+        : characters.map((character) => character.id);
 
-    return {
-      id: stringValue(scene.id, `scene-${index + 1}`),
-      order: index + 1,
-      durationSeconds: numberValue(scene.duration_seconds, defaultDuration, 1, 15),
-      operation: operationValue(scene.operation, Boolean(referenceImageUrl), Boolean(sourceVideoUrl)),
-      subject,
-      environment,
-      action,
-      visualStyle,
-      shotSize: shotSizeValue(scene.shot_size),
-      cameraMove: cameraValue(scene.camera_move),
-      lighting,
-      dialogue: stringValue(scene.dialogue) || undefined,
-      sound: stringValue(scene.sound) || undefined,
-      transition: transitionValue(scene.transition),
-      referenceImageUrl,
-      sourceVideoUrl,
-      characterIds,
-      negativePrompt: stringValue(scene.negative_prompt, stringValue(raw.negative_prompt)) || undefined,
-      seed: Number.isFinite(Number(scene.seed)) ? Number(scene.seed) : undefined,
-      procedurePhase: stringValue(scene.procedure_phase) || undefined,
-      requiredVisualEvidence: stringValue(scene.required_visual_evidence, action) || undefined,
-      sceneType: sceneTypeValue(scene.scene_type, index, sourceScenes.length),
-      memoryAnchor: stringValue(scene.memory_anchor, stringValue((raw.teaching_model as Record<string, unknown> | undefined)?.memory_anchor)) || undefined,
-    };
-  });
+      const mediaSource = ['pexels', 'elevate-owned', 'elevate-motion'].includes(
+        String(scene.media_source),
+      )
+        ? (scene.media_source as MediaScene['mediaSource'])
+        : index < Math.ceil(sourceScenes.length * 0.6)
+          ? 'pexels'
+          : 'elevate-motion';
+      const overlayTemplate = stringValue(scene.overlay_template, 'elevate-callout-v1');
+      const id = stringValue(scene.id, `scene-${index + 1}`);
+      const contentHash = crypto
+        .createHash('sha256')
+        .update(
+          JSON.stringify({ id, action, dialogue: scene.dialogue, mediaSource, overlayTemplate }),
+        )
+        .digest('hex');
+      return {
+        id,
+        order: index + 1,
+        durationSeconds: numberValue(scene.duration_seconds, defaultDuration, 1, 15),
+        operation: operationValue(
+          scene.operation,
+          Boolean(referenceImageUrl),
+          Boolean(sourceVideoUrl),
+        ),
+        subject,
+        environment,
+        action,
+        visualStyle,
+        shotSize: shotSizeValue(scene.shot_size),
+        cameraMove: cameraValue(scene.camera_move),
+        lighting,
+        dialogue: stringValue(scene.dialogue, stringValue(scene.narration)) || undefined,
+        sound: stringValue(scene.sound) || undefined,
+        transition: transitionValue(scene.transition),
+        referenceImageUrl,
+        sourceVideoUrl,
+        characterIds,
+        negativePrompt:
+          stringValue(scene.negative_prompt, stringValue(raw.negative_prompt)) || undefined,
+        seed: Number.isFinite(Number(scene.seed)) ? Number(scene.seed) : undefined,
+        procedurePhase: stringValue(scene.procedure_phase) || undefined,
+        requiredVisualEvidence: stringValue(scene.required_visual_evidence, action) || undefined,
+        sceneType: sceneTypeValue(scene.scene_type, index, sourceScenes.length),
+        memoryAnchor:
+          stringValue(
+            scene.memory_anchor,
+            stringValue((raw.teaching_model as Record<string, unknown> | undefined)?.memory_anchor),
+          ) || undefined,
+        mediaSource,
+        overlayTemplate,
+        contentHash: stringValue(scene.content_hash, contentHash),
+        reviewStatus: ['approved', 'rejected'].includes(String(scene.review_status))
+          ? (scene.review_status as MediaScene['reviewStatus'])
+          : 'draft',
+      };
+    },
+  );
 
   const storyboardBase = {
     version: '1.0' as const,
     title: input.title,
     objective: input.objective || input.title,
-    aspectRatio: (raw.aspect_ratio === '9:16' || raw.aspect_ratio === '1:1' ? raw.aspect_ratio : '16:9') as MediaStoryboard['aspectRatio'],
+    aspectRatio: (raw.aspect_ratio === '9:16' || raw.aspect_ratio === '1:1'
+      ? raw.aspect_ratio
+      : '16:9') as MediaStoryboard['aspectRatio'],
     width: numberValue(raw.width, 1280, 256, 1920),
     height: numberValue(raw.height, 704, 256, 1080),
     fps: numberValue(raw.fps, 24, 12, 60),
@@ -337,7 +462,10 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
 export function scenePrompt(scene: MediaScene, characters: MediaCharacterReference[] = []): string {
   const refs = characters
     .filter((character) => scene.characterIds.includes(character.id))
-    .map((character) => `${character.name || character.id}: ${character.appearancePrompt || 'preserve reference identity exactly'}`)
+    .map(
+      (character) =>
+        `${character.name || character.id}: ${character.appearancePrompt || 'preserve reference identity exactly'}`,
+    )
     .join('; ');
 
   return [
@@ -352,7 +480,11 @@ export function scenePrompt(scene: MediaScene, characters: MediaCharacterReferen
     scene.dialogue ? `Dialogue: ${scene.dialogue}` : '',
     scene.sound ? `Sound: ${scene.sound}` : '',
     scene.procedurePhase ? `Instructional phase: ${scene.procedurePhase}` : '',
-    scene.requiredVisualEvidence ? `The picture must visibly demonstrate: ${scene.requiredVisualEvidence}` : '',
+    scene.requiredVisualEvidence
+      ? `The picture must visibly demonstrate: ${scene.requiredVisualEvidence}`
+      : '',
     scene.negativePrompt ? `Avoid: ${scene.negativePrompt}` : '',
-  ].filter(Boolean).join('. ');
+  ]
+    .filter(Boolean)
+    .join('. ');
 }

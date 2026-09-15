@@ -34,7 +34,8 @@ import {
   type MediaCharacterReference,
 } from './media-director';
 import { recordMediaProvenance } from './media-provenance';
-import { renderStoryboardVideo } from './remotion-render';
+import { cpuOnlyCourseMedia, renderStoryboardVideo } from './remotion-render';
+import { approveControlledStoryboard } from './controlled-media-contract';
 import { uploadLessonMediaBuffer } from './upload-lesson-media';
 import { generateLessonScenes } from '@/server/video-generator/generateLessonScenes';
 import type { LessonRenderPlanDraft } from '@/server/video-generator/types';
@@ -470,6 +471,14 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
         segmentCount: storyboard.scenes.length,
       });
     }
+    if (!isMicroclip && cpuOnlyCourseMedia()) {
+      const approved = approveControlledStoryboard(storyboard);
+      storyboard = approved.storyboard;
+      logger.info('[video-worker] Controlled storyboard approved', {
+        jobId: job.id,
+        reviewers: approved.reviews.map((review) => review.role),
+      });
+    }
     const instructionalQuality = enforceInstructionalQuality({
       courseTitle,
       lessonTitle: job.lesson_title,
@@ -492,7 +501,12 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     // Direct GPU microclips do not currently produce the captions, transcript,
     // or multi-scene evidence required by the canonical quality gate. Keep this
     // expensive path opt-in until it can satisfy that same completion contract.
-    if (isMicroclip && storyboard.scenes.length === 1 && (await gpuVideoAvailable())) {
+    if (
+      isMicroclip &&
+      !cpuOnlyCourseMedia() &&
+      storyboard.scenes.length === 1 &&
+      (await gpuVideoAvailable())
+    ) {
       const scene = primaryScene;
       const requestedDuration = Math.min(15, Math.max(1, scene.durationSeconds));
       const gpuStartedAt = Date.now();

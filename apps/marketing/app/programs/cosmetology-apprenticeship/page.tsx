@@ -4,7 +4,6 @@ import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
-import CosmetologyVisualExperience from '@/components/programs/beauty/CosmetologyVisualExperience';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import { getStaticProgram } from '@/data/programs';
@@ -17,7 +16,6 @@ export default async function CosmetologyApprenticeshipPage() {
   if (!program) return notFound();
   const banner = heroBanners['cosmetology-apprenticeship'] ?? null;
   const structuredData = buildBeautyProgramStructuredData(program);
-  const heroOverride = <CosmetologyVisualExperience />;
 
   return (
     <>
@@ -30,7 +28,6 @@ export default async function CosmetologyApprenticeshipPage() {
       <ProgramDetailPage
         program={program}
         banner={banner}
-        heroOverride={heroOverride}
         featuredContent={<FeaturedHostPartners programSlug="cosmetology-apprenticeship" />}
       >
         <BeautyApprenticeshipAuthority program={program} />

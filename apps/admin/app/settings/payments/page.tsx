@@ -21,11 +21,11 @@ const FIELDS: SettingsField[] = [
   },
   {
     key: 'stripe_billing_mode',
-    label: 'Stripe Data Mode',
-    description: 'Archive keeps prior payments and invoices visible without creating new Stripe charges.',
+    label: 'Legacy Payment History',
+    description: 'Prior transactions remain read-only for accounting, refunds, disputes, and audit history.',
     type: 'select',
     options: [
-      { value: 'archive', label: 'Archive — history only' },
+      { value: 'archive', label: 'Archive only — no new charges' },
     ],
   },
   {
@@ -46,8 +46,8 @@ const FIELDS: SettingsField[] = [
     description: 'Enabled payment providers',
     type: 'select',
     options: [
-      { value: 'quickbooks_invoice', label: 'QuickBooks invoice + Pay Now' },
-      { value: 'quickbooks_invoice,manual', label: 'QuickBooks invoice + manual payment' },
+      { value: 'quickbooks_invoice,paypal', label: 'QuickBooks invoice + PayPal payouts' },
+      { value: 'quickbooks_invoice,paypal,manual', label: 'QuickBooks invoice + PayPal payouts + manual payment' },
     ],
   },
 ];
@@ -68,7 +68,7 @@ export default async function PaymentSettingsPage() {
   if (!initialValues['billing_provider']) initialValues['billing_provider'] = 'quickbooks';
   if (!initialValues['stripe_billing_mode']) initialValues['stripe_billing_mode'] = 'archive';
   if (!initialValues['currency'])        initialValues['currency']        = 'USD';
-  if (!initialValues['payment_methods']) initialValues['payment_methods'] = 'quickbooks_invoice';
+  if (!initialValues['payment_methods']) initialValues['payment_methods'] = 'quickbooks_invoice,paypal';
 
   return (
     <div className="w-full space-y-6 px-6 py-6">
@@ -77,7 +77,7 @@ export default async function PaymentSettingsPage() {
           <Link href="/settings" className="hover:text-slate-700">Settings</Link> / Payments
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Payment Settings</h1>
-        <p className="text-slate-500">QuickBooks invoicing, Stripe history, payment methods, and currency.</p>
+        <p className="text-slate-500">QuickBooks invoicing, PayPal payouts, payment methods, and currency.</p>
       </div>
 
       <SettingsFormClient
@@ -88,7 +88,7 @@ export default async function PaymentSettingsPage() {
       />
 
       <p className="text-xs text-slate-400 max-w-xl">
-        QuickBooks creates new invoices and Pay Now requests. Stripe credentials remain available only for historical imports. Integration secrets are managed in{' '}
+        QuickBooks creates new invoices and Pay Now requests. PayPal sends approved program-holder and contractor payouts. Prior payment-provider records remain read-only for reconciliation. Integration secrets are managed in{' '}
         <Link href="/settings/integrations" className="text-brand-blue-600 underline">
           Dev Studio → Secrets
         </Link>. Connection settings live in the{' '}

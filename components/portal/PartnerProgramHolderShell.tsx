@@ -158,7 +158,7 @@ const NAV: NavItem[] = [
   },
   {
     href: '/program-holder/how-to-use',
-    label: 'How to Use',
+    label: 'Start Here',
     icon: HelpCircle,
     roles: PH,
     section: 'Settings',

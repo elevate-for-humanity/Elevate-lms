@@ -174,7 +174,7 @@ export default function ProgramDetailPage({
   ];
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white [&_a]:no-underline [&_a:hover]:no-underline">
       {/* A. HERO */}
       <section>
         {heroOverride ??

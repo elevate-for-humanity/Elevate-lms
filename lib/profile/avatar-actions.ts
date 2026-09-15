@@ -3,13 +3,10 @@
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import {
-  IMAGE_RELEASE_TEXT,
-  IMAGE_RELEASE_VERSION,
-} from '@/lib/profile/image-release-constants';
+import { IMAGE_RELEASE_TEXT, IMAGE_RELEASE_VERSION } from '@/lib/profile/image-release-constants';
 
-const ALLOWED_AVATAR_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
-const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
+const MAX_AVATAR_SOURCE_BYTES = 10 * 1024 * 1024;
+const MAX_AVATAR_PIXELS = 40_000_000;
 
 function revalidateProfilePaths() {
   revalidatePath('/account/profile');
@@ -30,15 +27,35 @@ export async function uploadProfileAvatar(file: File) {
   } = await supabase.auth.getUser();
   if (!user) return { error: 'Sign in again before uploading your profile photo.' };
 
-  if (!ALLOWED_AVATAR_TYPES.has(file.type) || file.size > MAX_AVATAR_BYTES) {
-    return { error: 'Choose a JPG, PNG, or WebP image no larger than 2 MB.' };
+  if (!(file instanceof File) || file.size <= 0 || file.size > MAX_AVATAR_SOURCE_BYTES) {
+    return { error: 'Choose an image no larger than 10 MB.' };
   }
 
-  const extension = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-  const objectPath = `${user.id}/profile-${Date.now()}.${extension}`;
+  let normalized: Buffer;
+  try {
+    const sharp = (await import('sharp')).default;
+    const input = Buffer.from(await file.arrayBuffer());
+    const metadata = await sharp(input, { limitInputPixels: MAX_AVATAR_PIXELS }).metadata();
+    if (!metadata.width || !metadata.height || !metadata.format) {
+      return { error: 'That file is not a readable image.' };
+    }
+    normalized = await sharp(input, { limitInputPixels: MAX_AVATAR_PIXELS })
+      .rotate()
+      .resize(1200, 1200, { fit: 'cover', position: 'attention', withoutEnlargement: true })
+      .flatten({ background: '#ffffff' })
+      .jpeg({ quality: 88, mozjpeg: true })
+      .toBuffer();
+  } catch {
+    return {
+      error:
+        'That image format could not be decoded. Try exporting it as JPG, PNG, WebP, GIF, AVIF, TIFF, or HEIC.',
+    };
+  }
+
+  const objectPath = `${user.id}/profile-${Date.now()}.jpg`;
   const { error: uploadError } = await supabase.storage
     .from('avatars')
-    .upload(objectPath, file, { contentType: file.type, upsert: false });
+    .upload(objectPath, normalized, { contentType: 'image/jpeg', upsert: false });
   if (uploadError) return { error: `Photo upload failed: ${uploadError.message}` };
 
   const {
@@ -69,7 +86,9 @@ export async function getImageReleaseStatus() {
 
   const { data, error } = await (supabase as any)
     .from('image_release_consents')
-    .select('id,participant_name,signed_name,signer_capacity,guardian_relationship,consent_scope,document_version,signed_at,granted,revoked_at')
+    .select(
+      'id,participant_name,signed_name,signer_capacity,guardian_relationship,consent_scope,document_version,signed_at,granted,revoked_at',
+    )
     .eq('user_id', user.id)
     .eq('granted', true)
     .is('revoked_at', null)
@@ -141,7 +160,12 @@ export async function signImageRelease(input: {
   if (active?.id) {
     await (supabase as any)
       .from('image_release_consents')
-      .update({ granted: false, revoked_at: new Date().toISOString(), revoked_reason: 'Superseded by a newer document version', updated_at: new Date().toISOString() })
+      .update({
+        granted: false,
+        revoked_at: new Date().toISOString(),
+        revoked_reason: 'Superseded by a newer document version',
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', active.id)
       .eq('user_id', user.id);
   }

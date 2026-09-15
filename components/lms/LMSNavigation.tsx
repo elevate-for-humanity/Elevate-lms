@@ -4,9 +4,9 @@ import { createClient } from '@/lib/supabase/client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import Logo from '@/components/ui/Logo';
 import LogoImage from '@/components/site/LogoImage';
+import { ProfileImage } from '@/components/profile/ProfileImage';
 import { usePathname } from 'next/navigation';
 import { NotificationBell } from './NotificationBell';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -245,11 +245,9 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             {/* User Menu - Desktop */}
             <div className="hidden md:flex items-center gap-3 ml-2 pl-4 border-l border-white/20">
               {profile?.avatar_url ? (
-                <Image sizes="100vw"
+                <ProfileImage
                   src={profile.avatar_url}
                   alt={userName}
-                  width={32}
-                  height={32}
                   className="w-8 h-8 rounded-full object-cover"
                 />
               ) : (
@@ -348,11 +346,9 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
             <div className="mt-4 pt-4 border-t border-white/10">
               <div className="flex items-center gap-3 px-4 py-2">
                 {profile?.avatar_url ? (
-                  <Image sizes="100vw"
+                  <ProfileImage
                     src={profile.avatar_url}
                     alt={userName}
-                    width={40}
-                    height={40}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (

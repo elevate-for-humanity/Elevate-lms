@@ -24,6 +24,7 @@ import type {
   ActionItem,
 } from '@/lib/navigation/navigation-config';
 import { getNavigationForRole, ROLE_DISPLAY_NAMES } from '@/lib/navigation/navigation-config';
+import { ProfileImage } from '@/components/profile/ProfileImage';
 
 interface PlatformShellProps {
   user: {
@@ -243,9 +244,17 @@ export function PlatformShell({ user, role, actions = [], children, paris }: Pla
                 className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500"
                 aria-label="Open account menu"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-blue-600 text-sm font-black text-white">
-                  {userInitials}
-                </div>
+                {user.avatar_url ? (
+                  <ProfileImage
+                    src={user.avatar_url}
+                    alt={userName}
+                    className="h-8 w-8 rounded-full bg-white object-cover"
+                  />
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-blue-600 text-sm font-black text-white">
+                    {userInitials}
+                  </div>
+                )}
                 <ChevronDown className="hidden h-4 w-4 text-slate-500 lg:block" />
               </button>
 

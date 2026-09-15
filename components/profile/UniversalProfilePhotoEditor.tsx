@@ -9,6 +9,7 @@ import {
   uploadProfileAvatar,
 } from '@/lib/profile/avatar-actions';
 import { IMAGE_RELEASE_TEXT } from '@/lib/profile/image-release-constants';
+import { ProfileImage } from '@/components/profile/ProfileImage';
 
 type ReleaseStatus = {
   id: string;
@@ -27,6 +28,7 @@ export function UniversalProfilePhotoEditor({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [source, setSource] = useState<HTMLImageElement | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -38,7 +40,9 @@ export function UniversalProfilePhotoEditor({
   const [signedName, setSignedName] = useState('');
   const [signerCapacity, setSignerCapacity] = useState<'self' | 'parent_guardian'>('self');
   const [guardianRelationship, setGuardianRelationship] = useState('');
-  const [consentScope, setConsentScope] = useState<'internal_only' | 'internal_and_public'>('internal_and_public');
+  const [consentScope, setConsentScope] = useState<'internal_only' | 'internal_and_public'>(
+    'internal_and_public',
+  );
   const [acknowledged, setAcknowledged] = useState(false);
   const [releaseMessage, setReleaseMessage] = useState('');
 
@@ -63,16 +67,23 @@ export function UniversalProfilePhotoEditor({
     context.translate(size / 2, size / 2);
     context.rotate((rotation * Math.PI) / 180);
     const scale = Math.max(size / source.naturalWidth, size / source.naturalHeight) * zoom;
-    context.drawImage(source, (-source.naturalWidth * scale) / 2, (-source.naturalHeight * scale) / 2, source.naturalWidth * scale, source.naturalHeight * scale);
+    context.drawImage(
+      source,
+      (-source.naturalWidth * scale) / 2,
+      (-source.naturalHeight * scale) / 2,
+      source.naturalWidth * scale,
+      source.naturalHeight * scale,
+    );
     context.restore();
   }, [rotation, source, zoom]);
 
   function choose(file?: File) {
     if (!file) return;
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setMessage('Choose a JPG, PNG, or WebP photo.');
+    if ((!file.type.startsWith('image/') && file.type !== '') || file.size > 10 * 1024 * 1024) {
+      setMessage('Choose an image no larger than 10 MB.');
       return;
     }
+    setSelectedFile(file);
     const url = URL.createObjectURL(file);
     const image = new Image();
     image.onload = () => {
@@ -82,23 +93,32 @@ export function UniversalProfilePhotoEditor({
     };
     image.onerror = () => {
       URL.revokeObjectURL(url);
-      setMessage('That image could not be opened. Choose a JPG, PNG, or WebP photo.');
+      setSource(null);
+      setMessage(
+        'Preview is unavailable for this format. Save it and the server will convert it automatically.',
+      );
     };
     image.src = url;
   }
 
   async function save() {
     const canvas = canvasRef.current;
-    if (!canvas || !source) return;
+    if (!selectedFile) return;
     setBusy(true);
     setMessage('');
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.88));
-    if (!blob) {
-      setBusy(false);
-      setMessage('Could not prepare that image.');
-      return;
+    let uploadFile = selectedFile;
+    if (canvas && source) {
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, 'image/jpeg', 0.88),
+      );
+      if (!blob) {
+        setBusy(false);
+        setMessage('Could not prepare that image.');
+        return;
+      }
+      uploadFile = new File([blob], 'profile-photo.jpg', { type: 'image/jpeg' });
     }
-    const result = await uploadProfileAvatar(new File([blob], 'profile-photo.jpg', { type: 'image/jpeg' }));
+    const result = await uploadProfileAvatar(uploadFile);
     setMessage(result.error || 'Profile photo saved.');
     setBusy(false);
     if (result.success) window.location.reload();
@@ -143,15 +163,25 @@ export function UniversalProfilePhotoEditor({
           <Camera className="h-6 w-6 text-blue-700" />
           <div>
             <h2 className="text-lg font-black text-slate-950">Profile photo</h2>
-            <p className="text-sm text-slate-600">Choose, crop, and save a photo used across every dashboard.</p>
+            <p className="text-sm text-slate-600">
+              Choose, crop, and save a photo used across every dashboard.
+            </p>
           </div>
         </div>
         <div className="mt-4 grid gap-5 sm:grid-cols-[180px_1fr]">
           <div>
             {source ? (
-              <canvas ref={canvasRef} className="aspect-square w-full rounded-2xl object-cover" aria-label="Profile photo preview" />
+              <canvas
+                ref={canvasRef}
+                className="aspect-square w-full rounded-2xl object-cover"
+                aria-label="Profile photo preview"
+              />
             ) : currentUrl ? (
-              <img src={currentUrl} alt={`${name} profile`} className="aspect-square w-full rounded-2xl object-cover" />
+              <ProfileImage
+                src={currentUrl}
+                alt={`${name} profile`}
+                className="aspect-square w-full rounded-2xl object-cover"
+              />
             ) : (
               <div className="flex aspect-square items-center justify-center rounded-2xl bg-slate-100 text-5xl font-black text-slate-500">
                 {name.slice(0, 1).toUpperCase()}
@@ -161,39 +191,79 @@ export function UniversalProfilePhotoEditor({
           <div className="space-y-4">
             <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl bg-slate-950 px-4 py-2 font-bold text-white">
               <Upload className="h-4 w-4" /> Choose photo
-              <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(event) => choose(event.target.files?.[0])} />
+              <input
+                type="file"
+                accept="image/*,.heic,.heif,.avif,.tif,.tiff"
+                className="sr-only"
+                onChange={(event) => choose(event.target.files?.[0])}
+              />
             </label>
-            <p className="text-xs text-slate-600">JPG, PNG, or WebP. The saved image is optimized below the 2 MB storage limit.</p>
-            {source ? (
+            <p className="text-xs text-slate-600">
+              Common camera and web image formats are accepted up to 10 MB and normalized for every
+              dashboard.
+            </p>
+            {selectedFile ? (
               <>
-                <label className="block text-sm font-bold">
-                  Crop / zoom
-                  <input className="mt-1 w-full" type="range" min="1" max="2.5" step="0.05" value={zoom} onChange={(event) => setZoom(Number(event.target.value))} />
-                </label>
+                {source ? (
+                  <label className="block text-sm font-bold">
+                    Crop / zoom
+                    <input
+                      className="mt-1 w-full"
+                      type="range"
+                      min="1"
+                      max="2.5"
+                      step="0.05"
+                      value={zoom}
+                      onChange={(event) => setZoom(Number(event.target.value))}
+                    />
+                  </label>
+                ) : null}
                 <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={() => setRotation((value) => value + 90)} className="inline-flex min-h-11 items-center gap-2 rounded-xl border px-4 font-bold">
-                    <RotateCcw className="h-4 w-4" /> Rotate
-                  </button>
-                  <button type="button" onClick={() => void save()} disabled={busy} className="min-h-11 rounded-xl bg-blue-700 px-5 font-black text-white disabled:opacity-50">
+                  {source ? (
+                    <button
+                      type="button"
+                      onClick={() => setRotation((value) => value + 90)}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-xl border px-4 font-bold"
+                    >
+                      <RotateCcw className="h-4 w-4" /> Rotate
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => void save()}
+                    disabled={busy}
+                    className="min-h-11 rounded-xl bg-blue-700 px-5 font-black text-white disabled:opacity-50"
+                  >
                     {busy ? 'Saving…' : 'Save photo'}
                   </button>
                 </div>
               </>
             ) : null}
             <p className="rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
-              Uploading a profile photo does not grant permission for public marketing use. Public use requires the separate release below.
+              Uploading a profile photo does not grant permission for public marketing use. Public
+              use requires the separate release below.
             </p>
-            {message ? <p role="status" aria-live="polite" className="text-sm font-bold text-slate-800">{message}</p> : null}
+            {message ? (
+              <p role="status" aria-live="polite" className="text-sm font-bold text-slate-800">
+                {message}
+              </p>
+            ) : null}
           </div>
         </div>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="flex items-center gap-3">
-          {release ? <ShieldCheck className="h-6 w-6 text-emerald-700" /> : <FileSignature className="h-6 w-6 text-blue-700" />}
+          {release ? (
+            <ShieldCheck className="h-6 w-6 text-emerald-700" />
+          ) : (
+            <FileSignature className="h-6 w-6 text-blue-700" />
+          )}
           <div>
             <h2 className="text-lg font-black text-slate-950">Image release</h2>
-            <p className="text-sm text-slate-600">Control whether Elevate may use your image outside your private account.</p>
+            <p className="text-sm text-slate-600">
+              Control whether Elevate may use your image outside your private account.
+            </p>
           </div>
         </div>
 
@@ -203,53 +273,107 @@ export function UniversalProfilePhotoEditor({
           <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
             <p className="font-black text-emerald-950">Signed</p>
             <p className="mt-1 text-sm text-emerald-900">
-              {release.consent_scope === 'internal_and_public' ? 'Internal and public program use authorized.' : 'Internal dashboard use only.'}
+              {release.consent_scope === 'internal_and_public'
+                ? 'Internal and public program use authorized.'
+                : 'Internal dashboard use only.'}
             </p>
             <p className="mt-1 text-xs text-emerald-800">
-              Signed by {release.signed_name} on {new Date(release.signed_at).toLocaleDateString('en-US')}.
+              Signed by {release.signed_name} on{' '}
+              {new Date(release.signed_at).toLocaleDateString('en-US')}.
             </p>
-            <button type="button" onClick={() => void revokeRelease()} disabled={releaseBusy} className="mt-4 min-h-11 rounded-xl border border-red-300 bg-white px-4 font-bold text-red-700 disabled:opacity-50">
+            <button
+              type="button"
+              onClick={() => void revokeRelease()}
+              disabled={releaseBusy}
+              className="mt-4 min-h-11 rounded-xl border border-red-300 bg-white px-4 font-bold text-red-700 disabled:opacity-50"
+            >
               Revoke future public use
             </button>
           </div>
         ) : (
           <div className="mt-4 space-y-4">
-            <p className="rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{IMAGE_RELEASE_TEXT}</p>
+            <p className="rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+              {IMAGE_RELEASE_TEXT}
+            </p>
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="text-sm font-bold">Participant name
-                <input value={participantName} onChange={(event) => setParticipantName(event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3" />
+              <label className="text-sm font-bold">
+                Participant name
+                <input
+                  value={participantName}
+                  onChange={(event) => setParticipantName(event.target.value)}
+                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3"
+                />
               </label>
-              <label className="text-sm font-bold">Signer’s full legal name
-                <input value={signedName} onChange={(event) => setSignedName(event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3" />
+              <label className="text-sm font-bold">
+                Signer’s full legal name
+                <input
+                  value={signedName}
+                  onChange={(event) => setSignedName(event.target.value)}
+                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3"
+                />
               </label>
-              <label className="text-sm font-bold">I am signing as
-                <select value={signerCapacity} onChange={(event) => setSignerCapacity(event.target.value as 'self' | 'parent_guardian')} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3">
+              <label className="text-sm font-bold">
+                I am signing as
+                <select
+                  value={signerCapacity}
+                  onChange={(event) =>
+                    setSignerCapacity(event.target.value as 'self' | 'parent_guardian')
+                  }
+                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3"
+                >
                   <option value="self">Myself</option>
                   <option value="parent_guardian">Parent or legal guardian</option>
                 </select>
               </label>
               {signerCapacity === 'parent_guardian' ? (
-                <label className="text-sm font-bold">Relationship to participant
-                  <input value={guardianRelationship} onChange={(event) => setGuardianRelationship(event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3" />
+                <label className="text-sm font-bold">
+                  Relationship to participant
+                  <input
+                    value={guardianRelationship}
+                    onChange={(event) => setGuardianRelationship(event.target.value)}
+                    className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3"
+                  />
                 </label>
               ) : null}
-              <label className="text-sm font-bold">Permission
-                <select value={consentScope} onChange={(event) => setConsentScope(event.target.value as 'internal_only' | 'internal_and_public')} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3">
+              <label className="text-sm font-bold">
+                Permission
+                <select
+                  value={consentScope}
+                  onChange={(event) =>
+                    setConsentScope(event.target.value as 'internal_only' | 'internal_and_public')
+                  }
+                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3"
+                >
                   <option value="internal_and_public">Internal and public program use</option>
                   <option value="internal_only">Private dashboard use only</option>
                 </select>
               </label>
             </div>
             <label className="flex items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm font-semibold">
-              <input type="checkbox" checked={acknowledged} onChange={(event) => setAcknowledged(event.target.checked)} className="mt-1 h-4 w-4" />
-              I have read the release, understand the selected permission, and electronically sign using the legal name entered above.
+              <input
+                type="checkbox"
+                checked={acknowledged}
+                onChange={(event) => setAcknowledged(event.target.checked)}
+                className="mt-1 h-4 w-4"
+              />
+              I have read the release, understand the selected permission, and electronically sign
+              using the legal name entered above.
             </label>
-            <button type="button" onClick={() => void signRelease()} disabled={releaseBusy || !acknowledged} className="min-h-11 rounded-xl bg-blue-700 px-5 font-black text-white disabled:opacity-50">
+            <button
+              type="button"
+              onClick={() => void signRelease()}
+              disabled={releaseBusy || !acknowledged}
+              className="min-h-11 rounded-xl bg-blue-700 px-5 font-black text-white disabled:opacity-50"
+            >
               {releaseBusy ? 'Saving…' : 'Sign image release'}
             </button>
           </div>
         )}
-        {releaseMessage ? <p role="status" aria-live="polite" className="mt-3 text-sm font-bold text-slate-800">{releaseMessage}</p> : null}
+        {releaseMessage ? (
+          <p role="status" aria-live="polite" className="mt-3 text-sm font-bold text-slate-800">
+            {releaseMessage}
+          </p>
+        ) : null}
       </section>
     </div>
   );

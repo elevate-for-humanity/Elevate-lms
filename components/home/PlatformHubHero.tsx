@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, BriefcaseBusiness, GraduationCap } from 'lucide-react';
+import { ArrowRight, BadgeCheck, BriefcaseBusiness, GraduationCap, Store } from 'lucide-react';
 import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
 const HOME_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
 
@@ -31,14 +31,26 @@ export function PlatformHubHero() {
               Learn, operate programs, coordinate employers, document compliance, and move people
               from application to credential in one connected system.
             </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link href="/programs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800">
-                Explore Programs <ArrowRight className="h-5 w-5" aria-hidden="true" />
+            <div className="mt-7 grid gap-3 sm:grid-cols-3">
+              <Link href="/programs" className="group rounded-2xl bg-brand-red-700 p-4 text-white no-underline hover:bg-brand-red-800 hover:no-underline">
+                <GraduationCap className="h-6 w-6" aria-hidden="true" />
+                <span className="mt-3 block font-black">I want career training</span>
+                <span className="mt-1 block text-sm font-semibold text-white/85">Compare programs and apply.</span>
               </Link>
-              <Link href="/check-eligibility" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 px-6 py-3 font-black text-slate-950 hover:bg-slate-50">
-                Check My Options
+              <Link href="/partners/host-shops" className="group rounded-2xl border-2 border-slate-900 bg-white p-4 text-slate-950 no-underline hover:bg-slate-50 hover:no-underline">
+                <Store className="h-6 w-6" aria-hidden="true" />
+                <span className="mt-3 block font-black">I am a Host Shop</span>
+                <span className="mt-1 block text-sm font-semibold text-slate-600">Employ and train apprentices.</span>
+              </Link>
+              <Link href="/program-holder/apply" className="group rounded-2xl border-2 border-slate-900 bg-white p-4 text-slate-950 no-underline hover:bg-slate-50 hover:no-underline">
+                <BriefcaseBusiness className="h-6 w-6" aria-hidden="true" />
+                <span className="mt-3 block font-black">I run a program</span>
+                <span className="mt-1 block text-sm font-semibold text-slate-600">Use Elevate to deliver it.</span>
               </Link>
             </div>
+            <Link href="/check-eligibility" className="mt-4 inline-flex items-center gap-2 font-black text-brand-blue-800 no-underline hover:no-underline">
+              Not sure where to start? Check your options <ArrowRight className="h-5 w-5" aria-hidden="true" />
+            </Link>
             <div className="mt-8 grid gap-3 border-t border-slate-200 pt-6 sm:grid-cols-3">
               {PROOF.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-2 text-sm font-bold text-slate-700">

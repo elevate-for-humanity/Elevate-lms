@@ -46,11 +46,28 @@ async function _GET(request: Request) {
           AFFIRM_ENVIRONMENT: process.env.AFFIRM_ENVIRONMENT || '(not set, defaults to production)',
         },
       },
-      stripe: {
+      paypal: {
+        configured: Boolean(
+          process.env.PAYPAL_CLIENT_ID &&
+          process.env.PAYPAL_CLIENT_SECRET &&
+          process.env.PAYPAL_PAYOUT_WEBHOOK_ID
+        ),
         envVars: {
-          STRIPE_SECRET_KEY: !!process.env.STRIPE_SECRET_KEY,
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-          STRIPE_WEBHOOK_SECRET: !!process.env.STRIPE_WEBHOOK_SECRET,
+          PAYPAL_CLIENT_ID: !!process.env.PAYPAL_CLIENT_ID,
+          PAYPAL_CLIENT_SECRET: !!process.env.PAYPAL_CLIENT_SECRET,
+          PAYPAL_PAYOUT_WEBHOOK_ID: !!process.env.PAYPAL_PAYOUT_WEBHOOK_ID,
+          PAYPAL_ENVIRONMENT: process.env.PAYPAL_ENVIRONMENT || '(not set, defaults to sandbox)',
+        },
+      },
+      quickbooks: {
+        configured: Boolean(
+          process.env.QUICKBOOKS_CLIENT_ID && process.env.QUICKBOOKS_CLIENT_SECRET
+        ),
+        envVars: {
+          QUICKBOOKS_CLIENT_ID: !!process.env.QUICKBOOKS_CLIENT_ID,
+          QUICKBOOKS_CLIENT_SECRET: !!process.env.QUICKBOOKS_CLIENT_SECRET,
+          QUICKBOOKS_ENVIRONMENT:
+            process.env.QUICKBOOKS_ENVIRONMENT || '(managed by the QuickBooks connection)',
         },
       },
       supabase: {

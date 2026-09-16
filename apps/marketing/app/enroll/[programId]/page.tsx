@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { BookOpen, Key, CheckCircle, AlertCircle, ArrowRight, Tag } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
@@ -33,6 +33,7 @@ interface Program {
 export default function EnrollPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const programId = params.programId as string;
 
   const [program, setProgram] = useState<Program | null>(null);
@@ -40,7 +41,10 @@ export default function EnrollPage() {
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
   const [message, setMessage] = useState('');
-  const [couponCode, setCouponCode] = useState('');
+  const [couponCode, setCouponCode] = useState(() => searchParams.get('coupon')?.toUpperCase() || '');
+  const [paymentPlan, setPaymentPlan] = useState<'full' | 'installments'>(() =>
+    searchParams.get('payment_plan') === 'installments' ? 'installments' : 'full',
+  );
   const [eligibility, setEligibility] = useState<any>(null);
   const supabase = createClient();
 
@@ -143,8 +147,9 @@ export default function EnrollPage() {
           body: JSON.stringify({
             program_id: program?.id || programId,
             funding_source: 'self_pay',
+            payment_plan: paymentPlan,
             coupon_code: couponCode.trim() || undefined,
-            partner_key: new URLSearchParams(window.location.search).get('partner') || undefined,
+            partner_key: searchParams.get('partner') || undefined,
           }),
         });
 
@@ -383,7 +388,50 @@ export default function EnrollPage() {
               </div>
 
               {!program.is_free && (program.price || program.total_cost) ? (
-                <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 sm:mb-6">
+                <>
+                  <fieldset className="mb-4 rounded-xl border border-slate-200 bg-white p-4 sm:mb-6">
+                    <legend className="px-1 text-sm font-black text-slate-950">Payment schedule</legend>
+                    <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                      <label className={`cursor-pointer rounded-xl border-2 p-4 ${
+                        paymentPlan === 'full' ? 'border-blue-600 bg-blue-50' : 'border-slate-200'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="payment-plan"
+                          value="full"
+                          checked={paymentPlan === 'full'}
+                          onChange={() => setPaymentPlan('full')}
+                          className="mr-2"
+                        />
+                        <span className="font-bold text-slate-950">Pay in full</span>
+                        <span className="mt-1 block text-xs text-slate-600">One QuickBooks invoice</span>
+                      </label>
+                      <label className={`cursor-pointer rounded-xl border-2 p-4 ${
+                        paymentPlan === 'installments'
+                          ? 'border-blue-600 bg-blue-50'
+                          : 'border-slate-200'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="payment-plan"
+                          value="installments"
+                          checked={paymentPlan === 'installments'}
+                          onChange={() => setPaymentPlan('installments')}
+                          className="mr-2"
+                        />
+                        <span className="font-bold text-slate-950">Four installments</span>
+                        <span className="mt-1 block text-xs text-slate-600">
+                          Initial invoice, then three monthly invoices
+                        </span>
+                      </label>
+                    </div>
+                    <p className="mt-3 text-xs leading-5 text-slate-600">
+                      QuickBooks shows the online card or ACH methods enabled for your invoice.
+                      This installment schedule is not third-party BNPL.
+                    </p>
+                  </fieldset>
+
+                  <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 sm:mb-6">
                   <label
                     htmlFor="enrollment-coupon"
                     className="flex items-center gap-2 text-sm font-black text-blue-950"
@@ -404,7 +452,8 @@ export default function EnrollPage() {
                     created. For partner programs, a coupon can reduce only Elevate&apos;s portion;
                     the training provider&apos;s approved share remains protected.
                   </p>
-                </div>
+                  </div>
+                </>
               ) : null}
 
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">

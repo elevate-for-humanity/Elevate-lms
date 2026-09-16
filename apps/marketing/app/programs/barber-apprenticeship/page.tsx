@@ -356,9 +356,10 @@ export default async function BarberApprenticeshipPage() {
               Can’t afford to pay {program.selfPayCost} in full? See if you qualify.
             </h2>
             <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700 sm:text-lg">
-              Compare available buy-now-pay-later (BNPL) and installment options, or calculate a
-              payment plan before checkout. Approval and terms are determined by the selected
-              provider.
+              Buy Now, Pay Later lets an approved financing provider split tuition into smaller
+              scheduled payments instead of one full payment. You can also estimate Elevate's
+              installment plan before checkout. Approval, payment dates, and final terms depend on
+              the option you choose.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link
@@ -371,7 +372,7 @@ export default async function BarberApprenticeshipPage() {
                 href="/programs/barber-apprenticeship/payment/bnpl"
                 className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-brand-blue-700 bg-white px-7 py-3.5 font-black text-brand-blue-900 hover:bg-sky-50"
               >
-                See If You Qualify · BNPL Options
+                See Monthly Payment Options
               </Link>
               <Link
                 href={program.cta.applyHref}

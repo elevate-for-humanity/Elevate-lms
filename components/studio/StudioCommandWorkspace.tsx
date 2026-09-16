@@ -91,6 +91,25 @@ export default function StudioCommandWorkspace({
     setWorkspaceVisible(false);
   };
 
+  const handleCommandStart = (command: string) => {
+    setWorkspaceVisible(true);
+    setMobileSurface('tool');
+    setActiveCapability(null);
+    if (/\b(course|lesson|curriculum|quiz|assessment|learning object|media)\b/i.test(command)) {
+      setPreviewUrl(`${window.location.origin}/course-builder`);
+      setMode('preview');
+      return;
+    }
+    setMode('browser');
+  };
+
+  const handleTaskCheckpoint = (checkpoint: OrchestratedPlanCheckpoint | null) => {
+    setActiveTask(checkpoint);
+    if (!checkpoint) return;
+    setWorkspaceVisible(true);
+    setMobileSurface('tool');
+  };
+
   const activeWorkspace = useMemo(
     () => workspaces.find((workspace) => workspace.id === activeCapability) ?? null,
     [activeCapability, workspaces],
@@ -201,7 +220,8 @@ export default function StudioCommandWorkspace({
             embedded
             onOpenPreview={() => openPreview()}
             onPreviewTarget={openPreview}
-            onTaskCheckpoint={setActiveTask}
+            onTaskCheckpoint={handleTaskCheckpoint}
+            onCommandStart={handleCommandStart}
             onOpenTasks={() => openCapability('tasks')}
             suggestedPrompt={suggestedPrompt}
             restoreLatest={conversationKey === 0}

@@ -5,4 +5,6 @@ export const APPRENTICE_TIME_POLICY = {
   weeklyCombinedMaxHours: 50,
   outsideGeofenceGraceMinutes: 15,
   heartbeatIntervalMinutes: 2,
+  theoryHeartbeatIntervalSeconds: 60,
+  theoryInactivityTimeoutSeconds: 90,
 } as const;

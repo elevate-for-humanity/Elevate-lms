@@ -35,6 +35,7 @@ interface TimeclockContext {
   hoursCompleted: number;
   hoursRequired: number;
   weeklyOjlHours: number;
+  weeklyTheoryRecordedHours: number;
   weeklyTheoryVerifiedHours: number;
   weeklyOjlMaxHours: number;
   weeklyTheoryTargetHours: number;
@@ -490,14 +491,18 @@ export default function TimeclockPage() {
           {/* Weekly limits and attendance rules */}
           <section className="mb-6 rounded-lg border border-brand-blue-200 bg-brand-blue-50 p-4" aria-labelledby="timeclock-rules-heading">
             <h2 id="timeclock-rules-heading" className="font-bold text-slate-900">Weekly hours and timeclock rules</h2>
-            <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+            <div className="mt-3 grid grid-cols-1 gap-3 text-sm sm:grid-cols-3">
               <div className="rounded-md bg-white p-3">
                 <p className="font-semibold text-slate-900">OJL this week</p>
                 <p className="text-brand-blue-700">{context.weeklyOjlHours} / {context.weeklyOjlMaxHours} hours</p>
               </div>
               <div className="rounded-md bg-white p-3">
-                <p className="font-semibold text-slate-900">Verified theory</p>
-                <p className="text-brand-blue-700">{context.weeklyTheoryVerifiedHours} / {context.weeklyTheoryMaxHours} hours</p>
+                <p className="font-semibold text-slate-900">Recorded theory</p>
+                <p className="text-brand-blue-700">{context.weeklyTheoryRecordedHours} / {context.weeklyTheoryMaxHours} hours</p>
+              </div>
+              <div className="rounded-md bg-white p-3">
+                <p className="font-semibold text-slate-900">Verified RTI</p>
+                <p className="text-brand-blue-700">{context.weeklyTheoryVerifiedHours} hours</p>
               </div>
             </div>
             <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-800">
@@ -507,7 +512,7 @@ export default function TimeclockPage() {
               <li>Theory and workplace hours cannot overlap. Clock out before starting an online lesson.</li>
               <li>Clock in and out only at your approved Host Shop with location enabled.</li>
               <li>Leaving the geofence continuously for {context.outsideGeofenceGraceMinutes} minutes automatically clocks you out.</li>
-              <li>Login alone does not earn theory credit. Only documented active learning time that is verified counts.</li>
+              <li>Login alone does not earn theory credit. Active lesson time is recorded automatically, then reviewed before it becomes verified RTI.</li>
             </ul>
           </section>
 

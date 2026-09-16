@@ -89,6 +89,7 @@ async function _GET(request: NextRequest) {
 
   let activeShift = null;
   let weeklyOjlHours = 0;
+  let weeklyTheoryRecordedHours = 0;
   let weeklyTheoryVerifiedHours = 0;
   if (apprentice) {
     const workDate = getTimeclockWorkDate();
@@ -96,7 +97,7 @@ async function _GET(request: NextRequest) {
     const weekStart = new Date(`${weekEnding}T12:00:00Z`);
     weekStart.setUTCDate(weekStart.getUTCDate() - 6);
     const weekStartDate = weekStart.toISOString().slice(0, 10);
-    const [{ data: weeklyEntries }, { data: weeklyTheory }] = await Promise.all([
+    const [{ data: weeklyEntries }, { data: weeklyTheory }, { data: weeklyTheorySessions }] = await Promise.all([
       db.from('progress_entries')
         .select('hours_worked')
         .eq('apprentice_id', apprentice.id)
@@ -109,6 +110,10 @@ async function _GET(request: NextRequest) {
         .eq('status', 'verified')
         .gte('instruction_date', weekStartDate)
         .lte('instruction_date', weekEnding),
+      db.from('theory_activity_sessions')
+        .select('active_seconds')
+        .eq('user_id', subject.userId)
+        .eq('week_ending', weekEnding),
     ]);
     weeklyOjlHours = (weeklyEntries || []).reduce(
       (sum: number, row: any) => sum + Number(row.hours_worked || 0),
@@ -116,6 +121,10 @@ async function _GET(request: NextRequest) {
     );
     weeklyTheoryVerifiedHours = (weeklyTheory || []).reduce(
       (sum: number, row: any) => sum + Number(row.minutes_verified || 0) / 60,
+      0,
+    );
+    weeklyTheoryRecordedHours = (weeklyTheorySessions || []).reduce(
+      (sum: number, row: any) => sum + Number(row.active_seconds || 0) / 3600,
       0,
     );
     const { data: shift } = await db
@@ -152,6 +161,7 @@ async function _GET(request: NextRequest) {
         }
       : null,
     weeklyOjlHours: Math.round(weeklyOjlHours * 100) / 100,
+    weeklyTheoryRecordedHours: Math.round(weeklyTheoryRecordedHours * 100) / 100,
     weeklyTheoryVerifiedHours: Math.round(weeklyTheoryVerifiedHours * 100) / 100,
     weeklyOjlMaxHours: APPRENTICE_TIME_POLICY.weeklyOjlMaxHours,
     weeklyTheoryTargetHours: APPRENTICE_TIME_POLICY.weeklyTheoryTargetHours,

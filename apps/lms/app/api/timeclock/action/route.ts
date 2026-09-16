@@ -311,6 +311,31 @@ async function _POST(request: NextRequest) {
     const normalizedAccuracy = accuracy_m === undefined ? null : Math.round(accuracy_m);
 
     if (action === 'clock_in') {
+      const staleTheoryCutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+      await db
+        .from('theory_activity_sessions')
+        .update({ status: 'completed', ended_at: serverNow, updated_at: serverNow })
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .lt('last_heartbeat_at', staleTheoryCutoff);
+      const { data: activeTheorySession } = await db
+        .from('theory_activity_sessions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .gte('last_heartbeat_at', staleTheoryCutoff)
+        .limit(1)
+        .maybeSingle();
+      if (activeTheorySession) {
+        return NextResponse.json(
+          {
+            error: 'Close or pause the active theory lesson before clocking into OJL.',
+            code: 'THEORY_SESSION_ACTIVE',
+          },
+          { status: 409 },
+        );
+      }
+
       const { data: weeklyEntries } = await db
         .from('progress_entries')
         .select('hours_worked')

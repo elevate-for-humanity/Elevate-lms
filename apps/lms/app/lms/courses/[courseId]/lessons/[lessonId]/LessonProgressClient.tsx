@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
-import { CheckCircle2, Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { CheckCircle2, Clock3, Loader2 } from 'lucide-react';
 
 type QuizQuestion = {
   id?: string;
@@ -35,6 +35,105 @@ export default function LessonProgressClient({
   const [result, setResult] = useState<string>('');
   const [saving, setSaving] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [theoryStatus, setTheoryStatus] = useState<'starting' | 'active' | 'paused' | 'untracked'>('starting');
+  const [theoryMessage, setTheoryMessage] = useState('Starting active theory tracking…');
+  const [weeklyTheorySeconds, setWeeklyTheorySeconds] = useState(0);
+  const theorySessionId = useRef<string | null>(null);
+  const lastActivityAt = useRef(Date.now());
+  const startingTheorySession = useRef(false);
+
+  const startTheorySession = useCallback(async () => {
+    if (startingTheorySession.current || theorySessionId.current || document.hidden) return;
+    startingTheorySession.current = true;
+    try {
+      const response = await fetch('/api/theory/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'start', courseId, lessonId }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setTheoryStatus('paused');
+        setTheoryMessage(data.error || 'Theory tracking is paused.');
+        return;
+      }
+      if (!data.tracked) {
+        setTheoryStatus('untracked');
+        setTheoryMessage('Standard course progress tracking is active.');
+        return;
+      }
+      theorySessionId.current = data.sessionId;
+      setWeeklyTheorySeconds(Number(data.weeklyActiveSeconds || 0));
+      setTheoryStatus('active');
+      setTheoryMessage('Active lesson time is being recorded for RTI review.');
+    } finally {
+      startingTheorySession.current = false;
+    }
+  }, [courseId, lessonId]);
+
+  const stopTheorySession = useCallback((creditFinal = false) => {
+    const sessionId = theorySessionId.current;
+    if (!sessionId) return;
+    theorySessionId.current = null;
+    void fetch('/api/theory/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'stop', sessionId, creditFinal }),
+      keepalive: true,
+    });
+  }, []);
+
+  useEffect(() => {
+    void startTheorySession();
+    const noteActivity = () => {
+      lastActivityAt.current = Date.now();
+      if (!theorySessionId.current && !document.hidden) void startTheorySession();
+    };
+    const handleVisibility = () => {
+      if (document.hidden) {
+        stopTheorySession(true);
+        setTheoryStatus((status) => (status === 'untracked' ? status : 'paused'));
+        setTheoryMessage('Theory tracking paused while this lesson is not visible.');
+      } else {
+        lastActivityAt.current = Date.now();
+        void startTheorySession();
+      }
+    };
+    const activityEvents: (keyof WindowEventMap)[] = ['pointerdown', 'keydown', 'scroll', 'touchstart'];
+    activityEvents.forEach((event) => window.addEventListener(event, noteActivity, { passive: true }));
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    const heartbeat = window.setInterval(async () => {
+      const sessionId = theorySessionId.current;
+      if (!sessionId || document.hidden) return;
+      if (Date.now() - lastActivityAt.current > 90_000) {
+        stopTheorySession(false);
+        setTheoryStatus('paused');
+        setTheoryMessage('Theory tracking paused after inactivity. Interact with the lesson to resume.');
+        return;
+      }
+      const response = await fetch('/api/theory/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'heartbeat', sessionId }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.status !== 'active') {
+        theorySessionId.current = null;
+        setTheoryStatus('paused');
+        setTheoryMessage(data.message || data.error || 'Theory tracking is paused.');
+        return;
+      }
+      setWeeklyTheorySeconds(Number(data.weeklyActiveSeconds || 0));
+    }, 60_000);
+
+    return () => {
+      window.clearInterval(heartbeat);
+      activityEvents.forEach((event) => window.removeEventListener(event, noteActivity));
+      document.removeEventListener('visibilitychange', handleVisibility);
+      stopTheorySession(true);
+    };
+  }, [startTheorySession, stopTheorySession]);
 
   const isGated = lessonType === 'checkpoint' || lessonType === 'exam';
   const normalized = useMemo(
@@ -55,6 +154,7 @@ export default function LessonProgressClient({
   );
 
   async function markComplete() {
+    stopTheorySession(true);
     const elapsed = Math.max(120, Math.floor((Date.now() - startedAt.current) / 1000));
     const response = await fetch(`/api/courses/${courseId}/lessons/${lessonId}/complete`, {
       method: 'POST',
@@ -131,6 +231,13 @@ export default function LessonProgressClient({
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className={`mb-5 rounded-xl border p-4 ${theoryStatus === 'active' ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
+        <p className="flex items-center gap-2 text-sm font-extrabold text-slate-950">
+          <Clock3 className="h-4 w-4" /> Theory activity
+          <span className="ml-auto">{(weeklyTheorySeconds / 3600).toFixed(2)} / 10.00 hours this week</span>
+        </p>
+        <p className="mt-1 text-sm font-semibold text-slate-700">{theoryMessage}</p>
+      </div>
       {isGated ? (
         <>
           <h2 className="text-xl font-extrabold text-slate-950">

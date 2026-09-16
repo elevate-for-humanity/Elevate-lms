@@ -68,6 +68,7 @@ export function PlatformHubHero() {
             src={HOME_VIDEO}
             poster="/images/beauty/program-beauty-training.webp"
             showPosterBeforePlayback
+            loop
             ariaLabel="Elevate career training and workforce platform in action"
             className="absolute inset-0 h-full w-full object-cover object-center"
           />

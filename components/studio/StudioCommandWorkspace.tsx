@@ -67,7 +67,7 @@ export default function StudioCommandWorkspace({
 }) {
   const [conversationKey, setConversationKey] = useState(0);
   const [mode, setMode] = useState<InspectionMode>('browser');
-  const [previewUrl, setPreviewUrl] = useState('https://admin.elevateforhumanity.org/dashboard');
+  const [previewUrl, setPreviewUrl] = useState('https://admin.elevateforhumanity.org/course-builder');
   // Mobile must open on the command composer. The browser remains one tap away
   // and receives the same active task context after submission.
   const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('chat');
@@ -75,7 +75,7 @@ export default function StudioCommandWorkspace({
   const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const [workspaceVisible, setWorkspaceVisible] = useState(false);
+  const [workspaceVisible, setWorkspaceVisible] = useState(true);
 
   const openPreview = (url?: string) => {
     if (url) setPreviewUrl(url);
@@ -88,7 +88,9 @@ export default function StudioCommandWorkspace({
   const askAdminAI = (prompt: string) => {
     setSuggestedPrompt(prompt);
     setMobileSurface('chat');
-    setWorkspaceVisible(false);
+    setWorkspaceVisible(true);
+    setActiveCapability(null);
+    setMode('preview');
   };
 
   const handleCommandStart = (command: string) => {
@@ -150,7 +152,10 @@ export default function StudioCommandWorkspace({
               setActiveConversationId(null);
               setActiveTask(null);
               setMobileSurface('chat');
-              setWorkspaceVisible(false);
+              setWorkspaceVisible(true);
+              setActiveCapability(null);
+              setMode('preview');
+              setPreviewUrl('https://admin.elevateforhumanity.org/course-builder');
             }}
             className="ml-auto inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-white/20 px-3 text-xs font-bold hover:bg-white/10"
           >
@@ -168,28 +173,27 @@ export default function StudioCommandWorkspace({
             type="button"
             onClick={() => {
               setMobileSurface('chat');
-              setWorkspaceVisible(false);
+              setWorkspaceVisible(true);
             }}
-            aria-pressed={!workspaceVisible}
-            className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${!workspaceVisible ? 'bg-white text-brand-blue-800' : 'bg-white/10 text-white hover:bg-white/15'}`}
+            aria-pressed={mobileSurface === 'chat'}
+            className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${mobileSurface === 'chat' ? 'bg-white text-brand-blue-800' : 'bg-white/10 text-white hover:bg-white/15'}`}
           >
             <MessageSquare className="h-4 w-4" aria-hidden="true" /> Commands
           </button>
           <button
             type="button"
             onClick={() => {
-              setWorkspaceVisible((visible) => !visible);
-              setMobileSurface(workspaceVisible ? 'chat' : 'tool');
+              setWorkspaceVisible(true);
+              setMobileSurface('tool');
+              setActiveCapability(null);
+              setMode('preview');
+              setPreviewUrl('https://admin.elevateforhumanity.org/course-builder');
             }}
-            aria-pressed={workspaceVisible}
+            aria-pressed={workspaceVisible && !activeCapability && mode === 'preview'}
             className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-white/10 px-3 text-xs font-bold text-white hover:bg-white/15"
           >
-            {workspaceVisible ? (
-              <PanelRightClose className="h-4 w-4" aria-hidden="true" />
-            ) : (
-              <PanelRightOpen className="h-4 w-4" aria-hidden="true" />
-            )}
-            {workspaceVisible ? 'Hide live work' : 'Show live work'}
+            <PanelRightOpen className="h-4 w-4" aria-hidden="true" />
+            Course Builder live
           </button>
           <span className="ml-2 hidden text-[11px] font-semibold text-blue-100 sm:inline">
             One command · automated workflow · verified results

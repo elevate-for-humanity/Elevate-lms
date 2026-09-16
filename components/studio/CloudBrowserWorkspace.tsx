@@ -57,6 +57,7 @@ export default function CloudBrowserWorkspace({
   const [activeTaskId, setActiveTaskId] = useState('');
   const [approvedTaskId, setApprovedTaskId] = useState('');
   const imageRef = useRef<HTMLImageElement>(null);
+  const secureInputRef = useRef<HTMLInputElement>(null);
   const targetEditedRef = useRef(Boolean(initialTarget));
   const autoStartedRef = useRef(false);
 
@@ -484,6 +485,44 @@ export default function CloudBrowserWorkspace({
                 {agentResult}
               </p>
             )}
+          </div>
+          <div className="border-b border-slate-800 p-3">
+            <p className="mb-2 text-xs font-black text-emerald-300">Secure sign-in handoff</p>
+            <p className="mb-2 text-[10px] leading-4 text-slate-500">
+              Enter passwords or verification codes here. The value is sent directly to the active
+              isolated browser, cleared immediately, and never added to the AI conversation or task
+              evidence.
+            </p>
+            <div className="flex gap-2">
+              <input
+                ref={secureInputRef}
+                type="password"
+                autoComplete="off"
+                aria-label="Secure browser input"
+                className="min-w-0 flex-1 rounded border border-emerald-800 bg-slate-900 px-2 py-1.5 text-xs"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const value = secureInputRef.current?.value || '';
+                  if (!value || !session) return;
+                  if (secureInputRef.current) secureInputRef.current.value = '';
+                  void action({ type: 'type', text: value });
+                }}
+                disabled={!session}
+                className="rounded bg-emerald-600 px-2 text-xs font-black text-white disabled:opacity-50"
+              >
+                Type securely
+              </button>
+              <button
+                type="button"
+                onClick={() => action({ type: 'keypress', key: 'Enter' })}
+                disabled={!session}
+                className="rounded border border-emerald-800 px-2 text-xs text-emerald-200 disabled:opacity-50"
+              >
+                Enter
+              </button>
+            </div>
           </div>
           <div className="border-b border-slate-800 p-3">
             <p className="mb-2 flex items-center gap-2 text-xs font-black">

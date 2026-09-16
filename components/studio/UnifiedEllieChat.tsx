@@ -91,6 +91,7 @@ interface UnifiedEllieChatProps {
   suggestedPrompt?: string;
   restoreLatest?: boolean;
   onConversationChange?: (conversationId: string | null) => void;
+  onCommandStart?: (command: string) => void;
 }
 
 const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
@@ -612,6 +613,7 @@ export default function UnifiedEllieChat({
   suggestedPrompt,
   restoreLatest = true,
   onConversationChange,
+  onCommandStart,
 }: UnifiedEllieChatProps) {
   const naturalVoice = useNaturalVoice();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -972,6 +974,7 @@ export default function UnifiedEllieChat({
         };
 
         if (shouldOrchestrateMessage(command)) {
+          onCommandStart?.(command);
           // Outcome requests use the durable Codex-style runtime: persisted
           // plan → registered tools → evaluator → retry/approval checkpoint.
           await streamOrchestratedPlan(command, appendLine, {

@@ -35,11 +35,15 @@ type BrowserEvent = {
 export default function CloudBrowserWorkspace({
   unifiedTask = null,
   conversationId = null,
+  autoStart = false,
+  initialTarget = '',
 }: {
   unifiedTask?: OrchestratedPlanCheckpoint | null;
   conversationId?: string | null;
+  autoStart?: boolean;
+  initialTarget?: string;
 }) {
-  const [target, setTarget] = useState('');
+  const [target, setTarget] = useState(initialTarget);
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState('Ready to start');
   const [runtimeReady, setRuntimeReady] = useState<boolean | null>(null);
@@ -53,10 +57,19 @@ export default function CloudBrowserWorkspace({
   const [activeTaskId, setActiveTaskId] = useState('');
   const [approvedTaskId, setApprovedTaskId] = useState('');
   const imageRef = useRef<HTMLImageElement>(null);
-  const targetEditedRef = useRef(false);
+  const targetEditedRef = useRef(Boolean(initialTarget));
+  const autoStartedRef = useRef(false);
 
   const endpoint = session ? `${session.publicUrl}/sessions/${session.id}` : '';
   const authHeaders = session ? { Authorization: `Bearer ${session.token}` } : {};
+
+  useEffect(() => {
+    const requestedTarget = initialTarget.trim();
+    if (!requestedTarget) return;
+    targetEditedRef.current = true;
+    autoStartedRef.current = false;
+    setTarget(requestedTarget);
+  }, [initialTarget]);
 
   useEffect(() => {
     let cancelled = false;
@@ -163,6 +176,20 @@ export default function CloudBrowserWorkspace({
     }
     setStatus('Connected');
   }
+
+  useEffect(() => {
+    if (!autoStart || runtimeReady !== true || !target.trim() || session || autoStartedRef.current) {
+      return;
+    }
+    autoStartedRef.current = true;
+    void start().catch((cause) => {
+      autoStartedRef.current = false;
+      setError(cause instanceof Error ? cause.message : 'Could not start browser');
+      setStatus('Unavailable');
+    });
+    // start uses the active conversation and checkpoint identity captured by this render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, runtimeReady, session, target, conversationId, unifiedTask?.taskId]);
 
   async function action(payload: Record<string, unknown>) {
     if (!session) return;

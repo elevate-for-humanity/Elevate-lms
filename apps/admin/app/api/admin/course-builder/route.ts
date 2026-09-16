@@ -32,7 +32,7 @@ import { reviewCanonicalCourse, reviewCanonicalLessons } from '@/lib/course-buil
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
-import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
+import { assertCourseBuilderGenerationEnabled } from '@/lib/course-builder/generation-control';
 import {
   CourseBuilderCreditsError,
   getCourseBuilderCreditBalance,
@@ -280,12 +280,21 @@ export async function POST(req: NextRequest) {
     )
   ) {
     const db = await requireAdminClient();
-    if (await isCourseBuilderGenerationPaused(db)) {
+    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : null;
+    try {
+      await assertCourseBuilderGenerationEnabled(db, courseId);
+    } catch (error) {
+      const code =
+        error instanceof Error && error.message === 'COURSE_GENERATION_PAUSED'
+          ? 'COURSE_GENERATION_PAUSED'
+          : 'COURSE_BUILDER_GENERATION_PAUSED';
       return NextResponse.json(
         {
-          error: 'COURSE_BUILDER_GENERATION_PAUSED',
+          error: code,
           message:
-            'Course and video generation are paused during the authority consolidation audit.',
+            code === 'COURSE_GENERATION_PAUSED'
+              ? 'Generation is paused for this course.'
+              : 'Course and video generation are paused during the authority consolidation audit.',
         },
         { status: 423 },
       );

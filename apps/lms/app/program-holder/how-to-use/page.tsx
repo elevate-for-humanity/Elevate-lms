@@ -98,7 +98,7 @@ export default function ProgramHolderStartHerePage() {
               </li>
             ))}
           </ul>
-          <Link href="/program-holder/mou" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-blue-700 px-4 text-sm font-black text-white">
+          <Link href="/program-holder/sign-mou" className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-blue-700 px-4 text-sm font-black text-white">
             Review the complete MOU
           </Link>
         </article>

@@ -41,44 +41,42 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const [stepsResult, dependenciesResult, eventsResult, artifactsResult, tasksResult] =
-      await Promise.all([
-        db
-          .from('studio_run_steps')
-          .select('*')
-          .eq('run_id', runId)
-          .order('ordinal', { ascending: true }),
-        db
-          .from('studio_run_step_dependencies')
-          .select('step_id,depends_on_step_id')
-          .in(
-            'step_id',
-            (
-              await db.from('studio_run_steps').select('id').eq('run_id', runId)
-            ).data?.map((step) => step.id) ?? [],
-          ),
-        db
-          .from('studio_run_events')
-          .select('*')
-          .eq('run_id', runId)
-          .order('id', { ascending: true })
-          .limit(500),
-        db
-          .from('studio_run_artifacts')
-          .select('*')
-          .eq('run_id', runId)
-          .order('created_at', { ascending: true }),
-        db
-          .from('ai_tasks')
-          .select(
-            'id,studio_run_step_id,title,status,tool_name,requires_approval,approval_status,error_message,attempts,max_attempts,created_at,started_at,completed_at',
-          )
-          .eq('studio_run_id', runId)
-          .order('created_at', { ascending: true }),
-      ]);
+    const stepsResult = await db
+      .from('studio_run_steps')
+      .select('*')
+      .eq('run_id', runId)
+      .order('ordinal', { ascending: true });
+    if (stepsResult.error) throw stepsResult.error;
+    const stepIds = (stepsResult.data ?? []).map((step) => step.id);
+
+    const [dependenciesResult, eventsResult, artifactsResult, tasksResult] = await Promise.all([
+      stepIds.length
+        ? db
+            .from('studio_run_step_dependencies')
+            .select('step_id,depends_on_step_id')
+            .in('step_id', stepIds)
+        : Promise.resolve({ data: [], error: null }),
+      db
+        .from('studio_run_events')
+        .select('*')
+        .eq('run_id', runId)
+        .order('id', { ascending: true })
+        .limit(500),
+      db
+        .from('studio_run_artifacts')
+        .select('*')
+        .eq('run_id', runId)
+        .order('created_at', { ascending: true }),
+      db
+        .from('ai_tasks')
+        .select(
+          'id,studio_run_step_id,title,status,tool_name,requires_approval,approval_status,error_message,attempts,max_attempts,created_at,started_at,completed_at',
+        )
+        .eq('studio_run_id', runId)
+        .order('created_at', { ascending: true }),
+    ]);
 
     const error =
-      stepsResult.error ||
       dependenciesResult.error ||
       eventsResult.error ||
       artifactsResult.error ||

@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
+import { runWithPaidInferenceContext } from '../../lib/ai/paid-inference-context';
+
 import { courseFactory } from '../../lib/course-factory';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { queueCourseLessonVideos } from '../../lib/course-factory/media-service';
@@ -549,7 +551,7 @@ async function main() {
   );
 }
 
-main().catch(async (error) => {
+runWithPaidInferenceContext(JOB_ID, main).catch(async (error) => {
   const message = error instanceof Error ? error.message : String(error);
   if (isTransientDatabaseError(message)) {
     console.error(

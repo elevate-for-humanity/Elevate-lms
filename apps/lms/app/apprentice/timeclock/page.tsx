@@ -34,6 +34,13 @@ interface TimeclockContext {
   allowedSites: { id: string; name: string; lat: number; lng: number; radius_m: number }[];
   hoursCompleted: number;
   hoursRequired: number;
+  weeklyOjlHours: number;
+  weeklyTheoryVerifiedHours: number;
+  weeklyOjlMaxHours: number;
+  weeklyTheoryTargetHours: number;
+  weeklyTheoryMaxHours: number;
+  weeklyCombinedMaxHours: number;
+  outsideGeofenceGraceMinutes: number;
   canClock: boolean;
   previewing?: boolean;
   configurationMessage?: string | null;
@@ -479,6 +486,30 @@ export default function TimeclockPage() {
               />
             </div>
           </div>
+
+          {/* Weekly limits and attendance rules */}
+          <section className="mb-6 rounded-lg border border-brand-blue-200 bg-brand-blue-50 p-4" aria-labelledby="timeclock-rules-heading">
+            <h2 id="timeclock-rules-heading" className="font-bold text-slate-900">Weekly hours and timeclock rules</h2>
+            <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+              <div className="rounded-md bg-white p-3">
+                <p className="font-semibold text-slate-900">OJL this week</p>
+                <p className="text-brand-blue-700">{context.weeklyOjlHours} / {context.weeklyOjlMaxHours} hours</p>
+              </div>
+              <div className="rounded-md bg-white p-3">
+                <p className="font-semibold text-slate-900">Verified theory</p>
+                <p className="text-brand-blue-700">{context.weeklyTheoryVerifiedHours} / {context.weeklyTheoryMaxHours} hours</p>
+              </div>
+            </div>
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-800">
+              <li>Do not exceed {context.weeklyOjlMaxHours} OJL/work hours in one week.</li>
+              <li>Complete at least {context.weeklyTheoryTargetHours} theory hours weekly; no more than {context.weeklyTheoryMaxHours} may be credited.</li>
+              <li>Combined OJL and theory may not exceed {context.weeklyCombinedMaxHours} hours per week.</li>
+              <li>Theory and workplace hours cannot overlap. Clock out before starting an online lesson.</li>
+              <li>Clock in and out only at your approved Host Shop with location enabled.</li>
+              <li>Leaving the geofence continuously for {context.outsideGeofenceGraceMinutes} minutes automatically clocks you out.</li>
+              <li>Login alone does not earn theory credit. Only documented active learning time that is verified counts.</li>
+            </ul>
+          </section>
 
           {/* Site Selection (only show if not clocked in and has multiple sites) */}
           {!isClockedIn && context.allowedSites.length > 0 && (

@@ -12,6 +12,7 @@ import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-ent
 import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 import { getTimeclockWeekEnding, getTimeclockWorkDate } from '@/lib/timeclock/work-date';
+import { APPRENTICE_TIME_POLICY } from '@/lib/timeclock/policy';
 
 const MAX_ACCURACY_M = 50;
 const LUNCH_DURATION_MINUTES = 60;
@@ -310,6 +311,26 @@ async function _POST(request: NextRequest) {
     const normalizedAccuracy = accuracy_m === undefined ? null : Math.round(accuracy_m);
 
     if (action === 'clock_in') {
+      const { data: weeklyEntries } = await db
+        .from('progress_entries')
+        .select('hours_worked')
+        .eq('apprentice_id', apprentice.id)
+        .eq('week_ending', weekEnding)
+        .not('clock_out_at', 'is', null);
+      const weeklyOjlHours = (weeklyEntries || []).reduce(
+        (sum: number, row: any) => sum + Number(row.hours_worked || 0),
+        0,
+      );
+      if (weeklyOjlHours >= APPRENTICE_TIME_POLICY.weeklyOjlMaxHours) {
+        return NextResponse.json(
+          {
+            error: `The ${APPRENTICE_TIME_POLICY.weeklyOjlMaxHours}-hour weekly OJL limit has been reached.`,
+            code: 'WEEKLY_OJL_LIMIT_REACHED',
+          },
+          { status: 409 },
+        );
+      }
+
       const { data: openShift } = await db
         .from('progress_entries')
         .select('id, site_id, clock_in_at')

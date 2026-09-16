@@ -19,6 +19,8 @@ export default async function CosmetologyApprenticeshipPage() {
     ? {
         ...baseBanner,
         voiceoverSrc: undefined,
+        videoSrcDesktop: undefined,
+        videoSrcMobile: undefined,
         belowHeroHeadline: 'Build your cosmetology career through supervised salon training.',
         belowHeroSubheadline:
           'Learn in a licensed Host Salon, complete required instruction, document your hours and skills, and prepare for the applicable Indiana licensing process.',

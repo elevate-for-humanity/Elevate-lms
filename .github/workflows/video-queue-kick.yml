@@ -1,0 +1,25 @@
+name: One-time approved course video queue kick
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/video-queue-kick.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  kick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Process approved Course Builder video queue
+        env:
+          ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          test -n "$CRON_SECRET"
+          curl -sf -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 1800

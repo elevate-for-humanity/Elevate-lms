@@ -133,7 +133,7 @@ export default async function ParisStudentApplicationPage({
                   Self-pay options
                 </p>
                 <h2 id="application-payment-options" className="mt-2 text-2xl font-black text-slate-950">
-                  Payment calculator, BNPL, and coupon code
+                  Self-pay options and coupon code
                 </h2>
                 <p className="mt-2 text-sm text-slate-600">
                   Applying is free. Use this calculator only if you plan to self-pay; workforce-funding eligibility is reviewed separately.

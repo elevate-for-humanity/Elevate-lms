@@ -86,9 +86,20 @@ export function ParisFloatingButton({
     }
   }, []);
 
-  // Keep the information-dense Bookkeeping hero unobstructed. PARIS remains
-  // available throughout authenticated portals and on other public pages.
-  if (surface === 'public' && pathname === '/programs/bookkeeping') return null;
+  // Do not render the global assistant on pages that already contain a
+  // full PARIS application workspace. A second fixed assistant obscures form
+  // controls on phones and duplicates the active experience.
+  const hasEmbeddedParisWorkspace =
+    pathname.startsWith('/apply/student') || pathname.startsWith('/apply/host-site');
+
+  // Keep information-dense and embedded-PARIS surfaces unobstructed. PARIS
+  // remains available throughout authenticated portals and other public pages.
+  if (
+    surface === 'public' &&
+    (pathname === '/programs/bookkeeping' || hasEmbeddedParisWorkspace)
+  ) {
+    return null;
+  }
 
   return (
     <>

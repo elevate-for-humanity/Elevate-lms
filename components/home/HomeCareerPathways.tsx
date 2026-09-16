@@ -29,7 +29,7 @@ const PATHWAYS = [
     slug: 'bookkeeping',
     title: 'Bookkeeping Training',
     description: 'Build practical bookkeeping, QuickBooks, payroll, and financial-record skills.',
-    image: '/images/pages/bookkeeping-hero.webp',
+    image: '/images/pages/bookkeeping.webp',
     imageAlt: 'Bookkeeping learner working with business financial records',
     ctaHref: '/programs/bookkeeping',
     cta: 'Explore Bookkeeping Training',

@@ -9,6 +9,8 @@ interface SafeHeroVideoProps {
   ariaLabel?: string;
   /** Keep false when a poster would create a visible image-to-video flash. */
   showPosterBeforePlayback?: boolean;
+  /** Repeat the visual continuously. Audio/narration is controlled separately. */
+  loop?: boolean;
 }
 
 type NetworkInformationLike = {
@@ -36,7 +38,7 @@ function shouldAvoidAutoplay(): boolean {
  *
  * The poster is physically mounted behind the video layer, remains visible
  * until playback actually starts, and stays available as the fallback if the
- * video cannot load or autoplay. Hero videos play once.
+ * video cannot load or autoplay. Videos play once unless loop is requested.
  *
  * On Save-Data, 2G/slow-2G, or reduced-motion devices, the poster is used
  * instead of downloading/playing the hero video.
@@ -47,6 +49,7 @@ export function SafeHeroVideo({
   className = '',
   ariaLabel = 'Hero video',
   showPosterBeforePlayback = true,
+  loop = false,
 }: SafeHeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -79,14 +82,14 @@ export function SafeHeroVideo({
     }
 
     video.muted = true;
-    video.loop = false;
+    video.loop = loop;
     video.currentTime = 0;
     void video.play().catch(() => {
       // Autoplay can be blocked. Keep the mounted poster visible underneath.
     });
 
     return () => video.pause();
-  }, [src, avoidAutoplay]);
+  }, [src, avoidAutoplay, loop]);
 
   return (
     <>
@@ -104,6 +107,7 @@ export function SafeHeroVideo({
         <video
           ref={videoRef}
           autoPlay
+          loop={loop}
           muted
           playsInline
           preload="metadata"

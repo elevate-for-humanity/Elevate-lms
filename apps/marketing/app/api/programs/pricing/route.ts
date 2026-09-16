@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = createPublicClient();
-    const { data, error } = await supabase
+    const pricingQuery = supabase
       .from('program_pricing')
       .select(
         'program_slug, program_name, tuition_cents, deposit_min_cents, deposit_default_cents, payment_frequency, payment_weeks, stripe_deposit_url, stripe_full_url, notes',
@@ -67,6 +67,18 @@ export async function GET(request: NextRequest) {
       .eq('program_slug', slug)
       .eq('active', true)
       .maybeSingle();
+
+    // Public pricing must not wait indefinitely on an unhealthy database
+    // connection. Static registry pricing is the documented recovery source.
+    const { data, error } = await Promise.race([
+      Promise.resolve(pricingQuery),
+      new Promise<{ data: null; error: { message: string } }>((resolve) => {
+        setTimeout(
+          () => resolve({ data: null, error: { message: 'Program pricing lookup timed out' } }),
+          2500,
+        );
+      }),
+    ]);
 
     if (!error && data) {
       const tuitionCents = Number(data.tuition_cents || 0);

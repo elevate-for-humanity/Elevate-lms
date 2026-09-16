@@ -6,7 +6,7 @@ import type { VideoJob } from '@/lib/video/job-queue';
 import { processClaimedVideoJob } from '@/lib/video/process-video-job';
 import { finalizeUnifiedCourseBuildWithClient } from '@/lib/course-builder/build-lifecycle';
 import { COURSE_MEDIA_STALE_RENDER_MS } from '@/lib/course-factory/media-manager';
-import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
+import { getCourseBuilderGenerationControl } from '@/lib/course-builder/generation-control';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -66,29 +66,25 @@ export async function POST(request: NextRequest) {
     );
   }
   const db = await requireAdminClient();
-  const globallyPaused = await isCourseBuilderGenerationPaused(db);
-  let authorizedProof = false;
-  if (globallyPaused) {
-    const { data: proofSetting } = await db
-      .from('system_settings')
-      .select('value')
-      .eq('key', 'course_builder_proof_course_id')
-      .maybeSingle();
-    const proofCourseId = typeof proofSetting?.value === 'string' ? proofSetting.value.trim() : '';
+  const generationControl = await getCourseBuilderGenerationControl(db);
+  const globallyPaused = generationControl.paused;
+  const allowedCourseIds = new Set(generationControl.allowedCourseIds);
 
-    if (queueOneDraft && courseId && maxJobs === 1) {
-      authorizedProof = proofCourseId === courseId;
-    } else if (!courseId && !jobId && !queueOneDraft && proofCourseId) {
-      // Scheduled queue calls intentionally carry no course identifier. While
-      // the global gate is closed, scope that generic call to the one approved
-      // proof course and one render slot. This preserves the global pause while
-      // allowing the durable scheduler to finish the controlled acceptance job.
-      courseId = proofCourseId;
-      maxJobs = 1;
-      authorizedProof = true;
-    }
+  // A closed global gate may carry a narrow allowlist. Explicit and scheduled
+  // requests can only reach those courses; every other backlog remains paused.
+  if (globallyPaused && courseId && !allowedCourseIds.has(courseId)) {
+    return NextResponse.json({
+      ok: true,
+      started: 0,
+      reason: 'course-builder-generation-paused',
+      courseId,
+    });
   }
-  if (globallyPaused && !authorizedProof) {
+  if (
+    globallyPaused &&
+    !courseId &&
+    (jobId || queueOneDraft || generationControl.allowedCourseIds.length === 0)
+  ) {
     return NextResponse.json({
       ok: true,
       started: 0,
@@ -110,7 +106,7 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
-    if (!course || (course.generation_paused === true && !authorizedProof)) {
+    if (!course || course.generation_paused === true) {
       return NextResponse.json({
         ok: true,
         started: 0,
@@ -261,11 +257,15 @@ export async function POST(request: NextRequest) {
     // The database lease remains the concurrency authority, while the course
     // pause flag is the cost-control authority. Claim per unpaused course so a
     // large paused backlog cannot consume renderer or GPU capacity.
-    const { data: eligibleCourses, error: eligibleCourseError } = await db
+    let eligibleCourseQuery = db
       .from('courses')
       .select('id')
       .eq('generation_paused', false)
       .order('updated_at', { ascending: true });
+    if (globallyPaused) {
+      eligibleCourseQuery = eligibleCourseQuery.in('id', generationControl.allowedCourseIds);
+    }
+    const { data: eligibleCourses, error: eligibleCourseError } = await eligibleCourseQuery;
     if (eligibleCourseError) {
       return NextResponse.json({ error: 'Unable to inspect unpaused courses' }, { status: 500 });
     }

@@ -58,7 +58,7 @@ export function configuredNarrationProvider(
   const configured = (
     env.AI_NARRATION_PROVIDER ||
     env.AI_MEDIA_PROVIDER ||
-    (env.NODE_ENV === 'production' ? 'cloudflare' : 'local')
+    'local'
   )
     .trim()
     .toLowerCase();
@@ -96,9 +96,9 @@ export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = proce
   if (provider === 'openai' && !env.OPENAI_API_KEY?.trim()) {
     throw new Error('OpenAI narration route is selected but OPENAI_API_KEY is not configured');
   }
-  if (env.NODE_ENV === 'production' && (provider === 'edge' || provider === 'local')) {
+  if (env.NODE_ENV === 'production' && provider === 'edge') {
     throw new Error(
-      `${provider} narration is diagnostic-only and cannot be selected in production`,
+      'edge narration transmits course content to an external endpoint and cannot be selected in production',
     );
   }
 }
@@ -424,12 +424,14 @@ async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promi
 }
 
 export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}): Promise<Buffer> {
-  requirePaidInferenceContext('narration');
   const normalizedText = text.trim();
   if (!normalizedText) throw new Error('Narration requires non-empty text');
   const { voice = EDGE_TTS_VOICES.marcus, rate = '-5%', pitch = '0Hz', volume = '+0%' } = options;
   assertNarrationProviderConfigured();
   const provider = configuredNarrationProvider();
+  if (provider === 'cloudflare' || provider === 'elevenlabs' || provider === 'gemini' || provider === 'openai') {
+    requirePaidInferenceContext('narration');
+  }
   try {
     if (provider === 'cloudflare') return await generateCloudflareNarration(normalizedText);
     if (provider === 'elevenlabs') return await generateElevenLabsNarration(normalizedText);

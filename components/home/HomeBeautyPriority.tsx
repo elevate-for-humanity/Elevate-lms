@@ -4,6 +4,14 @@ import { ArrowRight, BadgeCheck, Sparkles } from 'lucide-react';
 
 const TRACKS = [
   {
+    title: 'Barber Apprenticeship',
+    hours: 'Structured instruction plus supervised host-shop training',
+    focus: 'Haircutting, fades, grooming, sanitation, client service, and professional practice',
+    image: '/images/partners/kountry-kutz/interior-active.webp',
+    href: '/programs/barber-apprenticeship',
+    icon: BadgeCheck,
+  },
+  {
     title: 'Cosmetology Apprenticeship',
     hours: '2,000 hours of supervised salon training',
     focus: 'Haircutting, styling, color, chemical services, sanitation, and client care',
@@ -39,16 +47,16 @@ export function HomeBeautyPriority() {
             Continue into a licensed beauty pathway.
           </h2>
           <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-700 sm:text-lg">
-            Barber and host-shop entry points are featured above. This section completes the beauty pathway with cosmetology, esthetics, and nail technician options so each discipline has a distinct destination instead of repeating the same cards.
+            Barber and host-shop entry points are featured above. Barber, cosmetology, esthetics, and nail technician apprenticeships are listed separately from workforce-funded classroom programs.
           </p>
         </div>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {TRACKS.map(({ title, hours, focus, image, href, icon: Icon }) => (
             <article key={title} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
               <Link href={href} className="block h-full">
                 <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-                  <Image src={image} alt={`${title} training`} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" sizes="(max-width: 768px) 100vw, 33vw" />
+                  <Image src={image} alt={`${title} training`} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" sizes="(max-width: 768px) 100vw, 25vw" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" />
                   <div className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-black text-slate-900 shadow-sm">
                     <Icon className="h-4 w-4 text-rose-700" /> Apprenticeship Pathway

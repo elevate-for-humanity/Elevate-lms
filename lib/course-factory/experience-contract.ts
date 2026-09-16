@@ -47,8 +47,8 @@ export const TimelineSceneSchema = z
     ]),
     narration: z.string().trim().min(1),
     visualDirection: z.string().trim().min(1),
-    onScreenText: z.array(z.string().trim().min(1)).default([]),
-    sourceReferences: z.array(z.string().trim().min(1)).default([]),
+    onScreenText: z.array(z.string().trim().min(1)).min(1),
+    sourceReferences: z.array(z.string().trim().min(1)).min(1),
   })
   .refine((scene) => scene.endTime > scene.startTime, {
     message: 'Scene endTime must be after startTime.',
@@ -91,7 +91,7 @@ export const InstructionalTimelineSchema = z
     height: z.number().int().positive().default(1080),
     fps: z.number().int().min(12).max(120).default(30),
     durationSeconds: z.number().positive(),
-    scenes: z.array(TimelineSceneSchema).min(2),
+    scenes: z.array(TimelineSceneSchema).min(6),
     captions: z.array(TimelineCaptionSchema).min(1),
     events: z.array(TimelineEventSchema).min(1),
     requiredWatchPercent: z.number().int().min(1).max(100).default(95),
@@ -115,6 +115,26 @@ export const InstructionalTimelineSchema = z
           path: ['scenes', index],
         });
     });
+    const purposes = new Set(timeline.scenes.map((scene) => scene.purpose));
+    for (const purpose of ['introduction', 'explanation', 'demonstration', 'practice', 'summary'] as const) {
+      if (!purposes.has(purpose))
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Instructional timeline requires a ${purpose} scene.`,
+          path: ['scenes'],
+        });
+    }
+    const hasConcreteExample = timeline.scenes.some(
+      (scene) =>
+        ['diagram', 'demonstration', 'practice'].includes(scene.purpose) &&
+        ['equipment-image', 'technical-diagram', 'screen-demonstration'].includes(scene.visualType),
+    );
+    if (!hasConcreteExample)
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Instructional timeline requires a concrete visual example or demonstration.',
+        path: ['scenes'],
+      });
     timeline.events.forEach((event, index) => {
       if (event.at > timeline.durationSeconds)
         ctx.addIssue({

@@ -25,6 +25,7 @@ import type {
 } from '@/lib/navigation/navigation-config';
 import { getNavigationForRole, ROLE_DISPLAY_NAMES } from '@/lib/navigation/navigation-config';
 import { ProfileImage } from '@/components/profile/ProfileImage';
+import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher';
 
 interface PlatformShellProps {
   user: {
@@ -41,6 +42,7 @@ interface PlatformShellProps {
   notifications?: number;
   children: React.ReactNode;
   paris?: Partial<ParisLearnerContext> | false;
+  showLanguageSwitcher?: boolean;
 }
 
 function isActiveHref(href: string, pathname: string): boolean {
@@ -52,7 +54,7 @@ function isActiveHref(href: string, pathname: string): boolean {
   }
 }
 
-export function PlatformShell({ user, role, actions = [], children, paris }: PlatformShellProps) {
+export function PlatformShell({ user, role, actions = [], children, paris, showLanguageSwitcher = false }: PlatformShellProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -203,6 +205,7 @@ export function PlatformShell({ user, role, actions = [], children, paris }: Pla
           </div>
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            {showLanguageSwitcher ? <LanguageSwitcher /> : null}
             {actions.length > 0 && (
               <div className="mr-4 hidden items-center gap-2 lg:flex">
                 {actions.slice(0, 2).map((action) =>

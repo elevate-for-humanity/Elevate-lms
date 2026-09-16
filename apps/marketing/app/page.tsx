@@ -6,6 +6,7 @@ import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PlatformHubHero } from '@/components/home/PlatformHubHero';
 import { HomeFeaturedHostShop } from '@/components/home/HomeFeaturedHostShop';
+import { HomeBeautyPriority } from '@/components/home/HomeBeautyPriority';
 import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -99,6 +100,7 @@ export default function HomePage() {
         </div>
         <div data-narration-disabled="true"><HomeEmployerStrip /></div>
         <div data-narration-disabled="true"><HomeFeaturedHostShop /></div>
+        <div data-narration-disabled="true"><HomeBeautyPriority /></div>
         <div data-narration-disabled="true">
           <HomeFinalCTA />
         </div>

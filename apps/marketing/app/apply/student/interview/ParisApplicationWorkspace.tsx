@@ -444,17 +444,17 @@ export default function ParisApplicationWorkspace({
     : programOptions ?? question?.options ?? [];
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-950 px-4 py-3 text-white sm:px-6">
-        <div>
-          <p className="text-sm font-black">{t.title}</p>
-          <p className="mt-0.5 text-xs text-slate-300">{t.subtitle}</p>
+    <div className="max-w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex min-w-0 flex-col items-stretch gap-3 border-b border-slate-200 bg-slate-950 px-4 py-4 text-white sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="min-w-0">
+          <p className="text-base font-black leading-tight">{t.title}</p>
+          <p className="mt-1 text-sm leading-5 text-slate-300">{t.subtitle}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="grid min-w-0 grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:flex sm:items-center sm:gap-3">
           <button
             type="button"
             onClick={toggleParisSpeech}
-            className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white hover:bg-slate-800"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-bold text-white hover:bg-slate-800 sm:w-auto sm:text-xs"
             aria-pressed={speechEnabled}
           >
             {speechEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
@@ -464,26 +464,26 @@ export default function ParisApplicationWorkspace({
             <p className="text-xs font-bold">{session.progress.percent}%</p>
             <p className="text-[11px] text-slate-400">{t.saved}</p>
           </div>
-          <div className="flex items-center rounded-lg border border-slate-700 bg-slate-900 p-1" aria-label={t.language}>
+          <div className="flex min-w-0 items-center rounded-lg border border-slate-700 bg-slate-900 p-1" aria-label={t.language}>
             <Languages className="mx-2 h-4 w-4 text-slate-300" />
-            <button type="button" onClick={() => void switchLanguage('en')} className={`rounded-md px-2 py-1 text-xs font-bold ${locale === 'en' ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}>English</button>
-            <button type="button" onClick={() => void switchLanguage('es')} className={`rounded-md px-2 py-1 text-xs font-bold ${locale === 'es' ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}>Español</button>
+            <button type="button" onClick={() => void switchLanguage('en')} className={`min-w-0 flex-1 whitespace-nowrap rounded-md px-2 py-2 text-sm font-bold sm:text-xs ${locale === 'en' ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}>English</button>
+            <button type="button" onClick={() => void switchLanguage('es')} className={`min-w-0 flex-1 whitespace-nowrap rounded-md px-2 py-2 text-sm font-bold sm:text-xs ${locale === 'es' ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}>Español</button>
           </div>
         </div>
       </div>
 
       <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
-        <section className="flex h-[min(72vh,720px)] min-h-[520px] min-w-0 flex-col border-b border-slate-200 lg:border-b-0 lg:border-r">
+        <section className="flex min-h-[34rem] min-w-0 flex-col border-b border-slate-200 sm:h-[min(72vh,720px)] sm:min-h-[520px] lg:border-b-0 lg:border-r">
           <div
             ref={scrollRef}
-            className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4 sm:p-6"
+            className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 p-3 sm:space-y-4 sm:p-6"
             aria-label="Application interview conversation"
             aria-live="polite"
             tabIndex={0}
           >
             {session.messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-6 ${message.role === 'user' ? 'bg-brand-red-600 text-white' : 'border border-slate-200 bg-white text-slate-800 shadow-sm'}`}>
+                <div className={`max-w-full rounded-2xl px-4 py-3 text-base leading-6 sm:max-w-[88%] sm:text-sm ${message.role === 'user' ? 'bg-brand-red-600 text-white' : 'border border-slate-200 bg-white text-slate-800 shadow-sm'}`}>
                   {message.role !== 'user' && <p className="mb-1 text-[11px] font-black uppercase tracking-wide text-brand-red-700">PARIS</p>}
                   <p className="whitespace-pre-line">{message.content}</p>
                   {message.input_mode === 'voice' && message.role === 'user' ? <p className="mt-1 text-[10px] text-red-100">Voice transcription</p> : null}
@@ -584,7 +584,7 @@ export default function ParisApplicationWorkspace({
             <div className="h-full rounded-full bg-brand-red-600 transition-all" style={{ width: `${session.progress.percent}%` }} />
           </div>
 
-          <div className="mt-6 space-y-2">
+          <div className="mt-4 max-h-[24rem] space-y-2 overflow-y-auto overscroll-contain pr-1 sm:mt-6 lg:max-h-none lg:overflow-visible lg:pr-0">
             {session.progress.required.map((field) => {
               const value = answers[field];
               const complete = session.progress.complete.includes(field);

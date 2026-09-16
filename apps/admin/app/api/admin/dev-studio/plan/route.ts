@@ -20,6 +20,13 @@ import { loadSharedContext } from '@/lib/platform/orchestration/context-service'
 import { getAITool } from '@/lib/ai/tools/registry';
 import { getAdminUrl } from '@/lib/utils/siteUrl';
 import { logger } from '@/lib/logger';
+import {
+  bindCanonicalTask,
+  ensureCanonicalStudioRun,
+  startCanonicalStudioStep,
+  syncCanonicalStudioRunCheckpoint,
+  verifyCanonicalStudioStep,
+} from '@/lib/devstudio/studio-run';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -152,6 +159,7 @@ export async function POST(req: NextRequest) {
   const params =
     body.params && typeof body.params === 'object' ? (body.params as Record<string, string>) : {};
   const tenantId = typeof body.tenantId === 'string' ? body.tenantId : undefined;
+  const courseId = typeof body.courseId === 'string' ? body.courseId : undefined;
   const resumePlanId = typeof body.planId === 'string' ? body.planId.trim() : '';
   const documentIds = Array.isArray(body.documentIds)
     ? body.documentIds
@@ -297,6 +305,16 @@ export async function POST(req: NextRequest) {
           await persistPlan(db, plan, auth.id, tenantId);
         }
 
+        const canonicalRun = await ensureCanonicalStudioRun(db, {
+          actorId: auth.id,
+          conversationId,
+          organizationId: tenantId,
+          courseId,
+          command: goal || plan.goal,
+          plan,
+        });
+        write(`${DIM}Run ID: ${canonicalRun.id}${RST}`, { runId: canonicalRun.id });
+
         plan.status = 'running';
         await persistPlan(db, plan, auth.id, tenantId);
 
@@ -330,6 +348,7 @@ export async function POST(req: NextRequest) {
             if (!canExecuteStep(step, plan.steps)) continue;
             progressed = true;
             step.status = 'running';
+            await startCanonicalStudioStep(db, canonicalRun, step);
             await persistPlan(db, plan, auth.id, tenantId);
 
             write(`${RUN} Step ${step.order}/${plan.steps.length}: ${step.title}`);
@@ -346,6 +365,8 @@ export async function POST(req: NextRequest) {
                   requestedBy: auth.id,
                   traceId: `${plan.id}:${step.id}`,
                   conversationId,
+                  studioRunId: canonicalRun.id,
+                  studioRunStepId: canonicalRun.stepIds.get(step.id),
                 },
                 {
                   actorRoles: auth.effectiveRoles,
@@ -357,6 +378,13 @@ export async function POST(req: NextRequest) {
               );
 
               step.task_id = String(created.id);
+              await bindCanonicalTask(
+                db,
+                canonicalRun,
+                step,
+                step.task_id,
+                created.tool_name ? String(created.tool_name) : null,
+              );
               let task = await currentTask(db, step.task_id);
               if (!task) throw new Error('Planner task record could not be reloaded');
 
@@ -448,6 +476,12 @@ export async function POST(req: NextRequest) {
 
               if (evaluation.status === 'PASS') {
                 step.status = 'done';
+                await verifyCanonicalStudioStep(db, canonicalRun, step, {
+                  source: 'ai_task_evaluator',
+                  task_id: step.task_id,
+                  evaluation: evaluation.status,
+                  tool: task?.tool_name ?? null,
+                });
                 write(`${PASS} Step ${step.order} verified: ${step.title}`);
                 const evidence = safeEvidenceSummary(taskEvidence(task));
                 write(
@@ -510,6 +544,7 @@ export async function POST(req: NextRequest) {
           plan.status = 'done';
 
         await persistPlan(db, plan, auth.id, tenantId);
+        await syncCanonicalStudioRunCheckpoint(db, canonicalRun, plan);
 
         write('\x1b[1m── Plan Summary ─────────────────────────\x1b[0m');
         write(`${PASS} Completed and verified: ${doneCount}/${plan.steps.length}`);
@@ -521,6 +556,7 @@ export async function POST(req: NextRequest) {
         write('', {
           checkpoint: {
             planId: plan.id,
+            runId: canonicalRun.id,
             taskId: waitingStep?.task_id ?? '',
             status:
               plan.status === 'done'

@@ -254,6 +254,31 @@ function persistedInstructionalScript(input: {
 /** Render one already-claimed canonical video job. GPU generation is an optional
  * rendering mechanic for microclips; Remotion is the common fallback. Both
  * report terminal state through the same video_jobs identity. */
+function applyLockedCourseBuilderMediaPolicy(job: VideoJob): void {
+  const sceneData =
+    job.scene_data && typeof job.scene_data === 'object'
+      ? (job.scene_data as Record<string, unknown>)
+      : {};
+  const policy =
+    sceneData.media_policy && typeof sceneData.media_policy === 'object'
+      ? (sceneData.media_policy as Record<string, unknown>)
+      : null;
+  const narration =
+    policy?.narration && typeof policy.narration === 'object'
+      ? (policy.narration as Record<string, unknown>)
+      : null;
+  if (
+    policy?.locked_by === 'course_builder' &&
+    narration?.strategy === 'repository_voice' &&
+    narration.allow_paid_provider === false
+  ) {
+    // The Course Builder contract is authoritative. Use the local renderer so
+    // runtime environment variables cannot spend credits or transmit lesson
+    // content to an external narration provider.
+    process.env.AI_NARRATION_PROVIDER = 'local';
+  }
+}
+
 async function runClaimedVideoJob(job: VideoJob): Promise<void> {
   // Start lease renewal before secret hydration, scene generation, and quality
   // planning. Those pre-render stages can call external providers and must not
@@ -278,6 +303,7 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     : null;
 
   try {
+    applyLockedCourseBuilderMediaPolicy(job);
     await hydrateMediaRuntimeSecrets();
     // Validate the canonical media route before scene planning or any GPU
     // request. A missing route must never consume rendering capacity or spend

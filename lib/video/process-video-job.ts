@@ -32,6 +32,7 @@ import {
   MAX_LESSON_VIDEO_SCENES,
   scenePrompt,
   type MediaCharacterReference,
+  type MediaStoryboard,
 } from './media-director';
 import { recordMediaProvenance } from './media-provenance';
 import { cpuOnlyCourseMedia, renderStoryboardVideo } from './remotion-render';
@@ -44,6 +45,41 @@ import { getCourseBuilderGenerationControl } from '@/lib/course-builder/generati
 
 const REMOTION_PROVIDER = 'remotion';
 const REMOTION_MODEL = 'ElevateLesson';
+
+function synchronizeControlledStoryboard(
+  storyboard: MediaStoryboard,
+  narration: string,
+): MediaStoryboard {
+  const wordCount = narration.match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g)?.length ?? 0;
+  // 132 spoken words per minute leaves room for demonstrations, labels, and
+  // knowledge-check pauses without rushing the learner.
+  const targetSeconds = Math.max(180, Math.min(420, Math.round((wordCount * 60) / 132)));
+  const sceneCount = storyboard.scenes.length;
+  if (sceneCount === 0) return storyboard;
+
+  const minimumPerScene = 12;
+  const remaining = Math.max(0, targetSeconds - minimumPerScene * sceneCount);
+  const weights = storyboard.scenes.map((scene) =>
+    Math.max(1, scene.dialogue?.match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g)?.length ?? 0),
+  );
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+  const allocated = weights.map((weight) =>
+    minimumPerScene + Math.floor((remaining * weight) / totalWeight),
+  );
+  let unallocated = targetSeconds - allocated.reduce((sum, seconds) => sum + seconds, 0);
+  for (let index = 0; unallocated > 0; index = (index + 1) % allocated.length) {
+    allocated[index] = (allocated[index] ?? minimumPerScene) + 1;
+    unallocated -= 1;
+  }
+
+  return {
+    ...storyboard,
+    scenes: storyboard.scenes.map((scene, index) => ({
+      ...scene,
+      durationSeconds: allocated[index] ?? minimumPerScene,
+    })),
+  };
+}
 
 async function hydrateMediaRuntimeSecrets(): Promise<void> {
   const missing = [
@@ -473,6 +509,7 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       });
     }
     if (!isMicroclip && cpuOnlyCourseMedia()) {
+      storyboard = synchronizeControlledStoryboard(storyboard, script);
       const approved = approveControlledStoryboard(storyboard);
       storyboard = approved.storyboard;
       logger.info('[video-worker] Controlled storyboard approved', {

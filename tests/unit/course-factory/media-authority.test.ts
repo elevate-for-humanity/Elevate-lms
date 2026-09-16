@@ -348,10 +348,10 @@ describe('canonical Course Factory media architecture', () => {
     expect(media).toContain('allow_paid_provider: false');
     expect(media).toContain("strategy: 'existing_then_pexels'");
     expect(renderer).toContain('applyLockedCourseBuilderMediaPolicy(job)');
-    expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
+    expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'local'");
     expect(narration).toContain("const provider = configuredNarrationProvider()");
     expect(narration).toContain("provider === 'cloudflare'");
-    expect(narration).not.toContain("env.NODE_ENV === 'production' && (provider === 'edge'");
+    expect(narration).toContain("env.NODE_ENV === 'production' && provider === 'edge'");
   });
 
 });

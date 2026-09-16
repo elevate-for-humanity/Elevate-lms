@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   }
 
   const options = await requestedOptions(request);
-  let { courseId, maxJobs } = options;
+  const { courseId, maxJobs } = options;
   const { jobId, queueOneDraft } = options;
   if (queueOneDraft && (!courseId || maxJobs !== 1)) {
     return NextResponse.json(

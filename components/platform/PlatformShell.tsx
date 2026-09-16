@@ -54,7 +54,7 @@ function isActiveHref(href: string, pathname: string): boolean {
   }
 }
 
-export function PlatformShell({ user, role, actions = [], children, paris, showLanguageSwitcher = false }: PlatformShellProps) {
+export function PlatformShell({ user, role, actions = [], children, paris, showLanguageSwitcher = true }: PlatformShellProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);

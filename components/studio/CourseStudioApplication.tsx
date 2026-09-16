@@ -53,13 +53,12 @@ function AutosaveIndicator() {
   return null;
 }
 
-function StudioTopbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
+function StudioTopbar({ previewOpen, onTogglePreview }: { previewOpen: boolean; onTogglePreview: () => void }) {
   const { state, save, setPanel } = useCourse();
   const { course, publishState } = state;
 
   return (
     <header className="h-14 border-b border-slate-200 bg-white flex items-center gap-3 px-4 shrink-0">
-      <button onClick={onToggleSidebar} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 lg:hidden" aria-label="Toggle sidebar"><Menu className="w-5 h-5" /></button>
       <Link href="/courses" className="flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition shrink-0">
         <ChevronLeft className="w-4 h-4" /><span className="hidden sm:inline">Courses</span>
       </Link>
@@ -69,7 +68,8 @@ function StudioTopbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
       <AutosaveIndicator />
       {state.warnings.length > 0 && <span className="hidden sm:flex items-center gap-1 text-xs text-amber-600"><AlertCircle className="w-3.5 h-3.5" />{state.warnings.length} warning{state.warnings.length > 1 ? 's' : ''}</span>}
       <button onClick={() => void save()} disabled={!state.autosave.isDirty} className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"><Save className="w-3.5 h-3.5" />Save</button>
-      <a href={`/api/admin/course-builder/preview?courseId=${encodeURIComponent(course.id)}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"><Eye className="h-3.5 w-3.5" /><span className="hidden sm:inline">Preview course</span></a>
+      <button onClick={() => setPanel('ai')} className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"><Bot className="h-3.5 w-3.5" /><span className="hidden sm:inline">Commands</span></button>
+      <button onClick={onTogglePreview} aria-pressed={previewOpen} className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold ${previewOpen ? 'border-brand-blue-300 bg-brand-blue-50 text-brand-blue-700' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}><Eye className="h-3.5 w-3.5" /><span className="hidden sm:inline">{previewOpen ? 'Hide learner view' : 'Show learner view'}</span></button>
       <button onClick={() => setPanel('publish')} className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition shrink-0 ${publishState.isPublished ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'}`}><Rocket className="w-3.5 h-3.5" /><span className="hidden sm:inline">{publishState.isPublished ? 'Published' : 'Publish'}</span></button>
     </header>
   );
@@ -105,23 +105,30 @@ function PublishProgress() {
 }
 
 export function CourseStudioApplication({ children }: { children: React.ReactNode }) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(true);
+  const { state } = useCourse();
+  const previewUrl = `/api/admin/course-builder/preview?courseId=${encodeURIComponent(state.course.id)}`;
+
   return (
-    <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
-      <StudioTopbar onToggleSidebar={() => setMobileSidebarOpen(v => !v)} />
+    <div className="flex h-screen flex-col overflow-hidden bg-slate-50">
+      <StudioTopbar previewOpen={previewOpen} onTogglePreview={() => setPreviewOpen(value => !value)} />
       <PublishProgress />
-      <div className="flex flex-1 overflow-hidden">
-        {mobileSidebarOpen && (
-          <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={() => setMobileSidebarOpen(false)}>
-            <div className="absolute left-0 top-0 bottom-0 w-52 bg-white shadow-xl" onClick={e => e.stopPropagation()}>
-              <div className="flex items-center justify-between px-4 h-12 border-b border-slate-200"><span className="text-sm font-semibold text-slate-800">Studio</span><button onClick={() => setMobileSidebarOpen(false)}><X className="w-5 h-5 text-slate-500" /></button></div>
-              <StudioSidebar collapsed={false} onCollapse={() => {}} />
+      <div className={`grid min-h-0 flex-1 overflow-hidden ${previewOpen ? 'lg:grid-cols-[minmax(0,1fr)_minmax(420px,46vw)]' : 'grid-cols-1'}`}>
+        <main className="min-h-0 overflow-y-auto">{children}</main>
+        {previewOpen && (
+          <aside className="min-h-[45vh] overflow-hidden border-l border-slate-200 bg-white lg:min-h-0" aria-label="Live learner browser">
+            <div className="flex h-10 items-center justify-between border-b border-slate-200 bg-slate-950 px-3 text-xs text-white">
+              <span className="font-semibold">Live learner view</span>
+              <span className="text-slate-300">Updates after save</span>
             </div>
-          </div>
+            <iframe
+              key={previewUrl}
+              src={previewUrl}
+              title="Live learner course preview"
+              className="h-[calc(100%-2.5rem)] min-h-[40vh] w-full bg-white"
+            />
+          </aside>
         )}
-        <div className="hidden lg:flex"><StudioSidebar collapsed={sidebarCollapsed} onCollapse={setSidebarCollapsed} /></div>
-        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

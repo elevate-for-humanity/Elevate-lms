@@ -7,7 +7,6 @@ import {
   Eye,
   Globe2,
   MessageSquare,
-  PanelRightClose,
   PanelRightOpen,
   Plus,
 } from 'lucide-react';

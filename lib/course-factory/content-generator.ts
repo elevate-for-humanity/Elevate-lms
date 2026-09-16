@@ -241,6 +241,34 @@ Return ONLY valid JSON with exactly this shape:
       "domainKey":"${domainKey}",
       "masteryThreshold":80,
       "evidenceSignals":["knowledge-check mastery","applied exercise completion","assessment performance"]
+    },
+    "instructionalTimeline": {
+      "version":1,
+      "width":1920,
+      "height":1080,
+      "fps":30,
+      "durationSeconds":360,
+      "scenes":[
+        {"id":"scene-1","startTime":0,"endTime":60,"purpose":"introduction","visualType":"instructor","narration":"lesson objective","visualDirection":"Instructor and lesson roadmap","onScreenText":["Objective"],"sourceReferences":["approved lesson source"]},
+        {"id":"scene-2","startTime":60,"endTime":120,"purpose":"explanation","visualType":"animated-text","narration":"core explanation","visualDirection":"Three sourced teaching points","onScreenText":["Key concept"],"sourceReferences":["approved lesson source"]},
+        {"id":"scene-3","startTime":120,"endTime":180,"purpose":"diagram","visualType":"technical-diagram","narration":"process explanation","visualDirection":"Labeled sequence diagram","onScreenText":["Correct sequence"],"sourceReferences":["approved lesson source"]},
+        {"id":"scene-4","startTime":180,"endTime":240,"purpose":"demonstration","visualType":"equipment-image","narration":"worked example","visualDirection":"Side-by-side correct and incorrect examples","onScreenText":["Correct","Needs correction"],"sourceReferences":["approved lesson source"]},
+        {"id":"scene-5","startTime":240,"endTime":300,"purpose":"practice","visualType":"screen-demonstration","narration":"guided practice","visualDirection":"Decision and evidence checklist","onScreenText":["Your turn"],"sourceReferences":["approved lesson source"]},
+        {"id":"scene-6","startTime":300,"endTime":360,"purpose":"summary","visualType":"animated-text","narration":"lesson recap","visualDirection":"Three takeaways and completed-work evidence","onScreenText":["Lesson recap"],"sourceReferences":["approved lesson source"]}
+      ],
+      "captions":[
+        {"start":0,"end":60,"text":"caption aligned to scene narration"},
+        {"start":60,"end":120,"text":"caption aligned to scene narration"},
+        {"start":120,"end":180,"text":"caption aligned to scene narration"},
+        {"start":180,"end":240,"text":"caption aligned to scene narration"},
+        {"start":240,"end":300,"text":"caption aligned to scene narration"},
+        {"start":300,"end":360,"text":"caption aligned to scene narration"}
+      ],
+      "events":[{"type":"question","id":"event-1","at":300,"questionId":"knowledge-check-1","required":true}],
+      "requiredWatchPercent":95,
+      "minimumSeatTimeSeconds":300,
+      "preventSeekPastRequiredEvents":true,
+      "resumeEnabled":true
     }
   }
 }

@@ -11,6 +11,7 @@ import { emitEvent } from '@/lib/events/emit';
 import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-entries';
 import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
+import { getTimeclockWeekEnding, getTimeclockWorkDate } from '@/lib/timeclock/work-date';
 
 const MAX_ACCURACY_M = 50;
 const LUNCH_DURATION_MINUTES = 60;
@@ -302,12 +303,10 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Outside geofence', distance_m: distanceM, radius_m: radiusM }, { status: 403 });
     }
 
-    const serverNow = new Date().toISOString();
-    const serverDate = serverNow.slice(0, 10);
-    const weekEndingDate = new Date(`${serverDate}T12:00:00Z`);
-    const daysToSaturday = (6 - weekEndingDate.getUTCDay() + 7) % 7;
-    weekEndingDate.setUTCDate(weekEndingDate.getUTCDate() + daysToSaturday);
-    const weekEnding = weekEndingDate.toISOString().slice(0, 10);
+    const now = new Date();
+    const serverNow = now.toISOString();
+    const serverDate = getTimeclockWorkDate(now);
+    const weekEnding = getTimeclockWeekEnding(serverDate);
     const normalizedAccuracy = accuracy_m === undefined ? null : Math.round(accuracy_m);
 
     if (action === 'clock_in') {
@@ -315,15 +314,20 @@ async function _POST(request: NextRequest) {
         .from('progress_entries')
         .select('id, site_id, clock_in_at')
         .eq('apprentice_id', apprentice.id)
+        .eq('work_date', serverDate)
+        .not('clock_in_at', 'is', null)
         .is('clock_out_at', null)
         .order('clock_in_at', { ascending: false })
         .limit(1)
         .maybeSingle();
       if (openShift) {
-        return NextResponse.json(
-          { error: 'An open shift already exists', progress_entry_id: openShift.id },
-          { status: 409 },
-        );
+        return NextResponse.json({
+          success: true,
+          action,
+          progress_entry_id: openShift.id,
+          clock_in_at: openShift.clock_in_at,
+          already_clocked_in: true,
+        });
       }
 
       let resolvedPartnerId = apprentice.employer_id || site.partner_id || null;
@@ -347,27 +351,46 @@ async function _POST(request: NextRequest) {
         );
       }
 
-      const { data: newEntry, error: insertError } = await db
+      const clockInValues = {
+        apprentice_id: apprentice.id,
+        partner_id: resolvedPartnerId,
+        program_id: resolvedProgramId,
+        submitted_by: user.id,
+        site_id,
+        work_date: serverDate,
+        week_ending: weekEnding,
+        hours_worked: 0,
+        clock_in_at: serverNow,
+        clock_in_lat: lat,
+        clock_in_lng: lng,
+        clock_in_accuracy_m: normalizedAccuracy,
+        last_known_lat: lat,
+        last_known_lng: lng,
+        last_location_at: serverNow,
+        status: 'submitted',
+        auto_clocked_out: false,
+      };
+
+      // Progress forms can create a current-day draft before the apprentice
+      // reaches the timeclock. Reuse that draft instead of inserting a second
+      // row. Historical drafts are deliberately ignored and never block a new
+      // day's shift.
+      const { data: currentDraft } = await db
         .from('progress_entries')
-        .insert({
-          apprentice_id: apprentice.id,
-          partner_id: resolvedPartnerId,
-          program_id: resolvedProgramId,
-          submitted_by: user.id,
-          site_id,
-          work_date: serverDate,
-          week_ending: weekEnding,
-          hours_worked: 0,
-          clock_in_at: serverNow,
-          clock_in_lat: lat,
-          clock_in_lng: lng,
-          clock_in_accuracy_m: normalizedAccuracy,
-          last_known_lat: lat,
-          last_known_lng: lng,
-          last_location_at: serverNow,
-          status: 'submitted',
-          auto_clocked_out: false,
-        })
+        .select('id')
+        .eq('apprentice_id', apprentice.id)
+        .eq('work_date', serverDate)
+        .eq('status', 'draft')
+        .is('clock_in_at', null)
+        .is('clock_out_at', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const entryWrite = currentDraft
+        ? db.from('progress_entries').update(clockInValues).eq('id', currentDraft.id)
+        : db.from('progress_entries').insert(clockInValues);
+      const { data: newEntry, error: insertError } = await entryWrite
         .select('id')
         .single();
 

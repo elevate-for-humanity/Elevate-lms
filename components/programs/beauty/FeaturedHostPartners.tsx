@@ -155,7 +155,6 @@ export default function FeaturedHostPartners({
                             kind: 'photo' as const,
                           }
                         : (stillMedia[1] ?? stillMedia[0]);
-                const secondaryImage = undefined;
                 const video: FeaturedHostPartnerMedia | undefined =
                   shop.slug === 'razors-image-barbershop'
                     ? {
@@ -174,13 +173,7 @@ export default function FeaturedHostPartners({
                   >
                     {video ? (
                       <div className="bg-slate-950 px-4 py-5 sm:px-6">
-                        <div
-                          className={
-                            secondaryImage
-                              ? 'grid items-stretch gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(150px,0.72fr)]'
-                              : ''
-                          }
-                        >
+                        <div>
                           <div className="relative mx-auto w-full max-w-lg overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
                             {image ? (
                               <Image
@@ -204,30 +197,6 @@ export default function FeaturedHostPartners({
                               Your browser does not support embedded video.
                             </video>
                           </div>
-                          {secondaryImage ? (
-                            <div className="grid gap-4">
-                              {image ? (
-                                <div className="relative min-h-52 overflow-hidden rounded-2xl border border-white/15 bg-white shadow-xl">
-                                  <Image
-                                    src={image.src}
-                                    alt={image.alt}
-                                    fill
-                                    sizes="(max-width: 640px) 100vw, 24vw"
-                                    className="object-cover"
-                                  />
-                                </div>
-                              ) : null}
-                              <div className="relative min-h-52 overflow-hidden rounded-2xl border border-white/15 bg-white shadow-xl">
-                                <Image
-                                  src={secondaryImage.src}
-                                  alt={secondaryImage.alt}
-                                  fill
-                                  sizes="(max-width: 640px) 100vw, 24vw"
-                                  className="object-contain"
-                                />
-                              </div>
-                            </div>
-                          ) : null}
                         </div>
                         <div className="mx-auto mt-4 max-w-xl text-center text-white">
                           <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-red-300">
@@ -253,7 +222,7 @@ export default function FeaturedHostPartners({
                         ) : null}
                       </div>
                     ) : image ? (
-                      <div className={secondaryImage ? 'grid bg-white sm:grid-cols-2' : 'bg-white'}>
+                      <div className="bg-white">
                         <div className="relative aspect-[4/3] max-h-[440px] overflow-hidden bg-white sm:aspect-[16/10]">
                           <Image
                             src={image.src}
@@ -263,17 +232,6 @@ export default function FeaturedHostPartners({
                             className="object-contain bg-white"
                           />
                         </div>
-                        {secondaryImage ? (
-                          <div className="relative aspect-[4/3] max-h-[440px] overflow-hidden bg-white sm:aspect-[16/10]">
-                            <Image
-                              src={secondaryImage.src}
-                              alt={secondaryImage.alt}
-                              fill
-                              sizes="(max-width: 1024px) 100vw, 25vw"
-                              className="object-contain bg-white"
-                            />
-                          </div>
-                        ) : null}
                       </div>
                     ) : null}
 

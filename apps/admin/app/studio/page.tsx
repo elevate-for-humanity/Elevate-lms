@@ -33,7 +33,11 @@ export default async function StudioPage({
           <span className="sr-only">
             Advanced capability surfaces are available through the unified command workspace.
           </span>
-          <div id="admin-ai-workspace" className="h-full min-h-0 min-w-0">
+          <div
+            id="admin-ai-workspace"
+            data-workspace-mode="command-orchestrated"
+            className="h-full min-h-0 min-w-0"
+          >
             <StudioCommandWorkspace
               workspaces={workspaces.map(({ id, label, route }) => ({ id, label, route }))}
               initialWorkspace={initialWorkspace}

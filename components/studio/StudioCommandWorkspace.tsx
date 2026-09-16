@@ -67,6 +67,7 @@ export default function StudioCommandWorkspace({
   const [conversationKey, setConversationKey] = useState(0);
   const [mode, setMode] = useState<InspectionMode>('preview');
   const [previewUrl, setPreviewUrl] = useState('https://admin.elevateforhumanity.org/course-builder');
+  const [browserTarget, setBrowserTarget] = useState('');
   // Mobile must open on the command composer. The browser remains one tap away
   // and receives the same active task context after submission.
   const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('chat');
@@ -96,6 +97,8 @@ export default function StudioCommandWorkspace({
     setWorkspaceVisible(true);
     setMobileSurface('tool');
     setActiveCapability(null);
+    const explicitUrl = command.match(/https?:\/\/[^\s"'<>]+/i)?.[0]?.replace(/[),.;]+$/, '') ?? '';
+    setBrowserTarget(explicitUrl);
     if (/\b(course|lesson|curriculum|quiz|assessment|learning object|media)\b/i.test(command)) {
       setPreviewUrl(`${window.location.origin}/course-builder`);
       setMode('preview');
@@ -285,6 +288,8 @@ export default function StudioCommandWorkspace({
               <CloudBrowserWorkspace
                 unifiedTask={activeTask}
                 conversationId={activeConversationId}
+                autoStart={activeCapability === 'browser'}
+                initialTarget={browserTarget}
               />
             </div>
             <div
@@ -321,6 +326,8 @@ export default function StudioCommandWorkspace({
               <CloudBrowserWorkspace
                 unifiedTask={activeTask}
                 conversationId={activeConversationId}
+                autoStart={workspaceVisible && !activeCapability && mode === 'browser'}
+                initialTarget={browserTarget}
               />
             </div>
           </div>

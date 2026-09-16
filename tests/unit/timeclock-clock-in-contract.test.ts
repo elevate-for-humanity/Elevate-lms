@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const route = readFileSync('apps/lms/app/api/timeclock/action/route.ts', 'utf8');
+const contextRoute = readFileSync('apps/lms/app/api/timeclock/context/route.ts', 'utf8');
 const migration = readFileSync(
   'supabase/migrations/20260915121242_fix_timeclock_daily_clockins.sql',
   'utf8',
@@ -24,5 +25,18 @@ describe('timeclock clock-in persistence contract', () => {
     expect(migration).toContain(
       'drop constraint if exists progress_entries_apprentice_id_partner_id_program_id_week_e_key',
     );
+  });
+
+  it('only treats a real current-day clock-in as an active shift', () => {
+    expect(route).toContain(".eq('work_date', serverDate)");
+    expect(route).toContain(".not('clock_in_at', 'is', null)");
+    expect(contextRoute).toContain(".eq('work_date', workDate)");
+    expect(contextRoute).toContain(".not('clock_in_at', 'is', null)");
+  });
+
+  it('reuses an existing current-day draft and makes retries idempotent', () => {
+    expect(route).toContain(".eq('status', 'draft')");
+    expect(route).toContain("update(clockInValues).eq('id', currentDraft.id)");
+    expect(route).toContain('already_clocked_in: true');
   });
 });

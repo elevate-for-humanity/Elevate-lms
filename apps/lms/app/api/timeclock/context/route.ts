@@ -6,6 +6,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
 import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
+import { getTimeclockWorkDate } from '@/lib/timeclock/work-date';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -87,10 +88,13 @@ async function _GET(request: NextRequest) {
 
   let activeShift = null;
   if (apprentice) {
+    const workDate = getTimeclockWorkDate();
     const { data: shift } = await db
       .from('progress_entries')
       .select('id, clock_in_at, lunch_start_at, lunch_end_at, site_id')
       .eq('apprentice_id', apprentice.id)
+      .eq('work_date', workDate)
+      .not('clock_in_at', 'is', null)
       .is('clock_out_at', null)
       .order('clock_in_at', { ascending: false })
       .limit(1)

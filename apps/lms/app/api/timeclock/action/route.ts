@@ -12,6 +12,7 @@ import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-ent
 import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
 import { APPRENTICE_TIMECLOCK_URL } from '@/lib/portal/apprenticeship-portal-paths';
 import { getTimeclockWeekEnding, getTimeclockWorkDate } from '@/lib/timeclock/work-date';
+import { APPRENTICE_TIME_POLICY } from '@/lib/timeclock/policy';
 
 const MAX_ACCURACY_M = 50;
 const LUNCH_DURATION_MINUTES = 60;
@@ -310,6 +311,51 @@ async function _POST(request: NextRequest) {
     const normalizedAccuracy = accuracy_m === undefined ? null : Math.round(accuracy_m);
 
     if (action === 'clock_in') {
+      const staleTheoryCutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+      await db
+        .from('theory_activity_sessions')
+        .update({ status: 'completed', ended_at: serverNow, updated_at: serverNow })
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .lt('last_heartbeat_at', staleTheoryCutoff);
+      const { data: activeTheorySession } = await db
+        .from('theory_activity_sessions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .gte('last_heartbeat_at', staleTheoryCutoff)
+        .limit(1)
+        .maybeSingle();
+      if (activeTheorySession) {
+        return NextResponse.json(
+          {
+            error: 'Close or pause the active theory lesson before clocking into OJL.',
+            code: 'THEORY_SESSION_ACTIVE',
+          },
+          { status: 409 },
+        );
+      }
+
+      const { data: weeklyEntries } = await db
+        .from('progress_entries')
+        .select('hours_worked')
+        .eq('apprentice_id', apprentice.id)
+        .eq('week_ending', weekEnding)
+        .not('clock_out_at', 'is', null);
+      const weeklyOjlHours = (weeklyEntries || []).reduce(
+        (sum: number, row: any) => sum + Number(row.hours_worked || 0),
+        0,
+      );
+      if (weeklyOjlHours >= APPRENTICE_TIME_POLICY.weeklyOjlMaxHours) {
+        return NextResponse.json(
+          {
+            error: `The ${APPRENTICE_TIME_POLICY.weeklyOjlMaxHours}-hour weekly OJL limit has been reached.`,
+            code: 'WEEKLY_OJL_LIMIT_REACHED',
+          },
+          { status: 409 },
+        );
+      }
+
       const { data: openShift } = await db
         .from('progress_entries')
         .select('id, site_id, clock_in_at')

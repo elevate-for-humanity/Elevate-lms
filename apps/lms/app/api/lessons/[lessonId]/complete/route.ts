@@ -198,12 +198,31 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
       timeline?.minimumSeatTimeSeconds ?? interactiveVideo?.minimumSeatTimeSeconds ?? 0,
     );
     const minimumSeconds = Math.max(MINIMUM_SEAT_TIME[contentType] ?? 30, configuredSeatTime);
-    if (timeSpentSeconds < minimumSeconds) {
+    const { data: apprentice } = await db
+      .from('apprentices')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .maybeSingle();
+    let effectiveTimeSpentSeconds = timeSpentSeconds;
+    if (apprentice) {
+      const { data: theorySessions, error: theorySessionError } = await db
+        .from('theory_activity_sessions')
+        .select('active_seconds')
+        .eq('user_id', user.id)
+        .eq('lesson_id', lessonId);
+      if (theorySessionError) throw theorySessionError;
+      effectiveTimeSpentSeconds = (theorySessions || []).reduce(
+        (sum: number, session: any) => sum + Number(session.active_seconds || 0),
+        0,
+      );
+    }
+    if (effectiveTimeSpentSeconds < minimumSeconds) {
       return NextResponse.json(
         {
           error: 'Minimum time requirement not met',
           required: minimumSeconds,
-          actual: timeSpentSeconds,
+          actual: effectiveTimeSpentSeconds,
         },
         { status: 403 },
       );
@@ -221,9 +240,17 @@ async function _POST(request: NextRequest, { params }: { params: Promise<{ lesso
       lessonId,
       lesson.course_id,
       enrollment.id,
-      timeSpentSeconds,
+      effectiveTimeSpentSeconds,
     );
     const completedAt = new Date().toISOString();
+    if (apprentice) {
+      await db
+        .from('theory_activity_sessions')
+        .update({ status: 'completed', ended_at: completedAt, updated_at: completedAt })
+        .eq('user_id', user.id)
+        .eq('lesson_id', lessonId)
+        .in('status', ['active', 'paused']);
+    }
 
     try {
       const { data: linkedCompetencies } = await db

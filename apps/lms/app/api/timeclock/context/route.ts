@@ -6,7 +6,8 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { resolvePortalPreviewSubject } from '@/lib/admin/portal-preview';
 import { getApprenticeshipRequiredHours } from '@/lib/compliance/apprenticeship';
 import { evaluateIdentityClockEligibility } from '@/lib/identity/clock-eligibility';
-import { getTimeclockWorkDate } from '@/lib/timeclock/work-date';
+import { getTimeclockWorkDate, getTimeclockWeekEnding } from '@/lib/timeclock/work-date';
+import { APPRENTICE_TIME_POLICY } from '@/lib/timeclock/policy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -87,8 +88,45 @@ async function _GET(request: NextRequest) {
   const hoursCompleted = (approvedHours || []).reduce((sum: number, row: any) => sum + Number(row.accepted_hours || row.hours_claimed || 0), 0);
 
   let activeShift = null;
+  let weeklyOjlHours = 0;
+  let weeklyTheoryRecordedHours = 0;
+  let weeklyTheoryVerifiedHours = 0;
   if (apprentice) {
     const workDate = getTimeclockWorkDate();
+    const weekEnding = getTimeclockWeekEnding(workDate);
+    const weekStart = new Date(`${weekEnding}T12:00:00Z`);
+    weekStart.setUTCDate(weekStart.getUTCDate() - 6);
+    const weekStartDate = weekStart.toISOString().slice(0, 10);
+    const [{ data: weeklyEntries }, { data: weeklyTheory }, { data: weeklyTheorySessions }] = await Promise.all([
+      db.from('progress_entries')
+        .select('hours_worked')
+        .eq('apprentice_id', apprentice.id)
+        .gte('work_date', weekStartDate)
+        .lte('work_date', weekEnding)
+        .not('clock_out_at', 'is', null),
+      db.from('apprenticeship_rti_entries')
+        .select('minutes_verified')
+        .eq('user_id', subject.userId)
+        .eq('status', 'verified')
+        .gte('instruction_date', weekStartDate)
+        .lte('instruction_date', weekEnding),
+      db.from('theory_activity_sessions')
+        .select('active_seconds')
+        .eq('user_id', subject.userId)
+        .eq('week_ending', weekEnding),
+    ]);
+    weeklyOjlHours = (weeklyEntries || []).reduce(
+      (sum: number, row: any) => sum + Number(row.hours_worked || 0),
+      0,
+    );
+    weeklyTheoryVerifiedHours = (weeklyTheory || []).reduce(
+      (sum: number, row: any) => sum + Number(row.minutes_verified || 0) / 60,
+      0,
+    );
+    weeklyTheoryRecordedHours = (weeklyTheorySessions || []).reduce(
+      (sum: number, row: any) => sum + Number(row.active_seconds || 0) / 3600,
+      0,
+    );
     const { data: shift } = await db
       .from('progress_entries')
       .select('id, clock_in_at, lunch_start_at, lunch_end_at, site_id')
@@ -122,7 +160,15 @@ async function _GET(request: NextRequest) {
           siteId: activeShift.site_id,
         }
       : null,
-    canClock: Boolean(apprentice && allowedSites.length && identity.eligible && !subject.previewing),
+    weeklyOjlHours: Math.round(weeklyOjlHours * 100) / 100,
+    weeklyTheoryRecordedHours: Math.round(weeklyTheoryRecordedHours * 100) / 100,
+    weeklyTheoryVerifiedHours: Math.round(weeklyTheoryVerifiedHours * 100) / 100,
+    weeklyOjlMaxHours: APPRENTICE_TIME_POLICY.weeklyOjlMaxHours,
+    weeklyTheoryTargetHours: APPRENTICE_TIME_POLICY.weeklyTheoryTargetHours,
+    weeklyTheoryMaxHours: APPRENTICE_TIME_POLICY.weeklyTheoryMaxHours,
+    weeklyCombinedMaxHours: APPRENTICE_TIME_POLICY.weeklyCombinedMaxHours,
+    outsideGeofenceGraceMinutes: APPRENTICE_TIME_POLICY.outsideGeofenceGraceMinutes,
+    canClock: Boolean(apprentice && allowedSites.length && identity.eligible && !subject.previewing && weeklyOjlHours < APPRENTICE_TIME_POLICY.weeklyOjlMaxHours),
     identityVerification: identity,
     previewing: subject.previewing,
     configurationMessage: !apprentice
@@ -133,6 +179,8 @@ async function _GET(request: NextRequest) {
           ? 'Complete secure ID and selfie verification before clock-in is enabled.'
         : subject.previewing
           ? 'Admin preview is read-only. The learner can clock in from their own account at the verified Host Shop.'
+          : weeklyOjlHours >= APPRENTICE_TIME_POLICY.weeklyOjlMaxHours
+            ? `The ${APPRENTICE_TIME_POLICY.weeklyOjlMaxHours}-hour weekly OJL limit has been reached.`
           : null,
   });
 }

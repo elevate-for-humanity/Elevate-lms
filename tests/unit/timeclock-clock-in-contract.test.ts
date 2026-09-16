@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 const route = readFileSync('apps/lms/app/api/timeclock/action/route.ts', 'utf8');
 const contextRoute = readFileSync('apps/lms/app/api/timeclock/context/route.ts', 'utf8');
+const timeclockPage = readFileSync('apps/lms/app/apprentice/timeclock/page.tsx', 'utf8');
+const policy = readFileSync('lib/timeclock/policy.ts', 'utf8');
 const migration = readFileSync(
   'supabase/migrations/20260915121242_fix_timeclock_daily_clockins.sql',
   'utf8',
@@ -46,5 +48,17 @@ describe('timeclock clock-in persistence contract', () => {
     expect(route).toContain(".eq('status', 'draft')");
     expect(route).toContain("update(clockInValues).eq('id', currentDraft.id)");
     expect(route).toContain('already_clocked_in: true');
+  });
+
+  it('shows and enforces the weekly apprenticeship time policy', () => {
+    expect(policy).toContain('weeklyOjlMaxHours: 40');
+    expect(policy).toContain('weeklyTheoryTargetHours: 3');
+    expect(policy).toContain('weeklyTheoryMaxHours: 10');
+    expect(policy).toContain('weeklyCombinedMaxHours: 50');
+    expect(policy).toContain('outsideGeofenceGraceMinutes: 15');
+    expect(route).toContain("code: 'WEEKLY_OJL_LIMIT_REACHED'");
+    expect(contextRoute).toContain('weeklyTheoryVerifiedHours');
+    expect(timeclockPage).toContain('Weekly hours and timeclock rules');
+    expect(timeclockPage).toContain('Login alone does not earn theory credit');
   });
 });

@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { isPausedSettingValue } from '@/lib/course-builder/generation-control';
+import { isPausedSettingValue, parseCourseBuilderGenerationControl } from '@/lib/course-builder/generation-control';
 
 const root = process.cwd();
 const read = (relativePath: string) => fs.readFileSync(path.join(root, relativePath), 'utf8');
@@ -15,6 +15,22 @@ describe('single Course Builder authority', () => {
     expect(isPausedSettingValue({ paused: true })).toBe(true);
     expect(isPausedSettingValue(false)).toBe(false);
     expect(isPausedSettingValue({ paused: false })).toBe(false);
+  });
+
+  it('keeps the global pause closed except for explicitly allowlisted courses', () => {
+    expect(
+      parseCourseBuilderGenerationControl({
+        paused: true,
+        allowedCourseIds: ['course-a', 'course-a', ' course-b '],
+      }),
+    ).toEqual({
+      paused: true,
+      allowedCourseIds: ['course-a', 'course-b'],
+    });
+    expect(parseCourseBuilderGenerationControl(true)).toEqual({
+      paused: true,
+      allowedCourseIds: [],
+    });
   });
 
   it('removes the legacy independent generated_* writer', () => {

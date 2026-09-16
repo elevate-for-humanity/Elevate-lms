@@ -105,16 +105,12 @@ export default function ProgramDetailPage({
     ? 'WIOA or Workforce Ready Grant may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment.'
     : 'WIOA may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment.';
   const selfPayNumeric = Number((p.selfPayCost || '').replace(/[^0-9.]/g, '')) || 0;
-  // Use depositAmount from program data if set, otherwise fall back to $600 minimum.
-  const bnplDepositStart = p.depositAmount
-    ? Number(p.depositAmount.replace(/[^0-9.]/g, ''))
-    : [
-          'barber-apprenticeship',
-          'cosmetology-apprenticeship',
-          'esthetician',
-          'nail-technician-apprenticeship',
-        ].includes(p.slug)
-      ? 600
+  const isApprenticeship = p.programType === 'apprenticeship';
+  const octoberCouponCode = '50OFFOCT';
+  const bnplDepositStart = isApprenticeship
+    ? 300
+    : p.depositAmount
+      ? Number(p.depositAmount.replace(/[^0-9.]/g, ''))
       : null;
   const estimatedWeeklyAfterDeposit =
     bnplDepositStart && selfPayNumeric > bnplDepositStart && p.durationWeeks > 0
@@ -138,6 +134,7 @@ export default function ProgramDetailPage({
       intent: 'enrollment',
       funding: 'self_pay',
       payment: mode,
+      ...(isApprenticeship ? { coupon: octoberCouponCode } : {}),
     }).toString()}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const isTaxPreparationProgram = p.slug === 'tax-preparation';
@@ -255,6 +252,18 @@ export default function ProgramDetailPage({
               </div>
             );
           })()}
+
+        {isApprenticeship ? (
+          <div className="border-y border-red-200 bg-red-700 px-4 py-4 text-white">
+            <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-red-100">October enrollment special</p>
+                <p className="mt-1 text-lg font-black">50% off the standard startup deposit — start for $300.</p>
+              </div>
+              <div className="shrink-0 rounded-xl border border-white/30 bg-white/10 px-4 py-2 text-sm font-black">Coupon: <span className="font-mono">50OFFOCT</span></div>
+            </div>
+          </div>
+        ) : null}
 
         {/* Hero content panel — below image, no overlay */}
         <div className="bg-white">
@@ -465,7 +474,9 @@ export default function ProgramDetailPage({
             </p>
             {bnplDepositStart && (
               <p className="mt-2 text-sm font-semibold text-slate-200">
-                Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.
+                {isApprenticeship
+                  ? `October coupon ${octoberCouponCode} lowers the startup deposit to ${bnplDepositStart.toLocaleString()}.`
+                  : `Payment plans start with an estimated ${bnplDepositStart.toLocaleString()} deposit.`}
               </p>
             )}
             {estimatedWeeklyAfterDeposit && (

@@ -14,6 +14,71 @@ import { portalPreviewDestination } from '@/lib/admin/portal-preview-destination
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin']);
 
+async function startHandoffPreview(handoffToken: string) {
+  const handoff = verifyPortalPreviewHandoff(handoffToken);
+  if (!handoff) {
+    return NextResponse.json({ error: 'Invalid or expired preview handoff' }, { status: 403 });
+  }
+
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(
+    /\/$/,
+    '',
+  );
+  const db = await requireAdminClient();
+  const [{ data: actor }, { data: target }] = await Promise.all([
+    db.from('profiles').select('id,role').eq('id', handoff.actorId).maybeSingle(),
+    db.from('profiles').select('id,role').eq('id', handoff.targetId).maybeSingle(),
+  ]);
+  if (
+    !actor?.id ||
+    !ADMIN_ROLES.has(String(actor.role || '')) ||
+    !target?.id ||
+    ADMIN_ROLES.has(String(target.role || ''))
+  ) {
+    return NextResponse.json({ error: 'Invalid preview handoff' }, { status: 403 });
+  }
+
+  const response = NextResponse.redirect(`${appUrl}${portalPreviewDestination(target.role)}`, 303);
+  response.cookies.set(PORTAL_PREVIEW_COOKIE, target.id, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60,
+    path: '/',
+  });
+  response.cookies.set('elevate_portal_preview_actor', actor.id, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60,
+    path: '/',
+  });
+  response.cookies.set(
+    PORTAL_PREVIEW_SESSION_COOKIE,
+    createPortalPreviewHandoff(actor.id, target.id, 60 * 60 * 1000),
+    {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60,
+      path: '/',
+    },
+  );
+  return response;
+}
+
+export async function POST(request: NextRequest) {
+  const contentType = request.headers.get('content-type') || '';
+  const handoffToken = contentType.includes('application/json')
+    ? String((await request.json().catch(() => null))?.handoff || '').trim()
+    : String((await request.formData().catch(() => null))?.get('handoff') || '').trim();
+
+  if (!handoffToken) {
+    return NextResponse.json({ error: 'handoff is required' }, { status: 400 });
+  }
+  return startHandoffPreview(handoffToken);
+}
+
 export async function GET(request: NextRequest) {
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org').replace(
     /\/$/,
@@ -25,47 +90,7 @@ export async function GET(request: NextRequest) {
   const requestedTargetId = handoff?.targetId || targetUserId;
   const db = await requireAdminClient();
 
-  if (handoff) {
-    const [{ data: actor }, { data: target }] = await Promise.all([
-      db.from('profiles').select('id,role').eq('id', handoff.actorId).maybeSingle(),
-      db.from('profiles').select('id,role').eq('id', handoff.targetId).maybeSingle(),
-    ]);
-    if (
-      !actor?.id ||
-      !ADMIN_ROLES.has(String(actor.role || '')) ||
-      !target?.id ||
-      ADMIN_ROLES.has(String(target.role || ''))
-    ) {
-      return NextResponse.json({ error: 'Invalid preview handoff' }, { status: 403 });
-    }
-    const response = NextResponse.redirect(`${appUrl}${portalPreviewDestination(target.role)}`);
-    response.cookies.set(PORTAL_PREVIEW_COOKIE, target.id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60,
-      path: '/',
-    });
-    response.cookies.set('elevate_portal_preview_actor', actor.id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60,
-      path: '/',
-    });
-    response.cookies.set(
-      PORTAL_PREVIEW_SESSION_COOKIE,
-      createPortalPreviewHandoff(actor.id, target.id, 60 * 60 * 1000),
-      {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60,
-        path: '/',
-      },
-    );
-    return response;
-  }
+  if (handoff) return startHandoffPreview(handoffToken!);
 
   const userDb = await createClient();
   const {

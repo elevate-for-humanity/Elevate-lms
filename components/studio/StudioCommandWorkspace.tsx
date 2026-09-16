@@ -142,8 +142,8 @@ export default function StudioCommandWorkspace({
           </div>
         </div>
         <nav
-          aria-label="Studio tools"
-          className="scrollbar-hide flex min-w-0 items-center gap-1 overflow-x-auto border-t border-white/10 px-2 py-1.5"
+          aria-label="Unified AI workspace"
+          className="flex min-w-0 items-center gap-1 border-t border-white/10 px-2 py-1.5"
         >
           <button
             type="button"
@@ -154,7 +154,7 @@ export default function StudioCommandWorkspace({
             aria-pressed={!workspaceVisible}
             className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${!workspaceVisible ? 'bg-white text-brand-blue-800' : 'bg-white/10 text-white hover:bg-white/15'}`}
           >
-            <MessageSquare className="h-4 w-4" aria-hidden="true" /> Chat
+            <MessageSquare className="h-4 w-4" aria-hidden="true" /> AI workspace
           </button>
           <button
             type="button"
@@ -170,19 +170,11 @@ export default function StudioCommandWorkspace({
             ) : (
               <PanelRightOpen className="h-4 w-4" aria-hidden="true" />
             )}
-            {workspaceVisible ? 'Close tools' : 'Open tools'}
+            {workspaceVisible ? 'Hide live work' : 'Show live work'}
           </button>
-          {workspaces.map((workspace) => (
-            <button
-              key={workspace.id}
-              type="button"
-              onClick={() => openCapability(workspace.id)}
-              aria-pressed={workspaceVisible && activeCapability === workspace.id}
-              className={`inline-flex min-h-9 shrink-0 items-center rounded-lg px-3 text-xs font-semibold ${workspaceVisible && activeCapability === workspace.id ? 'bg-white text-brand-blue-800' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
-            >
-              {workspace.label}
-            </button>
-          ))}
+          <span className="ml-2 hidden text-[11px] font-semibold text-blue-100 sm:inline">
+            One AI plan · contextual tools · shared evidence
+          </span>
         </nav>
       </header>
 

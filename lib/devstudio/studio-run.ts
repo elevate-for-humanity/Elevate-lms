@@ -244,3 +244,55 @@ export async function completeCanonicalStudioRun(
   if (error) throw error;
   await appendStudioRunEvent(db, run.id, 'run.completed', 'Studio run verified', result);
 }
+
+export async function syncCanonicalStudioRunCheckpoint(
+  db: SupabaseClient,
+  run: CanonicalStudioRun,
+  plan: Plan,
+) {
+  for (const step of plan.steps) {
+    const stepId = run.stepIds.get(step.id);
+    if (!stepId) continue;
+    if (step.status === 'skipped') {
+      const { error } = await db.from('studio_run_steps').update({
+        status: 'skipped',
+        required: false,
+        output: { reason: step.error ?? 'Dependency did not verify' },
+      }).eq('id', stepId);
+      if (error) throw error;
+    } else if (step.status === 'failed') {
+      const { error } = await db.from('studio_run_steps').update({
+        status: 'failed',
+        error: { message: step.error ?? 'Verification failed' },
+      }).eq('id', stepId);
+      if (error) throw error;
+    } else if (step.status === 'awaiting_approval') {
+      const { error } = await db.from('studio_run_steps').update({
+        status: 'blocked',
+        output: { reason: step.output ?? 'Authorized approval required' },
+      }).eq('id', stepId);
+      if (error) throw error;
+    }
+  }
+
+  if (plan.status === 'done') {
+    await completeCanonicalStudioRun(db, run, {
+      plan_id: plan.id,
+      verified_steps: plan.steps.filter((step) => step.status === 'done').length,
+      skipped_steps: plan.steps.filter((step) => step.status === 'skipped').length,
+    });
+    return;
+  }
+
+  const runStatus =
+    plan.status === 'failed'
+      ? 'failed'
+      : plan.status === 'awaiting_approval'
+        ? 'blocked'
+        : 'executing';
+  const { error } = await db.from('studio_runs').update({
+    status: runStatus,
+    failure: plan.status === 'failed' ? { message: 'One or more required steps failed verification' } : null,
+  }).eq('id', run.id);
+  if (error) throw error;
+}

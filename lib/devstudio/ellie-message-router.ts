@@ -8,7 +8,7 @@
  */
 
 export type EllieMessageRoute = 'command' | 'ops' | 'platform';
-export type StudioSpecialist = 'ELLIE' | 'LIZZY' | 'PARIS';
+export type StudioSpecialist = 'ELLIE' | 'LIZZY' | 'PARIS' | 'ZORA';
 
 // Outcome-oriented requests enter the governed command runtime. Keeping these
 // phrases explicit makes the natural-language contract auditable while the
@@ -62,9 +62,19 @@ export function shouldOrchestrateMessage(message: string): boolean {
   return VERIFIED_OPERATION_RE.test(message) && EXECUTABLE_TARGET_RE.test(message);
 }
 
-/** All requests enter one orchestrator. Internal capabilities are selected by
- * the server from intent and actual tool calls, never by a UI persona switch. */
-export function selectStudioAgent(_message: string): StudioSpecialist {
+/** All requests enter one orchestrator. The coordinator assigns the lead
+ * specialist from intent while the durable plan may hand work to every agent.
+ * Users never need to choose a persona or move between separate products. */
+export function selectStudioAgent(message: string): StudioSpecialist {
+  if (/\b(?:course|curriculum|lesson|learning|assessment|quiz|instruction|coach|student support)\b/i.test(message)) {
+    return 'ELLIE';
+  }
+  if (/\b(?:website|marketing|admissions|career|pathway|recruit|outreach|social)\b/i.test(message)) {
+    return 'PARIS';
+  }
+  if (/\b(?:compliance|audit|evidence|accessibility|standard|quality|policy|regulat|credential)\b/i.test(message)) {
+    return 'ZORA';
+  }
   return 'LIZZY';
 }
 

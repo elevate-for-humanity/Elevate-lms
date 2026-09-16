@@ -44,6 +44,11 @@ export default function FeaturedHostPartners({
         })
       : matchingShops;
 
+  const directoryShops =
+    programSlug === 'barber-apprenticeship'
+      ? shops.filter((shop) => shop.slug !== 'kountry-kutz-barbershop')
+      : shops;
+
   if (!shops.length) {
     const pathway = programLabel(programSlug ?? 'beauty-apprenticeship');
     const image =
@@ -132,44 +137,40 @@ export default function FeaturedHostPartners({
             </p>
 
             <div className="mt-10 grid gap-6 lg:grid-cols-2">
-              {shops.map((shop) => {
+              {directoryShops.map((shop) => {
                 const stillMedia = shop.media?.filter((media) => media.kind !== 'video') ?? [];
                 const image =
-                  shop.slug === 'razors-image-barbershop'
-                    ? {
-                        src: '/images/partners/razors-image-logo.jpg',
-                        alt: "Razor's Image Barbershop official logo",
-                        kind: 'photo' as const,
-                      }
-                    : shop.slug === 'generations-hair-llc'
-                      ? {
-                          src: '/images/partners/generations-hair/highlighted-curls-card.webp',
-                          alt: 'Highlighted dimensional curls created by Generations Hair LLC',
-                          kind: 'photo' as const,
-                        }
-                      : (stillMedia[1] ?? stillMedia[0]);
-                const secondaryImage =
-                  shop.slug === 'razors-image-barbershop'
-                    ? {
-                        src: '/images/partners/razors-image-storefront-2026.jpg',
-                        alt: "Razor's Image Barbershop storefront in Bloomington, Indiana",
-                      }
-                    : undefined;
-                const video: FeaturedHostPartnerMedia | undefined =
-                  programSlug === 'barber-apprenticeship'
+                  shop.slug === 'b-52s-barber-shop'
                     ? undefined
                     : shop.slug === 'razors-image-barbershop'
                       ? {
-                          src: '/videos/partners/razors-image-host-barbershop.mp4',
-                          alt: "Razor's Image owner describing the barber apprenticeship opportunity",
-                          kind: 'video' as const,
+                          src: '/images/partners/razors-image-logo.jpg',
+                          alt: "Razor's Image Barbershop official logo",
+                          kind: 'photo' as const,
                         }
+                      : shop.slug === 'generations-hair-llc'
+                        ? {
+                            src: '/images/partners/generations-hair/highlighted-curls-card.webp',
+                            alt: 'Highlighted dimensional curls created by Generations Hair LLC',
+                            kind: 'photo' as const,
+                          }
+                        : (stillMedia[1] ?? stillMedia[0]);
+                const secondaryImage = undefined;
+                const video: FeaturedHostPartnerMedia | undefined =
+                  shop.slug === 'razors-image-barbershop'
+                    ? {
+                        src: '/videos/partners/razors-image-host-barbershop.mp4',
+                        alt: "Razor's Image owner describing the barber apprenticeship opportunity",
+                        kind: 'video' as const,
+                      }
+                    : programSlug === 'barber-apprenticeship'
+                      ? undefined
                       : shop.media?.find((media) => media.kind === 'video');
                 const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
                 return (
                   <article
                     key={shop.slug}
-                    className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+                    className={`overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm ${shop.slug === 'razors-image-barbershop' ? 'lg:col-span-2' : ''}`}
                   >
                     {video ? (
                       <div className="bg-slate-950 px-4 py-5 sm:px-6">
@@ -180,7 +181,7 @@ export default function FeaturedHostPartners({
                               : ''
                           }
                         >
-                          <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
+                          <div className="relative mx-auto w-full max-w-lg overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
                             {image ? (
                               <Image
                                 src={image.src}

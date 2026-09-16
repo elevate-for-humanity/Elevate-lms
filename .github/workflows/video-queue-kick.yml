@@ -1,25 +1,44 @@
-name: One-time approved course video queue kick
+name: Process approved Barbering video queue
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
       - '.github/workflows/video-queue-kick.yml'
+      - '.github/video-queue-trigger'
 
 permissions:
   contents: read
 
+concurrency:
+  group: controlled-barbering-video-production
+  cancel-in-progress: false
+
 jobs:
-  kick:
+  process:
     runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      COURSE_ID: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17'
     steps:
-      - name: Process approved Course Builder video queue
-        env:
-          ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      - name: Process only the approved Barbering queue
+        shell: bash
         run: |
+          set -euo pipefail
           test -n "$CRON_SECRET"
-          curl -sf -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            -H "Content-Type: application/json" \
-            --max-time 1800
+          while true; do
+            status=$(curl -sS --connect-timeout 30 --max-time 1800               -o /tmp/video-worker.json -w '%{http_code}'               -X POST "$ADMIN_URL/api/internal/videos/process-queue"               -H "Authorization: Bearer $CRON_SECRET"               -H "Content-Type: application/json"               --data "{\"courseId\":\"$COURSE_ID\",\"maxJobs\":4}")
+            cat /tmp/video-worker.json
+            case "$status" in
+              200|202) ;;
+              *) echo "::error::Video worker returned HTTP $status"; exit 1 ;;
+            esac
+            started=$(node -e "const p=require('/tmp/video-worker.json'); if(p.ok!==true) process.exit(1); process.stdout.write(String(p.started||0))")
+            if [ "$started" = "0" ]; then
+              break
+            fi
+            sleep 5
+          done

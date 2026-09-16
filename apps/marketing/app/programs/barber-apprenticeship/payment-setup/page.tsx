@@ -116,7 +116,7 @@ export default function PaymentSetupPage() {
   const [deposit, setDeposit] = useState(STANDARD_MIN_DEPOSIT);
   const [depositInput, setDepositInput] = useState(String(STANDARD_MIN_DEPOSIT));
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [weeklyAmount, setWeeklyAmount] = useState(() => weeklyPaymentCents(MIN_DEPOSIT));
+  const [weeklyAmount, setWeeklyAmount] = useState(() => weeklyPaymentCents(STANDARD_MIN_DEPOSIT));
   const [loading, setLoading] = useState(true);
   const [fatalError, setFatalError] = useState<string | null>(null);
   const minimumDeposit = couponApplied ? OCTOBER_PROMO_DEPOSIT : STANDARD_MIN_DEPOSIT;

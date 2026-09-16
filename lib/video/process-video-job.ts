@@ -40,6 +40,7 @@ import { uploadLessonMediaBuffer } from './upload-lesson-media';
 import { generateLessonScenes } from '@/server/video-generator/generateLessonScenes';
 import type { LessonRenderPlanDraft } from '@/server/video-generator/types';
 import { assertNarrationProviderConfigured } from './edge-tts';
+import { getCourseBuilderGenerationControl } from '@/lib/course-builder/generation-control';
 
 const REMOTION_PROVIDER = 'remotion';
 const REMOTION_MODEL = 'ElevateLesson';
@@ -762,6 +763,21 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
 
 export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   const db = createAdminClient();
+
+  // An allowlisted controlled build uses the canonical deterministic CPU
+  // compositor for full lessons. Do not classify that path as paid WAN/GPU
+  // inference. Other courses and opted-in microclips retain the existing paid
+  // authorization contract.
+  const generationControl = await getCourseBuilderGenerationControl(db);
+  if (
+    job.asset_kind !== 'microclip' &&
+    cpuOnlyCourseMedia() &&
+    generationControl.allowedCourseIds.includes(job.course_id)
+  ) {
+    await runClaimedVideoJob(job);
+    return;
+  }
+
   try {
     const { data: course } = await db
       .from('courses')

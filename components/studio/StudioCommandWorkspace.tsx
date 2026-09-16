@@ -1,15 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useMemo, useState } from 'react';
-import {
-  Bot,
-  Eye,
-  Globe2,
-  MessageSquare,
-  PanelRightOpen,
-  Plus,
-} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Bot, Eye, Globe2, MessageSquare, PanelRightOpen, Plus } from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
 import RepositoryLivePreview from './RepositoryLivePreview';
 import type { OrchestratedPlanCheckpoint } from '@/lib/devstudio/ellie-unified-handlers';
@@ -31,20 +24,13 @@ const TasksWorkspace = dynamic(() => import('@/apps/admin/app/studio/tasks/Tasks
   ssr: false,
 });
 
-type InspectionMode = 'preview' | 'browser';
+type StudioSurface = 'commands' | 'course' | 'preview' | 'browser' | 'capability';
 type NativeCapability = 'workflows' | 'intelligence' | 'tasks' | 'browser';
 
 function isNativeCapability(id: string): id is NativeCapability {
   return id === 'workflows' || id === 'intelligence' || id === 'tasks' || id === 'browser';
 }
 
-/**
- * Every advanced Studio surface receives the identity of the conversation and
- * task that opened it. The destination may use those values immediately or
- * preserve them while the capability is progressively migrated to a native
- * panel. They are UI context only; server routes still authorize every read
- * and mutation independently.
- */
 export function buildConversationWorkspaceUrl(
   route: string,
   conversationId: string | null,
@@ -57,6 +43,13 @@ export function buildConversationWorkspaceUrl(
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
+function checkpointStatus(status: string): OrchestratedPlanCheckpoint['status'] {
+  if (status === 'completed') return 'done';
+  if (status === 'failed') return 'failed';
+  if (status === 'awaiting_approval') return 'awaiting_approval';
+  return 'running';
+}
+
 export default function StudioCommandWorkspace({
   workspaces,
   initialWorkspace,
@@ -65,53 +58,72 @@ export default function StudioCommandWorkspace({
   initialWorkspace?: string;
 }) {
   const [conversationKey, setConversationKey] = useState(0);
-  const [mode, setMode] = useState<InspectionMode>('preview');
-  const [previewUrl, setPreviewUrl] = useState('https://admin.elevateforhumanity.org/course-builder');
+  const [surface, setSurface] = useState<StudioSurface>(
+    initialWorkspace ? 'capability' : 'commands',
+  );
+  const [previewUrl, setPreviewUrl] = useState('');
   const [browserTarget, setBrowserTarget] = useState('');
-  // Mobile must open on the command composer. The browser remains one tap away
-  // and receives the same active task context after submission.
-  const [mobileSurface, setMobileSurface] = useState<'chat' | 'tool'>('chat');
   const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
   const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const [workspaceVisible, setWorkspaceVisible] = useState(true);
+
+  const courseBuilderUrl = useMemo(
+    () =>
+      `https://admin.elevateforhumanity.org${buildConversationWorkspaceUrl('/studio/courses', activeConversationId, activeTask?.taskId ?? null)}`,
+    [activeConversationId, activeTask?.taskId],
+  );
+
+  useEffect(() => {
+    if (!activeConversationId) return;
+    const controller = new AbortController();
+    void fetch(
+      `/api/admin/dev-studio/tasks?conversationId=${encodeURIComponent(activeConversationId)}&limit=20`,
+      { cache: 'no-store', signal: controller.signal },
+    )
+      .then((response) =>
+        response.ok ? response.json() : Promise.reject(new Error('Task restore failed')),
+      )
+      .then((payload) => {
+        const tasks = Array.isArray(payload.tasks) ? payload.tasks : [];
+        const current = tasks.find((task: Record<string, unknown>) =>
+          ['running', 'awaiting_approval', 'planning'].includes(String(task.status ?? '')),
+        );
+        if (!current) return;
+        setActiveTask({
+          planId: String(current.trace_id ?? '').split(':')[0] || 'restored',
+          taskId: String(current.id),
+          runId: current.studio_run_id ? String(current.studio_run_id) : undefined,
+          title: current.title ? String(current.title) : undefined,
+          reason: current.approval_reason ? String(current.approval_reason) : undefined,
+          status: checkpointStatus(String(current.status ?? 'running')),
+        });
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+      });
+    return () => controller.abort();
+  }, [activeConversationId]);
 
   const openPreview = (url?: string) => {
     if (url) setPreviewUrl(url);
-    setMode('preview');
-    setMobileSurface('tool');
-    setWorkspaceVisible(true);
     setActiveCapability(null);
+    setSurface('preview');
   };
-
   const askAdminAI = (prompt: string) => {
     setSuggestedPrompt(prompt);
-    setMobileSurface('chat');
-    setWorkspaceVisible(true);
     setActiveCapability(null);
-    setMode('preview');
+    setSurface('commands');
   };
-
   const handleCommandStart = (command: string) => {
-    setWorkspaceVisible(true);
-    setMobileSurface('tool');
     setActiveCapability(null);
     const explicitUrl = command.match(/https?:\/\/[^\s"'<>]+/i)?.[0]?.replace(/[),.;]+$/, '') ?? '';
     setBrowserTarget(explicitUrl);
-    if (/\b(course|lesson|curriculum|quiz|assessment|learning object|media)\b/i.test(command)) {
-      setPreviewUrl(`${window.location.origin}/course-builder`);
-      setMode('preview');
-      return;
-    }
-    setMode('browser');
-  };
-
-  const handleTaskCheckpoint = (checkpoint: OrchestratedPlanCheckpoint | null) => {
-    setActiveTask(checkpoint);
-    if (!checkpoint) return;
-    setWorkspaceVisible(true);
-    setMobileSurface('tool');
+    setSurface(
+      /\b(course|lesson|curriculum|quiz|assessment|learning object|media)\b/i.test(command)
+        ? 'course'
+        : 'browser',
+    );
   };
 
   const activeWorkspace = useMemo(
@@ -126,16 +138,17 @@ export default function StudioCommandWorkspace({
       activeTask?.taskId ?? null,
     );
   }, [activeConversationId, activeTask?.taskId, activeWorkspace]);
-
   const openCapability = (id: string) => {
     if (!workspaces.some((workspace) => workspace.id === id)) return;
     setActiveCapability(id);
-    setMobileSurface('tool');
-    setWorkspaceVisible(true);
+    setSurface('capability');
   };
 
   return (
-    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white">
+    <div
+      data-studio-root="unified"
+      className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-white"
+    >
       <header className="shrink-0 border-b-4 border-brand-red-600 bg-brand-blue-700 text-white shadow-sm">
         <div className="flex min-h-14 min-w-0 items-center gap-2 px-3 sm:px-5">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25">
@@ -153,11 +166,10 @@ export default function StudioCommandWorkspace({
               setConversationKey((value) => value + 1);
               setActiveConversationId(null);
               setActiveTask(null);
-              setMobileSurface('chat');
-              setWorkspaceVisible(true);
               setActiveCapability(null);
-              setMode('preview');
-              setPreviewUrl('https://admin.elevateforhumanity.org/course-builder');
+              setPreviewUrl('');
+              setBrowserTarget('');
+              setSurface('commands');
             }}
             className="ml-auto inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-white/20 px-3 text-xs font-bold hover:bg-white/10"
           >
@@ -169,64 +181,47 @@ export default function StudioCommandWorkspace({
         </div>
         <nav
           aria-label="Command workflow"
-          className="flex min-w-0 items-center gap-1 border-t border-white/10 px-2 py-1.5"
+          className="flex min-w-0 items-center gap-1 overflow-x-auto border-t border-white/10 px-2 py-1.5"
         >
           <button
             type="button"
             onClick={() => {
-              setMobileSurface('chat');
-              setWorkspaceVisible(true);
+              setActiveCapability(null);
+              setSurface('commands');
             }}
-            aria-pressed={mobileSurface === 'chat'}
-            className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${mobileSurface === 'chat' ? 'bg-white text-brand-blue-800' : 'bg-white/10 text-white hover:bg-white/15'}`}
+            aria-pressed={surface === 'commands'}
+            className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface === 'commands' ? 'bg-white text-brand-blue-800' : 'bg-white/10 text-white hover:bg-white/15'}`}
           >
             <MessageSquare className="h-4 w-4" aria-hidden="true" /> Commands
           </button>
           <button
             type="button"
             onClick={() => {
-              setWorkspaceVisible(true);
-              setMobileSurface('tool');
               setActiveCapability(null);
-              setMode('preview');
-              setPreviewUrl('https://admin.elevateforhumanity.org/course-builder');
+              setSurface('course');
             }}
-            aria-pressed={workspaceVisible && !activeCapability && mode === 'preview'}
-            className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-white/10 px-3 text-xs font-bold text-white hover:bg-white/15"
+            aria-pressed={surface === 'course'}
+            className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${surface === 'course' ? 'bg-white text-brand-blue-800' : 'bg-white/10 text-white hover:bg-white/15'}`}
           >
-            <PanelRightOpen className="h-4 w-4" aria-hidden="true" />
-            Course Builder live
+            <PanelRightOpen className="h-4 w-4" aria-hidden="true" /> Course Builder live
           </button>
           <span className="ml-2 hidden text-[11px] font-semibold text-blue-100 sm:inline">
-            One command · automated workflow · verified results
+            One workspace · governed workflow · verified evidence
           </span>
         </nav>
       </header>
 
-      <div className="flex min-h-0 min-w-0 flex-1">
+      <main className="min-h-0 min-w-0 flex-1 overflow-hidden" aria-label="Studio workspace">
         <section
-          className={`${mobileSurface === 'chat' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col border-r border-slate-200 ${workspaceVisible ? 'lg:flex lg:basis-[48%]' : 'lg:flex lg:basis-full'}`}
+          className={surface === 'commands' ? 'flex h-full min-h-0 min-w-0 flex-col' : 'hidden'}
           aria-label="Elevate Studio conversation"
         >
-          <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 sm:hidden">
-            <span className="text-xs font-bold text-slate-700">Command workflow</span>
-            <button
-              type="button"
-              onClick={() => {
-                setMobileSurface('tool');
-                setWorkspaceVisible(true);
-              }}
-              className="ml-auto rounded-lg bg-brand-blue-700 px-3 py-2 text-xs font-bold text-white"
-            >
-              Open tools
-            </button>
-          </div>
           <UnifiedEllieChat
             key={conversationKey}
             embedded
             onOpenPreview={() => openPreview()}
             onPreviewTarget={openPreview}
-            onTaskCheckpoint={handleTaskCheckpoint}
+            onTaskCheckpoint={setActiveTask}
             onCommandStart={handleCommandStart}
             onOpenTasks={() => openCapability('tasks')}
             suggestedPrompt={suggestedPrompt}
@@ -236,103 +231,134 @@ export default function StudioCommandWorkspace({
         </section>
 
         <section
-          className={`${mobileSurface === 'tool' ? 'flex' : 'hidden'} min-h-0 min-w-0 flex-1 flex-col bg-slate-950 ${workspaceVisible ? 'lg:flex lg:basis-[52%]' : 'lg:hidden'}`}
-          aria-label="Studio workspace"
+          className={
+            surface === 'commands' ? 'hidden' : 'flex h-full min-h-0 min-w-0 flex-col bg-slate-950'
+          }
+          aria-label="Active Studio tool"
         >
-          <header className="flex min-h-12 shrink-0 items-center gap-2 border-b border-slate-800 bg-slate-900 px-3 text-white">
-            <span className="mr-auto text-xs font-black">
-              {activeWorkspace?.label ?? 'Conversation tools'}
+          <header className="flex min-h-12 shrink-0 items-center gap-2 overflow-x-auto border-b border-slate-800 bg-slate-900 px-3 text-white">
+            <span className="mr-auto shrink-0 text-xs font-black">
+              {activeWorkspace?.label ??
+                (surface === 'course' ? 'Course Builder' : 'Active run tools')}
             </span>
             <button
               type="button"
+              aria-pressed={surface === 'preview' || surface === 'course'}
               onClick={() => {
                 setActiveCapability(null);
-                setMode('preview');
+                setSurface(previewUrl ? 'preview' : 'course');
               }}
-              className={`inline-flex items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${!activeCapability && mode === 'preview' ? 'bg-cyan-500 text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}
+              className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'preview' || surface === 'course' ? 'bg-cyan-500 text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}
             >
               <Eye className="h-4 w-4" aria-hidden="true" /> Preview
             </button>
             <button
               type="button"
+              aria-pressed={surface === 'browser'}
               onClick={() => {
                 setActiveCapability(null);
-                setMode('browser');
+                setSurface('browser');
               }}
-              className={`inline-flex items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${!activeCapability && mode === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-300 hover:bg-slate-800'}`}
+              className={`inline-flex shrink-0 items-center gap-1 rounded-md px-3 py-2 text-xs font-bold ${surface === 'browser' ? 'bg-violet-500 text-white' : 'text-slate-300 hover:bg-slate-800'}`}
             >
               <Globe2 className="h-4 w-4" aria-hidden="true" /> Browser
             </button>
             <button
               type="button"
-              onClick={() => {
-                setMobileSurface('chat');
-                setWorkspaceVisible(false);
-              }}
-              className="rounded-md px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800 lg:hidden"
+              onClick={() => setSurface('commands')}
+              className="shrink-0 rounded-md px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800"
             >
               Commands
             </button>
           </header>
-          <div className="min-h-0 flex-1 overflow-hidden lg:p-2">
-            <div className={activeCapability === 'workflows' ? 'h-full' : 'hidden'}>
+          <div className="min-h-0 min-w-0 flex-1 overflow-hidden p-0 sm:p-2">
+            <div
+              className={
+                surface === 'capability' && activeCapability === 'workflows' ? 'h-full' : 'hidden'
+              }
+            >
               <WorkflowsWorkspace embedded />
             </div>
-            <div className={activeCapability === 'intelligence' ? 'h-full' : 'hidden'}>
+            <div
+              className={
+                surface === 'capability' && activeCapability === 'intelligence'
+                  ? 'h-full'
+                  : 'hidden'
+              }
+            >
               <IntelligenceWorkspace onAskAI={askAdminAI} />
             </div>
-            <div className={activeCapability === 'tasks' ? 'h-full' : 'hidden'}>
+            <div
+              className={
+                surface === 'capability' && activeCapability === 'tasks' ? 'h-full' : 'hidden'
+              }
+            >
               <TasksWorkspace embedded conversationId={activeConversationId} />
             </div>
-            <div className={activeCapability === 'browser' ? 'h-full' : 'hidden'}>
+            <div
+              className={
+                surface === 'capability' && activeCapability === 'browser' ? 'h-full' : 'hidden'
+              }
+            >
               <CloudBrowserWorkspace
                 unifiedTask={activeTask}
                 conversationId={activeConversationId}
-                autoStart={activeCapability === 'browser'}
+                autoStart={surface === 'capability' && activeCapability === 'browser'}
                 initialTarget={browserTarget}
               />
             </div>
             <div
-              className={activeCapability && mountedWorkspaceUrl ? 'h-full' : 'hidden'}
-              aria-hidden={!activeCapability || !mountedWorkspaceUrl}
+              className={
+                surface === 'capability' && activeCapability && mountedWorkspaceUrl
+                  ? 'h-full'
+                  : 'hidden'
+              }
             >
               {mountedWorkspaceUrl ? (
                 <RepositoryLivePreview
                   filePath={null}
                   content=""
-                  initialUrl={`${window.location.origin}${mountedWorkspaceUrl}`}
+                  initialUrl={`https://admin.elevateforhumanity.org${mountedWorkspaceUrl}`}
                   trustedInteractive
+                  allowManualTarget={false}
+                  allowExternalOpen={false}
+                  targetLabel="Active capability"
                 />
               ) : null}
             </div>
-            <div
-              className={!activeCapability && mode === 'preview' ? 'h-full' : 'hidden'}
-              aria-hidden={Boolean(activeCapability) || mode !== 'preview'}
-            >
+            <div className={surface === 'course' ? 'h-full' : 'hidden'}>
               <RepositoryLivePreview
                 filePath={null}
                 content=""
-                initialUrl={previewUrl}
-                trustedInteractive={
-                  previewUrl.startsWith('https://admin.elevateforhumanity.org') ||
-                  previewUrl.startsWith(window.location.origin)
-                }
+                initialUrl={courseBuilderUrl}
+                trustedInteractive
+                allowManualTarget={false}
+                allowExternalOpen={false}
+                targetLabel="Course Builder · active conversation"
               />
             </div>
-            <div
-              className={!activeCapability && mode === 'browser' ? 'h-full' : 'hidden'}
-              aria-hidden={Boolean(activeCapability) || mode !== 'browser'}
-            >
+            <div className={surface === 'preview' ? 'h-full' : 'hidden'}>
+              <RepositoryLivePreview
+                filePath={null}
+                content=""
+                initialUrl={previewUrl || courseBuilderUrl}
+                trustedInteractive
+                allowManualTarget={false}
+                allowExternalOpen={Boolean(activeTask?.runId)}
+                targetLabel="Active run preview"
+              />
+            </div>
+            <div className={surface === 'browser' ? 'h-full' : 'hidden'}>
               <CloudBrowserWorkspace
                 unifiedTask={activeTask}
                 conversationId={activeConversationId}
-                autoStart={workspaceVisible && !activeCapability && mode === 'browser'}
+                autoStart={surface === 'browser'}
                 initialTarget={browserTarget}
               />
             </div>
           </div>
         </section>
-      </div>
+      </main>
     </div>
   );
 }

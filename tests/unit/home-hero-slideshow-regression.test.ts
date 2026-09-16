@@ -5,6 +5,19 @@ import { describe, expect, it } from 'vitest';
 const source = fs.readFileSync(path.resolve('components/ui/HomeHeroVideo.tsx'), 'utf8');
 
 describe('homepage hero slideshow rendering', () => {
+  it('loads the homepage content before the hero video without a splash transition', () => {
+    const homepageHero = fs.readFileSync(
+      path.resolve('components/home/PlatformHubHero.tsx'),
+      'utf8',
+    );
+
+    expect(homepageHero).toContain('SafeHeroVideo');
+    expect(homepageHero).toContain('hero-home-fast.mp4');
+    expect(homepageHero).toContain('showPosterBeforePlayback');
+    expect(homepageHero).toContain('className="order-1 flex items-center');
+    expect(homepageHero).toContain('className="relative order-2');
+  });
+
   it('keeps every slide mounted so transitions never expose the placeholder', () => {
     expect(source).toContain('demoSlides={slides.map((candidate)');
     expect(source).toContain('demoActiveSlideIndex={activeSlide}');
@@ -50,7 +63,7 @@ describe('homepage hero slideshow rendering', () => {
     expect(salonSlide).toBeLessThan(kountrySlide);
     expect(source).toContain('className="relative z-20 order-1');
     expect(source).toContain('className="relative order-2 w-full');
-    expect(source).toContain('h-[clamp(300px,46svh,480px)]');
+    expect(source).toContain('h-[clamp(520px,72svh,860px)]');
     expect(source).not.toContain("src: '/images/partners/generations-hair/salon-service.webp'");
     expect(source).toContain('narrateTranscript');
     expect(source).toContain('soundButtonVariant="prominent"');

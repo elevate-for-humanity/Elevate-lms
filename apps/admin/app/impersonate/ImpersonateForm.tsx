@@ -33,8 +33,19 @@ export default function ImpersonateForm() {
       setSuccess(
         `Now viewing as: ${data.impersonating.name} (${data.impersonating.email}). Session expires ${new Date(data.impersonating.expires_at).toLocaleTimeString()}.`,
       );
-      if (!data.preview_url) throw new Error('Secure preview handoff was not created');
-      window.location.assign(data.preview_url);
+      if (!data.preview_url || !data.preview_handoff) {
+        throw new Error('Secure preview handoff was not created');
+      }
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = data.preview_url;
+      const handoff = document.createElement('input');
+      handoff.type = 'hidden';
+      handoff.name = 'handoff';
+      handoff.value = data.preview_handoff;
+      form.appendChild(handoff);
+      document.body.appendChild(form);
+      form.submit();
     } catch {
       setError('Request failed');
     } finally {

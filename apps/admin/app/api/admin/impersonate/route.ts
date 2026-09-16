@@ -99,7 +99,12 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     success: true,
-    preview_url: `https://app.elevateforhumanity.org/api/admin/preview?handoff=${encodeURIComponent(createPortalPreviewHandoff(auth.id, target_user_id))}`,
+    // Submit the signed handoff in a POST body. Keeping it out of the URL
+    // prevents it from being stored in browser history, access logs, and
+    // referrer headers, and avoids security filters that reject credential-like
+    // query parameters during the cross-subdomain transition.
+    preview_url: 'https://app.elevateforhumanity.org/api/admin/preview',
+    preview_handoff: createPortalPreviewHandoff(auth.id, target_user_id),
     impersonating: {
       user_id: target_user_id,
       name: target.full_name,

@@ -16,8 +16,19 @@ export function OpenLearnerPortalButton({ studentId }: { studentId: string }) {
         body: JSON.stringify({ target_user_id: studentId, reason: 'Admin learner portal review' }),
       });
       const result = await response.json();
-      if (!response.ok || !result.preview_url) throw new Error(result.error || 'Could not open learner portal');
-      window.location.assign(result.preview_url);
+      if (!response.ok || !result.preview_url || !result.preview_handoff) {
+        throw new Error(result.error || 'Could not open learner portal');
+      }
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = result.preview_url;
+      const handoff = document.createElement('input');
+      handoff.type = 'hidden';
+      handoff.name = 'handoff';
+      handoff.value = result.preview_handoff;
+      form.appendChild(handoff);
+      document.body.appendChild(form);
+      form.submit();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not open learner portal');
     } finally {

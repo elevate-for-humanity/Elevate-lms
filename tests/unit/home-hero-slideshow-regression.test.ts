@@ -14,8 +14,21 @@ describe('homepage hero slideshow rendering', () => {
     expect(homepageHero).toContain('SafeHeroVideo');
     expect(homepageHero).toContain('hero-home-fast.mp4');
     expect(homepageHero).toContain('showPosterBeforePlayback');
+    expect(homepageHero).toContain('loop');
     expect(homepageHero).toContain('className="order-1 flex items-center');
     expect(homepageHero).toContain('className="relative order-2');
+  });
+
+  it('loops only the homepage hero visual while narration remains separate', () => {
+    const safeHeroVideo = fs.readFileSync(
+      path.resolve('components/hero/SafeHeroVideo.tsx'),
+      'utf8',
+    );
+
+    expect(safeHeroVideo).toContain('loop?: boolean');
+    expect(safeHeroVideo).toContain('loop = false');
+    expect(safeHeroVideo).toContain('loop={loop}');
+    expect(safeHeroVideo).toContain('video.loop = loop');
   });
 
   it('keeps every slide mounted so transitions never expose the placeholder', () => {

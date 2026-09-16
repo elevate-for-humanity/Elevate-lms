@@ -170,6 +170,8 @@ export async function createAiTask(
       trace_id: traceId,
       correlation_id: traceId,
       conversation_id: input.conversationId ?? null,
+      studio_run_id: input.studioRunId ?? null,
+      studio_run_step_id: input.studioRunStepId ?? null,
       plan: plan,
       plan_json: { steps: plan },
       requires_approval: needsApproval,

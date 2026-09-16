@@ -1,6 +1,10 @@
 import 'server-only';
 
-export type EvaluationStatus = 'PASS' | 'FAIL_RETRYABLE' | 'FAIL_BLOCKING' | 'REQUIRES_HUMAN_REVIEW';
+export type EvaluationStatus =
+  | 'PASS'
+  | 'FAIL_RETRYABLE'
+  | 'FAIL_BLOCKING'
+  | 'REQUIRES_HUMAN_REVIEW';
 
 export type EvaluationInput = {
   expectedOutput?: string;
@@ -44,6 +48,60 @@ function errorLooksRetryable(error: string): boolean {
   ].some((token) => value.includes(token));
 }
 
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function hasDurableToolEvidence(tool: string, result: unknown): string | null {
+  const record = asRecord(result);
+  if (!record) return null;
+
+  if (tool === 'openhands.execute') {
+    const github = asRecord(record.github_verification);
+    const branch = asRecord(github?.branch);
+    const pullRequests = Array.isArray(github?.pullRequests) ? github.pullRequests : [];
+    const repositoryEvidence = Boolean(
+      github?.verified === true &&
+      ((typeof branch?.sha === 'string' && branch.sha.length >= 7) || pullRequests.length > 0),
+    );
+    return repositoryEvidence
+      ? 'Verified repository branch or pull request evidence was returned.'
+      : null;
+  }
+
+  if (tool === 'workflows.runTests') {
+    const checks = Array.isArray(record.checks) ? record.checks : [];
+    const runId = record.workflow_run_id ?? record.workflowRunId ?? record.run_id ?? record.runId;
+    const conclusion = String(record.conclusion ?? record.status ?? '').toLowerCase();
+    return runId && checks.length > 0 && ['success', 'completed', 'passed'].includes(conclusion)
+      ? 'Completed CI run and check evidence was returned.'
+      : null;
+  }
+
+  if (tool === 'deployments.autopilot') {
+    const deploymentId =
+      record.deployment_id ?? record.deploymentId ?? record.run_id ?? record.runId;
+    const status = String(record.status ?? record.conclusion ?? '').toLowerCase();
+    return deploymentId && ['success', 'completed', 'deployed', 'ready'].includes(status)
+      ? 'Deployment identifier and terminal deployment status were returned.'
+      : null;
+  }
+
+  if (tool === 'browser.execute') {
+    const failures = Array.isArray(record.failures) ? record.failures : null;
+    const hasArtifact = Boolean(
+      record.artifact_id ?? record.artifactId ?? record.session_id ?? record.sessionId,
+    );
+    return hasArtifact && (record.verified === true || record.clean === true || failures !== null)
+      ? 'Durable browser verification evidence was returned.'
+      : null;
+  }
+
+  return 'Tool does not require a specialized evidence contract.';
+}
+
 export function evaluateExecution(input: EvaluationInput): EvaluationResult {
   const reasons: string[] = [];
   const attempts = Math.max(0, Number(input.attempts ?? 0));
@@ -77,6 +135,22 @@ export function evaluateExecution(input: EvaluationInput): EvaluationResult {
     };
   }
 
+  const evidenceContract = hasDurableToolEvidence(input.tool, input.result);
+  if (!evidenceContract) {
+    reasons.push(
+      `${input.tool} returned a response, but it did not include the required durable evidence. Generic success flags are not verification.`,
+    );
+    return {
+      status: 'FAIL_BLOCKING',
+      reasons,
+      evidence: {
+        tool: input.tool,
+        expected_output: input.expectedOutput ?? null,
+        verification_rule: input.verificationRule ?? null,
+      },
+    };
+  }
+
   const requiresEngineeringEvidence =
     input.verificationRule?.toLowerCase().includes('engineering runtime') ?? false;
   if (requiresEngineeringEvidence && input.tool !== 'openhands.execute') {
@@ -94,7 +168,7 @@ export function evaluateExecution(input: EvaluationInput): EvaluationResult {
     };
   }
 
-  reasons.push('Execution returned a non-empty result with no reported error.');
+  reasons.push(evidenceContract);
   if (input.verificationRule) reasons.push(`Verification rule: ${input.verificationRule}`);
 
   return {

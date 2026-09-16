@@ -37,6 +37,8 @@ const ELEVATE_PUBLIC_HOSTS = new Set([
   'testing.elevateforhumanity.org',
 ]);
 
+const DEPLOYMENT_HOST_SUFFIXES = ['.northflank.app'] as const;
+
 const STORE_RUNTIME_ALLOWED_PREFIXES = [
   '/store', '/login', '/signup', '/register', '/forgot-password', '/reset-password', '/auth',
   '/api/store', '/api/webhooks/store', '/api/webhooks/stripe', '/api/auth', '/api/ping', '/api/health',
@@ -74,6 +76,26 @@ function isCustomTenantHost(host: string) {
   return true;
 }
 
+function isDeploymentHost(host: string) {
+  return DEPLOYMENT_HOST_SUFFIXES.some(
+    (suffix) => host === suffix.slice(1) || host.endsWith(suffix),
+  );
+}
+
+function deploymentHostResponse(
+  pathname: string,
+  search: string,
+  requestHeaders: Headers,
+) {
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  response.headers.set(
+    'Link',
+    `<https://www.elevateforhumanity.org${pathname}${search}>; rel="canonical"`,
+  );
+  return response;
+}
+
 function isStoreRuntimeAllowed(pathname: string): boolean {
   return STORE_RUNTIME_ALLOWED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
@@ -98,6 +120,13 @@ export async function middleware(req: NextRequest) {
 
   const host = requestHost(req);
 
+  if (host === 'elevateforhumanity.org') {
+    return NextResponse.redirect(
+      new URL(`https://www.elevateforhumanity.org${pathname}${search}`),
+      308,
+    );
+  }
+
   const privateAppRoute = PRIVATE_APP_REDIRECTS.find(
     ({ prefix }) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
@@ -111,6 +140,13 @@ export async function middleware(req: NextRequest) {
 
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', `${pathname}${search}`);
+
+  // Build and provider URLs are operational deployment surfaces, not public
+  // websites or customer custom domains. Keep them usable for health checks
+  // while preventing search engines from indexing a second copy of Marketing.
+  if (isDeploymentHost(host)) {
+    return deploymentHostResponse(pathname, search, requestHeaders);
+  }
 
   if (pathname.startsWith('/api/tenant-sites/')) {
     return NextResponse.next({ request: { headers: requestHeaders } });

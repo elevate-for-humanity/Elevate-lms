@@ -339,4 +339,19 @@ describe('canonical Course Factory media architecture', () => {
     expect(acceptance).toContain('publishPersistedCourseWithClient');
     expect(acceptance).not.toContain('publish_course_from_staging');
   });
+  it('locks repository voice and Pexels-first media policy in Course Builder jobs', () => {
+    const media = read('lib/course-factory/media-service.ts');
+    const renderer = read('lib/video/process-video-job.ts');
+    const narration = read('lib/video/edge-tts.ts');
+    expect(media).toContain("locked_by: 'course_builder'");
+    expect(media).toContain("strategy: 'repository_voice'");
+    expect(media).toContain('allow_paid_provider: false');
+    expect(media).toContain("strategy: 'existing_then_pexels'");
+    expect(renderer).toContain('applyLockedCourseBuilderMediaPolicy(job)');
+    expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
+    expect(narration).toContain("const provider = configuredNarrationProvider()");
+    expect(narration).toContain("provider === 'cloudflare'");
+    expect(narration).not.toContain("env.NODE_ENV === 'production' && (provider === 'edge'");
+  });
+
 });

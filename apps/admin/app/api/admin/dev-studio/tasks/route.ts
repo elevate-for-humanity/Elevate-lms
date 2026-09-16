@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     let query = db
       .from('ai_tasks')
       .select(
-        'id, title, description, status, priority, agent_id, agent_type, trace_id, tool_name, requires_approval, approval_status, approval_reason, risk_tags, result_json, tool_output, error_message, conversation_id, created_at, updated_at, completed_at',
+        'id, title, description, status, priority, agent_id, agent_type, trace_id, tool_name, requires_approval, approval_status, approval_reason, risk_tags, result_json, tool_output, error_message, conversation_id, studio_run_id, studio_run_step_id, created_at, updated_at, completed_at',
       )
       .order('created_at', { ascending: false })
       .limit(limit);

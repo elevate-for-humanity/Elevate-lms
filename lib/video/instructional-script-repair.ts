@@ -12,6 +12,7 @@ export interface InstructionalScriptRepairResult {
   repaired: boolean;
   wordCount: number;
   minimumWordCount: number;
+  maximumWordCount: number;
 }
 
 function record(value: unknown): Record<string, unknown> {
@@ -69,6 +70,25 @@ function minimumWords(input: InstructionalScriptRepairInput): number {
   return 180;
 }
 
+function maximumWords(input: InstructionalScriptRepairInput): number {
+  const kind = `${input.lessonType ?? ''} ${input.evidenceType ?? ''} ${input.lessonTitle}`.toLowerCase();
+  if (/checkpoint|quiz|exam|review/.test(kind)) return 520;
+  if (/practical|lab|hands-on|procedure|demonstration/.test(kind)) return 780;
+  return 700;
+}
+
+function boundNarration(value: string, maximumWordCount: number): string {
+  const tokens = value.split(/\s+/).filter(Boolean);
+  if (tokens.length <= maximumWordCount) return value;
+  const recapWords = Math.min(120, Math.floor(maximumWordCount * 0.2));
+  const teachingWords = maximumWordCount - recapWords;
+  return [
+    tokens.slice(0, teachingWords).join(' '),
+    'Now, connect those steps to the lesson objective and check your understanding.',
+    tokens.slice(-recapWords).join(' '),
+  ].join(' ');
+}
+
 function readingGuideParts(contentJson: Record<string, unknown>): string[] {
   const experience = record(contentJson.experience);
   const guide = record(experience.readingGuide);
@@ -124,12 +144,16 @@ export function repairInstructionalScript(
   const baseScript = sanitizeInternalInstructions(decodedBaseScript);
   const baseWordCount = words(baseScript).length;
   const baseWasSanitized = baseScript !== decodedBaseScript;
+  const maximumWordCount = maximumWords(input);
   if (baseWordCount >= minimumWordCount) {
+    const boundedScript = boundNarration(baseScript, maximumWordCount);
+    const boundedWordCount = words(boundedScript).length;
     return {
-      script: baseScript,
-      repaired: baseWasSanitized,
-      wordCount: baseWordCount,
+      script: boundedScript,
+      repaired: baseWasSanitized || boundedScript !== baseScript,
+      wordCount: boundedWordCount,
       minimumWordCount,
+      maximumWordCount,
     };
   }
 
@@ -151,11 +175,13 @@ export function repairInstructionalScript(
   // satisfy the quality contract and produce a useful lesson-sized video.
   const repairedWords = words(parts.join(' ')).slice(0, Math.max(minimumWordCount + 80, 500));
   const script = repairedWords.join(' ');
-  const wordCount = repairedWords.length;
+  const boundedScript = boundNarration(script, maximumWordCount);
+  const wordCount = words(boundedScript).length;
   return {
-    script,
-    repaired: script !== decodedBaseScript,
+    script: boundedScript,
+    repaired: boundedScript !== decodedBaseScript,
     wordCount,
     minimumWordCount,
+    maximumWordCount,
   };
 }

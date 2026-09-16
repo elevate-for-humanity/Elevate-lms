@@ -81,11 +81,17 @@ export default function RepositoryLivePreview({
   content,
   initialUrl = '',
   trustedInteractive = false,
+  allowManualTarget = true,
+  allowExternalOpen = true,
+  targetLabel,
 }: {
   filePath: string | null;
   content: string;
   initialUrl?: string;
   trustedInteractive?: boolean;
+  allowManualTarget?: boolean;
+  allowExternalOpen?: boolean;
+  targetLabel?: string;
 }) {
   const target = useMemo(() => inferTarget(filePath ?? ''), [filePath]);
   const defaultOrigin = target?.origin ?? 'https://www.elevateforhumanity.org';
@@ -107,7 +113,7 @@ export default function RepositoryLivePreview({
     ? 'Unsaved source preview'
     : target
       ? `${target.label} deployed route preview`
-      : 'Manual URL preview';
+      : (targetLabel ?? (allowManualTarget ? 'Manual URL preview' : 'Active run preview'));
 
   return (
     <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-950 text-slate-100">
@@ -139,7 +145,7 @@ export default function RepositoryLivePreview({
           >
             <RefreshCw className="h-4 w-4" />
           </button>
-          {canOpen ? (
+          {canOpen && allowExternalOpen ? (
             <a
               href={previewUrl}
               target="_blank"
@@ -152,7 +158,7 @@ export default function RepositoryLivePreview({
           ) : null}
         </div>
 
-        {!sourcePreview ? (
+        {!sourcePreview && allowManualTarget ? (
           <div className="mt-2">
             <input
               value={manualUrl}
@@ -166,10 +172,14 @@ export default function RepositoryLivePreview({
               </p>
             ) : null}
           </div>
-        ) : (
+        ) : sourcePreview ? (
           <p className="mt-2 rounded-lg border border-emerald-900 bg-emerald-950/40 px-2 py-1.5 text-[10px] text-emerald-200">
             HTML/SVG changes render directly from the unsaved editor buffer. They do not need a
             commit or deployment.
+          </p>
+        ) : (
+          <p className="mt-2 truncate rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 font-mono text-[11px] text-slate-300">
+            {previewUrl || 'Waiting for the active run target'}
           </p>
         )}
       </header>

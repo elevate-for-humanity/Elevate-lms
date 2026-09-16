@@ -7,6 +7,10 @@ const migration = readFileSync(
   'supabase/migrations/20260915121242_fix_timeclock_daily_clockins.sql',
   'utf8',
 );
+const dailyShiftMigration = readFileSync(
+  'supabase/migrations/20260916193354_repair_timeclock_daily_shift_uniqueness.sql',
+  'utf8',
+);
 
 describe('timeclock clock-in persistence contract', () => {
   it('resolves the program partner from the apprentice, site, or shop', () => {
@@ -25,6 +29,10 @@ describe('timeclock clock-in persistence contract', () => {
     expect(migration).toContain(
       'drop constraint if exists progress_entries_apprentice_id_partner_id_program_id_week_e_key',
     );
+    expect(dailyShiftMigration).toContain(
+      'drop index if exists public.progress_entries_unique_week',
+    );
+    expect(dailyShiftMigration).toContain('progress_entries_unique_daily_timeclock');
   });
 
   it('only treats a real current-day clock-in as an active shift', () => {

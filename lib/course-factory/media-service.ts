@@ -341,6 +341,20 @@ export async function queueCourseLessonVideos(
                   fingerprint: sourceFingerprint,
                   narration_locked: videoConfig.narration_locked === true,
                 },
+                media_policy: {
+                  version: 1,
+                  locked_by: 'course_builder',
+                  narration: {
+                    strategy: 'repository_voice',
+                    instructor_id: instructor.id,
+                    voice: instructor.voice,
+                    allow_paid_provider: false,
+                  },
+                  visuals: {
+                    strategy: 'existing_then_pexels',
+                    generated_only_for_exact_instructional_evidence: true,
+                  },
+                },
               },
               asset_kind: 'lesson',
             }),
@@ -390,6 +404,20 @@ export async function queueCourseLessonVideos(
               asset_key: clipId,
               visual_prompt: clip.visualPrompt ?? null,
               target_duration_seconds: clip.durationSeconds ?? 180,
+              media_policy: {
+                version: 1,
+                locked_by: 'course_builder',
+                narration: {
+                  strategy: 'repository_voice',
+                  instructor_id: instructor.id,
+                  voice: instructor.voice,
+                  allow_paid_provider: false,
+                },
+                visuals: {
+                  strategy: 'existing_then_pexels',
+                  generated_only_for_exact_instructional_evidence: true,
+                },
+              },
             },
             asset_kind: 'microclip',
             asset_key: clipId,

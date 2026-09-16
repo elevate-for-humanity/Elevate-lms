@@ -144,15 +144,19 @@ describe('InstructionalTimelineSchema', () => {
     width: 1920,
     height: 1080,
     fps: 30,
-    durationSeconds: 180,
+    durationSeconds: 360,
     scenes: [
-      { id: 'intro', startTime: 0, endTime: 60, purpose: 'introduction', visualType: 'instructor', narration: 'Introduce the objective.', visualDirection: 'Instructor demonstrates the objective.', onScreenText: ['Objective'], sourceReferences: ['Approved standard'] },
-      { id: 'demo', startTime: 60, endTime: 180, purpose: 'demonstration', visualType: 'technical-diagram', narration: 'Demonstrate the procedure.', visualDirection: 'Show a labeled technical diagram.', onScreenText: ['Procedure'], sourceReferences: ['Approved manual'] },
+      { id: 'intro', startTime: 0, endTime: 60, purpose: 'introduction', visualType: 'instructor', narration: 'Introduce the objective.', visualDirection: 'Instructor presents the lesson roadmap.', onScreenText: ['Objective'], sourceReferences: ['Approved standard'] },
+      { id: 'explain', startTime: 60, endTime: 120, purpose: 'explanation', visualType: 'animated-text', narration: 'Explain the governing evidence.', visualDirection: 'Show three sourced evidence points.', onScreenText: ['Evidence'], sourceReferences: ['Approved standard'] },
+      { id: 'diagram', startTime: 120, endTime: 180, purpose: 'diagram', visualType: 'technical-diagram', narration: 'Diagram the correct sequence.', visualDirection: 'Show a labeled technical diagram.', onScreenText: ['Sequence'], sourceReferences: ['Approved manual'] },
+      { id: 'demo', startTime: 180, endTime: 240, purpose: 'demonstration', visualType: 'equipment-image', narration: 'Compare correct and incorrect examples.', visualDirection: 'Show labeled side-by-side examples.', onScreenText: ['Correct', 'Needs correction'], sourceReferences: ['Approved manual'] },
+      { id: 'practice', startTime: 240, endTime: 300, purpose: 'practice', visualType: 'screen-demonstration', narration: 'Guide the learner through practice.', visualDirection: 'Show a decision and evidence checklist.', onScreenText: ['Your turn'], sourceReferences: ['Approved exercise'] },
+      { id: 'summary', startTime: 300, endTime: 360, purpose: 'summary', visualType: 'animated-text', narration: 'Summarize the measurable outcome.', visualDirection: 'Show the final takeaway and evidence.', onScreenText: ['Recap'], sourceReferences: ['Approved standard'] },
     ],
     captions: [{ start: 0, end: 10, text: 'Introduce the objective.' }],
     events: [{ type: 'question', id: 'checkpoint-1', at: 60, questionId: 'knowledge-check-1', required: true }],
     requiredWatchPercent: 95,
-    minimumSeatTimeSeconds: 150,
+    minimumSeatTimeSeconds: 300,
     preventSeekPastRequiredEvents: true,
     resumeEnabled: true,
   } as const;
@@ -165,7 +169,7 @@ describe('InstructionalTimelineSchema', () => {
     const invalid = {
       ...timeline,
       scenes: [timeline.scenes[0], { ...timeline.scenes[1], startTime: 30 }],
-      events: [{ ...timeline.events[0], at: 181 }],
+      events: [{ ...timeline.events[0], at: 361 }],
     };
     expect(InstructionalTimelineSchema.safeParse(invalid).success).toBe(false);
   });

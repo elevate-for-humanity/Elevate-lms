@@ -307,6 +307,179 @@ function CourseBuildRuns() {
   );
 }
 
+
+interface CanonicalRunStep {
+  id: string;
+  title: string;
+  status: string;
+  ordinal: number;
+  required: boolean;
+  verification_summary?: string | null;
+  error_message?: string | null;
+}
+
+interface CanonicalRunArtifact {
+  id: string;
+  artifact_type: string;
+  label?: string | null;
+  url?: string | null;
+  validation_status?: string | null;
+}
+
+interface CanonicalRunPayload {
+  run: {
+    id: string;
+    command: string;
+    status: string;
+    completed_at?: string | null;
+  };
+  steps: CanonicalRunStep[];
+  artifacts: CanonicalRunArtifact[];
+  events: Array<{ id: number; event_type: string; message?: string | null }>;
+}
+
+function CanonicalRunActivity({ runId }: { runId: string | null }) {
+  const [payload, setPayload] = useState<CanonicalRunPayload | null>(null);
+  const [loadError, setLoadError] = useState('');
+
+  const refresh = useCallback(async () => {
+    if (!runId) {
+      setPayload(null);
+      setLoadError('');
+      return;
+    }
+    const response = await fetch(`/api/admin/dev-studio/runs/${encodeURIComponent(runId)}`, {
+      cache: 'no-store',
+    });
+    const body = await response.json().catch(() => null);
+    if (!response.ok || !body?.run) {
+      setLoadError(body?.error || 'Could not load the verified run checklist.');
+      return;
+    }
+    setPayload(body as CanonicalRunPayload);
+    setLoadError('');
+  }, [runId]);
+
+  useEffect(() => {
+    void refresh();
+    if (!runId) return;
+    const timer = window.setInterval(() => void refresh(), 1500);
+    return () => window.clearInterval(timer);
+  }, [refresh, runId]);
+
+  if (!runId) return null;
+  if (!payload) {
+    return (
+      <div className="shrink-0 border-b border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-700">
+        <div className="mx-auto flex max-w-5xl items-center gap-2">
+          {loadError ? (
+            <XCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
+          ) : (
+            <Loader2 className="h-4 w-4 animate-spin text-brand-blue-700" aria-hidden="true" />
+          )}
+          {loadError || 'Loading the canonical run checklist…'}
+        </div>
+      </div>
+    );
+  }
+
+  const required = payload.steps.filter((step) => step.required);
+  const verified = required.filter((step) => step.status === 'verified').length;
+  const percent = required.length ? Math.round((verified / required.length) * 100) : 0;
+  const terminal = ['completed', 'failed', 'cancelled'].includes(payload.run.status);
+  const latestEvent = payload.events[payload.events.length - 1];
+
+  return (
+    <section
+      className="shrink-0 border-b border-blue-100 bg-gradient-to-r from-blue-50 to-cyan-50 px-4 py-3"
+      aria-label="Canonical Studio run"
+      aria-live="polite"
+    >
+      <div className="mx-auto max-w-5xl space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {payload.run.status === 'completed' ? (
+            <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+          ) : payload.run.status === 'failed' ? (
+            <XCircle className="h-5 w-5 text-red-600" aria-hidden="true" />
+          ) : (
+            <Loader2 className="h-5 w-5 animate-spin text-brand-blue-700" aria-hidden="true" />
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-black text-slate-950">
+              {payload.run.command || 'Studio workflow'}
+            </p>
+            <p className="text-[11px] font-semibold text-slate-600">
+              {verified}/{required.length} required steps verified · {percent}% · {payload.run.status}
+            </p>
+          </div>
+          <span className="rounded-full bg-white px-2 py-1 text-[10px] font-black uppercase tracking-wide text-brand-blue-800 ring-1 ring-blue-200">
+            {terminal ? 'Final state' : 'Live'}
+          </span>
+        </div>
+        <div className="h-2 overflow-hidden rounded-full bg-white ring-1 ring-blue-100">
+          <div
+            className={`h-full rounded-full transition-all ${payload.run.status === 'failed' ? 'bg-red-500' : 'bg-brand-blue-700'}`}
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+        <ol className="grid gap-1.5 sm:grid-cols-2">
+          {payload.steps.map((step) => (
+            <li
+              key={step.id}
+              className="flex min-w-0 items-start gap-2 rounded-lg border border-blue-100 bg-white/90 px-2.5 py-2 text-xs"
+            >
+              {step.status === 'verified' ? (
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+              ) : step.status === 'failed' ? (
+                <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" aria-hidden="true" />
+              ) : step.status === 'running' ? (
+                <Loader2 className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-blue-600" aria-hidden="true" />
+              ) : (
+                <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-slate-300 text-[9px] font-bold text-slate-500">
+                  {step.ordinal}
+                </span>
+              )}
+              <span className="min-w-0">
+                <span className="block truncate font-bold text-slate-900">{step.title}</span>
+                <span className="block truncate text-[10px] text-slate-500">
+                  {step.error_message || step.verification_summary || step.status}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ol>
+        {payload.artifacts.length ? (
+          <div className="flex flex-wrap gap-2">
+            {payload.artifacts.map((artifact) =>
+              artifact.url ? (
+                <a
+                  key={artifact.id}
+                  href={artifact.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-lg bg-white px-2.5 py-1.5 text-[11px] font-bold text-brand-blue-800 ring-1 ring-blue-200 hover:bg-blue-50"
+                >
+                  {artifact.label || artifact.artifact_type}
+                </a>
+              ) : (
+                <span
+                  key={artifact.id}
+                  className="rounded-lg bg-white px-2.5 py-1.5 text-[11px] font-bold text-slate-700 ring-1 ring-blue-200"
+                >
+                  {artifact.label || artifact.artifact_type}
+                </span>
+              ),
+            )}
+          </div>
+        ) : null}
+        {latestEvent?.message ? (
+          <p className="truncate text-[11px] text-slate-600">{latestEvent.message}</p>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 const QUICK = [
   {
     label: 'Build a course',
@@ -462,6 +635,7 @@ export default function UnifiedEllieChat({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [planCheckpoint, setPlanCheckpoint] = useState<OrchestratedPlanCheckpoint | null>(null);
+  const [canonicalRunId, setCanonicalRunId] = useState<string | null>(null);
   const [checkpointError, setCheckpointError] = useState('');
   const attachmentInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -706,6 +880,7 @@ export default function UnifiedEllieChat({
   }
 
   function receiveCheckpoint(checkpoint: OrchestratedPlanCheckpoint) {
+    if (checkpoint.runId) setCanonicalRunId(checkpoint.runId);
     const active =
       checkpoint.status === 'done' || checkpoint.status === 'failed' ? null : checkpoint;
     setPlanCheckpoint(active);
@@ -748,6 +923,7 @@ export default function UnifiedEllieChat({
           planId: planCheckpoint.planId,
           conversationId: conversationId ?? undefined,
           onCheckpoint: receiveCheckpoint,
+          onRunId: setCanonicalRunId,
         },
       );
     } catch (error) {
@@ -802,6 +978,7 @@ export default function UnifiedEllieChat({
             documentIds: attachment ? [attachment.id] : [],
             conversationId: canonicalConversationId,
             onCheckpoint: receiveCheckpoint,
+            onRunId: setCanonicalRunId,
           });
         } else {
           // Questions retain conversation context and the unified provider
@@ -930,6 +1107,8 @@ export default function UnifiedEllieChat({
           </p>
         </div>
       )}
+
+      <CanonicalRunActivity runId={canonicalRunId} />
 
       <CourseBuildRuns />
 

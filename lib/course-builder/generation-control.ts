@@ -4,7 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 export const COURSE_BUILDER_PAUSE_KEY = 'course_builder_generation_paused';
 
-type CourseBuilderGenerationControl = {
+export type CourseBuilderGenerationControl = {
   paused: boolean;
   allowedCourseIds: string[];
 };
@@ -45,7 +45,7 @@ export function isPausedSettingValue(value: unknown): boolean {
   return parseCourseBuilderGenerationControl(value).paused;
 }
 
-async function loadCourseBuilderGenerationControl(
+export async function getCourseBuilderGenerationControl(
   db: SupabaseClient,
 ): Promise<CourseBuilderGenerationControl> {
   const { data, error } = await db
@@ -58,14 +58,14 @@ async function loadCourseBuilderGenerationControl(
 }
 
 export async function isCourseBuilderGenerationPaused(db: SupabaseClient): Promise<boolean> {
-  return (await loadCourseBuilderGenerationControl(db)).paused;
+  return (await getCourseBuilderGenerationControl(db)).paused;
 }
 
 export async function assertCourseBuilderGenerationEnabled(
   db: SupabaseClient,
   courseId?: string | null,
 ): Promise<void> {
-  const control = await loadCourseBuilderGenerationControl(db);
+  const control = await getCourseBuilderGenerationControl(db);
   const normalizedCourseId = typeof courseId === 'string' ? courseId.trim() : '';
 
   if (

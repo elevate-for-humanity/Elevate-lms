@@ -65,7 +65,7 @@ export default function StudioCommandWorkspace({
   initialWorkspace?: string;
 }) {
   const [conversationKey, setConversationKey] = useState(0);
-  const [mode, setMode] = useState<InspectionMode>('browser');
+  const [mode, setMode] = useState<InspectionMode>('preview');
   const [previewUrl, setPreviewUrl] = useState('https://admin.elevateforhumanity.org/course-builder');
   // Mobile must open on the command composer. The browser remains one tap away
   // and receives the same active task context after submission.

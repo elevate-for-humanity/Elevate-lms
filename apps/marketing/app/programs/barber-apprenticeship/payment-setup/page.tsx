@@ -11,7 +11,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 // ── Inner form ────────────────────────────────────────────────────────────────
 
-function PaymentSetupForm({ weeklyAmount, deposit }: { weeklyAmount: number; deposit: number }) {
+function PaymentSetupForm({ weeklyAmount, deposit, couponCode }: { weeklyAmount: number; deposit: number; couponCode?: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
@@ -40,7 +40,11 @@ function PaymentSetupForm({ weeklyAmount, deposit }: { weeklyAmount: number; dep
 
     // Setup succeeded — activate subscription then go to complete
     try {
-      const res = await fetch('/api/barber/activate-subscription', { method: 'POST' });
+      const res = await fetch('/api/barber/activate-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deposit, couponCode }),
+      });
       if (!res.ok) {
         const data = await res.json();
         setError(data.error ?? 'Failed to activate subscription. Contact support.');
@@ -98,20 +102,34 @@ function PaymentSetupForm({ weeklyAmount, deposit }: { weeklyAmount: number; dep
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-const MIN_DEPOSIT = MIN_SETUP_FEE_CENTS / 100; // $600
-const MAX_DEPOSIT = TUITION_DOLLARS;            // $4,980
+const STANDARD_MIN_DEPOSIT = MIN_SETUP_FEE_CENTS / 100; // $600
+const OCTOBER_PROMO_DEPOSIT = 300;
+const OCTOBER_PROMO_CODE = '50OFFOCT';
+const MAX_DEPOSIT = TUITION_DOLLARS; // $4,980
 
-function clampDeposit(v: number) {
-  return Math.min(MAX_DEPOSIT, Math.max(MIN_DEPOSIT, Math.round(v)));
+function clampDeposit(v: number, minimumDeposit: number) {
+  return Math.min(MAX_DEPOSIT, Math.max(minimumDeposit, Math.round(v)));
 }
 
 export default function PaymentSetupPage() {
-  const [deposit, setDeposit] = useState(MIN_DEPOSIT);
-  const [depositInput, setDepositInput] = useState(String(MIN_DEPOSIT));
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [deposit, setDeposit] = useState(STANDARD_MIN_DEPOSIT);
+  const [depositInput, setDepositInput] = useState(String(STANDARD_MIN_DEPOSIT));
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [weeklyAmount, setWeeklyAmount] = useState(() => weeklyPaymentCents(MIN_DEPOSIT));
   const [loading, setLoading] = useState(true);
   const [fatalError, setFatalError] = useState<string | null>(null);
+  const minimumDeposit = couponApplied ? OCTOBER_PROMO_DEPOSIT : STANDARD_MIN_DEPOSIT;
+
+  useEffect(() => {
+    const coupon = new URLSearchParams(window.location.search).get('coupon')?.toUpperCase();
+    if (coupon === OCTOBER_PROMO_CODE) {
+      setCouponApplied(true);
+      setDeposit(OCTOBER_PROMO_DEPOSIT);
+      setDepositInput(String(OCTOBER_PROMO_DEPOSIT));
+      setWeeklyAmount(weeklyPaymentCents(OCTOBER_PROMO_DEPOSIT));
+    }
+  }, []);
 
   // Live display value — previews while typing before blur clamps
   const displayDeposit = (() => {
@@ -159,6 +177,13 @@ export default function PaymentSetupPage() {
       </div>
 
       <div className="max-w-lg mx-auto px-6 py-10 space-y-8">
+        {couponApplied ? (
+          <div className="rounded-2xl border border-amber-400 bg-amber-500/10 p-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-amber-400">October enrollment special</p>
+            <p className="mt-1 font-bold text-white">Coupon 50OFFOCT applied — $300 startup deposit.</p>
+          </div>
+        ) : null}
+
         {/* Deposit Calculator */}
         <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 space-y-5">
           <div className="flex items-center gap-3 mb-1">
@@ -176,7 +201,7 @@ export default function PaymentSetupPage() {
             <span className="text-amber-400 font-bold text-xl shrink-0">$</span>
             <input
               type="number"
-              min={MIN_DEPOSIT}
+              min={minimumDeposit}
               max={MAX_DEPOSIT}
               step={1}
               value={depositInput}
@@ -184,8 +209,8 @@ export default function PaymentSetupPage() {
               onBlur={() => {
                 const parsed = parseFloat(depositInput);
                 const clamped = isNaN(parsed) || depositInput.trim() === ''
-                  ? MIN_DEPOSIT
-                  : clampDeposit(parsed);
+                  ? minimumDeposit
+                  : clampDeposit(parsed, minimumDeposit);
                 setDeposit(clamped);
                 setDepositInput(String(clamped));
                 setWeeklyAmount(weeklyPaymentCents(clamped));
@@ -195,7 +220,7 @@ export default function PaymentSetupPage() {
           </div>
           <input
             type="range"
-            min={MIN_DEPOSIT}
+            min={minimumDeposit}
             max={MAX_DEPOSIT}
             step={1}
             value={deposit}
@@ -208,7 +233,7 @@ export default function PaymentSetupPage() {
             className="w-full accent-amber-400 cursor-pointer"
           />
           <div className="flex justify-between text-xs text-slate-500">
-            <span>Min ${MIN_DEPOSIT.toLocaleString()}</span>
+            <span>Min ${minimumDeposit.toLocaleString()}{couponApplied ? ' with coupon' : ''}</span>
             <span>Pay in full ${MAX_DEPOSIT.toLocaleString()}</span>
           </div>
 
@@ -280,7 +305,7 @@ export default function PaymentSetupPage() {
               },
             }}
           >
-            <PaymentSetupForm weeklyAmount={weeklyAmount} deposit={deposit} />
+            <PaymentSetupForm weeklyAmount={weeklyAmount} deposit={deposit} couponCode={couponApplied ? OCTOBER_PROMO_CODE : undefined} />
           </Elements>
         )}
 

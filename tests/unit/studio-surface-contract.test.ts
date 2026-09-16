@@ -162,8 +162,8 @@ describe('Admin Dashboard and Studio surface contract', () => {
   it('opens the Studio browser container directly and preserves mobile task width', () => {
     const workspace = source('components/studio/StudioCommandWorkspace.tsx');
     const tasks = source('apps/admin/app/studio/tasks/TasksClient.tsx');
-    expect(workspace).toContain("setMode('browser')");
-    expect(workspace).toContain('Conversation tools');
+    expect(workspace).toContain("setSurface('browser')");
+    expect(workspace).toContain('data-studio-root="unified"');
     expect(tasks).toContain('flex min-w-0 flex-col gap-4 sm:flex-row');
     expect(tasks).toContain('w-full min-w-0 flex-1 overflow-hidden');
   });
@@ -182,7 +182,9 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('<UnifiedEllieChat');
     expect(workspace).toContain('<RepositoryLivePreview');
     expect(workspace).toContain('<CloudBrowserWorkspace');
-    expect(workspace).toContain('Conversation tools');
+    expect(workspace).toContain(
+      "type StudioSurface = 'commands' | 'course' | 'preview' | 'browser' | 'capability'",
+    );
   });
 
   it('keeps task evidence, tool surfaces, and durable files in the unified Studio', () => {
@@ -197,7 +199,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(workspace).toContain('buildConversationWorkspaceUrl');
     expect(workspace).toContain("url.searchParams.set('studioConversationId', conversationId)");
     expect(workspace).toContain("url.searchParams.set('studioTaskId', taskId)");
-    expect(workspace).toContain('workspaces.map((workspace) => (');
+    expect(workspace).toContain('workspaces.some((workspace) => workspace.id === id)');
     expect(workspace).not.toContain('Choose AI agent');
     expect(workspace).not.toContain("(['ELLIE', 'LIZZY', 'PARIS'] as const)");
     expect(workspace).toContain("onOpenTasks={() => openCapability('tasks')}");
@@ -219,6 +221,9 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(tasksPage).not.toContain('redirect(');
     expect(workspace).toContain('onConversationChange={setActiveConversationId}');
     expect(workspace).toContain('conversationId={activeConversationId}');
+    expect(workspace).toContain('studio_run_id');
+    expect(workspace).toContain("'/studio/courses'");
+    expect(workspace).toContain('allowManualTarget={false}');
     expect(chat).toContain('This conversation’s live work');
     expect(chat).toContain("window.dispatchEvent(new CustomEvent('studio:task-approved'");
     expect(source('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts')).toContain(
@@ -259,6 +264,15 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(page).not.toContain('h-[100dvh]');
     expect(layout).toContain('className="flex h-full');
     expect(layout).not.toContain('h-dvh');
+  });
+
+  it('requires durable evidence before engineering, CI, deployment, or browser verification passes', () => {
+    const evaluator = source('lib/platform/orchestration/evaluator.ts');
+    expect(evaluator).toContain("tool === 'openhands.execute'");
+    expect(evaluator).toContain("tool === 'workflows.runTests'");
+    expect(evaluator).toContain("tool === 'deployments.autopilot'");
+    expect(evaluator).toContain("tool === 'browser.execute'");
+    expect(evaluator).toContain('Generic success flags are not verification');
   });
 
   it('greets Store visitors with the PARIS product interview', () => {

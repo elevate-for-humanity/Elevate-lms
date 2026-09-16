@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, BriefcaseBusiness, GraduationCap, Store } from 'lucide-react';
 import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
-const HOME_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
+
+const HOME_VIDEO =
+  'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
 
 const PROOF = [
   { icon: GraduationCap, label: 'Hands-on training' },
@@ -19,7 +21,7 @@ export function PlatformHubHero() {
       data-narration="Welcome to Elevate for Humanity. Explore practical career training, registered apprenticeships, and employer-connected pathways in Indiana. Choose a program, review possible funding, and take your next step online."
     >
       <div className="mx-auto grid max-w-[1440px] lg:min-h-[720px] lg:grid-cols-[0.92fr_1.08fr]">
-        <div className="order-2 flex items-center px-5 py-10 sm:px-8 sm:py-14 lg:order-1 lg:px-14 lg:py-16">
+        <div className="order-1 flex items-center px-5 py-10 sm:px-8 sm:py-14 lg:px-14 lg:py-16">
           <div className="max-w-2xl">
             <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">
               Career training in Indiana
@@ -61,11 +63,11 @@ export function PlatformHubHero() {
             </div>
           </div>
         </div>
-        <div className="relative order-1 min-h-[clamp(340px,58svh,560px)] overflow-hidden bg-slate-950 lg:order-2 lg:min-h-[720px]">
+        <div className="relative order-2 min-h-[clamp(340px,58svh,560px)] overflow-hidden bg-slate-950 lg:min-h-[720px]">
           <SafeHeroVideo
             src={HOME_VIDEO}
             poster="/images/beauty/program-beauty-training.webp"
-            showPosterBeforePlayback={false}
+            showPosterBeforePlayback
             ariaLabel="Elevate career training and workforce platform in action"
             className="absolute inset-0 h-full w-full object-cover object-center"
           />

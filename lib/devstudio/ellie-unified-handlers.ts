@@ -22,6 +22,7 @@ export type OrchestratedPlanCheckpoint = {
   status: 'awaiting_approval' | 'running' | 'done' | 'failed';
   title?: string;
   reason?: string;
+  runId?: string;
 };
 
 export {
@@ -41,6 +42,7 @@ export async function streamOrchestratedPlan(
     documentIds?: string[];
     conversationId?: string;
     onCheckpoint?: (checkpoint: OrchestratedPlanCheckpoint) => void;
+    onRunId?: (runId: string) => void;
   } = {},
 ): Promise<void> {
   const res = await fetch('/api/admin/dev-studio/plan', {
@@ -73,10 +75,15 @@ export async function streamOrchestratedPlan(
         text?: string;
         line?: string;
         checkpoint?: OrchestratedPlanCheckpoint;
+        runId?: string;
       };
       const line = parsed.text ?? parsed.line;
       if (line) onLine(`${line}\n`);
-      if (parsed.checkpoint) options.onCheckpoint?.(parsed.checkpoint);
+      if (parsed.runId) options.onRunId?.(parsed.runId);
+      if (parsed.checkpoint) {
+        if (parsed.checkpoint.runId) options.onRunId?.(parsed.checkpoint.runId);
+        options.onCheckpoint?.(parsed.checkpoint);
+      }
     } catch {
       onLine(`${raw}\n`);
     }

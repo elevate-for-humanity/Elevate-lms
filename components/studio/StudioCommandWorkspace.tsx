@@ -142,7 +142,7 @@ export default function StudioCommandWorkspace({
           </div>
         </div>
         <nav
-          aria-label="Unified AI workspace"
+          aria-label="Command workflow"
           className="flex min-w-0 items-center gap-1 border-t border-white/10 px-2 py-1.5"
         >
           <button
@@ -154,7 +154,7 @@ export default function StudioCommandWorkspace({
             aria-pressed={!workspaceVisible}
             className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg px-3 text-xs font-bold ${!workspaceVisible ? 'bg-white text-brand-blue-800' : 'bg-white/10 text-white hover:bg-white/15'}`}
           >
-            <MessageSquare className="h-4 w-4" aria-hidden="true" /> AI workspace
+            <MessageSquare className="h-4 w-4" aria-hidden="true" /> Commands
           </button>
           <button
             type="button"
@@ -173,7 +173,7 @@ export default function StudioCommandWorkspace({
             {workspaceVisible ? 'Hide live work' : 'Show live work'}
           </button>
           <span className="ml-2 hidden text-[11px] font-semibold text-blue-100 sm:inline">
-            One AI plan · contextual tools · shared evidence
+            One command · automated workflow · verified results
           </span>
         </nav>
       </header>

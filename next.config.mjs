@@ -305,9 +305,10 @@ const nextConfig = {
         key: 'Strict-Transport-Security',
         value: 'max-age=63072000; includeSubDomains; preload',
       },
-      ...(isProduction
-        ? [{ key: 'X-Frame-Options', value: 'DENY' }]
-        : []),
+      // Clickjacking protection is enforced by the CSP frame-ancestors
+      // directive below. Do not also emit X-Frame-Options: DENY: it
+      // overrides the explicit first-party allowlist and breaks the
+      // authenticated Course Studio learner preview across subdomains.
       {
         key: 'X-Content-Type-Options',
         value: 'nosniff',

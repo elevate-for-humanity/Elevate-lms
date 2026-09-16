@@ -40,6 +40,8 @@ export interface CreateTaskInput {
   toolInput?: Record<string, unknown>;
   executionMode?: 'automatic' | 'interactive';
   conversationId?: string;
+  studioRunId?: string;
+  studioRunStepId?: string;
 }
 
 export interface TaskPlanStep {

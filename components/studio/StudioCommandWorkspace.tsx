@@ -137,8 +137,8 @@ export default function StudioCommandWorkspace({
           >
             <Plus className="h-4 w-4" aria-hidden="true" /> New task
           </button>
-          <div className="hidden rounded-lg bg-white px-3 py-2 text-xs font-black text-slate-950 sm:block">
-            LIZZY
+          <div className="hidden rounded-lg bg-white/10 px-3 py-2 text-xs font-black text-white sm:block">
+            Automated workflow
           </div>
         </div>
         <nav
@@ -184,7 +184,7 @@ export default function StudioCommandWorkspace({
           aria-label="Elevate Studio conversation"
         >
           <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 sm:hidden">
-            <span className="text-xs font-bold text-slate-700">Assistant: LIZZY</span>
+            <span className="text-xs font-bold text-slate-700">Command workflow</span>
             <button
               type="button"
               onClick={() => {
@@ -198,7 +198,6 @@ export default function StudioCommandWorkspace({
           </div>
           <UnifiedEllieChat
             key={conversationKey}
-            preferredAgent="LIZZY"
             embedded
             onOpenPreview={() => openPreview()}
             onPreviewTarget={openPreview}
@@ -246,7 +245,7 @@ export default function StudioCommandWorkspace({
               }}
               className="rounded-md px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-800 lg:hidden"
             >
-              Admin AI
+              Commands
             </button>
           </header>
           <div className="min-h-0 flex-1 overflow-hidden lg:p-2">

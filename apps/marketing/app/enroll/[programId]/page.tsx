@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { BookOpen, Key, CheckCircle, AlertCircle, ArrowRight, Tag } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
@@ -15,6 +15,11 @@ const APPRENTICESHIP_SLUGS = [
   'esthetician-apprenticeship',
   'nail-technician-apprenticeship',
 ];
+
+function getClientSearchParam(name: string) {
+  if (typeof window === 'undefined') return null;
+  return new URLSearchParams(window.location.search).get(name);
+}
 
 interface Program {
   id: string;
@@ -33,7 +38,6 @@ interface Program {
 export default function EnrollPage() {
   const params = useParams();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const programId = params.programId as string;
 
   const [program, setProgram] = useState<Program | null>(null);
@@ -41,9 +45,9 @@ export default function EnrollPage() {
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
   const [message, setMessage] = useState('');
-  const [couponCode, setCouponCode] = useState(() => searchParams.get('coupon')?.toUpperCase() || '');
+  const [couponCode, setCouponCode] = useState(() => getClientSearchParam('coupon')?.toUpperCase() || '');
   const [paymentPlan, setPaymentPlan] = useState<'full' | 'installments'>(() =>
-    searchParams.get('payment_plan') === 'installments' ? 'installments' : 'full',
+    getClientSearchParam('payment_plan') === 'installments' ? 'installments' : 'full',
   );
   const [eligibility, setEligibility] = useState<any>(null);
   const supabase = createClient();
@@ -149,7 +153,7 @@ export default function EnrollPage() {
             funding_source: 'self_pay',
             payment_plan: paymentPlan,
             coupon_code: couponCode.trim() || undefined,
-            partner_key: searchParams.get('partner') || undefined,
+            partner_key: getClientSearchParam('partner') || undefined,
           }),
         });
 

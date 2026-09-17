@@ -518,3 +518,24 @@ export default function HostShopShowcase({
       <style jsx>{`
         .host-showcase-media-enter {
           animation: host-showcase-fade 650ms ease-out both;
+          transform-origin: center;
+        }
+        @keyframes host-showcase-fade {
+          from {
+            opacity: 0;
+            transform: scale(1.02);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .host-showcase-media-enter {
+            animation: none;
+          }
+        }
+      `}</style>
+    </section>
+  );
+}

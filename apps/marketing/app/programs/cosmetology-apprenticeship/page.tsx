@@ -4,6 +4,7 @@ import BeautyApprenticeshipAuthority, {
   buildBeautyProgramStructuredData,
 } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
+import NailDesignShowcase from '@/components/programs/beauty/NailDesignShowcase';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import { getStaticProgram } from '@/data/programs';
@@ -47,7 +48,12 @@ export default async function CosmetologyApprenticeshipPage() {
       <ProgramDetailPage
         program={program}
         banner={banner}
-        featuredContent={<FeaturedHostPartners programSlug="cosmetology-apprenticeship" />}
+        featuredContent={
+          <>
+            <NailDesignShowcase />
+            <FeaturedHostPartners programSlug="cosmetology-apprenticeship" />
+          </>
+        }
       >
         <BeautyApprenticeshipAuthority program={program} />
       </ProgramDetailPage>

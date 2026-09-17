@@ -63,6 +63,7 @@ async function main() {
     probe(apiKey, 'applications', '/call_control_applications?page[size]=250'),
     probe(apiKey, 'outbound_profiles', '/outbound_voice_profiles?page[size]=250'),
     probe(apiKey, 'verified_numbers', '/verified_numbers?page[size]=250'),
+    probe(apiKey, 'webhook_deliveries', '/webhook_deliveries?page[size]=50'),
     probe(apiKey, 'balance', '/balance'),
   ]);
   for (const result of results) console.log(`AUDIT endpoint ${result.name}: ${result.ok ? 'reachable' : result.error}`);
@@ -74,6 +75,16 @@ async function main() {
   const apps = list(byName.applications);
   const profiles = list(byName.outbound_profiles);
   const verified = list(byName.verified_numbers);
+  const deliveries = list(byName.webhook_deliveries);
+  const deliverySummary = deliveries.reduce((summary: Record<string, number>, delivery: Json) => {
+    const key = String(delivery.status || delivery.response_status_code || delivery.http_status_code || 'unknown');
+    summary[key] = (summary[key] || 0) + 1;
+    return summary;
+  }, {});
+  console.log('AUDIT webhook delivery summary ' + JSON.stringify({
+    count: deliveries.length,
+    statuses: deliverySummary,
+  }));
 
   let webhookStatus = 0;
   try {

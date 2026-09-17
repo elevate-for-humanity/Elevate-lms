@@ -5,6 +5,9 @@ import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
 const HOME_VIDEO =
   'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
 
+const HOME_NARRATION =
+  'Welcome to Elevate for Humanity. Start with our featured Barber and Cosmetology apprenticeship programs. Apprentices combine structured instruction with supervised, hands-on training at an approved Host Site. You can also explore Esthetics and Nail Technician apprenticeships. Next, review our career training programs, including HVAC, CDL, Bookkeeping, and Business. Training may be free if you qualify for workforce funding, but approval is not automatic. To begin the funding process, scroll to the Paying for Training section and press the orange Schedule WorkOne Orientation button. Schedule and complete your official WorkOne orientation. Then return to this page and press Start Elevate Funding Intake so our team knows where you are in the process. Continue down the page to learn how employers can hire graduates or become apprenticeship Host Sites.';
+
 const PROOF = [
   { icon: GraduationCap, label: 'Hands-on training' },
   { icon: BriefcaseBusiness, label: 'Employer-connected pathways' },
@@ -17,8 +20,7 @@ export function PlatformHubHero() {
       className="border-b border-slate-200 bg-white"
       aria-labelledby="home-hero-heading"
       data-scroll-narration
-      data-narration-src="/audio/narration/home-hero.mp3"
-      data-narration="Welcome to Elevate for Humanity. Explore practical career training, registered apprenticeships, and employer-connected pathways in Indiana. Choose a program, review possible funding, and take your next step online."
+      data-narration={HOME_NARRATION}
     >
       <div className="mx-auto grid max-w-[1440px] lg:min-h-[720px] lg:grid-cols-[0.92fr_1.08fr]">
         <div className="order-1 flex items-center px-5 py-10 sm:px-8 sm:py-14 lg:px-14 lg:py-16">

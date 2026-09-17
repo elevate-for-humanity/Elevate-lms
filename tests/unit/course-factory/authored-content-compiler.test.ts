@@ -133,6 +133,38 @@ describe('authored content compiler', () => {
     );
   });
 
+  it('reuses stored authored reading evidence when raw checkpoint HTML is short', () => {
+    const baseline = compileAuthoredLessonExperience({
+      courseTitle: 'Indiana Cosmetology License',
+      moduleTitle: 'Professional Standards',
+      lessonTitle: 'Professional Standards Checkpoint',
+      lessonSlug: 'professional-standards-checkpoint',
+      domainKey: 'professional_standards',
+      html,
+      learningObjectives: [
+        'Identify professional standards.',
+        'Apply infection-control expectations.',
+        'Document a compliant decision.',
+      ],
+      quizQuestions: questions,
+    });
+    const { instructionalTimeline: _timeline, ...existingWithoutTimeline } = baseline.experience;
+    const repaired = compileAuthoredLessonExperience({
+      courseTitle: 'Indiana Cosmetology License',
+      moduleTitle: 'Professional Standards',
+      lessonTitle: 'Professional Standards Checkpoint',
+      lessonSlug: 'professional-standards-checkpoint',
+      domainKey: 'professional_standards',
+      html: '<p>Complete the checkpoint.</p>',
+      learningObjectives: baseline.objectives,
+      quizQuestions: questions,
+      existingExperience: existingWithoutTimeline,
+    });
+
+    expect(repaired.experience.instructionalTimeline?.scenes).toHaveLength(6);
+    expect(repaired.experience.readingGuide.sections.length).toBeGreaterThanOrEqual(3);
+  });
+
   it('blocks generic fallback content instead of publishing it', () => {
     expect(() =>
       compileAuthoredLessonExperience({

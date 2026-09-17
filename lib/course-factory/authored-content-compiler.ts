@@ -259,7 +259,37 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
     };
   }
 
-  const { sourceText, sections } = authoredSections(input.html, input.lessonTitle);
+  const existingRecord =
+    input.existingExperience &&
+    typeof input.existingExperience === 'object' &&
+    !Array.isArray(input.existingExperience)
+      ? (input.existingExperience as Record<string, any>)
+      : {};
+  const existingGuide =
+    existingRecord.readingGuide &&
+    typeof existingRecord.readingGuide === 'object' &&
+    !Array.isArray(existingRecord.readingGuide)
+      ? (existingRecord.readingGuide as Record<string, any>)
+      : {};
+  const existingSections = Array.isArray(existingGuide.sections)
+    ? existingGuide.sections
+        .filter((section: unknown): section is Record<string, any> =>
+          Boolean(section && typeof section === 'object' && !Array.isArray(section)),
+        )
+        .map(
+          (section: Record<string, any>) =>
+            `<h2>${clean(section.heading)}</h2><p>${clean(section.body)}</p>`,
+        )
+        .join('')
+    : '';
+  const repairSource = clean(
+    `${existingGuide.summary ?? ''} ${existingRecord.content ?? ''} ${existingRecord.narrationScript ?? ''}`,
+  );
+  const repairHtml =
+    existingSections && clean(`${existingSections} ${repairSource}`).length >= 500
+      ? `${existingSections}<p>${repairSource}</p>`
+      : input.html;
+  const { sourceText, sections } = authoredSections(repairHtml, input.lessonTitle);
   const objectives = normalizedObjectives(input.learningObjectives, sections);
   if (objectives.length < 3)
     throw new Error(`${input.lessonTitle}: at least three authored objectives are required`);

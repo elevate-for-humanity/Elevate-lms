@@ -92,3 +92,6 @@ jobs:
 
       - name: Verify every required lesson video is playable
         run: node --conditions=react-server --import tsx scripts/course-factory/verify-course-media.ts --course-id "$COURSE_ID"
+
+      - name: Publish only after the automated procurement gate passes
+        run: node --conditions=react-server --import tsx scripts/course-factory/publish-verified-course.ts --course-id "$COURSE_ID"

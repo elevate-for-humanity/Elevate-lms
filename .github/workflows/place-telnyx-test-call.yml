@@ -1,0 +1,22 @@
+name: Place Authorized Telnyx Test Call
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  call:
+    name: Call 317-760-7908 from 317-999-9620
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Place authorized switchboard test call
+        run: node .github/scripts/place-telnyx-test-call.mjs

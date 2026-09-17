@@ -61,8 +61,14 @@ export function createBaselineAgenticPlan(
         ? push('instructional-designer', 'design_learning_experience', {}, [architecture])
         : architecture;
     const design = push('visual-designer', 'compose_visual_system', {}, [architecture]);
+    const localization =
+      targetType === 'course'
+        ? push('translation', 'validate_course_localization', {}, [instruction])
+        : null;
     const media = push('media-director', 'plan_media', {}, [instruction, design]);
-    const qa = push('compliance-qa', 'validate_build', {}, [instruction, design, media]);
+    const qaDependencies = [instruction, design, media];
+    if (localization) qaDependencies.push(localization);
+    const qa = push('compliance-qa', 'validate_build', {}, qaDependencies);
     push('publisher', 'persist_canonical_build', {}, [qa]);
   } else if (targetType === 'website' || targetType === 'store_workspace') {
     const site = push('website-builder', 'compose_site', { prompt: trimmed });

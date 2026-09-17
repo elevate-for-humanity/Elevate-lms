@@ -147,6 +147,18 @@ export default function ProgramDetailPage({
     'business-administration',
     'bookkeeping',
   ].includes(p.slug);
+  const narrationCurriculum = p.curriculum
+    .slice(0, 3)
+    .map((module) => module.title)
+    .join(', ');
+  const narrationCredentials = p.credentials
+    .slice(0, 3)
+    .map((credential) => credential.name)
+    .join(', ');
+  const programHeroNarration = isApprenticeship
+    ? `Welcome to the ${p.title} page. This apprenticeship combines related instruction with supervised hands-on training at an approved Host Site. The published pathway is ${durationLabel}, with ${p.hoursPerWeekMin} to ${p.hoursPerWeekMax} hours per week. Training covers ${narrationCurriculum || 'the required occupational competencies'} and prepares participants for ${narrationCredentials || 'the listed completion requirements'}. Apply first, complete intake, confirm Host Site placement and payment or funding arrangements, then begin documented instruction and workplace learning. Continue down the page for requirements, schedule, costs, payment options, and the application link.`
+    : `Welcome to the ${p.title} program page. This is a ${durationLabel} ${p.deliveryMode === 'hybrid' ? 'hybrid program that generally starts with self-paced coursework from home and continues with scheduled hands-on training at a real training, lab, or employer site' : p.deliveryMode === 'online' ? 'online program' : 'in-person program'}. Training covers ${narrationCurriculum || 'the published program competencies'} and prepares participants for ${narrationCredentials || 'the listed credentials'}. Apply first and complete intake so admissions can confirm your schedule, requirements, and enrollment path. ${showPriorityFundingPath ? 'Training may be free if you qualify and receive agency authorization.' : ''} If funding does not apply, review pay-in-full, installment, buy now pay later, and employer-sponsored options below. Continue down the page for the complete curriculum, costs, credentials, and application steps.`;
+
   const pathwaySteps = [
     {
       step: 'Step 1',
@@ -257,7 +269,7 @@ export default function ProgramDetailPage({
       ) : null}
 
       {/* A. HERO */}
-      <section>
+      <section data-scroll-narration data-narration={programHeroNarration}>
         {heroOverride ??
           (() => {
             // bannerProp is passed from the server page.tsx — use it first.
@@ -277,10 +289,12 @@ export default function ProgramDetailPage({
               );
               const safeTrustIndicators = sanitizePublicFundingList(banner.trustIndicators, p.slug);
               const safeTranscript = sanitizePublicFundingText(
-                banner.transcript,
+                programHeroNarration,
                 p.slug,
                 safeSubheadline,
               );
+              // Only use a recorded track when it was authored for this exact script.
+              // Otherwise the site-wide homepage narrator reads the current page-specific copy.
               const voiceoverSrc =
                 safeTranscript === banner.transcript ? banner.voiceoverSrc : undefined;
               const bannerCtas = [banner.primaryCta, banner.secondaryCta].filter(
@@ -316,7 +330,10 @@ export default function ProgramDetailPage({
                   ctas={bannerCtas}
                   trustIndicators={safeTrustIndicators}
                   transcript={safeTranscript}
-                  narrateTranscript={p.slug === 'cna' && !voiceoverSrc}
+                  narrateTranscript={false}
+                  transcriptVoiceStyle="assistant"
+                  transcriptVoiceRate={0.98}
+                  preloadTranscriptVoice={false}
                 />
               );
             }

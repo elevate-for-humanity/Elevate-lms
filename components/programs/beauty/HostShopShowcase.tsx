@@ -39,6 +39,8 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
     alt: "Razor's Image owner describing the barber apprenticeship opportunity",
     kind: 'video',
     backdropSrc: '/images/partners/razors-image-video-poster.webp',
+    script:
+      "Welcome to Razor's Image Barbershop in Bloomington, Indiana, a participating Barber Apprenticeship Host Shop. This working barbershop gives approved apprentices an opportunity to develop professional barbering, sanitation, client service, grooming, and workplace skills under qualified supervision. The video introduces the shop and its apprenticeship opportunity. Placement, wages, supervision, enrollment, and licensing requirements are confirmed through Elevate before training begins.",
   },
   'b-52s-barber-shop': {
     src: '/images/partners/b52s-official.webp',
@@ -50,6 +52,8 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
     alt: 'Walk-through tour of participating apprenticeship Host Shop Salon Saloon',
     kind: 'video',
     backdropSrc: '/images/partners/salon-saloon/team-sign.webp',
+    script:
+      'Welcome to Salon Saloon in South Bend, Indiana, a participating Cosmetology Apprenticeship Host Salon. This tour introduces the salon environment where approved apprentices may build supervised skills in client service, sanitation, hair care, styling, and professional workplace routines. Placement, employment, supervision, and enrollment approval are confirmed through Elevate before training begins.',
   },
 };
 
@@ -514,24 +518,3 @@ export default function HostShopShowcase({
       <style jsx>{`
         .host-showcase-media-enter {
           animation: host-showcase-fade 650ms ease-out both;
-          transform-origin: center;
-        }
-        @keyframes host-showcase-fade {
-          from {
-            opacity: 0;
-            transform: scale(1.02);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .host-showcase-media-enter {
-            animation: none;
-          }
-        }
-      `}</style>
-    </section>
-  );
-}

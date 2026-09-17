@@ -240,7 +240,10 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
   learningPoints: string[];
 } {
   const existing = CourseExperienceSchema.safeParse(input.existingExperience);
-  if (existing.success && !sourceIsGeneric(existing.data)) {
+  const existingTimelineComplete =
+    existing.success &&
+    (existing.data.instructionalTimeline?.scenes.length ?? 0) >= 6;
+  if (existing.success && existingTimelineComplete && !sourceIsGeneric(existing.data)) {
     const questions = (Array.isArray(input.quizQuestions) ? input.quizQuestions : [])
       .map((question, index) => normalizeQuestion(question, index, input.domainKey))
       .filter((question): question is AuthoredQuestion => Boolean(question));

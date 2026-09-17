@@ -13,6 +13,8 @@ import 'server-only';
 
 import path from 'path';
 import os from 'os';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import { mkdir, writeFile, unlink, rm } from 'fs/promises';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
 import { getPexelsImage, getPexelsVideoClip } from './pexels';
@@ -73,6 +75,31 @@ export interface RemotionRenderResult {
 }
 
 const STORYBOARD_RENDER_FPS = 15;
+const execFileAsync = promisify(execFile);
+const EXACT_INSTRUCTIONAL_SCENE_TYPES = new Set([
+  'equipment_closeup',
+  'worked_example',
+  'common_mistake',
+  'safety_warning',
+]);
+
+async function measuredAudioDurationSeconds(audioPath: string): Promise<number | null> {
+  try {
+    const { stdout } = await execFileAsync('ffprobe', [
+      '-v',
+      'error',
+      '-show_entries',
+      'format=duration',
+      '-of',
+      'default=noprint_wrappers=1:nokey=1',
+      audioPath,
+    ], { timeout: 30_000, maxBuffer: 100_000 });
+    const seconds = Number.parseFloat(String(stdout).trim());
+    return Number.isFinite(seconds) && seconds > 0 ? seconds : null;
+  } catch {
+    return null;
+  }
+}
 
 export interface StoryboardRenderInput {
   lessonId: string;
@@ -478,6 +505,9 @@ export async function renderStoryboardVideo(
     for (const [index, scene] of input.storyboard.scenes.entries()) {
       const narration = scene.dialogue?.trim() || scene.action.trim();
       const audio = await generateEdgeTTS(narration, { voice: instructor.voice });
+      const sceneAudioPath = path.join(paths.outputDir, `scene-${index + 1}.mp3`);
+      await writeFile(sceneAudioPath, audio);
+      const measuredNarrationSeconds = await measuredAudioDurationSeconds(sceneAudioPath);
       const audioSrc = await uploadLessonMediaBuffer(
         audio,
         `${input.lessonId}-scene-${index + 1}`,
@@ -492,7 +522,9 @@ export async function renderStoryboardVideo(
       });
       const query = visualIntent.query;
       const instructionalLayout =
-        scene.mediaSource === 'elevate-motion' || visualIntent.deterministicDiagram
+        scene.mediaSource === 'elevate-motion' ||
+        visualIntent.deterministicDiagram ||
+        EXACT_INSTRUCTIONAL_SCENE_TYPES.has(scene.sceneType)
           ? instructionalLayoutForScene({
               title: scene.subject,
               action: scene.action,
@@ -668,7 +700,8 @@ export async function renderStoryboardVideo(
         ...(resolvedProvider ? { resolvedProvider } : {}),
         ...(resolvedModel ? { resolvedModel } : {}),
       };
-      const narrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60) + 1;
+      const estimatedNarrationSeconds = Math.ceil((narration.split(/\s+/).length / 140) * 60);
+      const narrationSeconds = Math.ceil(measuredNarrationSeconds ?? estimatedNarrationSeconds) + 1;
       // A lesson's instructional seat time includes reading, practice, checks,
       // and review; it must not become one continuous hour-long MP4. Time each
       // visual to its spoken narration so malformed blueprint durations cannot

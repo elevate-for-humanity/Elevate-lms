@@ -374,6 +374,7 @@ function SceneSlide({
       {!instructionalLayout && scene.clipUrl ? (
         <OffthreadVideo
           src={scene.clipUrl}
+          loop
           style={{
             position: 'absolute',
             inset: 0,

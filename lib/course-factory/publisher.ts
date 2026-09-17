@@ -336,7 +336,7 @@ export function buildAtomicPayload(
                               explanation: 'mental_model',
                               diagram: 'system_diagram',
                               demonstration: 'worked_example',
-                              practice: 'field_scenario',
+                              practice: 'knowledge_check',
                               summary: 'memory_recap',
                             };
                             return {

@@ -124,7 +124,7 @@ async function main() {
     webhook_api_v2: String(app?.webhook_api_version || '') === '2',
     production_webhook_reachable: webhookReachable,
     application_outbound_enabled: app?.outbound?.outbound_voice_profile_id != null || app?.outbound === true,
-    failover_webhook_configured: Boolean(app?.webhook_failover_url),
+    failover_webhook_configured: Boolean(app?.webhook_event_failover_url),
     outbound_profile_count: profiles.length,
     forwarding_destination_verified: verified.some((v) => v.phone_number === '+13177607908'),
   };

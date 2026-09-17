@@ -752,10 +752,6 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       instructorId: instructor.id,
     });
     if (!result.success || !result.videoUrl) {
-      await markFailed(job.id, result.error ?? 'Render returned no playable video URL', {
-        provider: REMOTION_PROVIDER,
-        provider_model: REMOTION_MODEL,
-      });
       throw new Error(result.error ?? 'Render returned no playable video URL');
     }
     const completedStoryboard = {
@@ -770,7 +766,7 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       provider_model: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
       scene_count: storyboard.scenes.length,
       scene_data: completedStoryboard,
-    });
+    }, job.lease_token);
     const qualityEvidence = await enforceMediaQuality({
       videoUrl: result.videoUrl,
       expectedDurationSeconds: result.duration ?? 0,
@@ -813,11 +809,11 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       scene_count: storyboard.scenes.length,
       scene_data: completedStoryboard,
       quality_evidence: qualityEvidence,
-    });
+    }, job.lease_token);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     logger.error('[video-worker] Render failed', error, { jobId: job.id });
-    await markFailed(job.id, message, { provider: 'video-worker' });
+    await markFailed(job.id, message, { provider: 'video-worker' }, job.lease_token);
     throw error;
   } finally {
     if (heartbeatTimer) clearInterval(heartbeatTimer);
@@ -915,7 +911,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       if (cachedError || !cached?.storage_location) {
         await markFailed(job.id, 'Validated media cache record is unavailable', {
           provider: 'paid-inference-gateway',
-        });
+        }, job.lease_token);
         return;
       }
       const metadata =
@@ -935,7 +931,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         ...(metadata.quality_evidence && typeof metadata.quality_evidence === 'object'
           ? { quality_evidence: metadata.quality_evidence as never }
           : {}),
-      });
+      }, job.lease_token);
       return;
     }
     if (authorization.decision !== 'approved' || !authorization.requestId) {
@@ -945,7 +941,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       }
       await markFailed(job.id, `Paid media authorization blocked: ${authorization.decision}`, {
         provider: 'paid-inference-gateway',
-      });
+      }, job.lease_token);
       return;
     }
     const paidExecution = await executePaidInference({

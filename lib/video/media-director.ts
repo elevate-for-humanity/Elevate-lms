@@ -302,7 +302,7 @@ function scriptScenes(script: string, title: string): Record<string, unknown>[] 
   });
   return groups.map((action, index) => {
     const phase = procedurePhase(action, index, groups.length);
-    const detail = /angle|position|blade|guard|hand|finger|line|section|tool/i.test(action);
+    const detail = /angle|position|blade|guard|hand|finger|line|section|tool|watch|observe|(?:you (?:can|will) see)|shown? (?:here|on screen)|demonstrat/i.test(action);
     return {
       action,
       scene_type: sceneTypeValue(undefined, index, groups.length),

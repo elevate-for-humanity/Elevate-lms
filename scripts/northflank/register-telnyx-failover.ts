@@ -48,14 +48,14 @@ async function main() {
   if (!apiKey) throw new Error('TELNYX_API_KEY is unavailable');
 
   const before = await request(apiKey, `/call_control_applications/${connectionId}`);
-  if (String(before.data?.webhook_failover_url || '') !== failoverUrl) {
+  if (String(before.data?.webhook_event_failover_url || '') !== failoverUrl) {
     await request(apiKey, `/call_control_applications/${connectionId}`, {
       method: 'PATCH',
-      body: JSON.stringify({ webhook_failover_url: failoverUrl }),
+      body: JSON.stringify({ webhook_event_failover_url: failoverUrl }),
     });
   }
   const after = await request(apiKey, `/call_control_applications/${connectionId}`);
-  if (String(after.data?.webhook_failover_url || '') !== failoverUrl) {
+  if (String(after.data?.webhook_event_failover_url || '') !== failoverUrl) {
     throw new Error('Telnyx failover webhook verification failed');
   }
   console.log('TELNYX FAILOVER WEBHOOK VERIFIED');

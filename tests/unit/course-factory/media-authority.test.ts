@@ -178,7 +178,7 @@ describe('canonical Course Factory media architecture', () => {
     const renderer = read('lib/video/process-video-job.ts');
     expect(renderer).toContain('provider: generated.provider');
     expect(renderer).toContain('provider: REMOTION_PROVIDER');
-    expect(renderer).toContain('provider_model: REMOTION_MODEL');
+    expect(renderer).toContain("storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL");
   });
 
   it('rejects missing and unreachable media from Course Factory readiness', () => {
@@ -239,9 +239,9 @@ describe('canonical Course Factory media architecture', () => {
     expect(publisher).toContain("overlay_template: 'caption-only-v1'");
     expect(publisher).toContain("practice: 'knowledge_check'");
     expect(publisher).not.toContain("practice: 'field_scenario'");
-    expect(publisher).toContain("const alignedEvidence =");
-    expect(publisher).toContain("const teachingAction =");
-    expect(publisher).toContain("required_visual_evidence: teachingAction");
+    expect(publisher).toContain('const alignedEvidence =');
+    expect(publisher).toContain('const teachingAction =');
+    expect(publisher).toContain('required_visual_evidence: teachingAction');
     expect(publisher).toContain("purpose === 'practice'");
     expect(publisher).toContain("purpose === 'demonstration' ? 'close-up' : 'medium'");
     expect(publisher).toContain("generation_status: experience ? 'generating' : 'queued'");
@@ -358,10 +358,9 @@ describe('canonical Course Factory media architecture', () => {
     expect(media).toContain("strategy: 'existing_then_pexels'");
     expect(renderer).toContain('applyLockedCourseBuilderMediaPolicy(job)');
     expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
-    expect(narration).toContain("const provider = configuredNarrationProvider()");
+    expect(narration).toContain('const provider = configuredNarrationProvider()');
     expect(narration).toContain("provider === 'cloudflare'");
     expect(narration).toContain("provider === 'edge'");
     expect(narration).not.toContain("production' && provider === 'edge'");
   });
-
 });

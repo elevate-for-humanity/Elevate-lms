@@ -81,7 +81,7 @@ export async function heartbeatJob(job: Pick<VideoJob, 'id' | 'lease_token'>): P
   const { data, error } = await db().rpc('heartbeat_video_job', {
     p_job_id: job.id,
     p_lease_token: job.lease_token,
-    p_lease_seconds: 7200,
+    p_lease_seconds: 3600,
   });
   if (error) throw error;
   return data === true;

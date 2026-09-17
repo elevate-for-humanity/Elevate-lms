@@ -325,6 +325,48 @@ export function buildAtomicPayload(
                       fingerprint: sourceFingerprint,
                       narration_locked: true,
                     },
+                    // Lesson instruction and lesson media are one version-locked
+                    // package. Persist the authored timeline in the exact scene
+                    // contract consumed by directMedia().
+                    scenes: Array.isArray(experience.instructionalTimeline?.scenes)
+                      ? experience.instructionalTimeline.scenes.map(
+                          (scene: Record<string, any>, sceneIndex: number) => {
+                            const sceneTypeByPurpose: Record<string, string> = {
+                              introduction: 'problem_hook',
+                              explanation: 'mental_model',
+                              diagram: 'system_diagram',
+                              demonstration: 'worked_example',
+                              practice: 'field_scenario',
+                              summary: 'memory_recap',
+                            };
+                            return {
+                              id: scene.id ?? `${lesson.slug}-scene-${sceneIndex + 1}`,
+                              subject: lesson.title,
+                              action: scene.visualDirection,
+                              dialogue: scene.narration,
+                              duration_seconds:
+                                Number(scene.endTime) > Number(scene.startTime)
+                                  ? Number(scene.endTime) - Number(scene.startTime)
+                                  : undefined,
+                              procedure_phase: scene.purpose,
+                              required_visual_evidence: scene.visualDirection,
+                              scene_type:
+                                sceneTypeByPurpose[String(scene.purpose)] ?? 'mental_model',
+                              visual_style:
+                                'lesson-specific instructional demonstration with concise captions',
+                              overlay_template: 'caption-only-v1',
+                              on_screen_text: Array.isArray(scene.onScreenText)
+                                ? scene.onScreenText.slice(0, 3)
+                                : [],
+                              source_references: Array.isArray(scene.sourceReferences)
+                                ? scene.sourceReferences
+                                : [],
+                            };
+                          },
+                        )
+                      : [],
+                    captions: experience.instructionalTimeline?.captions ?? [],
+                    timeline_events: experience.instructionalTimeline?.events ?? [],
                     visual_prompt: experience.visualPrompt ?? null,
                     scenario: experience.scenario ?? null,
                     case_study: experience.caseStudy ?? null,

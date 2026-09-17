@@ -1,12 +1,6 @@
 name: Upgrade Authored Course Experience
 
 on:
-  workflow_dispatch:
-    inputs:
-      course_id:
-        description: Existing canonical course UUID to upgrade in place
-        required: true
-        type: string
   push:
     branches: [main]
     paths:
@@ -25,7 +19,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        course_id: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('["{0}"]', inputs.course_id) || '["3fb5ce19-1cde-434c-a8c6-f138d7d7aa17","9ca9fb50-7119-46ea-ab81-9b0193c29c31"]') }}
+        course_id:
+          - '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17'
+          - '9ca9fb50-7119-46ea-ab81-9b0193c29c31'
     timeout-minutes: 360
     env:
       NODE_ENV: production

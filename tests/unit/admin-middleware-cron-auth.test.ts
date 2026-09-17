@@ -17,4 +17,12 @@ describe('Admin middleware cron authentication contract', () => {
     );
     expect(publicPaths).not.toContain('/api/cron/');
   });
+
+  it('admits the signed Telnyx webhook before browser-session authentication', () => {
+    const publicPaths = middleware.slice(
+      middleware.indexOf('const PUBLIC_PATHS'),
+      middleware.indexOf('function isPublicPath'),
+    );
+    expect(publicPaths).toContain("'/api/webhooks/telnyx'");
+  });
 });

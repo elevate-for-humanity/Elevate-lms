@@ -1,0 +1,33 @@
+name: Produce repaired pnpm lockfile
+
+on:
+  push:
+    branches:
+      - fix/regenerate-corrupted-pnpm-lock
+    paths:
+      - .github/workflows/produce-repaired-lockfile.yml
+
+permissions:
+  contents: read
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Regenerate lockfile from repository manifests
+        run: |
+          rm pnpm-lock.yaml
+          pnpm install --lockfile-only --no-frozen-lockfile --strict-peer-dependencies=false
+          pnpm install --frozen-lockfile --lockfile-only --strict-peer-dependencies=false
+      - uses: actions/upload-artifact@v4
+        with:
+          name: repaired-pnpm-lock
+          path: pnpm-lock.yaml
+          if-no-files-found: error

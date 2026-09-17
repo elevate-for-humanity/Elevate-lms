@@ -283,9 +283,8 @@ export async function approveApplication(
     // duplicating inserts in application code.
     const { data: courses, error: coursesError } = await db
       .from('lms_courses')
-      .select('id')
-      .eq('program_id', resolvedProgramId)
-      .eq('is_active', true);
+      .select('id,status,is_active')
+      .eq('program_id', resolvedProgramId);
     if (coursesError) {
       logger.error('[approve] failed to load program courses', new Error(coursesError.message), {
         resolvedProgramId,
@@ -293,7 +292,20 @@ export async function approveApplication(
       return { success: false, error: 'Failed to verify course provisioning' };
     }
 
-    const courseIds = (courses ?? []).map((course: { id: string }) => course.id);
+    const mappedCourses = courses ?? [];
+    const availableCourses = mappedCourses.filter(
+      (course: { status?: string | null; is_active?: boolean | null }) =>
+        course.status === 'published' && course.is_active === true,
+    );
+    if (mappedCourses.length > 0 && availableCourses.length === 0) {
+      logger.error('[approve] program has mapped courses but none are published and active', undefined, {
+        resolvedProgramId,
+        mappedCourseIds: mappedCourses.map((course: { id: string }) => course.id),
+      });
+      return { success: false, error: 'Program curriculum is not published and active' };
+    }
+
+    const courseIds = availableCourses.map((course: { id: string }) => course.id);
     if (courseIds.length > 0) {
       const { data: provisionedCourses, error: provisionError } = await db
         .from('course_enrollments')

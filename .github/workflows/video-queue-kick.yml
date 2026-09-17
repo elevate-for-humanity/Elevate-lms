@@ -39,7 +39,7 @@ jobs:
         run: |
           set -euo pipefail
           for attempt in $(seq 1 90); do
-            live_sha=$(curl -fsS --connect-timeout 20 --max-time 30 "$ADMIN_URL/version.json" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{process.stdout.write(JSON.parse(d).commit||'')}catch{}})")
+            live_sha=$((curl -fsS --connect-timeout 20 --max-time 30 "$ADMIN_URL/version.json" || true) | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{process.stdout.write(JSON.parse(d).commit||'')}catch{}})")
             if [ "$live_sha" = "$REQUIRED_ADMIN_SHA" ]; then
               exit 0
             fi

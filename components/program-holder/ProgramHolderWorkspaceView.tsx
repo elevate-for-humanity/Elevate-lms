@@ -8,7 +8,9 @@ import {
   FileText,
   ShieldCheck,
   Users,
+  Phone,
 } from 'lucide-react';
+import { formatUsPhone } from '@/lib/phone/config';
 import { getProgramHolderWorkspace, programTitle } from '@/lib/program-holder/workspace';
 import { ProgramHolderDocumentUpload } from './ProgramHolderDocumentUpload';
 import { ProgramHolderTrainingLogForm } from './ProgramHolderTrainingLogForm';
@@ -183,13 +185,16 @@ export async function ProgramHolderWorkspaceView({
     data.payoutProfile?.transfers_enabled &&
     data.payoutProfile?.verification_status === 'active',
   );
-  const dashboardHero = resolveDashboardHero(
-    data.profile?.avatar_url,
-    data.programs[0]?.slug,
-  );
+  const dashboardHero = resolveDashboardHero(data.profile?.avatar_url, data.programs[0]?.slug);
 
   if (section === 'students')
-    return <Students title="Enrolled Students" rows={[...data.enrollments, ...data.convertedStudents]} programs={data.programs} />;
+    return (
+      <Students
+        title="Enrolled Students"
+        rows={[...data.enrollments, ...data.convertedStudents]}
+        programs={data.programs}
+      />
+    );
   if (section === 'pending')
     return (
       <Applicants
@@ -235,17 +240,70 @@ export async function ProgramHolderWorkspaceView({
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      <section className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <span className="rounded-xl bg-indigo-100 p-3 text-indigo-700">
+              <Phone className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-indigo-700">
+                Your Elevate phone line
+              </p>
+              {data.phoneLine ? (
+                <>
+                  <a
+                    href={`tel:${data.phoneLine.e164}`}
+                    className="mt-1 block text-2xl font-black text-slate-950 hover:text-indigo-700"
+                  >
+                    {formatUsPhone(data.phoneLine.e164)}
+                  </a>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">
+                    {data.phoneLine.label}
+                    {data.phoneLine.extension ? ` · Extension ${data.phoneLine.extension}` : ''}
+                    {' · '}
+                    {data.phoneLine.status === 'active' ? 'Active' : 'Setup in progress'}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h2 className="mt-1 text-xl font-black text-slate-950">
+                    Line assignment pending
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Your business number and extension will appear here after an administrator
+                    assigns them.
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+          <Link
+            href="/program-holder/how-to-use"
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl border border-indigo-300 px-4 py-2 text-sm font-black text-indigo-900"
+          >
+            Phone system instructions
+          </Link>
+        </div>
+      </section>
       <section className="rounded-2xl border border-violet-200 bg-violet-50 p-5 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-700">New here?</p>
-            <h2 className="mt-1 text-xl font-black text-slate-950">Start with Elizabeth and Paris</h2>
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-violet-700">
+              New here?
+            </p>
+            <h2 className="mt-1 text-xl font-black text-slate-950">
+              Start with Elizabeth and Paris
+            </h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">
-              Review Elizabeth Greene&apos;s expectations, take the Paris dashboard walkthrough,
-              and learn what is required for payment.
+              Review Elizabeth Greene&apos;s expectations, take the Paris dashboard walkthrough, and
+              learn what is required for payment.
             </p>
           </div>
-          <Link href="/program-holder/how-to-use" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-black text-white">
+          <Link
+            href="/program-holder/how-to-use"
+            className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-violet-700 px-5 py-3 text-sm font-black text-white"
+          >
             Start orientation
           </Link>
         </div>
@@ -1081,19 +1139,21 @@ function EnrollmentTable({ rows, programs }: { rows: any[]; programs: any[] }) {
                   </td>
                   <td className="px-3 py-4">{row.next_required_action || 'Continue training'}</td>
                   <td className="px-3 py-4">
-<div className="flex flex-col items-start gap-2">
-                    <StudentCommunicationActions
-                      enrollmentId={row.id}
-                      studentName={row.full_name || 'Student'}
-                      hasEmail={Boolean(row.email)}
-                      hasPhone={Boolean(row.phone)}
-                    />
-                    <StudentReadyForTestingButton
-                      studentId={row.id}
-                      studentName={row.full_name || 'Student'}
-                      source={row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'}
-                    />
-                  </div>
+                    <div className="flex flex-col items-start gap-2">
+                      <StudentCommunicationActions
+                        enrollmentId={row.id}
+                        studentName={row.full_name || 'Student'}
+                        hasEmail={Boolean(row.email)}
+                        hasPhone={Boolean(row.phone)}
+                      />
+                      <StudentReadyForTestingButton
+                        studentId={row.id}
+                        studentName={row.full_name || 'Student'}
+                        source={
+                          row.roster_source === 'holder_student' ? 'holder_student' : 'enrollment'
+                        }
+                      />
+                    </div>
                   </td>
                 </tr>
               ))
@@ -1235,9 +1295,7 @@ function Applicants({
                     <p className="text-xs text-slate-500">{row.applicant_email || ''}</p>
                   </td>
                   <td className="p-3">{programTitle(programs, row.program_id)}</td>
-                  <td className="p-3 capitalize">
-                    {applicantPipelineStatus(row)}
-                  </td>
+                  <td className="p-3 capitalize">{applicantPipelineStatus(row)}</td>
                   <td className="p-3">
                     <p className="font-medium">{row.applicant_phone || 'No phone on file'}</p>
                     <div className="mt-1 flex gap-2">

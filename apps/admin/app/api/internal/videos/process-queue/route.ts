@@ -20,12 +20,22 @@ const videoWorkerGlobal = globalThis as VideoWorkerGlobal;
 const activeVideoBatches = videoWorkerGlobal.__elevateActiveVideoBatches ?? new Set<Promise<void>>();
 videoWorkerGlobal.__elevateActiveVideoBatches = activeVideoBatches;
 
-function renderConcurrency(): number {
-  const parsed = Number(process.env.VIDEO_RENDER_CONCURRENCY ?? '2');
-  if (!Number.isFinite(parsed)) return 2;
-  // The self-hosted compositor cannot safely sustain parallel Chromium renders.
-  // A single durable render avoids host OOM/SIGKILL while preserving queue throughput.
-  return Math.max(1, Math.min(Math.trunc(parsed), 1));
+function boundedConcurrency(value: string | undefined, fallback: number, maximum: number): number {
+  const parsed = Number(value ?? fallback);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(1, Math.min(Math.trunc(parsed), maximum));
+}
+
+function localRenderConcurrency(): number {
+  // One Chromium compositor per service instance avoids the OOM/SIGKILL failure
+  // mode. Horizontal service replicas provide safe parallelism.
+  return boundedConcurrency(process.env.VIDEO_RENDER_CONCURRENCY, 1, 1);
+}
+
+function globalRenderConcurrency(): number {
+  // Global database leases cap the fleet. Increase this with the number of
+  // isolated Admin renderer replicas; never increase local concurrency.
+  return boundedConcurrency(process.env.VIDEO_RENDER_GLOBAL_CONCURRENCY, 2, 12);
 }
 
 interface QueueRequestOptions {
@@ -102,7 +112,8 @@ export async function POST(request: NextRequest) {
       courseId,
     });
   }
-  const maxConcurrent = renderConcurrency();
+  const maxConcurrent = globalRenderConcurrency();
+  const localConcurrent = localRenderConcurrency();
 
   if (courseId) {
     const { data: course, error: courseError } = await db
@@ -147,7 +158,12 @@ export async function POST(request: NextRequest) {
   }
 
   const active = activeCount ?? 0;
-  const availableSlots = Math.min(Math.max(0, maxConcurrent - active), maxJobs ?? maxConcurrent);
+  const localActive = activeVideoBatches.size;
+  const availableSlots = Math.min(
+    Math.max(0, maxConcurrent - active),
+    Math.max(0, localConcurrent - localActive),
+    maxJobs ?? maxConcurrent,
+  );
   if (availableSlots === 0) {
     return NextResponse.json({
       ok: true,
@@ -155,6 +171,8 @@ export async function POST(request: NextRequest) {
       reason: 'render-capacity-full',
       courseId,
       active,
+      localActive,
+      localConcurrent,
       maxConcurrent,
     });
   }
@@ -352,6 +370,8 @@ export async function POST(request: NextRequest) {
         retryCount: job.retry_count ?? 0,
       })),
       activeBeforeClaim: active,
+      localActiveBeforeClaim: localActive,
+      localConcurrent,
       maxConcurrent,
       queuedDraftJobId,
       accepted: claimedJobs.length,

@@ -67,6 +67,12 @@ describe('canonical media completion quality gate', () => {
     expect(mediaQualityFailures(validEvidence)).toEqual([]);
   });
 
+  it('treats ASR as presence evidence while still rejecting materially incomplete narration', () => {
+    expect(mediaQualityFailures({ ...validEvidence, narrationCoverage: 0.907 })).toEqual([]);
+    expect(mediaQualityFailures({ ...validEvidence, narrationCoverage: 0.899 }))
+      .toEqual(expect.arrayContaining([expect.stringContaining('narration coverage')]));
+  });
+
   it('rejects the previously accepted 27-second frozen asset', () => {
     const failures = mediaQualityFailures({
       ...validEvidence,

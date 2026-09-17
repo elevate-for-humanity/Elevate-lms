@@ -21,7 +21,7 @@ import {
   AbsoluteFill,
   Audio,
   Img,
-  OffthreadVideo,
+  Video,
   interpolate,
   spring,
   useCurrentFrame,
@@ -420,7 +420,7 @@ function SceneSlide({
 
       {/* Background: video clip (looped) or image. Exact teaching graphics own the full frame. */}
       {!instructionalLayout && scene.clipUrl ? (
-        <OffthreadVideo
+        <Video
           src={scene.clipUrl}
           loop
           style={{

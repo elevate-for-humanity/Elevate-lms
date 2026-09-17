@@ -237,6 +237,8 @@ describe('canonical Course Factory media architecture', () => {
     expect(publisher).toContain('source_fingerprint: sourceFingerprint');
     expect(publisher).toContain('experience.instructionalTimeline?.scenes');
     expect(publisher).toContain("overlay_template: 'caption-only-v1'");
+    expect(publisher).toContain("practice: 'knowledge_check'");
+    expect(publisher).not.toContain("practice: 'field_scenario'");
     expect(publisher).toContain("generation_status: experience ? 'generating' : 'queued'");
     expect(factory.indexOf('await markCourseMediaPendingWithClient')).toBeLessThan(
       factory.indexOf("tracker.emit('media'"),

@@ -161,6 +161,8 @@ export default function FeaturedHostPartners({
                         src: '/videos/partners/razors-image-host-barbershop.mp4',
                         alt: "Razor's Image owner describing the barber apprenticeship opportunity",
                         kind: 'video' as const,
+                        script:
+                          "Welcome to Razor's Image Barbershop in Bloomington, Indiana, a participating Barber Apprenticeship Host Shop. In this video, the shop owner introduces the workplace and the opportunity for approved apprentices to develop barbering, sanitation, client service, grooming, and professional shop skills under qualified supervision. Placement, wages, supervision, enrollment, and licensing requirements are confirmed through Elevate before training begins.",
                       }
                     : programSlug === 'barber-apprenticeship'
                       ? undefined
@@ -172,7 +174,11 @@ export default function FeaturedHostPartners({
                     className={`overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm ${shop.slug === 'razors-image-barbershop' ? 'lg:col-span-2' : ''}`}
                   >
                     {video ? (
-                      <div className="bg-slate-950 px-4 py-5 sm:px-6">
+                      <div
+                        className="bg-slate-950 px-4 py-5 sm:px-6"
+                        data-scroll-narration
+                        data-narration={video.script}
+                      >
                         <div>
                           <div className="relative mx-auto w-full max-w-lg overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
                             {image ? (
@@ -213,7 +219,7 @@ export default function FeaturedHostPartners({
                         {video.script ? (
                           <details className="mx-auto mt-4 max-w-xl rounded-xl border border-white/20 bg-slate-950/30 p-4 text-white">
                             <summary className="cursor-pointer text-sm font-black">
-                              Read the Salon Saloon video script
+                              Read the {shop.dba ?? shop.name} video script
                             </summary>
                             <p className="mt-3 text-sm font-medium leading-6 text-slate-100">
                               {video.script}

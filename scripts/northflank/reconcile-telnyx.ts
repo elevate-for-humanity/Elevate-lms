@@ -112,10 +112,53 @@ async function main() {
   );
   const suppliedApiKey = process.env.TELNYX_API_KEY?.trim();
   const suppliedPublicKey = process.env.TELNYX_PUBLIC_KEY?.trim();
-  let apiKey = suppliedApiKey || findSecret(secretGroup, 'TELNYX_API_KEY');
+  const canonicalApiKey = findSecret(secretGroup, 'TELNYX_API_KEY');
+  let apiKey = suppliedApiKey || canonicalApiKey;
+  let publicKey =
+    suppliedPublicKey || findSecret(secretGroup, 'TELNYX_PUBLIC_KEY');
   let adminService: Json | undefined;
+  const inspectedGroups: Json[] = [secretGroup];
 
-  if (suppliedApiKey && !findSecret(secretGroup, 'TELNYX_API_KEY')) {
+  if (!apiKey) {
+    const listing = await nfFetch<any>(projectApiPath(projectId, '/secrets'));
+    const listedGroups = Array.isArray(listing)
+      ? listing
+      : listing?.secrets || listing?.items || listing?.results || [];
+    for (const summary of listedGroups) {
+      const id = String(summary?.id || summary?.name || '').trim();
+      if (!id || id === secretGroupId) continue;
+      try {
+        const group = await nfFetch<Json>(
+          projectApiPath(projectId, `/secrets/${id}`),
+        );
+        inspectedGroups.push(group);
+        const discovered = findSecret(group, 'TELNYX_API_KEY');
+        if (discovered) {
+          apiKey = discovered;
+          publicKey ||= findSecret(group, 'TELNYX_PUBLIC_KEY');
+          console.log(`Telnyx credential located in Northflank secret group ${id}.`);
+          break;
+        }
+      } catch {
+        // A list may include a secret outside this token's readable scope.
+      }
+    }
+  }
+
+  if (!apiKey) {
+    const adminServiceId =
+      process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin';
+    adminService = await nfFetch<Json>(
+      projectApiPath(projectId, `/services/${adminServiceId}`),
+    );
+    apiKey = findSecret(adminService.runtimeEnvironment, 'TELNYX_API_KEY');
+    publicKey ||= findSecret(
+      adminService.runtimeEnvironment,
+      'TELNYX_PUBLIC_KEY',
+    );
+  }
+
+  if (apiKey && !canonicalApiKey) {
     const variables = secretGroup.secrets?.variables;
     if (!variables || Array.isArray(variables) || typeof variables !== 'object') {
       throw new Error('Northflank secret group variables have an unsupported shape');
@@ -133,8 +176,8 @@ async function main() {
         secrets: {
           variables: {
             ...variables,
-            TELNYX_API_KEY: suppliedApiKey,
-            ...(suppliedPublicKey ? { TELNYX_PUBLIC_KEY: suppliedPublicKey } : {}),
+            TELNYX_API_KEY: apiKey,
+            ...(publicKey ? { TELNYX_PUBLIC_KEY: publicKey } : {}),
           },
         },
       }),
@@ -143,17 +186,8 @@ async function main() {
   }
 
   if (!apiKey) {
-    const adminServiceId =
-      process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin';
-    adminService = await nfFetch<Json>(
-      projectApiPath(projectId, `/services/${adminServiceId}`),
-    );
-    apiKey = findSecret(adminService.runtimeEnvironment, 'TELNYX_API_KEY');
-  }
-
-  if (!apiKey) {
     const candidateNames = [
-      ...matchingKeyNames(secretGroup),
+      ...inspectedGroups.flatMap((group) => matchingKeyNames(group)),
       ...matchingKeyNames(adminService?.runtimeEnvironment),
     ];
     throw new Error(

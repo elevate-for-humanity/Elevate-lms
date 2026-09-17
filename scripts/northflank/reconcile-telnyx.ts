@@ -84,10 +84,20 @@ async function main() {
   const secretGroup = await nfFetch<Json>(
     projectApiPath(projectId, `/secrets/${secretGroupId}`),
   );
-  const apiKey = findSecret(secretGroup, 'TELNYX_API_KEY');
+  let apiKey = findSecret(secretGroup, 'TELNYX_API_KEY');
+
+  if (!apiKey) {
+    const adminServiceId =
+      process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin';
+    const adminService = await nfFetch<Json>(
+      projectApiPath(projectId, `/services/${adminServiceId}`),
+    );
+    apiKey = findSecret(adminService.runtimeEnvironment, 'TELNYX_API_KEY');
+  }
+
   if (!apiKey) {
     throw new Error(
-      `TELNYX_API_KEY is missing or unreadable in Northflank secret group ${secretGroupId}`,
+      `TELNYX_API_KEY is absent from Northflank secret group ${secretGroupId} and the Admin service runtime`,
     );
   }
 

@@ -264,6 +264,23 @@ export async function ProgramHolderWorkspaceView({
                     {' · '}
                     {data.phoneLine.status === 'active' ? 'Active' : 'Setup in progress'}
                   </p>
+                  {data.programs.length ? (
+                    <div className="mt-3">
+                      <p className="text-xs font-black uppercase tracking-wider text-slate-500">
+                        Programs on this extension
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {data.programs.map((program) => (
+                          <span
+                            key={program.id}
+                            className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-bold text-indigo-800"
+                          >
+                            {program.title || program.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                 </>
               ) : (
                 <>

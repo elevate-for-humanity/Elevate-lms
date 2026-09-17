@@ -35,10 +35,10 @@ export async function verifyTelnyxWebhook(body: string, headers: Headers) {
   const publicKey = process.env.TELNYX_PUBLIC_KEY;
   if (!publicKey) throw new Error('TELNYX_PUBLIC_KEY is not configured.');
   const client = telnyxClient();
-  return client.webhooks.unwrap<TelnyxCallEvent>(body, {
+  return client.webhooks.unwrap(body, {
     headers: Object.fromEntries(headers.entries()),
     key: publicKey,
-  });
+  }) as unknown as TelnyxCallEvent;
 }
 
 export function encodeCallState(value: Record<string, string>) {

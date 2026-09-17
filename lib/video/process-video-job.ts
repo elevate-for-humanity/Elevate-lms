@@ -765,13 +765,13 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     // layouts even when an older authored storyboard still carries a Pexels
     // lookup URL. Persist what was actually rendered so the quality gate audits
     // delivered media instead of stale planning metadata.
-    const completedStoryboard = {
+    const completedStoryboard: MediaStoryboard & { source_contract: unknown } = {
       ...renderedStoryboard,
       scenes: renderedStoryboard.scenes.map((scene) =>
         scene.sceneType && exactInstructionalSceneTypes.has(scene.sceneType)
           ? {
               ...scene,
-              mediaSource: 'elevate-motion',
+              mediaSource: 'elevate-motion' as const,
               resolvedProvider: 'remotion',
               resolvedModel: `deterministic-${scene.sceneType}`,
             }

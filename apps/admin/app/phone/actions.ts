@@ -78,7 +78,7 @@ export async function createMeeting(formData: FormData): Promise<void> {
     throw new Error('Choose a valid meeting type.');
   }
   const readiness = liveKitReadiness();
-  if (!readiness.ready)
+  if ('missing' in readiness)
     throw new Error(`Meeting service is not configured: ${readiness.missing.join(', ')}`);
   const auth = await requireRole(PHONE_MANAGER_ROLES);
   const { db, workspace } = await requireWorkspace();

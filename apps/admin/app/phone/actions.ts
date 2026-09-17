@@ -330,3 +330,62 @@ export async function toggleDestination(formData: FormData): Promise<void> {
   if (error) throw new Error(error.message);
   revalidatePath('/phone');
 }
+
+export async function assignPhoneNumber(formData: FormData): Promise<void> {
+  const { db, id } = await requireSystemId();
+  const phoneNumberId = String(formData.get('phoneNumberId') ?? '');
+  const profileId = String(formData.get('profileId') ?? '').trim() || null;
+  const extension = String(formData.get('extension') ?? '').trim() || null;
+  if (extension && !/^\d{2,6}$/.test(extension)) {
+    throw new Error('Extension must contain 2 to 6 digits.');
+  }
+  if (profileId) {
+    const { data: profile } = await db
+      .from('profiles')
+      .select('id,role')
+      .eq('id', profileId)
+      .in('role', ['program_holder', 'programholder'])
+      .maybeSingle();
+    if (!profile) throw new Error('Select a valid Program Holder account.');
+  }
+  const { error } = await db
+    .from('phone_numbers')
+    .update({ assigned_profile_id: profileId, extension, updated_at: new Date().toISOString() })
+    .eq('id', phoneNumberId)
+    .eq('phone_system_id', id);
+  if (error) throw new Error(error.message);
+  revalidatePath('/phone');
+  revalidatePath('/program-holder/dashboard');
+}
+
+export async function saveProgramHolderExtension(formData: FormData): Promise<void> {
+  const { db, workspace } = await requireWorkspace();
+  const profileId = String(formData.get('profileId') ?? '').trim();
+  const extension = String(formData.get('extension') ?? '').trim();
+  const department = String(formData.get('department') ?? '').trim() || null;
+  if (!profileId || !/^\d{2,6}$/.test(extension)) {
+    throw new Error('Select a Program Holder and enter a 2 to 6 digit extension.');
+  }
+  const { data: profile } = await db
+    .from('profiles')
+    .select('id,full_name,email,role')
+    .eq('id', profileId)
+    .in('role', ['program_holder', 'programholder'])
+    .maybeSingle();
+  if (!profile) throw new Error('Select a valid Program Holder account.');
+  const { error } = await db.from('communication_extensions').upsert(
+    {
+      workspace_id: workspace.id,
+      profile_id: profile.id,
+      extension,
+      display_name: profile.full_name || profile.email || 'Program Holder',
+      department,
+      enabled: true,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'workspace_id,profile_id' },
+  );
+  if (error) throw new Error(error.message);
+  revalidatePath('/phone');
+  revalidatePath('/program-holder/dashboard');
+}

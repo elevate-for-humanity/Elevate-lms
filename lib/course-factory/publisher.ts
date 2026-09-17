@@ -342,10 +342,15 @@ export function buildAtomicPayload(
                             const onScreenText = Array.isArray(scene.onScreenText)
                               ? scene.onScreenText.slice(0, 3).map(String)
                               : [];
-                            const teachingAction = `Display the lesson evidence: ${onScreenText.join(' | ')}`;
+                            const purpose = String(scene.purpose);
+                            const alignedEvidence =
+                              purpose === 'practice' || purpose === 'summary'
+                                ? onScreenText.slice(1)
+                                : onScreenText.slice(0, 1);
+                            const teachingAction = `Display the lesson evidence: ${alignedEvidence.join(' | ')}`;
                             const dialogue =
-                              String(scene.purpose) === 'practice' && onScreenText.length > 1
-                                ? `${scene.narration} ${onScreenText.slice(1).join(' ')}`
+                              purpose === 'practice' && alignedEvidence.length > 0
+                                ? `${scene.narration} ${alignedEvidence.join(' ')}`
                                 : scene.narration;
                             return {
                               id: scene.id ?? `${lesson.slug}-scene-${sceneIndex + 1}`,
@@ -358,6 +363,7 @@ export function buildAtomicPayload(
                                   : undefined,
                               procedure_phase: scene.purpose,
                               required_visual_evidence: teachingAction,
+                              shot_size: purpose === 'demonstration' ? 'close-up' : 'medium',
                               scene_type:
                                 sceneTypeByPurpose[String(scene.purpose)] ?? 'mental_model',
                               visual_style: `${scene.visualDirection ?? ''} Lesson-specific instructional demonstration with concise captions`,

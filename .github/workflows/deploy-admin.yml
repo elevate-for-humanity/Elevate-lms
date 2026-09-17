@@ -145,6 +145,9 @@ jobs:
         env: { EXPECTED_SHA: '${{ github.sha }}' }
         run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status
 
+      - name: Reconcile and verify Telnyx production number
+        run: pnpm tsx scripts/northflank/reconcile-telnyx.ts
+
       - name: Smoke Admin liveness, readiness, dependency health, and exact live SHA
         run: |
           set -euo pipefail

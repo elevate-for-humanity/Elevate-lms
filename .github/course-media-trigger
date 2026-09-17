@@ -6,3 +6,5 @@ Requested: 2026-09-17
 Retry: static matrix validation
 
 Retry: valid workflow-level concurrency scope
+
+Retry: authorized server runtime condition

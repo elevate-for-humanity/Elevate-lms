@@ -235,6 +235,8 @@ describe('canonical Course Factory media architecture', () => {
     expect(queue).toContain("generation_status: 'generated'");
     expect(manager).toContain("lesson.generation_status !== 'generated'");
     expect(publisher).toContain('source_fingerprint: sourceFingerprint');
+    expect(publisher).toContain('experience.instructionalTimeline?.scenes');
+    expect(publisher).toContain("overlay_template: 'caption-only-v1'");
     expect(publisher).toContain("generation_status: experience ? 'generating' : 'queued'");
     expect(factory.indexOf('await markCourseMediaPendingWithClient')).toBeLessThan(
       factory.indexOf("tracker.emit('media'"),
@@ -348,10 +350,11 @@ describe('canonical Course Factory media architecture', () => {
     expect(media).toContain('allow_paid_provider: false');
     expect(media).toContain("strategy: 'existing_then_pexels'");
     expect(renderer).toContain('applyLockedCourseBuilderMediaPolicy(job)');
-    expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'local'");
+    expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
     expect(narration).toContain("const provider = configuredNarrationProvider()");
     expect(narration).toContain("provider === 'cloudflare'");
-    expect(narration).toContain("env.NODE_ENV === 'production' && provider === 'edge'");
+    expect(narration).toContain("provider === 'edge'");
+    expect(narration).not.toContain("production' && provider === 'edge'");
   });
 
 });

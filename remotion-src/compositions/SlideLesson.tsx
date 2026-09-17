@@ -221,14 +221,27 @@ function BrandedIntro({ props, frame }: { props: SlideLessonProps; frame: number
 function CaptionBar({
   text,
   frame,
+  durationFrames,
   primaryColor,
   bright,
 }: {
   text: string;
   frame: number;
+  durationFrames: number;
   primaryColor: string;
   bright: boolean;
 }) {
+  // Render timed caption phrases, never a persistent narration paragraph.
+  const words = text.trim().split(/\\s+/).filter(Boolean);
+  const phrases = Array.from(
+    { length: Math.max(1, Math.ceil(words.length / 8)) },
+    (_, index) => words.slice(index * 8, index * 8 + 8).join(' '),
+  );
+  const phraseIndex = Math.min(
+    phrases.length - 1,
+    Math.floor((Math.max(0, frame) / Math.max(1, durationFrames)) * phrases.length),
+  );
+  const caption = phrases[phraseIndex] ?? '';
   return (
     <div
       style={{
@@ -238,14 +251,18 @@ function CaptionBar({
         right: 0,
         background: bright ? 'rgba(255,255,255,0.94)' : 'rgba(0,0,0,0.72)',
         borderTop: `2px solid ${primaryColor}55`,
-        padding: '14px 60px',
+        padding: '12px 28px',
+        margin: '0 auto 18px',
+        width: 'fit-content',
+        maxWidth: '78%',
+        borderRadius: 14,
         opacity: fadeIn(frame, 10, 15),
       }}
     >
       <p
         style={{
           color: bright ? '#0f172a' : '#f1f5f9',
-          fontSize: 22,
+          fontSize: 28,
           fontFamily: 'sans-serif',
           lineHeight: 1.5,
           margin: 0,
@@ -253,7 +270,7 @@ function CaptionBar({
           textShadow: bright ? 'none' : '0 1px 3px rgba(0,0,0,0.8)',
         }}
       >
-        {text}
+        {caption}
       </p>
     </div>
   );
@@ -549,7 +566,7 @@ function SceneSlide({
       {scene.audioSrc && <Audio src={scene.audioSrc} volume={1.35} />}
 
       {/* Caption bar */}
-      <CaptionBar text={scene.narration} frame={frame} primaryColor={props.primaryColor} bright={bright} />
+      <CaptionBar text={scene.narration} frame={frame} durationFrames={scene.durationFrames} primaryColor={props.primaryColor} bright={bright} />
     </AbsoluteFill>
   );
 }

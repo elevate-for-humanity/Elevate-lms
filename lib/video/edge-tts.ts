@@ -96,11 +96,8 @@ export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = proce
   if (provider === 'openai' && !env.OPENAI_API_KEY?.trim()) {
     throw new Error('OpenAI narration route is selected but OPENAI_API_KEY is not configured');
   }
-  if (env.NODE_ENV === 'production' && provider === 'edge') {
-    throw new Error(
-      'edge narration transmits course content to an external endpoint and cannot be selected in production',
-    );
-  }
+  // Edge neural voices are the repository's zero-credit instructor voices.
+  // Selection remains explicit; paid-provider fallback is prohibited.
 }
 
 function narrationFailureDetail(error: unknown): string {

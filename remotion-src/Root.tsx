@@ -116,9 +116,9 @@ export function RemotionRoot() {
         id="SlideLesson"
         component={SlideLesson}
         durationInFrames={slideTotalFrames}
-        fps={30}
-        width={1920}
-        height={1080}
+        fps={15}
+        width={1280}
+        height={720}
         defaultProps={slideLessonDefaultProps as SlideLessonProps & Record<string, unknown>}
         calculateMetadata={({ props }) => ({
           durationInFrames: calcSlideLessonFrames(props.scenes),

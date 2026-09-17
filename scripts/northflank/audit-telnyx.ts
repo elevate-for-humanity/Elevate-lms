@@ -81,9 +81,20 @@ async function main() {
     summary[key] = (summary[key] || 0) + 1;
     return summary;
   }, {});
+  const eventSummary = deliveries.reduce((summary: Record<string, number>, delivery: Json) => {
+    const key = String(delivery.event_type || delivery.webhook?.event_type || delivery.event?.data?.event_type || 'unknown');
+    summary[key] = (summary[key] || 0) + 1;
+    return summary;
+  }, {});
+  const deliveryTimes = deliveries
+    .map((delivery: Json) => delivery.created_at || delivery.occurred_at || delivery.updated_at)
+    .filter(Boolean)
+    .sort();
   console.log('AUDIT webhook delivery summary ' + JSON.stringify({
     count: deliveries.length,
     statuses: deliverySummary,
+    event_types: eventSummary,
+    newest_at: deliveryTimes.at(-1) || null,
   }));
 
   let webhookStatus = 0;

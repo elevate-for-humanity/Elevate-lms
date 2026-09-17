@@ -73,6 +73,8 @@ describe('authored content compiler', () => {
       expect(content.experience.quickClips).toHaveLength(2);
       expect(content.experience.knowledgeChecks).toHaveLength(3);
       expect(content.experience.narrationScript.length).toBeGreaterThan(200);
+      expect(content.experience.instructionalTimeline.scenes).toHaveLength(6);
+      expect(content.experience.instructionalTimeline.captions).toHaveLength(6);
     }
 
     const audit = validateBlueprint(result, {
@@ -124,6 +126,8 @@ describe('authored content compiler', () => {
     expect(result.experience.quickClips).toHaveLength(2);
     expect(result.experience.knowledgeChecks).toHaveLength(3);
     expect(result.experience.narrationScript.length).toBeGreaterThan(200);
+    expect(result.experience.instructionalTimeline?.scenes).toHaveLength(6);
+    expect(result.experience.instructionalTimeline?.scenes[3]?.purpose).toBe('demonstration');
     expect(JSON.stringify(result.experience)).not.toMatch(
       /deterministic baseline|intentionally general/i,
     );

@@ -50,6 +50,32 @@ function findSecret(root: unknown, key: string): string | undefined {
   return walk(root);
 }
 
+function matchingKeyNames(root: unknown): string[] {
+  const matches = new Set<string>();
+  const seen = new Set<unknown>();
+  const walk = (value: unknown) => {
+    if (!value || typeof value !== 'object' || seen.has(value)) return;
+    seen.add(value);
+    if (Array.isArray(value)) {
+      for (const item of value) walk(item);
+      return;
+    }
+    for (const [key, nested] of Object.entries(value as Json)) {
+      if (/tel|nyx/i.test(key)) matches.add(key);
+      if (
+        nested &&
+        typeof nested === 'object' &&
+        /tel|nyx/i.test(String((nested as Json).key ?? (nested as Json).name ?? ''))
+      ) {
+        matches.add(String((nested as Json).key ?? (nested as Json).name));
+      }
+      walk(nested);
+    }
+  };
+  walk(root);
+  return [...matches].sort();
+}
+
 async function telnyx<T = Json>(
   apiKey: string,
   path: string,
@@ -87,6 +113,7 @@ async function main() {
   const suppliedApiKey = process.env.TELNYX_API_KEY?.trim();
   const suppliedPublicKey = process.env.TELNYX_PUBLIC_KEY?.trim();
   let apiKey = suppliedApiKey || findSecret(secretGroup, 'TELNYX_API_KEY');
+  let adminService: Json | undefined;
 
   if (suppliedApiKey && !findSecret(secretGroup, 'TELNYX_API_KEY')) {
     const variables = secretGroup.secrets?.variables;
@@ -118,15 +145,19 @@ async function main() {
   if (!apiKey) {
     const adminServiceId =
       process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin';
-    const adminService = await nfFetch<Json>(
+    adminService = await nfFetch<Json>(
       projectApiPath(projectId, `/services/${adminServiceId}`),
     );
     apiKey = findSecret(adminService.runtimeEnvironment, 'TELNYX_API_KEY');
   }
 
   if (!apiKey) {
+    const candidateNames = [
+      ...matchingKeyNames(secretGroup),
+      ...matchingKeyNames(adminService?.runtimeEnvironment),
+    ];
     throw new Error(
-      `TELNYX_API_KEY is absent from Northflank secret group ${secretGroupId} and the Admin service runtime`,
+      `TELNYX_API_KEY is absent from Northflank secret group ${secretGroupId} and the Admin service runtime. Similar key names: ${candidateNames.length ? [...new Set(candidateNames)].join(', ') : 'none'}`,
     );
   }
 

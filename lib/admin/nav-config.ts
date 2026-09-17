@@ -40,6 +40,8 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Reports — Caseload', href: '/reports/caseload' },
       { label: 'Reports — WIOA', href: '/reports/wioa' },
       { label: 'Notifications', href: '/notifications' },
+      { label: 'Communications Hub', href: '/phone' },
+      { label: 'Team Meetings', href: '/phone/meetings' },
       { label: 'SMS Delivery', href: '/operations/sms-logs' },
       { label: 'Inbox', href: '/inbox' },
     ],

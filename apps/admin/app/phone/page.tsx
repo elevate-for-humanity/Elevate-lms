@@ -15,6 +15,8 @@ import {
   dismissCommunicationsAnnouncement,
   setDefaultDestination,
   toggleDestination,
+  assignPhoneNumber,
+  saveProgramHolderExtension,
 } from './actions';
 
 export const dynamic = 'force-dynamic';
@@ -38,6 +40,8 @@ export default async function PhonePage() {
     callsResult,
     voicemailResult,
     workspaceResult,
+    programHoldersResult,
+    extensionsResult,
   ] = systemId
     ? await Promise.all([
         db.from('phone_numbers').select('*').eq('phone_system_id', systemId).order('created_at'),
@@ -66,6 +70,19 @@ export default async function PhonePage() {
           .select('id,status')
           .eq('phone_system_id', systemId)
           .maybeSingle(),
+        db
+          .from('profiles')
+          .select('id,full_name,email,role,program_holder_id')
+          .in('role', ['program_holder', 'programholder'])
+          .not('program_holder_id', 'is', null)
+          .order('full_name'),
+        db
+          .from('communication_extensions')
+          .select(
+            'id,profile_id,extension,display_name,department,enabled,workspace:communication_workspaces!inner(phone_system_id)',
+          )
+          .eq('workspace.phone_system_id', systemId)
+          .order('extension'),
       ])
     : ([
         { data: [] },
@@ -74,11 +91,17 @@ export default async function PhonePage() {
         { count: 0 },
         { count: 0 },
         { data: null },
+        { data: [] },
+        { data: [] },
       ] as any);
 
   const numbers = numbersResult.data ?? [];
   const destinations = destinationsResult.data ?? [];
   const menuOptions = menuResult.data ?? [];
+  const programHolders = (programHoldersResult.data ?? []).filter(
+    (profile: any) => !String(profile.email || '').endsWith('@qa.invalid'),
+  );
+  const extensions = extensionsResult.data ?? [];
   const settings: PhoneSettings = {
     greeting: system?.greeting ?? 'Thank you for calling Elevate for Humanity.',
     afterHours:
@@ -230,6 +253,37 @@ export default async function PhonePage() {
                   <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-800">
                     {item.status}
                   </span>
+                  <form
+                    action={assignPhoneNumber}
+                    className="grid min-w-64 gap-2 sm:grid-cols-[1fr_5rem_auto]"
+                  >
+                    <input type="hidden" name="phoneNumberId" value={item.id} />
+                    <select
+                      name="profileId"
+                      defaultValue={item.assigned_profile_id ?? ''}
+                      aria-label={`Assign ${item.label}`}
+                      className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs"
+                    >
+                      <option value="">Unassigned</option>
+                      {programHolders.map((profile: any) => (
+                        <option key={profile.id} value={profile.id}>
+                          {profile.full_name || profile.email}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      name="extension"
+                      inputMode="numeric"
+                      pattern="[0-9]{2,6}"
+                      defaultValue={item.extension ?? ''}
+                      placeholder="Ext."
+                      aria-label={`Extension for ${item.label}`}
+                      className="rounded-lg border border-slate-300 px-2 py-1.5 text-xs"
+                    />
+                    <button className="rounded-lg bg-slate-950 px-3 py-1.5 text-xs font-bold text-white">
+                      Assign
+                    </button>
+                  </form>
                 </li>
               ))}
             </ul>
@@ -310,6 +364,80 @@ export default async function PhonePage() {
           </div>
         ) : (
           <p className="mt-3 text-sm text-slate-600">No menu routes configured yet.</p>
+        )}
+      </section>
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="font-black">Extension and phone directory</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Each Program Holder sees their own extension and assigned business line in their
+          dashboard.
+        </p>
+        <form
+          action={saveProgramHolderExtension}
+          className="mt-4 grid gap-3 md:grid-cols-[1fr_8rem_1fr_auto]"
+        >
+          <select
+            name="profileId"
+            required
+            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+          >
+            <option value="">Choose Program Holder</option>
+            {programHolders.map((profile: any) => (
+              <option key={profile.id} value={profile.id}>
+                {profile.full_name || profile.email}
+              </option>
+            ))}
+          </select>
+          <input
+            name="extension"
+            required
+            inputMode="numeric"
+            pattern="[0-9]{2,6}"
+            placeholder="Extension"
+            className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          />
+          <input
+            name="department"
+            placeholder="Program or department"
+            className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          />
+          <button className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-black text-white">
+            Save extension
+          </button>
+        </form>
+        {extensions.length ? (
+          <div className="mt-4 overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-slate-950 text-white">
+                <tr>
+                  <th className="px-3 py-2">Name</th>
+                  <th className="px-3 py-2">Department</th>
+                  <th className="px-3 py-2">Extension</th>
+                  <th className="px-3 py-2">Phone number</th>
+                  <th className="px-3 py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {extensions.map((entry: any) => {
+                  const assigned = numbers.find(
+                    (number: any) => number.assigned_profile_id === entry.profile_id,
+                  );
+                  const primary = numbers.find((number: any) => number.is_primary);
+                  return (
+                    <tr key={entry.id} className="border-t border-slate-200">
+                      <td className="px-3 py-2 font-bold">{entry.display_name}</td>
+                      <td className="px-3 py-2">{entry.department || '—'}</td>
+                      <td className="px-3 py-2">{entry.extension}</td>
+                      <td className="px-3 py-2">{formatUsPhone((assigned || primary)?.e164)}</td>
+                      <td className="px-3 py-2">{entry.enabled ? 'Active' : 'Paused'}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="mt-4 text-sm text-slate-600">No extensions assigned yet.</p>
         )}
       </section>
       <aside className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-950">

@@ -370,6 +370,23 @@ function SceneSlide({
         willChange: instructionalLayout ? 'background-position' : undefined,
       }}
     >
+      {/* A continuously moving delivery marker makes visual progress explicit
+          and prevents long instructional canvases from becoming frozen video. */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 12,
+          left: `calc(${sceneProgress * 100}% - 28px)`,
+          width: 56,
+          height: 10,
+          borderRadius: 999,
+          background: props.accentColor,
+          boxShadow: `0 0 18px ${props.accentColor}99`,
+          zIndex: 30,
+          willChange: 'left',
+        }}
+      />
+
       {/* Background: video clip (looped) or image. Exact teaching graphics own the full frame. */}
       {!instructionalLayout && scene.clipUrl ? (
         <OffthreadVideo

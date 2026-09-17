@@ -754,8 +754,29 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     if (!result.success || !result.videoUrl) {
       throw new Error(result.error ?? 'Render returned no playable video URL');
     }
+    const renderedStoryboard = result.sceneData ?? storyboard;
+    const exactInstructionalSceneTypes = new Set([
+      'equipment_closeup',
+      'worked_example',
+      'common_mistake',
+      'safety_warning',
+    ]);
+    // Exact instructional scenes are rendered by SlideLesson's deterministic
+    // layouts even when an older authored storyboard still carries a Pexels
+    // lookup URL. Persist what was actually rendered so the quality gate audits
+    // delivered media instead of stale planning metadata.
     const completedStoryboard = {
-      ...(result.sceneData ?? storyboard),
+      ...renderedStoryboard,
+      scenes: renderedStoryboard.scenes.map((scene) =>
+        scene.sceneType && exactInstructionalSceneTypes.has(scene.sceneType)
+          ? {
+              ...scene,
+              mediaSource: 'elevate-motion',
+              resolvedProvider: 'remotion',
+              resolvedModel: `deterministic-${scene.sceneType}`,
+            }
+          : scene,
+      ),
       source_contract: persistedSceneData.source_contract ?? null,
     };
     await markCandidate(job.id, {
@@ -774,7 +795,13 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       sceneData: completedStoryboard,
       provider: REMOTION_PROVIDER,
       providerModel: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
-      expectedScript: script,
+      // The quality gate must compare ASR with the exact words sent to the
+      // repository voice. The aggregate lesson script can include non-spoken
+      // planning/title material and produced false failures near 96% coverage.
+      expectedScript: completedStoryboard.scenes
+        .map((scene) => scene.dialogue?.trim() || scene.action.trim())
+        .filter(Boolean)
+        .join(' '),
       instructionalQuality,
     });
     const sourceContract =

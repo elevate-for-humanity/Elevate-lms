@@ -239,6 +239,9 @@ describe('canonical Course Factory media architecture', () => {
     expect(publisher).toContain("overlay_template: 'caption-only-v1'");
     expect(publisher).toContain("practice: 'knowledge_check'");
     expect(publisher).not.toContain("practice: 'field_scenario'");
+    expect(publisher).toContain("const teachingAction =");
+    expect(publisher).toContain("required_visual_evidence: teachingAction");
+    expect(publisher).toContain("String(scene.purpose) === 'practice'");
     expect(publisher).toContain("generation_status: experience ? 'generating' : 'queued'");
     expect(factory.indexOf('await markCourseMediaPendingWithClient')).toBeLessThan(
       factory.indexOf("tracker.emit('media'"),

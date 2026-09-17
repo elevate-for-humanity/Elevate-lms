@@ -275,7 +275,9 @@ function applyLockedCourseBuilderMediaPolicy(job: VideoJob): void {
     // The Course Builder contract is authoritative. Use the local renderer so
     // runtime environment variables cannot spend credits or transmit lesson
     // content to an external narration provider.
-    process.env.AI_NARRATION_PROVIDER = 'local';
+    // Repository instructor voices are Edge neural voice identifiers. Edge TTS is
+    // the zero-credit renderer for this locked policy; espeak-ng is emergency-only.
+    process.env.AI_NARRATION_PROVIDER = 'edge';
   }
 }
 

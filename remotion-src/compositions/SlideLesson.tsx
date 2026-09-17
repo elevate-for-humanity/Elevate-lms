@@ -251,7 +251,11 @@ function CaptionBar({
         right: 0,
         background: bright ? 'rgba(255,255,255,0.94)' : 'rgba(0,0,0,0.72)',
         borderTop: `2px solid ${primaryColor}55`,
-        padding: '12px 28px',\n        margin: '0 auto 18px',\n        width: 'fit-content',\n        maxWidth: '78%',\n        borderRadius: 14,
+        padding: '12px 28px',
+        margin: '0 auto 18px',
+        width: 'fit-content',
+        maxWidth: '78%',
+        borderRadius: 14,
         opacity: fadeIn(frame, 10, 15),
       }}
     >

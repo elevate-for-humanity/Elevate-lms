@@ -71,6 +71,8 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      TELNYX_API_KEY: ${{ secrets.TELNYX_API_KEY }}
+      TELNYX_PUBLIC_KEY: ${{ secrets.TELNYX_PUBLIC_KEY }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org

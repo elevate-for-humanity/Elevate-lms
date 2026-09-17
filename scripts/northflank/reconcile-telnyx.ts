@@ -84,7 +84,36 @@ async function main() {
   const secretGroup = await nfFetch<Json>(
     projectApiPath(projectId, `/secrets/${secretGroupId}`),
   );
-  let apiKey = findSecret(secretGroup, 'TELNYX_API_KEY');
+  const suppliedApiKey = process.env.TELNYX_API_KEY?.trim();
+  const suppliedPublicKey = process.env.TELNYX_PUBLIC_KEY?.trim();
+  let apiKey = suppliedApiKey || findSecret(secretGroup, 'TELNYX_API_KEY');
+
+  if (suppliedApiKey && !findSecret(secretGroup, 'TELNYX_API_KEY')) {
+    const variables = secretGroup.secrets?.variables;
+    if (!variables || Array.isArray(variables) || typeof variables !== 'object') {
+      throw new Error('Northflank secret group variables have an unsupported shape');
+    }
+    await nfFetch(projectApiPath(projectId, `/secrets/${secretGroupId}`), {
+      method: 'POST',
+      body: JSON.stringify({
+        name: secretGroup.name || secretGroupId,
+        description:
+          secretGroup.description || 'Elevate shared production secrets/config',
+        priority: secretGroup.priority ?? 10,
+        type: secretGroup.type || 'secret',
+        secretType: secretGroup.secretType || 'environment',
+        restrictions: secretGroup.restrictions,
+        secrets: {
+          variables: {
+            ...variables,
+            TELNYX_API_KEY: suppliedApiKey,
+            ...(suppliedPublicKey ? { TELNYX_PUBLIC_KEY: suppliedPublicKey } : {}),
+          },
+        },
+      }),
+    });
+    console.log('Northflank Telnyx runtime credentials synchronized.');
+  }
 
   if (!apiKey) {
     const adminServiceId =

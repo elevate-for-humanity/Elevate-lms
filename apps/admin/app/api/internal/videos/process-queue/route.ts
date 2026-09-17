@@ -5,7 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import type { VideoJob } from '@/lib/video/job-queue';
 import { processClaimedVideoJob } from '@/lib/video/process-video-job';
 import { finalizeUnifiedCourseBuildWithClient } from '@/lib/course-builder/build-lifecycle';
-import { COURSE_MEDIA_STALE_RENDER_MS } from '@/lib/course-factory/media-manager';
+import { COURSE_MEDIA_RENDER_LEASE_SECONDS, COURSE_MEDIA_STALE_RENDER_MS } from '@/lib/course-factory/media-manager';
 import { getCourseBuilderGenerationControl } from '@/lib/course-builder/generation-control';
 
 export const runtime = 'nodejs';
@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
         completed_at: null,
         heartbeat_at: claimedAt.toISOString(),
         lease_token: randomUUID(),
-        lease_expires_at: new Date(claimedAt.getTime() + 900_000).toISOString(),
+        lease_expires_at: new Date(claimedAt.getTime() + COURSE_MEDIA_RENDER_LEASE_SECONDS * 1000).toISOString(),
         updated_at: claimedAt.toISOString(),
       })
       .eq('id', jobId)
@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
     const { data, error: claimError } = await db.rpc('claim_video_jobs', {
       p_limit: availableSlots,
       p_course_id: courseId,
-      p_lease_seconds: 900,
+      p_lease_seconds: COURSE_MEDIA_RENDER_LEASE_SECONDS,
     });
     if (claimError) {
       logger.error('[video-worker] Atomic queue claim failed', claimError);
@@ -275,7 +275,7 @@ export async function POST(request: NextRequest) {
       const { data, error: claimError } = await db.rpc('claim_video_jobs', {
         p_limit: remaining,
         p_course_id: course.id,
-        p_lease_seconds: 900,
+        p_lease_seconds: COURSE_MEDIA_RENDER_LEASE_SECONDS,
       });
       if (claimError) {
         logger.error('[video-worker] Atomic course-scoped queue claim failed', claimError, {

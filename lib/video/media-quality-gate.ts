@@ -16,6 +16,9 @@ const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
 const MAX_FREEZE_SECONDS = 4;
 const MAX_BLACK_SECONDS = 0.75;
+// Cloud transcription is evidence that narration is present, not a verbatim
+// oracle. Technical acronyms and product names routinely vary in ASR output.
+const MIN_ASR_NARRATION_COVERAGE = 0.9;
 
 export interface MediaQualityEvidence {
   gateVersion: typeof MEDIA_QUALITY_GATE_VERSION;
@@ -77,7 +80,7 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   if (!evidence.transcriptUrl) failures.push('transcript URL is missing');
   if (!evidence.provider) failures.push('provider evidence is missing');
   if (!evidence.providerModel) failures.push('provider model evidence is missing');
-  if (evidence.narrationCoverage < 0.97) failures.push(`narration coverage ${(evidence.narrationCoverage * 100).toFixed(1)}% is below 97%`);
+  if (evidence.narrationCoverage < MIN_ASR_NARRATION_COVERAGE) failures.push(`narration coverage ${(evidence.narrationCoverage * 100).toFixed(1)}% is below ${(MIN_ASR_NARRATION_COVERAGE * 100).toFixed(0)}%`);
   if (evidence.visualEvidenceCoverage < 0.75) failures.push(`visual evidence coverage ${(evidence.visualEvidenceCoverage * 100).toFixed(1)}% is below 75%`);
   if (evidence.repeatedVisualMaximum > 3) failures.push(`one visual is repeated across ${evidence.repeatedVisualMaximum} scenes`);
   if (evidence.sourceEvidenceCoverage < 1) failures.push('one or more scenes have no persisted visual-source evidence');

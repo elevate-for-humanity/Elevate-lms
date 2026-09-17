@@ -268,6 +268,13 @@ function InstructionalGraphic({
   frame: number;
   props: SlideLessonProps;
 }) {
+  const { fps } = useVideoConfig();
+  // Move instructional focus on a two-second cadence. This is deliberately a
+  // substantial card-level state change: tiny progress markers and sub-pixel
+  // gradient motion are visually imperceptible to FFmpeg's full-frame freeze
+  // detector and allowed long narrated scenes to look static.
+  const focusStep = Math.floor(frame / Math.max(1, Math.round(fps * 2)));
+
   const card = {
     background: 'rgba(255,255,255,0.96)',
     border: '1px solid rgba(148,163,184,0.45)',
@@ -281,12 +288,28 @@ function InstructionalGraphic({
   if (layout.kind === 'comparison' || layout.kind === 'refrigeration-cycle') {
     return (
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${layout.kind === 'refrigeration-cycle' ? 4 : 3}, 1fr)`, gap: 20 }}>
-        {layout.columns.map((column, index) => (
-          <div key={column.title} style={{ ...card, padding: 28, opacity: fadeIn(frame, 16 + index * 10, 16) }}>
+        {layout.columns.map((column, index) => {
+          const focused = index === focusStep % layout.columns.length;
+          return (
+          <div
+            key={column.title}
+            style={{
+              ...card,
+              padding: 28,
+              opacity: fadeIn(frame, 16 + index * 10, 16),
+              background: focused ? props.accentColor + '26' : card.background,
+              border: focused ? `4px solid ${props.accentColor}` : card.border,
+              boxShadow: focused
+                ? `0 18px 46px ${props.accentColor}55`
+                : card.boxShadow,
+              transform: focused ? 'scale(1.035)' : 'scale(1)',
+            }}
+          >
             <div style={{ color: props.primaryColor, fontSize: 28, marginBottom: 12 }}>{column.title}</div>
             <div style={{ fontSize: 22, lineHeight: 1.35, fontWeight: 650 }}>{column.purpose}</div>
           </div>
-        ))}
+          );
+        })}
       </div>
     );
   }
@@ -294,7 +317,9 @@ function InstructionalGraphic({
   const columns = layout.kind === 'lean-canvas' ? 3 : layout.kind === 'pitch-deck' ? 4 : 3;
   return (
     <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, 1fr)`, gap: 12 }}>
-      {layout.items.map((item, index) => (
+      {layout.items.map((item, index) => {
+        const focused = index === focusStep % layout.items.length;
+        return (
         <div
           key={item}
           style={{
@@ -305,7 +330,12 @@ function InstructionalGraphic({
             alignItems: 'center',
             gap: 12,
             opacity: fadeIn(frame, 14 + index * 6, 14),
-            transform: `translateY(${Math.max(0, 14 - Math.max(0, frame - index * 6))}px)`,
+            transform: `translateY(${Math.max(0, 14 - Math.max(0, frame - index * 6))}px) scale(${focused ? 1.045 : 1})`,
+            background: focused ? props.accentColor + '26' : card.background,
+            border: focused ? `4px solid ${props.accentColor}` : card.border,
+            boxShadow: focused
+              ? `0 16px 40px ${props.accentColor}55`
+              : card.boxShadow,
           }}
         >
           <div
@@ -327,7 +357,8 @@ function InstructionalGraphic({
           </div>
           <div style={{ fontSize: layout.kind === 'lean-canvas' ? 17 : 18, lineHeight: 1.2 }}>{item}</div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

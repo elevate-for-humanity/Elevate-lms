@@ -1,5 +1,6 @@
 import { upgradePersistedAuthoredCourse } from '../../lib/course-factory/persisted-authored-upgrade';
 import { requireAdminClient } from '../../lib/supabase/admin';
+import { queueCourseLessonVideos } from '../../lib/course-factory/media-service';
 
 function argument(name: string): string | null {
   const index = process.argv.indexOf(`--${name}`);
@@ -90,6 +91,18 @@ async function main() {
     );
   }
 
+  const media = await queueCourseLessonVideos({
+    courseId,
+    onlyMissing: true,
+    force: false,
+    limit: null,
+  });
+  if (media.failed > 0 || media.lessonVideosReady !== after.lessonCount) {
+    throw new Error(
+      `Media handoff failed: lessons=${after.lessonCount}, ready=${media.lessonVideosReady}, failed=${media.failed}`,
+    );
+  }
+
   console.log(
     JSON.stringify(
       {
@@ -103,6 +116,7 @@ async function main() {
         publishedLessons: after.publishedLessons,
         approvedLessons: after.approvedLessons,
         preservedVideos: after.videoLessonIds.length,
+        media,
       },
       null,
       2,

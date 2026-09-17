@@ -5,7 +5,8 @@ import { classifyVideoFailure, type VideoAssetKind, type VideoJob } from '@/lib/
 import { MEDIA_QUALITY_GATE_VERSION, mediaQualityFailures, type MediaQualityEvidence } from '@/lib/video/media-quality-gate';
 
 export const COURSE_MEDIA_MAX_RETRIES = 3;
-export const COURSE_MEDIA_STALE_RENDER_MS = 45 * 60 * 1000;
+export const COURSE_MEDIA_STALE_RENDER_MS = 2 * 60 * 60 * 1000;
+export const COURSE_MEDIA_RENDER_LEASE_SECONDS = 2 * 60 * 60;
 export const COURSE_MEDIA_RETRY_BASE_MS = 60 * 1000;
 export const COURSE_MEDIA_RETRY_MAX_BACKOFF_MS = 15 * 60 * 1000;
 

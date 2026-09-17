@@ -255,7 +255,11 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
   const imageItems = (shop.media ?? [])
     .filter((media) => media.kind !== 'video')
     .map((media) => ({ url: media.src, alt: media.alt }));
-  const videoUrl = shop.media?.find((media) => media.kind === 'video')?.src;
+  const videoMedia = shop.media?.find((media) => media.kind === 'video');
+  const videoUrl = videoMedia?.src;
+  const videoScript =
+    videoMedia?.script ??
+    `Welcome to ${shop.dba ?? shop.name}, an Elevate ${hostLabel}. This participating ${trainingSetting} supports supervised apprenticeship training in a real workplace. Placement, employment, supervision, and enrollment approval are confirmed through Elevate before training begins.`;
   const mapUrl = directionsUrl(address);
   const canonical = `${SITE_URL}/host-shops/${shop.slug}`;
   const publicUrls = [shop.websiteUrl, shop.bookingUrl, shop.socialUrl, shop.onlineListingUrl].filter(Boolean);
@@ -297,7 +301,11 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c') }} />
       {videoUrl ? (
-        <section className="relative isolate h-[clamp(500px,72svh,820px)] overflow-hidden bg-black">
+        <section
+          className="relative isolate h-[clamp(500px,72svh,820px)] overflow-hidden bg-black"
+          data-scroll-narration
+          data-narration={videoScript}
+        >
           <video
             src={videoUrl}
             autoPlay
@@ -319,6 +327,17 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
               </p>
             </div>
           </div>
+        </section>
+      ) : null}
+
+      {videoUrl ? (
+        <section className="border-b border-slate-200 bg-white px-4 py-5 sm:px-6">
+          <details className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+            <summary className="cursor-pointer text-sm font-black text-brand-blue-900">
+              Read the {shop.dba ?? shop.name} tour script
+            </summary>
+            <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-700">{videoScript}</p>
+          </details>
         </section>
       ) : null}
 

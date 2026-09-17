@@ -315,7 +315,7 @@ async function updateMicroclipExperience(
 export async function markRendering(jobId: string): Promise<void> {
   const supabase = db();
   const now = new Date().toISOString();
-  const { data: job } = await supabase
+  let failureQuery = supabase
     .from('video_jobs')
     .update({
       status: 'rendering',
@@ -325,10 +325,15 @@ export async function markRendering(jobId: string): Promise<void> {
       updated_at: now,
     })
     .eq('id', jobId)
+    .eq('status', 'rendering');
+  if (leaseToken) failureQuery = failureQuery.eq('lease_token', leaseToken);
+  const { data: job, error: failureError } = await failureQuery
     .select('lesson_id, asset_kind, asset_key')
-    .single();
+    .maybeSingle();
+  if (failureError) throw failureError;
+  if (!job) throw new Error(`VIDEO_JOB_LEASE_LOST:${jobId}`);
 
-  if (job?.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
+  if (job.lesson_id && job.asset_kind === 'microclip' && job.asset_key) {
     await updateMicroclipExperience(job.lesson_id, job.asset_key, {
       status: 'rendering',
       error: null,
@@ -347,6 +352,7 @@ export async function markCandidate(
     provider?: string;
     provider_model?: string;
   },
+  leaseToken?: string | null,
 ): Promise<void> {
   const now = new Date().toISOString();
   const patch: Record<string, unknown> = {
@@ -367,8 +373,15 @@ export async function markCandidate(
     patch.scene_data = result.scene_data;
     patch.procedure_schema = result.scene_data;
   }
-  const { error } = await db().from('video_jobs').update(patch).eq('id', jobId);
+  let candidateQuery = db()
+    .from('video_jobs')
+    .update(patch)
+    .eq('id', jobId)
+    .eq('status', 'rendering');
+  if (leaseToken) candidateQuery = candidateQuery.eq('lease_token', leaseToken);
+  const { data: candidate, error } = await candidateQuery.select('id').maybeSingle();
   if (error) throw error;
+  if (!candidate) throw new Error(`VIDEO_JOB_LEASE_LOST:${jobId}`);
   logger.info(`[VideoJob] Candidate persisted before quality review: ${jobId}`);
 }
 
@@ -384,6 +397,7 @@ export async function markComplete(
     provider_model?: string;
     quality_evidence?: MediaQualityEvidence;
   },
+  leaseToken?: string | null,
 ): Promise<void> {
   const supabase = db();
   const now = new Date().toISOString();
@@ -417,12 +431,17 @@ export async function markComplete(
   // A renderer that returns no replacement storyboard must not erase the
   // canonical plan that was attached when the job was queued.
   if (result.scene_data != null) completionPatch.scene_data = result.scene_data;
-  const { data: job } = await supabase
+  let completionQuery = supabase
     .from('video_jobs')
     .update(completionPatch)
     .eq('id', jobId)
+    .eq('status', 'rendering');
+  if (leaseToken) completionQuery = completionQuery.eq('lease_token', leaseToken);
+  const { data: job, error: completionError } = await completionQuery
     .select('course_id, lesson_id, asset_kind, asset_key, script')
-    .single();
+    .maybeSingle();
+  if (completionError) throw completionError;
+  if (!job) throw new Error(`VIDEO_JOB_LEASE_LOST:${jobId}`);
 
   if (job?.lesson_id && job.asset_kind === 'lesson') {
     const { data: lesson } = await supabase
@@ -507,6 +526,7 @@ export async function markFailed(
   jobId: string,
   errorMessage: string,
   evidence: { provider?: string; provider_model?: string } = {},
+  leaseToken?: string | null,
 ): Promise<void> {
   const supabase = db();
   const now = new Date().toISOString();

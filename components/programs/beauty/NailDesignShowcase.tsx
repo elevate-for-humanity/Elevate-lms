@@ -118,7 +118,7 @@ export default function NailDesignShowcase() {
                 </Link>
                 <Link
                   href="/programs/nail-technician-apprenticeship"
-                  className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-white/40 px-6 py-3 font-black text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-400 px-6 py-3 font-black text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
                   Explore Nail Technician
                 </Link>

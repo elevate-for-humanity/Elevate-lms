@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: authored-course-upgrade-${{ matrix.course_id }}
+  group: authored-course-media-launch
   cancel-in-progress: false
 
 jobs:

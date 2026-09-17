@@ -8,3 +8,5 @@ Retry: static matrix validation
 Retry: valid workflow-level concurrency scope
 
 Retry: authorized server runtime condition
+
+Retry: reset refreshed canonical media attempts

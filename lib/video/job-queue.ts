@@ -170,6 +170,11 @@ export async function createJob(input: CreateJobInput): Promise<VideoJob> {
   const assetKind = input.asset_kind ?? 'lesson';
   const existing = await findCanonicalJob(supabase, input);
   if (existing) {
+    // A new locked source contract is a new render attempt on the same canonical
+    // asset identity. Obsolete retry/dead-letter history must not strand it.
+    const sourceChanged =
+      (existing.script ?? '') !== (input.script ?? '') ||
+      JSON.stringify(existing.scene_data ?? null) !== JSON.stringify(input.scene_data ?? null);
     // A curriculum refresh may replace narration and scene direction while
     // retaining the canonical asset identity. Never render a stale queued job.
     if (existing.status !== 'rendering') {
@@ -183,12 +188,22 @@ export async function createJob(input: CreateJobInput): Promise<VideoJob> {
           // Draft is an authoring state. Once Course Builder supplies the
           // canonical lesson payload, the same durable job must become
           // claimable by the renderer instead of remaining stranded.
-          ...(existing.status === 'draft'
+          ...(existing.status === 'draft' || sourceChanged
             ? {
                 status: 'queued' as const,
                 queued_at: new Date().toISOString(),
+                started_at: null,
+                completed_at: null,
                 error_message: null,
+                retry_count: 0,
+                failure_class: null,
+                next_retry_at: null,
+                dead_lettered_at: null,
+                lease_token: null,
+                lease_expires_at: null,
+                heartbeat_at: null,
                 review_status: 'not_ready' as const,
+                quality_evidence: {},
               }
             : {}),
           updated_at: new Date().toISOString(),

@@ -515,7 +515,9 @@ export default function ProgramDetailPage({
             <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg">
               {isApprenticeship
                 ? 'This is an earn-while-you-learn pathway combining supervised work at an approved Host Site with required related instruction, progress tracking, and completion documentation.'
-                : `This is a ${durationLabel} ${p.deliveryMode === 'hybrid' ? 'hybrid' : p.deliveryMode === 'online' ? 'online' : 'in-person'} training pathway. You apply, complete intake, follow the published training and assessment plan, earn the listed credentials when requirements are met, and receive career-support services.`}
+                : p.deliveryMode === 'hybrid'
+                  ? `This is a ${durationLabel} hybrid pathway. Most training begins with self-paced coursework you complete from home, followed by scheduled hands-on training at a real training, lab, or employer site. You complete intake, lessons, practical competencies, assessments, and the listed credential requirements, with career-support services available throughout the pathway.`
+                  : `This is a ${durationLabel} ${p.deliveryMode === 'online' ? 'online' : 'in-person'} training pathway. You apply, complete intake, follow the published training and assessment plan, earn the listed credentials when requirements are met, and receive career-support services.`}
             </p>
           </div>
 
@@ -525,7 +527,16 @@ export default function ProgramDetailPage({
               <dl className="mt-4 space-y-3 text-sm">
                 <div><dt className="font-bold text-slate-500">Length</dt><dd className="mt-1 font-black text-slate-950">{durationLabel}</dd></div>
                 <div><dt className="font-bold text-slate-500">Weekly schedule</dt><dd className="mt-1 font-black text-slate-950">{p.schedule || `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hours per week`}</dd></div>
-                <div><dt className="font-bold text-slate-500">Delivery</dt><dd className="mt-1 font-black capitalize text-slate-950">{p.deliveryMode}</dd></div>
+                <div>
+                  <dt className="font-bold text-slate-500">Delivery</dt>
+                  <dd className="mt-1 font-black text-slate-950">
+                    {p.deliveryMode === 'hybrid'
+                      ? 'Self-paced from home + scheduled hands-on site training'
+                      : p.deliveryMode === 'online'
+                        ? 'Online'
+                        : 'In-person'}
+                  </dd>
+                </div>
                 <div><dt className="font-bold text-slate-500">Credentials</dt><dd className="mt-1 font-black text-slate-950">{p.credentials.length} listed credential{p.credentials.length === 1 ? '' : 's'}</dd></div>
               </dl>
             </div>

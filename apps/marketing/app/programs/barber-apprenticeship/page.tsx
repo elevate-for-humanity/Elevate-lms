@@ -30,7 +30,7 @@ const BARBER_HERO_IMAGE =
 const BARBER_RTI_HOURS = 260;
 // Approved, conversational hero narration for the featured Kountry Kutz host shop.
 const KOUNTRY_KUTZ_HERO_TRANSCRIPT =
-  "Welcome to Kountry Kutz Barbershop in New Palestine, Indiana. Kountry Kutz is a participating barber-apprenticeship Host Shop where apprentices can connect structured technical instruction with supervised experience in a working barbershop. The shop provides a professional environment for learning sanitation, client service, haircutting, grooming, workplace safety, and daily shop routines. Apprenticeship placement and final approval are confirmed separately through Elevate's enrollment and compliance process.";
+  "Welcome to the Barber Apprenticeship program and your tour of Kountry Kutz Barbershop in New Palestine, Indiana. Kountry Kutz is a participating apprenticeship Host Shop where approved apprentices connect structured technical instruction with supervised experience in a working barbershop. As the video moves through the shop, notice the professional workstations and real client-service environment used to build skills in sanitation, haircutting, grooming, workplace safety, communication, and daily shop routines. Continue down the page to learn how the apprenticeship works, review participating Host Shops, and apply. Placement, wages, supervision, enrollment, and licensing requirements are confirmed through Elevate before training begins.";
 
 const FLOW = [
   {

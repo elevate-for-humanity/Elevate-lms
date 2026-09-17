@@ -12,6 +12,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 1800;
 
+type VideoWorkerGlobal = typeof globalThis & {
+  __elevateActiveVideoBatches?: Set<Promise<void>>;
+};
+
+const videoWorkerGlobal = globalThis as VideoWorkerGlobal;
+const activeVideoBatches = videoWorkerGlobal.__elevateActiveVideoBatches ?? new Set<Promise<void>>();
+videoWorkerGlobal.__elevateActiveVideoBatches = activeVideoBatches;
+
 function renderConcurrency(): number {
   const parsed = Number(process.env.VIDEO_RENDER_CONCURRENCY ?? '2');
   if (!Number.isFinite(parsed)) return 2;
@@ -293,37 +301,42 @@ export async function POST(request: NextRequest) {
   }
   const claimedJobs = claimedRows as VideoJob[];
 
-  // The Admin service is self-hosted. Next's deferred after() callback did not
-  // execute reliably there, leaving claimed rows in rendering until their
-  // leases expired. Keep execution attached to the durable internal worker
-  // request; the instrumentation loop awaits this request and retries after a
-  // process restart, while database leases preserve duplicate safety.
-  const results = await Promise.allSettled(claimedJobs.map((job) => processClaimedVideoJob(job)));
-  results.forEach((result, index) => {
-    if (result.status === 'rejected') {
-      logger.error('[video-worker] Processor failed', result.reason, {
-        jobId: claimedJobs[index]?.id,
-        courseId: claimedJobs[index]?.course_id,
-      });
+  // Do not attach a long Remotion render to the lifetime of this HTTP request.
+  // Northflank/Next can terminate a request after roughly 15 minutes even when
+  // the service process remains healthy, which sends SIGTERM to the compositor
+  // and strands its leased row. Keep a process-global strong reference to the
+  // batch instead. The database lease is still the ownership authority and the
+  // background loop will observe render-capacity-full until this batch exits.
+  const batch = (async () => {
+    const results = await Promise.allSettled(claimedJobs.map((job) => processClaimedVideoJob(job)));
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        logger.error('[video-worker] Processor failed', result.reason, {
+          jobId: claimedJobs[index]?.id,
+          courseId: claimedJobs[index]?.course_id,
+        });
+      }
+    });
+    const courseIds = [...new Set(claimedJobs.map((job) => job.course_id).filter(Boolean))];
+    for (const completedCourseId of courseIds) {
+      try {
+        const finalization = await finalizeUnifiedCourseBuildWithClient({
+          db,
+          courseId: completedCourseId,
+        });
+        logger.info('[video-worker] Unified draft course finalization checked', {
+          courseId: completedCourseId,
+          state: finalization.state,
+        });
+      } catch (finalizationError) {
+        logger.error('[video-worker] Automated course finalization failed', finalizationError, {
+          courseId: completedCourseId,
+        });
+      }
     }
-  });
-  const courseIds = [...new Set(claimedJobs.map((job) => job.course_id).filter(Boolean))];
-  for (const completedCourseId of courseIds) {
-    try {
-      const finalization = await finalizeUnifiedCourseBuildWithClient({
-        db,
-        courseId: completedCourseId,
-      });
-      logger.info('[video-worker] Unified draft course finalization checked', {
-        courseId: completedCourseId,
-        state: finalization.state,
-      });
-    } catch (finalizationError) {
-      logger.error('[video-worker] Automated course finalization failed', finalizationError, {
-        courseId: completedCourseId,
-      });
-    }
-  }
+  })();
+  activeVideoBatches.add(batch);
+  void batch.finally(() => activeVideoBatches.delete(batch));
 
   return NextResponse.json(
     {
@@ -341,8 +354,7 @@ export async function POST(request: NextRequest) {
       activeBeforeClaim: active,
       maxConcurrent,
       queuedDraftJobId,
-      completed: results.filter((result) => result.status === 'fulfilled').length,
-      failed: results.filter((result) => result.status === 'rejected').length,
+      accepted: claimedJobs.length,
     },
     { status: 200 },
   );

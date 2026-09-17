@@ -60,6 +60,7 @@ const slideLessonDefaultProps: SlideLessonProps = {
   accentColor: '#3b82f6',
   backgroundColor: '#0f172a',
   logoText: 'Elevate LMS',
+  openingImageUrl: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
   scenes: [
     {
       scene_number: 1,

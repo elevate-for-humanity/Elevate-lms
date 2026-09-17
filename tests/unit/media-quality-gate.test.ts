@@ -17,6 +17,9 @@ const validEvidence: MediaQualityEvidence = {
   expectedDurationSeconds: 148,
   videoStreams: 1,
   audioStreams: 1,
+  width: 1920,
+  height: 1080,
+  openingStillUrl: 'https://assets.example/lesson-poster.jpg',
   sceneChanges: 4,
   longestFreezeSeconds: 1.8,
   longestBlackSeconds: 0,
@@ -34,32 +37,49 @@ const validEvidence: MediaQualityEvidence = {
   sourceEvidenceCoverage: 1,
   exactVisualSourceCoverage: 1,
   instructionalQuality: {
-    wordCount: 190, minimumWordCount: 180, courseDomain: 'cosmetology', demonstrationClaimed: false,
-    demonstrationScenes: 1, titleKeywordCoverage: 1, sceneTypeCoverage: 0.2, hasMentalModel: false,
-    hasWorkedExample: true, hasMemoryRecap: false, hasKnowledgeCheck: false, hasSafetyScene: true,
-    objectiveCoverage: 1, sceneNarrationAlignment: 1, instructionLeakageDetected: false,
+    wordCount: 190,
+    minimumWordCount: 180,
+    courseDomain: 'cosmetology',
+    demonstrationClaimed: false,
+    demonstrationScenes: 1,
+    titleKeywordCoverage: 1,
+    sceneTypeCoverage: 0.2,
+    hasMentalModel: false,
+    hasWorkedExample: true,
+    hasMemoryRecap: false,
+    hasKnowledgeCheck: false,
+    hasSafetyScene: true,
+    objectiveCoverage: 1,
+    sceneNarrationAlignment: 1,
+    instructionLeakageDetected: false,
   },
 };
 
 describe('canonical media completion quality gate', () => {
   it('uses Cloudflare Whisper when Cloudflare is the canonical provider', () => {
-    expect(resolveCloudflareTranscriptionModel({
-      AI_PROVIDER: 'cloudflare',
-      CLOUDFLARE_ACCOUNT_ID: 'account-id',
-      CLOUDFLARE_AI_API_TOKEN: 'token',
-    })).toBe('@cf/openai/whisper');
+    expect(
+      resolveCloudflareTranscriptionModel({
+        AI_PROVIDER: 'cloudflare',
+        CLOUDFLARE_ACCOUNT_ID: 'account-id',
+        CLOUDFLARE_AI_API_TOKEN: 'token',
+      }),
+    ).toBe('@cf/openai/whisper');
   });
 
   it('preserves an explicitly configured Cloudflare transcription model', () => {
-    expect(resolveCloudflareTranscriptionModel({
-      AI_TRANSCRIPTION_PROVIDER: 'cloudflare',
-      AI_TRANSCRIPTION_MODEL: '@cf/openai/whisper-large-v3-turbo',
-    })).toBe('@cf/openai/whisper-large-v3-turbo');
+    expect(
+      resolveCloudflareTranscriptionModel({
+        AI_TRANSCRIPTION_PROVIDER: 'cloudflare',
+        AI_TRANSCRIPTION_MODEL: '@cf/openai/whisper-large-v3-turbo',
+      }),
+    ).toBe('@cf/openai/whisper-large-v3-turbo');
   });
 
   it('keeps transcription chunks below the long-lesson upload boundary', () => {
     expect(cloudflareTranscriptionChunkSeconds({})).toBe(240);
-    expect(cloudflareTranscriptionChunkSeconds({ AI_TRANSCRIPTION_CHUNK_SECONDS: '900' })).toBe(300);
+    expect(cloudflareTranscriptionChunkSeconds({ AI_TRANSCRIPTION_CHUNK_SECONDS: '900' })).toBe(
+      300,
+    );
     expect(cloudflareTranscriptionChunkSeconds({ AI_TRANSCRIPTION_CHUNK_SECONDS: '5' })).toBe(60);
   });
 
@@ -69,8 +89,9 @@ describe('canonical media completion quality gate', () => {
 
   it('treats ASR as presence evidence while still rejecting materially incomplete narration', () => {
     expect(mediaQualityFailures({ ...validEvidence, narrationCoverage: 0.907 })).toEqual([]);
-    expect(mediaQualityFailures({ ...validEvidence, narrationCoverage: 0.899 }))
-      .toEqual(expect.arrayContaining([expect.stringContaining('narration coverage')]));
+    expect(mediaQualityFailures({ ...validEvidence, narrationCoverage: 0.899 })).toEqual(
+      expect.arrayContaining([expect.stringContaining('narration coverage')]),
+    );
   });
 
   it('rejects the previously accepted 27-second frozen asset', () => {
@@ -84,14 +105,16 @@ describe('canonical media completion quality gate', () => {
       captionUrl: undefined,
       transcriptUrl: undefined,
     });
-    expect(failures).toEqual(expect.arrayContaining([
-      expect.stringContaining('duration mismatch'),
-      expect.stringContaining('insufficient visual changes'),
-      expect.stringContaining('frozen interval'),
-      expect.stringContaining('storyboard mismatch'),
-      'caption URL is missing',
-      'transcript URL is missing',
-    ]));
+    expect(failures).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('duration mismatch'),
+        expect.stringContaining('insufficient visual changes'),
+        expect.stringContaining('frozen interval'),
+        expect.stringContaining('storyboard mismatch'),
+        'caption URL is missing',
+        'transcript URL is missing',
+      ]),
+    );
   });
 
   it('rejects silent, tiny, and unattributed output while permitting a validated microclip scene', () => {
@@ -104,11 +127,28 @@ describe('canonical media completion quality gate', () => {
       provider: undefined,
       providerModel: undefined,
     });
-    expect(failures).toEqual(expect.arrayContaining([
-      expect.stringContaining('too small'),
-      'MP4 has no narration/audio stream',
-      'provider evidence is missing',
-      'provider model evidence is missing',
-    ]));
+    expect(failures).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('too small'),
+        'MP4 has no narration/audio stream',
+        'provider evidence is missing',
+        'provider model evidence is missing',
+      ]),
+    );
+  });
+
+  it('rejects blurry-scale delivery and a missing opening photograph', () => {
+    const failures = mediaQualityFailures({
+      ...validEvidence,
+      width: 640,
+      height: 360,
+      openingStillUrl: undefined,
+    });
+    expect(failures).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('below 1280x720'),
+        'photographic opening still is missing',
+      ]),
+    );
   });
 });

@@ -74,6 +74,14 @@ async function main() {
   const profiles = list(byName.outbound_profiles);
   const verified = list(byName.verified_numbers);
 
+  let webhookStatus = 0;
+  try {
+    const response = await fetch(webhook, { method: 'GET', redirect: 'manual' });
+    webhookStatus = response.status;
+  } catch {}
+  const webhookReachable = webhookStatus > 0 && webhookStatus < 500;
+  console.log(`AUDIT production webhook: ${webhookReachable ? 'reachable' : 'unreachable'} (HTTP ${webhookStatus || 'network-failure'})`);
+
   const status = String(number?.status || '').toLowerCase();
   const checks = {
     api_authenticated: results.every((r) => r.name === 'balance' || r.ok),
@@ -90,6 +98,8 @@ async function main() {
     application_active: app?.active === true,
     primary_webhook_matches: app?.webhook_event_url === webhook,
     webhook_api_v2: String(app?.webhook_api_version || '') === '2',
+    production_webhook_reachable: webhookReachable,
+    application_outbound_enabled: app?.outbound?.outbound_voice_profile_id != null || app?.outbound === true,
     failover_webhook_configured: Boolean(app?.webhook_failover_url),
     outbound_profile_count: profiles.length,
     forwarding_destination_verified: verified.some((v) => v.phone_number === '+13177607908'),
@@ -106,6 +116,8 @@ async function main() {
   if (!checks.application_active) blockers.push('Call Control application inactive');
   if (!checks.primary_webhook_matches) blockers.push('primary webhook mismatch');
   if (!checks.webhook_api_v2) blockers.push('webhook API is not v2');
+  if (!checks.production_webhook_reachable) blockers.push('production webhook is unreachable');
+  if (!checks.application_outbound_enabled) blockers.push('Call Control outbound calling is not configured');
   if (!checks.failover_webhook_configured) blockers.push('failover webhook missing');
   if (!checks.outbound_profile_count) blockers.push('outbound voice profile missing');
   if (!checks.forwarding_destination_verified) blockers.push('forwarding destination not verified');

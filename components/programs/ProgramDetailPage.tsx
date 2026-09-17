@@ -35,6 +35,8 @@ import {
   Layers,
   CheckCircle2,
   WalletCards,
+  CalendarDays,
+  ClipboardList,
 } from 'lucide-react';
 import type { FundingType, ProgramSchema } from '@/lib/programs/program-schema';
 import {
@@ -54,6 +56,7 @@ import {
 } from '@/lib/programs/public-funding-copy';
 import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
+import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
 
 interface Props {
   program: ProgramSchema;
@@ -138,6 +141,12 @@ export default function ProgramDetailPage({
     }).toString()}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
   const isTaxPreparationProgram = p.slug === 'tax-preparation';
+  const showPriorityFundingPath = [
+    'hvac-technician',
+    'cdl-training',
+    'business-administration',
+    'bookkeeping',
+  ].includes(p.slug);
   const pathwaySteps = [
     {
       step: 'Step 1',
@@ -418,6 +427,81 @@ export default function ProgramDetailPage({
           </div>
         </div>
       </section>
+
+      {showPriorityFundingPath ? (
+        <section
+          aria-labelledby={`funding-next-steps-${p.slug}`}
+          className="border-y border-emerald-200 bg-emerald-50 px-4 py-10 sm:py-12"
+        >
+          <div className="mx-auto max-w-6xl">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">
+              Funding options for eligible applicants
+            </p>
+            <h2
+              id={`funding-next-steps-${p.slug}`}
+              className="mt-2 max-w-4xl text-3xl font-black tracking-tight text-slate-950"
+            >
+              Apply first, then schedule your funding intake.
+            </h2>
+            <p className="mt-3 max-w-4xl text-base leading-7 text-slate-700">
+              This program has a funding pathway for applicants who meet the responsible
+              agency&apos;s requirements. Funding is not automatic: WorkOne or the applicable agency
+              confirms participant eligibility, covered costs, available funds, and written
+              authorization before funded enrollment.
+            </p>
+
+            <ol className="mt-7 grid gap-4 md:grid-cols-2">
+              <li className="rounded-2xl border border-emerald-200 bg-white p-5">
+                <p className="text-sm font-black text-emerald-800">Step 1</p>
+                <h3 className="mt-1 text-xl font-black text-slate-950">
+                  Complete the program application
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Select {p.title} so the admissions team can review your program choice,
+                  readiness, and preferred payment path.
+                </p>
+                <Link
+                  href={applicationHref}
+                  className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-black text-white hover:bg-brand-red-700"
+                >
+                  <ClipboardList className="h-5 w-5" />
+                  Complete Application
+                </Link>
+              </li>
+              <li className="rounded-2xl border border-emerald-200 bg-white p-5">
+                <p className="text-sm font-black text-emerald-800">Step 2</p>
+                <h3 className="mt-1 text-xl font-black text-slate-950">
+                  Schedule the official intake
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Meet with WorkOne to complete the eligibility review and learn which approved
+                  costs may be covered for you.
+                </p>
+                <a
+                  href={WORKONE_INDY_BOOKING_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-sm font-black text-white hover:bg-emerald-800"
+                >
+                  <CalendarDays className="h-5 w-5" />
+                  Schedule Funding Intake
+                </a>
+              </li>
+            </ol>
+
+            <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+              <h3 className="text-lg font-black text-slate-950">
+                If you do not qualify for workforce funding
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                You can still ask admissions about self-pay, available payment-plan or
+                buy-now-pay-later choices, and employer-sponsored training. The team will explain
+                current costs and help you choose an enrollment route before you commit.
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {p.slug !== 'business-administration' ? (
         <ProgramCohortFlyer programSlug={p.slug} programTitle={p.title} />

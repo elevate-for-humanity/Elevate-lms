@@ -210,13 +210,43 @@ async function main() {
     });
   }
 
+  const profiles = await telnyx<Json>(
+    apiKey,
+    '/outbound_voice_profiles?page[size]=250',
+  );
+  let outboundProfileId = String(
+    process.env.TELNYX_OUTBOUND_VOICE_PROFILE_ID ||
+      profiles.data?.find?.((profile: Json) => profile.name === 'Elevate Production Voice')?.id ||
+      profiles.data?.[0]?.id ||
+      '',
+  );
+  if (!outboundProfileId) {
+    const created = await telnyx<Json>(apiKey, '/outbound_voice_profiles', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'Elevate Production Voice',
+        traffic_type: 'conversational',
+        service_plan: 'global',
+        whitelisted_destinations: ['US'],
+      }),
+    });
+    outboundProfileId = String(created.data?.id || '');
+    if (!outboundProfileId) throw new Error('Telnyx did not return an outbound voice profile ID');
+    console.log('Telnyx production outbound voice profile created.');
+  }
+
   const appBefore = await telnyx<Json>(
     apiKey,
     `/call_control_applications/${connectionId}`,
   );
+  const outboundBefore = String(
+    appBefore.data?.outbound?.outbound_voice_profile_id || '',
+  );
   if (
     String(appBefore.data?.webhook_event_url || '') !== webhookUrl ||
-    String(appBefore.data?.webhook_api_version || '') !== '2'
+    String(appBefore.data?.webhook_api_version || '') !== '2' ||
+    appBefore.data?.active !== true ||
+    outboundBefore !== outboundProfileId
   ) {
     await telnyx(apiKey, `/call_control_applications/${connectionId}`, {
       method: 'PATCH',
@@ -224,6 +254,7 @@ async function main() {
         webhook_event_url: webhookUrl,
         webhook_api_version: '2',
         active: true,
+        outbound: { outbound_voice_profile_id: outboundProfileId },
       }),
     });
   }
@@ -238,10 +269,13 @@ async function main() {
   const webhookConnected =
     String(appAfter.data?.webhook_event_url || '') === webhookUrl &&
     String(appAfter.data?.webhook_api_version || '') === '2';
+  const outboundConnected =
+    String(appAfter.data?.outbound?.outbound_voice_profile_id || '') ===
+    outboundProfileId;
 
-  if (!numberConnected || !webhookConnected) {
+  if (!numberConnected || !webhookConnected || !outboundConnected) {
     throw new Error(
-      `Telnyx verification failed: numberConnected=${numberConnected} webhookConnected=${webhookConnected}`,
+      `Telnyx verification failed: numberConnected=${numberConnected} webhookConnected=${webhookConnected} outboundConnected=${outboundConnected}`,
     );
   }
 

@@ -4,3 +4,5 @@ Launch the canonical authored-course repair and media renderer for:
 
 Requested: 2026-09-17
 Retry: static matrix validation
+
+Retry: valid workflow-level concurrency scope

@@ -45,7 +45,7 @@ export interface SceneData {
   imageUrl: string | null;
   /** Absolute path to per-scene MP3 audio */
   audioSrc: string | null;
-  /** Duration in frames at 30fps */
+  /** Duration in frames at the SlideLesson composition frame rate. */
   durationFrames: number;
   sceneType?: string;
   memoryAnchor?: string;
@@ -67,8 +67,8 @@ export interface SlideLessonProps {
 
 // ââ Constants âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-const INTRO_FRAMES = 30; // One readable second; never open on a blank/blurred card.
-const OUTRO_FRAMES = 60;
+const INTRO_FRAMES = 15; // One readable second at the canonical 15fps delivery rate.
+const OUTRO_FRAMES = 30;
 
 // ââ Animation helpers âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 

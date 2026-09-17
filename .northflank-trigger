@@ -1,4 +1,4 @@
-merge_sha=0be8f1e10a89048496e01baf54bace3b33e78f5b
-services=admin
-requested_at=2026-09-13T16:31:00Z
-reason=deploy-final-storyboard-boundary
+merge_sha=a696018d2c7b3c0d711740f5ba28481ca222d957
+services=all
+requested_at=2026-09-17T13:20:00Z
+reason=deploy-current-main-all-northflank-services

@@ -15,7 +15,9 @@ export const maxDuration = 1800;
 function renderConcurrency(): number {
   const parsed = Number(process.env.VIDEO_RENDER_CONCURRENCY ?? '2');
   if (!Number.isFinite(parsed)) return 2;
-  return Math.max(1, Math.min(Math.trunc(parsed), 4));
+  // The self-hosted compositor cannot safely sustain parallel Chromium renders.
+  // A single durable render avoids host OOM/SIGKILL while preserving queue throughput.
+  return Math.max(1, Math.min(Math.trunc(parsed), 1));
 }
 
 interface QueueRequestOptions {

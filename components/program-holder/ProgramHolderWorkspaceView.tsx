@@ -1311,7 +1311,9 @@ function Applicants({
                     <p className="font-bold">{row.applicant_name || 'Applicant'}</p>
                     <p className="text-xs text-slate-500">{row.applicant_email || ''}</p>
                   </td>
-                  <td className="p-3">{programTitle(programs, row.program_id)}</td>
+                  <td className="p-3">
+                    {programTitle(programs, row.program_id, row.program_slug)}
+                  </td>
                   <td className="p-3 capitalize">{applicantPipelineStatus(row)}</td>
                   <td className="p-3">
                     <p className="font-medium">{row.applicant_phone || 'No phone on file'}</p>

@@ -71,14 +71,26 @@ export async function POST(request: NextRequest) {
     const selfie = form.get('selfie');
     const passport = idType === 'passport';
     const db = await requireAdminClient();
-    const { data: providerVerification } = await db
-      .from('id_verifications')
-      .select('id')
-      .eq('user_id', user.id)
-      .in('status', ['approved', 'verified'])
-      .limit(1)
-      .maybeSingle();
+    const [{ data: providerVerification }, { data: profile }] = await Promise.all([
+      db
+        .from('id_verifications')
+        .select('id')
+        .eq('user_id', user.id)
+        .in('status', ['approved', 'verified'])
+        .limit(1)
+        .maybeSingle(),
+      db.from('profiles').select('role').eq('id', user.id).maybeSingle(),
+    ]);
     const providerVerified = Boolean(providerVerification);
+    const profileRole = String(profile?.role || '').toLowerCase();
+    const identityOwnerType =
+      profileRole.includes('apprentice')
+        ? 'apprentice'
+        : ['partner', 'host_shop', 'host_shop_admin'].includes(profileRole)
+          ? 'host_shop'
+          : ['employer', 'sponsor', 'recruiter'].includes(profileRole)
+            ? 'employer'
+            : 'student';
 
     if (!firstName || !lastName || !dateOfBirth || !streetAddress || !city || !state || !zipCode || !idType) {
       return NextResponse.json({ error: 'Complete all required identity fields.' }, { status: 400 });
@@ -148,7 +160,7 @@ export async function POST(request: NextRequest) {
     const documentRows = uploads.map((upload) => ({
       user_id: user.id,
       uploaded_by: user.id,
-      owner_type: 'user',
+      owner_type: identityOwnerType,
       owner_id: user.id,
       document_type: 'photo_id',
       file_name:

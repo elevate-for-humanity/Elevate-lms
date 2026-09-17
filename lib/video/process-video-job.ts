@@ -753,7 +753,6 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     });
     if (!result.success || !result.videoUrl) {
       throw new Error(result.error ?? 'Render returned no playable video URL');
-      throw new Error(result.error ?? 'Render returned no playable video URL');
     }
     const completedStoryboard = {
       ...(result.sceneData ?? storyboard),

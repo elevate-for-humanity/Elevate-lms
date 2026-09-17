@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { SupabaseClient } from '@/lib/supabase';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getBlueprintBySlug } from './blueprint-loader';
@@ -149,6 +150,16 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
       existingExperience: currentJson.experience ?? currentContent.experience,
     });
     const quickClips = compiled.experience.quickClips;
+    const sourceFingerprint = createHash('sha256')
+      .update(
+        JSON.stringify({
+          narration: compiled.experience.narrationScript,
+          objective: compiled.objectives[0] ?? null,
+          learningPoints: compiled.learningPoints,
+          visualPrompt: compiled.experience.visualPrompt ?? null,
+        }),
+      )
+      .digest('hex');
     return {
       id: lesson.id,
       content: {
@@ -171,6 +182,9 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
       video_config: {
         ...record(lesson.video_config),
         enabled: true,
+        source_fingerprint: sourceFingerprint,
+        source_contract_version: 1,
+        narration_locked: true,
         ai_instructor: true,
         narration: compiled.experience.narrationScript,
         transcript: compiled.experience.narrationScript,
@@ -182,6 +196,11 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
       script: compiled.experience.narrationScript,
       bullet_points: compiled.learningPoints,
       scene_data: {
+        source_contract: {
+          version: 1,
+          fingerprint: sourceFingerprint,
+          narration_locked: true,
+        },
         visual_prompt: compiled.experience.visualPrompt,
         reading_guide: compiled.experience.readingGuide,
         scenario: compiled.experience.scenario,
@@ -190,7 +209,9 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
         glossary: compiled.experience.glossary,
         readiness: compiled.experience.readiness,
       },
-      generation_status: 'generated',
+      // Authored content is ready, but the lesson is not generated until its
+      // locked media package has rendered and passed the canonical quality gate.
+      generation_status: 'generating',
     };
   });
 

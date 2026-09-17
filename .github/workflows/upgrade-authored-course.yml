@@ -18,12 +18,14 @@ concurrency:
 jobs:
   upgrade:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 360
     env:
       NODE_ENV: production
       SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
       COURSE_ID: ${{ github.event_name == 'workflow_dispatch' && inputs.course_id || '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17' }}
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +46,7 @@ jobs:
         run: |
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
+          test -n "$CRON_SECRET"
 
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false --prod=false
@@ -51,5 +54,37 @@ jobs:
       - name: Prove the complete Barber blueprint compiles
         run: pnpm vitest run tests/unit/course-factory/authored-content-compiler.test.ts
 
-      - name: Upgrade the exact authored course without changing publication or media ownership
+      - name: Upgrade the exact authored course and enqueue missing media
         run: node --import tsx scripts/course-factory/upgrade-authored-course.ts --course-id "$COURSE_ID"
+
+      - name: Run the exact course media queue to completion
+        shell: bash
+        run: |
+          set -euo pipefail
+          while true; do
+            status=$(curl -sS --connect-timeout 30 --max-time 1800 \
+              -o /tmp/video-worker.json -w '%{http_code}' \
+              -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "Content-Type: application/json" \
+              --data "{\"courseId\":\"$COURSE_ID\",\"maxJobs\":4}")
+            cat /tmp/video-worker.json
+            case "$status" in
+              200|202) ;;
+              *) echo "::error::Video worker returned HTTP $status"; exit 1 ;;
+            esac
+            outcome=$(node -e "const p=require('/tmp/video-worker.json'); if(p.ok!==true) process.exit(1); process.stdout.write(String(p.reason || (p.started ? 'started' : 'queue-empty')))")
+            case "$outcome" in
+              course-builder-generation-paused|course-generation-paused)
+                echo "::error::Media generation is paused: $outcome"; exit 1 ;;
+              render-capacity-full)
+                sleep 30; continue ;;
+              queue-empty)
+                break ;;
+              *)
+                sleep 5 ;;
+            esac
+          done
+
+      - name: Verify every required lesson video is playable
+        run: node --import tsx scripts/course-factory/verify-course-media.ts --course-id "$COURSE_ID"

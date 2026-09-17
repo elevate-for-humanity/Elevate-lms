@@ -1,0 +1,39 @@
+name: Audit Telnyx Voice Account
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/northflank/audit-telnyx.ts'
+      - '.github/workflows/audit-telnyx.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: telnyx-account-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Audit complete Telnyx voice configuration
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_SECRET_GROUP_ID: ${{ secrets.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env' }}
+      TELNYX_API_KEY: ${{ secrets.TELNYX_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Audit account-wide Telnyx voice configuration
+        run: pnpm tsx scripts/northflank/audit-telnyx.ts

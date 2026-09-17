@@ -339,25 +339,30 @@ export function buildAtomicPayload(
                               practice: 'knowledge_check',
                               summary: 'memory_recap',
                             };
+                            const onScreenText = Array.isArray(scene.onScreenText)
+                              ? scene.onScreenText.slice(0, 3).map(String)
+                              : [];
+                            const teachingAction = `Display the lesson evidence: ${onScreenText.join(' | ')}`;
+                            const dialogue =
+                              String(scene.purpose) === 'practice' && onScreenText.length > 1
+                                ? `${scene.narration} ${onScreenText.slice(1).join(' ')}`
+                                : scene.narration;
                             return {
                               id: scene.id ?? `${lesson.slug}-scene-${sceneIndex + 1}`,
                               subject: lesson.title,
-                              action: scene.visualDirection,
-                              dialogue: scene.narration,
+                              action: teachingAction,
+                              dialogue,
                               duration_seconds:
                                 Number(scene.endTime) > Number(scene.startTime)
                                   ? Number(scene.endTime) - Number(scene.startTime)
                                   : undefined,
                               procedure_phase: scene.purpose,
-                              required_visual_evidence: scene.visualDirection,
+                              required_visual_evidence: teachingAction,
                               scene_type:
                                 sceneTypeByPurpose[String(scene.purpose)] ?? 'mental_model',
-                              visual_style:
-                                'lesson-specific instructional demonstration with concise captions',
+                              visual_style: `${scene.visualDirection ?? ''} Lesson-specific instructional demonstration with concise captions`,
                               overlay_template: 'caption-only-v1',
-                              on_screen_text: Array.isArray(scene.onScreenText)
-                                ? scene.onScreenText.slice(0, 3)
-                                : [],
+                              on_screen_text: onScreenText,
                               source_references: Array.isArray(scene.sourceReferences)
                                 ? scene.sourceReferences
                                 : [],

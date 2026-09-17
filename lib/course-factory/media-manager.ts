@@ -196,10 +196,14 @@ export async function recoverCourseMediaJobs(input: { courseId?: string | null; 
       ? new Date(row.started_at).getTime() < staleBefore
       : false;
     const stale = leaseExpired || legacyStale;
+    // A failed render must remain failed until an operator has corrected the
+    // underlying source or renderer and explicitly requests recovery. Time
+    // passing alone is not authority to repeat an identical expensive render.
     const eligibleFailed =
+      input.force === true &&
       row.status === 'failed' &&
       isCourseMediaFailureRetryable(row.error_message) &&
-      (input.force === true || retryBackoffElapsed(row, now));
+      retryBackoffElapsed(row, now);
     if (!stale && !eligibleFailed) continue;
     try {
       await resetCanonicalMediaJob(

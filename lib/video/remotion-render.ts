@@ -72,6 +72,8 @@ export interface RemotionRenderResult {
   sceneData?: MediaStoryboard;
 }
 
+const STORYBOARD_RENDER_FPS = 15;
+
 export interface StoryboardRenderInput {
   lessonId: string;
   courseTitle: string;
@@ -127,7 +129,7 @@ export function buildStoryboardWebVtt(scenes: SceneData[]): string {
   let cursor = 1;
   const cues = scenes.map((scene, index) => {
     const start = cursor;
-    cursor += scene.durationFrames / 30;
+    cursor += scene.durationFrames / STORYBOARD_RENDER_FPS;
     return `${index + 1}\n${vttTimestamp(start)} --> ${vttTimestamp(cursor)}\n${scene.narration}`;
   });
   return `WEBVTT\n\n${cues.join('\n\n')}\n`;
@@ -687,7 +689,7 @@ export async function renderStoryboardVideo(
         clipUrl,
         imageUrl,
         audioSrc,
-        durationFrames: Math.ceil(durationSeconds * 30),
+        durationFrames: Math.ceil(durationSeconds * STORYBOARD_RENDER_FPS),
         sceneType: scene.sceneType,
         memoryAnchor: scene.memoryAnchor,
       });
@@ -706,7 +708,7 @@ export async function renderStoryboardVideo(
       surfaceMode: 'bright',
       logoText: 'Elevate LMS',
     };
-    const totalFrames = 90 + normalizedScenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
+    const totalFrames = STORYBOARD_RENDER_FPS * 3 + normalizedScenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
     const bundleUrl = await getBundleUrl();
     const { renderMedia, selectComposition } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
@@ -764,7 +766,7 @@ export async function renderStoryboardVideo(
     return {
       success: true,
       videoUrl,
-      duration: totalFrames / 30,
+      duration: totalFrames / STORYBOARD_RENDER_FPS,
       method: 'remotion-free',
       sceneData: resolvedStoryboard,
     };

@@ -1,4 +1,4 @@
-merge_sha=a696018d2c7b3c0d711740f5ba28481ca222d957
-services=all
-requested_at=2026-09-17T13:20:00Z
-reason=deploy-current-main-all-northflank-services
+merge_sha=09ae98d236171226d72a27387755effe0ff6306c
+services=lms
+requested_at=2026-09-17T13:36:00Z
+reason=repair-lms-video-job-lease-contract

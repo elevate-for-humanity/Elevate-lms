@@ -59,7 +59,7 @@ jobs:
         run: pnpm vitest run tests/unit/course-factory/authored-content-compiler.test.ts
 
       - name: Upgrade the exact authored course and enqueue missing media
-        run: node --import tsx scripts/course-factory/upgrade-authored-course.ts --course-id "$COURSE_ID"
+        run: node --conditions=react-server --import tsx scripts/course-factory/upgrade-authored-course.ts --course-id "$COURSE_ID"
 
       - name: Run the exact course media queue to completion
         shell: bash
@@ -91,4 +91,4 @@ jobs:
           done
 
       - name: Verify every required lesson video is playable
-        run: node --import tsx scripts/course-factory/verify-course-media.ts --course-id "$COURSE_ID"
+        run: node --conditions=react-server --import tsx scripts/course-factory/verify-course-media.ts --course-id "$COURSE_ID"

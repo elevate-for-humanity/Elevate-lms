@@ -318,6 +318,66 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
   const narrationScript = clean(
     `${input.lessonTitle}. ${objectives.join(' ')} ${sections.map((section) => `${section.heading}. ${section.body}`).join(' ')}`,
   ).slice(0, 12000);
+  const timelineScenes = [
+    {
+      id: `${input.lessonSlug}-scene-1`,
+      purpose: 'introduction' as const,
+      visualType: 'instructor' as const,
+      narration: clean(`${input.lessonTitle}. In this lesson you will ${objective0}`),
+      visualDirection: `Elevate instructor introduces ${input.lessonTitle} beside a labeled lesson roadmap.`,
+      onScreenText: [input.lessonTitle, objectiveLabel(objective0)],
+      sourceReferences: [`Authored lesson objective: ${objective0}`],
+    },
+    {
+      id: `${input.lessonSlug}-scene-2`,
+      purpose: 'explanation' as const,
+      visualType: 'animated-text' as const,
+      narration: clean(`${section0.heading}. ${section0.body}`),
+      visualDirection: `Readable teaching slide explaining ${section0.heading} with three concise evidence-based points.`,
+      onScreenText: [section0.heading, ...objectives.slice(0, 2).map(objectiveLabel)],
+      sourceReferences: [`Authored section: ${section0.heading}`],
+    },
+    {
+      id: `${input.lessonSlug}-scene-3`,
+      purpose: 'diagram' as const,
+      visualType: 'technical-diagram' as const,
+      narration: clean(`${section1.heading}. ${section1.body}`),
+      visualDirection: `Labeled technical diagram showing the sequence, decision points, and evidence for ${section1.heading}.`,
+      onScreenText: [section1.heading, 'Correct sequence', 'Evidence to check'],
+      sourceReferences: [`Authored section: ${section1.heading}`],
+    },
+    {
+      id: `${input.lessonSlug}-scene-4`,
+      purpose: 'demonstration' as const,
+      visualType: 'equipment-image' as const,
+      narration: clean(`Worked example. Apply this objective: ${objective0}. ${section2.body}`),
+      visualDirection: `Side-by-side correct and incorrect worked examples for ${input.lessonTitle}, with labels identifying the observable difference.`,
+      onScreenText: ['Worked example', 'Correct', 'Needs correction'],
+      sourceReferences: [`Authored section: ${section2.heading}`],
+    },
+    {
+      id: `${input.lessonSlug}-scene-5`,
+      purpose: 'practice' as const,
+      visualType: 'screen-demonstration' as const,
+      narration: clean(`Now practice: ${objective1}. Use the lesson evidence before choosing your response.`),
+      visualDirection: `Guided practice slide presenting a realistic ${input.lessonTitle} decision and visible evidence for the learner to inspect.`,
+      onScreenText: ['Your turn', question0.question],
+      sourceReferences: [`Authored assessment: ${question0.question}`],
+    },
+    {
+      id: `${input.lessonSlug}-scene-6`,
+      purpose: 'summary' as const,
+      visualType: 'animated-text' as const,
+      narration: clean(`Review the key lesson outcomes: ${objectives.slice(0, 3).join(' ')}`),
+      visualDirection: `Accessible recap slide with the three lesson outcomes and the completed-work evidence learners should retain.`,
+      onScreenText: ['Lesson recap', ...objectives.slice(0, 3).map(objectiveLabel)],
+      sourceReferences: sections.slice(0, 3).map((section) => `Authored section: ${section.heading}`),
+    },
+  ].map((scene, index) => ({
+    ...scene,
+    startTime: index * 60,
+    endTime: (index + 1) * 60,
+  }));
 
   const experience = CourseExperienceSchema.parse({
     readingGuide: {
@@ -404,6 +464,32 @@ export function compileAuthoredLessonExperience(input: AuthoredLessonInput): {
         `${input.lessonTitle} exercise completion`,
         `${input.lessonTitle} practical evidence`,
       ],
+    },
+    instructionalTimeline: {
+      version: 1,
+      width: 1920,
+      height: 1080,
+      fps: 30,
+      durationSeconds: 360,
+      scenes: timelineScenes,
+      captions: timelineScenes.map((scene) => ({
+        start: scene.startTime,
+        end: scene.endTime,
+        text: scene.narration,
+      })),
+      events: [
+        {
+          type: 'question',
+          id: `${input.lessonSlug}-timeline-check`,
+          at: 300,
+          questionId: question0.id ?? `${input.lessonSlug}-q1`,
+          required: true,
+        },
+      ],
+      requiredWatchPercent: 95,
+      minimumSeatTimeSeconds: 300,
+      preventSeekPastRequiredEvents: true,
+      resumeEnabled: true,
     },
   });
 

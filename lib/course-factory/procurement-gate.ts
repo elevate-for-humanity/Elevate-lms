@@ -91,6 +91,44 @@ function requireExperienceAssets(
       'Self-paced lesson requires an accessible visual specification.',
     );
   }
+  const timeline = experience.instructionalTimeline;
+  const timelineScenes = Array.isArray(timeline?.scenes) ? timeline.scenes : [];
+  const requiredScenePurposes = [
+    'introduction',
+    'explanation',
+    'demonstration',
+    'practice',
+    'summary',
+  ];
+  if (
+    timelineScenes.length < 6 ||
+    requiredScenePurposes.some(
+      (purpose) => !timelineScenes.some((scene: Record<string, any>) => scene?.purpose === purpose),
+    )
+  ) {
+    add(
+      'error',
+      'INSTRUCTIONAL_TIMELINE_REQUIRED',
+      `${path}.content.experience.instructionalTimeline`,
+      'Every lesson requires at least six sourced slides: introduction, explanation, visual example, demonstration, guided practice, and summary.',
+    );
+  }
+  if (
+    !timelineScenes.some(
+      (scene: Record<string, any>) =>
+        ['diagram', 'demonstration', 'practice'].includes(String(scene?.purpose ?? '')) &&
+        ['equipment-image', 'technical-diagram', 'screen-demonstration'].includes(
+          String(scene?.visualType ?? ''),
+        ),
+    )
+  ) {
+    add(
+      'error',
+      'WORKED_VISUAL_EXAMPLE_REQUIRED',
+      `${path}.content.experience.instructionalTimeline.scenes`,
+      'Every lesson requires a concrete, sourced visual example showing correct application.',
+    );
+  }
   if (!Array.isArray(experience.flashcards) || experience.flashcards.length < 6) {
     add(
       'error',

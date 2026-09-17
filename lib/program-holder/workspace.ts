@@ -20,6 +20,13 @@ export type ProgramHolderWorkspace = {
   imageReleaseConsent: any | null;
   contactAccessGranted: boolean;
   requiresEnchantedHeartsTerms: boolean;
+  phoneLine: {
+    id: string;
+    e164: string;
+    label: string;
+    extension: string | null;
+    status: string;
+  } | null;
 };
 
 /** Canonical, holder-scoped data contract shared by every Program Holder page. */
@@ -46,6 +53,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       imageReleaseConsent: null,
       contactAccessGranted: false,
       requiresEnchantedHeartsTerms: false,
+      phoneLine: null,
     };
   }
 
@@ -94,6 +102,8 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     payoutRes,
     schedulesRes,
     notificationRes,
+    phoneLineRes,
+    extensionRes,
   ] = await Promise.all([
     programIds.length
       ? db
@@ -187,10 +197,50 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .order('created_at', { ascending: false }),
     db
       .from('notification_preferences')
-      .select('email_course_updates,sms_urgent,sms_phone,email_delivery_updates,sms_delivery_updates,paris_orientation_completed_at')
+      .select(
+        'email_course_updates,sms_urgent,sms_phone,email_delivery_updates,sms_delivery_updates,paris_orientation_completed_at',
+      )
       .eq('user_id', profile.id)
       .maybeSingle(),
+    db
+      .from('phone_numbers')
+      .select('id,e164,label,extension,status')
+      .eq('assigned_profile_id', profile.id)
+      .neq('status', 'released')
+      .order('is_primary', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    db
+      .from('communication_extensions')
+      .select('extension,workspace:communication_workspaces(phone_system_id)')
+      .eq('profile_id', profile.id)
+      .eq('enabled', true)
+      .limit(1)
+      .maybeSingle(),
   ]);
+
+  let phoneLine = phoneLineRes.data ?? null;
+  const extension = extensionRes.data?.extension ?? phoneLine?.extension ?? null;
+  const workspaceValue = extensionRes.data?.workspace as
+    | { phone_system_id?: string | null }
+    | { phone_system_id?: string | null }[]
+    | null
+    | undefined;
+  const phoneSystemId = Array.isArray(workspaceValue)
+    ? workspaceValue[0]?.phone_system_id
+    : workspaceValue?.phone_system_id;
+  if (!phoneLine && phoneSystemId) {
+    const { data: primaryLine } = await db
+      .from('phone_numbers')
+      .select('id,e164,label,status')
+      .eq('phone_system_id', phoneSystemId)
+      .eq('is_primary', true)
+      .neq('status', 'released')
+      .maybeSingle();
+    phoneLine = primaryLine ? { ...primaryLine, extension } : null;
+  } else if (phoneLine) {
+    phoneLine = { ...phoneLine, extension };
+  }
 
   return {
     mode: 'holder',
@@ -237,6 +287,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     imageReleaseConsent: imageReleaseRes.data ?? null,
     contactAccessGranted,
     requiresEnchantedHeartsTerms,
+    phoneLine,
   };
 }
 

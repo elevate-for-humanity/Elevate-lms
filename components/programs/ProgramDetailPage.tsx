@@ -181,6 +181,46 @@ export default function ProgramDetailPage({
 
   return (
     <main className="min-h-screen bg-white [&_a]:no-underline [&_a:hover]:no-underline">
+      {showPriorityFundingPath ? (
+        <section className="border-b-4 border-emerald-950 bg-emerald-700 px-4 py-8 text-white sm:py-10">
+          <div className="mx-auto max-w-6xl text-center">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100">
+              HVAC · CDL · Bookkeeping · Business
+            </p>
+            <h1 className="mt-3 text-4xl font-black uppercase leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+              Training may be free if you qualify.
+            </h1>
+            <p className="mx-auto mt-4 max-w-4xl text-lg font-bold leading-8 text-white sm:text-xl">
+              Complete the program application, then schedule your WorkOne intake. WorkOne or the
+              responsible agency confirms eligibility and provides the written authorization
+              required for funded enrollment.
+            </p>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
+              <Link
+                href={applicationHref}
+                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-white px-7 py-4 text-base font-black text-emerald-950 hover:bg-emerald-50"
+              >
+                <ClipboardList className="h-5 w-5" />
+                Complete Application
+              </Link>
+              <a
+                href={WORKONE_INDY_BOOKING_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-xl border-2 border-white bg-emerald-950 px-7 py-4 text-base font-black text-white hover:bg-slate-950"
+              >
+                <CalendarDays className="h-5 w-5" />
+                Schedule WorkOne Intake
+              </a>
+            </div>
+            <p className="mt-4 text-xs font-semibold leading-5 text-emerald-100">
+              Funding depends on participant eligibility, program eligibility, available funds,
+              and agency authorization. Funding is not automatic.
+            </p>
+          </div>
+        </section>
+      ) : null}
+
       {/* A. HERO */}
       <section>
         {heroOverride ??
@@ -1028,7 +1068,7 @@ export default function ProgramDetailPage({
               {/* Every published self-pay program uses the canonical server-created checkout.
                   This provides the payment calculator, BNPL eligibility, and coupon entry
                   without depending on a legacy hard-coded Stripe URL. */}
-              {enrollmentTracks.selfPay.available && selfPayNumeric > 0 && (
+              {enrollmentTracks.selfPay.available && selfPayNumeric > 0 && p.slug !== 'hvac-technician' && (
                 <div className="mt-4 mb-4">
                   <PaymentPlanCalculator programSlug={p.slug} />
                 </div>

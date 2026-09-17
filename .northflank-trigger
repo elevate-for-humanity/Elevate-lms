@@ -1,4 +1,3 @@
-merge_sha=09ae98d236171226d72a27387755effe0ff6306c
-services=lms
-requested_at=2026-09-17T13:36:00Z
-reason=repair-lms-video-job-lease-contract
+services=all
+requested_at=2026-09-17T14:24:00Z
+reason=deploy-current-main

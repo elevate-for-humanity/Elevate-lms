@@ -31,6 +31,8 @@ overrides:
   uuid: ^11.0.0
   postcss: ^8.5.18
   '@playwright/test': 1.57.0
+  playwright: 1.57.0
+  playwright-core: 1.57.0
   '@opentelemetry/core': ^2.9.0
   '@opentelemetry/sdk-node': ^0.220.0
   '@opentelemetry/exporter-trace-otlp-http': ^0.220.0

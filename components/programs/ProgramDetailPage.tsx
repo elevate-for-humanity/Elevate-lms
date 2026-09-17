@@ -212,11 +212,46 @@ export default function ProgramDetailPage({
                 <CalendarDays className="h-5 w-5" />
                 Schedule WorkOne Intake
               </a>
+              <a
+                href="#payment-options"
+                className="inline-flex min-h-14 items-center justify-center rounded-xl border-2 border-white bg-transparent px-7 py-4 text-base font-black text-white hover:bg-white/10"
+              >
+                See Payment Options
+              </a>
             </div>
-            <p className="mt-4 text-xs font-semibold leading-5 text-emerald-100">
+            <p className="mx-auto mt-5 max-w-4xl text-sm font-bold leading-6 text-emerald-50">
+              If you do not qualify, you can still enroll using pay-in-full, an available
+              installment plan, buy now/pay later when approved by the payment provider, or
+              employer-sponsored training. Exact terms are shown before you commit.
+            </p>
+            <p className="mt-3 text-xs font-semibold leading-5 text-emerald-100">
               Funding depends on participant eligibility, program eligibility, available funds,
               and agency authorization. Funding is not automatic.
             </p>
+          </div>
+        </section>
+      ) : isApprenticeship ? (
+        <section className="border-b-4 border-slate-950 bg-brand-red-700 px-4 py-8 text-white sm:py-10">
+          <div className="mx-auto max-w-6xl text-center">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-red-100">
+              Registered apprenticeship pathway
+            </p>
+            <h1 className="mt-3 text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+              Earn while you learn—with structured training and a Host Site.
+            </h1>
+            <p className="mx-auto mt-4 max-w-4xl text-lg font-bold leading-8 text-white">
+              Apply to the program, complete intake, connect with an approved employer or Host
+              Site, complete supervised on-the-job learning and related instruction, and document
+              your progress toward completion.
+            </p>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href={applicationHref} className="inline-flex min-h-14 items-center justify-center rounded-xl bg-white px-7 py-4 text-base font-black text-brand-red-800 hover:bg-red-50">
+                Apply for Apprenticeship
+              </Link>
+              <a href="#program-overview" className="inline-flex min-h-14 items-center justify-center rounded-xl border-2 border-white px-7 py-4 text-base font-black text-white hover:bg-white/10">
+                See How It Works
+              </a>
+            </div>
           </div>
         </section>
       ) : null}
@@ -464,6 +499,73 @@ export default function ProgramDetailPage({
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="program-overview" className="border-y border-slate-200 bg-slate-50 px-4 py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-4xl">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+              Everything you need to know
+            </p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+              How the {p.title} program works
+            </h2>
+            <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg">
+              {isApprenticeship
+                ? 'This is an earn-while-you-learn pathway combining supervised work at an approved Host Site with required related instruction, progress tracking, and completion documentation.'
+                : `This is a ${durationLabel} ${p.deliveryMode === 'hybrid' ? 'hybrid' : p.deliveryMode === 'online' ? 'online' : 'in-person'} training pathway. You apply, complete intake, follow the published training and assessment plan, earn the listed credentials when requirements are met, and receive career-support services.`}
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-black text-slate-950">Program format</h3>
+              <dl className="mt-4 space-y-3 text-sm">
+                <div><dt className="font-bold text-slate-500">Length</dt><dd className="mt-1 font-black text-slate-950">{durationLabel}</dd></div>
+                <div><dt className="font-bold text-slate-500">Weekly schedule</dt><dd className="mt-1 font-black text-slate-950">{p.schedule || `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hours per week`}</dd></div>
+                <div><dt className="font-bold text-slate-500">Delivery</dt><dd className="mt-1 font-black capitalize text-slate-950">{p.deliveryMode}</dd></div>
+                <div><dt className="font-bold text-slate-500">Credentials</dt><dd className="mt-1 font-black text-slate-950">{p.credentials.length} listed credential{p.credentials.length === 1 ? '' : 's'}</dd></div>
+              </dl>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-black text-slate-950">Your next steps</h3>
+              <ol className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
+                <li><strong className="text-slate-950">1. Apply:</strong> Select this program and submit your contact, readiness, and funding information.</li>
+                <li><strong className="text-slate-950">2. Complete intake:</strong> Admissions confirms requirements, documents, schedule, and the correct enrollment path.</li>
+                <li><strong className="text-slate-950">3. Start training:</strong> Complete lessons, hands-on work, assessments, attendance, and progress requirements.</li>
+                <li><strong className="text-slate-950">4. Finish:</strong> Complete required credentials and use career or placement support.</li>
+              </ol>
+            </div>
+
+            <div id="payment-options" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+              <h3 className="text-xl font-black text-slate-950">Funding and payment options</h3>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
+                {showPriorityFundingPath ? (
+                  <li><strong className="text-slate-950">Workforce funding:</strong> Training may be free if you qualify and receive agency authorization.</li>
+                ) : null}
+                <li><strong className="text-slate-950">Pay in full:</strong> Pay the published tuition through the secure enrollment process.</li>
+                <li><strong className="text-slate-950">Payment plan:</strong> Split eligible tuition into installments; deposit and terms are shown before acceptance.</li>
+                <li><strong className="text-slate-950">Buy now/pay later:</strong> Apply through the available provider; approval and terms are determined by that provider.</li>
+                <li><strong className="text-slate-950">Employer-sponsored:</strong> An employer may pay eligible costs when an arrangement is approved.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link href={applicationHref} className="inline-flex min-h-14 items-center justify-center rounded-xl bg-brand-red-700 px-7 py-4 text-base font-black text-white hover:bg-brand-red-800">
+              Apply to {p.title}
+            </Link>
+            {showPriorityFundingPath ? (
+              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center rounded-xl bg-emerald-700 px-7 py-4 text-base font-black text-white hover:bg-emerald-800">
+                Schedule WorkOne Intake
+              </a>
+            ) : null}
+            <Link href={requestInfoHref} className="inline-flex min-h-14 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-7 py-4 text-base font-black text-slate-950 hover:bg-slate-50">
+              Request Program Information
+            </Link>
           </div>
         </div>
       </section>
@@ -970,7 +1072,7 @@ export default function ProgramDetailPage({
       )}
 
       {/* ENROLLMENT TRACKS */}
-      <section className="py-14 border-y border-slate-100">
+      <section id="enrollment-options" className="py-14 border-y border-slate-100">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-10">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-green-600 mb-3">

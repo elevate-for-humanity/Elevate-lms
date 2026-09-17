@@ -53,6 +53,7 @@ async function main() {
   if (!projectId) throw new Error('NORTHFLANK_PROJECT_ID is required');
   const group = await nfFetch<Json>(projectApiPath(projectId, `/secrets/${groupId}`));
   const apiKey = process.env.TELNYX_API_KEY?.trim() || findSecret(group, 'TELNYX_API_KEY');
+  const publicKey = process.env.TELNYX_PUBLIC_KEY?.trim() || findSecret(group, 'TELNYX_PUBLIC_KEY');
   if (!apiKey) throw new Error('TELNYX_API_KEY is unavailable');
 
   const results = await Promise.all([
@@ -85,6 +86,7 @@ async function main() {
   const status = String(number?.status || '').toLowerCase();
   const checks = {
     api_authenticated: results.every((r) => r.name === 'balance' || r.ok),
+    webhook_signature_key_configured: Boolean(publicKey),
     owned_number_count: numbers.length,
     expected_number_found: Boolean(number),
     expected_number_matches: number?.phone_number === expectedNumber,
@@ -107,6 +109,7 @@ async function main() {
   console.log('AUDIT HEALTH ' + JSON.stringify(checks));
 
   const blockers: string[] = [];
+  if (!checks.webhook_signature_key_configured) blockers.push('TELNYX_PUBLIC_KEY is missing from production secrets');
   if (!checks.expected_number_found) blockers.push('expected number record missing');
   if (!checks.expected_number_matches) blockers.push('number ID maps to a different number');
   if (status && !['active', 'purchased'].includes(status)) blockers.push(`number status is ${status}`);

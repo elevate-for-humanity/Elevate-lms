@@ -50,7 +50,7 @@ for (const id of ['elevate-production-env', 'telnyx-api-key']) {
 if (!apiKey) throw new Error('TELNYX_API_KEY was not found in Northflank');
 
 const response = await fetch(
-  `https://api.telnyx.com/v2/verified_numbers?filter[phone_number]=${encodeURIComponent(NUMBER)}`,
+  'https://api.telnyx.com/v2/verified_numbers',
   { headers: { Authorization: `Bearer ${apiKey}` } },
 );
 const json = await response.json();

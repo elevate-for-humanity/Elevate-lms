@@ -69,15 +69,23 @@ function isOpenHandsStatusCommand(lower: string): boolean {
 
 function isEngineeringCommand(lower: string): boolean {
   if (/\bopenhands\b/.test(lower)) return true;
+  // Operators frequently refer to the product by its visible name (and by
+  // voice-to-text variants) instead of saying "repository" or "component".
+  // A repair request for these engineering surfaces must never fall through
+  // to advisory chat, because advisory chat cannot change or verify code.
+  const studioSurface =
+    /\b(?:dev(?:iant|int|in)?|div(?:iant|int)|elevate)\s+studio\b|\badmin\s+ai\b|\bcourse\s+builder\b/.test(
+      lower,
+    );
   const engineeringNoun =
     /\b(code|codebase|repo|repository|github|pull request|pr\b|branch|commit|typescript|javascript|route|component|api endpoint|test file|regression test|ci\b|workflow|workflow file|source file|container|devcontainer|studio workspace)\b/.test(
       lower,
     );
   const engineeringVerb =
-    /\b(fix|debug|refactor|implement|modify|change|update|edit|review|write|add|remove|clean up|cleanup|test)\b/.test(
+    /\b(fix|repair|correct|debug|refactor|implement|modify|change|update|edit|review|write|add|remove|clean up|cleanup|test)\b/.test(
       lower,
     );
-  return engineeringNoun && engineeringVerb;
+  return (engineeringNoun || studioSurface) && engineeringVerb;
 }
 
 function isEngineeringExecutionCommand(lower: string): boolean {

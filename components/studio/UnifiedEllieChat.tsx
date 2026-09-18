@@ -201,12 +201,18 @@ function ConversationActivity({ conversationId }: { conversationId: string | nul
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                 ) : task.status === 'failed' ? (
                   <XCircle className="h-4 w-4 text-red-600" />
+                ) : task.status === 'blocked' ? (
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
                 ) : (
                   <Loader2 className={`h-4 w-4 text-blue-600 ${waiting ? '' : 'animate-spin'}`} />
                 )}
                 <span className="min-w-0 flex-1 font-bold text-slate-900">{task.title}</span>
                 <span className="rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-600">
-                  {task.status.replaceAll('_', ' ')}
+                  {task.status === 'failed'
+                    ? 'execution failed'
+                    : task.status === 'blocked'
+                      ? 'capability required'
+                      : task.status.replaceAll('_', ' ')}
                 </span>
                 {waiting ? (
                   <button
@@ -388,6 +394,7 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
   const verified = required.filter((step) => step.status === 'verified').length;
   const percent = required.length ? Math.round((verified / required.length) * 100) : 0;
   const terminal = ['completed', 'failed', 'cancelled'].includes(payload.run.status);
+  const blocked = payload.run.status === 'blocked';
   const latestEvent = payload.events[payload.events.length - 1];
 
   return (
@@ -402,6 +409,8 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
             <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
           ) : payload.run.status === 'failed' ? (
             <XCircle className="h-5 w-5 text-red-600" aria-hidden="true" />
+          ) : blocked ? (
+            <AlertTriangle className="h-5 w-5 text-amber-600" aria-hidden="true" />
           ) : (
             <Loader2 className="h-5 w-5 animate-spin text-brand-blue-700" aria-hidden="true" />
           )}
@@ -414,12 +423,12 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
             </p>
           </div>
           <span className="rounded-full bg-white px-2 py-1 text-[10px] font-black uppercase tracking-wide text-brand-blue-800 ring-1 ring-blue-200">
-            {terminal ? 'Final state' : 'Live'}
+            {terminal ? 'Final state' : blocked ? 'Action required' : 'Live'}
           </span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-white ring-1 ring-blue-100">
           <div
-            className={`h-full rounded-full transition-all ${payload.run.status === 'failed' ? 'bg-red-500' : 'bg-brand-blue-700'}`}
+            className={`h-full rounded-full transition-all ${payload.run.status === 'failed' ? 'bg-red-500' : blocked ? 'bg-amber-500' : 'bg-brand-blue-700'}`}
             style={{ width: `${percent}%` }}
           />
         </div>
@@ -433,6 +442,8 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
               ) : step.status === 'failed' ? (
                 <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" aria-hidden="true" />
+              ) : step.status === 'blocked' ? (
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
               ) : step.status === 'running' ? (
                 <Loader2 className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-blue-600" aria-hidden="true" />
               ) : (

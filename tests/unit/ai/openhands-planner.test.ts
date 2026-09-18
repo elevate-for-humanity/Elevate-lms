@@ -10,6 +10,16 @@ describe('OpenHands engineering delegation', () => {
     expect(planned?.input.task).toContain('Fix the broken TypeScript route');
   });
 
+  it.each([
+    'Can you fix the Dev Studio? It is generic.',
+    'Can you fix the divint studio its generic',
+    'Repair Admin AI so live tools execute',
+  ])('routes named Studio repair work to OpenHands: %s', (command) => {
+    const planned = planAIToolFromCommand(command);
+    expect(planned?.name).toBe('openhands.execute');
+    expect(planned?.input.task).toBe(command);
+  });
+
   it('routes compound browser and repository repair to OpenHands', () => {
     const command =
       'Fix every public Store demo in the live browser and repository, including claims that do not match the real workflow';

@@ -386,7 +386,7 @@ async function _POST(request: NextRequest) {
         resolvedPartnerId = shop?.partner_id ?? null;
       }
       if (!resolvedPartnerId) {
-        logger.error('[Timeclock] no partner configured for apprentice site', undefined, {
+        logger.warn('[Timeclock] no partner configured for apprentice site', {
           apprentice_id: apprentice.id,
           site_id,
           shop_id: site.shop_id,

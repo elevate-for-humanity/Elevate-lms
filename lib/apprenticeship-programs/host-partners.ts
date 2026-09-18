@@ -78,6 +78,29 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     socialLabel: 'Photos, video & social',
   },
   {
+    slug: 'top-shelf-barber-lounge',
+    name: 'Top Shelf Barber Lounge',
+    businessType: 'BarberShop',
+    city: 'Elkhart',
+    state: 'IN',
+    zip: '46514',
+    address: '1600 E Bristol St',
+    phone: '(574) 268-8532',
+    programs: ['barber-apprenticeship'],
+    note: 'Elkhart barber lounge and active apprenticeship host shop.',
+    marketingBlurb:
+      "An Elkhart barbershop offering fades, shape ups, beard trims, children's haircuts, shear cuts, and supervised barber apprenticeship experience.",
+    media: [
+      {
+        src: 'https://d2ugbn5gb88fyp.cloudfront.net/1265883/0_0.jpg',
+        alt: 'Top Shelf Barber Lounge barber providing a haircut',
+        kind: 'photo',
+      },
+    ],
+    websiteUrl: 'https://barbershopelkhart.com/',
+    websiteLabel: 'Visit Top Shelf Barber Lounge',
+  },
+  {
     slug: 'cals-kutz-studio',
     name: 'Cals Kutz Studio',
     businessType: 'BarberShop',

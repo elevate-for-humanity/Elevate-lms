@@ -30,7 +30,7 @@ const BARBER_HERO_IMAGE =
 const BARBER_RTI_HOURS = 260;
 // Approved, conversational hero narration for the featured Kountry Kutz host shop.
 const KOUNTRY_KUTZ_HERO_TRANSCRIPT =
-  "Welcome to the Barber Apprenticeship program and your tour of Kountry Kutz Barbershop in New Palestine, Indiana. Kountry Kutz is a participating apprenticeship Host Shop where approved apprentices connect structured technical instruction with supervised experience in a working barbershop. As the video moves through the shop, notice the professional workstations and real client-service environment used to build skills in sanitation, haircutting, grooming, workplace safety, communication, and daily shop routines. Continue down the page to learn how the apprenticeship works, review participating Host Shops, and apply. Placement, wages, supervision, enrollment, and licensing requirements are confirmed through Elevate before training begins.";
+  "Welcome to the Barber Apprenticeship program. Right now, you're getting a look inside Kountry Kutz Barbershop in New Palestine, Indiana. This is the kind of real workplace where an approved apprentice can learn, practice, and grow under qualified supervision. As the tour moves through the shop, imagine yourself building confidence at these workstations. You will learn how to protect every client through proper sanitation and safety. You will strengthen your haircutting and grooming skills. And you will learn the communication and daily routines that turn technical ability into professional service. Keep going when you're ready. The next sections explain how apprenticeship works, introduce participating Host Shops, and show you how to apply. Elevate confirms placement, wages, supervision, enrollment, and licensing requirements before training begins."
 
 const FLOW = [
   {
@@ -99,7 +99,7 @@ export default async function BarberApprenticeshipPage() {
         }}
       />
 
-      <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT}>
+      <div data-scroll-narration data-narration={KOUNTRY_KUTZ_HERO_TRANSCRIPT} data-narration-rate="0.84" data-narration-style="instructor">
         <HeroVideo
           videoSrcDesktop="/videos/partners/kountry-kutz/shop-tour.mp4"
           videoSrcMobile="/videos/partners/kountry-kutz/shop-tour.mp4"
@@ -110,7 +110,7 @@ export default async function BarberApprenticeshipPage() {
           transcript={KOUNTRY_KUTZ_HERO_TRANSCRIPT}
           narrateTranscript={false}
           transcriptVoiceStyle="assistant"
-          transcriptVoiceRate={1}
+          transcriptVoiceRate={0.84}
           preloadTranscriptVoice={false}
           analyticsName="barber-apprenticeship"
           heightClassName="h-[clamp(520px,72svh,860px)]"

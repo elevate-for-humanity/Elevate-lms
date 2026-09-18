@@ -5,7 +5,10 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
-const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration';
+// Version the preference after restoring prerecorded scroll narration. This
+// clears stale "off" state left by the previously silent implementation while
+// preserving every new choice the visitor makes from this release onward.
+const NARRATION_PREFERENCE_KEY = 'elevate:scroll-narration:v2';
 
 function narrationFor(section: HTMLElement) {
   return section.dataset.narration?.replace(/\s+/g, ' ').trim().slice(0, 900) ?? '';

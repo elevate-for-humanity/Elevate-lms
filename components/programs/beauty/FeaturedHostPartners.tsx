@@ -211,6 +211,7 @@ export default function FeaturedHostPartners({
                                     src={media.src}
                                     alt={media.alt}
                                     fill
+                                    unoptimized={media.src.startsWith('http')}
                                     sizes="(max-width: 640px) 50vw, 220px"
                                     className="object-contain"
                                   />
@@ -249,6 +250,7 @@ export default function FeaturedHostPartners({
                             src={image.src}
                             alt={image.alt}
                             fill
+                            unoptimized={image.src.startsWith('http')}
                             sizes="(max-width: 1024px) 100vw, 50vw"
                             className="object-contain bg-white"
                           />

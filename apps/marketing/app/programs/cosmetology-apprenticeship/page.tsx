@@ -48,12 +48,8 @@ export default async function CosmetologyApprenticeshipPage() {
       <ProgramDetailPage
         program={program}
         banner={banner}
-        featuredContent={
-          <>
-            <NailDesignShowcase />
-            <FeaturedHostPartners programSlug="cosmetology-apprenticeship" />
-          </>
-        }
+        heroOverride={<NailDesignShowcase asHero />}
+        featuredContent={<FeaturedHostPartners programSlug="cosmetology-apprenticeship" />}
       >
         <BeautyApprenticeshipAuthority program={program} />
       </ProgramDetailPage>

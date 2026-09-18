@@ -189,11 +189,43 @@ jobs:
           # Start each device profile in a fresh Playwright process. This keeps
           # long WCAG sweeps from accumulating browser memory across engines and
           # turning real accessibility results into WebKit/Chromium crashes.
-          for project in desktop-chrome laptop-chrome tablet-chrome iphone-webkit android-chrome; do
+          for project in desktop-chrome laptop-chrome tablet-chrome android-chrome; do
             pnpm exec playwright test tests/e2e/accessibility.spec.ts \
               --config playwright.config.ts \
               --project="$project"
           done
+
+          # WebKit can terminate its shared browser process after repeated Axe
+          # injections on the hosted runner. Preserve the complete iPhone/Safari
+          # checklist while giving every case a clean WebKit process.
+          while IFS= read -r test_title; do
+            pnpm exec playwright test tests/e2e/accessibility.spec.ts \
+              --config playwright.config.ts \
+              --project=iphone-webkit \
+              --grep "$test_title"
+          done <<'EOF'
+          / has no serious or critical axe violations
+          /programs has no serious or critical axe violations
+          /apprenticeships has no serious or critical axe violations
+          /programs/business-administration has no serious or critical axe violations
+          /programs/hvac-technician has no serious or critical axe violations
+          /programs/cdl-training has no serious or critical axe violations
+          /programs/barber-apprenticeship has no serious or critical axe violations
+          /partners/host-shops has no serious or critical axe violations
+          /funding has no serious or critical axe violations
+          /check-eligibility has no serious or critical axe violations
+          /apply has no serious or critical axe violations
+          /contact has no serious or critical axe violations
+          homepage supports keyboard navigation and skip navigation
+          mobile menu can open and close with keyboard
+          visible images expose alt attributes across key public routes
+          visible buttons and links have accessible names
+          apply form controls have programmatic labels
+          homepage heading hierarchy starts with one H1 and does not skip levels
+          color contrast rule is enabled and reports no serious violations on homepage
+          focus indicator is visually present
+          reduced motion preference suppresses long animations
+          EOF
       - name: Homepage config leak smoke
         run: pnpm exec playwright test tests/e2e/home-config-leaks.spec.ts --config playwright.config.ts
       - name: Upload test results

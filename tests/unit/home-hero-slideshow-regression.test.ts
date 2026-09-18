@@ -15,10 +15,10 @@ describe('homepage hero slideshow rendering', () => {
     expect(homepageHero).toContain('hero-home-fast.mp4');
     expect(homepageHero).toContain('showPosterBeforePlayback');
     expect(homepageHero).toContain('loop');
-    expect(homepageHero).toContain('Barber and Cosmetology apprenticeship programs');
-    expect(homepageHero).toContain('Training may be free if you qualify for workforce funding');
-    expect(homepageHero).toContain('press the orange Schedule WorkOne Orientation button');
-    expect(homepageHero).toContain('press Start Elevate Funding Intake');
+    expect(homepageHero).toContain('There are two main paths');
+    expect(homepageHero).toContain('For example, someone choosing barbering');
+    expect(homepageHero).toContain('Think about which sounds more like you');
+    expect(homepageHero).toContain('Training may be free if you qualify');
     expect(homepageHero).not.toContain('data-narration-src="/audio/narration/home-hero.mp3"');
     expect(homepageHero).toContain('className="order-1 flex items-center');
     expect(homepageHero).toContain('className="relative order-2');
@@ -55,7 +55,7 @@ describe('homepage hero slideshow rendering', () => {
     expect(featuredHosts).toContain("Welcome to Razor's Image Barbershop");
     expect(featuredHosts).toContain('data-narration={video.script}');
     expect(barberPage).toContain('KOUNTRY_KUTZ_HERO_TRANSCRIPT');
-    expect(barberPage).toContain('As the video moves through the shop');
+    expect(barberPage).toContain('As the tour moves through the shop');
   });
 
   it('keeps every slide mounted so transitions never expose the placeholder', () => {

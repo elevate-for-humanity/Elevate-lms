@@ -63,8 +63,8 @@ function synchronizeControlledStoryboard(
     Math.max(1, scene.dialogue?.match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g)?.length ?? 0),
   );
   const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-  const allocated = weights.map((weight) =>
-    minimumPerScene + Math.floor((remaining * weight) / totalWeight),
+  const allocated = weights.map(
+    (weight) => minimumPerScene + Math.floor((remaining * weight) / totalWeight),
   );
   let unallocated = targetSeconds - allocated.reduce((sum, seconds) => sum + seconds, 0);
   for (let index = 0; unallocated > 0; index = (index + 1) % allocated.length) {
@@ -267,11 +267,14 @@ function applyLockedCourseBuilderMediaPolicy(job: VideoJob): void {
     policy?.narration && typeof policy.narration === 'object'
       ? (policy.narration as Record<string, unknown>)
       : null;
-  if (
-    policy?.locked_by === 'course_builder' &&
-    narration?.strategy === 'repository_voice' &&
-    narration.allow_paid_provider === false
-  ) {
+  if (policy?.locked_by === 'course_builder' && narration?.strategy === 'repository_voice') {
+    if (narration.allow_paid_provider === true && narration.provider === 'cloudflare') {
+      process.env.AI_NARRATION_PROVIDER = 'cloudflare';
+      return;
+    }
+    if (narration.allow_paid_provider !== false) {
+      throw new Error('MEDIA_NARRATION_POLICY_INVALID');
+    }
     // The Course Builder contract is authoritative. Use the local renderer so
     // runtime environment variables cannot spend credits or transmit lesson
     // content to an external narration provider.
@@ -279,6 +282,22 @@ function applyLockedCourseBuilderMediaPolicy(job: VideoJob): void {
     // the zero-credit renderer for this locked policy; espeak-ng is emergency-only.
     process.env.AI_NARRATION_PROVIDER = 'edge';
   }
+}
+
+function usesPaidNarration(job: VideoJob): boolean {
+  const sceneData =
+    job.scene_data && typeof job.scene_data === 'object'
+      ? (job.scene_data as Record<string, unknown>)
+      : {};
+  const policy =
+    sceneData.media_policy && typeof sceneData.media_policy === 'object'
+      ? (sceneData.media_policy as Record<string, unknown>)
+      : null;
+  const narration =
+    policy?.narration && typeof policy.narration === 'object'
+      ? (policy.narration as Record<string, unknown>)
+      : null;
+  return narration?.allow_paid_provider === true;
 }
 
 async function runClaimedVideoJob(job: VideoJob): Promise<void> {
@@ -781,15 +800,19 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       ),
       source_contract: persistedSceneData.source_contract ?? null,
     };
-    await markCandidate(job.id, {
-      video_url: result.videoUrl,
-      ...(result.audioUrl ? { audio_url: result.audioUrl } : {}),
-      ...(result.duration !== undefined ? { duration_seconds: result.duration } : {}),
-      provider: REMOTION_PROVIDER,
-      provider_model: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
-      scene_count: storyboard.scenes.length,
-      scene_data: completedStoryboard,
-    }, job.lease_token);
+    await markCandidate(
+      job.id,
+      {
+        video_url: result.videoUrl,
+        ...(result.audioUrl ? { audio_url: result.audioUrl } : {}),
+        ...(result.duration !== undefined ? { duration_seconds: result.duration } : {}),
+        provider: REMOTION_PROVIDER,
+        provider_model: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
+        scene_count: storyboard.scenes.length,
+        scene_data: completedStoryboard,
+      },
+      job.lease_token,
+    );
     const qualityEvidence = await enforceMediaQuality({
       videoUrl: result.videoUrl,
       expectedDurationSeconds: result.duration ?? 0,
@@ -829,16 +852,20 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     ) {
       throw new Error('MEDIA_SOURCE_VERSION_MISMATCH');
     }
-    await markComplete(job.id, {
-      video_url: result.videoUrl,
-      ...(result.audioUrl ? { audio_url: result.audioUrl } : {}),
-      ...(result.duration !== undefined ? { duration_seconds: result.duration } : {}),
-      provider: REMOTION_PROVIDER,
-      provider_model: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
-      scene_count: storyboard.scenes.length,
-      scene_data: completedStoryboard,
-      quality_evidence: qualityEvidence,
-    }, job.lease_token);
+    await markComplete(
+      job.id,
+      {
+        video_url: result.videoUrl,
+        ...(result.audioUrl ? { audio_url: result.audioUrl } : {}),
+        ...(result.duration !== undefined ? { duration_seconds: result.duration } : {}),
+        provider: REMOTION_PROVIDER,
+        provider_model: storyboard.scenes.length > 1 ? 'SlideLesson' : REMOTION_MODEL,
+        scene_count: storyboard.scenes.length,
+        scene_data: completedStoryboard,
+        quality_evidence: qualityEvidence,
+      },
+      job.lease_token,
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     logger.error('[video-worker] Render failed', error, { jobId: job.id });
@@ -860,7 +887,8 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   if (
     job.asset_kind !== 'microclip' &&
     cpuOnlyCourseMedia() &&
-    generationControl.allowedCourseIds.includes(job.course_id)
+    generationControl.allowedCourseIds.includes(job.course_id) &&
+    !usesPaidNarration(job)
   ) {
     await runClaimedVideoJob(job);
     return;
@@ -938,29 +966,40 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         .eq('validation_status', 'valid')
         .maybeSingle();
       if (cachedError || !cached?.storage_location) {
-        await markFailed(job.id, 'Validated media cache record is unavailable', {
-          provider: 'paid-inference-gateway',
-        }, job.lease_token);
+        await markFailed(
+          job.id,
+          'Validated media cache record is unavailable',
+          {
+            provider: 'paid-inference-gateway',
+          },
+          job.lease_token,
+        );
         return;
       }
       const metadata =
         cached.metadata && typeof cached.metadata === 'object'
           ? (cached.metadata as Record<string, unknown>)
           : {};
-      await markComplete(job.id, {
-        video_url: cached.storage_location,
-        ...(typeof metadata.audio_url === 'string' ? { audio_url: metadata.audio_url } : {}),
-        ...(typeof metadata.duration_seconds === 'number'
-          ? { duration_seconds: metadata.duration_seconds }
-          : {}),
-        ...(typeof metadata.scene_count === 'number' ? { scene_count: metadata.scene_count } : {}),
-        ...(metadata.scene_data ? { scene_data: metadata.scene_data } : {}),
-        provider: 'artifact-cache',
-        provider_model: 'validated-reuse',
-        ...(metadata.quality_evidence && typeof metadata.quality_evidence === 'object'
-          ? { quality_evidence: metadata.quality_evidence as never }
-          : {}),
-      }, job.lease_token);
+      await markComplete(
+        job.id,
+        {
+          video_url: cached.storage_location,
+          ...(typeof metadata.audio_url === 'string' ? { audio_url: metadata.audio_url } : {}),
+          ...(typeof metadata.duration_seconds === 'number'
+            ? { duration_seconds: metadata.duration_seconds }
+            : {}),
+          ...(typeof metadata.scene_count === 'number'
+            ? { scene_count: metadata.scene_count }
+            : {}),
+          ...(metadata.scene_data ? { scene_data: metadata.scene_data } : {}),
+          provider: 'artifact-cache',
+          provider_model: 'validated-reuse',
+          ...(metadata.quality_evidence && typeof metadata.quality_evidence === 'object'
+            ? { quality_evidence: metadata.quality_evidence as never }
+            : {}),
+        },
+        job.lease_token,
+      );
       return;
     }
     if (authorization.decision !== 'approved' || !authorization.requestId) {
@@ -968,9 +1007,14 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         await markAwaitingPaidApproval(job);
         return;
       }
-      await markFailed(job.id, `Paid media authorization blocked: ${authorization.decision}`, {
-        provider: 'paid-inference-gateway',
-      }, job.lease_token);
+      await markFailed(
+        job.id,
+        `Paid media authorization blocked: ${authorization.decision}`,
+        {
+          provider: 'paid-inference-gateway',
+        },
+        job.lease_token,
+      );
       return;
     }
     const paidExecution = await executePaidInference({

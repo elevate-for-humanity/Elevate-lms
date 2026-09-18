@@ -195,7 +195,7 @@ export default function ProgramDetailPage({
 
 
       {/* A. HERO */}
-      <section data-scroll-narration data-narration={programHeroNarration} data-narration-rate="0.88" data-narration-style="instructor">
+      <section data-scroll-narration data-narration={programHeroNarration} data-narration-rate="0.82" data-narration-style="instructor">
         {heroOverride ??
           (() => {
             // bannerProp is passed from the server page.tsx — use it first.
@@ -256,77 +256,40 @@ export default function ProgramDetailPage({
           })()}
 
       {isWorkforceFunded ? (
-        <section className="border-b-4 border-emerald-950 bg-emerald-700 px-4 py-8 text-white sm:py-10">
-          <div className="mx-auto max-w-6xl text-center">
-            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100">
-              Workforce-funded training pathway
-            </p>
-            <h1 className="mt-3 text-4xl font-black uppercase leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-              Training may be free if you qualify.
-            </h1>
-            <p className="mx-auto mt-4 max-w-4xl text-lg font-bold leading-8 text-white sm:text-xl">
-              Complete the program application, then schedule your WorkOne intake. WorkOne or the
-              responsible agency confirms eligibility and provides the written authorization
-              required for funded enrollment.
-            </p>
-            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
-              <Link
-                href={applicationHref}
-                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-xl bg-white px-7 py-4 text-base font-black text-emerald-950 hover:bg-emerald-50"
-              >
-                <ClipboardList className="h-5 w-5" />
-                Complete Application
+        <section className="border-y border-slate-800 bg-slate-950 px-4 py-6 text-white">
+          <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
+                Funding review available
+              </p>
+              <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">
+                This training may be no-cost if you qualify.
+              </h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">
+                Apply first, then complete the required WorkOne or agency intake. Free training
+                requires written approval before enrollment. If funding is not approved, Buy Now
+                Pay Later is one separate payment option—not free funding and not guaranteed.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+              <Link href={applicationHref} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-black text-white hover:bg-brand-red-700">
+                <ClipboardList className="h-5 w-5" /> Apply Now
               </Link>
-              <a
-                href={WORKONE_INDY_BOOKING_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-xl border-2 border-white bg-emerald-950 px-7 py-4 text-base font-black text-white hover:bg-slate-950"
-              >
-                <CalendarDays className="h-5 w-5" />
-                Schedule WorkOne Intake
-              </a>
-              <a
-                href="#payment-options"
-                className="inline-flex min-h-14 items-center justify-center rounded-xl border-2 border-white bg-transparent px-7 py-4 text-base font-black text-white hover:bg-white/10"
-              >
-                See Payment Options
+              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-white bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100">
+                <CalendarDays className="h-5 w-5" /> Schedule Funding Intake
               </a>
             </div>
-            <p className="mx-auto mt-5 max-w-4xl text-sm font-bold leading-6 text-emerald-50">
-              If workforce funding is not approved, Buy Now Pay Later is one optional payment
-              alternative—not free training and not guaranteed. You may also choose pay-in-full,
-              an available installment plan, or approved employer-sponsored training. Every
-              payment provider decides its own approval and terms before you commit.
-            </p>
-            <p className="mt-3 text-xs font-semibold leading-5 text-emerald-100">
-              Funding depends on participant eligibility, program eligibility, available funds,
-              and agency authorization. Funding is not automatic.
-            </p>
           </div>
         </section>
       ) : isApprenticeship ? (
-        <section className="border-b-4 border-slate-950 bg-brand-red-700 px-4 py-8 text-white sm:py-10">
-          <div className="mx-auto max-w-6xl text-center">
-            <p className="text-sm font-black uppercase tracking-[0.2em] text-red-100">
-              Registered apprenticeship pathway
-            </p>
-            <h1 className="mt-3 text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-              Earn while you learn—with structured training and a Host Site.
-            </h1>
-            <p className="mx-auto mt-4 max-w-4xl text-lg font-bold leading-8 text-white">
-              Apply to the program, complete intake, connect with an approved employer or Host
-              Site, complete supervised on-the-job learning and related instruction, and document
-              your progress toward completion.
-            </p>
-            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href={applicationHref} className="inline-flex min-h-14 items-center justify-center rounded-xl bg-white px-7 py-4 text-base font-black text-brand-red-800 hover:bg-red-50">
-                Apply for Apprenticeship
-              </Link>
-              <a href="#program-overview" className="inline-flex min-h-14 items-center justify-center rounded-xl border-2 border-white px-7 py-4 text-base font-black text-white hover:bg-white/10">
-                See How It Works
-              </a>
+        <section className="border-y border-slate-800 bg-slate-950 px-4 py-6 text-white">
+          <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">Earn while you learn</p>
+              <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">Related instruction plus paid, supervised workplace training.</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">Apply first. Elevate confirms program requirements, Host Site or employer placement, schedule, related instruction, wages, and any available funding before training begins.</p>
             </div>
+            <Link href={applicationHref} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Apply for Apprenticeship</Link>
           </div>
         </section>
       ) : null}

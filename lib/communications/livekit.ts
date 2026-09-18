@@ -18,7 +18,7 @@ export function liveKitReadiness(): LiveKitReadiness {
 
 function credentials() {
   const readiness = liveKitReadiness();
-  if (!readiness.ready)
+  if ('missing' in readiness)
     throw new Error(`Meeting service is missing: ${readiness.missing.join(', ')}`);
   return {
     url: readiness.url,

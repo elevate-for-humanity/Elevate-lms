@@ -9,6 +9,8 @@ type PlayOptions = {
   voice?: string;
   style?: NaturalVoiceStyle;
   rate?: number;
+  /** Only true for a visible speed control chosen by the learner. */
+  userControlledRate?: boolean;
   onEnded?: () => void;
   onError?: () => void;
   allowBrowserFallback?: boolean;
@@ -16,6 +18,31 @@ type PlayOptions = {
 
 const naturalVoiceCache = new Map<string, Promise<Blob>>();
 const NATURAL_VOICE_STOP_EVENT = 'elevate:natural-voice-stop';
+
+const DELIVERY_RATE_BY_STYLE: Record<NaturalVoiceStyle, number> = {
+  default: 0.88,
+  assistant: 0.88,
+  instructor: 0.84,
+  commercial: 0.9,
+};
+
+/**
+ * Keep every automatic voice on the platform within an understandable range.
+ * A learner can still deliberately choose a faster rate from an exposed speed
+ * control; page authors and generated experiences cannot accidentally race.
+ */
+export function narrationPlaybackRate(options: PlayOptions = {}) {
+  const requested = Number(options.rate);
+  if (options.userControlledRate && Number.isFinite(requested)) {
+    return Math.min(1.5, Math.max(0.75, requested));
+  }
+
+  const style = options.style || 'default';
+  const baseline = DELIVERY_RATE_BY_STYLE[style];
+  return Number.isFinite(requested)
+    ? Math.min(0.92, Math.max(0.78, requested))
+    : baseline;
+}
 
 /** Stops every natural-voice hook instance, including audio created on another page section. */
 export function stopAllNaturalVoicePlayback() {
@@ -29,7 +56,7 @@ function naturalVoiceCacheKey(text: string, options: PlayOptions) {
     text,
     options.voice || 'coral',
     options.style || 'default',
-    options.rate || 1,
+    narrationPlaybackRate(options),
     options.src || '',
   ]);
 }
@@ -70,7 +97,7 @@ async function requestNaturalVoiceBlob(text: string, options: PlayOptions): Prom
               text,
               voice: options.voice || 'coral',
               style: options.style || 'default',
-              rate: options.rate || 1,
+              rate: narrationPlaybackRate(options),
             }),
           }),
       cache: source ? 'force-cache' : 'no-store',
@@ -97,7 +124,7 @@ async function requestNaturalVoice(text: string, options: PlayOptions): Promise<
   const url = URL.createObjectURL(blob);
   const audio = new Audio(url);
   audio.preload = 'auto';
-  audio.playbackRate = Math.min(2, Math.max(0.5, options.rate || 1));
+  audio.playbackRate = narrationPlaybackRate(options);
   const release = () => URL.revokeObjectURL(url);
   audio.addEventListener('ended', release, { once: true });
   audio.addEventListener('error', release, { once: true });
@@ -116,8 +143,8 @@ function browserFallback(text: string, options: PlayOptions): SpeechSynthesisUtt
   const browserVoice = chooseBrowserVoice();
   if (browserVoice) utterance.voice = browserVoice;
   utterance.lang = browserVoice?.lang || 'en-US';
-  utterance.rate = Math.min(2, Math.max(0.5, options.rate || 1));
-  utterance.pitch = options.style === 'commercial' ? 1.02 : 1;
+  utterance.rate = narrationPlaybackRate(options);
+  utterance.pitch = options.style === 'commercial' || options.style === 'assistant' ? 1.02 : 1;
   utterance.volume = 1;
   window.speechSynthesis.speak(utterance);
   return utterance;

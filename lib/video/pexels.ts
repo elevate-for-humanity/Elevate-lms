@@ -142,7 +142,7 @@ export async function getPexelsVideoClip(
     const url = new URL('https://api.pexels.com/videos/search');
     url.searchParams.set('query', keyword);
     url.searchParams.set('orientation', orientation);
-    url.searchParams.set('size', 'medium');
+    url.searchParams.set('size', 'large');
     url.searchParams.set('per_page', String(perPage));
 
     const res = await fetch(url.toString(), {
@@ -172,10 +172,11 @@ export async function getPexelsVideoClip(
       return file.width >= file.height;
     };
 
+    const ranked = [...video.video_files]
+      .filter((file) => file.file_type === 'video/mp4' && orientationMatches(file))
+      .sort((left, right) => right.width * right.height - left.width * left.height);
     const hdFile =
-      video.video_files.find(
-        (f) => orientationMatches(f) && f.quality === 'hd' && Math.max(f.width, f.height) >= 1280,
-      ) ??
+      ranked.find((f) => f.quality === 'hd' && f.width >= 1920 && f.height >= 1080) ??
       video.video_files.find(
         (f) => orientationMatches(f) && f.quality === 'sd' && Math.max(f.width, f.height) >= 640,
       ) ??
@@ -184,7 +185,9 @@ export async function getPexelsVideoClip(
       video.video_files.find((f) => f.quality === 'sd' && f.width >= 640) ??
       video.video_files[0];
 
-    return hdFile?.link ?? null;
+    // Never upscale a low-resolution clip into the 1920x1080 lesson canvas.
+    // A sharp still is preferable to blurry motion.
+    return hdFile && hdFile.width >= 1920 && hdFile.height >= 1080 ? hdFile.link : null;
   } catch (err) {
     logger.warn('[pexels] video fetch error', { err });
     return null;

@@ -1,4 +1,5 @@
 import 'server-only';
+import { reconcileStudioRunFromTask } from '@/lib/devstudio/studio-run-reconciler';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { evaluateExecution, type EvaluationResult } from '@/lib/platform/orchestration/evaluator';
@@ -391,6 +392,45 @@ export async function reconcileOpenHandsTasks(
   for (const candidate of data ?? []) {
     result.checked += 1;
     try {
+      const configuredTimeout = Number(process.env.STUDIO_EXTERNAL_TASK_TIMEOUT_MINUTES ?? 360);
+      const timeoutMinutes = Number.isFinite(configuredTimeout)
+        ? Math.max(30, configuredTimeout)
+        : 360;
+      const startedAt = new Date(candidate.started_at ?? candidate.created_at).getTime();
+      const expired =
+        candidate.status === 'running' &&
+        Number.isFinite(startedAt) &&
+        startedAt < Date.now() - timeoutMinutes * 60_000;
+      if (expired) {
+        const timeoutMessage = `OpenHands execution exceeded the ${timeoutMinutes}-minute runtime limit and was closed instead of remaining stuck.`;
+        const { data: timedOut, error: timeoutError } = await db
+          .from('ai_tasks')
+          .update({
+            status: 'failed',
+            error_message: timeoutMessage,
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', candidate.id)
+          .eq('status', 'running')
+          .select(
+            'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message',
+          )
+          .maybeSingle();
+        if (timeoutError) throw timeoutError;
+        if (timedOut) {
+          await reconcileStudioRunFromTask(db, timedOut);
+          await appendLog(
+            candidate.id,
+            timeoutMessage,
+            'error',
+            candidate.tenant_id,
+            candidate.user_id,
+          );
+          result.failed += 1;
+        }
+        continue;
+      }
       if (candidate.status === 'running') {
         await refreshOpenHandsTask({ taskId: candidate.id, actorId: candidate.user_id });
       }
@@ -400,6 +440,7 @@ export async function reconcileOpenHandsTasks(
         .eq('id', candidate.id)
         .single();
       if (!refreshed) continue;
+      await reconcileStudioRunFromTask(db, refreshed);
       if (refreshed.status === 'completed') {
         result.completed += 1;
         continue;

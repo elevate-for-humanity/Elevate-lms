@@ -85,15 +85,19 @@ const EXACT_INSTRUCTIONAL_SCENE_TYPES = new Set([
 
 async function measuredAudioDurationSeconds(audioPath: string): Promise<number | null> {
   try {
-    const { stdout } = await execFileAsync('ffprobe', [
-      '-v',
-      'error',
-      '-show_entries',
-      'format=duration',
-      '-of',
-      'default=noprint_wrappers=1:nokey=1',
-      audioPath,
-    ], { timeout: 30_000, maxBuffer: 100_000 });
+    const { stdout } = await execFileAsync(
+      'ffprobe',
+      [
+        '-v',
+        'error',
+        '-show_entries',
+        'format=duration',
+        '-of',
+        'default=noprint_wrappers=1:nokey=1',
+        audioPath,
+      ],
+      { timeout: 30_000, maxBuffer: 100_000 },
+    );
     const seconds = Number.parseFloat(String(stdout).trim());
     return Number.isFinite(seconds) && seconds > 0 ? seconds : null;
   } catch {
@@ -731,6 +735,25 @@ export async function renderStoryboardVideo(
     // Final trust boundary before Chromium. Runtime provider and storage values
     // must be normalized even when their SDK declarations claim strings.
     const normalizedScenes = normalizeSlideLessonScenes(scenes);
+    const firstStoryboardScene = resolvedStoryboard.scenes[0];
+    const openingImageUrl =
+      normalizeRemotionMediaUrl(firstStoryboardScene?.referenceImageUrl) ||
+      normalizeRemotionMediaUrl(
+        await getPexelsImage('default', {
+          query: normalizedScenes[0]?.clip_keyword || input.storyboard.title,
+          deterministicKey: firstStoryboardScene?.contentHash || input.lessonId,
+          allowGeneratedFallback: false,
+        }),
+      );
+    if (!openingImageUrl || !firstStoryboardScene) {
+      throw new Error('MEDIA_OPENING_STILL_MISSING');
+    }
+    resolvedStoryboard.scenes[0] = {
+      ...firstStoryboardScene,
+      referenceImageUrl: openingImageUrl,
+      resolvedProvider: firstStoryboardScene.resolvedProvider || 'pexels',
+      resolvedModel: firstStoryboardScene.resolvedModel || 'opening-still',
+    };
     const props: SlideLessonProps & Record<string, unknown> = {
       courseTitle: input.courseTitle,
       lessonTitle: input.storyboard.title,
@@ -740,8 +763,11 @@ export async function renderStoryboardVideo(
       backgroundColor: '#f8fafc',
       surfaceMode: 'bright',
       logoText: 'Elevate LMS',
+      openingImageUrl,
     };
-    const totalFrames = STORYBOARD_RENDER_FPS * 3 + normalizedScenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
+    const totalFrames =
+      STORYBOARD_RENDER_FPS * 5 +
+      normalizedScenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
     const bundleUrl = await getBundleUrl();
     const { renderMedia, selectComposition } = await import('@remotion/renderer');
     const browserExecutable = process.env.REMOTION_BROWSER_EXECUTABLE?.trim() || undefined;
@@ -771,16 +797,12 @@ export async function renderStoryboardVideo(
       const message = error instanceof Error ? error.message : String(error);
       if (!message.includes('Failed to load image with src [object Object]')) throw error;
 
-      logger.warn(
-        '[RemotionRender] Provider visual was not serializable; retrying on the branded instructional canvas',
-        { lessonId: input.lessonId },
-      );
-      const canvasScenes = normalizedScenes.map((scene) => ({
-        ...scene,
-        clipUrl: null,
-        imageUrl: null,
-      }));
-      await renderSlideLesson({ ...props, scenes: canvasScenes });
+      // Never turn a broken provider asset into a learner-facing white/canvas
+      // slideshow. That fallback used planning metadata as if the intended
+      // visuals had actually rendered, so it could survive the provenance gate.
+      // Fail closed and keep the previous approved lesson video active while a
+      // corrected, source-locked job is retried.
+      throw new Error('MEDIA_VISUAL_SERIALIZATION_FAILED', { cause: error });
     }
     const captionUrl = await uploadCourseVideosObject(
       Buffer.from(buildStoryboardWebVtt(scenes), 'utf8'),

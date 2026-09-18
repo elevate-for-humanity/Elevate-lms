@@ -2,13 +2,7 @@ Launch the canonical authored-course repair and media renderer for:
 - 3fb5ce19-1cde-434c-a8c6-f138d7d7aa17 (Barber)
 - 9ca9fb50-7119-46ea-ab81-9b0193c29c31 (Cosmetology)
 
-Requested: 2026-09-17
-Retry: static matrix validation
-
-Retry: valid workflow-level concurrency scope
-
-Retry: authorized server runtime condition
-
-Retry: reset refreshed canonical media attempts
-
-Follow-up: publish after playable media and procurement verification
+Requested: 2026-09-18
+Release: d2fb021fef38538046e4b9e33aef598d3c9ff419
+Mode: preserve curriculum, rebuild locked narration/storyboards, CPU render, quality-gated publish
+Reason: emergency student access for morning classes

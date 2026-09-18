@@ -18,7 +18,14 @@ function durationWeeks(value: string | null | undefined): number | null {
   return null;
 }
 
-function ProgramCard({ program }: { program: ProgramsPageRow }) {
+function ProgramCard({
+  program,
+  variant = 'training',
+}: {
+  program: ProgramsPageRow;
+  variant?: 'training' | 'apprenticeship';
+}) {
+  const apprenticeship = variant === 'apprenticeship';
   const funded = program.funding_tier === 'workforce-funded';
   const image = getProgramCardImage(program.slug);
   return (
@@ -30,16 +37,20 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
             category={program.category}
           />
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
-            {funded ? (
+            {apprenticeship ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-brand-blue-800 px-3 py-1.5 text-sm font-extrabold text-white shadow">
+                <ShieldCheck className="h-4 w-4" /> Earn while you learn
+              </span>
+            ) : funded ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-3 py-1.5 text-sm font-extrabold text-white shadow">
                 <ShieldCheck className="h-4 w-4" /> Funding pathway
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-1.5 text-sm font-extrabold text-white shadow">
-                <DollarSign className="h-4 w-4" /> Self-Pay
+                <DollarSign className="h-4 w-4" /> Payment options
               </span>
             )}
-            {funded && program.top_jobs_stars ? (
+            {!apprenticeship && funded && program.top_jobs_stars ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-sm font-bold text-slate-900 shadow">
                 <Star className="h-4 w-4 fill-amber-400 text-amber-500" /> {program.top_jobs_stars}★
                 Top Jobs
@@ -84,7 +95,7 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
             href={`/apply?program=${program.slug}`}
             className={`inline-flex flex-1 items-center justify-center rounded-xl px-4 py-3 text-base font-bold ${funded ? 'bg-brand-red-600 text-white hover:bg-brand-red-700' : 'border border-slate-300 text-slate-900 hover:bg-slate-50'}`}
           >
-            {funded ? 'Start Application' : 'Self-Pay Enrollment'}
+            {apprenticeship ? 'Apply for Apprenticeship' : funded ? 'Start Application' : 'See Payment Options'}
           </Link>
         </div>
       </div>
@@ -92,7 +103,13 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
   );
 }
 
-export function ProgramsExplorer({ programs }: { programs: ProgramsPageRow[] }) {
+export function ProgramsExplorer({
+  programs,
+  variant = 'training',
+}: {
+  programs: ProgramsPageRow[];
+  variant?: 'training' | 'apprenticeship';
+}) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [duration, setDuration] = useState('all');
@@ -171,7 +188,7 @@ export function ProgramsExplorer({ programs }: { programs: ProgramsPageRow[] }) 
       {filtered.length ? (
         <div className="mt-6 grid items-start gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filtered.slice(0, visibleCount).map((program) => (
-            <ProgramCard key={program.slug} program={program} />
+            <ProgramCard key={program.slug} program={program} variant={variant} />
           ))}
         </div>
       ) : (

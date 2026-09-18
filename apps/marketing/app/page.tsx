@@ -91,15 +91,16 @@ export default function HomePage() {
       <StructuredData />
       <main className="[&_a]:no-underline [&_a:hover]:no-underline">
         <PlatformHubHero />
-        <div data-narration-disabled="true"><HomeBeautyPriority /></div>
-        <div data-narration-disabled="true"><HomeFeaturedHostShop /></div>
+        {/* Put funded career training and the WorkOne action path before apprenticeships. */}
         <div data-narration-disabled="true">
           <HomeCareerPathways />
         </div>
-        <div data-narration-disabled="true"><HomeEmployerStrip /></div>
         <div data-narration-disabled="true">
           <HomeFunding />
         </div>
+        <div data-narration-disabled="true"><HomeBeautyPriority /></div>
+        <div data-narration-disabled="true"><HomeFeaturedHostShop /></div>
+        <div data-narration-disabled="true"><HomeEmployerStrip /></div>
         <div data-narration-disabled="true"><HomePlatformOverview /></div>
         <div data-narration-disabled="true">
           <HomeFinalCTA />

@@ -325,6 +325,59 @@ export function buildAtomicPayload(
                       fingerprint: sourceFingerprint,
                       narration_locked: true,
                     },
+                    // Lesson instruction and lesson media are one version-locked
+                    // package. Persist the authored timeline in the exact scene
+                    // contract consumed by directMedia().
+                    scenes: Array.isArray(experience.instructionalTimeline?.scenes)
+                      ? experience.instructionalTimeline.scenes.map(
+                          (scene: Record<string, any>, sceneIndex: number) => {
+                            const sceneTypeByPurpose: Record<string, string> = {
+                              introduction: 'problem_hook',
+                              explanation: 'mental_model',
+                              diagram: 'system_diagram',
+                              demonstration: 'worked_example',
+                              practice: 'knowledge_check',
+                              summary: 'memory_recap',
+                            };
+                            const onScreenText = Array.isArray(scene.onScreenText)
+                              ? scene.onScreenText.slice(0, 3).map(String)
+                              : [];
+                            const purpose = String(scene.purpose);
+                            const alignedEvidence =
+                              purpose === 'practice' || purpose === 'summary'
+                                ? onScreenText.slice(1)
+                                : onScreenText.slice(0, 1);
+                            const teachingAction = `Display the lesson evidence: ${alignedEvidence.join(' | ')}`;
+                            const dialogue =
+                              purpose === 'practice' && alignedEvidence.length > 0
+                                ? `${scene.narration} ${alignedEvidence.join(' ')}`
+                                : scene.narration;
+                            return {
+                              id: scene.id ?? `${lesson.slug}-scene-${sceneIndex + 1}`,
+                              subject: lesson.title,
+                              action: teachingAction,
+                              dialogue,
+                              duration_seconds:
+                                Number(scene.endTime) > Number(scene.startTime)
+                                  ? Number(scene.endTime) - Number(scene.startTime)
+                                  : undefined,
+                              procedure_phase: scene.purpose,
+                              required_visual_evidence: teachingAction,
+                              shot_size: purpose === 'demonstration' ? 'close-up' : 'medium',
+                              scene_type:
+                                sceneTypeByPurpose[String(scene.purpose)] ?? 'mental_model',
+                              visual_style: `${scene.visualDirection ?? ''} Lesson-specific instructional demonstration with concise captions`,
+                              overlay_template: 'caption-only-v1',
+                              on_screen_text: onScreenText,
+                              source_references: Array.isArray(scene.sourceReferences)
+                                ? scene.sourceReferences
+                                : [],
+                            };
+                          },
+                        )
+                      : [],
+                    captions: experience.instructionalTimeline?.captions ?? [],
+                    timeline_events: experience.instructionalTimeline?.events ?? [],
                     visual_prompt: experience.visualPrompt ?? null,
                     scenario: experience.scenario ?? null,
                     case_study: experience.caseStudy ?? null,

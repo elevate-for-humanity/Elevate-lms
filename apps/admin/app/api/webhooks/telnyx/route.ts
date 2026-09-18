@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { resend } from '@/lib/resend';
 import {
   decodeCallState,
   encodeCallState,
@@ -25,6 +26,52 @@ type System = {
   voicemail_transcription_enabled: boolean;
   call_recording_enabled: boolean;
 };
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+async function sendVoicemailEmail(input: {
+  caller: string;
+  recordingUrl: string;
+  transcript?: string;
+}) {
+  const recipient =
+    process.env.VOICEMAIL_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com';
+  const transcript = input.transcript?.trim();
+  const subject = transcript
+    ? `Voicemail transcript from ${input.caller}`
+    : `New voicemail from ${input.caller}`;
+
+  try {
+    await resend.emails.send({
+      from: 'Elevate for Humanity <noreply@elevateforhumanity.org>',
+      to: recipient,
+      subject,
+      text: [
+        `Caller: ${input.caller}`,
+        transcript ? `Message: ${transcript}` : 'The transcript is still processing.',
+        `Recording: ${input.recordingUrl}`,
+      ].join('\n\n'),
+      html: `
+        <h2>${transcript ? 'Voicemail transcript' : 'New voicemail received'}</h2>
+        <p><strong>Caller:</strong> ${escapeHtml(input.caller)}</p>
+        <p><strong>Message:</strong> ${
+          transcript ? escapeHtml(transcript) : 'The transcript is still processing.'
+        }</p>
+        <p><a href="${escapeHtml(input.recordingUrl)}">Listen to the recording</a></p>
+      `,
+    });
+  } catch (error) {
+    // Email delivery must not cause Telnyx to retry an otherwise processed event.
+    console.error('Voicemail email delivery failed:', error);
+  }
+}
 
 async function beginVoicemail(system: System, callControlId: string, eventId: string) {
   const client = telnyxClient();
@@ -171,16 +218,19 @@ async function handleEvent(
       .eq('enabled', true)
       .order('position');
     if (system.routing_mode === 'menu' && options?.length) {
+      const menuDigits = Array.from(
+        new Set([...options.map((option: any) => String(option.digit)), '9']),
+      ).join('');
       await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
-        payload: menuPrompt(system.greeting, options),
+        payload: `${menuPrompt(system.greeting, options)} Press 9 if you know your program holder's three-digit extension.`,
         voice: 'Telnyx.KokoroTTS.af',
         minimum_digits: 1,
         maximum_digits: 1,
-        valid_digits: options.map((option: any) => option.digit).join(''),
+        valid_digits: menuDigits,
         maximum_tries: 2,
         timeout_millis: 7000,
         command_id: `${eventId}-menu`,
-        client_state: encodeCallState({ systemId: system.id }),
+        client_state: encodeCallState({ systemId: system.id, phase: 'main_menu' }),
       });
     } else if (system.default_destination_id) {
       await transferToDestination(
@@ -196,7 +246,59 @@ async function handleEvent(
     return;
   }
   if (type === 'call.gather.ended') {
-    const digit = Number(payload.digits);
+    const digits = String(payload.digits ?? '').trim();
+    const state = decodeCallState(payload.client_state);
+    if (state.phase === 'extension_menu') {
+      const { data: workspace } = await db
+        .from('communication_workspaces')
+        .select('id')
+        .eq('phone_system_id', system.id)
+        .maybeSingle();
+      const { data: extension } = workspace?.id
+        ? await db
+            .from('communication_extensions')
+            .select('destination_id')
+            .eq('workspace_id', workspace.id)
+            .eq('extension', digits)
+            .eq('enabled', true)
+            .maybeSingle()
+        : { data: null };
+      if (extension?.destination_id) {
+        await transferToDestination(
+          db,
+          system,
+          payload.call_control_id,
+          extension.destination_id,
+          eventId,
+        );
+      } else {
+        await client.calls.actions.speak(payload.call_control_id, {
+          payload: 'That extension is not available. Please leave a message after the beep.',
+          voice: 'Telnyx.KokoroTTS.af',
+          command_id: `${eventId}-extension-unavailable`,
+          client_state: encodeCallState({
+            systemId: system.id,
+            phase: 'voicemail_prompt',
+          }),
+        });
+      }
+      return;
+    }
+    if (digits === '9') {
+      await client.calls.actions.gatherUsingSpeak(payload.call_control_id, {
+        payload: 'Please enter the three-digit program holder extension.',
+        voice: 'Telnyx.KokoroTTS.af',
+        minimum_digits: 3,
+        maximum_digits: 3,
+        valid_digits: '0123456789',
+        maximum_tries: 2,
+        timeout_millis: 9000,
+        command_id: `${eventId}-extension-menu`,
+        client_state: encodeCallState({ systemId: system.id, phase: 'extension_menu' }),
+      });
+      return;
+    }
+    const digit = Number(digits);
     const { data: option } = await db
       .from('phone_menu_options')
       .select('destination_id')
@@ -268,13 +370,26 @@ async function handleEvent(
         is_read: false,
         status: 'new',
       });
+      await sendVoicemailEmail({
+        caller: call?.from_number || 'unknown',
+        recordingUrl,
+      });
     }
   }
   if (type === 'call.recording.transcription.saved' && payload.transcription_text && call?.id) {
-    await db
+    const { data: voicemail } = await db
       .from('voicemails')
       .update({ transcription: payload.transcription_text })
-      .eq('call_id', call.id);
+      .eq('call_id', call.id)
+      .select('recording_url,phone_number')
+      .maybeSingle();
+    if (voicemail?.recording_url) {
+      await sendVoicemailEmail({
+        caller: voicemail.phone_number || call.from_number || 'unknown',
+        recordingUrl: voicemail.recording_url,
+        transcript: payload.transcription_text,
+      });
+    }
   }
 }
 

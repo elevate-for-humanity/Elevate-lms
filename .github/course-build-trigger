@@ -1,6 +1,6 @@
 Controlled production trigger
 Scope: cosmetology
 Course ID: 9ca9fb50-7119-46ea-ab81-9b0193c29c31
-Requested: 2026-09-16
+Requested: 2026-09-17
 
-Retry: paid-inference-context-authorized
+Retry: cloudflare-timeout-resume-from-durable-journal

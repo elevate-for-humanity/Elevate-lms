@@ -49,11 +49,10 @@ permissions:
 
 concurrency:
   group: northflank-admin-deploy
-  # Northflank images take several minutes to build. Cancelling an active run
-  # on every shared-library commit can leave production pinned to an old image
-  # indefinitely when commits arrive faster than builds complete. Finish the
-  # active deployment; GitHub will retain only the newest pending run.
-  cancel-in-progress: false
+  # Only the newest main-branch admin release is authoritative. Cancel an
+  # obsolete run so a stuck Northflank build cannot block an urgent production
+  # repair from reaching the live service.
+  cancel-in-progress: true
 
 jobs:
   deploy-admin:
@@ -72,6 +71,8 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      TELNYX_API_KEY: ${{ secrets.TELNYX_API_KEY }}
+      TELNYX_PUBLIC_KEY: ${{ secrets.TELNYX_PUBLIC_KEY }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
@@ -145,6 +146,9 @@ jobs:
       - name: Verify deployed SHA matches main
         env: { EXPECTED_SHA: '${{ github.sha }}' }
         run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status
+
+      - name: Reconcile and verify Telnyx production number
+        run: pnpm tsx scripts/northflank/reconcile-telnyx.ts
 
       - name: Smoke Admin liveness, readiness, dependency health, and exact live SHA
         run: |

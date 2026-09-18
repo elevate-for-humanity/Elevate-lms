@@ -31,6 +31,8 @@ overrides:
   uuid: ^11.0.0
   postcss: ^8.5.18
   '@playwright/test': 1.57.0
+  playwright: 1.57.0
+  playwright-core: 1.57.0
   '@opentelemetry/core': ^2.9.0
   '@opentelemetry/sdk-node': ^0.220.0
   '@opentelemetry/exporter-trace-otlp-http': ^0.220.0
@@ -517,7 +519,7 @@ importers:
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.11.3
-        version: 4.13.0(playwright-core@1.63.0)
+        version: 4.13.0(playwright-core@1.57.0)
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.5.0(jiti@1.21.7))
@@ -633,8 +635,8 @@ importers:
         specifier: ^8.22.0
         version: 8.23.0
       playwright:
-        specifier: ^1.57.0
-        version: 1.63.0
+        specifier: 1.57.0
+        version: 1.57.0
       postcss:
         specifier: ^8.5.18
         version: 8.5.28
@@ -8177,19 +8179,9 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright-core@1.63.0:
-    resolution: {integrity: sha512-rYCsBF/M5HjUch52bbtVONEFjv6Xu8sm8h72dNlR5bzIE1fvC/bxgspzkjSfU+MweEMmPM8KJebG6nnyxo5mCg==}
-    engines: {node: '>=20'}
-    hasBin: true
-
   playwright@1.57.0:
     resolution: {integrity: sha512-ilYQj1s8sr2ppEJ2YVadYBN0Mb3mdo9J0wQ+UuDhzYqURwSoW4n1Xs5vs7ORwgDGmyEh33tRMeS8KhdkMoLXQw==}
     engines: {node: '>=18'}
-    hasBin: true
-
-  playwright@1.63.0:
-    resolution: {integrity: sha512-+7ziBLidS4NaNCdt57SUDT+wYmmd5fmiQejUic/kb+YsYSCPyOOE9sebzMjNmQrsnNpDJqd4WHvV/8lfKfUDUg==}
-    engines: {node: '>=20'}
     hasBin: true
 
   png-js@1.1.0:
@@ -10410,10 +10402,10 @@ snapshots:
 
   '@aws/lambda-invoke-store@0.3.0': {}
 
-  '@axe-core/playwright@4.13.0(playwright-core@1.63.0)':
+  '@axe-core/playwright@4.13.0(playwright-core@1.57.0)':
     dependencies:
       axe-core: 4.13.0
-      playwright-core: 1.63.0
+      playwright-core: 1.57.0
 
   '@babel/code-frame@7.29.7':
     dependencies:
@@ -18330,17 +18322,11 @@ snapshots:
 
   playwright-core@1.57.0: {}
 
-  playwright-core@1.63.0: {}
-
   playwright@1.57.0:
     dependencies:
       playwright-core: 1.57.0
     optionalDependencies:
       fsevents: 2.3.2
-
-  playwright@1.63.0:
-    dependencies:
-      playwright-core: 1.63.0
 
   png-js@1.1.0:
     dependencies:

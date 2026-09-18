@@ -18,15 +18,22 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ProgramsPage() {
   const { programs } = await getPublicProgramsPageData();
-  const funded = programs.filter((program) => program.funding_tier === 'workforce-funded');
-  const selfPay = programs.filter((program) => program.funding_tier === 'self-pay');
+  const isApprenticeship = (program: (typeof programs)[number]) =>
+    program.category.toLowerCase().includes('apprenticeship') ||
+    program.slug.includes('apprenticeship') ||
+    program.title.toLowerCase().includes('apprenticeship');
+  const apprenticeships = programs.filter(isApprenticeship);
+  const careerTraining = programs.filter((program) => !isApprenticeship(program));
+  const funded = careerTraining.filter((program) => program.funding_tier === 'workforce-funded');
+  const selfPay = careerTraining.filter((program) => program.funding_tier === 'self-pay');
 
   return (
     <main className="min-h-screen bg-white">
       <div
         data-scroll-narration
-        data-narration="Explore Elevate career programs built for real employment opportunities. Train for HVAC and skilled trades, commercial driving, business and entrepreneurship, bookkeeping and finance, information technology, healthcare, and other in-demand fields. Many programs may be free to participants who qualify for workforce funding. Funding is not automatic: the responsible agency must approve the participant, program, and covered costs in writing. If funding is not approved, admissions can explain available self-pay and payment options. Enrollment is open, upcoming cohorts are forming, and PARIS can guide you through program selection, funding steps, the application, required documents, and what to do next."
-        data-narration-src="/audio/heroes/home.mp3"
+        data-narration="Welcome. Let's find the training path that fits where you want to go. First, think about the kind of work you want to do. If you want career training, you can explore hands-on options such as HVAC and commercial driving, or business-focused options such as Bookkeeping and Business. Some programs may be free if you qualify for workforce funding and receive written approval before training begins. If you want to earn while you learn, choose an apprenticeship. That path combines instruction with paid, supervised training at an approved employer or Host Site. You do not need to decide everything at once. Open the program that interests you, listen to what it prepares you to do, and review the schedule and requirements. Then complete the application. Elevate will help you understand the correct funding, apprenticeship, or payment step from there."
+        data-narration-rate="0.82"
+        data-narration-style="instructor"
       >
         <HomeProgramShowcase asHero />
       </div>
@@ -45,12 +52,26 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
+      <section className="border-b border-blue-200 bg-blue-50 py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="max-w-3xl">
+              <p className="text-sm font-extrabold uppercase tracking-widest text-brand-blue-800">Earn While You Learn</p>
+              <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Registered apprenticeships are a separate pathway</h2>
+              <p className="mt-4 text-lg leading-relaxed text-slate-700">Apprenticeships combine related instruction with paid, supervised work at an approved employer or Host Site. Program participation may be no-cost to eligible apprentices, but employment, placement, funding, and enrollment approval must be confirmed before training begins.</p>
+            </div>
+            <Link href="/apprenticeships" className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-blue-800 px-6 py-3.5 text-base font-extrabold text-white hover:bg-brand-blue-900">How Apprenticeships Work <ArrowRight className="h-4 w-4" /></Link>
+          </div>
+          {apprenticeships.length > 0 ? <ProgramsExplorer programs={apprenticeships} variant="apprenticeship" /> : <p className="mt-8 rounded-xl bg-white p-6 text-slate-700">View the apprenticeship directory for current occupations and application steps.</p>}
+        </div>
+      </section>
+
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="max-w-3xl">
             <p className="text-sm font-extrabold uppercase tracking-widest text-brand-red-700">Regular Courses</p>
             <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Self-pay and payment-plan programs</h2>
-            <p className="mt-4 text-lg leading-relaxed text-slate-700">Use the filters to narrow the catalog instead of scrolling every program. Related names remain consolidated when they represent the same public pathway.</p>
+            <p className="mt-4 text-lg leading-relaxed text-slate-700">These are career-training courses with pay-in-full, installment, employer-sponsored, or Buy Now Pay Later options. BNPL requires separate provider approval and is not the same as free workforce funding.</p>
           </div>
           <ProgramsExplorer programs={selfPay} />
         </div>

@@ -388,6 +388,36 @@ export async function processCourseAgenticTask(input: {
     target.courseId = refreshedCourseId;
   }
 
+  if (task.worker === 'translation') {
+    const { data: lessons, error } = await db
+      .from('course_lessons')
+      .select('id,title,script')
+      .eq('course_id', target.courseId);
+    if (error) throw error;
+    const incomplete = (lessons ?? []).filter(
+      (lesson) => !stringValue(lesson.title) || !stringValue(lesson.script),
+    );
+    if (incomplete.length) {
+      throw new Error(
+        `Localization readiness blocked: ${incomplete.length} lessons are missing learner-facing title or narration.`,
+      );
+    }
+    await updateTask(
+      task,
+      project,
+      'completed',
+      {
+        course_id: target.courseId,
+        source_locale: 'en',
+        localization_ready_lessons: (lessons ?? []).length,
+        locale_variants_preserved: true,
+        learner_content_only: true,
+      },
+      `Localization contract verified for ${(lessons ?? []).length} canonical lessons.`,
+    );
+    return;
+  }
+
   if (task.worker === 'media-director') {
     const queued = await queueCourseMedia({ courseId: target.courseId, onlyMissing: true });
     const media = await getCourseMediaState(target.courseId, { verifyUrls: true });

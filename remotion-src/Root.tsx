@@ -60,6 +60,7 @@ const slideLessonDefaultProps: SlideLessonProps = {
   accentColor: '#3b82f6',
   backgroundColor: '#0f172a',
   logoText: 'Elevate LMS',
+  openingImageUrl: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
   scenes: [
     {
       scene_number: 1,
@@ -117,8 +118,8 @@ export function RemotionRoot() {
         component={SlideLesson}
         durationInFrames={slideTotalFrames}
         fps={15}
-        width={1280}
-        height={720}
+        width={1920}
+        height={1080}
         defaultProps={slideLessonDefaultProps as SlideLessonProps & Record<string, unknown>}
         calculateMetadata={({ props }) => ({
           durationInFrames: calcSlideLessonFrames(props.scenes),

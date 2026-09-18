@@ -25,6 +25,7 @@ import {
   createBrowserSpeechRecognition,
   type BrowserSpeechRecognition,
 } from '@/lib/browser/speech-recognition';
+import { linkifyParisRoutes, resolvePublicNavigation } from '@/lib/paris/public-navigation';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -32,12 +33,6 @@ interface Message {
 }
 
 const STORAGE_PREFIX = 'elevate:paris:conversation:';
-
-function linkifyParisRoutes(content: string): string {
-  return content
-    .replace(/\*\*(\/[a-z0-9/_-]+)\*\*/gi, '[$1]($1)')
-    .replace(/(^|[\s(])(https?:\/\/[^\s)<>]+)/gi, '$1[$2]($2)');
-}
 
 function plainTextForSpeech(content: string): string {
   return content
@@ -365,6 +360,22 @@ export default function ParisChat({
       setIsLoading(true);
 
       try {
+        if (surface === 'public') {
+          const destination = resolvePublicNavigation(trimmed);
+          if (destination) {
+            const reply = `Opening ${destination.label}.`;
+            setMessages((previous) => [...previous, { role: 'assistant', content: reply }]);
+            if (autoSpeak)
+              void voice.play(plainTextForSpeech(reply), {
+                voice: 'coral',
+                style: 'assistant',
+                rate: 1,
+                allowBrowserFallback: false,
+              });
+            router.push(destination.href);
+            return;
+          }
+        }
         if (portalSurface) {
           const command = resolvePortalNavigation(trimmed, pathname);
           if (command) {

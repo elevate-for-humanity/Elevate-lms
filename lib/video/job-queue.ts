@@ -312,7 +312,7 @@ async function updateMicroclipExperience(
   if (updateError) throw updateError;
 }
 
-export async function markRendering(jobId: string): Promise<void> {
+export async function markRendering(jobId: string, leaseToken?: string | null): Promise<void> {
   const supabase = db();
   const now = new Date().toISOString();
   let failureQuery = supabase

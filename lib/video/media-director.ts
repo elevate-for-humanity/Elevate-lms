@@ -302,7 +302,7 @@ function scriptScenes(script: string, title: string): Record<string, unknown>[] 
   });
   return groups.map((action, index) => {
     const phase = procedurePhase(action, index, groups.length);
-    const detail = /angle|position|blade|guard|hand|finger|line|section|tool/i.test(action);
+    const detail = /angle|position|blade|guard|hand|finger|line|section|tool|watch|observe|(?:you (?:can|will) see)|shown? (?:here|on screen)|demonstrat/i.test(action);
     return {
       action,
       scene_type: sceneTypeValue(undefined, index, groups.length),
@@ -351,18 +351,18 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
   const scenes = (sourceScenes.length ? sourceScenes : [fallbackScene]).map(
     (scene, index): MediaScene => {
       const referenceImageUrl =
-        stringValue(scene.reference_image_url, stringValue(raw.reference_image_url)) || undefined;
+        stringValue(scene.reference_image_url ?? scene.referenceImageUrl, stringValue(raw.reference_image_url ?? raw.referenceImageUrl)) || undefined;
       const sourceVideoUrl =
-        stringValue(scene.source_video_url, stringValue(raw.source_video_url)) || undefined;
+        stringValue(scene.source_video_url ?? scene.sourceVideoUrl, stringValue(raw.source_video_url ?? raw.sourceVideoUrl)) || undefined;
       const action = stringValue(
         scene.action,
-        stringValue(scene.visual_prompt, stringValue(raw.visual_prompt, input.script)),
+        stringValue(scene.visual_prompt ?? scene.visualPrompt, stringValue(raw.visual_prompt ?? raw.visualPrompt, input.script)),
       );
       const subject = stringValue(scene.subject, input.title);
       const environment = stringValue(
         scene.environment,
         stringValue(
-          scene.visual_prompt,
+          scene.visual_prompt ?? scene.visualPrompt,
           stringValue(
             raw.visual_prompt,
             stringValue(raw.environment, 'professional real-world environment'),
@@ -370,9 +370,9 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
         ),
       );
       const visualStyle = stringValue(
-        scene.visual_style,
+        scene.visual_style ?? scene.visualStyle,
         stringValue(
-          raw.visual_style,
+          raw.visual_style ?? raw.visualStyle,
           'branded educational motion graphics with licensed documentary footage',
         ),
       );
@@ -380,18 +380,19 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
         scene.lighting,
         stringValue(raw.lighting, 'natural motivated lighting'),
       );
-      const characterIds = Array.isArray(scene.character_ids)
-        ? scene.character_ids.filter((id): id is string => typeof id === 'string')
+      const rawCharacterIds = scene.character_ids ?? scene.characterIds;
+      const characterIds = Array.isArray(rawCharacterIds)
+        ? rawCharacterIds.filter((id): id is string => typeof id === 'string')
         : characters.map((character) => character.id);
 
       const mediaSource = ['pexels', 'elevate-owned', 'elevate-motion'].includes(
-        String(scene.media_source),
+        String(scene.media_source ?? scene.mediaSource),
       )
-        ? (scene.media_source as MediaScene['mediaSource'])
+        ? ((scene.media_source ?? scene.mediaSource) as MediaScene['mediaSource'])
         : index < Math.ceil(sourceScenes.length * 0.6)
           ? 'pexels'
           : 'elevate-motion';
-      const overlayTemplate = stringValue(scene.overlay_template, 'elevate-callout-v1');
+      const overlayTemplate = stringValue(scene.overlay_template ?? scene.overlayTemplate, 'elevate-callout-v1');
       const id = stringValue(scene.id, `scene-${index + 1}`);
       const contentHash = crypto
         .createHash('sha256')
@@ -402,7 +403,7 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
       return {
         id,
         order: index + 1,
-        durationSeconds: numberValue(scene.duration_seconds, defaultDuration, 1, 90),
+        durationSeconds: numberValue(scene.duration_seconds ?? scene.durationSeconds, defaultDuration, 1, 90),
         operation: operationValue(
           scene.operation,
           Boolean(referenceImageUrl),
@@ -412,8 +413,8 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
         environment,
         action,
         visualStyle,
-        shotSize: shotSizeValue(scene.shot_size),
-        cameraMove: cameraValue(scene.camera_move),
+        shotSize: shotSizeValue(scene.shot_size ?? scene.shotSize),
+        cameraMove: cameraValue(scene.camera_move ?? scene.cameraMove),
         lighting,
         dialogue: stringValue(scene.dialogue, stringValue(scene.narration)) || undefined,
         sound: stringValue(scene.sound) || undefined,
@@ -422,21 +423,21 @@ export function directMedia(input: MediaDirectorInput): MediaStoryboard {
         sourceVideoUrl,
         characterIds,
         negativePrompt:
-          stringValue(scene.negative_prompt, stringValue(raw.negative_prompt)) || undefined,
+          stringValue(scene.negative_prompt ?? scene.negativePrompt, stringValue(raw.negative_prompt ?? raw.negativePrompt)) || undefined,
         seed: Number.isFinite(Number(scene.seed)) ? Number(scene.seed) : undefined,
-        procedurePhase: stringValue(scene.procedure_phase) || undefined,
-        requiredVisualEvidence: stringValue(scene.required_visual_evidence, action) || undefined,
-        sceneType: sceneTypeValue(scene.scene_type, index, sourceScenes.length),
+        procedurePhase: stringValue(scene.procedure_phase ?? scene.procedurePhase) || undefined,
+        requiredVisualEvidence: stringValue(scene.required_visual_evidence ?? scene.requiredVisualEvidence, action) || undefined,
+        sceneType: sceneTypeValue(scene.scene_type ?? scene.sceneType, index, sourceScenes.length),
         memoryAnchor:
           stringValue(
-            scene.memory_anchor,
+            scene.memory_anchor ?? scene.memoryAnchor,
             stringValue((raw.teaching_model as Record<string, unknown> | undefined)?.memory_anchor),
           ) || undefined,
         mediaSource,
         overlayTemplate,
-        contentHash: stringValue(scene.content_hash, contentHash),
-        reviewStatus: ['approved', 'rejected'].includes(String(scene.review_status))
-          ? (scene.review_status as MediaScene['reviewStatus'])
+        contentHash: stringValue(scene.content_hash ?? scene.contentHash, contentHash),
+        reviewStatus: ['approved', 'rejected'].includes(String(scene.review_status ?? scene.reviewStatus))
+          ? ((scene.review_status ?? scene.reviewStatus) as MediaScene['reviewStatus'])
           : 'draft',
       };
     },

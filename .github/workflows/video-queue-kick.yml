@@ -1,4 +1,4 @@
-name: Process approved Barbering video queue
+name: Process approved course video queues
 
 on:
   workflow_dispatch:
@@ -12,25 +12,55 @@ permissions:
   contents: read
 
 concurrency:
-  group: controlled-barbering-video-production
+  group: controlled-course-video-production
   cancel-in-progress: false
 
 jobs:
   process:
+    name: Process ${{ matrix.course_name }} canonical CPU queue
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - course_name: Barbering
+            course_id: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17'
+          - course_name: Cosmetology
+            course_id: '9ca9fb50-7119-46ea-ab81-9b0193c29c31'
     env:
       ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
-      COURSE_ID: '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17'
+      COURSE_ID: ${{ matrix.course_id }}
+      REQUIRED_ADMIN_SHA: '2f89dd216546f0a37b31273d3c0bec31703a3843'
     steps:
-      - name: Process only the approved Barbering queue
+      - name: Wait for the approved Admin media planner release
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            live_sha=$((curl -fsS --connect-timeout 20 --max-time 30 "$ADMIN_URL/version.json" || true) | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{process.stdout.write(JSON.parse(d).commit||'')}catch{}})")
+            if [ "$live_sha" = "$REQUIRED_ADMIN_SHA" ]; then
+              exit 0
+            fi
+            echo "Admin media planner not live yet (attempt $attempt/90, live=$live_sha)"
+            sleep 60
+          done
+          echo "::error::Approved Admin media planner release did not become live"
+          exit 1
+
+      - name: Process only the approved course queue
         shell: bash
         run: |
           set -euo pipefail
           test -n "$CRON_SECRET"
           while true; do
-            status=$(curl -sS --connect-timeout 30 --max-time 1800               -o /tmp/video-worker.json -w '%{http_code}'               -X POST "$ADMIN_URL/api/internal/videos/process-queue"               -H "Authorization: Bearer $CRON_SECRET"               -H "Content-Type: application/json"               --data "{\"courseId\":\"$COURSE_ID\",\"maxJobs\":4}")
+            status=$(curl -sS --connect-timeout 30 --max-time 1800 \
+              -o /tmp/video-worker.json -w '%{http_code}' \
+              -X POST "$ADMIN_URL/api/internal/videos/process-queue" \
+              -H "Authorization: Bearer $CRON_SECRET" \
+              -H "Content-Type: application/json" \
+              --data "{\"courseId\":\"$COURSE_ID\",\"maxJobs\":2}")
             cat /tmp/video-worker.json
             case "$status" in
               200|202) ;;

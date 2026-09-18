@@ -275,7 +275,9 @@ function applyLockedCourseBuilderMediaPolicy(job: VideoJob): void {
     // The Course Builder contract is authoritative. Use the local renderer so
     // runtime environment variables cannot spend credits or transmit lesson
     // content to an external narration provider.
-    process.env.AI_NARRATION_PROVIDER = 'local';
+    // Repository instructor voices are Edge neural voice identifiers. Edge TTS is
+    // the zero-credit renderer for this locked policy; espeak-ng is emergency-only.
+    process.env.AI_NARRATION_PROVIDER = 'edge';
   }
 }
 
@@ -765,13 +767,13 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
     // layouts even when an older authored storyboard still carries a Pexels
     // lookup URL. Persist what was actually rendered so the quality gate audits
     // delivered media instead of stale planning metadata.
-    const completedStoryboard = {
+    const completedStoryboard: MediaStoryboard & { source_contract: unknown } = {
       ...renderedStoryboard,
       scenes: renderedStoryboard.scenes.map((scene) =>
         scene.sceneType && exactInstructionalSceneTypes.has(scene.sceneType)
           ? {
               ...scene,
-              mediaSource: 'elevate-motion',
+              mediaSource: 'elevate-motion' as const,
               resolvedProvider: 'remotion',
               resolvedModel: `deterministic-${scene.sceneType}`,
             }

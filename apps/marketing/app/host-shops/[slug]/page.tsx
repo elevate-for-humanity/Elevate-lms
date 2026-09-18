@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ExternalLink, MapPin, Navigation, Phone, ShieldCheck } from 'lucide-react';
 import HostShopMediaCarousel from '@/components/partners/HostShopMediaCarousel';
@@ -113,10 +114,16 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const externalUrl = profile.website_url || profile.website;
   const mapUrl = approved.googleMapsUrl || (address ? directionsUrl(address) : undefined);
   const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
+  const featuredFallback = getFeaturedHostPartnerBySlug(slug);
+  const featuredFallbackImages = (featuredFallback?.media ?? [])
+    .filter((media) => media.kind !== 'video')
+    .map((media) => ({ url: media.src, alt: media.alt }));
+  const featuredFallbackVideo = featuredFallback?.media?.find((media) => media.kind === 'video')?.src;
   const items = dedupeMedia([
     ...gallery,
     ...(profile.logo_url ? [{ url: profile.logo_url, alt: `${approved.name} logo`, source: profile.source_url || externalUrl || undefined }] : []),
     ...(profile.flyer_url ? [{ url: profile.flyer_url, alt: `${approved.name} flyer`, source: profile.source_url || externalUrl || undefined }] : []),
+    ...featuredFallbackImages,
   ]);
   const programs = approved.programs;
   const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
@@ -155,7 +162,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
             </div>
           </div>
           <div className="min-w-0">
-            {items.length || profile.video_url ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || undefined} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+            {items.length || profile.video_url ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || featuredFallbackVideo || undefined} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
           </div>
         </div>
       </section>
@@ -302,29 +309,28 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c') }} />
       {videoUrl ? (
         <section
-          className="relative isolate h-[clamp(500px,72svh,820px)] overflow-hidden bg-black"
+          className="border-b border-slate-200 bg-white px-4 py-8 sm:px-6 sm:py-12"
           data-scroll-narration
           data-narration={videoScript}
+          data-narration-rate="0.82"
+          data-narration-style="instructor"
         >
-          <video
-            src={videoUrl}
-            autoPlay
-            muted
-            loop
-            playsInline
-            controls
-            preload="metadata"
-            className="absolute inset-0 h-full w-full object-contain"
-            aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`}
-          />
-          <div className="pointer-events-none absolute inset-0 bg-black/45" aria-hidden="true" />
-          <div className="relative mx-auto flex h-full max-w-6xl items-end px-4 pb-8 pt-20 text-white sm:px-6 sm:pb-12">
-            <div className="max-w-3xl">
-              <p className="text-sm font-black uppercase tracking-[0.2em] text-white">{hostLabel}</p>
-              <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">{shop.dba ?? shop.name}</h1>
-              <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white sm:text-lg">
-                One of Elevate&apos;s participating {isBarberShop ? 'host shops' : 'host salons'} supporting apprenticeship training in a real {trainingSetting} environment.
-              </p>
+          <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">{hostLabel}</p>
+              <h1 className="mt-3 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">{shop.dba ?? shop.name}</h1>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-700 sm:text-lg">{shop.marketingBlurb ?? shop.note}</p>
+              <p className="mt-4 text-sm font-bold leading-6 text-slate-600">Listen to the page guide for the full shop and apprenticeship introduction. The tour video remains muted by default so two audio tracks never compete.</p>
+            </div>
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2 sm:items-center">
+              {imageItems[0] ? (
+                <div className="relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                  <Image src={imageItems[0].url} alt={imageItems[0].alt ?? `${shop.dba ?? shop.name} shop image`} fill sizes="(max-width: 640px) 100vw, 28vw" className="object-contain" />
+                </div>
+              ) : null}
+              <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg">
+                <video src={videoUrl} muted playsInline controls preload="metadata" className="aspect-[9/16] max-h-[560px] w-full object-contain" aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`} />
+              </div>
             </div>
           </div>
         </section>

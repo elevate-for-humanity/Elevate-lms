@@ -63,6 +63,25 @@ function words(value: string): string[] {
   return value.match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g) ?? [];
 }
 
+function dedupeTeachingSegments(value: string): string {
+  const seen = new Set<string>();
+  return value
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map((segment) => segment.trim())
+    .filter(Boolean)
+    .filter((segment) => {
+      const tokens = words(segment);
+      if (tokens.length < 6) return true;
+      const key = tokens.join(' ').toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function minimumWords(input: InstructionalScriptRepairInput): number {
   const kind = `${input.lessonType ?? ''} ${input.evidenceType ?? ''} ${input.lessonTitle}`.toLowerCase();
   if (/checkpoint|quiz|exam|review/.test(kind)) return 120;
@@ -141,7 +160,8 @@ export function repairInstructionalScript(
 ): InstructionalScriptRepairResult {
   const minimumWordCount = minimumWords(input);
   const decodedBaseScript = decodeHtml(input.baseScript);
-  const baseScript = sanitizeInternalInstructions(decodedBaseScript);
+  const sanitizedBaseScript = sanitizeInternalInstructions(decodedBaseScript);
+  const baseScript = dedupeTeachingSegments(sanitizedBaseScript);
   const baseWordCount = words(baseScript).length;
   const baseWasSanitized = baseScript !== decodedBaseScript;
   const maximumWordCount = maximumWords(input);
@@ -174,7 +194,7 @@ export function repairInstructionalScript(
   // Bound repaired narration while retaining enough governed instruction to
   // satisfy the quality contract and produce a useful lesson-sized video.
   const repairedWords = words(parts.join(' ')).slice(0, Math.max(minimumWordCount + 80, 500));
-  const script = repairedWords.join(' ');
+  const script = dedupeTeachingSegments(repairedWords.join(' '));
   const boundedScript = boundNarration(script, maximumWordCount);
   const wordCount = words(boundedScript).length;
   return {

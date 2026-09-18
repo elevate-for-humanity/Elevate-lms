@@ -914,8 +914,12 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       job.scene_data && typeof job.scene_data === 'object'
         ? compactLegacySceneData(job.scene_data as Record<string, unknown>).sceneData
         : job.scene_data;
+    const paidNarration = usesPaidNarration(job);
+    const cloudflareTtsModel = process.env.CLOUDFLARE_TTS_MODEL?.trim() || '@cf/deepgram/aura-1';
     const fingerprint = paidArtifactFingerprint({
       operation: 'lesson-video',
+      authorizationRoute: paidNarration ? 'cloudflare-tts-cpu-remotion' : 'paid-video-render',
+      narrationModel: paidNarration ? cloudflareTtsModel : null,
       courseId: job.course_id,
       lessonId: job.lesson_id,
       assetKind: job.asset_kind,
@@ -936,13 +940,15 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
             : Math.ceil((job.script?.split(/\s+/).filter(Boolean).length ?? 1) / 45)),
       ),
     );
-    const projectedCostMicros = Math.max(
-      0,
-      Number(
-        process.env.LESSON_VIDEO_PROJECTED_COST_MICROS ??
-          String(Math.max(500_000, estimatedScenes * 150_000)),
-      ),
-    );
+    const projectedCostMicros = paidNarration
+      ? Math.max(0, Number(process.env.CLOUDFLARE_TTS_PROJECTED_COST_MICROS ?? '100000'))
+      : Math.max(
+          0,
+          Number(
+            process.env.LESSON_VIDEO_PROJECTED_COST_MICROS ??
+              String(Math.max(500_000, estimatedScenes * 150_000)),
+          ),
+        );
     const authorization = await reservePaidInference(db, {
       scopeKey,
       tenantId,
@@ -951,8 +957,10 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       jobId: job.id,
       artifactFingerprint: fingerprint,
       idempotencyKey: `lesson-video:${job.id}:${fingerprint}`,
-      provider: 'media-pipeline',
-      model: process.env.GPU_VIDEO_PROVIDER?.trim() || REMOTION_MODEL,
+      provider: paidNarration ? 'cloudflare' : 'media-pipeline',
+      model: paidNarration
+        ? cloudflareTtsModel
+        : process.env.GPU_VIDEO_PROVIDER?.trim() || REMOTION_MODEL,
       operation: 'lesson-video',
       projectedCostMicros,
     });

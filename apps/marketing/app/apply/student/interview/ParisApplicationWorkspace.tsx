@@ -156,7 +156,8 @@ export default function ParisApplicationWorkspace({
             saved: 'Guardado automáticamente',
             requiredEvidence: 'Se requiere evidencia para las horas de transferencia reclamadas.',
             evidence: 'Evidencia de horas de transferencia',
-            review: 'PARIS puede ayudar a completar la solicitud, pero el personal autorizado toma las decisiones de admisión, financiamiento y aprobación.',
+            review:
+              'PARIS puede ayudar a completar la solicitud, pero el personal autorizado toma las decisiones de admisión, financiamiento y aprobación.',
             language: 'Idioma',
           }
         : {
@@ -174,7 +175,8 @@ export default function ParisApplicationWorkspace({
             saved: 'Saved automatically',
             requiredEvidence: 'Evidence is required for claimed transfer hours.',
             evidence: 'Transfer-hours evidence',
-            review: 'PARIS can help complete the application, but authorized staff make admissions, funding, and approval decisions.',
+            review:
+              'PARIS can help complete the application, but authorized staff make admissions, funding, and approval decisions.',
             language: 'Language',
           },
     [locale],
@@ -188,7 +190,8 @@ export default function ParisApplicationWorkspace({
       body: JSON.stringify(body),
     });
     const data = (await response.json().catch(() => ({}))) as InterviewResponse;
-    if (!response.ok || !data.ok) throw new Error(data.error || 'PARIS could not continue the interview.');
+    if (!response.ok || !data.ok)
+      throw new Error(data.error || 'PARIS could not continue the interview.');
     setSession(data);
     return data;
   }
@@ -206,7 +209,10 @@ export default function ParisApplicationWorkspace({
         const data = await callInterview({ action: 'start', locale: 'en' });
         if (alive) setSession(data);
       } catch (err) {
-        if (alive) setError(err instanceof Error ? err.message : 'Unable to start the application interview.');
+        if (alive)
+          setError(
+            err instanceof Error ? err.message : 'Unable to start the application interview.',
+          );
       } finally {
         if (alive) setLoading(false);
       }
@@ -225,7 +231,11 @@ export default function ParisApplicationWorkspace({
     const latest = [...session.messages].reverse().find((message) => message.role === 'assistant');
     if (!latest || latest.id === spokenMessageId.current) return;
     spokenMessageId.current = latest.id;
-    void parisVoice.play(latest.content, { style: 'assistant', rate: 0.96, allowBrowserFallback: false });
+    void parisVoice.play(latest.content, {
+      style: 'assistant',
+      rate: 0.96,
+      allowBrowserFallback: false,
+    });
   }, [parisVoice, session?.messages, speechEnabled]);
 
   function toggleParisSpeech() {
@@ -235,10 +245,16 @@ export default function ParisApplicationWorkspace({
       return;
     }
     setSpeechEnabled(true);
-    const latest = session?.messages ? [...session.messages].reverse().find((message) => message.role === 'assistant') : null;
+    const latest = session?.messages
+      ? [...session.messages].reverse().find((message) => message.role === 'assistant')
+      : null;
     if (latest) {
       spokenMessageId.current = latest.id;
-      void parisVoice.play(latest.content, { style: 'assistant', rate: 0.96, allowBrowserFallback: false });
+      void parisVoice.play(latest.content, {
+        style: 'assistant',
+        rate: 0.96,
+        allowBrowserFallback: false,
+      });
     }
   }
 
@@ -277,7 +293,9 @@ export default function ParisApplicationWorkspace({
 
     if (session?.state.pendingConfirmation) {
       const normalized = value.toLowerCase();
-      if (['yes', 'y', 'confirm', 'correct', 'sí', 'si', 'confirmar', 'correcto'].includes(normalized)) {
+      if (
+        ['yes', 'y', 'confirm', 'correct', 'sí', 'si', 'confirmar', 'correcto'].includes(normalized)
+      ) {
         setInput('');
         setDraftInputMode('text');
         await chooseAction('confirm');
@@ -333,7 +351,11 @@ export default function ParisApplicationWorkspace({
     };
     const Recognition = w.SpeechRecognition || w.webkitSpeechRecognition;
     if (!Recognition) {
-      setError(locale === 'es' ? 'Este navegador no admite reconocimiento de voz.' : 'This browser does not support speech recognition.');
+      setError(
+        locale === 'es'
+          ? 'Este navegador no admite reconocimiento de voz.'
+          : 'This browser does not support speech recognition.',
+      );
       return;
     }
     const recognition = new Recognition();
@@ -344,7 +366,11 @@ export default function ParisApplicationWorkspace({
     recognition.onend = () => setListening(false);
     recognition.onerror = () => {
       setListening(false);
-      setError(locale === 'es' ? 'No pude entender el audio. Inténtelo de nuevo o escriba su respuesta.' : 'I could not understand the audio. Try again or type your answer.');
+      setError(
+        locale === 'es'
+          ? 'No pude entender el audio. Inténtelo de nuevo o escriba su respuesta.'
+          : 'I could not understand the audio. Try again or type your answer.',
+      );
     };
     recognition.onresult = (event: any) => {
       const transcript = String(event.results?.[0]?.[0]?.transcript || '').trim();
@@ -360,7 +386,9 @@ export default function ParisApplicationWorkspace({
   async function submitApplication() {
     if (!session?.readyForSubmission || !session.applicationPayload || submitting) return;
     if (applicationIntent === 'enrollment' && !paymentSessionId) {
-      setError('Complete the verified payment or BNPL checkout before submitting this enrollment application.');
+      setError(
+        'Complete the verified payment or BNPL checkout before submitting this enrollment application.',
+      );
       return;
     }
     const answers = session.state.answers;
@@ -401,7 +429,8 @@ export default function ParisApplicationWorkspace({
         program?: string;
         error?: string;
       };
-      if (!response.ok || !data.ok || !data.id) throw new Error(data.error || 'Application could not be submitted.');
+      if (!response.ok || !data.ok || !data.id)
+        throw new Error(data.error || 'Application could not be submitted.');
       await callInterview({ action: 'link_application', applicationId: data.id, locale });
       const query = new URLSearchParams();
       if (data.referenceNumber) query.set('ref', data.referenceNumber);
@@ -425,7 +454,11 @@ export default function ParisApplicationWorkspace({
   }
 
   if (!session) {
-    return <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-900">{error || 'Unable to start the application interview.'}</div>;
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-900">
+        {error || 'Unable to start the application interview.'}
+      </div>
+    );
   }
 
   const question = session.nextQuestion;
@@ -440,8 +473,8 @@ export default function ParisApplicationWorkspace({
       ? programs.map((program) => ({ value: program.slug, label: program.title }))
       : null;
   const options = session.state.pendingConfirmation
-    ? question?.options ?? []
-    : programOptions ?? question?.options ?? [];
+    ? (question?.options ?? [])
+    : (programOptions ?? question?.options ?? []);
 
   return (
     <div className="max-w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -464,10 +497,25 @@ export default function ParisApplicationWorkspace({
             <p className="text-xs font-bold">{session.progress.percent}%</p>
             <p className="text-[11px] text-slate-400">{t.saved}</p>
           </div>
-          <div className="flex min-w-0 items-center rounded-lg border border-slate-700 bg-slate-900 p-1" aria-label={t.language}>
+          <div
+            className="flex min-w-0 items-center rounded-lg border border-slate-700 bg-slate-900 p-1"
+            aria-label={t.language}
+          >
             <Languages className="mx-2 h-4 w-4 text-slate-300" />
-            <button type="button" onClick={() => void switchLanguage('en')} className={`min-w-0 flex-1 whitespace-nowrap rounded-md px-2 py-2 text-sm font-bold sm:text-xs ${locale === 'en' ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}>English</button>
-            <button type="button" onClick={() => void switchLanguage('es')} className={`min-w-0 flex-1 whitespace-nowrap rounded-md px-2 py-2 text-sm font-bold sm:text-xs ${locale === 'es' ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}>Español</button>
+            <button
+              type="button"
+              onClick={() => void switchLanguage('en')}
+              className={`min-w-0 flex-1 whitespace-nowrap rounded-md px-2 py-2 text-sm font-bold sm:text-xs ${locale === 'en' ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}
+            >
+              English
+            </button>
+            <button
+              type="button"
+              onClick={() => void switchLanguage('es')}
+              className={`min-w-0 flex-1 whitespace-nowrap rounded-md px-2 py-2 text-sm font-bold sm:text-xs ${locale === 'es' ? 'bg-white text-slate-950' : 'text-slate-300 hover:bg-slate-800'}`}
+            >
+              Español
+            </button>
           </div>
         </div>
       </div>
@@ -482,11 +530,22 @@ export default function ParisApplicationWorkspace({
             tabIndex={0}
           >
             {session.messages.map((message) => (
-              <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-full rounded-2xl px-4 py-3 text-base leading-6 sm:max-w-[88%] sm:text-sm ${message.role === 'user' ? 'bg-brand-red-600 text-white' : 'border border-slate-200 bg-white text-slate-800 shadow-sm'}`}>
-                  {message.role !== 'user' && <p className="mb-1 text-[11px] font-black uppercase tracking-wide text-brand-red-700">PARIS</p>}
+              <div
+                key={message.id}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-full rounded-2xl px-4 py-3 text-base leading-6 sm:max-w-[88%] sm:text-sm ${message.role === 'user' ? 'bg-brand-red-600 text-white' : 'border border-slate-200 bg-white text-slate-800 shadow-sm'}`}
+                >
+                  {message.role !== 'user' && (
+                    <p className="mb-1 text-[11px] font-black uppercase tracking-wide text-brand-red-700">
+                      PARIS
+                    </p>
+                  )}
                   <p className="whitespace-pre-line">{message.content}</p>
-                  {message.input_mode === 'voice' && message.role === 'user' ? <p className="mt-1 text-[10px] text-red-100">Voice transcription</p> : null}
+                  {message.input_mode === 'voice' && message.role === 'user' ? (
+                    <p className="mt-1 text-[10px] text-red-100">Voice transcription</p>
+                  ) : null}
                 </div>
               </div>
             ))}
@@ -494,7 +553,9 @@ export default function ParisApplicationWorkspace({
             {question ? (
               <div className="rounded-2xl border border-brand-red-200 bg-white p-4 shadow-sm">
                 <p className="text-sm font-black text-slate-950">{question.prompt}</p>
-                {question.help ? <p className="mt-2 text-xs leading-5 text-slate-600">{question.help}</p> : null}
+                {question.help ? (
+                  <p className="mt-2 text-xs leading-5 text-slate-600">{question.help}</p>
+                ) : null}
                 {options.length ? (
                   <div className="mt-4 grid gap-2 sm:grid-cols-2">
                     {options.map((option) => (
@@ -527,7 +588,11 @@ export default function ParisApplicationWorkspace({
                   disabled={sending || listening}
                   className={`inline-flex h-12 w-12 flex-none items-center justify-center rounded-xl border ${listening ? 'border-brand-red-500 bg-red-50 text-brand-red-700' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}
                   aria-label={listening ? t.listening : 'Speak answer'}
-                  title={locale === 'es' ? 'Responder usando el micrófono' : 'Answer using the microphone'}
+                  title={
+                    locale === 'es'
+                      ? 'Responder usando el micrófono'
+                      : 'Answer using the microphone'
+                  }
                 >
                   {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                 </button>
@@ -544,8 +609,12 @@ export default function ParisApplicationWorkspace({
                   disabled={sending}
                   placeholder={
                     session.state.pendingConfirmation
-                      ? (locale === 'es' ? 'Escriba Sí o Cambiar…' : 'Type Yes or Change…')
-                      : (listening ? t.listening : t.typeAnswer)
+                      ? locale === 'es'
+                        ? 'Escriba Sí o Cambiar…'
+                        : 'Type Yes or Change…'
+                      : listening
+                        ? t.listening
+                        : t.typeAnswer
                   }
                   className="min-h-12 max-h-32 min-w-0 flex-1 resize-y rounded-xl border-2 border-slate-400 px-4 py-3 text-base text-slate-950 focus:border-brand-red-600 focus:outline-none focus:ring-2 focus:ring-red-100 disabled:bg-slate-100"
                   rows={2}
@@ -558,13 +627,23 @@ export default function ParisApplicationWorkspace({
                   className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-brand-red-600 text-white hover:bg-brand-red-700 disabled:opacity-50"
                   aria-label={t.send}
                 >
-                  {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                  {sending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Send className="h-5 w-5" />
+                  )}
                 </button>
               </div>
               {draftInputMode === 'voice' && input.trim() ? (
-                <p className="mt-2 text-xs font-medium text-slate-600" role="status">{t.voiceDraft}</p>
+                <p className="mt-2 text-xs font-medium text-slate-600" role="status">
+                  {t.voiceDraft}
+                </p>
               ) : null}
-              {error ? <p className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
+              {error ? (
+                <p className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                  {error}
+                </p>
+              ) : null}
             </div>
           ) : null}
         </section>
@@ -572,28 +651,57 @@ export default function ParisApplicationWorkspace({
         <aside className="bg-white p-4 sm:p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-brand-red-700">{t.status}</p>
+              <p className="text-xs font-black uppercase tracking-widest text-brand-red-700">
+                {t.status}
+              </p>
               <h2 className="mt-1 text-xl font-black text-slate-950">{t.summary}</h2>
             </div>
             <div className="text-right">
               <p className="text-2xl font-black text-slate-950">{session.progress.percent}%</p>
-              <p className="text-[11px] text-slate-500">{session.progress.complete.length}/{session.progress.required.length}</p>
+              <p className="text-[11px] text-slate-500">
+                {session.progress.complete.length}/{session.progress.required.length}
+              </p>
             </div>
           </div>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
-            <div className="h-full rounded-full bg-brand-red-600 transition-all" style={{ width: `${session.progress.percent}%` }} />
+            <div
+              className="h-full rounded-full bg-brand-red-600 transition-all"
+              style={{ width: `${session.progress.percent}%` }}
+            />
           </div>
 
-          <div className="mt-4 max-h-[24rem] space-y-2 overflow-y-auto overscroll-contain pr-1 sm:mt-6 lg:max-h-none lg:overflow-visible lg:pr-0">
+          <div
+            aria-label={
+              locale === 'es'
+                ? 'Detalles del progreso de la solicitud'
+                : 'Application progress details'
+            }
+            className="mt-4 max-h-[24rem] space-y-2 overflow-y-auto overscroll-contain pr-1 sm:mt-6 lg:max-h-none lg:overflow-visible lg:pr-0"
+            role="region"
+            tabIndex={0}
+          >
             {session.progress.required.map((field) => {
               const value = answers[field];
               const complete = session.progress.complete.includes(field);
               return (
-                <div key={field} className="flex items-start gap-3 rounded-xl border border-slate-200 p-3">
-                  {complete ? <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-emerald-600" /> : <ChevronRight className="mt-0.5 h-4 w-4 flex-none text-slate-400" />}
+                <div
+                  key={field}
+                  className="flex items-start gap-3 rounded-xl border border-slate-200 p-3"
+                >
+                  {complete ? (
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-emerald-600" />
+                  ) : (
+                    <ChevronRight className="mt-0.5 h-4 w-4 flex-none text-slate-400" />
+                  )}
                   <div className="min-w-0">
-                    <p className="text-xs font-black text-slate-800">{LABELS[field]?.[locale] || field}</p>
-                    <p className={`mt-0.5 break-words text-xs ${value ? 'text-slate-600' : 'text-slate-400'}`}>{value || (locale === 'es' ? 'Pendiente' : 'Pending')}</p>
+                    <p className="text-xs font-black text-slate-800">
+                      {LABELS[field]?.[locale] || field}
+                    </p>
+                    <p
+                      className={`mt-0.5 break-words text-xs ${value ? 'text-slate-600' : 'text-slate-400'}`}
+                    >
+                      {value || (locale === 'es' ? 'Pendiente' : 'Pending')}
+                    </p>
                   </div>
                 </div>
               );
@@ -614,20 +722,30 @@ export default function ParisApplicationWorkspace({
                   onChange={(event) => setTransferEvidence(event.target.files?.[0] || null)}
                   className="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs"
                 />
-                <span className="mt-2 block font-normal leading-5 text-slate-500">{t.requiredEvidence}</span>
+                <span className="mt-2 block font-normal leading-5 text-slate-500">
+                  {t.requiredEvidence}
+                </span>
               </label>
             ) : (
-              <p className="mt-2 text-xs leading-5 text-slate-600">{locale === 'es' ? 'PARIS mostrará requisitos adicionales cuando correspondan a su programa o ruta de financiamiento.' : 'PARIS will surface additional requirements when they apply to your program or funding path.'}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-600">
+                {locale === 'es'
+                  ? 'PARIS mostrará requisitos adicionales cuando correspondan a su programa o ruta de financiamiento.'
+                  : 'PARIS will surface additional requirements when they apply to your program or funding path.'}
+              </p>
             )}
           </div>
 
           <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-4 text-xs leading-5 text-blue-950">
-            <div className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 flex-none" /><p>{t.review}</p></div>
+            <div className="flex items-start gap-2">
+              <ShieldCheck className="mt-0.5 h-4 w-4 flex-none" />
+              <p>{t.review}</p>
+            </div>
           </div>
 
           {applicationIntent === 'enrollment' && !paymentSessionId ? (
             <div className="mt-4 rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-sm font-bold leading-6 text-amber-950">
-              Complete the verified deposit, full-payment, or eligible BNPL checkout below before submitting this enrollment application.
+              Complete the verified deposit, full-payment, or eligible BNPL checkout below before
+              submitting this enrollment application.
             </div>
           ) : null}
 
@@ -638,10 +756,25 @@ export default function ParisApplicationWorkspace({
               disabled={submitting || (applicationIntent === 'enrollment' && !paymentSessionId)}
               className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3.5 text-sm font-black text-white hover:bg-brand-red-700 disabled:opacity-60"
             >
-              {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> {t.submitting}</> : <><UserRound className="h-4 w-4" /> {applicationIntent === 'enrollment' && !paymentSessionId ? 'Payment required to submit' : t.submit}</>}
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> {t.submitting}
+                </>
+              ) : (
+                <>
+                  <UserRound className="h-4 w-4" />{' '}
+                  {applicationIntent === 'enrollment' && !paymentSessionId
+                    ? 'Payment required to submit'
+                    : t.submit}
+                </>
+              )}
             </button>
           ) : null}
-          {error && session.readyForSubmission ? <p className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
+          {error && session.readyForSubmission ? (
+            <p className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              {error}
+            </p>
+          ) : null}
         </aside>
       </div>
     </div>

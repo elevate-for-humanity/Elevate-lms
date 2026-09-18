@@ -195,7 +195,7 @@ export default function ProgramDetailPage({
 
 
       {/* A. HERO */}
-      <section data-scroll-narration data-narration={programHeroNarration} data-narration-rate="0.88">
+      <section data-scroll-narration data-narration={programHeroNarration} data-narration-rate="0.88" data-narration-style="instructor">
         {heroOverride ??
           (() => {
             // bannerProp is passed from the server page.tsx — use it first.

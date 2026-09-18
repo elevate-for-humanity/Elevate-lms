@@ -45,7 +45,9 @@ for (const id of ['elevate-production-env', 'telnyx-api-key']) {
   try {
     apiKey = findSecret(await nf(`/secrets/${id}`), 'TELNYX_API_KEY');
     if (apiKey) break;
-  } catch {}
+  } catch {
+    // Continue to the next known Northflank secret group.
+  }
 }
 if (!apiKey) throw new Error('TELNYX_API_KEY was not found in Northflank');
 
@@ -56,7 +58,7 @@ const existing = await fetch(
 if (existing.ok) {
   const json = await existing.json();
   if (Array.isArray(json.data) && json.data.some((item) => item.phone_number === NUMBER)) {
-    console.log(`ALREADY VERIFIED: ${NUMBER}`);
+    console.info(`ALREADY VERIFIED: ${NUMBER}`);
     process.exit(0);
   }
 }
@@ -79,6 +81,6 @@ if (!response.ok) {
     `Telnyx verification request failed HTTP ${response.status}: ${detail || 'request failed'}`,
   );
 }
-console.log(
+console.info(
   `VERIFICATION CALL REQUESTED: ${NUMBER}; id=${json.data?.id || 'accepted'}`,
 );

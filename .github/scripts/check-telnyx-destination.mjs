@@ -45,7 +45,9 @@ for (const id of ['elevate-production-env', 'telnyx-api-key']) {
   try {
     apiKey = findSecret(await nf(`/secrets/${id}`), 'TELNYX_API_KEY');
     if (apiKey) break;
-  } catch {}
+  } catch {
+    // Continue to the next known Northflank secret group.
+  }
 }
 if (!apiKey) throw new Error('TELNYX_API_KEY was not found in Northflank');
 
@@ -56,7 +58,7 @@ const response = await fetch(
 const json = await response.json();
 if (!response.ok) throw new Error(`Telnyx verified-number lookup failed HTTP ${response.status}`);
 const entries = Array.isArray(json.data) ? json.data : [];
-console.log(
+console.info(
   'VERIFIED NUMBER METADATA:',
   JSON.stringify(
     entries.map((item) => {
@@ -76,4 +78,4 @@ const verified = entries.some((item) => {
   return digits === targetDigits || digits.endsWith(targetDigits.slice(-10));
 });
 if (!verified) throw new Error(`NOT YET VERIFIED: ${NUMBER}`);
-console.log(`VERIFIED DESTINATION: ${NUMBER}`);
+console.info(`VERIFIED DESTINATION: ${NUMBER}`);

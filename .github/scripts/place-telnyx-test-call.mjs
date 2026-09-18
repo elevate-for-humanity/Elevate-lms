@@ -26,10 +26,12 @@ function findSecret(root, key) {
     if (Array.isArray(value)) {
       for (const item of value) {
         if (
-          item && typeof item === 'object' &&
+          item &&
+          typeof item === 'object' &&
           String(item.key ?? item.name ?? '') === key &&
           typeof (item.value ?? item.secret) === 'string'
-        ) return String(item.value ?? item.secret);
+        )
+          return String(item.value ?? item.secret);
         const found = walk(item);
         if (found) return found;
       }
@@ -51,7 +53,10 @@ async function getTelnyxKey() {
       const key = findSecret(group, 'TELNYX_API_KEY');
       if (key) return key;
     } catch (error) {
-      console.debug(`Unable to inspect Northflank secret group ${id}`, error instanceof Error ? error.message : error);
+      console.debug(
+        `Unable to inspect Northflank secret group ${id}`,
+        error instanceof Error ? error.message : error,
+      );
     }
   }
   const listing = await nf('/secrets');
@@ -65,7 +70,10 @@ async function getTelnyxKey() {
       const key = findSecret(await nf(`/secrets/${id}`), 'TELNYX_API_KEY');
       if (key) return key;
     } catch (error) {
-      console.debug(`Unable to inspect discovered Northflank secret group ${id}`, error instanceof Error ? error.message : error);
+      console.debug(
+        `Unable to inspect discovered Northflank secret group ${id}`,
+        error instanceof Error ? error.message : error,
+      );
     }
   }
   throw new Error('TELNYX_API_KEY was not found in Northflank');

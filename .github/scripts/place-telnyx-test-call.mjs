@@ -50,7 +50,9 @@ async function getTelnyxKey() {
       const group = await nf(`/secrets/${id}`);
       const key = findSecret(group, 'TELNYX_API_KEY');
       if (key) return key;
-    } catch {}
+    } catch (error) {
+      console.debug(`Unable to inspect Northflank secret group ${id}`, error instanceof Error ? error.message : error);
+    }
   }
   const listing = await nf('/secrets');
   const groups = Array.isArray(listing)
@@ -62,7 +64,9 @@ async function getTelnyxKey() {
     try {
       const key = findSecret(await nf(`/secrets/${id}`), 'TELNYX_API_KEY');
       if (key) return key;
-    } catch {}
+    } catch (error) {
+      console.debug(`Unable to inspect discovered Northflank secret group ${id}`, error instanceof Error ? error.message : error);
+    }
   }
   throw new Error('TELNYX_API_KEY was not found in Northflank');
 }
@@ -96,6 +100,6 @@ if (!response.ok) {
   const detail = json.errors?.map((error) => error.title || error.detail).join('; ');
   throw new Error(`Telnyx test call failed HTTP ${response.status}: ${detail || 'request failed'}`);
 }
-console.log(
+console.info(
   `TEST CALL ACCEPTED: ${FROM} -> ${TO}; call_control_id=${json.data?.call_control_id || 'accepted'}`,
 );

@@ -3,11 +3,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BriefcaseBusiness, GraduationCap, MapPin, ShieldCheck } from 'lucide-react';
 import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
-import HeroVideo from '@/components/marketing/HeroVideo';
-import heroBanners from '@/content/heroBanners';
+import HeroPicture from '@/components/marketing/HeroPicture';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
 import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
-const APPRENTICESHIP_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4';
 
 export const metadata: Metadata = {
   title: 'Apprenticeship Programs',
@@ -65,30 +63,26 @@ const EXPERIENCE = [
 ] as const;
 
 export default function ApprenticeshipsPage() {
-  const hero = heroBanners.apprenticeships;
   return (
     <main className="min-h-screen bg-white text-slate-950 [&_a]:no-underline [&_a:hover]:no-underline">
-      <HeroVideo
-        videoSrcDesktop={hero.videoSrcDesktop || APPRENTICESHIP_VIDEO}
-        videoSrcMobile={hero.videoSrcMobile || APPRENTICESHIP_VIDEO}
-        posterImage="/images/pages/apprenticeship-sponsor-page-1.webp"
-        voiceoverSrc={hero.voiceoverSrc}
-        narrateTranscript={false}
-        showSoundControl={false}
-        microLabel="Earn while you learn"
-        belowHeroHeadline="Apprenticeship puts training where the work happens."
-        belowHeroSubheadline="Build real skills through supervised work-based learning, structured instruction, progress tracking, and a clear path toward occupation-specific requirements."
-        ctas={[
-          { label: 'Explore Apprenticeships', href: '#programs' },
-          { label: 'Find Host Shops', href: '/partners/host-shops', variant: 'secondary' },
-        ]}
-        trustIndicators={hero.trustIndicators}
-        transcript={hero.transcript}
-        analyticsName="apprenticeships"
-        heightClassName="h-[clamp(520px,72vh,900px)]"
-        mediaFit="cover"
-        overlayMode="soft"
-      />
+      <section
+        data-scroll-narration
+        data-narration-rate="0.82"
+        data-narration-style="instructor"
+        data-narration="Welcome to Elevate's apprenticeship programs. An apprenticeship is not a regular classroom course. You learn the occupation through structured related instruction and paid, supervised work at an approved employer or Host Site. Start by choosing barbering, cosmetology, esthetics, or nail technology. Each page explains the skills, required hours, workplace training, progress records, licensing preparation, costs, and application steps. Apply first. Elevate then confirms enrollment, the training site, supervision, wages, schedule, and any approved funding before training begins."
+      >
+        <HeroPicture
+          src="/images/pages/apprenticeships-hero.webp"
+          alt="Apprentices learning skilled occupations through supervised workplace training"
+          analyticsName="apprenticeships"
+          belowHeroHeadline="Earn while you learn in a real workplace."
+          belowHeroSubheadline="Choose an occupation, complete related instruction, build skills through paid supervised work, and track your hours and competencies toward program completion."
+          ctas={[
+            { label: 'Explore Apprenticeships', href: '#programs' },
+            { label: 'Find Host Shops', href: '/partners/host-shops', variant: 'secondary' },
+          ]}
+        />
+      </section>
 
       <section className="border-b border-slate-200 bg-white px-4 py-10 sm:py-12">
         <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -116,13 +110,12 @@ export default function ApprenticeshipsPage() {
                 <Link href={pathway.href} className="block">
                   <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                     <Image src={pathway.image} alt={pathway.imageAlt} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" sizes="(max-width: 768px) 100vw, 50vw" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/65 via-transparent to-transparent" aria-hidden="true" />
-                    <span className="absolute left-4 top-4 rounded-full bg-slate-950/85 px-3 py-1.5 text-xs font-black uppercase tracking-wide text-white backdrop-blur-sm">{pathway.badge}</span>
-                    <h3 className="absolute bottom-5 left-5 right-5 text-2xl font-black text-white sm:text-3xl">{pathway.title}</h3>
+                    <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1.5 text-xs font-black uppercase tracking-wide text-slate-950 shadow">{pathway.badge}</span>
                   </div>
                 </Link>
                 <div className="p-6">
-                  <p className="text-sm font-medium leading-6 text-slate-700 sm:text-base">{pathway.description}</p>
+                  <h3 className="text-2xl font-black text-slate-950 sm:text-3xl">{pathway.title}</h3>
+                  <p className="mt-3 text-sm font-medium leading-6 text-slate-700 sm:text-base">{pathway.description}</p>
                   <div className="mt-5 grid grid-cols-2 gap-3">
                     <Link href={pathway.href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white hover:bg-slate-800">Program</Link>
                     <Link href={pathway.applyHref} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-3 text-sm font-black text-slate-950 hover:bg-slate-50">Apply</Link>

@@ -146,7 +146,7 @@ describe('canonical media completion quality gate', () => {
     });
     expect(failures).toEqual(
       expect.arrayContaining([
-        expect.stringContaining('below 1280x720'),
+        expect.stringContaining('below 1920x1080'),
         'photographic opening still is missing',
       ]),
     );

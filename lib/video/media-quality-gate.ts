@@ -66,8 +66,8 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   }
   if (evidence.videoStreams < 1) failures.push('MP4 has no decodable video stream');
   if (evidence.audioStreams < 1) failures.push('MP4 has no narration/audio stream');
-  if (evidence.width < 1280 || evidence.height < 720) {
-    failures.push(`video resolution ${evidence.width}x${evidence.height} is below 1280x720`);
+  if (evidence.width < 1920 || evidence.height < 1080) {
+    failures.push(`video resolution ${evidence.width}x${evidence.height} is below 1920x1080`);
   }
   if (!evidence.openingStillUrl) failures.push('photographic opening still is missing');
   if (evidence.storyboardSceneCount !== evidence.expectedSceneCount) {

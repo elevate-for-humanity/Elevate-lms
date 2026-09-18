@@ -16,7 +16,6 @@ import ProgramExperienceGuide from '@/components/programs/ProgramExperienceGuide
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import HeroVideo from '@/components/marketing/HeroVideo';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import ProgramApplyForm from '@/components/programs/ProgramApplyForm';
 import { PayNowButton } from '@/components/programs/PayNowButton';
@@ -157,7 +156,7 @@ export default function ProgramDetailPage({
     .join(', ');
   const programHeroNarration = isApprenticeship
     ? `Welcome to the ${p.title} page. This apprenticeship combines related instruction with supervised hands-on training at an approved Host Site. The published pathway is ${durationLabel}, with ${p.hoursPerWeekMin} to ${p.hoursPerWeekMax} hours per week. Training covers ${narrationCurriculum || 'the required occupational competencies'} and prepares participants for ${narrationCredentials || 'the listed completion requirements'}. Apply first, complete intake, confirm Host Site placement and payment or funding arrangements, then begin documented instruction and workplace learning. Continue down the page for requirements, schedule, costs, payment options, and the application link.`
-    : `Welcome to the ${p.title} program page. This is a ${durationLabel} ${p.deliveryMode === 'hybrid' ? 'hybrid program that generally starts with self-paced coursework from home and continues with scheduled hands-on training at a real training, lab, or employer site' : p.deliveryMode === 'online' ? 'online program' : 'in-person program'}. Training covers ${narrationCurriculum || 'the published program competencies'} and prepares participants for ${narrationCredentials || 'the listed credentials'}. Apply first and complete intake so admissions can confirm your schedule, requirements, and enrollment path. ${showPriorityFundingPath ? 'Training may be free if you qualify and receive agency authorization.' : ''} If funding does not apply, review pay-in-full, installment, buy now pay later, and employer-sponsored options below. Continue down the page for the complete curriculum, costs, credentials, and application steps.`;
+    : `Welcome to the ${p.title} program page. This is a ${durationLabel} ${p.deliveryMode === 'hybrid' ? 'hybrid program that generally starts with self-paced coursework from home and continues with scheduled hands-on training at a real training, lab, or employer site' : p.deliveryMode === 'online' ? 'online program' : 'in-person program'}. Training covers ${narrationCurriculum || 'the published program competencies'} and prepares participants for ${narrationCredentials || 'the listed credentials'}. Apply first and complete intake so admissions can confirm your schedule, requirements, and enrollment path. ${isWorkforceFunded ? 'Training may be free only if you qualify and receive written agency authorization before enrollment.' : ''} If funding does not apply, review pay-in-full, installment, buy now pay later, and employer-sponsored options below. Continue down the page for the complete curriculum, costs, credentials, and application steps.`;
 
   const pathwaySteps = [
     {
@@ -227,29 +226,13 @@ export default function ProgramDetailPage({
               const bannerCtas = [banner.primaryCta, banner.secondaryCta].filter(
                 (cta): cta is NonNullable<typeof cta> => Boolean(cta?.href && cta.label),
               );
-              // Use HeroPicture when no video is configured — avoids passing
-              // undefined to HeroVideo's required videoSrcDesktop prop.
-              if (!banner.videoSrcDesktop) {
-                return (
-                  <HeroPicture
-                    src={heroPosterSrc}
-                    alt={heroAlt}
-                    preserveAspectRatio={p.slug === 'bookkeeping'}
-                    microLabel={banner.microLabel}
-                    analyticsName={banner.analyticsName}
-                    belowHeroHeadline={safeHeadline}
-                    belowHeroSubheadline={safeSubheadline}
-                    ctas={bannerCtas}
-                    trustIndicators={safeTrustIndicators}
-                    transcript={safeTranscript}
-                  />
-                );
-              }
+              // Program pages use a clear picture-first hero. Primary copy and
+              // actions render below the image so no dark overlay obscures the media.
               return (
-                <HeroVideo
-                  videoSrcDesktop={banner.videoSrcDesktop}
-                  posterImage={heroPosterSrc}
-                  voiceoverSrc={voiceoverSrc}
+                <HeroPicture
+                  src={heroPosterSrc}
+                  alt={heroAlt}
+                  preserveAspectRatio={p.slug === 'bookkeeping'}
                   microLabel={banner.microLabel}
                   analyticsName={banner.analyticsName}
                   belowHeroHeadline={safeHeadline}
@@ -257,11 +240,6 @@ export default function ProgramDetailPage({
                   ctas={bannerCtas}
                   trustIndicators={safeTrustIndicators}
                   transcript={safeTranscript}
-                  narrateTranscript={false}
-                  transcriptVoiceStyle="assistant"
-                  transcriptVoiceRate={0.88}
-                  preloadTranscriptVoice={false}
-                  overlayMode="none"
                 />
               );
             }
@@ -282,11 +260,11 @@ export default function ProgramDetailPage({
             );
           })()}
 
-      {showPriorityFundingPath ? (
+      {isWorkforceFunded ? (
         <section className="border-b-4 border-emerald-950 bg-emerald-700 px-4 py-8 text-white sm:py-10">
           <div className="mx-auto max-w-6xl text-center">
             <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-100">
-              HVAC · CDL · Bookkeeping · Business
+              Workforce-funded training pathway
             </p>
             <h1 className="mt-3 text-4xl font-black uppercase leading-tight tracking-tight sm:text-5xl lg:text-6xl">
               Training may be free if you qualify.
@@ -321,9 +299,10 @@ export default function ProgramDetailPage({
               </a>
             </div>
             <p className="mx-auto mt-5 max-w-4xl text-sm font-bold leading-6 text-emerald-50">
-              If you do not qualify, you can still enroll using pay-in-full, an available
-              installment plan, buy now/pay later when approved by the payment provider, or
-              employer-sponsored training. Exact terms are shown before you commit.
+              If workforce funding is not approved, Buy Now Pay Later is one optional payment
+              alternative—not free training and not guaranteed. You may also choose pay-in-full,
+              an available installment plan, or approved employer-sponsored training. Every
+              payment provider decides its own approval and terms before you commit.
             </p>
             <p className="mt-3 text-xs font-semibold leading-5 text-emerald-100">
               Funding depends on participant eligibility, program eligibility, available funds,
@@ -574,12 +553,12 @@ export default function ProgramDetailPage({
             <div id="payment-options" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
               <h3 className="text-xl font-black text-slate-950">Funding and payment options</h3>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
-                {showPriorityFundingPath ? (
-                  <li><strong className="text-slate-950">Workforce funding:</strong> Training may be free if you qualify and receive agency authorization.</li>
+                {isWorkforceFunded ? (
+                  <li><strong className="text-slate-950">Workforce funding:</strong> Training may be free only if you qualify and receive written agency authorization before enrollment.</li>
                 ) : null}
                 <li><strong className="text-slate-950">Pay in full:</strong> Pay the published tuition through the secure enrollment process.</li>
                 <li><strong className="text-slate-950">Payment plan:</strong> Split eligible tuition into installments; deposit and terms are shown before acceptance.</li>
-                <li><strong className="text-slate-950">Buy now/pay later:</strong> Apply through the available provider; approval and terms are determined by that provider.</li>
+                <li><strong className="text-slate-950">Buy Now Pay Later:</strong> If workforce funding is not approved, this is one optional payment alternative. It is not free training, is not funding, and requires separate provider approval.</li>
                 <li><strong className="text-slate-950">Employer-sponsored:</strong> An employer may pay eligible costs when an arrangement is approved.</li>
               </ul>
             </div>

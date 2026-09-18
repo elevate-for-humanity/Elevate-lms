@@ -176,7 +176,7 @@ export async function getPexelsVideoClip(
       .filter((file) => file.file_type === 'video/mp4' && orientationMatches(file))
       .sort((left, right) => right.width * right.height - left.width * left.height);
     const hdFile =
-      ranked.find((f) => f.quality === 'hd' && f.width >= 1280 && f.height >= 720) ??
+      ranked.find((f) => f.quality === 'hd' && f.width >= 1920 && f.height >= 1080) ??
       video.video_files.find(
         (f) => orientationMatches(f) && f.quality === 'sd' && Math.max(f.width, f.height) >= 640,
       ) ??
@@ -187,7 +187,7 @@ export async function getPexelsVideoClip(
 
     // Never upscale a low-resolution clip into the 1920x1080 lesson canvas.
     // A sharp still is preferable to blurry motion.
-    return hdFile && hdFile.width >= 1280 && hdFile.height >= 720 ? hdFile.link : null;
+    return hdFile && hdFile.width >= 1920 && hdFile.height >= 1080 ? hdFile.link : null;
   } catch (err) {
     logger.warn('[pexels] video fetch error', { err });
     return null;

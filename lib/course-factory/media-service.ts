@@ -301,7 +301,11 @@ export async function queueCourseLessonVideos(
         lesson.media_quality_status === 'approved' &&
         existingLessonJob?.review_status === 'approved' &&
         hasCanonicalMediaQualityEvidence(existingLessonJob.quality_evidence);
-      const mainInFlight = lesson.video_status === 'queued' || lesson.video_status === 'rendering';
+      // video_jobs is the durable execution authority. course_lessons.video_status
+      // is a denormalized display field and may be stale after a worker crash or
+      // failed retry; trusting it here can strand a failed canonical job forever.
+      const mainInFlight =
+        existingLessonJob?.status === 'queued' || existingLessonJob?.status === 'rendering';
       // Queued/draft jobs still need their canonical payload synchronized after
       // a curriculum refresh. Only a renderer-owned active lease is immutable.
       const shouldQueueMain =

@@ -46,7 +46,7 @@ export function PlatformHubHero() {
                 <span className="mt-3 block font-black">I am a Host Shop</span>
                 <span className="mt-1 block text-sm font-semibold text-slate-600">Employ and train apprentices.</span>
               </Link>
-              <Link href="/program-holder/apply" className="group rounded-2xl border-2 border-slate-900 bg-white p-4 text-slate-950 no-underline hover:bg-slate-50 hover:no-underline">
+              <Link href="/apply/program-holder" className="group rounded-2xl border-2 border-slate-900 bg-white p-4 text-slate-950 no-underline hover:bg-slate-50 hover:no-underline">
                 <BriefcaseBusiness className="h-6 w-6" aria-hidden="true" />
                 <span className="mt-3 block font-black">I run a program</span>
                 <span className="mt-1 block text-sm font-semibold text-slate-600">Use Elevate to deliver it.</span>

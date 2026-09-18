@@ -95,6 +95,11 @@ function OperationalShortcuts() {
       href: '/program-holders',
     },
     {
+      title: 'Phone System',
+      description: 'Manage business numbers, personal extensions, routing, calls, and voicemail.',
+      href: '/phone',
+    },
+    {
       title: 'Host Shops',
       description: 'Manage host shops, apprentices, verification, and compliance.',
       href: '/partners',

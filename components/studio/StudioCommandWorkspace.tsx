@@ -1,8 +1,18 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { Bot, Eye, Globe2, MessageSquare, PanelRightOpen, Plus } from 'lucide-react';
+import {
+  Bot,
+  Eye,
+  Globe2,
+  LayoutDashboard,
+  MessageSquare,
+  PanelRightOpen,
+  Phone,
+  Plus,
+} from 'lucide-react';
 import UnifiedEllieChat from './UnifiedEllieChat';
 import RepositoryLivePreview from './RepositoryLivePreview';
 import type { OrchestratedPlanCheckpoint } from '@/lib/devstudio/ellie-unified-handlers';
@@ -160,6 +170,24 @@ export default function StudioCommandWorkspace({
               Build, inspect, and operate
             </span>
           </div>
+          <div className="ml-auto flex shrink-0 items-center gap-1">
+            <Link
+              href="/dashboard"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-white/20 px-2.5 text-xs font-bold hover:bg-white/10 sm:px-3"
+              aria-label="Open admin dashboard"
+            >
+              <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden min-[430px]:inline">Dashboard</span>
+            </Link>
+            <Link
+              href="/phone"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-white/20 px-2.5 text-xs font-bold hover:bg-white/10 sm:px-3"
+              aria-label="Open phone system"
+            >
+              <Phone className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden min-[430px]:inline">Phone</span>
+            </Link>
+          </div>
           <button
             type="button"
             onClick={() => {
@@ -171,7 +199,7 @@ export default function StudioCommandWorkspace({
               setBrowserTarget('');
               setSurface('commands');
             }}
-            className="ml-auto inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-white/20 px-3 text-xs font-bold hover:bg-white/10"
+            className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-white/20 px-2.5 text-xs font-bold hover:bg-white/10 sm:px-3"
           >
             <Plus className="h-4 w-4" aria-hidden="true" /> New task
           </button>

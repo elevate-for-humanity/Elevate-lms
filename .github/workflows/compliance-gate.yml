@@ -185,7 +185,15 @@ jobs:
           echo '::error::Marketing server did not become ready within 120 seconds.'
           exit 1
       - name: Run accessibility tests
-        run: pnpm exec playwright test tests/e2e/accessibility.spec.ts --config playwright.config.ts
+        run: |
+          # Start each device profile in a fresh Playwright process. This keeps
+          # long WCAG sweeps from accumulating browser memory across engines and
+          # turning real accessibility results into WebKit/Chromium crashes.
+          for project in desktop-chrome laptop-chrome tablet-chrome iphone-webkit android-chrome; do
+            pnpm exec playwright test tests/e2e/accessibility.spec.ts \
+              --config playwright.config.ts \
+              --project="$project"
+          done
       - name: Homepage config leak smoke
         run: pnpm exec playwright test tests/e2e/home-config-leaks.spec.ts --config playwright.config.ts
       - name: Upload test results

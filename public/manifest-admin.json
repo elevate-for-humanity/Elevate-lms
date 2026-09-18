@@ -20,10 +20,11 @@
     {"src":"/icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
   ],
   "shortcuts": [
+    {"name":"Admin Dashboard","short_name":"Dashboard","url":"/dashboard","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
+    {"name":"Phone System","short_name":"Phone","url":"/phone","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
     {"name":"Admin AI Studio","short_name":"Studio","url":"/studio","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
     {"name":"Students","short_name":"Students","url":"/students","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
-    {"name":"Applications","short_name":"Apps","url":"/applications","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]},
-    {"name":"Reports","short_name":"Reports","url":"/reports","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]}
+    {"name":"Applications","short_name":"Apps","url":"/applications","icons":[{"src":"/icon-96.png","sizes":"96x96","type":"image/png"}]}
   ],
   "id": "org.elevateforhumanity.admin",
   "launch_handler": {"client_mode":"navigate-existing"},

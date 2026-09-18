@@ -193,6 +193,95 @@ export default function ProgramDetailPage({
 
   return (
     <main className="min-h-screen bg-white [&_a]:no-underline [&_a:hover]:no-underline">
+
+
+      {/* A. HERO */}
+      <section data-scroll-narration data-narration={programHeroNarration} data-narration-rate="0.88">
+        {heroOverride ??
+          (() => {
+            // bannerProp is passed from the server page.tsx — use it first.
+            // heroBanners Proxy returns {} on the client (loadJsonOnce is server-only).
+            // Check pageKey to distinguish a real banner from the empty fallback object.
+            const banner = bannerProp ?? heroBanners[p.slug];
+            if (banner?.pageKey) {
+              const safeHeadline = sanitizePublicFundingText(
+                banner.belowHeroHeadline,
+                p.slug,
+                p.title,
+              );
+              const safeSubheadline = sanitizePublicFundingText(
+                banner.belowHeroSubheadline,
+                p.slug,
+                p.subtitle,
+              );
+              const safeTrustIndicators = sanitizePublicFundingList(banner.trustIndicators, p.slug);
+              const safeTranscript = sanitizePublicFundingText(
+                programHeroNarration,
+                p.slug,
+                safeSubheadline,
+              );
+              // Only use a recorded track when it was authored for this exact script.
+              // Otherwise the site-wide homepage narrator reads the current page-specific copy.
+              const voiceoverSrc =
+                safeTranscript === banner.transcript ? banner.voiceoverSrc : undefined;
+              const bannerCtas = [banner.primaryCta, banner.secondaryCta].filter(
+                (cta): cta is NonNullable<typeof cta> => Boolean(cta?.href && cta.label),
+              );
+              // Use HeroPicture when no video is configured — avoids passing
+              // undefined to HeroVideo's required videoSrcDesktop prop.
+              if (!banner.videoSrcDesktop) {
+                return (
+                  <HeroPicture
+                    src={heroPosterSrc}
+                    alt={heroAlt}
+                    preserveAspectRatio={p.slug === 'bookkeeping'}
+                    microLabel={banner.microLabel}
+                    analyticsName={banner.analyticsName}
+                    belowHeroHeadline={safeHeadline}
+                    belowHeroSubheadline={safeSubheadline}
+                    ctas={bannerCtas}
+                    trustIndicators={safeTrustIndicators}
+                    transcript={safeTranscript}
+                  />
+                );
+              }
+              return (
+                <HeroVideo
+                  videoSrcDesktop={banner.videoSrcDesktop}
+                  posterImage={heroPosterSrc}
+                  voiceoverSrc={voiceoverSrc}
+                  microLabel={banner.microLabel}
+                  analyticsName={banner.analyticsName}
+                  belowHeroHeadline={safeHeadline}
+                  belowHeroSubheadline={safeSubheadline}
+                  ctas={bannerCtas}
+                  trustIndicators={safeTrustIndicators}
+                  transcript={safeTranscript}
+                  narrateTranscript={false}
+                  transcriptVoiceStyle="assistant"
+                  transcriptVoiceRate={0.88}
+                  preloadTranscriptVoice={false}
+                  overlayMode="none"
+                />
+              );
+            }
+            // Fallback: plain image hero for programs without a banner entry
+            return (
+              <div className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden">
+                {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
+                <Image
+                  src={heroPosterSrc}
+                  alt={heroAlt}
+                  fill
+                  className="object-cover object-center"
+                  priority
+                  sizes="100vw"
+                  placeholder="empty"
+                />
+              </div>
+            );
+          })()}
+
       {showPriorityFundingPath ? (
         <section className="border-b-4 border-emerald-950 bg-emerald-700 px-4 py-8 text-white sm:py-10">
           <div className="mx-auto max-w-6xl text-center">
@@ -267,92 +356,6 @@ export default function ProgramDetailPage({
           </div>
         </section>
       ) : null}
-
-      {/* A. HERO */}
-      <section data-scroll-narration data-narration={programHeroNarration}>
-        {heroOverride ??
-          (() => {
-            // bannerProp is passed from the server page.tsx — use it first.
-            // heroBanners Proxy returns {} on the client (loadJsonOnce is server-only).
-            // Check pageKey to distinguish a real banner from the empty fallback object.
-            const banner = bannerProp ?? heroBanners[p.slug];
-            if (banner?.pageKey) {
-              const safeHeadline = sanitizePublicFundingText(
-                banner.belowHeroHeadline,
-                p.slug,
-                p.title,
-              );
-              const safeSubheadline = sanitizePublicFundingText(
-                banner.belowHeroSubheadline,
-                p.slug,
-                p.subtitle,
-              );
-              const safeTrustIndicators = sanitizePublicFundingList(banner.trustIndicators, p.slug);
-              const safeTranscript = sanitizePublicFundingText(
-                programHeroNarration,
-                p.slug,
-                safeSubheadline,
-              );
-              // Only use a recorded track when it was authored for this exact script.
-              // Otherwise the site-wide homepage narrator reads the current page-specific copy.
-              const voiceoverSrc =
-                safeTranscript === banner.transcript ? banner.voiceoverSrc : undefined;
-              const bannerCtas = [banner.primaryCta, banner.secondaryCta].filter(
-                (cta): cta is NonNullable<typeof cta> => Boolean(cta?.href && cta.label),
-              );
-              // Use HeroPicture when no video is configured — avoids passing
-              // undefined to HeroVideo's required videoSrcDesktop prop.
-              if (!banner.videoSrcDesktop) {
-                return (
-                  <HeroPicture
-                    src={heroPosterSrc}
-                    alt={heroAlt}
-                    preserveAspectRatio={p.slug === 'bookkeeping'}
-                    microLabel={banner.microLabel}
-                    analyticsName={banner.analyticsName}
-                    belowHeroHeadline={safeHeadline}
-                    belowHeroSubheadline={safeSubheadline}
-                    ctas={bannerCtas}
-                    trustIndicators={safeTrustIndicators}
-                    transcript={safeTranscript}
-                  />
-                );
-              }
-              return (
-                <HeroVideo
-                  videoSrcDesktop={banner.videoSrcDesktop}
-                  posterImage={heroPosterSrc}
-                  voiceoverSrc={voiceoverSrc}
-                  microLabel={banner.microLabel}
-                  analyticsName={banner.analyticsName}
-                  belowHeroHeadline={safeHeadline}
-                  belowHeroSubheadline={safeSubheadline}
-                  ctas={bannerCtas}
-                  trustIndicators={safeTrustIndicators}
-                  transcript={safeTranscript}
-                  narrateTranscript={false}
-                  transcriptVoiceStyle="assistant"
-                  transcriptVoiceRate={0.98}
-                  preloadTranscriptVoice={false}
-                />
-              );
-            }
-            // Fallback: plain image hero for programs without a banner entry
-            return (
-              <div className="relative h-[clamp(520px,72svh,860px)] w-full overflow-hidden">
-                {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
-                <Image
-                  src={heroPosterSrc}
-                  alt={heroAlt}
-                  fill
-                  className="object-cover object-center"
-                  priority
-                  sizes="100vw"
-                  placeholder="empty"
-                />
-              </div>
-            );
-          })()}
 
         {isApprenticeship ? (
           <div className="border-y border-red-200 bg-red-700 px-4 py-4 text-white">

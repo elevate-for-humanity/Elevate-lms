@@ -178,6 +178,8 @@ export default function FeaturedHostPartners({
                         className="bg-slate-950 px-4 py-5 sm:px-6"
                         data-scroll-narration
                         data-narration={video.script}
+                        data-narration-rate="0.84"
+                        data-narration-style="instructor"
                       >
                         <div>
                           <div className="relative mx-auto w-full max-w-lg overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">

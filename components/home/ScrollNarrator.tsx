@@ -17,7 +17,7 @@ function narrationSourceFor(section: HTMLElement) {
 
 function narrationRateFor(section: HTMLElement) {
   const value = Number(section.dataset.narrationRate);
-  return Number.isFinite(value) && value >= 0.75 && value <= 1.1 ? value : 0.98;
+  return Number.isFinite(value) && value >= 0.75 && value <= 1.1 ? value : 0.84;
 }
 
 function narrationStyleFor(section: HTMLElement) {

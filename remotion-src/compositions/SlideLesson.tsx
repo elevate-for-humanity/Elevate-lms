@@ -520,8 +520,8 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
             left: 0,
             right: '40%',
             background: bright
-              ? 'linear-gradient(90deg, rgba(248,250,252,0.68) 0%, rgba(248,250,252,0.20) 62%, transparent 100%)'
-              : 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.22) 62%, transparent 100%)',
+              ? 'linear-gradient(90deg, rgba(248,250,252,0.68) 0%, rgba(248,250,252,0.06) 62%, transparent 100%)'
+              : 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.08) 62%, transparent 100%)',
           }}
         />
       )}

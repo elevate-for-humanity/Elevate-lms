@@ -797,16 +797,12 @@ export async function renderStoryboardVideo(
       const message = error instanceof Error ? error.message : String(error);
       if (!message.includes('Failed to load image with src [object Object]')) throw error;
 
-      logger.warn(
-        '[RemotionRender] Provider visual was not serializable; retrying on the branded instructional canvas',
-        { lessonId: input.lessonId },
-      );
-      const canvasScenes = normalizedScenes.map((scene) => ({
-        ...scene,
-        clipUrl: null,
-        imageUrl: null,
-      }));
-      await renderSlideLesson({ ...props, scenes: canvasScenes });
+      // Never turn a broken provider asset into a learner-facing white/canvas
+      // slideshow. That fallback used planning metadata as if the intended
+      // visuals had actually rendered, so it could survive the provenance gate.
+      // Fail closed and keep the previous approved lesson video active while a
+      // corrected, source-locked job is retried.
+      throw new Error('MEDIA_VISUAL_SERIALIZATION_FAILED', { cause: error });
     }
     const captionUrl = await uploadCourseVideosObject(
       Buffer.from(buildStoryboardWebVtt(scenes), 'utf8'),

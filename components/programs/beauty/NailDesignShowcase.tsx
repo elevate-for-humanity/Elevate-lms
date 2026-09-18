@@ -40,7 +40,7 @@ const slides = [
   },
 ] as const;
 
-export default function NailDesignShowcase() {
+export default function NailDesignShowcase({ asHero = false }: { asHero?: boolean }) {
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -55,19 +55,25 @@ export default function NailDesignShowcase() {
   };
 
   return (
-    <section className="overflow-hidden bg-gradient-to-b from-rose-50 via-white to-white px-4 py-12 sm:px-6 sm:py-16">
+    <section className={`overflow-hidden bg-gradient-to-b from-rose-50 via-white to-white px-4 ${asHero ? 'pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8' : 'py-12 sm:px-6 sm:py-16'}`}>
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto mb-8 max-w-3xl text-center sm:mb-10">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-rose-100 px-4 py-2 text-sm font-black text-rose-800">
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             Hands-on beauty skills
           </div>
-          <h2 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-            Learn nail design, artistry, and more
-          </h2>
+          {asHero ? (
+            <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">
+              Cosmetology Apprenticeship: learn in a real salon
+            </h1>
+          ) : (
+            <h2 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+              Learn nail design, artistry, and more
+            </h2>
+          )}
           <p className="mt-4 text-base font-medium leading-7 text-slate-700 sm:text-lg">
-            Explore creative techniques while learning the preparation, sanitation, product control,
-            and professional habits behind beautiful results.
+            Build hair, nail, sanitation, client-service, and professional salon skills through
+            related instruction and paid, supervised training at an approved Host Salon.
           </p>
         </div>
 

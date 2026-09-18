@@ -668,12 +668,17 @@ export async function runTaskExecution(
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    const capabilityBlocked =
+      /PAID_INFERENCE_AUTHORIZATION_REQUIRED|API[_\s-]?(?:KEY|TOKEN).*(?:MISSING|NOT CONFIGURED|REQUIRED)|NO CREDENTIALS|CAPABILITY.*NOT CONNECTED/i.test(
+        message,
+      );
+    const terminalStatus = capabilityBlocked ? 'blocked' : 'failed';
     if (executeStep) {
       await db
         .from('ai_task_steps')
         .update({
-          status: 'failed',
-          completed_at: new Date().toISOString(),
+          status: terminalStatus,
+          completed_at: capabilityBlocked ? null : new Date().toISOString(),
           error_message: message,
           output: message,
         })
@@ -682,24 +687,26 @@ export async function runTaskExecution(
     await db
       .from('ai_tasks')
       .update({
-        status: 'failed',
+        status: terminalStatus,
         error_message: message,
-        completed_at: new Date().toISOString(),
+        completed_at: capabilityBlocked ? null : new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('id', taskId);
-    await setAgentStatus(db, task.agent_id, 'error');
+    await setAgentStatus(db, task.agent_id, capabilityBlocked ? 'idle' : 'error');
     await appendTaskLog(
       db,
       taskId,
-      `Task execution error: ${message}`,
-      'error',
+      capabilityBlocked
+        ? `Task blocked because its required capability is unavailable: ${message}`
+        : `Task execution error: ${message}`,
+      capabilityBlocked ? 'warn' : 'error',
       executeStep?.id,
       runtime.tenantId ?? task.tenant_id,
       actorId,
     );
     await reconcileTaskProjection(db, taskId);
-    throw error;
+    if (!capabilityBlocked) throw error;
   }
 }
 

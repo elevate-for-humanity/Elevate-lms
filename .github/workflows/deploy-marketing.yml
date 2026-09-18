@@ -1,6 +1,6 @@
 name: Deploy Marketing (www)
 
-# Deployment checkpoint: strict-boundary repair convergence
+# Deployment checkpoint: full-stack production parity release
 
 on:
   push:

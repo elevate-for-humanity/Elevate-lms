@@ -1,6 +1,6 @@
 name: Deploy Admin
 
-# Deployment checkpoint: authorized learner-path production release
+# Deployment checkpoint: full-stack production parity release
 
 on:
   push:

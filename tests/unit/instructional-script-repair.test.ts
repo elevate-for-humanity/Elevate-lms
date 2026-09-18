@@ -43,6 +43,21 @@ describe('instructional script repair', () => {
     expect(result.script).toContain('The correct response is Sanitize the station');
   });
 
+  it('removes repeated teaching sentences from otherwise complete narration', () => {
+    const repeated = 'Sanitize the workstation before preparing the client for service.';
+    const baseScript = `${'topic instruction '.repeat(180)}. ${repeated} ${repeated}`;
+    const result = repairInstructionalScript({
+      lessonTitle: 'Sanitation Procedure',
+      lessonType: 'lesson',
+      baseScript,
+      content: {},
+      contentJson: {},
+    });
+
+    expect(result.repaired).toBe(true);
+    expect(result.script.match(/Sanitize the workstation/g)).toHaveLength(1);
+  });
+
   it('does not rewrite narration that already satisfies the minimum', () => {
     const baseScript = 'topic '.repeat(190);
     const result = repairInstructionalScript({

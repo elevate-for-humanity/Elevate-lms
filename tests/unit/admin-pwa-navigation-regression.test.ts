@@ -34,4 +34,18 @@ describe('admin PWA navigation', () => {
     expect(source).toContain("title: 'Phone System'");
     expect(source).toContain("href: '/phone'");
   });
+
+  it('keeps the mobile application progress region keyboard accessible', () => {
+    const source = fs.readFileSync(
+      path.join(
+        root,
+        'apps/marketing/app/apply/student/interview/ParisApplicationWorkspace.tsx',
+      ),
+      'utf8',
+    );
+
+    expect(source).toContain('role="region"');
+    expect(source).toContain('tabIndex={0}');
+    expect(source).toContain("'Application progress'");
+  });
 });

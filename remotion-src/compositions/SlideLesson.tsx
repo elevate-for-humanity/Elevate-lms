@@ -515,10 +515,13 @@ function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProp
         <div
           style={{
             position: 'absolute',
-            inset: 0,
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: '40%',
             background: bright
-              ? 'linear-gradient(90deg, rgba(248,250,252,0.76) 0%, rgba(248,250,252,0.42) 48%, rgba(248,250,252,0.06) 76%, transparent 100%)'
-              : 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.28) 58%, rgba(15,23,42,0.08) 100%)',
+              ? 'linear-gradient(90deg, rgba(248,250,252,0.68) 0%, rgba(248,250,252,0.20) 62%, transparent 100%)'
+              : 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.22) 62%, transparent 100%)',
           }}
         />
       )}

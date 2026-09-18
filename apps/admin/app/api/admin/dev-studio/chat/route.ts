@@ -1757,7 +1757,7 @@ async function _POST(req: NextRequest) {
           db,
           authorize: () =>
             reservePaidInference(db, {
-              scopeKey: 'platform',
+              scopeKey: 'studio-chat',
               actorId: auth.userId,
               artifactFingerprint,
               idempotencyKey: `studio-chat:${requestNonce}`,

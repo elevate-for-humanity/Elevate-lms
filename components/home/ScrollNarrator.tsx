@@ -20,6 +20,13 @@ function narrationRateFor(section: HTMLElement) {
   return Number.isFinite(value) && value >= 0.75 && value <= 1.1 ? value : 0.98;
 }
 
+function narrationStyleFor(section: HTMLElement) {
+  const value = section.dataset.narrationStyle;
+  return value === 'instructor' || value === 'commercial' || value === 'default'
+    ? value
+    : 'assistant';
+}
+
 function mostVisiblePageSection() {
   const sections = Array.from(
     document.querySelectorAll<HTMLElement>('main [data-scroll-narration]'),
@@ -76,7 +83,7 @@ export function ScrollNarrator() {
     const started = await play(text, {
       src: source,
       voice: 'coral',
-      style: 'assistant',
+      style: narrationStyleFor(section),
       rate: narrationRateFor(section),
       allowBrowserFallback: true,
     });
@@ -119,7 +126,7 @@ export function ScrollNarrator() {
         void prepare(text, {
           src: narrationSourceFor(section),
           voice: 'coral',
-          style: 'assistant',
+          style: narrationStyleFor(section),
           rate: narrationRateFor(section),
           allowBrowserFallback: true,
         });

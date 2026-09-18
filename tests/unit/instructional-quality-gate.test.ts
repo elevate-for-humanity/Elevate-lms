@@ -68,6 +68,15 @@ describe('instructional quality gate', () => {
     expect(result.failures).toContain('narration contains internal generation instructions');
   });
 
+  it('rejects repeated substantial teaching narration', () => {
+    const repeated = 'Sanitize the workstation before preparing the client for service.';
+    const result = instructionalQualityFailures({
+      courseTitle: 'Cosmetology Apprenticeship', lessonTitle: 'Sanitation and Disinfection',
+      script: `${longInstruction}. ${repeated} ${repeated}`, instructor, storyboard: storyboard(),
+    });
+    expect(result.failures.some((failure) => failure.includes('narration repeats'))).toBe(true);
+  });
+
   it('requires narration to cover every persisted learning objective', () => {
     const result = instructionalQualityFailures({
       courseTitle: 'Cosmetology Apprenticeship', lessonTitle: 'Sanitation and Disinfection',

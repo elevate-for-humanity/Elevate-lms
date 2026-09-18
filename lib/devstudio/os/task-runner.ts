@@ -5,6 +5,7 @@ import type { CreateTaskInput, TaskPlanStep } from './types';
 import { executeAICommand } from '@/lib/ai/runtime/command-executor';
 import { getAITool, type AIAgentId } from '@/lib/ai/tools/registry';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
+import { reconcileStudioRunFromTask } from '@/lib/devstudio/studio-run-reconciler';
 
 export type TaskExecutionRuntimeContext = {
   actorRoles: readonly string[];
@@ -14,6 +15,18 @@ export type TaskExecutionRuntimeContext = {
   appOrigin?: string;
   approvalGranted?: boolean;
 };
+
+async function reconcileTaskProjection(db: SupabaseClient, taskId: string) {
+  const { data, error } = await db
+    .from('ai_tasks')
+    .select(
+      'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message',
+    )
+    .eq('id', taskId)
+    .single();
+  if (error || !data) throw new Error(error?.message ?? 'Task projection could not be loaded');
+  await reconcileStudioRunFromTask(db, data);
+}
 
 function buildPlan(command: string): TaskPlanStep[] {
   return [
@@ -298,6 +311,8 @@ export async function runTaskExecution(
     .from('ai_tasks')
     .update({
       status: 'running',
+      started_at: new Date().toISOString(),
+      completed_at: null,
       updated_at: new Date().toISOString(),
       attempts: Number(task.attempts ?? 0) + 1,
     })
@@ -441,6 +456,7 @@ export async function runTaskExecution(
         runtime.tenantId ?? task.tenant_id,
         actorId,
       );
+      await reconcileTaskProjection(db, taskId);
       return;
     }
 
@@ -490,6 +506,7 @@ export async function runTaskExecution(
         runtime.tenantId ?? task.tenant_id,
         actorId,
       );
+      await reconcileTaskProjection(db, taskId);
       return;
     }
 
@@ -538,6 +555,7 @@ export async function runTaskExecution(
         runtime.tenantId ?? task.tenant_id,
         actorId,
       );
+      await reconcileTaskProjection(db, taskId);
       return;
     }
 
@@ -634,6 +652,8 @@ export async function runTaskExecution(
       actorId,
     );
 
+    await reconcileTaskProjection(db, taskId);
+
     await writeDevAuditLog(db, {
       actorId,
       action: 'task.complete',
@@ -678,6 +698,7 @@ export async function runTaskExecution(
       runtime.tenantId ?? task.tenant_id,
       actorId,
     );
+    await reconcileTaskProjection(db, taskId);
     throw error;
   }
 }
@@ -740,6 +761,7 @@ export async function approveTask(
       runtime.tenantId ?? task.tenant_id,
       reviewerId,
     );
+    await reconcileTaskProjection(db, taskId);
   }
 }
 

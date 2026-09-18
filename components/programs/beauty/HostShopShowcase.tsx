@@ -240,6 +240,8 @@ export default function HostShopShowcase({
             'Meet verified apprenticeship Host Shops and see how supervised workplace training connects apprentices with real businesses.')
           : undefined
       }
+      data-narration-rate="0.84"
+      data-narration-style="instructor"
       className="border-y border-sky-200 bg-gradient-to-br from-sky-50 via-white to-orange-50 px-4 py-10 text-slate-950 sm:px-6 sm:py-12"
       onMouseEnter={() => setInteracting(true)}
       onMouseLeave={() => setInteracting(false)}

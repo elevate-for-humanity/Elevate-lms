@@ -63,6 +63,8 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         src: '/videos/partners/kountry-kutz/shop-tour.mp4',
         alt: 'Guided interior tour of Kountry Kutz Barbershop',
         kind: 'video',
+        script:
+          'Welcome to Kountry Kutz Barbershop on Main Street in New Palestine, Indiana. Kountry Kutz is a family-oriented working barbershop and an approved Elevate Barber Apprenticeship Host Shop. Apprentices may build supervised skills in sanitation, client consultation, haircutting, fading, grooming, shop routines, customer service, and professional conduct while completing required related instruction and documented training hours. Apply through Elevate first. Placement, employment, wages, supervisor capacity, schedule, enrollment, and licensing requirements are confirmed before training begins.',
       },
       {
         src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
@@ -128,6 +130,13 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         src: '/images/partners/razors-image-apprenticeship-flyer.webp',
         alt: "Original Razor's Image Barber Apprenticeship Program artwork",
         kind: 'flyer',
+      },
+      {
+        src: '/videos/partners/razors-image-host-barbershop.mp4',
+        alt: "Razor's Image owner introducing the Bloomington barber apprenticeship Host Shop",
+        kind: 'video',
+        script:
+          "Welcome to Razor's Image Barbershop in Bloomington, Indiana. Razor's Image is a multicultural working barbershop and an approved Elevate Barber Apprenticeship Host Shop. Apprentices may build supervised skills in professional grooming, sanitation, client consultation, hair and scalp care, customer service, shop operations, and barbering technique while completing related instruction and documented training hours. Apply through Elevate first. Placement, employment, wages, supervision, schedule, enrollment, and licensing requirements are confirmed before training begins.",
       },
     ],
     resourceUrl:

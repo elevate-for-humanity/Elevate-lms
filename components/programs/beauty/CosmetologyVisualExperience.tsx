@@ -73,6 +73,8 @@ export default function CosmetologyVisualExperience() {
         data-scroll-narration
         data-narration="The cosmetology apprenticeship combines related instruction with supervised salon training. Apply and complete intake, confirm funding or a payment option, secure an approved host salon, complete orientation, then track hours and competencies in your portal. Apprentices learn sanitation, client consultation, hair cutting, texture, color, styling, professional service, and workplace habits. Host-site availability, wages, funding, registration, and licensing are confirmed for each participant and are not guaranteed by an application."
         data-narration-src="/audio/heroes/cosmetology.mp3"
+        data-narration-rate="0.84"
+        data-narration-style="instructor"
       >
         <div className="mx-auto grid max-w-7xl lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
           <div className="flex items-center px-5 py-12 sm:px-8 sm:py-16 lg:px-10 lg:py-20">

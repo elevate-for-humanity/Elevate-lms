@@ -41,6 +41,7 @@ export function HomeSocialAppCTA() {
       data-scroll-narration
       data-narration-src="/audio/narration/social.mp3"
       data-narration="Stay connected with Elevate. Like us on Facebook, follow us on Instagram, subscribe on YouTube, connect on LinkedIn, or open the latest video feed for new demonstrations, tours, and community updates."
+      data-narration-rate="0.84"
     >
       <div className="mx-auto max-w-6xl">
         <div className="text-center">

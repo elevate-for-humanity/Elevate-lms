@@ -5,6 +5,7 @@ import type { CreateTaskInput, TaskPlanStep } from './types';
 import { executeAICommand } from '@/lib/ai/runtime/command-executor';
 import { getAITool, type AIAgentId } from '@/lib/ai/tools/registry';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
+import { reconcileStudioRunFromTask } from '@/lib/devstudio/studio-run-reconciler';
 
 export type TaskExecutionRuntimeContext = {
   actorRoles: readonly string[];
@@ -14,6 +15,18 @@ export type TaskExecutionRuntimeContext = {
   appOrigin?: string;
   approvalGranted?: boolean;
 };
+
+async function reconcileTaskProjection(db: SupabaseClient, taskId: string) {
+  const { data, error } = await db
+    .from('ai_tasks')
+    .select(
+      'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message',
+    )
+    .eq('id', taskId)
+    .single();
+  if (error || !data) throw new Error(error?.message ?? 'Task projection could not be loaded');
+  await reconcileStudioRunFromTask(db, data);
+}
 
 function buildPlan(command: string): TaskPlanStep[] {
   return [
@@ -298,6 +311,8 @@ export async function runTaskExecution(
     .from('ai_tasks')
     .update({
       status: 'running',
+      started_at: new Date().toISOString(),
+      completed_at: null,
       updated_at: new Date().toISOString(),
       attempts: Number(task.attempts ?? 0) + 1,
     })
@@ -441,6 +456,7 @@ export async function runTaskExecution(
         runtime.tenantId ?? task.tenant_id,
         actorId,
       );
+      await reconcileTaskProjection(db, taskId);
       return;
     }
 
@@ -490,6 +506,7 @@ export async function runTaskExecution(
         runtime.tenantId ?? task.tenant_id,
         actorId,
       );
+      await reconcileTaskProjection(db, taskId);
       return;
     }
 
@@ -538,6 +555,7 @@ export async function runTaskExecution(
         runtime.tenantId ?? task.tenant_id,
         actorId,
       );
+      await reconcileTaskProjection(db, taskId);
       return;
     }
 
@@ -634,6 +652,8 @@ export async function runTaskExecution(
       actorId,
     );
 
+    await reconcileTaskProjection(db, taskId);
+
     await writeDevAuditLog(db, {
       actorId,
       action: 'task.complete',
@@ -678,6 +698,7 @@ export async function runTaskExecution(
       runtime.tenantId ?? task.tenant_id,
       actorId,
     );
+    await reconcileTaskProjection(db, taskId);
     throw error;
   }
 }
@@ -740,7 +761,58 @@ export async function approveTask(
       runtime.tenantId ?? task.tenant_id,
       reviewerId,
     );
+    await reconcileTaskProjection(db, taskId);
   }
+}
+
+export async function recoverStaleAiTasks(
+  db: SupabaseClient,
+  timeoutMinutes = 360,
+): Promise<number> {
+  const boundedTimeout = Number.isFinite(timeoutMinutes) ? Math.max(30, timeoutMinutes) : 360;
+  const cutoff = new Date(Date.now() - boundedTimeout * 60_000).toISOString();
+  const { data: stale, error } = await db
+    .from('ai_tasks')
+    .select(
+      'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message,tenant_id,user_id,started_at,created_at',
+    )
+    .eq('status', 'running')
+    .or(`started_at.lt.${cutoff},and(started_at.is.null,created_at.lt.${cutoff})`)
+    .limit(50);
+  if (error) throw new Error(`Unable to load stale Studio tasks: ${error.message}`);
+
+  let recovered = 0;
+  for (const task of stale ?? []) {
+    const timeoutMessage = `Studio task exceeded the ${boundedTimeout}-minute runtime limit and was closed instead of remaining stuck.`;
+    const { data: closed, error: closeError } = await db
+      .from('ai_tasks')
+      .update({
+        status: 'failed',
+        error_message: timeoutMessage,
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', task.id)
+      .eq('status', 'running')
+      .select(
+        'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message',
+      )
+      .maybeSingle();
+    if (closeError) throw closeError;
+    if (!closed) continue;
+    await reconcileStudioRunFromTask(db, closed);
+    await appendTaskLog(
+      db,
+      task.id,
+      timeoutMessage,
+      'error',
+      undefined,
+      task.tenant_id,
+      task.user_id,
+    );
+    recovered += 1;
+  }
+  return recovered;
 }
 
 export async function rollbackTask(

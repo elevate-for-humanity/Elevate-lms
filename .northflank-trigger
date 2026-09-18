@@ -1,4 +1,4 @@
-merge_sha=1f813a1ae67cdbd7b5d2ebfaee2b8a1bcd8f2519
-services=marketing
-requested_at=2026-09-17T18:28:59.004Z
-reason=Publish funding application and intake guidance for HVAC, CDL, Business, and Bookkeeping
+merge_sha=795d9de4025b2dcf0fcaea0aa8b2d37c3ecfe351
+services=admin,lms
+requested_at=2026-09-18T00:28:30.000Z
+reason=Deploy true 1080p course video renderer and media quality gate

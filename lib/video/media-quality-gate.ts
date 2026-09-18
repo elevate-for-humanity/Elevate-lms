@@ -10,7 +10,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import type { MediaStoryboard } from './media-director';
 import type { InstructionalQualityEvidence } from './instructional-quality-gate';
 
-export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v2';
+export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v3';
 
 const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
@@ -27,6 +27,9 @@ export interface MediaQualityEvidence {
   expectedDurationSeconds: number;
   videoStreams: number;
   audioStreams: number;
+  width: number;
+  height: number;
+  openingStillUrl?: string;
   sceneChanges: number;
   longestFreezeSeconds: number;
   longestBlackSeconds: number;
@@ -48,18 +51,25 @@ export interface MediaQualityEvidence {
 
 export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   const failures: string[] = [];
-  if (evidence.gateVersion !== MEDIA_QUALITY_GATE_VERSION) failures.push('media quality evidence uses an obsolete gate version');
+  if (evidence.gateVersion !== MEDIA_QUALITY_GATE_VERSION)
+    failures.push('media quality evidence uses an obsolete gate version');
   const durationTolerance = Math.max(2, evidence.expectedDurationSeconds * 0.1);
   if (evidence.bytes < MIN_BYTES) failures.push(`MP4 is too small (${evidence.bytes} bytes)`);
   if (!Number.isFinite(evidence.actualDurationSeconds) || evidence.actualDurationSeconds <= 0) {
     failures.push('MP4 has no measurable duration');
-  } else if (Math.abs(evidence.actualDurationSeconds - evidence.expectedDurationSeconds) > durationTolerance) {
+  } else if (
+    Math.abs(evidence.actualDurationSeconds - evidence.expectedDurationSeconds) > durationTolerance
+  ) {
     failures.push(
       `duration mismatch: expected ${evidence.expectedDurationSeconds.toFixed(2)}s, decoded ${evidence.actualDurationSeconds.toFixed(2)}s`,
     );
   }
   if (evidence.videoStreams < 1) failures.push('MP4 has no decodable video stream');
   if (evidence.audioStreams < 1) failures.push('MP4 has no narration/audio stream');
+  if (evidence.width < 1920 || evidence.height < 1080) {
+    failures.push(`video resolution ${evidence.width}x${evidence.height} is below 1920x1080`);
+  }
+  if (!evidence.openingStillUrl) failures.push('photographic opening still is missing');
   if (evidence.storyboardSceneCount !== evidence.expectedSceneCount) {
     failures.push(
       `storyboard mismatch: expected ${evidence.expectedSceneCount} scenes, preserved ${evidence.storyboardSceneCount}`,
@@ -71,24 +81,42 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
     );
   }
   if (evidence.longestFreezeSeconds > MAX_FREEZE_SECONDS) {
-    failures.push(`frozen interval ${evidence.longestFreezeSeconds.toFixed(2)}s exceeds ${MAX_FREEZE_SECONDS}s`);
+    failures.push(
+      `frozen interval ${evidence.longestFreezeSeconds.toFixed(2)}s exceeds ${MAX_FREEZE_SECONDS}s`,
+    );
   }
   if (evidence.longestBlackSeconds > MAX_BLACK_SECONDS) {
-    failures.push(`blank/black interval ${evidence.longestBlackSeconds.toFixed(2)}s exceeds ${MAX_BLACK_SECONDS}s`);
+    failures.push(
+      `blank/black interval ${evidence.longestBlackSeconds.toFixed(2)}s exceeds ${MAX_BLACK_SECONDS}s`,
+    );
   }
   if (!evidence.captionUrl) failures.push('caption URL is missing');
   if (!evidence.transcriptUrl) failures.push('transcript URL is missing');
   if (!evidence.provider) failures.push('provider evidence is missing');
   if (!evidence.providerModel) failures.push('provider model evidence is missing');
-  if (evidence.narrationCoverage < MIN_ASR_NARRATION_COVERAGE) failures.push(`narration coverage ${(evidence.narrationCoverage * 100).toFixed(1)}% is below ${(MIN_ASR_NARRATION_COVERAGE * 100).toFixed(0)}%`);
-  if (evidence.visualEvidenceCoverage < 0.75) failures.push(`visual evidence coverage ${(evidence.visualEvidenceCoverage * 100).toFixed(1)}% is below 75%`);
-  if (evidence.repeatedVisualMaximum > 3) failures.push(`one visual is repeated across ${evidence.repeatedVisualMaximum} scenes`);
-  if (evidence.sourceEvidenceCoverage < 1) failures.push('one or more scenes have no persisted visual-source evidence');
-  if (evidence.exactVisualSourceCoverage < 1) failures.push('one or more demonstration scenes use unverified stock imagery');
-  if (evidence.instructionalQuality.instructionLeakageDetected) failures.push('narration contains internal generation instructions');
-  if (evidence.instructionalQuality.objectiveCoverage < 1) failures.push('narration does not cover every stated learning objective');
-  if (evidence.instructionalQuality.sceneNarrationAlignment < 0.75) failures.push('storyboard does not align with narration');
-  const missingPhases = evidence.requiredProcedurePhases.filter((phase) => !evidence.deliveredProcedurePhases.includes(phase));
+  if (evidence.narrationCoverage < MIN_ASR_NARRATION_COVERAGE)
+    failures.push(
+      `narration coverage ${(evidence.narrationCoverage * 100).toFixed(1)}% is below ${(MIN_ASR_NARRATION_COVERAGE * 100).toFixed(0)}%`,
+    );
+  if (evidence.visualEvidenceCoverage < 0.75)
+    failures.push(
+      `visual evidence coverage ${(evidence.visualEvidenceCoverage * 100).toFixed(1)}% is below 75%`,
+    );
+  if (evidence.repeatedVisualMaximum > 3)
+    failures.push(`one visual is repeated across ${evidence.repeatedVisualMaximum} scenes`);
+  if (evidence.sourceEvidenceCoverage < 1)
+    failures.push('one or more scenes have no persisted visual-source evidence');
+  if (evidence.exactVisualSourceCoverage < 1)
+    failures.push('one or more demonstration scenes use unverified stock imagery');
+  if (evidence.instructionalQuality.instructionLeakageDetected)
+    failures.push('narration contains internal generation instructions');
+  if (evidence.instructionalQuality.objectiveCoverage < 1)
+    failures.push('narration does not cover every stated learning objective');
+  if (evidence.instructionalQuality.sceneNarrationAlignment < 0.75)
+    failures.push('storyboard does not align with narration');
+  const missingPhases = evidence.requiredProcedurePhases.filter(
+    (phase) => !evidence.deliveredProcedurePhases.includes(phase),
+  );
   if (missingPhases.length) failures.push(`missing procedure phases: ${missingPhases.join(', ')}`);
   return failures;
 }
@@ -105,10 +133,12 @@ function narrationCoverage(script: string, deliveredTranscript: string): number 
 }
 
 function longestMetric(output: string, key: 'freeze_duration' | 'black_duration'): number {
-  const expression = key === 'freeze_duration'
-    ? /freeze_duration:\s*([0-9.]+)/g
-    : /black_duration:([0-9.]+)/g;
-  return [...output.matchAll(expression)].reduce((longest, match) => Math.max(longest, Number(match[1]) || 0), 0);
+  const expression =
+    key === 'freeze_duration' ? /freeze_duration:\s*([0-9.]+)/g : /black_duration:([0-9.]+)/g;
+  return [...output.matchAll(expression)].reduce(
+    (longest, match) => Math.max(longest, Number(match[1]) || 0),
+    0,
+  );
 }
 
 async function requireTextAsset(url: string, label: string): Promise<string> {
@@ -124,9 +154,7 @@ export function resolveCloudflareTranscriptionModel(env: NodeJS.ProcessEnv = pro
   return configured?.startsWith('@cf/') ? configured : '@cf/openai/whisper';
 }
 
-export function cloudflareTranscriptionChunkSeconds(
-  env: NodeJS.ProcessEnv = process.env,
-): number {
+export function cloudflareTranscriptionChunkSeconds(env: NodeJS.ProcessEnv = process.env): number {
   const configured = Number.parseInt(env.AI_TRANSCRIPTION_CHUNK_SECONDS ?? '', 10);
   if (!Number.isFinite(configured)) return 240;
   return Math.min(300, Math.max(60, configured));
@@ -137,7 +165,8 @@ async function requireCloudflareTranscriptionCredentials(): Promise<{
   token: string;
 }> {
   let accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim() ?? '';
-  let token = (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim() ?? '';
+  let token =
+    (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim() ?? '';
   if (accountId && token) return { accountId, token };
 
   const db = createAdminClient();
@@ -146,7 +175,9 @@ async function requireCloudflareTranscriptionCredentials(): Promise<{
     if (!error && typeof data === 'string') accountId = data.trim();
   }
   if (!token) {
-    const { data, error } = await db.rpc('get_platform_secret', { p_key: 'CLOUDFLARE_AI_API_TOKEN' });
+    const { data, error } = await db.rpc('get_platform_secret', {
+      p_key: 'CLOUDFLARE_AI_API_TOKEN',
+    });
     if (!error && typeof data === 'string') token = data.trim();
   }
   if (!accountId || !token) {
@@ -162,12 +193,34 @@ async function transcribeRenderedAudio(videoPath: string, workDir: string): Prom
   // boundary. Encode bounded mono MP3 segments so quality verification scales
   // with lesson duration without weakening the transcription requirement.
   const audioPattern = join(workDir, 'rendered-audio-%03d.mp3');
-  await execFileAsync('ffmpeg', [
-    '-hide_banner', '-loglevel', 'error', '-y', '-i', videoPath,
-    '-vn', '-ac', '1', '-ar', '16000', '-codec:a', 'libmp3lame', '-b:a', '48k',
-    '-f', 'segment', '-segment_time', String(cloudflareTranscriptionChunkSeconds()),
-    '-reset_timestamps', '1', audioPattern,
-  ], { timeout: 120_000, maxBuffer: 2_000_000 });
+  await execFileAsync(
+    'ffmpeg',
+    [
+      '-hide_banner',
+      '-loglevel',
+      'error',
+      '-y',
+      '-i',
+      videoPath,
+      '-vn',
+      '-ac',
+      '1',
+      '-ar',
+      '16000',
+      '-codec:a',
+      'libmp3lame',
+      '-b:a',
+      '48k',
+      '-f',
+      'segment',
+      '-segment_time',
+      String(cloudflareTranscriptionChunkSeconds()),
+      '-reset_timestamps',
+      '1',
+      audioPattern,
+    ],
+    { timeout: 120_000, maxBuffer: 2_000_000 },
+  );
   const audioPaths = (await readdir(workDir))
     .filter((name) => /^rendered-audio-\d{3}\.mp3$/.test(name))
     .sort()
@@ -195,10 +248,12 @@ async function transcribeRenderedAudio(videoPath: string, workDir: string): Prom
         `Cloudflare rendered-audio transcription chunk ${index + 1}/${audioPaths.length} returned HTTP ${response.status}`,
       );
     }
-    const payload = await response.json() as { result?: { text?: string } };
+    const payload = (await response.json()) as { result?: { text?: string } };
     const chunkTranscript = payload.result?.text?.trim() ?? '';
     if (!chunkTranscript) {
-      throw new Error(`Rendered-audio transcription chunk ${index + 1}/${audioPaths.length} is empty`);
+      throw new Error(
+        `Rendered-audio transcription chunk ${index + 1}/${audioPaths.length} is empty`,
+      );
     }
     transcriptParts.push(chunkTranscript);
   }
@@ -224,27 +279,62 @@ export async function enforceMediaQuality(input: {
   const videoPath = join(workDir, 'asset.mp4');
   try {
     await writeFile(videoPath, buffer);
-    const { stdout: probeOutput } = await execFileAsync('ffprobe', [
-      '-v', 'error', '-show_entries', 'format=duration:stream=codec_type', '-of', 'json', videoPath,
-    ], { timeout: 30_000, maxBuffer: 2_000_000 });
+    const { stdout: probeOutput } = await execFileAsync(
+      'ffprobe',
+      [
+        '-v',
+        'error',
+        '-show_entries',
+        'format=duration:stream=codec_type,width,height',
+        '-of',
+        'json',
+        videoPath,
+      ],
+      { timeout: 30_000, maxBuffer: 2_000_000 },
+    );
     const probe = JSON.parse(String(probeOutput)) as {
       format?: { duration?: string };
-      streams?: Array<{ codec_type?: string }>;
+      streams?: Array<{ codec_type?: string; width?: number; height?: number }>;
     };
     const streams = probe.streams ?? [];
+    const videoStream = streams.find((stream) => stream.codec_type === 'video');
     const actualTranscript = await transcribeRenderedAudio(videoPath, workDir);
-    const evidenceScenes = input.sceneData.scenes.filter((scene) => Boolean(scene.requiredVisualEvidence));
-    const visualKeys = input.sceneData.scenes.map((scene) => scene.referenceImageUrl || scene.sourceVideoUrl || scene.action.trim().toLowerCase());
+    const evidenceScenes = input.sceneData.scenes.filter((scene) =>
+      Boolean(scene.requiredVisualEvidence),
+    );
+    const visualKeys = input.sceneData.scenes.map(
+      (scene) =>
+        scene.referenceImageUrl || scene.sourceVideoUrl || scene.action.trim().toLowerCase(),
+    );
     const counts = new Map<string, number>();
     visualKeys.forEach((key) => counts.set(key, (counts.get(key) ?? 0) + 1));
-    const deliveredProcedurePhases = [...new Set(input.sceneData.scenes.map((scene) => scene.procedurePhase).filter((value): value is NonNullable<typeof value> => Boolean(value)))];
-    const requiredProcedurePhases = [...new Set(input.sceneData.scenes
-      .filter((scene) => Boolean(scene.requiredVisualEvidence))
-      .map((scene) => scene.procedurePhase)
-      .filter((value): value is NonNullable<typeof value> => Boolean(value)))];
-    const sourcedScenes = input.sceneData.scenes.filter((scene) => Boolean(scene.resolvedProvider && scene.resolvedModel));
-    const exactSceneTypes = new Set(['equipment_closeup', 'worked_example', 'common_mistake', 'safety_warning']);
-    const exactScenes = input.sceneData.scenes.filter((scene) => scene.sceneType && exactSceneTypes.has(scene.sceneType));
+    const deliveredProcedurePhases = [
+      ...new Set(
+        input.sceneData.scenes
+          .map((scene) => scene.procedurePhase)
+          .filter((value): value is NonNullable<typeof value> => Boolean(value)),
+      ),
+    ];
+    const requiredProcedurePhases = [
+      ...new Set(
+        input.sceneData.scenes
+          .filter((scene) => Boolean(scene.requiredVisualEvidence))
+          .map((scene) => scene.procedurePhase)
+          .filter((value): value is NonNullable<typeof value> => Boolean(value)),
+      ),
+    ];
+    const sourcedScenes = input.sceneData.scenes.filter((scene) =>
+      Boolean(scene.resolvedProvider && scene.resolvedModel),
+    );
+    const exactSceneTypes = new Set([
+      'equipment_closeup',
+      'worked_example',
+      'common_mistake',
+      'safety_warning',
+    ]);
+    const exactScenes = input.sceneData.scenes.filter(
+      (scene) => scene.sceneType && exactSceneTypes.has(scene.sceneType),
+    );
     const verifiedExactScenes = exactScenes.filter((scene) =>
       ['wan', 'ltx', 'remotion'].includes(scene.resolvedProvider ?? ''),
     );
@@ -259,17 +349,47 @@ export async function enforceMediaQuality(input: {
     );
     const { stderr: sceneOutput } = await execFileAsync(
       'ffmpeg',
-      ['-hide_banner', '-i', videoPath, '-filter:v', "select='gt(scene,0.12)',showinfo", '-an', '-f', 'null', '-'],
+      [
+        '-hide_banner',
+        '-i',
+        videoPath,
+        '-filter:v',
+        "select='gt(scene,0.12)',showinfo",
+        '-an',
+        '-f',
+        'null',
+        '-',
+      ],
       { timeout: analysisTimeoutMs, maxBuffer: 64_000_000 },
     );
     const { stderr: freezeOutput } = await execFileAsync(
       'ffmpeg',
-      ['-hide_banner', '-i', videoPath, '-vf', 'freezedetect=n=-45dB:d=2', '-an', '-f', 'null', '-'],
+      [
+        '-hide_banner',
+        '-i',
+        videoPath,
+        '-vf',
+        'freezedetect=n=-45dB:d=2',
+        '-an',
+        '-f',
+        'null',
+        '-',
+      ],
       { timeout: analysisTimeoutMs, maxBuffer: 64_000_000 },
     );
     const { stderr: blackOutput } = await execFileAsync(
       'ffmpeg',
-      ['-hide_banner', '-i', videoPath, '-vf', 'blackdetect=d=0.3:pix_th=0.10', '-an', '-f', 'null', '-'],
+      [
+        '-hide_banner',
+        '-i',
+        videoPath,
+        '-vf',
+        'blackdetect=d=0.3:pix_th=0.10',
+        '-an',
+        '-f',
+        'null',
+        '-',
+      ],
       { timeout: analysisTimeoutMs, maxBuffer: 64_000_000 },
     );
 
@@ -280,6 +400,9 @@ export async function enforceMediaQuality(input: {
       expectedDurationSeconds: input.expectedDurationSeconds,
       videoStreams: streams.filter((stream) => stream.codec_type === 'video').length,
       audioStreams: streams.filter((stream) => stream.codec_type === 'audio').length,
+      width: Number(videoStream?.width ?? 0),
+      height: Number(videoStream?.height ?? 0),
+      openingStillUrl: input.sceneData.scenes[0]?.referenceImageUrl,
       sceneChanges: (String(sceneOutput).match(/pts_time:/g) ?? []).length,
       longestFreezeSeconds: longestMetric(String(freezeOutput), 'freeze_duration'),
       longestBlackSeconds: longestMetric(String(blackOutput), 'black_duration'),
@@ -290,12 +413,18 @@ export async function enforceMediaQuality(input: {
       provider: input.provider,
       providerModel: input.providerModel,
       narrationCoverage: narrationCoverage(input.expectedScript, actualTranscript),
-      visualEvidenceCoverage: input.sceneData.scenes.length ? evidenceScenes.length / input.sceneData.scenes.length : 0,
+      visualEvidenceCoverage: input.sceneData.scenes.length
+        ? evidenceScenes.length / input.sceneData.scenes.length
+        : 0,
       repeatedVisualMaximum: Math.max(0, ...counts.values()),
       requiredProcedurePhases,
       deliveredProcedurePhases,
-      sourceEvidenceCoverage: input.sceneData.scenes.length ? sourcedScenes.length / input.sceneData.scenes.length : 0,
-      exactVisualSourceCoverage: exactScenes.length ? verifiedExactScenes.length / exactScenes.length : 1,
+      sourceEvidenceCoverage: input.sceneData.scenes.length
+        ? sourcedScenes.length / input.sceneData.scenes.length
+        : 0,
+      exactVisualSourceCoverage: exactScenes.length
+        ? verifiedExactScenes.length / exactScenes.length
+        : 1,
       instructionalQuality: input.instructionalQuality,
     };
     const failures = mediaQualityFailures(evidence);

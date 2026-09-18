@@ -16,7 +16,6 @@ import ProgramExperienceGuide from '@/components/programs/ProgramExperienceGuide
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import HeroVideo from '@/components/marketing/HeroVideo';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import ProgramApplyForm from '@/components/programs/ProgramApplyForm';
 import { PayNowButton } from '@/components/programs/PayNowButton';
@@ -147,6 +146,18 @@ export default function ProgramDetailPage({
     'business-administration',
     'bookkeeping',
   ].includes(p.slug);
+  const narrationCurriculum = p.curriculum
+    .slice(0, 3)
+    .map((module) => module.title)
+    .join(', ');
+  const narrationCredentials = p.credentials
+    .slice(0, 3)
+    .map((credential) => credential.name)
+    .join(', ');
+  const programHeroNarration = isApprenticeship
+    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${p.hoursPerWeekMin} to ${p.hoursPerWeekMax} hours each week. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and funding or payment path before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
+    : `Welcome to ${p.title}. This program is designed to help you move from interest to real, usable career skills. The ${durationLabel} experience is ${p.deliveryMode === 'hybrid' ? 'a blend of flexible online learning and scheduled hands-on practice' : p.deliveryMode === 'online' ? 'available online, so you can build skills with a flexible learning routine' : 'taught in person, with direct guidance and practical learning'}. Along the way, you will build confidence in areas such as ${narrationCurriculum || 'the program skills'} and prepare for ${narrationCredentials || 'the program credentials'}. Start by applying and completing intake. That gives admissions what they need to confirm your schedule, requirements, and best enrollment path. ${isWorkforceFunded ? 'Your training may be free if you qualify and receive written approval from the workforce agency before enrollment.' : 'You will also find clear payment choices on this page.'} Take your time, review the details, and use the application link when you are ready.`;
+
   const pathwaySteps = [
     {
       step: 'Step 1',
@@ -181,8 +192,10 @@ export default function ProgramDetailPage({
 
   return (
     <main className="min-h-screen bg-white [&_a]:no-underline [&_a:hover]:no-underline">
+
+
       {/* A. HERO */}
-      <section>
+      <section data-scroll-narration data-narration={programHeroNarration} data-narration-rate="0.82" data-narration-style="instructor">
         {heroOverride ??
           (() => {
             // bannerProp is passed from the server page.tsx — use it first.
@@ -202,46 +215,26 @@ export default function ProgramDetailPage({
               );
               const safeTrustIndicators = sanitizePublicFundingList(banner.trustIndicators, p.slug);
               const safeTranscript = sanitizePublicFundingText(
-                banner.transcript,
+                programHeroNarration,
                 p.slug,
                 safeSubheadline,
               );
+              // Only use a recorded track when it was authored for this exact script.
+              // Otherwise the site-wide homepage narrator reads the current page-specific copy.
               const voiceoverSrc =
                 safeTranscript === banner.transcript ? banner.voiceoverSrc : undefined;
               const bannerCtas = [banner.primaryCta, banner.secondaryCta].filter(
                 (cta): cta is NonNullable<typeof cta> => Boolean(cta?.href && cta.label),
               );
-              // Use HeroPicture when no video is configured — avoids passing
-              // undefined to HeroVideo's required videoSrcDesktop prop.
-              if (!banner.videoSrcDesktop) {
-                return (
-                  <HeroPicture
-                    src={heroPosterSrc}
-                    alt={heroAlt}
-                    preserveAspectRatio={p.slug === 'bookkeeping'}
-                    microLabel={banner.microLabel}
-                    analyticsName={banner.analyticsName}
-                    belowHeroHeadline={safeHeadline}
-                    belowHeroSubheadline={safeSubheadline}
-                    ctas={bannerCtas}
-                    trustIndicators={safeTrustIndicators}
-                    transcript={safeTranscript}
-                  />
-                );
-              }
+              // Program pages use a clear picture-first hero. Primary copy and
+              // actions render below the image so no dark overlay obscures the media.
               return (
-                <HeroVideo
-                  videoSrcDesktop={banner.videoSrcDesktop}
-                  posterImage={heroPosterSrc}
-                  voiceoverSrc={voiceoverSrc}
+                <HeroPicture
+                  src={heroPosterSrc}
+                  alt={heroAlt}
+                  preserveAspectRatio={p.slug === 'bookkeeping'}
                   microLabel={banner.microLabel}
                   analyticsName={banner.analyticsName}
-                  belowHeroHeadline={safeHeadline}
-                  belowHeroSubheadline={safeSubheadline}
-                  ctas={bannerCtas}
-                  trustIndicators={safeTrustIndicators}
-                  transcript={safeTranscript}
-                  narrateTranscript={p.slug === 'cna' && !voiceoverSrc}
                 />
               );
             }
@@ -261,6 +254,45 @@ export default function ProgramDetailPage({
               </div>
             );
           })()}
+
+      {isWorkforceFunded ? (
+        <section className="border-y border-slate-800 bg-slate-950 px-4 py-6 text-white">
+          <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">
+                Funding review available
+              </p>
+              <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">
+                This training may be no-cost if you qualify.
+              </h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">
+                Apply first, then complete the required WorkOne or agency intake. Free training
+                requires written approval before enrollment. If funding is not approved, Buy Now
+                Pay Later is one separate payment option—not free funding and not guaranteed.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+              <Link href={applicationHref} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-black text-white hover:bg-brand-red-700">
+                <ClipboardList className="h-5 w-5" /> Apply Now
+              </Link>
+              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-white bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100">
+                <CalendarDays className="h-5 w-5" /> Schedule Funding Intake
+              </a>
+            </div>
+          </div>
+        </section>
+      ) : isApprenticeship ? (
+        <section className="border-y border-slate-800 bg-slate-950 px-4 py-6 text-white">
+          <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300">Earn while you learn</p>
+              <h2 className="mt-2 text-2xl font-black leading-tight sm:text-3xl">Related instruction plus paid, supervised workplace training.</h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">Apply first. Elevate confirms program requirements, Host Site or employer placement, schedule, related instruction, wages, and any available funding before training begins.</p>
+            </div>
+            <Link href={applicationHref} className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Apply for Apprenticeship</Link>
+          </div>
+        </section>
+      ) : null}
 
         {isApprenticeship ? (
           <div className="border-y border-red-200 bg-red-700 px-4 py-4 text-white">
@@ -424,6 +456,84 @@ export default function ProgramDetailPage({
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="program-overview" className="border-y border-slate-200 bg-slate-50 px-4 py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-4xl">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+              Everything you need to know
+            </p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+              How the {p.title} program works
+            </h2>
+            <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg">
+              {isApprenticeship
+                ? 'This is an earn-while-you-learn pathway combining supervised work at an approved Host Site with required related instruction, progress tracking, and completion documentation.'
+                : p.deliveryMode === 'hybrid'
+                  ? `This is a ${durationLabel} hybrid pathway. Most training begins with self-paced coursework you complete from home, followed by scheduled hands-on training at a real training, lab, or employer site. You complete intake, lessons, practical competencies, assessments, and the listed credential requirements, with career-support services available throughout the pathway.`
+                  : `This is a ${durationLabel} ${p.deliveryMode === 'online' ? 'online' : 'in-person'} training pathway. You apply, complete intake, follow the published training and assessment plan, earn the listed credentials when requirements are met, and receive career-support services.`}
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-black text-slate-950">Program format</h3>
+              <dl className="mt-4 space-y-3 text-sm">
+                <div><dt className="font-bold text-slate-500">Length</dt><dd className="mt-1 font-black text-slate-950">{durationLabel}</dd></div>
+                <div><dt className="font-bold text-slate-500">Weekly schedule</dt><dd className="mt-1 font-black text-slate-950">{p.schedule || `${p.hoursPerWeekMin}–${p.hoursPerWeekMax} hours per week`}</dd></div>
+                <div>
+                  <dt className="font-bold text-slate-500">Delivery</dt>
+                  <dd className="mt-1 font-black text-slate-950">
+                    {p.deliveryMode === 'hybrid'
+                      ? 'Self-paced from home + scheduled hands-on site training'
+                      : p.deliveryMode === 'online'
+                        ? 'Online'
+                        : 'In-person'}
+                  </dd>
+                </div>
+                <div><dt className="font-bold text-slate-500">Credentials</dt><dd className="mt-1 font-black text-slate-950">{p.credentials.length} listed credential{p.credentials.length === 1 ? '' : 's'}</dd></div>
+              </dl>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-black text-slate-950">Your next steps</h3>
+              <ol className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
+                <li><strong className="text-slate-950">1. Apply:</strong> Select this program and submit your contact, readiness, and funding information.</li>
+                <li><strong className="text-slate-950">2. Complete intake:</strong> Admissions confirms requirements, documents, schedule, and the correct enrollment path.</li>
+                <li><strong className="text-slate-950">3. Start training:</strong> Complete lessons, hands-on work, assessments, attendance, and progress requirements.</li>
+                <li><strong className="text-slate-950">4. Finish:</strong> Complete required credentials and use career or placement support.</li>
+              </ol>
+            </div>
+
+            <div id="payment-options" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+              <h3 className="text-xl font-black text-slate-950">Funding and payment options</h3>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
+                {isWorkforceFunded ? (
+                  <li><strong className="text-slate-950">Workforce funding:</strong> Training may be free only if you qualify and receive written agency authorization before enrollment.</li>
+                ) : null}
+                <li><strong className="text-slate-950">Pay in full:</strong> Pay the published tuition through the secure enrollment process.</li>
+                <li><strong className="text-slate-950">Payment plan:</strong> Split eligible tuition into installments; deposit and terms are shown before acceptance.</li>
+                <li><strong className="text-slate-950">Buy Now Pay Later:</strong> If workforce funding is not approved, this is one optional payment alternative. It is not free training, is not funding, and requires separate provider approval.</li>
+                <li><strong className="text-slate-950">Employer-sponsored:</strong> An employer may pay eligible costs when an arrangement is approved.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link href={applicationHref} className="inline-flex min-h-14 items-center justify-center rounded-xl bg-brand-red-700 px-7 py-4 text-base font-black text-white hover:bg-brand-red-800">
+              Apply to {p.title}
+            </Link>
+            {showPriorityFundingPath ? (
+              <a href={WORKONE_INDY_BOOKING_URL} target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center rounded-xl bg-emerald-700 px-7 py-4 text-base font-black text-white hover:bg-emerald-800">
+                Schedule WorkOne Intake
+              </a>
+            ) : null}
+            <Link href={requestInfoHref} className="inline-flex min-h-14 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-7 py-4 text-base font-black text-slate-950 hover:bg-slate-50">
+              Request Program Information
+            </Link>
           </div>
         </div>
       </section>
@@ -930,7 +1040,7 @@ export default function ProgramDetailPage({
       )}
 
       {/* ENROLLMENT TRACKS */}
-      <section className="py-14 border-y border-slate-100">
+      <section id="enrollment-options" className="py-14 border-y border-slate-100">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-10">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-green-600 mb-3">
@@ -1028,7 +1138,7 @@ export default function ProgramDetailPage({
               {/* Every published self-pay program uses the canonical server-created checkout.
                   This provides the payment calculator, BNPL eligibility, and coupon entry
                   without depending on a legacy hard-coded Stripe URL. */}
-              {enrollmentTracks.selfPay.available && selfPayNumeric > 0 && (
+              {enrollmentTracks.selfPay.available && selfPayNumeric > 0 && p.slug !== 'hvac-technician' && (
                 <div className="mt-4 mb-4">
                   <PaymentPlanCalculator programSlug={p.slug} />
                 </div>

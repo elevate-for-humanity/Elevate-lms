@@ -63,11 +63,13 @@ export interface SlideLessonProps {
   backgroundColor: string; // e.g. '#0f172a'
   surfaceMode?: 'bright' | 'dark';
   logoText?: string; // defaults to 'Elevate LMS'
+  /** Photographic poster shown before narration and motion begin. */
+  openingImageUrl?: string | null;
 }
 
 // ââ Constants âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-const INTRO_FRAMES = 15; // One readable second at the canonical 15fps delivery rate.
+const INTRO_FRAMES = 45; // Three-second photographic poster at the canonical 15fps delivery rate.
 const OUTRO_FRAMES = 30;
 
 // ââ Animation helpers âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -86,7 +88,15 @@ function slideUp(frame: number, fps: number, delay = 0): number {
 
 // ââ Brand bar âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-function BrandBar({ color, logoText, bright = false }: { color: string; logoText: string; bright?: boolean }) {
+function BrandBar({
+  color,
+  logoText,
+  bright = false,
+}: {
+  color: string;
+  logoText: string;
+  bright?: boolean;
+}) {
   return (
     <div
       style={{
@@ -156,7 +166,33 @@ function BrandedIntro({ props, frame }: { props: SlideLessonProps; frame: number
         alignItems: 'center',
       }}
     >
-      <BrandBar color={props.primaryColor} logoText={props.logoText ?? 'Elevate LMS'} bright={bright} />
+      {props.openingImageUrl && (
+        <Img
+          src={props.openingImageUrl}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+      )}
+      {props.openingImageUrl && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(180deg, rgba(15,23,42,0.04) 0%, rgba(15,23,42,0.12) 55%, rgba(15,23,42,0.68) 100%)',
+          }}
+        />
+      )}
+      <BrandBar
+        color={props.primaryColor}
+        logoText={props.logoText ?? 'Elevate LMS'}
+        bright={bright}
+      />
 
       {/* Decorative orb */}
       <div
@@ -176,7 +212,7 @@ function BrandedIntro({ props, frame }: { props: SlideLessonProps; frame: number
           style={{
             opacity: fadeIn(frame, 0, 1),
             fontSize: 18,
-            color: props.accentColor,
+            color: props.openingImageUrl ? '#ffffff' : props.accentColor,
             fontFamily: 'sans-serif',
             fontWeight: 700,
             textTransform: 'uppercase',
@@ -192,7 +228,8 @@ function BrandedIntro({ props, frame }: { props: SlideLessonProps; frame: number
             transform: `translateY(${slideUp(frame, fps, 0)}px)`,
             fontSize: 60,
             fontWeight: 900,
-            color: bright ? '#0f172a' : '#fff',
+            color: props.openingImageUrl ? '#ffffff' : bright ? '#0f172a' : '#fff',
+            textShadow: props.openingImageUrl ? '0 3px 18px rgba(0,0,0,0.72)' : 'none',
             fontFamily: 'sans-serif',
             lineHeight: 1.15,
           }}
@@ -233,9 +270,8 @@ function CaptionBar({
 }) {
   // Render timed caption phrases, never a persistent narration paragraph.
   const words = text.trim().split(/\\s+/).filter(Boolean);
-  const phrases = Array.from(
-    { length: Math.max(1, Math.ceil(words.length / 8)) },
-    (_, index) => words.slice(index * 8, index * 8 + 8).join(' '),
+  const phrases = Array.from({ length: Math.max(1, Math.ceil(words.length / 8)) }, (_, index) =>
+    words.slice(index * 8, index * 8 + 8).join(' '),
   );
   const phraseIndex = Math.min(
     phrases.length - 1,
@@ -304,27 +340,35 @@ function InstructionalGraphic({
 
   if (layout.kind === 'comparison' || layout.kind === 'refrigeration-cycle') {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${layout.kind === 'refrigeration-cycle' ? 4 : 3}, 1fr)`, gap: 20 }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${layout.kind === 'refrigeration-cycle' ? 4 : 3}, 1fr)`,
+          gap: 20,
+        }}
+      >
         {layout.columns.map((column, index) => {
           const focused = index === focusStep % layout.columns.length;
           return (
-          <div
-            key={column.title}
-            style={{
-              ...card,
-              padding: 28,
-              opacity: fadeIn(frame, 16 + index * 10, 16),
-              background: focused ? props.accentColor + '26' : card.background,
-              border: focused ? `4px solid ${props.accentColor}` : card.border,
-              boxShadow: focused
-                ? `0 18px 46px ${props.accentColor}55`
-                : card.boxShadow,
-              transform: focused ? 'scale(1.035)' : 'scale(1)',
-            }}
-          >
-            <div style={{ color: props.primaryColor, fontSize: 28, marginBottom: 12 }}>{column.title}</div>
-            <div style={{ fontSize: 22, lineHeight: 1.35, fontWeight: 650 }}>{column.purpose}</div>
-          </div>
+            <div
+              key={column.title}
+              style={{
+                ...card,
+                padding: 28,
+                opacity: fadeIn(frame, 16 + index * 10, 16),
+                background: focused ? props.accentColor + '26' : card.background,
+                border: focused ? `4px solid ${props.accentColor}` : card.border,
+                boxShadow: focused ? `0 18px 46px ${props.accentColor}55` : card.boxShadow,
+                transform: focused ? 'scale(1.035)' : 'scale(1)',
+              }}
+            >
+              <div style={{ color: props.primaryColor, fontSize: 28, marginBottom: 12 }}>
+                {column.title}
+              </div>
+              <div style={{ fontSize: 22, lineHeight: 1.35, fontWeight: 650 }}>
+                {column.purpose}
+              </div>
+            </div>
           );
         })}
       </div>
@@ -337,43 +381,43 @@ function InstructionalGraphic({
       {layout.items.map((item, index) => {
         const focused = index === focusStep % layout.items.length;
         return (
-        <div
-          key={item}
-          style={{
-            ...card,
-            padding: layout.kind === 'activity' ? '16px 20px' : '18px 14px',
-            minHeight: layout.kind === 'lean-canvas' ? 76 : 62,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            opacity: fadeIn(frame, 14 + index * 6, 14),
-            transform: `translateY(${Math.max(0, 14 - Math.max(0, frame - index * 6))}px) scale(${focused ? 1.045 : 1})`,
-            background: focused ? props.accentColor + '26' : card.background,
-            border: focused ? `4px solid ${props.accentColor}` : card.border,
-            boxShadow: focused
-              ? `0 16px 40px ${props.accentColor}55`
-              : card.boxShadow,
-          }}
-        >
           <div
+            key={item}
             style={{
-              width: 28,
-              height: 28,
-              flexShrink: 0,
-              borderRadius: layout.kind === 'activity' ? 7 : 14,
+              ...card,
+              padding: layout.kind === 'activity' ? '16px 20px' : '18px 14px',
+              minHeight: layout.kind === 'lean-canvas' ? 76 : 62,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              background: props.primaryColor,
-              color: '#fff',
-              fontSize: 14,
-              fontWeight: 900,
+              gap: 12,
+              opacity: fadeIn(frame, 14 + index * 6, 14),
+              transform: `translateY(${Math.max(0, 14 - Math.max(0, frame - index * 6))}px) scale(${focused ? 1.045 : 1})`,
+              background: focused ? props.accentColor + '26' : card.background,
+              border: focused ? `4px solid ${props.accentColor}` : card.border,
+              boxShadow: focused ? `0 16px 40px ${props.accentColor}55` : card.boxShadow,
             }}
           >
-            {layout.kind === 'activity' ? 'â' : index + 1}
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                flexShrink: 0,
+                borderRadius: layout.kind === 'activity' ? 7 : 14,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: props.primaryColor,
+                color: '#fff',
+                fontSize: 14,
+                fontWeight: 900,
+              }}
+            >
+              {layout.kind === 'activity' ? 'â' : index + 1}
+            </div>
+            <div style={{ fontSize: layout.kind === 'lean-canvas' ? 17 : 18, lineHeight: 1.2 }}>
+              {item}
+            </div>
           </div>
-          <div style={{ fontSize: layout.kind === 'lean-canvas' ? 17 : 18, lineHeight: 1.2 }}>{item}</div>
-        </div>
         );
       })}
     </div>
@@ -382,28 +426,23 @@ function InstructionalGraphic({
 
 // ââ Scene slide âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-function SceneSlide({
-  scene,
-  props,
-}: {
-  scene: SceneData;
-  props: SlideLessonProps;
-}) {
+function SceneSlide({ scene, props }: { scene: SceneData; props: SlideLessonProps }) {
   const { fps } = useVideoConfig();
   // useCurrentFrame() is local to the surrounding Sequence. Passing the
   // composition frame from SlideLesson caused later scenes to enter with all
   // motion already completed, leaving long frozen stills in rendered lessons.
   const frame = useCurrentFrame();
   const bright = props.surfaceMode === 'bright';
-  const instructionalLayout = instructionalLayoutForScene({ title: scene.title, action: scene.narration, sceneType: scene.sceneType });
-  const instructionalBackgroundPosition =
-    `${50 + Math.sin(frame / (fps * 2)) * 30}% ${50 + Math.cos(frame / (fps * 2.5)) * 20}%`;
-  const sceneProgress = interpolate(
-    frame,
-    [0, Math.max(1, scene.durationFrames - 1)],
-    [0, 1],
-    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
-  );
+  const instructionalLayout = instructionalLayoutForScene({
+    title: scene.title,
+    action: scene.narration,
+    sceneType: scene.sceneType,
+  });
+  const instructionalBackgroundPosition = `${50 + Math.sin(frame / (fps * 2)) * 30}% ${50 + Math.cos(frame / (fps * 2.5)) * 20}%`;
+  const sceneProgress = interpolate(frame, [0, Math.max(1, scene.durationFrames - 1)], [0, 1], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+  });
   const mediaTransform = `scale(${1.035 + sceneProgress * 0.055}) translate(${(scene.scene_number % 2 ? 1 : -1) * sceneProgress * 1.4}%, ${sceneProgress * -0.8}%)`;
 
   return (
@@ -470,20 +509,28 @@ function SceneSlide({
         />
       ) : null}
 
-      {/* Directional scrim keeps cinematic footage readable. Instructional graphics use a clean canvas. */}
+      {/* Keep footage visible. Text gets a localized directional scrim, never a
+          near-opaque full-frame wash that makes HD media look blurred. */}
       {!instructionalLayout && (
         <div
           style={{
             position: 'absolute',
-            inset: 0,
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: '40%',
             background: bright
-              ? 'linear-gradient(90deg, rgba(248,250,252,0.94) 0%, rgba(248,250,252,0.72) 58%, rgba(248,250,252,0.32) 100%)'
-              : 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.28) 58%, rgba(15,23,42,0.08) 100%)',
+              ? 'linear-gradient(90deg, rgba(248,250,252,0.68) 0%, rgba(248,250,252,0.20) 62%, transparent 100%)'
+              : 'linear-gradient(90deg, rgba(15,23,42,0.50) 0%, rgba(15,23,42,0.22) 62%, transparent 100%)',
           }}
         />
       )}
 
-      <BrandBar color={props.primaryColor} logoText={props.logoText ?? 'Elevate LMS'} bright={bright || Boolean(instructionalLayout)} />
+      <BrandBar
+        color={props.primaryColor}
+        logoText={props.logoText ?? 'Elevate LMS'}
+        bright={bright || Boolean(instructionalLayout)}
+      />
 
       {/* Scene number badge */}
       <div
@@ -552,8 +599,25 @@ function SceneSlide({
                   gap: 16,
                 }}
               >
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: props.accentColor, flexShrink: 0, marginTop: 10 }} />
-                <div style={{ color: bright ? '#0f172a' : '#e2e8f0', fontSize: 28, fontFamily: 'sans-serif', lineHeight: 1.5, textShadow: bright ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
+                <div
+                  style={{
+                    width: 10,
+                    height: 10,
+                    borderRadius: '50%',
+                    background: props.accentColor,
+                    flexShrink: 0,
+                    marginTop: 10,
+                  }}
+                />
+                <div
+                  style={{
+                    color: bright ? '#0f172a' : '#e2e8f0',
+                    fontSize: 28,
+                    fontFamily: 'sans-serif',
+                    lineHeight: 1.5,
+                    textShadow: bright ? 'none' : '0 1px 6px rgba(0,0,0,0.5)',
+                  }}
+                >
                   {bullet}
                 </div>
               </div>
@@ -566,7 +630,13 @@ function SceneSlide({
       {scene.audioSrc && <Audio src={scene.audioSrc} volume={1.35} />}
 
       {/* Caption bar */}
-      <CaptionBar text={scene.narration} frame={frame} durationFrames={scene.durationFrames} primaryColor={props.primaryColor} bright={bright} />
+      <CaptionBar
+        text={scene.narration}
+        frame={frame}
+        durationFrames={scene.durationFrames}
+        primaryColor={props.primaryColor}
+        bright={bright}
+      />
     </AbsoluteFill>
   );
 }
@@ -586,7 +656,11 @@ function BrandedOutro({ props, frame }: { props: SlideLessonProps; frame: number
         alignItems: 'center',
       }}
     >
-      <BrandBar color={props.primaryColor} logoText={props.logoText ?? 'Elevate LMS'} bright={bright} />
+      <BrandBar
+        color={props.primaryColor}
+        logoText={props.logoText ?? 'Elevate LMS'}
+        bright={bright}
+      />
 
       <div style={{ textAlign: 'center', padding: '0 120px', maxWidth: 1100 }}>
         <div

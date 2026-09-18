@@ -6,6 +6,7 @@ import { getPlatformHealth } from '@/lib/platform/platform-health';
 import { emitEvent } from '@/lib/platform/events';
 import { reconcileApplicationRemediations } from '@/lib/automation/reconcile-application-remediations';
 import { reconcileOpenHandsTasks } from '@/lib/devstudio/openhands/runtime';
+import { recoverStaleAiTasks } from '@/lib/devstudio/os/task-runner';
 
 export type AutopilotTickResult = {
   ok: boolean;
@@ -103,6 +104,10 @@ export async function runPlatformAutopilotTick(): Promise<AutopilotTickResult> {
     }
 
     try {
+      const recoveredTasks = await recoverStaleAiTasks(db);
+      checks.push(`stale_studio_tasks_recovered:${recoveredTasks}`);
+      if (recoveredTasks) actions.push(`closed_stale_studio_tasks:${recoveredTasks}`);
+
       const engineering = await reconcileOpenHandsTasks(10);
       checks.push(`engineering_tasks_checked:${engineering.checked}`);
       if (engineering.running) actions.push(`engineering_tasks_running:${engineering.running}`);

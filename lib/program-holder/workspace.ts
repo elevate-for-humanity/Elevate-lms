@@ -62,7 +62,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('program_holders')
       .select(
-        'id,status,mou_signed,mou_status,approved_at,payout_status,organization_name,name,is_using_internal_lms,hvac_license_url',
+        'id,status,mou_signed,mou_status,mou_type,approved_at,payout_status,organization_name,name,is_using_internal_lms,hvac_license_url,features',
       )
       .eq('id', holderId)
       .maybeSingle(),
@@ -154,7 +154,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         `id,user_id,applicant_name,status,application_status,program_id,label,call_notes,call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,expected_payout_cents,expected_payout_status,updated_at${applicantContactColumns}`,
       )
       .eq('program_holder_id', holderId)
-      .in('status', ['active', 'enrolled'])
+      .in('status', ['active', 'enrolled', 'pending', 'applied', 'approved', 'scheduled', 'ready'])
       .order('updated_at', { ascending: false }),
     db
       .from('hour_entries')

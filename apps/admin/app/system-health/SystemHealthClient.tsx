@@ -42,6 +42,7 @@ const SERVICE_ICONS: Record<string, React.ElementType> = {
   Database: Database,
   Redis: Zap,
   Stripe: Shield,
+  'Stripe (legacy archive)': Shield,
   'Email (SendGrid)': Mail,
   'Storage (Supabase)': Server,
 };
@@ -195,7 +196,7 @@ export default function SystemHealthClient({
                 <div>
                   <p className="text-white text-sm capitalize">{p.name}</p>
                   <p className={`text-xs ${p.configured ? 'text-slate-400' : 'text-slate-600'}`}>
-                    {p.configured ? (p.active ? 'Primary configured' : 'Configured') : 'Not set'}
+                    {p.configured ? (p.active ? 'Primary configured; runtime not probed here' : 'Configured; runtime not probed here') : 'Not set'}
                   </p>
                 </div>
               </div>

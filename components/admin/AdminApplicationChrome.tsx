@@ -12,7 +12,10 @@ export function AdminApplicationChrome({
   navSections: NavSection[];
 }) {
   const pathname = usePathname();
-  const studioOwnsViewport = pathname === '/studio' || pathname.startsWith('/studio/');
+  // Only the conversation workspace owns the viewport. Tool pages such as
+  // Course Builder are ordinary documents and must retain the Admin header and
+  // browser scrolling.
+  const studioOwnsViewport = pathname === '/studio';
 
   return (
     <div

@@ -14,6 +14,7 @@ import {
 import { runCourseFactoryPipeline } from '@/components/admin/course-builder/runCourseFactoryPipeline';
 import VoiceDictationButton from '@/components/voice/VoiceDictationButton';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import CourseBuilderConversation from '@/components/course/CourseBuilderConversation';
 
 interface GenerateResult {
   ok: boolean;
@@ -266,12 +267,29 @@ export default function AutomaticCourseBuilder() {
   };
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-4xl">
+      <CourseBuilderConversation
+        onDraft={(draft) => {
+          if (draft.title) setTitle(draft.title);
+          if (draft.audience) setAudience(draft.audience);
+          if (draft.duration_hours) setHours(String(draft.duration_hours));
+          if (draft.description) setPrompt(draft.description);
+          if (draft.modules?.length) {
+            setModuleCount(String(draft.modules.length));
+            const largestModule = Math.max(
+              1,
+              ...draft.modules.map((module) => module.lessons?.length || 0),
+            );
+            setLessonsPerModule(String(largestModule));
+          }
+          speak('The course draft is ready below. Review it, select the registered program, and confirm before generation.');
+        }}
+      />
       <div className="mb-6">
         <div className="flex items-center gap-3">
           <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
             <Sparkles className="h-5 w-5 text-brand-blue-600" />
-            AI Course Generator
+            Talk to Course Builder
           </h2>
           <button
             type="button"
@@ -292,7 +310,8 @@ export default function AutomaticCourseBuilder() {
           </button>
         </div>
         <p className="text-sm text-slate-700 mt-1">
-          Runs the canonical Course Factory end to end: grounded curriculum, complete lessons,
+          Tell Course Builder what you want by typing or using the microphone beside each field.
+          It runs the canonical Course Factory end to end: grounded curriculum, complete lessons,
           interactive checks, assessments, narration, visual direction, durable publication, and
           queued lesson videos.
         </p>

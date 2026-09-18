@@ -5,7 +5,8 @@ import { CheckCircle2, CircleAlert, ExternalLink } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { mergeHostShopDocumentRequirements, resolveHostShopProgram } from '@/lib/partners/host-shop-onboarding';
+import { resolveHostShopProgram } from '@/lib/partners/host-shop-onboarding';
+import { OpenPortalPreviewButton } from '@/components/admin/OpenPortalPreviewButton';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -49,10 +50,12 @@ export default async function PartnersPage() {
 
   const hostReadiness = hostShopPartners.map((partner: any) => {
     const program = resolveHostShopProgram(partner);
-    const requirements = mergeHostShopDocumentRequirements(
-      (requirementRows || []).filter((row: any) => ['ALL', program].includes(row.program_id) && ['ALL', partner.state || 'Indiana'].includes(row.state)),
-      program,
-    ).filter((row: any) => row.is_required);
+    const requirements = (requirementRows || []).filter(
+      (row: any) =>
+        ['ALL', program].includes(row.program_id) &&
+        ['ALL', partner.state || 'Indiana'].includes(row.state) &&
+        row.is_required,
+    );
     const latestByType = new Map<string, any>();
     const documents = (hostDocuments || []).filter((row: any) => row.partner_id === partner.id).sort((a: any, b: any) => String(b.uploaded_at || '').localeCompare(String(a.uploaded_at || '')));
     for (const document of documents) if (!latestByType.has(document.document_type)) latestByType.set(document.document_type, document);
@@ -62,8 +65,9 @@ export default async function PartnersPage() {
     });
     const linkedUsers = (hostUsers || []).filter((row: any) => row.partner_id === partner.id).length;
     const linkedShops = (canonicalShops || []).filter((row: any) => row.partner_id === partner.id).length;
+    const previewUserId = (hostUsers || []).find((row: any) => row.partner_id === partner.id)?.user_id ?? null;
     const complete = requirements.length > 0 && missing.length === 0 && partner.mou_signed === true && partner.onboarding_completed === true && linkedUsers > 0 && linkedShops > 0;
-    return { partner, requirements, missing, linkedUsers, linkedShops, complete };
+    return { partner, requirements, missing, linkedUsers, linkedShops, previewUserId, complete };
   });
 
   return (
@@ -71,6 +75,12 @@ export default async function PartnersPage() {
       <div className="mx-auto max-w-7xl px-4 py-4"><Breadcrumbs items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Partners' }]} /></div>
       <section className="relative h-48 overflow-hidden md:h-64"><Image src="/images/pages/admin-partners-detail.jpg" alt="Partners" fill className="object-cover" quality={90} priority sizes="100vw" /></section>
       <main className="mx-auto max-w-7xl px-4 py-10">
+        <nav aria-label="Portal preview directories" className="mb-6 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+          <Link href="/partners" className="rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white">Host Shops</Link>
+          <Link href="/program-holders" className="rounded-xl px-4 py-3 text-sm font-black text-slate-800 hover:bg-slate-100">Program Holders</Link>
+          <Link href="/host-shop/apprentices" className="rounded-xl px-4 py-3 text-sm font-black text-slate-800 hover:bg-slate-100">Apprentices</Link>
+          <Link href="/students" className="rounded-xl px-4 py-3 text-sm font-black text-slate-800 hover:bg-slate-100">Learners</Link>
+        </nav>
         <div className="mb-8 grid grid-cols-1 gap-5 md:grid-cols-4">
           <Metric label="Production partners" value={productionItems.length} />
           <Metric label="Active" value={activePartners.length} />
@@ -83,15 +93,16 @@ export default async function PartnersPage() {
             <Link href="https://app.elevateforhumanity.org/host-shop/dashboard" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100">Open Host Shop portal <ExternalLink className="h-4 w-4" /></Link>
           </div>
           <div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm">
-            <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-700"><tr><th className="px-5 py-3">Host Shop</th><th className="px-5 py-3">Portal links</th><th className="px-5 py-3">Documents</th><th className="px-5 py-3">MOU</th><th className="px-5 py-3">Onboarding</th><th className="px-5 py-3">Readiness</th></tr></thead>
-            <tbody className="divide-y divide-slate-200">{hostReadiness.map(({ partner, requirements, missing, linkedUsers, linkedShops, complete }: any) => (
+            <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-700"><tr><th className="px-5 py-3">Host Shop</th><th className="px-5 py-3">Portal links</th><th className="px-5 py-3">Documents</th><th className="px-5 py-3">MOU</th><th className="px-5 py-3">Onboarding</th><th className="px-5 py-3">Readiness</th><th className="px-5 py-3">Dashboard</th></tr></thead>
+            <tbody className="divide-y divide-slate-200">{hostReadiness.map(({ partner, requirements, missing, linkedUsers, linkedShops, previewUserId, complete }: any) => (
               <tr key={partner.id} className={complete ? 'bg-white' : 'bg-red-50/40'}>
                 <td className="px-5 py-4"><p className="font-black text-slate-950">{partner.name}</p><p className="mt-1 text-xs font-medium text-slate-600">{partner.contact_email || 'No contact email'}</p></td>
                 <td className="px-5 py-4"><StatusLine ok={linkedUsers > 0}>{linkedUsers ? `${linkedUsers} account link${linkedUsers === 1 ? '' : 's'}` : 'Account link missing'}</StatusLine><StatusLine ok={linkedShops > 0}>{linkedShops ? `${linkedShops} shop record${linkedShops === 1 ? '' : 's'}` : 'Shop record missing'}</StatusLine></td>
-                <td className="px-5 py-4"><p className="font-black text-slate-950">{requirements.length - missing.length}/{requirements.length} accepted</p>{missing.length ? <p className="mt-1 max-w-sm text-xs font-bold leading-5 text-red-800">Missing: {missing.map((item: any) => item.document_name).join(', ')}</p> : <p className="mt-1 text-xs font-bold text-green-800">All required documents accepted</p>}</td>
+                <td className="px-5 py-4">{requirements.length ? <><p className="font-black text-slate-950">{requirements.length - missing.length}/{requirements.length} accepted</p>{missing.length ? <p className="mt-1 max-w-sm text-xs font-bold leading-5 text-red-800">Missing: {missing.map((item: any) => item.document_name).join(', ')}</p> : <p className="mt-1 text-xs font-bold text-green-800">All required documents accepted</p>}</> : <p className="max-w-sm text-xs font-bold leading-5 text-amber-800">Requirements are not configured for {program}; readiness cannot be calculated.</p>}</td>
                 <td className="px-5 py-4"><StatusLine ok={partner.mou_signed === true}>{partner.mou_signed ? 'Signed' : 'Missing'}</StatusLine></td>
                 <td className="px-5 py-4"><StatusLine ok={partner.onboarding_completed === true}>{partner.onboarding_completed ? 'Complete' : `Incomplete${partner.onboarding_step ? ` — ${partner.onboarding_step}` : ''}`}</StatusLine></td>
                 <td className="px-5 py-4">{complete ? <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 font-black text-green-900"><CheckCircle2 className="h-4 w-4" /> Ready</span> : <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 font-black text-red-900"><CircleAlert className="h-4 w-4" /> Action required</span>}</td>
+                <td className="px-5 py-4">{previewUserId ? <OpenPortalPreviewButton targetUserId={previewUserId} label="Open dashboard" reason={`Admin review of Host Shop ${partner.id}`} /> : <span className="text-xs font-bold text-amber-800">Link an account first</span>}</td>
               </tr>))}</tbody>
           </table></div>
         </section>

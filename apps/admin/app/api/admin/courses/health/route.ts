@@ -5,6 +5,9 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
+import { refreshSecrets } from '@/lib/secrets';
+import { getGroqClient } from '@/lib/ai/groq-client';
+import { getOpenAIClient } from '@/lib/ai/openai-client';
 
 interface IntegrityIssue {
   courseId: string;
@@ -112,16 +115,27 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       : 'Enabled',
   });
 
+  await refreshSecrets().catch(() => undefined);
   const aiAvailable = isAIAvailable();
   const provider = getActiveProviderName();
+  let aiVerified = false;
+  let aiMessage = 'Canonical AI provider is unavailable; manual editing remains available';
+  if (aiAvailable) {
+    try {
+      if (provider === 'groq') await getGroqClient().models.list();
+      else await getOpenAIClient().models.list();
+      aiVerified = true;
+      aiMessage = `${provider} authenticated and reachable`;
+    } catch (error) {
+      aiMessage = `${provider} is configured but the live provider check failed: ${error instanceof Error ? error.message : 'unknown provider error'}`;
+    }
+  }
   checks.push({
     name: 'AI Course Builder',
-    passed: aiAvailable,
-    message: aiAvailable
-      ? `Canonical ${provider} provider configured`
-      : 'Canonical AI provider is unavailable; manual editing remains available',
+    passed: aiVerified,
+    message: aiMessage,
   });
-  if (!aiAvailable) status = 'degraded';
+  if (!aiVerified) status = 'degraded';
 
   const response: CapabilityHealth = { capability: 'course-builder', status, configured: true, checks, checkedAt: new Date().toISOString() };
   return NextResponse.json(response, { status: status === 'unavailable' ? 503 : 200 });

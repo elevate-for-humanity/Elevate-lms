@@ -167,26 +167,37 @@ export function ScrollNarrator() {
   }, [enabled, narrateVisibleSection]);
 
   useEffect(() => {
-    if (!enabled || !notice) return;
+    if (!enabled) return;
 
-    // Mobile browsers require a user gesture before audible media can start.
-    // Treat the visitor's next ordinary interaction anywhere on the page as
-    // that gesture, then keep narration synchronized to scrolling. Visitors
-    // should never have to hunt for or repeatedly tap the speaker control.
+    // Browsers require a user gesture before audible playback. Register the
+    // unlock listener immediately, before the first autoplay attempt settles,
+    // so the visitor's first ordinary touch used to begin scrolling also
+    // starts narration. The floating speaker remains a stop/replay control,
+    // but it is never required to start the guided page experience.
     let retrying = false;
+    let unlocked = false;
     const beginFromNaturalInteraction = () => {
-      if (retrying) return;
+      if (retrying || unlocked) return;
       retrying = true;
       setNotice(null);
       lastNarrationRef.current = null;
-      void narrateVisibleSection().finally(() => {
-        retrying = false;
-      });
+      void narrateVisibleSection()
+        .then(() => {
+          unlocked = true;
+        })
+        .finally(() => {
+          retrying = false;
+        });
     };
 
     window.addEventListener('pointerdown', beginFromNaturalInteraction, {
       capture: true,
       once: true,
+    });
+    window.addEventListener('touchstart', beginFromNaturalInteraction, {
+      capture: true,
+      once: true,
+      passive: true,
     });
     window.addEventListener('keydown', beginFromNaturalInteraction, {
       capture: true,
@@ -195,9 +206,10 @@ export function ScrollNarrator() {
 
     return () => {
       window.removeEventListener('pointerdown', beginFromNaturalInteraction, true);
+      window.removeEventListener('touchstart', beginFromNaturalInteraction, true);
       window.removeEventListener('keydown', beginFromNaturalInteraction, true);
     };
-  }, [enabled, narrateVisibleSection, notice]);
+  }, [enabled, narrateVisibleSection]);
 
   const toggle = () => {
     if (enabled && (isPlaying || isLoading)) {

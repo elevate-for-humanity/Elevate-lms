@@ -33,6 +33,7 @@ export default async function ProgramsPage() {
         data-scroll-narration
         data-narration="Welcome to Elevate's career training catalog. Let us walk through how the choices work. Career-training programs such as HVAC, commercial driving, bookkeeping, business, technology, and healthcare are listed separately from registered apprenticeships. Many career programs may be free when a workforce agency confirms that both the applicant and the program qualify and issues written authorization before training begins. Apprenticeships use a different earn-while-you-learn model that combines related instruction with paid, supervised training at an approved employer or Host Site. Start by choosing the path that matches your goal, review what the program teaches, complete the application, and then finish the correct funding or apprenticeship intake. If workforce funding is not approved, Buy Now Pay Later is one optional payment alternative, not free training and not guaranteed. Admissions can also explain installments, pay-in-full, and employer-sponsored options."
         data-narration-rate="0.88"
+        data-narration-style="instructor"
       >
         <HomeProgramShowcase asHero />
       </div>

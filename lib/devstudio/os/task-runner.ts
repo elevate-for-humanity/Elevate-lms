@@ -765,6 +765,56 @@ export async function approveTask(
   }
 }
 
+export async function recoverStaleAiTasks(
+  db: SupabaseClient,
+  timeoutMinutes = 360,
+): Promise<number> {
+  const boundedTimeout = Number.isFinite(timeoutMinutes) ? Math.max(30, timeoutMinutes) : 360;
+  const cutoff = new Date(Date.now() - boundedTimeout * 60_000).toISOString();
+  const { data: stale, error } = await db
+    .from('ai_tasks')
+    .select(
+      'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message,tenant_id,user_id,started_at,created_at',
+    )
+    .eq('status', 'running')
+    .or(`started_at.lt.${cutoff},and(started_at.is.null,created_at.lt.${cutoff})`)
+    .limit(50);
+  if (error) throw new Error(`Unable to load stale Studio tasks: ${error.message}`);
+
+  let recovered = 0;
+  for (const task of stale ?? []) {
+    const timeoutMessage = `Studio task exceeded the ${boundedTimeout}-minute runtime limit and was closed instead of remaining stuck.`;
+    const { data: closed, error: closeError } = await db
+      .from('ai_tasks')
+      .update({
+        status: 'failed',
+        error_message: timeoutMessage,
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', task.id)
+      .eq('status', 'running')
+      .select(
+        'id,status,studio_run_id,studio_run_step_id,tool_name,result_json,tool_output,error_message',
+      )
+      .maybeSingle();
+    if (closeError) throw closeError;
+    if (!closed) continue;
+    await reconcileStudioRunFromTask(db, closed);
+    await appendTaskLog(
+      db,
+      task.id,
+      timeoutMessage,
+      'error',
+      undefined,
+      task.tenant_id,
+      task.user_id,
+    );
+    recovered += 1;
+  }
+  return recovered;
+}
+
 export async function rollbackTask(
   db: SupabaseClient,
   taskId: string,

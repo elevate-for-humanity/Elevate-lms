@@ -909,12 +909,19 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         .maybeSingle();
       tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
     }
-    const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
+    const paidNarration = usesPaidNarration(job);
+    // Pre-authorized Cloudflare narration uses an isolated course scope. This
+    // lets approved course narration auto-dispatch under a tight budget without
+    // weakening manual approval for GPU video or unrelated paid inference.
+    const scopeKey = paidNarration
+      ? `course:${job.course_id}:cloudflare-tts`
+      : tenantId
+        ? `tenant:${tenantId}`
+        : 'platform';
     const normalizedSceneData =
       job.scene_data && typeof job.scene_data === 'object'
         ? compactLegacySceneData(job.scene_data as Record<string, unknown>).sceneData
         : job.scene_data;
-    const paidNarration = usesPaidNarration(job);
     const cloudflareTtsModel = process.env.CLOUDFLARE_TTS_MODEL?.trim() || '@cf/deepgram/aura-1';
     const fingerprint = paidArtifactFingerprint({
       operation: 'lesson-video',

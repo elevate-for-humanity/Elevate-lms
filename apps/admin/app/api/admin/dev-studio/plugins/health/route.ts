@@ -18,7 +18,10 @@ export async function GET(request: NextRequest) {
       process.env.GROQ_API_KEY ||
       process.env.OPENAI_API_KEY ||
       process.env.ANTHROPIC_API_KEY ||
-      process.env.GEMINI_API_KEY,
+      process.env.GEMINI_API_KEY ||
+      ((process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN) &&
+        process.env.CLOUDFLARE_ACCOUNT_ID &&
+        process.env.CLOUDFLARE_AI_MODEL?.startsWith('@cf/')),
     );
     const northflankConfigured = Boolean(
       (process.env.NORTHFLANK_API_TOKEN || process.env.NORTHFLANK_API_KEY) &&

@@ -22,6 +22,11 @@ import { isGeminiConfigured } from '@/lib/gemini-client';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
 import { aiChat, getActiveProviderName } from '@/lib/ai/ai-service';
+import {
+  executePaidInference,
+  paidArtifactFingerprint,
+  reservePaidInference,
+} from '@/lib/ai/paid-inference-gateway';
 import { getRAGContext } from '@/lib/platform/rag';
 import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
 import { runStudioBrowserAudit } from '@/lib/devstudio/browser-audit';
@@ -1734,14 +1739,53 @@ async function _POST(req: NextRequest) {
 
     if (!assistantMessage) {
       try {
-        const fallbackResult = await aiChat({
-          messages: [{ role: 'system', content: systemPrompt }, ...messages],
-          temperature: 0.4,
-          maxTokens: 2048,
+        const db = await requireAdminClient();
+        const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();
+        const projectedCostMicros = Math.max(
+          0,
+          Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS ?? '100000'),
+        );
+        const artifactFingerprint = paidArtifactFingerprint({
+          operation: 'studio-chat',
+          actorId: auth.userId,
+          provider: canonicalProvider,
+          model: typeof rawModel === 'string' ? rawModel : null,
+          message: lastUserMessage,
+          requestNonce,
         });
-        assistantMessage = fallbackResult.content ?? null;
-        provider = fallbackResult.provider ?? canonicalProvider;
-        model = fallbackResult.model;
+        const paidExecution = await executePaidInference({
+          db,
+          authorize: () =>
+            reservePaidInference(db, {
+              scopeKey: 'platform',
+              actorId: auth.userId,
+              artifactFingerprint,
+              idempotencyKey: `studio-chat:${requestNonce}`,
+              provider: canonicalProvider,
+              model:
+                typeof rawModel === 'string' && rawModel.trim()
+                  ? rawModel.trim()
+                  : process.env.CLOUDFLARE_AI_MODEL || 'canonical',
+              operation: 'studio-chat',
+              projectedCostMicros,
+            }),
+          dispatch: () =>
+            aiChat({
+              messages: [{ role: 'system', content: systemPrompt }, ...messages],
+              temperature: 0.4,
+              maxTokens: 2048,
+            }),
+        });
+        if (paidExecution.decision === 'approved' && paidExecution.value) {
+          assistantMessage = paidExecution.value.content ?? null;
+          provider = paidExecution.value.provider ?? canonicalProvider;
+          model = paidExecution.value.model;
+        } else {
+          logger.warn('[devstudio/chat] governed inference was not dispatched', {
+            decision: paidExecution.decision,
+            requestId: paidExecution.requestId,
+          });
+        }
       } catch (err: unknown) {
         logger.warn('[devstudio/chat] aiChat fallback failed', normalizeError(err));
       }

@@ -235,11 +235,6 @@ export default function ProgramDetailPage({
                   preserveAspectRatio={p.slug === 'bookkeeping'}
                   microLabel={banner.microLabel}
                   analyticsName={banner.analyticsName}
-                  belowHeroHeadline={safeHeadline}
-                  belowHeroSubheadline={safeSubheadline}
-                  ctas={bannerCtas}
-                  trustIndicators={safeTrustIndicators}
-                  transcript={safeTranscript}
                 />
               );
             }

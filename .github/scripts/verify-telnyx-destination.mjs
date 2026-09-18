@@ -22,10 +22,12 @@ function findSecret(root, key) {
     if (Array.isArray(value)) {
       for (const item of value) {
         if (
-          item && typeof item === 'object' &&
+          item &&
+          typeof item === 'object' &&
           String(item.key ?? item.name ?? '') === key &&
           typeof (item.value ?? item.secret) === 'string'
-        ) return String(item.value ?? item.secret);
+        )
+          return String(item.value ?? item.secret);
         const found = walk(item);
         if (found) return found;
       }
@@ -45,8 +47,11 @@ for (const id of ['elevate-production-env', 'telnyx-api-key']) {
   try {
     apiKey = findSecret(await nf(`/secrets/${id}`), 'TELNYX_API_KEY');
     if (apiKey) break;
-  } catch {
-    // Continue to the next known Northflank secret group.
+  } catch (error) {
+    console.debug(
+      `Unable to inspect Northflank secret group ${id}`,
+      error instanceof Error ? error.message : error,
+    );
   }
 }
 if (!apiKey) throw new Error('TELNYX_API_KEY was not found in Northflank');
@@ -81,6 +86,4 @@ if (!response.ok) {
     `Telnyx verification request failed HTTP ${response.status}: ${detail || 'request failed'}`,
   );
 }
-console.info(
-  `VERIFICATION CALL REQUESTED: ${NUMBER}; id=${json.data?.id || 'accepted'}`,
-);
+console.info(`VERIFICATION CALL REQUESTED: ${NUMBER}; id=${json.data?.id || 'accepted'}`);

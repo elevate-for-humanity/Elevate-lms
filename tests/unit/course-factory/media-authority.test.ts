@@ -158,8 +158,8 @@ describe('canonical Course Factory media architecture', () => {
   it('keeps GPU fallback and Remotion on the same canonical job identity', () => {
     const renderer = read('lib/video/process-video-job.ts');
     expect(renderer).toContain('GPU scene failed; falling back to Remotion');
-    expect(renderer).toContain('markComplete(job.id');
-    expect(renderer).toContain('markFailed(job.id');
+    expect(renderer).toMatch(/markComplete\(\s*job\.id/);
+    expect(renderer).toMatch(/markFailed\(\s*job\.id/);
     expect(renderer).not.toMatch(/createJob\s*\(/);
   });
 
@@ -354,7 +354,8 @@ describe('canonical Course Factory media architecture', () => {
     const narration = read('lib/video/edge-tts.ts');
     expect(media).toContain("locked_by: 'course_builder'");
     expect(media).toContain("strategy: 'repository_voice'");
-    expect(media).toContain('allow_paid_provider: false');
+    expect(media).toContain('allow_paid_provider: allowPaidNarration');
+    expect(media).toContain("provider: 'cloudflare'");
     expect(media).toContain("strategy: 'existing_then_pexels'");
     expect(renderer).toContain('applyLockedCourseBuilderMediaPolicy(job)');
     expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");

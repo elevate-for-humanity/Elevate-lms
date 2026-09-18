@@ -3,6 +3,6 @@ Launch the canonical authored-course repair and media renderer for:
 - 9ca9fb50-7119-46ea-ab81-9b0193c29c31 (Cosmetology)
 
 Requested: 2026-09-18
-Release: d2fb021fef38538046e4b9e33aef598d3c9ff419
-Mode: preserve curriculum, rebuild locked narration/storyboards, CPU render, quality-gated publish
+Release: 4d8bccb0cd82c9d588f82d702a446887426164e3
+Mode: preserve curriculum, Cloudflare TTS narration, CPU Remotion 1080p render, quality-gated publish
 Reason: emergency student access for morning classes

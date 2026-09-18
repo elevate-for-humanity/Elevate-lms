@@ -15,6 +15,11 @@ function narrationSourceFor(section: HTMLElement) {
   return section.dataset.narrationSrc?.trim() || undefined;
 }
 
+function narrationRateFor(section: HTMLElement) {
+  const value = Number(section.dataset.narrationRate);
+  return Number.isFinite(value) && value >= 0.75 && value <= 1.1 ? value : 0.98;
+}
+
 function mostVisiblePageSection() {
   const sections = Array.from(
     document.querySelectorAll<HTMLElement>('main [data-scroll-narration]'),
@@ -72,7 +77,7 @@ export function ScrollNarrator() {
       src: source,
       voice: 'coral',
       style: 'assistant',
-      rate: 0.98,
+      rate: narrationRateFor(section),
       allowBrowserFallback: true,
     });
     if (!started) {
@@ -115,7 +120,7 @@ export function ScrollNarrator() {
           src: narrationSourceFor(section),
           voice: 'coral',
           style: 'assistant',
-          rate: 0.98,
+          rate: narrationRateFor(section),
           allowBrowserFallback: true,
         });
     };

@@ -17,12 +17,145 @@ function cleanName(name: string) {
   return name.replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/-+/g, '-');
 }
 
+type CourseUploadControl = {
+  action?: 'prepare' | 'finalize';
+  title?: string;
+  description?: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
+  courseId?: string;
+  lessonId?: string;
+  storagePath?: string;
+};
+
+async function controlCourseUpload(
+  input: CourseUploadControl,
+  userId: string,
+  request: NextRequest,
+) {
+  const title = String(input.title ?? '').trim();
+  const courseId = String(input.courseId ?? '').trim();
+  const lessonId = String(input.lessonId ?? '').trim();
+  const fileName = cleanName(String(input.fileName ?? '').trim());
+  const fileType = String(input.fileType ?? '').trim();
+  const fileSize = Number(input.fileSize ?? 0);
+  if (!title || !courseId || !lessonId || !UUID.test(courseId) || !UUID.test(lessonId)) {
+    return NextResponse.json(
+      { error: 'A valid title, courseId, and lessonId are required' },
+      { status: 400 },
+    );
+  }
+
+  const db = await requireAdminClient();
+  const { data: lesson, error: lessonLookupError } = await db
+    .from('course_lessons')
+    .select('id')
+    .eq('id', lessonId)
+    .eq('course_id', courseId)
+    .maybeSingle();
+  if (lessonLookupError || !lesson) {
+    return NextResponse.json(
+      { error: 'Lesson does not belong to the selected course' },
+      { status: 400 },
+    );
+  }
+
+  if (input.action === 'prepare') {
+    if (!fileName || !fileType.startsWith('video/') || fileSize <= 0 || fileSize > MAX_BYTES) {
+      return NextResponse.json(
+        { error: 'A valid video file of 200 MB or less is required' },
+        { status: 400 },
+      );
+    }
+    const storagePath = `${courseId}/${Date.now()}-${fileName}`;
+    const { data, error } = await db.storage
+      .from('course_videos')
+      .createSignedUploadUrl(storagePath);
+    if (error || !data?.token) {
+      return NextResponse.json(
+        { error: 'Could not prepare the private video upload' },
+        { status: 500 },
+      );
+    }
+    return NextResponse.json({
+      success: true,
+      bucket: 'course_videos',
+      storagePath,
+      token: data.token,
+    });
+  }
+
+  if (input.action !== 'finalize' || !input.storagePath?.startsWith(`${courseId}/`)) {
+    return NextResponse.json({ error: 'Invalid upload finalization request' }, { status: 400 });
+  }
+
+  const storagePath = input.storagePath;
+  const { data: signed, error: signedError } = await db.storage
+    .from('course_videos')
+    .createSignedUrl(storagePath, 60 * 60);
+  if (signedError || !signed?.signedUrl) {
+    return NextResponse.json({ error: 'Uploaded video could not be verified' }, { status: 400 });
+  }
+  const { data: videoData, error: videoError } = await db
+    .from('course_videos')
+    .insert({
+      title,
+      course_id: courseId,
+      lesson_id: lessonId,
+      storage_path: storagePath,
+      generated_by: 'manual',
+      status: 'ready',
+      created_by: userId,
+    })
+    .select('id,title,course_id,lesson_id,storage_path,status,created_at')
+    .single();
+  if (videoError) {
+    await db.storage.from('course_videos').remove([storagePath]);
+    return NextResponse.json(
+      { error: 'Uploaded video metadata could not be saved' },
+      { status: 500 },
+    );
+  }
+  const { error: lessonError } = await db
+    .from('course_lessons')
+    .update({
+      media_origin: 'licensed',
+      media_quality_status: 'pending_render',
+      video_status: 'queued',
+      video_error: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', lessonId)
+    .eq('course_id', courseId);
+  if (lessonError) {
+    await db.from('course_videos').delete().eq('id', videoData.id);
+    await db.storage.from('course_videos').remove([storagePath]);
+    return NextResponse.json(
+      { error: 'Uploaded video could not be linked to its lesson' },
+      { status: 500 },
+    );
+  }
+  await logAdminAudit({
+    action: AdminAction.VIDEO_UPLOADED,
+    actorId: userId,
+    entityType: 'course_videos',
+    entityId: videoData.id,
+    metadata: { file_name: fileName, course_id: courseId, lesson_id: lessonId },
+    req: request,
+  });
+  return NextResponse.json({ success: true, url: signed.signedUrl, video: videoData });
+}
+
 const _POST = withAuth(
   async (request: NextRequest, user) => {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
 
     try {
+      if (request.headers.get('content-type')?.includes('application/json')) {
+        return controlCourseUpload((await request.json()) as CourseUploadControl, user.id, request);
+      }
       const formData = await request.formData();
       const file = formData.get('file');
       const title = String(formData.get('title') ?? '').trim();
@@ -98,7 +231,10 @@ const _POST = withAuth(
           .from(bucket)
           .createSignedUrl(storagePath, 60 * 60);
         if (signedError || !signed?.signedUrl) {
-          return NextResponse.json({ error: 'Course video saved but playback URL could not be created' }, { status: 500 });
+          return NextResponse.json(
+            { error: 'Course video saved but playback URL could not be created' },
+            { status: 500 },
+          );
         }
 
         // lesson_id is the durable association. The video worker resolves a
@@ -119,7 +255,10 @@ const _POST = withAuth(
           if (lessonError) {
             await db.from('course_videos').delete().eq('id', videoData.id);
             await db.storage.from(bucket).remove([storagePath]);
-            return NextResponse.json({ error: 'Video uploaded but lesson linking failed' }, { status: 500 });
+            return NextResponse.json(
+              { error: 'Video uploaded but lesson linking failed' },
+              { status: 500 },
+            );
           }
         }
 
@@ -128,7 +267,11 @@ const _POST = withAuth(
           actorId: user.id,
           entityType: 'course_videos',
           entityId: videoData.id,
-          metadata: { file_name: file.name, course_id: courseId || null, lesson_id: lessonId || null },
+          metadata: {
+            file_name: file.name,
+            course_id: courseId || null,
+            lesson_id: lessonId || null,
+          },
           req: request,
         });
 

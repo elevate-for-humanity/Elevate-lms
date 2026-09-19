@@ -86,6 +86,20 @@ export async function ProgramHolderWorkspaceView({
   const requiredDocumentTypes = ['government_id', 'business_registration', 'insurance', 'w9'];
   const holderFeatures =
     data.holder?.features && typeof data.holder.features === 'object' ? data.holder.features : {};
+  const regionalAssignment =
+    holderFeatures.regional_assignment && typeof holderFeatures.regional_assignment === 'object'
+      ? holderFeatures.regional_assignment as Record<string, unknown>
+      : null;
+  const customMou =
+    holderFeatures.custom_mou && typeof holderFeatures.custom_mou === 'object'
+      ? holderFeatures.custom_mou as Record<string, unknown>
+      : null;
+  const coordinatorRequirements = Array.isArray(customMou?.requirements)
+    ? customMou.requirements.map((item) => String(item))
+    : [];
+  const coordinatorTrainingTopics = Array.isArray(holderFeatures.training_topics)
+    ? holderFeatures.training_topics.map((item) => String(item))
+    : [];
   const requiresMediaEvidence = holderFeatures.student_media_required === true;
   const requiresImageRelease = holderFeatures.require_image_release === true || requiresMediaEvidence;
   const selectedPayoutProvider = String(
@@ -280,6 +294,45 @@ export async function ProgramHolderWorkspaceView({
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {regionalAssignment && customMou ? (
+        <section className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm sm:p-6">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Regional operating assignment</p>
+          <h2 className="mt-2 text-2xl font-black text-slate-950">
+            {String(holderFeatures.approved_role || 'Regional Site Coordinator')}
+          </h2>
+          <p className="mt-2 text-sm text-slate-700">
+            Territory: <strong>{String(regionalAssignment.scope || 'Assigned region')}</strong>. Your dashboard is linked to the Gary regional team while preserving your individual login and audit history.
+          </p>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <h3 className="font-black text-slate-950">How the role works</h3>
+              <p className="mt-2 text-sm text-slate-700">Recruit qualified Program Holders for every program offered in the region. Until an approved holder is assigned, the Site Coordinators remain responsible for coordinating that program, applicants, students, WorkOne steps, records, communication, progress, and closeout.</p>
+              <p className="mt-2 text-sm text-slate-700">Use PARIS and the interactive office to open workspaces, call or message people, record notes and outcomes, manage tasks and documents, monitor learners, submit reports, and review payout readiness.</p>
+            </div>
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+              <h3 className="font-black text-emerald-950">Compensation</h3>
+              <p className="mt-2 text-sm text-emerald-950">
+                <strong>{formatUsd(Number(customMou.compensation_per_eligible_enrollment || 1000))}</strong> per eligible, verified enrollment: {formatUsd(Number(customMou.initial_payment || 500))} after verified enrollment, documentation, and funding authorization; {formatUsd(Number(customMou.completion_payment || 500))} after verified completion and closeout.
+              </p>
+              <p className="mt-2 text-xs text-emerald-900">A lead, incomplete application, unverified enrollment, or unverified completion does not by itself trigger payment.</p>
+            </div>
+          </div>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            <div>
+              <h3 className="font-black text-slate-950">Required setup and operating checklist</h3>
+              <ul className="mt-2 space-y-2 text-sm text-slate-700">
+                {coordinatorRequirements.map((item) => <li key={item} className="flex gap-2"><span aria-hidden="true">□</span><span>{item}</span></li>)}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-black text-slate-950">Required training</h3>
+              <ul className="mt-2 space-y-2 text-sm text-slate-700">
+                {coordinatorTrainingTopics.map((item) => <li key={item} className="flex gap-2"><span aria-hidden="true">•</span><span>{item}</span></li>)}
+              </ul>
+            </div>
+          </div>
+        </section>
+      ) : null}
       <section className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">

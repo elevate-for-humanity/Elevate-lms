@@ -10,6 +10,7 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getXAIAPIKey } from '@/lib/ai/xai-config';
+import { getAnthropicAPIKey } from '@/lib/ai/anthropic-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -34,10 +35,21 @@ export async function GET(request: NextRequest) {
   const gemini = process.env.GEMINI_API_KEY;
   const openai = process.env.OPENAI_API_KEY;
   const openhands = process.env.OPENHANDS_API_KEY;
+  const anthropic = getAnthropicAPIKey();
 
   const activeProvider =
     process.env.AI_PROVIDER ||
-    (xai ? 'xai' : groq ? 'groq' : gemini ? 'gemini' : openai ? 'openai' : null);
+    (xai
+      ? 'xai'
+      : anthropic
+        ? 'anthropic'
+        : groq
+          ? 'groq'
+          : gemini
+            ? 'gemini'
+            : openai
+              ? 'openai'
+              : null);
 
   return NextResponse.json({
     activeProvider,
@@ -47,6 +59,11 @@ export async function GET(request: NextRequest) {
       GROK_API_KEY: {
         set: Boolean(process.env.GROK_API_KEY),
         masked: maskKey(process.env.GROK_API_KEY),
+      },
+      ANTHROPIC_API_KEY: { set: Boolean(anthropic), masked: maskKey(anthropic) },
+      CLAUDE_API_KEY: {
+        set: Boolean(process.env.CLAUDE_API_KEY),
+        masked: maskKey(process.env.CLAUDE_API_KEY),
       },
       GEMINI_API_KEY: { set: Boolean(gemini), masked: maskKey(gemini) },
       OPENAI_API_KEY: { set: Boolean(openai), masked: maskKey(openai) },

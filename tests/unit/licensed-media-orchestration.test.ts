@@ -4,6 +4,7 @@ vi.mock('server-only', () => ({}));
 
 import { mediaMatchTerms, scoreLicensedMediaMatch } from '@/lib/course-builder/licensed-media';
 import { XAIProvider } from '@/lib/ai/providers/xai';
+import { AnthropicProvider } from '@/lib/ai/providers/anthropic';
 
 describe('licensed media course matching', () => {
   it('removes generic stock-video words and keeps distinct course topics', () => {
@@ -51,5 +52,23 @@ describe('Grok / xAI provider registration', () => {
     delete process.env.XAI_API_KEY;
     process.env.GROK_API_KEY = 'grok-test-key-long-enough';
     expect(new XAIProvider().isAvailable()).toBe(true);
+  });
+});
+
+describe('Anthropic provider registration', () => {
+  const originalAnthropicKey = process.env.ANTHROPIC_API_KEY;
+  const originalClaudeKey = process.env.CLAUDE_API_KEY;
+
+  afterEach(() => {
+    if (originalAnthropicKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = originalAnthropicKey;
+    if (originalClaudeKey === undefined) delete process.env.CLAUDE_API_KEY;
+    else process.env.CLAUDE_API_KEY = originalClaudeKey;
+  });
+
+  it('recognizes a key saved under the Claude admin alias', () => {
+    delete process.env.ANTHROPIC_API_KEY;
+    process.env.CLAUDE_API_KEY = 'claude-test-key-long-enough';
+    expect(new AnthropicProvider().isAvailable()).toBe(true);
   });
 });

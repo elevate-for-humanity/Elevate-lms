@@ -8,7 +8,10 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { extractJSON } from '@/lib/extract-json';
 import { requirePaidInferenceContext } from './paid-inference-context';
-import { getAnthropicAPIKey, isAnthropicConfigured } from './anthropic-config';
+import {
+  getAnthropicAPIKey,
+  isAnthropicConfigured as hasAnthropicCredential,
+} from './anthropic-config';
 
 let _client: Anthropic | null = null;
 
@@ -22,7 +25,7 @@ export function getAnthropicClient(): Anthropic {
 }
 
 export function isAnthropicConfigured(): boolean {
-  return isAnthropicConfigured();
+  return hasAnthropicCredential();
 }
 
 /**

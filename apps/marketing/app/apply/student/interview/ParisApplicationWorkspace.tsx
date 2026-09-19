@@ -584,7 +584,12 @@ export default function ParisApplicationWorkspace({
             <div className="h-full rounded-full bg-brand-red-600 transition-all" style={{ width: `${session.progress.percent}%` }} />
           </div>
 
-          <div className="mt-4 max-h-[24rem] space-y-2 overflow-y-auto overscroll-contain pr-1 sm:mt-6 lg:max-h-none lg:overflow-visible lg:pr-0">
+          <div
+            role="region"
+            aria-label={locale === 'es' ? 'Progreso de la solicitud' : 'Application progress'}
+            tabIndex={0}
+            className="mt-4 max-h-[24rem] space-y-2 overflow-y-auto overscroll-contain pr-1 sm:mt-6 lg:max-h-none lg:overflow-visible lg:pr-0"
+          >
             {session.progress.required.map((field) => {
               const value = answers[field];
               const complete = session.progress.complete.includes(field);

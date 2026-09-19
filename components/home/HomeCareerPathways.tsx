@@ -47,7 +47,7 @@ const PATHWAYS = [
 
 export function HomeCareerPathways() {
   return (
-    <section className="bg-white px-4 py-10 sm:py-12" aria-labelledby="featured-pathways-heading">
+    <section\n      className="bg-white px-4 py-10 sm:py-12"\n      aria-labelledby="featured-pathways-heading"\n      aria-label="Choose where you want to go next."\n    >
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 max-w-3xl">
           <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">

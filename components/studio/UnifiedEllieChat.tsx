@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
+  Activity,
   AlertTriangle,
   Bot,
   Camera,
@@ -78,6 +79,16 @@ interface ChatMessage {
   capabilitiesUsed?: string[];
   actionOutcome?: { status: 'executed' | 'rejected' | 'failed'; message: string };
 }
+
+type StudioProvider = 'auto' | 'openai' | 'anthropic' | 'gemini' | 'groq';
+
+const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
+  auto: 'Best available',
+  openai: 'ChatGPT',
+  anthropic: 'Claude',
+  gemini: 'Gemini',
+  groq: 'Groq',
+};
 
 interface UnifiedEllieChatProps {
   onOpenDeploy?: () => void;
@@ -622,6 +633,9 @@ export default function UnifiedEllieChat({
   const [loading, setLoading] = useState(false);
   const [health, setHealth] = useState('checking…');
   const [aiOk, setAiOk] = useState(true);
+  const [availableProviders, setAvailableProviders] = useState<Record<string, boolean>>({});
+  const [selectedProvider, setSelectedProvider] = useState<StudioProvider>('auto');
+  const [showActivity, setShowActivity] = useState(false);
   const [lastRoute, setLastRoute] = useState<EllieMessageRoute | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -759,11 +773,21 @@ export default function UnifiedEllieChat({
   }
 
   useEffect(() => {
-    fetchAiHealth().then(({ ok, label }) => {
+    fetchAiHealth().then(({ ok, label, providers }) => {
       setAiOk(ok);
       setHealth(label);
+      setAvailableProviders(providers);
     });
   }, []);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem('elevate:studio:provider') as StudioProvider | null;
+    if (saved && saved in STUDIO_PROVIDER_LABELS) setSelectedProvider(saved);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('elevate:studio:provider', selectedProvider);
+  }, [selectedProvider]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -876,7 +900,7 @@ export default function UnifiedEllieChat({
     void naturalVoice.play(clean, {
       voice: 'coral',
       style: 'assistant',
-      rate: 0.96,
+      rate: 1.08,
       allowBrowserFallback: false,
     });
   }
@@ -992,6 +1016,7 @@ export default function UnifiedEllieChat({
               agent: 'ADMIN_AI',
               fileContext,
               documentsContext: attachment?.context,
+              provider: selectedProvider === 'auto' ? undefined : selectedProvider,
               onToken: (token) => {
                 spokenText += token;
                 setMessages((prev) => {
@@ -1111,11 +1136,50 @@ export default function UnifiedEllieChat({
         </div>
       )}
 
-      <CanonicalRunActivity runId={canonicalRunId} />
+      <div className="shrink-0 border-b border-slate-200 bg-white px-3 py-2">
+        <div className="mx-auto flex max-w-5xl items-center gap-2">
+          <label className="sr-only" htmlFor="studio-ai-provider">Choose AI</label>
+          <select
+            id="studio-ai-provider"
+            value={selectedProvider}
+            onChange={(event) => setSelectedProvider(event.target.value as StudioProvider)}
+            className="min-h-9 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-800"
+          >
+            {(Object.keys(STUDIO_PROVIDER_LABELS) as StudioProvider[]).map((provider) => (
+              <option
+                key={provider}
+                value={provider}
+                disabled={provider !== 'auto' && !availableProviders[provider]}
+              >
+                {STUDIO_PROVIDER_LABELS[provider]}
+                {provider !== 'auto' && !availableProviders[provider] ? ' — unavailable' : ''}
+              </option>
+            ))}
+          </select>
+          <span className="hidden truncate text-xs text-slate-500 sm:inline">
+            {selectedProvider === 'auto'
+              ? health
+              : `${STUDIO_PROVIDER_LABELS[selectedProvider]} selected`}
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowActivity((visible) => !visible)}
+            aria-expanded={showActivity}
+            className="ml-auto inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
+          >
+            <Activity className="h-4 w-4" aria-hidden="true" />
+            {showActivity ? 'Hide activity' : 'Activity'}
+          </button>
+        </div>
+      </div>
 
-      <CourseBuildRuns />
-
-      <ConversationActivity conversationId={conversationId} />
+      {showActivity ? (
+        <div className="max-h-[42vh] shrink-0 overflow-y-auto border-b border-slate-200">
+          <CanonicalRunActivity runId={canonicalRunId} />
+          <CourseBuildRuns />
+          <ConversationActivity conversationId={conversationId} />
+        </div>
+      ) : null}
 
       {planCheckpoint?.status === 'awaiting_approval' ? (
         <div className="shrink-0 border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">

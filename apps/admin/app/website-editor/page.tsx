@@ -233,7 +233,7 @@ export default function WebsiteEditorPage() {
                     className={`w-full rounded-xl border p-3 text-left ${values.route === page.route ? 'border-blue-400 bg-blue-950' : 'border-slate-800 bg-slate-900 hover:border-slate-600'}`}
                   >
                     <span className="block truncate text-sm font-bold">
-                      {page.title || page.route}
+                      {page.title && page.title.toLowerCase() !== page.status ? page.title : page.route}
                     </span>
                     <span className="mt-1 block truncate text-xs text-slate-400">
                       {page.route} · {page.status}

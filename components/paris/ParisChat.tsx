@@ -95,6 +95,12 @@ function resolvePortalNavigation(command: string, pathname: string) {
       reports: '/reports',
       hours: '/hours',
       payouts: '/payouts',
+      applicants: '/students/pending',
+      meetings: '/meetings',
+      inbox: '/inbox',
+      compliance: '/compliance',
+      orientation: '/how-to-use',
+      agreement: '/sign-mou',
       dashboard: '/dashboard',
     },
     '/host-shop/dashboard': {
@@ -140,6 +146,12 @@ function resolvePortalNavigation(command: string, pathname: string) {
       words: ['student', 'learner', 'email', 'message', 'text'],
       label: 'student communications',
     },
+    { key: 'applicants', words: ['applicant', 'application'], label: 'applicants' },
+    { key: 'meetings', words: ['meeting', 'appointment', 'calendar', 'schedule'], label: 'team meetings' },
+    { key: 'inbox', words: ['inbox', 'office mail', 'internal mail'], label: 'office mail' },
+    { key: 'compliance', words: ['compliance', 'requirement', 'readiness'], label: 'compliance requirements' },
+    { key: 'orientation', words: ['orientation', 'how to use', 'training guide'], label: 'orientation' },
+    { key: 'agreement', words: ['agreement', 'mou', 'contract'], label: 'your agreement' },
     { key: 'programs', words: ['program', 'course'], label: 'your assigned programs' },
     { key: 'documents', words: ['document', 'upload'], label: 'documents' },
     { key: 'reports', words: ['report'], label: 'reports' },
@@ -171,13 +183,16 @@ I'll ask a few focused questions, recommend the smallest setup that fits, explai
 
 function portalGreeting(portalRole?: string | null, personName?: string | null): Message {
   const role = portalRole?.replaceAll('_', ' ') || 'authenticated portal';
-  const firstName = personName?.trim().split(/\s+/)[0];
+  const displayName = personName?.trim() || '';
+  const honorificName = /^(dr\.|doctor)\s/i.test(displayName)
+    ? displayName
+    : displayName.split(/\s+/)[0];
   const ownerPrompt = /program holder|host shop/i.test(role)
     ? '\n\nI can also help you interview new applicants and organize the follow-up call. Which applicant or required compliance item should we work on first?'
     : '\n\nWhat would you like to complete first?';
   return {
     role: 'assistant',
-    content: `Hi${firstName ? ` ${firstName}` : ''} — I'm PARIS, your authenticated portal assistant for the ${role} workspace.
+    content: `Hi${honorificName ? ` ${honorificName}` : ''} — I'm PARIS, your authenticated portal assistant for the ${role} workspace.
 
 I can help you understand red to-dos, interview applicants, draft student notes and outreach, organize onboarding, and explain where to upload documents or record progress. I can prefill drafts, but you must review and submit official hours, milestones, compliance records, agreements, and messages.${ownerPrompt}`,
   };
@@ -379,7 +394,7 @@ export default function ParisChat({
         if (portalSurface) {
           const command = resolvePortalNavigation(trimmed, pathname);
           if (command) {
-            const reply = `Opening ${command.label}.`;
+            const reply = `Done — I opened ${command.label}.`;
             setMessages((previous) => [...previous, { role: 'assistant', content: reply }]);
             if (autoSpeak)
               void voice.play(plainTextForSpeech(reply), {
@@ -576,7 +591,7 @@ export default function ParisChat({
             <div className="rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-3 shadow-sm">
               <div className="flex items-center gap-2 text-slate-700">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                <span className="text-sm">Checking the current guidance…</span>
+                <span className="text-sm">Working on your request…</span>
               </div>
             </div>
           </div>

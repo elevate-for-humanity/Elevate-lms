@@ -84,6 +84,27 @@ export async function ProgramHolderWorkspaceView({
       .map((row) => row.document_type),
   );
   const requiredDocumentTypes = ['government_id', 'business_registration', 'insurance', 'w9'];
+  const holderFeatures =
+    data.holder?.features && typeof data.holder.features === 'object' ? data.holder.features : {};
+  const regionalAssignment =
+    holderFeatures.regional_assignment && typeof holderFeatures.regional_assignment === 'object'
+      ? holderFeatures.regional_assignment as Record<string, unknown>
+      : null;
+  const customMou =
+    holderFeatures.custom_mou && typeof holderFeatures.custom_mou === 'object'
+      ? holderFeatures.custom_mou as Record<string, unknown>
+      : null;
+  const coordinatorRequirements = Array.isArray(customMou?.requirements)
+    ? customMou.requirements.map((item) => String(item))
+    : [];
+  const coordinatorTrainingTopics = Array.isArray(holderFeatures.training_topics)
+    ? holderFeatures.training_topics.map((item) => String(item))
+    : [];
+  const requiresMediaEvidence = holderFeatures.student_media_required === true;
+  const requiresImageRelease = holderFeatures.require_image_release === true || requiresMediaEvidence;
+  const selectedPayoutProvider = String(
+    holderFeatures.payout_provider || data.payoutProfile?.payout_provider || '',
+  ).toLowerCase();
   const studentCloseoutGaps = incompleteBackWork.map((row) => ({
     id: row.id,
     name: row.full_name || row.email || 'Student',
@@ -95,29 +116,42 @@ export async function ProgramHolderWorkspaceView({
       !row.practical_skills_verified ? 'practical-skills verification' : null,
     ].filter(Boolean) as string[],
   }));
-  const complianceItems = [
+  const complianceItems: Array<{
+    label: string;
+    complete: boolean;
+    required: boolean;
+    owner: 'Program Holder' | 'Elevate' | 'Shared';
+  }> = [
     {
       label: 'Program-holder approval',
       complete: ['active', 'approved'].includes(data.holder?.status),
+      required: true,
+      owner: 'Elevate',
     },
-    { label: 'Memorandum of Understanding', complete: Boolean(data.holder?.mou_signed) },
-    ...(isHvac ? [{ label: 'HVAC program assignment', complete: true }] : []),
+    { label: 'Memorandum of Understanding', complete: Boolean(data.holder?.mou_signed), required: true, owner: 'Shared' },
+    ...(isHvac ? [{ label: 'HVAC program assignment', complete: true, required: true, owner: 'Elevate' as const }] : []),
     ...(isHvac
       ? [
           {
             label: 'HVAC license or instructor credential',
             complete:
               Boolean(data.holder?.hvac_license_url) || approvedDocumentTypes.has('epa_608'),
+            required: true,
+            owner: 'Program Holder' as const,
           },
         ]
       : []),
     {
       label: 'Program Holder handbook acknowledgement',
       complete: data.acknowledgements.some((item) => item.document_type === 'handbook'),
+      required: true,
+      owner: 'Program Holder',
     },
     {
       label: 'Non-compete agreement',
       complete: data.acknowledgements.some((item) => item.document_type === 'non_compete'),
+      required: true,
+      owner: 'Program Holder',
     },
     ...(data.requiresEnchantedHeartsTerms
       ? [
@@ -126,57 +160,77 @@ export async function ProgramHolderWorkspaceView({
             complete: data.acknowledgements.some(
               (item) => item.document_type === 'enchanted_hearts_referral_terms',
             ),
+            required: true,
+            owner: 'Program Holder' as const,
           },
         ]
       : []),
     {
       label: 'Approved ID, business registration, insurance, and W-9',
       complete: requiredDocumentTypes.every((type) => approvedDocumentTypes.has(type)),
+      required: true,
+      owner: 'Shared',
     },
     {
       label: 'Profile picture',
       complete:
         Boolean(data.profile?.avatar_url) ||
         data.documents.some((row) => row.document_type === 'profile_photo'),
+      required: false,
+      owner: 'Program Holder',
     },
-    {
+    ...(requiresImageRelease ? [{
       label: 'Signed image release',
       complete: Boolean(data.imageReleaseConsent?.signed_at),
-    },
+      required: true,
+      owner: 'Program Holder' as const,
+    }] : []),
     {
       label: 'Company logo upload',
       complete: data.documents.some((row) => row.document_type === 'company_logo'),
+      required: false,
+      owner: 'Program Holder',
     },
-    {
+    ...(selectedPayoutProvider === 'quickbooks' ? [{
       label: 'QuickBooks payment-record connection',
       complete: ['active', 'connected', 'synced', 'complete'].includes(
         String(data.payoutProfile?.quickbooks_sync_status || '').toLowerCase(),
       ),
-    },
-    {
+      required: true,
+      owner: 'Elevate' as const,
+    }] : []),
+    ...(selectedPayoutProvider === 'paypal' ? [{
       label: 'PayPal payout connection',
       complete:
         data.payoutProfile?.payout_provider === 'paypal' &&
         Boolean(data.payoutProfile?.payouts_enabled) &&
         Boolean(data.payoutProfile?.transfers_enabled),
-    },
-    {
+      required: true,
+      owner: 'Shared' as const,
+    }] : []),
+    ...(requiresMediaEvidence ? [{
       label: 'Student photos and training videos',
       complete: data.documents.some((row) =>
         ['student_photo', 'student_video'].includes(row.document_type),
       ),
-    },
-    {
+      required: true,
+      owner: 'Program Holder' as const,
+    }] : []),
+    ...(completed.length ? [{
       label: 'Graduated-student back work and 48-hour sign-offs',
       complete: incompleteBackWork.length === 0,
-    },
-    { label: 'Course delivery assignment', complete: data.courseAssignments.length > 0 },
+      required: true,
+      owner: 'Shared' as const,
+    }] : []),
+    { label: 'Course delivery assignment', complete: data.courseAssignments.length > 0, required: data.programs.length > 0, owner: 'Elevate' },
   ];
+  const requiredComplianceItems = complianceItems.filter((item) => item.required);
   const complianceScore = Math.round(
-    (complianceItems.filter((item) => item.complete).length / complianceItems.length) * 100,
+    (requiredComplianceItems.filter((item) => item.complete).length /
+      Math.max(1, requiredComplianceItems.length)) * 100,
   );
-  const completedRequirements = complianceItems.filter((item) => item.complete).length;
-  const missingRequirements = complianceItems.length - completedRequirements;
+  const completedRequirements = requiredComplianceItems.filter((item) => item.complete).length;
+  const missingRequirements = requiredComplianceItems.length - completedRequirements;
   const primaryProgramLabel =
     data.programs[0]?.title || data.programs[0]?.name || 'Assigned program';
   const callQueue = data.applicants.filter((row) => !row.call_date || !row.call_outcome);
@@ -240,6 +294,47 @@ export async function ProgramHolderWorkspaceView({
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {regionalAssignment && customMou ? (
+        <section className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-5 shadow-sm sm:p-6">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Regional operating assignment</p>
+          <h2 className="mt-2 text-2xl font-black text-slate-950">
+            {String(holderFeatures.approved_role || 'Regional Site Coordinator')}
+          </h2>
+          <p className="mt-2 text-sm text-slate-700">
+            Territory: <strong>{String(regionalAssignment.scope || 'Assigned region')}</strong>. Your dashboard is linked to the Gary regional team while preserving your individual login and audit history.
+          </p>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <h3 className="font-black text-slate-950">How the role works</h3>
+              <p className="mt-2 text-sm text-slate-700">Recruit qualified Program Holders for every program offered in the region. Until an approved holder is assigned, the Site Coordinators remain responsible for coordinating that program, applicants, students, WorkOne steps, records, communication, progress, and closeout.</p>
+              <p className="mt-2 text-sm text-slate-700">Use PARIS and the interactive office to open workspaces, call or message people, record notes and outcomes, manage tasks and documents, monitor learners, submit reports, and review payout readiness.</p>
+            </div>
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+              <h3 className="font-black text-emerald-950">Compensation</h3>
+              <p className="mt-2 text-sm text-emerald-950">
+                <strong>{formatUsd(Number(customMou.compensation_per_eligible_enrollment || 1000))}</strong> per eligible, verified enrollment: {formatUsd(Number(customMou.initial_payment || 500))} after verified enrollment, documentation, and funding authorization; {formatUsd(Number(customMou.completion_payment || 500))} after verified completion and closeout.
+              </p>
+              <p className="mt-2 text-xs text-emerald-900">A lead, incomplete application, unverified enrollment, or unverified completion does not by itself trigger payment.</p>
+              <p className="mt-2 text-sm font-bold text-rose-800">{String(customMou.payout_contact_requirement || 'No payout credit is earned until you make a documented call/contact on the assigned applicant and record the outcome in the system.')}</p>
+              <p className="mt-2 text-xs text-rose-700">{String(customMou.uncontacted_alert_rule || 'Applicants without a documented contact outcome for five days are escalated to the admin dashboard.')}</p>
+            </div>
+          </div>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            <div>
+              <h3 className="font-black text-slate-950">Required setup and operating checklist</h3>
+              <ul className="mt-2 space-y-2 text-sm text-slate-700">
+                {coordinatorRequirements.map((item) => <li key={item} className="flex gap-2"><span aria-hidden="true">□</span><span>{item}</span></li>)}
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-black text-slate-950">Required training</h3>
+              <ul className="mt-2 space-y-2 text-sm text-slate-700">
+                {coordinatorTrainingTopics.map((item) => <li key={item} className="flex gap-2"><span aria-hidden="true">•</span><span>{item}</span></li>)}
+              </ul>
+            </div>
+          </div>
+        </section>
+      ) : null}
       <section className="rounded-2xl border border-indigo-200 bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
@@ -462,7 +557,7 @@ export async function ProgramHolderWorkspaceView({
               </p>
               <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                 {complianceItems
-                  .filter((item) => !item.complete)
+                  .filter((item) => item.required && !item.complete)
                   .map((item) => (
                     <li
                       key={item.label}
@@ -603,7 +698,7 @@ export async function ProgramHolderWorkspaceView({
             <div>
               <h2 className="text-xl font-black text-slate-950">Program readiness</h2>
               <p className="mt-1 text-sm text-slate-600">
-                {completedRequirements} of {complianceItems.length} requirements complete.
+                {completedRequirements} of {requiredComplianceItems.length} applicable requirements complete.
               </p>
             </div>
             <span className="rounded-full bg-blue-50 px-3 py-1 text-sm font-black text-blue-800">
@@ -621,7 +716,12 @@ export async function ProgramHolderWorkspaceView({
                 ) : (
                   <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />
                 )}
-                <span className="min-w-0 text-sm font-bold text-slate-800">{item.label}</span>
+                <span className="min-w-0 text-sm font-bold text-slate-800">
+                  {item.label}
+                  <span className="mt-0.5 block text-xs font-medium text-slate-500">
+                    {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
+                  </span>
+                </span>
               </div>
             ))}
           </div>
@@ -1500,7 +1600,12 @@ function Compliance({
   atRisk,
 }: {
   score: number;
-  items: { label: string; complete: boolean }[];
+  items: {
+    label: string;
+    complete: boolean;
+    required: boolean;
+    owner: 'Program Holder' | 'Elevate' | 'Shared';
+  }[];
   atRisk: number;
 }) {
   return (
@@ -1526,7 +1631,12 @@ function Compliance({
                 key={item.label}
                 className="flex items-center justify-between rounded-xl border border-slate-200 p-4"
               >
-                <span className="font-semibold">{item.label}</span>
+                <span className="font-semibold">
+                  {item.label}
+                  <span className="mt-1 block text-xs font-medium text-slate-500">
+                    {item.required ? 'Required' : 'Recommended'} · Owner: {item.owner}
+                  </span>
+                </span>
                 {item.complete ? (
                   <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                 ) : (

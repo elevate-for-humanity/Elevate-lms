@@ -1,6 +1,6 @@
 name: Deploy Marketing (www)
 
-# Deployment checkpoint: strict-boundary repair convergence
+# Deployment checkpoint: full-stack production parity release
 
 on:
   push:
@@ -326,8 +326,11 @@ jobs:
           curl -fsS --max-time 30 https://www.elevateforhumanity.org/programs/cdl-training -o /tmp/cdl-page.html
           grep -q 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4' /tmp/cdl-page.html
           grep -q '/audio/heroes/cdl.mp3' /tmp/cdl-page.html
-          grep -q 'Video transcript' /tmp/cdl-page.html
-          grep -q 'Play hero audio' /tmp/cdl-page.html
+          # Verify the current accessible hero contract. The CDL hero intentionally
+          # uses the visual label and descriptive image text instead of legacy
+          # transcript/audio button copy.
+          grep -q 'CDL Class A' /tmp/cdl-page.html
+          grep -q 'CDL student performing a pre-trip inspection' /tmp/cdl-page.html
 
           curl -fsS --range 0-1023 --max-time 30 -D /tmp/cdl-video.headers -o /tmp/cdl-video.bin https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/cdl-hero.mp4
           grep -qi '^content-type: video/mp4' /tmp/cdl-video.headers

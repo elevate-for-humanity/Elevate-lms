@@ -27,6 +27,8 @@ export interface InstructionalQualityEvidence {
   objectiveCoverage: number;
   sceneNarrationAlignment: number;
   instructionLeakageDetected: boolean;
+  repeatedNarrationSegments: number;
+  repeatedSceneDialogues: number;
 }
 
 const IGNORED_WORDS = new Set([
@@ -49,6 +51,19 @@ const IGNORED_WORDS = new Set([
 
 function words(value: string): string[] {
   return value.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+}
+
+function normalizedTeachingSegments(value: string): string[] {
+  return value
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map((segment) => words(segment).join(' '))
+    .filter((segment) => segment.split(' ').length >= 6);
+}
+
+function duplicateCount(values: string[]): number {
+  const counts = new Map<string, number>();
+  for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
+  return [...counts.values()].reduce((total, count) => total + Math.max(0, count - 1), 0);
 }
 
 function domain(courseTitle: string): InstructionalQualityEvidence['courseDomain'] {
@@ -162,6 +177,12 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
   );
   const objectiveCoverage = objectivesCoverage(learningObjectives, input.script);
   const sceneNarrationAlignment = sceneAlignment(input.storyboard);
+  const repeatedNarrationSegments = duplicateCount(normalizedTeachingSegments(input.script));
+  const repeatedSceneDialogues = duplicateCount(
+    input.storyboard.scenes.flatMap((scene) =>
+      scene.dialogue ? normalizedTeachingSegments(scene.dialogue) : [],
+    ),
+  );
   const instructionLeakageDetected =
     /\b(the narration should|the script should|apply this to .{0,160} by identifying|end with the action the learner|as an ai|return (?:valid )?json|prompt engineering)\b/i.test(
       input.script,
@@ -187,6 +208,10 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
   }
   if (instructionLeakageDetected)
     failures.push('narration contains internal generation instructions');
+  if (repeatedNarrationSegments > 0)
+    failures.push(`narration repeats ${repeatedNarrationSegments} substantial teaching segment(s)`);
+  if (repeatedSceneDialogues > 0)
+    failures.push(`storyboard repeats ${repeatedSceneDialogues} substantial scene dialogue segment(s)`);
   if (objectiveCoverage < 1) {
     failures.push(
       `narration covers only ${Math.round(objectiveCoverage * 100)}% of stated learning objectives`,
@@ -275,6 +300,8 @@ export function instructionalQualityFailures(input: InstructionalQualityInput): 
       objectiveCoverage,
       sceneNarrationAlignment,
       instructionLeakageDetected,
+      repeatedNarrationSegments,
+      repeatedSceneDialogues,
     },
     failures,
   };

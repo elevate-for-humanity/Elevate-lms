@@ -1,6 +1,6 @@
 /**
  * Database operations for LMS resources using Supabase
- * Standardized CRUD with soft delete support
+ * Standardized CRUD with soft delete support.
  */
 
 import { createClient } from '@/lib/supabase/server';

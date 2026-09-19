@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import ProgramHolderApplicationActions from './ProgramHolderApplicationActions';
 
 export const dynamic = 'force-dynamic';
@@ -28,7 +28,7 @@ function formatDate(date: string) {
 
 export default async function ProgramHolderApplicationsPage() {
   await requireRole(['admin']);
-  const supabase = await createClient();
+  const supabase = await requireAdminClient();
 
   const { data: applications } = await supabase
     .from('program_holder_applications')

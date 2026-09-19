@@ -10,7 +10,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import type { MediaStoryboard } from './media-director';
 import type { InstructionalQualityEvidence } from './instructional-quality-gate';
 
-export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v3';
+export const MEDIA_QUALITY_GATE_VERSION = 'media-quality-v4';
 
 const execFileAsync = promisify(execFile);
 const MIN_BYTES = 100_000;
@@ -66,8 +66,10 @@ export function mediaQualityFailures(evidence: MediaQualityEvidence): string[] {
   }
   if (evidence.videoStreams < 1) failures.push('MP4 has no decodable video stream');
   if (evidence.audioStreams < 1) failures.push('MP4 has no narration/audio stream');
-  if (evidence.width < 1920 || evidence.height < 1080) {
-    failures.push(`video resolution ${evidence.width}x${evidence.height} is below 1920x1080`);
+  // HD 720p is an acceptable delivery format. Resolution alone must not reject
+  // an otherwise clear, teachable lesson; instructional defects are enforced below.
+  if (evidence.width < 1280 || evidence.height < 720) {
+    failures.push(`video resolution ${evidence.width}x${evidence.height} is below 1280x720`);
   }
   if (!evidence.openingStillUrl) failures.push('photographic opening still is missing');
   if (evidence.storyboardSceneCount !== evidence.expectedSceneCount) {

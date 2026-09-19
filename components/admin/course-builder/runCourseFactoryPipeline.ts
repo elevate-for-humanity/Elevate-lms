@@ -51,6 +51,8 @@ export type CourseFactoryPipelineInput = {
   buildScope?: 'lesson' | 'course';
   includeVideos?: boolean;
   dryRun?: boolean;
+  studioConversationId?: string;
+  studioTaskId?: string;
 };
 
 /**

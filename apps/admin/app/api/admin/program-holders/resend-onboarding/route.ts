@@ -88,13 +88,19 @@ export async function POST(req: NextRequest) {
   }
   const authEmail = authUser.user.email;
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+  // Program Holder onboarding is hosted by the LMS app. Do not use the
+  // marketing-site URL here: it has no /program-holder routes and cannot share
+  // the LMS auth cookie reliably on mobile devices.
+  const siteUrl = process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org';
+  const onboardingPath = '/program-holder/onboarding';
+  const callbackUrl = `${siteUrl}/auth/callback?redirect=${encodeURIComponent(onboardingPath)}`;
+  const loginUrl = `${siteUrl}/login?portal=program-holder&redirect=${encodeURIComponent(onboardingPath)}`;
 
   // Generate a fresh magic link using the auth account email (canonical).
   const { data: linkData, error: linkError } = await adminDb.auth.admin.generateLink({
     type: 'magiclink',
     email: authEmail,
-    options: { redirectTo: `${siteUrl}/program-holder/onboarding` },
+    options: { redirectTo: callbackUrl },
   });
 
   if (linkError || !linkData?.properties?.action_link) {
@@ -145,7 +151,9 @@ export async function POST(req: NextRequest) {
             </td></tr>
           </table>
           <p style="color:#64748b;font-size:13px;line-height:1.7;margin:0">
-            This link expires in 24 hours. If you need a new one, contact us at
+            This secure link is time-limited. If it has expired or your email app already opened it, use the
+            <a href="${loginUrl}" style="color:#dc2626;font-weight:bold">Program Holder sign-in and password-recovery page</a>.
+            For additional help, contact us at
             <a href="mailto:info@${PLATFORM_DEFAULTS.canonicalDomain}" style="color:#dc2626">info@${PLATFORM_DEFAULTS.canonicalDomain}</a>
             or call <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color:#dc2626">${PLATFORM_DEFAULTS.supportPhone}</a>.
           </p>

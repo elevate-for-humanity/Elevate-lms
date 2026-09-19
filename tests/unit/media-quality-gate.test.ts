@@ -52,6 +52,8 @@ const validEvidence: MediaQualityEvidence = {
     objectiveCoverage: 1,
     sceneNarrationAlignment: 1,
     instructionLeakageDetected: false,
+    repeatedNarrationSegments: 0,
+    repeatedSceneDialogues: 0,
   },
 };
 
@@ -137,6 +139,10 @@ describe('canonical media completion quality gate', () => {
     );
   });
 
+  it('accepts HD 720p delivery', () => {
+    expect(mediaQualityFailures({ ...validEvidence, width: 1280, height: 720 })).toEqual([]);
+  });
+
   it('rejects blurry-scale delivery and a missing opening photograph', () => {
     const failures = mediaQualityFailures({
       ...validEvidence,
@@ -146,7 +152,7 @@ describe('canonical media completion quality gate', () => {
     });
     expect(failures).toEqual(
       expect.arrayContaining([
-        expect.stringContaining('below 1920x1080'),
+        expect.stringContaining('below 1280x720'),
         'photographic opening still is missing',
       ]),
     );

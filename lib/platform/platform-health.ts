@@ -159,6 +159,25 @@ async function checkRedis(): Promise<ServiceCheck> {
 }
 
 async function checkStripe(): Promise<ServiceCheck> {
+  try {
+    const { createAdminClient } = await import('@/lib/supabase/admin');
+    const { data: settings } = await createAdminClient()
+      .from('platform_settings')
+      .select('key,value')
+      .in('key', ['billing_provider', 'stripe_billing_mode']);
+    const values = Object.fromEntries((settings ?? []).map((row: any) => [row.key, row.value]));
+    if (values.billing_provider !== 'stripe' || values.stripe_billing_mode === 'archive') {
+      return {
+        name: 'Stripe (legacy archive)',
+        status: 'unknown',
+        configured: false,
+        message: 'Disabled for new transactions; retained only for historical records',
+      };
+    }
+  } catch {
+    // If settings cannot be read, continue to the credential probe. The
+    // database health check will separately expose the settings-store outage.
+  }
   const { getStripeRuntimeKey } = await import('@/lib/stripe/runtime-key');
   const key = getStripeRuntimeKey();
   const configured = Boolean(key);
@@ -308,7 +327,7 @@ function generateAlerts(
   }
 
   for (const service of [services.stripe, services.email, services.storage]) {
-    if (!service.configured) {
+    if (!service.configured && !/disabled for new transactions/i.test(service.message ?? '')) {
       alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `${service.name} is not configured` });
     } else if (service.status === 'down') {
       alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `${service.name} is unreachable` });

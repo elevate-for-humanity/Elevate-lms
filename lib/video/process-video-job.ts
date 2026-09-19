@@ -275,12 +275,13 @@ function applyLockedCourseBuilderMediaPolicy(job: VideoJob): void {
     if (narration.allow_paid_provider !== false) {
       throw new Error('MEDIA_NARRATION_POLICY_INVALID');
     }
-    // The Course Builder contract is authoritative. Use the local renderer so
-    // runtime environment variables cannot spend credits or transmit lesson
-    // content to an external narration provider.
-    // Repository instructor voices are Edge neural voice identifiers. Edge TTS is
-    // the zero-credit renderer for this locked policy; espeak-ng is emergency-only.
-    process.env.AI_NARRATION_PROVIDER = 'edge';
+    // A locked zero-credit narration policy cannot publish learner-facing
+    // media in production. Edge/local voices are diagnostic-only; fail before
+    // rendering rather than producing an ungoverned or low-quality artifact.
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('MEDIA_NARRATION_AUTHORIZATION_REQUIRED');
+    }
+    process.env.AI_NARRATION_PROVIDER = 'local';
   }
 }
 
@@ -386,6 +387,79 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       )
       .eq('id', job.lesson_id)
       .maybeSingle();
+    const { data: licensedLessonVideos, error: licensedVideoError } = await db
+      .from('course_videos')
+      .select('id,storage_path,title,created_at,asset_role,sequence_index')
+      .eq('course_id', job.course_id)
+      .eq('lesson_id', job.lesson_id)
+      .eq('asset_role', 'source_broll')
+      .eq('status', 'ready')
+      .not('storage_path', 'is', null)
+      .order('sequence_index', { ascending: true })
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (licensedVideoError) {
+      throw new Error(`LICENSED_MEDIA_LOOKUP_FAILED:${licensedVideoError.message}`);
+    }
+    const licensedLessonVideo = licensedLessonVideos?.[0] ?? null;
+    let licensedSourceVideoUrl: string | null = null;
+    if (licensedLessonVideo?.storage_path) {
+      const { data: signedLicensedVideo, error: signedLicensedVideoError } = await db.storage
+        .from('course_videos')
+        .createSignedUrl(licensedLessonVideo.storage_path, 60 * 60 * 6);
+      if (signedLicensedVideoError || !signedLicensedVideo?.signedUrl) {
+        throw new Error(
+          `LICENSED_MEDIA_SIGN_FAILED:${signedLicensedVideoError?.message ?? 'missing signed URL'}`,
+        );
+      }
+      licensedSourceVideoUrl = signedLicensedVideo.signedUrl;
+    }
+    const { data: preRollVideos, error: preRollError } = await db
+      .from('course_videos')
+      .select('id,storage_path,title,asset_role,duration_seconds,sequence_index,created_at')
+      .eq('course_id', job.course_id)
+      .in('asset_role', ['course_preroll', 'lesson_preroll'])
+      .eq('status', 'ready')
+      .not('storage_path', 'is', null)
+      .or(`lesson_id.eq.${job.lesson_id},lesson_id.is.null`)
+      .order('sequence_index', { ascending: true })
+      .order('created_at', { ascending: false });
+    if (preRollError) throw new Error(`PREROLL_LOOKUP_FAILED:${preRollError.message}`);
+    const preRollVideo =
+      preRollVideos?.find((video) => video.asset_role === 'lesson_preroll') ?? preRollVideos?.[0] ?? null;
+    let preRollUrl: string | null = null;
+    if (preRollVideo?.storage_path) {
+      const { data: signedPreRoll, error: signedPreRollError } = await db.storage
+        .from('course_videos')
+        .createSignedUrl(preRollVideo.storage_path, 60 * 60 * 6);
+      if (signedPreRollError || !signedPreRoll?.signedUrl) {
+        throw new Error(`PREROLL_SIGN_FAILED:${signedPreRollError?.message ?? 'missing signed URL'}`);
+      }
+      preRollUrl = signedPreRoll.signedUrl;
+    }
+    const { data: postRollVideo, error: postRollError } = await db
+      .from('course_videos')
+      .select('id,storage_path,title,duration_seconds,sequence_index,created_at')
+      .eq('course_id', job.course_id)
+      .eq('lesson_id', job.lesson_id)
+      .eq('asset_role', 'lesson_outro')
+      .eq('status', 'ready')
+      .not('storage_path', 'is', null)
+      .order('sequence_index', { ascending: true })
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (postRollError) throw new Error(`POSTROLL_LOOKUP_FAILED:${postRollError.message}`);
+    let postRollUrl: string | null = null;
+    if (postRollVideo?.storage_path) {
+      const { data: signedPostRoll, error: signedPostRollError } = await db.storage
+        .from('course_videos')
+        .createSignedUrl(postRollVideo.storage_path, 60 * 60 * 6);
+      if (signedPostRollError || !signedPostRoll?.signedUrl) {
+        throw new Error(`POSTROLL_SIGN_FAILED:${signedPostRollError?.message ?? 'missing signed URL'}`);
+      }
+      postRollUrl = signedPostRoll.signedUrl;
+    }
     const videoConfig =
       lesson?.video_config && typeof lesson.video_config === 'object'
         ? (lesson.video_config as Record<string, unknown>)
@@ -524,9 +598,50 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
         );
       }
     }
-    const sceneData = generatedPlan
+    let sceneData = generatedPlan
       ? { ...persistedSceneData, ...generatedSceneData(generatedPlan) }
       : persistedSceneData;
+    if (licensedSourceVideoUrl) {
+      const plannedScenes = Array.isArray(sceneData.scenes)
+        ? sceneData.scenes.filter((scene): scene is Record<string, unknown> =>
+            Boolean(scene && typeof scene === 'object'),
+          )
+        : [];
+      // One uploaded procedure clip is one evidence-bearing scene. It is not
+      // stretched or repeated across the entire lesson; the remaining scenes
+      // continue through the normal objective-aligned media director.
+      if (plannedScenes.length > 0) {
+        sceneData = {
+          ...sceneData,
+          licensed_media: {
+            course_video_id: licensedLessonVideo?.id,
+            title: licensedLessonVideo?.title,
+            storage_path: licensedLessonVideo?.storage_path,
+          },
+          scenes: plannedScenes.map((scene, index) =>
+            index === 0
+              ? {
+                  ...scene,
+                  source_video_url: licensedSourceVideoUrl,
+                  media_source: 'elevate-owned',
+                  operation: 'videoToVideo',
+                }
+              : scene,
+          ),
+        };
+      } else {
+        sceneData = {
+          ...sceneData,
+          source_video_url: licensedSourceVideoUrl,
+          media_source: 'elevate-owned',
+          licensed_media: {
+            course_video_id: licensedLessonVideo?.id,
+            title: licensedLessonVideo?.title,
+            storage_path: licensedLessonVideo?.storage_path,
+          },
+        };
+      }
+    }
     const isMicroclip = job.asset_kind === 'microclip';
     // Every render is an immutable candidate. Approval, not rendering, changes
     // the learner-facing lesson URL.
@@ -771,6 +886,12 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       courseTitle,
       storyboard,
       instructorId: instructor.id,
+      preRollUrl,
+      preRollDurationSeconds:
+        typeof preRollVideo?.duration_seconds === 'number' ? preRollVideo.duration_seconds : 5,
+      postRollUrl,
+      postRollDurationSeconds:
+        typeof postRollVideo?.duration_seconds === 'number' ? postRollVideo.duration_seconds : 5,
     });
     if (!result.success || !result.videoUrl) {
       throw new Error(result.error ?? 'Render returned no playable video URL');
@@ -909,12 +1030,19 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         .maybeSingle();
       tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
     }
-    const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
+    const paidNarration = usesPaidNarration(job);
+    // Pre-authorized Cloudflare narration uses an isolated course scope. This
+    // lets approved course narration auto-dispatch under a tight budget without
+    // weakening manual approval for GPU video or unrelated paid inference.
+    const scopeKey = paidNarration
+      ? `course:${job.course_id}:cloudflare-tts`
+      : tenantId
+        ? `tenant:${tenantId}`
+        : 'platform';
     const normalizedSceneData =
       job.scene_data && typeof job.scene_data === 'object'
         ? compactLegacySceneData(job.scene_data as Record<string, unknown>).sceneData
         : job.scene_data;
-    const paidNarration = usesPaidNarration(job);
     const cloudflareTtsModel = process.env.CLOUDFLARE_TTS_MODEL?.trim() || '@cf/deepgram/aura-1';
     const fingerprint = paidArtifactFingerprint({
       operation: 'lesson-video',

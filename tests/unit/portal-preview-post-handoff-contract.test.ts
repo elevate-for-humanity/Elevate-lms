@@ -17,6 +17,10 @@ const studentButton = readFileSync(
   'components/admin/students/OpenLearnerPortalButton.tsx',
   'utf8',
 );
+const sharedPortalButton = readFileSync(
+  'components/admin/OpenPortalPreviewButton.tsx',
+  'utf8',
+);
 
 describe('portal preview POST handoff contract', () => {
   it('keeps the signed handoff out of newly issued preview URLs', () => {
@@ -28,12 +32,12 @@ describe('portal preview POST handoff contract', () => {
   it('accepts a form POST and redirects with preview cookies', () => {
     expect(previewRoute).toContain('export async function POST(request: NextRequest)');
     expect(previewRoute).toContain("request.formData()");
-    expect(previewRoute).toContain("NextResponse.redirect(`${appUrl}${portalPreviewDestination(target.role)}`, 303)");
+    expect(previewRoute).toContain("NextResponse.redirect(\`${appUrl}${portalPreviewDestination(target.role)}\`, 303)");
     expect(previewRoute).toContain('PORTAL_PREVIEW_SESSION_COOKIE');
   });
 
-  it('uses form POST navigation from both admin entry points', () => {
-    for (const source of [impersonateForm, studentButton]) {
+  it('uses form POST navigation from every admin entry point', () => {
+    for (const source of [impersonateForm, studentButton, sharedPortalButton]) {
       expect(source).toContain("form.method = 'POST'");
       expect(source).toContain("handoff.name = 'handoff'");
       expect(source).toContain('form.submit()');

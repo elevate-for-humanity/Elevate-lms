@@ -276,6 +276,7 @@ export function buildAtomicPayload(
                     source_fingerprint: sourceFingerprint,
                     source_contract_version: 1,
                     narration_locked: true,
+                    allow_paid_narration: true,
                     instructor: instructor.name,
                     instructor_id: instructor.id,
                     instructor_avatar: instructor.avatar,

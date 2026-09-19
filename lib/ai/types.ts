@@ -266,6 +266,7 @@ export type AIProviderName =
   | 'cloudflare'
   | 'azure'
   | 'groq'
+  | 'xai'
   | 'elevate'
   | 'none';
 export type AIImageProviderName = 'dalle' | 'stability' | 'azure' | 'none';

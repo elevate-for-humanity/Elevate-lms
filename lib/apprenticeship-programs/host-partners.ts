@@ -64,7 +64,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         alt: 'Guided interior tour of Kountry Kutz Barbershop',
         kind: 'video',
         script:
-          'Welcome to Kountry Kutz Barbershop on Main Street in New Palestine, Indiana. Kountry Kutz is a family-oriented working barbershop and an approved Elevate Barber Apprenticeship Host Shop. Apprentices may build supervised skills in sanitation, client consultation, haircutting, fading, grooming, shop routines, customer service, and professional conduct while completing required related instruction and documented training hours. Apply through Elevate first. Placement, employment, wages, supervisor capacity, schedule, enrollment, and licensing requirements are confirmed before training begins.',
+          'Welcome to Kountry Kutz Barbershop, located at 56 West Main Street, Suite A, in New Palestine, Indiana. As the video takes you through the shop, notice the professional barber stations, mirrors, chairs, work surfaces, tools, and client service areas that make this a real working barbershop. This family-oriented Main Street shop is an approved Elevate Barber Apprenticeship Host Shop. Here, apprentices can learn how to prepare and sanitize a station, disinfect tools, greet and consult with clients, drape clients correctly, and develop supervised skills in clipper cutting, shear work, fading, lineups, beard grooming, and professional customer service. The tour also shows the daily shop environment where apprentices practice organization, time management, communication, and safe workplace routines. Apply through Elevate before reporting to the shop. Placement, employment, wages, schedule, supervisor capacity, documented training hours, and licensing requirements are confirmed before training begins.',
       },
       {
         src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
@@ -76,6 +76,59 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     websiteLabel: 'Visit Kountry Kutz website',
     socialUrl: 'https://linktr.ee/kountrykutz',
     socialLabel: 'Photos, video & social',
+  },
+  {
+    slug: 'top-shelf-barber-lounge',
+    name: 'Top Shelf Barber Lounge',
+    businessType: 'BarberShop',
+    city: 'Elkhart',
+    state: 'IN',
+    zip: '46514',
+    address: '1600 E Bristol St',
+    phone: '(574) 268-8532',
+    programs: ['barber-apprenticeship'],
+    note: 'Elkhart barber lounge and active apprenticeship host shop.',
+    marketingBlurb:
+      "An Elkhart barbershop offering fades, shape ups, beard trims, children's haircuts, shear cuts, and supervised barber apprenticeship experience.",
+    media: [
+      {
+        src: 'https://d2ugbn5gb88fyp.cloudfront.net/1265883/0_0.jpg',
+        alt: 'Top Shelf Barber Lounge barber providing a haircut',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile.jpg',
+        alt: 'Top Shelf Barber Lounge clean fade and textured haircut',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-textured-crop.jpg',
+        alt: 'Top Shelf Barber Lounge textured crop and blended fade',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-wave-and-beard.jpg',
+        alt: 'Top Shelf Barber Lounge wave haircut, lineup, and beard grooming',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe.jpg',
+        alt: 'Top Shelf Barber Lounge modern fringe haircut with tapered sides',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade.jpg',
+        alt: 'Top Shelf Barber Lounge precision fade and lineup',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-and-beard.jpg',
+        alt: 'Top Shelf Barber Lounge fade haircut and full beard shaping',
+        kind: 'photo',
+      },
+    ],
+    websiteUrl: 'https://barbershopelkhart.com/',
+    websiteLabel: 'Visit Top Shelf Barber Lounge',
   },
   {
     slug: 'cals-kutz-studio',
@@ -366,7 +419,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         alt: 'Salon Saloon team and salon tour',
         kind: 'video',
         script:
-          'Welcome to Salon Saloon in South Bend, Indiana, a participating Cosmetology Apprenticeship Host Salon. Apprenticeship candidates can learn about supervised salon training, client service, sanitation, hair care, and professional workplace routines. Placement, employment, supervision, and enrollment approval are confirmed through Elevate before training begins.',
+          'Welcome to Salon Saloon, located at 1740 South Bend Avenue, Suite A, in South Bend, Indiana. As we move through the salon, notice the open service floor, professional styling stations, mirrors, salon chairs, product displays, and organized work areas designed for serving clients and supporting hands-on learning. Salon Saloon is a participating Elevate Cosmetology Apprenticeship Host Salon. In this real salon environment, apprentices can learn how to prepare and sanitize a station, disinfect tools, conduct a professional client consultation, evaluate hair and scalp needs, assist with shampoo and conditioning services, and build supervised skills in cutting, coloring, styling, finishing, and client care. The tour also introduces the workplace routines apprentices are expected to master, including safety, organization, communication, scheduling, and maintaining a clean professional environment between every guest. Apply through Elevate before reporting to the salon. Placement, employment, schedule, supervision, documented training hours, and enrollment approval are confirmed before training begins.',
       },
     ],
     websiteUrl: 'https://tory-103460.square.site/',

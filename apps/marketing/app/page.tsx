@@ -92,17 +92,52 @@ export default function HomePage() {
       <main className="[&_a]:no-underline [&_a:hover]:no-underline">
         <PlatformHubHero />
         {/* Put funded career training and the WorkOne action path before apprenticeships. */}
-        <div data-narration-disabled="true">
+        <div
+          data-scroll-narration
+          data-narration-src="/audio/narration/career-pathways.mp3"
+          data-narration="Explore career pathways in HVAC, commercial driving, bookkeeping, and business. Training may be available at no cost for people who qualify through an approved workforce funding source."
+        >
           <HomeCareerPathways />
         </div>
-        <div data-narration-disabled="true">
+        <div
+          data-scroll-narration
+          data-narration-src="/audio/narration/funding.mp3"
+          data-narration="Not sure how you will pay for training? Start here. Review workforce funding, employer-supported training, grants, and self-pay options. If you are using WorkOne, schedule your official orientation and then complete Elevate's funding intake."
+        >
           <HomeFunding />
         </div>
-        <div data-narration-disabled="true"><HomeBeautyPriority /></div>
-        <div data-narration-disabled="true"><HomeFeaturedHostShop /></div>
-        <div data-narration-disabled="true"><HomeEmployerStrip /></div>
-        <div data-narration-disabled="true"><HomePlatformOverview /></div>
-        <div data-narration-disabled="true">
+        <div
+          data-scroll-narration
+          data-narration-src="/audio/narration/apprenticeship.mp3"
+          data-narration="Explore Barber, Cosmetology, Esthetics, and Nail Technician registered apprenticeship pathways. Apprentices combine structured instruction with supervised hands-on training at an approved Host Site."
+        >
+          <HomeBeautyPriority />
+        </div>
+        <div
+          data-scroll-narration
+          data-narration-src="/audio/narration/host-shop.mp3"
+          data-narration="Meet featured Host Shops where apprentices build real skills under qualified supervision. Businesses can also apply to become an approved apprenticeship Host Site."
+        >
+          <HomeFeaturedHostShop />
+        </div>
+        <div
+          data-scroll-narration
+          data-narration="Employers can hire credentialed graduates, become an apprenticeship Host Site, or work with Elevate to design a training cohort around their workforce needs."
+        >
+          <HomeEmployerStrip />
+        </div>
+        <div
+          data-scroll-narration
+          data-narration-src="/audio/narration/website-builder.mp3"
+          data-narration="Elevate connects applications, courses, apprenticeships, attendance, credentials, employer workflows, and workforce operations in one coordinated platform."
+        >
+          <HomePlatformOverview />
+        </div>
+        <div
+          data-scroll-narration
+          data-narration-src="/audio/narration/final.mp3"
+          data-narration="Ready for your next step? Start an application, check your options, or contact our team for help choosing the right path."
+        >
           <HomeFinalCTA />
         </div>
         {/* Keep verification and credential relationships after the conversion journey. */}

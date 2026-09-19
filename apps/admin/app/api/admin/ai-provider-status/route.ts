@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { getXAIAPIKey } from '@/lib/ai/xai-config';
+import { getAnthropicAPIKey } from '@/lib/ai/anthropic-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -29,16 +31,40 @@ export async function GET(request: NextRequest) {
   await hydrateProcessEnv();
 
   const groq = process.env.GROQ_API_KEY;
+  const xai = getXAIAPIKey();
   const gemini = process.env.GEMINI_API_KEY;
   const openai = process.env.OPENAI_API_KEY;
   const openhands = process.env.OPENHANDS_API_KEY;
+  const anthropic = getAnthropicAPIKey();
 
-  const activeProvider = groq ? 'groq' : gemini ? 'gemini' : openai ? 'openai' : null;
+  const activeProvider =
+    process.env.AI_PROVIDER ||
+    (xai
+      ? 'xai'
+      : anthropic
+        ? 'anthropic'
+        : groq
+          ? 'groq'
+          : gemini
+            ? 'gemini'
+            : openai
+              ? 'openai'
+              : null);
 
   return NextResponse.json({
     activeProvider,
     keys: {
       GROQ_API_KEY: { set: Boolean(groq), masked: maskKey(groq) },
+      XAI_API_KEY: { set: Boolean(xai), masked: maskKey(xai) },
+      GROK_API_KEY: {
+        set: Boolean(process.env.GROK_API_KEY),
+        masked: maskKey(process.env.GROK_API_KEY),
+      },
+      ANTHROPIC_API_KEY: { set: Boolean(anthropic), masked: maskKey(anthropic) },
+      CLAUDE_API_KEY: {
+        set: Boolean(process.env.CLAUDE_API_KEY),
+        masked: maskKey(process.env.CLAUDE_API_KEY),
+      },
       GEMINI_API_KEY: { set: Boolean(gemini), masked: maskKey(gemini) },
       OPENAI_API_KEY: { set: Boolean(openai), masked: maskKey(openai) },
       OPENHANDS_API_KEY: { set: Boolean(openhands), masked: maskKey(openhands) },

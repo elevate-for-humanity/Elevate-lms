@@ -4,10 +4,9 @@
  * This route lives in the dedicated Admin app so /integrations/env-manager
  * does not depend on the retired apps/app container.
  *
- * platform_settings is plaintext configuration storage. Secret-looking keys
- * may be read in masked form for legacy visibility, but they cannot be written
- * here. Production secrets must be configured in the owning runtime service
- * environment (Northflank) and the service redeployed when necessary.
+ * Non-secret settings live in platform_settings. Secret-looking keys are
+ * transparently routed to encrypted platform_secrets so the fields rendered by
+ * the Environment Manager actually persist to the canonical runtime store.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,6 +15,7 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
+import { refreshSecrets } from '@/lib/secrets';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -74,21 +74,30 @@ export async function GET(req: NextRequest) {
   if (auth.error) return auth.error;
 
   const db = await requireAdminClient();
-  const { data, error } = await db
-    .from('platform_settings')
-    .select('key, value, updated_at')
-    .order('key');
+  const [{ data, error }, { data: secrets, error: secretError }] = await Promise.all([
+    db.from('platform_settings').select('key, value, updated_at').order('key'),
+    db.from('platform_secrets').select('key, updated_at').order('key'),
+  ]);
 
   if (error) return safeDbError(error, 'Failed to load settings');
+  if (secretError) return safeDbError(secretError, 'Failed to load encrypted secrets');
 
   return NextResponse.json({
-    settings: (data ?? []).map((row) => ({
-      key: row.key,
-      value: maskValue(row.key, row.value ?? ''),
-      is_secret: isSecret(row.key),
-      updated_at: row.updated_at,
-    })),
-    secretWritePolicy: 'runtime-environment-only',
+    settings: [
+      ...(data ?? []).map((row) => ({
+        key: row.key,
+        value: maskValue(row.key, row.value ?? ''),
+        is_secret: isSecret(row.key),
+        updated_at: row.updated_at,
+      })),
+      ...(secrets ?? []).map((row) => ({
+        key: row.key,
+        value: '••••••••',
+        is_secret: true,
+        updated_at: row.updated_at,
+      })),
+    ],
+    secretWritePolicy: 'encrypted-platform-secrets',
   });
 }
 
@@ -119,30 +128,45 @@ export async function POST(req: NextRequest) {
     if (!isAllowedKey(key)) {
       return safeError(`Invalid key format: ${key}`, 400);
     }
-    if (isSecret(key)) {
-      return safeError(
-        `${key} is a secret credential. Configure it in the owning Northflank service environment, not plaintext platform_settings.`,
-        400,
-      );
-    }
     if (entry.value === undefined || entry.value === null) {
       return safeError(`Missing value for key: ${key}`, 400);
     }
   }
 
-  const rows = body.entries.map((entry) => ({
-    key: entry.key!.trim(),
-    value: entry.value!,
-    updated_at: new Date().toISOString(),
-    updated_by: auth.id,
-  }));
+  const settingRows = body.entries
+    .filter((entry) => !isSecret(entry.key!.trim()))
+    .map((entry) => ({
+      key: entry.key!.trim(),
+      value: entry.value!,
+      updated_at: new Date().toISOString(),
+      updated_by: auth.id,
+    }));
+  const secretRows = body.entries
+    .filter((entry) => isSecret(entry.key!.trim()))
+    .map((entry) => ({
+      key: entry.key!.trim(),
+      value_enc: entry.value!,
+      scope: 'runtime',
+      category: 'integrations',
+      is_sensitive: true,
+      updated_at: new Date().toISOString(),
+      updated_by: auth.id,
+    }));
 
   const db = await requireAdminClient();
-  const { error } = await db.from('platform_settings').upsert(rows, { onConflict: 'key' });
-  if (error) return safeDbError(error, 'Failed to save settings');
+  if (settingRows.length) {
+    const { error } = await db.from('platform_settings').upsert(settingRows, { onConflict: 'key' });
+    if (error) return safeDbError(error, 'Failed to save settings');
+  }
+  if (secretRows.length) {
+    const { error } = await db.from('platform_secrets').upsert(secretRows, { onConflict: 'key' });
+    if (error) return safeDbError(error, 'Failed to save encrypted secrets');
+    await refreshSecrets();
+  }
 
-  await auditWrite(auth.id, 'upsert', rows.map((row) => row.key));
-  return NextResponse.json({ saved: rows.length });
+  const keys = body.entries.map((entry) => entry.key!.trim());
+  await auditWrite(auth.id, 'upsert', keys);
+  return NextResponse.json({ saved: keys.length, encrypted: secretRows.length });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -156,7 +180,10 @@ export async function DELETE(req: NextRequest) {
   if (!key) return safeError('key query param required', 400);
   if (!isAllowedKey(key)) return safeError(`Invalid key format: ${key}`, 400);
   if (isSecret(key)) {
-    return safeError('Secret credentials must be removed from the owning runtime environment.', 400);
+    return safeError(
+      'Secret credentials must be removed from the owning runtime environment.',
+      400,
+    );
   }
 
   const db = await requireAdminClient();

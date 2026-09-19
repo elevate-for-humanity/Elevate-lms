@@ -64,7 +64,8 @@ export type VideoFailureClass =
 export function classifyVideoFailure(message: string): VideoFailureClass {
   const text = message.toLowerCase();
   if (/413|request entity too large|upload|storage|bucket|tus/.test(text)) return 'storage';
-  if (/unauthorized|forbidden|invalid api key|401|403/.test(text)) return 'authorization';
+  if (/unauthorized|authorization(?:_| )required|forbidden|invalid api key|401|403/.test(text))
+    return 'authorization';
   if (/not configured|missing .*key|missing .*url|configuration/.test(text)) return 'configuration';
   if (/lesson not found|course not found|not found/.test(text)) return 'not_found';
   if (/quality|frozen|black frame|visual change|narration coverage|caption/.test(text))

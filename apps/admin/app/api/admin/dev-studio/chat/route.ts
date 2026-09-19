@@ -22,6 +22,12 @@ import { isGeminiConfigured } from '@/lib/gemini-client';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
 import { aiChat, getActiveProviderName } from '@/lib/ai/ai-service';
+import { isXAIConfigured } from '@/lib/ai/xai-config';
+import {
+  executePaidInference,
+  paidArtifactFingerprint,
+  reservePaidInference,
+} from '@/lib/ai/paid-inference-gateway';
 import { getRAGContext } from '@/lib/platform/rag';
 import { getAiCharterContext } from '@/lib/devstudio/platform-control-plane';
 import { runStudioBrowserAudit } from '@/lib/devstudio/browser-audit';
@@ -37,7 +43,7 @@ import path from 'path';
 
 type ToolCallRecord = { tool: string; args: Record<string, unknown>; result: string };
 type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
-type ChatProvider = 'auto' | 'groq' | 'openai' | 'gemini' | 'anthropic';
+type ChatProvider = 'auto' | 'xai' | 'groq' | 'openai' | 'gemini' | 'anthropic';
 type StudioAgent = 'ADMIN_AI';
 
 const PUBLIC_ORIGIN = 'https://www.elevateforhumanity.org';
@@ -143,6 +149,7 @@ async function recordUnifiedCapabilityUse(
 }
 
 const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, ...string[]]> = {
+  xai: ['grok-4.6'],
   groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
   openai: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'],
   gemini: ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'],
@@ -150,7 +157,7 @@ const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, readonly [string, .
 };
 
 function normalizeProvider(value: unknown): ChatProvider {
-  return ['auto', 'groq', 'openai', 'gemini', 'anthropic'].includes(String(value))
+  return ['auto', 'xai', 'groq', 'openai', 'gemini', 'anthropic'].includes(String(value))
     ? (String(value) as ChatProvider)
     : 'auto';
 }
@@ -1539,13 +1546,7 @@ async function _POST(req: NextRequest) {
     let provider = 'none';
     let model = 'none';
     const canonicalProvider = getActiveProviderName();
-    const providerOrder = [canonicalProvider];
-    if (providerPreference !== 'auto' && providerPreference !== canonicalProvider) {
-      logger.warn('[devstudio/chat] ignored non-canonical provider override', {
-        requested: providerPreference,
-        canonical: canonicalProvider,
-      });
-    }
+    const providerOrder = [providerPreference === 'auto' ? canonicalProvider : providerPreference];
 
     for (const nextProvider of providerOrder) {
       if (assistantMessage) break;
@@ -1734,14 +1735,54 @@ async function _POST(req: NextRequest) {
 
     if (!assistantMessage) {
       try {
-        const fallbackResult = await aiChat({
-          messages: [{ role: 'system', content: systemPrompt }, ...messages],
-          temperature: 0.4,
-          maxTokens: 2048,
+        const db = await requireAdminClient();
+        const requestNonce = req.headers.get('x-request-id')?.trim() || crypto.randomUUID();
+        const projectedCostMicros = Math.max(
+          0,
+          Number(process.env.STUDIO_CHAT_PROJECTED_COST_MICROS ?? '100000'),
+        );
+        const artifactFingerprint = paidArtifactFingerprint({
+          operation: 'studio-chat',
+          actorId: auth.userId,
+          provider: canonicalProvider,
+          model: typeof rawModel === 'string' ? rawModel : null,
+          message: lastUserMessage,
+          requestNonce,
         });
-        assistantMessage = fallbackResult.content ?? null;
-        provider = fallbackResult.provider ?? canonicalProvider;
-        model = fallbackResult.model;
+        const paidExecution = await executePaidInference({
+          db,
+          authorize: () =>
+            reservePaidInference(db, {
+              scopeKey: 'studio-chat',
+              actorId: auth.userId,
+              artifactFingerprint,
+              idempotencyKey: `studio-chat:${requestNonce}`,
+              provider: canonicalProvider,
+              model:
+                typeof rawModel === 'string' && rawModel.trim()
+                  ? rawModel.trim()
+                  : process.env.CLOUDFLARE_AI_MODEL || 'canonical',
+              operation: 'studio-chat',
+              projectedCostMicros,
+            }),
+          dispatch: () =>
+            aiChat({
+              messages: [{ role: 'system', content: systemPrompt }, ...messages],
+              temperature: 0.4,
+              maxTokens: 2048,
+              provider: providerPreference === 'auto' ? undefined : providerPreference,
+            }),
+        });
+        if (paidExecution.decision === 'approved' && paidExecution.value) {
+          assistantMessage = paidExecution.value.content ?? null;
+          provider = paidExecution.value.provider ?? canonicalProvider;
+          model = paidExecution.value.model;
+        } else {
+          logger.warn('[devstudio/chat] governed inference was not dispatched', {
+            decision: paidExecution.decision,
+            requestId: paidExecution.requestId,
+          });
+        }
       } catch (err: unknown) {
         logger.warn('[devstudio/chat] aiChat fallback failed', normalizeError(err));
       }
@@ -1750,6 +1791,7 @@ async function _POST(req: NextRequest) {
     if (!assistantMessage) {
       logger.error('[devstudio/chat] no provider available', undefined, {
         hasGroq: isGroqConfigured(),
+        hasXAI: isXAIConfigured(),
         hasGemini: isGeminiConfigured(),
         hasOpenAI: isOpenAIConfigured(),
         hasAnthropic: isAnthropicConfigured(),
@@ -1762,6 +1804,7 @@ async function _POST(req: NextRequest) {
               : `LIZZY could not reach the configured ${canonicalProvider} provider. Check that provider connection in Admin → Integrations.`,
           debug: {
             hasGroq: isGroqConfigured(),
+            hasXAI: isXAIConfigured(),
             hasOpenAI: isOpenAIConfigured(),
             hasAnthropic: isAnthropicConfigured(),
             hasGemini: isGeminiConfigured(),
@@ -1813,6 +1856,7 @@ async function _POST(req: NextRequest) {
               model,
               providerPreference,
               availableProviders: {
+                xai: isXAIConfigured(),
                 groq: isGroqConfigured(),
                 openai: isOpenAIConfigured(),
                 anthropic: isAnthropicConfigured(),

@@ -21,7 +21,10 @@ permissions:
 
 concurrency:
   group: controlled-course-video-production
-  cancel-in-progress: false
+  # A newer release supersedes a worker that is still waiting on an older
+  # deployment identity. Active render batches are database-leased and recover
+  # safely; stale workflow orchestrators must not block the corrected one.
+  cancel-in-progress: true
 
 jobs:
   process:

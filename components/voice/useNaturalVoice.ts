@@ -20,10 +20,10 @@ const naturalVoiceCache = new Map<string, Promise<Blob>>();
 const NATURAL_VOICE_STOP_EVENT = 'elevate:natural-voice-stop';
 
 const DELIVERY_RATE_BY_STYLE: Record<NaturalVoiceStyle, number> = {
-  default: 1,
-  assistant: 1.02,
-  instructor: 0.98,
-  commercial: 1.02,
+  default: 0.9,
+  assistant: 0.88,
+  instructor: 0.86,
+  commercial: 0.9,
 };
 
 /**
@@ -40,7 +40,7 @@ export function narrationPlaybackRate(options: PlayOptions = {}) {
   const style = options.style || 'default';
   const baseline = DELIVERY_RATE_BY_STYLE[style];
   return Number.isFinite(requested)
-    ? Math.min(1.12, Math.max(0.9, requested))
+    ? Math.min(1.05, Math.max(0.82, requested))
     : baseline;
 }
 

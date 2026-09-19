@@ -9,6 +9,7 @@ import { refreshSecrets } from '@/lib/secrets';
 import { getGroqClient } from '@/lib/ai/groq-client';
 import { getOpenAIClient } from '@/lib/ai/openai-client';
 import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
+import { logger } from '@/lib/logger';
 
 interface IntegrityIssue {
   courseId: string;
@@ -146,7 +147,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       aiVerified = true;
       aiMessage = `${provider} authenticated and reachable`;
     } catch (error) {
-      aiMessage = `${provider} is configured but the live provider check failed: ${error instanceof Error ? error.message : 'unknown provider error'}`;
+      logger.warn('Course Builder provider health check failed', {
+        provider,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      aiMessage = `${provider} is configured but the live provider check failed`;
     }
   }
   checks.push({

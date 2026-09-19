@@ -554,8 +554,8 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       : persistedSceneData;
     if (licensedSourceVideoUrl) {
       const plannedScenes = Array.isArray(sceneData.scenes)
-        ? sceneData.scenes.filter(
-            (scene): scene is Record<string, unknown> => Boolean(scene && typeof scene === 'object'),
+        ? sceneData.scenes.filter((scene): scene is Record<string, unknown> =>
+            Boolean(scene && typeof scene === 'object'),
           )
         : [];
       // One uploaded procedure clip is one evidence-bearing scene. It is not

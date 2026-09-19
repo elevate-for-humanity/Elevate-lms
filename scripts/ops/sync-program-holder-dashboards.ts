@@ -9,6 +9,16 @@ import { createClient } from '@supabase/supabase-js';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
+/** Legacy/intake labels resolve to the canonical program catalog slug. */
+const PROGRAM_SLUG_ALIASES: Record<string, string> = {
+  entrepreneurship: 'business-startup',
+  'entrepreneurship-small-business': 'business-startup',
+};
+
+function canonicalProgramSlugs(slugs: string[]) {
+  return [...new Set(slugs.map((slug) => PROGRAM_SLUG_ALIASES[slug] ?? slug))];
+}
+
 /** contact_email → program slugs they oversee */
 const HOLDER_PROGRAMS: Record<string, string[]> = {
   'mesmerizedbybeautyl@yahoo.com': [
@@ -62,13 +72,14 @@ async function main() {
 
   const db = createClient(url, key, { auth: { persistSession: false } });
 
-  const allSlugs = [...new Set(Object.values(HOLDER_PROGRAMS).flat())];
+  const allSlugs = [...new Set(Object.values(HOLDER_PROGRAMS).flatMap(canonicalProgramSlugs))];
   const { data: programs } = await db.from('programs').select('id, slug').in('slug', allSlugs);
   const slugToId = Object.fromEntries((programs ?? []).map((p) => [p.slug, p.id]));
   const missingSlugs = allSlugs.filter((s) => !slugToId[s]);
   if (missingSlugs.length) console.warn('⚠ Missing program slugs:', missingSlugs.join(', '));
 
-  for (const [email, slugs] of Object.entries(HOLDER_PROGRAMS)) {
+  for (const [email, configuredSlugs] of Object.entries(HOLDER_PROGRAMS)) {
+    const slugs = canonicalProgramSlugs(configuredSlugs);
     const { data: holder } = await db
       .from('program_holders')
       .select('id, organization_name')

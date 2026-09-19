@@ -8,6 +8,6 @@
     "check": "node --check server.mjs && node --test server.test.mjs"
   },
   "dependencies": {
-    "playwright": "1.57.0"
+    "playwright-core": "1.57.0"
   }
 }

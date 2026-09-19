@@ -29,6 +29,12 @@ const _GET = withErrorHandling(async (request: NextRequest) => {
     );
   }
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id,full_name,role,avatar_url,program_holder_id,tenant_id')
+    .eq('id', user.id)
+    .maybeSingle();
+
   return NextResponse.json({
     success: true,
     user: {
@@ -39,6 +45,7 @@ const _GET = withErrorHandling(async (request: NextRequest) => {
       emailConfirmed: user.email_confirmed_at !== null,
       createdAt: user.created_at,
     },
+    profile: profile ?? null,
   });
 });
 

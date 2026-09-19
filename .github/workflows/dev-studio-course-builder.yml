@@ -144,7 +144,7 @@ jobs:
             # Rebuild the canonical authored source first so Course Builder never
             # republishes stale refrigerant classifications or static penalty data.
             pnpm tsx scripts/backfill-hvac-script-text.ts --force
-            pnpm tsx scripts/course-builder/run.ts --course hvac-technician --mode refresh
+            pnpm tsx scripts/course-builder/run.ts --course hvac-technician --mode refresh --authorize-paid-inference
             pnpm tsx scripts/check-hvac-content.ts
           elif [ "${{ steps.target.outputs.program }}" = "business-administration" ]; then
             pnpm tsx scripts/course-factory/build-business-program.ts
@@ -152,7 +152,7 @@ jobs:
             if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.number }}" = "1030" ] && [ "${{ steps.target.outputs.program }}" = "cosmetology-apprenticeship" ]; then
               pnpm tsx scripts/course-builder/requeue-course-media.ts --course cosmetology-apprenticeship
             else
-              pnpm tsx scripts/course-builder/run.ts --course "${{ steps.target.outputs.program }}" --mode refresh
+              pnpm tsx scripts/course-builder/run.ts --course "${{ steps.target.outputs.program }}" --mode refresh --authorize-paid-inference
             fi
           fi
 

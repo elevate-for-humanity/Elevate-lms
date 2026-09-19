@@ -25,6 +25,7 @@ import {
   AzureProvider,
   StabilityProvider,
   GroqProvider,
+  XAIProvider,
 } from './providers';
 
 const chatProviders: Record<string, () => AIProvider> = {
@@ -32,6 +33,7 @@ const chatProviders: Record<string, () => AIProvider> = {
   gemini: () => new GeminiProvider(),
   google: () => new GoogleProvider(),
   groq: () => new GroqProvider(),
+  xai: () => new XAIProvider(),
   cloudflare: () => new CloudflareProvider(),
   openai: () => new OpenAIProvider(),
   anthropic: () => new AnthropicProvider(),
@@ -48,7 +50,17 @@ const imageProviders: Record<string, () => AIImageProvider> = {
 // first AI_PROVIDER_ORDER entry remains a migration-compatible way to select
 // that same single authority. Course generation must repair a failed provider,
 // never produce divergent artifacts through a silent provider substitution.
-const PROVIDER_DISCOVERY_ORDER = ['elevate', 'cloudflare', 'groq', 'gemini', 'google', 'anthropic', 'azure', 'openai'];
+const PROVIDER_DISCOVERY_ORDER = [
+  'elevate',
+  'cloudflare',
+  'xai',
+  'groq',
+  'gemini',
+  'google',
+  'anthropic',
+  'azure',
+  'openai',
+];
 let discoveredProviderName: string | null = null;
 
 function configuredProviderName(): string {
@@ -132,11 +144,20 @@ function resolveConfiguredChatProvider(options: ChatCompletionOptions): AIProvid
       'Elevate-owned AI is unavailable; repair ELEVATE_LLM_URL / ELEVATE_LLM_SECRET before retrying',
     );
   }
-  const configured = configuredDefaultProvider();
-  if (options.provider && options.provider !== 'none' && options.provider !== configured) {
-    throw new Error(
-      `Provider override "${options.provider}" is not allowed; configured authority is "${configured}"`,
-    );
+  const requested = options.provider?.trim().toLowerCase();
+  if (requested && requested !== 'none' && requested !== 'auto') {
+    const createProvider = chatProviders[requested];
+    if (!createProvider) throw new Error(`Unknown AI chat provider: ${requested}`);
+    if (disabledChatProviders.has(requested)) {
+      throw new Error(
+        `Selected AI provider "${requested}" is quarantined after a terminal failure`,
+      );
+    }
+    const provider = createProvider();
+    if (!provider.isAvailable()) {
+      throw new Error(`Selected AI provider "${requested}" is not configured`);
+    }
+    return provider;
   }
   return resolveChatProvider();
 }

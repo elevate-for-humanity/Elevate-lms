@@ -43,8 +43,8 @@ for (const file of [
 const studioBrowserImage = read('Dockerfile.studio-browser');
 for (const invariant of [
   'FROM node:22-bookworm-slim',
-  'playwright install --with-deps chromium',
-  'PLAYWRIGHT_BROWSERS_PATH=/ms-playwright',
+  'apt-get install -y --no-install-recommends chromium',
+  'STUDIO_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium',
   'USER studio',
 ]) {
   if (!studioBrowserImage.includes(invariant)) {
@@ -65,6 +65,10 @@ for (const invariant of [
 
 const browserAgentRoute = read('apps/admin/app/api/admin/dev-studio/browser/agent/route.ts');
 const browserPlanner = read('lib/devstudio/browser-planner.ts');
+const browserRuntime = read('services/studio-browser/server.mjs');
+if (!browserRuntime.includes('process.env.STUDIO_BROWSER_EXECUTABLE_PATH')) {
+  fail('Studio browser runtime does not use its configured system Chromium executable');
+}
 for (const forbiddenProviderBypass of [
   'getOpenAIClient',
   'OPENAI_COMPUTER_MODEL',

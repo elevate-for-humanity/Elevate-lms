@@ -185,6 +185,7 @@ export async function upgradePersistedAuthoredCourse(courseId: string, client?: 
         source_fingerprint: sourceFingerprint,
         source_contract_version: 1,
         narration_locked: true,
+        allow_paid_narration: true,
         ai_instructor: true,
         narration: compiled.experience.narrationScript,
         transcript: compiled.experience.narrationScript,

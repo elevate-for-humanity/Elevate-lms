@@ -5,9 +5,6 @@ export const HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
   { type: 'epa_608', label: 'EPA Section 608 technician certification' },
   { type: 'w9', label: 'Completed IRS Form W-9' },
   { type: 'hvac_training_plan', label: 'Approved HVAC syllabus and training plan' },
-  { type: 'profile_photo', label: 'Program Holder profile picture' },
-  { type: 'student_photo', label: 'Student training photos' },
-  { type: 'student_video', label: 'Student training videos' },
 ] as const;
 
 export const CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
@@ -16,7 +13,6 @@ export const CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS = [
   { type: 'insurance', label: 'Current general liability insurance certificate' },
   { type: 'w9', label: 'Completed IRS Form W-9' },
   { type: 'training_plan', label: 'Approved program syllabus and training plan' },
-  { type: 'profile_photo', label: 'Program Holder profile picture' },
 ] as const;
 
 export type ProgramHolderReadiness = {
@@ -60,7 +56,7 @@ export async function getProgramHolderPaymentReadiness(
 ): Promise<ProgramHolderReadiness> {
   const { data: holder } = await db
     .from('program_holders')
-    .select('user_id,mou_signed,mou_status,mou_type')
+    .select('user_id,mou_signed,mou_status,mou_type,features')
     .eq('id', holderId)
     .maybeSingle();
 
@@ -130,6 +126,9 @@ export async function getProgramHolderPaymentReadiness(
   const handbookAcknowledged = acknowledgedTypes.has('handbook');
   const rightsAcknowledged = acknowledgedTypes.has('rights');
   const isHvac = (assignments || []).some((item: any) => item.programs?.slug === 'hvac-technician');
+  const features = holder.features && typeof holder.features === 'object' ? holder.features : {};
+  const requiresMediaRelease = features.require_image_release === true || features.student_media_required === true;
+  const payoutProvider = String(features.payout_provider || payoutProfile?.payout_provider || '').toLowerCase();
   const required = isHvac
     ? HVAC_PROGRAM_HOLDER_REQUIRED_DOCUMENTS
     : CORE_PROGRAM_HOLDER_REQUIRED_DOCUMENTS;
@@ -148,14 +147,13 @@ export async function getProgramHolderPaymentReadiness(
     ...(!handbookAcknowledged ? ['Program Holder handbook acknowledgement'] : []),
     ...(!rightsAcknowledged ? ['Rights and responsibilities acknowledgement'] : []),
     ...required.filter((item) => !approvedTypes.has(item.type)).map((item) => item.label),
-    ...(!imageRelease ? ['Signed image release'] : []),
-    ...(!approvedTypes.has('company_logo') ? ['Program Holder company logo'] : []),
-    ...(!['active', 'connected', 'synced', 'complete'].includes(
+    ...(requiresMediaRelease && !imageRelease ? ['Signed image release'] : []),
+    ...(payoutProvider === 'quickbooks' && !['active', 'connected', 'synced', 'complete'].includes(
       String(payoutProfile?.quickbooks_sync_status || '').toLowerCase(),
     )
       ? ['QuickBooks payment-record connection']
       : []),
-    ...(!(
+    ...(payoutProvider === 'paypal' && !(
       payoutProfile?.payout_provider === 'paypal' &&
       payoutProfile?.payouts_enabled === true &&
       payoutProfile?.transfers_enabled === true

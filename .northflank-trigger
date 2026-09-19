@@ -1,4 +1,4 @@
-merge_sha=795d9de4025b2dcf0fcaea0aa8b2d37c3ecfe351
-services=admin,lms
-requested_at=2026-09-18T00:28:30.000Z
-reason=Deploy true 1080p course video renderer and media quality gate
+merge_sha=21220cf956ccd653b0cd9180522b3420a5716dab
+services=lms
+requested_at=2026-09-18T16:08:00.000Z
+reason=Deploy Top Shelf Android PWA false-offline recovery

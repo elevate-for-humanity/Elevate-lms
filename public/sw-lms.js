@@ -94,29 +94,12 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // Authentication and recovery navigations must bypass the service worker
-  // completely so redirects and Set-Cookie headers reach the browser.
-  if (
-    request.mode === 'navigate' &&
-    (
-      url.pathname.startsWith('/api/auth/') ||
-      url.pathname === '/reset-password' ||
-      url.pathname === '/login' ||
-      url.pathname.startsWith('/login/')
-    )
-  ) {
-    return;
-  }
-
-  // Never cache authenticated HTML/RSC, application APIs, auth routes, range
-  // requests, or protected dashboard/course navigations. Navigations are always
-  // network-only with the public offline shell as the only fallback.
+  // Every LMS document navigation may carry authentication redirects, cookies,
+  // role routing, or protected data. Leave all navigations to the browser. A
+  // previous network-first handler converted transient Android/PWA request
+  // failures into the offline shell even while the device was online, trapping
+  // valid users immediately after sign-in.
   if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() =>
-        caches.match('/offline.html'),
-      ),
-    );
     return;
   }
 

@@ -13,6 +13,7 @@ export const REQUIRED_COURSE_GATES = [
   'module_assessments',
   'practice_exam',
   'narration',
+  'visual_alignment',
   'captions',
   'transcript',
   'accessibility',
@@ -35,6 +36,97 @@ function record(value: unknown): Record<string, unknown> {
     : {};
 }
 
+function validateNarrationVisualAlignment(
+  lesson: CoursePackageLesson,
+  path: string,
+): ReadinessFinding[] {
+  const timeline = lesson.timeline;
+  if (!timeline) return [];
+  const findings: ReadinessFinding[] = [];
+  const usedAssets = new Map<string, number>();
+
+  for (const visual of timeline.visuals) {
+    const visualPath = `${path}.timeline.visuals.${visual.id}`;
+    const narrationCueIds = visual.narrationCueIds ?? [];
+
+    if (!visual.teachingPurpose?.trim()) {
+      findings.push({
+        gate: 'visual_alignment',
+        path: visualPath,
+        message: 'Visual is missing a teaching purpose tied to the spoken point.',
+      });
+    }
+    if (!narrationCueIds.length) {
+      findings.push({
+        gate: 'visual_alignment',
+        path: visualPath,
+        message: 'Visual is not mapped to a narration cue.',
+      });
+    }
+    if (!visual.visualType) {
+      findings.push({
+        gate: 'visual_alignment',
+        path: visualPath,
+        message: 'Visual type is missing.',
+      });
+    }
+    if (!visual.source || !visual.licenseStatus) {
+      findings.push({
+        gate: 'visual_alignment',
+        path: visualPath,
+        message: 'Visual source and license status must be recorded.',
+      });
+    }
+    if (
+      visual.source &&
+      !['owned', 'diagram'].includes(visual.source) &&
+      !visual.licenseEvidenceUrl
+    ) {
+      findings.push({
+        gate: 'visual_alignment',
+        path: visualPath,
+        message: 'Third-party media requires a license evidence URL.',
+      });
+    }
+    if (visual.matchScore === undefined || visual.matchScore < 0.75) {
+      findings.push({
+        gate: 'visual_alignment',
+        path: visualPath,
+        message: 'Visual-to-narration match score must be at least 0.75.',
+      });
+    }
+    if (visual.assetUrl) {
+      usedAssets.set(visual.assetUrl, (usedAssets.get(visual.assetUrl) ?? 0) + 1);
+    }
+  }
+
+  for (const audio of timeline.audio) {
+    const mapped = timeline.visuals.some((visual) => {
+      const overlaps = visual.start < audio.end && visual.end > audio.start;
+      return overlaps && (visual.narrationCueIds ?? []).includes(audio.id);
+    });
+    if (!mapped) {
+      findings.push({
+        gate: 'visual_alignment',
+        path: `${path}.timeline.audio.${audio.id}`,
+        message: 'Every spoken teaching point requires an overlapping, explicitly mapped teaching visual.',
+      });
+    }
+  }
+
+  for (const [assetUrl, count] of usedAssets) {
+    if (count > 2) {
+      findings.push({
+        gate: 'visual_alignment',
+        path: `${path}.timeline.visuals`,
+        message: `The same media asset is repeated ${count} times (${assetUrl}). Replace repeated filler with narration-specific visuals.`,
+      });
+    }
+  }
+
+  return findings;
+}
+
 function lessonFindings(lesson: CoursePackageLesson): ReadinessFinding[] {
   const path = `modules.lessons.${lesson.slug}`;
   const exp = record(lesson.experience);
@@ -50,6 +142,7 @@ function lessonFindings(lesson: CoursePackageLesson): ReadinessFinding[] {
   if (!lesson.questions.length && !Array.isArray(exp.knowledgeChecks) && !isPractical) findings.push({ gate: 'knowledge_checks', path, message: 'Knowledge checks are missing.' });
   if (!isAssessment && !isPractical && !String(exp.narrationScript ?? '').trim()) findings.push({ gate: 'narration', path, message: 'Narration is missing.' });
   const timeline = lesson.timeline;
+  if (!isAssessment && !isPractical) findings.push(...validateNarrationVisualAlignment(lesson, path));
   if (!isAssessment && !isPractical && !timeline?.captions.length) findings.push({ gate: 'captions', path, message: 'Timed captions are missing.' });
   if (!isAssessment && !isPractical && !String(exp.transcript ?? exp.narrationScript ?? '').trim()) findings.push({ gate: 'transcript', path, message: 'Transcript is missing.' });
   if (!isAssessment && !isPractical && (!timeline || lesson.completion.requiredWatchPercent <= 0)) findings.push({ gate: 'progress_tracking', path, message: 'Timeline progress requirements are missing.' });

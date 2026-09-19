@@ -65,6 +65,12 @@ export interface SlideLessonProps {
   logoText?: string; // defaults to 'Elevate LMS'
   /** Photographic poster shown before narration and motion begin. */
   openingImageUrl?: string | null;
+  /** Optional approved course/lesson pre-roll, placed before the branded card. */
+  preRollUrl?: string | null;
+  preRollDurationFrames?: number;
+  /** Optional approved lesson outro, placed after the branded completion card. */
+  postRollUrl?: string | null;
+  postRollDurationFrames?: number;
 }
 
 // ââ Constants âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -736,14 +742,22 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
     sceneOffsets.push(offset);
     offset += scene.durationFrames;
   }
+  const preRollFrames = props.preRollUrl ? Math.max(1, props.preRollDurationFrames ?? 75) : 0;
+  const postRollFrames = props.postRollUrl ? Math.max(1, props.postRollDurationFrames ?? 75) : 0;
 
   return (
     <AbsoluteFill>
       {/* Optional full-lesson audio track (when per-scene audio is absent) */}
       {props.fullAudioSrc && <Audio src={props.fullAudioSrc} volume={1.35} />}
 
+      {props.preRollUrl && (
+        <Sequence from={0} durationInFrames={preRollFrames}>
+          <Video src={props.preRollUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </Sequence>
+      )}
+
       {/* Branded intro */}
-      <Sequence from={0} durationInFrames={INTRO_FRAMES}>
+      <Sequence from={preRollFrames} durationInFrames={INTRO_FRAMES}>
         <BrandedIntro props={props} frame={frame} />
       </Sequence>
 
@@ -751,7 +765,7 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
       {props.scenes.map((scene, i) => (
         <Sequence
           key={scene.scene_number}
-          from={INTRO_FRAMES + sceneOffsets[i]}
+          from={preRollFrames + INTRO_FRAMES + sceneOffsets[i]}
           durationInFrames={scene.durationFrames}
         >
           <SceneSlide scene={scene} props={props} />
@@ -759,9 +773,18 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
       ))}
 
       {/* Branded outro */}
-      <Sequence from={INTRO_FRAMES + offset} durationInFrames={OUTRO_FRAMES}>
+      <Sequence from={preRollFrames + INTRO_FRAMES + offset} durationInFrames={OUTRO_FRAMES}>
         <BrandedOutro props={props} frame={frame} />
       </Sequence>
+
+      {props.postRollUrl && (
+        <Sequence
+          from={preRollFrames + INTRO_FRAMES + offset + OUTRO_FRAMES}
+          durationInFrames={postRollFrames}
+        >
+          <Video src={props.postRollUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </Sequence>
+      )}
     </AbsoluteFill>
   );
 }
@@ -769,6 +792,10 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
 // ââ Frame calculator ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 /** Total frames for a SlideLesson composition given its scenes. */
-export function calcSlideLessonFrames(scenes: Pick<SceneData, 'durationFrames'>[]): number {
-  return INTRO_FRAMES + scenes.reduce((sum, s) => sum + s.durationFrames, 0) + OUTRO_FRAMES;
+export function calcSlideLessonFrames(
+  scenes: Pick<SceneData, 'durationFrames'>[],
+  preRollDurationFrames = 0,
+  postRollDurationFrames = 0,
+): number {
+  return preRollDurationFrames + INTRO_FRAMES + scenes.reduce((sum, s) => sum + s.durationFrames, 0) + OUTRO_FRAMES + postRollDurationFrames;
 }

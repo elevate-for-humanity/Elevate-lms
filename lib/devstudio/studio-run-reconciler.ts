@@ -90,12 +90,19 @@ export async function reconcileStudioRunFromTask(db: SupabaseClient, task: TaskS
       .eq('id', task.studio_run_step_id)
       .eq('run_id', task.studio_run_id);
     if (error) throw new Error(`Unable to fail Studio step: ${error.message}`);
-  } else if (task.status === 'awaiting_approval') {
+  } else if (task.status === 'awaiting_approval' || task.status === 'blocked') {
     const { error } = await db
       .from('studio_run_steps')
       .update({
         status: 'blocked',
-        output: { reason: task.error_message || 'Human approval required', task_id: task.id },
+        output: {
+          reason:
+            task.error_message ||
+            (task.status === 'awaiting_approval'
+              ? 'Human approval required'
+              : 'Required execution capability is unavailable'),
+          task_id: task.id,
+        },
         updated_at: now,
       })
       .eq('id', task.studio_run_step_id)

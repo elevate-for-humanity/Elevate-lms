@@ -62,7 +62,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('program_holders')
       .select(
-        'id,status,mou_signed,mou_status,approved_at,payout_status,organization_name,name,is_using_internal_lms,hvac_license_url',
+        'id,status,mou_signed,mou_status,mou_type,approved_at,payout_status,organization_name,name,is_using_internal_lms,hvac_license_url,features',
       )
       .eq('id', holderId)
       .maybeSingle(),
@@ -89,6 +89,14 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   // This is an authorization boundary, not a presentational hide/show control.
   const enrollmentContactColumns = contactAccessGranted ? ',email,phone' : '';
   const applicantContactColumns = contactAccessGranted ? ',applicant_email,applicant_phone' : '';
+  const allApplicantAccess = holderRes.data?.features?.all_applicant_access === true;
+  const applicantsQuery = db
+    .from('program_holder_students')
+    .select(
+      `id,application_id,user_id,enrollment_id,applicant_name,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome,next_follow_up,work_start_date,work_site${applicantContactColumns}`,
+    )
+    .in('status', ['applied', 'pending'])
+    .order('created_at', { ascending: false });
   const [
     programsRes,
     enrollmentsRes,
@@ -163,6 +171,45 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .in('status', ['active', 'enrolled'])
           .order('updated_at', { ascending: false })
       : Promise.resolve({ data: [] }),
+    db
+      .from('program_enrollments')
+      .select(
+        `id,user_id,full_name,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,funding_verified,voucher_issued_date,voucher_paid_date,payment_status,amount_paid_cents,completed_at,completion_date${enrollmentContactColumns}`,
+      )
+      .eq('program_holder_id', holderId)
+      .in('status', [
+        'active',
+        'enrolled',
+        'in_progress',
+        'pending',
+        'applied',
+        'approved',
+        'scheduled',
+        'ready',
+        'funded',
+        'completed',
+        'graduated',
+      ])
+      .order('enrolled_at', { ascending: false }),
+    db
+      .from('program_enrollments')
+      .select(
+        `id,user_id,full_name,status,enrollment_state,program_id,program_slug,training_start_date,training_end_date,student_start_date,expected_end_date,start_date${enrollmentContactColumns}`,
+      )
+      .eq('program_holder_id', holderId)
+      .in('status', ['active', 'enrolled', 'pending', 'approved', 'scheduled', 'ready', 'funded'])
+      .order('training_start_date', { ascending: true, nullsFirst: false }),
+    allApplicantAccess
+      ? applicantsQuery
+      : applicantsQuery.eq('program_holder_id', holderId),
+    db
+      .from('program_holder_students')
+      .select(
+        `id,user_id,enrollment_id,applicant_name,status,application_status,program_id,label,call_notes,call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,expected_payout_cents,expected_payout_status,updated_at${applicantContactColumns}`,
+      )
+      .eq('program_holder_id', holderId)
+      .in('status', ['active', 'enrolled', 'in_progress'])
+      .order('updated_at', { ascending: false }),
     db
       .from('hour_entries')
       .select(
@@ -278,6 +325,39 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     phoneLine = { ...phoneLine, extension };
   }
 
+  const applicantRows = applicantsRes.data ?? [];
+  const deduplicatedApplicants = allApplicantAccess
+    ? applicantRows.filter((row: any, index: number, rows: any[]) => {
+        const key =
+          row.application_id ||
+          [row.user_id || '', row.applicant_email?.toLowerCase() || '', row.program_id || ''].join(':');
+        return (
+          rows.findIndex((candidate: any) => {
+            const candidateKey =
+              candidate.application_id ||
+              [
+                candidate.user_id || '',
+                candidate.applicant_email?.toLowerCase() || '',
+                candidate.program_id || '',
+              ].join(':');
+            return candidateKey === key;
+          }) === index
+        );
+      })
+    : applicantRows;
+
+  const canonicalEnrollmentIds = new Set(
+    (enrollmentsRes.data ?? []).map((row: any) => row.id).filter(Boolean),
+  );
+  const canonicalEnrollmentUserIds = new Set(
+    (enrollmentsRes.data ?? []).map((row: any) => row.user_id).filter(Boolean),
+  );
+  const deduplicatedConvertedStudents = (convertedStudentsRes.data ?? []).filter(
+    (row: any) =>
+      !(row.enrollment_id && canonicalEnrollmentIds.has(row.enrollment_id)) &&
+      !(row.user_id && canonicalEnrollmentUserIds.has(row.user_id)),
+  );
+
   return {
     mode: 'holder',
     holder: holderRes.data ?? null,
@@ -287,6 +367,10 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     upcomingEnrollments: upcomingRoster,
     applicants: applicantsRes.data ?? [],
     convertedStudents: convertedRoster.map((row: any) => ({
+    enrollments: enrollmentsRes.data ?? [],
+    upcomingEnrollments: upcomingRes.data ?? [],
+    applicants: deduplicatedApplicants,
+    convertedStudents: deduplicatedConvertedStudents.map((row: any) => ({
       ...row,
       roster_source: 'holder_student',
       full_name: row.applicant_name || 'Student',

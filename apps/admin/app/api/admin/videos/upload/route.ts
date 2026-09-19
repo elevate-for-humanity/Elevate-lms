@@ -31,6 +31,34 @@ type CourseUploadControl = {
 };
 
 async function queueLicensedLessonRender(courseId: string, lessonId: string) {
+  const db = await requireAdminClient();
+  const { data: lesson, error: lessonError } = await db
+    .from('course_lessons')
+    .select('video_config')
+    .eq('id', lessonId)
+    .eq('course_id', courseId)
+    .maybeSingle();
+  if (lessonError || !lesson) {
+    throw lessonError ?? new Error('Lesson not found while preparing its render policy');
+  }
+  const videoConfig =
+    lesson.video_config && typeof lesson.video_config === 'object'
+      ? (lesson.video_config as Record<string, unknown>)
+      : {};
+  const { error: policyError } = await db
+    .from('course_lessons')
+    .update({
+      video_config: {
+        ...videoConfig,
+        allow_paid_narration: true,
+        narration_locked: true,
+      },
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', lessonId)
+    .eq('course_id', courseId);
+  if (policyError) throw policyError;
+
   // Always pass through Course Factory. It refreshes the canonical job's
   // locked narration policy as well as requeueing it; directly resetting a
   // legacy job can preserve the obsolete Edge route that now returns 403.

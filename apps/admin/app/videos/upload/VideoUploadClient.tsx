@@ -14,12 +14,18 @@ type UploadResponse = {
   error?: string;
 };
 
-export default function VideoUploadClient() {
+export default function VideoUploadClient({
+  initialCourseId = '',
+  embedded = false,
+}: {
+  initialCourseId?: string;
+  embedded?: boolean;
+}) {
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Training');
-  const [courseId, setCourseId] = useState('');
+  const [courseId, setCourseId] = useState(initialCourseId);
   const [lessonId, setLessonId] = useState('');
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +112,7 @@ export default function VideoUploadClient() {
         setFile(null);
         setTitle('');
         setDescription('');
-        setCourseId('');
+        setCourseId(initialCourseId);
         setLessonId('');
         return;
       }
@@ -129,7 +135,7 @@ export default function VideoUploadClient() {
       setFile(null);
       setTitle('');
       setDescription('');
-      setCourseId('');
+      setCourseId(initialCourseId);
       setLessonId('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Video upload failed.');
@@ -140,6 +146,14 @@ export default function VideoUploadClient() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {embedded ? (
+        <div className="rounded-2xl border border-cyan-800 bg-slate-950 p-5 text-white">
+          <h2 className="font-black">Upload a purchased scene to this course</h2>
+          <p className="mt-1 text-sm text-slate-300">
+            Choose the downloaded MP4, add the lesson ID, and upload. The selected course is already attached.
+          </p>
+        </div>
+      ) : null}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex items-center gap-2">
           <Film className="h-5 w-5 text-brand-blue-700" />

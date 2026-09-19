@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   BookOpen,
@@ -106,28 +106,8 @@ function PublishProgress() {
 
 export function CourseStudioApplication({ children }: { children: React.ReactNode }) {
   const [previewOpen, setPreviewOpen] = useState(true);
-  const [previewHtml, setPreviewHtml] = useState('');
-  const [previewError, setPreviewError] = useState('');
   const { state } = useCourse();
   const previewUrl = `/api/admin/course-builder/preview?courseId=${encodeURIComponent(state.course.id)}`;
-
-  useEffect(() => {
-    if (!previewOpen) return;
-    const controller = new AbortController();
-    setPreviewError('');
-    fetch(previewUrl, { cache: 'no-store', signal: controller.signal })
-      .then(async (response) => {
-        const body = await response.text();
-        if (!response.ok) throw new Error(`Learner preview failed (${response.status})`);
-        return body;
-      })
-      .then(setPreviewHtml)
-      .catch((error) => {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-        setPreviewError(error instanceof Error ? error.message : 'Learner preview failed');
-      });
-    return () => controller.abort();
-  }, [previewOpen, previewUrl, state.autosave.lastSavedAt]);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-slate-50">
@@ -141,44 +121,12 @@ export function CourseStudioApplication({ children }: { children: React.ReactNod
               <span className="font-semibold">Live learner view</span>
               <span className="text-slate-300">Updates after save</span>
             </div>
-            {previewError ? (
-              <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 p-6 text-center">
-                <AlertCircle className="h-8 w-8 text-amber-500" />
-                <p className="font-semibold text-slate-900">Learner preview could not load</p>
-                <p className="text-sm text-slate-600">{previewError}</p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPreviewHtml('');
-                    setPreviewError('');
-                    fetch(previewUrl, { cache: 'no-store' })
-                      .then(async (response) => {
-                        const body = await response.text();
-                        if (!response.ok) throw new Error(`Learner preview failed (${response.status})`);
-                        return body;
-                      })
-                      .then(setPreviewHtml)
-                      .catch((error) => setPreviewError(error instanceof Error ? error.message : 'Learner preview failed'));
-                  }}
-                  className="rounded-lg bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white"
-                >
-                  Retry preview
-                </button>
-              </div>
-            ) : previewHtml ? (
-              <iframe
-                key={`${previewUrl}:${state.autosave.lastSavedAt ?? ''}`}
-                srcDoc={previewHtml}
-                sandbox=""
-                referrerPolicy="no-referrer"
-                title="Live learner course preview"
-                className="h-[calc(100%-2.5rem)] min-h-[40vh] w-full bg-white"
-              />
-            ) : (
-              <div className="flex min-h-[40vh] items-center justify-center text-sm text-slate-500">
-                Loading learner preview…
-              </div>
-            )}
+            <iframe
+              key={previewUrl}
+              src={previewUrl}
+              title="Live learner course preview"
+              className="h-[calc(100%-2.5rem)] min-h-[40vh] w-full bg-white"
+            />
           </aside>
         )}
       </div>

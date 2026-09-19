@@ -89,6 +89,14 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   // This is an authorization boundary, not a presentational hide/show control.
   const enrollmentContactColumns = contactAccessGranted ? ',email,phone' : '';
   const applicantContactColumns = contactAccessGranted ? ',applicant_email,applicant_phone' : '';
+  const allApplicantAccess = holderRes.data?.features?.all_applicant_access === true;
+  const applicantsQuery = db
+    .from('program_holder_students')
+    .select(
+      `id,application_id,user_id,enrollment_id,applicant_name,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome,next_follow_up,work_start_date,work_site${applicantContactColumns}`,
+    )
+    .in('status', ['applied', 'pending'])
+    .order('created_at', { ascending: false });
   const [
     programsRes,
     enrollmentsRes,
@@ -140,14 +148,9 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .eq('program_holder_id', holderId)
       .in('status', ['active', 'enrolled', 'pending', 'approved', 'scheduled', 'ready', 'funded'])
       .order('training_start_date', { ascending: true, nullsFirst: false }),
-    db
-      .from('program_holder_students')
-      .select(
-        `id,applicant_name,status,application_status,program_id,created_at,label,call_notes,call_date,call_outcome,next_follow_up,work_start_date,work_site${applicantContactColumns}`,
-      )
-      .eq('program_holder_id', holderId)
-      .in('status', ['applied', 'pending'])
-      .order('created_at', { ascending: false }),
+    allApplicantAccess
+      ? applicantsQuery
+      : applicantsQuery.eq('program_holder_id', holderId),
     db
       .from('program_holder_students')
       .select(
@@ -242,6 +245,27 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     phoneLine = { ...phoneLine, extension };
   }
 
+  const applicantRows = applicantsRes.data ?? [];
+  const deduplicatedApplicants = allApplicantAccess
+    ? applicantRows.filter((row: any, index: number, rows: any[]) => {
+        const key =
+          row.application_id ||
+          [row.user_id || '', row.applicant_email?.toLowerCase() || '', row.program_id || ''].join(':');
+        return (
+          rows.findIndex((candidate: any) => {
+            const candidateKey =
+              candidate.application_id ||
+              [
+                candidate.user_id || '',
+                candidate.applicant_email?.toLowerCase() || '',
+                candidate.program_id || '',
+              ].join(':');
+            return candidateKey === key;
+          }) === index
+        );
+      })
+    : applicantRows;
+
   const canonicalEnrollmentIds = new Set(
     (enrollmentsRes.data ?? []).map((row: any) => row.id).filter(Boolean),
   );
@@ -261,7 +285,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programs: programsRes.data ?? [],
     enrollments: enrollmentsRes.data ?? [],
     upcomingEnrollments: upcomingRes.data ?? [],
-    applicants: applicantsRes.data ?? [],
+    applicants: deduplicatedApplicants,
     convertedStudents: deduplicatedConvertedStudents.map((row: any) => ({
       ...row,
       roster_source: 'holder_student',

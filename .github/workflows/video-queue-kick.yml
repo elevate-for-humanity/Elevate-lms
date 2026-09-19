@@ -40,10 +40,28 @@ jobs:
       ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       COURSE_ID: ${{ matrix.course_id }}
-      # A push/manual run must render only after its exact Admin release is
-      # serving. Scheduled recovery runs use the latest main SHA automatically.
-      REQUIRED_ADMIN_SHA: ${{ github.sha }}
     steps:
+      - name: Check out release history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve the approved Admin runtime revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          required_admin_sha=$(git log -1 --format=%H -- \
+            apps/admin \
+            components \
+            lib \
+            remotion-src \
+            server \
+            package.json \
+            pnpm-lock.yaml)
+          test -n "$required_admin_sha"
+          echo "REQUIRED_ADMIN_SHA=$required_admin_sha" >> "$GITHUB_ENV"
+          echo "Waiting for Admin runtime revision $required_admin_sha"
+
       - name: Wait for the approved Admin media planner release
         shell: bash
         run: |

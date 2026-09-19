@@ -338,6 +338,7 @@ export async function persistLessonGenerationCheckpoint(input: {
           source_fingerprint: sourceFingerprint,
           source_contract_version: 1,
           narration_locked: true,
+          allow_paid_narration: true,
           narration,
           visual_prompt: input.experience.visualPrompt ?? null,
           quick_clips: quickClips,

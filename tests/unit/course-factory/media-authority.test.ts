@@ -358,7 +358,9 @@ describe('canonical Course Factory media architecture', () => {
     expect(media).toContain("provider: 'cloudflare'");
     expect(media).toContain("strategy: 'existing_then_pexels'");
     expect(renderer).toContain('applyLockedCourseBuilderMediaPolicy(job)');
-    expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
+    expect(renderer).toContain("process.env.AI_NARRATION_PROVIDER = 'cloudflare'");
+    expect(renderer).toContain('MEDIA_NARRATION_AUTHORIZATION_REQUIRED');
+    expect(renderer).not.toContain("process.env.AI_NARRATION_PROVIDER = 'edge'");
     expect(narration).toContain('const provider = configuredNarrationProvider()');
     expect(narration).toContain("provider === 'cloudflare'");
     expect(narration).toContain("provider === 'edge'");

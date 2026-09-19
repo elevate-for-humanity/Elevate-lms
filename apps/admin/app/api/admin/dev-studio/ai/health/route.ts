@@ -2,21 +2,15 @@ import { NextRequest } from 'next/server';
 
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
-import { isXAIConfigured } from '@/lib/ai/xai-config';
+import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   return capabilityHealthResponse(request, async () => {
-    const hasGroq = Boolean(process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY);
-    const hasXAI = isXAIConfigured();
-    const hasGemini = Boolean(process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY);
-    const hasOpenAI = Boolean(process.env.OPENAI_API_KEY || process.env.NEXT_PUBLIC_OPENAI_API_KEY);
-    const hasAnthropic = Boolean(
-      process.env.ANTHROPIC_API_KEY || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY,
-    );
-    const aiConfigured = hasXAI || hasGroq || hasGemini || hasOpenAI || hasAnthropic;
+    const { providers, anyConfigured: aiConfigured } = await resolveAIRuntimeState();
+    const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = providers;
 
     return buildCapabilityHealth('ai', [
       {

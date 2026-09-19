@@ -275,12 +275,13 @@ function applyLockedCourseBuilderMediaPolicy(job: VideoJob): void {
     if (narration.allow_paid_provider !== false) {
       throw new Error('MEDIA_NARRATION_POLICY_INVALID');
     }
-    // The Course Builder contract is authoritative. Use the local renderer so
-    // runtime environment variables cannot spend credits or transmit lesson
-    // content to an external narration provider.
-    // Repository instructor voices are Edge neural voice identifiers. Edge TTS is
-    // the zero-credit renderer for this locked policy; espeak-ng is emergency-only.
-    process.env.AI_NARRATION_PROVIDER = 'edge';
+    // A locked zero-credit narration policy cannot publish learner-facing
+    // media in production. Edge/local voices are diagnostic-only; fail before
+    // rendering rather than producing an ungoverned or low-quality artifact.
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('MEDIA_NARRATION_AUTHORIZATION_REQUIRED');
+    }
+    process.env.AI_NARRATION_PROVIDER = 'local';
   }
 }
 
@@ -388,11 +389,13 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       .maybeSingle();
     const { data: licensedLessonVideos, error: licensedVideoError } = await db
       .from('course_videos')
-      .select('id,storage_path,title,created_at')
+      .select('id,storage_path,title,created_at,asset_role,sequence_index')
       .eq('course_id', job.course_id)
       .eq('lesson_id', job.lesson_id)
+      .eq('asset_role', 'source_broll')
       .eq('status', 'ready')
       .not('storage_path', 'is', null)
+      .order('sequence_index', { ascending: true })
       .order('created_at', { ascending: false })
       .limit(1);
     if (licensedVideoError) {
@@ -410,6 +413,29 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
         );
       }
       licensedSourceVideoUrl = signedLicensedVideo.signedUrl;
+    }
+    const { data: preRollVideos, error: preRollError } = await db
+      .from('course_videos')
+      .select('id,storage_path,title,asset_role,duration_seconds,sequence_index,created_at')
+      .eq('course_id', job.course_id)
+      .in('asset_role', ['course_preroll', 'lesson_preroll'])
+      .eq('status', 'ready')
+      .not('storage_path', 'is', null)
+      .or(`lesson_id.eq.${job.lesson_id},lesson_id.is.null`)
+      .order('sequence_index', { ascending: true })
+      .order('created_at', { ascending: false });
+    if (preRollError) throw new Error(`PREROLL_LOOKUP_FAILED:${preRollError.message}`);
+    const preRollVideo =
+      preRollVideos?.find((video) => video.asset_role === 'lesson_preroll') ?? preRollVideos?.[0] ?? null;
+    let preRollUrl: string | null = null;
+    if (preRollVideo?.storage_path) {
+      const { data: signedPreRoll, error: signedPreRollError } = await db.storage
+        .from('course_videos')
+        .createSignedUrl(preRollVideo.storage_path, 60 * 60 * 6);
+      if (signedPreRollError || !signedPreRoll?.signedUrl) {
+        throw new Error(`PREROLL_SIGN_FAILED:${signedPreRollError?.message ?? 'missing signed URL'}`);
+      }
+      preRollUrl = signedPreRoll.signedUrl;
     }
     const videoConfig =
       lesson?.video_config && typeof lesson.video_config === 'object'
@@ -837,6 +863,9 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       courseTitle,
       storyboard,
       instructorId: instructor.id,
+      preRollUrl,
+      preRollDurationSeconds:
+        typeof preRollVideo?.duration_seconds === 'number' ? preRollVideo.duration_seconds : 5,
     });
     if (!result.success || !result.videoUrl) {
       throw new Error(result.error ?? 'Render returned no playable video URL');

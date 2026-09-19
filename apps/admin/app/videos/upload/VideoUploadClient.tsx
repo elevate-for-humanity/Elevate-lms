@@ -33,6 +33,7 @@ export default function VideoUploadClient({
   const [category, setCategory] = useState('Training');
   const [courseId, setCourseId] = useState(initialCourseId);
   const [lessonId, setLessonId] = useState(initialLessonId);
+  const [assetRole, setAssetRole] = useState<'source_broll' | 'course_preroll' | 'lesson_preroll' | 'lesson_outro' | 'reference'>('source_broll');
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
@@ -78,6 +79,7 @@ export default function VideoUploadClient({
             courseId: courseId.trim(),
             lessonId: lessonId.trim(),
             licensedMatchId: licensedMatchId || undefined,
+            assetRole,
           }),
         });
         const prepared = (await prepareResponse.json().catch(() => ({}))) as UploadResponse & {
@@ -110,6 +112,7 @@ export default function VideoUploadClient({
             lessonId: lessonId.trim(),
             storagePath: prepared.storagePath,
             licensedMatchId: licensedMatchId || undefined,
+            assetRole,
           }),
         });
         const finalized = (await finalizeResponse.json().catch(() => ({}))) as UploadResponse;
@@ -217,6 +220,22 @@ export default function VideoUploadClient({
               className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 font-mono text-sm text-slate-950"
             />
           </label>
+          {courseId.trim() && lessonId.trim() && !licensedMatchId ? (
+            <label className="text-sm font-bold text-slate-700 sm:col-span-2">
+              Placement in the course video
+              <select
+                value={assetRole}
+                onChange={(event) => setAssetRole(event.target.value as typeof assetRole)}
+                className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-slate-950"
+              >
+                <option value="source_broll">Lesson scene / B-roll</option>
+                <option value="lesson_preroll">Lesson pre-roll</option>
+                <option value="course_preroll">Course pre-roll</option>
+                <option value="lesson_outro">Lesson outro</option>
+                <option value="reference">Reference only</option>
+              </select>
+            </label>
+          ) : null}
         </div>
       </div>
 

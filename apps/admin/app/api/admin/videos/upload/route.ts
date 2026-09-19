@@ -30,6 +30,7 @@ type CourseUploadControl = {
   lessonId?: string;
   storagePath?: string;
   licensedMatchId?: string;
+  assetRole?: 'source_broll' | 'course_preroll' | 'lesson_preroll' | 'lesson_outro' | 'reference';
 };
 
 async function queueLicensedLessonRender(courseId: string, lessonId: string) {
@@ -87,6 +88,7 @@ async function controlCourseUpload(
   const fileName = cleanName(String(input.fileName ?? '').trim());
   const fileType = String(input.fileType ?? '').trim();
   const fileSize = Number(input.fileSize ?? 0);
+  const assetRole = input.licensedMatchId ? 'source_broll' : input.assetRole ?? 'source_broll';
   if (!title || !courseId || !lessonId || !UUID.test(courseId) || !UUID.test(lessonId)) {
     return NextResponse.json(
       { error: 'A valid title, courseId, and lessonId are required' },
@@ -152,6 +154,7 @@ async function controlCourseUpload(
       lesson_id: lessonId,
       storage_path: storagePath,
       generated_by: 'manual',
+      asset_role: assetRole,
       status: 'ready',
       created_by: userId,
     })
@@ -180,13 +183,18 @@ async function controlCourseUpload(
       return NextResponse.json({ error: toErrorMessage(matchError) }, { status: 400 });
     }
   }
+  const shouldRenderLesson = assetRole === 'source_broll';
   const { error: lessonError } = await db
     .from('course_lessons')
     .update({
-      media_origin: 'uploaded',
-      media_quality_status: 'pending',
-      video_status: 'queued',
-      video_error: null,
+      ...(shouldRenderLesson
+        ? {
+            media_origin: 'uploaded',
+            media_quality_status: 'pending',
+            video_status: 'queued',
+            video_error: null,
+          }
+        : {}),
       updated_at: new Date().toISOString(),
     })
     .eq('id', lessonId)
@@ -200,7 +208,7 @@ async function controlCourseUpload(
     );
   }
   try {
-    await queueLicensedLessonRender(courseId, lessonId);
+    if (shouldRenderLesson) await queueLicensedLessonRender(courseId, lessonId);
   } catch (queueError) {
     await db
       .from('course_lessons')
@@ -226,6 +234,7 @@ async function controlCourseUpload(
       course_id: courseId,
       lesson_id: lessonId,
       licensed_match_id: input.licensedMatchId ?? null,
+      asset_role: assetRole,
     },
     req: request,
   });

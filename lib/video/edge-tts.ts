@@ -63,7 +63,8 @@ export type NarrationProvider =
 export function configuredNarrationProvider(
   env: NodeJS.ProcessEnv = process.env,
 ): NarrationProvider {
-  const configured = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER || 'edge')
+  const safeDefault = env.NODE_ENV === 'production' ? 'cloudflare' : 'local';
+  const configured = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER || safeDefault)
     .trim()
     .toLowerCase();
   if (
@@ -80,6 +81,11 @@ export function configuredNarrationProvider(
 
 export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = process.env): void {
   const provider = configuredNarrationProvider(env);
+  if (env.NODE_ENV === 'production' && (provider === 'edge' || provider === 'local')) {
+    throw new Error(
+      `${provider} narration is diagnostic-only and cannot publish learner-facing media in production`,
+    );
+  }
   if (provider === 'cloudflare') {
     const accountId = env.CLOUDFLARE_ACCOUNT_ID?.trim();
     const token = (env.CLOUDFLARE_AI_API_TOKEN || env.CLOUDFLARE_API_TOKEN)?.trim();

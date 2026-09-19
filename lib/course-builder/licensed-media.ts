@@ -177,7 +177,7 @@ export async function attachLicensedMediaUpload(input: {
 }) {
   const { data: match, error: lookupError } = await input.db
     .from('course_lesson_media_matches')
-    .select('id,status,course_id,lesson_id')
+    .select('id,status,course_id,lesson_id,entitlement_id')
     .eq('id', input.matchId)
     .maybeSingle();
   if (lookupError) throw lookupError;
@@ -187,6 +187,16 @@ export async function attachLicensedMediaUpload(input: {
   if (match.status !== 'approved') {
     throw new Error('Approve the licensed scene before uploading and attaching it');
   }
+  const { error: placementError } = await input.db
+    .from('course_videos')
+    .update({
+      asset_role: 'source_broll',
+      entitlement_id: match.entitlement_id,
+    })
+    .eq('id', input.courseVideoId)
+    .eq('course_id', input.courseId)
+    .eq('lesson_id', input.lessonId);
+  if (placementError) throw placementError;
   const { data, error } = await input.db
     .from('course_lesson_media_matches')
     .update({

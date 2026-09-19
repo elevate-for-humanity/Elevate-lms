@@ -151,7 +151,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     db
       .from('program_holder_students')
       .select(
-        `id,user_id,applicant_name,status,application_status,program_id,label,call_notes,call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,expected_payout_cents,expected_payout_status,updated_at${applicantContactColumns}`,
+        `id,user_id,enrollment_id,applicant_name,status,application_status,program_id,label,call_notes,call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,expected_payout_cents,expected_payout_status,updated_at${applicantContactColumns}`,
       )
       .eq('program_holder_id', holderId)
       .in('status', ['active', 'enrolled', 'in_progress'])
@@ -242,6 +242,18 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     phoneLine = { ...phoneLine, extension };
   }
 
+  const canonicalEnrollmentIds = new Set(
+    (enrollmentsRes.data ?? []).map((row: any) => row.id).filter(Boolean),
+  );
+  const canonicalEnrollmentUserIds = new Set(
+    (enrollmentsRes.data ?? []).map((row: any) => row.user_id).filter(Boolean),
+  );
+  const deduplicatedConvertedStudents = (convertedStudentsRes.data ?? []).filter(
+    (row: any) =>
+      !(row.enrollment_id && canonicalEnrollmentIds.has(row.enrollment_id)) &&
+      !(row.user_id && canonicalEnrollmentUserIds.has(row.user_id)),
+  );
+
   return {
     mode: 'holder',
     holder: holderRes.data ?? null,
@@ -250,7 +262,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     enrollments: enrollmentsRes.data ?? [],
     upcomingEnrollments: upcomingRes.data ?? [],
     applicants: applicantsRes.data ?? [],
-    convertedStudents: (convertedStudentsRes.data ?? []).map((row: any) => ({
+    convertedStudents: deduplicatedConvertedStudents.map((row: any) => ({
       ...row,
       roster_source: 'holder_student',
       full_name: row.applicant_name || 'Student',

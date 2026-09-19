@@ -180,7 +180,7 @@ export async function POST(
       contact_name: contactName,
       contact_email: email,
       contact_phone: application.phone || null,
-      status: 'active',
+      status: alreadySigned ? 'active' : 'approved_pending_mou',
       approved_at: existingHolder?.approved_at || now,
       approved_by: adminUser.id,
       mou_signed: alreadySigned,
@@ -280,7 +280,7 @@ export async function POST(
 
       const { error: holderProgramError } = await db
         .from('program_holders')
-        .update({ primary_program_id: primaryProgram.id, status: 'active' })
+        .update({ primary_program_id: primaryProgram.id, status: alreadySigned ? 'active' : 'approved_pending_mou' })
         .eq('id', holderId);
       if (holderProgramError) throw holderProgramError;
     }

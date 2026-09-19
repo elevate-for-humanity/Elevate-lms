@@ -3,7 +3,7 @@ import http from 'node:http';
 import dns from 'node:dns/promises';
 import net from 'node:net';
 import { pathToFileURL } from 'node:url';
-import { chromium } from 'playwright';
+import { chromium } from 'playwright-core';
 
 const port = Number(process.env.PORT || 3100);
 const sharedSecret = process.env.STUDIO_BROWSER_SECRET || '';
@@ -115,6 +115,9 @@ export function createBrowserLifecycleManager({ launch = (options) => chromium.l
       try {
         const candidate = await launch({
           headless: true,
+          ...(process.env.STUDIO_BROWSER_EXECUTABLE_PATH
+            ? { executablePath: process.env.STUDIO_BROWSER_EXECUTABLE_PATH }
+            : {}),
           args: [
             '--disable-background-networking',
             '--disable-component-update',

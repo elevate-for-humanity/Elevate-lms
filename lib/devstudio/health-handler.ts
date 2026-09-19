@@ -2,20 +2,15 @@ import 'server-only';
 
 import { NextRequest, NextResponse } from 'next/server';
 
-import { isAnthropicConfigured } from '@/lib/ai/anthropic-client';
-import { isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
-import { isGeminiConfigured } from '@/lib/gemini-client';
-import { isGroqConfigured } from '@/lib/groq-client';
 import {
   getNorthflankProjectId,
   getNorthflankServices,
   isNorthflankReady,
 } from '@/lib/northflank/runtime';
-import { getDecryptedPlatformSecret, hydrateNorthflankEnv } from '@/lib/secrets';
+import { hydrateNorthflankEnv } from '@/lib/secrets';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
-import { getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 /**
  * Canonical Admin-owned Dev Studio health implementation.
@@ -28,29 +23,12 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
 
-  await hydrateProcessEnv().catch(() => undefined);
-
-  const requestedKeys = [
-    'GROQ_API_KEY',
-    'GEMINI_API_KEY',
-    'OPENAI_API_KEY',
-    'ANTHROPIC_API_KEY',
-    'GITHUB_TOKEN',
-  ] as const;
-  const selectedSecrets = Object.fromEntries(
-    await Promise.all(
-      requestedKeys.map(async (key) => [
-        key,
-        await getDecryptedPlatformSecret(key).catch(() => undefined),
-      ]),
-    ),
-  ) as Record<(typeof requestedKeys)[number], string | undefined>;
+  const ai = await resolveAIRuntimeState().catch(() => ({
+    providers: { groq: false, xai: false, gemini: false, openai: false, anthropic: false, cloudflare: false },
+    activeProvider: 'none', elevate: false, anyConfigured: false,
+  }));
   await hydrateNorthflankEnv().catch(() => undefined);
-
-  const hasGroq = isGroqConfigured() || Boolean(selectedSecrets.GROQ_API_KEY);
-  const hasGemini = isGeminiConfigured() || Boolean(selectedSecrets.GEMINI_API_KEY);
-  const hasOpenAI = isOpenAIConfigured() || Boolean(selectedSecrets.OPENAI_API_KEY);
-  const hasAnthropic = isAnthropicConfigured() || Boolean(selectedSecrets.ANTHROPIC_API_KEY);
+  const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic, cloudflare: hasCloudflare } = ai.providers;
   const githubToken = await getGitHubToken();
   const hasGitHub = Boolean(githubToken);
   let githubTokenValid = false;
@@ -66,10 +44,9 @@ export async function handleDevStudioHealth(req: NextRequest) {
       githubTokenValid = false;
     }
   }
-  const activeProvider = getActiveProviderName();
-  const hasElevate = activeProvider === 'elevate';
-  const hasCloudflare = activeProvider === 'cloudflare';
-  const aiConfigured = isAIAvailable();
+  const activeProvider = ai.activeProvider;
+  const hasElevate = ai.elevate;
+  const aiConfigured = ai.anyConfigured;
   const northflankServices = getNorthflankServices().map((service) => ({
     key: service.key,
     id: service.id,
@@ -89,6 +66,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
 
   return NextResponse.json({
     hasGroq,
+    hasXAI,
     hasGemini,
     hasOpenAI,
     hasAnthropic,
@@ -106,6 +84,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
       elevate: hasElevate,
       cloudflare: hasCloudflare,
       groq: hasGroq,
+      xai: hasXAI,
       gemini: hasGemini,
       openai: hasOpenAI,
       anthropic: hasAnthropic,

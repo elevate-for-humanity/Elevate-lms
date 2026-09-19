@@ -23,7 +23,7 @@ function individualAppProduct(appSlug: IndividualAppSlug, planId: IndividualPlan
     inStock: true,
     featured: Boolean(plan.popular),
     digital: true,
-    tags: ['individual-app', appSlug, plan.id],
+    tags: ['individual-app', appSlug, plan.id, 'licensed-media', 'finished-output-only'],
   };
 }
 

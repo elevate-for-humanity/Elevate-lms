@@ -12,6 +12,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { logger } from '@/lib/logger';
 import { missingRequiredWebsiteAnswers, type WebsiteInterviewAnswers } from '@/lib/website-builder/interview';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { buildLicensedAssetProjectPolicy } from '@/lib/media/licensed-asset-policy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -118,7 +119,7 @@ async function _POST(request: NextRequest) {
         description: safeString(generated.seo?.description, fallback.seo?.description || '', 500),
         keywords: Array.isArray(generated.seo?.keywords) ? generated.seo.keywords.map((item: unknown) => safeString(item, '', 80)).filter(Boolean).slice(0, 20) : fallback.seo?.keywords,
       },
-      meta: { ...(fallback.meta || {}), generatedBy: 'paris-autonomous-website-builder', parisInterviewCompleted: true, interview: answers, generatedAt: new Date().toISOString() },
+      meta: { ...(fallback.meta || {}), generatedBy: 'paris-autonomous-website-builder', parisInterviewCompleted: true, interview: answers, generatedAt: new Date().toISOString(), licensedAssetPolicy: buildLicensedAssetProjectPolicy({ consumer: 'website_builder', plan }) },
     });
   } catch (error) {
     logger.error('[website-builder] PARIS generation failed', error instanceof Error ? error : new Error(String(error)));

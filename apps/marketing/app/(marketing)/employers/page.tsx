@@ -49,13 +49,15 @@ export default function EmployerJourneyPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950">
       <HeroPicture
-        src="/images/pages/about-employer-partners.webp"
+        src="/images/pages/for-employers-page-1.webp"
         alt="Employer partners collaborating on workforce training and hiring"
         microLabel="Employer Partnerships"
+        heightStyle="h-[clamp(280px,42svh,460px)]"
         belowHeroHeadline="Build a documented workforce partnership"
         belowHeroSubheadline="Elevate supports hiring, work-based learning, training coordination, and registered apprenticeship activity through documented program and employer workflows."
         ctas={[
-          { label: 'Discuss a Partnership', href: '/contact' },
+          { label: 'Apply as an Employer Partner', href: '/apply/employer' },
+          { label: 'Apply as a Program Partner', href: '/partners/apply', variant: 'secondary' },
           { label: 'Post a Job', href: '/employers/post-job', variant: 'secondary' },
         ]}
         trustIndicators={['Candidate referrals', 'Work-based learning', 'Apprenticeship support']}

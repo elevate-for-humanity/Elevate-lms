@@ -13,8 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getDecryptedPlatformSecret, hydrateNorthflankEnv } from '@/lib/secrets';
-import { isGroqConfigured } from '@/lib/groq-client';
-import { isGeminiConfigured } from '@/lib/gemini-client';
+import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -36,14 +35,8 @@ export async function GET(request: NextRequest) {
 
   const mode = (process.env.DEVSTUDIO_DEVCONTAINER_MODE ?? 'auto').toLowerCase();
   const hasGitHub = Boolean(process.env.GITHUB_TOKEN);
-  const hasOpenAI = Boolean(process.env.OPENAI_API_KEY);
-  const hasAnthropic = Boolean(process.env.ANTHROPIC_API_KEY);
   const keys = [
-    'GROQ_API_KEY',
-    'GEMINI_API_KEY',
-    'OPENAI_API_KEY',
     'OPENHANDS_API_KEY',
-    'ANTHROPIC_API_KEY',
     'GITHUB_TOKEN',
   ] as const;
   const selectedSecrets = Object.fromEntries(
@@ -52,15 +45,12 @@ export async function GET(request: NextRequest) {
     ),
   ) as Record<(typeof keys)[number], string | undefined>;
   await hydrateNorthflankEnv().catch(() => undefined);
-
-  const hasGroq = isGroqConfigured() || Boolean(selectedSecrets.GROQ_API_KEY);
-  const hasGemini = isGeminiConfigured() || Boolean(selectedSecrets.GEMINI_API_KEY);
-  const dbOpenAI = Boolean(selectedSecrets.OPENAI_API_KEY);
+  const ai = await resolveAIRuntimeState();
+  const { xai: hasXAI, groq: hasGroq, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic, cloudflare: hasCloudflare } = ai.providers;
   const hasOpenHands = Boolean(selectedSecrets.OPENHANDS_API_KEY || process.env.OPENHANDS_API_KEY);
-  const dbAnthropic = Boolean(selectedSecrets.ANTHROPIC_API_KEY);
   const dbGitHub = Boolean(selectedSecrets.GITHUB_TOKEN);
 
-  const hasAnyAI = hasGroq || hasGemini || hasOpenAI || dbOpenAI || hasAnthropic || dbAnthropic;
+  const hasAnyAI = ai.anyConfigured;
   const githubOk = hasGitHub || dbGitHub;
 
   const checks: Check[] = [];
@@ -103,10 +93,13 @@ export async function GET(request: NextRequest) {
 
   // ── AI providers ───────────────────────────────────────────────────────────
   const aiProviders = [
+    hasXAI && 'Grok / xAI',
     hasGroq && 'Groq',
     hasGemini && 'Gemini',
-    (hasOpenAI || dbOpenAI) && 'OpenAI',
-    (hasAnthropic || dbAnthropic) && 'Anthropic',
+    hasOpenAI && 'OpenAI',
+    hasAnthropic && 'Anthropic',
+    hasCloudflare && 'Cloudflare',
+    ai.elevate && 'Elevate',
   ]
     .filter(Boolean)
     .join(', ');

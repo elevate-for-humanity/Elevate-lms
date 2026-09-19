@@ -261,6 +261,7 @@ export async function queueCourseLessonVideos(
         lesson.video_config && typeof lesson.video_config === 'object'
           ? (lesson.video_config as Record<string, unknown>)
           : {};
+      const allowPaidNarration = videoConfig.allow_paid_narration === true;
       const instructorId =
         [videoConfig.instructorId, videoConfig.instructor_id]
           .find((value): value is string => typeof value === 'string' && value.trim().length > 0)
@@ -300,7 +301,11 @@ export async function queueCourseLessonVideos(
         lesson.media_quality_status === 'approved' &&
         existingLessonJob?.review_status === 'approved' &&
         hasCanonicalMediaQualityEvidence(existingLessonJob.quality_evidence);
-      const mainInFlight = lesson.video_status === 'queued' || lesson.video_status === 'rendering';
+      // video_jobs is the durable execution authority. course_lessons.video_status
+      // is a denormalized display field and may be stale after a worker crash or
+      // failed retry; trusting it here can strand a failed canonical job forever.
+      const mainInFlight =
+        existingLessonJob?.status === 'queued' || existingLessonJob?.status === 'rendering';
       // Queued/draft jobs still need their canonical payload synchronized after
       // a curriculum refresh. Only a renderer-owned active lease is immutable.
       const shouldQueueMain =
@@ -348,7 +353,8 @@ export async function queueCourseLessonVideos(
                     strategy: 'repository_voice',
                     instructor_id: instructor.id,
                     voice: instructor.voice,
-                    allow_paid_provider: false,
+                    allow_paid_provider: allowPaidNarration,
+                    ...(allowPaidNarration ? { provider: 'cloudflare' } : {}),
                   },
                   visuals: {
                     strategy: 'existing_then_pexels',
@@ -411,7 +417,8 @@ export async function queueCourseLessonVideos(
                   strategy: 'repository_voice',
                   instructor_id: instructor.id,
                   voice: instructor.voice,
-                  allow_paid_provider: false,
+                  allow_paid_provider: allowPaidNarration,
+                  ...(allowPaidNarration ? { provider: 'cloudflare' } : {}),
                 },
                 visuals: {
                   strategy: 'existing_then_pexels',

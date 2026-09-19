@@ -22,10 +22,12 @@ function findSecret(root, key) {
     if (Array.isArray(value)) {
       for (const item of value) {
         if (
-          item && typeof item === 'object' &&
+          item &&
+          typeof item === 'object' &&
           String(item.key ?? item.name ?? '') === key &&
           typeof (item.value ?? item.secret) === 'string'
-        ) return String(item.value ?? item.secret);
+        )
+          return String(item.value ?? item.secret);
         const found = walk(item);
         if (found) return found;
       }
@@ -45,18 +47,22 @@ for (const id of ['elevate-production-env', 'telnyx-api-key']) {
   try {
     apiKey = findSecret(await nf(`/secrets/${id}`), 'TELNYX_API_KEY');
     if (apiKey) break;
-  } catch {}
+  } catch (error) {
+    console.debug(
+      `Unable to inspect Northflank secret group ${id}`,
+      error instanceof Error ? error.message : error,
+    );
+  }
 }
 if (!apiKey) throw new Error('TELNYX_API_KEY was not found in Northflank');
 
-const response = await fetch(
-  'https://api.telnyx.com/v2/verified_numbers',
-  { headers: { Authorization: `Bearer ${apiKey}` } },
-);
+const response = await fetch('https://api.telnyx.com/v2/verified_numbers', {
+  headers: { Authorization: `Bearer ${apiKey}` },
+});
 const json = await response.json();
 if (!response.ok) throw new Error(`Telnyx verified-number lookup failed HTTP ${response.status}`);
 const entries = Array.isArray(json.data) ? json.data : [];
-console.log(
+console.info(
   'VERIFIED NUMBER METADATA:',
   JSON.stringify(
     entries.map((item) => {
@@ -76,4 +82,4 @@ const verified = entries.some((item) => {
   return digits === targetDigits || digits.endsWith(targetDigits.slice(-10));
 });
 if (!verified) throw new Error(`NOT YET VERIFIED: ${NUMBER}`);
-console.log(`VERIFIED DESTINATION: ${NUMBER}`);
+console.info(`VERIFIED DESTINATION: ${NUMBER}`);

@@ -122,7 +122,7 @@ export function CallListPanel({ applicants }: { applicants: Applicant[] }) {
             {applicants.length}
           </span>
         </h2>
-        <p className="text-xs text-amber-600">HVAC applicants — tap phone to call, log notes below</p>
+        <p className="text-xs text-amber-600">Program applicants — tap phone to call, log notes below</p>
       </div>
 
       <div className="border-b border-amber-100 bg-white px-6 py-4">

@@ -240,6 +240,13 @@ export default async function HostShopDashboardView() {
   ];
   const toolCards: PortalCard[] = [
     {
+      href: '/host-shop/dashboard/resources',
+      title: 'Guides, handbook & MOU',
+      detail:
+        'Open the Host Shop user guide, operating handbook, current MOU, orientation, and required compliance documents.',
+      image: '/images/pages/academic-integrity-hero.webp',
+    },
+    {
       href: '/host-shop/orientation',
       title: 'Required orientation',
       detail:

@@ -44,10 +44,9 @@ export default function FeaturedHostPartners({
         })
       : matchingShops;
 
-  const directoryShops =
-    programSlug === 'barber-apprenticeship'
-      ? shops.filter((shop) => shop.slug !== 'kountry-kutz-barbershop')
-      : shops;
+  // Show every verified barber host in one directory, including Kountry Kutz.
+  // The prior exclusion made the featured shop disappear from the network list.
+  const directoryShops = shops;
 
   if (!shops.length) {
     const pathway = programLabel(programSlug ?? 'beauty-apprenticeship');
@@ -140,15 +139,13 @@ export default function FeaturedHostPartners({
               {directoryShops.map((shop) => {
                 const stillMedia = shop.media?.filter((media) => media.kind !== 'video') ?? [];
                 const image =
-                  shop.slug === 'b-52s-barber-shop'
-                    ? undefined
-                    : shop.slug === 'razors-image-barbershop'
-                      ? {
-                          src: '/images/partners/razors-image-logo.jpg',
-                          alt: "Razor's Image Barbershop official logo",
-                          kind: 'photo' as const,
-                        }
-                      : shop.slug === 'generations-hair-llc'
+                  shop.slug === 'razors-image-barbershop'
+                    ? {
+                        src: '/images/partners/razors-image-logo.jpg',
+                        alt: "Razor's Image Barbershop official logo",
+                        kind: 'photo' as const,
+                      }
+                    : shop.slug === 'generations-hair-llc'
                         ? {
                             src: '/images/partners/generations-hair/highlighted-curls-card.webp',
                             alt: 'Highlighted dimensional curls created by Generations Hair LLC',
@@ -164,9 +161,7 @@ export default function FeaturedHostPartners({
                         script:
                           "Welcome to Razor's Image Barbershop in Bloomington, Indiana, a participating Barber Apprenticeship Host Shop. In this video, the shop owner introduces the workplace and the opportunity for approved apprentices to develop barbering, sanitation, client service, grooming, and professional shop skills under qualified supervision. Placement, wages, supervision, enrollment, and licensing requirements are confirmed through Elevate before training begins.",
                       }
-                    : programSlug === 'barber-apprenticeship'
-                      ? undefined
-                      : shop.media?.find((media) => media.kind === 'video');
+                    : shop.media?.find((media) => media.kind === 'video');
                 const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
                 return (
                   <article
@@ -182,7 +177,7 @@ export default function FeaturedHostPartners({
                         data-narration-style="instructor"
                       >
                         <div>
-                          <div className="relative mx-auto w-full max-w-lg overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
+                          <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl border border-white/15 bg-black shadow-2xl">
                             {image ? (
                               <Image
                                 src={image.src}
@@ -199,12 +194,31 @@ export default function FeaturedHostPartners({
                               preload="metadata"
                               poster={image?.src}
                               aria-label={video.alt}
-                              className="relative z-10 aspect-[9/16] max-h-[680px] w-full bg-transparent object-contain"
+                              className="relative z-10 mx-auto aspect-[9/16] max-h-[460px] w-full bg-transparent object-contain sm:max-h-[520px]"
                             >
                               <source src={video.src} type="video/mp4" />
                               Your browser does not support embedded video.
                             </video>
                           </div>
+                          {stillMedia.length ? (
+                            <div className="mx-auto mt-4 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-3">
+                              {stillMedia.map((media) => (
+                                <div
+                                  key={media.src}
+                                  className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/15 bg-white"
+                                >
+                                  <Image
+                                    src={media.src}
+                                    alt={media.alt}
+                                    fill
+                                    unoptimized={media.src.startsWith('http')}
+                                    sizes="(max-width: 640px) 50vw, 220px"
+                                    className="object-contain"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          ) : null}
                         </div>
                         <div className="mx-auto mt-4 max-w-xl text-center text-white">
                           <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-red-300">
@@ -236,6 +250,7 @@ export default function FeaturedHostPartners({
                             src={image.src}
                             alt={image.alt}
                             fill
+                            unoptimized={image.src.startsWith('http')}
                             sizes="(max-width: 1024px) 100vw, 50vw"
                             className="object-contain bg-white"
                           />

@@ -6,6 +6,8 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
+import { refreshSecrets } from '@/lib/secrets';
+import { getGroqClient } from '@/lib/ai/groq-client';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -227,10 +229,30 @@ async function callOpenAI(messages: any[], systemPrompt: string): Promise<{ repl
   }
 }
 
+async function callGroq(messages: any[], systemPrompt: string): Promise<{ reply: string; provider: string } | null> {
+  if (!process.env.GROQ_API_KEY) return null;
+  try {
+    const response = await getGroqClient().chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      temperature: 0.5,
+      max_tokens: 1000,
+    });
+    const reply = response.choices[0]?.message?.content?.trim();
+    return reply ? { reply, provider: 'groq' } : null;
+  } catch (error) {
+    logger.warn('[ai-chat] Groq call failed', error);
+    return null;
+  }
+}
+
 async function _POST(req: NextRequest) {
   let learnerRequested = false;
   let portalRequested = false;
   try {
+    await refreshSecrets().catch((error) => {
+      logger.warn('[ai-chat] Secret refresh failed; checking runtime environment', error);
+    });
     const body = await req.json().catch(() => null);
 
     if (!body || !Array.isArray(body.messages) || body.messages.length === 0) {
@@ -266,6 +288,18 @@ async function _POST(req: NextRequest) {
     const openaiResult = await callOpenAI(messages, systemPrompt);
     if (openaiResult) {
       return NextResponse.json({ reply: openaiResult.reply, provider: openaiResult.provider });
+    }
+
+    const groqResult = await callGroq(messages, systemPrompt);
+    if (groqResult) {
+      return NextResponse.json({ reply: groqResult.reply, provider: groqResult.provider });
+    }
+
+    if (learnerRequested || portalRequested) {
+      return NextResponse.json(
+        { error: 'No live AI provider is reachable. No task was completed.' },
+        { status: 503 },
+      );
     }
 
     // Use smart fallback

@@ -2,18 +2,29 @@ name: Process approved course video queues
 
 on:
   workflow_dispatch:
+  schedule:
+    # Recovery sweep for durable queued jobs. Concurrency below prevents
+    # overlapping production drains when a manual or push run is active.
+    - cron: '17 * * * *'
   push:
     branches: [main]
     paths:
       - '.github/workflows/video-queue-kick.yml'
       - '.github/video-queue-trigger'
+      - 'lib/video/**'
+      - 'lib/course-factory/media-service.ts'
+      - 'lib/course-builder/licensed-media.ts'
+      - 'remotion-src/**'
 
 permissions:
   contents: read
 
 concurrency:
   group: controlled-course-video-production
-  cancel-in-progress: false
+  # A newer release supersedes a worker that is still waiting on an older
+  # deployment identity. Active render batches are database-leased and recover
+  # safely; stale workflow orchestrators must not block the corrected one.
+  cancel-in-progress: true
 
 jobs:
   process:
@@ -32,14 +43,34 @@ jobs:
       ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       COURSE_ID: ${{ matrix.course_id }}
-      REQUIRED_ADMIN_SHA: '2f89dd216546f0a37b31273d3c0bec31703a3843'
     steps:
+      - name: Check out release history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve the approved Admin runtime revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          required_admin_sha=$(git log -1 --format=%H -- \
+            apps/admin \
+            components \
+            lib \
+            remotion-src \
+            server \
+            package.json \
+            pnpm-lock.yaml)
+          test -n "$required_admin_sha"
+          echo "REQUIRED_ADMIN_SHA=$required_admin_sha" >> "$GITHUB_ENV"
+          echo "Waiting for Admin runtime revision $required_admin_sha"
+
       - name: Wait for the approved Admin media planner release
         shell: bash
         run: |
           set -euo pipefail
           for attempt in $(seq 1 90); do
-            live_sha=$((curl -fsS --connect-timeout 20 --max-time 30 "$ADMIN_URL/version.json" || true) | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{process.stdout.write(JSON.parse(d).commit||'')}catch{}})")
+            live_sha=$((curl -fsS --connect-timeout 20 --max-time 30 "$ADMIN_URL/api/version" || true) | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const p=JSON.parse(d);process.stdout.write(p.commitSha||'')}catch{}})")
             if [ "$live_sha" = "$REQUIRED_ADMIN_SHA" ]; then
               exit 0
             fi
@@ -67,8 +98,23 @@ jobs:
               *) echo "::error::Video worker returned HTTP $status"; exit 1 ;;
             esac
             started=$(node -e "const p=require('/tmp/video-worker.json'); if(p.ok!==true) process.exit(1); process.stdout.write(String(p.started||0))")
+            reason=$(node -e "const p=require('/tmp/video-worker.json'); process.stdout.write(String(p.reason||''))")
             if [ "$started" = "0" ]; then
-              break
+              if [ "$reason" = "render-capacity-full" ]; then
+                sleep 30
+                continue
+              fi
+              case "$reason" in
+                queue-empty|no-draft-or-queued-job) break ;;
+                course-builder-generation-paused|course-generation-paused)
+                  echo "::error::Course queue is paused ($reason)"
+                  exit 1
+                  ;;
+                *)
+                  echo "::error::Queue made no progress (reason=$reason)"
+                  exit 1
+                  ;;
+              esac
             fi
             sleep 5
           done

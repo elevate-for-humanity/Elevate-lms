@@ -56,14 +56,14 @@ type HealthState = {
 
 const TABS: Array<{ id: Tab; label: string; icon: any }> = [
   { id: 'courses', label: 'Courses', icon: BookOpen },
-  { id: 'ai', label: 'AI Generate', icon: Sparkles },
+  { id: 'ai', label: 'Talk to Course Builder', icon: Sparkles },
   { id: 'blueprints', label: 'Blueprints', icon: Boxes },
   { id: 'media', label: 'Video + Audio', icon: Video },
   { id: 'registry', label: 'Credential Registry', icon: Award },
 ];
 
 export default function UnifiedCourseBuilder() {
-  const [tab, setTab] = useState<Tab>('courses');
+  const [tab, setTab] = useState<Tab>('ai');
   const [courses, setCourses] = useState<CourseRow[]>([]);
   const [programs, setPrograms] = useState<ProgramRow[]>([]);
   const [courseId, setCourseId] = useState('');
@@ -170,7 +170,7 @@ export default function UnifiedCourseBuilder() {
         </div>
       </div>
 
-      <main className="mx-auto min-w-0 max-w-[1600px] p-3 sm:p-4">
+      <main className="mx-auto min-w-0 max-w-[1600px] p-3 pb-24 sm:p-4 sm:pb-24">
         {health ? (
           <section
             aria-label="Course Builder health"

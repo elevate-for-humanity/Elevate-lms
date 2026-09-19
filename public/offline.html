@@ -62,7 +62,30 @@
         It looks like you've lost your internet connection. Please check your connection and try
         again.
       </p>
-      <button onclick="window.location.reload()">Try Again</button>
+      <button id="retry-button" type="button">Try Again</button>
     </div>
+    <script>
+      document.getElementById('retry-button').addEventListener('click', async function () {
+        this.disabled = true;
+        this.textContent = 'Reconnecting…';
+        try {
+          if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(registrations.map((registration) => registration.unregister()));
+          }
+          if ('caches' in window) {
+            const names = await caches.keys();
+            await Promise.all(
+              names.filter((name) => name.startsWith('elevate-')).map((name) => caches.delete(name)),
+            );
+          }
+        } finally {
+          const isPortal =
+            window.location.hostname.startsWith('app.') ||
+            window.location.hostname.startsWith('admin.');
+          window.location.replace(isPortal ? '/login?pwa-recovered=1' : '/');
+        }
+      });
+    </script>
   </body>
 </html>

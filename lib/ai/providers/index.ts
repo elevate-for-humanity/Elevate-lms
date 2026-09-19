@@ -7,3 +7,4 @@ export { CloudflareProvider } from './cloudflare';
 export { AzureProvider } from './azure';
 export { StabilityProvider } from './stability';
 export { GroqProvider } from './groq';
+export { XAIProvider } from './xai';

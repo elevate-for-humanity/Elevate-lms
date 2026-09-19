@@ -21,6 +21,7 @@ export function PlatformHubHero() {
       aria-labelledby="home-hero-heading"
       data-scroll-narration
       data-narration={HOME_NARRATION}
+      data-narration-src="/audio/narration/home-hero.mp3"
       data-narration-rate="0.84"
       data-narration-style="assistant"
     >

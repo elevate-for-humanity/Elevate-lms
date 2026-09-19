@@ -67,23 +67,25 @@ export async function configureProgramHolderPayoutAccount(
     .eq('user_id', ctx.user.id)
     .maybeSingle();
 
-  if (!existing) {
-    throw new Error('A payout recipient must be provisioned by Elevate first.');
-  }
+  const payoutState = {
+    payout_provider: provider,
+    transfers_enabled: false,
+    payouts_enabled: false,
+    charges_enabled: false,
+    instant_payouts_enabled: false,
+    verification_status: 'banking_required',
+    quickbooks_sync_status: 'pending',
+    updated_at: new Date().toISOString(),
+  };
 
-  const { error } = await ctx.db
-    .from('program_holder_payouts')
-    .update({
-      payout_provider: provider,
-      transfers_enabled: false,
-      payouts_enabled: false,
-      charges_enabled: false,
-      instant_payouts_enabled: false,
-      verification_status: 'banking_required',
-      quickbooks_sync_status: 'pending',
-      updated_at: new Date().toISOString(),
-    })
-    .eq('user_id', ctx.user.id);
+  const payoutQuery = existing
+    ? ctx.db.from('program_holder_payouts').update(payoutState).eq('user_id', ctx.user.id)
+    : ctx.db.from('program_holder_payouts').insert({
+        user_id: ctx.user.id,
+        ...payoutState,
+      });
+
+  const { error } = await payoutQuery;
 
   if (error) throw new Error('Unable to save the payout account.');
 

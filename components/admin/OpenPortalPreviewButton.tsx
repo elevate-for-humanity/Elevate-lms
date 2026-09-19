@@ -25,13 +25,25 @@ export function OpenPortalPreviewButton({
         body: JSON.stringify({ target_user_id: targetUserId, reason }),
       });
       const result = await response.json();
-      if (!response.ok || !result.preview_url) {
-        throw new Error(result.error || 'Could not open the portal');
+      if (!response.ok || !result.preview_url || !result.preview_handoff) {
+        throw new Error(result.error || 'Could not create the secure portal preview');
       }
-      window.location.assign(result.preview_url);
+
+      // Cross-subdomain previews use a short-lived signed POST handoff. Sending
+      // the token in a form body keeps it out of URLs, browser history, access
+      // logs, and referrer headers.
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = result.preview_url;
+      const handoff = document.createElement('input');
+      handoff.type = 'hidden';
+      handoff.name = 'handoff';
+      handoff.value = result.preview_handoff;
+      form.appendChild(handoff);
+      document.body.appendChild(form);
+      form.submit();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not open the portal');
-    } finally {
       setBusy(false);
     }
   }

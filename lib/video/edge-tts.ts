@@ -44,6 +44,14 @@ const OPENAI_VOICE_MAP: Record<
 export const DEFAULT_GEMINI_TTS_MODEL = 'gemini-2.5-flash-preview-tts';
 export const DEFAULT_CLOUDFLARE_TTS_MODEL = '@cf/deepgram/aura-1';
 
+const CLOUDFLARE_SPEAKER_BY_INSTRUCTOR_VOICE: Record<EdgeTTSVoice, string> = {
+  [EDGE_TTS_VOICES.marcus]: 'orion',
+  [EDGE_TTS_VOICES.female]: 'luna',
+  [EDGE_TTS_VOICES.neutral]: 'athena',
+  [EDGE_TTS_VOICES.british]: 'angus',
+  [EDGE_TTS_VOICES.warm]: 'orpheus',
+};
+
 export type NarrationProvider =
   | 'cloudflare'
   | 'elevenlabs'
@@ -55,7 +63,8 @@ export type NarrationProvider =
 export function configuredNarrationProvider(
   env: NodeJS.ProcessEnv = process.env,
 ): NarrationProvider {
-  const configured = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER || 'edge')
+  const safeDefault = env.NODE_ENV === 'production' ? 'cloudflare' : 'local';
+  const configured = (env.AI_NARRATION_PROVIDER || env.AI_MEDIA_PROVIDER || safeDefault)
     .trim()
     .toLowerCase();
   if (
@@ -72,6 +81,11 @@ export function configuredNarrationProvider(
 
 export function assertNarrationProviderConfigured(env: NodeJS.ProcessEnv = process.env): void {
   const provider = configuredNarrationProvider(env);
+  if (env.NODE_ENV === 'production' && (provider === 'edge' || provider === 'local')) {
+    throw new Error(
+      `${provider} narration is diagnostic-only and cannot publish learner-facing media in production`,
+    );
+  }
   if (provider === 'cloudflare') {
     const accountId = env.CLOUDFLARE_ACCOUNT_ID?.trim();
     const token = (env.CLOUDFLARE_AI_API_TOKEN || env.CLOUDFLARE_API_TOKEN)?.trim();
@@ -265,7 +279,10 @@ async function generateElevenLabsNarration(text: string): Promise<Buffer> {
   return Buffer.from(await response.arrayBuffer());
 }
 
-async function generateCloudflareNarrationChunk(text: string): Promise<Buffer> {
+async function generateCloudflareNarrationChunk(
+  text: string,
+  instructorVoice: EdgeTTSVoice,
+): Promise<Buffer> {
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
   const token = (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim();
   if (!accountId || !token) throw new Error('Cloudflare Workers AI narration is not configured');
@@ -274,7 +291,12 @@ async function generateCloudflareNarrationChunk(text: string): Promise<Buffer> {
     throw new Error('CLOUDFLARE_TTS_MODEL must be a Cloudflare Workers AI model identifier');
   }
   const gatewayId = process.env.AI_GATEWAY_ID?.trim() || 'default';
-  const speaker = process.env.CLOUDFLARE_TTS_SPEAKER?.trim() || 'orion';
+  // An explicit deployment override remains available, but otherwise the
+  // governed course instructor selects a stable speaker. This prevents every
+  // program from collapsing to the same generic voice.
+  const speaker =
+    process.env.CLOUDFLARE_TTS_SPEAKER?.trim() ||
+    CLOUDFLARE_SPEAKER_BY_INSTRUCTOR_VOICE[instructorVoice];
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
     {
@@ -379,13 +401,16 @@ async function normalizeCloudflareMp3Segments(segments: Buffer[]): Promise<Buffe
   });
 }
 
-async function generateCloudflareNarration(text: string): Promise<Buffer> {
+async function generateCloudflareNarration(
+  text: string,
+  instructorVoice: EdgeTTSVoice,
+): Promise<Buffer> {
   const chunks = cloudflareNarrationChunks(text);
   const segments: Buffer[] = [];
   // Keep calls sequential to preserve narration order and avoid burst pressure
   // on the authoritative provider.
   for (const chunk of chunks) {
-    segments.push(await generateCloudflareNarrationChunk(chunk));
+    segments.push(await generateCloudflareNarrationChunk(chunk, instructorVoice));
   }
   return normalizeCloudflareMp3Segments(segments);
 }
@@ -433,7 +458,8 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
     requirePaidInferenceContext('narration');
   }
   try {
-    if (provider === 'cloudflare') return await generateCloudflareNarration(normalizedText);
+    if (provider === 'cloudflare')
+      return await generateCloudflareNarration(normalizedText, voice);
     if (provider === 'elevenlabs') return await generateElevenLabsNarration(normalizedText);
     if (provider === 'gemini') return await generateGeminiNarration(normalizedText);
     if (provider === 'openai') return await generateOpenAINarration(normalizedText, voice);

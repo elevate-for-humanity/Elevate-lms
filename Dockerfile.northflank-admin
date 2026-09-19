@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# Dockerfile.northflank-admin - Northflank Admin Service
+# Dockerfile.northflank-admin - Northflank Admin Service (canonical)
 # Serves admin.elevateforhumanity.org
 #
 # Production contract:

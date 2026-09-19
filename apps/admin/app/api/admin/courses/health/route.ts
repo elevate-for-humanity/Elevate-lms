@@ -5,6 +5,11 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { isCourseBuilderGenerationPaused } from '@/lib/course-builder/generation-control';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
+import { refreshSecrets } from '@/lib/secrets';
+import { getGroqClient } from '@/lib/ai/groq-client';
+import { getOpenAIClient } from '@/lib/ai/openai-client';
+import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
+import { logger } from '@/lib/logger';
 
 interface IntegrityIssue {
   courseId: string;
@@ -112,16 +117,49 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       : 'Enabled',
   });
 
+  await refreshSecrets().catch(() => undefined);
   const aiAvailable = isAIAvailable();
   const provider = getActiveProviderName();
+  let aiVerified = false;
+  let aiMessage = 'Canonical AI provider is unavailable; manual editing remains available';
+  if (aiAvailable) {
+    try {
+      if (provider === 'cloudflare') {
+        const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
+        const token = (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim();
+        if (!accountId || !token) throw new Error('Cloudflare Workers AI credentials are incomplete');
+        const response = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/models/search?per_page=1`,
+          { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(10_000) },
+        );
+        if (!response.ok) throw new Error(`Cloudflare provider returned ${response.status}`);
+      } else if (provider === 'groq') {
+        await runWithPaidInferenceContext(
+          `course-builder-health:${crypto.randomUUID()}`,
+          () => getGroqClient().models.list(),
+        );
+      } else if (provider === 'openai') {
+        await runWithPaidInferenceContext(
+          `course-builder-health:${crypto.randomUUID()}`,
+          () => getOpenAIClient().models.list(),
+        );
+      }
+      aiVerified = true;
+      aiMessage = `${provider} authenticated and reachable`;
+    } catch (error) {
+      logger.warn('Course Builder provider health check failed', {
+        provider,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      aiMessage = `${provider} is configured but the live provider check failed`;
+    }
+  }
   checks.push({
     name: 'AI Course Builder',
-    passed: aiAvailable,
-    message: aiAvailable
-      ? `Canonical ${provider} provider configured`
-      : 'Canonical AI provider is unavailable; manual editing remains available',
+    passed: aiVerified,
+    message: aiMessage,
   });
-  if (!aiAvailable) status = 'degraded';
+  if (!aiVerified) status = 'degraded';
 
   const response: CapabilityHealth = { capability: 'course-builder', status, configured: true, checks, checkedAt: new Date().toISOString() };
   return NextResponse.json(response, { status: status === 'unavailable' ? 503 : 200 });

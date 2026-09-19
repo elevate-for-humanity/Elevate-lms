@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
+  Activity,
   AlertTriangle,
   Bot,
   Camera,
@@ -78,6 +79,17 @@ interface ChatMessage {
   capabilitiesUsed?: string[];
   actionOutcome?: { status: 'executed' | 'rejected' | 'failed'; message: string };
 }
+
+type StudioProvider = 'auto' | 'xai' | 'openai' | 'anthropic' | 'gemini' | 'groq';
+
+const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
+  auto: 'Best available',
+  xai: 'Grok / xAI',
+  openai: 'ChatGPT',
+  anthropic: 'Claude',
+  gemini: 'Gemini',
+  groq: 'Groq',
+};
 
 interface UnifiedEllieChatProps {
   onOpenDeploy?: () => void;
@@ -201,12 +213,18 @@ function ConversationActivity({ conversationId }: { conversationId: string | nul
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                 ) : task.status === 'failed' ? (
                   <XCircle className="h-4 w-4 text-red-600" />
+                ) : task.status === 'blocked' ? (
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
                 ) : (
                   <Loader2 className={`h-4 w-4 text-blue-600 ${waiting ? '' : 'animate-spin'}`} />
                 )}
                 <span className="min-w-0 flex-1 font-bold text-slate-900">{task.title}</span>
                 <span className="rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-600">
-                  {task.status.replaceAll('_', ' ')}
+                  {task.status === 'failed'
+                    ? 'execution failed'
+                    : task.status === 'blocked'
+                      ? 'capability required'
+                      : task.status.replaceAll('_', ' ')}
                 </span>
                 {waiting ? (
                   <button
@@ -308,7 +326,6 @@ function CourseBuildRuns() {
   );
 }
 
-
 interface CanonicalRunStep {
   id: string;
   title: string;
@@ -388,6 +405,7 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
   const verified = required.filter((step) => step.status === 'verified').length;
   const percent = required.length ? Math.round((verified / required.length) * 100) : 0;
   const terminal = ['completed', 'failed', 'cancelled'].includes(payload.run.status);
+  const blocked = payload.run.status === 'blocked';
   const latestEvent = payload.events[payload.events.length - 1];
 
   return (
@@ -402,6 +420,8 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
             <CheckCircle2 className="h-5 w-5 text-emerald-600" aria-hidden="true" />
           ) : payload.run.status === 'failed' ? (
             <XCircle className="h-5 w-5 text-red-600" aria-hidden="true" />
+          ) : blocked ? (
+            <AlertTriangle className="h-5 w-5 text-amber-600" aria-hidden="true" />
           ) : (
             <Loader2 className="h-5 w-5 animate-spin text-brand-blue-700" aria-hidden="true" />
           )}
@@ -410,16 +430,17 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
               {payload.run.command || 'Studio workflow'}
             </p>
             <p className="text-[11px] font-semibold text-slate-600">
-              {verified}/{required.length} required steps verified · {percent}% · {payload.run.status}
+              {verified}/{required.length} required steps verified · {percent}% ·{' '}
+              {payload.run.status}
             </p>
           </div>
           <span className="rounded-full bg-white px-2 py-1 text-[10px] font-black uppercase tracking-wide text-brand-blue-800 ring-1 ring-blue-200">
-            {terminal ? 'Final state' : 'Live'}
+            {terminal ? 'Final state' : blocked ? 'Action required' : 'Live'}
           </span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-white ring-1 ring-blue-100">
           <div
-            className={`h-full rounded-full transition-all ${payload.run.status === 'failed' ? 'bg-red-500' : 'bg-brand-blue-700'}`}
+            className={`h-full rounded-full transition-all ${payload.run.status === 'failed' ? 'bg-red-500' : blocked ? 'bg-amber-500' : 'bg-brand-blue-700'}`}
             style={{ width: `${percent}%` }}
           />
         </div>
@@ -430,11 +451,19 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
               className="flex min-w-0 items-start gap-2 rounded-lg border border-blue-100 bg-white/90 px-2.5 py-2 text-xs"
             >
               {step.status === 'verified' ? (
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+                <CheckCircle2
+                  className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600"
+                  aria-hidden="true"
+                />
               ) : step.status === 'failed' ? (
                 <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" aria-hidden="true" />
+              ) : step.status === 'blocked' ? (
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
               ) : step.status === 'running' ? (
-                <Loader2 className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-blue-600" aria-hidden="true" />
+                <Loader2
+                  className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-blue-600"
+                  aria-hidden="true"
+                />
               ) : (
                 <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-slate-300 text-[9px] font-bold text-slate-500">
                   {step.ordinal}
@@ -622,6 +651,9 @@ export default function UnifiedEllieChat({
   const [loading, setLoading] = useState(false);
   const [health, setHealth] = useState('checking…');
   const [aiOk, setAiOk] = useState(true);
+  const [availableProviders, setAvailableProviders] = useState<Record<string, boolean>>({});
+  const [selectedProvider, setSelectedProvider] = useState<StudioProvider>('auto');
+  const [showActivity, setShowActivity] = useState(false);
   const [lastRoute, setLastRoute] = useState<EllieMessageRoute | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -759,11 +791,21 @@ export default function UnifiedEllieChat({
   }
 
   useEffect(() => {
-    fetchAiHealth().then(({ ok, label }) => {
+    fetchAiHealth().then(({ ok, label, providers }) => {
       setAiOk(ok);
       setHealth(label);
+      setAvailableProviders(providers);
     });
   }, []);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem('elevate:studio:provider') as StudioProvider | null;
+    if (saved && saved in STUDIO_PROVIDER_LABELS) setSelectedProvider(saved);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('elevate:studio:provider', selectedProvider);
+  }, [selectedProvider]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -876,7 +918,7 @@ export default function UnifiedEllieChat({
     void naturalVoice.play(clean, {
       voice: 'coral',
       style: 'assistant',
-      rate: 0.96,
+      rate: 1.08,
       allowBrowserFallback: false,
     });
   }
@@ -992,6 +1034,7 @@ export default function UnifiedEllieChat({
               agent: 'ADMIN_AI',
               fileContext,
               documentsContext: attachment?.context,
+              provider: selectedProvider === 'auto' ? undefined : selectedProvider,
               onToken: (token) => {
                 spokenText += token;
                 setMessages((prev) => {
@@ -1111,11 +1154,52 @@ export default function UnifiedEllieChat({
         </div>
       )}
 
-      <CanonicalRunActivity runId={canonicalRunId} />
+      <div className="shrink-0 border-b border-slate-200 bg-white px-3 py-2">
+        <div className="mx-auto flex max-w-5xl items-center gap-2">
+          <label className="sr-only" htmlFor="studio-ai-provider">
+            Choose AI
+          </label>
+          <select
+            id="studio-ai-provider"
+            value={selectedProvider}
+            onChange={(event) => setSelectedProvider(event.target.value as StudioProvider)}
+            className="min-h-9 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-800"
+          >
+            {(Object.keys(STUDIO_PROVIDER_LABELS) as StudioProvider[]).map((provider) => (
+              <option
+                key={provider}
+                value={provider}
+                disabled={provider !== 'auto' && !availableProviders[provider]}
+              >
+                {STUDIO_PROVIDER_LABELS[provider]}
+                {provider !== 'auto' && !availableProviders[provider] ? ' — unavailable' : ''}
+              </option>
+            ))}
+          </select>
+          <span className="hidden truncate text-xs text-slate-500 sm:inline">
+            {selectedProvider === 'auto'
+              ? health
+              : `${STUDIO_PROVIDER_LABELS[selectedProvider]} selected`}
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowActivity((visible) => !visible)}
+            aria-expanded={showActivity}
+            className="ml-auto inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-xs font-bold text-slate-700 hover:bg-slate-50"
+          >
+            <Activity className="h-4 w-4" aria-hidden="true" />
+            {showActivity ? 'Hide activity' : 'Activity'}
+          </button>
+        </div>
+      </div>
 
-      <CourseBuildRuns />
-
-      <ConversationActivity conversationId={conversationId} />
+      {showActivity ? (
+        <div className="max-h-[42vh] shrink-0 overflow-y-auto border-b border-slate-200">
+          <CanonicalRunActivity runId={canonicalRunId} />
+          <CourseBuildRuns />
+          <ConversationActivity conversationId={conversationId} />
+        </div>
+      ) : null}
 
       {planCheckpoint?.status === 'awaiting_approval' ? (
         <div className="shrink-0 border-b border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">

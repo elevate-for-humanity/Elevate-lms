@@ -27,10 +27,48 @@ const TimelineCueSchema = z.object({
   end: z.number().positive(),
 }).refine((cue) => cue.end > cue.start, { message: 'Timeline cue end must follow start' });
 
+export const VisualAssetSourceSchema = z.enum([
+  'pixabay',
+  'mixkit',
+  'coverr',
+  'pexels',
+  'envato',
+  'storyblocks',
+  'adobe_stock',
+  'shutterstock',
+  'owned',
+  'diagram',
+]);
+
+export const VisualLicenseStatusSchema = z.enum([
+  'verified_free',
+  'verified_paid',
+  'owned',
+]);
+
 export const LessonTimelineSchema = z.object({
   durationSeconds: z.number().positive(),
-  audio: z.array(TimelineCueSchema.safeExtend({ narration: z.string().trim().min(1) })),
-  visuals: z.array(TimelineCueSchema.safeExtend({ direction: z.string().trim().min(1), assetUrl: z.string().url().optional() })),
+  audio: z.array(TimelineCueSchema.safeExtend({
+    narration: z.string().trim().min(1),
+  })),
+  visuals: z.array(TimelineCueSchema.safeExtend({
+    direction: z.string().trim().min(1),
+    assetUrl: z.string().url().optional(),
+    narrationCueIds: z.array(IdSchema).min(1).optional(),
+    teachingPurpose: z.string().trim().min(1).optional(),
+    searchTerms: z.array(z.string().trim().min(1)).default([]),
+    source: VisualAssetSourceSchema.optional(),
+    licenseStatus: VisualLicenseStatusSchema.optional(),
+    licenseEvidenceUrl: z.string().url().optional(),
+    matchScore: z.number().min(0).max(1).optional(),
+    visualType: z.enum([
+      'video',
+      'image',
+      'diagram',
+      'correct_incorrect',
+      'step_sequence',
+    ]).optional(),
+  })),
   captions: z.array(TimelineCueSchema.safeExtend({ text: z.string().trim().min(1) })),
   interactions: z.array(TimelineCueSchema.safeExtend({ interactionId: IdSchema, pausePlayback: z.boolean().default(true) })),
   checkpoints: z.array(TimelineCueSchema.safeExtend({ questionId: IdSchema, remediationSceneNumber: z.number().int().positive().optional() })),

@@ -47,7 +47,7 @@ export default async function ProgramCoursesPage({ params }: { params: Promise<{
 
       <div className="mb-6 flex items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-slate-950">Courses — {program.title}</h1>
-        <Link href="/course-builder" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-700">
+        <Link href="/studio/courses" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-700">
           <Plus className="h-4 w-4" /> Build Course
         </Link>
       </div>
@@ -57,12 +57,12 @@ export default async function ProgramCoursesPage({ params }: { params: Promise<{
           <BookOpen className="mx-auto mb-4 h-12 w-12 text-slate-400" />
           <h2 className="mb-2 text-lg font-medium text-slate-900">No courses yet</h2>
           <p className="mb-4 text-slate-600">Create this program's first canonical course in Course Builder.</p>
-          <Link href="/course-builder" className="font-medium text-brand-blue-700 hover:underline">Open Course Builder</Link>
+          <Link href="/studio/courses" className="font-medium text-brand-blue-700 hover:underline">Open Course Builder</Link>
         </div>
       ) : (
         <div className="divide-y rounded-lg border bg-white">
           {courses.map((course) => (
-            <Link key={course.id} href={`/course-builder?courseId=${encodeURIComponent(course.id)}`} className="flex items-center justify-between p-4 hover:bg-slate-50">
+            <Link key={course.id} href={`/studio/courses?courseId=${encodeURIComponent(course.id)}`} className="flex items-center justify-between p-4 hover:bg-slate-50">
               <div className="flex-1">
                 <h2 className="font-medium text-slate-900">{course.title}</h2>
                 <div className="mt-1 flex flex-wrap items-center gap-4 text-sm text-slate-600">

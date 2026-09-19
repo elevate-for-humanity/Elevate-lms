@@ -53,7 +53,7 @@ export default async function ProgramsPage() {
           </div>
         </div>
 
-        <Link href="/course-builder" className="group mb-6 flex items-center justify-between gap-4 rounded-2xl border border-brand-red-200 bg-gradient-to-r from-brand-red-50 to-white px-6 py-5 transition-shadow hover:shadow-md">
+        <Link href="/studio/courses" className="group mb-6 flex items-center justify-between gap-4 rounded-2xl border border-brand-red-200 bg-gradient-to-r from-brand-red-50 to-white px-6 py-5 transition-shadow hover:shadow-md">
           <div className="flex items-center gap-4"><div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-red-600"><svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3.75 3.75 0 01-5.303 0l-.347-.347z" /></svg></div><div><p className="text-sm font-bold text-slate-900">AI Course Builder</p><p className="mt-0.5 text-xs text-slate-500">Describe what you need — the unified builder creates courses with lessons, quizzes, content, media, assessments and compliance tools.</p></div></div>
           <span className="whitespace-nowrap text-sm font-bold text-brand-red-600 group-hover:underline">Open Builder →</span>
         </Link>

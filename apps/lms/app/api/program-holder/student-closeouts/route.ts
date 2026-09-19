@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     .maybeSingle();
   if (!enrollment || !ctx.programIds.includes(enrollment.program_id))
     return NextResponse.json(
-      { error: 'This student is not in your HVAC roster.' },
+      { error: 'This student is not in your assigned program roster.' },
       { status: 403 },
     );
   const { error } = await ctx.db
@@ -96,9 +96,9 @@ export async function POST(request: Request) {
   await ctx.db.from('hour_entries').insert({
     user_id: enrollment.user_id,
     program_holder_id: ctx.holderId,
-    program_slug: enrollment.program_slug || 'hvac-technician',
+    program_slug: enrollment.program_slug || 'assigned-program',
     source_type: 'program_holder_student_closeout',
-    source_entity_name: 'HVAC student completion closeout',
+    source_entity_name: 'Program student completion closeout',
     work_date: end,
     hours_claimed: hours,
     category: 'student_closeout',

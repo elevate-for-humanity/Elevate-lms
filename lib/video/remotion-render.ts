@@ -110,6 +110,10 @@ export interface StoryboardRenderInput {
   courseTitle: string;
   storyboard: MediaStoryboard;
   instructorId?: string;
+  preRollUrl?: string | null;
+  preRollDurationSeconds?: number;
+  postRollUrl?: string | null;
+  postRollDurationSeconds?: number;
 }
 
 function enabled(value: string | undefined): boolean {
@@ -764,9 +768,17 @@ export async function renderStoryboardVideo(
       surfaceMode: 'bright',
       logoText: 'Elevate LMS',
       openingImageUrl,
+      preRollUrl: normalizeRemotionMediaUrl(input.preRollUrl),
+      preRollDurationFrames: input.preRollUrl
+        ? Math.ceil(Math.max(1, input.preRollDurationSeconds ?? 5) * STORYBOARD_RENDER_FPS)
+        : 0,
+      postRollUrl: normalizeRemotionMediaUrl(input.postRollUrl),
+      postRollDurationFrames: input.postRollUrl
+        ? Math.ceil(Math.max(1, input.postRollDurationSeconds ?? 5) * STORYBOARD_RENDER_FPS)
+        : 0,
     };
     const totalFrames =
-      STORYBOARD_RENDER_FPS * 5 +
+      (props.preRollDurationFrames ?? 0) + (props.postRollDurationFrames ?? 0) + STORYBOARD_RENDER_FPS * 5 +
       normalizedScenes.reduce((sum, scene) => sum + scene.durationFrames, 0);
     const bundleUrl = await getBundleUrl();
     const { renderMedia, selectComposition } = await import('@remotion/renderer');

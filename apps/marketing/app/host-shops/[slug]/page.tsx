@@ -118,7 +118,9 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const featuredFallbackImages = (featuredFallback?.media ?? [])
     .filter((media) => media.kind !== 'video')
     .map((media) => ({ url: media.src, alt: media.alt }));
-  const featuredFallbackVideo = featuredFallback?.media?.find((media) => media.kind === 'video')?.src;
+  const featuredFallbackVideoMedia = featuredFallback?.media?.find((media) => media.kind === 'video');
+  const featuredFallbackVideo = featuredFallbackVideoMedia?.src;
+  const videoScript = featuredFallbackVideoMedia?.script;
   const items = dedupeMedia([
     ...gallery,
     ...(profile.logo_url ? [{ url: profile.logo_url, alt: `${approved.name} logo`, source: profile.source_url || externalUrl || undefined }] : []),
@@ -147,7 +149,13 @@ export default async function HostShopProfilePage({ params }: PageProps) {
     <main className="overflow-x-hidden bg-white text-slate-950">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
 
-      <section className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-50">
+      <section
+        className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-50"
+        data-scroll-narration={videoScript ? '' : undefined}
+        data-narration={videoScript}
+        data-narration-rate={videoScript ? '0.82' : undefined}
+        data-narration-style={videoScript ? 'instructor' : undefined}
+      >
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-12 lg:py-16">
           <div className="min-w-0">
             <p className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-800"><ShieldCheck className="h-4 w-4" /> Approved Elevate apprenticeship Host Site</p>
@@ -166,6 +174,17 @@ export default async function HostShopProfilePage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {videoScript ? (
+        <section className="border-b border-slate-200 bg-white px-4 py-5 sm:px-6">
+          <details className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+            <summary className="cursor-pointer text-sm font-black text-brand-blue-900">
+              Read the {approved.name} guided tour script
+            </summary>
+            <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-700">{videoScript}</p>
+          </details>
+        </section>
+      ) : null}
 
       <section className="px-4 py-10 sm:px-6 sm:py-14">
         <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">

@@ -651,6 +651,10 @@ export async function POST(req: NextRequest) {
   });
   const tenantId = creditOwner.tenantId ?? null;
   const scopeKey = tenantId ? `tenant:${tenantId}` : 'platform';
+  const studioConversationId =
+    typeof body.studioConversationId === 'string' && body.studioConversationId.trim()
+      ? body.studioConversationId.trim()
+      : null;
 
   if (body.dryRun === true) {
     const { data: cachedArtifact } = await db
@@ -729,6 +733,32 @@ export async function POST(req: NextRequest) {
     throw error;
   }
 
+  const taskCorrelationId = crypto.randomUUID();
+  const { data: studioTask } = await db
+    .from('ai_tasks')
+    .insert({
+      task_id: taskCorrelationId,
+      title: `Build course: ${title}`,
+      description: 'Course Builder generation owned by the unified Studio conversation',
+      command: topic,
+      status: 'running',
+      priority: 'medium',
+      requested_by: auth.id,
+      created_by: auth.id,
+      user_id: auth.id,
+      tenant_id: tenantId,
+      agent_type: 'LIZZY',
+      intent: 'course_builder',
+      correlation_id: taskCorrelationId,
+      conversation_id: studioConversationId,
+      tool_name: 'build_course',
+      payload: { title, topic, programId, sourceTaskId: body.studioTaskId || null },
+      metadata: { source: '/api/admin/course-builder', unifiedStudio: true },
+      started_at: new Date().toISOString(),
+    })
+    .select('id')
+    .maybeSingle();
+
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
@@ -782,6 +812,20 @@ export async function POST(req: NextRequest) {
         if (!result.ok) {
           await refundReservation(generationReservation, auth.id, 'course_generation_failed');
         }
+        if (studioTask?.id) {
+          await db.from('ai_tasks').update({
+            status: result.ok ? 'completed' : 'failed',
+            result_json: {
+              courseId: result.courseId ?? null,
+              modulesGenerated: result.moduleCount ?? 0,
+              lessonsGenerated: result.lessonCount ?? 0,
+              completionState: result.completionState,
+            },
+            error_message: result.ok ? null : (result.errors ?? []).join('; '),
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }).eq('id', studioTask.id);
+        }
         write({
           stage: 'complete',
           result: {
@@ -800,6 +844,14 @@ export async function POST(req: NextRequest) {
         });
       } catch (error) {
         await refundReservation(generationReservation, auth.id, 'course_generation_exception');
+        if (studioTask?.id) {
+          await db.from('ai_tasks').update({
+            status: 'failed',
+            error_message: error instanceof Error ? error.message : 'Course generation failed',
+            completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }).eq('id', studioTask.id);
+        }
         logger.error('[course-builder] Course Factory error', error);
         write({
           stage: 'error',

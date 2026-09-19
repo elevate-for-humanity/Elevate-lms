@@ -97,7 +97,7 @@ export function ProgramHolderStudentCloseoutForm({ enrollments }: { enrollments:
           </label>
           <label className="flex items-center gap-3 rounded-lg border bg-white p-3 text-sm font-bold">
             <input name="practical_skills_verified" value="true" type="checkbox" required />{' '}
-            Practical HVAC skills verified
+            Practical program skills verified
           </label>
           <label className="flex items-center gap-3 rounded-lg border bg-white p-3 text-sm font-bold">
             <input name="certificate_received" value="true" type="checkbox" required /> Certificate

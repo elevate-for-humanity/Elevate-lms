@@ -105,7 +105,7 @@ const capabilities = [
       'Understand potential WIOA, Workforce Ready Grant, and other workforce funding pathways before enrollment.',
     icon: CheckCircle2,
     href: '/funding',
-    image: '/images/pages/funding-impact-1.webp',
+    image: '/images/pages/about-funding-nav.webp',
     imageAlt:
       'WIOA and Workforce Ready Grant funding navigation for career training in Indiana',
   },

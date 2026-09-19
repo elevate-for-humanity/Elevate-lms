@@ -9,6 +9,12 @@ const workspace = fs.readFileSync(
 const guard = fs.readFileSync(path.resolve('lib/auth/require-program-holder.ts'), 'utf8');
 const payment = fs.readFileSync(path.resolve('lib/program-holder/release-payment.ts'), 'utf8');
 const mou = fs.readFileSync(path.resolve('apps/lms/app/program-holder/sign-mou/page.tsx'), 'utf8');
+const holderData = fs.readFileSync(path.resolve('lib/program-holder/workspace.ts'), 'utf8');
+const callList = fs.readFileSync(path.resolve('components/program-holder/CallListPanel.tsx'), 'utf8');
+const closeout = fs.readFileSync(
+  path.resolve('components/program-holder/ProgramHolderStudentCloseoutForm.tsx'),
+  'utf8',
+);
 
 describe('program-holder dashboard hero', () => {
   it('uses the account image before a program-specific fallback', () => {
@@ -36,5 +42,19 @@ describe('program-holder dashboard hero', () => {
     expect(payment).not.toContain('HVAC training payment');
     expect(mou).not.toContain('INDY ON DEMAND SERVICES LLC');
     expect(mou).toContain("from('program_holder_programs')");
+  });
+
+  it('requires every roster row to belong to an assigned program and learner role', () => {
+    expect(holderData).toContain(".in('program_id', programIds)");
+    expect(holderData).toContain("['student', 'learner', 'apprentice'].includes");
+    expect(holderData).toContain('eligibleRosterUserIds.has(row.user_id)');
+    expect(holderData).not.toContain("'pending',\n        'applied'");
+  });
+
+  it('does not label shared dashboard tools as HVAC-only', () => {
+    expect(callList).toContain('Program applicants');
+    expect(callList).not.toContain('HVAC applicants');
+    expect(closeout).toContain('Practical program skills verified');
+    expect(closeout).not.toContain('Practical HVAC skills verified');
   });
 });

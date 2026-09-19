@@ -5,6 +5,7 @@ import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
 import { ensureComposableSiteConfig, sanitizePages } from '@/lib/tenant/site-composition';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { buildLicensedAssetProjectPolicy } from '@/lib/media/licensed-asset-policy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -93,7 +94,14 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
   const siteName = typeof body.siteName === 'string' && body.siteName.trim() ? body.siteName.trim().slice(0, 120) : 'My Website';
   const fallback = buildDefaultSiteConfig({ organizationName: siteName, contactEmail: user.email || undefined });
-  const config = normalizeProvidedConfig(body.siteConfig, fallback);
+  const normalizedConfig = normalizeProvidedConfig(body.siteConfig, fallback);
+  const config = ensureComposableSiteConfig({
+    ...normalizedConfig,
+    meta: {
+      ...(normalizedConfig.meta || {}),
+      licensedAssetPolicy: buildLicensedAssetProjectPolicy({ consumer: 'website_builder', plan }),
+    },
+  });
   const payload = { user_id: user.id, site_name: siteName, template_id: config.template.id, site_config: config, is_published: false, status: 'draft', updated_at: new Date().toISOString() };
 
   const query = reusable?.id

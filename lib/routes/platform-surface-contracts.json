@@ -125,8 +125,17 @@
       "canonical": { "app": "admin", "path": "/testing-center" }
     },
     "courseBuilder": {
-      "function": "Create and manage course content",
-      "canonical": { "app": "admin", "path": "/course-builder" },
+      "function": "Create, govern, review, and publish course content",
+      "canonical": { "app": "admin", "path": "/studio/courses" },
+      "compatibility": [
+        { "app": "admin", "path": "/course-builder", "target": "/studio/courses" },
+        { "app": "admin", "path": "/course-studio", "target": "/studio/courses" }
+      ],
+      "operational": [
+        { "app": "admin", "path": "/studio/courses/[courseId]", "purpose": "Course-specific editing studio" },
+        { "app": "admin", "path": "/studio/courses/bulk-operations", "purpose": "Bulk course operations" },
+        { "app": "admin", "path": "/studio/courses/lifecycle", "purpose": "Governance, versions, and SCORM" }
+      ],
       "informational": [
         { "app": "marketing", "path": "/store/course-builder", "purpose": "Public Store description that launches the Admin builder" }
       ]

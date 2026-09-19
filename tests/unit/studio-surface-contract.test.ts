@@ -155,7 +155,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(panel).toContain(
       "['Dev Studio core', health.execution?.ready ? 'ready' : 'unavailable']",
     );
-    expect(panel).toContain("['Repository writes'");
+    expect(panel).toContain("'Repository writes'");
     expect(panel).toContain('connected GitHub plugin is separate');
   });
 
@@ -302,7 +302,7 @@ describe('Admin Dashboard and Studio surface contract', () => {
   it('does not duplicate the Course Builder under multiple program labels', () => {
     const programs = source('apps/admin/app/programs/page.tsx');
 
-    expect(programs.match(/href="\/course-builder"/g)).toHaveLength(1);
+    expect(programs.match(/href="\/studio\/courses"/g)).toHaveLength(1);
     expect(programs).not.toContain('>Program Builder<');
     expect(programs).toContain('>Course Library<');
   });

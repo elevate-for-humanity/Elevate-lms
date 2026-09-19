@@ -39,7 +39,43 @@ describe('Admin UI route consolidation', () => {
 
   it('keeps the canonical Studio and Course Builder entries', () => {
     expect(existsSync(path.join(root, 'apps/admin/app/studio/page.tsx'))).toBe(true);
+    expect(existsSync(path.join(root, 'apps/admin/app/studio/courses/page.tsx'))).toBe(true);
     expect(existsSync(path.join(root, 'apps/admin/app/course-builder/page.tsx'))).toBe(true);
+    expect(existsSync(path.join(root, 'apps/admin/app/course-studio/page.tsx'))).toBe(true);
+
+    const builderAlias = readFileSync(
+      path.join(root, 'apps/admin/app/course-builder/page.tsx'),
+      'utf8',
+    );
+    const studioAlias = readFileSync(
+      path.join(root, 'apps/admin/app/course-studio/page.tsx'),
+      'utf8',
+    );
+    expect(builderAlias).toContain("redirect('/studio/courses')");
+    expect(studioAlias).toContain("redirect('/studio/courses')");
+  });
+
+  it('declares one Course Builder authority and routes generated courses into it', () => {
+    const contracts = JSON.parse(
+      readFileSync(path.join(root, 'lib/routes/platform-surface-contracts.json'), 'utf8'),
+    );
+    const catalog = readFileSync(path.join(root, 'lib/platform/capability-catalog.ts'), 'utf8');
+    const automaticBuilder = readFileSync(
+      path.join(root, 'components/course/AutomaticCourseBuilder.tsx'),
+      'utf8',
+    );
+
+    expect(contracts.surfaces.courseBuilder.canonical.path).toBe('/studio/courses');
+    expect(contracts.surfaces.courseBuilder.compatibility).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/course-builder', target: '/studio/courses' }),
+        expect.objectContaining({ path: '/course-studio', target: '/studio/courses' }),
+      ]),
+    );
+    expect(catalog).toContain("adminHref: '/studio/courses'");
+    expect(catalog).not.toContain("adminHref: '/admin/dev-studio'");
+    expect(automaticBuilder).toContain('`/studio/courses/${result.course_id}`');
+    expect(automaticBuilder).not.toContain('`/curriculum/${result.course_id}`');
   });
 
   it('keeps course operations wired into the canonical builder', () => {

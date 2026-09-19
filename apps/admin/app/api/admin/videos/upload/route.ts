@@ -5,7 +5,6 @@ import { toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { resetCanonicalMediaJob } from '@/lib/course-factory/media-manager';
 import { queueCourseLessonVideos } from '@/lib/course-factory/media-service';
 
 export const runtime = 'nodejs';
@@ -32,28 +31,9 @@ type CourseUploadControl = {
 };
 
 async function queueLicensedLessonRender(courseId: string, lessonId: string) {
-  const db = await requireAdminClient();
-  const { data: existingJob, error } = await db
-    .from('video_jobs')
-    .select('id,status')
-    .eq('course_id', courseId)
-    .eq('lesson_id', lessonId)
-    .eq('asset_kind', 'lesson')
-    .is('asset_key', null)
-    .maybeSingle();
-  if (error) throw error;
-
-  if (existingJob) {
-    return resetCanonicalMediaJob(
-      { courseId, lessonId, assetKind: 'lesson', assetKey: null },
-      {
-        force: true,
-        sourceRepaired: true,
-        reason: 'Licensed lesson footage uploaded; rebuilding the canonical lesson video',
-      },
-    );
-  }
-
+  // Always pass through Course Factory. It refreshes the canonical job's
+  // locked narration policy as well as requeueing it; directly resetting a
+  // legacy job can preserve the obsolete Edge route that now returns 403.
   const queued = await queueCourseLessonVideos({
     courseId,
     lessonId,
@@ -63,7 +43,7 @@ async function queueLicensedLessonRender(courseId: string, lessonId: string) {
   if (queued.queued < 1 && queued.alreadyActive < 1 && queued.lessonVideosReady < 1) {
     throw new Error('Canonical lesson video job was not queued');
   }
-  return null;
+  return queued;
 }
 
 async function controlCourseUpload(
@@ -378,3 +358,14 @@ const _POST = withAuth(
         entityId: videoData.id,
         metadata: { file_name: file.name, category },
         req: request,
+      });
+
+      return NextResponse.json({ success: true, url: publicUrl, video: videoData });
+    } catch (error) {
+      return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
+    }
+  },
+  { roles: ['admin'] },
+);
+
+export const POST = withApiAudit('/api/admin/videos/upload', _POST);

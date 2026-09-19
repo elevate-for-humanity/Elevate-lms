@@ -111,8 +111,11 @@ export function ScrollNarrator() {
     );
     setHasNarration(narrationSections.length > 0);
     if (!enabled) return;
-    const frame = window.requestAnimationFrame(() => void narrateVisibleSection());
-    return () => window.cancelAnimationFrame(frame);
+    // Give the page and opening visual time to settle before narration begins.
+    // This prevents the hero, route transition, and first scroll section from
+    // competing to speak during initial render.
+    const timer = window.setTimeout(() => void narrateVisibleSection(), 1400);
+    return () => window.clearTimeout(timer);
   }, [enabled, narrateVisibleSection, pathname, stop]);
 
   useEffect(() => {
@@ -160,24 +163,25 @@ export function ScrollNarrator() {
   }, [enabled, pathname, prepare]);
 
   useEffect(() => {
-    let frame = 0;
+    let timer = 0;
     const synchronizeNarrationToScroll = () => {
-      if (!enabled || frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
+      if (!enabled) return;
+      window.clearTimeout(timer);
+      // Wait until scrolling settles so adjacent section scripts never fire
+      // over one another during a fast swipe.
+      timer = window.setTimeout(() => {
         const current = lastNarrationRef.current?.section;
         const visible = mostVisiblePageSection();
-        if (visible === current) return;
-        if (!visible) return;
+        if (!visible || visible === current) return;
         void narrateVisibleSection();
-      });
+      }, 850);
     };
 
     window.addEventListener('scroll', synchronizeNarrationToScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', synchronizeNarrationToScroll);
-      if (frame) window.cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
     };
   }, [enabled, narrateVisibleSection]);
 

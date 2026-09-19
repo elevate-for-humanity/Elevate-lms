@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { courseBuilderJsonHeaders } from '@/components/admin/course-builder/request';
 import { Bot, ExternalLink, Loader2, Mic2, PlayCircle, RefreshCw, Sparkles } from 'lucide-react';
-import VideoUploadClient from '@/apps/admin/app/videos/upload/VideoUploadClient';
+import Link from 'next/link';
 
 type Instructor = {
   id: string;
@@ -123,7 +123,6 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
   }
 
   return (
-    <>
     <section className="mb-5 overflow-hidden rounded-2xl border border-cyan-200 bg-gradient-to-br from-cyan-950 via-slate-950 to-violet-950 text-white shadow-xl">
       <div className="grid gap-0 lg:grid-cols-[280px_1fr]">
         <div className="relative min-h-72 bg-cyan-950">
@@ -208,28 +207,18 @@ export default function CourseInstructorMediaPanel({ courseId }: { courseId: str
         </div>
       </div>
     </section>
-    <section className="mb-5 rounded-2xl border border-slate-700 bg-slate-900 p-5 text-white">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">Purchased Media Library</p>
-          <h2 className="mt-1 text-xl font-black">Find, download, and attach purchased scenes</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
-            Open your Envato library in the Studio Browser, download the scene you purchased, then return here and upload it directly to the selected course and lesson.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <a href="https://app.envato.com/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-3 font-black text-slate-950 hover:bg-amber-300">
-            <ExternalLink className="h-4 w-4" /> Open purchased library
-          </a>
-          <a href="https://app.envato.com/search/stock-video" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-cyan-400 px-4 py-3 font-bold text-cyan-200 hover:bg-cyan-950">
-            <ExternalLink className="h-4 w-4" /> Find scenes
-          </a>
-        </div>
-      </div>
-      <div className="mt-6 rounded-2xl bg-white p-4 text-slate-950 sm:p-6">
-        <VideoUploadClient initialCourseId={courseId} embedded />
-      </div>
-    </section>
-    </>
+    <div className="mb-5 rounded-2xl border border-cyan-800 bg-slate-900 p-5 text-white">
+      <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">Course Builder plugin</p>
+      <h2 className="mt-1 text-xl font-black">Purchased Media</h2>
+      <p className="mt-2 text-sm text-slate-300">
+        Search your purchased scene library, download files, attach them to this course, and verify playback through the installed plugin.
+      </p>
+      <Link
+        href={`/studio/integrations/purchased-media?courseId=${encodeURIComponent(courseId)}`}
+        className="mt-4 inline-flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-3 font-black text-slate-950 hover:bg-amber-300"
+      >
+        <ExternalLink className="h-4 w-4" /> Open Purchased Media plugin
+      </Link>
+    </div>
   );
 }

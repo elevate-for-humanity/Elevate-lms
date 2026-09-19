@@ -8,6 +8,7 @@ import { getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
 import { refreshSecrets } from '@/lib/secrets';
 import { getGroqClient } from '@/lib/ai/groq-client';
 import { getOpenAIClient } from '@/lib/ai/openai-client';
+import { runWithPaidInferenceContext } from '@/lib/ai/paid-inference-context';
 
 interface IntegrityIssue {
   courseId: string;
@@ -122,8 +123,26 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   let aiMessage = 'Canonical AI provider is unavailable; manual editing remains available';
   if (aiAvailable) {
     try {
-      if (provider === 'groq') await getGroqClient().models.list();
-      else await getOpenAIClient().models.list();
+      if (provider === 'cloudflare') {
+        const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
+        const token = (process.env.CLOUDFLARE_AI_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN)?.trim();
+        if (!accountId || !token) throw new Error('Cloudflare Workers AI credentials are incomplete');
+        const response = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/models/search?per_page=1`,
+          { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(10_000) },
+        );
+        if (!response.ok) throw new Error(`Cloudflare provider returned ${response.status}`);
+      } else if (provider === 'groq') {
+        await runWithPaidInferenceContext(
+          `course-builder-health:${crypto.randomUUID()}`,
+          () => getGroqClient().models.list(),
+        );
+      } else if (provider === 'openai') {
+        await runWithPaidInferenceContext(
+          `course-builder-health:${crypto.randomUUID()}`,
+          () => getOpenAIClient().models.list(),
+        );
+      }
       aiVerified = true;
       aiMessage = `${provider} authenticated and reachable`;
     } catch (error) {

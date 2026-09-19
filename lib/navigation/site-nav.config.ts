@@ -142,6 +142,11 @@ export const headerNavigation: NavGroup[] = [
     label: 'For Employers',
     items: [
       {
+        label: 'Apply as an Employer Partner',
+        href: '/apply/employer',
+        description: 'Join the hiring and workforce partner network',
+      },
+      {
         label: 'Hire Talent',
         href: '/employers',
         description: 'Find job-ready candidates',
@@ -175,6 +180,11 @@ export const headerNavigation: NavGroup[] = [
         label: 'Become a Program Holder',
         href: '/apply/program-holder',
         description: 'Apply to deliver training programs',
+      },
+      {
+        label: 'Apply as a Community or Workforce Partner',
+        href: '/partners/apply',
+        description: 'Start a documented partnership with Elevate',
       },
       {
         label: '🔥 License Platform',

@@ -2,46 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { DEFAULT_NAV, isNavSections, type NavItem, type NavSection } from '@/lib/admin/nav-config';
+import { DEFAULT_NAV, isNavSections, type NavSection } from '@/lib/admin/nav-config';
 import { safeError } from '@/lib/api/safe-error';
-
-const COURSE_BUILDER_ALIASES = new Set([
-  '/course-builder',
-  '/courses/builder',
-  '/studio/course-builder',
-  '/studio/courses/lifecycle',
-]);
 
 function normalizeAdminHref(href: string): string {
   if (href === '/') return '/';
   const withoutLegacyPrefix = href.replace(/^\/admin(?=\/|$)/, '');
-  const normalized = withoutLegacyPrefix.startsWith('/') ? withoutLegacyPrefix : `/${withoutLegacyPrefix}`;
-  return COURSE_BUILDER_ALIASES.has(normalized) ? '/studio/courses' : normalized;
+  return withoutLegacyPrefix.startsWith('/') ? withoutLegacyPrefix : `/${withoutLegacyPrefix}`;
 }
 
 function normalizeAdminNavSections(sections: NavSection[]): NavSection[] {
-  let courseBuilderClaimed = false;
-
-  return sections.map((section) => {
-    const items: NavItem[] = [];
-    const seenHrefs = new Set<string>();
-
-    for (const item of section.items) {
-      const href = normalizeAdminHref(item.href);
-      const isCourseBuilder = href === '/studio/courses';
-      if (seenHrefs.has(href) || (isCourseBuilder && courseBuilderClaimed)) continue;
-
-      seenHrefs.add(href);
-      if (isCourseBuilder) courseBuilderClaimed = true;
-      items.push({
-        ...item,
-        label: isCourseBuilder ? 'Course Builder' : item.label,
-        href,
-      });
-    }
-
-    return { ...section, href: normalizeAdminHref(section.href), items };
-  });
+  return sections.map((section) => ({
+    ...section,
+    href: normalizeAdminHref(section.href),
+    items: section.items.map((item) => ({ ...item, href: normalizeAdminHref(item.href) })),
+  }));
 }
 
 function mergeWithCanonicalNav(configured: NavSection[]): NavSection[] {

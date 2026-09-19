@@ -7,6 +7,8 @@ import { toErrorMessage } from '@/lib/safe';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// Keep provider credentials server-only; this route is the Course Builder boundary.
+
 const ENVATO_API = 'https://api.envato.com';
 const MAX_RESULTS = 100;
 

@@ -309,8 +309,9 @@ export async function POST(
     if (appUpdateError) throw appUpdateError;
 
     const accessLink = await secureAccessLink(db, email, identity.isNewUser);
-    const portalUrl = `${PORTAL_BASE}/program-holder/dashboard`;
-    const nextUrl = alreadySigned ? portalUrl : `${PORTAL_BASE}/program-holder/sign-mou`;
+    const portalUrl = `${PORTAL_BASE}/login?portal=program-holder&redirect=${encodeURIComponent('/program-holder/dashboard')}`;
+    const fallbackPath = alreadySigned ? '/program-holder/dashboard' : '/program-holder/sign-mou';
+    const nextUrl = `${PORTAL_BASE}/login?portal=program-holder&redirect=${encodeURIComponent(fallbackPath)}`;
     const subject = 'Approved: Gary Regional Site Coordinator — Dashboard Access & Required Onboarding | Elevate for Humanity';
     const result = await sendEmail({
       to: email,

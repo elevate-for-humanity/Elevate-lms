@@ -8,7 +8,10 @@ export type LicensedAssetConsumer =
   | 'course_builder'
   | 'website_builder'
   | 'store_builder'
-  | 'subscription_delivery';
+  | 'subscription_delivery'
+  | 'marketing_page'
+  | 'program_page'
+  | 'apprenticeship_page';
 
 export type LicensedAssetCategory =
   | 'stock_video'

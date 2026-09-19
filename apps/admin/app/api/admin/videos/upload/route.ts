@@ -59,7 +59,13 @@ const _POST = withAuth(
       const folder = isCourseVideo ? courseId || 'unassigned' : 'public';
       const storagePath = `${folder}/${Date.now()}-${cleanName(file.name)}`;
 
-      const { error: uploadError } = await db.storage.from(bucket).upload(storagePath, file, {
+      // Supabase's Node storage client expects bytes/Blob data. Passing the
+      // undici File returned by NextRequest.formData() is unreliable in the
+      // production runtime and was causing valid MP4 uploads to fail before an
+      // object was ever created.
+      const fileBytes = Buffer.from(await file.arrayBuffer());
+
+      const { error: uploadError } = await db.storage.from(bucket).upload(storagePath, fileBytes, {
         contentType: file.type,
         upsert: false,
       });
@@ -75,6 +81,7 @@ const _POST = withAuth(
             course_id: courseId || null,
             lesson_id: lessonId || null,
             storage_path: storagePath,
+            duration_seconds: null,
             generated_by: 'manual',
             status: 'ready',
             created_by: user.id,
@@ -92,6 +99,28 @@ const _POST = withAuth(
           .createSignedUrl(storagePath, 60 * 60);
         if (signedError || !signed?.signedUrl) {
           return NextResponse.json({ error: 'Course video saved but playback URL could not be created' }, { status: 500 });
+        }
+
+        // lesson_id is the durable association. The video worker resolves a
+        // fresh signed URL from this row at render time, so private licensed
+        // footage never depends on an expired URL stored in scene_data.
+        if (lessonId) {
+          const { error: lessonError } = await db
+            .from('course_lessons')
+            .update({
+              media_origin: 'licensed',
+              media_quality_status: 'pending_render',
+              video_status: 'queued',
+              video_error: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', lessonId)
+            .eq('course_id', courseId);
+          if (lessonError) {
+            await db.from('course_videos').delete().eq('id', videoData.id);
+            await db.storage.from(bucket).remove([storagePath]);
+            return NextResponse.json({ error: 'Video uploaded but lesson linking failed' }, { status: 500 });
+          }
         }
 
         await logAdminAudit({

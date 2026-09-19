@@ -11,7 +11,13 @@ export type LicensedAssetConsumer =
   | 'subscription_delivery'
   | 'marketing_page'
   | 'program_page'
-  | 'apprenticeship_page';
+  | 'apprenticeship_page'
+  | 'admin_dashboard'
+  | 'program_holder_dashboard'
+  | 'host_shop_dashboard'
+  | 'apprentice_dashboard'
+  | 'learner_dashboard'
+  | 'instructor_dashboard';
 
 export type LicensedAssetCategory =
   | 'stock_video'

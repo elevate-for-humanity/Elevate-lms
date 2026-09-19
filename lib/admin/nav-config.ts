@@ -120,7 +120,7 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Program Administration', href: '/programs' },
       { label: 'Create Program', href: '/programs/new' },
       { label: 'Programs — Catalog', href: '/programs/catalog' },
-      { label: 'Studio', href: '/studio' },
+      { label: 'Course Builder', href: '/studio/courses' },
       { label: 'All Courses', href: '/courses' },
       { label: 'Career Courses', href: '/career-courses' },
       { label: 'Modules', href: '/modules' },

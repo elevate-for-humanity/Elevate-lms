@@ -2,11 +2,19 @@ name: Process approved course video queues
 
 on:
   workflow_dispatch:
+  schedule:
+    # Recovery sweep for durable queued jobs. Concurrency below prevents
+    # overlapping production drains when a manual or push run is active.
+    - cron: '17 * * * *'
   push:
     branches: [main]
     paths:
       - '.github/workflows/video-queue-kick.yml'
       - '.github/video-queue-trigger'
+      - 'lib/video/**'
+      - 'lib/course-factory/media-service.ts'
+      - 'lib/course-builder/licensed-media.ts'
+      - 'remotion-src/**'
 
 permissions:
   contents: read
@@ -32,7 +40,9 @@ jobs:
       ADMIN_URL: ${{ secrets.ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
       CRON_SECRET: ${{ secrets.CRON_SECRET }}
       COURSE_ID: ${{ matrix.course_id }}
-      REQUIRED_ADMIN_SHA: '2f89dd216546f0a37b31273d3c0bec31703a3843'
+      # A push/manual run must render only after its exact Admin release is
+      # serving. Scheduled recovery runs use the latest main SHA automatically.
+      REQUIRED_ADMIN_SHA: ${{ github.sha }}
     steps:
       - name: Wait for the approved Admin media planner release
         shell: bash

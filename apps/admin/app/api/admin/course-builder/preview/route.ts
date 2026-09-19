@@ -143,6 +143,10 @@ export async function GET(request: NextRequest) {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'private, no-store, max-age=0',
       'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+      // This authenticated HTML endpoint is intentionally embedded only by the
+      // same-origin Course Studio. Override any inherited DENY header without
+      // weakening framing policy for the rest of Admin.
+      'X-Frame-Options': 'SAMEORIGIN',
       'X-Content-Type-Options': 'nosniff',
       'Referrer-Policy': 'no-referrer',
     },

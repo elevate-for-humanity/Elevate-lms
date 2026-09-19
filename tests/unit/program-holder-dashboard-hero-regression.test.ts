@@ -24,10 +24,10 @@ describe('program-holder dashboard hero', () => {
     expect(workspace).toContain("getProgramCardImage(programSlug || 'business-administration')");
   });
 
-  it('uses Jozanna George for Mesmerized by Beauty', () => {
-    expect(workspace).toContain(
-      "'4bc589d3-bd39-4a50-a724-73e50506c1f1': '/images/jozanna-george.jpg'",
-    );
+  it('uses the holder profile image without hard-coded account identities', () => {
+    expect(workspace).toContain('resolveDashboardHero(data.profile?.avatar_url');
+    expect(workspace).toContain('if (avatarUrl?.trim())');
+    expect(workspace).not.toContain('4bc589d3-bd39-4a50-a724-73e50506c1f1');
   });
 
   it('does not force the HVAC image onto unrelated dashboards', () => {

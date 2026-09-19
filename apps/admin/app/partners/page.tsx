@@ -67,7 +67,7 @@ export default async function PartnersPage() {
     const linkedShops = (canonicalShops || []).filter((row: any) => row.partner_id === partner.id).length;
     const previewUserId = (hostUsers || []).find((row: any) => row.partner_id === partner.id)?.user_id ?? null;
     const complete = requirements.length > 0 && missing.length === 0 && partner.mou_signed === true && partner.onboarding_completed === true && linkedUsers > 0 && linkedShops > 0;
-    return { partner, requirements, missing, linkedUsers, linkedShops, previewUserId, complete };
+    return { partner, program, requirements, missing, linkedUsers, linkedShops, previewUserId, complete };
   });
 
   return (
@@ -94,7 +94,7 @@ export default async function PartnersPage() {
           </div>
           <div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm">
             <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-700"><tr><th className="px-5 py-3">Host Shop</th><th className="px-5 py-3">Portal links</th><th className="px-5 py-3">Documents</th><th className="px-5 py-3">MOU</th><th className="px-5 py-3">Onboarding</th><th className="px-5 py-3">Readiness</th><th className="px-5 py-3">Dashboard</th></tr></thead>
-            <tbody className="divide-y divide-slate-200">{hostReadiness.map(({ partner, requirements, missing, linkedUsers, linkedShops, previewUserId, complete }: any) => (
+            <tbody className="divide-y divide-slate-200">{hostReadiness.map(({ partner, program, requirements, missing, linkedUsers, linkedShops, previewUserId, complete }: any) => (
               <tr key={partner.id} className={complete ? 'bg-white' : 'bg-red-50/40'}>
                 <td className="px-5 py-4"><p className="font-black text-slate-950">{partner.name}</p><p className="mt-1 text-xs font-medium text-slate-600">{partner.contact_email || 'No contact email'}</p></td>
                 <td className="px-5 py-4"><StatusLine ok={linkedUsers > 0}>{linkedUsers ? `${linkedUsers} account link${linkedUsers === 1 ? '' : 's'}` : 'Account link missing'}</StatusLine><StatusLine ok={linkedShops > 0}>{linkedShops ? `${linkedShops} shop record${linkedShops === 1 ? '' : 's'}` : 'Shop record missing'}</StatusLine></td>

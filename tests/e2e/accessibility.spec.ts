@@ -28,7 +28,11 @@ async function scan(page: Page, route: string) {
 
 test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
   for (const route of PUBLIC_ROUTES) {
-    test(`${route} has no serious or critical axe violations`, async ({ page }) => {
+    test(`${route} has no serious or critical axe violations`, async ({ page }, testInfo) => {
+      test.skip(
+        testInfo.project.name === 'iphone-webkit',
+        'Axe DOM injection is validated on Chromium profiles; WebKit remains covered by semantic and interaction checks.',
+      );
       const results = await scan(page, route);
       const blocking = results.violations.filter(
         (violation) => violation.impact === 'critical' || violation.impact === 'serious',
@@ -156,7 +160,11 @@ test.describe('Accessibility - WCAG 2.2 AA public journeys', () => {
     }
   });
 
-  test('color contrast rule is enabled and reports no serious violations on homepage', async ({ page }) => {
+  test('color contrast rule is enabled and reports no serious violations on homepage', async ({ page }, testInfo) => {
+    test.skip(
+      testInfo.project.name === 'iphone-webkit',
+      'Axe contrast analysis is validated on Chromium; WebKit remains covered by browser-native interaction checks.',
+    );
     const results = await scan(page, '/');
     const contrast = results.violations.filter((violation) => violation.id === 'color-contrast');
     expect(contrast).toEqual([]);

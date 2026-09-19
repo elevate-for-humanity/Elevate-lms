@@ -437,6 +437,29 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       }
       preRollUrl = signedPreRoll.signedUrl;
     }
+    const { data: postRollVideo, error: postRollError } = await db
+      .from('course_videos')
+      .select('id,storage_path,title,duration_seconds,sequence_index,created_at')
+      .eq('course_id', job.course_id)
+      .eq('lesson_id', job.lesson_id)
+      .eq('asset_role', 'lesson_outro')
+      .eq('status', 'ready')
+      .not('storage_path', 'is', null)
+      .order('sequence_index', { ascending: true })
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (postRollError) throw new Error(`POSTROLL_LOOKUP_FAILED:${postRollError.message}`);
+    let postRollUrl: string | null = null;
+    if (postRollVideo?.storage_path) {
+      const { data: signedPostRoll, error: signedPostRollError } = await db.storage
+        .from('course_videos')
+        .createSignedUrl(postRollVideo.storage_path, 60 * 60 * 6);
+      if (signedPostRollError || !signedPostRoll?.signedUrl) {
+        throw new Error(`POSTROLL_SIGN_FAILED:${signedPostRollError?.message ?? 'missing signed URL'}`);
+      }
+      postRollUrl = signedPostRoll.signedUrl;
+    }
     const videoConfig =
       lesson?.video_config && typeof lesson.video_config === 'object'
         ? (lesson.video_config as Record<string, unknown>)
@@ -866,6 +889,9 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       preRollUrl,
       preRollDurationSeconds:
         typeof preRollVideo?.duration_seconds === 'number' ? preRollVideo.duration_seconds : 5,
+      postRollUrl,
+      postRollDurationSeconds:
+        typeof postRollVideo?.duration_seconds === 'number' ? postRollVideo.duration_seconds : 5,
     });
     if (!result.success || !result.videoUrl) {
       throw new Error(result.error ?? 'Render returned no playable video URL');

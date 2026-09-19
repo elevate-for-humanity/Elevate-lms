@@ -68,6 +68,9 @@ export interface SlideLessonProps {
   /** Optional approved course/lesson pre-roll, placed before the branded card. */
   preRollUrl?: string | null;
   preRollDurationFrames?: number;
+  /** Optional approved lesson outro, placed after the branded completion card. */
+  postRollUrl?: string | null;
+  postRollDurationFrames?: number;
 }
 
 // ââ Constants âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -740,6 +743,7 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
     offset += scene.durationFrames;
   }
   const preRollFrames = props.preRollUrl ? Math.max(1, props.preRollDurationFrames ?? 75) : 0;
+  const postRollFrames = props.postRollUrl ? Math.max(1, props.postRollDurationFrames ?? 75) : 0;
 
   return (
     <AbsoluteFill>
@@ -772,6 +776,15 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
       <Sequence from={preRollFrames + INTRO_FRAMES + offset} durationInFrames={OUTRO_FRAMES}>
         <BrandedOutro props={props} frame={frame} />
       </Sequence>
+
+      {props.postRollUrl && (
+        <Sequence
+          from={preRollFrames + INTRO_FRAMES + offset + OUTRO_FRAMES}
+          durationInFrames={postRollFrames}
+        >
+          <Video src={props.postRollUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </Sequence>
+      )}
     </AbsoluteFill>
   );
 }
@@ -782,6 +795,7 @@ export function SlideLesson(props: SlideLessonProps & Record<string, unknown>) {
 export function calcSlideLessonFrames(
   scenes: Pick<SceneData, 'durationFrames'>[],
   preRollDurationFrames = 0,
+  postRollDurationFrames = 0,
 ): number {
-  return preRollDurationFrames + INTRO_FRAMES + scenes.reduce((sum, s) => sum + s.durationFrames, 0) + OUTRO_FRAMES;
+  return preRollDurationFrames + INTRO_FRAMES + scenes.reduce((sum, s) => sum + s.durationFrames, 0) + OUTRO_FRAMES + postRollDurationFrames;
 }

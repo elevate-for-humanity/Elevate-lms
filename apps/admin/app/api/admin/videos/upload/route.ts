@@ -14,6 +14,13 @@ export const dynamic = 'force-dynamic';
 
 const MAX_BYTES = 200 * 1024 * 1024;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const COURSE_VIDEO_ROLES = new Set([
+  'source_broll',
+  'course_preroll',
+  'lesson_preroll',
+  'lesson_outro',
+  'reference',
+]);
 
 function cleanName(name: string) {
   return name.replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/-+/g, '-');
@@ -94,6 +101,9 @@ async function controlCourseUpload(
       { error: 'A valid title, courseId, and lessonId are required' },
       { status: 400 },
     );
+  }
+  if (!COURSE_VIDEO_ROLES.has(assetRole)) {
+    return NextResponse.json({ error: 'Unsupported course video placement role' }, { status: 400 });
   }
 
   const db = await requireAdminClient();

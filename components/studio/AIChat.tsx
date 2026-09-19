@@ -56,10 +56,11 @@ interface AIChatProps {
   ellieMode?: boolean;
 }
 
-type ProviderId = 'auto' | 'groq' | 'openai' | 'anthropic' | 'gemini';
+type ProviderId = 'auto' | 'xai' | 'groq' | 'openai' | 'anthropic' | 'gemini';
 
 const MODEL_OPTIONS: Record<ProviderId, string[]> = {
   auto: ['auto'],
+  xai: ['grok-4.6'],
   groq: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
   openai: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'],
   anthropic: ['claude-sonnet-4-5', 'claude-3-5-haiku-latest'],
@@ -68,6 +69,7 @@ const MODEL_OPTIONS: Record<ProviderId, string[]> = {
 
 const PROVIDER_LABELS: Record<ProviderId, string> = {
   auto: 'Auto',
+  xai: 'Grok / xAI',
   groq: 'Groq',
   openai: 'ChatGPT / OpenAI',
   anthropic: 'Claude / Anthropic',
@@ -493,6 +495,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
   const [aiProvider, setAiProvider] = useState<string>('');
   const [availableProviders, setAvailableProviders] = useState<Record<ProviderId, boolean>>({
     auto: true,
+    xai: false,
     groq: false,
     openai: false,
     anthropic: false,
@@ -514,6 +517,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
         const data = await res.json();
         const providers = {
           auto: true,
+          xai: Boolean(data?.hasXAI ?? data?.availableProviders?.xai),
           groq: Boolean(data?.hasGroq ?? data?.availableProviders?.groq),
           openai: Boolean(data?.hasOpenAI ?? data?.availableProviders?.openai),
           anthropic: Boolean(data?.hasAnthropic ?? data?.availableProviders?.anthropic),
@@ -522,6 +526,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
         setAvailableProviders((prev) => ({ ...prev, ...providers }));
         const configured =
           data?.aiConfigured === true ||
+          providers.xai ||
           providers.groq ||
           providers.openai ||
           providers.anthropic ||
@@ -529,6 +534,7 @@ export default function AIChat({ fileContext, onApplyCode, ellieMode = false }: 
         if (configured) {
           setAiStatus('ready');
           const names = [
+            providers.xai && 'Grok',
             providers.groq && 'Groq',
             providers.openai && 'OpenAI',
             providers.anthropic && 'Anthropic',

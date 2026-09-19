@@ -45,8 +45,15 @@ export async function GET(req: NextRequest) {
       supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'student'),
       supabase.from('applications').select('id', { count: 'exact', head: true }),
       supabase.from('enrollments').select('id', { count: 'exact', head: true }),
-      supabase.from('programs').select('id', { count: 'exact', head: true }).eq('published', true).eq('is_active', true),
-      supabase.from('applications').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+      supabase
+        .from('programs')
+        .select('id', { count: 'exact', head: true })
+        .eq('published', true)
+        .eq('is_active', true),
+      supabase
+        .from('applications')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
       supabase.from('program_completion_certificates').select('id', { count: 'exact', head: true }),
     ]);
 
@@ -57,33 +64,50 @@ export async function GET(req: NextRequest) {
     let groqFromDb = false;
     let geminiFromDb = false;
     let openaiFromDb = false;
+    let xaiFromDb = false;
     try {
       const { data: secretRows } = await supabase
         .from('platform_secrets')
         .select('key, value_enc')
-        .in('key', ['GROQ_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY']);
+        .in('key', ['XAI_API_KEY', 'GROQ_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY']);
       for (const row of secretRows ?? []) {
-        if (row.key === 'GROQ_API_KEY'   && row.value_enc?.length > 10) groqFromDb   = true;
-        if (row.key === 'GEMINI_API_KEY'  && row.value_enc?.length > 10) geminiFromDb = true;
-        if (row.key === 'OPENAI_API_KEY'  && row.value_enc?.length > 10) openaiFromDb = true;
+        if (row.key === 'GROQ_API_KEY' && row.value_enc?.length > 10) groqFromDb = true;
+        if (row.key === 'GEMINI_API_KEY' && row.value_enc?.length > 10) geminiFromDb = true;
+        if (row.key === 'OPENAI_API_KEY' && row.value_enc?.length > 10) openaiFromDb = true;
+        if (row.key === 'XAI_API_KEY' && row.value_enc?.length > 10) xaiFromDb = true;
       }
-    } catch { /* non-fatal — fall back to process.env only */ }
+    } catch {
+      /* non-fatal — fall back to process.env only */
+    }
 
     const aiProviders = {
-      groq:   isGroqConfigured()   || groqFromDb,
+      xai: !!process.env.XAI_API_KEY || xaiFromDb,
+      groq: isGroqConfigured() || groqFromDb,
       gemini: isGeminiConfigured() || geminiFromDb,
       openai: !!process.env.OPENAI_API_KEY || openaiFromDb,
     };
-    const activeAiProvider = aiProviders.groq ? 'groq' : aiProviders.gemini ? 'gemini' : aiProviders.openai ? 'openai' : 'none';
+    const requestedProvider = process.env.AI_PROVIDER?.toLowerCase();
+    const activeAiProvider =
+      requestedProvider && aiProviders[requestedProvider as keyof typeof aiProviders]
+        ? requestedProvider
+        : aiProviders.xai
+          ? 'xai'
+          : aiProviders.groq
+            ? 'groq'
+            : aiProviders.gemini
+              ? 'gemini'
+              : aiProviders.openai
+                ? 'openai'
+                : 'none';
 
     // System status summary
-    const systemStatus = SYSTEMS.map(s => ({ id: s.id, name: s.name, status: s.status }));
+    const systemStatus = SYSTEMS.map((s) => ({ id: s.id, name: s.name, status: s.status }));
 
     // Debt summary
     const debtByseverity = {
-      high: PLATFORM_DEBT.filter(d => d.severity === 'high').length,
-      medium: PLATFORM_DEBT.filter(d => d.severity === 'medium').length,
-      low: PLATFORM_DEBT.filter(d => d.severity === 'low').length,
+      high: PLATFORM_DEBT.filter((d) => d.severity === 'high').length,
+      medium: PLATFORM_DEBT.filter((d) => d.severity === 'medium').length,
+      low: PLATFORM_DEBT.filter((d) => d.severity === 'low').length,
     };
 
     const state = {
@@ -99,8 +123,12 @@ export async function GET(req: NextRequest) {
       },
       platform: {
         active_students: count(studentsRes as PromiseSettledResult<{ count: number | null }>),
-        total_applications: count(applicationsRes as PromiseSettledResult<{ count: number | null }>),
-        pending_applications: count(pendingAppsRes as PromiseSettledResult<{ count: number | null }>),
+        total_applications: count(
+          applicationsRes as PromiseSettledResult<{ count: number | null }>,
+        ),
+        pending_applications: count(
+          pendingAppsRes as PromiseSettledResult<{ count: number | null }>,
+        ),
         total_enrollments: count(enrollmentsRes as PromiseSettledResult<{ count: number | null }>),
         published_programs: count(programsRes as PromiseSettledResult<{ count: number | null }>),
         certificates_issued: count(activeCertRes as PromiseSettledResult<{ count: number | null }>),
@@ -109,7 +137,7 @@ export async function GET(req: NextRequest) {
       debt: {
         total_items: PLATFORM_DEBT.length,
         by_severity: debtByseverity,
-        top_issues: PLATFORM_DEBT.filter(d => d.severity === 'high').map(d => d.id),
+        top_issues: PLATFORM_DEBT.filter((d) => d.severity === 'high').map((d) => d.id),
       },
       last_audit: '2026-05-17',
       db_health: 'healthy',

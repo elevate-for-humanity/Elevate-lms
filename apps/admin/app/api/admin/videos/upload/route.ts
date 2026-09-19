@@ -6,6 +6,7 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { queueCourseLessonVideos } from '@/lib/course-factory/media-service';
+import { attachLicensedMediaUpload } from '@/lib/course-builder/licensed-media';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -28,6 +29,7 @@ type CourseUploadControl = {
   courseId?: string;
   lessonId?: string;
   storagePath?: string;
+  licensedMatchId?: string;
 };
 
 async function queueLicensedLessonRender(courseId: string, lessonId: string) {
@@ -162,6 +164,22 @@ async function controlCourseUpload(
       { status: 500 },
     );
   }
+  if (input.licensedMatchId) {
+    try {
+      await attachLicensedMediaUpload({
+        db,
+        matchId: input.licensedMatchId,
+        courseId,
+        lessonId,
+        courseVideoId: videoData.id,
+        actorId: userId,
+      });
+    } catch (matchError) {
+      await db.from('course_videos').delete().eq('id', videoData.id);
+      await db.storage.from('course_videos').remove([storagePath]);
+      return NextResponse.json({ error: toErrorMessage(matchError) }, { status: 400 });
+    }
+  }
   const { error: lessonError } = await db
     .from('course_lessons')
     .update({
@@ -203,7 +221,12 @@ async function controlCourseUpload(
     actorId: userId,
     entityType: 'course_videos',
     entityId: videoData.id,
-    metadata: { file_name: fileName, course_id: courseId, lesson_id: lessonId },
+    metadata: {
+      file_name: fileName,
+      course_id: courseId,
+      lesson_id: lessonId,
+      licensed_match_id: input.licensedMatchId ?? null,
+    },
     req: request,
   });
   return NextResponse.json({ success: true, url: signed.signedUrl, video: videoData });

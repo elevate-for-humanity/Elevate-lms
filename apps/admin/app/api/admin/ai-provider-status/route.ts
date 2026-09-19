@@ -29,16 +29,20 @@ export async function GET(request: NextRequest) {
   await hydrateProcessEnv();
 
   const groq = process.env.GROQ_API_KEY;
+  const xai = process.env.XAI_API_KEY;
   const gemini = process.env.GEMINI_API_KEY;
   const openai = process.env.OPENAI_API_KEY;
   const openhands = process.env.OPENHANDS_API_KEY;
 
-  const activeProvider = groq ? 'groq' : gemini ? 'gemini' : openai ? 'openai' : null;
+  const activeProvider =
+    process.env.AI_PROVIDER ||
+    (xai ? 'xai' : groq ? 'groq' : gemini ? 'gemini' : openai ? 'openai' : null);
 
   return NextResponse.json({
     activeProvider,
     keys: {
       GROQ_API_KEY: { set: Boolean(groq), masked: maskKey(groq) },
+      XAI_API_KEY: { set: Boolean(xai), masked: maskKey(xai) },
       GEMINI_API_KEY: { set: Boolean(gemini), masked: maskKey(gemini) },
       OPENAI_API_KEY: { set: Boolean(openai), masked: maskKey(openai) },
       OPENHANDS_API_KEY: { set: Boolean(openhands), masked: maskKey(openhands) },

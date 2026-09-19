@@ -17,16 +17,22 @@ type UploadResponse = {
 export default function VideoUploadClient({
   initialCourseId = '',
   embedded = false,
+  initialLessonId = '',
+  licensedMatchId = '',
+  onUploaded,
 }: {
   initialCourseId?: string;
   embedded?: boolean;
+  initialLessonId?: string;
+  licensedMatchId?: string;
+  onUploaded?: () => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Training');
   const [courseId, setCourseId] = useState(initialCourseId);
-  const [lessonId, setLessonId] = useState('');
+  const [lessonId, setLessonId] = useState(initialLessonId);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
@@ -71,6 +77,7 @@ export default function VideoUploadClient({
             fileSize: file.size,
             courseId: courseId.trim(),
             lessonId: lessonId.trim(),
+            licensedMatchId: licensedMatchId || undefined,
           }),
         });
         const prepared = (await prepareResponse.json().catch(() => ({}))) as UploadResponse & {
@@ -102,6 +109,7 @@ export default function VideoUploadClient({
             courseId: courseId.trim(),
             lessonId: lessonId.trim(),
             storagePath: prepared.storagePath,
+            licensedMatchId: licensedMatchId || undefined,
           }),
         });
         const finalized = (await finalizeResponse.json().catch(() => ({}))) as UploadResponse;
@@ -113,7 +121,8 @@ export default function VideoUploadClient({
         setTitle('');
         setDescription('');
         setCourseId(initialCourseId);
-        setLessonId('');
+        setLessonId(initialLessonId);
+        onUploaded?.();
         return;
       }
 
@@ -136,7 +145,8 @@ export default function VideoUploadClient({
       setTitle('');
       setDescription('');
       setCourseId(initialCourseId);
-      setLessonId('');
+      setLessonId(initialLessonId);
+      onUploaded?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Video upload failed.');
     } finally {
@@ -150,7 +160,8 @@ export default function VideoUploadClient({
         <div className="rounded-2xl border border-cyan-800 bg-slate-950 p-5 text-white">
           <h2 className="font-black">Upload a purchased scene to this course</h2>
           <p className="mt-1 text-sm text-slate-300">
-            Choose the downloaded MP4, add the lesson ID, and upload. The selected course is already attached.
+            Choose the downloaded MP4, add the lesson ID, and upload. The selected course is already
+            attached.
           </p>
         </div>
       ) : null}

@@ -32,6 +32,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
 
   const requestedKeys = [
     'GROQ_API_KEY',
+    'XAI_API_KEY',
     'GEMINI_API_KEY',
     'OPENAI_API_KEY',
     'ANTHROPIC_API_KEY',
@@ -48,6 +49,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
   await hydrateNorthflankEnv().catch(() => undefined);
 
   const hasGroq = isGroqConfigured() || Boolean(selectedSecrets.GROQ_API_KEY);
+  const hasXAI = Boolean(process.env.XAI_API_KEY || selectedSecrets.XAI_API_KEY);
   const hasGemini = isGeminiConfigured() || Boolean(selectedSecrets.GEMINI_API_KEY);
   const hasOpenAI = isOpenAIConfigured() || Boolean(selectedSecrets.OPENAI_API_KEY);
   const hasAnthropic = isAnthropicConfigured() || Boolean(selectedSecrets.ANTHROPIC_API_KEY);
@@ -89,6 +91,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
 
   return NextResponse.json({
     hasGroq,
+    hasXAI,
     hasGemini,
     hasOpenAI,
     hasAnthropic,
@@ -106,6 +109,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
       elevate: hasElevate,
       cloudflare: hasCloudflare,
       groq: hasGroq,
+      xai: hasXAI,
       gemini: hasGemini,
       openai: hasOpenAI,
       anthropic: hasAnthropic,

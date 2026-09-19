@@ -80,10 +80,11 @@ interface ChatMessage {
   actionOutcome?: { status: 'executed' | 'rejected' | 'failed'; message: string };
 }
 
-type StudioProvider = 'auto' | 'openai' | 'anthropic' | 'gemini' | 'groq';
+type StudioProvider = 'auto' | 'xai' | 'openai' | 'anthropic' | 'gemini' | 'groq';
 
 const STUDIO_PROVIDER_LABELS: Record<StudioProvider, string> = {
   auto: 'Best available',
+  xai: 'Grok / xAI',
   openai: 'ChatGPT',
   anthropic: 'Claude',
   gemini: 'Gemini',
@@ -319,7 +320,6 @@ function CourseBuildRuns() {
   );
 }
 
-
 interface CanonicalRunStep {
   id: string;
   title: string;
@@ -421,7 +421,8 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
               {payload.run.command || 'Studio workflow'}
             </p>
             <p className="text-[11px] font-semibold text-slate-600">
-              {verified}/{required.length} required steps verified · {percent}% · {payload.run.status}
+              {verified}/{required.length} required steps verified · {percent}% ·{' '}
+              {payload.run.status}
             </p>
           </div>
           <span className="rounded-full bg-white px-2 py-1 text-[10px] font-black uppercase tracking-wide text-brand-blue-800 ring-1 ring-blue-200">
@@ -441,11 +442,17 @@ function CanonicalRunActivity({ runId }: { runId: string | null }) {
               className="flex min-w-0 items-start gap-2 rounded-lg border border-blue-100 bg-white/90 px-2.5 py-2 text-xs"
             >
               {step.status === 'verified' ? (
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden="true" />
+                <CheckCircle2
+                  className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600"
+                  aria-hidden="true"
+                />
               ) : step.status === 'failed' ? (
                 <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" aria-hidden="true" />
               ) : step.status === 'running' ? (
-                <Loader2 className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-blue-600" aria-hidden="true" />
+                <Loader2
+                  className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-blue-600"
+                  aria-hidden="true"
+                />
               ) : (
                 <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-slate-300 text-[9px] font-bold text-slate-500">
                   {step.ordinal}
@@ -1138,7 +1145,9 @@ export default function UnifiedEllieChat({
 
       <div className="shrink-0 border-b border-slate-200 bg-white px-3 py-2">
         <div className="mx-auto flex max-w-5xl items-center gap-2">
-          <label className="sr-only" htmlFor="studio-ai-provider">Choose AI</label>
+          <label className="sr-only" htmlFor="studio-ai-provider">
+            Choose AI
+          </label>
           <select
             id="studio-ai-provider"
             value={selectedProvider}

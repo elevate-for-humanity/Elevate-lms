@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
   const hasAnthropic = Boolean(process.env.ANTHROPIC_API_KEY);
   const keys = [
     'GROQ_API_KEY',
+    'XAI_API_KEY',
     'GEMINI_API_KEY',
     'OPENAI_API_KEY',
     'OPENHANDS_API_KEY',
@@ -54,13 +55,15 @@ export async function GET(request: NextRequest) {
   await hydrateNorthflankEnv().catch(() => undefined);
 
   const hasGroq = isGroqConfigured() || Boolean(selectedSecrets.GROQ_API_KEY);
+  const hasXAI = Boolean(process.env.XAI_API_KEY || selectedSecrets.XAI_API_KEY);
   const hasGemini = isGeminiConfigured() || Boolean(selectedSecrets.GEMINI_API_KEY);
   const dbOpenAI = Boolean(selectedSecrets.OPENAI_API_KEY);
   const hasOpenHands = Boolean(selectedSecrets.OPENHANDS_API_KEY || process.env.OPENHANDS_API_KEY);
   const dbAnthropic = Boolean(selectedSecrets.ANTHROPIC_API_KEY);
   const dbGitHub = Boolean(selectedSecrets.GITHUB_TOKEN);
 
-  const hasAnyAI = hasGroq || hasGemini || hasOpenAI || dbOpenAI || hasAnthropic || dbAnthropic;
+  const hasAnyAI =
+    hasXAI || hasGroq || hasGemini || hasOpenAI || dbOpenAI || hasAnthropic || dbAnthropic;
   const githubOk = hasGitHub || dbGitHub;
 
   const checks: Check[] = [];
@@ -103,6 +106,7 @@ export async function GET(request: NextRequest) {
 
   // ── AI providers ───────────────────────────────────────────────────────────
   const aiProviders = [
+    hasXAI && 'Grok / xAI',
     hasGroq && 'Groq',
     hasGemini && 'Gemini',
     (hasOpenAI || dbOpenAI) && 'OpenAI',

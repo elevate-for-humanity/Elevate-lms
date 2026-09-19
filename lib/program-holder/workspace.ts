@@ -346,13 +346,11 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       })
     : applicantRows;
 
-  const canonicalEnrollmentIds = new Set(
-    (enrollmentsRes.data ?? []).map((row: any) => row.id).filter(Boolean),
-  );
+  const canonicalEnrollmentIds = new Set(enrolledRoster.map((row: any) => row.id).filter(Boolean));
   const canonicalEnrollmentUserIds = new Set(
-    (enrollmentsRes.data ?? []).map((row: any) => row.user_id).filter(Boolean),
+    enrolledRoster.map((row: any) => row.user_id).filter(Boolean),
   );
-  const deduplicatedConvertedStudents = (convertedStudentsRes.data ?? []).filter(
+  const deduplicatedConvertedStudents = convertedRoster.filter(
     (row: any) =>
       !(row.enrollment_id && canonicalEnrollmentIds.has(row.enrollment_id)) &&
       !(row.user_id && canonicalEnrollmentUserIds.has(row.user_id)),
@@ -365,10 +363,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programs: programsRes.data ?? [],
     enrollments: enrolledRoster,
     upcomingEnrollments: upcomingRoster,
-    applicants: applicantsRes.data ?? [],
-    convertedStudents: convertedRoster.map((row: any) => ({
-    enrollments: enrollmentsRes.data ?? [],
-    upcomingEnrollments: upcomingRes.data ?? [],
     applicants: deduplicatedApplicants,
     convertedStudents: deduplicatedConvertedStudents.map((row: any) => ({
       ...row,

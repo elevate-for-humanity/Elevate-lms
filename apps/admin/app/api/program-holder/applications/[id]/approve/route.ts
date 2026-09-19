@@ -6,7 +6,10 @@ import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff', 'org_admin']);
-const PORTAL_BASE = 'https://www.elevateforhumanity.org';
+// Program Holder pages are served by the LMS app, not the public marketing site.
+// Keeping auth callback and destination on the same app domain is especially
+// important on mobile browsers, where cross-domain cookies are often blocked.
+const PORTAL_BASE = 'https://app.elevateforhumanity.org';
 
 type AuthUserSummary = { id: string; email?: string | null };
 
@@ -90,7 +93,10 @@ async function secureAccessLink(
   email: string,
   isNewUser: boolean,
 ) {
-  const redirectTo = `${PORTAL_BASE}/auth/callback?redirect=${encodeURIComponent('/program-holder/sign-mou')}`;
+  const destination = isNewUser
+    ? '/reset-password?portal=program-holder&mode=recovery&next=/program-holder/sign-mou'
+    : '/program-holder/sign-mou';
+  const redirectTo = `${PORTAL_BASE}/auth/callback?redirect=${encodeURIComponent(destination)}`;
   const { data, error } = await db.auth.admin.generateLink({
     type: isNewUser ? 'recovery' : 'magiclink',
     email: email.toLowerCase().trim(),

@@ -2,13 +2,9 @@
 
 import Link from 'next/link';
 import { ExternalLink, Film, ShieldCheck } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
 import VideoUploadClient from '@/apps/admin/app/videos/upload/VideoUploadClient';
 
-export default function PurchasedMediaPlugin() {
-  const searchParams = useSearchParams();
-  const courseId = searchParams.get('courseId') ?? '';
-
+export default function PurchasedMediaPlugin({ courseId = '' }: { courseId?: string }) {
   return (
     <main className="min-h-screen bg-slate-950 p-4 text-white sm:p-6">
       <div className="mx-auto max-w-5xl space-y-6">

@@ -386,6 +386,31 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
       )
       .eq('id', job.lesson_id)
       .maybeSingle();
+    const { data: licensedLessonVideos, error: licensedVideoError } = await db
+      .from('course_videos')
+      .select('id,storage_path,title,created_at')
+      .eq('course_id', job.course_id)
+      .eq('lesson_id', job.lesson_id)
+      .eq('status', 'ready')
+      .not('storage_path', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(1);
+    if (licensedVideoError) {
+      throw new Error(`LICENSED_MEDIA_LOOKUP_FAILED:${licensedVideoError.message}`);
+    }
+    const licensedLessonVideo = licensedLessonVideos?.[0] ?? null;
+    let licensedSourceVideoUrl: string | null = null;
+    if (licensedLessonVideo?.storage_path) {
+      const { data: signedLicensedVideo, error: signedLicensedVideoError } = await db.storage
+        .from('course_videos')
+        .createSignedUrl(licensedLessonVideo.storage_path, 60 * 60 * 6);
+      if (signedLicensedVideoError || !signedLicensedVideo?.signedUrl) {
+        throw new Error(
+          `LICENSED_MEDIA_SIGN_FAILED:${signedLicensedVideoError?.message ?? 'missing signed URL'}`,
+        );
+      }
+      licensedSourceVideoUrl = signedLicensedVideo.signedUrl;
+    }
     const videoConfig =
       lesson?.video_config && typeof lesson.video_config === 'object'
         ? (lesson.video_config as Record<string, unknown>)
@@ -524,9 +549,50 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
         );
       }
     }
-    const sceneData = generatedPlan
+    let sceneData = generatedPlan
       ? { ...persistedSceneData, ...generatedSceneData(generatedPlan) }
       : persistedSceneData;
+    if (licensedSourceVideoUrl) {
+      const plannedScenes = Array.isArray(sceneData.scenes)
+        ? sceneData.scenes.filter(
+            (scene): scene is Record<string, unknown> => Boolean(scene && typeof scene === 'object'),
+          )
+        : [];
+      // One uploaded procedure clip is one evidence-bearing scene. It is not
+      // stretched or repeated across the entire lesson; the remaining scenes
+      // continue through the normal objective-aligned media director.
+      if (plannedScenes.length > 0) {
+        sceneData = {
+          ...sceneData,
+          licensed_media: {
+            course_video_id: licensedLessonVideo?.id,
+            title: licensedLessonVideo?.title,
+            storage_path: licensedLessonVideo?.storage_path,
+          },
+          scenes: plannedScenes.map((scene, index) =>
+            index === 0
+              ? {
+                  ...scene,
+                  source_video_url: licensedSourceVideoUrl,
+                  media_source: 'elevate-owned',
+                  operation: 'video-to-video',
+                }
+              : scene,
+          ),
+        };
+      } else {
+        sceneData = {
+          ...sceneData,
+          source_video_url: licensedSourceVideoUrl,
+          media_source: 'elevate-owned',
+          licensed_media: {
+            course_video_id: licensedLessonVideo?.id,
+            title: licensedLessonVideo?.title,
+            storage_path: licensedLessonVideo?.storage_path,
+          },
+        };
+      }
+    }
     const isMicroclip = job.asset_kind === 'microclip';
     // Every render is an immutable candidate. Approval, not rendering, changes
     // the learner-facing lesson URL.

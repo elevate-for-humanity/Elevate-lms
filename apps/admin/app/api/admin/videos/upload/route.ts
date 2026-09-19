@@ -5,6 +5,8 @@ import { toErrorMessage } from '@/lib/safe';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { resetCanonicalMediaJob } from '@/lib/course-factory/media-manager';
+import { queueCourseLessonVideos } from '@/lib/course-factory/media-service';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -28,6 +30,41 @@ type CourseUploadControl = {
   lessonId?: string;
   storagePath?: string;
 };
+
+async function queueLicensedLessonRender(courseId: string, lessonId: string) {
+  const db = await requireAdminClient();
+  const { data: existingJob, error } = await db
+    .from('video_jobs')
+    .select('id,status')
+    .eq('course_id', courseId)
+    .eq('lesson_id', lessonId)
+    .eq('asset_kind', 'lesson')
+    .is('asset_key', null)
+    .maybeSingle();
+  if (error) throw error;
+
+  if (existingJob) {
+    return resetCanonicalMediaJob(
+      { courseId, lessonId, assetKind: 'lesson', assetKey: null },
+      {
+        force: true,
+        sourceRepaired: true,
+        reason: 'Licensed lesson footage uploaded; rebuilding the canonical lesson video',
+      },
+    );
+  }
+
+  const queued = await queueCourseLessonVideos({
+    courseId,
+    lessonId,
+    onlyMissing: false,
+    force: true,
+  });
+  if (queued.queued < 1 && queued.alreadyActive < 1 && queued.lessonVideosReady < 1) {
+    throw new Error('Canonical lesson video job was not queued');
+  }
+  return null;
+}
 
 async function controlCourseUpload(
   input: CourseUploadControl,
@@ -120,8 +157,8 @@ async function controlCourseUpload(
   const { error: lessonError } = await db
     .from('course_lessons')
     .update({
-      media_origin: 'licensed',
-      media_quality_status: 'pending_render',
+      media_origin: 'uploaded',
+      media_quality_status: 'pending',
       video_status: 'queued',
       video_error: null,
       updated_at: new Date().toISOString(),
@@ -133,6 +170,23 @@ async function controlCourseUpload(
     await db.storage.from('course_videos').remove([storagePath]);
     return NextResponse.json(
       { error: 'Uploaded video could not be linked to its lesson' },
+      { status: 500 },
+    );
+  }
+  try {
+    await queueLicensedLessonRender(courseId, lessonId);
+  } catch (queueError) {
+    await db
+      .from('course_lessons')
+      .update({
+        video_status: 'failed',
+        video_error: `Licensed footage saved, but render queue failed: ${toErrorMessage(queueError)}`,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', lessonId)
+      .eq('course_id', courseId);
+    return NextResponse.json(
+      { error: 'Video was saved, but its lesson render could not be queued' },
       { status: 500 },
     );
   }
@@ -244,8 +298,8 @@ const _POST = withAuth(
           const { error: lessonError } = await db
             .from('course_lessons')
             .update({
-              media_origin: 'licensed',
-              media_quality_status: 'pending_render',
+              media_origin: 'uploaded',
+              media_quality_status: 'pending',
               video_status: 'queued',
               video_error: null,
               updated_at: new Date().toISOString(),
@@ -257,6 +311,23 @@ const _POST = withAuth(
             await db.storage.from(bucket).remove([storagePath]);
             return NextResponse.json(
               { error: 'Video uploaded but lesson linking failed' },
+              { status: 500 },
+            );
+          }
+          try {
+            await queueLicensedLessonRender(courseId, lessonId);
+          } catch (queueError) {
+            await db
+              .from('course_lessons')
+              .update({
+                video_status: 'failed',
+                video_error: `Licensed footage saved, but render queue failed: ${toErrorMessage(queueError)}`,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', lessonId)
+              .eq('course_id', courseId);
+            return NextResponse.json(
+              { error: 'Video was saved, but its lesson render could not be queued' },
               { status: 500 },
             );
           }
@@ -307,14 +378,3 @@ const _POST = withAuth(
         entityId: videoData.id,
         metadata: { file_name: file.name, category },
         req: request,
-      });
-
-      return NextResponse.json({ success: true, url: publicUrl, video: videoData });
-    } catch (error) {
-      return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
-    }
-  },
-  { roles: ['admin'] },
-);
-
-export const POST = withApiAudit('/api/admin/videos/upload', _POST);

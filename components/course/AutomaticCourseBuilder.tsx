@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   Loader2,
   Sparkles,
@@ -104,6 +105,7 @@ const US_STATES = [
 
 export default function AutomaticCourseBuilder() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const naturalVoice = useNaturalVoice();
 
   const [title, setTitle] = useState('');
@@ -237,6 +239,8 @@ export default function AutomaticCourseBuilder() {
         buildScope,
         includeVideos: true,
         dryRun: false,
+        studioConversationId: searchParams.get('studioConversationId') || undefined,
+        studioTaskId: searchParams.get('studioTaskId') || undefined,
       });
 
       if (!published.courseId) throw new Error('Course Factory did not return a course ID.');

@@ -61,7 +61,7 @@ function normalizePurchase(value: unknown) {
 }
 
 const _GET = withAuth(async (request: NextRequest) => {
-  const limited = await applyRateLimit(request, 'standard');
+  const limited = await applyRateLimit(request, 'api');
   if (limited) return limited;
   try {
     const action = request.nextUrl.searchParams.get('action') || 'status';

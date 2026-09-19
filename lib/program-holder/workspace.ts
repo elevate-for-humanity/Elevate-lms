@@ -154,7 +154,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
         `id,user_id,applicant_name,status,application_status,program_id,label,call_notes,call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,expected_payout_cents,expected_payout_status,updated_at${applicantContactColumns}`,
       )
       .eq('program_holder_id', holderId)
-      .in('status', ['active', 'enrolled', 'pending', 'applied', 'approved', 'scheduled', 'ready'])
+      .in('status', ['active', 'enrolled', 'in_progress'])
       .order('updated_at', { ascending: false }),
     db
       .from('hour_entries')

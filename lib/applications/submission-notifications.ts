@@ -142,11 +142,9 @@ async function sendAndAudit(
 export async function notifyApplicationSubmission(
   input: NotifyApplicationSubmissionInput,
 ): Promise<ApplicationNotificationResult> {
-  const staffEmail =
-    input.staffEmail ||
-    process.env.PARTNER_NOTIFICATION_EMAIL ||
-    PLATFORM_DEFAULTS.supportEmail ||
-    'elevate4humanityedu@gmail.com';
+  // Application records contain sensitive applicant data. Route every internal
+  // application copy to the owner-confirmed administrative inbox only.
+  const staffEmail = input.staffEmail || 'elevate4humanityedu@gmail.com';
 
   await input.db.from('staff_notifications').insert({
     type: 'application_submitted',

@@ -575,7 +575,7 @@ async function runClaimedVideoJob(job: VideoJob): Promise<void> {
                   ...scene,
                   source_video_url: licensedSourceVideoUrl,
                   media_source: 'elevate-owned',
-                  operation: 'video-to-video',
+                  operation: 'videoToVideo',
                 }
               : scene,
           ),

@@ -29,6 +29,7 @@ const ELEVATE_CC = 'info@elevateforhumanity.org';
 const ADMIN_REVIEW = `${process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl}/admin/applications`;
 
 const PROGRAM_LABELS: Record<string, string> = {
+  'barber-apprenticeship': 'Barber Apprenticeship',
   'cosmetology-apprenticeship': 'Cosmetology Apprenticeship',
   'esthetician-apprenticeship': 'Esthetician Apprenticeship',
   'nail-technician-apprenticeship': 'Nail Technician Apprenticeship',

@@ -25,11 +25,12 @@ const HOLDER_PROGRAMS: Record<string, string[]> = {
     'esthetician-apprenticeship',
     'nail-technician-apprenticeship',
     'cosmetology-apprenticeship',
+    'barber-apprenticeship',
   ],
   'info@centerofdestiny.org': [
     'business-startup',
     'bookkeeping',
-    
+
     'business-administration',
     'entrepreneurship',
   ],
@@ -49,7 +50,7 @@ const HOLDER_PROGRAMS: Record<string, string[]> = {
     'software-development',
     'graphic-design',
     'bookkeeping',
-    
+
     'office-administration',
     'business-administration',
     'entrepreneurship',
@@ -94,9 +95,15 @@ async function main() {
     console.log(`\n${holder.organization_name} (${email}) → ${slugs.length} programs`);
 
     if (!DRY_RUN) {
-      await db.from('program_holders').update({ teaches_multiple: slugs.length > 1 }).eq('id', holder.id);
+      await db
+        .from('program_holders')
+        .update({ teaches_multiple: slugs.length > 1 })
+        .eq('id', holder.id);
       if (programIds[0]) {
-        await db.from('program_holders').update({ primary_program_id: programIds[0] }).eq('id', holder.id);
+        await db
+          .from('program_holders')
+          .update({ primary_program_id: programIds[0] })
+          .eq('id', holder.id);
       }
     }
 
@@ -106,10 +113,12 @@ async function main() {
         console.log(`  [dry-run] link ${slug}`);
         continue;
       }
-      const { error } = await db.from('program_holder_programs').upsert(
-        { program_holder_id: holder.id, program_id: programId, status: 'active' },
-        { onConflict: 'program_holder_id,program_id' },
-      );
+      const { error } = await db
+        .from('program_holder_programs')
+        .upsert(
+          { program_holder_id: holder.id, program_id: programId, status: 'active' },
+          { onConflict: 'program_holder_id,program_id' },
+        );
       if (error) console.warn(`  ⚠ ${slug}:`, error.message);
       else console.log(`  ✅ ${slug}`);
     }
@@ -140,8 +149,14 @@ async function main() {
       },
       { onConflict: 'id' },
     );
-    await db.auth.admin.updateUserById(userId, { app_metadata: { role: 'partner' }, email_confirm: true });
-    await db.from('partners').update({ partner_type: 'barber', type: 'barber' }).eq('id', PRESTIGE_PARTNER.partnerId);
+    await db.auth.admin.updateUserById(userId, {
+      app_metadata: { role: 'partner' },
+      email_confirm: true,
+    });
+    await db
+      .from('partners')
+      .update({ partner_type: 'barber', type: 'barber' })
+      .eq('id', PRESTIGE_PARTNER.partnerId);
     const { data: existingPu } = await db
       .from('partner_users')
       .select('id')

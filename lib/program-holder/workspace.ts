@@ -58,7 +58,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
   }
 
   const { db, holderId, programIds, profile } = ctx;
-  const [holderRes, acknowledgementsRes, imageReleaseRes] = await Promise.all([
+  const [holderRes, acknowledgementsRes, imageReleaseRes, partnerRes] = await Promise.all([
     db
       .from('program_holders')
       .select(
@@ -76,6 +76,12 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .eq('user_id', profile.id)
       .eq('granted', true)
       .is('revoked_at', null)
+      .maybeSingle(),
+    db
+      .from('partners')
+      .select('id')
+      .ilike('contact_email', profile.email || '__no_program_holder_email__')
+      .limit(1)
       .maybeSingle(),
   ]);
   const acknowledgements = acknowledgementsRes.data ?? [];
@@ -112,6 +118,7 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     notificationRes,
     phoneLineRes,
     extensionRes,
+    schoolApplicationsRes,
   ] = await Promise.all([
     programIds.length
       ? db
@@ -171,45 +178,6 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
           .in('status', ['active', 'enrolled'])
           .order('updated_at', { ascending: false })
       : Promise.resolve({ data: [] }),
-    db
-      .from('program_enrollments')
-      .select(
-        `id,user_id,full_name,status,enrollment_state,program_id,program_slug,enrolled_at,progress_percent,at_risk,next_required_action,training_start_date,training_end_date,total_hours_completed,lms_completed,practical_skills_verified,funding_verified,voucher_issued_date,voucher_paid_date,payment_status,amount_paid_cents,completed_at,completion_date${enrollmentContactColumns}`,
-      )
-      .eq('program_holder_id', holderId)
-      .in('status', [
-        'active',
-        'enrolled',
-        'in_progress',
-        'pending',
-        'applied',
-        'approved',
-        'scheduled',
-        'ready',
-        'funded',
-        'completed',
-        'graduated',
-      ])
-      .order('enrolled_at', { ascending: false }),
-    db
-      .from('program_enrollments')
-      .select(
-        `id,user_id,full_name,status,enrollment_state,program_id,program_slug,training_start_date,training_end_date,student_start_date,expected_end_date,start_date${enrollmentContactColumns}`,
-      )
-      .eq('program_holder_id', holderId)
-      .in('status', ['active', 'enrolled', 'pending', 'approved', 'scheduled', 'ready', 'funded'])
-      .order('training_start_date', { ascending: true, nullsFirst: false }),
-    allApplicantAccess
-      ? applicantsQuery
-      : applicantsQuery.eq('program_holder_id', holderId),
-    db
-      .from('program_holder_students')
-      .select(
-        `id,user_id,enrollment_id,applicant_name,status,application_status,program_id,label,call_notes,call_date,call_outcome,work_start_date,completion_date,work_progress,hours_taught,hours_required,work_site,expected_payout_cents,expected_payout_status,updated_at${applicantContactColumns}`,
-      )
-      .eq('program_holder_id', holderId)
-      .in('status', ['active', 'enrolled', 'in_progress'])
-      .order('updated_at', { ascending: false }),
     db
       .from('hour_entries')
       .select(
@@ -271,7 +239,53 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       .eq('enabled', true)
       .limit(1)
       .maybeSingle(),
+    partnerRes.data?.id
+      ? db
+          .from('school_applications')
+          .select(
+            'id,first_name,last_name,email,phone,program_interest,status,created_at,updated_at',
+          )
+          .eq('partner_id', partnerRes.data.id)
+          .in('status', ['submitted', 'under_review', 'accepted', 'enrolled'])
+          .order('created_at', { ascending: false })
+      : Promise.resolve({ data: [] }),
   ]);
+
+  const schoolApplications = schoolApplicationsRes.data ?? [];
+  const schoolApplicants = schoolApplications
+    .filter((row: any) => ['submitted', 'under_review'].includes(row.status))
+    .map((row: any) => ({
+      id: `school-${row.id}`,
+      applicant_name: [row.first_name, row.last_name].filter(Boolean).join(' ') || 'Applicant',
+      applicant_email: contactAccessGranted ? row.email : null,
+      applicant_phone: contactAccessGranted ? row.phone : null,
+      program_id: null,
+      program_slug: row.program_interest,
+      status: row.status === 'under_review' ? 'pending' : 'applied',
+      application_status: row.status,
+      created_at: row.created_at,
+      roster_source: 'school_application',
+    }));
+  const approvedSchoolStudents = schoolApplications
+    .filter((row: any) => ['accepted', 'enrolled'].includes(row.status))
+    .map((row: any) => ({
+      id: `school-${row.id}`,
+      user_id: null,
+      applicant_name: [row.first_name, row.last_name].filter(Boolean).join(' ') || 'Student',
+      full_name: [row.first_name, row.last_name].filter(Boolean).join(' ') || 'Student',
+      email: contactAccessGranted ? row.email : null,
+      phone: contactAccessGranted ? row.phone : null,
+      program_id: null,
+      program_slug: row.program_interest,
+      status: row.status === 'enrolled' ? 'enrolled' : 'approved',
+      enrollment_state: row.status === 'enrolled' ? 'enrolled' : 'approved',
+      enrolled_at: row.created_at,
+      progress_percent: 0,
+      total_hours_completed: 0,
+      roster_source: 'school_application',
+      next_required_action:
+        row.status === 'accepted' ? 'Complete enrollment setup' : 'Begin training',
+    }));
 
   const rosterUserIds: string[] = Array.from(
     new Set(
@@ -346,13 +360,11 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
       })
     : applicantRows;
 
-  const canonicalEnrollmentIds = new Set(
-    (enrollmentsRes.data ?? []).map((row: any) => row.id).filter(Boolean),
-  );
+  const canonicalEnrollmentIds = new Set(enrolledRoster.map((row: any) => row.id).filter(Boolean));
   const canonicalEnrollmentUserIds = new Set(
-    (enrollmentsRes.data ?? []).map((row: any) => row.user_id).filter(Boolean),
+    enrolledRoster.map((row: any) => row.user_id).filter(Boolean),
   );
-  const deduplicatedConvertedStudents = (convertedStudentsRes.data ?? []).filter(
+  const deduplicatedConvertedStudents = convertedRoster.filter(
     (row: any) =>
       !(row.enrollment_id && canonicalEnrollmentIds.has(row.enrollment_id)) &&
       !(row.user_id && canonicalEnrollmentUserIds.has(row.user_id)),
@@ -365,37 +377,36 @@ export async function getProgramHolderWorkspace(): Promise<ProgramHolderWorkspac
     programs: programsRes.data ?? [],
     enrollments: enrolledRoster,
     upcomingEnrollments: upcomingRoster,
-    applicants: applicantsRes.data ?? [],
-    convertedStudents: convertedRoster.map((row: any) => ({
-    enrollments: enrollmentsRes.data ?? [],
-    upcomingEnrollments: upcomingRes.data ?? [],
-    applicants: deduplicatedApplicants,
-    convertedStudents: deduplicatedConvertedStudents.map((row: any) => ({
-      ...row,
-      roster_source: 'holder_student',
-      full_name: row.applicant_name || 'Student',
-      enrollment_state: row.status,
-      program_slug: null,
-      training_start_date: row.work_start_date,
-      training_end_date: row.completion_date,
-      total_hours_completed: Number(row.hours_taught || 0),
-      progress_percent:
-        Number(row.hours_required || 0) > 0
-          ? Math.min(
-              100,
-              Math.round((Number(row.hours_taught || 0) / Number(row.hours_required)) * 100),
-            )
-          : 0,
-      next_required_action:
-        row.work_progress && row.work_progress !== 'Not started'
-          ? row.work_progress
-          : 'Record training progress',
-      funding_verified: false,
-      voucher_issued_date: null,
-      voucher_paid_date: null,
-      payment_status: null,
-      amount_paid_cents: 0,
-    })),
+    applicants: [...deduplicatedApplicants, ...schoolApplicants],
+    convertedStudents: [
+      ...deduplicatedConvertedStudents.map((row: any) => ({
+        ...row,
+        roster_source: 'holder_student',
+        full_name: row.applicant_name || 'Student',
+        enrollment_state: row.status,
+        program_slug: null,
+        training_start_date: row.work_start_date,
+        training_end_date: row.completion_date,
+        total_hours_completed: Number(row.hours_taught || 0),
+        progress_percent:
+          Number(row.hours_required || 0) > 0
+            ? Math.min(
+                100,
+                Math.round((Number(row.hours_taught || 0) / Number(row.hours_required)) * 100),
+              )
+            : 0,
+        next_required_action:
+          row.work_progress && row.work_progress !== 'Not started'
+            ? row.work_progress
+            : 'Record training progress',
+        funding_verified: false,
+        voucher_issued_date: null,
+        voucher_paid_date: null,
+        payment_status: null,
+        amount_paid_cents: 0,
+      })),
+      ...approvedSchoolStudents,
+    ],
     hours: hoursRes.data ?? [],
     documents: documentsRes.data ?? [],
     reports: reportsRes.data ?? [],

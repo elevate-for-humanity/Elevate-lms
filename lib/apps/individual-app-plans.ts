@@ -38,7 +38,7 @@ const WEBSITE_BUILDER_PLANS: IndividualPlanDefinition[] = [
     name: 'Starter',
     priceMonthly: 29,
     priceLabel: '$29/mo',
-    features: ['1 website', '5 pages', 'Basic templates', 'Elevate subdomain', 'Email support'],
+    features: ['1 website', '5 pages', 'Basic templates', 'Curated licensed photos and graphics in finished sites', 'Elevate subdomain', 'Email support'],
   },
   {
     id: 'professional',
@@ -50,6 +50,7 @@ const WEBSITE_BUILDER_PLANS: IndividualPlanDefinition[] = [
       '3 websites',
       'Unlimited pages',
       'All templates',
+      'Curated licensed video, photos, graphics, fonts, music, and effects in finished sites',
       'Custom domain',
       'LMS enrollment widgets',
       'Import existing site',
@@ -64,6 +65,7 @@ const WEBSITE_BUILDER_PLANS: IndividualPlanDefinition[] = [
     features: [
       'Unlimited websites for the licensed user',
       'Advanced builder controls',
+      'Full governed creative library for finished websites and stores',
       'Import existing sites',
       'Priority support',
       'Organization licensing available through procurement review',

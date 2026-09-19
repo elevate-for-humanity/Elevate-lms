@@ -89,13 +89,20 @@ export async function getCourse(id: string) {
 }
 
 export async function updateCourse(id: string, patch: CourseUpdate) {
-  const supabase = await getSupabase();
+  // Admin course mutations have already passed route-level role checks. Use the
+  // service client here because the canonical courses table is protected by RLS;
+  // a session-scoped client can read the lms_courses view but cannot reliably
+  // update the underlying record.
+  const supabase = await requireAdminClient();
+  await setAuditContext(supabase, { systemActor: 'admin_courses_api' });
   const { data: current, error: currentError } = await supabase
     .from('courses')
     .select('metadata, published_at')
     .eq('id', id)
     .maybeSingle();
-  if (currentError) throw new Error('Database operation failed');
+  if (currentError) {
+    throw new Error(`Course lookup failed: ${currentError.message} (code: ${currentError.code})`);
+  }
   if (!current) return null;
 
   const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
@@ -148,7 +155,9 @@ export async function updateCourse(id: string, patch: CourseUpdate) {
     .select()
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error('Database operation failed');
+  if (error) {
+    throw new Error(`Course update failed: ${error.message} (code: ${error.code})`);
+  }
   return data;
 }
 

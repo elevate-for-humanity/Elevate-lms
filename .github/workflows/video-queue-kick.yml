@@ -77,8 +77,23 @@ jobs:
               *) echo "::error::Video worker returned HTTP $status"; exit 1 ;;
             esac
             started=$(node -e "const p=require('/tmp/video-worker.json'); if(p.ok!==true) process.exit(1); process.stdout.write(String(p.started||0))")
+            reason=$(node -e "const p=require('/tmp/video-worker.json'); process.stdout.write(String(p.reason||''))")
             if [ "$started" = "0" ]; then
-              break
+              if [ "$reason" = "render-capacity-full" ]; then
+                sleep 30
+                continue
+              fi
+              case "$reason" in
+                queue-empty|no-draft-or-queued-job) break ;;
+                course-builder-generation-paused|course-generation-paused)
+                  echo "::error::Course queue is paused ($reason)"
+                  exit 1
+                  ;;
+                *)
+                  echo "::error::Queue made no progress (reason=$reason)"
+                  exit 1
+                  ;;
+              esac
             fi
             sleep 5
           done

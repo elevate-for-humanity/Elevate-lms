@@ -315,6 +315,8 @@ export async function ProgramHolderWorkspaceView({
                 <strong>{formatUsd(Number(customMou.compensation_per_eligible_enrollment || 1000))}</strong> per eligible, verified enrollment: {formatUsd(Number(customMou.initial_payment || 500))} after verified enrollment, documentation, and funding authorization; {formatUsd(Number(customMou.completion_payment || 500))} after verified completion and closeout.
               </p>
               <p className="mt-2 text-xs text-emerald-900">A lead, incomplete application, unverified enrollment, or unverified completion does not by itself trigger payment.</p>
+              <p className="mt-2 text-sm font-bold text-rose-800">{String(customMou.payout_contact_requirement || 'No payout credit is earned until you make a documented call/contact on the assigned applicant and record the outcome in the system.')}</p>
+              <p className="mt-2 text-xs text-rose-700">{String(customMou.uncontacted_alert_rule || 'Applicants without a documented contact outcome for five days are escalated to the admin dashboard.')}</p>
             </div>
           </div>
           <div className="mt-5 grid gap-4 lg:grid-cols-2">

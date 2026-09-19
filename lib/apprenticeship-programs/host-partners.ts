@@ -96,6 +96,36 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         alt: 'Top Shelf Barber Lounge barber providing a haircut',
         kind: 'photo',
       },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-profile.jpg',
+        alt: 'Top Shelf Barber Lounge clean fade and textured haircut',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-textured-crop.jpg',
+        alt: 'Top Shelf Barber Lounge textured crop and blended fade',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-wave-and-beard.jpg',
+        alt: 'Top Shelf Barber Lounge wave haircut, lineup, and beard grooming',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-modern-fringe.jpg',
+        alt: 'Top Shelf Barber Lounge modern fringe haircut with tapered sides',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-precision-fade.jpg',
+        alt: 'Top Shelf Barber Lounge precision fade and lineup',
+        kind: 'photo',
+      },
+      {
+        src: '/images/partners/top-shelf-barber-lounge/top-shelf-fade-and-beard.jpg',
+        alt: 'Top Shelf Barber Lounge fade haircut and full beard shaping',
+        kind: 'photo',
+      },
     ],
     websiteUrl: 'https://barbershopelkhart.com/',
     websiteLabel: 'Visit Top Shelf Barber Lounge',

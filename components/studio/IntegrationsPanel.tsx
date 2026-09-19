@@ -189,6 +189,24 @@ export default function IntegrationsPanel() {
       <div className="grid gap-4 md:grid-cols-2">
         <JobBoardPanel />
 
+        <div className="rounded-xl border border-cyan-200 bg-white">
+          <div className="flex items-center justify-between border-b border-cyan-100 p-4">
+            <div className="flex items-center gap-2">
+              <ExternalLink className="h-4 w-4 text-cyan-700" />
+              <h3 className="text-sm font-semibold text-slate-900">Purchased Media</h3>
+            </div>
+            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">Installed</span>
+          </div>
+          <div className="p-4">
+            <p className="text-xs text-slate-600">
+              Search and download licensed Envato scenes, then attach them to canonical courses and lessons with playback verification.
+            </p>
+            <Link href="/studio/integrations/purchased-media" className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-700 px-3 py-2 text-xs font-medium text-white hover:bg-cyan-800">
+              Open plugin <ExternalLink className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
+
         <div className="rounded-xl border border-slate-200 bg-white">
           <div className="flex items-center justify-between border-b border-slate-200 p-4">
             <div className="flex items-center gap-2">

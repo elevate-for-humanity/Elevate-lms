@@ -22,6 +22,7 @@ import { isGeminiConfigured } from '@/lib/gemini-client';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { getAnthropicClient, isAnthropicConfigured } from '@/lib/ai/anthropic-client';
 import { aiChat, getActiveProviderName } from '@/lib/ai/ai-service';
+import { isXAIConfigured } from '@/lib/ai/xai-config';
 import {
   executePaidInference,
   paidArtifactFingerprint,
@@ -1790,7 +1791,7 @@ async function _POST(req: NextRequest) {
     if (!assistantMessage) {
       logger.error('[devstudio/chat] no provider available', undefined, {
         hasGroq: isGroqConfigured(),
-        hasXAI: Boolean(process.env.XAI_API_KEY),
+        hasXAI: isXAIConfigured(),
         hasGemini: isGeminiConfigured(),
         hasOpenAI: isOpenAIConfigured(),
         hasAnthropic: isAnthropicConfigured(),
@@ -1803,7 +1804,7 @@ async function _POST(req: NextRequest) {
               : `LIZZY could not reach the configured ${canonicalProvider} provider. Check that provider connection in Admin → Integrations.`,
           debug: {
             hasGroq: isGroqConfigured(),
-            hasXAI: Boolean(process.env.XAI_API_KEY),
+            hasXAI: isXAIConfigured(),
             hasOpenAI: isOpenAIConfigured(),
             hasAnthropic: isAnthropicConfigured(),
             hasGemini: isGeminiConfigured(),
@@ -1855,7 +1856,7 @@ async function _POST(req: NextRequest) {
               model,
               providerPreference,
               availableProviders: {
-                xai: Boolean(process.env.XAI_API_KEY),
+                xai: isXAIConfigured(),
                 groq: isGroqConfigured(),
                 openai: isOpenAIConfigured(),
                 anthropic: isAnthropicConfigured(),

@@ -102,7 +102,14 @@ const SERVICE_GROUPS: ServiceGroup[] = [
     // GROQ_API_KEY is the primary (free tier available). GEMINI_API_KEY is the fallback.
     // At least one must be set for natural-language commands to work.
     label: 'AI Providers (required for AI features)',
-    keys: ['XAI_API_KEY', 'XAI_MODEL', 'GROQ_API_KEY', 'GEMINI_API_KEY', 'AI_PROVIDER'],
+    keys: [
+      'XAI_API_KEY',
+      'GROK_API_KEY',
+      'XAI_MODEL',
+      'GROQ_API_KEY',
+      'GEMINI_API_KEY',
+      'AI_PROVIDER',
+    ],
   },
   {
     label: 'Licensed Media — Envato',

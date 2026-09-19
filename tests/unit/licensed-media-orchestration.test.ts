@@ -7,12 +7,9 @@ import { XAIProvider } from '@/lib/ai/providers/xai';
 
 describe('licensed media course matching', () => {
   it('removes generic stock-video words and keeps distinct course topics', () => {
-    expect(mediaMatchTerms('The course lesson: Barber clipper safety and clipper guards video')).toEqual([
-      'barber',
-      'clipper',
-      'safety',
-      'guards',
-    ]);
+    expect(
+      mediaMatchTerms('The course lesson: Barber clipper safety and clipper guards video'),
+    ).toEqual(['barber', 'clipper', 'safety', 'guards']);
   });
 
   it('scores course-specific purchased scenes above unrelated footage', () => {
@@ -33,9 +30,12 @@ describe('licensed media course matching', () => {
 
 describe('Grok / xAI provider registration', () => {
   const originalKey = process.env.XAI_API_KEY;
+  const originalGrokKey = process.env.GROK_API_KEY;
   afterEach(() => {
     if (originalKey === undefined) delete process.env.XAI_API_KEY;
     else process.env.XAI_API_KEY = originalKey;
+    if (originalGrokKey === undefined) delete process.env.GROK_API_KEY;
+    else process.env.GROK_API_KEY = originalGrokKey;
   });
 
   it('requires the server-side XAI_API_KEY and identifies itself as xai', () => {
@@ -45,5 +45,11 @@ describe('Grok / xAI provider registration', () => {
     const provider = new XAIProvider();
     expect(provider.name).toBe('xai');
     expect(provider.isAvailable()).toBe(true);
+  });
+
+  it('recognizes an existing key saved under the Grok admin alias', () => {
+    delete process.env.XAI_API_KEY;
+    process.env.GROK_API_KEY = 'grok-test-key-long-enough';
+    expect(new XAIProvider().isAvailable()).toBe(true);
   });
 });

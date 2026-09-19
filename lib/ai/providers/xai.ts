@@ -2,6 +2,7 @@ import OpenAI from 'openai';
 import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '../types';
 import { requirePaidInferenceContext } from '../paid-inference-context';
 import { normalizeStructuredOutput, requestsJson } from './structured-output';
+import { getXAIAPIKey, isXAIConfigured } from '../xai-config';
 
 /** xAI Grok through its OpenAI-compatible API. */
 export class XAIProvider implements AIProvider {
@@ -11,14 +12,14 @@ export class XAIProvider implements AIProvider {
   private getClient(): OpenAI {
     requirePaidInferenceContext('xai');
     if (this.client) return this.client;
-    const apiKey = process.env.XAI_API_KEY?.trim();
+    const apiKey = getXAIAPIKey();
     if (!apiKey || apiKey.length < 12) throw new Error('XAI_API_KEY not configured');
     this.client = new OpenAI({ apiKey, baseURL: 'https://api.x.ai/v1' });
     return this.client;
   }
 
   isAvailable(): boolean {
-    return (process.env.XAI_API_KEY?.trim().length ?? 0) >= 12;
+    return isXAIConfigured();
   }
 
   async chat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {

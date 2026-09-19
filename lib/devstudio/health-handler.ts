@@ -15,6 +15,7 @@ import {
 import { getDecryptedPlatformSecret, hydrateNorthflankEnv } from '@/lib/secrets';
 import { getGitHubToken } from '@/lib/devstudio/github-token';
 import { getActiveProviderName, isAIAvailable } from '@/lib/ai/ai-service';
+import { isXAIConfigured } from '@/lib/ai/xai-config';
 import { hydrateProcessEnv } from '@/lib/secrets';
 
 /**
@@ -33,6 +34,9 @@ export async function handleDevStudioHealth(req: NextRequest) {
   const requestedKeys = [
     'GROQ_API_KEY',
     'XAI_API_KEY',
+    'GROK_API_KEY',
+    'XAI_API_TOKEN',
+    'GROK_API_TOKEN',
     'GEMINI_API_KEY',
     'OPENAI_API_KEY',
     'ANTHROPIC_API_KEY',
@@ -49,7 +53,14 @@ export async function handleDevStudioHealth(req: NextRequest) {
   await hydrateNorthflankEnv().catch(() => undefined);
 
   const hasGroq = isGroqConfigured() || Boolean(selectedSecrets.GROQ_API_KEY);
-  const hasXAI = Boolean(process.env.XAI_API_KEY || selectedSecrets.XAI_API_KEY);
+  const hasXAI =
+    isXAIConfigured() ||
+    Boolean(
+      selectedSecrets.XAI_API_KEY ||
+      selectedSecrets.GROK_API_KEY ||
+      selectedSecrets.XAI_API_TOKEN ||
+      selectedSecrets.GROK_API_TOKEN,
+    );
   const hasGemini = isGeminiConfigured() || Boolean(selectedSecrets.GEMINI_API_KEY);
   const hasOpenAI = isOpenAIConfigured() || Boolean(selectedSecrets.OPENAI_API_KEY);
   const hasAnthropic = isAnthropicConfigured() || Boolean(selectedSecrets.ANTHROPIC_API_KEY);

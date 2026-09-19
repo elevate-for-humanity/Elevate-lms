@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { isXAIConfigured } from '@/lib/ai/xai-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
       {
         name: 'ai-provider',
         passed: Boolean(
-          process.env.XAI_API_KEY ||
+          isXAIConfigured() ||
           process.env.OPENAI_API_KEY ||
           process.env.ANTHROPIC_API_KEY ||
           process.env.GROQ_API_KEY ||

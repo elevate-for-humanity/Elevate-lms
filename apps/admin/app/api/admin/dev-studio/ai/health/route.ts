@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
+import { isXAIConfigured } from '@/lib/ai/xai-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   return capabilityHealthResponse(request, async () => {
     const hasGroq = Boolean(process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY);
-    const hasXAI = Boolean(process.env.XAI_API_KEY);
+    const hasXAI = isXAIConfigured();
     const hasGemini = Boolean(process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY);
     const hasOpenAI = Boolean(process.env.OPENAI_API_KEY || process.env.NEXT_PUBLIC_OPENAI_API_KEY);
     const hasAnthropic = Boolean(

@@ -108,7 +108,7 @@ export async function recommendLicensedMediaForCourse(input: {
     await Promise.all([
       input.db
         .from('course_lessons')
-        .select('id,title,content,description,learning_objectives')
+        .select('id,title,content,learning_objectives')
         .eq('course_id', input.courseId)
         .order('order_index', { ascending: true }),
       input.db
@@ -125,7 +125,6 @@ export async function recommendLicensedMediaForCourse(input: {
   for (const lesson of lessons ?? []) {
     const lessonText = [
       lesson.title,
-      lesson.description,
       lesson.content,
       JSON.stringify(lesson.learning_objectives ?? []),
     ]

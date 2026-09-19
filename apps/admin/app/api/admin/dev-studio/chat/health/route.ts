@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { isXAIConfigured } from '@/lib/ai/xai-config';
 
 interface CapabilityHealth {
   capability: string;
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const checks: CapabilityHealth['checks'] = [];
   let status: CapabilityHealth['status'] = 'healthy';
   const hasAiKey =
-    !!process.env.XAI_API_KEY ||
+    isXAIConfigured() ||
     !!process.env.GROQ_API_KEY ||
     !!process.env.GEMINI_API_KEY ||
     !!process.env.OPENAI_API_KEY ||

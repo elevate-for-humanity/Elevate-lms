@@ -20,6 +20,7 @@ import { isGroqConfigured } from '@/lib/groq-client';
 import { isGeminiConfigured } from '@/lib/gemini-client';
 import { PLATFORM_DEBT, SYSTEMS } from '@/lib/platform/knowledge-graph';
 import { safeInternalError } from '@/lib/api/safe-error';
+import { isXAIConfigured } from '@/lib/ai/xai-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -69,19 +70,31 @@ export async function GET(req: NextRequest) {
       const { data: secretRows } = await supabase
         .from('platform_secrets')
         .select('key, value_enc')
-        .in('key', ['XAI_API_KEY', 'GROQ_API_KEY', 'GEMINI_API_KEY', 'OPENAI_API_KEY']);
+        .in('key', [
+          'XAI_API_KEY',
+          'GROK_API_KEY',
+          'XAI_API_TOKEN',
+          'GROK_API_TOKEN',
+          'GROQ_API_KEY',
+          'GEMINI_API_KEY',
+          'OPENAI_API_KEY',
+        ]);
       for (const row of secretRows ?? []) {
         if (row.key === 'GROQ_API_KEY' && row.value_enc?.length > 10) groqFromDb = true;
         if (row.key === 'GEMINI_API_KEY' && row.value_enc?.length > 10) geminiFromDb = true;
         if (row.key === 'OPENAI_API_KEY' && row.value_enc?.length > 10) openaiFromDb = true;
-        if (row.key === 'XAI_API_KEY' && row.value_enc?.length > 10) xaiFromDb = true;
+        if (
+          ['XAI_API_KEY', 'GROK_API_KEY', 'XAI_API_TOKEN', 'GROK_API_TOKEN'].includes(row.key) &&
+          row.value_enc?.length > 10
+        )
+          xaiFromDb = true;
       }
     } catch {
       /* non-fatal — fall back to process.env only */
     }
 
     const aiProviders = {
-      xai: !!process.env.XAI_API_KEY || xaiFromDb,
+      xai: isXAIConfigured() || xaiFromDb,
       groq: isGroqConfigured() || groqFromDb,
       gemini: isGeminiConfigured() || geminiFromDb,
       openai: !!process.env.OPENAI_API_KEY || openaiFromDb,

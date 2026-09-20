@@ -20,7 +20,10 @@ function narrationSourceFor(section: HTMLElement) {
 
 function narrationRateFor(section: HTMLElement) {
   const value = Number(section.dataset.narrationRate);
-  return Number.isFinite(value) && value >= 0.75 && value <= 1.1 ? value : 0.84;
+  // Page narration should sound like a capable guide speaking naturally.
+  // Rates below 0.9 stretch prerecorded audio and make consonants sound
+  // slurred, so legacy slow-rate attributes are normalized here.
+  return Number.isFinite(value) && value >= 0.9 && value <= 1.1 ? value : 1;
 }
 
 function narrationStyleFor(section: HTMLElement) {

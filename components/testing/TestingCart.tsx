@@ -100,12 +100,12 @@ export default function TestingCart() {
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-white/5">
+          <div key={item.id} className="flex flex-col items-stretch gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:gap-4">
             <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-bold text-slate-950 truncate">{item.name}</h4>
+              <h4 className="break-words text-sm font-bold leading-5 text-slate-950">{item.name}</h4>
               <p className="text-xs text-slate-500">${item.price}</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               <button
                 onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                 className="w-6 h-6 rounded bg-slate-200 flex items-center justify-center hover:bg-slate-300"

@@ -22,7 +22,7 @@ export function PlatformHubHero() {
       data-scroll-narration
       data-narration={HOME_NARRATION}
       data-narration-src="/audio/narration/home-hero.mp3"
-      data-narration-rate="0.84"
+      data-narration-rate="1"
       data-narration-style="assistant"
     >
       <div className="mx-auto grid max-w-[1440px] lg:min-h-[720px] lg:grid-cols-[0.92fr_1.08fr]">

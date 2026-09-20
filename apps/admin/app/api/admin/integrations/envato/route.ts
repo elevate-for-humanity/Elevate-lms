@@ -6,10 +6,12 @@ import { toErrorMessage } from '@/lib/safe';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
+  attachStoredLicensedMedia,
   recommendLicensedMediaForCourse,
   syncLicensedPurchases,
   type LicensedPurchase,
 } from '@/lib/course-builder/licensed-media';
+import { queueCourseLessonVideos } from '@/lib/course-factory/media-service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -141,6 +143,29 @@ const _GET = withAuth(
         const recommendations = await recommendLicensedMediaForCourse({ db, courseId });
         return NextResponse.json({ connected: true, recommendations });
       }
+      if (action === 'library') {
+        const db = await requireAdminClient();
+        const { data, error } = await db
+          .from('licensed_media_entitlements')
+          .select(
+            'id,title,provider_item_id,item_url,thumbnail_url,license_type,metadata,updated_at',
+          )
+          .eq('provider', 'envato')
+          .order('updated_at', { ascending: false });
+        if (error) throw error;
+        const assets = (data ?? []).filter((row) => {
+          const metadata =
+            row.metadata && typeof row.metadata === 'object'
+              ? (row.metadata as Record<string, unknown>)
+              : {};
+          return (
+            metadata.storage_bucket === 'course_videos' &&
+            typeof metadata.storage_path === 'string' &&
+            metadata.storage_path.startsWith('licensed-library/')
+          );
+        });
+        return NextResponse.json({ connected: true, assets });
+      }
       if (action === 'download') {
         const itemId = request.nextUrl.searchParams.get('itemId')?.trim() || '';
         const purchaseCode = request.nextUrl.searchParams.get('purchaseCode')?.trim() || '';
@@ -178,6 +203,7 @@ const _POST = withAuth(
         action?: string;
         courseId?: string;
         matchId?: string;
+        lessonId?: string;
       };
       const db = await requireAdminClient();
       if (input.action === 'sync') {
@@ -235,6 +261,41 @@ const _POST = withAuth(
           .single();
         if (error) throw error;
         return NextResponse.json({ ok: true, match: data });
+      }
+      if (input.action === 'attach') {
+        if (!input.matchId || !input.courseId || !input.lessonId) {
+          return NextResponse.json(
+            { error: 'matchId, courseId, and lessonId are required' },
+            { status: 400 },
+          );
+        }
+        await courseOrg(db, input.courseId);
+        const video = await attachStoredLicensedMedia({
+          db,
+          matchId: input.matchId,
+          courseId: input.courseId,
+          lessonId: input.lessonId,
+          actorId: user.id,
+        });
+        const { error: lessonError } = await db
+          .from('course_lessons')
+          .update({
+            media_origin: 'uploaded',
+            media_quality_status: 'pending',
+            video_status: 'queued',
+            video_error: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', input.lessonId)
+          .eq('course_id', input.courseId);
+        if (lessonError) throw lessonError;
+        const queued = await queueCourseLessonVideos({
+          courseId: input.courseId,
+          lessonId: input.lessonId,
+          onlyMissing: false,
+          force: true,
+        });
+        return NextResponse.json({ ok: true, video, queued });
       }
       return NextResponse.json({ error: 'Unsupported action' }, { status: 400 });
     } catch (error) {

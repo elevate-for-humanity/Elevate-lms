@@ -340,6 +340,12 @@ export default async function StudentDashboard() {
       image: '/images/pages/comp-home-highlight-success.webp',
     },
     {
+      href: '/lms/resume-builder',
+      label: 'Resume Builder',
+      text: 'Create, update, and save your professional resume.',
+      image: '/images/pages/career-counseling.jpg',
+    },
+    {
       href: '/lms/calendar',
       label: 'Schedule',
       text: 'Review classes, deadlines, and upcoming activity.',

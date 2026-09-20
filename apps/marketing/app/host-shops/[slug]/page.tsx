@@ -348,7 +348,7 @@ function FeaturedHostShopProfile({ shop }: { shop: FeaturedHostPartner }) {
                 </div>
               ) : null}
               <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-lg">
-                <video src={videoUrl} muted playsInline controls preload="metadata" className="aspect-[9/16] max-h-[560px] w-full object-contain" aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`} />
+                <video src={videoUrl} autoPlay muted playsInline loop preload="auto" className="aspect-[9/16] max-h-[560px] w-full object-contain" aria-label={`${shop.dba ?? shop.name} ${hostLabel} video`} />
               </div>
             </div>
           </div>

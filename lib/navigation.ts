@@ -9,6 +9,18 @@ export type { NavItem, NavSubItem } from '@/types/navigation';
 // Keep public programs discoverable by name in both desktop and mobile navigation.
 export const NAV_ITEMS: NavItem[] = [
   {
+    id: 'students',
+    name: 'Students',
+    href: '/learner/dashboard',
+    subItems: [
+      { name: 'Student Dashboard', href: '/learner/dashboard', isSectionLink: true, isAuth: true },
+      { name: 'Apply for Training', href: ROUTES.apply, isSectionLink: true },
+      { name: 'My Courses', href: '/lms/dashboard', isSectionLink: true, isAuth: true },
+      { name: 'Check Eligibility', href: ROUTES.eligibility, isSectionLink: true },
+      { name: 'Student Support', href: '/student-support', isSectionLink: true },
+    ],
+  },
+  {
     id: 'programs',
     name: 'Programs',
     href: ROUTES.programs,

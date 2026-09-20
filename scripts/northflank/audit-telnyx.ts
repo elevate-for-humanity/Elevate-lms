@@ -96,6 +96,12 @@ async function main() {
     event_types: eventSummary,
     newest_at: deliveryTimes.at(-1) || null,
   }));
+  console.log('AUDIT recent webhook deliveries ' + JSON.stringify(deliveries.slice(0, 12).map((delivery: Json) => ({
+    event_type: delivery.event_type || delivery.webhook?.event_type || delivery.event?.data?.event_type || null,
+    status: delivery.status || null,
+    response_status_code: delivery.response_status_code || delivery.http_status_code || null,
+    created_at: delivery.created_at || delivery.occurred_at || delivery.updated_at || null,
+  }))));
 
   let webhookStatus = 0;
   try {
@@ -128,6 +134,23 @@ async function main() {
     outbound_profile_count: profiles.length,
     forwarding_destination_verified: verified.some((v) => v.phone_number === '+13177607908'),
   };
+  console.log('AUDIT inbound configuration ' + JSON.stringify({
+    number: {
+      status: number?.status || null,
+      connection_id: number?.connection_id || null,
+      features: number?.features || null,
+      call_forwarding: number?.call_forwarding || null,
+      inbound_call_screening: number?.inbound_call_screening || null,
+    },
+    application: {
+      active: app?.active ?? null,
+      webhook_api_version: app?.webhook_api_version || null,
+      webhook_event_url: app?.webhook_event_url || null,
+      webhook_event_failover_url: app?.webhook_event_failover_url || null,
+      inbound: app?.inbound || null,
+      outbound_configured: app?.outbound?.outbound_voice_profile_id != null || app?.outbound === true,
+    },
+  }));
   console.log('AUDIT HEALTH ' + JSON.stringify(checks));
 
   const blockers: string[] = [];

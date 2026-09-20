@@ -73,6 +73,7 @@ export default function StudioCommandWorkspace({
   );
   const [previewUrl, setPreviewUrl] = useState('');
   const [browserTarget, setBrowserTarget] = useState('');
+  const [browserTask, setBrowserTask] = useState('');
   const [activeTask, setActiveTask] = useState<OrchestratedPlanCheckpoint | null>(null);
   const [activeCapability, setActiveCapability] = useState<string | null>(initialWorkspace ?? null);
   const [suggestedPrompt, setSuggestedPrompt] = useState('');
@@ -145,6 +146,7 @@ export default function StudioCommandWorkspace({
   };
   const handleCommandStart = (command: string) => {
     setActiveCapability(null);
+    setBrowserTask(command);
     const explicitUrl = command.match(/https?:\/\/[^\s"'<>]+/i)?.[0]?.replace(/[),.;]+$/, '') ?? '';
     setBrowserTarget(explicitUrl);
     setSurface(
@@ -391,6 +393,7 @@ export default function StudioCommandWorkspace({
                 conversationId={activeConversationId}
                 autoStart={surface === 'capability' && activeCapability === 'browser'}
                 initialTarget={browserTarget}
+                initialTask={browserTask}
               />
             </div>
             <div
@@ -440,6 +443,7 @@ export default function StudioCommandWorkspace({
                 conversationId={activeConversationId}
                 autoStart={surface === 'browser'}
                 initialTarget={browserTarget}
+                initialTask={browserTask}
               />
             </div>
           </div>

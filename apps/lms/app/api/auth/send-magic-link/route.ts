@@ -64,6 +64,7 @@ export async function POST(req: Request) {
   }
 
   const magicLink = link.properties.action_link;
+  // This address is intentionally credential-free so recipients can safely bookmark it.
   const permanentLoginUrl = destination.startsWith('/host-shop')
     ? `${appOrigin}/host-shop/login`
     : `${appOrigin}/login?redirect=${encodeURIComponent(destination)}`;

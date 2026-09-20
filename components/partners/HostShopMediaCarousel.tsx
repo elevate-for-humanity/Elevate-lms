@@ -55,7 +55,7 @@ export default function HostShopMediaCarousel({
     <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg sm:rounded-3xl">
       <div className="relative aspect-[4/3] w-full bg-white sm:aspect-[16/10] lg:max-h-[560px]">
         {active.type === 'video' ? (
-          <video key={active.url} src={active.url} controls playsInline preload="metadata" className="host-shop-media-enter h-full w-full object-contain bg-black" aria-label={active.alt || `${shopName} video`} />
+          <video key={active.url} src={active.url} autoPlay muted playsInline loop preload="auto" className="host-shop-media-enter h-full w-full object-contain bg-black" aria-label={active.alt || `${shopName} video`} />
         ) : (
           <img key={active.url} src={active.url} alt={active.alt || `${shopName} promotional image`} className="host-shop-media-enter h-full w-full object-contain" loading="lazy" decoding="async" />
         )}

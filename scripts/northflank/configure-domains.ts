@@ -35,7 +35,7 @@ type Port = {
 };
 
 const SERVICE_DOMAINS = {
-  marketing: ['www.elevateforhumanity.org', 'elevateforhumanity.org'],
+  marketing: ['www.elevateforhumanity.org'],
   lms: ['app.elevateforhumanity.org'],
   admin: ['admin.elevateforhumanity.org'],
 } as const;

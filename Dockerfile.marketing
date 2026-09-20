@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile:1.7
 FROM node:22-alpine AS base
 
+# Invalidate Northflank's runtime image after the September 20 production 502 incident.
+RUN echo "nf-cache-invalidate-marketing-2026-09-20-runtime-recovery"
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV NEXT_TELEMETRY_DISABLED=1

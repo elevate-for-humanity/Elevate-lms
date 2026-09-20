@@ -244,7 +244,7 @@ export default async function HostShopDashboardView() {
       title: 'Guides, handbook & MOU',
       detail:
         'Open the Host Shop user guide, operating handbook, current MOU, orientation, and required compliance documents.',
-      image: '/images/pages/academic-integrity-hero.webp',
+      image: '/images/pages/orientation-page-1.webp',
     },
     {
       href: '/host-shop/orientation',

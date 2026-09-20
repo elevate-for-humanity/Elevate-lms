@@ -211,14 +211,14 @@ export default function TestingPage() {
                         return (
                           <div
                             key={name}
-                            className="flex items-center justify-between gap-3 border-b border-slate-100 pb-2 text-sm last:border-0 last:pb-0"
+                            className="flex flex-col items-stretch gap-3 border-b border-slate-100 pb-3 text-sm last:border-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
                           >
-                            <span className="font-medium text-slate-700">{name}</span>
+                            <span className="min-w-0 break-words font-medium leading-6 text-slate-700">{name}</span>
                             {cents ? (
-                              <div className="flex flex-wrap items-center justify-end gap-2">
+                              <div className="flex shrink-0 flex-col gap-2 min-[420px]:flex-row sm:flex-wrap sm:items-center sm:justify-end">
                                 <Link
                                   href={`/testing/checkout?provider=${encodeURIComponent(provider.key)}&exam=${encodeURIComponent(name)}`}
-                                  className="inline-flex items-center gap-1.5 rounded-lg bg-brand-red-600 px-3 py-2 text-xs font-bold text-white hover:bg-brand-red-700"
+                                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-red-600 px-3 py-2 text-xs font-bold text-white hover:bg-brand-red-700"
                                 >
                                   Pay {`${(cents / 100).toFixed(2)}`} now
                                   <ArrowRight className="h-3.5 w-3.5" />
@@ -240,7 +240,7 @@ export default function TestingPage() {
                       })}
                     </div>
 
-                    <div className="mt-6 flex flex-wrap gap-3">
+                    <div className="mt-6 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
                       <Link
                         href={`/testing/${provider.key}`}
                         className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-800 hover:bg-slate-50"

@@ -45,7 +45,7 @@ export default async function NailTechnicianApprenticeshipPage() {
         featuredContent={<FeaturedHostPartners programSlug="nail-technician-apprenticeship" />}
       >
         <div className="space-y-10">
-          <NailDesignShowcase />
+          <NailDesignShowcase program="nail-technician" />
           <BeautyApprenticeshipAuthority program={program} />
 
       <section className="border-y border-emerald-200 bg-emerald-50 px-4 py-12 sm:px-6 sm:py-16">

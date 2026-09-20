@@ -11,7 +11,8 @@ import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 
 const secretGroupId = process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env';
 const numberId = process.env.TELNYX_PHONE_NUMBER_ID || '3050756061020554451';
-const configuredConnectionId = process.env.TELNYX_CONNECTION_ID || '3051039365166794471';
+const configuredConnectionId = process.env.TELNYX_CONNECTION_ID || '3053364749187155214';
+const obsoleteConnectionId = '3051039365166794471';
 let connectionId = configuredConnectionId;
 const expectedNumber = process.env.TELNYX_PHONE_NUMBER || '+13179999620';
 const webhookUrl =
@@ -253,7 +254,7 @@ async function main() {
     apiKey,
     `/call_control_applications/${connectionId}`,
   );
-  const replacementRequired = connectionId === configuredConnectionId;
+  const replacementRequired = connectionId === obsoleteConnectionId;
   if (replacementRequired) {
     // The user explicitly approved replacing this defective, single allowed
     // Call Control application after carrier reprovisioning still returned a

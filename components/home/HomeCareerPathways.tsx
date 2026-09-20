@@ -49,7 +49,6 @@ export function HomeCareerPathways() {
   return (
     <section
       className="bg-white px-4 py-10 sm:py-12"
-      aria-labelledby="featured-pathways-heading"
       aria-label="Choose where you want to go next."
     >
       <div className="mx-auto max-w-6xl">

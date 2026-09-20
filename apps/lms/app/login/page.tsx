@@ -79,6 +79,7 @@ export default function LoginPage() {
   const safeRedirect = validateRedirect(requestedRedirect, '');
   const isProgramHolderLogin = safeRedirect.startsWith('/program-holder');
   const reason = searchParams.get('reason');
+  const callbackError = searchParams.get('error');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -88,6 +89,14 @@ export default function LoginPage() {
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (callbackError === 'magic_link_expired') {
+      setError('That secure sign-in link has expired. Request a new link or sign in with your password.');
+    } else if (callbackError === 'magic_link_failed') {
+      setError('That secure sign-in link is invalid. Request a new link or sign in with your password.');
+    }
+  }, [callbackError]);
 
   // An idle-timeout redirect must actually clear the Supabase browser session
   // before the user signs in again.

@@ -162,6 +162,9 @@ jobs:
       - name: Enforce canonical Northflank Marketing configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute
 
+      - name: Restore canonical Marketing domains
+        run: pnpm tsx scripts/northflank/configure-domains.ts --execute
+
       - name: Record predeploy upstream health
         id: predeploy
         run: |

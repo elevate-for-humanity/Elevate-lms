@@ -42,8 +42,26 @@ async function get(apiKey: string, path: string): Promise<Json> {
   }
   return body;
 }
+async function post(apiKey: string, path: string, body: Json): Promise<Json> {
+  const response = await fetch(`https://api.telnyx.com/v2${path}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const text = await response.text();
+  let payload: Json = {}; try { payload = text ? JSON.parse(text) : {}; } catch {}
+  if (!response.ok) {
+    const code = payload.errors?.[0]?.code || response.status;
+    throw new Error(`Telnyx endpoint failed (code ${code})`);
+  }
+  return payload;
+}
 async function probe(apiKey: string, name: string, path: string) {
   try { return { name, ok: true, value: await get(apiKey, path) }; }
+  catch (error) { return { name, ok: false, error: error instanceof Error ? error.message : String(error) }; }
+}
+async function probePost(apiKey: string, name: string, path: string, body: Json) {
+  try { return { name, ok: true, value: await post(apiKey, path, body) }; }
   catch (error) { return { name, ok: false, error: error instanceof Error ? error.message : String(error) }; }
 }
 function list(result: any): Json[] { return Array.isArray(result?.value?.data) ? result.value.data : []; }
@@ -59,6 +77,9 @@ async function main() {
   const results = await Promise.all([
     probe(apiKey, 'number', `/phone_numbers/${numberId}`),
     probe(apiKey, 'numbers', '/phone_numbers?page[size]=250'),
+    probe(apiKey, 'number_slim', `/phone_numbers/slim?filter[phone_number]=${encodeURIComponent(expectedNumber)}&page[size]=10`),
+    probe(apiKey, 'voice_numbers', `/phone_numbers/voice?filter[phone_number]=${encodeURIComponent(expectedNumber)}&page[size]=10`),
+    probePost(apiKey, 'ownership', '/phone_numbers/actions/verify_ownership', { phone_numbers: [expectedNumber] }),
     probe(apiKey, 'application', `/call_control_applications/${connectionId}`),
     probe(apiKey, 'applications', '/call_control_applications?page[size]=250'),
     probe(apiKey, 'outbound_profiles', '/outbound_voice_profiles?page[size]=250'),
@@ -72,6 +93,10 @@ async function main() {
   const number = byName.number?.value?.data;
   const app = byName.application?.value?.data;
   const numbers = list(byName.numbers);
+  const slimNumbers = list(byName.number_slim);
+  const voiceNumbers = list(byName.voice_numbers);
+  const voiceNumber = voiceNumbers.find((item: Json) => item.phone_number === expectedNumber);
+  const ownership = byName.ownership?.value?.data || {};
   const apps = list(byName.applications);
   const profiles = list(byName.outbound_profiles);
   const verified = list(byName.verified_numbers);
@@ -120,9 +145,11 @@ async function main() {
     expected_number_found: Boolean(number),
     expected_number_matches: number?.phone_number === expectedNumber,
     expected_number_status: status || null,
-    voice_capability_present: Array.isArray(number?.features)
-      ? number.features.some((f: Json) => f.name === 'voice' && f.enabled !== false)
-      : true,
+    voice_record_found: Boolean(voiceNumber),
+    voice_connection_assigned: String(voiceNumber?.connection_id || '') === connectionId,
+    ownership_verified: Array.isArray(ownership.found) && ownership.found.some(
+      (item: Json) => item.number_val_e164 === expectedNumber && String(item.id || '') === numberId,
+    ),
     connection_assigned: String(number?.connection_id || '') === connectionId,
     call_control_app_count: apps.length,
     application_found: Boolean(app),
@@ -153,6 +180,22 @@ async function main() {
       source_type: number?.source_type || null,
       inbound_call_screening: number?.inbound_call_screening || null,
     },
+    voice: voiceNumber ? {
+      phone_number: voiceNumber.phone_number || null,
+      connection_id: voiceNumber.connection_id || null,
+      inbound_call_screening: voiceNumber.inbound_call_screening || null,
+      call_forwarding: voiceNumber.call_forwarding || null,
+      translated_number: voiceNumber.translated_number || null,
+      tech_prefix_enabled: voiceNumber.tech_prefix_enabled ?? null,
+      usage_payment_method: voiceNumber.usage_payment_method || null,
+      media_features: voiceNumber.media_features || null,
+      record_fields: Object.keys(voiceNumber).sort(),
+    } : null,
+    ownership: {
+      found: ownership.found || [],
+      not_found: ownership.not_found || [],
+    },
+    slim_number_count: slimNumbers.length,
     account: {
       balance: balance?.balance ?? null,
       credit_limit: balance?.credit_limit ?? null,
@@ -175,7 +218,9 @@ async function main() {
   if (!checks.expected_number_found) blockers.push('expected number record missing');
   if (!checks.expected_number_matches) blockers.push('number ID maps to a different number');
   if (status && !['active', 'purchased'].includes(status)) blockers.push(`number status is ${status}`);
-  if (!checks.voice_capability_present) blockers.push('voice capability is disabled');
+  if (!checks.voice_record_found) blockers.push('number is missing from the dedicated voice configuration endpoint');
+  if (!checks.voice_connection_assigned) blockers.push('voice configuration is not assigned to the expected Call Control application');
+  if (!checks.ownership_verified) blockers.push('Telnyx ownership verification did not return the expected number ID');
   if (!checks.connection_assigned) blockers.push('number is not assigned to the expected Call Control application');
   if (!checks.application_found) blockers.push('Call Control application missing');
   if (!checks.application_active) blockers.push('Call Control application inactive');
@@ -185,7 +230,9 @@ async function main() {
   if (!checks.application_outbound_enabled) blockers.push('Call Control outbound calling is not configured');
   if (!checks.failover_webhook_configured) blockers.push('failover webhook missing');
   if (!checks.outbound_profile_count) blockers.push('outbound voice profile missing');
-  if (!checks.forwarding_destination_verified) blockers.push('forwarding destination not verified');
+  // Direct inbound Call Control does not require an external forwarding number.
+  // Keep this as diagnostic output, but never fail phone health because forwarding
+  // is intentionally disabled for this deployment.
   console.log('AUDIT BLOCKERS ' + JSON.stringify(blockers));
   if (blockers.length) process.exitCode = 2;
 }

@@ -25,14 +25,21 @@ export default async function EnvManagerPage() {
           ]}
         />
         <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-medium leading-6 text-amber-950">
-          Production API secrets belong in the environment for the service that uses them. This page can review existing configuration and manage non-secret <code className="rounded bg-white px-1">platform_settings</code>; it does not write private API keys into plaintext database storage.
+          Secret values entered here are routed to the protected runtime-secret store and are masked
+          after saving. Use the dedicated Grok setup page for a simpler mobile save-and-test flow.
         </div>
         <p className="mt-3 text-sm font-medium text-slate-700">
-          Admin runtime: <code className="rounded bg-slate-100 px-1">admin.elevateforhumanity.org</code>. After changing a Northflank runtime variable, redeploy the owning service when a fresh container is required.
+          Admin runtime:{' '}
+          <code className="rounded bg-slate-100 px-1">admin.elevateforhumanity.org</code>. After
+          changing a Northflank runtime variable, redeploy the owning service when a fresh container
+          is required.
         </p>
         <div className="mt-3 flex flex-wrap gap-4 text-sm font-bold">
           <Link href="/integrations" className="text-brand-blue-700 underline">
             Integration status
+          </Link>
+          <Link href="/settings/grok" className="text-brand-blue-700 underline">
+            Grok / xAI setup
           </Link>
           <Link href="/studio" className="text-brand-blue-700 underline">
             Dev Studio

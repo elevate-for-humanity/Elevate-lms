@@ -60,13 +60,6 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
         kind: 'photo',
       },
       {
-        src: '/videos/partners/kountry-kutz/shop-tour.mp4',
-        alt: 'Guided interior tour of Kountry Kutz Barbershop',
-        kind: 'video',
-        script:
-          'Welcome to Kountry Kutz Barbershop, located at 56 West Main Street, Suite A, in New Palestine, Indiana. As the video takes you through the shop, notice the professional barber stations, mirrors, chairs, work surfaces, tools, and client service areas that make this a real working barbershop. This family-oriented Main Street shop is an approved Elevate Barber Apprenticeship Host Shop. Here, apprentices can learn how to prepare and sanitize a station, disinfect tools, greet and consult with clients, drape clients correctly, and develop supervised skills in clipper cutting, shear work, fading, lineups, beard grooming, and professional customer service. The tour also shows the daily shop environment where apprentices practice organization, time management, communication, and safe workplace routines. Apply through Elevate before reporting to the shop. Placement, employment, wages, schedule, supervisor capacity, documented training hours, and licensing requirements are confirmed before training begins.',
-      },
-      {
         src: '/images/partners/kountry-kutz-apprenticeship-flyer.webp',
         alt: 'Kountry Kutz approved barber apprenticeship site announcement',
         kind: 'flyer',

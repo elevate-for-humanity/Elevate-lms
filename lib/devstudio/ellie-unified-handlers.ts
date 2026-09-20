@@ -111,6 +111,7 @@ export async function fetchAiHealth(): Promise<{
     const providers = {
       elevate: Boolean(data.hasElevate || data.availableProviders?.elevate),
       cloudflare: Boolean(data.hasCloudflare || data.availableProviders?.cloudflare),
+      xai: Boolean(data.hasXAI || data.availableProviders?.xai),
       groq: Boolean(data.hasGroq),
       openai: Boolean(data.hasOpenAI),
       anthropic: Boolean(data.hasAnthropic),
@@ -120,6 +121,7 @@ export async function fetchAiHealth(): Promise<{
     const label = [
       providers.elevate && 'Elevate AI',
       providers.cloudflare && 'Cloudflare AI',
+      providers.xai && 'Grok / xAI',
       providers.groq && 'Groq',
       providers.openai && 'OpenAI',
       providers.anthropic && 'Claude',

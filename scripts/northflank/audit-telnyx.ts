@@ -146,6 +146,11 @@ async function main() {
       connection_name: number?.connection_name || null,
       record_fields: number ? Object.keys(number).sort() : [],
       call_forwarding: number?.call_forwarding || null,
+      call_forwarding_enabled: number?.call_forwarding_enabled ?? null,
+      number_level_routing: number?.number_level_routing ?? null,
+      hd_voice_enabled: number?.hd_voice_enabled ?? null,
+      release_in_progress: number?.release_in_progress ?? null,
+      source_type: number?.source_type || null,
       inbound_call_screening: number?.inbound_call_screening || null,
     },
     account: {

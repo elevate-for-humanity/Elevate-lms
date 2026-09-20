@@ -2,14 +2,17 @@ import { NextRequest } from 'next/server';
 
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
-import { resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
+import { probeCloudflareWorkersAI, resolveAIRuntimeState } from '@/lib/ai/provider-runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   return capabilityHealthResponse(request, async () => {
-    const { providers, anyConfigured: aiConfigured } = await resolveAIRuntimeState();
+    const [{ providers, anyConfigured: aiConfigured }, cloudflare] = await Promise.all([
+      resolveAIRuntimeState(),
+      probeCloudflareWorkersAI(),
+    ]);
     const { groq: hasGroq, xai: hasXAI, gemini: hasGemini, openai: hasOpenAI, anthropic: hasAnthropic } = providers;
 
     return buildCapabilityHealth('ai', [
@@ -50,6 +53,12 @@ export async function GET(request: NextRequest) {
         passed: hasAnthropic,
         required: false,
         message: hasAnthropic ? 'Anthropic is configured.' : 'Anthropic is not configured.',
+      },
+      {
+        name: 'cloudflare-workers-ai',
+        passed: cloudflare.reachable,
+        required: false,
+        message: cloudflare.detail,
       },
     ]);
   });

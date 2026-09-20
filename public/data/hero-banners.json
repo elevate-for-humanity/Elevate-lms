@@ -832,10 +832,10 @@
     "voiceoverSrc": "/audio/heroes/nail-tech.mp3",
     "microLabel": "DOL Registered Apprenticeship",
     "credentialLabel": "Indiana Nail Technician License",
-    "durationLabel": "600 hours",
+    "durationLabel": "2,000 hours",
     "salaryRangeLabel": "$24,000 to $42,000",
     "belowHeroHeadline": "Earn your Indiana Nail Technician License while getting paid.",
-    "belowHeroSubheadline": "DOL Registered Apprenticeship. 600 hours of supervised training in a licensed salon. Manicure, pedicure, acrylics, and gel nails. Earn wages from day one.",
+    "belowHeroSubheadline": "DOL Registered Apprenticeship. 2,000-hour training plan in an approved salon, including 19 verified competencies and 210 hours of related instruction. Earn wages from day one.",
     "primaryCta": {
       "label": "Apply Now",
       "href": "/programs/nail-technician-apprenticeship/apply"
@@ -849,7 +849,7 @@
       "DOL Registered Apprenticeship",
       "Earn wages from day one",
       "Indiana Nail Technician License",
-      "600 hours — fastest path"
+      "2,000-hour apprenticeship plan"
     ],
     "transcript": "Earn toward the Indiana Nail Technician License through a 2,000-hour DOL Registered Manicurist Apprenticeship training plan, including 19 verified occupational competencies and 210 hours of related instruction. Training covers manicure, pedicure, acrylics, gel nails, sanitation, and client service in an approved salon. Wages begin on day one under the host-site employment agreement.",
     "analyticsName": "nail-technician-apprenticeship",

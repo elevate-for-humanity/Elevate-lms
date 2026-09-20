@@ -12,7 +12,9 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-const MAX_BYTES = 200 * 1024 * 1024;
+// Paid Supabase projects support much larger objects. Keep this aligned with
+// the private course_videos bucket limit so 4K licensed masters are accepted.
+const MAX_BYTES = 500 * 1024 * 1024;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const COURSE_VIDEO_ROLES = new Set([
   'source_broll',
@@ -27,7 +29,7 @@ function cleanName(name: string) {
 }
 
 type CourseUploadControl = {
-  action?: 'prepare' | 'finalize';
+  action?: 'prepare' | 'finalize' | 'prepare-library' | 'finalize-library';
   title?: string;
   description?: string;
   fileName?: string;
@@ -38,7 +40,21 @@ type CourseUploadControl = {
   storagePath?: string;
   licensedMatchId?: string;
   assetRole?: 'source_broll' | 'course_preroll' | 'lesson_preroll' | 'lesson_outro' | 'reference';
+  providerItemId?: string;
+  provider?: 'envato';
+  sourceUrl?: string;
+  resolution?: string;
+  durationSeconds?: number;
+  programTags?: string[];
+  lessonTags?: string[];
 };
+
+function cleanTags(values: unknown) {
+  if (!Array.isArray(values)) return [];
+  return [
+    ...new Set(values.map((value) => String(value).trim().toLowerCase()).filter(Boolean)),
+  ].slice(0, 40);
+}
 
 async function queueLicensedLessonRender(courseId: string, lessonId: string) {
   const db = await requireAdminClient();
@@ -95,7 +111,120 @@ async function controlCourseUpload(
   const fileName = cleanName(String(input.fileName ?? '').trim());
   const fileType = String(input.fileType ?? '').trim();
   const fileSize = Number(input.fileSize ?? 0);
-  const assetRole = input.licensedMatchId ? 'source_broll' : input.assetRole ?? 'source_broll';
+  const assetRole = input.licensedMatchId ? 'source_broll' : (input.assetRole ?? 'source_broll');
+  const libraryAction = input.action === 'prepare-library' || input.action === 'finalize-library';
+  const providerItemId = cleanName(String(input.providerItemId ?? '').trim());
+  if (libraryAction) {
+    if (!title || !providerItemId || input.provider !== 'envato') {
+      return NextResponse.json(
+        { error: 'A title, Envato item ID, and provider are required for the licensed library' },
+        { status: 400 },
+      );
+    }
+    if (!fileName || !fileType.startsWith('video/') || fileSize <= 0 || fileSize > MAX_BYTES) {
+      return NextResponse.json(
+        { error: 'A valid licensed video file of 500 MB or less is required' },
+        { status: 400 },
+      );
+    }
+    const db = await requireAdminClient();
+    if (input.action === 'prepare-library') {
+      const storagePath = `licensed-library/envato/${providerItemId}/${Date.now()}-${fileName}`;
+      const { data, error } = await db.storage
+        .from('course_videos')
+        .createSignedUploadUrl(storagePath);
+      if (error || !data?.token) {
+        return NextResponse.json(
+          { error: 'Could not prepare the secure licensed-media upload' },
+          { status: 500 },
+        );
+      }
+      return NextResponse.json({
+        success: true,
+        bucket: 'course_videos',
+        storagePath,
+        token: data.token,
+      });
+    }
+    const storagePath = String(input.storagePath ?? '');
+    if (!storagePath.startsWith(`licensed-library/envato/${providerItemId}/`)) {
+      return NextResponse.json({ error: 'Invalid licensed-media storage path' }, { status: 400 });
+    }
+    const folder = storagePath.slice(0, storagePath.lastIndexOf('/'));
+    const storedName = storagePath.slice(storagePath.lastIndexOf('/') + 1);
+    const { data: storedFiles, error: verifyError } = await db.storage
+      .from('course_videos')
+      .list(folder, { search: storedName, limit: 2 });
+    const storedFile = storedFiles?.find((file) => file.name === storedName);
+    if (verifyError || !storedFile) {
+      return NextResponse.json(
+        { error: 'Uploaded licensed media could not be verified' },
+        { status: 400 },
+      );
+    }
+    const { data: existing, error: existingError } = await db
+      .from('licensed_media_entitlements')
+      .select('id,metadata')
+      .eq('provider', 'envato')
+      .eq('provider_item_id', providerItemId)
+      .maybeSingle();
+    if (existingError) throw existingError;
+    const existingMetadata =
+      existing?.metadata && typeof existing.metadata === 'object'
+        ? (existing.metadata as Record<string, unknown>)
+        : {};
+    const metadata = {
+      ...existingMetadata,
+      storage_bucket: 'course_videos',
+      storage_path: storagePath,
+      file_name: fileName,
+      mime_type: fileType,
+      file_size: fileSize,
+      resolution: String(input.resolution ?? '').trim() || null,
+      duration_seconds:
+        Number.isFinite(Number(input.durationSeconds)) && Number(input.durationSeconds) > 0
+          ? Number(input.durationSeconds)
+          : null,
+      program_tags: cleanTags(input.programTags),
+      lesson_tags: cleanTags(input.lessonTags),
+      source_url: String(input.sourceUrl ?? '').trim() || null,
+      storage_verified_at: new Date().toISOString(),
+    };
+    const row = {
+      provider: 'envato',
+      provider_item_id: providerItemId,
+      title,
+      item_url: String(input.sourceUrl ?? '').trim() || null,
+      license_type: 'Envato lifetime commercial license',
+      metadata,
+      created_by: userId,
+    };
+    const { data: entitlement, error: entitlementError } = existing
+      ? await db
+          .from('licensed_media_entitlements')
+          .update(row)
+          .eq('id', existing.id)
+          .select('id,title,provider_item_id,license_type,metadata')
+          .single()
+      : await db
+          .from('licensed_media_entitlements')
+          .insert(row)
+          .select('id,title,provider_item_id,license_type,metadata')
+          .single();
+    if (entitlementError) {
+      await db.storage.from('course_videos').remove([storagePath]);
+      throw entitlementError;
+    }
+    await logAdminAudit({
+      action: AdminAction.VIDEO_UPLOADED,
+      actorId: userId,
+      entityType: 'licensed_media_entitlements',
+      entityId: entitlement.id,
+      metadata: { provider: 'envato', provider_item_id: providerItemId, storage_path: storagePath },
+      req: request,
+    });
+    return NextResponse.json({ success: true, entitlement });
+  }
   if (!title || !courseId || !lessonId || !UUID.test(courseId) || !UUID.test(lessonId)) {
     return NextResponse.json(
       { error: 'A valid title, courseId, and lessonId are required' },
@@ -123,7 +252,7 @@ async function controlCourseUpload(
   if (input.action === 'prepare') {
     if (!fileName || !fileType.startsWith('video/') || fileSize <= 0 || fileSize > MAX_BYTES) {
       return NextResponse.json(
-        { error: 'A valid video file of 200 MB or less is required' },
+        { error: 'A valid video file of 500 MB or less is required' },
         { status: 400 },
       );
     }

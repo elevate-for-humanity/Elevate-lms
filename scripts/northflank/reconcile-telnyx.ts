@@ -203,12 +203,18 @@ async function main() {
     );
   }
 
-  if (String(numberBefore.data?.connection_id || '') !== connectionId) {
-    await telnyx(apiKey, `/phone_numbers/${numberId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ connection_id: connectionId }),
-    });
-  }
+  // Re-assert the complete inbound route even when the connection ID already
+  // matches. This is intentionally idempotent and forces Telnyx to reconcile
+  // the carrier-side number route after a number returns a fast busy without
+  // producing a Call Control webhook.
+  await telnyx(apiKey, `/phone_numbers/${numberId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      connection_id: connectionId,
+      call_forwarding_enabled: false,
+      number_level_routing: 'disabled',
+    }),
+  });
 
   const profiles = await telnyx<Json>(
     apiKey,

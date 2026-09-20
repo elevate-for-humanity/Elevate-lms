@@ -5,7 +5,7 @@ import { ArrowRight, BadgeCheck, Sparkles } from 'lucide-react';
 const TRACKS = [
   {
     title: 'Barber Apprenticeship',
-    hours: 'Structured instruction plus supervised host-shop training',
+    hours: '2,000 hours of supervised host-shop training',
     focus: 'Haircutting, fades, grooming, sanitation, client service, and professional practice',
     image: '/images/partners/kountry-kutz/interior-active.webp',
     href: '/programs/barber-apprenticeship',
@@ -21,7 +21,7 @@ const TRACKS = [
   },
   {
     title: 'Esthetician Apprenticeship',
-    hours: 'Supervised work-based training with related technical instruction',
+    hours: '2,000 hours of supervised work-based training',
     focus: 'Skin care, sanitation, client consultation, services, safety, and professional practice',
     image: '/images/beauty/esthetics-hero.webp',
     href: '/programs/esthetician-apprenticeship',
@@ -29,7 +29,7 @@ const TRACKS = [
   },
   {
     title: 'Nail Technician Apprenticeship',
-    hours: '600 hours of supervised training',
+    hours: '2,000 hours of supervised nail-salon training',
     focus: 'Manicuring, pedicuring, nail enhancements, sanitation, and client safety',
     image: '/images/pexels/nail-tech.webp',
     href: '/programs/nail-technician-apprenticeship',

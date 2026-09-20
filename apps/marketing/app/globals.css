@@ -1464,22 +1464,8 @@ body {
   }
 }
 
-/* 4️⃣ Make hero/banner sections use more height */
-.hero,
-.banner,
-.page-header {
-  min-height: 80vh; /* Taller hero area */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-/* 5️⃣ Add spacing between homepage sections */
-section {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
-}
+/* Section and hero spacing is owned by each component. Global minimum heights and
+   padding created large blank gaps and broke compact mobile navigation journeys. */
 
 /* 6️⃣ Adjust CTA buttons to scale with screen size */
 button,

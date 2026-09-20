@@ -244,6 +244,23 @@ body {
   }
 }
 
+/* Mobile table safety net.
+   Dense policy, pricing, reporting, and schedule tables must scroll inside
+   their own box instead of compressing every word into one-character columns
+   or widening the whole page. Pages with a purpose-built mobile card view can
+   hide their table at the mobile breakpoint. */
+@media (max-width: 767px) {
+  main table:not([data-mobile-layout='fixed']) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+}
+
 /* ============================================================================
    LAYOUT & CONTAINERS
    ============================================================================ */

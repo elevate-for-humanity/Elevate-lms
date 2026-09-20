@@ -44,6 +44,7 @@ async function serverSignIn(email: string, password: string): Promise<string> {
     if (controller.signal.aborted) {
       throw new Error(
         'The sign-in service took too long to respond. Your internet may be working; please retry once or use password reset.',
+        { cause: error },
       );
     }
     throw error;

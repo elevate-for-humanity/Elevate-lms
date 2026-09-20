@@ -47,6 +47,7 @@ export default function HostShopLoginPage() {
         if (controller.signal.aborted) {
           throw new Error(
             'The sign-in service took too long to respond. Your internet may be working; please retry once or send a secure magic link.',
+            { cause },
           );
         }
         throw cause;

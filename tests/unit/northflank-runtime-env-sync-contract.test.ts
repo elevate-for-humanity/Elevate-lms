@@ -46,4 +46,12 @@ describe('Northflank runtime environment synchronization contract', () => {
     }
     expect(admin).toContain('pnpm tsx scripts/northflank/sync-env.ts --execute');
   });
+
+  it('gives the Admin secret merge every critical runtime credential', () => {
+    const admin = read('.github/workflows/deploy-admin.yml');
+
+    for (const key of ['NEXTAUTH_SECRET', 'STRIPE_SECRET_KEY', 'SENDGRID_API_KEY']) {
+      expect(admin).toContain(`${key}: \${{ secrets.${key} }}`);
+    }
+  });
 });

@@ -85,6 +85,11 @@ async function listPurchases() {
   return rows.map(normalizePurchase).filter((purchase) => purchase.itemId);
 }
 
+async function marketAccount() {
+  const payload = await envatoGet('/v1/market/private/user/username.json');
+  return safeText(payload.username);
+}
+
 async function courseOrg(db: Awaited<ReturnType<typeof requireAdminClient>>, courseId: string) {
   const { data, error } = await db
     .from('courses')
@@ -106,22 +111,28 @@ function errorResponse(error: unknown) {
 
 const _GET = withAuth(
   async (request: NextRequest) => {
-  const limited = await applyRateLimit(request, 'api');
+    const limited = await applyRateLimit(request, 'api');
     if (limited) return limited;
     try {
       const action = request.nextUrl.searchParams.get('action') || 'status';
       const courseId = request.nextUrl.searchParams.get('courseId')?.trim() || '';
       if (action === 'status') {
-        const payload = await envatoGet('/v1/market/private/user/username.json');
+        const username = await marketAccount();
         return NextResponse.json({
           connected: true,
-          username: safeText(payload.username),
+          username,
           provider: 'Envato Market',
         });
       }
       if (action === 'purchases') {
-        const purchases = await listPurchases();
-        return NextResponse.json({ connected: true, purchases, count: purchases.length });
+        const [purchases, username] = await Promise.all([listPurchases(), marketAccount()]);
+        return NextResponse.json({
+          connected: true,
+          provider: 'Envato Market',
+          username,
+          purchases,
+          count: purchases.length,
+        });
       }
       if (action === 'recommendations') {
         if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
@@ -173,7 +184,7 @@ const _POST = withAuth(
         if (!input.courseId)
           return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
         const orgId = await courseOrg(db, input.courseId);
-        const purchases = await listPurchases();
+        const [purchases, username] = await Promise.all([listPurchases(), marketAccount()]);
         const entitlements = await syncLicensedPurchases({
           db,
           purchases,
@@ -186,6 +197,8 @@ const _POST = withAuth(
         });
         return NextResponse.json({
           ok: true,
+          provider: 'Envato Market',
+          username,
           purchases,
           entitlements: entitlements.length,
           recommendations,

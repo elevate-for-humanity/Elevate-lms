@@ -5,8 +5,8 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 const PROGRAMS = [
   { value: 'cosmetology-apprenticeship',     label: 'Cosmetology Apprenticeship (2,000 hrs)' },
-  { value: 'esthetician-apprenticeship',     label: 'Esthetician Apprenticeship (700 hrs)' },
-  { value: 'nail-technician-apprenticeship', label: 'Nail Technician Apprenticeship (400 hrs)' },
+  { value: 'esthetician-apprenticeship',     label: 'Esthetician Apprenticeship (2,000 hrs)' },
+  { value: 'nail-technician-apprenticeship', label: 'Nail Technician Apprenticeship (2,000 hrs)' },
 ];
 
 const FUNDING_OPTIONS = [

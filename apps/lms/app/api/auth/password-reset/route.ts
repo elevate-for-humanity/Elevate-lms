@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
     recoveryUrl.searchParams.set('type', 'recovery');
     recoveryUrl.searchParams.set('next', resetPath);
     const recoveryLink = recoveryUrl.toString();
+    // Keep a reusable portal address in the message; only the credential-bearing reset URL expires.
     const permanentLoginUrl = programHolder
       ? new URL('/login?redirect=/program-holder/onboarding', siteUrls.app).toString()
       : new URL('/login', siteUrls.app).toString();

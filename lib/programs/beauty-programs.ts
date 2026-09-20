@@ -67,7 +67,7 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     shortTitle: 'Esthetician',
     color: 'pink',
     licenseTitle: 'Indiana Esthetician License',
-    ojtHours: 700,
+    ojtHours: 2000,
     depositCents: 112000,
     fullTuitionCents: 320000,
     stripeDepositLink: 'https://buy.stripe.com/cNicN52UU4QS4NZ1AZgIo06',
@@ -76,8 +76,8 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     orientationTime: '8–10 minutes',
     nextSteps: [
       { title: 'Complete orientation', desc: 'Sanitation, safety, and spa protocols — required before hands-on training' },
-      { title: 'Apply for your Indiana Esthetician License', desc: 'We guide you through the IPLA application — 700 hours required for licensure' },
-      { title: 'Log OJT hours weekly', desc: '700 hours required — track via your apprentice dashboard' },
+      { title: 'Apply for your Indiana Esthetician License', desc: 'We guide you through the Indiana licensing application after completing the registered apprenticeship requirements' },
+      { title: 'Log OJT hours weekly', desc: '2,000 OJL hours required — track via your apprentice dashboard' },
     ],
   },
   'nail-technician-apprenticeship': {
@@ -86,7 +86,7 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     shortTitle: 'Nail Tech',
     color: 'rose',
     licenseTitle: 'Indiana Nail Technician License',
-    ojtHours: 450,
+    ojtHours: 2000,
     depositCents: 175000,
     fullTuitionCents: 500000,
     stripeDepositLink: 'https://buy.stripe.com/cNicN52UU4QS4NZ1AZgIo06',
@@ -95,8 +95,8 @@ export const BEAUTY_PROGRAMS: Record<string, BeautyProgramConfig> = {
     orientationTime: '8–10 minutes',
     nextSteps: [
       { title: 'Complete orientation', desc: 'Sanitation, safety, and salon protocols — required before hands-on training' },
-      { title: 'Apply for your Indiana Nail Technician License', desc: 'We guide you through the IPLA application — 450 hours required for licensure' },
-      { title: 'Log OJT hours weekly', desc: '450 hours required — track via your apprentice dashboard' },
+      { title: 'Apply for your Indiana Nail Technician License', desc: 'We guide you through the Indiana licensing application after completing the registered apprenticeship requirements' },
+      { title: 'Log OJT hours weekly', desc: '2,000 OJL hours required — track via your apprentice dashboard' },
     ],
   },
 };

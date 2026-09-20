@@ -32,12 +32,27 @@ export default function HostShopLoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        cache: 'no-store',
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 20_000);
+      let response: Response;
+      try {
+        response = await fetch('/api/auth/signin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          cache: 'no-store',
+          signal: controller.signal,
+          body: JSON.stringify({ email: email.trim(), password }),
+        });
+      } catch (cause) {
+        if (controller.signal.aborted) {
+          throw new Error(
+            'The sign-in service took too long to respond. Your internet may be working; please retry once or send a secure magic link.',
+          );
+        }
+        throw cause;
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
       const body = (await response.json().catch(() => null)) as { success?: boolean; error?: string } | null;
       if (!response.ok || body?.success !== true) {
         throw new Error(body?.error || 'Invalid email or password.');

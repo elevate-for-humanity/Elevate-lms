@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   AlertTriangle,
+  Database,
+  Download,
   Globe2,
   Keyboard,
   Loader2,
@@ -31,6 +33,16 @@ type BrowserEvent = {
   status?: number;
   error?: string;
 };
+type StudioDownload = {
+  id: string;
+  fileName: string;
+  contentType: string;
+  size: number;
+  status: 'downloading' | 'ready' | 'uploading' | 'stored' | 'failed';
+  uploadProgress?: number;
+  sourceUrl?: string;
+  error?: string;
+};
 
 export default function CloudBrowserWorkspace({
   unifiedTask = null,
@@ -49,6 +61,13 @@ export default function CloudBrowserWorkspace({
   const [runtimeReady, setRuntimeReady] = useState<boolean | null>(null);
   const [error, setError] = useState('');
   const [events, setEvents] = useState<BrowserEvent[]>([]);
+  const [downloads, setDownloads] = useState<StudioDownload[]>([]);
+  const [envatoItemId, setEnvatoItemId] = useState('');
+  const [licensedTitle, setLicensedTitle] = useState('');
+  const [programTags, setProgramTags] = useState('');
+  const [lessonTags, setLessonTags] = useState('');
+  const [resolution, setResolution] = useState('3840x2160');
+  const [storingDownload, setStoringDownload] = useState('');
   const [typedText, setTypedText] = useState('');
   const [agentTask, setAgentTask] = useState('');
   const [agentResult, setAgentResult] = useState('');
@@ -179,7 +198,13 @@ export default function CloudBrowserWorkspace({
   }
 
   useEffect(() => {
-    if (!autoStart || runtimeReady !== true || !target.trim() || session || autoStartedRef.current) {
+    if (
+      !autoStart ||
+      runtimeReady !== true ||
+      !target.trim() ||
+      session ||
+      autoStartedRef.current
+    ) {
       return;
     }
     autoStartedRef.current = true;
@@ -204,6 +229,85 @@ export default function CloudBrowserWorkspace({
     else if (body.url) setTarget(body.url);
   }
 
+  async function storeLicensedDownload(download: StudioDownload) {
+    if (!session || download.status !== 'ready') return;
+    if (!envatoItemId.trim()) {
+      setError('Enter the Envato item ID before saving this licensed file.');
+      return;
+    }
+    setError('');
+    setStoringDownload(download.id);
+    const common = {
+      title: licensedTitle.trim() || download.fileName.replace(/\.[^.]+$/, ''),
+      fileName: download.fileName,
+      fileType: download.contentType,
+      fileSize: download.size,
+      provider: 'envato',
+      providerItemId: envatoItemId.trim(),
+      sourceUrl: download.sourceUrl || target,
+      resolution: resolution.trim(),
+      programTags: programTags
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean),
+      lessonTags: lessonTags
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean),
+    };
+    try {
+      const prepareResponse = await fetch('/api/admin/videos/upload', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ action: 'prepare-library', ...common }),
+      });
+      const prepared = await prepareResponse.json().catch(() => ({}));
+      if (
+        !prepareResponse.ok ||
+        !prepared.bucket ||
+        !prepared.storagePath ||
+        !prepared.token ||
+        !prepared.uploadEndpoint
+      )
+        throw new Error(prepared.error || 'Could not prepare private course-media storage.');
+      const importResponse = await fetch(`${endpoint}/imports`, {
+        method: 'POST',
+        headers: { ...authHeaders, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          downloadId: download.id,
+          endpoint: prepared.uploadEndpoint,
+          bucket: prepared.bucket,
+          storagePath: prepared.storagePath,
+          token: prepared.token,
+        }),
+      });
+      const imported = await importResponse.json().catch(() => ({}));
+      if (!importResponse.ok || !imported.ok)
+        throw new Error(imported.error || 'The browser download could not be stored.');
+      const finalizeResponse = await fetch('/api/admin/videos/upload', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          action: 'finalize-library',
+          storagePath: prepared.storagePath,
+          ...common,
+        }),
+      });
+      const finalized = await finalizeResponse.json().catch(() => ({}));
+      if (!finalizeResponse.ok || !finalized.success)
+        throw new Error(finalized.error || 'The stored media could not be indexed.');
+      setStatus('Licensed media stored securely');
+      setEnvatoItemId('');
+      setLicensedTitle('');
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : 'The licensed download could not be stored.',
+      );
+    } finally {
+      setStoringDownload('');
+    }
+  }
+
   async function stop() {
     if (activeTaskId) {
       await fetch(`/api/admin/dev-studio/tasks/${activeTaskId}/cancel`, { method: 'POST' }).catch(
@@ -214,6 +318,7 @@ export default function CloudBrowserWorkspace({
       await fetch(endpoint, { method: 'DELETE', headers: authHeaders }).catch(() => undefined);
     setSession(null);
     setEvents([]);
+    setDownloads([]);
     setStatus('Stopped');
     setActiveTaskId('');
   }
@@ -334,6 +439,13 @@ export default function CloudBrowserWorkspace({
           setEvents(payload.events || []);
           if (payload.url) setTarget(payload.url);
         }
+        const downloadsResponse = await fetch(`${endpoint}/downloads`, { headers }).catch(
+          () => null,
+        );
+        if (downloadsResponse?.ok) {
+          const payload = await downloadsResponse.json();
+          setDownloads(payload.downloads || []);
+        }
       },
       agentRunning ? 1000 : 3000,
     );
@@ -446,6 +558,76 @@ export default function CloudBrowserWorkspace({
           )}
         </div>
         <aside className="hidden min-h-0 flex-col border-l border-slate-800 bg-slate-950 lg:flex">
+          <div className="border-b border-slate-800 p-3">
+            <p className="mb-1 flex items-center gap-2 text-xs font-black text-cyan-300">
+              <Download className="h-4 w-4" /> Envato licensed downloads
+            </p>
+            <p className="mb-2 text-[10px] leading-4 text-slate-500">
+              Download inside this browser, then store the finished 4K file directly in the private
+              Course Builder library.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                value={envatoItemId}
+                onChange={(event) => setEnvatoItemId(event.target.value)}
+                placeholder="Envato item ID"
+                className="rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+              />
+              <input
+                value={resolution}
+                onChange={(event) => setResolution(event.target.value)}
+                placeholder="Resolution"
+                className="rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+              />
+              <input
+                value={licensedTitle}
+                onChange={(event) => setLicensedTitle(event.target.value)}
+                placeholder="Asset title"
+                className="col-span-2 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+              />
+              <input
+                value={programTags}
+                onChange={(event) => setProgramTags(event.target.value)}
+                placeholder="Programs: barber, hvac"
+                className="col-span-2 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+              />
+              <input
+                value={lessonTags}
+                onChange={(event) => setLessonTags(event.target.value)}
+                placeholder="Lesson tags, comma separated"
+                className="col-span-2 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs"
+              />
+            </div>
+            <div className="mt-2 max-h-40 space-y-2 overflow-y-auto">
+              {downloads.map((download) => (
+                <div
+                  key={download.id}
+                  className="rounded border border-slate-800 bg-slate-900 p-2 text-[10px]"
+                >
+                  <p className="truncate font-bold text-white">{download.fileName}</p>
+                  <p className="text-slate-400">
+                    {download.status} ·{' '}
+                    {download.size ? `${Math.round(download.size / 1048576)} MB` : 'preparing'}
+                    {download.status === 'uploading' ? ` · ${download.uploadProgress || 0}%` : ''}
+                  </p>
+                  {download.error ? <p className="text-rose-300">{download.error}</p> : null}
+                  {download.status === 'ready' ? (
+                    <button
+                      onClick={() => storeLicensedDownload(download)}
+                      disabled={Boolean(storingDownload)}
+                      className="mt-1 flex w-full items-center justify-center gap-1 rounded bg-emerald-600 px-2 py-1 font-black text-white disabled:opacity-50"
+                    >
+                      <Database className="h-3 w-3" />{' '}
+                      {storingDownload === download.id ? 'Storing…' : 'Save to Course Builder'}
+                    </button>
+                  ) : null}
+                </div>
+              ))}
+              {!downloads.length ? (
+                <p className="text-[10px] text-slate-500">No browser downloads yet.</p>
+              ) : null}
+            </div>
+          </div>
           <div className="border-b border-slate-800 p-3">
             <p className="mb-1 text-xs font-black text-violet-300">LIZZY Browser Task</p>
             <p className="mb-2 text-[10px] text-slate-500">

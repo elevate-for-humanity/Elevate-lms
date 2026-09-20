@@ -3,7 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
+import {
+  stopAllNaturalVoicePlayback,
+  useNaturalVoice,
+} from '@/components/voice/useNaturalVoice';
 
 // Version the preference after restoring prerecorded scroll narration. This
 // clears stale "off" state left by the previously silent implementation while
@@ -31,6 +34,13 @@ function narrationStyleFor(section: HTMLElement) {
   return value === 'instructor' || value === 'commercial' || value === 'default'
     ? value
     : 'assistant';
+}
+
+function pauseOtherAudibleMedia(except?: HTMLMediaElement) {
+  document.querySelectorAll<HTMLMediaElement>('audio, video').forEach((media) => {
+    if (media === except || media.paused || media.muted || media.volume === 0) return;
+    media.pause();
+  });
 }
 
 function mostVisiblePageSection() {
@@ -86,6 +96,7 @@ export function ScrollNarrator() {
       return;
 
     lastNarrationRef.current = { section, text, source };
+    pauseOtherAudibleMedia();
     const started = await play(text, {
       src: source,
       voice: 'coral',
@@ -100,6 +111,23 @@ export function ScrollNarrator() {
       setNotice(null);
     }
   }, [play]);
+
+  useEffect(() => {
+    const governAudibleMedia = (event: Event) => {
+      const media = event.target;
+      if (!(media instanceof HTMLMediaElement) || media.paused || media.muted || media.volume === 0)
+        return;
+      stopAllNaturalVoicePlayback();
+      pauseOtherAudibleMedia(media);
+    };
+
+    document.addEventListener('play', governAudibleMedia, true);
+    document.addEventListener('volumechange', governAudibleMedia, true);
+    return () => {
+      document.removeEventListener('play', governAudibleMedia, true);
+      document.removeEventListener('volumechange', governAudibleMedia, true);
+    };
+  }, []);
 
   useEffect(() => {
     const preference = window.localStorage.getItem(NARRATION_PREFERENCE_KEY);

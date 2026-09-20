@@ -35,12 +35,9 @@ const FEATURED_MEDIA_BY_SHOP: Record<string, ShowcaseMedia> = {
     kind: 'photo',
   },
   'razors-image-barbershop': {
-    src: '/videos/partners/razors-image-host-barbershop.mp4',
-    alt: "Razor's Image owner describing the barber apprenticeship opportunity",
-    kind: 'video',
-    backdropSrc: '/images/partners/razors-image-video-poster.webp',
-    script:
-      "Welcome to Razor's Image Barbershop in Bloomington, Indiana, a participating Barber Apprenticeship Host Shop. This working barbershop gives approved apprentices an opportunity to develop professional barbering, sanitation, client service, grooming, and workplace skills under qualified supervision. The video introduces the shop and its apprenticeship opportunity. Placement, wages, supervision, enrollment, and licensing requirements are confirmed through Elevate before training begins.",
+    src: '/images/partners/razors-image-video-poster.webp',
+    alt: "Razor's Image Barbershop in Bloomington, Indiana",
+    kind: 'photo',
   },
   'b-52s-barber-shop': {
     src: '/images/partners/b52s-official.webp',

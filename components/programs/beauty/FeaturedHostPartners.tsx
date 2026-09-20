@@ -154,13 +154,7 @@ export default function FeaturedHostPartners({
                         : (stillMedia[1] ?? stillMedia[0]);
                 const video: FeaturedHostPartnerMedia | undefined =
                   shop.slug === 'razors-image-barbershop'
-                    ? {
-                        src: '/videos/partners/razors-image-host-barbershop.mp4',
-                        alt: "Razor's Image owner describing the barber apprenticeship opportunity",
-                        kind: 'video' as const,
-                        script:
-                          "Welcome to Razor's Image Barbershop in Bloomington, Indiana, a participating Barber Apprenticeship Host Shop. In this video, the shop owner introduces the workplace and the opportunity for approved apprentices to develop barbering, sanitation, client service, grooming, and professional shop skills under qualified supervision. Placement, wages, supervision, enrollment, and licensing requirements are confirmed through Elevate before training begins.",
-                      }
+                    ? undefined
                     : shop.media?.find((media) => media.kind === 'video');
                 const fullAddress = `${shop.address}, ${shop.city}, ${shop.state} ${shop.zip}`;
                 return (

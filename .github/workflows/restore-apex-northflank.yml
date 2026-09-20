@@ -1,0 +1,59 @@
+name: Restore Northflank apex routing
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/northflank/configure-services.ts'
+      - 'scripts/northflank/configure-domains.ts'
+      - '.github/workflows/restore-apex-northflank.yml'
+
+concurrency:
+  group: restore-northflank-apex
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing' }}
+      NORTHFLANK_LMS_SERVICE_ID: ${{ secrets.NORTHFLANK_LMS_SERVICE_ID || 'elevate-lms' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+      RESTORE_APEX_NORTHFLANK: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Require Northflank access
+        run: test -n "$NORTHFLANK_API_TOKEN"
+      - name: Register missing production domains
+        run: pnpm tsx scripts/northflank/register-domains.ts || true
+      - name: Verify registered production domains
+        run: pnpm tsx scripts/northflank/register-domains.ts --verify
+      - name: Restore apex and canonical service assignments
+        run: pnpm tsx scripts/northflank/configure-domains.ts --execute
+      - name: Verify apex no longer returns an upstream 502
+        run: |
+          set -euo pipefail
+          for attempt in {1..12}; do
+            result="$(curl -sS -o /dev/null -w '%{http_code}|%{redirect_url}' --max-time 20 https://elevateforhumanity.org/ || true)"
+            code="${result%%|*}"
+            if [ "$code" = "200" ] || [ "$code" = "301" ] || [ "$code" = "308" ]; then
+              echo "Apex healthy: $result"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Apex still unhealthy"
+          exit 1

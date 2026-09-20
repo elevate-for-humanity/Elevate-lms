@@ -50,10 +50,16 @@ async function getSubdomainCname(domain: string): Promise<{ verified: boolean; c
     const row = await nfFetch<{ verified?: boolean; content?: string }>(
       `/teams/${teamId}/domains/${encodeURIComponent(domain)}/subdomains/@`,
     );
-    return { verified: Boolean(row.verified), content: row.content };
+    if (row.verified) return { verified: true, content: row.content };
   } catch {
-    return { verified: false };
+    // Apex domains do not always expose the CNAME-oriented subdomain status.
   }
+
+  const registry = await nfFetch<{ domains?: Array<{ name: string; status?: string }> }>(
+    `/teams/${teamId}/domains`,
+  );
+  const registered = (registry.domains ?? []).find((item) => item.name === domain);
+  return { verified: registered?.status === 'verified' };
 }
 
 async function assignDomainToService(

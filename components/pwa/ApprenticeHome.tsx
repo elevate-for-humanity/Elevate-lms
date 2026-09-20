@@ -43,7 +43,7 @@ const DISCIPLINE_CONFIG = {
     icon: <Hand className="w-10 h-10 text-white" />,
     color: 'bg-pink-700',
     lightColor: 'bg-pink-500',
-    targetHours: 450,
+    targetHours: 2000,
     applyHref: '/apply?program=nail-technician-apprenticeship',
     logHref: '/pwa/nail-tech/log-hours',
     historyHref: '/pwa/nail-tech/history',
@@ -57,7 +57,7 @@ const DISCIPLINE_CONFIG = {
     icon: <Flower2 className="w-10 h-10 text-white" />,
     color: 'bg-rose-700',
     lightColor: 'bg-rose-500',
-    targetHours: 0,
+    targetHours: 2000,
     targetCompetencies: 20,
     requiredRtiHours: 300,
     applyHref: '/programs/esthetician/apply',
@@ -133,9 +133,9 @@ function Dashboard({
   discipline: Props['discipline'];
 }) {
   const config = DISCIPLINE_CONFIG[discipline];
-  const isCompetencyBased = discipline === 'esthetician';
-  const pct = isCompetencyBased ? 0 : Math.min(100, Math.round((data.totalHours / config.targetHours) * 100));
-  const remaining = isCompetencyBased ? 0 : Math.max(0, config.targetHours - data.totalHours);
+  const isCompetencyBased = false;
+  const pct = Math.min(100, Math.round((data.totalHours / config.targetHours) * 100));
+  const remaining = Math.max(0, config.targetHours - data.totalHours);
 
   return (
     <div className="min-h-screen bg-slate-900 pb-8">

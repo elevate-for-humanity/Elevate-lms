@@ -21,6 +21,7 @@ type ImportSource = 'url' | 'file';
 
 export default function WebsiteImportClient() {
   const [url, setUrl] = useState('');
+  const [secondUrl, setSecondUrl] = useState('');
   const [source, setSource] = useState<ImportSource>('url');
   const [importFile, setImportFile] = useState<File | null>(null);
   const [result, setResult] = useState<ImportResult | null>(null);
@@ -39,7 +40,7 @@ export default function WebsiteImportClient() {
       const response = await fetch(isFile ? '/api/apps/website-builder/import-data' : '/api/apps/website-builder/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(isFile ? { fileName: importFile?.name, content } : { url }),
+        body: JSON.stringify(isFile ? { fileName: importFile?.name, content } : { urls: [url, secondUrl].filter((value) => value.trim()) }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not import website');
@@ -112,7 +113,10 @@ export default function WebsiteImportClient() {
 
           <div className="mt-3 rounded-2xl bg-white p-3 text-slate-950 sm:flex">
             {source === 'url' ? (
-              <input type="url" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://yourbusiness.com" className="min-w-0 flex-1 rounded-xl px-4 py-3 outline-none" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <input type="url" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="Primary website URL" className="w-full rounded-xl px-4 py-3 outline-none" />
+                <input type="url" value={secondUrl} onChange={(event) => setSecondUrl(event.target.value)} placeholder="Second website URL (optional)" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none" />
+              </div>
             ) : (
               <label className="flex min-w-0 flex-1 cursor-pointer items-center rounded-xl px-4 py-3">
                 <FileUp className="mr-3 h-5 w-5 text-slate-500" />
@@ -125,7 +129,7 @@ export default function WebsiteImportClient() {
               {busy ? 'Analyzing…' : 'Analyze with AI'}
             </button>
           </div>
-          <p className="mt-3 text-xs text-slate-400">Import a public site through the URL API or upload a JSON/CSV export. Nothing is published until you review it.</p>
+          <p className="mt-3 text-xs text-slate-400">Import one or two public sites for a combined, deduplicated draft, or upload a JSON/CSV export. Nothing is published until you review it.</p>
         </section>
 
         {error && <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm font-semibold text-red-800">{error}</div>}

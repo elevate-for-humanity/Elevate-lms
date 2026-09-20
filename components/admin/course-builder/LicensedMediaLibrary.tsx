@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Check, Download, ExternalLink, Loader2, RefreshCw, Search, X } from 'lucide-react';
+import { Check, Download, ExternalLink, Loader2, RefreshCw, Search, Upload, X } from 'lucide-react';
 import VideoUploadClient from '@/apps/admin/app/videos/upload/VideoUploadClient';
 
 type Purchase = {
@@ -39,6 +39,8 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
   const [query, setQuery] = useState('');
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState('');
+  const [connected, setConnected] = useState<boolean | null>(null);
+  const [manualUploadOpen, setManualUploadOpen] = useState(false);
 
   const load = useCallback(async () => {
     setBusy('load');
@@ -55,9 +57,11 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
       const recommendationData = await recommendationResponse.json();
       if (!purchaseResponse.ok)
         throw new Error(purchaseData.error || 'Unable to load purchased media');
+      setConnected(Boolean(purchaseData.connected));
       setPurchases(purchaseData.purchases ?? []);
       if (recommendationResponse.ok) setRecommendations(recommendationData.recommendations ?? []);
     } catch (error) {
+      setConnected(false);
       setMessage(error instanceof Error ? error.message : 'Unable to load licensed media');
     } finally {
       setBusy('');
@@ -85,10 +89,12 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Unable to sync purchased media');
+      setConnected(true);
       setPurchases(data.purchases ?? []);
       setRecommendations(data.recommendations ?? []);
       setMessage(`Synced ${data.entitlements} licensed purchases and matched them to this course.`);
     } catch (error) {
+      setConnected(false);
       setMessage(error instanceof Error ? error.message : 'Unable to sync purchased media');
     } finally {
       setBusy('');
@@ -170,6 +176,14 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
           )}{' '}
           Sync purchases + match lessons
         </button>
+        <button
+          type="button"
+          onClick={() => setManualUploadOpen((value) => !value)}
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-500 px-4 py-3 font-black text-white"
+        >
+          <Upload className="h-4 w-4" />
+          {manualUploadOpen ? 'Close manual upload' : 'Upload purchased file'}
+        </button>
       </div>
       {message ? (
         <p className="mt-4 rounded-xl border border-cyan-800 bg-cyan-950 p-3 text-sm text-cyan-100">
@@ -223,7 +237,9 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
             ))}
             {!busy && !filtered.length ? (
               <p className="p-4 text-sm text-slate-500">
-                No purchases loaded. Connect ENVATO_API_TOKEN in Studio Secrets, then sync.
+                {connected
+                  ? 'The connected marketplace account returned no purchased items. You can still download from the paid marketplace and use Upload purchased file.'
+                  : 'Marketplace connection unavailable. Verify ENVATO_API_TOKEN in Studio Secrets, then sync again.'}
               </p>
             ) : null}
           </div>
@@ -296,6 +312,36 @@ export default function LicensedMediaLibrary({ courseId }: { courseId: string })
           </div>
         </div>
       </div>
+      {manualUploadOpen ? (
+        <div className="mt-5 rounded-2xl bg-white p-4 text-slate-950 sm:p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="font-black">Upload a purchased scene</h3>
+              <p className="text-sm text-slate-600">
+                Download the licensed file from your paid account, then attach it to the correct
+                lesson here.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setManualUploadOpen(false)}
+              className="rounded-lg border p-2"
+              aria-label="Close manual upload"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <VideoUploadClient
+            key={`manual-${courseId}`}
+            initialCourseId={courseId}
+            embedded
+            onUploaded={() => {
+              setManualUploadOpen(false);
+              void load();
+            }}
+          />
+        </div>
+      ) : null}
       {selected ? (
         <div className="mt-5 rounded-2xl bg-white p-4 text-slate-950 sm:p-6">
           <div className="mb-4 flex items-center justify-between">

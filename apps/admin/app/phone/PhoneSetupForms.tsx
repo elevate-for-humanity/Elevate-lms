@@ -85,7 +85,15 @@ export type PhoneSettings = {
   aiHumanHandoffEnabled: boolean;
 };
 
-export function NewSystemNotice({ dismissAction }: { dismissAction: () => Promise<void> }) {
+export type PhoneSetupStep = { label: string; complete: boolean };
+
+export function NewSystemNotice({
+  dismissAction,
+  steps,
+}: {
+  dismissAction: () => Promise<void>;
+  steps: PhoneSetupStep[];
+}) {
   return (
     <section className="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-blue-50 p-5 shadow-sm">
       <div className="flex items-start justify-between gap-4">
@@ -114,20 +122,21 @@ export function NewSystemNotice({ dismissAction }: { dismissAction: () => Promis
         </form>
       </div>
       <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          ['1', 'Add team cell phones'],
-          ['2', 'Choose call routing'],
-          ['3', 'Create extensions'],
-          ['4', 'Test before activation'],
-        ].map(([step, text]) => (
+        {steps.map((item, index) => (
           <div
-            key={step}
+            key={item.label}
             className="flex items-center gap-2 rounded-lg bg-white/80 px-3 py-2 text-sm font-semibold text-slate-800"
           >
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-indigo-100 text-xs font-black text-indigo-800">
-              {step}
+            <span
+              className={`grid h-6 w-6 place-items-center rounded-full text-xs font-black ${
+                item.complete
+                  ? 'bg-emerald-100 text-emerald-800'
+                  : 'bg-amber-100 text-amber-900'
+              }`}
+            >
+              {item.complete ? '✓' : index + 1}
             </span>
-            {text}
+            {item.label}
           </div>
         ))}
       </div>
@@ -345,7 +354,7 @@ export function PhoneSetupForms({
           </p>
           <label className="mt-4 block text-sm font-bold">
             Label
-            <input name="label" required placeholder="Current TextMe number" className={field} />
+            <input name="label" required placeholder="Name this external number" className={field} />
           </label>
           <label className="mt-3 block text-sm font-bold">
             Phone number
@@ -353,7 +362,7 @@ export function PhoneSetupForms({
               name="phone"
               inputMode="tel"
               required
-              placeholder="317-314-3757"
+              placeholder="Enter the external phone number"
               className={field}
             />
           </label>
@@ -378,7 +387,7 @@ export function PhoneSetupForms({
             </label>
             <label className="mt-4 block text-sm font-bold">
               Department
-              <input name="department" placeholder="Admissions" className={field} />
+              <input name="department" placeholder="Department name" className={field} />
             </label>
           </div>
           <label className="mt-3 block text-sm font-bold">
@@ -387,7 +396,7 @@ export function PhoneSetupForms({
               name="destination"
               inputMode="tel"
               required
-              placeholder="317-555-0100"
+              placeholder="Enter the team member’s cell phone"
               className={field}
             />
           </label>
@@ -434,7 +443,7 @@ export function PhoneSetupForms({
             </label>
             <label className="col-span-2 mt-4 block text-sm font-bold">
               Label
-              <input name="label" required placeholder="Admissions" className={field} />
+              <input name="label" required placeholder="Route label" className={field} />
             </label>
           </div>
           <label className="mt-3 block text-sm font-bold">
@@ -452,7 +461,7 @@ export function PhoneSetupForms({
           </label>
           <label className="mt-3 block text-sm font-bold">
             Spoken keywords
-            <input name="keywords" placeholder="admissions, enrollment, apply" className={field} />
+            <input name="keywords" placeholder="Comma-separated spoken keywords" className={field} />
           </label>
           <button disabled={menuPending || destinations.length === 0} className={button}>
             {menuPending ? 'Saving…' : 'Save menu route'}

@@ -69,7 +69,11 @@ export function createBaselineAgenticPlan(
     const qaDependencies = [instruction, design, media];
     if (localization) qaDependencies.push(localization);
     const qa = push('compliance-qa', 'validate_build', {}, qaDependencies);
-    push('publisher', 'persist_canonical_build', {}, [qa]);
+    const publication = push('publisher', 'persist_canonical_build', {}, [qa]);
+    // Course publication is authorized by its deterministic checklist. Keep
+    // human approval requirements for other publisher targets independent.
+    const publicationTask = tasks.find((task) => task.id === publication);
+    if (targetType === 'course' && publicationTask) publicationTask.approvalRequired = false;
   } else if (targetType === 'website' || targetType === 'store_workspace') {
     const site = push('website-builder', 'compose_site', { prompt: trimmed });
     const design = push('visual-designer', 'compose_visual_system', {}, [site]);

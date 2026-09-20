@@ -2,7 +2,7 @@ import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
-import JozannaIndustryInstructor from '@/components/programs/beauty/JozannaIndustryInstructor';
+import NailDesignShowcase from '@/components/programs/beauty/NailDesignShowcase';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import heroBanners from '@/content/heroBanners';
 import { notFound } from 'next/navigation';
@@ -45,7 +45,7 @@ export default async function NailTechnicianApprenticeshipPage() {
         featuredContent={<FeaturedHostPartners programSlug="nail-technician-apprenticeship" />}
       >
         <div className="space-y-10">
-          <JozannaIndustryInstructor industry="nail-technician" />
+          <NailDesignShowcase />
           <BeautyApprenticeshipAuthority program={program} />
 
       <section className="border-y border-emerald-200 bg-emerald-50 px-4 py-12 sm:px-6 sm:py-16">

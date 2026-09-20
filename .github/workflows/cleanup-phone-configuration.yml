@@ -1,0 +1,37 @@
+name: Clean and Audit Phone Configuration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/northflank/cleanup-phone-configuration.ts'
+      - '.github/workflows/cleanup-phone-configuration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phone-configuration-cleanup
+  cancel-in-progress: true
+
+jobs:
+  cleanup:
+    name: Remove accidental phone data and audit live records
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_SECRET_GROUP_ID: ${{ secrets.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - run: pnpm tsx scripts/northflank/cleanup-phone-configuration.ts

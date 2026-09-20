@@ -35,7 +35,10 @@ type Port = {
 };
 
 const SERVICE_DOMAINS = {
-  marketing: ['www.elevateforhumanity.org'],
+  marketing:
+    process.env.RESTORE_APEX_NORTHFLANK === 'true'
+      ? ['www.elevateforhumanity.org', 'elevateforhumanity.org']
+      : ['www.elevateforhumanity.org'],
   lms: ['app.elevateforhumanity.org'],
   admin: ['admin.elevateforhumanity.org'],
 } as const;

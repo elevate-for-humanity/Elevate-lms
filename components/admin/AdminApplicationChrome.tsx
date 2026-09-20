@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { AdminNavShell } from '@/components/admin/AdminNavShell';
+import { AdminMobileDock } from '@/components/admin/AdminMobileDock';
 import type { NavSection } from '@/lib/admin/nav-config';
 
 export function AdminApplicationChrome({
@@ -31,12 +32,13 @@ export function AdminApplicationChrome({
         data-elevate-dashboard-content
         className={
           studioOwnsViewport
-            ? 'admin-studio-viewport h-full min-w-0 overflow-hidden'
-            : 'min-w-0 overflow-x-clip'
+            ? 'admin-studio-viewport h-[calc(100dvh-4rem)] min-w-0 overflow-hidden lg:h-full'
+            : 'min-w-0 overflow-x-clip pb-16 lg:pb-0'
         }
       >
         {children}
       </main>
+      <AdminMobileDock />
     </div>
   );
 }

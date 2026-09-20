@@ -81,8 +81,6 @@ async function main() {
     start_date: today,
     end_date: today,
   });
-  cdrQuery.append('connections[]', connectionId);
-
   const results = await Promise.all([
     probe(apiKey, 'number', `/phone_numbers/${numberId}`),
     probe(apiKey, 'numbers', '/phone_numbers?page[size]=250'),

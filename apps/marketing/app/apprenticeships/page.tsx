@@ -6,6 +6,19 @@ import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import HostShopShowcase from '@/components/programs/beauty/HostShopShowcase';
 import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
+import { buildGuidedNarration } from '@/lib/narration/guided-script';
+
+const APPRENTICESHIP_NARRATION = buildGuidedNarration({
+  welcome: "Before you choose an apprenticeship, let's make sure the process is clear.",
+  concept:
+    'An apprenticeship has two parts that work together. Related instruction teaches you why a skill is done a certain way. Supervised work gives you a safe place to practice that skill until you can do it consistently.',
+  example:
+    'A barber apprentice might first study sanitation and client safety. At an approved Host Shop, the apprentice then practices the correct routine with a qualified supervisor and records the progress.',
+  reflection:
+    'Ask yourself whether you are ready to learn, work a real schedule, accept coaching, and keep an accurate record of your hours and skills.',
+  nextStep:
+    'Choose the occupation that fits your goal and open its page. When you are ready, apply. Elevate will review intake with you and confirm the Host Site, schedule, wages, and funding or payment path before training begins.',
+});
 
 export const metadata: Metadata = {
   title: 'Apprenticeship Programs',
@@ -69,7 +82,7 @@ export default function ApprenticeshipsPage() {
         data-scroll-narration
         data-narration-rate="0.82"
         data-narration-style="instructor"
-        data-narration="Welcome to Elevate's apprenticeship programs. An apprenticeship is not a regular classroom course. You learn the occupation through structured related instruction and paid, supervised work at an approved employer or Host Site. Start by choosing barbering, cosmetology, esthetics, or nail technology. Each page explains the skills, required hours, workplace training, progress records, licensing preparation, costs, and application steps. Apply first. Elevate then confirms enrollment, the training site, supervision, wages, schedule, and any approved funding before training begins."
+        data-narration={APPRENTICESHIP_NARRATION}
       >
         <HeroPicture
           src="/images/pages/apprenticeships-hero.webp"

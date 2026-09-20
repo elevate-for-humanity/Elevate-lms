@@ -56,6 +56,7 @@ import {
 import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
 import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 import { WORKONE_INDY_BOOKING_URL } from '@/lib/workone/booking';
+import { buildGuidedNarration } from '@/lib/narration/guided-script';
 
 interface Props {
   program: ProgramSchema;
@@ -146,17 +147,26 @@ export default function ProgramDetailPage({
     'business-administration',
     'bookkeeping',
   ].includes(p.slug);
-  const narrationCurriculum = p.curriculum
-    .slice(0, 3)
-    .map((module) => module.title)
-    .join(', ');
-  const narrationCredentials = p.credentials
-    .slice(0, 3)
-    .map((credential) => credential.name)
-    .join(', ');
   const programHeroNarration = isApprenticeship
-    ? `Welcome to ${p.title}. This is an earn-while-you-learn path that connects classroom instruction with supervised experience at an approved Host Site. Picture yourself learning a skill, practicing it with a qualified professional, and seeing your progress build week by week. The full pathway is ${durationLabel}, usually ${p.hoursPerWeekMin} to ${p.hoursPerWeekMax} hours each week. You will grow through areas such as ${narrationCurriculum || 'the skills required for this occupation'}, while working toward ${narrationCredentials || 'the program completion requirements'}. Your first step is simple: apply and complete intake. We will then help confirm your Host Site, schedule, and funding or payment path before training begins. Move through this page at your own pace. You will see what to expect, what it costs, and exactly how to apply.`
-    : `Welcome to ${p.title}. This program is designed to help you move from interest to real, usable career skills. The ${durationLabel} experience is ${p.deliveryMode === 'hybrid' ? 'a blend of flexible online learning and scheduled hands-on practice' : p.deliveryMode === 'online' ? 'available online, so you can build skills with a flexible learning routine' : 'taught in person, with direct guidance and practical learning'}. Along the way, you will build confidence in areas such as ${narrationCurriculum || 'the program skills'} and prepare for ${narrationCredentials || 'the program credentials'}. Start by applying and completing intake. That gives admissions what they need to confirm your schedule, requirements, and best enrollment path. ${isWorkforceFunded ? 'Your training may be free if you qualify and receive written approval from the workforce agency before enrollment.' : 'You will also find clear payment choices on this page.'} Take your time, review the details, and use the application link when you are ready.`;
+    ? buildGuidedNarration({
+        welcome: `Let's look at what ${p.title} would mean for you.`,
+        concept:
+          'You will learn a skill, practice it under qualified supervision at an approved Host Site, and document your progress. The instruction and the workplace practice support each other.',
+        example: `A normal week may include related instruction and supervised work. Plan for about ${p.hoursPerWeekMin} to ${p.hoursPerWeekMax} hours each week, with progress building over ${durationLabel}.`,
+        reflection:
+          'Before you continue, think honestly about your schedule. Can you attend consistently, accept coaching, and record your work as you learn?',
+        nextStep:
+          'If that structure fits you, review the schedule and requirements below. Then apply and complete intake. Elevate will confirm the Host Site, wages, schedule, and funding or payment path before you begin.',
+      })
+    : buildGuidedNarration({
+        welcome: `Let's look at what ${p.title} would mean for you.`,
+        concept: `This is a ${durationLabel} career-training program. ${p.deliveryMode === 'hybrid' ? 'You will combine flexible online learning with scheduled hands-on practice.' : p.deliveryMode === 'online' ? 'You will learn online, so you will need a steady weekly routine and time to practice.' : 'You will learn in person with direct guidance and practical work.'}`,
+        example:
+          'Instead of trying to memorize information, focus on what you will be able to do. Each lesson should move you from seeing a skill, to practicing it, to showing that you can use it correctly.',
+        reflection:
+          'Think about the time you can protect each week for lessons, practice, and assignments. A realistic routine is more useful than rushing through the program.',
+        nextStep: `Review the schedule and entry requirements below. Then apply and complete intake so admissions can confirm your enrollment path. ${isWorkforceFunded ? 'Funding may cover the training if you qualify, but the workforce agency must give written approval before you begin.' : 'The available payment choices are explained below.'}`,
+      });
 
   const pathwaySteps = [
     {

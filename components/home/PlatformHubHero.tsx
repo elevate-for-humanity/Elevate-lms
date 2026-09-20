@@ -1,12 +1,22 @@
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, BriefcaseBusiness, GraduationCap, Store } from 'lucide-react';
 import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
+import { buildGuidedNarration } from '@/lib/narration/guided-script';
 
 const HOME_VIDEO =
   'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4';
 
-const HOME_NARRATION =
-  "Welcome to Elevate for Humanity. You're in the right place to turn a career goal into a clear next step. If you want to earn while you learn, begin with our Barber or Cosmetology apprenticeships. You'll learn the skills, practice them with supervision at an approved Host Site, and track your progress along the way. Looking for career training instead? Explore HVAC, CDL, Bookkeeping, or Business. And here is the important part: your training may be free if you qualify for workforce funding. Approval is not automatic, but we will show you what to do. When you reach Paying for Training, choose Schedule WorkOne Orientation. Complete that appointment, then come back and select Start Elevate Funding Intake. Take your time as you explore. When you find the path that feels right, use the application link to get started.";
+const HOME_NARRATION = buildGuidedNarration({
+  welcome: "Welcome to Elevate for Humanity. Let's slow down and find the right starting point for you.",
+  concept:
+    'There are two main paths. An apprenticeship lets you learn a trade while practicing under supervision at an approved workplace. Career training prepares you for a specific job through classes, practice, and credential preparation.',
+  example:
+    'For example, someone choosing barbering may learn technique in class and then practice with clients at a Host Shop. Someone choosing HVAC may build technical skills first, then prepare for certification and employment.',
+  reflection:
+    'Think about which sounds more like you: learning inside a workplace, or completing focused career training before moving into a job.',
+  nextStep:
+    'Choose I want career training to compare your options. If cost is a concern, look for the funding step. Training may be free if you qualify, but WorkOne must approve it before training begins. If you are unsure, choose Check your options and we will guide you from there.',
+});
 
 const PROOF = [
   { icon: GraduationCap, label: 'Hands-on training' },

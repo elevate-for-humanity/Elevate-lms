@@ -7,6 +7,7 @@ import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 import { ESTHETICIAN_APPRENTICESHIP } from '@/data/programs/esthetician-apprenticeship';
 import { NAIL_TECH } from '@/data/programs/nail-technician-apprenticeship';
 import { COSMETOLOGY } from '@/data/programs/cosmetology-apprenticeship';
+import { BEAUTY_PROGRAMS } from '@/lib/programs/beauty-programs';
 
 describe('apprenticeship supervised-hour targets', () => {
   it('keeps every beauty apprenticeship and supported alias at 2,000 hours', () => {
@@ -42,5 +43,6 @@ describe('apprenticeship supervised-hour targets', () => {
         2000,
       );
     }
+    expect(BEAUTY_PROGRAMS['nail-technician-apprenticeship'].ojtHours).toBe(2000);
   });
 });

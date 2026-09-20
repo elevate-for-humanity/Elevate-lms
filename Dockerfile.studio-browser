@@ -7,7 +7,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 ENV STUDIO_BROWSER_EXECUTABLE_PATH=/usr/bin/chromium
 COPY services/studio-browser/package.json services/studio-browser/package-lock.json ./
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends chromium ca-certificates fonts-liberation \
+    && apt-get install -y --no-install-recommends chromium ca-certificates fonts-liberation unzip \
     && npm ci --omit=dev --ignore-scripts --no-audit --no-fund \
     && npm cache clean --force \
     && rm -rf /var/lib/apt/lists/* /tmp/* \
